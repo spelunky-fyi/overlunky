@@ -4,6 +4,8 @@
 #include "entities_chars.hpp"
 #include "entity.hpp"
 #include "level_api_types.hpp"
+#include "render_api.hpp"
+#include "screen.hpp"
 #include "script.hpp"
 #include "window_api.hpp"
 
@@ -74,6 +76,7 @@ enum class ON
     RENDER_PRE_PAUSE_MENU,
     RENDER_POST_PAUSE_MENU,
     RENDER_PRE_DRAW_DEPTH,
+    RENDER_POST_JOURNAL_PAGE,
     SPEECH_BUBBLE,
     TOAST,
 };
@@ -280,6 +283,7 @@ class LuaBackend
 
     void process_vanilla_render_callbacks(ON event);
     void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
+    void process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
 
     std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
     std::u16string pre_toast(char16_t* buffer);

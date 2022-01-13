@@ -66,7 +66,7 @@ void* register_hook_function(void*** vtable, size_t index, void* hook_function)
     }
     return nullptr;
 }
-[[maybe_unused]] void unregister_hook_function(void*** vtable, size_t index)
+void unregister_hook_function(void*** vtable, size_t index)
 {
     if (VTableHook* vtable_hook = get_vtable_hook(*vtable))
     {

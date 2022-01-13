@@ -134,18 +134,28 @@ void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, c
         });
 }
 
+void trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.process_vanilla_render_journal_page_callbacks(event, page_type, page);
+            return true;
+        });
+}
+
 std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer)
 {
-    std::u16string new_string{};
+    std::u16string new_string{no_return_str};
     bool return_empty_str = false;
     LuaBackend::for_each_backend(
         [=, &new_string, &return_empty_str](LuaBackend& backend)
         {
             auto this_data = backend.pre_speach_bubble(entity, buffer);
-            if (this_data.empty())
+            if (this_data.empty() && new_string == no_return_str)
                 return_empty_str = true;
 
-            if (new_string.empty() || new_string == no_return_str)
+            if (new_string == no_return_str)
             {
                 new_string = std::move(this_data);
             }
@@ -156,16 +166,16 @@ std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer)
 
 std::u16string pre_toast(char16_t* buffer)
 {
-    std::u16string new_string{};
+    std::u16string new_string{no_return_str};
     bool return_empty_str = false;
     LuaBackend::for_each_backend(
         [=, &new_string, &return_empty_str](LuaBackend& backend)
         {
             auto this_data = backend.pre_toast(buffer);
-            if (this_data.empty())
+            if (this_data.empty() && new_string == no_return_str)
                 return_empty_str = true;
 
-            if (new_string.empty() || new_string == no_return_str)
+            if (new_string == no_return_str)
             {
                 new_string = std::move(this_data);
             }

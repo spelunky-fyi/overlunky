@@ -100,6 +100,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_excalibur"] = &Entity::as<Excalibur>;
     lua["Entity"]["as_shield"] = &Entity::as<Shield>;
     lua["Entity"]["as_powerup"] = &Entity::as<Powerup>;
+    lua["Entity"]["as_prizedispenser"] = &Entity::as<PrizeDispenser>;
 
     lua.new_usertype<Bomb>(
         "Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, "is_big_bomb", &Bomb::is_big_bomb, sol::base_classes, sol::bases<Entity, Movable>());
@@ -540,6 +541,8 @@ void register_usertypes(sol::state& lua)
         &Coffin::inside,
         "timer",
         &Coffin::timer,
+        "player_respawn",
+        &Coffin::player_respawn,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -901,6 +904,15 @@ void register_usertypes(sol::state& lua)
         "Shield",
         "shake",
         &Shield::shake,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<PrizeDispenser>(
+        "PrizeDispenser",
+        "item_ids",
+        &PrizeDispenser::item_ids,
+        "prizes_spawned",
+        &PrizeDispenser::prizes_spawned,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 }

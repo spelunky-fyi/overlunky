@@ -42,6 +42,8 @@ struct RenderAPI
     TextureDefinition get_texture_definition(TEXTURE texture_id);
     Texture* get_texture(TEXTURE texture_id);
     TEXTURE define_texture(TextureDefinition data);
+    void reload_texture(const char* texture_name);  // Does a lookup for the right texture to reload
+    void reload_texture(const char** texture_name); // Reloads the texture directly
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
@@ -56,7 +58,7 @@ struct RenderInfo
     float x;
     float y;
     uint32_t unknown3;
-    uint32_t unknown4;
+    float unknown4;
     uint32_t unknown5;
     uint32_t unknown6;
     uint32_t unknown7;
@@ -68,15 +70,24 @@ struct RenderInfo
     float x_dupe2;
     float y_dupe2;
     uint32_t unknown11;
-    uint32_t unknown12;
-    uint32_t unknown13;
+    uint8_t unknown_timer1; // can someone test this at higher refresh rate if it's tided to the fps or Hz?
+    uint8_t unknown_timer2; // for some entities this stops when the entity is not on screen but the above one don't
+    bool unknown12c;
+    bool unknown12d;
+    bool stop_render; // stops all the rendering stuff, the value is forced thou
+    uint8_t unknown13b;
+    uint8_t unknown13c;
+    uint8_t unknown13d;
     uint32_t unknown14;
     uint8_t unknown15_counter;
     uint8_t unknown16_counter;
     bool unknown17;
     bool unknown18;
     uint32_t unknown19;
-    uint32_t shader;
+    uint8_t shader; //0 - 36, game crash at around 55
+    uint8_t unknown20a;
+    uint8_t unknown20b;
+    uint8_t unknown20c;
 
     // destination in world coords
     float destination_bottom_left_x; // entity.x - (entity.w/2)
@@ -122,7 +133,6 @@ struct RenderInfo
     size_t unknown42;
     size_t unknown43;
     size_t unknown44;
-    size_t unknown45;
     bool render_as_non_liquid; // for liquids, forced to false, for non-liquids: sprite goes crazy when moving about
     uint8_t unknown47;
     uint8_t unknown48;
@@ -136,6 +146,8 @@ struct RenderInfo
     uint32_t unknown55;
     float darkness; // 0.0 = completely black ; 1.0 = normal (dark effect like when on fire)
     uint32_t unknown56;
+    uint32_t unknown57;
+    uint32_t unknown58; //end, next RenderInfo below
 };
 
 struct TextRenderingInfo
@@ -153,7 +165,7 @@ struct TextRenderingInfo
     uint16_t unknown8;
     int32_t unknown9;
     size_t unknown10;
-    size_t unknown11;
+    Texture* font;
 };
 
 struct TextureRenderingInfo

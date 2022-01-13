@@ -10,6 +10,7 @@
 
 #include "aliases.hpp"
 #include "color.hpp"
+#include "layer.hpp"
 #include "math.hpp"
 #include "memory.hpp"
 #include "state_structs.hpp"
@@ -17,7 +18,7 @@
 struct RenderInfo;
 struct Texture;
 
-enum REPEAT_TYPE : uint8_t
+enum class REPEAT_TYPE : uint8_t
 {
     NoRepeat,
     Linear,
@@ -42,10 +43,34 @@ struct Rect
 };
 
 class Entity;
+class Movable;
+class Container;
+
+template <class FunT>
+struct HookWithId
+{
+    std::uint32_t id;
+    std::function<FunT> fun;
+};
+struct EntityHooksInfo
+{
+    void* entity;
+    std::uint32_t cbcount;
+    std::vector<HookWithId<void(Entity*)>> on_dtor;
+    std::vector<HookWithId<void(Entity*)>> on_destroy;
+    std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
+    std::vector<HookWithId<bool(Entity*)>> on_player_instagib;
+    std::vector<HookWithId<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)>> on_damage;
+    std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
+    std::vector<HookWithId<void(Movable*)>> post_statemachine;
+    std::vector<HookWithId<void(Container*, Movable*)>> on_open;
+    std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision1;
+    std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision2;
+};
+
 // Creates an instance of this entity
 using EntityCreate = Entity* (*)();
 using EntityDestroy = void (*)(Entity*);
-using AnimationMap = std::unordered_map<uint8_t, Animation>;
 
 struct EntityDB
 {
@@ -104,7 +129,7 @@ struct EntityDB
     int32_t sound_killed_by_other;
     float field_a8;
     int32_t field_AC;
-    AnimationMap animations;
+    std::unordered_map<uint8_t, Animation> animations;
     float default_special_offsetx;
     float default_special_offsety;
     uint8_t init;
@@ -129,25 +154,12 @@ EntityDB* get_type(uint32_t id);
 
 ENT_TYPE to_id(std::string_view id);
 
-class Vector
-{
-  public:
-    uint32_t* heap;
-    uint32_t* begin;
-    uint32_t size, count;
-
-    bool empty()
-    {
-        return !!count;
-    }
-};
-
 class Entity
 {
   public:
     EntityDB* type;
     Entity* overlay;
-    Vector items;
+    EntityList items;
     uint32_t flags;
     uint32_t more_flags;
     int32_t uid;
@@ -196,6 +208,8 @@ class Entity
     void remove();
     /// Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
     void respawn(LAYER layer);
+    /// Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
+    void perform_teleport(uint8_t delta_x, uint8_t delta_y);
 
     Entity* topmost()
     {
@@ -252,21 +266,26 @@ class Entity
     }
 
     std::pair<float, float> position_self() const;
-    std::pair<float, float> position_render() const;
-    void remove_item(uint32_t id);
+    void remove_item(uint32_t item_uid);
 
     TEXTURE get_texture();
+    /// Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     bool set_texture(TEXTURE texture_id);
 
     void unhook(std::uint32_t id);
     struct EntityHooksInfo& get_hooks();
 
     bool is_movable();
+    bool is_liquid();
 
     std::uint32_t set_on_dtor(std::function<void(Entity*)> cb);
     std::uint32_t reserve_callback_id();
     void set_on_destroy(std::uint32_t reserved_callback_id, std::function<void(Entity*)> on_destroy);
     void set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill);
+    void set_on_player_instagib(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> on_instagib);
+    void set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage);
+    void set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1);
+    void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
 
     template <typename T>
     T* as()
@@ -303,15 +322,15 @@ class Entity
     virtual void v20() = 0;
     virtual void remove_item_ptr(Entity*) = 0;
     virtual Entity* get_held_entity() = 0;
-    virtual void v23() = 0;
-    virtual bool on_open(Entity* opener) = 0; // used for crates and presents
-
+    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // spawns LASERTRAP_SHOT from LASERTRAP
+    /// Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    virtual bool trigger_action(Entity* user) = 0;
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     virtual void activate(Entity* activator) = 0;
 
-    virtual void on_collision2(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision1
-    virtual uint64_t on_save_level_transition_data() = 0; // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
-    virtual void on_restore_level_transition_data(uint64_t data) = 0;
+    virtual void on_collision2(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision1, maybe this is on_hitbox_overlap as it works for logical tiggers
+    virtual uint16_t get_metadata() = 0;                  // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+    virtual void apply_metadata(uint16_t metadata) = 0;
     virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
     virtual void on_walked_off_by(Entity* walker) = 0; // appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item_ptr
     virtual void v31() = 0;
@@ -328,62 +347,89 @@ class Entity
 
 struct Inventory
 {
+    /// Sum of the money collected in current level
     uint32_t money;
     uint8_t bombs;
     uint8_t ropes;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     int16_t poison_tick_timer;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     bool cursed;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     bool elixir_buff;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     uint8_t health;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     uint8_t kapala_blood_amount;
-
-    uint32_t unknown3;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Is set to state.time_total when player dies in coop (to determinate who should be first to re-spawn from coffin)
+    uint32_t time_of_death;
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ENT_TYPE held_item;
-    /// Metadata of the held item (health, is cursed etc.) Used in level transition to transfer to new entity, is wrong during the level
+    /// Metadata of the held item (health, is cursed etc.)
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     int16_t held_item_metadata;
     uint8_t unknown5c; //padding?
 
     int8_t player_slot;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ENT_TYPE mount_type;
-    /// Metadata of the mount (health, is cursed etc.) Used in level transition to transfer to new player entity, is wrong during the level
+    /// Metadata of the mount (health, is cursed etc.)
+    /// Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     int16_t mount_metadata;
-    int16_t unknown_mount_ralated;
+    int16_t unknown_mount_ralated; // unsure, can be padding as well
 
-    std::array<ENT_TYPE, 512> collected_money; // entity types
+    /// Types of gold/gems collected during this level, used later to display during the transition
+    std::array<ENT_TYPE, 512> collected_money;
+    /// Values of gold/gems collected during this level, used later to display during the transition
     std::array<uint32_t, 512> collected_money_values;
+    /// Count/size for the `collected_money` arrays
     uint32_t collected_money_count;
-    std::array<ENT_TYPE, 256> killed_enemies; // entity types
+    /// Types of enemies killed during this level, used later to display during the transition
+    std::array<ENT_TYPE, 256> killed_enemies;
     uint32_t kills_level;
     uint32_t kills_total;
 
-    std::array<int16_t, 8> unknown_companions_realated;
-    /// Companions poison tick timers, used in level transition to transfer to new player entity, is wrong during the level
+    /// Metadata of items held by companions (health, is cursed etc.)
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    std::array<int16_t, 8> companion_held_item_metadatas;
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<int16_t, 8> companion_poison_tick_timers;
-    /// Companion ENT_TYPEs, used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<ENT_TYPE, 8> companions;
-    /// Items ENT_TYPE held by companions, used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<ENT_TYPE, 8> companion_held_items;
-    /// 0..3, used in level transition to transfer to new player entity, is wrong during the level
+    /// (0..3) Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<uint8_t, 8> companion_trust;
-    /// Number of companions, this is always up to date, can be edited
+    /// Number of companions, it will determinate how many companions will be transfered to next level
+    /// Increments when player acquires new companion, decrements when one of them dies
     uint8_t companion_count;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<uint8_t, 8> companion_health;
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<bool, 8> is_companion_cursed;
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
-
-    /// Used in level transition to transfer to new player entity, is wrong during the level
+    /// Used to transfer information to transition/next level. Is not updated during a level
+    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<ENT_TYPE, 30> acquired_powerups;
+    /// Total money collected during previous levels (not the current one)
     uint32_t collected_money_total;
 };
 

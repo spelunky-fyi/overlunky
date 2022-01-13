@@ -87,6 +87,61 @@ BEG = {
   SPAWNED_WITH_TRUECROWN = 4,
   TRUECROWN_THROWN = 5
 }
+BGBackLayerDoor = {
+  __index = "function",
+  __name = "sol.BGBackLayerDoor.user",
+  __newindex = "function"
+}
+BGEggshipRoom = {
+  __index = "function",
+  __name = "sol.BGEggshipRoom.user",
+  __newindex = "function"
+}
+BGFloatingDebris = {
+  __index = "function",
+  __name = "sol.BGFloatingDebris.user",
+  __newindex = "function"
+}
+BGMovingStar = {
+  __index = "function",
+  __name = "sol.BGMovingStar.user",
+  __newindex = "function"
+}
+BGRelativeElement = {
+  __index = "function",
+  __name = "sol.BGRelativeElement.user",
+  __newindex = "function"
+}
+BGShootingStar = {
+  __index = "function",
+  __name = "sol.BGShootingStar.user",
+  __newindex = "function"
+}
+BGShopEntrence = {
+  __index = "function",
+  __name = "sol.BGShopEntrence.user",
+  __newindex = "function"
+}
+BGShopKeeperPrime = {
+  __index = "function",
+  __name = "sol.BGShopKeeperPrime.user",
+  __newindex = "function"
+}
+BGSurfaceLayer = {
+  __index = "function",
+  __name = "sol.BGSurfaceLayer.user",
+  __newindex = "function"
+}
+BGSurfaceStar = {
+  __index = "function",
+  __name = "sol.BGSurfaceStar.user",
+  __newindex = "function"
+}
+BGTutorialSign = {
+  __index = "function",
+  __name = "sol.BGTutorialSign.user",
+  __newindex = "function"
+}
 BUTTON = {
   BOMB = 4,
   DOOR = 32,
@@ -120,6 +175,11 @@ BigSpearTrap = {
   __name = "sol.BigSpearTrap.user",
   __newindex = "function"
 }
+Birdies = {
+  __index = "function",
+  __name = "sol.Birdies.user",
+  __newindex = "function"
+}
 Bodyguard = {
   __index = "function",
   __name = "sol.Bodyguard.user",
@@ -150,9 +210,24 @@ Boulder = {
   __name = "sol.Boulder.user",
   __newindex = "function"
 }
+BoulderSpawner = {
+  __index = "function",
+  __name = "sol.BoulderSpawner.user",
+  __newindex = "function"
+}
 Bullet = {
   __index = "function",
   __name = "sol.Bullet.user",
+  __newindex = "function"
+}
+BurningRopeEffect = {
+  __index = "function",
+  __name = "sol.BurningRopeEffect.user",
+  __newindex = "function"
+}
+Button = {
+  __index = "function",
+  __name = "sol.Button.user",
   __newindex = "function"
 }
 CAUSE_OF_DEATH = {
@@ -202,6 +277,11 @@ COSUBTHEME = {
 Camera = {
   __name = "sol.Camera.user"
 }
+CameraFlash = {
+  __index = "function",
+  __name = "sol.CameraFlash.user",
+  __newindex = "function"
+}
 Cape = {
   __index = "function",
   __name = "sol.Cape.user",
@@ -235,6 +315,11 @@ ChainedPushBlock = {
 Chest = {
   __index = "function",
   __name = "sol.Chest.user",
+  __newindex = "function"
+}
+CinematicAnchor = {
+  __index = "function",
+  __name = "sol.CinematicAnchor.user",
   __newindex = "function"
 }
 CityOfGoldDoor = {
@@ -369,9 +454,19 @@ Crocman = {
   __name = "sol.Crocman.user",
   __newindex = "function"
 }
+CrossBeam = {
+  __index = "function",
+  __name = "sol.CrossBeam.user",
+  __newindex = "function"
+}
 Crushtrap = {
   __index = "function",
   __name = "sol.Crushtrap.user",
+  __newindex = "function"
+}
+CursedEffect = {
+  __index = "function",
+  __name = "sol.CursedEffect.user",
   __newindex = "function"
 }
 CursedPot = {
@@ -382,7 +477,20 @@ CursedPot = {
 CustomSound = {
   __name = "sol.CustomSound.user"
 }
+DMAlienBlast = {
+  __index = "function",
+  __name = "sol.DMAlienBlast.user",
+  __newindex = "function"
+}
+DMSpawning = {
+  __index = "function",
+  __name = "sol.DMSpawning.user",
+  __newindex = "function"
+}
 DROP = {
+  ALIENQUEEN_ALIENBLAST = 178,
+  ALIENQUEEN_ALIENBLAST_RE = 180,
+  ALIENQUEEN_ALIENBLAST_RI = 179,
   ALTAR_DICE_CLIMBINGGLOVES = 0,
   ALTAR_DICE_COOKEDTURKEY = 1,
   ALTAR_DICE_DIAMOND = 2,
@@ -401,75 +509,174 @@ DROP = {
   ALTAR_USHABTI_CAVEMAN = 15,
   ALTAR_USHABTI_TURKEY = 16,
   ALTAR_USHABTI_VAMPIRE = 17,
+  ANUBIS2_ANUBIS_COFFIN = 153,
   ANUBIS2_JETPACK = 18,
+  ANUBIS2_SPECIALSHOT_R = 183,
+  ANUBIS_COFFIN_SORCERESS = 105,
+  ANUBIS_COFFIN_VAMPIRE = 104,
+  ANUBIS_COFFIN_WITCHDOCTOR = 106,
   ANUBIS_SCEPTER = 19,
+  ANUBIS_SPECIALSHOT_R = 182,
+  ARROWTRAP_WOODENARROW = 150,
+  AXOLOTL_BUBBLE = 171,
   BEG_BOMBBAG = 20,
+  BEG_TELEPACK = 22,
   BEG_TRUECROWN = 21,
-  BONEPILE_SKELETONKEY = 22,
-  BONEPILE_SKULL = 23,
-  CROCMAN_TELEPACK = 24,
-  CROCMAN_TELEPORTER = 25,
-  GHOSTJAR_DIAMOND = 26,
-  GHOST_DIAMOND = 27,
-  GIANTSPIDER_PASTE = 28,
-  GOLDENMONKEY_SMALLRUBY = 29,
-  GOLDENMONKEY_SMALLSAPPHIRE = 30,
-  HANGINGSPIDER_WEBGUN = 31,
-  ICECAVE_BOULDER = 32,
-  JIANGSHIASSASSIN_SPIKESHOES = 33,
-  JIANGSHI_SPRINGSHOES = 34,
-  KINGU_TABLETOFDESTINY = 35,
-  LEPRECHAUN_CLOVER = 36,
-  MATTOCK_BROKENMATTOCK = 37,
-  MOLE_MATTOCK = 38,
-  MOSQUITO_HOVERPACK = 39,
-  MUMMY_DIAMOND = 40,
-  MUMMY_FLY = 41,
-  NECROMANCER_RUBY = 42,
-  OLMEC_BOMB = 43,
-  OLMEC_CAVEMAN_1 = 44,
-  OLMEC_CAVEMAN_2 = 45,
-  OLMEC_CAVEMAN_3 = 46,
-  OLMEC_UFO = 47,
-  OSIRIS_EMERALDS = 48,
-  OSIRIS_PORTAL = 50,
-  OSIRIS_TABLETOFDESTINY = 49,
-  PANGXIE_ACIDBUBBLE = 51,
-  QUEENBEE_ROYALJELLY = 52,
-  ROBOT_METALSHIELD = 53,
-  SCEPTER_ANUBISSPECIALSHOT = 54,
-  SCEPTER_PLAYERSHOT = 55,
-  SHOPKEEPER_GOLDCOIN = 56,
-  SKELETON_SKELETONKEY = 57,
-  SKELETON_SKULL = 58,
-  SORCERESS_RUBY = 59,
-  SPARROW_ROPEPILE = 60,
-  SPARROW_SKELETONKEY = 61,
-  TIAMAT_BAT = 62,
-  TIAMAT_BEE = 63,
-  TIAMAT_CAVEMAN = 64,
-  TIAMAT_COBRA = 65,
-  TIAMAT_HERMITCRAB = 66,
-  TIAMAT_MONKEY = 67,
-  TIAMAT_MOSQUITO = 68,
-  TIAMAT_OCTOPUS = 69,
-  TIAMAT_OLMITE = 70,
-  TIAMAT_SCORPION = 71,
-  TIAMAT_SHOT = 72,
-  TIAMAT_SNAKE = 73,
-  TIAMAT_UFO = 74,
-  TIAMAT_YETI = 75,
-  TORCH_SMALLNUGGET = 76,
-  TURKEY_COOKEDTURKEY = 77,
-  UFO_PARACHUTE = 78,
-  VAMPIRE_CAPE = 79,
-  VAN_HORSING_COMPASS = 80,
-  VAN_HORSING_DIAMOND = 81,
-  VLAD_VLADSCAPE = 82,
-  YETIKING_FREEZERAY = 83,
-  YETIKING_ICESPIRE = 84,
-  YETIQUEEN_POWERPACK = 85,
-  YETI_PITCHERSMITT = 86
+  BONEPILE_SKELETONKEY = 23,
+  BONEPILE_SKULL = 24,
+  CANDLE_NUGGET = 144,
+  CATMUMMY_CURSINGCLOUD = 181,
+  CATMUMMY_DIAMOND = 116,
+  CHEST_BOMB = 135,
+  CHEST_EMERALD = 130,
+  CHEST_LEPRECHAUN = 134,
+  CHEST_RUBY = 132,
+  CHEST_SAPPHIRE = 131,
+  CHEST_SMALLEMERALD = 129,
+  CHEST_SMALLRUBY = 133,
+  CLONEGUN_SHOT = 163,
+  COBRA_ACIDSPIT = 174,
+  COFFIN_SKULL = 147,
+  COOKEDTURKEY_HEALTH = 185,
+  COOKFIRE_TORCH = 145,
+  CROCMAN_TELEPACK = 25,
+  CROCMAN_TELEPORTER = 26,
+  CRUSHTRAP_NUGGET = 126,
+  CUTSCENE_GOLDCOIN = 142,
+  DUATALTAR_BOMBBAG = 122,
+  DUATALTAR_BOMBBOX = 123,
+  DUATALTAR_COOKEDTURKEY = 124,
+  EGGSAC_GRUB_1 = 109,
+  EGGSAC_GRUB_2 = 110,
+  EGGSAC_GRUB_3 = 111,
+  EMBED_NUGGET = 128,
+  FACTORY_GENERATOR_SCRAP = 88,
+  FIREBUG_FIREBALL = 173,
+  FLOORSTYLEDCOG_NUGGET = 125,
+  FREEZERAY_SHOT = 162,
+  GHIST_GOLDCOIN = 58,
+  GHOSTJAR_DIAMOND = 27,
+  GHOST_DIAMOND = 28,
+  GIANTFOOD_HEALTH = 186,
+  GIANTFROG_FROG = 107,
+  GIANTFROG_TADPOLE = 108,
+  GIANTSPIDER_PASTE = 29,
+  GIANTSPIDER_WEBSHOT = 155,
+  GOLDENMONKEY_NUGGET = 33,
+  GOLDENMONKEY_SMALLEMERALD = 30,
+  GOLDENMONKEY_SMALLRUBY = 32,
+  GOLDENMONKEY_SMALLSAPPHIRE = 31,
+  HANGINGSPIDER_WEBGUN = 34,
+  HERMITCRAB_ACIDBUBBLE = 176,
+  HUMPHEAD_HIREDHAND = 117,
+  HUNDUN_FIREBALL = 172,
+  ICECAVE_BOULDER = 35,
+  JIANGSHIASSASSIN_SPIKESHOES = 36,
+  JIANGSHI_SPRINGSHOES = 37,
+  KAPALA_HEALTH = 188,
+  KINGU_FEMALE_JIANGSHI = 41,
+  KINGU_JIANGSHI = 40,
+  KINGU_OCTOPUS = 39,
+  KINGU_TABLETOFDESTINY = 38,
+  LAMASSU_DIAMOND = 121,
+  LAMASSU_EMERALD = 120,
+  LAMASSU_LASERSHOT = 166,
+  LAMASSU_RUBY = 119,
+  LAMASSU_SAPPHIRE = 118,
+  LASERTRAP_SHOT = 152,
+  LAVAMANDER_RUBY = 115,
+  LAVAPOT_MAGMAMAN = 114,
+  LEPRECHAUN_CLOVER = 42,
+  LOCKEDCHEST_UDJATEYE = 139,
+  MADAME_TUSK_KEY = 103,
+  MATTOCK_BROKENMATTOCK = 43,
+  MOLE_MATTOCK = 44,
+  MOSQUITO_HOVERPACK = 45,
+  MOTHERSTATUE_HEALTH = 184,
+  MUMMY_DIAMOND = 46,
+  MUMMY_FLY = 154,
+  NECROMANCER_RUBY = 47,
+  OCTOPUS_INKSPIT = 175,
+  OLMEC_BOMB = 156,
+  OLMEC_CAVEMAN_1 = 48,
+  OLMEC_CAVEMAN_2 = 49,
+  OLMEC_CAVEMAN_3 = 50,
+  OLMEC_SISTERS_BOMBBOX = 149,
+  OLMEC_SISTERS_ROPEPILE = 148,
+  OLMEC_UFO = 157,
+  OSIRIS_EMERALDS = 51,
+  OSIRIS_PORTAL = 53,
+  OSIRIS_TABLETOFDESTINY = 52,
+  PANGXIE_ACIDBUBBLE = 177,
+  PANGXIE_WOODENSHIELD = 54,
+  PLASMACANNON_SHOT = 161,
+  POISONEDARROWTRAP_WOODENARROW = 151,
+  POTOFGOLD_GOLDCOIN = 141,
+  QILIN_FIREBALL = 170,
+  QUEENBEE_ROYALJELLY = 55,
+  QUILLBACK_BOMBBAG = 112,
+  QUILLBACK_COOKEDTURKEY = 113,
+  REDLANTERN_SMALLNUGGET = 143,
+  ROBOT_METALSHIELD = 56,
+  ROCKDOG_FIREBALL = 169,
+  ROYALJELLY_HEALTH = 187,
+  SACRIFICE_EGGPLANT = 99,
+  SACRIFICE_IDOL = 96,
+  SACRIFICE_PRESENT = 97,
+  SACRIFICE_ROCK = 98,
+  SCEPTER_ANUBISSPECIALSHOT = 159,
+  SCEPTER_PLAYERSHOT = 160,
+  SCRAP_ALIEN = 94,
+  SCRAP_COBRA = 92,
+  SCRAP_SCORPION = 93,
+  SCRAP_SNAKE = 91,
+  SCRAP_SPIDER = 90,
+  SHOPKEEPER_GENERATOR_1 = 89,
+  SHOPKEEPER_GOLDCOIN = 57,
+  SHOTGUN_BULLET = 164,
+  SKELETON_SKELETONKEY = 59,
+  SKELETON_SKULL = 60,
+  SKULLDROPTRAP_SKULL = 146,
+  SLIDINGWALL_NUGGET = 127,
+  SORCERESS_DAGGERSHOT = 167,
+  SORCERESS_RUBY = 61,
+  SPARROW_ROPEPILE = 62,
+  SPARROW_SKELETONKEY = 63,
+  TIAMAT_BAT = 64,
+  TIAMAT_BEE = 65,
+  TIAMAT_CAVEMAN = 66,
+  TIAMAT_COBRA = 67,
+  TIAMAT_HERMITCRAB = 68,
+  TIAMAT_MONKEY = 69,
+  TIAMAT_MOSQUITO = 70,
+  TIAMAT_OCTOPUS = 71,
+  TIAMAT_OLMITE = 72,
+  TIAMAT_SCORPION = 73,
+  TIAMAT_SHOT = 74,
+  TIAMAT_SNAKE = 75,
+  TIAMAT_TIAMATSHOT = 168,
+  TIAMAT_UFO = 76,
+  TIAMAT_YETI = 77,
+  TORCH_SMALLNUGGET = 78,
+  TURKEY_COOKEDTURKEY = 79,
+  UFO_ALIEN = 95,
+  UFO_LASERSHOT = 165,
+  UFO_PARACHUTE = 80,
+  USHABTI_QILIN = 140,
+  VAMPIRE_CAPE = 81,
+  VAN_HORSING_COMPASS = 82,
+  VAN_HORSING_DIAMOND = 83,
+  VAULTCHEST_DIAMOND = 137,
+  VAULTCHEST_EMERALD = 136,
+  VAULTCHEST_RUBY = 138,
+  VLAD_VLADSCAPE = 84,
+  YAMA_EGGPLANTCROWN = 100,
+  YAMA_GIANTFOOD = 101,
+  YANG_KEY = 102,
+  YETIKING_FREEZERAY = 85,
+  YETIKING_ICESPIRE = 158,
+  YETIQUEEN_POWERPACK = 86,
+  YETI_PITCHERSMITT = 87
 }
 DROPCHANCE = {
   BONEBLOCK_SKELETONKEY = 0,
@@ -484,9 +691,19 @@ DROPCHANCE = {
   UFO_PARACHUTE = 9,
   YETI_PITCHERSMITT = 10
 }
+DecoRegeneratingBlock = {
+  __index = "function",
+  __name = "sol.DecoRegeneratingBlock.user",
+  __newindex = "function"
+}
 DecoratedDoor = {
   __index = "function",
   __name = "sol.DecoratedDoor.user",
+  __newindex = "function"
+}
+DestructibleBG = {
+  __index = "function",
+  __name = "sol.DestructibleBG.user",
   __newindex = "function"
 }
 Door = {
@@ -500,6 +717,11 @@ DoorCoords = {
 Drill = {
   __index = "function",
   __name = "sol.Drill.user",
+  __newindex = "function"
+}
+DustWallApep = {
+  __index = "function",
+  __name = "sol.DustWallApep.user",
   __newindex = "function"
 }
 ENT_FLAG = {
@@ -534,12 +756,16 @@ ENT_FLAG = {
 }
 ENT_MORE_FLAG = {
   CURSED_EFFECT = 15,
-  DISABLE_INPUT = 16,
-  FALLING = 12,
+  DISABLE_INPUT = 17,
+  ELIXIR_BUFF = 16,
+  FALLING = 14,
   HIRED_HAND_REVIVED = 2,
+  HIT_GROUND = 12,
+  HIT_WALL = 13,
   SWIMMING = 11
 }
 ENT_TYPE = {
+  ACIDBUBBLE = 1000,
   ACTIVEFLOOR_BONEBLOCK = 601,
   ACTIVEFLOOR_BOULDER = 599,
   ACTIVEFLOOR_BUBBLE_PLATFORM = 622,
@@ -570,6 +796,32 @@ ENT_TYPE = {
   ACTIVEFLOOR_TIMEDPOWDERKEG = 614,
   ACTIVEFLOOR_UNCHAINED_SPIKEBALL = 609,
   ACTIVEFLOOR_WOODENLOG_TRAP = 598,
+  ALIEN = 1001,
+  ALTAR = 1002,
+  AMMIT = 1003,
+  ANKHPOWERUP = 1004,
+  ANUBIS = 1005,
+  APEPHEAD = 1006,
+  APEPPART = 1007,
+  ARROW = 1008,
+  ARROWTRAP = 1009,
+  AXOLOTL = 1010,
+  AXOLOTLSHOT = 1011,
+  BACKPACK = 1012,
+  BAT = 1013,
+  BEE = 1014,
+  BEG = 1015,
+  BGBACKLAYERDOOR = 1016,
+  BGEGGSHIPROOM = 1017,
+  BGFLOATINGDEBRIS = 1018,
+  BGMOVINGSTAR = 1019,
+  BGRELATIVEELEMENT = 1020,
+  BGSHOOTINGSTAR = 1021,
+  BGSHOPENTRENCE = 1022,
+  BGSHOPKEEPERPRIME = 1023,
+  BGSURFACELAYER = 1024,
+  BGSURFACESTAR = 1025,
+  BGTUTORIALSIGN = 1026,
   BG_ANUBIS_THRONE = 819,
   BG_BASECAMP_BUNKBED = 799,
   BG_BASECAMP_DININGTABLE_DISHES = 801,
@@ -648,6 +900,25 @@ ENT_TYPE = {
   BG_VLAD_WINDOW = 817,
   BG_WATER_FOUNTAIN = 836,
   BG_YAMA_BODY = 837,
+  BIGSPEARTRAP = 1027,
+  BIRDIES = 1028,
+  BODYGUARD = 1029,
+  BOMB = 1030,
+  BONEBLOCK = 1031,
+  BOOMBOX = 1032,
+  BOOMERANG = 1033,
+  BOULDER = 1034,
+  BOULDERSPAWNER = 1035,
+  BULLET = 1036,
+  BURNINGROPEEFFECT = 1037,
+  BUTTON = 1038,
+  CAMERAFLASH = 1039,
+  CAPE = 1040,
+  CATMUMMY = 1041,
+  CAVEMAN = 1042,
+  CAVEMANSHOPKEEPER = 1043,
+  CHAIN = 1044,
+  CHAINEDPUSHBLOCK = 1045,
   CHAR_AMAZON = 200,
   CHAR_ANA_SPELUNKY = 194,
   CHAR_AU = 207,
@@ -670,6 +941,37 @@ ENT_TYPE = {
   CHAR_ROFFY_D_SLOTH = 197,
   CHAR_TINA_FLAN = 205,
   CHAR_VALERIE_CRUMP = 206,
+  CHEST = 1046,
+  CINEMATICANCHOR = 1047,
+  CITYOFGOLDDOOR = 1048,
+  CLAMBASE = 1049,
+  CLAW = 1050,
+  CLIMBABLEROPE = 1051,
+  CLONEGUNSHOT = 1052,
+  COBRA = 1053,
+  COFFIN = 1054,
+  COIN = 1055,
+  CONTAINER = 1056,
+  CONVEYORBELT = 1057,
+  COOKFIRE = 1058,
+  CRABMAN = 1059,
+  CRITTER = 1060,
+  CRITTERBEETLE = 1061,
+  CRITTERBUTTERFLY = 1062,
+  CRITTERCRAB = 1063,
+  CRITTERDRONE = 1064,
+  CRITTERFIREFLY = 1065,
+  CRITTERFISH = 1066,
+  CRITTERLOCUST = 1067,
+  CRITTERPENGUIN = 1068,
+  CRITTERSLIME = 1069,
+  CRITTERSNAIL = 1070,
+  CROCMAN = 1071,
+  CROSSBEAM = 1072,
+  CRUSHTRAP = 1073,
+  CURSEDEFFECT = 1074,
+  CURSEDPOT = 1075,
+  DECORATEDDOOR = 1076,
   DECORATION_BABYLON = 127,
   DECORATION_BABYLONBUSH = 138,
   DECORATION_BABYLON_FLOWER = 141,
@@ -745,8 +1047,36 @@ ENT_TYPE = {
   DECORATION_TREE_VINE = 159,
   DECORATION_TREE_VINE_TOP = 158,
   DECORATION_VLAD = 165,
+  DECOREGENERATINGBLOCK = 1077,
+  DESTRUCTIBLEBG = 1078,
+  DMALIENBLAST = 1079,
+  DMSPAWNING = 1080,
+  DOOR = 1081,
+  DRILL = 1082,
+  DUSTWALLAPEP = 1083,
+  EGGPLANTMINISTER = 1084,
+  EGGPLANTTHROWER = 1085,
+  EGGSAC = 1086,
+  EGGSHIPCENTERJETFLAME = 1087,
+  EGGSHIPDOOR = 1088,
+  EGGSHIPDOORS = 1089,
+  ELEVATOR = 1090,
   EMBED_GOLD = 190,
   EMBED_GOLD_BIG = 191,
+  EMPRESSGRAVE = 1091,
+  ENTITY = 1092,
+  EXCALIBUR = 1093,
+  EXITDOOR = 1094,
+  EXPLOSION = 1095,
+  FALLINGPLATFORM = 1096,
+  FIREBALL = 1097,
+  FIREBUG = 1098,
+  FIREBUGUNCHAINED = 1099,
+  FIREFROG = 1100,
+  FISH = 1101,
+  FLAME = 1102,
+  FLAMESIZE = 1103,
+  FLOOR = 1104,
   FLOORSTYLED_BABYLON = 106,
   FLOORSTYLED_BEEHIVE = 108,
   FLOORSTYLED_COG = 110,
@@ -861,6 +1191,45 @@ ENT_TYPE = {
   FLOOR_VINE = 17,
   FLOOR_VINE_TREE_TOP = 18,
   FLOOR_YAMA_PLATFORM = 95,
+  FLY = 1105,
+  FLYHEAD = 1106,
+  FORCEFIELD = 1107,
+  FORESTSISTER = 1108,
+  FROG = 1109,
+  FROSTBREATHEFFECT = 1110,
+  FROZENLIQUID = 1111,
+  FXALIENBLAST = 1112,
+  FXANKHBROKENPIECE = 1113,
+  FXANKHROTATINGSPARK = 1114,
+  FXCOMPASS = 1115,
+  FXEMPRESS = 1116,
+  FXFIREFLYLIGHT = 1117,
+  FXHUNDUNNECKPIECE = 1118,
+  FXJELLYFISHSTAR = 1119,
+  FXJETPACKFLAME = 1120,
+  FXKINGUSLIDING = 1121,
+  FXLAMASSUATTACK = 1122,
+  FXMAINEXITDOOR = 1123,
+  FXNECROMANCERANKH = 1124,
+  FXOUROBORODRAGONPART = 1125,
+  FXOUROBOROOCCLUDER = 1126,
+  FXPICKUPEFFECT = 1127,
+  FXPLAYERINDICATOR = 1128,
+  FXQUICKSAND = 1129,
+  FXSALECONTAINER = 1130,
+  FXSHOTGUNBLAST = 1131,
+  FXSORCERESSATTACK = 1132,
+  FXSPARKSMALL = 1133,
+  FXSPRINGTRAPRING = 1134,
+  FXTIAMATHEAD = 1135,
+  FXTIAMATTAIL = 1136,
+  FXTIAMATTORSO = 1137,
+  FXTORNJOURNALPAGE = 1138,
+  FXUNDERWATERBUBBLE = 1139,
+  FXVATBUBBLE = 1140,
+  FXWATERDROP = 1141,
+  FXWEBBEDEFFECT = 1142,
+  FXWITCHDOCTORHINT = 1143,
   FX_ALIENBLAST = 694,
   FX_ALIENBLAST_RETICULE_EXTERNAL = 693,
   FX_ALIENBLAST_RETICULE_INTERNAL = 692,
@@ -987,6 +1356,32 @@ ENT_TYPE = {
   FX_WATER_SURFACE = 680,
   FX_WEBBEDEFFECT = 669,
   FX_WITCHDOCTOR_HINT = 660,
+  GENERATOR = 1144,
+  GHIST = 1145,
+  GHOST = 1146,
+  GHOSTBREATH = 1147,
+  GIANTCLAMTOP = 1148,
+  GIANTFISH = 1149,
+  GIANTFLY = 1150,
+  GIANTFROG = 1151,
+  GOLDBAR = 1152,
+  GOLDMONKEY = 1153,
+  GRUB = 1154,
+  GUN = 1155,
+  HANGANCHOR = 1156,
+  HANGSPIDER = 1157,
+  HANGSTRAND = 1158,
+  HERMITCRAB = 1159,
+  HONEY = 1160,
+  HORIZONTALFORCEFIELD = 1161,
+  HORNEDLIZARD = 1162,
+  HOVERPACK = 1163,
+  HUNDUN = 1164,
+  HUNDUNCHEST = 1165,
+  HUNDUNHEAD = 1166,
+  ICESLIDINGSOUND = 1167,
+  IDOL = 1168,
+  IMP = 1169,
   ITEM_ACIDBUBBLE = 391,
   ITEM_ACIDSPIT = 389,
   ITEM_ALIVE_EMBEDDED_ON_ICE = 463,
@@ -1227,6 +1622,30 @@ ENT_TYPE = {
   ITEM_WHIP_FLAME = 346,
   ITEM_WOODEN_ARROW = 371,
   ITEM_WOODEN_SHIELD = 591,
+  JETPACK = 1170,
+  JIANGSHI = 1171,
+  JUMPDOG = 1172,
+  JUNGLESPEARCOSMETIC = 1173,
+  JUNGLETRAPTRIGGER = 1174,
+  KAPALAPOWERUP = 1175,
+  KINGU = 1176,
+  LAHAMU = 1177,
+  LAMASSU = 1178,
+  LAMPFLAME = 1179,
+  LANDMINE = 1180,
+  LASERBEAM = 1181,
+  LASERTRAP = 1182,
+  LAVA = 1183,
+  LAVAMANDER = 1184,
+  LEAF = 1185,
+  LEPRECHAUN = 1186,
+  LIGHTARROW = 1187,
+  LIGHTARROWPLATFORM = 1188,
+  LIGHTEMITTER = 1189,
+  LIGHTSHOT = 1190,
+  LIMBANCHOR = 1191,
+  LIQUID = 1192,
+  LIQUIDSURFACE = 1193,
   LIQUID_COARSE_LAVA = 915,
   LIQUID_COARSE_WATER = 910,
   LIQUID_IMPOSTOR_LAKE = 911,
@@ -1234,6 +1653,17 @@ ENT_TYPE = {
   LIQUID_LAVA = 912,
   LIQUID_STAGNANT_LAVA = 913,
   LIQUID_WATER = 909,
+  LOCKEDDOOR = 1194,
+  LOGICALANCHOVYFLOCK = 1195,
+  LOGICALCONVEYORBELTSOUND = 1196,
+  LOGICALDOOR = 1197,
+  LOGICALDRAIN = 1198,
+  LOGICALLIQUIDSTREAMSOUND = 1199,
+  LOGICALMINIGAME = 1200,
+  LOGICALREGENERATINGBLOCK = 1201,
+  LOGICALSOUND = 1202,
+  LOGICALSTATICSOUND = 1203,
+  LOGICALTRAPTRIGGER = 1204,
   LOGICAL_ANCHOVY_FLOCK = 873,
   LOGICAL_ARROW_TRAP_TRIGGER = 849,
   LOGICAL_BIGSPEAR_TRAP_TRIGGER = 884,
@@ -1286,11 +1716,23 @@ ENT_TYPE = {
   LOGICAL_TOTEM_TRAP_TRIGGER = 850,
   LOGICAL_WATER_DRAIN = 881,
   LOGICAL_WET_EFFECT = 855,
+  MAGMAMAN = 1205,
+  MAINEXIT = 1206,
+  MANTRAP = 1207,
+  MATTOCK = 1208,
+  MECH = 1209,
+  MEGAJELLYFISH = 1210,
   MIDBG = 810,
   MIDBG_BEEHIVE = 813,
   MIDBG_PALACE_STYLEDDECORATION = 812,
   MIDBG_PLATFORM_STRUCTURE = 814,
   MIDBG_STYLEDDECORATION = 811,
+  MINIGAMEASTEROID = 1211,
+  MINIGAMESHIP = 1212,
+  MINIGAMESHIPOFFSET = 1213,
+  MOLE = 1214,
+  MONKEY = 1215,
+  MONSTER = 1216,
   MONS_ALIEN = 267,
   MONS_ALIENQUEEN = 271,
   MONS_AMMIT = 280,
@@ -1409,13 +1851,129 @@ ENT_TYPE = {
   MONS_YETI = 268,
   MONS_YETIKING = 269,
   MONS_YETIQUEEN = 270,
+  MOSQUITO = 1217,
+  MOTHERSTATUE = 1218,
+  MOUNT = 1219,
   MOUNT_AXOLOTL = 901,
   MOUNT_BASECAMP_CHAIR = 905,
   MOUNT_BASECAMP_COUCH = 906,
   MOUNT_MECH = 902,
   MOUNT_QILIN = 903,
   MOUNT_ROCKDOG = 900,
-  MOUNT_TURKEY = 899
+  MOUNT_TURKEY = 899,
+  MOVABLE = 1220,
+  MOVINGICON = 1221,
+  MUMMY = 1222,
+  MUMMYFLIESSOUND = 1223,
+  NECROMANCER = 1224,
+  NPC = 1225,
+  OCTOPUS = 1226,
+  OLMEC = 1227,
+  OLMECCANNON = 1228,
+  OLMECFLOATER = 1229,
+  OLMITE = 1230,
+  ONFIREEFFECT = 1231,
+  ORB = 1232,
+  OSIRISHAND = 1233,
+  OSIRISHEAD = 1234,
+  OUROBOROCAMERAANCHOR = 1235,
+  OUROBOROCAMERAZOOMIN = 1236,
+  PALACESIGN = 1237,
+  PARACHUTEPOWERUP = 1238,
+  PET = 1239,
+  PIPE = 1240,
+  PIPETRAVELERSOUND = 1241,
+  PLAYER = 1242,
+  PLAYERBAG = 1243,
+  PLAYERGHOST = 1244,
+  POISONEDEFFECT = 1245,
+  POLEDECO = 1246,
+  PORTAL = 1247,
+  POT = 1248,
+  POWERUP = 1249,
+  POWERUPCAPABLE = 1250,
+  PROTOSHOPKEEPER = 1251,
+  PUNISHBALL = 1252,
+  PUSHBLOCK = 1253,
+  QILIN = 1254,
+  QUICKSAND = 1255,
+  QUICKSANDSOUND = 1256,
+  QUILLBACK = 1257,
+  REGENBLOCK = 1258,
+  ROBOT = 1259,
+  ROCKDOG = 1260,
+  ROLLINGITEM = 1261,
+  ROOMLIGHT = 1262,
+  ROOMOWNER = 1263,
+  RUBBLE = 1264,
+  SCARAB = 1265,
+  SCEPTERSHOT = 1266,
+  SCORPION = 1267,
+  SHIELD = 1268,
+  SHOOTINGSTARSPAWNER = 1269,
+  SHOPKEEPER = 1270,
+  SKELETON = 1271,
+  SKULLDROPTRAP = 1272,
+  SLEEPBUBBLE = 1273,
+  SLIDINGWALLCEILING = 1274,
+  SNAPTRAP = 1275,
+  SORCERESS = 1276,
+  SOUNDSHOT = 1277,
+  SPARK = 1278,
+  SPARKTRAP = 1279,
+  SPEAR = 1280,
+  SPECIALSHOT = 1281,
+  SPIDER = 1282,
+  SPIKEBALLTRAP = 1283,
+  SPLASHBUBBLEGENERATOR = 1284,
+  STICKYTRAP = 1285,
+  STRETCHCHAIN = 1286,
+  SWITCH = 1287,
+  TADPOLE = 1288,
+  TELEPORTER = 1289,
+  TELEPORTERBACKPACK = 1290,
+  TELEPORTINGBORDER = 1291,
+  TELESCOPE = 1292,
+  TENTACLE = 1293,
+  TENTACLEBOTTOM = 1294,
+  TERRA = 1295,
+  THINICE = 1296,
+  TIAMAT = 1297,
+  TIAMATSHOT = 1298,
+  TIMEDFORCEFIELD = 1299,
+  TIMEDPOWDERKEG = 1300,
+  TIMEDSHOT = 1301,
+  TORCH = 1302,
+  TORCHFLAME = 1303,
+  TOTEMTRAP = 1304,
+  TRANSFERFLOOR = 1305,
+  TRAPPART = 1306,
+  TREASURE = 1307,
+  TREASUREHOOK = 1308,
+  TRUECROWNPOWERUP = 1309,
+  TUN = 1310,
+  TV = 1311,
+  UDJATSOCKET = 1312,
+  UFO = 1313,
+  UNCHAINEDSPIKEBALL = 1314,
+  USHABTI = 1315,
+  VAMPIRE = 1316,
+  VANHORSING = 1317,
+  VLAD = 1318,
+  VLADSCAPE = 1319,
+  WADDLER = 1320,
+  WALKINGMONSTER = 1321,
+  WALLTORCH = 1322,
+  WEBSHOT = 1323,
+  WETEFFECT = 1324,
+  WITCHDOCTOR = 1325,
+  WITCHDOCTORSKULL = 1326,
+  WOODENLOGTRAP = 1327,
+  YAMA = 1328,
+  YANG = 1329,
+  YELLOWCAPE = 1330,
+  YETIKING = 1331,
+  YETIQUEEN = 1332
 }
 EggSac = {
   __index = "function",
@@ -1435,6 +1993,16 @@ EggShipDoorS = {
 EggplantMinister = {
   __index = "function",
   __name = "sol.EggplantMinister.user",
+  __newindex = "function"
+}
+EggplantThrower = {
+  __index = "function",
+  __name = "sol.EggplantThrower.user",
+  __newindex = "function"
+}
+EggshipCenterJetFlame = {
+  __index = "function",
+  __name = "sol.EggshipCenterJetFlame.user",
   __newindex = "function"
 }
 Elevator = {
@@ -1461,6 +2029,11 @@ Excalibur = {
 ExitDoor = {
   __index = "function",
   __name = "sol.ExitDoor.user",
+  __newindex = "function"
+}
+Explosion = {
+  __index = "function",
+  __name = "sol.Explosion.user",
   __newindex = "function"
 }
 F = {}
@@ -1547,9 +2120,174 @@ Frog = {
   __name = "sol.Frog.user",
   __newindex = "function"
 }
+FrostBreathEffect = {
+  __index = "function",
+  __name = "sol.FrostBreathEffect.user",
+  __newindex = "function"
+}
 FrozenLiquid = {
   __index = "function",
   __name = "sol.FrozenLiquid.user",
+  __newindex = "function"
+}
+FxAlienBlast = {
+  __index = "function",
+  __name = "sol.FxAlienBlast.user",
+  __newindex = "function"
+}
+FxAnkhBrokenPiece = {
+  __index = "function",
+  __name = "sol.FxAnkhBrokenPiece.user",
+  __newindex = "function"
+}
+FxAnkhRotatingSpark = {
+  __index = "function",
+  __name = "sol.FxAnkhRotatingSpark.user",
+  __newindex = "function"
+}
+FxCompass = {
+  __index = "function",
+  __name = "sol.FxCompass.user",
+  __newindex = "function"
+}
+FxEmpress = {
+  __index = "function",
+  __name = "sol.FxEmpress.user",
+  __newindex = "function"
+}
+FxFireflyLight = {
+  __index = "function",
+  __name = "sol.FxFireflyLight.user",
+  __newindex = "function"
+}
+FxHundunNeckPiece = {
+  __index = "function",
+  __name = "sol.FxHundunNeckPiece.user",
+  __newindex = "function"
+}
+FxJellyfishStar = {
+  __index = "function",
+  __name = "sol.FxJellyfishStar.user",
+  __newindex = "function"
+}
+FxJetpackFlame = {
+  __index = "function",
+  __name = "sol.FxJetpackFlame.user",
+  __newindex = "function"
+}
+FxKinguSliding = {
+  __index = "function",
+  __name = "sol.FxKinguSliding.user",
+  __newindex = "function"
+}
+FxLamassuAttack = {
+  __index = "function",
+  __name = "sol.FxLamassuAttack.user",
+  __newindex = "function"
+}
+FxMainExitDoor = {
+  __index = "function",
+  __name = "sol.FxMainExitDoor.user",
+  __newindex = "function"
+}
+FxNecromancerANKH = {
+  __index = "function",
+  __name = "sol.FxNecromancerANKH.user",
+  __newindex = "function"
+}
+FxOuroboroDragonPart = {
+  __index = "function",
+  __name = "sol.FxOuroboroDragonPart.user",
+  __newindex = "function"
+}
+FxOuroboroOccluder = {
+  __index = "function",
+  __name = "sol.FxOuroboroOccluder.user",
+  __newindex = "function"
+}
+FxPickupEffect = {
+  __index = "function",
+  __name = "sol.FxPickupEffect.user",
+  __newindex = "function"
+}
+FxPlayerIndicator = {
+  __index = "function",
+  __name = "sol.FxPlayerIndicator.user",
+  __newindex = "function"
+}
+FxQuickSand = {
+  __index = "function",
+  __name = "sol.FxQuickSand.user",
+  __newindex = "function"
+}
+FxSaleContainer = {
+  __index = "function",
+  __name = "sol.FxSaleContainer.user",
+  __newindex = "function"
+}
+FxShotgunBlast = {
+  __index = "function",
+  __name = "sol.FxShotgunBlast.user",
+  __newindex = "function"
+}
+FxSorceressAttack = {
+  __index = "function",
+  __name = "sol.FxSorceressAttack.user",
+  __newindex = "function"
+}
+FxSparkSmall = {
+  __index = "function",
+  __name = "sol.FxSparkSmall.user",
+  __newindex = "function"
+}
+FxSpringtrapRing = {
+  __index = "function",
+  __name = "sol.FxSpringtrapRing.user",
+  __newindex = "function"
+}
+FxTiamatHead = {
+  __index = "function",
+  __name = "sol.FxTiamatHead.user",
+  __newindex = "function"
+}
+FxTiamatTail = {
+  __index = "function",
+  __name = "sol.FxTiamatTail.user",
+  __newindex = "function"
+}
+FxTiamatTorso = {
+  __index = "function",
+  __name = "sol.FxTiamatTorso.user",
+  __newindex = "function"
+}
+FxTornJournalPage = {
+  __index = "function",
+  __name = "sol.FxTornJournalPage.user",
+  __newindex = "function"
+}
+FxUnderwaterBubble = {
+  __index = "function",
+  __name = "sol.FxUnderwaterBubble.user",
+  __newindex = "function"
+}
+FxVatBubble = {
+  __index = "function",
+  __name = "sol.FxVatBubble.user",
+  __newindex = "function"
+}
+FxWaterDrop = {
+  __index = "function",
+  __name = "sol.FxWaterDrop.user",
+  __newindex = "function"
+}
+FxWebbedEffect = {
+  __index = "function",
+  __name = "sol.FxWebbedEffect.user",
+  __newindex = "function"
+}
+FxWitchdoctorHint = {
+  __index = "function",
+  __name = "sol.FxWitchdoctorHint.user",
   __newindex = "function"
 }
 GHOST_BEHAVIOR = {
@@ -1566,6 +2304,9 @@ GameManager = {
 }
 GameProps = {
   __name = "sol.GameProps.user"
+}
+Gamepad = {
+  __name = "sol.Gamepad.user"
 }
 Generator = {
   __index = "function",
@@ -1707,6 +2448,11 @@ INPUTS = {
   UP = 1024,
   WHIP = 2
 }
+IceSlidingSound = {
+  __index = "function",
+  __name = "sol.IceSlidingSound.user",
+  __newindex = "function"
+}
 Idol = {
   __index = "function",
   __name = "sol.Idol.user",
@@ -1714,6 +2460,12 @@ Idol = {
 }
 Illumination = {
   __name = "sol.Illumination.user"
+}
+ImGuiIO = {
+  __name = "sol.ImGuiIO.user"
+}
+ImVec2 = {
+  __name = "sol.ImVec2.user"
 }
 Imp = {
   __index = "function",
@@ -1749,6 +2501,22 @@ JOURNALUI_STATE = {
   INVISIBLE = 0,
   STABLE = 2
 }
+JOURNAL_PAGE_TYPE = {
+  BESTIARY = 4,
+  DEATH_CAUSE = 9,
+  DEATH_MENU = 10,
+  FEATS = 8,
+  ITEMS = 5,
+  JOURNAL_MENU = 1,
+  LAST_GAME_PLAYED = 13,
+  PEOPLE = 3,
+  PLACES = 2,
+  PLAYER_PROFILE = 12,
+  PROGRESS = 0,
+  RECAP = 11,
+  STORY = 7,
+  TRAPS = 6
+}
 JUNGLESISTERS = {
   GREAT_PARTY_HUH = 5,
   I_WISH_BROUGHT_A_JACKET = 6,
@@ -1767,6 +2535,84 @@ Jiangshi = {
   __name = "sol.Jiangshi.user",
   __newindex = "function"
 }
+JournalPage = {
+  __name = "sol.JournalPage.user"
+}
+JournalPageBestiary = {
+  __index = "function",
+  __name = "sol.JournalPageBestiary.user",
+  __newindex = "function"
+}
+JournalPageDeathCause = {
+  __index = "function",
+  __name = "sol.JournalPageDeathCause.user",
+  __newindex = "function"
+}
+JournalPageDeathMenu = {
+  __index = "function",
+  __name = "sol.JournalPageDeathMenu.user",
+  __newindex = "function"
+}
+JournalPageDiscoverable = {
+  __index = "function",
+  __name = "sol.JournalPageDiscoverable.user",
+  __newindex = "function"
+}
+JournalPageFeats = {
+  __index = "function",
+  __name = "sol.JournalPageFeats.user",
+  __newindex = "function"
+}
+JournalPageItems = {
+  __index = "function",
+  __name = "sol.JournalPageItems.user",
+  __newindex = "function"
+}
+JournalPageJournalMenu = {
+  __index = "function",
+  __name = "sol.JournalPageJournalMenu.user",
+  __newindex = "function"
+}
+JournalPageLastGamePlayed = {
+  __index = "function",
+  __name = "sol.JournalPageLastGamePlayed.user",
+  __newindex = "function"
+}
+JournalPagePeople = {
+  __index = "function",
+  __name = "sol.JournalPagePeople.user",
+  __newindex = "function"
+}
+JournalPagePlaces = {
+  __index = "function",
+  __name = "sol.JournalPagePlaces.user",
+  __newindex = "function"
+}
+JournalPagePlayerProfile = {
+  __index = "function",
+  __name = "sol.JournalPagePlayerProfile.user",
+  __newindex = "function"
+}
+JournalPageProgress = {
+  __index = "function",
+  __name = "sol.JournalPageProgress.user",
+  __newindex = "function"
+}
+JournalPageRecap = {
+  __index = "function",
+  __name = "sol.JournalPageRecap.user",
+  __newindex = "function"
+}
+JournalPageStory = {
+  __index = "function",
+  __name = "sol.JournalPageStory.user",
+  __newindex = "function"
+}
+JournalPageTraps = {
+  __index = "function",
+  __name = "sol.JournalPageTraps.user",
+  __newindex = "function"
+}
 JournalPopupUI = {
   __name = "sol.JournalPopupUI.user"
 }
@@ -1781,6 +2627,16 @@ JumpDog = {
 JungleSpearCosmetic = {
   __index = "function",
   __name = "sol.JungleSpearCosmetic.user",
+  __newindex = "function"
+}
+JungleSpearTrap = {
+  __index = "function",
+  __name = "sol.JungleSpearTrap.user",
+  __newindex = "function"
+}
+JungleTrapTrigger = {
+  __index = "function",
+  __name = "sol.JungleTrapTrigger.user",
   __newindex = "function"
 }
 KapalaPowerup = {
@@ -1857,11 +2713,6 @@ Lava = {
   __name = "sol.Lava.user",
   __newindex = "function"
 }
-LavaGlow = {
-  __index = "function",
-  __name = "sol.LavaGlow.user",
-  __newindex = "function"
-}
 Lavamander = {
   __index = "function",
   __name = "sol.Lavamander.user",
@@ -1903,9 +2754,19 @@ LightShot = {
   __name = "sol.LightShot.user",
   __newindex = "function"
 }
+LimbAnchor = {
+  __index = "function",
+  __name = "sol.LimbAnchor.user",
+  __newindex = "function"
+}
 Liquid = {
   __index = "function",
   __name = "sol.Liquid.user",
+  __newindex = "function"
+}
+LiquidSurface = {
+  __index = "function",
+  __name = "sol.LiquidSurface.user",
   __newindex = "function"
 }
 LoadContext = {
@@ -1935,6 +2796,56 @@ LogicOlmecCutscene = {
 LogicTiamatCutscene = {
   __index = "function",
   __name = "sol.LogicTiamatCutscene.user",
+  __newindex = "function"
+}
+LogicalAnchovyFlock = {
+  __index = "function",
+  __name = "sol.LogicalAnchovyFlock.user",
+  __newindex = "function"
+}
+LogicalConveyorbeltSound = {
+  __index = "function",
+  __name = "sol.LogicalConveyorbeltSound.user",
+  __newindex = "function"
+}
+LogicalDoor = {
+  __index = "function",
+  __name = "sol.LogicalDoor.user",
+  __newindex = "function"
+}
+LogicalDrain = {
+  __index = "function",
+  __name = "sol.LogicalDrain.user",
+  __newindex = "function"
+}
+LogicalLiquidStreamSound = {
+  __index = "function",
+  __name = "sol.LogicalLiquidStreamSound.user",
+  __newindex = "function"
+}
+LogicalMiniGame = {
+  __index = "function",
+  __name = "sol.LogicalMiniGame.user",
+  __newindex = "function"
+}
+LogicalRegeneratingBlock = {
+  __index = "function",
+  __name = "sol.LogicalRegeneratingBlock.user",
+  __newindex = "function"
+}
+LogicalSound = {
+  __index = "function",
+  __name = "sol.LogicalSound.user",
+  __newindex = "function"
+}
+LogicalStaticSound = {
+  __index = "function",
+  __name = "sol.LogicalStaticSound.user",
+  __newindex = "function"
+}
+LogicalTrapTrigger = {
+  __index = "function",
+  __name = "sol.LogicalTrapTrigger.user",
   __newindex = "function"
 }
 MASK = {
@@ -1996,6 +2907,11 @@ MiniGameShip = {
   __name = "sol.MiniGameShip.user",
   __newindex = "function"
 }
+MiniGameShipOffset = {
+  __index = "function",
+  __name = "sol.MiniGameShipOffset.user",
+  __newindex = "function"
+}
 Mole = {
   __index = "function",
   __name = "sol.Mole.user",
@@ -2031,9 +2947,19 @@ Movable = {
   __name = "sol.Movable.user",
   __newindex = "function"
 }
+MovingIcon = {
+  __index = "function",
+  __name = "sol.MovingIcon.user",
+  __newindex = "function"
+}
 Mummy = {
   __index = "function",
   __name = "sol.Mummy.user",
+  __newindex = "function"
+}
+MummyFliesSound = {
+  __index = "function",
+  __name = "sol.MummyFliesSound.user",
   __newindex = "function"
 }
 NPC = {
@@ -2078,6 +3004,7 @@ ON = {
   PROLOGUE = 2,
   RECAP = 20,
   RENDER_POST_HUD = 118,
+  RENDER_POST_JOURNAL_PAGE = 122,
   RENDER_POST_PAUSE_MENU = 120,
   RENDER_PRE_DRAW_DEPTH = 121,
   RENDER_PRE_HUD = 117,
@@ -2090,11 +3017,11 @@ ON = {
   SCRIPT_ENABLE = 115,
   SEED_INPUT = 8,
   SPACESHIP = 15,
-  SPEECH_BUBBLE = 122,
+  SPEECH_BUBBLE = 123,
   START = 103,
   TEAM_SELECT = 10,
   TITLE = 3,
-  TOAST = 123,
+  TOAST = 124,
   TRANSITION = 13,
   WIN = 16
 }
@@ -2123,6 +3050,11 @@ Olmite = {
   __name = "sol.Olmite.user",
   __newindex = "function"
 }
+OnFireEffect = {
+  __index = "function",
+  __name = "sol.OnFireEffect.user",
+  __newindex = "function"
+}
 Online = {
   __name = "sol.Online.user"
 }
@@ -2145,6 +3077,16 @@ OsirisHand = {
 OsirisHead = {
   __index = "function",
   __name = "sol.OsirisHead.user",
+  __newindex = "function"
+}
+OuroboroCameraAnchor = {
+  __index = "function",
+  __name = "sol.OuroboroCameraAnchor.user",
+  __newindex = "function"
+}
+OuroboroCameraZoomin = {
+  __index = "function",
+  __name = "sol.OuroboroCameraZoomin.user",
   __newindex = "function"
 }
 PARTICLEEMITTER = {
@@ -2466,6 +3408,11 @@ PROCEDURAL_CHANCE = {
   WITCHDOCTOR = 235,
   YETI = 268
 }
+PalaceSign = {
+  __index = "function",
+  __name = "sol.PalaceSign.user",
+  __newindex = "function"
+}
 ParachutePowerup = {
   __index = "function",
   __name = "sol.ParachutePowerup.user",
@@ -2488,6 +3435,11 @@ Pet = {
 Pipe = {
   __index = "function",
   __name = "sol.Pipe.user",
+  __newindex = "function"
+}
+PipeTravelerSound = {
+  __index = "function",
+  __name = "sol.PipeTravelerSound.user",
   __newindex = "function"
 }
 Player = {
@@ -2517,9 +3469,19 @@ PlayerSlotSettings = {
 PlayingSound = {
   __name = "sol.PlayingSound.user"
 }
+PoisonedEffect = {
+  __index = "function",
+  __name = "sol.PoisonedEffect.user",
+  __newindex = "function"
+}
 PoleDeco = {
   __index = "function",
   __name = "sol.PoleDeco.user",
+  __newindex = "function"
+}
+Portal = {
+  __index = "function",
+  __name = "sol.Portal.user",
   __newindex = "function"
 }
 PostRoomGenerationContext = {
@@ -2545,6 +3507,11 @@ PreHandleRoomTilesContext = {
 }
 PreLoadLevelFilesContext = {
   __name = "sol.PreLoadLevelFilesContext.user"
+}
+PrizeDispenser = {
+  __index = "function",
+  __name = "sol.PrizeDispenser.user",
+  __newindex = "function"
 }
 ProtoShopkeeper = {
   __index = "function",
@@ -2572,6 +3539,11 @@ QuestsInfo = {
 QuickSand = {
   __index = "function",
   __name = "sol.QuickSand.user",
+  __newindex = "function"
+}
+QuickSandSound = {
+  __index = "function",
+  __name = "sol.QuickSandSound.user",
   __newindex = "function"
 }
 Quillback = {
@@ -2866,9 +3838,19 @@ RollingItem = {
   __name = "sol.RollingItem.user",
   __newindex = "function"
 }
+RoomLight = {
+  __index = "function",
+  __name = "sol.RoomLight.user",
+  __newindex = "function"
+}
 RoomOwner = {
   __index = "function",
   __name = "sol.RoomOwner.user",
+  __newindex = "function"
+}
+Rubble = {
+  __index = "function",
+  __name = "sol.Rubble.user",
   __newindex = "function"
 }
 SCREEN = {
@@ -3121,6 +4103,11 @@ Shield = {
   __name = "sol.Shield.user",
   __newindex = "function"
 }
+ShootingStarSpawner = {
+  __index = "function",
+  __name = "sol.ShootingStarSpawner.user",
+  __newindex = "function"
+}
 Shopkeeper = {
   __index = "function",
   __name = "sol.Shopkeeper.user",
@@ -3137,6 +4124,11 @@ Skeleton = {
 SkullDropTrap = {
   __index = "function",
   __name = "sol.SkullDropTrap.user",
+  __newindex = "function"
+}
+SleepBubble = {
+  __index = "function",
+  __name = "sol.SleepBubble.user",
   __newindex = "function"
 }
 SlidingWallCeiling = {
@@ -3187,6 +4179,11 @@ Spider = {
 SpikeballTrap = {
   __index = "function",
   __name = "sol.SpikeballTrap.user",
+  __newindex = "function"
+}
+SplashBubbleGenerator = {
+  __index = "function",
+  __name = "sol.SplashBubbleGenerator.user",
   __newindex = "function"
 }
 StateMemory = {
@@ -3662,6 +4659,7 @@ TILE_CODE = {
   BOMB_BOX = 281,
   BONE_BLOCK = 6,
   BONE_KEY = 302,
+  BOOMBOX = 388,
   BOOMERANG = 315,
   BOULDER = 374,
   BUBBLE_PLATFORM = 365,
@@ -4068,6 +5066,9 @@ Terra = {
   __index = "function",
   __name = "sol.Terra.user",
   __newindex = "function"
+}
+TextRenderingInfo = {
+  __name = "sol.TextRenderingInfo.user"
 }
 TextureDefinition = {
   __name = "sol.TextureDefinition.user"
@@ -4827,6 +5828,11 @@ WebShot = {
   __name = "sol.WebShot.user",
   __newindex = "function"
 }
+WetEffect = {
+  __index = "function",
+  __name = "sol.WetEffect.user",
+  __newindex = "function"
+}
 WitchDoctor = {
   __index = "function",
   __name = "sol.WitchDoctor.user",
@@ -4879,6 +5885,7 @@ YetiQueen = {
 }
 add_custom_name = function(...) end
 add_string = function(...) end
+advance_screen_particles = function(...) end
 apply_entity_db = function(...) end
 attach_ball_and_chain = function(...) end
 attach_entity = function(...) end
@@ -4886,7 +5893,11 @@ cancel_speechbubble = function(...) end
 cancel_toast = function(...) end
 carry = function(...) end
 cast_entity = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n        function cast_entity(entity_raw)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_u...Çç\1\0\4ë<\0\0\0∏\0\0Äà\0\0\0»\0\2\0ã\0\0\1\14\1\0\2\14\1\2\3å\0\1\2ºÄ\0\0008\2\0Ä\0\1\1\0Ä\1\0\0E\1\2\0F\1\0\0008\0\0ÄH\0\2\0G\1\1\0Ñ\0\4âTYPE_MAP\4Ötype\4ÉidÅ\0\0\0Äë\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2ÄÇãentity_rawÄëâcast_funàëÅÖ_ENV",'@serialized'))
+change_altar_damage_spawns = function(...) end
+change_diceshop_prizes = function(...) end
 change_string = function(...) end
+change_sunchallenge_spawns = function(...) end
+change_waddler_drop = function(...) end
 clear_callback = function(...) end
 clear_custom_name = function(...) end
 clear_entity_callback = function(...) end
@@ -4894,6 +5905,7 @@ clear_screen_callback = function(...) end
 clear_vanilla_sound_callback = function(...) end
 clr_flag = function(...) end
 clrflag = function(...) end
+create_illumination = function(...) end
 create_image = function(...) end
 create_sound = function(...) end
 default_spawn_is_valid = function(...) end
@@ -4914,10 +5926,12 @@ draw_rect_filled = function(...) end
 draw_text = function(...) end
 draw_text_size = function(...) end
 drop = function(...) end
+enter_door = function(...) end
 entity_get_items_by = function(...) end
 entity_has_item_type = function(...) end
 entity_has_item_uid = function(...) end
 entity_remove_item = function(...) end
+extinguish_particles = function(...) end
 f = {}
 filter_entities = function(...) end
 flip_entity = function(...) end
@@ -4927,6 +5941,8 @@ force_olmec_phase_0 = function(...) end
 game_manager = {}
 game_position = function(...) end
 generate_particles = function(...) end
+generate_screen_particles = function(...) end
+generate_world_particles = function(...) end
 get_bounds = function(...) end
 get_camera_position = function(...) end
 get_character_heart_color = function(...) end
@@ -4951,6 +5967,7 @@ get_entity_type = function(...) end
 get_frame = function(...) end
 get_grid_entity_at = function(...) end
 get_hitbox = function(...) end
+get_io = function(...) end
 get_level_config = function(...) end
 get_level_flags = function(...) end
 get_missing_extra_spawns = function(...) end
@@ -5017,10 +6034,11 @@ lock_door_at = function(...) end
 lua_print = print
 message = function(...) end
 messpect = function(...) end
+modify_ankh_health_gain = function(...) end
 modify_sparktraps = function(...) end
 mouse_position = function(...) end
 move_entity = function(...) end
-move_liquid = function(...) end
+move_grid_entity = function(...) end
 online = {}
 options = {}
 os = {
@@ -5039,12 +6057,14 @@ os = {
 pause = function(...) end
 pick_up = function(...) end
 players = {}
+poison_entity = function(...) end
 prinspect = function(...) end
 prng = {}
 raise = function(...) end
 read_input = function(...) end
 read_prng = function(...) end
 read_stolen_input = function(...) end
+refresh_illumination = function(...) end
 register_console_command = function(...) end
 register_option_bool = function(...) end
 register_option_button = function(...) end
@@ -5052,6 +6072,8 @@ register_option_combo = function(...) end
 register_option_float = function(...) end
 register_option_int = function(...) end
 register_option_string = function(...) end
+reload_texture = function(...) end
+render_screen_particles = function(...) end
 replace_drop = function(...) end
 return_input = function(...) end
 rgba = function(...) end
@@ -5086,19 +6108,25 @@ set_kapala_hud_icon = function(...) end
 set_level_flags = function(...) end
 set_max_rope_length = function(...) end
 set_olmec_phase_y_level = function(...) end
+set_on_damage = function(...) end
 set_on_destroy = function(...) end
 set_on_kill = function(...) end
 set_on_open = function(...) end
+set_on_player_instagib = function(...) end
 set_post_entity_spawn = function(...) end
 set_post_render_screen = function(...) end
 set_post_statemachine = function(...) end
 set_post_tile_code_callback = function(...) end
+set_pre_collision1 = function(...) end
+set_pre_collision2 = function(...) end
 set_pre_entity_spawn = function(...) end
 set_pre_render_screen = function(...) end
 set_pre_statemachine = function(...) end
 set_pre_tile_code_callback = function(...) end
 set_room_template_size = function(...) end
 set_seed = function(...) end
+set_time_ghost_enabled = function(...) end
+set_time_jelly_enabled = function(...) end
 set_timeout = function(...) end
 set_vanilla_sound_callback = function(...) end
 setflag = function(...) end
@@ -5117,6 +6145,7 @@ spawn_layer_door = function(...) end
 spawn_liquid = function(...) end
 spawn_on_floor = function(...) end
 spawn_over = function(...) end
+spawn_player = function(...) end
 spawn_tree = function(...) end
 speechbubble_visible = function(...) end
 state = {}

@@ -455,6 +455,8 @@ void register_usertypes(sol::state& lua)
         "Quillback",
         "particle",
         &Quillback::particle,
+        "seen_player",
+        &Quillback::seen_player,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 

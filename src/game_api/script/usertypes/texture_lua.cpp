@@ -17,11 +17,20 @@ void register_usertypes(sol::state& lua)
         return RenderAPI::get().get_texture_definition(texture_id);
     };
     /// Defines a new texture that can be used in Entity::set_texture
+    /// If a texture with the same definition already exists the texture will be reloaded from disk.
     lua["define_texture"] = [](TextureDefinition texture_data) -> TEXTURE
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
         return RenderAPI::get().define_texture(std::move(texture_data));
+    };
+    /// Reloads a texture from disk, use this only as a development tool for example in the console
+    /// Note that `define_texture` will also reload the texture if it already exists
+    lua["reload_texture"] = [](std::string texture_path)
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        texture_path = get_image_file_path(backend->get_root(), std::move(texture_path));
+        return RenderAPI::get().reload_texture(texture_path.c_str());
     };
 
     /// Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.

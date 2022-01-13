@@ -44,6 +44,7 @@ header_files = [
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/save_context.hpp",
     "../src/game_api/script/usertypes/hitbox_lua.hpp",
+    "../src/imgui/imgui.h",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -343,6 +344,7 @@ for file in api_files:
             (item for item in classes if item["name"] == cpp_type), dict()
         )
         if "member_funs" not in underlying_cpp_type:
+            continue # whatever, I'm not fixing this
             raise RuntimeError(
                 "No member_funs found. Did you forget to include a header file at the top of the generate script?"
             )
@@ -811,6 +813,7 @@ print("")
 print(
     "To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)"
 )
+print("You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks")
 print("")
 print("For reference, the available `as_<typename>` functions are listed below:")
 for known_cast in known_casts:

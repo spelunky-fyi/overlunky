@@ -268,6 +268,10 @@ Spawns apep with the choice if it going left or right, if you want the game to c
 ### [`spawn_tree`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
 `nil spawn_tree(float x, float y, LAYER layer)`<br/>
 Spawns and grows a tree
+### [`spawn_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_player)
+`nil spawn_player(int player_slot, float x, float y)`<br/>
+Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
+If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 ### [`set_pre_entity_spawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 `CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)`<br/>
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
@@ -300,11 +304,17 @@ Enable/disable game engine pause.
 ### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
 `nil move_entity(int uid, float x, float y, float vx, float vy)`<br/>
 Teleport entity to coordinates with optional velocity
+### [`move_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
+`nil move_entity(int uid, float x, float y, float vx, float vy, LAYER layer)`<br/>
+Teleport entity to coordinates with optional velocity
+### [`move_grid_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_grid_entity)
+`nil move_grid_entity(int uid, float x, float y, LAYER layer)`<br/>
+Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
 ### [`set_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door_target)
-`nil set_door_target(int id, int w, int l, int t)`<br/>
+`nil set_door_target(int uid, int w, int l, int t)`<br/>
 Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
 ### [`set_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door)
-`nil set_door(int id, int w, int l, int t)`<br/>
+`nil set_door(int uid, int w, int l, int t)`<br/>
 Short for [set_door_target](#set_door_target).
 ### [`get_door_target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_door_target)
 `tuple<int, int, int> get_door_target(int uid)`<br/>
@@ -466,9 +476,6 @@ Get the current timestamp in milliseconds since the Unix Epoch.
 ### [`carry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry)
 `nil carry(int mount_uid, int rider_uid)`<br/>
 Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
-### [`set_arrowtrap_projectile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
-`nil set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)`<br/>
-Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
 ### [`set_kapala_blood_threshold`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_kapala_blood_threshold)
 `nil set_kapala_blood_threshold(int threshold)`<br/>
 Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
@@ -497,6 +504,12 @@ Forces Olmec to stay on phase 0 (stomping)
 ### [`set_ghost_spawn_times`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ghost_spawn_times)
 `nil set_ghost_spawn_times(int normal = 10800, int cursed = 9000)`<br/>
 Determines when the ghost appears, either when the player is cursed or not
+### [`set_time_ghost_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_ghost_enabled)
+`nil set_time_ghost_enabled(bool b)`<br/>
+Determines whether the time ghost appears, including the showing of the ghost toast
+### [`set_time_jelly_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_jelly_enabled)
+`nil set_time_jelly_enabled(bool b)`<br/>
+Determines whether the time jelly appears in cosmic ocean
 ### [`set_journal_enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_journal_enabled)
 `nil set_journal_enabled(bool b)`<br/>
 Enables or disables the journal
@@ -608,12 +621,14 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 `uid` has to be the uid of a `Movable` or else stuff will break.
 Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_post_statemachine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_statemachine)
 `optional<CallbackId> set_post_statemachine(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 `uid` has to be the uid of a `Movable` or else stuff will break.
 Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_on_destroy`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_destroy)
 `optional<CallbackId> set_on_destroy(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -626,13 +641,42 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
 The callback signature is `nil on_kill(Entity self, Entity killer)`
 Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_player_instagib`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_player_instagib)
+`optional<CallbackId> set_on_player_instagib(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
+The callback signature is `bool on_player_instagib(Entity self)`
+The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
+This is so that when the entity dies (from other causes), the death screen still gets shown.
+Use this only when no other approach works, this call can be expensive if overused.
+### [`set_on_damage`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_damage)
+`optional<CallbackId> set_on_damage(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
+The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
+Note that damage_dealer can be nil ! (long fall, ...)
+DO NOT CALL `self:damage()` in the callback !
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`set_on_open`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
 `optional<CallbackId> set_on_open(int uid, function fun)`<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-`uid` has to be the uid of a `Container` or else stuff will break.
-Sets a callback that is called right when a container is opened via up+door.
-The callback signature is `nil on_open(Entity self, Entity opener)`
+Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+The callback signature is `nil on_open(Entity entity_self, Entity opener)`
 Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+### [`set_pre_collision1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision1)
+`optional<CallbackId> set_pre_collision1(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+### [`set_pre_collision2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision2)
+`optional<CallbackId> set_pre_collision2(int uid, function fun)`<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ### [`raise`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
 `nil raise()`<br/>
 Raise a signal and probably crash the game
@@ -645,7 +689,7 @@ Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values
 Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
 Will return the string of currently choosen language
 ### [`change_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_string)
-`nil change_string(STRINGID string_id, string str)`<br/>
+`nil change_string(STRINGID string_id, string_view str)`<br/>
 Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
 This edits custom string and in game strings but changing the language in settings will reset game strings
 ### [`add_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_string)
@@ -659,6 +703,54 @@ This is better alternative to `add_string` but instead of changing the name for 
 ### [`clear_custom_name`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_custom_name)
 `nil clear_custom_name(int uid)`<br/>
 Clears the name set with `add_custom_name`
+### [`enter_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_door)
+`nil enter_door(int player_uid, int door_uid)`<br/>
+Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
+Doesn't really work for layer doors
+### [`change_sunchallenge_spawns`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_sunchallenge_spawns)
+`nil change_sunchallenge_spawns(array<ENT_TYPE> ent_types)`<br/>
+Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
+{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
+Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance")
+Use empty table as argument to reset to the game default
+### [`change_diceshop_prizes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_diceshop_prizes)
+`nil change_diceshop_prizes(array<ENT_TYPE> ent_types)`<br/>
+Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
+{ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
+ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
+ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
+Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
+If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser)
+Use empty table as argument to reset to the game default
+### [`change_altar_damage_spawns`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_altar_damage_spawns)
+`nil change_altar_damage_spawns(array<ENT_TYPE> ent_types)`<br/>
+Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
+{MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
+Max 255 types
+Use empty table as argument to reset to the game default
+### [`change_waddler_drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_waddler_drop)
+`nil change_waddler_drop(array<ENT_TYPE> ent_types)`<br/>
+Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
+{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
+Max 255 types
+Use empty table as argument to reset to the game default
+### [`poison_entity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_entity)
+`nil poison_entity(int entity_uid)`<br/>
+Poisons entity, to cure poison set `poison_tick_timer` to -1
+### [`modify_ankh_health_gain`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modify_ankh_health_gain)
+`nil modify_ankh_health_gain(int max_health, int beat_add_health)`<br/>
+Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
+`beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
+If you set `health` above the game max health it will be forced down to the game max
+### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
+`Illumination create_illumination(Color color, float size, float x, float y)`<br/>
+Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
+`Illumination create_illumination(Color color, float size, int uid)`<br/>
+Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+### [`refresh_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=refresh_illumination)
+`nil refresh_illumination(Illumination illumination)`<br/>
+Refreshes an Illumination, keeps it from fading out
 ### [`toast_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_visible)
 `bool toast_visible()`<br/>
 ### [`speechbubble_visible`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_visible)
@@ -688,9 +780,21 @@ Same as `Player.set_heart_color`
 ### [`get_particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 `ParticleDB get_particle_type(int id)`<br/>
 Get the [ParticleDB](#particledb) details of the specified ID
-### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
-`nil generate_particles(int particle_emitter_id, int uid)`<br/>
-Generate particles of the specified type around the specified entity uid (use e.g. generate_particles(PARTICLEEMITTER.PETTING_PET, player.uid))
+### [`generate_world_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_world_particles)
+`ParticleEmitterInfo generate_world_particles(int particle_emitter_id, int uid)`<br/>
+Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
+### [`generate_screen_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_screen_particles)
+`ParticleEmitterInfo generate_screen_particles(int particle_emitter_id, float x, float y)`<br/>
+Generate particles of the specified type at a certain screen coordinate (use e.g. `local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)`). See the `particles.lua` example script for more details.
+### [`advance_screen_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=advance_screen_particles)
+`nil advance_screen_particles(ParticleEmitterInfo particle_emitter)`<br/>
+Advances the state of the screen particle emitter (simulates the next positions, ... of all the particles in the emitter). Only used with screen particle emitters. See the `particles.lua` example script for more details.
+### [`render_screen_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_screen_particles)
+`nil render_screen_particles(ParticleEmitterInfo particle_emitter)`<br/>
+Renders the particles to the screen. Only used with screen particle emitters. See the `particles.lua` example script for more details.
+### [`extinguish_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=extinguish_particles)
+`nil extinguish_particles(ParticleEmitterInfo particle_emitter)`<br/>
+Extinguish a particle emitter (use the return value of `generate_world_particles` or `generate_screen_particles` as the parameter in this function)
 ### [`default_spawn_is_valid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_spawn_is_valid)
 `bool default_spawn_is_valid(float x, float y, int layer)`<br/>
 Default function in spawn definitions to check whether a spawn is valid or not
@@ -813,18 +917,32 @@ Create image from file. Returns a tuple containing id, width and height.
 ### [`mouse_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouse_position)
 `tuple<float, float> mouse_position()`<br/>
 Current mouse cursor position in screen coordinates.
+### [`get_io`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_io)
+`// Access via get_io()`<br/>
+Returns: [ImGuiIO](#imguiio) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
+- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
+- Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 `nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+Use `-1` as dropchance_id to reset all to default
 ### [`replace_drop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_drop)
 `nil replace_drop(int drop_id, ENT_TYPE new_drop_entity_type)`<br/>
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
+Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
 ### [`get_texture_definition`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture_definition)
 `TextureDefinition get_texture_definition(TEXTURE texture_id)`<br/>
 Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
 ### [`define_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_texture)
 `TEXTURE define_texture(TextureDefinition texture_data)`<br/>
 Defines a new texture that can be used in Entity::set_texture
+If a texture with the same definition already exists the texture will be reloaded from disk.
+### [`reload_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_texture)
+`nil reload_texture(string texture_path)`<br/>
+Reloads a texture from disk, use this only as a development tool for example in the console
+Note that `define_texture` will also reload the texture if it already exists
 ### [`get_hitbox`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox)
 `AABB get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)`<br/>
 Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
@@ -880,9 +998,15 @@ Use `get_entities_overlapping_hitbox` instead
 ### [`get_entity_ai_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
 `int get_entity_ai_state(int uid)`<br/>
 As the name is misleading. use entity `move_state` field instead
+### [`set_arrowtrap_projectile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
+`nil set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)`<br/>
+Use `replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)` and `replace_drop(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type)` instead
 ### [`set_camera_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
 `nil set_camera_position(float cx, float cy)`<br/>
 this doesn't actually work at all. See State -> Camera the for proper camera handling
+### [`generate_particles`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
+`ParticleEmitterInfo generate_particles(int particle_emitter_id, int uid)`<br/>
+Use `generate_world_particles`
 ### [`draw_line`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
 `nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`<br/>
 Use `GuiDrawContext.draw_line` instead
@@ -979,12 +1103,6 @@ end
 - [`bool save(string data)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save) &SaveContext::Save
 ### `LoadContext`
 - [`string load()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load) &LoadContext::Load
-### `SelectPlayerSlot`
-- [`bool activated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activated) &SelectPlayerSlot::activated
-- [`ENT_TYPE character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) &SelectPlayerSlot::character
-- [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &SelectPlayerSlot::texture_id
-### `Items`
-- [`player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) sol::property([](Items&s){returnstd::ref(s.player_select_slots
 ### `ArenaConfigArenas`
 - [`bool dwelling_1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_1) &ArenaConfigArenas::dwelling_1
 - [`bool dwelling_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_2) &ArenaConfigArenas::dwelling_2
@@ -1109,6 +1227,20 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`bool final_ghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=final_ghost) &ArenaState::final_ghost
 - [`int breath_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=breath_cooldown) &ArenaState::breath_cooldown
 - [`bool punish_ball`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=punish_ball) &ArenaState::punish_ball
+### `SelectPlayerSlot`
+- [`bool activated`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activated) &SelectPlayerSlot::activated
+- [`ENT_TYPE character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) &SelectPlayerSlot::character
+- [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &SelectPlayerSlot::texture_id
+### `Items`
+- [`int player_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) &Items::player_count
+- [`int saved_pets_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets_count) &Items::saved_pets_count
+- [`array<ENT_TYPE, 4> saved_pets`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets) &Items::saved_pets
+\
+Pet information for level transition
+- [`array<bool, 4> is_pet_cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_cursed) &Items::is_pet_cursed
+- [`array<bool, 4> is_pet_poisoned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_poisoned) &Items::is_pet_poisoned
+- [`array<Inventory, MAX_PLAYERS> player_inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) &Items::player_inventories
+- [`array<SelectPlayerSlot, MAX_PLAYERS> player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) &Items::player_select_slots
 ### `StateMemory`
 - [`int screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
 - [`int screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) &StateMemory::screen
@@ -1121,6 +1253,11 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`int kali_favor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_favor) &StateMemory::kali_favor
 - [`int kali_status`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_status) &StateMemory::kali_status
 - [`int kali_altars_destroyed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_altars_destroyed) &StateMemory::kali_altars_destroyed
+\
+Also affects if the player has punish ball, if the punish ball is destroyed it is set to -1
+- [`int kali_gifts`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_gifts) &StateMemory::kali_gifts
+\
+0 - none, 1 - item, 3 - kapala
 - [`int seed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed) &StateMemory::seed
 - [`int time_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_total) &StateMemory::time_total
 - [`int world`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) &StateMemory::world
@@ -1132,12 +1269,17 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`int theme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) &StateMemory::theme
 - [`int theme_next`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_next) &StateMemory::theme_next
 - [`int theme_start`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_start) &StateMemory::theme_start
+- [`nil force_current_theme(int t)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_current_theme) &StateMemory::force_current_theme
+\
+This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
 - [`int shoppie_aggro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro) &StateMemory::shoppie_aggro
 - [`int shoppie_aggro_next`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro_next) &StateMemory::shoppie_aggro_levels
 - [`int merchant_aggro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=merchant_aggro) &StateMemory::merchant_aggro
 - [`int kills_npc`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_npc) &StateMemory::kills_npc
 - [`int level_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_count) &StateMemory::level_count
 - [`int damage_taken`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage_taken) &StateMemory::damage_taken
+\
+Total amount of damage taken, excluding cause of death
 - [`int journal_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_flags) &StateMemory::journal_flags
 - [`int time_last_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last_level) &StateMemory::time_last_level
 - [`int time_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) &StateMemory::time_level
@@ -1150,9 +1292,13 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 - [`int fadein`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadein) &StateMemory::fadein
 - [`int loading_black_screen_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading_black_screen_timer) &StateMemory::loading_black_screen_timer
 - [`int saved_dogs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_dogs) &StateMemory::saved_dogs
+\
+Run totals
 - [`int saved_cats`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_cats) &StateMemory::saved_cats
 - [`int saved_hamsters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_hamsters) &StateMemory::saved_hamsters
 - [`int win_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_state) &StateMemory::win_state
+\
+0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
 - [`Illumination illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) &StateMemory::illumination
 - [`int money_last_levels`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_last_levels) &StateMemory::money_last_levels
 - [`int money_shop_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) &StateMemory::money_shop_total
@@ -1189,6 +1335,21 @@ The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 
 Returns animation_frame of the correct ushabti
 - [`nil set_correct_ushabti(int animation_frame)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) &StateMemory::set_correct_ushabti
 - [`ArenaState arena`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) &StateMemory::arena
+- [`ENT_TYPE speedrun_character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) &StateMemory::speedrun_character
+- [`int speedrun_activation_trigger`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_activation_trigger) &StateMemory::speedrun_activation_trigger
+- [`ENT_TYPE end_spaceship_character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_spaceship_character) &StateMemory::end_spaceship_character
+\
+Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
+- [`bool world2_coffin_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world2_coffin_spawned) &StateMemory::world2_coffin_spawned
+- [`bool world4_coffin_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world4_coffin_spawned) &StateMemory::world4_coffin_spawned
+- [`bool world6_coffin_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world6_coffin_spawned) &StateMemory::world6_coffin_spawned
+- [`ENT_TYPE first_damage_cause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_cause) &StateMemory::first_damage_cause
+- [`int first_damage_world`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_world) &StateMemory::first_damage_world
+- [`int first_damage_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_level) &StateMemory::first_damage_level
+- [`int time_speedrun`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_speedrun) &StateMemory::time_speedrun
+- [`ENT_TYPE coffin_contents`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffin_contents) &StateMemory::coffin_contents
+- [`int screen_change_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_change_counter) &StateMemory::screen_change_counter
+- [`int time_startup`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) &StateMemory::time_startup
 - [`LogicList logic`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) &StateMemory::logic
 ### `GameManager`
 - [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
@@ -1248,6 +1409,12 @@ It's rendered on objects around, not as an actual bright spot
 - [`int flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) &Illumination::flags
 \
 see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+- [`int type_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type_flags) &Illumination::type_flags
+\
+Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness
+Rectangle always uses light1, even when it's disabled in flags
+- [`bool enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) &Illumination::enabled
+- [`int layer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) &Illumination::layer
 ### `Camera`
 - [`float bounds_left`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounds_left) &Camera::bounds_left
 - [`float bounds_right`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounds_right) &Camera::bounds_right
@@ -1410,7 +1577,7 @@ Changes color based on given uColor
 - [`int life`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=life) &EntityDB::life
 - [`int blood_content`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blood_content) &EntityDB::blood_content
 - [`int texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) &EntityDB::texture
-- [`AnimationMap animations`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) &EntityDB::animations
+- [`map<int, Animation> animations`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) &EntityDB::animations
 - [`int properties_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=properties_flags) &EntityDB::properties_flags
 - [`int default_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_flags) &EntityDB::default_flags
 - [`int default_more_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_more_flags) &EntityDB::default_more_flags
@@ -1453,6 +1620,8 @@ Use `overlaps_with(AABB hitbox)` instead
 - [`bool overlaps_with(Entity other)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) overlaps_with
 - [`TEXTURE get_texture()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) &Entity::get_texture
 - [`bool set_texture(TEXTURE texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) &Entity::set_texture
+\
+Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
 - [`nil set_draw_depth(int draw_depth)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) &Entity::set_draw_depth
 - [`nil liberate_from_shop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) &Entity::liberate_from_shop
 - [`Entity get_held_entity()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) &Entity::get_held_entity
@@ -1471,6 +1640,14 @@ Completely removes the entity from existence
 - [`nil activate(Entity activator)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate) &Entity::activate
 \
 Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
+- [`nil perform_teleport(int delta_x, int delta_y)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=perform_teleport) &Entity::perform_teleport
+\
+Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
+- [`bool trigger_action(Entity user)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_action) &Entity::trigger_action
+\
+Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+- [`get_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) &Entity::get_metadata
+- [`nil apply_metadata(int metadata)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) &Entity::apply_metadata
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -1499,6 +1676,7 @@ Related to taking damage, also drops you from ladder/rope, can't be set while on
 \
 Deprecated, it's the same as lock_input_timer, but this name makes no sense
 - [`int wet_effect_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wet_effect_timer) &Movable::wet_effect_timer
+- [`int poison_tick_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) &Movable::poison_tick_timer
 - [`int airtime`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) &Movable::falling_timer
 \
 airtime = falling_timer
@@ -1552,63 +1730,99 @@ Unequips the currently worn backitem
 Returns the uid of the currently worn backitem, or -1 if wearing nothing
 ### `Inventory`
 - [`int money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) &Inventory::money
+\
+Sum of the money collected in current level
 - [`int bombs`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) &Inventory::bombs
 - [`int ropes`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) &Inventory::ropes
+- [`int player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) /*&Inventory::player_slot
 - [`int poison_tick_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) &Inventory::poison_tick_timer
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`bool cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cursed) &Inventory::cursed
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`bool elixir_buff`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elixir_buff) &Inventory::elixir_buff
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`int health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) &Inventory::health
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`int kapala_blood_amount`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) &Inventory::kapala_blood_amount
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+- [`int time_of_death`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_of_death) &Inventory::time_of_death
+\
+Is set to state.time_total when player dies in coop (to determinate who should be first to re-spawn from coffin)
 - [`ENT_TYPE held_item`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item) &Inventory::held_item
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`int held_item_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item_metadata) &Inventory::held_item_metadata
 \
-Metadata of the held item (health, is cursed etc.) Used in level transition to transfer to new entity, is wrong during the level
-- [`player_slot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) sol::property([](Inventory&i)-&gt;int8_t{if(i.player_slot&gt;=0)returni.player_slot+1;elsereturni.player_slot;}
+Metadata of the held item (health, is cursed etc.)
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`ENT_TYPE mount_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_type) &Inventory::mount_type
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`int mount_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_metadata) &Inventory::mount_metadata
 \
-Metadata of the mount (health, is cursed etc.) Used in level transition to transfer to new player entity, is wrong during the level
+Metadata of the mount (health, is cursed etc.)
+Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`int kills_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) &Inventory::kills_level
 - [`int kills_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) &Inventory::kills_total
 - [`int collected_money_total`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) &Inventory::collected_money_total
+\
+Total money collected during previous levels (not the current one)
 - [`array<ENT_TYPE, 512> collected_money`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money) &Inventory::collected_money
+\
+Types of gold/gems collected during this level, used later to display during the transition
 - [`array<int, 512> collected_money_values`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_values) &Inventory::collected_money_values
+\
+Values of gold/gems collected during this level, used later to display during the transition
 - [`array<ENT_TYPE, 256> killed_enemies`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_enemies) &Inventory::killed_enemies
+\
+Types of enemies killed during this level, used later to display during the transition
 - [`int companion_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_count) &Inventory::companion_count
 \
-Number of companions, this is always up to date, can be edited
-- [`array<int, 8> companion_poison_tick_timers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_poison_tick_timers) &Inventory::companion_poison_tick_timers
-\
-Companions poison tick timers, used in level transition to transfer to new player entity, is wrong during the level
+Number of companions, it will determinate how many companions will be transfered to next level
+Increments when player acquires new companion, decrements when one of them dies
 - [`array<ENT_TYPE, 8> companions`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companions) &Inventory::companions
 \
-Companion ENT_TYPEs, used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`array<ENT_TYPE, 8> companion_held_items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_held_items) &Inventory::companion_held_items
 \
-Items ENT_TYPE held by companions, used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+- [`array<int, 8> companion_held_item_metadatas`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_held_item_metadatas) &Inventory::companion_held_item_metadatas
+\
+Metadata of items held by companions (health, is cursed etc.)
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`array<int, 8> companion_trust`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_trust) &Inventory::companion_trust
 \
-0..3, used in level transition to transfer to new player entity, is wrong during the level
+(0..3) Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`array<int, 8> companion_health`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_health) &Inventory::companion_health
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+- [`array<int, 8> companion_poison_tick_timers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_poison_tick_timers) &Inventory::companion_poison_tick_timers
+\
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 - [`array<bool, 8> is_companion_cursed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_companion_cursed) &Inventory::is_companion_cursed
 \
-Used in level transition to transfer to new player entity, is wrong during the level
+Used to transfer information to transition/next level. Is not updated during a level
+You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 ### `Ai`
 - [`Entity target`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target) &Ai::target
 - [`int target_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_uid) &Ai::target_uid
@@ -1704,10 +1918,16 @@ Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door) [`EggShipDoor
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool arrow_shot`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_shot) &Arrowtrap::arrow_shot
 - [`nil rearm()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rearm) &Arrowtrap::rearm
+- [`nil trigger(int who_uid)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &Arrowtrap::trigger
+\
+The uid must be movable entity for ownership transfers
 ### `TotemTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`ENT_TYPE spawn_entity_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) &TotemTrap::spawn_entity_type
 - [`int first_sound_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_sound_id) &TotemTrap::first_sound_id
+- [`nil trigger(int who_uid, bool left)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &TotemTrap::trigger
+\
+The uid must be movable entity for ownership transfers
 ### `LaserTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &LaserTrap::emitted_light
@@ -1774,6 +1994,9 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`bool left_part`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_part) &BigSpearTrap::left_part
 \
 setting the left part to 0 or right part to 1 destroys the trap
+- [`nil trigger(int who_uid, bool left)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &BigSpearTrap::trigger
+\
+The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,
 ### `StickyTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int attached_piece_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) &StickyTrap::attached_piece_uid
@@ -1840,6 +2063,11 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int deco_up`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_up) &PoleDeco::deco_up
 - [`int deco_down`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deco_down) &PoleDeco::deco_down
+### `JungleSpearTrap`
+Derived from [`Entity`](#entity) [`Floor`](#floor)
+- [`nil trigger(int who_uid, int direction)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &JungleSpearTrap::trigger
+\
+The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right, 3 = up, 4 = down
 ### `Crushtrap`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float dirx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dirx) &Crushtrap::dirx
@@ -2198,6 +2426,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#power
 ### `Quillback`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
 - [`ParticleEmitterInfo particle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) &Quillback::particle
+- [`bool seen_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seen_player) &Quillback::seen_player
 ### `Leprechaun`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Monster`](#monster) [`WalkingMonster`](#walkingmonster)
 - [`int hump_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hump_timer) &Leprechaun::hump_timer
@@ -2849,6 +3078,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`ENT_TYPE inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Coffin::inside
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Coffin::timer
+- [`bool player_respawn`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_respawn) &Coffin::player_respawn
 ### `Fly`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &Fly::timer
@@ -3019,6 +3249,13 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Shield`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float shake`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake) &Shield::shake
+### `PrizeDispenser`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`array<int, 6> item_ids`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_ids) &PrizeDispenser::item_ids
+\
+Id's of the items (not types), by default 0-24, look at [change_diceshop_prizes](#change_diceshop_prizes) for the list of default prizes
+so for example: id 0 equals ITEM_PICKUP_BOMBBAG, id 1 equals ITEM_PICKUP_BOMBBOX etc. Game generates 6 but uses max 5 for Tusk dice shop
+- [`int prizes_spawned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prizes_spawned) &PrizeDispenser::prizes_spawned
 ### `LiquidSurface`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float glow_radius`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=glow_radius) &LiquidSurface::glow_radius
@@ -3221,6 +3458,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `Liquid`
 Derived from [`Entity`](#entity)
 - [`Entity fx_surface`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_surface) &Liquid::fx_surface
+- [`int get_liquid_flags()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_liquid_flags) &Liquid::get_liquid_flags
+- [`nil set_liquid_flags(int flags)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_liquid_flags) &Liquid::set_liquid_flags
 ### `Lava`
 Derived from [`Entity`](#entity) [`Liquid`](#liquid)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &Lava::emitted_light
@@ -3476,6 +3715,11 @@ Derived from [`Entity`](#entity)
 ### `ParticleEmitterInfo`
 - [`ParticleDB particle_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_type) &ParticleEmitterInfo::particle_type
 - [`int particle_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count) &ParticleEmitterInfo::particle_count
+- [`int entity_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) &ParticleEmitterInfo::entity_uid
+- [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ParticleEmitterInfo::x
+- [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ParticleEmitterInfo::y
+- [`float offset_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_x) &ParticleEmitterInfo::offset_x
+- [`float offset_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) &ParticleEmitterInfo::offset_y
 ### `PreLoadLevelFilesContext`
 - [`nil override_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) &PreLoadLevelFilesContext::override_level_files
 \
@@ -3792,6 +4036,29 @@ Pop unique identifier from the stack. Put after the input.
 - [`nil win_image(IMAGE image, int width, int height)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) &GuiDrawContext::win_image
 \
 Draw image to window.
+### `ImVec2`
+Current mouse cursor position in screen coordinates.
+- [`x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ImVec2::x
+- [`float                                   x, y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ImVec2::y
+### `ImGuiIO`
+- [`ImVec2      displaysize`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) &ImGuiIO::DisplaySize
+- [`float       framerate`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) &ImGuiIO::Framerate
+- [`bool        wantkeyboard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) &ImGuiIO::WantCaptureKeyboard
+- [`keysdown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) sol::property([](ImGuiIO&io){returnstd::ref(io.KeysDown)/**/;})
+- [`keydown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) keydown
+- [`keypressed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) keypressed
+- [`keyreleased`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) keyreleased
+- [`bool        keyctrl`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyctrl) &ImGuiIO::KeyCtrl
+- [`bool        keyshift`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyshift) &ImGuiIO::KeyShift
+- [`bool        keyalt`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) &ImGuiIO::KeyAlt
+- [`bool        keysuper`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) &ImGuiIO::KeySuper
+- [`bool        wantmouse`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) &ImGuiIO::WantCaptureMouse
+- [`ImVec2      mousepos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) &ImGuiIO::MousePos
+- [`mousedown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseDown)/**/;})
+- [`mouseclicked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseClicked)/**/;})
+- [`mousedoubleclicked`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseDoubleClicked)/**/;})
+- [`float       mousewheel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) &ImGuiIO::MouseWheel
+- [`gamepad`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) sol::property([](){g_WantUpdateHasGamepad=true;returnget_gamepad()/**/;})
 ### `VanillaRenderContext`
 - [`nil draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &VanillaRenderContext::draw_text
 \
@@ -3801,10 +4068,10 @@ Draw text using the built-in renderer. Use in combination with ON.RENDER_✱ eve
 Measure the provided text using the built-in renderer
 - [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU events
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 - [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU events
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 - [`nil draw_world_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
 \
 Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
@@ -3831,6 +4098,13 @@ Draw a texture in world coordinates from top-left to bottom-right using the buil
 - [`float source_bottom_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_left_y) &TextureRenderingInfo::source_bottom_left_y
 - [`float source_bottom_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_right_x) &TextureRenderingInfo::source_bottom_right_x
 - [`float source_bottom_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_right_y) &TextureRenderingInfo::source_bottom_right_y
+### `TextRenderingInfo`
+- [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &TextRenderingInfo::x
+- [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &TextRenderingInfo::y
+- [`int text_length`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) &TextRenderingInfo::text_length
+- [`float width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &TextRenderingInfo::width
+- [`float height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &TextRenderingInfo::height
+- [`Texture font`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=font) &TextRenderingInfo::font
 ### `TextureDefinition`
 Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
 `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.
@@ -4250,6 +4524,106 @@ Derived from [`Screen`](#screen)
 - [`TextureRenderingInfo unknown23`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown23) &JournalUI::unknown23
 - [`TextureRenderingInfo entire_book`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) &JournalUI::entire_book
 - [`int page_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) &JournalUI::page_timer
+### `JournalPage`
+- [`TextureRenderingInfo background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background) &JournalPage::background
+- [`int page_number`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_number) &JournalPage::page_number
+### `JournalPageProgress`
+Derived from [`JournalPage`](#journalpage)
+- [`TextureRenderingInfo coffeestain_top`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffeestain_top) &JournalPageProgress::coffeestain_top
+### `JournalPageJournalMenu`
+Derived from [`JournalPage`](#journalpage)
+- [`int selected_menu_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) &JournalPageJournalMenu::selected_menu_index
+- [`TextRenderingInfo journal_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_text_info) &JournalPageJournalMenu::journal_text_info
+- [`TextureRenderingInfo completion_badge`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=completion_badge) &JournalPageJournalMenu::completion_badge
+### `JournalPageDiscoverable`
+Derived from [`JournalPage`](#journalpage)
+- [`bool show_main_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_main_image) &JournalPageDiscoverable::show_main_image
+- [`TextRenderingInfo title_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=title_text_info) &JournalPageDiscoverable::title_text_info
+- [`TextRenderingInfo entry_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entry_text_info) &JournalPageDiscoverable::entry_text_info
+- [`TextRenderingInfo chapter_title_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_title_text_info) &JournalPageDiscoverable::chapter_title_text_info
+### `JournalPagePlaces`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo main_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_image) &JournalPagePlaces::main_image
+### `JournalPagePeople`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo character_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character_background) &JournalPagePeople::character_background
+- [`TextureRenderingInfo character_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character_icon) &JournalPagePeople::character_icon
+- [`TextureRenderingInfo character_drawing`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character_drawing) &JournalPagePeople::character_drawing
+### `JournalPageBestiary`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo monster_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=monster_background) &JournalPageBestiary::monster_background
+- [`TextureRenderingInfo monster_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=monster_icon) &JournalPageBestiary::monster_icon
+- [`TextureRenderingInfo defeated_killedby_black_bars`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defeated_killedby_black_bars) &JournalPageBestiary::defeated_killedby_black_bars
+- [`TextRenderingInfo defeated_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defeated_text_info) &JournalPageBestiary::defeated_text_info
+- [`TextRenderingInfo defeated_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defeated_value_text_info) &JournalPageBestiary::defeated_value_text_info
+- [`TextRenderingInfo killedby_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killedby_text_info) &JournalPageBestiary::killedby_text_info
+- [`TextRenderingInfo killedby_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killedby_value_text_info) &JournalPageBestiary::killedby_value_text_info
+### `JournalPageItems`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo item_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_icon) &JournalPageItems::item_icon
+- [`TextureRenderingInfo item_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_background) &JournalPageItems::item_background
+### `JournalPageTraps`
+Derived from [`JournalPage`](#journalpage) [`JournalPageDiscoverable`](#journalpagediscoverable)
+- [`TextureRenderingInfo trap_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_icon) &JournalPageTraps::trap_icon
+- [`TextureRenderingInfo trap_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_background) &JournalPageTraps::trap_background
+### `JournalPageStory`
+Derived from [`JournalPage`](#journalpage)
+### `JournalPageFeats`
+Derived from [`JournalPage`](#journalpage)
+- [`TextRenderingInfo chapter_title_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_title_text_info) &JournalPageFeats::chapter_title_text_info
+- [`TextureRenderingInfo feat_icons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=feat_icons) &JournalPageFeats::feat_icons
+### `JournalPageDeathCause`
+Derived from [`JournalPage`](#journalpage)
+- [`TextRenderingInfo death_cause_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=death_cause_text_info) &JournalPageDeathCause::death_cause_text_info
+### `JournalPageDeathMenu`
+Derived from [`JournalPage`](#journalpage)
+- [`int selected_menu_index`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) &JournalPageDeathMenu::selected_menu_index
+- [`TextRenderingInfo game_over_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_over_text_info) &JournalPageDeathMenu::game_over_text_info
+- [`TextRenderingInfo level_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_text_info) &JournalPageDeathMenu::level_text_info
+- [`TextRenderingInfo level_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_value_text_info) &JournalPageDeathMenu::level_value_text_info
+- [`TextRenderingInfo money_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_text_info) &JournalPageDeathMenu::money_text_info
+- [`TextRenderingInfo money_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_value_text_info) &JournalPageDeathMenu::money_value_text_info
+- [`TextRenderingInfo time_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_text_info) &JournalPageDeathMenu::time_text_info
+- [`TextRenderingInfo time_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_value_text_info) &JournalPageDeathMenu::time_value_text_info
+### `JournalPageRecap`
+Derived from [`JournalPage`](#journalpage)
+### `JournalPagePlayerProfile`
+Derived from [`JournalPage`](#journalpage)
+- [`TextureRenderingInfo player_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_icon) &JournalPagePlayerProfile::player_icon
+- [`int player_icon_id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_icon_id) &JournalPagePlayerProfile::player_icon_id
+- [`TextRenderingInfo player_profile_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_profile_text_info) &JournalPagePlayerProfile::player_profile_text_info
+- [`TextRenderingInfo plays_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=plays_text_info) &JournalPagePlayerProfile::plays_text_info
+- [`TextRenderingInfo plays_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=plays_value_text_info) &JournalPagePlayerProfile::plays_value_text_info
+- [`TextRenderingInfo wins_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_text_info) &JournalPagePlayerProfile::wins_text_info
+- [`TextRenderingInfo wins_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins_value_text_info) &JournalPagePlayerProfile::wins_value_text_info
+- [`TextRenderingInfo deaths_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deaths_text_info) &JournalPagePlayerProfile::deaths_text_info
+- [`TextRenderingInfo deaths_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deaths_value_text_info) &JournalPagePlayerProfile::deaths_value_text_info
+- [`TextRenderingInfo win_pct_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pct_text_info) &JournalPagePlayerProfile::win_pct_text_info
+- [`TextRenderingInfo win_pct_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pct_value_text_info) &JournalPagePlayerProfile::win_pct_value_text_info
+- [`TextRenderingInfo average_score_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=average_score_text_info) &JournalPagePlayerProfile::average_score_text_info
+- [`TextRenderingInfo average_score_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=average_score_value_text_info) &JournalPagePlayerProfile::average_score_value_text_info
+- [`TextRenderingInfo top_score_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_score_text_info) &JournalPagePlayerProfile::top_score_text_info
+- [`TextRenderingInfo top_score_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_score_value_text_info) &JournalPagePlayerProfile::top_score_value_text_info
+- [`TextRenderingInfo deepest_level_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_level_text_info) &JournalPagePlayerProfile::deepest_level_text_info
+- [`TextRenderingInfo deepest_level_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deepest_level_value_text_info) &JournalPagePlayerProfile::deepest_level_value_text_info
+- [`TextRenderingInfo deadliest_level_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deadliest_level_text_info) &JournalPagePlayerProfile::deadliest_level_text_info
+- [`TextRenderingInfo deadliest_level_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=deadliest_level_value_text_info) &JournalPagePlayerProfile::deadliest_level_value_text_info
+- [`TextRenderingInfo average_time_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=average_time_text_info) &JournalPagePlayerProfile::average_time_text_info
+- [`TextRenderingInfo average_time_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=average_time_value_text_info) &JournalPagePlayerProfile::average_time_value_text_info
+- [`TextRenderingInfo best_time_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=best_time_text_info) &JournalPagePlayerProfile::best_time_text_info
+- [`TextRenderingInfo best_time_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=best_time_value_text_info) &JournalPagePlayerProfile::best_time_value_text_info
+### `JournalPageLastGamePlayed`
+Derived from [`JournalPage`](#journalpage)
+- [`TextureRenderingInfo main_image`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_image) &JournalPageLastGamePlayed::main_image
+- [`TextRenderingInfo last_game_played_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_game_played_text_info) &JournalPageLastGamePlayed::last_game_played_text_info
+- [`TextRenderingInfo level_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_text_info) &JournalPageLastGamePlayed::level_text_info
+- [`TextRenderingInfo level_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_value_text_info) &JournalPageLastGamePlayed::level_value_text_info
+- [`TextRenderingInfo money_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_text_info) &JournalPageLastGamePlayed::money_text_info
+- [`TextRenderingInfo money_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_value_text_info) &JournalPageLastGamePlayed::money_value_text_info
+- [`TextRenderingInfo time_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_text_info) &JournalPageLastGamePlayed::time_text_info
+- [`TextRenderingInfo time_value_text_info`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_value_text_info) &JournalPageLastGamePlayed::time_value_text_info
+- [`int sticker_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sticker_count) &JournalPageLastGamePlayed::sticker_count
+- [`array<TextureRenderingInfo, 20> stickers`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) &JournalPageLastGamePlayed::stickers
 ### `ScreenArenaMenu`
 Derived from [`Screen`](#screen)
 - [`ScreenZoomAnimation brick_background_animation`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brick_background_animation) &ScreenArenaMenu::brick_background_animation
@@ -4435,6 +4809,7 @@ Derived from [`Screen`](#screen)
 When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
 
 To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)
+You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks
 
 For reference, the available `as_<typename>` functions are listed below:
 - as_acidbubble
@@ -4611,6 +4986,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_jiangshi
 - as_jumpdog
 - as_junglespearcosmetic
+- as_junglespeartrap
 - as_jungletraptrigger
 - as_kapalapowerup
 - as_kingu
@@ -4688,6 +5064,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_pot
 - as_powerup
 - as_powerupcapable
+- as_prizedispenser
 - as_protoshopkeeper
 - as_punishball
 - as_pushblock
@@ -4784,7 +5161,7 @@ end, ON.LEVEL)
 ### ENT_TYPE
 - [`FLOOR_BORDERTILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.FLOOR_BORDERTILE) 1
 - ...check [entities.txt](game_data/entities.txt)...
-- [`LIQUID_STAGNANT_LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.LIQUID_STAGNANT_LAVA) 898
+- [`LIQUID_COARSE_LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.LIQUID_COARSE_LAVA) 915
 ### PARTICLEEMITTER
 - [`TITLE_TORCHFLAME_SMOKE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.TITLE_TORCHFLAME_SMOKE) 1
 - ...check [particle_emitters.txt](game_data/particle_emitters.txt)...
@@ -4808,11 +5185,11 @@ end, ON.LEVEL)
 - [`CURRENT_LAYER2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_SOUND_PARAM.CURRENT_LAYER2) 37
 ### DROPCHANCE
 - [`BONEBLOCK_SKELETONKEY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.BONEBLOCK_SKELETONKEY) 0
-- ...see drops.hpp for a list of possible dropchances...
+- ...see [drops.cpp](../src/game_api/drops.cpp) for a list of possible dropchances...
 - [`YETI_PITCHERSMITT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.YETI_PITCHERSMITT) 10
 ### DROP
 - [`ALTAR_DICE_CLIMBINGGLOVES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_CLIMBINGGLOVES) 0
-- ...see drops.hpp for a list of possible drops...
+- ...see [drops.cpp](../src/game_api/drops.cpp) for a list of possible drops...
 - [`YETI_PITCHERSMITT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETI_PITCHERSMITT) 85
 ### TEXTURE
 - [`DATA_TEXTURES_PLACEHOLDER_0`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=TEXTURE.DATA_TEXTURES_PLACEHOLDER_0) 0
@@ -4937,6 +5314,26 @@ Runs after the pause menu is drawn on screen. In this event, you can draw textur
 \
 Params: `VanillaRenderContext render_ctx, int draw_depth`\
 Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+- [`RENDER_POST_JOURNAL_PAGE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_JOURNAL_PAGE) ON::RENDER_POST_JOURNAL_PAGE
+\
+Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`\
+Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx\
+The page_type parameter values can be found in the JOURNAL_PAGE_TYPE ENUM\
+The JournalPage parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:\
+`page:as_journal_page_progress()`\
+`page:as_journal_page_journalmenu()`\
+`page:as_journal_page_places()`\
+`page:as_journal_page_people()`\
+`page:as_journal_page_bestiary()`\
+`page:as_journal_page_items()`\
+`page:as_journal_page_traps()`\
+`page:as_journal_page_story()`\
+`page:as_journal_page_feats()`\
+`page:as_journal_page_deathcause()`\
+`page:as_journal_page_deathmenu()`\
+`page:as_journal_page_recap()`\
+`page:as_journal_page_playerprofile()`\
+`page:as_journal_page_lastgameplayed()`
 - [`SPEECH_BUBBLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) ON::SPEECH_BUBBLE
 \
 Params: `Entity speaking_entity, string text`\
@@ -5341,6 +5738,21 @@ Params: `PlayingSound vanilla_sound`
 - [`STORY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.STORY) 8
 - [`RECAP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.RECAP) 9
 - [`DEATH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.DEATH) 10
+### JOURNAL_PAGE_TYPE
+- [`PROGRESS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PROGRESS) JournalPageType::Progress
+- [`JOURNAL_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.JOURNAL_MENU) JournalPageType::JournalMenu
+- [`PLACES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PLACES) JournalPageType::Places
+- [`PEOPLE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PEOPLE) JournalPageType::People
+- [`BESTIARY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.BESTIARY) JournalPageType::Bestiary
+- [`ITEMS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.ITEMS) JournalPageType::Items
+- [`TRAPS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.TRAPS) JournalPageType::Traps
+- [`STORY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.STORY) JournalPageType::Story
+- [`FEATS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.FEATS) JournalPageType::Feats
+- [`DEATH_CAUSE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.DEATH_CAUSE) JournalPageType::DeathCause
+- [`DEATH_MENU`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.DEATH_MENU) JournalPageType::DeathMenu
+- [`RECAP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.RECAP) JournalPageType::Recap
+- [`PLAYER_PROFILE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.PLAYER_PROFILE) JournalPageType::PlayerProfile
+- [`LAST_GAME_PLAYED`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_PAGE_TYPE.LAST_GAME_PLAYED) JournalPageType::LastGamePlayed
 ## Aliases
 We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
 ### CallbackId == int;

@@ -59,9 +59,10 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         data.sub_image_height = data.height;
     }
 
+    auto* textures = get_textures();
+
     std::lock_guard lock{custom_textures_lock};
 
-    auto* textures = get_textures();
     Texture new_texture{
         static_cast<int64_t>(textures->texture_map.size() + custom_textures.size() + 1),
         nullptr,
@@ -92,6 +93,7 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         existing_name.remove_prefix(sizeof("Data/Textures/../../") - 1);
         if (existing_name == data.texture_path && is_same(texture, new_texture))
         {
+            reload_texture(texture.name);
             return texture.id;
         }
     }
@@ -100,6 +102,7 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     {
         if (texture.name != nullptr && *texture.name == data.texture_path && is_same(texture, new_texture))
         {
+            reload_texture(texture.name);
             return texture.id;
         }
     }
@@ -131,6 +134,43 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     return new_texture.id;
 }
 
+void RenderAPI::reload_texture(const char* texture_name)
+{
+    {
+        std::lock_guard lock{custom_textures_lock};
+        for (auto& [id, texture] : custom_textures)
+        {
+            std::string_view existing_name{*texture.name};
+            existing_name.remove_prefix(sizeof("Data/Textures/../../") - 1);
+            if (existing_name == texture_name)
+            {
+                reload_texture(texture.name);
+                return;
+            }
+        }
+    }
+
+    std::string_view name_view{texture_name};
+    auto* textures = get_textures();
+    for (auto& texture : textures->textures)
+    {
+        if (texture.name && *texture.name == name_view)
+        {
+            reload_texture(texture.name);
+            return;
+        }
+    }
+}
+void RenderAPI::reload_texture(const char** texture_name)
+{
+    class Renderer;
+    using LoadTextureFunT = void(Renderer*, const char**);
+
+    auto renderer_ptr = (Renderer*)renderer();
+    auto load_texture = *vtable_find<LoadTextureFunT*>(renderer_ptr, 0x2D);
+    load_texture(renderer_ptr, texture_name);
+}
+
 using VanillaRenderHudFun = void(size_t, float, float, size_t);
 VanillaRenderHudFun* g_render_hud_trampoline{nullptr};
 void render_hud(size_t hud_data, float y, float opacity, size_t hud_data2)
@@ -156,6 +196,92 @@ void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float 
 {
     trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_PRE_DRAW_DEPTH, draw_depth, {bbox_left, bbox_top, bbox_right, bbox_bottom});
     g_render_draw_depth_trampoline(layer, draw_depth, bbox_left, bbox_bottom, bbox_right, bbox_top);
+}
+
+using VanillaRenderJournalPageFun = void(JournalPage*);
+VanillaRenderJournalPageFun* g_render_journal_page_journalmenu_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_progress_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_place_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_people_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_bestiary_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_items_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_traps_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_story_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_feats_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_deathcause_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_deathmenu_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_recap_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_player_profile_trampoline{nullptr};
+VanillaRenderJournalPageFun* g_render_journal_page_last_game_played_trampoline{nullptr};
+void render_journal_page_journalmenu(JournalPage* page)
+{
+    g_render_journal_page_journalmenu_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::JournalMenu, page);
+}
+void render_journal_page_progress(JournalPage* page)
+{
+    g_render_journal_page_progress_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Progress, page);
+}
+void render_journal_page_place(JournalPage* page)
+{
+    g_render_journal_page_place_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Places, page);
+}
+void render_journal_page_people(JournalPage* page)
+{
+    g_render_journal_page_people_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::People, page);
+}
+void render_journal_page_bestiary(JournalPage* page)
+{
+    g_render_journal_page_bestiary_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Bestiary, page);
+}
+void render_journal_page_items(JournalPage* page)
+{
+    g_render_journal_page_items_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Items, page);
+}
+void render_journal_page_traps(JournalPage* page)
+{
+    g_render_journal_page_traps_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Traps, page);
+}
+void render_journal_page_story(JournalPage* page)
+{
+    g_render_journal_page_story_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Story, page);
+}
+void render_journal_page_feats(JournalPage* page)
+{
+    g_render_journal_page_feats_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Feats, page);
+}
+void render_journal_page_deathcause(JournalPage* page)
+{
+    g_render_journal_page_deathcause_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::DeathCause, page);
+}
+void render_journal_page_deathmenu(JournalPage* page)
+{
+    g_render_journal_page_deathmenu_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::DeathMenu, page);
+}
+void render_journal_page_recap(JournalPage* page)
+{
+    g_render_journal_page_recap_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Recap, page);
+}
+void render_journal_page_player_profile(JournalPage* page)
+{
+    g_render_journal_page_player_profile_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::PlayerProfile, page);
+}
+void render_journal_page_last_game_played(JournalPage* page)
+{
+    g_render_journal_page_last_game_played_trampoline(page);
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::LastGamePlayed, page);
 }
 
 bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
@@ -369,8 +495,7 @@ const Texture* fetch_texture(int32_t texture_id)
 
     if (texture_id < -3)
     {
-        auto* current_theme = State::get().ptr_local()->current_theme();
-        texture_id = current_theme->get_dynamic_floor_texture_id(texture_id);
+        texture_id = State::get().ptr_local()->current_theme->get_dynamic_floor_texture_id(texture_id);
     }
     return get_textures()->texture_map[texture_id];
 }
@@ -410,12 +535,56 @@ void init_render_api_hooks()
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
     g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth"sv);
 
+    size_t fourth_virt = 4 * sizeof(size_t);
+    size_t* render_virt = (size_t*)(get_address("vftable_JournalPageJournalMenu"sv) + fourth_virt);
+    g_render_journal_page_journalmenu_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageProgress"sv) + fourth_virt);
+    g_render_journal_page_progress_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPagePlace"sv) + fourth_virt);
+    g_render_journal_page_place_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPagePeople"sv) + fourth_virt);
+    g_render_journal_page_people_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageBestiary"sv) + fourth_virt);
+    g_render_journal_page_bestiary_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageItems"sv) + fourth_virt);
+    g_render_journal_page_items_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageTraps"sv) + fourth_virt);
+    g_render_journal_page_traps_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageStory"sv) + fourth_virt);
+    g_render_journal_page_story_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageFeats"sv) + fourth_virt);
+    g_render_journal_page_feats_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageDeathCause"sv) + fourth_virt);
+    g_render_journal_page_deathcause_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageDeathMenu"sv) + fourth_virt);
+    g_render_journal_page_deathmenu_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageRecap"sv) + fourth_virt);
+    g_render_journal_page_recap_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPagePlayerProfile"sv) + fourth_virt);
+    g_render_journal_page_player_profile_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+    render_virt = (size_t*)(get_address("vftable_JournalPageLastGamePlayed"sv) + fourth_virt);
+    g_render_journal_page_last_game_played_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
+
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
     DetourAttach((void**)&g_render_draw_depth_trampoline, &render_draw_depth);
+    DetourAttach((void**)&g_render_journal_page_journalmenu_trampoline, &render_journal_page_journalmenu);
+    DetourAttach((void**)&g_render_journal_page_progress_trampoline, &render_journal_page_progress);
+    DetourAttach((void**)&g_render_journal_page_place_trampoline, &render_journal_page_place);
+    DetourAttach((void**)&g_render_journal_page_people_trampoline, &render_journal_page_people);
+    DetourAttach((void**)&g_render_journal_page_bestiary_trampoline, &render_journal_page_bestiary);
+    DetourAttach((void**)&g_render_journal_page_items_trampoline, &render_journal_page_items);
+    DetourAttach((void**)&g_render_journal_page_traps_trampoline, &render_journal_page_traps);
+    DetourAttach((void**)&g_render_journal_page_story_trampoline, &render_journal_page_story);
+    DetourAttach((void**)&g_render_journal_page_feats_trampoline, &render_journal_page_feats);
+    DetourAttach((void**)&g_render_journal_page_deathcause_trampoline, &render_journal_page_deathcause);
+    DetourAttach((void**)&g_render_journal_page_deathmenu_trampoline, &render_journal_page_deathmenu);
+    DetourAttach((void**)&g_render_journal_page_recap_trampoline, &render_journal_page_recap);
+    DetourAttach((void**)&g_render_journal_page_player_profile_trampoline, &render_journal_page_player_profile);
+    DetourAttach((void**)&g_render_journal_page_last_game_played_trampoline, &render_journal_page_last_game_played);
 
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)

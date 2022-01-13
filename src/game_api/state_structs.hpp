@@ -45,10 +45,21 @@ struct Illumination
     float distortion;
     int32_t entity_uid;
     uint32_t timer;
-    /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
-    uint32_t flags;
-    uint32_t unknown1;
-    uint32_t unknown2;
+    union
+    {
+        /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+        uint32_t flags;
+        struct
+        {
+            uint8_t light_flags; // no reason to expose this
+
+            /// Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness
+            /// Rectangle always uses light1, even when it's disabled in flags
+            uint8_t type_flags;
+            uint8_t layer;
+            bool enabled;
+        };
+    };
 };
 
 struct InputMapping
@@ -369,15 +380,18 @@ struct ArenaState
 class Logic
 {
   public:
-    uint32_t unknown1;
-    uint32_t unknown2;
+    uint32_t logic_index; // array index into state.logic, where this instance resides
+    uint32_t padding;
 
     virtual ~Logic() = 0;
 
     // Continuously performs the main functionality of the logic instance
-    // Ouroboros : transitions to level when music finished
+    // Tutorial: handles dropping of the torch and rope in intro routine
+    // Ouroboros: transitions to level when music finished
     // Basecamp speedrun: keep track of time, player position passing official
-    // Level: spawns ghost when time is up (checks cursed for earlier ghost)
+    // Ghost trigger: spawns ghost when time is up (checks cursed for earlier ghost)
+    // Ghost toast trigger: shows the 'A terrible chill...' toast after 90 frames
+    // Tun aggro: spawns Tun after 30 seconds
     // Dice shop: runs the logic of the dice shop
     // Tun pre challenge: unknown
     // Moon challenge: handles waitroom forcefields + tracks mattock breakage
@@ -388,6 +402,7 @@ class Logic
     // Olmec cutscene: runs the cutscene
     // Tiamat cutscene: runs the cutscene
     // Apep trigger: tracks player position, spawns APEP_HEAD
+    // COG Ankh sacrifice: countdown timer (100 frames) from the moment you die, triggers transitioning to duat
     // Duat bosses trigger: tracks player position, spawns ANUBIS2 and OSIRIS_HEAD
     // Tiamat: spawns bubbles
     // Tusk pleasure palace: triggers aggro on everyone when non-high roller enters door
@@ -417,6 +432,14 @@ class LogicBasecampSpeedrun : public Logic
     uint32_t unknown4;
 
     virtual ~LogicBasecampSpeedrun() = 0;
+};
+
+class LogicGhostToast : public Logic
+{
+  public:
+    uint32_t toast_timer;
+
+    virtual ~LogicGhostToast() = 0;
 };
 
 class LogicDiceShop : public Logic
@@ -474,9 +497,7 @@ class LogicStarChallenge : public Logic
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
     uint16_t unknown7;
     uint32_t unknown8;
-    Entity** torches;
-    size_t one_after_last_torch; // this appears to be the address after the last torch, like an end iterator
-    size_t unknown9;
+    std::vector<Entity*> torches;
     uint32_t start_countdown;
 
     virtual ~LogicStarChallenge() = 0;
@@ -548,6 +569,14 @@ class LogicApepTrigger : public Logic
     virtual ~LogicApepTrigger() = 0;
 };
 
+class LogicCOGAnkhSacrifice : public Logic
+{
+    uint8_t unknown3;
+    uint8_t timer;
+
+    virtual ~LogicCOGAnkhSacrifice() = 0;
+};
+
 class LogicDuatBossesTrigger : public Logic
 {
   public:
@@ -574,39 +603,55 @@ class LogicArena1 : public Logic
     virtual ~LogicArena1() = 0;
 };
 
+class LogicArenaAlienBlast : public Logic
+{
+  public:
+    uint32_t timer;
+
+    virtual ~LogicArenaAlienBlast() = 0;
+};
+
+class LogicArenaLooseBombs : public Logic
+{
+  public:
+    uint32_t timer;
+
+    virtual ~LogicArenaLooseBombs() = 0;
+};
+
 struct LogicList
 {
-    uint64_t unknown1;
+    Logic* tutorial;
     LogicOuroboros* ouroboros;
     LogicBasecampSpeedrun* basecamp_speedrun;
-    size_t level_info; // unsure; every level seems to have this, except big boss levels and CO
-    size_t unknown5;
-    size_t unknown6;
+    Logic* ghost_trigger;
+    LogicGhostToast* ghost_toast_trigger;
+    Logic* tun_aggro;
     LogicDiceShop* diceshop;
-    size_t tun_pre_challenge;
+    Logic* tun_pre_challenge;
     LogicMoonChallenge* tun_moon_challenge;
     LogicStarChallenge* tun_star_challenge;
     LogicSunChallenge* tun_sun_challenge;
-    size_t volcana_related;
-    size_t water_related;
+    Logic* volcana_related;
+    Logic* water_related;
     LogicOlmecCutscene* olmec_cutscene;
     LogicTiamatCutscene* tiamat_cutscene;
     LogicApepTrigger* apep_trigger;
-    size_t unknown16;
+    LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
     LogicDuatBossesTrigger* duat_bosses_trigger;
-    size_t unknown17;
+    Logic* tiamat;
     LogicTuskPleasurePalace* tusk_pleasure_palace;
-    size_t discovery_info; // black market, vlad, wet fur discovery; shows the toast
-    size_t black_market;
-    size_t cosmic_ocean;
+    Logic* discovery_info; // black market, vlad, wet fur discovery; shows the toast
+    Logic* black_market;
+    Logic* cosmic_ocean;
     LogicArena1* arena_1;
-    size_t arena_2;
-    size_t arena_3;
-    size_t unknown26;
-    size_t unknown27;
+    Logic* arena_2;
+    Logic* arena_3;
+    LogicArenaAlienBlast* arena_alien_blast;
+    LogicArenaLooseBombs* arena_loose_bombs;
 };
 
-struct MysteryLiquid3
+struct LiquidPhysicsEngine
 {
     bool pause_physics;
     uint8_t padding[3];
@@ -628,29 +673,29 @@ struct MysteryLiquid3
     float unknown15;
     uint32_t entity_count;
     uint32_t allocated_size;
-    uint32_t unk23;
-    size_t unk1;
-    size_t unk2;
-    uint32_t unk3a;
-    uint32_t unk3b;
-    size_t unk41;
-    size_t unk42;
-    size_t unk43;
-    size_t unk44;
-    size_t list;
-    int32_t unknown45a;
-    int32_t unknown45b;    //padding
-    int32_t* liquid_flags; // simple array
-    int32_t unknown47a;
-    int32_t unknown47b; //padding
-    std::pair<float, float>* entity_coordinates;
-    int32_t unknown49a;
-    int32_t unknown49b; //padding
-    std::pair<float, float>* entity_velocities;
-    int32_t unknown51a;
-    int32_t unknown51b; //padding
-    size_t unknown52;
-    size_t unknown53;
+    uint32_t unk23;         // padding probably
+    std::list<size_t> unk1; //seams to be empty, or have one element 0?
+    uint32_t resize_value;  // used to resive the arrays?
+    uint32_t unk3b;         // padding probably
+    std::list<int32_t> liquid_ids;
+    std::list<int32_t> unknown44;                        // all of them are -1
+    std::list<int32_t>::const_iterator* list_liquid_ids; // list of all iterators of liquid_ids?
+    int32_t unknown45a;                                  // size related for the array above
+    int32_t unknown45b;                                  // padding
+    uint32_t* liquid_flags;                              // array
+    int32_t unknown47a;                                  // size related for the array above
+    int32_t unknown47b;                                  // padding
+    std::pair<float, float>* entity_coordinates;         // array
+    int32_t unknown49a;                                  // size related for the array above
+    int32_t unknown49b;                                  //padding
+    std::pair<float, float>* entity_velocities;          // array
+    int32_t unknown51a;                                  // size related for the array above
+    int32_t unknown51b;                                  //padding
+    std::pair<float, float>* unknown52;                  // not sure about the type, it's defenetly a 64bit
+    std::pair<float, float>* unknown53;
+    size_t unknown54;
+    std::pair<float, float>* unknown55;
+    // 3 more size_t here
 };
 
 struct LiquidPhysicsParams
@@ -682,8 +727,11 @@ struct LiquidPhysicsParams
     uint32_t unknown22;
     float unknown23;
     uint32_t unknown24;
-    MysteryLiquid3* unknown25; // MysteryLiquidPointer3 in plugin | resets each level
-    uint32_t liquid_flags;     // 2 - lava_interaction? crashes the game if no lava is present, 3 - pause_physics, 6 - low_agitation?, 7 - high_agitation?, 8 - high_surface_tension?, 9 - low_surface_tension?, 11 - high_bounce?, 12 - low_bounce?
+};
+
+struct LiquidTileSpawnData
+{
+    uint32_t liquid_flags; // 2 - lava_interaction? crashes the game if no lava is present, 3 - pause_physics, 6 - low_agitation?, 7 - high_agitation?, 8 - high_surface_tension?, 9 - low_surface_tension?, 11 - high_bounce?, 12 - low_bounce?
     float last_spawn_x;
     float last_spawn_y;
     float spawn_velocity_x;
@@ -691,9 +739,9 @@ struct LiquidPhysicsParams
     uint32_t unknown31;
     uint32_t unknown32;
     uint32_t unknown33;
-    size_t unknown34;
-    size_t unknown35;                  //DataPointer? seam to get access validation if you change to something
-    uint32_t liquidtile_liquid_amount; //how much liquid will be spawned from tilecode, 1=1x2, 2=2x3, 3=3x4 etc.
+    size_t unknown34;                  // MysteryLiquidPointer2 in plugin, contains last spawn entity
+    size_t unknown35;                  // DataPointer? seam to get access validation if you change to something
+    uint32_t liquidtile_liquid_amount; // how much liquid will be spawned from tilecode, 1=1x2, 2=2x3, 3=3x4 etc.
     float blobs_separation;
     int32_t unknown39; //is the last 4 garbage? seams not accessed
     float unknown40;
@@ -703,28 +751,34 @@ struct LiquidPhysicsParams
 
 struct LiquidPhysics
 {
-    size_t unknown1;
+    size_t unknown1; // MysteryLiquidPointer1 in plugin
     union
     {
-        std::array<LiquidPhysicsParams, 5> pools;
         struct
         {
-            LiquidPhysicsParams water_physics;
-            LiquidPhysicsParams coarse_water_physics;
-            LiquidPhysicsParams lava_physics;
-            LiquidPhysicsParams coarse_lava_physics;
-            LiquidPhysicsParams stagnant_lava_physics;
+            LiquidPhysicsParams physics_defaults;
+            LiquidPhysicsEngine* physics_engine;
+            LiquidTileSpawnData tile_spawn_data;
+        } pools[5];
+        struct
+        {
+            LiquidPhysicsParams water_physics_defaults;
+            LiquidPhysicsEngine* water_physics_engine;
+            LiquidTileSpawnData water_tile_spawn_data;
+            LiquidPhysicsParams coarse_water_physics_defaults;
+            LiquidPhysicsEngine* coarse_water_physics_engine;
+            LiquidTileSpawnData coarse_water_tile_spawn_data;
+            LiquidPhysicsParams lava_physics_defaults;
+            LiquidPhysicsEngine* lava_physics_engine;
+            LiquidTileSpawnData lava_tile_spawn_data;
+            LiquidPhysicsParams coarse_lava_physics_defaults;
+            LiquidPhysicsEngine* coarse_lava_physics_engine;
+            LiquidTileSpawnData coarse_lava_tile_spawn_data;
+            LiquidPhysicsParams stagnant_lava_physics_defaults;
+            LiquidPhysicsEngine* stagnant_lava_physics_engine;
+            LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
-};
-
-struct PointerList
-{
-    size_t begin;
-    size_t end; // one past the last pointer, like end iterator
-    size_t unknown1;
-    uint32_t unknown2;
-    uint32_t unknown3;
 };
 
 struct AITarget

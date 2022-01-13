@@ -462,6 +462,7 @@ std::array g_community_tile_codes{
             };
             g_attachee_requiring_entities.push_back({{{x, y - 1}}, do_spawn});
         }},
+    CommunityTileCode{"boombox", "ENT_TYPE_ITEM_BOOMBOX"},
     //CommunityTileCode{
     //    "lake_imposter",
     //    "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
@@ -802,11 +803,11 @@ void load_level_file(LevelGenData* level_gen_data, const char* level_file_name)
     }
 }
 
-using DoExtraSpawns = void(ThemeInfo*, std::uint32_t, std::uint32_t, std::uint32_t, std::uint32_t, std::uint8_t);
+using DoExtraSpawns = void(ThemeInfo*, std::uint32_t, std::uint32_t, std::uint32_t, std::uint8_t);
 DoExtraSpawns* g_do_extra_spawns_trampoline{nullptr};
-void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_width, std::uint32_t border_height, std::uint32_t level_width, std::uint32_t level_height, std::uint8_t layer)
+void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_size, std::uint32_t level_width, std::uint32_t level_height, std::uint8_t layer)
 {
-    g_do_extra_spawns_trampoline(theme, border_width, border_height, level_width, level_height, layer);
+    g_do_extra_spawns_trampoline(theme, border_size, level_width, level_height, layer);
 
     PRNG& prng = PRNG::get_local();
 
@@ -818,10 +819,10 @@ void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_width, std::uint32_t
             provider.transient_valid_positions.clear();
         }
 
-        for (std::uint32_t ix = border_width; ix != level_width; ix++)
+        for (std::uint32_t ix = border_size; ix != level_width; ix++)
         {
             const float x = static_cast<float>(ix);
-            for (std::uint32_t iy = border_height; iy != level_height; iy++)
+            for (std::uint32_t iy = border_size; iy != level_height; iy++)
             {
                 const float y = 122.0f - static_cast<float>(iy);
                 for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
@@ -1030,32 +1031,38 @@ void LevelGenData::init()
     // Add new community tile codes
     for (auto& community_tile_code : g_community_tile_codes)
     {
-        assert(!get_tile_code(std::string{community_tile_code.tile_code}).has_value());
-        community_tile_code.tile_code_id = define_tile_code(std::string{community_tile_code.tile_code});
-        const auto entity_id = to_id(community_tile_code.entity_type);
-        if (entity_id < 0)
+        // If another module already inserted this we can skip it
+        if (!get_tile_code(std::string{community_tile_code.tile_code}).has_value())
         {
-            community_tile_code.entity_id = to_id("ENT_TYPE_ITEM_BOMB");
-        }
-        else
-        {
-            community_tile_code.entity_id = entity_id;
+            community_tile_code.tile_code_id = define_tile_code(std::string{community_tile_code.tile_code});
+            const auto entity_id = to_id(community_tile_code.entity_type);
+            if (entity_id < 0)
+            {
+                community_tile_code.entity_id = to_id("ENT_TYPE_ITEM_BOMB");
+            }
+            else
+            {
+                community_tile_code.entity_id = entity_id;
+            }
         }
     }
 
     // Add new community chances
     for (auto& community_chance : g_community_chances)
     {
-        assert(!get_chance(std::string{community_chance.chance}).has_value());
-        community_chance.chance_id = define_chance(std::string{community_chance.chance});
-        const auto entity_id = to_id(community_chance.entity_type);
-        if (entity_id < 0)
+        // If another module already inserted this we can skip it
+        if (!get_chance(std::string{community_chance.chance}).has_value())
         {
-            community_chance.entity_id = to_id("ENT_TYPE_ITEM_BOMB");
-        }
-        else
-        {
-            community_chance.entity_id = entity_id;
+            community_chance.chance_id = define_chance(std::string{community_chance.chance});
+            const auto entity_id = to_id(community_chance.entity_type);
+            if (entity_id < 0)
+            {
+                community_chance.entity_id = to_id("ENT_TYPE_ITEM_BOMB");
+            }
+            else
+            {
+                community_chance.entity_id = entity_id;
+            }
         }
     }
 
@@ -1083,8 +1090,8 @@ void LevelGenData::init()
                 "\x41\x53"                     //PUSH       R11
                 "\x41\x53"                     //PUSH       R11
                 "\x48\x8d\x8d\xa0\x02\x00\x00" //LEA        RCX, [RBP + 0x2a0] == room_template_name
-                "\x48\x8d\x95\x58\x05\x00\x00" //LEA        RDX, [RBP + 0x558] == room_width
-                "\x4c\x8d\x85\xb8\x05\x00\x00" //LEA        R8, [RBP + 0x5b8] == room_height
+                "\x48\x8d\x95\x78\x05\x00\x00" //LEA        RDX, [RBP + 0x578] == room_width
+                "\x4c\x8d\x85\xe0\x05\x00\x00" //LEA        R8, [RBP + 0x5e0] == room_height
                 "\x48\xb8{}"                   //MOV        RAX, &get_room_size
                 "\xff\xd0"                     //CALL       RAX
                 "\x41\x5b"                     //POP        R11
@@ -1095,15 +1102,15 @@ void LevelGenData::init()
                 "\x5a"                         //POP        RDX
                 "\x59"                         //POP        RCX
                 "\x58"                         //POP        RAX
-                "\x44\x8b\xad\xd4\x05\x00\x00" //MOV        R13D,dword ptr [RBP + 0x5d4]
-                "\x41\x83\xe5\x08"             //AND        R13D,0x8
-                "\x48\x8b\x85\x50\x05\x00\x00" //MOV        RAX,qword ptr [RBP + 0x550]
-                "\x48\x85\xc0"                 //TEST       RAX,RAX
-                "\x74\x13"                     //JZ         FIRST_JUMP
-                "\x49\x89\xc4"                 //MOV        R12,RAX
-                "\x48\x8b\x9d\x60\x05\x00\x00" //MOV        RBX,qword ptr [RBP + 0x560]
-                "\x48\x8b\xb5\x48\x05\x00\x00" //MOV        RSI,qword ptr [RBP + 0x548]
+                // Original Code Begin
+                "\x44\x8b\xbd\xe4\x05\x00\x00" //MOV        R15D,dword ptr [RBP + 0x5e4]
+                "\x41\x83\xe7\x08"             //AND        R15D,0x8
+                "\x4c\x8b\xb5\x70\x05\x00\x00" //MOV        R14,qword ptr [RBP + 0x570]
+                "\x4d\x85\xf6"                 //TEST       R14,R14
+                "\x74\x09"                     //JZ         FIRST_JUMP
+                "\x48\x8b\xbd\x60\x05\x00\x00" //MOV        RDI,qword ptr [RBP + 0x560]
                 "\xeb\x0c"                     //JMP        SECOND_JUMP
+                                               // Original Code End
                 /*FIST_JUMP*/ "\x48\xb8{}"     //MOV        RAX, get_room_size_first_jump
                 "\xff\xe0"                     //JMP        RAX
                 /*SECOND_JUMP*/ "\x48\xb8{}"   //MOV        RAX, get_room_size_second_jump
@@ -1392,7 +1399,6 @@ RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_templat
     return RoomTemplateType::None;
 }
 
-using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
 void LevelGenSystem::init()
 {
     data->init();
@@ -1417,6 +1423,7 @@ void LevelGenSystem::init()
                 original(self, param_2, param_3, param_4);
             },
             0xd);
+        using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
         hook_vtable<DoProceduralSpawnFun>(
             theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
             {

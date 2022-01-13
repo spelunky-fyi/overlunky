@@ -37,7 +37,7 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
         to_id("ENT_TYPE_LIQUID_COARSE_LAVA"),
     };
 
-    auto state = State::get().ptr();
+    auto state = get_state_ptr();
     if (state->loading != 2 && std::ranges::find(lava_types, entity_type) != lava_types.end())
     {
         std::vector<Lava*> lavas{};
@@ -59,7 +59,7 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
             float light_size = 1.0f;
             uint32_t flags = 0x63;
 
-            using construct_illumination_ptr_fun_t = Illumination*(PointerList*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
+            using construct_illumination_ptr_fun_t = Illumination*(std::vector<Illumination*>*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
             static auto construct_illumination_ptr_call = (construct_illumination_ptr_fun_t*)get_address("construct_illumination_ptr");
 
             auto ill_ptr = construct_illumination_ptr_call(state->lightsources, position, color, 2, light_size, flags, lava->uid, lava->layer);
@@ -74,59 +74,65 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 
 void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, uint32_t liquid_flags, uint32_t amount, float blobs_separation = INFINITY)
 {
-    LiquidPhysicsParams* liquid_physics = nullptr;
-    auto state_ptr = State::get().ptr();
+    LiquidTileSpawnData* liquid_spawn_info = nullptr;
+    auto state_ptr = get_state_ptr();
+    static const ENT_TYPE liquid_water = to_id("ENT_TYPE_LIQUID_WATER");
+    static const ENT_TYPE liquid_coarse_water = to_id("ENT_TYPE_LIQUID_COARSE_WATER");
+    static const ENT_TYPE liquid_lava = to_id("ENT_TYPE_LIQUID_LAVA");
+    static const ENT_TYPE liquid_stagnant_lava = to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA");
+    static const ENT_TYPE liquid_coarse_lava = to_id("ENT_TYPE_LIQUID_COARSE_LAVA");
 
-    if (entity_type == to_id("ENT_TYPE_LIQUID_WATER"))
+    if (entity_type == liquid_water)
     {
-        liquid_physics = &state_ptr->liquid_physics->water_physics;
+        liquid_spawn_info = &state_ptr->liquid_physics->water_tile_spawn_data;
     }
-    else if (entity_type == to_id("ENT_TYPE_LIQUID_COARSE_WATER"))
+    else if (entity_type == liquid_coarse_water)
     {
-        liquid_physics = &state_ptr->liquid_physics->coarse_water_physics;
+        liquid_spawn_info = &state_ptr->liquid_physics->coarse_water_tile_spawn_data;
     }
-    else if (entity_type == to_id("ENT_TYPE_LIQUID_LAVA"))
+    else if (entity_type == liquid_lava)
     {
-        liquid_physics = &state_ptr->liquid_physics->lava_physics;
+        liquid_spawn_info = &state_ptr->liquid_physics->lava_tile_spawn_data;
     }
-    else if (entity_type == to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"))
+    else if (entity_type == liquid_stagnant_lava)
     {
-        liquid_physics = &state_ptr->liquid_physics->stagnant_lava_physics;
+        liquid_spawn_info = &state_ptr->liquid_physics->stagnant_lava_tile_spawn_data;
     }
-    else if (entity_type == to_id("ENT_TYPE_LIQUID_COARSE_LAVA"))
+    else if (entity_type == liquid_coarse_lava)
     {
-        liquid_physics = &state_ptr->liquid_physics->coarse_lava_physics;
+        liquid_spawn_info = &state_ptr->liquid_physics->coarse_lava_tile_spawn_data;
     }
 
-    if (liquid_physics != nullptr)
+    if (liquid_spawn_info != nullptr)
     {
         auto some_value = get_address("spawn_liquid_amount");
-        write_mem_prot(some_value, (int8_t)0, true);
+        const uint8_t tmp_value = read_u8(some_value);
+        write_mem_prot(some_value, (uint8_t)0, true);
 
         // Save default liquid physics spawn values
-        float tmp_spawn_velocity_x = liquid_physics->spawn_velocity_x,
-              tmp_spawn_velocity_y = liquid_physics->spawn_velocity_y,
-              tmp_blobs_separation = liquid_physics->blobs_separation;
-        uint32_t tmp_liquid_flags = liquid_physics->liquid_flags,
-                 tmp_liquidtile_liquid_amount = liquid_physics->liquidtile_liquid_amount;
+        float tmp_spawn_velocity_x = liquid_spawn_info->spawn_velocity_x,
+              tmp_spawn_velocity_y = liquid_spawn_info->spawn_velocity_y,
+              tmp_blobs_separation = liquid_spawn_info->blobs_separation;
+        uint32_t tmp_liquid_flags = liquid_spawn_info->liquid_flags,
+                 tmp_liquidtile_liquid_amount = liquid_spawn_info->liquidtile_liquid_amount;
 
-        liquid_physics->liquid_flags = liquid_flags;
-        liquid_physics->spawn_velocity_x = velocityx;
-        liquid_physics->spawn_velocity_y = velocityy;
-        liquid_physics->liquidtile_liquid_amount = amount;
+        liquid_spawn_info->liquid_flags = liquid_flags;
+        liquid_spawn_info->spawn_velocity_x = velocityx;
+        liquid_spawn_info->spawn_velocity_y = velocityy;
+        liquid_spawn_info->liquidtile_liquid_amount = amount;
         if (blobs_separation != INFINITY)
-            liquid_physics->blobs_separation = blobs_separation;
+            liquid_spawn_info->blobs_separation = blobs_separation;
 
         spawn_liquid(entity_type, x, y);
 
         // Reset to default values
-        liquid_physics->liquid_flags = tmp_liquid_flags;
-        liquid_physics->spawn_velocity_x = tmp_spawn_velocity_x;
-        liquid_physics->spawn_velocity_y = tmp_spawn_velocity_y;
-        liquid_physics->liquidtile_liquid_amount = tmp_liquidtile_liquid_amount;
-        liquid_physics->blobs_separation = tmp_blobs_separation;
+        liquid_spawn_info->liquid_flags = tmp_liquid_flags;
+        liquid_spawn_info->spawn_velocity_x = tmp_spawn_velocity_x;
+        liquid_spawn_info->spawn_velocity_y = tmp_spawn_velocity_y;
+        liquid_spawn_info->liquidtile_liquid_amount = tmp_liquidtile_liquid_amount;
+        liquid_spawn_info->blobs_separation = tmp_blobs_separation;
 
-        write_mem_prot(some_value, (int8_t)1, true);
+        write_mem_prot(some_value, tmp_value, true);
     }
 }
 
@@ -382,8 +388,8 @@ void spawn_tree(float x, float y, LAYER layer)
 
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, float top_threshold)
 {
-    static auto impostor_lake_id = to_id("ENT_TYPE_LIQUID_IMPOSTOR_LAKE");
-    static auto impostor_lava_id = to_id("ENT_TYPE_LIQUID_IMPOSTOR_LAVA");
+    static const auto impostor_lake_id = to_id("ENT_TYPE_LIQUID_IMPOSTOR_LAKE");
+    static const auto impostor_lava_id = to_id("ENT_TYPE_LIQUID_IMPOSTOR_LAVA");
     if (impostor_type == impostor_lake_id || impostor_type == impostor_lava_id)
     {
         push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
@@ -466,8 +472,7 @@ using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool
 SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
 Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
-    auto* current_theme = State::get().ptr_local()->current_theme();
-    const auto theme_floor = current_theme->random_block_floorstyle();
+    const auto theme_floor = State::get().ptr_local()->current_theme->random_block_floorstyle();
     const bool is_floor_spreading = (entity_type == theme_floor) && (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) && !(g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN_TILE_CODE);
     if (is_floor_spreading)
     {
@@ -515,4 +520,36 @@ void init_spawn_hooks()
             DEBUG("Failed hooking SpawnEntity: {}\n", error);
         }
     }
+}
+
+void spawn_player(int8_t player_slot, float x, float y)
+{
+    if (player_slot < 1 || player_slot > 4)
+        return;
+
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
+    using spawn_player_fun = void(Items*, uint8_t ps, float pos_x, float pos_y);
+    static auto spawn_player = (spawn_player_fun*)get_address("spawn_player");
+    spawn_player(get_state_ptr()->items, player_slot - 1, x, y);
+}
+
+int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
+{
+    auto offset = get_address("spawn_companion");
+    if (offset != 0)
+    {
+        push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+        OnScopeExit pop{[]
+                        { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
+        auto state = get_state_ptr();
+        typedef Player* spawn_companion_func(StateMemory*, float x, float y, size_t layer, uint32_t entity_type);
+        static spawn_companion_func* sc = (spawn_companion_func*)(offset);
+        Player* spawned = sc(state, x, y, enum_to_layer(layer), companion_type);
+        return spawned->uid;
+    }
+    return -1;
 }

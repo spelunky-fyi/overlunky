@@ -150,8 +150,6 @@ void LuaBackend::clear_all_callbacks()
     lua["on_death"] = sol::lua_nil;
     lua["on_win"] = sol::lua_nil;
     lua["on_screen"] = sol::lua_nil;
-    lua["on_render_pre_hud"] = sol::lua_nil;
-    lua["on_render_post_hud"] = sol::lua_nil;
 }
 
 bool LuaBackend::reset()
@@ -212,7 +210,7 @@ bool LuaBackend::update()
         {
             on_frame.value()();
         }
-        if (g_state->screen == (int)ON::CAMP && state.screen != (int)ON::CAMP)
+        if (g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3)
         {
             if (on_camp)
                 on_camp.value()();
@@ -360,6 +358,11 @@ bool LuaBackend::update()
                 callback.lastRan = now;
             }
             else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3)
+            {
+                handle_function(callback.func);
+                callback.lastRan = now;
+            }
+            else if (callback.screen == ON::CAMP && g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3)
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
@@ -878,6 +881,22 @@ void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
     }
 }
 
+void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (callback.screen == event)
+        {
+            handle_function(callback.func, render_ctx, page_type, page);
+            callback.lastRan = now;
+        }
+    }
+}
 void LuaBackend::hook_entity_dtor(Entity* entity)
 {
     if (std::count_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity](auto& dtor_hook)

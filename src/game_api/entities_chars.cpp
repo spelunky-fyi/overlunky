@@ -42,9 +42,10 @@ bool PowerupCapable::has_powerup(ENT_TYPE powerup_type)
 std::vector<ENT_TYPE> PowerupCapable::get_powerups()
 {
     std::vector<ENT_TYPE> return_powerups;
-    for (auto it = powerups.begin(); it != powerups.end(); ++it)
+    return_powerups.reserve(powerups.size());
+    for (auto& it : powerups)
     {
-        return_powerups.push_back(it->first);
+        return_powerups.push_back(it.first);
     }
     return return_powerups;
 }

@@ -1,4 +1,5 @@
 #include "entity_lua.hpp"
+#include "custom_types.hpp"
 #include "entity.hpp"
 #include "movable.hpp"
 
@@ -79,6 +80,18 @@ void register_usertypes(sol::state& lua)
         &EntityDB::width,
         "height",
         &EntityDB::height,
+        "offsetx",
+        sol::property([](EntityDB& e) -> float
+                      { return e.rect_collision.offsetx; }),
+        "offsety",
+        sol::property([](EntityDB& e) -> float
+                      { return e.rect_collision.offsety; }),
+        "hitboxx",
+        sol::property([](EntityDB& e) -> float
+                      { return e.rect_collision.hitboxx; }),
+        "hitboxy",
+        sol::property([](EntityDB& e) -> float
+                      { return e.rect_collision.hitboxy; }),
         "draw_depth",
         &EntityDB::draw_depth,
         "friction",
@@ -220,7 +233,15 @@ void register_usertypes(sol::state& lua)
         "destroy",
         &Entity::destroy,
         "activate",
-        &Entity::activate);
+        &Entity::activate,
+        "perform_teleport",
+        &Entity::perform_teleport,
+        "trigger_action",
+        &Entity::trigger_action,
+        "get_metadata",
+        &Entity::get_metadata,
+        "apply_metadata",
+        &Entity::apply_metadata);
 
     auto damage = sol::overload(
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
@@ -271,6 +292,8 @@ void register_usertypes(sol::state& lua)
         &Movable::some_state,
         "wet_effect_timer",
         &Movable::wet_effect_timer,
+        "poison_tick_timer",
+        &Movable::poison_tick_timer,
         "airtime",
         &Movable::falling_timer,
         "falling_timer",
@@ -326,13 +349,18 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("ENT_TYPE"
                            //, "FLOOR_BORDERTILE", 1
                            //, "", ...check__[entities.txt]\[game_data/entities.txt\]...
-                           //, "LIQUID_STAGNANT_LAVA", 898
+                           //, "LIQUID_COARSE_LAVA", 915
     );
     for (auto& item : list_entities())
     {
         auto name = item.name.substr(9, item.name.size());
         lua["ENT_TYPE"][name] = item.id;
     }
+    for (auto elm : get_custom_types_map())
+    {
+        lua["ENT_TYPE"][elm.second] = elm.first;
+    }
+
     lua.create_named_table("REPEAT_TYPE", "NO_REPEAT", REPEAT_TYPE::NoRepeat, "LINEAR", REPEAT_TYPE::Linear, "BACK_AND_FORTH", REPEAT_TYPE::BackAndForth);
     lua.create_named_table("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
     lua.create_named_table(

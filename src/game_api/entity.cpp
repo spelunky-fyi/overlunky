@@ -17,23 +17,6 @@
 using namespace std::chrono_literals;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
-template <class FunT>
-struct HookWithId
-{
-    std::uint32_t id;
-    std::function<FunT> fun;
-};
-struct EntityHooksInfo
-{
-    void* entity;
-    std::uint32_t cbcount;
-    std::vector<HookWithId<void(Entity*)>> on_dtor;
-    std::vector<HookWithId<void(Entity*)>> on_destroy;
-    std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
-    std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
-    std::vector<HookWithId<void(Movable*)>> post_statemachine;
-    std::vector<HookWithId<void(Container*, Movable*)>> on_open;
-};
 std::vector<EntityHooksInfo> g_entity_hooks;
 
 struct EntityBucket
@@ -165,7 +148,7 @@ void Entity::teleport_abs(float dx, float dy, float vx, float vy)
     y = dy;
     if (is_movable())
     {
-        auto movable_ent = (Movable*)pointer();
+        auto movable_ent = this->as<Movable>();
         movable_ent->velocityx = vx;
         movable_ent->velocityy = vy;
     }
@@ -196,10 +179,8 @@ void Entity::set_layer(LAYER layer_to)
     static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
     add_to_layer(ptr_to, this);
 
-    int* pitems = (int*)items.begin;
-    for (uint8_t idx = 0; idx < items.count; ++idx)
+    for (auto item : items)
     {
-        auto item = get_entity_ptr(pitems[idx]);
         item->set_layer(layer_to);
     }
 }
@@ -216,10 +197,8 @@ void Entity::remove()
             static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
             remove_from_layer(ptr_from, this);
 
-            int* pitems = (int*)items.begin;
-            for (uint8_t idx = 0; idx < items.count; ++idx)
+            for (auto item : items)
             {
-                auto item = get_entity_ptr(pitems[idx]);
                 item->remove();
             }
         }
@@ -230,6 +209,13 @@ void Entity::remove()
 void Entity::respawn(LAYER layer_to)
 {
     set_layer(layer_to);
+}
+
+void Entity::perform_teleport(uint8_t delta_x, uint8_t delta_y)
+{
+    using TeleportFun = void(Entity*, uint8_t, uint8_t);
+    static TeleportFun* tp = (TeleportFun*)get_address("teleport");
+    tp(this, delta_x, delta_y);
 }
 
 std::pair<float, float> Entity::position()
@@ -252,37 +238,21 @@ std::pair<float, float> Entity::position_self() const
     return std::pair<float, float>(x, y);
 }
 
-std::pair<float, float> Entity::position_render() const
+void Entity::remove_item(uint32_t item_uid)
 {
-    if (overlay != nullptr)
-    {
-        auto [x_pos, y_pos] = position_self();
-        auto [rx_pos, ry_pos] = overlay->position_render();
-        return {rx_pos + x_pos, ry_pos + y_pos};
-    }
-    if (rendering_info == nullptr)
-    {
-        return position_self();
-    }
-    return {rendering_info->x, rendering_info->y};
-}
-
-void Entity::remove_item(uint32_t id)
-{
-    remove_item_ptr(State::get().find(id));
+    auto entity = get_entity_ptr(item_uid);
+    if (entity)
+        remove_item_ptr(entity);
 }
 
 void Player::set_jetpack_fuel(uint8_t fuel)
 {
     static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
-    int* pitems = (int*)items.begin;
-    for (uint8_t idx = 0; idx < items.count; ++idx)
+    for (auto item : items)
     {
-        auto ent_type = get_entity_type(pitems[idx]);
-        if (ent_type == jetpackID)
+        if (item->type->id == jetpackID)
         {
-            auto jetpack = get_entity_ptr(pitems[idx])->as<Jetpack>();
-            jetpack->fuel = fuel;
+            item->as<Jetpack>()->fuel = fuel;
             break;
         }
     }
@@ -291,14 +261,11 @@ void Player::set_jetpack_fuel(uint8_t fuel)
 uint8_t Player::kapala_blood_amount()
 {
     static auto kapalaPowerupID = to_id("ENT_TYPE_ITEM_POWERUP_KAPALA");
-    int* pitems = (int*)items.begin;
-    for (uint8_t idx = 0; idx < items.count; ++idx)
+    for (auto item : items)
     {
-        auto ent_type = get_entity_type(pitems[idx]);
-        if (ent_type == kapalaPowerupID)
+        if (item->type->id == kapalaPowerupID)
         {
-            auto kapala = get_entity_ptr(pitems[idx])->as<KapalaPowerup>();
-            return kapala->amount_of_blood;
+            return item->as<KapalaPowerup>()->amount_of_blood;
         }
     }
     return 0;
@@ -417,6 +384,7 @@ std::tuple<float, float, uint8_t> get_position(uint32_t uid)
     Entity* ent = get_entity_ptr(uid);
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer);
+
     return {0.0f, 0.0f, (uint8_t)0};
 }
 
@@ -424,7 +392,12 @@ std::tuple<float, float, uint8_t> get_render_position(uint32_t uid)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent)
-        return std::make_tuple(ent->position_render().first, ent->position_render().second, ent->layer);
+    {
+        if (ent->rendering_info != nullptr && !ent->rendering_info->stop_render)
+            return std::make_tuple(ent->rendering_info->x, ent->rendering_info->y, ent->layer);
+        else
+            return get_position(uid);
+    }
     return {0.0f, 0.0f, (uint8_t)0};
 }
 
@@ -439,6 +412,12 @@ std::tuple<float, float> get_velocity(uint32_t uid)
             Movable* mov = ent->as<Movable>();
             vx = mov->velocityx;
             vy = mov->velocityy;
+        }
+        else if (ent->is_liquid())
+        {
+            auto liquid_engine = State::get().get_correct_liquid_engine(ent->type->id);
+            vx = liquid_engine->entity_velocities->first;
+            vy = liquid_engine->entity_velocities->second;
         }
         if (ent->overlay)
         {
@@ -492,11 +471,19 @@ void Entity::unhook(std::uint32_t id)
                       { return hook.id == id; });
         std::erase_if(it->on_kill, [id](auto& hook)
                       { return hook.id == id; });
+        std::erase_if(it->on_player_instagib, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->on_damage, [id](auto& hook)
+                      { return hook.id == id; });
         std::erase_if(it->pre_statemachine, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->post_statemachine, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->on_open, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->pre_collision1, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->pre_collision2, [id](auto& hook)
                       { return hook.id == id; });
     }
 }
@@ -577,13 +564,72 @@ void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(
     hook_info.on_kill.push_back({reserved_callback_id, std::move(on_kill)});
 }
 
+void Entity::set_on_player_instagib(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> on_instagib)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    // no hooking here, because the instagib function is hooked in rpc.cpp
+    hook_info.on_player_instagib.push_back({reserved_callback_id, std::move(on_instagib)});
+}
+
+void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.on_damage.empty())
+    {
+        if ((this->type->search_flags & 0x1) == 0x1)
+        {
+            // Can't hook player::on_damage here, because this is permanently hooked for the god function.
+            // The god function takes care of calling the script hooks in rpc.cpp
+        }
+        else
+        {
+            hook_vtable<void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t)>(
+                this,
+                [](Entity* self, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint16_t stun_amount, uint8_t iframes, void (*original)(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t))
+                {
+                    EntityHooksInfo& _hook_info = self->get_hooks();
+                    bool skip_orig = false;
+                    for (auto& [id, on_damage] : _hook_info.on_damage)
+                    {
+                        if (on_damage(self, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
+                        {
+                            skip_orig = true;
+                        }
+                    }
+
+                    if (!skip_orig)
+                    {
+                        original(self, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
+                    }
+                },
+                0x30);
+        }
+    }
+    hook_info.on_damage.push_back({reserved_callback_id, std::move(on_damage)});
+}
+
 bool Entity::is_movable()
 {
+    static const ENT_TYPE first_logical = to_id("ENT_TYPE_LOGICAL_CONSTELLATION");
     if (type->search_flags & 0b11111111) // PLAYER | MOUNT | MONSTER | ITEM | ROPE | EXPLOSION | FX | ACTIVEFLOOR
         return true;
     else if (type->search_flags & 0x1000) // LOGICAL - as it has some movable entities
-        if (type->id < 842)               // actually check if it's not logical
+        if (type->id < first_logical)     // actually check if it's not logical
             return true;
+
+    return false;
+}
+
+bool Entity::is_liquid()
+{
+    static const ENT_TYPE liquid_water = to_id("ENT_TYPE_LIQUID_WATER");
+    static const ENT_TYPE liquid_coarse_water = to_id("ENT_TYPE_LIQUID_COARSE_WATER");
+    static const ENT_TYPE liquid_lava = to_id("ENT_TYPE_LIQUID_LAVA");
+    static const ENT_TYPE liquid_stagnant_lava = to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA");
+    static const ENT_TYPE liquid_coarse_lava = to_id("ENT_TYPE_LIQUID_COARSE_LAVA");
+
+    if (type->id == liquid_water || type->id == liquid_coarse_water || type->id == liquid_lava || type->id == liquid_stagnant_lava || type->id == liquid_coarse_lava)
+        return true;
 
     return false;
 }
@@ -610,4 +656,64 @@ void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<vo
             0x18);
     }
     hook_info.on_open.push_back({reserved_callback_id, std::move(on_open)});
+}
+
+void Entity::set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_collision1.empty())
+    {
+        hook_vtable<void(Entity*, Entity*)>(
+            this,
+            [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
+            {
+                EntityHooksInfo& _hook_info = self->get_hooks();
+
+                bool skip_orig = false;
+                for (auto& [id, pre] : _hook_info.pre_collision1)
+                {
+                    if (pre(self, collision_entity))
+                    {
+                        skip_orig = true;
+                    }
+                }
+
+                if (!skip_orig)
+                {
+                    original(self, collision_entity);
+                }
+            },
+            0x4);
+    }
+    hook_info.pre_collision1.push_back({reserved_callback_id, std::move(pre_collision1)});
+}
+
+void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_collision2.empty())
+    {
+        hook_vtable<void(Entity*, Entity*)>(
+            this,
+            [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
+            {
+                EntityHooksInfo& _hook_info = self->get_hooks();
+
+                bool skip_orig = false;
+                for (auto& [id, pre] : _hook_info.pre_collision2)
+                {
+                    if (pre(self, collision_entity))
+                    {
+                        skip_orig = true;
+                    }
+                }
+
+                if (!skip_orig)
+                {
+                    original(self, collision_entity);
+                }
+            },
+            0x1A);
+    }
+    hook_info.pre_collision2.push_back({reserved_callback_id, std::move(pre_collision2)});
 }

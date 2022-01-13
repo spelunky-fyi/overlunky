@@ -10,6 +10,37 @@
 
 #include "logger.h"
 
+#include <xinput.h>
+typedef DWORD(WINAPI* PFN_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*);
+typedef DWORD(WINAPI* PFN_XInputGetState)(DWORD, XINPUT_STATE*);
+static bool g_HasGamepad = false;
+static bool g_WantUpdateHasGamepad = false;
+static HMODULE g_XInputDLL = NULL;
+static PFN_XInputGetCapabilities g_XInputGetCapabilities = NULL;
+static PFN_XInputGetState g_XInputGetState = NULL;
+
+struct Gamepad : XINPUT_GAMEPAD
+{
+    bool enabled;
+};
+
+Gamepad get_gamepad()
+{
+    if (g_WantUpdateHasGamepad)
+    {
+        XINPUT_CAPABILITIES caps;
+        g_HasGamepad = g_XInputGetCapabilities ? (g_XInputGetCapabilities(0, XINPUT_FLAG_GAMEPAD, &caps) == ERROR_SUCCESS) : false;
+        //g_WantUpdateHasGamepad = false;
+    }
+
+    XINPUT_STATE xinput_state;
+    if (g_HasGamepad && g_XInputGetState && g_XInputGetState(0, &xinput_state) == ERROR_SUCCESS)
+    {
+        return {xinput_state.Gamepad, true};
+    }
+    return Gamepad{{0}};
+}
+
 const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
 
 GuiDrawContext::GuiDrawContext(LuaBackend* _backend, ImDrawList* _draw_list)
@@ -57,7 +88,7 @@ void GuiDrawContext::draw_rect_filled(float left, float top, float right, float 
 };
 void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
 {
-    draw_rect_filled(rect.left, rect.bottom, rect.right, rect.top, rounding, color);
+    draw_rect_filled(rect.left, rect.top, rect.right, rect.bottom, rounding, color);
 }
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
 {
@@ -94,19 +125,19 @@ void GuiDrawContext::draw_text(float x, float y, float size, std::string text, u
     }
     backend->draw_list->AddText(font, size, a, color, text.c_str());
 };
-void GuiDrawContext::draw_image(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
+void GuiDrawContext::draw_image(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
 {
     if (!backend->images.contains(image))
         return;
-    ImVec2 a = screenify({x1, y1});
-    ImVec2 b = screenify({x2, y2});
+    ImVec2 a = screenify({left, top});
+    ImVec2 b = screenify({right, bottom});
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     backend->draw_list->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
 };
 void GuiDrawContext::draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)
 {
-    draw_image(image, rect.left, rect.bottom, rect.right, rect.top, uv_rect.left, uv_rect.bottom, uv_rect.right, uv_rect.top, color);
+    draw_image(image, rect.left, rect.top, rect.right, rect.bottom, uv_rect.left, uv_rect.top, uv_rect.right, uv_rect.bottom, color);
 }
 void GuiDrawContext::draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
 {
@@ -269,6 +300,23 @@ namespace NGui
 {
 void register_usertypes(sol::state& lua)
 {
+    const char* xinput_dll_names[] =
+        {
+            "xinput1_4.dll",   // Windows 8+
+            "xinput1_3.dll",   // DirectX SDK
+            "xinput9_1_0.dll", // Windows Vista, Windows 7
+            "xinput1_2.dll",   // DirectX SDK
+            "xinput1_1.dll"    // DirectX SDK
+        };
+    for (int n = 0; n < IM_ARRAYSIZE(xinput_dll_names); n++)
+        if (HMODULE dll = ::LoadLibraryA(xinput_dll_names[n]))
+        {
+            g_XInputDLL = dll;
+            g_XInputGetCapabilities = (PFN_XInputGetCapabilities)::GetProcAddress(dll, "XInputGetCapabilities");
+            g_XInputGetState = (PFN_XInputGetState)::GetProcAddress(dll, "XInputGetState");
+            break;
+        }
+
     auto draw_rect = sol::overload(
         static_cast<void (GuiDrawContext::*)(float, float, float, float, float, float, uColor)>(&GuiDrawContext::draw_rect),
         static_cast<void (GuiDrawContext::*)(AABB, float, float, uColor)>(&GuiDrawContext::draw_rect));
@@ -406,6 +454,126 @@ void register_usertypes(sol::state& lua)
         auto pos = normalize(ImGui::GetMousePos());
         return std::make_pair(pos.x, pos.y);
     };
+    lua.new_usertype<ImVec2>(
+        "ImVec2",
+        "x",
+        &ImVec2::x,
+        "y",
+        &ImVec2::y);
+
+    lua.new_usertype<Gamepad>(
+        "Gamepad",
+        "enabled",
+        &Gamepad::enabled,
+        "buttons",
+        &Gamepad::wButtons,
+        "lt",
+        sol::property([](Gamepad& p) -> float
+                      { return (float)p.bLeftTrigger / 255.f; }),
+        "rt",
+        sol::property([](Gamepad& p) -> float
+                      { return (float)p.bRightTrigger / 255.f; }),
+        "lx",
+        sol::property([](Gamepad& p) -> float
+                      { return (float)p.sThumbLX / 32768.f; }),
+        "ly",
+        sol::property([](Gamepad& p) -> float
+                      { return (float)p.sThumbLY / 32768.f; }),
+        "rx",
+        sol::property([](Gamepad& p) -> float
+                      { return (float)p.sThumbRX / 32768.f; }),
+        "ry",
+        sol::property([](Gamepad& p) -> float
+                      { return (float)p.sThumbRY / 32768.f; }));
+
+    auto keydown = sol::overload(
+        [](int keycode)
+        {
+            return ImGui::IsKeyDown(keycode);
+        },
+        [](char key)
+        {
+            return ImGui::IsKeyDown((int)key);
+        });
+    auto keypressed = sol::overload(
+        [](int keycode)
+        {
+            return ImGui::IsKeyPressed(keycode, false);
+        },
+        [](int keycode, bool repeat)
+        {
+            return ImGui::IsKeyPressed(keycode, repeat);
+        },
+        [](char key)
+        {
+            return ImGui::IsKeyPressed((int)key, false);
+        },
+        [](char key, bool repeat)
+        {
+            return ImGui::IsKeyPressed((int)key, repeat);
+        });
+    auto keyreleased = sol::overload(
+        [](int keycode)
+        {
+            return ImGui::IsKeyReleased(keycode);
+        },
+        [](char key)
+        {
+            return ImGui::IsKeyReleased((int)key);
+        });
+    lua.new_usertype<ImGuiIO>(
+        "ImGuiIO",
+        "displaysize",
+        &ImGuiIO::DisplaySize,
+        "framerate",
+        &ImGuiIO::Framerate,
+        "wantkeyboard",
+        &ImGuiIO::WantCaptureKeyboard,
+        "keysdown",
+        sol::property([](ImGuiIO& io)
+                      { return std::ref(io.KeysDown) /**/; }),
+        "keydown",
+        keydown,
+        "keypressed",
+        keypressed,
+        "keyreleased",
+        keyreleased,
+        "keyctrl",
+        &ImGuiIO::KeyCtrl,
+        "keyshift",
+        &ImGuiIO::KeyShift,
+        "keyalt",
+        &ImGuiIO::KeyAlt,
+        "keysuper",
+        &ImGuiIO::KeySuper,
+        "wantmouse",
+        &ImGuiIO::WantCaptureMouse,
+        "mousepos",
+        &ImGuiIO::MousePos,
+        "mousedown",
+        sol::property([](ImGuiIO& io)
+                      { return std::ref(io.MouseDown) /**/; }),
+        "mouseclicked",
+        sol::property([](ImGuiIO& io)
+                      { return std::ref(io.MouseClicked) /**/; }),
+        "mousedoubleclicked",
+        sol::property([](ImGuiIO& io)
+                      { return std::ref(io.MouseDoubleClicked) /**/; }),
+        "mousewheel",
+        &ImGuiIO::MouseWheel,
+        "gamepad",
+        sol::property([]()
+                      {
+                          g_WantUpdateHasGamepad = true;
+                          return get_gamepad() /**/;
+                      }));
+
+    /// Returns: [ImGuiIO](#imguiio) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+    /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
+    /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+    /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
+    /// - Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+    lua["get_io"] = ImGui::GetIO;
 
     /// Deprecated
     /// Use `GuiDrawContext.draw_line` instead

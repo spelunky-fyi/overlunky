@@ -442,13 +442,16 @@ end
     /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
     /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level
     lua["spawn_impostor_lake"] = spawn_impostor_lake;
+    /// Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
+    /// If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
+    lua["spawn_player"] = spawn_player;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
     /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
-        std::vector<uint32_t> types;
+        std::vector<ENT_TYPE> types;
         sol::type va_type = entity_types.get_type();
         if (va_type == sol::type::number)
         {
@@ -458,9 +461,10 @@ end
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
+        std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(types));
 
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
+        backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
         return backend->cbcount++;
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
@@ -468,7 +472,7 @@ end
     /// The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
-        std::vector<uint32_t> types;
+        std::vector<ENT_TYPE> types;
         sol::type va_type = entity_types.get_type();
         if (va_type == sol::type::number)
         {
@@ -478,9 +482,10 @@ end
         {
             types = entity_types.get<std::vector<uint32_t>>(0);
         }
+        std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(types));
 
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(types), flags, std::move(cb)});
+        backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
         return backend->cbcount++;
     };
 
@@ -510,8 +515,13 @@ end
         else
             set_pause(0);
     };
+    auto move_entity_abs = sol::overload(
+        static_cast<void (*)(uint32_t, float, float, float, float)>(::move_entity_abs),
+        static_cast<void (*)(uint32_t, float, float, float, float, LAYER)>(::move_entity_abs));
     /// Teleport entity to coordinates with optional velocity
     lua["move_entity"] = move_entity_abs;
+    /// Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
+    lua["move_grid_entity"] = move_grid_entity;
     /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
     lua["set_door_target"] = set_door_target;
     /// Short for [set_door_target](#set_door_target).
@@ -706,7 +716,8 @@ end
     { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
     /// Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
-    /// Sets the arrow type (wooden, metal, light) that is shot from a regular arrow trap and a poison arrow trap.
+    /// Deprecated
+    /// Use `replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)` and `replace_drop(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type)` instead
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
     /// Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
     lua["set_kapala_blood_threshold"] = set_kapala_blood_threshold;
@@ -728,6 +739,10 @@ end
     lua["force_olmec_phase_0"] = force_olmec_phase_0;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
+    /// Determines whether the time ghost appears, including the showing of the ghost toast
+    lua["set_time_ghost_enabled"] = set_time_ghost_enabled;
+    /// Determines whether the time jelly appears in cosmic ocean
+    lua["set_time_jelly_enabled"] = set_time_jelly_enabled;
     /// Enables or disables the journal
     lua["set_journal_enabled"] = set_journal_enabled;
     /// Enables or disables the default position based camp camera bounds, to set them manually yourself
@@ -950,6 +965,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -974,6 +990,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1046,10 +1063,65 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-    /// `uid` has to be the uid of a `Container` or else stuff will break.
-    /// Sets a callback that is called right when a container is opened via up+door.
-    /// The callback signature is `nil on_open(Entity self, Entity opener)`
+    /// Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
+    /// The callback signature is `bool on_player_instagib(Entity self)`
+    /// The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
+    /// This is so that when the entity dies (from other causes), the death screen still gets shown.
     /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_on_player_instagib"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_player_instagib(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
+    /// The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
+    /// Note that damage_dealer can be nil ! (long fall, ...)
+    /// DO NOT CALL `self:damage()` in the callback !
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_on_damage(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* damage_dealer, int8_t damage_amount, float velocity_x, float velocity_y, uint16_t stun_amount, uint8_t iframes)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](damage_dealer), damage_amount, velocity_x, velocity_y, stun_amount, iframes).value_or(false);
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+    /// The callback signature is `nil on_open(Entity entity_self, Entity opener)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
@@ -1066,6 +1138,56 @@ end
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
                 });
             backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    lua["set_pre_collision1"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_pre_collision1(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* collision_entity)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](collision_entity)).value_or(false);
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    lua["set_pre_collision2"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_pre_collision2(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self, Entity* collision_entity)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+
+                    return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](collision_entity)).value_or(false);
+                });
+            backend->hook_entity_dtor(e);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }
@@ -1097,6 +1219,45 @@ end
 
     /// Clears the name set with `add_custom_name`
     lua["clear_custom_name"] = clear_custom_name;
+
+    /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
+    /// Doesn't really work for layer doors
+    lua["enter_door"] = enter_door;
+
+    /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
+    /// {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
+    /// Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance")
+    /// Use empty table as argument to reset to the game default
+    lua["change_sunchallenge_spawns"] = change_sunchallenge_spawns;
+
+    /// Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
+    /// {ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
+    /// ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
+    /// ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
+    /// Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
+    /// If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser)
+    /// Use empty table as argument to reset to the game default
+    lua["change_diceshop_prizes"] = change_diceshop_prizes;
+
+    /// Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
+    /// {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
+    /// Max 255 types
+    /// Use empty table as argument to reset to the game default
+    lua["change_altar_damage_spawns"] = change_altar_damage_spawns;
+
+    /// Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
+    /// {ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
+    /// Max 255 types
+    /// Use empty table as argument to reset to the game default
+    lua["change_waddler_drop"] = change_waddler_drop;
+
+    /// Poisons entity, to cure poison set `poison_tick_timer` to -1
+    lua["poison_entity"] = poison_entity;
+
+    /// Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
+    /// `beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
+    /// If you set `health` above the game max health it will be forced down to the game max
+    lua["modify_ankh_health_gain"] = modify_ankh_health_gain;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
@@ -1198,6 +1359,8 @@ end
         ON::RENDER_POST_PAUSE_MENU,
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
+        "RENDER_POST_JOURNAL_PAGE",
+        ON::RENDER_POST_JOURNAL_PAGE,
         "SPEECH_BUBBLE",
         ON::SPEECH_BUBBLE,
         "TOAST",
@@ -1258,6 +1421,25 @@ end
     // RENDER_PRE_DRAW_DEPTH
     // Params: `VanillaRenderContext render_ctx, int draw_depth`
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_POST_JOURNAL_PAGE
+    // Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`
+    // Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // The page_type parameter values can be found in the JOURNAL_PAGE_TYPE ENUM
+    // The JournalPage parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:
+    // `page:as_journal_page_progress()`
+    // `page:as_journal_page_journalmenu()`
+    // `page:as_journal_page_places()`
+    // `page:as_journal_page_people()`
+    // `page:as_journal_page_bestiary()`
+    // `page:as_journal_page_items()`
+    // `page:as_journal_page_traps()`
+    // `page:as_journal_page_story()`
+    // `page:as_journal_page_feats()`
+    // `page:as_journal_page_deathcause()`
+    // `page:as_journal_page_deathmenu()`
+    // `page:as_journal_page_recap()`
+    // `page:as_journal_page_playerprofile()`
+    // `page:as_journal_page_lastgameplayed()`
     // SPEECH_BUBBLE
     // Params: `Entity speaking_entity, string text`
     // Runs before any speech bubble is created, even the one using `say` function

@@ -463,6 +463,7 @@ class Coffin : public Movable
     ENT_TYPE inside;
     uint8_t timer;
     int8_t shake_state; /* unsure */
+    bool player_respawn;
 };
 
 class Fly : public Movable
@@ -764,4 +765,14 @@ class Shield : public Movable
 {
   public:
     float shake;
+};
+
+class PrizeDispenser : public Movable
+{
+  public:
+    /// Id's of the items (not types), by default 0-24, look at [change_diceshop_prizes](#change_diceshop_prizes) for the list of default prizes
+    /// so for example: id 0 equals ITEM_PICKUP_BOMBBAG, id 1 equals ITEM_PICKUP_BOMBBOX etc. Game generates 6 but uses max 5 for Tusk dice shop
+    std::array<uint8_t, 6> item_ids;
+    uint8_t prizes_spawned;
+    int8_t padding;
 };

@@ -8,20 +8,22 @@
 #include "detours.h"
 #include <cassert>
 
-static STRINGID wrong_stringid = 0;
-std::unordered_map<STRINGID, std::u16string> custom_strings;
-std::unordered_map<uint32_t, STRINGID> custom_shopitem_names;
+static STRINGID g_original_string_ids_end{std::numeric_limits<STRINGID>::max()};
+std::unordered_map<STRINGID, std::u16string> g_custom_strings;
+std::unordered_map<uint32_t, STRINGID> g_custom_shopitem_names;
 
 using OnShopItemNameFormatFun = void(Entity*, char16_t*);
 OnShopItemNameFormatFun* g_on_shopnameformat_trampoline{nullptr};
 void on_shopitemnameformat(Entity* item, char16_t* buffer)
 {
     STRINGID items_stringid = item->type->description;
-    auto it = custom_shopitem_names.find(item->uid);
-    if (it != custom_shopitem_names.end())
+    auto it = g_custom_shopitem_names.find(item->uid);
+    if (it != g_custom_shopitem_names.end())
+    {
         items_stringid = it->second;
+    }
 
-    if (items_stringid >= wrong_stringid)
+    if (items_stringid >= g_original_string_ids_end)
     {
         const STRINGID buy_stringid = hash_to_stringid(0x21683743); // get id of the "Buy %s" text
         constexpr auto buffer_size = 0x800;                         // maybe TODO: add check if the buffer size is to small?
@@ -42,7 +44,9 @@ void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound
     if (str != u"~[:NO_RETURN:]#")
     {
         if (str.empty())
+        {
             return;
+        }
 
         const auto data_size = str.size() * sizeof(char16_t);
         new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
@@ -64,7 +68,9 @@ void OnToast(char16_t* buffer)
     if (str != u"~[:NO_RETURN:]#")
     {
         if (str.empty())
+        {
             return;
+        }
 
         const auto data_size = str.size() * sizeof(char16_t);
         new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
@@ -79,12 +85,8 @@ void OnToast(char16_t* buffer)
 
 void strings_init()
 {
-    if (wrong_stringid == 0)
-    {
-        //get wrong stringid from bordertile
-        wrong_stringid = get_type(1)->description;
-    }
-    fix_entity_descriptions(wrong_stringid);
+    g_original_string_ids_end = get_type(1)->description; //get wrong stringid from bordertile
+    fix_entity_descriptions(g_original_string_ids_end);
 
     auto addr_format_shopitem = get_address("format_shopitem_name");
     auto addr_npcdialogue = get_address("speech_bubble_fun");
@@ -118,21 +120,27 @@ STRINGID hash_to_stringid(uint32_t hash)
 {
     auto it = string_hashes.find(hash);
     if (it != string_hashes.end())
+    {
         return it->second;
+    }
 
-    return wrong_stringid;
+    return g_original_string_ids_end;
 }
 
 const char16_t* get_string(STRINGID string_id)
 {
-    if (string_id == wrong_stringid)
-        return u"";
-
-    if (string_id > wrong_stringid)
+    if (string_id == g_original_string_ids_end)
     {
-        auto it = custom_strings.find(string_id);
-        if (it != custom_strings.end())
+        return u"";
+    }
+
+    if (string_id > g_original_string_ids_end)
+    {
+        auto it = g_custom_strings.find(string_id);
+        if (it != g_custom_strings.end())
+        {
             return it->second.data();
+        }
 
         return u"";
     }
@@ -140,19 +148,22 @@ const char16_t* get_string(STRINGID string_id)
     return strings_table[string_id];
 }
 
-void change_string(STRINGID string_id, std::u16string str)
+void change_string(STRINGID string_id, std::u16string_view str)
 {
-    if (string_id == wrong_stringid)
-        return;
-    else if (string_id > wrong_stringid)
+    if (string_id == g_original_string_ids_end)
     {
-        auto it = custom_strings.find(string_id);
-        if (it != custom_strings.end())
-            it->second = std::move(str);
+        return;
+    }
+    else if (string_id > g_original_string_ids_end)
+    {
+        auto it = g_custom_strings.find(string_id);
+        if (it != g_custom_strings.end())
+        {
+            it->second = str;
+        }
     }
     else
     {
-        //stolen from character name change
         auto strings_table = get_strings_table();
 
         const char16_t** old_string = strings_table + string_id;
@@ -169,31 +180,33 @@ void change_string(STRINGID string_id, std::u16string str)
 
 STRINGID add_string(std::u16string str) // future idea: add more strings variants for all languages?
 {
-    STRINGID new_id = wrong_stringid + (STRINGID)custom_strings.size() + 1;
-    custom_strings[new_id] = std::move(str);
+    STRINGID new_id = g_original_string_ids_end + (STRINGID)g_custom_strings.size() + 1;
+    g_custom_strings[new_id] = std::move(str);
     return new_id;
 }
 
 void add_custom_name(uint32_t uid, std::u16string name)
 {
     clear_custom_name(uid);
-    custom_shopitem_names[uid] = add_string(name);
+    g_custom_shopitem_names[uid] = add_string(std::move(name));
 }
 
 void clear_custom_name(uint32_t uid)
 {
-    auto it = custom_shopitem_names.find(uid);
-    if (it != custom_shopitem_names.end())
+    auto it = g_custom_shopitem_names.find(uid);
+    if (it != g_custom_shopitem_names.end())
     {
-        custom_strings.erase(it->second);
-        custom_shopitem_names.erase(it);
+        g_custom_strings.erase(it->second);
+        g_custom_shopitem_names.erase(it);
     }
 }
 
 void clear_custom_shopitem_names()
 {
-    for (auto& it : custom_shopitem_names)
-        custom_strings.erase(it.second);
+    for (auto& [uid, string_id] : g_custom_shopitem_names)
+    {
+        g_custom_strings.erase(string_id);
+    }
 
-    custom_shopitem_names.clear();
+    g_custom_shopitem_names.clear();
 }
