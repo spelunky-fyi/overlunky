@@ -169,7 +169,6 @@ class LaserTrap : public Floor
     uint8_t reset_timer;
     bool phase_2;
     /// The uid must be movable entity for ownership transfers
-    /// doesn't work for some reason :( TODO: fix?
     void trigger(int32_t who_uid)
     {
         return trigger_trap(this, who_uid);

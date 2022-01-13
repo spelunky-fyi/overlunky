@@ -650,15 +650,24 @@ void Arrowtrap::rearm()
 
 void trigger_trap(Entity* trap, int32_t who_uid, uint8_t direction)
 {
-    auto who = get_entity_ptr(who_uid);
+    auto who = get_entity_ptr(who_uid)->as<Movable>();
     static const ENT_TYPE ar_logical_trigger = to_id("ENT_TYPE_LOGICAL_ARROW_TRAP_TRIGGER"); // + 5
     static const ENT_TYPE bs_logical_trigger = to_id("ENT_TYPE_LOGICAL_BIGSPEAR_TRAP_TRIGGER");
+    static const ENT_TYPE laser_trap = to_id("ENT_TYPE_FLOOR_LASER_TRAP");
     if (who)
     {
         for (auto item : trap->items)
         {
             if ((item->type->id >= ar_logical_trigger && item->type->id < ar_logical_trigger + 6) || item->type->id == bs_logical_trigger)
             {
+                if (trap->type->id == laser_trap)
+                {
+                    auto vel_tmp = who->velocityx;
+                    who->velocityx = 1.0;
+                    trap->v23(item, who);
+                    who->velocityx = vel_tmp;
+                    return;
+                }
                 if (direction == 1) // left
                 {
                     if (item->x >= 0)
@@ -679,7 +688,6 @@ void trigger_trap(Entity* trap, int32_t who_uid, uint8_t direction)
                     if (item->y >= 0)
                         continue;
                 }
-
                 item->on_collision2(who);
                 return;
             }
