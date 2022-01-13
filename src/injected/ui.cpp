@@ -3200,7 +3200,7 @@ void render_clickhandler()
         }
 
         const auto additional_fixed_entities = {
-            (ENT_TYPE)CUSTOM_TYPE::LOGICALTRAPTRIGGER,
+            (ENT_TYPE)CUSTOM_TYPE::TRIGGER,
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
             to_id("ENT_TYPE_ACTIVEFLOOR_EGGSHIPBLOCKER"),

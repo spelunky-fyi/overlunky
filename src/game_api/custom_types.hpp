@@ -316,6 +316,7 @@ enum class CUSTOM_TYPE : uint32_t
     TRAPPART,
     TREASURE,
     TREASUREHOOK,
+    TRIGGER,
     TRUECROWNPOWERUP,
     TUN,
     TV,
