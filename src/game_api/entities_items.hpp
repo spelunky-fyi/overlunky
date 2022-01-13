@@ -385,6 +385,9 @@ class Torch : public Movable
     bool is_lit;
     int8_t unknown1;
     int16_t unknown2;
+
+    virtual void v_91() = 0;
+    virtual void light_up() = 0;
 };
 
 class WallTorch : public Torch
