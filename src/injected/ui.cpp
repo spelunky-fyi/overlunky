@@ -834,6 +834,10 @@ bool active(std::string window)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
+    if (current == NULL)
+        return false;
+    while (current->ParentWindow != NULL)
+        current = current->ParentWindow;
     if (!options["tabbed_interface"] || detached(window))
     {
         if (windows.find(window) == windows.end())
