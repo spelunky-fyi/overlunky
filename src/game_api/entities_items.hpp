@@ -112,6 +112,7 @@ class CookFire : public Movable
 {
   public:
     int32_t unknown1;
+    /// Can set it on fire or extinguish
     bool lit;
     uint8_t unused1;
     uint16_t unused2;
@@ -382,12 +383,13 @@ class Torch : public Movable
 {
   public:
     int32_t flame_uid;
+    /// It's used just to check, to light/extinguish use `light_up` function
     bool is_lit;
     int8_t unknown1;
     int16_t unknown2;
 
     virtual void v_91() = 0;
-    virtual void light_up() = 0;
+    virtual void light_up(bool lit) = 0;
 };
 
 class WallTorch : public Torch

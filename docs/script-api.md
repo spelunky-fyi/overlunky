@@ -1942,6 +1942,9 @@ Derived from [`Entity`](#entity) [`Floor`](#floor)
 \
 after triggering counts from 0 to 255, changes the 'phase_2' then counts from 0 to 104
 - [`bool phase_2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase_2) &LaserTrap::phase_2
+- [`nil trigger(int who_uid)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) &LaserTrap::trigger
+\
+The uid must be movable entity for ownership transfers
 ### `SparkTrap`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &SparkTrap::emitted_light
@@ -3046,6 +3049,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int flame_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_uid) &Torch::flame_uid
 - [`bool is_lit`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_lit) &Torch::is_lit
+\
+It's used just to check, to light/extinguish use `light_up` function
+- [`nil light_up(bool lit)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_up) &Torch::light_up
 ### `WallTorch`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Torch`](#torch)
 - [`bool dropped_gold`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dropped_gold) &WallTorch::dropped_gold
@@ -3194,6 +3200,8 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 ### `CookFire`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`bool lit`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lit) &CookFire::lit
+\
+Can set it on fire or extinguish
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &CookFire::emitted_light
 - [`ParticleEmitterInfo particles_smoke`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_smoke) &CookFire::particles_smoke
 - [`ParticleEmitterInfo particles_flames`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_flames) &CookFire::particles_flames
