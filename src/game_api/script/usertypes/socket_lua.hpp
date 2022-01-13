@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-
 class UdpServer
 {
   public:

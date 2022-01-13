@@ -41,10 +41,10 @@
 #include "usertypes/save_context.hpp"
 #include "usertypes/screen_arena_lua.hpp"
 #include "usertypes/screen_lua.hpp"
+#include "usertypes/socket_lua.hpp"
 #include "usertypes/sound_lua.hpp"
 #include "usertypes/state_lua.hpp"
 #include "usertypes/texture_lua.hpp"
-#include "usertypes/socket_lua.hpp"
 #include "usertypes/vanilla_render_lua.hpp"
 
 #include "lua_libs/lua_libs.hpp"

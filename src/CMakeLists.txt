@@ -139,7 +139,7 @@ if(BUILD_OVERLUNKY)
         # overlunky exe and dll
         add_subdirectory(injected)
         add_subdirectory(injector)
-        
+
         if(MSVC)
                 if(BUILD_INFO_DUMP AND EXISTS ${SPELUNKY_INSTALL_DIR})
                         find_package(Python3 COMPONENTS Interpreter)
@@ -163,3 +163,4 @@ endif()
 
 add_subdirectory(sockpp)
 target_include_directories(spel2_api PUBLIC sockpp/include)
+target_link_libraries(injected PUBLIC sockpp-static)

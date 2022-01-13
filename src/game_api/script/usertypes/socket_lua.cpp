@@ -29,14 +29,14 @@ namespace NSocket
 {
 void register_usertypes(sol::state& lua)
 {
-    /// UDP server
+    /// Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
     lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) -> UdpServer*
     {
         UdpServer* server = new UdpServer(std::move(host), std::move(port), std::move(cb));
         return server;
     };
 
-    /// UDP client
+    /// Send data to specified UDP address. Requires unsafe mode.
     lua["udp_send"] = [](std::string host, in_port_t port, std::string msg)
     {
         sockpp::udp_socket sock;
