@@ -2943,6 +2943,10 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     if (!type)
         return;
 
+    bool circle = false;
+    if ((ent->type->search_flags & 0x10) > 0)
+        circle = true;
+
     std::tuple<float, float, int8_t> render_position;
     if (options["draw_hitboxes_interpolated"])
         render_position = get_render_position(ent->uid);
@@ -2961,7 +2965,17 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
     }
-    draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
+    if (!circle)
+        draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
+    else
+        draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
+
+    if (type == to_id("ENT_TYPE_FLOOR_SPARK_TRAP") && ent->animation_frame == 7)
+    {
+        auto [radx, rady] = screen_position(std::get<0>(render_position) + 3, std::get<1>(render_position) + 3);
+        auto srad = screenify({radx, rady});
+        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+    }
 }
 
 void fix_script_requires(Script auto* script)
