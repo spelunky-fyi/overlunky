@@ -2937,6 +2937,11 @@ void render_olmec(Entity* ent, ImColor color)
     draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
 }
 
+static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+
 void render_hitbox(Entity* ent, bool cross, ImColor color)
 {
     const auto type = ent->type->id;
@@ -2975,6 +2980,26 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
         auto [radx, rady] = screen_position(std::get<0>(render_position) + 3, std::get<1>(render_position) + 3);
         auto srad = screenify({radx, rady});
         draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+    }
+    else if (type == to_id("ENT_TYPE_ITEM_WOODEN_ARROW") || type == to_id("ENT_TYPE_ITEM_METAL_ARROW") || type == to_id("ENT_TYPE_ITEM_LIGHT_ARROW"))
+    {
+        ImVec2 ps = {get<0>(render_position), get<1>(render_position)};
+        float cosa = ImCos(ent->angle);
+        float sina = ImSin(ent->angle);
+        ImVec2 pa = {-ent->hitboxx, -ent->hitboxy};
+        ImVec2 pb = {+ent->hitboxx, -ent->hitboxy};
+        ImVec2 pc = {+ent->hitboxx, +ent->hitboxy};
+        ImVec2 pd = {-ent->hitboxx, +ent->hitboxy};
+        pa = ps + ImRotate(pa, cosa, sina);
+        pb = ps + ImRotate(pb, cosa, sina);
+        pc = ps + ImRotate(pc, cosa, sina);
+        pd = ps + ImRotate(pd, cosa, sina);
+        auto [pax, pay] = screen_position(pa.x, pa.y);
+        auto [pbx, pby] = screen_position(pb.x, pb.y);
+        auto [pcx, pcy] = screen_position(pc.x, pc.y);
+        auto [pdx, pdy] = screen_position(pd.x, pd.y);
+        const ImVec2 points[] = {screenify({pax, pay}), screenify({pbx, pby}), screenify({pcx, pcy}), screenify({pdx, pdy}), screenify({pax, pay})};
+        draw_list->AddPolyline(points, 5, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
 }
 
