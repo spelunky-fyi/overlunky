@@ -17,8 +17,8 @@ void udp_data(sockpp::udp_socket socket, UdpServer* server)
     }
 }
 
-UdpServer::UdpServer(std::string host, in_port_t port, sol::function cb)
-    : host(host), port(port), cb(cb)
+UdpServer::UdpServer(std::string host_, in_port_t port_, sol::function cb_)
+    : host(host_), port(port_), cb(cb_)
 {
     sock.bind(sockpp::inet_address(host, port));
     std::thread thr(udp_data, std::move(sock), this);
