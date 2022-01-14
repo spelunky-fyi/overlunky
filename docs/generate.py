@@ -44,6 +44,7 @@ header_files = [
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
     "../src/game_api/script/usertypes/save_context.hpp",
     "../src/game_api/script/usertypes/hitbox_lua.hpp",
+    "../src/game_api/script/usertypes/socket_lua.hpp",
     "../src/imgui/imgui.h",
 ]
 api_files = [
@@ -83,6 +84,7 @@ api_files = [
     "../src/game_api/script/usertypes/hitbox_lua.cpp",
     "../src/game_api/script/usertypes/screen_lua.cpp",
     "../src/game_api/script/usertypes/screen_arena_lua.cpp",
+    "../src/game_api/script/usertypes/socket_lua.cpp",
 ]
 rpc = []
 classes = []

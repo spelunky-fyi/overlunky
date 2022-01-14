@@ -189,6 +189,14 @@ struct Window
 };
 std::map<std::string, Window*> windows;
 
+struct EntityWindow
+{
+    std::string name;
+    int uid;
+    bool open;
+};
+std::map<int, EntityWindow*> entity_windows;
+
 static ImFont *font, *bigfont, *hugefont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f;
@@ -834,6 +842,10 @@ bool active(std::string window)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
+    if (current == NULL)
+        return false;
+    while (current->ParentWindow != NULL)
+        current = current->ParentWindow;
     if (!options["tabbed_interface"] || detached(window))
     {
         if (windows.find(window) == windows.end())
@@ -1200,6 +1212,11 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->items->player_select_slots[0].texture_id = g_save->players[0] + ana_texture;
     if (g_state->items->player_count < 1)
         g_state->items->player_count = 1;
+    if (screen == 11) // this skips rope cutscene in camp
+    {
+        g_state->force_current_theme(17);
+        g_state->screen = 11;
+    }
     g_state->screen_next = screen;
     g_state->world_start = world;
     g_state->level_start = level;
@@ -2920,11 +2937,20 @@ void render_olmec(Entity* ent, ImColor color)
     draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
 }
 
+static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+
 void render_hitbox(Entity* ent, bool cross, ImColor color)
 {
     const auto type = ent->type->id;
     if (!type)
         return;
+
+    bool circle = false;
+    if ((ent->type->search_flags & 0x10) > 0)
+        circle = true;
 
     std::tuple<float, float, int8_t> render_position;
     if (options["draw_hitboxes_interpolated"])
@@ -2944,7 +2970,37 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
     }
-    draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
+    if (!circle)
+        draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
+    else
+        draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
+
+    if (type == to_id("ENT_TYPE_FLOOR_SPARK_TRAP") && ent->animation_frame == 7)
+    {
+        auto [radx, rady] = screen_position(std::get<0>(render_position) + 3, std::get<1>(render_position) + 3);
+        auto srad = screenify({radx, rady});
+        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+    }
+    else if (type == to_id("ENT_TYPE_ITEM_WOODEN_ARROW") || type == to_id("ENT_TYPE_ITEM_METAL_ARROW") || type == to_id("ENT_TYPE_ITEM_LIGHT_ARROW"))
+    {
+        ImVec2 ps = {get<0>(render_position), get<1>(render_position)};
+        float cosa = ImCos(ent->angle);
+        float sina = ImSin(ent->angle);
+        ImVec2 pa = {-ent->hitboxx, -ent->hitboxy};
+        ImVec2 pb = {+ent->hitboxx, -ent->hitboxy};
+        ImVec2 pc = {+ent->hitboxx, +ent->hitboxy};
+        ImVec2 pd = {-ent->hitboxx, +ent->hitboxy};
+        pa = ps + ImRotate(pa, cosa, sina);
+        pb = ps + ImRotate(pb, cosa, sina);
+        pc = ps + ImRotate(pc, cosa, sina);
+        pd = ps + ImRotate(pd, cosa, sina);
+        auto [pax, pay] = screen_position(pa.x, pa.y);
+        auto [pbx, pby] = screen_position(pb.x, pb.y);
+        auto [pcx, pcy] = screen_position(pc.x, pc.y);
+        auto [pdx, pdy] = screen_position(pd.x, pd.y);
+        const ImVec2 points[] = {screenify({pax, pay}), screenify({pbx, pby}), screenify({pcx, pcy}), screenify({pdx, pdy}), screenify({pax, pay})};
+        draw_list->AddPolyline(points, 5, ImColor(255, 0, 0, 150), 0, 2.0f);
+    }
 }
 
 void fix_script_requires(Script auto* script)
@@ -3144,7 +3200,7 @@ void render_clickhandler()
         }
 
         const auto additional_fixed_entities = {
-            (ENT_TYPE)CUSTOM_TYPE::LOGICALTRAPTRIGGER,
+            (ENT_TYPE)CUSTOM_TYPE::TRIGGER,
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
             to_id("ENT_TYPE_ACTIVEFLOOR_EGGSHIPBLOCKER"),
@@ -4356,115 +4412,133 @@ void render_screen(const char* label, int state)
     }
 }
 
-void render_entity_props()
+void render_entity_props(int uid, bool detached = false)
 {
+    Player* entity = (Player*)get_entity_ptr(uid);
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
-    ImGui::Checkbox("Lock to player one", &lock_player);
-    tooltip("Automatically switch to player after new level.");
-    if (lock_player)
+    if (!detached)
     {
-        if (!g_players.empty())
+        ImGui::Checkbox("Lock to player one", &lock_player);
+        tooltip("Automatically switch to player after new level.");
+        if (lock_player)
         {
-            g_last_id = g_players.at(0)->uid;
+            if (!g_players.empty())
+            {
+                g_last_id = g_players.at(0)->uid;
+            }
         }
+        ImGui::InputInt("UID", &g_last_id);
+        tooltip("Use mouse to easily select or move entities around.", "mouse_grab");
+        ImGui::SameLine();
+        ImGui::Checkbox("Sticky", &lock_entity);
+        tooltip("Check to keep this entity selected when spawning others.");
+        ImGui::SameLine();
+        if (ImGui::Button("Detach##DetachEntity"))
+        {
+            auto name = fmt::format("Entity {}", g_last_id);
+            auto window = new EntityWindow({name, g_last_id, true});
+            entity_windows[uid] = window;
+        }
+        tooltip("Detach entity to separate window.");
+        ImGui::PopItemWidth();
+        if (!update_entity())
+            return;
     }
-    ImGui::InputInt("Set UID", &g_last_id);
-    tooltip("Use mouse to easily select or move entities around.", "mouse_grab");
-    ImGui::SameLine();
-    ImGui::Checkbox("Sticky", &lock_entity);
-    tooltip("Check to keep this entity selected when spawning others.");
-    ImGui::PopItemWidth();
-    if (!update_entity())
+    if (entity == nullptr)
+    {
+        auto it = entity_windows.find(uid);
+        if (it != entity_windows.end())
+            entity_windows[uid]->open = false;
         return;
-    if (g_entity == 0)
-        return;
+    }
+    auto entity_type = get_entity_type(uid);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    render_uid(g_entity->uid, "EntityGeneral");
+    render_uid(entity->uid, "EntityGeneral");
     ImGui::SameLine();
     if (ImGui::Button("Void##VoidEntity"))
     {
-        if (g_entity->overlay)
+        if (entity->overlay)
         {
-            Movable* mount = (Movable*)g_entity->overlay;
-            if (mount->holding_uid == g_entity->uid)
+            Movable* mount = (Movable*)entity->overlay;
+            if (mount->holding_uid == entity->uid)
             {
                 mount->holding_uid = -1;
             }
         }
-        g_entity->overlay = nullptr;
-        g_entity->y -= 1000.0;
+        entity->overlay = nullptr;
+        entity->y -= 1000.0;
     }
     tooltip("Move the entity under the level,\nlike it just fell in to the void.");
     ImGui::SameLine();
     if (ImGui::Button("Kill##KillEntity"))
     {
-        g_entity->kill(true, nullptr);
+        entity->kill(true, nullptr);
     }
     tooltip("Kill the entity,\nlike it received damage and died.");
     ImGui::SameLine();
     if (ImGui::Button("Rem##RemoveEntity"))
     {
-        g_entity->remove();
+        entity->remove();
     }
     tooltip("Move the entity to limbo layer,\nlike it exists but doesn't do anything.");
     ImGui::SameLine();
     if (ImGui::Button("Dstr##DestroyEntity"))
     {
-        g_entity->destroy();
+        entity->destroy();
     }
     tooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.", "mouse_destroy");
-    if (ImGui::CollapsingHeader("State") && g_entity->is_movable())
+    if (ImGui::CollapsingHeader("State") && entity->is_movable())
     {
-        render_state("Current state", g_entity->state);
-        render_state("Last state", g_entity->last_state);
-        render_ai("AI state", g_entity->move_state);
-        if (g_entity->standing_on_uid != -1)
+        render_state("Current state", entity->state);
+        render_state("Last state", entity->last_state);
+        render_ai("AI state", entity->move_state);
+        if (entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");
-            render_uid(g_entity->standing_on_uid, "StateStanding");
+            render_uid(entity->standing_on_uid, "StateStanding");
         }
-        if (g_entity->holding_uid != -1)
+        if (entity->holding_uid != -1)
         {
             ImGui::Text("Holding:");
             ImGui::SameLine();
             if (ImGui::Button("Drop##DropHolding"))
             {
-                Movable* holding = get_entity_ptr(g_entity->holding_uid)->as<Movable>();
-                holding->x = g_entity->x;
-                holding->y = g_entity->y;
+                Movable* holding = get_entity_ptr(entity->holding_uid)->as<Movable>();
+                holding->x = entity->x;
+                holding->y = entity->y;
                 holding->overlay = 0;
-                g_entity->holding_uid = -1;
+                entity->holding_uid = -1;
             }
-            render_uid(g_entity->holding_uid, "StateHolding");
+            render_uid(entity->holding_uid, "StateHolding");
         }
-        auto* overlay = (Movable*)g_entity->overlay;
+        auto* overlay = (Movable*)entity->overlay;
         if (!IsBadReadPtr(overlay, 0x178))
         {
             ImGui::Text("Riding:");
             ImGui::SameLine();
             if (ImGui::Button("Unmount##UnmountRiding"))
             {
-                auto* mount = (Movable*)g_entity->overlay;
-                if (mount->holding_uid == g_entity->uid)
+                auto* mount = (Movable*)entity->overlay;
+                if (mount->holding_uid == entity->uid)
                 {
                     mount->holding_uid = -1;
                 }
-                g_entity->x = mount->x;
-                g_entity->y = mount->y;
-                g_entity->overlay = 0;
+                entity->x = mount->x;
+                entity->y = mount->y;
+                entity->overlay = 0;
             }
             render_uid(overlay->uid, "StateRiding");
         }
-        if (g_entity->last_owner_uid != -1)
+        if (entity->last_owner_uid != -1)
         {
             ImGui::Text("Owner / Attacker:");
             ImGui::SameLine();
             if (ImGui::Button("Remove##RemoveOwner"))
             {
-                g_entity->owner_uid = -1;
-                g_entity->last_owner_uid = -1;
+                entity->owner_uid = -1;
+                entity->last_owner_uid = -1;
             }
-            render_uid(g_entity->last_owner_uid, "StateOwner");
+            render_uid(entity->last_owner_uid, "StateOwner");
         }
     }
     if (ImGui::CollapsingHeader("Position"))
@@ -4472,12 +4546,12 @@ void render_entity_props()
         if (ImGui::Button("Change"))
         {
             auto layer_to = LAYER::FRONT;
-            if (g_entity->layer == 0)
+            if (entity->layer == 0)
                 layer_to = LAYER::BACK;
-            g_entity->set_layer(layer_to);
+            entity->set_layer(layer_to);
         }
         ImGui::SameLine();
-        switch (g_entity->layer)
+        switch (entity->layer)
         {
         case 0:
             ImGui::Text("Layer: FRONT");
@@ -4489,72 +4563,72 @@ void render_entity_props()
             ImGui::Text("Layer: UNKNOWN");
             break;
         }
-        ImGui::InputFloat("Position X##EntityPositionX", &g_entity->x, 0.2f, 1.0f);
-        ImGui::InputFloat("Position Y##EntityPositionX", &g_entity->y, 0.2f, 1.0f);
-        ImGui::InputFloat("Velocity X##EntityVelocityX", &g_entity->velocityx, 0.2f, 1.0f);
-        ImGui::InputFloat("Velocity y##EntityVelocityY", &g_entity->velocityy, 0.2f, 1.0f);
-        ImGui::InputFloat("Angle##EntityAngle", &g_entity->angle, 0.2f, 1.0f);
-        SliderByte("Falling timer##EntityFallingTimer", (char*)&g_entity->falling_timer, 0, 98);
+        ImGui::InputFloat("Position X##EntityPositionX", &entity->x, 0.2f, 1.0f);
+        ImGui::InputFloat("Position Y##EntityPositionX", &entity->y, 0.2f, 1.0f);
+        ImGui::InputFloat("Velocity X##EntityVelocityX", &entity->velocityx, 0.2f, 1.0f);
+        ImGui::InputFloat("Velocity y##EntityVelocityY", &entity->velocityy, 0.2f, 1.0f);
+        ImGui::InputFloat("Angle##EntityAngle", &entity->angle, 0.2f, 1.0f);
+        SliderByte("Falling timer##EntityFallingTimer", (char*)&entity->falling_timer, 0, 98);
         uint8_t falldamage = 0;
-        if (g_entity->falling_timer >= 98)
+        if (entity->falling_timer >= 98)
             falldamage = 4;
-        else if (g_entity->falling_timer >= 78)
+        else if (entity->falling_timer >= 78)
             falldamage = 3;
-        else if (g_entity->falling_timer >= 58)
+        else if (entity->falling_timer >= 58)
             falldamage = 2;
-        else if (g_entity->falling_timer >= 38)
+        else if (entity->falling_timer >= 38)
             falldamage = 1;
         const char* damagenum[] = {"0", "1", "2", "4", "99"};
         SliderByte("Fall damage##EntityFallDamage", (char*)&falldamage, 0, 4, damagenum[falldamage]);
     }
     if (ImGui::CollapsingHeader("Stats"))
     {
-        ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&g_entity->health, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("Price##Price", ImGuiDataType_S32, (char*)&g_entity->price, 0.5f, &s32_min, &s32_max);
-        if (g_inventory != 0)
+        ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&entity->health, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Price##Price", ImGuiDataType_S32, (char*)&entity->price, 0.5f, &s32_min, &s32_max);
+        if (entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") && entity->inventory_ptr != 0)
         {
-            ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&g_inventory->bombs, 0.5f, &u8_one, &u8_max);
-            ImGui::DragScalar("Ropes##EntityRopes", ImGuiDataType_U8, (char*)&g_inventory->ropes, 0.5f, &u8_one, &u8_max);
-            ImGui::DragInt("Money##EntityMoney", (int*)&g_inventory->money, 20.0f, INT_MIN, INT_MAX, "%d");
-            ImGui::DragInt("Level kills##EntityLevelKills", (int*)&g_inventory->kills_level, 0.5f, 0, INT_MAX, "%d");
-            ImGui::DragInt("Total kills##EntityTotalKills", (int*)&g_inventory->kills_total, 0.5f, 0, INT_MAX, "%d");
+            ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&entity->inventory_ptr->bombs, 0.5f, &u8_one, &u8_max);
+            ImGui::DragScalar("Ropes##EntityRopes", ImGuiDataType_U8, (char*)&entity->inventory_ptr->ropes, 0.5f, &u8_one, &u8_max);
+            ImGui::DragInt("Money##EntityMoney", (int*)&entity->inventory_ptr->money, 20.0f, INT_MIN, INT_MAX, "%d");
+            ImGui::DragInt("Level kills##EntityLevelKills", (int*)&entity->inventory_ptr->kills_level, 0.5f, 0, INT_MAX, "%d");
+            ImGui::DragInt("Total kills##EntityTotalKills", (int*)&entity->inventory_ptr->kills_total, 0.5f, 0, INT_MAX, "%d");
         }
     }
     if (ImGui::CollapsingHeader("Items"))
     {
-        if (g_entity->items.size > 0)
+        if (entity->items.size > 0)
         {
-            for (auto i = g_entity->items.uid_begin(); i < g_entity->items.uid_end(); ++i)
+            for (auto i = entity->items.uid_begin(); i < entity->items.uid_end(); ++i)
             {
                 render_uid(*i, "EntityItems", true);
             }
         }
     }
-    if (ImGui::CollapsingHeader("Global attributes") && g_entity->type)
+    if (ImGui::CollapsingHeader("Global attributes") && entity->type)
     {
-        ImGui::DragScalar("Damage##GlobalDamage", ImGuiDataType_U8, (char*)&g_entity->type->damage, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("Health##GlobalLife", ImGuiDataType_U8, (char*)&g_entity->type->life, 0.5f, &u8_one, &u8_max);
-        ImGui::DragFloat("Friction##GlobalFriction", &g_entity->type->friction, 0.01f, 0.0f, 10.0f, "%.5f");
-        ImGui::DragFloat("Elasticity##GlobalElasticity", &g_entity->type->elasticity, 0.01f, 0.0f, 10.0f, "%.5f");
-        ImGui::DragFloat("Weight##GlobalWeight", &g_entity->type->weight, 0.01f, 0.0f, 10.0f, "%.5f");
-        ImGui::DragFloat("Acceleration##GlobalAcceleration", &g_entity->type->acceleration, 0.01f, 0.0f, 10.0f, "%.5f");
-        ImGui::DragFloat("Max speed##GlobalMaxSpeed", &g_entity->type->max_speed, 0.01f, 0.0f, 10.0f, "%.5f");
-        ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &g_entity->type->sprint_factor, 0.01f, 0.0f, 10.0f, "%.5f");
-        ImGui::DragFloat("Jump power##GlobalJumpPower", &g_entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
-        ImGui::InputScalar("Search flags##SearchFlags", ImGuiDataType_U32, &g_entity->type->search_flags, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+        ImGui::DragScalar("Damage##GlobalDamage", ImGuiDataType_U8, (char*)&entity->type->damage, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Health##GlobalLife", ImGuiDataType_U8, (char*)&entity->type->life, 0.5f, &u8_one, &u8_max);
+        ImGui::DragFloat("Friction##GlobalFriction", &entity->type->friction, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Elasticity##GlobalElasticity", &entity->type->elasticity, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Weight##GlobalWeight", &entity->type->weight, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Acceleration##GlobalAcceleration", &entity->type->acceleration, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Max speed##GlobalMaxSpeed", &entity->type->max_speed, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &entity->type->sprint_factor, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::DragFloat("Jump power##GlobalJumpPower", &entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
+        ImGui::InputScalar("Search flags##SearchFlags", ImGuiDataType_U32, &entity->type->search_flags, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
         if (ImGui::CollapsingHeader("Properties flags"))
         {
             for (int i = 0; i < 32; i++)
             {
-                ImGui::CheckboxFlags(entity_type_properties_flags[i], &g_entity->type->properties_flags, int_pow(2, i));
+                ImGui::CheckboxFlags(entity_type_properties_flags[i], &entity->type->properties_flags, int_pow(2, i));
             }
         }
     }
     if (ImGui::CollapsingHeader("Special attributes"))
     {
-        if (g_entity_type == to_id("ENT_TYPE_ITEM_COFFIN"))
+        if (entity_type == to_id("ENT_TYPE_ITEM_COFFIN"))
         {
-            auto coffin = (Coffin*)g_entity;
+            auto coffin = (Coffin*)entity;
             ImGui::Text("Character in coffin:");
             ImGui::SliderInt("##CoffinSpawns", (int*)&coffin->inside, to_id("ENT_TYPE_CHAR_ANA_SPELUNKY"), to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD"));
             if (coffin->inside == to_id("ENT_TYPE_CHAR_CLASSIC_GUY") + 1)
@@ -4564,11 +4638,11 @@ void render_entity_props()
             ImGui::InputScalar("Timer##CoffinTimer", ImGuiDataType_U8, &coffin->timer, 0, 0, "%lld", ImGuiInputTextFlags_ReadOnly);
         }
         else if (
-            g_entity_type == to_id("ENT_TYPE_ITEM_CRATE") || g_entity_type == to_id("ENT_TYPE_ITEM_PRESENT") ||
-            g_entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || g_entity_type == to_id("ENT_TYPE_ITEM_POT") ||
-            g_entity_type == to_id("ENT_TYPE_ITEM_DMCRATE") || g_entity_type == to_id("ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE"))
+            entity_type == to_id("ENT_TYPE_ITEM_CRATE") || entity_type == to_id("ENT_TYPE_ITEM_PRESENT") ||
+            entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || entity_type == to_id("ENT_TYPE_ITEM_POT") ||
+            entity_type == to_id("ENT_TYPE_ITEM_DMCRATE") || entity_type == to_id("ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE"))
         {
-            auto container = (Container*)g_entity;
+            auto container = (Container*)entity;
             ImGui::Text("Item in container:");
             ImGui::InputInt("##EntitySpawns", (int*)&container->inside, 1, 10);
             if (container->inside > 0)
@@ -4577,16 +4651,16 @@ void render_entity_props()
                 ImGui::Text("%s", entity_names[container->inside].c_str());
             }
         }
-        else if (g_entity_type == to_id("ENT_TYPE_ITEM_MATTOCK"))
+        else if (entity_type == to_id("ENT_TYPE_ITEM_MATTOCK"))
         {
-            auto mattock = (Mattock*)g_entity;
+            auto mattock = (Mattock*)entity;
             ImGui::SliderScalar("Uses left##MattockUses", ImGuiDataType_U8, &mattock->remaining, &u8_min, &u8_max);
         }
         else if (
-            g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") ||
-            g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_COG") || g_entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
+            entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") ||
+            entity_type == to_id("ENT_TYPE_FLOOR_DOOR_COG") || entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
-            auto target = (ExitDoor*)g_entity;
+            auto target = (ExitDoor*)entity;
             ImGui::Text("Door target:");
             ImGui::Checkbox("Enabled##DoorEnabled", &target->special_door);
             ImGui::DragScalar("World##DoorWorldnumber", ImGuiDataType_U8, &target->world, 0.5f, &u8_one, &u8_max);
@@ -4595,9 +4669,9 @@ void render_entity_props()
             ImGui::SameLine();
             ImGui::Text("%s", theme_name(target->theme));
         }
-        else if (g_entity_type == to_id("ENT_TYPE_LOGICAL_PORTAL"))
+        else if (entity_type == to_id("ENT_TYPE_LOGICAL_PORTAL"))
         {
-            auto target = (Portal*)g_entity;
+            auto target = (Portal*)entity;
             ImGui::Text("Portal target:");
             ImGui::DragScalar("World##DoorWorldnumber", ImGuiDataType_U8, &target->world, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Level##DoorLevelnumber", ImGuiDataType_U8, &target->level, 0.5f, &u8_one, &u8_max);
@@ -4605,9 +4679,9 @@ void render_entity_props()
             ImGui::SameLine();
             ImGui::Text("%s", theme_name(target->theme));
         }
-        else if ((g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD")) || (g_entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && g_entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")))
+        else if ((entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD")) || (entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")))
         {
-            for (const auto& [powerup_id, powerup_entity] : g_entity->powerups)
+            for (const auto& [powerup_id, powerup_entity] : entity->powerups)
             {
                 render_powerup(powerup_entity->uid, "CharPowerups");
             }
@@ -4670,61 +4744,61 @@ void render_entity_props()
             ImGui::SameLine();
             if (ImGui::Button("Add##AddPowerupButton"))
             {
-                g_entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
+                entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
 
-            if (g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") && g_entity->ai != 0)
+            if (entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") && entity->ai != 0)
             {
-                ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &g_entity->ai->state, &u8_min, &s8_max);
-                ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &g_entity->ai->trust, &u8_min, &s8_max);
-                ImGui::InputScalar("Whipped##AiWhipped", ImGuiDataType_S8, &g_entity->ai->whipped, &u8_min, &s8_max);
-                if (g_entity->ai->target_uid != -1)
+                ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &entity->ai->state, &u8_min, &s8_max);
+                ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &entity->ai->trust, &u8_min, &s8_max);
+                ImGui::InputScalar("Whipped##AiWhipped", ImGuiDataType_S8, &entity->ai->whipped, &u8_min, &s8_max);
+                if (entity->ai->target_uid != -1)
                 {
                     ImGui::Text("Target:");
-                    render_uid(g_entity->ai->target_uid, "Ai");
+                    render_uid(entity->ai->target_uid, "Ai");
                 }
             }
         }
     }
     if (ImGui::CollapsingHeader("Style"))
     {
-        ImGui::ColorEdit4("Color", (float*)&g_entity->color);
-        ImGui::DragFloat("Width##EntityWidth", &g_entity->w, 0.5f, 0.0, 10.0, "%.3f");
-        ImGui::DragFloat("Height##EntityHeight", &g_entity->h, 0.5f, 0.0, 10.0, "%.3f");
-        ImGui::DragFloat("Box width##EntityBoxWidth", &g_entity->hitboxx, 0.5f, 0.0, 10.0, "%.3f");
-        ImGui::DragFloat("Box height##EntityBoxHeight", &g_entity->hitboxy, 0.5f, 0.0, 10.0, "%.3f");
-        ImGui::DragFloat("Offset X##EntityOffsetX", &g_entity->offsetx, 0.5f, -10.0, 10.0, "%.3f");
-        ImGui::DragFloat("Offset Y##EntityOffsetY", &g_entity->offsety, 0.5f, -10.0, 10.0, "%.3f");
-        ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &g_entity->animation_frame, 0.2f, &u16_zero, &u16_max);
-        uint8_t draw_depth = g_entity->draw_depth;
+        ImGui::ColorEdit4("Color", (float*)&entity->color);
+        ImGui::DragFloat("Width##EntityWidth", &entity->w, 0.5f, 0.0, 10.0, "%.3f");
+        ImGui::DragFloat("Height##EntityHeight", &entity->h, 0.5f, 0.0, 10.0, "%.3f");
+        ImGui::DragFloat("Box width##EntityBoxWidth", &entity->hitboxx, 0.5f, 0.0, 10.0, "%.3f");
+        ImGui::DragFloat("Box height##EntityBoxHeight", &entity->hitboxy, 0.5f, 0.0, 10.0, "%.3f");
+        ImGui::DragFloat("Offset X##EntityOffsetX", &entity->offsetx, 0.5f, -10.0, 10.0, "%.3f");
+        ImGui::DragFloat("Offset Y##EntityOffsetY", &entity->offsety, 0.5f, -10.0, 10.0, "%.3f");
+        ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &entity->animation_frame, 0.2f, &u16_zero, &u16_max);
+        uint8_t draw_depth = entity->draw_depth;
         if (ImGui::DragScalar("Draw depth##EntityDrawDepth", ImGuiDataType_U8, &draw_depth, 0.2f, &u8_zero, &u8_draw_depth_max))
-            g_entity->set_draw_depth(draw_depth);
+            entity->set_draw_depth(draw_depth);
     }
     if (ImGui::CollapsingHeader("Flags"))
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(entity_flags[i], &g_entity->flags, int_pow(2, i));
+            ImGui::CheckboxFlags(entity_flags[i], &entity->flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("More Flags"))
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(more_flags[i], &g_entity->more_flags, int_pow(2, i));
+            ImGui::CheckboxFlags(more_flags[i], &entity->more_flags, int_pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Input Display"))
     {
         ImVec2 region = ImGui::GetContentRegionMax();
         bool dirs[4] = {false, false, false, false};
-        if (g_entity->movex < 0.0f)
+        if (entity->movex < 0.0f)
             dirs[0] = true;
-        if (g_entity->movey < 0.0f)
+        if (entity->movey < 0.0f)
             dirs[1] = true;
-        if (g_entity->movey > 0.0f)
+        if (entity->movey > 0.0f)
             dirs[2] = true;
-        if (g_entity->movex > 0.0f)
+        if (entity->movex > 0.0f)
             dirs[3] = true;
         for (int i = 0; i < 4; i++)
         {
@@ -4734,7 +4808,7 @@ void render_entity_props()
         }
         for (int i = 0; i < 6; i++)
         {
-            int buttons = g_entity->buttons;
+            int buttons = entity->buttons;
             ImGui::CheckboxFlags(button_flags[i], &buttons, int_pow(2, i));
             if (i < 5)
                 ImGui::SameLine(region.x / 6 * (i + 1));
@@ -4742,10 +4816,10 @@ void render_entity_props()
     }
     if (ImGui::CollapsingHeader("Illumination"))
     {
-        if ((g_entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && g_entity_type <= to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))) //TODO: show all lit entities
+        if ((entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))) //TODO: show all lit entities
         {
-            if (g_entity->emitted_light)
-                render_illumination(g_entity->emitted_light, "Entity illumination");
+            if (entity->emitted_light)
+                render_illumination(entity->emitted_light, "Entity illumination");
         }
     }
     ImGui::PopItemWidth();
@@ -5308,7 +5382,7 @@ void render_tool(std::string tool)
     else if (tool == "tool_camera")
         render_camera();
     else if (tool == "tool_entity_properties")
-        render_entity_props();
+        render_entity_props(g_last_id);
     else if (tool == "tool_game_properties")
         render_game_props();
     else if (tool == "tool_script")
@@ -5535,7 +5609,7 @@ void imgui_draw()
             {
                 ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
                 ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
-                render_entity_props();
+                render_entity_props(g_last_id);
                 lastwidth += ImGui::GetWindowWidth();
                 lastheight += ImGui::GetWindowHeight();
                 ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
@@ -5611,7 +5685,7 @@ void imgui_draw()
                 ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
                 ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
                 ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
-                render_entity_props();
+                render_entity_props(g_last_id);
                 lastwidth += ImGui::GetWindowWidth();
                 lastheight += ImGui::GetWindowHeight();
                 ImGui::End();
@@ -5697,6 +5771,19 @@ void imgui_draw()
         ImGui::Begin("Styles");
         ImGui::ShowStyleEditor();
         ImGui::End();
+    }
+
+    for (auto it = entity_windows.begin(); it != entity_windows.end();)
+    {
+        ImGui::PushID(it->second->uid);
+        ImGui::Begin(it->second->name.c_str(), &it->second->open);
+        render_entity_props(it->second->uid, true);
+        ImGui::End();
+        ImGui::PopID();
+        if (!it->second->open)
+            entity_windows.erase(it++);
+        else
+            ++it;
     }
 }
 

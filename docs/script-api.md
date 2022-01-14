@@ -955,6 +955,12 @@ Same as `get_hitbox` but based on `get_render_position`
 ### [`screen_aabb`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_aabb)
 `AABB screen_aabb(AABB box)`<br/>
 Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
+### [`udp_listen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
+`UdpServer udp_listen(string host, in_port_t port, function cb)`<br/>
+Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
+### [`udp_send`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_send)
+`nil udp_send(string host, in_port_t port, string msg)`<br/>
+Send data to specified UDP address. Requires unsafe mode.
 ## Deprecated Functions
 #### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!
 ### [`on_frame`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_frame)
