@@ -923,14 +923,6 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_KINGU)
 ]]
 
-set_post_entity_spawn(function(ent)
-    set_interval(function()
-        replace_drop(DROP.ANUBIS_COFFIN_SORCERESS, pick(enemies_small))
-        replace_drop(DROP.ANUBIS_COFFIN_VAMPIRE, pick(enemies_small))
-        replace_drop(DROP.ANUBIS_COFFIN_WITCHDOCTOR, pick(enemies_small))
-    end, 30)
-end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_ANUBIS2)
-
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if state.theme ~= THEME.OLMEC or not options.hard_olmec then
         return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
@@ -1585,12 +1577,26 @@ local function get_chain_item()
 end
 
 --[[TODO
-    HUMPHEAD_HIREDHAND
-    DUATALTAR_*
     LOCKEDCHEST_UDJATEYE
     HUNDUN_FIREBALL
     TIAMAT_*
 ]]
+
+set_post_entity_spawn(function(ent)
+    replace_drop(DROP.HUMPHEAD_HIREDHAND, pick(friends))
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_GIANTFISH)
+
+set_post_entity_spawn(function(ent)
+    replace_drop(DROP.LOCKEDCHEST_UDJATEYE, get_chain_item())
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.LOCKEDCHEST)
+
+set_post_entity_spawn(function(ent)
+    set_interval(function()
+        replace_drop(DROP.ANUBIS_COFFIN_SORCERESS, pick(enemies_small))
+        replace_drop(DROP.ANUBIS_COFFIN_VAMPIRE, pick(enemies_small))
+        replace_drop(DROP.ANUBIS_COFFIN_WITCHDOCTOR, pick(enemies_small))
+    end, 30)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_ANUBIS2)
 
 set_pre_tile_code_callback(function(x, y, layer)
     spawn_critical(get_chain_item(), x, y, layer, 0, 0)
@@ -1641,7 +1647,7 @@ set_post_entity_spawn(function(ent)
     replace_drop(DROP.GHOSTJAR_DIAMOND, pick(crate_items))
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CURSEDPOT)
 
-set_post_entity_spawn(function(ent)
+--[[set_post_entity_spawn(function(ent)
     if not options.chain then return end
     local x, y, l = get_position(ent.uid)
     local rx, ry = get_room_index(x, y)
@@ -1650,7 +1656,7 @@ set_post_entity_spawn(function(ent)
         kill_entity(ent.uid)
         spawn_entity_nonreplaceable(get_chain_item(), x, y, l, (prng:random()-0.5)*0.2, 0.2)
     end
-end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_UDJATEYE)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_UDJATEYE)]]
 
 set_callback(function()
     if not options.chain then return end
@@ -2387,6 +2393,10 @@ set_callback(function()
     if state.theme == THEME.OLMEC then
         replace_drop(DROP.OLMEC_SISTERS_BOMBBOX, pick(crate_items))
         replace_drop(DROP.OLMEC_SISTERS_ROPEPILE, pick(sister_items))
+    elseif state.theme == THEME.DUAT then
+        replace_drop(DROP.DUATALTAR_BOMBBAG, pick(crate_items))
+        replace_drop(DROP.DUATALTAR_BOMBBOX, pick(crate_items))
+        --replace_drop(DROP.DUATALTAR_COOKEDTURKEY, pick(crate_items)) --doesnt work
     end
 end, ON.PRE_LEVEL_GENERATION)
 
