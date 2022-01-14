@@ -4,7 +4,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) I
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.6"
+meta.version = "2.6a"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -1411,6 +1411,7 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
          ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ITEM_USHABTI, ENT_TYPE.ITEM_CRATE}
 local abzu_crate_items = {ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PICKUP_BOMBBOX}
 local monkey_crap = join(crate_items, {ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_BOMB})
+local sister_items = {ENT_TYPE.ITEM_PICKUP_ROPEPILE, ENT_TYPE.ITEM_PICKUP_BOMBBAG, ENT_TYPE.ITEM_PICKUP_BOMBBOX, ENT_TYPE.ITEM_PICKUP_12BAG, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY, ENT_TYPE.ITEM_PICKUP_GIANTFOOD, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_SPECTACLES, ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_COMPASS, ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_CAPE, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_SHOTGUN, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_CROSSBOW, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_MATTOCK, ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_SCEPTER, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.ITEM_BOOMBOX}
 
 set_post_entity_spawn(function(ent)
     --math.randomseed(read_prng()[5]+ent.uid)
@@ -1584,16 +1585,9 @@ local function get_chain_item()
 end
 
 --[[TODO
-    ANUBIS_COFFIN_SORCERESS
-    ANUBIS_COFFIN_VAMPIRE
-    ANUBIS_COFFIN_WITCHDOCTOR
-    KINGU_OCTOPUS
-    KINGU_JIANGSHI
-    KINGU_FEMALE_JIANGSHI
     HUMPHEAD_HIREDHAND
     DUATALTAR_*
     LOCKEDCHEST_UDJATEYE
-    OLMEC_SISTERS_*
     HUNDUN_FIREBALL
     TIAMAT_*
 ]]
@@ -1643,9 +1637,9 @@ set_post_entity_spawn(function(ent)
     replace_drop(DROP.BEG_TRUECROWN, pick(crate_items))
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HUNDUNS_SERVANT)
 
---[[set_post_entity_spawn(function(ent)
+set_post_entity_spawn(function(ent)
     replace_drop(DROP.GHOSTJAR_DIAMOND, pick(crate_items))
-end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CURSEDPOT)]]
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CURSEDPOT)
 
 set_post_entity_spawn(function(ent)
     if not options.chain then return end
@@ -2390,6 +2384,10 @@ end, ON.GUIFRAME)
 --[[SPIKES]]
 set_callback(function()
     swapping_liquid = state.theme ~= THEME.OLMEC and prng:random() < options.liquid_chance/100
+    if state.theme == THEME.OLMEC then
+        replace_drop(DROP.OLMEC_SISTERS_BOMBBOX, pick(crate_items))
+        replace_drop(DROP.OLMEC_SISTERS_ROPEPILE, pick(sister_items))
+    end
 end, ON.PRE_LEVEL_GENERATION)
 
 local function swap_liquid(liquid_type, x, y)
