@@ -225,11 +225,13 @@ void register_usertypes(sol::state& lua)
     };
 
     /// Gets a short tile code based on definition, returns `nil` if it can't be found
-    lua["get_short_tile_code"] = [](ShortTileCodeDef short_tile_code_def) -> std::optional<uint8_t> {
+    lua["get_short_tile_code"] = [](ShortTileCodeDef short_tile_code_def) -> std::optional<uint8_t>
+    {
         return State::get().ptr_local()->level_gen->data->get_short_tile_code(short_tile_code_def);
     };
     /// Gets the definition of a short tile code (if available), will vary depending on which file is loaded
-    lua["get_short_tile_code_definition"] = [](SHORT_TILE_CODE short_tile_code) -> std::optional<ShortTileCodeDef> {
+    lua["get_short_tile_code_definition"] = [](SHORT_TILE_CODE short_tile_code) -> std::optional<ShortTileCodeDef>
+    {
         return State::get().ptr_local()->level_gen->data->get_short_tile_code_def(short_tile_code);
     };
 
@@ -294,16 +296,19 @@ void register_usertypes(sol::state& lua)
     /// Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.
     /// Returns missing spawns in the front layer and missing spawns in the back layer in that order.
     /// The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.
-    lua["get_missing_extra_spawns"] = [](std::uint32_t extra_spawn_chance_id) -> std::pair<std::uint32_t, std::uint32_t> {
+    lua["get_missing_extra_spawns"] = [](std::uint32_t extra_spawn_chance_id) -> std::pair<std::uint32_t, std::uint32_t>
+    {
         return State::get().ptr()->level_gen->data->get_missing_extra_spawns(extra_spawn_chance_id);
     };
 
     /// Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
-    lua["get_room_index"] = [](float x, float y) -> std::pair<int, int> {
+    lua["get_room_index"] = [](float x, float y) -> std::pair<int, int>
+    {
         return State::get().ptr_local()->level_gen->get_room_index(x, y);
     };
     /// Transform a room index into the top left corner position in the room
-    lua["get_room_pos"] = [](int x, int y) -> std::pair<float, float> {
+    lua["get_room_pos"] = [](int x, int y) -> std::pair<float, float>
+    {
         return State::get().ptr_local()->level_gen->get_room_pos(x, y);
     };
     /// Get the room template given a certain index, returns `nil` if coordinates are out of bounds
@@ -352,6 +357,55 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->data->level_config[config];
     };
 
+    lua.new_usertype<ThemeInfo>(
+        "ThemeInfo",
+        "sub_theme",
+        &ThemeInfo::sub_theme);
+
+    lua.new_usertype<CustomTheme>(
+        "CustomTheme",
+        "theme",
+        &CustomTheme::theme,
+        "base_theme",
+        &CustomTheme::base_theme,
+        "sub_theme",
+        &CustomTheme::sub_theme,
+        "block_type",
+        &CustomTheme::block_type,
+        "block_type2",
+        &CustomTheme::block_type2,
+        "texture_floor",
+        &CustomTheme::texture_floor,
+        "texture_bg",
+        &CustomTheme::texture_bg,
+        "texture_door",
+        &CustomTheme::texture_door,
+        "gravity",
+        &CustomTheme::gravity,
+        "player_damage",
+        &CustomTheme::player_damage,
+        "procedural_spawn",
+        &CustomTheme::procedural_spawn,
+        "procedural_level_gen",
+        &CustomTheme::procedural_level_gen,
+        "transition",
+        &CustomTheme::transition,
+        "vault",
+        &CustomTheme::vault,
+        "coffin",
+        &CustomTheme::coffin,
+        "populate",
+        &CustomTheme::populate,
+        "spawn_players",
+        &CustomTheme::spawn_players,
+        "loop",
+        &CustomTheme::loop);
+
+    lua["force_custom_theme"] = [](CustomTheme* customtheme)
+    {
+        State::get().ptr_local()->current_theme = customtheme;
+    };
+
     // Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
     lua.new_usertype<PreLoadLevelFilesContext>(
         "PreLoadLevelFilesContext",
@@ -363,7 +417,9 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
-    lua.new_usertype<LevelGenSystem>("LevelGenSystem", sol::no_constructor, "shop_type", &LevelGenSystem::shop_type, "spawn_x", &LevelGenSystem::spawn_x, "spawn_y", &LevelGenSystem::spawn_y, "spawn_room_x", &LevelGenSystem::spawn_room_x, "spawn_room_y", &LevelGenSystem::spawn_room_y, "exits", &LevelGenSystem::exit_doors_locations);
+    lua.new_usertype<LevelGenSystem>(
+        "LevelGenSystem", sol::no_constructor, "shop_type", &LevelGenSystem::shop_type, "spawn_x", &LevelGenSystem::spawn_x, "spawn_y", &LevelGenSystem::spawn_y, "spawn_room_x", &LevelGenSystem::spawn_room_x, "spawn_room_y", &LevelGenSystem::spawn_room_y, "exits", &LevelGenSystem::exit_doors_locations, "themes", sol::property([](LevelGenSystem& lgs)
+                                                                                                                                                                                                                                                                                                                                        { return std::ref(lgs.themes); }));
 
     // Context received in ON.POST_ROOM_GENERATION.
     // Used to change the room templates in the level and other shenanigans that affect level gen.
