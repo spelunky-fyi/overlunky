@@ -370,10 +370,14 @@ void register_usertypes(sol::state& lua)
         &CustomTheme::base_theme,
         "sub_theme",
         &CustomTheme::sub_theme,
-        "block_type",
-        &CustomTheme::block_type,
-        "block_type2",
-        &CustomTheme::block_type2,
+        "spreading_floor",
+        &CustomTheme::spreading_floor,
+        "spreading_floorstyled",
+        &CustomTheme::spreading_floorstyled,
+        "border_floor",
+        &CustomTheme::border_floor,
+        "border_type",
+        &CustomTheme::border_type,
         "texture_floor",
         &CustomTheme::texture_floor,
         "texture_bg",
@@ -401,9 +405,15 @@ void register_usertypes(sol::state& lua)
         "loop",
         &CustomTheme::loop);
 
+    /// Force a CustomTheme in POST_ROOM_GENERATION or PRE_LEVEL_GENERATION.
     lua["force_custom_theme"] = [](CustomTheme* customtheme)
     {
         State::get().ptr_local()->current_theme = customtheme;
+    };
+
+    lua["force_custom_subtheme"] = [](CustomTheme* customtheme)
+    {
+        State::get().ptr_local()->level_gen->theme_cosmicocean->sub_theme = customtheme;
     };
 
     // Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.

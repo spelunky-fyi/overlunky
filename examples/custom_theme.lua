@@ -23,7 +23,8 @@ local themes = {
     THEME.ICE_CAVES,
     THEME.NEO_BABYLON,
     THEME.SUNKEN_CITY,
-    THEME.CITY_OF_GOLD
+    THEME.CITY_OF_GOLD,
+    THEME.DUAT
 }
 
 local textures_floor = {
@@ -39,6 +40,8 @@ local textures_floor = {
     TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0
 }
 
+local borders = {1, 2, 3}
+
 local function pick(from)
     return from[prng:random(#from)]
 end
@@ -47,6 +50,7 @@ local customtheme
 
 set_callback(function(ctx)
     if state.screen ~= SCREEN.LEVEL then return end
+
     -- this sets which procedural level generation to use
     ctx:override_level_files({"generic.lvl", pick(lvls)})
 
@@ -60,10 +64,10 @@ set_callback(function()
         customtheme = CustomTheme:new()
     end
 
-    -- this mainly sets the music I guess
+    -- not sure what this affects
     state.theme = pick(themes)
 
-    -- size does matter
+    -- size doesn't really matter in custom theme, when game doesn't try to force its logic
     state.width = prng:random(2, 8)
     state.height = prng:random(2, 8)
 
@@ -76,9 +80,14 @@ set_callback(function(ctx)
     -- set fallback theme to whatever we randomized earlier
     customtheme.base_theme = state.theme - 1
 
-    -- force different floor texture
+    -- force different floor textures
     customtheme.texture_floor = pick(textures_floor)
+    customtheme.border_floor = pick(borders)
 
+    -- force custom theme here to get the level generation from the lvl file, but visuals from our theme
+    force_custom_theme(customtheme)
+
+    -- these only still work in their default themes
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.ARROWTRAP_CHANCE, 20)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRUSHER_TRAP_CHANCE, 20)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPARKTRAP_CHANCE, 20)
@@ -124,9 +133,6 @@ set_callback(function(ctx)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.GIANTFLY, 20)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.LEPRECHAUN, 20)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRABMAN, 20)
-
-    -- force custom theme here to get the level generation from the lvl file, but visuals from our theme
-    force_custom_theme(customtheme)
 end, ON.POST_ROOM_GENERATION)
 
 set_callback(function()
@@ -136,13 +142,14 @@ set_callback(function()
     state.world = prng:random(1, 255)
     state.level = prng:random(1, 255)
 
-    -- this is for the transition
+    -- this is for the transition floor
     state.theme_next = pick(themes)
 
     -- this changes the music, even mid level
     state.theme = pick(themes)
 
     -- camera needs adjustment
+    -- TODO: something unknown in CustomTheme is making ice caves bottom weird
     state.camera.bounds_left = 0.5
     state.camera.bounds_right = 10*state.width+4.5
     state.camera.bounds_top = 124.5

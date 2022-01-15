@@ -255,7 +255,7 @@ class ThemeInfo
     // cog: 110 (ENT_TYPE_FLOORSTYLED_COG)
     // duat: 112 (ENT_TYPE_FLOORSTYLED_DUAT)
     // hundun: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
-    // strangely, it's only applied to an odd block here and there
+    // strangely, it's only applied to an odd block here and there (so floorspreading?)
     virtual uint32_t random_block_floorstyle() = 0;
 
     // similar to random_block_floorstyle(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE)
@@ -470,17 +470,22 @@ void force_co_subtheme(int8_t subtheme);
 class CustomTheme : public ThemeInfo
 {
   public:
+    std::string level_file = "";
     uint8_t theme = 100;
     uint8_t base_theme = 0;
-    uint32_t block_type = to_id("ENT_TYPE_FLOOR_GENERIC");
-    uint32_t block_type2 = to_id("ENT_TYPE_FLOORSTYLED_STONE");
+    uint32_t spreading_floor = UINT32_MAX;
+    uint32_t spreading_floorstyled = UINT32_MAX;
+    uint32_t border_floor = UINT32_MAX;
+    uint8_t border_type = 0; //enum
     uint32_t texture_floor = 0;
     uint32_t texture_bg = 0;
     uint32_t texture_door = 0;
     uint32_t texture_backdoor = 0;
+
     float gravity = -1.0f;
+    float back_light = 0.0f;
+
     bool player_damage = true;
-    std::string level_file = "dwellingarea.lvl";
     bool loop = false;
     bool procedural_spawn = false;
     bool procedural_level_gen = false;
@@ -489,7 +494,6 @@ class CustomTheme : public ThemeInfo
     bool populate = false;
     bool spawn_players = true;
     bool transition = true;
-    float back_light = 0.0f;
 
     ~CustomTheme(){}
     bool get_unknown1()
@@ -506,18 +510,23 @@ class CustomTheme : public ThemeInfo
     }
     void unknown_v4()
     {
+        State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v4();
     }
     void unknown_v5()
     {
+        State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v5();
     }
     void handle_level_specialities()
     {
+        State::get().ptr_local()->level_gen->themes[base_theme]->handle_level_specialities();
     }
     void unknown_v7()
     {
+        State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v7();
     }
     void unknown_v8()
     {
+        State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v8();
     }
     void insert_shopkeeper_vault()
     {
@@ -531,10 +540,11 @@ class CustomTheme : public ThemeInfo
     }
     void set_theme_specific_level_feeling()
     {
+        State::get().ptr_local()->level_gen->themes[base_theme]->set_theme_specific_level_feeling();
     }
     bool unknown_v12()
     {
-        return true;
+        return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v12();
     }
     void populate_level()
     {
@@ -543,8 +553,23 @@ class CustomTheme : public ThemeInfo
     }
     void add_level_bordertiles()
     {
-        // get borders from dwelling so they don't leak
-        State::get().ptr_local()->level_gen->themes[0]->add_level_bordertiles();
+        // get borders from dwelling so they don't leak for testing
+        switch(border_type)
+        {
+            // full border, from dwelling
+            case 0:
+            State::get().ptr_local()->level_gen->themes[0]->add_level_bordertiles();
+            break;
+
+            // bottomless, from ice caves
+            case 1:
+            State::get().ptr_local()->level_gen->themes[6]->add_level_bordertiles();
+            break;
+
+            // no border
+            default:
+            break;
+        }
     }
     void post_process_level()
     {
@@ -561,14 +586,6 @@ class CustomTheme : public ThemeInfo
     void populate_background()
     {
         State::get().ptr_local()->level_gen->themes[base_theme]->populate_background();
-        /*auto bg = spawn_entity_abs(to_id("ENT_TYPE_BG_LEVEL_BACKWALL"), 42.5f, 62.5f, LAYER::FRONT, 0.0f, 0.0f);
-        auto ent = get_entity_ptr(bg);
-        ent->w = 86.0f;
-        ent->h = 126.0f;
-        ent->hitboxx = 43.0f;
-        ent->hitboxy = 63.0f;
-        ent->tilew = 12;
-        ent->tileh = 12;*/
     }
     void populate_background_beautification()
     {
@@ -598,10 +615,13 @@ class CustomTheme : public ThemeInfo
     }
     void handle_multiplayer()
     {
+        State::get().ptr_local()->level_gen->themes[base_theme]->handle_multiplayer();
     }
     const char* level_file_to_load()
     {
-        return level_file.c_str();
+        if (level_file != "")
+            return level_file.c_str();
+        return State::get().ptr_local()->level_gen->themes[base_theme]->level_file_to_load();
     }
     uint8_t theme_id()
     {
@@ -613,15 +633,19 @@ class CustomTheme : public ThemeInfo
     }
     uint32_t random_block_floorstyle()
     {
-        return block_type;
+        if (spreading_floor != UINT32_MAX)
+            return spreading_floor;
+        return State::get().ptr_local()->level_gen->themes[base_theme]->random_block_floorstyle();
     }
     uint32_t random_block_floorstyle_2()
     {
-        return block_type2;
+        if (spreading_floorstyled != UINT32_MAX)
+            return spreading_floorstyled;
+        return State::get().ptr_local()->level_gen->themes[base_theme]->random_block_floorstyle_2();
     }
     bool unknown_v30()
     {
-        return false;
+        return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v30();
     }
     uint32_t transition_tunnel_block_modifier()
     {
@@ -629,15 +653,17 @@ class CustomTheme : public ThemeInfo
     }
     uint32_t unknown_v32()
     {
-        return 4;
+        return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v32();
     }
     uint32_t backwall_entity_id()
     {
-        return 778;
+        return to_id("ENT_TYPE_BG_LEVEL_BACKWALL");
     }
     uint32_t bordertile_entity_id()
     {
-        return 1;
+        if (border_floor != UINT32_MAX)
+            return border_floor;
+        return State::get().ptr_local()->level_gen->themes[base_theme]->bordertile_entity_id();
     }
     uint32_t transition_tunnel_critter_entity_id()
     {
@@ -653,7 +679,7 @@ class CustomTheme : public ThemeInfo
     }
     bool unknown_37()
     {
-        return true;
+        return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_37();
     }
     uint32_t backlayer_lut()
     {
@@ -702,13 +728,12 @@ class CustomTheme : public ThemeInfo
                 return texture_backdoor;
             break;
         default:
-            return State::get().ptr_local()->level_gen->themes[base_theme]->get_dynamic_floor_texture_id(texture_id);
+            break;
         }
         return State::get().ptr_local()->level_gen->themes[base_theme]->get_dynamic_floor_texture_id(texture_id);
     }
     void set_next_world_level_theme()
     {
-        DEBUG("set_next_world_level_theme");
         auto state = State::get().ptr_local();
         state->world_next = 1;
         state->level_next = 1;
@@ -716,7 +741,8 @@ class CustomTheme : public ThemeInfo
     }
     uint32_t get_zero_based_level_height()
     {
-        return State::get().ptr()->h - 1;
+        //return State::get().ptr()->h - 1;
+        return State::get().ptr_local()->level_gen->themes[base_theme]->get_zero_based_level_height();
     }
     uint32_t unknown_v47()
     {
@@ -732,13 +758,11 @@ class CustomTheme : public ThemeInfo
     }
     void populate_extra_random_entities()
     {
-        DEBUG("populate_extra_random_entities");
         if (procedural_spawn)
             State::get().ptr_local()->level_gen->themes[base_theme]->populate_extra_random_entities();
     }
     void do_procedural_spawn()
     {
-        DEBUG("do_procedural_spawn");
         if (procedural_spawn)
             State::get().ptr_local()->level_gen->themes[base_theme]->do_procedural_spawn();
     }
