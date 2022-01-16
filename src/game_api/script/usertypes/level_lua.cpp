@@ -364,6 +364,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<CustomTheme>(
         "CustomTheme",
+        "level_file",
+        &CustomTheme::level_file,
         "theme",
         &CustomTheme::theme,
         "base_theme",
