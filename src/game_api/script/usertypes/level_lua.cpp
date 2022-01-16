@@ -360,22 +360,32 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<ThemeInfo>(
         "ThemeInfo",
         "sub_theme",
-        &ThemeInfo::sub_theme);
+        &ThemeInfo::sub_theme,
+        "theme",
+        &ThemeInfo::theme_id,
+        "base_theme",
+        &ThemeInfo::theme_base_id);
 
     lua.new_usertype<CustomTheme>(
         "CustomTheme",
         "level_file",
         &CustomTheme::level_file,
-        "disable_progress",
-        &CustomTheme::disable_progress,
+        "init",
+        &CustomTheme::init,
+        "progress",
+        &CustomTheme::progress,
         "theme",
         &CustomTheme::theme,
         "base_theme",
         &CustomTheme::base_theme,
         "sub_theme",
         &CustomTheme::sub_theme,
-        "bg_theme",
-        &CustomTheme::bg_theme,
+        "next_world",
+        &CustomTheme::next_world,
+        "next_level",
+        &CustomTheme::next_level,
+        "next_theme",
+        &CustomTheme::next_theme,
         "spreading_floor",
         &CustomTheme::spreading_floor,
         "spreading_floorstyled",
@@ -384,6 +394,8 @@ void register_usertypes(sol::state& lua)
         &CustomTheme::border_floor,
         "border_type",
         &CustomTheme::border_type,
+        "camera_theme",
+        &CustomTheme::camera_theme,
         "textures",
         &CustomTheme::textures,
         "gravity",
@@ -440,10 +452,16 @@ void register_usertypes(sol::state& lua)
         &CustomTheme::bg,
         "lighting",
         &CustomTheme::lighting,
-        "post_process_themes",
-        &CustomTheme::post_process_themes,
-        "post_process_decoration_themes",
-        &CustomTheme::post_process_decoration_themes);
+        "unknownv12",
+        &CustomTheme::unknownv12,
+        "unknownv30",
+        &CustomTheme::unknownv30,
+        "unknownv32",
+        &CustomTheme::unknownv32,
+        "unknownv37",
+        &CustomTheme::unknownv37,
+        "unknownv47",
+        &CustomTheme::unknownv47);
 
     lua.create_named_table("CUSTOM_TEXTURE",
         "BG",
@@ -460,15 +478,17 @@ void register_usertypes(sol::state& lua)
         -10
     );
 
+    lua.create_named_table("CUSTOM_BORDER", "NORMAL", 0, "BOTTOMLESS", 1, "NONE", 2);
+
     /// Force a CustomTheme in POST_ROOM_GENERATION or PRE_LEVEL_GENERATION.
     lua["force_custom_theme"] = [](CustomTheme* customtheme)
     {
-        State::get().ptr_local()->current_theme = customtheme;
+        State::get().ptr()->current_theme = customtheme;
     };
 
     lua["force_custom_subtheme"] = [](CustomTheme* customtheme)
     {
-        State::get().ptr_local()->level_gen->theme_cosmicocean->sub_theme = customtheme;
+        State::get().ptr()->level_gen->theme_cosmicocean->sub_theme = customtheme;
     };
 
     // Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.

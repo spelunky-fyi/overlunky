@@ -237,6 +237,7 @@ class ThemeInfo
     virtual void populate_players() = 0;
 
     // when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail
+    // this actually also sets the camera bounds and various theme specific special effects, also spawns osiris
     virtual void handle_multiplayer() = 0;
 
     // the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
@@ -291,7 +292,7 @@ class ThemeInfo
     // if you return false in other themes you are invincible except for crushing deaths, and you do still experience knockback and stun
     virtual bool are_players_vulnerable() = 0;
 
-    // returns true by default, except CO, duat (these have no bg, but don't know if related)
+    // returns true by default, except CO, duat (these also have no bg, but don't know if related)
     virtual bool unknown_37() = 0;
 
     // returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
@@ -477,38 +478,46 @@ class CustomTheme : public ThemeInfo
     uint32_t spreading_floor = UINT32_MAX;
     uint32_t spreading_floorstyled = UINT32_MAX;
     uint32_t border_floor = UINT32_MAX;
-    uint8_t bg_theme = UINT8_MAX;
     uint8_t border_type = 0; // enum
+    uint8_t camera_theme = 0;
     std::map<int32_t, uint32_t> textures;
+    uint8_t next_world = 1;
+    uint8_t next_level = 1;
+    uint8_t next_theme = 1;
 
     float gravity = -1.0f;
     float back_light = 0.0f;
 
-    bool disable_progress = true;
+    bool init = false;
+    bool progress = false;
     bool player_damage = true;
     bool loop = false;
-    bool procedural_spawn = true;
-    bool procedural_level_gen = true;
+    bool procedural_spawn = false;
+    bool procedural_level_gen = false;
     bool vault = false;
     bool coffin = false;
     bool players = true;
     bool transition = true;
     bool flags = true;
-    bool unknownv4 = true;
-    bool unknownv5 = true;
+    bool unknownv4 = false;
+    bool unknownv5 = false;
     bool special = false;
-    bool unknownv7 = true;
-    bool unknownv8 = true;
+    bool unknownv7 = false;
+    bool unknownv8 = false;
     bool feeling = false;
     bool populate = true;
-    bool post_process = true;
-    bool post_process_exit = true;
-    bool post_process_entity = true;
-    bool post_process_decoration = true;
+    bool post_process = false;
+    bool post_process_exit = false;
+    bool post_process_entity = false;
+    bool post_process_decoration = false;
     bool bg = true;
     bool lighting = false;
-    std::vector<uint8_t> post_process_themes;
-    std::vector<uint8_t> post_process_decoration_themes;
+
+    bool unknownv12 = false;
+    bool unknownv30 = false;
+    bool unknownv32 = false;
+    bool unknownv37 = false;
+    bool unknownv47 = false;
 
     ~CustomTheme()
     {
@@ -524,7 +533,8 @@ class CustomTheme : public ThemeInfo
     }
     void initialize_levelgen()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->initialize_levelgen();
+        if (init)
+            State::get().ptr_local()->level_gen->themes[base_theme]->initialize_levelgen();
     }
     void unknown_v4()
     {
@@ -568,7 +578,9 @@ class CustomTheme : public ThemeInfo
     }
     bool unknown_v12()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v12();
+        if (unknownv12)
+            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v12();
+        return false;
     }
     void populate_level()
     {
@@ -632,20 +644,25 @@ class CustomTheme : public ThemeInfo
     }
     void on_level_transition()
     {
-        auto state = State::get().ptr_local();
+        if (transition)
+            State::get().ptr_local()->level_gen->themes[base_theme]->on_level_transition();
+        /*auto state = State::get().ptr_local();
         state->quest_flags &= ~(1U);
         state->screen_next = 12;
         state->ingame = true;
-        state->loading = 1;
+        state->loading = 1;*/
     }
     void populate_players()
     {
         if (players)
-            State::get().ptr_local()->level_gen->themes[base_theme]->populate_players();
+            State::get().ptr_local()->level_gen->themes[11]->populate_players();
     }
     void handle_multiplayer()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->handle_multiplayer();
+        if (camera_theme > 0 and camera_theme < 18)
+            State::get().ptr_local()->level_gen->themes[camera_theme-1]->handle_multiplayer();
+        else
+            State::get().ptr_local()->level_gen->themes[base_theme]->handle_multiplayer();
     }
     const char* level_file_to_load()
     {
@@ -655,6 +672,7 @@ class CustomTheme : public ThemeInfo
     }
     uint8_t theme_id()
     {
+        //return base_theme;
         return theme;
     }
     uint8_t theme_base_id()
@@ -675,8 +693,9 @@ class CustomTheme : public ThemeInfo
     }
     bool unknown_v30()
     {
+        if (unknownv30)
+            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v30();
         return false;
-        //return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v30();
     }
     uint32_t transition_tunnel_block_modifier()
     {
@@ -684,11 +703,13 @@ class CustomTheme : public ThemeInfo
     }
     uint32_t unknown_v32()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v32();
+        if (unknownv32)
+            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v32();
+        return 0;
     }
     uint32_t backwall_entity_id()
     {
-        return to_id("ENT_TYPE_BG_LEVEL_BACKWALL");
+        return 778;
     }
     uint32_t bordertile_entity_id()
     {
@@ -710,7 +731,9 @@ class CustomTheme : public ThemeInfo
     }
     bool unknown_37()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_37();
+        if (unknownv37)
+            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_37();
+        return true;
     }
     uint32_t backlayer_lut()
     {
@@ -740,39 +763,38 @@ class CustomTheme : public ThemeInfo
     }
     void set_next_world_level_theme()
     {
-        if (disable_progress)
+        if (progress)
         {
-            auto state = State::get().ptr_local();
-            state->world_next = 1;
-            state->level_next = 1;
-            state->theme_next = 1;
+            State::get().ptr_local()->level_gen->themes[base_theme]->set_next_world_level_theme();
         }
         else
         {
-            State::get().ptr_local()->level_gen->themes[base_theme]->set_next_world_level_theme();
+            auto state = State::get().ptr_local();
+            state->world_next = next_world;
+            state->level_next = next_level;
+            state->theme_next = next_theme;
         }
     }
     uint32_t get_zero_based_level_height()
     {
+        //return State::get().ptr_local()->w - 1;
         return State::get().ptr_local()->level_gen->themes[base_theme]->get_zero_based_level_height();
     }
     uint32_t unknown_v47()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v47();
+        if (unknownv47)
+            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v47();
+        return 0;
     }
     void post_process_decoration1()
     {
         if (post_process)
             State::get().ptr_local()->level_gen->themes[base_theme]->post_process_decoration1();
-        for (auto post_theme : post_process_decoration_themes)
-            State::get().ptr_local()->level_gen->themes[post_theme]->post_process_decoration1();
     }
     void post_process_decoration2()
     {
         if (post_process)
             State::get().ptr_local()->level_gen->themes[base_theme]->post_process_decoration2();
-        for (auto post_theme : post_process_decoration_themes)
-            State::get().ptr_local()->level_gen->themes[post_theme]->post_process_decoration2();
     }
     void populate_extra_random_entities()
     {
