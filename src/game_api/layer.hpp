@@ -69,13 +69,14 @@ struct Layer
     //char + fx + mons + item + logical + mount + activefloor + BG (excluding BG_SHOP, BG_LEVEL_*)
     EntityList unknown_entities1;
     size_t unknown1;
-    std::map<int, int> unknown2;
+    // key is the mask
+    std::map<uint32_t, EntityList> entities_by_mask;
 
     char stuff0[0xF430]; // Just wanna get to grid_entities
 
     Entity* grid_entities[0x7e][0x56];
 
-    char stuff1[0x3FD08]; // Just wanna get to expired_items_
+    char stuff1[0x3FD08];
 
     EntityList unknown_entities2; // debris, explosions, laserbeams etc. ?
     EntityList unknown_entities3; // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?

@@ -201,7 +201,7 @@ class FxSpringtrapRing : public Movable
 class FxWitchdoctorHint : public Movable
 {
   public:
-    std::map<size_t, size_t> unknown;
+    std::set<int32_t> unknown; // uid of the witchdoctor, why the map/set?
 };
 
 class FxNecromancerANKH : public Movable

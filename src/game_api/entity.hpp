@@ -446,7 +446,6 @@ struct SoundInfo
 
 struct SoundPosition
 {
-  public:
     size_t __vftable;
     float x;
     float y;
