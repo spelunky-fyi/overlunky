@@ -366,6 +366,8 @@ void register_usertypes(sol::state& lua)
         "CustomTheme",
         "level_file",
         &CustomTheme::level_file,
+        "disable_progress",
+        &CustomTheme::disable_progress,
         "theme",
         &CustomTheme::theme,
         "base_theme",
@@ -382,12 +384,8 @@ void register_usertypes(sol::state& lua)
         &CustomTheme::border_floor,
         "border_type",
         &CustomTheme::border_type,
-        "texture_floor",
-        &CustomTheme::texture_floor,
-        "texture_bg",
-        &CustomTheme::texture_bg,
-        "texture_door",
-        &CustomTheme::texture_door,
+        "textures",
+        &CustomTheme::textures,
         "gravity",
         &CustomTheme::gravity,
         "player_damage",
@@ -408,16 +406,24 @@ void register_usertypes(sol::state& lua)
         &CustomTheme::transition,
         "flags",
         &CustomTheme::flags,
+        "unknown1",
+        &CustomTheme::unknown1,
+        "unknown2",
+        &CustomTheme::unknown2,
+        "unknown3",
+        &CustomTheme::unknown3,
         "unknown4",
         &CustomTheme::unknown4,
-        "unknown5",
-        &CustomTheme::unknown5,
+        "unknownv4",
+        &CustomTheme::unknownv4,
+        "unknownv5",
+        &CustomTheme::unknownv5,
         "special",
         &CustomTheme::special,
-        "unknown7",
-        &CustomTheme::unknown7,
-        "unknown8",
-        &CustomTheme::unknown8,
+        "unknownv7",
+        &CustomTheme::unknownv7,
+        "unknownv8",
+        &CustomTheme::unknownv8,
         "feeling",
         &CustomTheme::feeling,
         "populate",
@@ -438,6 +444,21 @@ void register_usertypes(sol::state& lua)
         &CustomTheme::post_process_themes,
         "post_process_decoration_themes",
         &CustomTheme::post_process_decoration_themes);
+
+    lua.create_named_table("CUSTOM_TEXTURE",
+        "BG",
+        -4,
+        "FLOOR",
+        -5,
+        "DOOR",
+        -6,
+        "BACKDOOR",
+        -7,
+        "DECORATION",
+        -8,
+        "COFFIN",
+        -10
+    );
 
     /// Force a CustomTheme in POST_ROOM_GENERATION or PRE_LEVEL_GENERATION.
     lua["force_custom_theme"] = [](CustomTheme* customtheme)
@@ -462,8 +483,24 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
     lua.new_usertype<LevelGenSystem>(
-        "LevelGenSystem", sol::no_constructor, "shop_type", &LevelGenSystem::shop_type, "spawn_x", &LevelGenSystem::spawn_x, "spawn_y", &LevelGenSystem::spawn_y, "spawn_room_x", &LevelGenSystem::spawn_room_x, "spawn_room_y", &LevelGenSystem::spawn_room_y, "exits", &LevelGenSystem::exit_doors_locations, "themes", sol::property([](LevelGenSystem& lgs)
-                                                                                                                                                                                                                                                                                                                                        { return std::ref(lgs.themes); }));
+        "LevelGenSystem",
+        sol::no_constructor,
+        "shop_type",
+        &LevelGenSystem::shop_type,
+        "spawn_x",
+        &LevelGenSystem::spawn_x,
+        "spawn_y",
+        &LevelGenSystem::spawn_y,
+        "spawn_room_x",
+        &LevelGenSystem::spawn_room_x,
+        "spawn_room_y",
+        &LevelGenSystem::spawn_room_y,
+        "exits",
+        &LevelGenSystem::exit_doors_locations,
+        "themes",
+        sol::property([](LevelGenSystem& lgs){ return std::ref(lgs.themes); }),
+        "flags",
+        &LevelGenSystem::flags);
 
     // Context received in ON.POST_ROOM_GENERATION.
     // Used to change the room templates in the level and other shenanigans that affect level gen.

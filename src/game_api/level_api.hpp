@@ -479,14 +479,12 @@ class CustomTheme : public ThemeInfo
     uint32_t border_floor = UINT32_MAX;
     uint8_t bg_theme = UINT8_MAX;
     uint8_t border_type = 0; // enum
-    uint32_t texture_floor = 0;
-    uint32_t texture_bg = 0;
-    uint32_t texture_door = 0;
-    uint32_t texture_backdoor = 0;
+    std::map<int32_t, uint32_t> textures;
 
     float gravity = -1.0f;
     float back_light = 0.0f;
 
+    bool disable_progress = true;
     bool player_damage = true;
     bool loop = false;
     bool procedural_spawn = true;
@@ -495,12 +493,12 @@ class CustomTheme : public ThemeInfo
     bool coffin = false;
     bool players = true;
     bool transition = true;
-    bool flags = false;
-    bool unknown4 = true;
-    bool unknown5 = true;
+    bool flags = true;
+    bool unknownv4 = true;
+    bool unknownv5 = true;
     bool special = false;
-    bool unknown7 = true;
-    bool unknown8 = true;
+    bool unknownv7 = true;
+    bool unknownv8 = true;
     bool feeling = false;
     bool populate = true;
     bool post_process = true;
@@ -530,12 +528,12 @@ class CustomTheme : public ThemeInfo
     }
     void unknown_v4()
     {
-        if (unknown4)
+        if (unknownv4)
             State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v4();
     }
     void unknown_v5()
     {
-        if (unknown5)
+        if (unknownv5)
             State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v5();
     }
     void handle_level_specialities()
@@ -545,12 +543,12 @@ class CustomTheme : public ThemeInfo
     }
     void unknown_v7()
     {
-        if (unknown7)
+        if (unknownv7)
             State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v7();
     }
     void unknown_v8()
     {
-        if (unknown8)
+        if (unknownv8)
             State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v8();
     }
     void insert_shopkeeper_vault()
@@ -677,7 +675,8 @@ class CustomTheme : public ThemeInfo
     }
     bool unknown_v30()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v30();
+        return false;
+        //return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v30();
     }
     uint32_t transition_tunnel_block_modifier()
     {
@@ -733,47 +732,28 @@ class CustomTheme : public ThemeInfo
     {
         return State::get().ptr_local()->level_gen->themes[base_theme]->get_unknown_1_or_2(index);
     }
-    // texture_id == -4 -> returns 122 BG_CAVE_0
-    // texture_id == -5 -> returns 115 FLOOR_CAVE_0
-    // texture_id == -6 -> returns 117 FLOOR_CAVE_2
-    // texture_id == -7 -> returns 118 FLOOR_CAVE_3
-    // texture_id == -8 -> returns 120 DECO_CAVE_0
-    // texture_id == -10 -> returns 369 COFFINS_0
     uint32_t get_dynamic_floor_texture_id(int32_t texture_id)
     {
-        switch (texture_id)
-        {
-        case -4:
-            if (texture_bg > 0)
-                return texture_bg;
-            break;
-        case -5:
-            if (texture_floor > 0)
-                return texture_floor;
-            break;
-        case -6:
-            if (texture_door > 0)
-                return texture_door;
-            break;
-        case -7:
-            if (texture_backdoor > 0)
-                return texture_backdoor;
-            break;
-        default:
-            break;
-        }
+        if (textures.find(texture_id) != textures.end())
+            return textures[texture_id];
         return State::get().ptr_local()->level_gen->themes[base_theme]->get_dynamic_floor_texture_id(texture_id);
     }
     void set_next_world_level_theme()
     {
-        auto state = State::get().ptr_local();
-        state->world_next = 1;
-        state->level_next = 1;
-        state->theme_next = 1;
+        if (disable_progress)
+        {
+            auto state = State::get().ptr_local();
+            state->world_next = 1;
+            state->level_next = 1;
+            state->theme_next = 1;
+        }
+        else
+        {
+            State::get().ptr_local()->level_gen->themes[base_theme]->set_next_world_level_theme();
+        }
     }
     uint32_t get_zero_based_level_height()
     {
-        // return State::get().ptr()->h - 1;
         return State::get().ptr_local()->level_gen->themes[base_theme]->get_zero_based_level_height();
     }
     uint32_t unknown_v47()
