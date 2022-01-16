@@ -24,7 +24,7 @@ local themes = {
     THEME.NEO_BABYLON,
     THEME.SUNKEN_CITY,
     THEME.CITY_OF_GOLD,
-    THEME.DUAT
+    --THEME.DUAT
 }
 
 local textures_floor = {
@@ -40,7 +40,21 @@ local textures_floor = {
     TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0
 }
 
-local borders = {1, 2, 3}
+local borders = {
+    ENT_TYPE.FLOOR_BORDERTILE,
+    ENT_TYPE.FLOOR_BORDERTILE_METAL,
+    ENT_TYPE.FLOOR_BORDERTILE_OCTOPUS
+}
+
+names = {}
+for i,v in pairs(ENT_TYPE) do
+  names[v] = i
+end
+
+theme_names = {}
+for i,v in pairs(THEME) do
+  theme_names[v] = i
+end
 
 local function pick(from)
     return from[prng:random(#from)]
@@ -68,27 +82,31 @@ set_callback(function()
     state.theme = pick(themes)
 
     -- size doesn't really matter in custom theme, when game doesn't try to force its logic
-    state.width = prng:random(2, 8)
-    state.height = prng:random(2, 8)
-
-    -- if we called force_custom_theme here, we'd get no procedural level generation to do our own thing
-end, ON.PRE_LEVEL_GENERATION)
-
-set_callback(function(ctx)
-    if state.screen ~= SCREEN.LEVEL then return end
+    state.width = prng:random(3, 6)
+    state.height = prng:random(3, 6)
 
     -- set fallback theme to whatever we randomized earlier
+    -- background and default procedural spawns are taken from here
     customtheme.base_theme = state.theme - 1
 
     -- force different floor textures
     customtheme.texture_floor = pick(textures_floor)
     customtheme.border_floor = pick(borders)
 
-    -- force custom theme here to get the level generation from the lvl file, but visuals from our theme
+    customtheme.players = true
+
+    print(F"Base theme: {theme_names[state.theme]}")
+
+end, ON.PRE_LEVEL_GENERATION)
+
+set_callback(function(ctx)
+    if state.screen ~= SCREEN.LEVEL then return end
+
+    -- force custom theme here to get the normal level generation from the lvl file, but visuals from our theme
     force_custom_theme(customtheme)
 
     -- these only still work in their default themes
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.ARROWTRAP_CHANCE, 20)
+    --[[ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.ARROWTRAP_CHANCE, 20)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRUSHER_TRAP_CHANCE, 20)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPARKTRAP_CHANCE, 20)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.SPIKE_BALL_CHANCE, 20)
@@ -132,7 +150,7 @@ set_callback(function(ctx)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.TADPOLE, 20)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.GIANTFLY, 20)
     ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.LEPRECHAUN, 20)
-    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRABMAN, 20)
+    ctx:set_procedural_spawn_chance(PROCEDURAL_CHANCE.CRABMAN, 20)]]
 end, ON.POST_ROOM_GENERATION)
 
 set_callback(function()
@@ -150,8 +168,16 @@ set_callback(function()
 
     -- camera needs adjustment
     -- TODO: something unknown in CustomTheme is making ice caves bottom weird
+    --state.camera.bounds_left = 0.5
+    --state.camera.bounds_right = 10*state.width+4.5
+    --state.camera.bounds_top = 124.5
+    --state.camera.bounds_bottom = 120.5-8*state.height
+end, ON.POST_LEVEL_GENERATION)
+
+set_callback(function()
+    -- fix it here instead
     state.camera.bounds_left = 0.5
     state.camera.bounds_right = 10*state.width+4.5
     state.camera.bounds_top = 124.5
     state.camera.bounds_bottom = 120.5-8*state.height
-end, ON.POST_LEVEL_GENERATION)
+end, ON.LEVEL)

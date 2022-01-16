@@ -2,9 +2,10 @@
 
 #include "game_allocator.hpp"
 #include "level_api_types.hpp"
+#include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
-#include "rpc.hpp"
+
 
 #include <cstdint>
 #include <optional>
@@ -255,13 +256,13 @@ class ThemeInfo
     // cog: 110 (ENT_TYPE_FLOORSTYLED_COG)
     // duat: 112 (ENT_TYPE_FLOORSTYLED_DUAT)
     // hundun: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
-    // strangely, it's only applied to an odd block here and there (so floorspreading?)
+    // strangely, it's only applied to an odd block here and there (floorspreading)
     virtual uint32_t random_block_floorstyle() = 0;
 
-    // similar to random_block_floorstyle(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE)
+    // similar to random_block_floorstyle(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE) (floorspreading)
     virtual uint32_t random_block_floorstyle_2() = 0;
 
-    // all return false, except olmec, temple, neobab, cog, duat
+    // all return false, except olmec, temple, neobab, cog, duat (this probably picks which floorspreading block to use)
     virtual bool unknown_v30() = 0;
 
     // determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme
@@ -290,7 +291,7 @@ class ThemeInfo
     // if you return false in other themes you are invincible except for crushing deaths, and you do still experience knockback and stun
     virtual bool are_players_vulnerable() = 0;
 
-    // returns true by default, except CO, duat
+    // returns true by default, except CO, duat (these have no bg, but don't know if related)
     virtual bool unknown_37() = 0;
 
     // returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
@@ -476,7 +477,8 @@ class CustomTheme : public ThemeInfo
     uint32_t spreading_floor = UINT32_MAX;
     uint32_t spreading_floorstyled = UINT32_MAX;
     uint32_t border_floor = UINT32_MAX;
-    uint8_t border_type = 0; //enum
+    uint8_t bg_theme = UINT8_MAX;
+    uint8_t border_type = 0; // enum
     uint32_t texture_floor = 0;
     uint32_t texture_bg = 0;
     uint32_t texture_door = 0;
@@ -487,46 +489,69 @@ class CustomTheme : public ThemeInfo
 
     bool player_damage = true;
     bool loop = false;
-    bool procedural_spawn = false;
-    bool procedural_level_gen = false;
+    bool procedural_spawn = true;
+    bool procedural_level_gen = true;
     bool vault = false;
     bool coffin = false;
-    bool populate = false;
-    bool spawn_players = true;
+    bool players = true;
     bool transition = true;
+    bool flags = false;
+    bool unknown4 = true;
+    bool unknown5 = true;
+    bool special = false;
+    bool unknown7 = true;
+    bool unknown8 = true;
+    bool feeling = false;
+    bool populate = true;
+    bool post_process = true;
+    bool post_process_exit = true;
+    bool post_process_entity = true;
+    bool post_process_decoration = true;
+    bool bg = true;
+    bool lighting = false;
+    std::vector<uint8_t> post_process_themes;
+    std::vector<uint8_t> post_process_decoration_themes;
 
-    ~CustomTheme(){}
+    ~CustomTheme()
+    {
+    }
     bool get_unknown1()
     {
         return State::get().ptr_local()->level_gen->themes[base_theme]->get_unknown1();
     }
     void initialize_flags()
     {
+        if (flags)
+            State::get().ptr_local()->level_gen->themes[base_theme]->initialize_flags();
     }
     void initialize_levelgen()
     {
-        if (procedural_level_gen)
-            State::get().ptr_local()->level_gen->themes[base_theme]->initialize_levelgen();
+        State::get().ptr_local()->level_gen->themes[base_theme]->initialize_levelgen();
     }
     void unknown_v4()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v4();
+        if (unknown4)
+            State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v4();
     }
     void unknown_v5()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v5();
+        if (unknown5)
+            State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v5();
     }
     void handle_level_specialities()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->handle_level_specialities();
+        if (special)
+            State::get().ptr_local()->level_gen->themes[base_theme]->handle_level_specialities();
     }
     void unknown_v7()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v7();
+        if (unknown7)
+            State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v7();
     }
     void unknown_v8()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v8();
+        if (unknown8)
+            State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v8();
     }
     void insert_shopkeeper_vault()
     {
@@ -540,7 +565,8 @@ class CustomTheme : public ThemeInfo
     }
     void set_theme_specific_level_feeling()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->set_theme_specific_level_feeling();
+        if (feeling)
+            State::get().ptr_local()->level_gen->themes[base_theme]->set_theme_specific_level_feeling();
     }
     bool unknown_v12()
     {
@@ -554,46 +580,52 @@ class CustomTheme : public ThemeInfo
     void add_level_bordertiles()
     {
         // get borders from dwelling so they don't leak for testing
-        switch(border_type)
+        switch (border_type)
         {
-            // full border, from dwelling
-            case 0:
+        // full border, from dwelling
+        case 0:
             State::get().ptr_local()->level_gen->themes[0]->add_level_bordertiles();
             break;
 
-            // bottomless, from ice caves
-            case 1:
+        // bottomless, from ice caves
+        case 1:
             State::get().ptr_local()->level_gen->themes[6]->add_level_bordertiles();
             break;
 
-            // no border
-            default:
+        // no border
+        default:
             break;
         }
     }
     void post_process_level()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->post_process_level();
+        if (post_process)
+            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_level();
     }
     void post_process_exitdoors()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->post_process_exitdoors();
+        if (post_process_exit)
+            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_exitdoors();
     }
     void post_process_entities()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->post_process_entities();
+        if (post_process_entity)
+            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_entities();
     }
     void populate_background()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->populate_background();
+        if (bg)
+            State::get().ptr_local()->level_gen->themes[base_theme]->populate_background();
     }
     void populate_background_beautification()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->populate_background_beautification();
+        if (bg)
+            State::get().ptr_local()->level_gen->themes[base_theme]->populate_background_beautification();
     }
     void populate_extra_lighting()
     {
-        State::get().ptr_local()->level_gen->themes[base_theme]->populate_extra_lighting();
+        if (lighting)
+            State::get().ptr_local()->level_gen->themes[base_theme]->populate_extra_lighting();
     }
     void populate_level_transition()
     {
@@ -610,7 +642,7 @@ class CustomTheme : public ThemeInfo
     }
     void populate_players()
     {
-        if (spawn_players)
+        if (players)
             State::get().ptr_local()->level_gen->themes[base_theme]->populate_players();
     }
     void handle_multiplayer()
@@ -741,7 +773,7 @@ class CustomTheme : public ThemeInfo
     }
     uint32_t get_zero_based_level_height()
     {
-        //return State::get().ptr()->h - 1;
+        // return State::get().ptr()->h - 1;
         return State::get().ptr_local()->level_gen->themes[base_theme]->get_zero_based_level_height();
     }
     uint32_t unknown_v47()
@@ -750,11 +782,17 @@ class CustomTheme : public ThemeInfo
     }
     void post_process_decoration1()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->post_process_decoration1();
+        if (post_process)
+            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_decoration1();
+        for (auto post_theme : post_process_decoration_themes)
+            State::get().ptr_local()->level_gen->themes[post_theme]->post_process_decoration1();
     }
     void post_process_decoration2()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->post_process_decoration2();
+        if (post_process)
+            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_decoration2();
+        for (auto post_theme : post_process_decoration_themes)
+            State::get().ptr_local()->level_gen->themes[post_theme]->post_process_decoration2();
     }
     void populate_extra_random_entities()
     {
