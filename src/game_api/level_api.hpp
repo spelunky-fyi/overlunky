@@ -475,18 +475,21 @@ class CustomTheme : public ThemeInfo
     std::string level_file = "";
     uint8_t theme = 100;
     uint8_t base_theme = 0;
+    uint8_t custom_base_theme = UINT8_MAX;
+    uint8_t border_type = 0; // enum
+    uint8_t camera_theme = UINT8_MAX;
+    uint8_t texture_theme = UINT8_MAX;
+    uint8_t bg_theme = UINT8_MAX;
     uint32_t spreading_floor = UINT32_MAX;
     uint32_t spreading_floorstyled = UINT32_MAX;
     uint32_t border_floor = UINT32_MAX;
-    uint8_t border_type = 0; // enum
-    uint8_t camera_theme = 0;
     std::map<int32_t, uint32_t> textures;
     uint8_t next_world = 1;
     uint8_t next_level = 1;
     uint8_t next_theme = 1;
 
-    float gravity = -1.0f;
-    float back_light = 0.0f;
+    float gravity = FLT_MAX;
+    float back_light = FLT_MAX;
 
     bool init = false;
     bool progress = false;
@@ -524,7 +527,8 @@ class CustomTheme : public ThemeInfo
     }
     bool get_unknown1()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->get_unknown1();
+        return unknown1;
+        //return State::get().ptr_local()->level_gen->themes[base_theme]->get_unknown1();
     }
     void initialize_flags()
     {
@@ -533,59 +537,61 @@ class CustomTheme : public ThemeInfo
     }
     void initialize_levelgen()
     {
-        if (init)
-            State::get().ptr_local()->level_gen->themes[base_theme]->initialize_levelgen();
+        if (init && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->initialize_levelgen();
     }
     void unknown_v4()
     {
-        if (unknownv4)
-            State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v4();
+        if (unknownv4 && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v4();
     }
     void unknown_v5()
     {
-        if (unknownv5)
-            State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v5();
+        if (unknownv5 && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v5();
     }
     void handle_level_specialities()
     {
-        if (special)
-            State::get().ptr_local()->level_gen->themes[base_theme]->handle_level_specialities();
+        if (special && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->handle_level_specialities();
     }
     void unknown_v7()
     {
-        if (unknownv7)
-            State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v7();
+        if (unknownv7 && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v7();
     }
     void unknown_v8()
     {
-        if (unknownv8)
-            State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v8();
+        if (unknownv8 && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v8();
     }
     void insert_shopkeeper_vault()
     {
-        if (vault)
-            State::get().ptr_local()->level_gen->themes[base_theme]->insert_shopkeeper_vault();
+        if (vault && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->insert_shopkeeper_vault();
     }
     void insert_coffin()
     {
-        if (coffin)
-            State::get().ptr_local()->level_gen->themes[base_theme]->insert_coffin();
+        if (coffin && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->insert_coffin();
     }
     void set_theme_specific_level_feeling()
     {
-        if (feeling)
-            State::get().ptr_local()->level_gen->themes[base_theme]->set_theme_specific_level_feeling();
+        if (feeling && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->set_theme_specific_level_feeling();
     }
     bool unknown_v12()
     {
-        if (unknownv12)
-            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v12();
+        if (unknownv12 && custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v12();
         return false;
     }
     void populate_level()
     {
-        if (populate)
-            State::get().ptr_local()->level_gen->themes[base_theme]->populate_level();
+        if (populate && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_level();
+        else if (populate)
+            State::get().ptr_local()->level_gen->themes[0]->populate_level();
     }
     void add_level_bordertiles()
     {
@@ -609,103 +615,133 @@ class CustomTheme : public ThemeInfo
     }
     void post_process_level()
     {
-        if (post_process)
-            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_level();
+        if (post_process && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_level();
     }
     void post_process_exitdoors()
     {
-        if (post_process_exit)
-            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_exitdoors();
+        if (post_process_exit && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_exitdoors();
     }
     void post_process_entities()
     {
-        if (post_process_entity)
-            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_entities();
+        if (post_process_entity && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_entities();
     }
     void populate_background()
     {
-        if (bg)
-            State::get().ptr_local()->level_gen->themes[base_theme]->populate_background();
+        if (bg && bg_theme < 18)
+            State::get().ptr_local()->level_gen->themes[bg_theme]->populate_background();
+        //else if (bg && texture_theme < 18)
+        //    State::get().ptr_local()->level_gen->themes[texture_theme]->populate_background();
+        else if (bg && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_background();
+        else if (bg)
+        {
+            auto uid = spawn_entity_abs(to_id("ENT_TYPE_BG_LEVEL_BACKWALL"), 42.5f, 62.5f, LAYER::FRONT, 0.f, 0.f);
+            auto ent = get_entity_ptr(uid);
+            ent->w = 86.f;
+            ent->h = 126.f;
+            ent->hitboxx = 43.f;
+            ent->hitboxy = 63.f;
+            ent->tilew = 21.5f;
+            ent->tileh = 31.5f;
+        }
     }
     void populate_background_beautification()
     {
-        if (bg)
-            State::get().ptr_local()->level_gen->themes[base_theme]->populate_background_beautification();
+        if (bg && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_background_beautification();
     }
     void populate_extra_lighting()
     {
-        if (lighting)
-            State::get().ptr_local()->level_gen->themes[base_theme]->populate_extra_lighting();
+        if (lighting && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_extra_lighting();
     }
     void populate_level_transition()
     {
-        if (transition)
-            State::get().ptr_local()->level_gen->themes[base_theme]->populate_level_transition();
+        if (transition && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_level_transition();
     }
     void on_level_transition()
     {
-        if (transition)
-            State::get().ptr_local()->level_gen->themes[base_theme]->on_level_transition();
-        /*auto state = State::get().ptr_local();
-        state->quest_flags &= ~(1U);
-        state->screen_next = 12;
-        state->ingame = true;
-        state->loading = 1;*/
+        if (transition && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->on_level_transition();
     }
     void populate_players()
     {
-        if (players)
-            State::get().ptr_local()->level_gen->themes[11]->populate_players();
+        if (players && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_players();
+        else if (players)
+            State::get().ptr_local()->level_gen->themes[0]->populate_players();
     }
     void handle_multiplayer()
     {
-        if (camera_theme > 0 and camera_theme < 18)
-            State::get().ptr_local()->level_gen->themes[camera_theme-1]->handle_multiplayer();
+        if (camera_theme < 18)
+            State::get().ptr_local()->level_gen->themes[camera_theme]->handle_multiplayer();
+        else if (custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->handle_multiplayer();
         else
-            State::get().ptr_local()->level_gen->themes[base_theme]->handle_multiplayer();
+        {
+            auto state = State::get().ptr_local();
+            state->camera->bounds_left = 0.5f;
+            state->camera->bounds_top = 124.5f;
+            state->camera->bounds_right = 10.0f * state->w + 4.5f;
+            state->camera->bounds_bottom = 120.5f - 8.0f * state->h;
+        }
     }
     const char* level_file_to_load()
     {
         if (level_file != "")
             return level_file.c_str();
-        return State::get().ptr_local()->level_gen->themes[base_theme]->level_file_to_load();
+        else if (custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->level_file_to_load();
+        return "";
     }
     uint8_t theme_id()
     {
-        //return base_theme;
+        //return custom_base_theme;
         return theme;
     }
     uint8_t theme_base_id()
     {
-        return base_theme;
+        if (custom_base_theme < 18)
+            return custom_base_theme;
+        return 0;
     }
     uint32_t random_block_floorstyle()
     {
         if (spreading_floor != UINT32_MAX)
             return spreading_floor;
-        return State::get().ptr_local()->level_gen->themes[base_theme]->random_block_floorstyle();
+        else if (custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->random_block_floorstyle();
+        return to_id("ENT_TYPE_FLOOR_GENERIC");
     }
     uint32_t random_block_floorstyle_2()
     {
         if (spreading_floorstyled != UINT32_MAX)
             return spreading_floorstyled;
-        return State::get().ptr_local()->level_gen->themes[base_theme]->random_block_floorstyle_2();
+        else if (custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->random_block_floorstyle_2();
+        return to_id("ENT_TYPE_FLOORSTYLED_STONE");
     }
     bool unknown_v30()
     {
-        if (unknownv30)
-            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v30();
+        if (unknownv30 && custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v30();
         return false;
     }
     uint32_t transition_tunnel_block_modifier()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->transition_tunnel_block_modifier();
+        if (custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->transition_tunnel_block_modifier();
+        return 85;
     }
     uint32_t unknown_v32()
     {
-        if (unknownv32)
-            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v32();
-        return 0;
+        if (unknownv32 && custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v32();
+        return 12;
     }
     uint32_t backwall_entity_id()
     {
@@ -715,15 +751,23 @@ class CustomTheme : public ThemeInfo
     {
         if (border_floor != UINT32_MAX)
             return border_floor;
-        return State::get().ptr_local()->level_gen->themes[base_theme]->bordertile_entity_id();
+        else if (custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->bordertile_entity_id();
+        return to_id("ENT_TYPE_FLOOR_BORDERTILE");
     }
     uint32_t transition_tunnel_critter_entity_id()
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->transition_tunnel_critter_entity_id();
+        if (custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->transition_tunnel_critter_entity_id();
+        return to_id("ENT_TYPE_MONS_CRITTERDUNGBEETLE");
     }
     float liquid_gravity_direction()
     {
-        return gravity;
+        if (gravity != FLT_MAX)
+            return gravity;
+        else if (custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->liquid_gravity_direction();
+        return -1.0f;
     }
     bool are_players_vulnerable()
     {
@@ -731,8 +775,8 @@ class CustomTheme : public ThemeInfo
     }
     bool unknown_37()
     {
-        if (unknownv37)
-            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_37();
+        if (unknownv37 && custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_37();
         return true;
     }
     uint32_t backlayer_lut()
@@ -741,7 +785,11 @@ class CustomTheme : public ThemeInfo
     }
     float backlayer_global_illumination_level()
     {
-        return back_light;
+        if (back_light != FLT_MAX)
+            return back_light;
+        else if (custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->backlayer_global_illumination_level();
+        return 0.0f;
     }
     bool enable_camera_loop()
     {
@@ -753,19 +801,25 @@ class CustomTheme : public ThemeInfo
     }
     bool get_unknown_1_or_2(uint8_t index)
     {
-        return State::get().ptr_local()->level_gen->themes[base_theme]->get_unknown_1_or_2(index);
+        if (index == 0)
+            return unknown1;
+        return unknown2;
     }
     uint32_t get_dynamic_floor_texture_id(int32_t texture_id)
     {
         if (textures.find(texture_id) != textures.end())
             return textures[texture_id];
-        return State::get().ptr_local()->level_gen->themes[base_theme]->get_dynamic_floor_texture_id(texture_id);
+        else if (texture_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[texture_theme]->get_dynamic_floor_texture_id(texture_id);
+        else if (custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->get_dynamic_floor_texture_id(texture_id);
+        return 0;
     }
     void set_next_world_level_theme()
     {
         if (progress)
         {
-            State::get().ptr_local()->level_gen->themes[base_theme]->set_next_world_level_theme();
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->set_next_world_level_theme();
         }
         else
         {
@@ -777,33 +831,33 @@ class CustomTheme : public ThemeInfo
     }
     uint32_t get_zero_based_level_height()
     {
-        //return State::get().ptr_local()->w - 1;
-        return State::get().ptr_local()->level_gen->themes[base_theme]->get_zero_based_level_height();
+        return State::get().ptr_local()->h - 1;
+        //return State::get().ptr_local()->level_gen->themes[custom_base_theme]->get_zero_based_level_height();
     }
     uint32_t unknown_v47()
     {
-        if (unknownv47)
-            return State::get().ptr_local()->level_gen->themes[base_theme]->unknown_v47();
+        if (unknownv47 && custom_base_theme < 18)
+            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v47();
         return 0;
     }
     void post_process_decoration1()
     {
-        if (post_process)
-            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_decoration1();
+        if (post_process && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_decoration1();
     }
     void post_process_decoration2()
     {
-        if (post_process)
-            State::get().ptr_local()->level_gen->themes[base_theme]->post_process_decoration2();
+        if (post_process && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_decoration2();
     }
     void populate_extra_random_entities()
     {
-        if (procedural_spawn)
-            State::get().ptr_local()->level_gen->themes[base_theme]->populate_extra_random_entities();
+        if (procedural_spawn && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_extra_random_entities();
     }
     void do_procedural_spawn()
     {
-        if (procedural_spawn)
-            State::get().ptr_local()->level_gen->themes[base_theme]->do_procedural_spawn();
+        if (procedural_spawn && custom_base_theme < 18)
+            State::get().ptr_local()->level_gen->themes[custom_base_theme]->do_procedural_spawn();
     }
 };

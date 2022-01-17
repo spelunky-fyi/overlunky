@@ -378,8 +378,14 @@ void register_usertypes(sol::state& lua)
         &CustomTheme::theme,
         "base_theme",
         &CustomTheme::base_theme,
+        "custom_base_theme",
+        &CustomTheme::custom_base_theme,
         "sub_theme",
         &CustomTheme::sub_theme,
+        "texture_theme",
+        &CustomTheme::texture_theme,
+        "bg_theme",
+        &CustomTheme::bg_theme,
         "next_world",
         &CustomTheme::next_world,
         "next_level",
@@ -461,7 +467,19 @@ void register_usertypes(sol::state& lua)
         "unknownv37",
         &CustomTheme::unknownv37,
         "unknownv47",
-        &CustomTheme::unknownv47);
+        &CustomTheme::unknownv47,
+
+        "v12",
+        &CustomTheme::unknown_v12,
+        "v30",
+        &CustomTheme::unknown_v30,
+        "v32",
+        &CustomTheme::unknown_v32,
+        "v37",
+        &CustomTheme::unknown_37,
+        "v47",
+        &CustomTheme::unknown_v47
+    );
 
     lua.create_named_table("CUSTOM_TEXTURE",
         "BG",
