@@ -662,11 +662,15 @@ class CustomTheme : public ThemeInfo
     {
         if (transition && custom_base_theme < 18)
             State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_level_transition();
+        else if (transition)
+            State::get().ptr_local()->level_gen->themes[0]->populate_level_transition();
     }
     void on_level_transition()
     {
         if (transition && custom_base_theme < 18)
             State::get().ptr_local()->level_gen->themes[custom_base_theme]->on_level_transition();
+        else if (transition)
+            State::get().ptr_local()->level_gen->themes[0]->on_level_transition();
     }
     void populate_players()
     {
