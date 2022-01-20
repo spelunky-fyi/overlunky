@@ -238,6 +238,7 @@ class ThemeInfo
 
     // when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail
     // this actually also sets the camera bounds and various theme specific special effects, also spawns osiris
+    // also makes curse pots spawn the ghost
     virtual void handle_multiplayer() = 0;
 
     // the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
@@ -476,7 +477,7 @@ class CustomTheme : public ThemeInfo
     uint8_t theme = 100;
     uint8_t base_theme = 0;
     uint8_t custom_base_theme = UINT8_MAX;
-    uint8_t border_type = 0; // enum
+    uint8_t border_theme = UINT8_MAX;
     uint8_t camera_theme = UINT8_MAX;
     uint8_t texture_theme = UINT8_MAX;
     uint8_t bg_theme = UINT8_MAX;
@@ -514,6 +515,7 @@ class CustomTheme : public ThemeInfo
     bool post_process_entity = false;
     bool post_process_decoration = false;
     bool bg = true;
+    bool border = true;
     bool lighting = false;
 
     bool unknownv12 = false;
@@ -595,23 +597,10 @@ class CustomTheme : public ThemeInfo
     }
     void add_level_bordertiles()
     {
-        // get borders from dwelling so they don't leak for testing
-        switch (border_type)
-        {
-        // full border, from dwelling
-        case 0:
+        if (border && border_theme < 18)
+            State::get().ptr_local()->level_gen->themes[border_theme]->add_level_bordertiles();
+        else if (border)
             State::get().ptr_local()->level_gen->themes[0]->add_level_bordertiles();
-            break;
-
-        // bottomless, from ice caves
-        case 1:
-            State::get().ptr_local()->level_gen->themes[6]->add_level_bordertiles();
-            break;
-
-        // no border
-        default:
-            break;
-        }
     }
     void post_process_level()
     {
@@ -683,8 +672,8 @@ class CustomTheme : public ThemeInfo
     {
         if (camera_theme < 18)
             State::get().ptr_local()->level_gen->themes[camera_theme]->handle_multiplayer();
-        else if (custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->handle_multiplayer();
+        //else if (custom_base_theme < 18)
+        //    State::get().ptr_local()->level_gen->themes[custom_base_theme]->handle_multiplayer();
         else
         {
             auto state = State::get().ptr_local();
