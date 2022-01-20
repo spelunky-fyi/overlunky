@@ -16,6 +16,8 @@
 0x6be572f6: Reset
 0x6f8ba7c1: Disabled
 0xff3d053f: Enabled
+0x590c1507: OK
+0x4c3d1636: Retry
 ########################################
 ## INTRO POEM                         ##
 ##   Three lines chosen randomly...   ##
@@ -158,6 +160,7 @@
 0xf2f05950: Normal
 0x29e8df85: Low
 0x9a10db7d: Overscan
+0x13ec052d: Resize the display area to fit your screen.
 0x1e07b09f: AUDIO
 0x0a8d040d: SFX Volume
 0x0de10191: Set the volume of sound effects.
@@ -192,10 +195,15 @@
 0xb9886e89: Toggle the right stick for movement.
 0x8d95ee18: Right Stick
 0xb9886e89: Toggle the right stick for movement.
+0x3eeba5ed: Right stick
+0xb9886e89: Toggle the right stick for movement.
 0x2c0b9fd9: Vibration
 0x88a85fe2: Set the controller vibration mode.
 0xb5d6ea6a: Rumble
 0xa7ee418e: Set the controller rumble mode.
+0x2c0b9fd9: Vibration
+0x88a85fe2: Set the controller vibration mode.
+0x2c0b9fd9: Vibration
 0x60224f78: <SYS_ACCEPT/> Change Key
 0x6b33b386: <SYS_ACCEPT/> Change Button
 0x6b33b386: <SYS_ACCEPT/> Change Button
@@ -233,6 +241,9 @@
 0xa9039985: Sync Code:
 0x0873bb4e: Requesting Code
 0x98911d5f: Syncing
+0xa1240fc1: There was an error synchronizing progress with linked storage.
+0x5691cf30: There was an error fetching linked storage code.
+0xfb809b0b: There was an error linking progress storage.
 #### Gameplay
 ########################################
 0xde045e5f: Pet Style
@@ -2337,6 +2348,10 @@
 0x98c8e795: A network error occurred
 0xcf6c2186: Starting in %d
 0x50581689: This leaderboard is currently unavailable, please come back later.
+0x9b7db03e: Unable to start the daily challenge, please try again later.
+0xf2f6655f: Warning
+0xa902bb0c: This lobby is Cross-Play enabled.\nPlayers from other platforms may join or already be in the lobby.\nDo you want to continue?
+0x2a343f5e: Do you want to make this lobby Cross-Play enabled?\nWarning: This will allow players from other platforms to join this lobby.
 ########################################
 #### Ending
 ########################################
@@ -2515,3 +2530,5 @@
 #### Others
 ########################################
 0xe983216a: The demo has ended.\nThanks for playing!
+0x13aced89: Insufficient space to save data. Continue without saving?
+0x796b612f: There was an error initializing save data. The game will continue with save games disabled.
