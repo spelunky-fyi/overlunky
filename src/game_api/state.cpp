@@ -73,7 +73,7 @@ State& State::get()
         STATE = State{addr_location};
         STATE.ptr()->level_gen->init();
         init_spawn_hooks();
-        init_render_api_hooks();
+        //init_render_api_hooks(); // TODO:
         get_is_init() = true;
         strings_init();
     }
