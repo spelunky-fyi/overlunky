@@ -473,7 +473,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "write_load_opt"sv,
         PatternCommandBuffer{}
             .set_optional(true)
-            .find_inst("\xFF\xD3\xB9\xFA\x00\x00\x00"sv)
+            .find_inst("\xFF\xD3\xB9\xFA\x00\x00\x00"sv) // TODO: not found
             .at_exe(),
     },
     {
