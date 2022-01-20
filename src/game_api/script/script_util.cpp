@@ -12,7 +12,7 @@ Toast get_toast()
 
 Say get_say()
 {
-    static Say say = (Say)get_address("say");
+    static Say say = (Say)get_address("speech_bubble_fun");
     return say;
 }
 
