@@ -480,7 +480,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "write_load_opt_fixed"sv,
         PatternCommandBuffer{}
             .set_optional(true)
-            .find_inst("\x90\x90\xB9\xFA\x00\x00\x00"sv)
+            .find_inst("\x90\x90\xB9\xFA\x00\x00\x00"sv) // TODO: not found
             .at_exe(),
     },
     {
@@ -705,7 +705,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_inst("\xff\x90\x90\x01\x00\x00\x8b\x05****\x65"sv)
             .offset(-0xcc)
-            .find_inst("\x41\x57\x41\x56\x41\x55\x41\x54")
+            .find_inst("\x41\x57\x41\x56\x41\x55\x41\x54"sv)
             .at_exe(),
     },
     {
@@ -1295,10 +1295,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "sparktrap_angle_increment"sv,
-        // Put a read bp on Spark:angle, the next instruction adds a hardcoded float
+        // Put a read bp on Spark:rotatnio_angle, the next instruction adds a hardcoded float from constant, we want address of that constant
         PatternCommandBuffer{}
-            .set_optional(true) // TODO
-            .find_inst("\xF3\x0F\x58\x05****\xF3\x0F\x11\x81\x58\x01\x00\x00"sv)
+            .find_after_inst("\xF3\x0F\x10\x89\x58\x01\x00\x00\xF3\x0F\x58\x0D"sv)
             .at_exe(),
     },
     {

@@ -897,26 +897,21 @@ void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_enti
 
 void modify_sparktraps(float angle_increment, float distance)
 {
-    static size_t angle_increment_offset = 0;
-    static size_t angle_increment_instruction = 0;
-    if (angle_increment_offset == 0)
+    static float* new_array;
+    if (new_array == nullptr)
     {
-        angle_increment_instruction = get_address("sparktrap_angle_increment");
-        angle_increment_offset = angle_increment_instruction - 0x32;
-        auto distance_offset_relative = static_cast<int32_t>(angle_increment_offset - (angle_increment_instruction + 8));
-        write_mem_prot(angle_increment_instruction + 4, distance_offset_relative, true);
-    }
-    write_mem_prot(angle_increment_offset, angle_increment, true);
+        const auto offset = get_address("sparktrap_angle_increment");
+        const int32_t distance_offset = 0xF1;
+        new_array = (float*)alloc_mem_rel32(offset + 4, sizeof(float) * 2);
+        if (!new_array)
+            return;
 
-    static size_t distance_offset = 0;
-    if (distance_offset == 0)
-    {
-        auto distance_instruction = angle_increment_instruction + 0x1F;
-        distance_offset = angle_increment_instruction - 0x2E;
-        auto distance_offset_relative = static_cast<int32_t>(distance_offset - (distance_instruction + 8));
-        write_mem_prot(distance_instruction + 4, distance_offset_relative, true);
+        int32_t rel = static_cast<int32_t>((size_t)new_array - (offset + 4));
+        write_mem_prot(offset, rel, true);
+        write_mem_prot(offset + distance_offset, (int32_t)(rel - distance_offset + sizeof(float)), true);
     }
-    write_mem_prot(distance_offset, distance, true);
+    *new_array = angle_increment;
+    *(new_array + 1) = distance;
 }
 
 void set_kapala_blood_threshold(uint8_t threshold)
