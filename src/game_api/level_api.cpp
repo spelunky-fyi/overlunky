@@ -82,6 +82,10 @@ struct CommunityTileCode
     std::uint32_t entity_id;
     std::uint32_t tile_code_id;
 };
+void g_spawn_not_snapped_to_floor(const CommunityTileCode& self, float x, float y, Layer* layer)
+{
+    layer->spawn_entity(self.entity_id, x, y, false, 0, 0, false);
+};
 template <GHOST_BEHAVIOR behavior>
 auto g_spawn_ghost = [](const CommunityTileCode& self, float x, float y, Layer* layer)
 {
@@ -195,14 +199,17 @@ std::array g_community_tile_codes{
     },
     CommunityTileCode{"cog_door", "ENT_TYPE_FLOOR_DOOR_COG"},
     CommunityTileCode{"dustwall", "ENT_TYPE_FLOOR_DUSTWALL"},
-    CommunityTileCode{"bat", "ENT_TYPE_MONS_BAT"},
+    CommunityTileCode{"bat", "ENT_TYPE_MONS_BAT", g_spawn_not_snapped_to_floor},
+    CommunityTileCode{"bat_flying", "ENT_TYPE_MONS_BAT"},
     CommunityTileCode{"skeleton", "ENT_TYPE_MONS_SKELETON"},
     CommunityTileCode{"redskeleton", "ENT_TYPE_MONS_REDSKELETON"},
     CommunityTileCode{"lizard", "ENT_TYPE_MONS_HORNEDLIZARD"},
     CommunityTileCode{"mole", "ENT_TYPE_MONS_MOLE"},
     CommunityTileCode{"monkey", "ENT_TYPE_MONS_MONKEY"},
     CommunityTileCode{"firebug", "ENT_TYPE_MONS_FIREBUG"},
-    CommunityTileCode{"vampire", "ENT_TYPE_MONS_VAMPIRE"},
+    CommunityTileCode{"vampire", "ENT_TYPE_MONS_VAMPIRE", g_spawn_not_snapped_to_floor},
+    CommunityTileCode{"vampire_flying", "ENT_TYPE_MONS_VAMPIRE"},
+    CommunityTileCode{"vlad_flying", "ENT_TYPE_MONS_VLAD"},
     CommunityTileCode{"osiris", "ENT_TYPE_MONS_OSIRIS_HEAD"},
     CommunityTileCode{"anubis2", "ENT_TYPE_MONS_ANUBIS2"},
     CommunityTileCode{"assassin", "ENT_TYPE_MONS_FEMALE_JIANGSHI"},
@@ -294,7 +301,7 @@ std::array g_community_tile_codes{
     CommunityTileCode{"monkey_gold", "ENT_TYPE_MONS_GOLDMONKEY"},
     CommunityTileCode{"altar_duat", "ENT_TYPE_FLOOR_DUAT_ALTAR"},
     CommunityTileCode{"spikeball", "ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL"},
-    CommunityTileCode{"cobweb", "ENT_TYPE_ITEM_WEB"},
+    CommunityTileCode{"cobweb", "ENT_TYPE_ITEM_WEB", g_spawn_not_snapped_to_floor},
     // Wave 2
     CommunityTileCode{
         "eggsac",
@@ -323,7 +330,8 @@ std::array g_community_tile_codes{
     CommunityTileCode{"eggsac_right", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<1, 0, 1>},
     CommunityTileCode{"eggsac_bottom", "ENT_TYPE_ITEM_EGGSAC", g_spawn_eggsac<0, -1, 0>},
     CommunityTileCode{"grub", "ENT_TYPE_MONS_GRUB"},
-    CommunityTileCode{"spider", "ENT_TYPE_MONS_SPIDER"},
+    CommunityTileCode{"spider", "ENT_TYPE_MONS_SPIDER", g_spawn_not_snapped_to_floor},
+    CommunityTileCode{"spider_falling", "ENT_TYPE_MONS_SPIDER"},
     CommunityTileCode{
         "spider_hanging",
         "ENT_TYPE_MONS_HANGSPIDER",
