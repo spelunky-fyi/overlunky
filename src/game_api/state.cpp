@@ -428,14 +428,20 @@ SaveData* State::savedata()
     auto gm = get_game_manager();
     return gm->save_related->savedata.decode();
 }
-
+uint32_t lowbias32(uint32_t x)
+{
+    x ^= x >> 16;
+    x *= 0x7feb352d;
+    x ^= x >> 15;
+    x *= 0x846ca68b;
+    x ^= x >> 16;
+    return x;
+}
 Entity* State::find(uint32_t uid)
 {
-    if (uid < 0)
-        return nullptr;
     // Ported from MauveAlert's python code in the CAT tracker
     auto mask = ptr()->uid_to_entity_mask;
-    uint32_t target_uid_plus_one = uid + 1;
+    uint32_t target_uid_plus_one = lowbias32(uid + 1);
     uint32_t cur_index = target_uid_plus_one & mask;
     while (true)
     {

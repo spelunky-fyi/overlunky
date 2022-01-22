@@ -1386,7 +1386,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "say_context"sv,
         // Find the pattern for `say`, go one up higher in the callstack and look what writes to rcx
         PatternCommandBuffer{}
-            .find_inst("\xC6\x44\x24\x20\x01\x48\x8D\x0D"sv)
+            .find_after_inst("\xC6\x44\x24\x20\x01\x48\x8D\x0D"sv)
             .offset(-0x3)
             .decode_pc()
             .at_exe(),
