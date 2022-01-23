@@ -643,10 +643,10 @@ class CustomTheme : public ThemeInfo
     {
         auto index = THEME_OVERRIDE::ENT_SPREADING;
         if (!get_override_enabled(index))
-            return to_id("ENT_TYPE_FLOOR_GENERIC");
+            return to_id("ENT_TYPE_FX_SHADOW");
         if (get_override_func_enabled(index))
         {
-            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_FLOOR_GENERIC"));
+            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_FX_SHADOW"));
         }
         return State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->random_block_floorstyle();
     }
@@ -654,10 +654,10 @@ class CustomTheme : public ThemeInfo
     {
         auto index = THEME_OVERRIDE::ENT_SPREADING_STYLED;
         if (!get_override_enabled(index))
-            return to_id("ENT_TYPE_FLOORSTYLED_STONE");
+            return to_id("ENT_TYPE_FX_SHADOW");
         if (get_override_func_enabled(index))
         {
-            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_FLOORSTYLED_STONE"));
+            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_FX_SHADOW"));
         }
         return State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->random_block_floorstyle_2();
     }
@@ -713,10 +713,10 @@ class CustomTheme : public ThemeInfo
     {
         auto index = THEME_OVERRIDE::ENT_CRITTER;
         if (!get_override_enabled(index))
-            return to_id("ENT_TYPE_MONS_CRITTERDUNGBEETLE");
+            return to_id("ENT_TYPE_FX_SHADOW");
         if (get_override_func_enabled(index))
         {
-            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_MONS_CRITTERDUNGBEETLE"));
+            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_FX_SHADOW"));
         }
         return State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->transition_tunnel_critter_entity_id();
     }
