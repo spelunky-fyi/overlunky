@@ -6,7 +6,6 @@
 #include "spawn_api.hpp"
 #include "state.hpp"
 
-
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -239,7 +238,7 @@ class ThemeInfo
     // when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail
     // this actually also sets the camera bounds and various theme specific special effects, also spawns osiris
     // also makes curse pots spawn the ghost
-    virtual void handle_multiplayer() = 0;
+    virtual void effects() = 0;
 
     // the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
     virtual const char* level_file_to_load() = 0;
@@ -470,17 +469,19 @@ void add_next_levels(std::vector<std::string> next_levels);
 int8_t get_co_subtheme();
 void force_co_subtheme(int8_t subtheme);
 
-enum class CUSTOM_TEXTURE : int32_t
+enum class DYNAMIC_TEXTURE : int32_t
 {
-    BG = -4,
+    INVISIBLE = -2,
+    BACKGROUND = -4,
     FLOOR = -5,
     DOOR = -6,
-    BACKDOOR = -7,
-    DECORATION = -8,
+    DOOR_LAYER = -7,
+    BACKGROUND_DECORATION = -8,
+    KALI_STATUE = -9,
     COFFIN = -10
 };
 
-enum class CUSTOM_OVERRIDE : uint8_t
+enum class THEME_OVERRIDE : uint8_t
 {
     BASE,
     UNKNOWN_V1,
@@ -504,7 +505,7 @@ enum class CUSTOM_OVERRIDE : uint8_t
     BACKGROUND_DECORATION,
     LIGHTING,
     POPULATE_TRANSITION,
-    DO_TRANSITION,
+    POST_TRANSITION,
     POPULATE_PLAYERS,
     EFFECTS,
     LVL_FILE,
@@ -527,7 +528,7 @@ enum class CUSTOM_OVERRIDE : uint8_t
     VAULT_LEVEL,
     GET_UNKNOWN1_OR_2,
     TEXTURE_DYNAMIC,
-    NEXT_LEVEL,
+    PRE_TRANSITION,
     LEVEL_HEIGHT,
     UNKNOWN_V47,
     POST_PROCESS_DECORATION,
