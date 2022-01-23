@@ -191,9 +191,10 @@ LevelGenRoomData& PreHandleRoomTilesContext::get_mutable_room_data()
 
 struct ThemeOverride
 {
-    bool enabled;
-    uint8_t theme;
-    std::optional<sol::function> func;
+    bool enabled = {true};
+    uint8_t theme = {UINT8_MAX};
+    bool func_enabled = {false};
+    sol::function func;
 };
 
 class CustomTheme : public ThemeInfo
@@ -202,70 +203,36 @@ class CustomTheme : public ThemeInfo
     std::string level_file = "";
     uint8_t theme = 100;
     uint8_t base_theme = 1;
+    LuaBackend* backend;
 
-    std::map<THEME_OVERRIDE, ThemeOverride*> overrides;
+    std::map<CUSTOM_OVERRIDE, ThemeOverride*> overrides;
+    std::map<CUSTOM_TEXTURE, uint32_t> textures;
 
-    uint8_t custom_base_theme = UINT8_MAX;
-    uint8_t border_theme = UINT8_MAX;
-    uint8_t camera_theme = UINT8_MAX;
-    uint8_t texture_theme = UINT8_MAX;
-    uint8_t bg_theme = UINT8_MAX;
-    uint32_t spreading_floor = UINT32_MAX;
-    uint32_t spreading_floorstyled = UINT32_MAX;
-    uint32_t border_floor = UINT32_MAX;
-    std::map<int32_t, uint32_t> textures;
-    uint8_t next_world = 1;
-    uint8_t next_level = 1;
-    uint8_t next_theme = 1;
-
-    float gravity = FLT_MAX;
-    float back_light = FLT_MAX;
-
-    bool init = false;
-    bool progress = false;
-    bool player_damage = true;
-    bool loop = false;
-    bool procedural_spawn = false;
-    bool procedural_level_gen = false;
-    bool vault = false;
-    bool coffin = false;
-    bool players = true;
-    bool transition = true;
-    bool flags = true;
-    bool unknownv4 = false;
-    bool unknownv5 = false;
-    bool special = false;
-    bool unknownv7 = false;
-    bool unknownv8 = false;
-    bool feeling = false;
-    bool populate = true;
-    bool post_process = false;
-    bool post_process_exit = false;
-    bool post_process_entity = false;
-    bool post_process_decoration = false;
-    bool bg = true;
-    bool border = true;
-    bool lighting = false;
-
-    bool unknownv12 = false;
-    bool unknownv30 = false;
-    bool unknownv32 = false;
-    bool unknownv37 = false;
-    bool unknownv47 = false;
-
-    void override(THEME_OVERRIDE index, bool enabled_)
+    void override(CUSTOM_OVERRIDE index, bool enabled_)
     {
-        overrides[index]->enabled = enabled_;
+        if (overrides.find(index) == overrides.end())
+            overrides[index] = new ThemeOverride({enabled_, UINT8_MAX});
+        else
+            overrides[index]->enabled = enabled_;
     }
 
-    void override(THEME_OVERRIDE index, uint8_t theme_)
+    void override(CUSTOM_OVERRIDE index, uint8_t theme_)
     {
-        overrides[index]->theme = theme_;
+        if (overrides.find(index) == overrides.end())
+            overrides[index] = new ThemeOverride({true, theme_});
+        else
+            overrides[index]->theme = theme_;
     }
 
-    void override(THEME_OVERRIDE index, sol::function func_)
+    void override(CUSTOM_OVERRIDE index, sol::function func_)
     {
-        overrides[index]->func = std::move(func_);
+        if (overrides.find(index) == overrides.end())
+            overrides[index] = new ThemeOverride({true, UINT8_MAX, true, std::move(func_)});
+        else
+        {
+            overrides[index]->func_enabled = true;
+            overrides[index]->func = std::move(func_);
+        }
     }
 
     bool get_base_theme()
@@ -273,7 +240,7 @@ class CustomTheme : public ThemeInfo
         return base_theme - 1;
     }
 
-    bool get_override_enabled(THEME_OVERRIDE index)
+    bool get_override_enabled(CUSTOM_OVERRIDE index)
     {
         if (overrides.find(index) != overrides.end())
         {
@@ -282,45 +249,49 @@ class CustomTheme : public ThemeInfo
         return false;
     }
 
-    uint8_t get_override_theme(THEME_OVERRIDE index)
+    uint8_t get_override_theme(CUSTOM_OVERRIDE index)
     {
-        if (overrides.find(index) != overrides.end())
+        if (overrides.find(index) != overrides.end() && overrides[index]->theme != UINT8_MAX)
         {
             return overrides[index]->theme - 1;
         }
         return UINT8_MAX;
     }
 
-    bool get_override_func_enabled(THEME_OVERRIDE index)
+    bool get_override_func_enabled(CUSTOM_OVERRIDE index)
     {
         if (overrides.find(index) != overrides.end())
         {
-            return overrides[index]->func != std::nullopt;
+            return overrides[index]->func_enabled;
         }
         return false;
     }
 
     template <class Ret, class... Args>
-    std::optional<Ret> run_override_func(THEME_OVERRIDE index, Args&&... args)
+    std::optional<Ret> run_override_func(CUSTOM_OVERRIDE index, [[maybe_unused]]Args&&... args)
     {
-        if (overrides.find(index) != overrides.end())
+        if (overrides.find(index) != overrides.end() && get_override_func_enabled(index))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
-            return backend->handle_function_with_return<Ret>(overrides[index]->func.value(), std::forward<Args>(args)...);
+            DEBUG("running override function {}", (uint8_t)index);
+            return backend->handle_function_with_return<Ret>(overrides[index]->func, std::forward<Args>(args)...);
         }
         return std::nullopt;
     }
 
     CustomTheme()
     {
-        overrides[THEME_OVERRIDE::INIT_FLAGS] = new ThemeOverride({true, UINT8_MAX, std::nullopt});
-        overrides[THEME_OVERRIDE::INIT_LEVELGEN] = new ThemeOverride({true, UINT8_MAX, std::nullopt});
-        overrides[THEME_OVERRIDE::POPULATE_LEVEL] = new ThemeOverride({true, UINT8_MAX, std::nullopt});
-        overrides[THEME_OVERRIDE::POPULATE_PLAYERS] = new ThemeOverride({true, UINT8_MAX, std::nullopt});
-        overrides[THEME_OVERRIDE::POPULATE_TRANSITION] = new ThemeOverride({true, UINT8_MAX, std::nullopt});
-        overrides[THEME_OVERRIDE::DO_TRANSITION] = new ThemeOverride({true, UINT8_MAX, std::nullopt});
-        overrides[THEME_OVERRIDE::BACKGROUND] = new ThemeOverride({true, UINT8_MAX, std::nullopt});
-        overrides[THEME_OVERRIDE::BORDER] = new ThemeOverride({true, UINT8_MAX, std::nullopt});
+        backend = LuaBackend::get_calling_backend();
+        overrides[CUSTOM_OVERRIDE::INIT_FLAGS] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::INIT_LEVELGEN] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::POPULATE_LEVEL] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::POPULATE_PLAYERS] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::POPULATE_TRANSITION] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::DO_TRANSITION] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::BACKGROUND] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::BACKGROUND_DECORATION] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::BORDER] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::EFFECTS] = new ThemeOverride();
+        overrides[CUSTOM_OVERRIDE::TEXTURE_DYNAMIC] = new ThemeOverride();
     }
     ~CustomTheme()
     {
@@ -331,63 +302,7 @@ class CustomTheme : public ThemeInfo
     }
     void initialize_flags()
     {
-        if (flags)
-            State::get().ptr_local()->level_gen->themes[base_theme]->initialize_flags();
-    }
-    void initialize_levelgen()
-    {
-        if (init && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->initialize_levelgen();
-    }
-    void unknown_v4()
-    {
-        if (unknownv4 && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v4();
-    }
-    void unknown_v5()
-    {
-        if (unknownv5 && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v5();
-    }
-    void handle_level_specialities()
-    {
-        if (special && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->handle_level_specialities();
-    }
-    void unknown_v7()
-    {
-        if (unknownv7 && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v7();
-    }
-    void unknown_v8()
-    {
-        if (unknownv8 && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v8();
-    }
-    void insert_shopkeeper_vault()
-    {
-        if (vault && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->insert_shopkeeper_vault();
-    }
-    void insert_coffin()
-    {
-        if (coffin && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->insert_coffin();
-    }
-    void set_theme_specific_level_feeling()
-    {
-        if (feeling && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->set_theme_specific_level_feeling();
-    }
-    bool unknown_v12()
-    {
-        if (unknownv12 && custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v12();
-        return false;
-    }
-    void populate_level()
-    {
-        auto index = THEME_OVERRIDE::POPULATE_LEVEL;
+        auto index = CUSTOM_OVERRIDE::INIT_FLAGS;
         if (!get_override_enabled(index))
             return;
         if (get_override_func_enabled(index))
@@ -396,18 +311,238 @@ class CustomTheme : public ThemeInfo
             return;
         }
         auto override_theme = get_override_theme(index);
-        auto override_base_theme = get_override_theme(THEME_OVERRIDE::BASE);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->initialize_flags();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->initialize_flags();
+        else
+            level_gen->themes[get_base_theme()]->initialize_flags();
+    }
+    void initialize_levelgen()
+    {
+        auto index = CUSTOM_OVERRIDE::INIT_LEVELGEN;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->initialize_levelgen();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->initialize_levelgen();
+        else
+            level_gen->themes[get_base_theme()]->initialize_levelgen();
+    }
+    void unknown_v4()
+    {
+        auto index = CUSTOM_OVERRIDE::UNKNOWN_V4;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->unknown_v4();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->unknown_v4();
+        else
+            level_gen->themes[get_base_theme()]->unknown_v4();
+    }
+    void unknown_v5()
+    {
+        auto index = CUSTOM_OVERRIDE::UNKNOWN_V5;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->unknown_v5();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->unknown_v5();
+        else
+            level_gen->themes[get_base_theme()]->unknown_v5();
+    }
+    void handle_level_specialities()
+    {
+        auto index = CUSTOM_OVERRIDE::SPECIALS;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->handle_level_specialities();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->handle_level_specialities();
+        else
+            level_gen->themes[get_base_theme()]->handle_level_specialities();
+    }
+    void unknown_v7()
+    {
+        auto index = CUSTOM_OVERRIDE::UNKNOWN_V7;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->unknown_v7();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->unknown_v7();
+        else
+            level_gen->themes[get_base_theme()]->unknown_v7();
+    }
+    void unknown_v8()
+    {
+        auto index = CUSTOM_OVERRIDE::UNKNOWN_V8;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->unknown_v8();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->unknown_v8();
+        else
+            level_gen->themes[get_base_theme()]->unknown_v8();
+    }
+    void insert_shopkeeper_vault()
+    {
+        auto index = CUSTOM_OVERRIDE::VAULT;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->insert_shopkeeper_vault();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->insert_shopkeeper_vault();
+        else
+            level_gen->themes[get_base_theme()]->insert_shopkeeper_vault();
+    }
+    void insert_coffin()
+    {
+        auto index = CUSTOM_OVERRIDE::COFFIN;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->insert_coffin();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->insert_coffin();
+        else
+            level_gen->themes[get_base_theme()]->insert_coffin();
+    }
+    void set_theme_specific_level_feeling()
+    {
+        auto index = CUSTOM_OVERRIDE::FEELING;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->set_theme_specific_level_feeling();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->set_theme_specific_level_feeling();
+        else
+            level_gen->themes[get_base_theme()]->set_theme_specific_level_feeling();
+    }
+    bool unknown_v12()
+    {
+        auto index = CUSTOM_OVERRIDE::UNKNOWN_V12;
+        if (!get_override_enabled(index))
+            return false;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<bool>(index).value_or(false);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->unknown_v12();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->unknown_v12();
+        else
+            return level_gen->themes[get_base_theme()]->unknown_v12();
+        return false;
+    }
+    void populate_level()
+    {
+        auto index = CUSTOM_OVERRIDE::POPULATE_LEVEL;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
         auto level_gen = State::get().ptr_local()->level_gen;
         if (override_theme != UINT8_MAX)
             level_gen->themes[override_theme]->populate_level();
-        else if (custom_base_theme != UINT8_MAX)
+        else if (override_base_theme != UINT8_MAX)
             level_gen->themes[override_base_theme]->populate_level();
         else
             level_gen->themes[get_base_theme()]->populate_level();
     }
     void add_level_bordertiles()
     {
-        auto index = THEME_OVERRIDE::BORDER;
+        auto index = CUSTOM_OVERRIDE::BORDER;
         if (!get_override_enabled(index))
             return;
         if (get_override_func_enabled(index))
@@ -416,203 +551,516 @@ class CustomTheme : public ThemeInfo
             return;
         }
         auto override_theme = get_override_theme(index);
-        auto override_base_theme = get_override_theme(THEME_OVERRIDE::BASE);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
         auto level_gen = State::get().ptr_local()->level_gen;
         if (override_theme != UINT8_MAX)
             level_gen->themes[override_theme]->add_level_bordertiles();
-        else if (custom_base_theme != UINT8_MAX)
+        else if (override_base_theme != UINT8_MAX)
             level_gen->themes[override_base_theme]->add_level_bordertiles();
         else
             level_gen->themes[get_base_theme()]->add_level_bordertiles();
     }
     void post_process_level()
     {
-        if (post_process && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_level();
+        auto index = CUSTOM_OVERRIDE::POST_PROCESS_LEVEL;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->post_process_level();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->post_process_level();
+        else
+            level_gen->themes[get_base_theme()]->post_process_level();
     }
     void post_process_exitdoors()
     {
-        if (post_process_exit && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_exitdoors();
+        auto index = CUSTOM_OVERRIDE::POST_PROCESS_EXIT;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->post_process_exitdoors();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->post_process_exitdoors();
+        else
+            level_gen->themes[get_base_theme()]->post_process_exitdoors();
     }
     void post_process_entities()
     {
-        if (post_process_entity && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_entities();
+        auto index = CUSTOM_OVERRIDE::POST_PROCESS_ENTITIES;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->post_process_entities();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->post_process_entities();
+        else
+            level_gen->themes[get_base_theme()]->post_process_entities();
     }
     void populate_background()
     {
-        if (bg && bg_theme < 18)
-            State::get().ptr_local()->level_gen->themes[bg_theme]->populate_background();
-        //else if (bg && texture_theme < 18)
-        //    State::get().ptr_local()->level_gen->themes[texture_theme]->populate_background();
-        else if (bg && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_background();
-        else if (bg)
+        auto index = CUSTOM_OVERRIDE::BACKGROUND;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
         {
-            auto uid = spawn_entity_abs(to_id("ENT_TYPE_BG_LEVEL_BACKWALL"), 42.5f, 62.5f, LAYER::FRONT, 0.f, 0.f);
-            auto ent = get_entity_ptr(uid);
-            ent->w = 86.f;
-            ent->h = 126.f;
-            ent->hitboxx = 43.f;
-            ent->hitboxy = 63.f;
-            ent->tilew = 21.5f;
-            ent->tileh = 31.5f;
+            run_override_func<std::monostate>(index);
+            return;
         }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->populate_background();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->populate_background();
+        else
+            level_gen->themes[get_base_theme()]->populate_background();
     }
     void populate_background_beautification()
     {
-        if (bg && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_background_beautification();
+        auto index = CUSTOM_OVERRIDE::BACKGROUND_DECORATION;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->populate_background_beautification();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->populate_background_beautification();
+        else
+            level_gen->themes[get_base_theme()]->populate_background_beautification();
     }
     void populate_extra_lighting()
     {
-        if (lighting && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_extra_lighting();
+        auto index = CUSTOM_OVERRIDE::LIGHTING;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->populate_extra_lighting();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->populate_extra_lighting();
+        else
+            level_gen->themes[get_base_theme()]->populate_extra_lighting();
     }
     void populate_level_transition()
     {
-        if (transition && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_level_transition();
-        else if (transition)
-            State::get().ptr_local()->level_gen->themes[0]->populate_level_transition();
+        auto index = CUSTOM_OVERRIDE::POPULATE_TRANSITION;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->populate_level_transition();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->populate_level_transition();
+        else
+            level_gen->themes[get_base_theme()]->populate_level_transition();
     }
     void on_level_transition()
     {
-        if (transition && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->on_level_transition();
-        else if (transition)
-            State::get().ptr_local()->level_gen->themes[0]->on_level_transition();
+        auto index = CUSTOM_OVERRIDE::DO_TRANSITION;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->on_level_transition();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->on_level_transition();
+        else
+            level_gen->themes[get_base_theme()]->on_level_transition();
     }
     void populate_players()
     {
-        if (players && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_players();
-        else if (players)
-            State::get().ptr_local()->level_gen->themes[0]->populate_players();
+        auto index = CUSTOM_OVERRIDE::POPULATE_PLAYERS;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->populate_players();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->populate_players();
+        else
+            level_gen->themes[get_base_theme()]->populate_players();
     }
     void handle_multiplayer()
     {
-        if (camera_theme < 18)
-            State::get().ptr_local()->level_gen->themes[camera_theme]->handle_multiplayer();
-        //else if (custom_base_theme < 18)
-        //    State::get().ptr_local()->level_gen->themes[custom_base_theme]->handle_multiplayer();
-        else
+        auto index = CUSTOM_OVERRIDE::EFFECTS;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
         {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->handle_multiplayer();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->handle_multiplayer();
+        else
+            level_gen->themes[get_base_theme()]->handle_multiplayer();
+            /*
             auto state = State::get().ptr_local();
             state->camera->bounds_left = 0.5f;
             state->camera->bounds_top = 124.5f;
             state->camera->bounds_right = 10.0f * state->w + 4.5f;
             state->camera->bounds_bottom = 120.5f - 8.0f * state->h;
-        }
+            */
     }
     const char* level_file_to_load()
     {
-        if (level_file != "")
-            return level_file.c_str();
-        else if (custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->level_file_to_load();
-        return "";
+        return level_file.c_str();
     }
     uint8_t theme_id()
     {
-        //return custom_base_theme;
         return theme;
     }
     uint8_t theme_base_id()
     {
-        if (custom_base_theme < 18)
-            return custom_base_theme;
-        return 0;
+        return base_theme;
     }
     uint32_t random_block_floorstyle()
     {
-        if (spreading_floor != UINT32_MAX)
-            return spreading_floor;
-        else if (custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->random_block_floorstyle();
+        auto index = CUSTOM_OVERRIDE::ENT_SPREADING;
+        if (!get_override_enabled(index))
+            return to_id("ENT_TYPE_FX_SHADOW");
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_FLOOR_GENERIC"));
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->random_block_floorstyle();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->random_block_floorstyle();
+        else
+            return level_gen->themes[get_base_theme()]->random_block_floorstyle();
         return to_id("ENT_TYPE_FLOOR_GENERIC");
     }
     uint32_t random_block_floorstyle_2()
     {
-        if (spreading_floorstyled != UINT32_MAX)
-            return spreading_floorstyled;
-        else if (custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->random_block_floorstyle_2();
+        auto index = CUSTOM_OVERRIDE::ENT_SPREADING_STYLED;
+        if (!get_override_enabled(index))
+            return to_id("ENT_TYPE_FX_SHADOW");
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_FLOORSTYLED_STONE"));
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->random_block_floorstyle_2();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->random_block_floorstyle_2();
+        else
+            return level_gen->themes[get_base_theme()]->random_block_floorstyle_2();
         return to_id("ENT_TYPE_FLOORSTYLED_STONE");
     }
     bool unknown_v30()
     {
-        if (unknownv30 && custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v30();
+        auto index = CUSTOM_OVERRIDE::UNKNOWN_V30;
+        if (!get_override_enabled(index))
+            return false;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<bool>(index).value_or(false);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->unknown_v30();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->unknown_v30();
+        else
+            return level_gen->themes[get_base_theme()]->unknown_v30();
         return false;
     }
     uint32_t transition_tunnel_block_modifier()
     {
-        if (custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->transition_tunnel_block_modifier();
+        auto index = CUSTOM_OVERRIDE::TRANSITION_MODIFIER;
+        if (!get_override_enabled(index))
+            return 85;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index).value_or(85);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->transition_tunnel_block_modifier();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->transition_tunnel_block_modifier();
+        else
+            return level_gen->themes[get_base_theme()]->transition_tunnel_block_modifier();
         return 85;
     }
     uint32_t unknown_v32()
     {
-        if (unknownv32 && custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v32();
+        auto index = CUSTOM_OVERRIDE::UNKNOWN_V32;
+        if (!get_override_enabled(index))
+            return 12;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index).value_or(85);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->unknown_v32();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->unknown_v32();
+        else
+            return level_gen->themes[get_base_theme()]->unknown_v32();
         return 12;
     }
     uint32_t backwall_entity_id()
     {
-        return 778;
+        return to_id("ENT_TYPE_BG_LEVEL_BACKWALL");
     }
     uint32_t bordertile_entity_id()
     {
-        if (border_floor != UINT32_MAX)
-            return border_floor;
-        else if (custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->bordertile_entity_id();
+        auto index = CUSTOM_OVERRIDE::ENT_BORDER;
+        if (!get_override_enabled(index))
+            return to_id("ENT_TYPE_FLOOR_BORDERTILE");
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_FLOOR_BORDERTILE"));
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->bordertile_entity_id();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->bordertile_entity_id();
+        else
+            return level_gen->themes[get_base_theme()]->bordertile_entity_id();
         return to_id("ENT_TYPE_FLOOR_BORDERTILE");
     }
     uint32_t transition_tunnel_critter_entity_id()
     {
-        if (custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->transition_tunnel_critter_entity_id();
-        return to_id("ENT_TYPE_MONS_CRITTERDUNGBEETLE");
+        auto index = CUSTOM_OVERRIDE::ENT_CRITTER;
+        if (!get_override_enabled(index))
+            return to_id("ENT_TYPE_FX_SHADOW");
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index).value_or(to_id("ENT_TYPE_FX_SHADOW"));
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->transition_tunnel_critter_entity_id();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->transition_tunnel_critter_entity_id();
+        else
+            return level_gen->themes[get_base_theme()]->transition_tunnel_critter_entity_id();
+        return to_id("ENT_TYPE_FX_SHADOW");
     }
     float liquid_gravity_direction()
     {
-        if (gravity != FLT_MAX)
-            return gravity;
-        else if (custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->liquid_gravity_direction();
+        auto index = CUSTOM_OVERRIDE::GRAVITY;
+        if (!get_override_enabled(index))
+            return 0.0f;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<float>(index).value_or(-1.0f);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->liquid_gravity_direction();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->liquid_gravity_direction();
+        else
+            return level_gen->themes[get_base_theme()]->liquid_gravity_direction();
         return -1.0f;
     }
     bool are_players_vulnerable()
     {
-        return player_damage;
+        auto index = CUSTOM_OVERRIDE::PLAYER_DAMAGE;
+        if (!get_override_enabled(index))
+            return false;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<bool>(index).value_or(true);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->are_players_vulnerable();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->are_players_vulnerable();
+        else
+            return level_gen->themes[get_base_theme()]->are_players_vulnerable();
+        return true;
     }
-    bool unknown_37()
+    bool unknown_v38()
     {
-        if (unknownv37 && custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_37();
+        auto index = CUSTOM_OVERRIDE::UNKNOWN_V38;
+        if (!get_override_enabled(index))
+            return false;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<bool>(index).value_or(true);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->unknown_v38();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->unknown_v38();
+        else
+            return level_gen->themes[get_base_theme()]->unknown_v38();
         return true;
     }
     uint32_t backlayer_lut()
     {
+        auto index = CUSTOM_OVERRIDE::TEXTURE_BACKLAYER_LUT;
+        if (!get_override_enabled(index))
+            return 395;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index).value_or(395);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->backlayer_lut();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->backlayer_lut();
+        else
+            return level_gen->themes[get_base_theme()]->backlayer_lut();
         return 395;
     }
     float backlayer_global_illumination_level()
     {
-        if (back_light != FLT_MAX)
-            return back_light;
-        else if (custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->backlayer_global_illumination_level();
+        auto index = CUSTOM_OVERRIDE::BACKLAYER_LIGHT_LEVEL;
+        if (!get_override_enabled(index))
+            return 0.0f;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<float>(index).value_or(0.0f);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->backlayer_global_illumination_level();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->backlayer_global_illumination_level();
+        else
+            return level_gen->themes[get_base_theme()]->backlayer_global_illumination_level();
         return 0.0f;
     }
     bool enable_camera_loop()
     {
-        return loop;
+        auto index = CUSTOM_OVERRIDE::LOOP;
+        if (!get_override_enabled(index))
+            return false;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<bool>(index).value_or(false);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->enable_camera_loop();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->enable_camera_loop();
+        else
+            return level_gen->themes[get_base_theme()]->enable_camera_loop();
+        return false;
     }
     uint8_t max_level_for_vault()
     {
+        auto index = CUSTOM_OVERRIDE::VAULT_LEVEL;
+        if (!get_override_enabled(index))
+            return 255;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint8_t>(index).value_or(255);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->max_level_for_vault();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->max_level_for_vault();
+        else
+            return level_gen->themes[get_base_theme()]->max_level_for_vault();
         return 255;
     }
     bool get_unknown_1_or_2(uint8_t index)
@@ -623,58 +1071,168 @@ class CustomTheme : public ThemeInfo
     }
     uint32_t get_dynamic_floor_texture_id(int32_t texture_id)
     {
-        if (textures.find(texture_id) != textures.end())
-            return textures[texture_id];
-        else if (texture_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[texture_theme]->get_dynamic_floor_texture_id(texture_id);
-        else if (custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->get_dynamic_floor_texture_id(texture_id);
+        auto index = CUSTOM_OVERRIDE::TEXTURE_DYNAMIC;
+        if (textures.find((CUSTOM_TEXTURE)texture_id) != textures.end())
+        {
+            return textures[(CUSTOM_TEXTURE)texture_id];
+        }
+        if (!get_override_enabled(index))
+            return 0;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index, texture_id).value_or(0);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->get_dynamic_floor_texture_id(texture_id);
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->get_dynamic_floor_texture_id(texture_id);
+        else
+            return level_gen->themes[get_base_theme()]->get_dynamic_floor_texture_id(texture_id);
         return 0;
     }
     void set_next_world_level_theme()
     {
-        if (progress)
+        auto index = CUSTOM_OVERRIDE::NEXT_LEVEL;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
         {
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->set_next_world_level_theme();
+            run_override_func<std::monostate>(index);
+            return;
         }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->set_next_world_level_theme();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->set_next_world_level_theme();
         else
-        {
-            auto state = State::get().ptr_local();
-            state->world_next = next_world;
-            state->level_next = next_level;
-            state->theme_next = next_theme;
-        }
+            level_gen->themes[get_base_theme()]->set_next_world_level_theme();
     }
     uint32_t get_zero_based_level_height()
     {
-        return State::get().ptr_local()->h - 1;
-        //return State::get().ptr_local()->level_gen->themes[custom_base_theme]->get_zero_based_level_height();
+        auto index = CUSTOM_OVERRIDE::LEVEL_HEIGHT;
+        auto def = State::get().ptr_local()->h - 1;
+        if (!get_override_enabled(index))
+            return def;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index).value_or(def);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->get_zero_based_level_height();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->get_zero_based_level_height();
+        else
+            return level_gen->themes[get_base_theme()]->get_zero_based_level_height();
+        return def;
     }
     uint32_t unknown_v47()
     {
-        if (unknownv47 && custom_base_theme < 18)
-            return State::get().ptr_local()->level_gen->themes[custom_base_theme]->unknown_v47();
+        auto index = CUSTOM_OVERRIDE::UNKNOWN_V47;
+        if (!get_override_enabled(index))
+            return 0;
+        if (get_override_func_enabled(index))
+        {
+            return run_override_func<uint32_t>(index).value_or(0);
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            return level_gen->themes[override_theme]->unknown_v47();
+        else if (override_base_theme != UINT8_MAX)
+            return level_gen->themes[override_base_theme]->unknown_v47();
+        else
+            return level_gen->themes[get_base_theme()]->unknown_v47();
         return 0;
     }
     void post_process_decoration1()
     {
-        if (post_process && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_decoration1();
+        auto index = CUSTOM_OVERRIDE::POST_PROCESS_DECORATION;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->post_process_decoration1();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->post_process_decoration1();
+        else
+            level_gen->themes[get_base_theme()]->post_process_decoration1();
     }
     void post_process_decoration2()
     {
-        if (post_process && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->post_process_decoration2();
+        auto index = CUSTOM_OVERRIDE::POST_PROCESS_DECORATION2;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->post_process_decoration2();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->post_process_decoration2();
+        else
+            level_gen->themes[get_base_theme()]->post_process_decoration2();
     }
     void populate_extra_random_entities()
     {
-        if (procedural_spawn && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->populate_extra_random_entities();
+        auto index = CUSTOM_OVERRIDE::POPULATE_EXTRA_SPAWNS;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->populate_extra_random_entities();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->populate_extra_random_entities();
+        else
+            level_gen->themes[get_base_theme()]->populate_extra_random_entities();
     }
     void do_procedural_spawn()
     {
-        if (procedural_spawn && custom_base_theme < 18)
-            State::get().ptr_local()->level_gen->themes[custom_base_theme]->do_procedural_spawn();
+        auto index = CUSTOM_OVERRIDE::PROCEDURAL_SPAWN;
+        if (!get_override_enabled(index))
+            return;
+        if (get_override_func_enabled(index))
+        {
+            run_override_func<std::monostate>(index);
+            return;
+        }
+        auto override_theme = get_override_theme(index);
+        auto override_base_theme = get_override_theme(CUSTOM_OVERRIDE::BASE);
+        auto level_gen = State::get().ptr_local()->level_gen;
+        if (override_theme != UINT8_MAX)
+            level_gen->themes[override_theme]->do_procedural_spawn();
+        else if (override_base_theme != UINT8_MAX)
+            level_gen->themes[override_base_theme]->do_procedural_spawn();
+        else
+            level_gen->themes[get_base_theme()]->do_procedural_spawn();
     }
 };
 
@@ -856,49 +1414,40 @@ void register_usertypes(sol::state& lua)
         &ThemeInfo::theme_base_id);
 
     auto theme_override = sol::overload(
-        static_cast<void (CustomTheme::*)(THEME_OVERRIDE, bool)>(&CustomTheme::override),
-        static_cast<void (CustomTheme::*)(THEME_OVERRIDE, uint8_t)>(&CustomTheme::override),
-        static_cast<void (CustomTheme::*)(THEME_OVERRIDE, sol::function)>(&CustomTheme::override));
+        static_cast<void (CustomTheme::*)(CUSTOM_OVERRIDE, bool)>(&CustomTheme::override),
+        static_cast<void (CustomTheme::*)(CUSTOM_OVERRIDE, uint8_t)>(&CustomTheme::override),
+        static_cast<void (CustomTheme::*)(CUSTOM_OVERRIDE, sol::function)>(&CustomTheme::override));
 
     lua.new_usertype<CustomTheme>(
         "CustomTheme",
         "level_file",
         &CustomTheme::level_file,
-        "init",
-        &CustomTheme::init,
-        "progress",
-        &CustomTheme::progress,
         "theme",
         &CustomTheme::theme,
         "base_theme",
         &CustomTheme::base_theme,
         "sub_theme",
         &CustomTheme::sub_theme,
-        "next_world",
-        &CustomTheme::next_world,
-        "next_level",
-        &CustomTheme::next_level,
-        "next_theme",
-        &CustomTheme::next_theme,
+        "textures",
+        &CustomTheme::textures,
         "override",
         theme_override);
 
     lua.create_named_table("CUSTOM_TEXTURE",
         "BG",
-        -4,
+        CUSTOM_TEXTURE::BG,
         "FLOOR",
-        -5,
+        CUSTOM_TEXTURE::FLOOR,
         "DOOR",
-        -6,
+        CUSTOM_TEXTURE::DOOR,
         "BACKDOOR",
-        -7,
+        CUSTOM_TEXTURE::BACKDOOR,
         "DECORATION",
-        -8,
+        CUSTOM_TEXTURE::DECORATION,
         "COFFIN",
-        -10
-    );
+        CUSTOM_TEXTURE::COFFIN);
 
-    lua.create_named_table("CUSTOM_BORDER", "NORMAL", 0, "BOTTOMLESS", 1, "NONE", 2);
+    lua.create_named_table("CUSTOM_OVERRIDE", "BASE", CUSTOM_OVERRIDE::BASE, "UNKNOWN_V1", CUSTOM_OVERRIDE::UNKNOWN_V1, "INIT_FLAGS", CUSTOM_OVERRIDE::INIT_FLAGS, "INIT_LEVELGEN", CUSTOM_OVERRIDE::INIT_LEVELGEN, "UNKNOWN_V4", CUSTOM_OVERRIDE::UNKNOWN_V4, "UNKNOWN_V5", CUSTOM_OVERRIDE::UNKNOWN_V5, "SPECIALS", CUSTOM_OVERRIDE::SPECIALS, "UNKNOWN_V7", CUSTOM_OVERRIDE::UNKNOWN_V7, "UNKNOWN_V8", CUSTOM_OVERRIDE::UNKNOWN_V8, "VAULT", CUSTOM_OVERRIDE::VAULT, "COFFIN", CUSTOM_OVERRIDE::COFFIN, "FEELING", CUSTOM_OVERRIDE::FEELING, "UNKNOWN_V12", CUSTOM_OVERRIDE::UNKNOWN_V12, "POPULATE_LEVEL", CUSTOM_OVERRIDE::POPULATE_LEVEL, "BORDER", CUSTOM_OVERRIDE::BORDER, "POST_PROCESS_LEVEL", CUSTOM_OVERRIDE::POST_PROCESS_LEVEL, "POST_PROCESS_EXIT", CUSTOM_OVERRIDE::POST_PROCESS_EXIT, "POST_PROCESS_ENTITIES", CUSTOM_OVERRIDE::POST_PROCESS_ENTITIES, "BACKGROUND", CUSTOM_OVERRIDE::BACKGROUND, "BACKGROUND_DECORATION", CUSTOM_OVERRIDE::BACKGROUND_DECORATION, "LIGHTING", CUSTOM_OVERRIDE::LIGHTING, "POPULATE_TRANSITION", CUSTOM_OVERRIDE::POPULATE_TRANSITION, "DO_TRANSITION", CUSTOM_OVERRIDE::DO_TRANSITION, "POPULATE_PLAYERS", CUSTOM_OVERRIDE::POPULATE_PLAYERS, "EFFECTS", CUSTOM_OVERRIDE::EFFECTS, "LVL_FILE", CUSTOM_OVERRIDE::LVL_FILE, "THEME_ID", CUSTOM_OVERRIDE::THEME_ID, "THEME_BASE_ID", CUSTOM_OVERRIDE::THEME_BASE_ID, "ENT_SPREADING", CUSTOM_OVERRIDE::ENT_SPREADING, "ENT_SPREADING_STYLED", CUSTOM_OVERRIDE::ENT_SPREADING_STYLED, "UNKNOWN_V30", CUSTOM_OVERRIDE::UNKNOWN_V30, "TRANSITION_MODIFIER", CUSTOM_OVERRIDE::TRANSITION_MODIFIER, "UNKNOWN_V32", CUSTOM_OVERRIDE::UNKNOWN_V32, "ENT_BACKWALL", CUSTOM_OVERRIDE::ENT_BACKWALL, "ENT_BORDER", CUSTOM_OVERRIDE::ENT_BORDER, "ENT_CRITTER", CUSTOM_OVERRIDE::ENT_CRITTER, "GRAVITY", CUSTOM_OVERRIDE::GRAVITY, "PLAYER_DAMAGE", CUSTOM_OVERRIDE::PLAYER_DAMAGE, "UNKNOWN_V38", CUSTOM_OVERRIDE::UNKNOWN_V38, "TEXTURE_BACKLAYER_LUT", CUSTOM_OVERRIDE::TEXTURE_BACKLAYER_LUT, "BACKLAYER_LIGHT_LEVEL", CUSTOM_OVERRIDE::BACKLAYER_LIGHT_LEVEL, "LOOP", CUSTOM_OVERRIDE::LOOP, "VAULT_LEVEL", CUSTOM_OVERRIDE::VAULT_LEVEL, "GET_UNKNOWN1_OR_2", CUSTOM_OVERRIDE::GET_UNKNOWN1_OR_2, "TEXTURE_DYNAMIC", CUSTOM_OVERRIDE::TEXTURE_DYNAMIC, "NEXT_LEVEL", CUSTOM_OVERRIDE::NEXT_LEVEL, "LEVEL_HEIGHT", CUSTOM_OVERRIDE::LEVEL_HEIGHT, "UNKNOWN_V47", CUSTOM_OVERRIDE::UNKNOWN_V47, "POST_PROCESS_DECORATION", CUSTOM_OVERRIDE::POST_PROCESS_DECORATION, "POST_PROCESS_DECORATION2", CUSTOM_OVERRIDE::POST_PROCESS_DECORATION2, "POPULATE_EXTRA_SPAWNS", CUSTOM_OVERRIDE::POPULATE_EXTRA_SPAWNS, "PROCEDURAL_SPAWN", CUSTOM_OVERRIDE::PROCEDURAL_SPAWN);
 
     /// Force a CustomTheme in POST_ROOM_GENERATION or PRE_LEVEL_GENERATION.
     lua["force_custom_theme"] = [](CustomTheme* customtheme)

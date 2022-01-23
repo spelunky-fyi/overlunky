@@ -294,7 +294,7 @@ class ThemeInfo
     virtual bool are_players_vulnerable() = 0;
 
     // returns true by default, except CO, duat (these also have no bg, but don't know if related)
-    virtual bool unknown_37() = 0;
+    virtual bool unknown_v38() = 0;
 
     // returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
     virtual uint32_t backlayer_lut() = 0;
@@ -470,7 +470,17 @@ void add_next_levels(std::vector<std::string> next_levels);
 int8_t get_co_subtheme();
 void force_co_subtheme(int8_t subtheme);
 
-enum class THEME_OVERRIDE : uint8_t
+enum class CUSTOM_TEXTURE : int32_t
+{
+    BG = -4,
+    FLOOR = -5,
+    DOOR = -6,
+    BACKDOOR = -7,
+    DECORATION = -8,
+    COFFIN = -10
+};
+
+enum class CUSTOM_OVERRIDE : uint8_t
 {
     BASE,
     UNKNOWN_V1,
@@ -521,7 +531,7 @@ enum class THEME_OVERRIDE : uint8_t
     LEVEL_HEIGHT,
     UNKNOWN_V47,
     POST_PROCESS_DECORATION,
-    POST_PROCESS_DECIRATION2,
+    POST_PROCESS_DECORATION2,
     POPULATE_EXTRA_SPAWNS,
     PROCEDURAL_SPAWN
 };
