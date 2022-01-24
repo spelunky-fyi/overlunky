@@ -506,7 +506,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->populate_level();
+            State::get().ptr_local()->level_gen->themes[get_override_theme_or_dwelling(index)]->populate_level();
         run_post_func<std::monostate>(index);
     }
     void add_level_bordertiles()
@@ -516,7 +516,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_level_bordertiles();
+            State::get().ptr_local()->level_gen->themes[get_override_theme_or_dwelling(index)]->add_level_bordertiles();
         run_post_func<std::monostate>(index);
     }
     void post_process_level()
@@ -607,7 +607,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->on_level_transition();
+            State::get().ptr_local()->level_gen->themes[get_override_theme_or_dwelling(index)]->on_level_transition();
         run_post_func<std::monostate>(index);
     }
     void populate_players()
