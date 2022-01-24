@@ -1236,18 +1236,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "olmec_transition_phase_1_custom_floats"sv,
-        // Take the start of the function determined by `olmec_transition_phase_1_y_level`
-        // and use the room above that. Make sure to leave room for the second float.
-        PatternCommandBuffer{}
-            .find_inst("\xF3\x0F\x58\x48\x44\xF3\x0F\x10\x15****\x0F\x2E\xD1"sv)
-            .at_exe()
-            .function_start()
-            .offset(-0x0A)
-            .function_start() // have to go up a couple functions to find some room in-between
-            .offset(-0x0c),
-    },
-    {
         "olmec_transition_phase_1"sv,
         // Put write bp on olmec.attack_phase (when he's in phase 0)
         // Look for the condition that jumps over the little section that changes the phase to 1

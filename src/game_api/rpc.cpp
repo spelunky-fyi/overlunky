@@ -1049,18 +1049,20 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
     // If you want to make Olmec stay in phase 0 (stomping) all the time, you can just set
     // the phase 1 y level to 70. Don't set it too low, from 1.25.0 onwards, Olmec's stomp
     // activation distance seems to be related to the y-level trigger point.
-    static size_t phase1_offset = 0;
-    static size_t phase2_offset = 0;
+    static size_t phase1_offset;
     if (phase1_offset == 0)
     {
         // from 1.23.x onwards, there are now two instructions per phase that reference the y-level float
-        size_t phase_1_instruction_a = get_address("olmec_transition_phase_1_y_level");
-        size_t phase_1_instruction_b = phase_1_instruction_a + 0xd;
-        phase1_offset = get_address("olmec_transition_phase_1_custom_floats");
+        const size_t phase_1_instruction_a = get_address("olmec_transition_phase_1_y_level");
+        const size_t phase_1_instruction_b = phase_1_instruction_a + 0xd;
 
-        size_t phase_2_instruction_a = get_address("olmec_transition_phase_2_y_level");
-        size_t phase_2_instruction_b = phase_2_instruction_a + 0x11;
-        phase2_offset = phase1_offset + 0x4;
+        const size_t phase_2_instruction_a = get_address("olmec_transition_phase_2_y_level");
+        const size_t phase_2_instruction_b = phase_2_instruction_a + 0x11;
+        phase1_offset = (size_t)alloc_mem_rel32(phase_2_instruction_b + 4, sizeof(float) * 2);
+        if (!phase1_offset)
+            return;
+
+        auto phase2_offset = phase1_offset + 0x4;
 
         // write the default values to our new floats
         write_mem_prot(phase1_offset, 100.0f, true);
@@ -1081,33 +1083,25 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
 
     if (phase == 1)
     {
-        write_mem_prot(phase1_offset, y, true);
+        *(float*)phase1_offset = y;
     }
     else if (phase == 2)
     {
-        write_mem_prot(phase2_offset, y, true);
+        *(float*)(phase1_offset + sizeof(float)) = y;
     }
 }
 
 void force_olmec_phase_0(bool b)
 {
-    static size_t offset = 0;
-    static char original_instruction[2] = {0};
-    if (offset == 0)
-    {
-        offset = get_address("olmec_transition_phase_1");
-        for (uint8_t x = 0; x < 2; ++x)
-        {
-            original_instruction[x] = read_u8(offset + x);
-        }
-    }
+    static size_t offset = get_address("olmec_transition_phase_1");
+
     if (b)
     {
-        write_mem_prot(offset, "\xEB\x2E"s, true); // jbe -> jmp
+        write_mem_recoverable("force_olmec_phase_0", offset, "\xEB\x2E"s, true); // jbe -> jmp
     }
     else
     {
-        write_mem_prot(offset, std::string(original_instruction, 2), true);
+        recover_mem("force_olmec_phase_0");
     }
 }
 
