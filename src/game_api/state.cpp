@@ -26,15 +26,7 @@ inline bool& get_is_init()
 
 void do_write_load_opt()
 {
-    size_t write_load_addr = get_address("write_load_opt");
-    if (write_load_addr > 0ull)
-    {
-        write_mem_prot(write_load_addr, "\x90\x90"sv, true);
-    }
-    else
-    {
-        assert(get_address("write_load_opt") > 0ull);
-    }
+    write_mem_prot(get_address("write_load_opt"), "\x90\x90"sv, true);
 }
 bool& get_write_load_opt()
 {
