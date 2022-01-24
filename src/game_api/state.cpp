@@ -432,7 +432,7 @@ uint32_t lowbias32(uint32_t x)
 Entity* State::find(uint32_t uid)
 {
     // Ported from MauveAlert's python code in the CAT tracker
-    auto mask = ptr()->uid_to_entity_mask;
+    uint32_t mask = (uint32_t)ptr()->uid_to_entity_mask;
     uint32_t target_uid_plus_one = lowbias32(uid + 1);
     uint32_t cur_index = target_uid_plus_one & mask;
     while (true)
@@ -448,12 +448,12 @@ Entity* State::find(uint32_t uid)
             return nullptr;
         }
 
-        if ((target_uid_plus_one & mask) > (entry.uid_plus_one & mask))
+        if (((cur_index - target_uid_plus_one) & mask) > ((cur_index - entry.uid_plus_one) & mask))
         {
             return nullptr;
         }
 
-        cur_index = (cur_index + 1) & mask;
+        cur_index = (cur_index + (uint32_t)1) & mask;
     }
 }
 
