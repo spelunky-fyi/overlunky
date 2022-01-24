@@ -33,7 +33,7 @@ void do_write_load_opt()
     }
     else
     {
-        assert(get_address("write_load_opt_fixed") > 0ull);
+        assert(get_address("write_load_opt") > 0ull);
     }
 }
 bool& get_write_load_opt()
