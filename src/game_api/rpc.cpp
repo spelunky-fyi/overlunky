@@ -1171,54 +1171,38 @@ void set_time_ghost_enabled(bool b)
 {
     static size_t offset_trigger = 0;
     static size_t offset_toast_trigger = 0;
-    static char original_instruction_trigger[4] = {0};
-    static char original_instruction_toast_trigger[4] = {0};
     if (offset_trigger == 0)
     {
         auto memory = Memory::get();
         offset_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
-        for (uint8_t x = 0; x < 4; ++x)
-        {
-            original_instruction_trigger[x] = read_u8(offset_trigger + x);
-        }
         offset_toast_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TOAST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
-        for (uint8_t x = 0; x < 4; ++x)
-        {
-            original_instruction_toast_trigger[x] = read_u8(offset_toast_trigger + x);
-        }
     }
     if (b)
     {
-        write_mem_prot(offset_trigger, std::string(original_instruction_trigger, 4), true);
-        write_mem_prot(offset_toast_trigger, std::string(original_instruction_toast_trigger, 4), true);
+        recover_mem("set_time_ghost_enabled");
     }
     else
     {
-        write_mem_prot(offset_trigger, "\xC3\x90\x90\x90"s, true);
-        write_mem_prot(offset_toast_trigger, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_ghost_enabled", offset_trigger, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_ghost_enabled", offset_toast_trigger, "\xC3\x90\x90\x90"s, true);
     }
 }
 
 void set_time_jelly_enabled(bool b)
 {
     static size_t offset = 0;
-    static char original_instruction[4] = {0};
     if (offset == 0)
     {
         auto memory = Memory::get();
         offset = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_COSMIC_OCEAN, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
-        for (uint8_t x = 0; x < 4; ++x)
-        {
-            original_instruction[x] = read_u8(offset + x);
-        }
     }
     if (b)
     {
-        write_mem_prot(offset, std::string(original_instruction, 4), true);
+        recover_mem("set_time_jelly_enabled");
     }
     else
     {
-        write_mem_prot(offset, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_jelly_enabled", offset, "\xC3\x90\x90\x90"s, true);
     }
 }
 
