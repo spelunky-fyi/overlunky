@@ -1007,9 +1007,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // fx_explosion entity. Put a read bp on its idle_counter and continue until you've breaked a couple of times.
         // The big function that breaks contains a call to the internal hitbox-overlap function for which the default
         // mask is put on the stack (0x18F)
+        // it's virtual function 77 (process input)
         PatternCommandBuffer{}
-            .set_optional(true) // TODO
-            .find_inst("\x0F\x57\xFF\x0F\x57\xDB\x49"sv)
+            .find_inst("\x45\x0F\x57\xC0\x0F\x57\xDB\x4D\x89\xE8\xE8"sv)
             .offset(-0x15)
             .at_exe(),
     },
