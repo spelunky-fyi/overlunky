@@ -13,7 +13,7 @@ class PalaceSign : public Entity
 {
   public:
     SoundPosition* sound_pos;
-    Illumination* illumination; //illumination1/2 used only in dark level, no pointer in normal level
+    Illumination* illumination; // illumination1/2 used only in dark level, no pointer in normal level
     Illumination* arrow_illumination;
     uint8_t arrow_change_timer;
 };
@@ -22,7 +22,7 @@ class DecoRegeneratingBlock : public Entity
 {
   public:
     int8_t unknown1;
-    uint8_t unknown2;   //timer after self_destruct is triggered, modifies the size depending of the unknown1
+    uint8_t unknown2;   // timer after self_destruct is triggered, modifies the size depending of the unknown1
     bool self_destruct; // UNSURE have reverse effect of spawning in after the broke is blocken, unsued in the game?
 };
 

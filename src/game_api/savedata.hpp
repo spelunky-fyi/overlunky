@@ -104,7 +104,7 @@ struct SaveData
     int32_t score_top;
     uint8_t deepest_area;
     uint8_t deepest_level;
-    int8_t skip4[1022];                                            //TODO
+    int8_t skip4[1022];                                            // TODO
     std::array<std::array<uint32_t, 255>, 8> deathcount_per_level; // 8 themes, 255 uint32_t's for each level
     int64_t time_total;
     int32_t time_best;

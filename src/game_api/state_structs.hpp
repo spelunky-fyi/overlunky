@@ -32,7 +32,7 @@ struct Illumination
             LightParams light1;
             LightParams light2;
             LightParams light3;
-            ///It's rendered on objects around, not as an actual bright spot
+            /// It's rendered on objects around, not as an actual bright spot
             LightParams light4;
         };
     };
@@ -674,7 +674,7 @@ struct LiquidPhysicsEngine
     uint32_t entity_count;
     uint32_t allocated_size;
     uint32_t unk23;         // padding probably
-    std::list<size_t> unk1; //seams to be empty, or have one element 0?
+    std::list<size_t> unk1; // seams to be empty, or have one element 0?
     uint32_t resize_value;  // used to resive the arrays?
     uint32_t unk3b;         // padding probably
     std::list<int32_t> liquid_ids;
@@ -687,10 +687,10 @@ struct LiquidPhysicsEngine
     int32_t unknown47b;                                  // padding
     std::pair<float, float>* entity_coordinates;         // array
     int32_t unknown49a;                                  // size related for the array above
-    int32_t unknown49b;                                  //padding
+    int32_t unknown49b;                                  // padding
     std::pair<float, float>* entity_velocities;          // array
     int32_t unknown51a;                                  // size related for the array above
-    int32_t unknown51b;                                  //padding
+    int32_t unknown51b;                                  // padding
     std::pair<float, float>* unknown52;                  // not sure about the type, it's defenetly a 64bit
     std::pair<float, float>* unknown53;
     size_t unknown54;
@@ -700,8 +700,8 @@ struct LiquidPhysicsEngine
 
 struct LiquidPhysicsParams
 {
-    int32_t shader_type; //can also be flags, as for water, any value with bit one is fine
-    uint8_t unknown2;    //shader related, shader id maybe?
+    int32_t shader_type; // can also be flags, as for water, any value with bit one is fine
+    uint8_t unknown2;    // shader related, shader id maybe?
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
@@ -743,7 +743,7 @@ struct LiquidTileSpawnData
     size_t unknown35;                  // DataPointer? seam to get access validation if you change to something
     uint32_t liquidtile_liquid_amount; // how much liquid will be spawned from tilecode, 1=1x2, 2=2x3, 3=3x4 etc.
     float blobs_separation;
-    int32_t unknown39; //is the last 4 garbage? seams not accessed
+    int32_t unknown39; // is the last 4 garbage? seams not accessed
     float unknown40;
     float unknown41;
     uint32_t unknown42;

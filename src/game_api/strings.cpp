@@ -85,7 +85,7 @@ void OnToast(char16_t* buffer)
 
 void strings_init()
 {
-    g_original_string_ids_end = get_type(1)->description; //get wrong stringid from bordertile
+    g_original_string_ids_end = get_type(1)->description; // get wrong stringid from bordertile
     fix_entity_descriptions(g_original_string_ids_end);
 
     auto addr_format_shopitem = get_address("format_shopitem_name");

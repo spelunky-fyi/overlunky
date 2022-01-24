@@ -56,7 +56,7 @@ class Cape : public Backpack
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
-    uint32_t floating_count; //it's per level, not per cape
+    uint32_t floating_count; // it's per level, not per cape
 };
 
 class VladsCape : public Cape
@@ -571,7 +571,7 @@ class SkullDropTrap : public Movable
 class FrozenLiquid : public Movable
 {
   public:
-    int32_t unknown1; //have problem cheeking those, looks like unused memory, but then, it's always zeros on spawn, changing it can crash the game
+    int32_t unknown1; // have problem cheeking those, looks like unused memory, but then, it's always zeros on spawn, changing it can crash the game
     int32_t unknown2;
 };
 

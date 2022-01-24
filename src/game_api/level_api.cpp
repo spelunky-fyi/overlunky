@@ -463,7 +463,7 @@ std::array g_community_tile_codes{
             g_attachee_requiring_entities.push_back({{{x, y - 1}}, do_spawn});
         }},
     CommunityTileCode{"boombox", "ENT_TYPE_ITEM_BOOMBOX"},
-    //CommunityTileCode{
+    // CommunityTileCode{
     //    "lake_imposter",
     //    "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
     //    [](const CommunityTileCode& self, float x, float y, [[maybe_unused]] Layer* layer)
@@ -1081,40 +1081,40 @@ void LevelGenData::init()
             const size_t get_room_size_addr = (size_t) static_cast<void (*)(const char*, uint32_t&, uint32_t&)>(&get_room_size);
 
             const std::string redirect_code = fmt::format(
-                "\x50"                         //PUSH       RAX
-                "\x51"                         //PUSH       RCX
-                "\x52"                         //PUSH       RDX
-                "\x41\x50"                     //PUSH       R8
-                "\x41\x51"                     //PUSH       R9
-                "\x41\x52"                     //PUSH       R10
-                "\x41\x53"                     //PUSH       R11
-                "\x41\x53"                     //PUSH       R11
-                "\x48\x8d\x8d\xa0\x02\x00\x00" //LEA        RCX, [RBP + 0x2a0] == room_template_name
-                "\x48\x8d\x95\x78\x05\x00\x00" //LEA        RDX, [RBP + 0x578] == room_width
-                "\x4c\x8d\x85\xe0\x05\x00\x00" //LEA        R8, [RBP + 0x5e0] == room_height
-                "\x48\xb8{}"                   //MOV        RAX, &get_room_size
-                "\xff\xd0"                     //CALL       RAX
-                "\x41\x5b"                     //POP        R11
-                "\x41\x5b"                     //POP        R11
-                "\x41\x5a"                     //POP        R10
-                "\x41\x59"                     //POP        R9
-                "\x41\x58"                     //POP        R8
-                "\x5a"                         //POP        RDX
-                "\x59"                         //POP        RCX
-                "\x58"                         //POP        RAX
+                "\x50"                         // PUSH       RAX
+                "\x51"                         // PUSH       RCX
+                "\x52"                         // PUSH       RDX
+                "\x41\x50"                     // PUSH       R8
+                "\x41\x51"                     // PUSH       R9
+                "\x41\x52"                     // PUSH       R10
+                "\x41\x53"                     // PUSH       R11
+                "\x41\x53"                     // PUSH       R11
+                "\x48\x8d\x8d\xa0\x02\x00\x00" // LEA        RCX, [RBP + 0x2a0] == room_template_name
+                "\x48\x8d\x95\x78\x05\x00\x00" // LEA        RDX, [RBP + 0x578] == room_width
+                "\x4c\x8d\x85\xe0\x05\x00\x00" // LEA        R8, [RBP + 0x5e0] == room_height
+                "\x48\xb8{}"                   // MOV        RAX, &get_room_size
+                "\xff\xd0"                     // CALL       RAX
+                "\x41\x5b"                     // POP        R11
+                "\x41\x5b"                     // POP        R11
+                "\x41\x5a"                     // POP        R10
+                "\x41\x59"                     // POP        R9
+                "\x41\x58"                     // POP        R8
+                "\x5a"                         // POP        RDX
+                "\x59"                         // POP        RCX
+                "\x58"                         // POP        RAX
                 // Original Code Begin
-                "\x44\x8b\xbd\xe4\x05\x00\x00" //MOV        R15D,dword ptr [RBP + 0x5e4]
-                "\x41\x83\xe7\x08"             //AND        R15D,0x8
-                "\x4c\x8b\xb5\x70\x05\x00\x00" //MOV        R14,qword ptr [RBP + 0x570]
-                "\x4d\x85\xf6"                 //TEST       R14,R14
-                "\x74\x09"                     //JZ         FIRST_JUMP
-                "\x48\x8b\xbd\x60\x05\x00\x00" //MOV        RDI,qword ptr [RBP + 0x560]
-                "\xeb\x0c"                     //JMP        SECOND_JUMP
-                                               // Original Code End
-                /*FIST_JUMP*/ "\x48\xb8{}"     //MOV        RAX, get_room_size_first_jump
-                "\xff\xe0"                     //JMP        RAX
-                /*SECOND_JUMP*/ "\x48\xb8{}"   //MOV        RAX, get_room_size_second_jump
-                "\xff\xe0"sv,                  //JMP        RAX
+                "\x44\x8b\xbd\xe4\x05\x00\x00" // MOV        R15D,dword ptr [RBP + 0x5e4]
+                "\x41\x83\xe7\x08"             // AND        R15D,0x8
+                "\x4c\x8b\xb5\x70\x05\x00\x00" // MOV        R14,qword ptr [RBP + 0x570]
+                "\x4d\x85\xf6"                 // TEST       R14,R14
+                "\x74\x09"                     // JZ         FIRST_JUMP
+                "\x48\x8b\xbd\x60\x05\x00\x00" // MOV        RDI,qword ptr [RBP + 0x560]
+                "\xeb\x0c"                     // JMP        SECOND_JUMP
+                           //  Original Code End
+                /*FIST_JUMP*/ "\x48\xb8{}"   // MOV        RAX, get_room_size_first_jump
+                "\xff\xe0"                   // JMP        RAX
+                /*SECOND_JUMP*/ "\x48\xb8{}" // MOV        RAX, get_room_size_second_jump
+                "\xff\xe0"sv,                // JMP        RAX
                 to_le_bytes(get_room_size_addr),
                 to_le_bytes(get_room_size_first_jump),
                 to_le_bytes(get_room_size_second_jump));
@@ -1122,8 +1122,8 @@ void LevelGenData::init()
             g_get_room_size_redirect = ExecutableMemory{redirect_code};
 
             std::string code = fmt::format(
-                "\x48\xb8{}"  //MOV         RAX, g_get_room_size_redirect.get()
-                "\xff\xe0"sv, //JMP         RAX
+                "\x48\xb8{}"  // MOV         RAX, g_get_room_size_redirect.get()
+                "\xff\xe0"sv, // JMP         RAX
                 to_le_bytes((size_t)g_get_room_size_redirect.get()));
 
             // Fill with nop, code is not performance-critical either way
@@ -1420,8 +1420,7 @@ void LevelGenSystem::init()
                     }
                 }
 
-                original(self, param_2, param_3, param_4);
-            },
+                original(self, param_2, param_3, param_4); },
             0xd);
         using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
         hook_vtable<DoProceduralSpawnFun>(
@@ -1435,8 +1434,7 @@ void LevelGenSystem::init()
                 {
                     return;
                 }
-                original(self, spawn_info);
-            },
+                original(self, spawn_info); },
             0x33);
     }
 }

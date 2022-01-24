@@ -103,9 +103,18 @@ set_callback(function(ctx)
             current.custom:override(THEME_OVERRIDE.PLAYER_DAMAGE, false) -- disable player damage and resource use (like in camp)
             current.custom:override(THEME_OVERRIDE.TEXTURE_DYNAMIC, THEME.NEO_BABYLON) -- get the rest of the textures from neobab
             current.custom:override(THEME_OVERRIDE.EFFECTS, THEME.VOLCANA) -- get those hot effects from volcana
-            current.custom:override(THEME_OVERRIDE.ENT_BORDER, function() -- set bordertile entity
-                return random_border
+            current.custom:post(THEME_OVERRIDE.EFFECTS, function() -- remove the camera bounds just set by the theme though
+                prinspect("Fix camera for the loop here, so it won't yank to position on level start")
+                state.camera.adjusted_focus_x = state.level_gen.spawn_x
+                state.camera.adjusted_focus_y = state.level_gen.spawn_y + 0.05
+                state.camera.bounds_left = -math.huge
+                state.camera.bounds_top = math.huge
+                state.camera.bounds_right = math.huge
+                state.camera.bounds_bottom = -math.huge
             end)
+            -- make level loop like co
+            current.custom:override(THEME_OVERRIDE.BORDER, THEME.COSMIC_OCEAN)
+            current.custom:override(THEME_OVERRIDE.LOOP, THEME.COSMIC_OCEAN)
 
             theme_index = theme_index + 1
         end

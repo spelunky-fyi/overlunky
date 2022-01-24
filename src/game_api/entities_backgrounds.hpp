@@ -12,7 +12,7 @@ class BGBackLayerDoor : public Entity
 class BGSurfaceStar : public Entity
 {
   public:
-    int32_t blink_timer; //why negative?
+    int32_t blink_timer; // why negative?
     float relative_x;
     float relative_y;
     int32_t unknown_padding;
@@ -92,5 +92,5 @@ class BGShopKeeperPrime : public Entity
     int16_t bubbles_timer;
     bool bubble_spawn_trigger;
     int8_t unknown_padding;
-    int16_t bubble_spawn_delay; //normally it's just 0, 1 or 2, but you can set it to some value and then when using bubble_spawn_trigger it will count down and then spawn bubbles
+    int16_t bubble_spawn_delay; // normally it's just 0, 1 or 2, but you can set it to some value and then when using bubble_spawn_trigger it will count down and then spawn bubbles
 };

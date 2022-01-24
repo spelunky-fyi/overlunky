@@ -235,7 +235,7 @@ int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t) // ui only
 
     auto state = State::get();
 
-    auto player = state.items()->player(0); //do the same stuff as in spawn_entity?
+    auto player = state.items()->player(0); // do the same stuff as in spawn_entity?
     if (player == nullptr)
         return -1;
     auto [_x, _y] = player->position();

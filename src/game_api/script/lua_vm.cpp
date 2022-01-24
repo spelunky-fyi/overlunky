@@ -279,7 +279,8 @@ end
     ///   end
     /// end, ON.LEVEL)
     /// ```
-    lua["read_prng"] = []() -> std::vector<int64_t> { return read_prng(); };
+    lua["read_prng"] = []() -> std::vector<int64_t>
+    { return read_prng(); };
     /// Show a message that looks like a level feeling.
     lua["toast"] = [](std::wstring message)
     {
@@ -569,7 +570,8 @@ end
     /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
     lua["get_entities"] = get_entities;
     /// Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
-    lua["filter_entities"] = [&lua](std::vector<uint32_t> entities, sol::function predicate) -> std::vector<uint32_t> {
+    lua["filter_entities"] = [&lua](std::vector<uint32_t> entities, sol::function predicate) -> std::vector<uint32_t>
+    {
         return filter_entities(std::move(entities), [&lua, pred = std::move(predicate)](Entity* entity) -> bool
                                { return pred(lua["cast_entity"](entity)); });
     };
@@ -816,7 +818,8 @@ end
     lua["testflag"] = lua["test_flag"];
 
     /// Gets the resolution (width and height) of the screen
-    lua["get_window_size"] = []() -> std::tuple<int, int> { return {(int)ImGui::GetWindowWidth(), (int)ImGui::GetWindowHeight()}; };
+    lua["get_window_size"] = []() -> std::tuple<int, int>
+    { return {(int)ImGui::GetWindowWidth(), (int)ImGui::GetWindowHeight()}; };
 
     /// Steal input from a Player or HH.
     lua["steal_input"] = [](int uid)

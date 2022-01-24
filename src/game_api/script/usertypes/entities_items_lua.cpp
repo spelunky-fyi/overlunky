@@ -161,7 +161,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
-    lua.new_usertype<WebGun>( //left to not break compability
+    lua.new_usertype<WebGun>( // left to not break compability
         "WebGun",
         sol::base_classes,
         sol::bases<Entity, Movable, Gun>());

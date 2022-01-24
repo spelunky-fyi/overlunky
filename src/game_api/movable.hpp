@@ -17,7 +17,7 @@ class Movable : public Entity
     BUTTON buttons_previous;
     int16_t unknown_padding; // garbage?
     uint32_t stand_counter;
-    float jump_height_multiplier; //entitydb.jump gets multiplied by this value
+    float jump_height_multiplier; // entitydb.jump gets multiplied by this value
     int32_t price;
     int32_t owner_uid;
     int32_t last_owner_uid;
@@ -47,7 +47,7 @@ class Movable : public Entity
     int16_t poison_tick_timer;
     uint8_t onfire_effect_timer;
     uint8_t exit_invincibility_timer;   // when exiting a door or a pipe, ...
-    uint8_t invincibility_frames_timer; //blinks the entity
+    uint8_t invincibility_frames_timer; // blinks the entity
     uint8_t frozen_timer;
     uint8_t unknown_damage_counter_a;
     uint8_t unknown_damage_counter_b;
@@ -72,7 +72,7 @@ class Movable : public Entity
     virtual bool is_on_fire() = 0;
     virtual void v46() = 0;
     virtual void v47() = 0;
-    //virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
+    // virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
     virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount, uint32_t iframes) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost)
     virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                                         // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
     virtual void v51() = 0;
