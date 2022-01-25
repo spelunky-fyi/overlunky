@@ -26,15 +26,7 @@ inline bool& get_is_init()
 
 void do_write_load_opt()
 {
-    size_t write_load_addr = get_address("write_load_opt");
-    if (write_load_addr > 0ull)
-    {
-        write_mem_prot(write_load_addr, "\x90\x90"sv, true);
-    }
-    else
-    {
-        assert(get_address("write_load_opt_fixed") > 0ull);
-    }
+    write_mem_prot(get_address("write_load_opt"), "\x90\x90"sv, true);
 }
 bool& get_write_load_opt()
 {
@@ -428,14 +420,20 @@ SaveData* State::savedata()
     auto gm = get_game_manager();
     return gm->save_related->savedata.decode();
 }
-
+uint32_t lowbias32(uint32_t x)
+{
+    x ^= x >> 16;
+    x *= 0x7feb352d;
+    x ^= x >> 15;
+    x *= 0x846ca68b;
+    x ^= x >> 16;
+    return x;
+}
 Entity* State::find(uint32_t uid)
 {
-    if (uid < 0)
-        return nullptr;
     // Ported from MauveAlert's python code in the CAT tracker
-    auto mask = ptr()->uid_to_entity_mask;
-    uint32_t target_uid_plus_one = uid + 1;
+    const uint32_t mask = ptr()->uid_to_entity_mask;
+    const uint32_t target_uid_plus_one = lowbias32(uid + 1);
     uint32_t cur_index = target_uid_plus_one & mask;
     while (true)
     {
@@ -450,12 +448,12 @@ Entity* State::find(uint32_t uid)
             return nullptr;
         }
 
-        if ((target_uid_plus_one & mask) > (entry.uid_plus_one & mask))
+        if (((cur_index - target_uid_plus_one) & mask) > ((cur_index - entry.uid_plus_one) & mask))
         {
             return nullptr;
         }
 
-        cur_index = (cur_index + 1) & mask;
+        cur_index = (cur_index + (uint32_t)1) & mask;
     }
 }
 
