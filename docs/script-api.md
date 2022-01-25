@@ -689,7 +689,7 @@ Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values
 Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
 Will return the string of currently choosen language
 ### [`change_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_string)
-`nil change_string(STRINGID string_id, string_view str)`<br/>
+`nil change_string(STRINGID id, string str)`<br/>
 Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
 This edits custom string and in game strings but changing the language in settings will reset game strings
 ### [`add_string`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_string)
@@ -1568,6 +1568,8 @@ Changes color based on given uColor
 ### `EntityDB`
 - [`ENT_TYPE id`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) &EntityDB::id
 - [`int search_flags`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) &EntityDB::search_flags
+\
+MASK
 - [`float width`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) &EntityDB::width
 - [`float height`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &EntityDB::height
 - [`offsetx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) sol::property([](EntityDB&e)-&gt;float{returne.rect_collision.offsetx;})
@@ -5450,22 +5452,74 @@ Any integer in the range [0, 9] is a valid class, some are however not documente
 - [`DOOR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BUTTON.DOOR) 32
 ### MASK
 - [`PLAYER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.PLAYER) 0x1
+\
+All CHAR_* entities, only `Player` type
 - [`MOUNT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.MOUNT) 0x2
+\
+All MOUNT_* entities, only `Mount` type
 - [`MONSTER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.MONSTER) 0x4
+\
+All MONS_* entities, various types, all `Movable`
 - [`ITEM`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ITEM) 0x8
+\
+All ITEM_* entities except: ITEM_POWERUP_*, ITEM_ROPE, ITEM_CLIMBABLE_ROPE, ITEM_UNROLLED_ROPE, ITEM_RUBBLE, ITEM_FLAMETHROWER_FIREBALL, ITEM_CURSING_CLOUD\
+Also includes: FX_JETPACKFLAME, FX_OLMECPART_FLOATER, FX_SMALLFLAME, FX_TELEPORTSHADOW\
+Various types, all `Movable`
 - [`EXPLOSION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.EXPLOSION) 0x10
+\
+Only: FX_EXPLOSION, FX_POWEREDEXPLOSION, FX_MODERNEXPLOSION\
+All `Explosion` type
 - [`ROPE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ROPE) 0x20
+\
+Only: ITEM_ROPE, ITEM_CLIMBABLE_ROPE, ITEM_UNROLLED_ROPE\
+Various types, all `Movable`
 - [`FX`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.FX) 0x40
+\
+All FX_* entities except: FX_COMPASS, FX_SPECIALCOMPASS, FX_EXPLOSION, FX_POWEREDEXPLOSION, FX_MODERNEXPLOSION, FX_JETPACKFLAME, FX_OLMECPART_FLOATER, FX_SMALLFLAME, FX_TELEPORTSHADOW, FX_LEADER_FLAG, FX_PLAYERINDICATOR, FX_PLAYERINDICATORPORTRAIT\
+Also includes: DECORATION_CHAINANDBLOCKS_CHAINDECORATION, DECORATION_SLIDINGWALL_CHAINDECORATION, ITEM_RUBBLE, ITEM_FLAMETHROWER_FIREBALL, ITEM_CURSING_CLOUD\
+Various types, all `Movable`
 - [`ACTIVEFLOOR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ACTIVEFLOOR) 0x80
+\
+All ACTIVEFLOOR_* entities\
+Various types, all `Movable`
 - [`FLOOR`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.FLOOR) 0x100
+\
+All FLOOR_* and FLOORSTYLED_* entities\
+Various types, all `Floor`
 - [`DECORATION`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.DECORATION) 0x200
+\
+All DECORATION_* entities except: DECORATION_CHAINANDBLOCKS_CHAINDECORATION, DECORATION_SLIDINGWALL_CHAINDECORATION, DECORATION_PALACE_PORTRAIT\
+Also includes: EMBED_GOLD, ENT_TYPE_EMBED_GOLD_BIG\
+Various types, all `Entity`
 - [`BG`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.BG) 0x400
+\
+All MIDBG* entities and most of the BG_* entities\
+does not include: a lot .. check [default_flags_more_flags.txt](internal\
+Also includes: DECORATION_PALACE_PORTRAIT\
+Various types, all `Entity`
 - [`SHADOW`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.SHADOW) 0x800
+\
+All the BG_* entities excluded from `BG` (MASK.BG | MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above\
+Various types, all `Entity`
 - [`LOGICAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LOGICAL) 0x1000
+\
+All LOGICAL_* entities\
+Also includes: ITEM_POWERUP_*, FX_COMPASS, FX_SPECIALCOMPASS, FX_LEADER_FLAG, FX_PLAYERINDICATOR, FX_PLAYERINDICATORPORTRAIT\
+Various types, all `Entity`
 - [`WATER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.WATER) 0x2000
+\
+Only: LIQUID_WATER, LIQUID_COARSE_WATER, LIQUID_IMPOSTOR_LAKE\
+Various types, all `Entity`
 - [`LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) 0x4000
+\
+Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA\
+Various types, all `Entity`
 - [`LIQUID`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) 0x6000
+\
+Short for (MASK.WATER | MASK.LAVA)
 - [`ANY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ANY) 0x0
+\
+Value of 0, treated by all the functions as ANY mask
 ### FLOOR_SIDE
 - [`TOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.TOP) FLOOR_SIDE::TOP
 - [`BOTTOM`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM) FLOOR_SIDE::BOTTOM

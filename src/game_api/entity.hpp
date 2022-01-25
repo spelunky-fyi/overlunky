@@ -77,8 +77,8 @@ struct EntityDB
     EntityCreate create_func;
     EntityDestroy destroy_func;
     int32_t field_10;
-    /* Entity id (ENT_...) */
     ENT_TYPE id;
+    /// MASK
     uint32_t search_flags;
     float width;
     float height;
