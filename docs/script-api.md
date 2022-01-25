@@ -5494,7 +5494,7 @@ Various types, all `Entity`
 - [`BG`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.BG) 0x400
 \
 All MIDBG* entities and most of the BG_* entities\
-does not include: a lot .. check [default_flags_more_flags.txt](internal\
+does not include: a lot .. check [default_flags_more_flags.txt](internal\entity.type.default_flags_more_flags.txt) for full list\
 Also includes: DECORATION_PALACE_PORTRAIT\
 Various types, all `Entity`
 - [`SHADOW`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.SHADOW) 0x800

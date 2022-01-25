@@ -432,7 +432,7 @@ void register_usertypes(sol::state& lua)
     // Various types, all `Entity`
     // BG
     // All MIDBG* entities and most of the BG_* entities
-    // does not include: a lot .. check [default_flags_more_flags.txt](internal/entity.type.default_flags_more_flags.txt) for full list
+    // does not include: a lot .. check [default_flags_more_flags.txt](internal\entity.type.default_flags_more_flags.txt) for full list
     // Also includes: DECORATION_PALACE_PORTRAIT
     // Various types, all `Entity`
     // SHADOW
