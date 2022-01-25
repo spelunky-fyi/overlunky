@@ -472,15 +472,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "write_load_opt"sv,
         PatternCommandBuffer{}
-            .set_optional(true)
-            .find_inst("\xFF\xD3\xB9\xFA\x00\x00\x00"sv)
-            .at_exe(),
-    },
-    {
-        "write_load_opt_fixed"sv,
-        PatternCommandBuffer{}
-            .set_optional(true)
-            .find_inst("\x90\x90\xB9\xFA\x00\x00\x00"sv)
+            .find_after_inst("\x41\xB8\x50\x00\x00\x00\x45\x31\xC9"sv)
             .at_exe(),
     },
     {
@@ -530,9 +522,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "add_to_layer"sv,
         // Used in load_item as `add_to_layer(layer, spawned_entity)`
         PatternCommandBuffer{}
-            .find_inst("\xE9****\x49\x81\xC6****"sv)
-            .decode_call()
-            .at_exe(),
+            .find_inst("\x48\x83\xC1\x08\x45\x31\xC0\xE8"sv)
+            .at_exe()
+            .function_start(),
     },
     {
         "remove_from_layer"sv,
@@ -705,7 +697,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_inst("\xff\x90\x90\x01\x00\x00\x8b\x05****\x65"sv)
             .offset(-0xcc)
-            .find_inst("\x41\x57\x41\x56\x41\x55\x41\x54")
+            .find_inst("\x41\x57\x41\x56\x41\x55\x41\x54"sv)
             .at_exe(),
     },
     {
@@ -835,8 +827,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // close to each other. The first is to prepare the text for rendering/calculate text dimensions/...
         // The second is to actually draw on screen
         PatternCommandBuffer{}
-            .find_inst("\xB9\x02\x00\x00\x00\x41\xB8\x02\x00\x00\x00\x41\x0F\x28\xD8"sv)
-            .offset(0xF)
+            .find_after_inst("\xB9\x0F\x00\x00\x00\x41\xB8\x02\x00\x00\x00\xE8"sv)
+            .offset(-0x1)
             .decode_call()
             .at_exe(),
     },
@@ -844,8 +836,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "draw_text"sv,
         // See `prepare_text_for_rendering`
         PatternCommandBuffer{}
-            .find_inst("\xB9\x02\x00\x00\x00\x41\xB8\x02\x00\x00\x00\x41\x0F\x28\xD8"sv)
-            .offset(0x25)
+            .find_inst("\x41\x8B\x8F\xD0\x02\x00\x00\x81\xF9\xFF\x50\x25\x02"sv)
+            .offset(-0x5)
             .decode_call()
             .at_exe(),
     },
@@ -871,7 +863,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Locate the function in `render_hud`. Towards the bottom you will find calls following a big stack buildup
         // and r8 will have the char* of the texture
         PatternCommandBuffer{}
-            .find_inst("\x48\x8B\x8D\xC8\x12\x00\x00\xB2\x29"sv)
+            .find_inst("\x4C\x8D\x8D\xD8\x12\x00\x00\xB2\x29"sv)
             .offset(0x9)
             .decode_call()
             .at_exe(),
@@ -1015,8 +1007,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // fx_explosion entity. Put a read bp on its idle_counter and continue until you've breaked a couple of times.
         // The big function that breaks contains a call to the internal hitbox-overlap function for which the default
         // mask is put on the stack (0x18F)
+        // it's virtual function 77 (process input)
         PatternCommandBuffer{}
-            .find_inst("\x0F\x57\xFF\x0F\x57\xDB\x49")
+            .find_inst("\x45\x0F\x57\xC0\x0F\x57\xDB\x4D\x89\xE8\xE8"sv)
             .offset(-0x15)
             .at_exe(),
     },
@@ -1025,7 +1018,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Set a bp on load_item for ITEM_CLIMBABLE_ROPE and throw a rope
         // A little below that will 6 be written into the entity's segment_nr_inverse
         PatternCommandBuffer{}
-            .find_inst("\xFF\x50\x30\xC7\x83\x30\x01\x00\x00*\x00\x00\x00")
+            .find_inst("\xFF\x50\x30\xC7\x83\x30\x01\x00\x00*\x00\x00\x00"sv)
             .offset(0x09)
             .at_exe(),
     },
@@ -1034,7 +1027,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Set a bp on load_item for ITEM_CLIMBABLE_ROPE and throw a rope, continue until all the segments are being made
         // At the beginning of this big function will be two comparisons to 6 and a comparison to 5
         PatternCommandBuffer{}
-            .find_inst("\x83\xF9*\x75\x3B")
+            .find_inst("\x83\xF9*\x75\x3B"sv)
             .offset(0x02)
             .at_exe(),
     },
@@ -1043,7 +1036,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // See process_ropes_one
         PatternCommandBuffer{}
             .get_address("process_ropes_one"sv)
-            .find_next_inst("\x83\xF8*\x0F\x85")
+            .find_next_inst("\x83\xF8*\x0F\x85"sv)
             .offset(0x02)
             .at_exe(),
     },
@@ -1052,7 +1045,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // See process_ropes_two
         PatternCommandBuffer{}
             .get_address("process_ropes_two"sv)
-            .find_next_inst("\x83\xF8*\x0F\x87****\x41")
+            .find_next_inst("\x83\xF8*\x0F\x87****\x41"sv)
             .offset(0x02)
             .at_exe(),
     },
@@ -1243,18 +1236,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "olmec_transition_phase_1_custom_floats"sv,
-        // Take the start of the function determined by `olmec_transition_phase_1_y_level`
-        // and use the room above that. Make sure to leave room for the second float.
-        PatternCommandBuffer{}
-            .find_inst("\xF3\x0F\x58\x48\x44\xF3\x0F\x10\x15****\x0F\x2E\xD1"sv)
-            .at_exe()
-            .function_start()
-            .offset(-0x0A)
-            .function_start() // have to go up a couple functions to find some room in-between
-            .offset(-0x0c),
-    },
-    {
         "olmec_transition_phase_1"sv,
         // Put write bp on olmec.attack_phase (when he's in phase 0)
         // Look for the condition that jumps over the little section that changes the phase to 1
@@ -1294,9 +1275,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "sparktrap_angle_increment"sv,
-        // Put a read bp on Spark:angle, the next instruction adds a hardcoded float
+        // Put a read bp on Spark:rotatnio_angle, the next instruction adds a hardcoded float from constant, we want address of that constant
         PatternCommandBuffer{}
-            .find_inst("\xF3\x0F\x58\x05****\xF3\x0F\x11\x81\x58\x01\x00\x00"sv)
+            .find_after_inst("\xF3\x0F\x10\x89\x58\x01\x00\x00\xF3\x0F\x58\x0D"sv)
             .at_exe(),
     },
     {
@@ -1377,16 +1358,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "toast"sv,
         // Put a write bp on State.toast
         PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        "say"sv,
-        // Put a write bp on State.speechbubble
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
-            .find_next_inst("\x48\x8D\x55\xD0\x41\xB8\x20\x00\x00\x00\xE8"sv)
+            .find_inst("\x48\x8D\x55\xD0\x41\xB8\x21\x00\x00\x00\xE8"sv)
             .at_exe()
             .function_start(),
     },
@@ -1394,7 +1366,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "say_context"sv,
         // Find the pattern for `say`, go one up higher in the callstack and look what writes to rcx
         PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x0D****\x4C\x8D\x44\x24\x40\x4C\x89\xFA\x41"sv)
+            .find_after_inst("\xC6\x44\x24\x20\x01\x48\x8D\x0D"sv)
+            .offset(-0x3)
             .decode_pc()
             .at_exe(),
     },
@@ -1438,120 +1411,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "construct_soundposition_ptr"sv,
         // Put a write bp on ACTIVEFLOOR_DRILL sound_pos1 and release the drill
         PatternCommandBuffer{}
-            .find_inst("\xE8****\x49\x89\x86\x30\x01\x00\x00"sv)
+            .find_inst("\xE8****\x49\x89\x84\x24\x30\x01\x00\x00"sv)
             .decode_call()
             .at_exe(),
     },
     {
-        "vftable_JournalPageJournalMenu"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        // Open the journal on any page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        // scroll up to the top, find refrence to this address (each page is referenced two times, but the top of vtable is like 10 times)
+        "vftable_JournalPages"sv,
         PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x0D****\x48\x89\x08\x48\x8D\x48\x58"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageProgress"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x48\x89\x06\x48\xC7\x46\x58\x00\x00\x00\x00"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPagePlace"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x4C\x8D\x2D****\x4C\x8D\x3D****\x0F"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPagePeople"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x48\x8B\x9D\x30\x08\x00\x00\x48\x89\x03"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageBestiary"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x48\x8B\xBD\x30\x08\x00\x00"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageItems"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x48\x8B\xB5\x30\x08\x00\x00"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageTraps"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x48\x8B\x9D\x30\x08\x00\x00"sv)
-            .find_next_inst("\x48\x8D\x05****\x48\x8B\x9D\x30\x08\x00\x00"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageStory"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x4C\x8D\x35****\x44\x0F\x28\x15"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageFeats"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x48\x89\x01\x48\x89\x4D\xE0"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageDeathCause"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x49\x89\x04\x24\x0F\x57\xC0"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageDeathMenu"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x48\x89\x01\x48\x89\xCE"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageRecap"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x48\x89\x01\x48\x8D\x79\x58"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPagePlayerProfile"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x49\x89\x04\x24\x49\xC7"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "vftable_JournalPageLastGamePlayed"sv,
-        // Open the journal on this page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8D\x05****\x48\x89\x03\xC7\x83\xD8\x00\x00\x00"sv)
+            .find_inst("\x49\x89\x04\x24\x41\x89\x4C\x24\x50"sv)
+            .offset(-0x7)
             .decode_pc()
             .at_exe(),
     },
@@ -1572,14 +1442,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "speech_bubble_fun"sv,
         PatternCommandBuffer{}
             .find_inst("\xE8\xFE\xFF\xFF\xFF\x48\x89\xD6\x48\x89\xCB"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        // Put write bp on state->toast (pointer), you will end up somewhere in the middle of the function
-        "toast_fun"sv,
-        PatternCommandBuffer{}
-            .find_inst("\xF3\x0F\x59\xD6\x48\xC7\x44\x24\x20\x00\x00\x00\x00\xB9\x01\x00\x00\x00\x48"sv)
             .at_exe()
             .function_start(),
     },

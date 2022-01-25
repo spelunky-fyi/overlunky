@@ -90,7 +90,7 @@ void strings_init()
 
     auto addr_format_shopitem = get_address("format_shopitem_name");
     auto addr_npcdialogue = get_address("speech_bubble_fun");
-    auto addr_toastfun = get_address("toast_fun");
+    auto addr_toastfun = get_address("toast");
 
     g_on_shopnameformat_trampoline = (OnShopItemNameFormatFun*)addr_format_shopitem;
     g_speach_bubble_trampoline = (OnNPCDialogueFun*)addr_npcdialogue;
