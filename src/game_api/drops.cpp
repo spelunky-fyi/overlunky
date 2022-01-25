@@ -66,9 +66,9 @@ std::vector<DropEntry> drop_entries{
     {"MOSQUITO_HOVERPACK", "\x3C\x02\x00\x00"s, VTABLE_OFFSET::MONS_MOSQUITO, 3},
     {"MUMMY_DIAMOND", "\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_MUMMY, 3},
     {"NECROMANCER_RUBY", "\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_NECROMANCER, 3},
-    {"OLMEC_CAVEMAN_1", "\xBA\xE1\x00\x00\x00\xE8\x58\xB3\xD7\xFF"s, VTABLE_OFFSET::NONE, 0, 1},
-    {"OLMEC_CAVEMAN_2", "\xBA\xE1\x00\x00\x00\xE8\xA4\xB2\xD7\xFF"s, VTABLE_OFFSET::NONE, 0, 1},
-    {"OLMEC_CAVEMAN_3", "\xBA\xE1\x00\x00\x00\xE8\xD4\xB1\xD7\xFF"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"OLMEC_CAVEMAN_1", "\x48\x89\xF1\xBA\xE1\x00\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 4},
+    {"OLMEC_CAVEMAN_2", "\xFF\x90\x80\x00\x00\x00\xC6\x44\x24\x20\x00\xF3\x0F\x10\x15"s, VTABLE_OFFSET::NONE, 0, 0x1F},
+    {"OLMEC_CAVEMAN_3", "\x48\x89\xF1\xBA\xE1\x00\x00\x00\xE8****\x48\x89\xC6"s, VTABLE_OFFSET::NONE, 0, 4},
     {"OSIRIS_EMERALDS", "\x20\x00\xBA\xF2\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"OSIRIS_TABLETOFDESTINY", "\xBA\x1C\x02\x00\x00\xE8****\x8B\x0D"s, VTABLE_OFFSET::NONE, 0, 1},
     {"OSIRIS_PORTAL", "\xBA\x64\x03\x00\x00\xE8****\x66\xC7"s, VTABLE_OFFSET::NONE, 0, 1},
@@ -199,8 +199,8 @@ std::vector<DropEntry> drop_entries{
     {"SKULLDROPTRAP_SKULL", "\xBA\xEA\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1},
     {"COFFIN_SKULL", "\xBA\xE2\x01\x00\x00"s, VTABLE_OFFSET::ITEM_COFFIN, 88, 1},
     /// Game does this (this value | 0x1) to get BOMBBAG (so depending on the chosen ENT_TYPE it can be + 1 or + 0)
-    {"OLMEC_SISTERS_ROPEPILE", "\x0D\x00\x02\x00\x00"s, VTABLE_OFFSET::QUEST_JUNGLE_SISTERS, 1, 1},
-    {"OLMEC_SISTERS_BOMBBOX", "\xBA\x02\x02\x00\x00"s, VTABLE_OFFSET::QUEST_JUNGLE_SISTERS, 1, 1},
+    {"OLMEC_SISTERS_ROPEPILE", "\x0D\x00\x02\x00\x00\x83\xFB\x03"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"OLMEC_SISTERS_BOMBBOX", "\xBA\x02\x02\x00\x00\x0F\x45\xD0"s, VTABLE_OFFSET::NONE, 0, 1},
 
     ///
     /// Attacks:
@@ -254,7 +254,7 @@ std::vector<DropEntry> drop_entries{
     ///
 
     /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2
-    {"MOTHERSTATUE_HEALTH", "\xBB\x04\x00\x00\x00\xD3"s, VTABLE_OFFSET::FLOOR_MOTHER_STATUE, 2, 1},
+    {"MOTHERSTATUE_HEALTH", "\xBD\x04\x00\x00\x00\xD3"s, VTABLE_OFFSET::FLOOR_MOTHER_STATUE, 2, 1},
     /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2
     {"COOKEDTURKEY_HEALTH", "\xBA\x01\x00\x00\x00\x48\x0F\xBA\xE1\x2E\xBD"s, VTABLE_OFFSET::ITEM_PICKUP_GIANTFOOD, 94, 1},
     /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2

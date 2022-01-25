@@ -4,7 +4,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) I
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.6"
+meta.version = "2.6a"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -633,7 +633,7 @@ local enemies_challenge = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
     ENT_TYPE.MONS_MOLE, ENT_TYPE.MONS_MANTRAP, ENT_TYPE.MONS_TIKIMAN, ENT_TYPE.MONS_WITCHDOCTOR, ENT_TYPE.MONS_MAGMAMAN, ENT_TYPE.MONS_FIREBUG_UNCHAINED,
     ENT_TYPE.MONS_CROCMAN, ENT_TYPE.MONS_COBRA, ENT_TYPE.MONS_SORCERESS, ENT_TYPE.MONS_NECROMANCER, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI,
-    ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.MONS_ALIEN,
+    ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_ALIEN,
     ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER,
     ENT_TYPE.MONS_OLMITE_HELMET, ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG, ENT_TYPE.MONS_LEPRECHAUN}
 local enemies_sisters = {ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN}
@@ -898,10 +898,8 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.MONS_REDSKELETON)
 
 set_post_entity_spawn(function(ent)
+    if state.theme == THEME.NEO_BABYLON and state.level == 2 then return end --ushabti != 100
     ent.carried_entity_type = pick(crab_items)
-    if prng:random() < 0.25 then
-        ent.carried_entity_type = ENT_TYPE.ITEM_ICESPIRE
-    end
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HERMITCRAB)
 
 set_post_entity_spawn(function(ent)
@@ -922,14 +920,6 @@ set_post_entity_spawn(function(ent)
     end, 30)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_KINGU)
 ]]
-
-set_post_entity_spawn(function(ent)
-    set_interval(function()
-        replace_drop(DROP.ANUBIS_COFFIN_SORCERESS, pick(enemies_small))
-        replace_drop(DROP.ANUBIS_COFFIN_VAMPIRE, pick(enemies_small))
-        replace_drop(DROP.ANUBIS_COFFIN_WITCHDOCTOR, pick(enemies_small))
-    end, 30)
-end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_ANUBIS2)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if state.theme ~= THEME.OLMEC or not options.hard_olmec then
@@ -1187,18 +1177,16 @@ set_callback(function(ctx)
     end
 end, ON.POST_ROOM_GENERATION)
 
-set_post_entity_spawn(function(ent)
+set_callback(function()
     if test_flag(state.level_flags, 18) then
-        local light = spawn_entity_over(ENT_TYPE.LOGICAL_ROOM_LIGHT, ent.uid, 0, 0)
-        set_on_kill(ent.uid, function()
-            local e = get_entity(light)
-            e.illumination.enabled = false
-        end)
-        local e = get_entity(light)
-        e.illumination.light1.green = 0
-        e.illumination.light1.size = 2
+        for i,v in ipairs(get_entities_by_type(ENT_TYPE.ITEM_FLOATING_ORB)) do
+            local x, y, l = get_position(v)
+            local light = get_entity(spawn(ENT_TYPE.LOGICAL_ROOM_LIGHT, x, y, l, 0, 0))
+            light.illumination.light1.green = 0
+            light.illumination.light1.size = 2
+        end
     end
-end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_FLOATING_ORB)
+end, ON.LEVEL)
 
 --[[SHOPS]]
 local shop_items = {ENT_TYPE.ITEM_PICKUP_ROPEPILE, ENT_TYPE.ITEM_PICKUP_BOMBBAG, ENT_TYPE.ITEM_PICKUP_BOMBBOX, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_SPECTACLES, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_PICKUP_COMPASS, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_MATTOCK, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ITEM_PURCHASABLE_CAPE, ENT_TYPE.ITEM_PURCHASABLE_HOVERPACK, ENT_TYPE.ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ENT_TYPE.ITEM_PURCHASABLE_POWERPACK, ENT_TYPE.ITEM_PURCHASABLE_JETPACK, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_SKULL, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_WOODEN_ARROW, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY}
@@ -1411,6 +1399,7 @@ local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.
          ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ITEM_USHABTI, ENT_TYPE.ITEM_CRATE}
 local abzu_crate_items = {ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PICKUP_BOMBBOX}
 local monkey_crap = join(crate_items, {ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_BOMB})
+local sister_items = {ENT_TYPE.ITEM_PICKUP_ROPEPILE, ENT_TYPE.ITEM_PICKUP_BOMBBAG, ENT_TYPE.ITEM_PICKUP_BOMBBOX, ENT_TYPE.ITEM_PICKUP_12BAG, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY, ENT_TYPE.ITEM_PICKUP_GIANTFOOD, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_SPECTACLES, ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_COMPASS, ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_CAPE, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_SHOTGUN, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_CROSSBOW, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_MATTOCK, ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_SCEPTER, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.ITEM_BOOMBOX}
 
 set_post_entity_spawn(function(ent)
     --math.randomseed(read_prng()[5]+ent.uid)
@@ -1584,19 +1573,25 @@ local function get_chain_item()
 end
 
 --[[TODO
-    ANUBIS_COFFIN_SORCERESS
-    ANUBIS_COFFIN_VAMPIRE
-    ANUBIS_COFFIN_WITCHDOCTOR
-    KINGU_OCTOPUS
-    KINGU_JIANGSHI
-    KINGU_FEMALE_JIANGSHI
-    HUMPHEAD_HIREDHAND
-    DUATALTAR_*
-    LOCKEDCHEST_UDJATEYE
-    OLMEC_SISTERS_*
     HUNDUN_FIREBALL
     TIAMAT_*
 ]]
+
+set_post_entity_spawn(function(ent)
+    replace_drop(DROP.HUMPHEAD_HIREDHAND, pick(friends))
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_GIANTFISH)
+
+set_post_entity_spawn(function(ent)
+    replace_drop(DROP.LOCKEDCHEST_UDJATEYE, get_chain_item())
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.LOCKEDCHEST)
+
+set_post_entity_spawn(function(ent)
+    set_interval(function()
+        replace_drop(DROP.ANUBIS_COFFIN_SORCERESS, pick(enemies_small))
+        replace_drop(DROP.ANUBIS_COFFIN_VAMPIRE, pick(enemies_small))
+        replace_drop(DROP.ANUBIS_COFFIN_WITCHDOCTOR, pick(enemies_small))
+    end, 30)
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_ANUBIS2)
 
 set_pre_tile_code_callback(function(x, y, layer)
     spawn_critical(get_chain_item(), x, y, layer, 0, 0)
@@ -1643,11 +1638,11 @@ set_post_entity_spawn(function(ent)
     replace_drop(DROP.BEG_TRUECROWN, pick(crate_items))
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HUNDUNS_SERVANT)
 
---[[set_post_entity_spawn(function(ent)
-    replace_drop(DROP.GHOSTJAR_DIAMOND, pick(crate_items))
-end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CURSEDPOT)]]
-
 set_post_entity_spawn(function(ent)
+    replace_drop(DROP.GHOSTJAR_DIAMOND, pick(crate_items))
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_CURSEDPOT)
+
+--[[set_post_entity_spawn(function(ent)
     if not options.chain then return end
     local x, y, l = get_position(ent.uid)
     local rx, ry = get_room_index(x, y)
@@ -1656,7 +1651,7 @@ set_post_entity_spawn(function(ent)
         kill_entity(ent.uid)
         spawn_entity_nonreplaceable(get_chain_item(), x, y, l, (prng:random()-0.5)*0.2, 0.2)
     end
-end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_UDJATEYE)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_PICKUP_UDJATEYE)]]
 
 set_callback(function()
     if not options.chain then return end
@@ -2390,6 +2385,14 @@ end, ON.GUIFRAME)
 --[[SPIKES]]
 set_callback(function()
     swapping_liquid = state.theme ~= THEME.OLMEC and prng:random() < options.liquid_chance/100
+    if state.theme == THEME.OLMEC then
+        replace_drop(DROP.OLMEC_SISTERS_BOMBBOX, pick(crate_items))
+        replace_drop(DROP.OLMEC_SISTERS_ROPEPILE, pick(sister_items))
+    elseif state.theme == THEME.DUAT then
+        replace_drop(DROP.DUATALTAR_BOMBBAG, pick(crate_items))
+        replace_drop(DROP.DUATALTAR_BOMBBOX, pick(crate_items))
+        --replace_drop(DROP.DUATALTAR_COOKEDTURKEY, pick(crate_items)) --doesnt work
+    end
 end, ON.PRE_LEVEL_GENERATION)
 
 local function swap_liquid(liquid_type, x, y)

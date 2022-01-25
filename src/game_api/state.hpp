@@ -169,7 +169,8 @@ struct StateMemory
     size_t unknown27;
 
     // This is a Robin Hood Table
-    size_t uid_to_entity_mask;
+    uint32_t uid_to_entity_mask;
+    uint32_t padding13;
     RobinHoodTableEntry* uid_to_entity_data;
 
     size_t backlayer_player_related1;

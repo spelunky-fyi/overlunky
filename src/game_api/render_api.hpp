@@ -6,6 +6,26 @@
 
 #include <mutex>
 
+enum JOURNAL_VFTABLE
+{
+    // to get those offsets, find "vftable_JournalPages" then go to each page in journal, then to it's first vtable function address
+    // and calculate offset diference
+    PROGRESS = 496,         // open journal: page 0 or die, journal: page 2
+    MENU = 448,             // open journal: page 1
+    PLACES = 672,           // open journal > Places: any page > 1
+    PEOPLE = 624,           // open journal > People: any page > 1
+    BESTIARY = 576,         // open journal > Bestiary: any page > 1
+    ITEMS = 400,            // open journal > Items: any page > 1
+    TRAPS = 912,            // open journal > Traps: any page > 1
+    STORY = 864,            // open journal > Story: any page > 1
+    FEATS = 96,             // open journal > Feats: any page > 1 or open player profile from main menu, any page > 1
+    DEATH_CAUSE = 160,      // die, journal: page 0
+    DEATH_MENU = 256,       // die, journal: page 1
+    RECAP = 208,            // die, journal: page 3 Dear Journal
+    PLAYER_PROFILE = 720,   // open player profile from main menu, journal: page 0
+    LAST_GAME_PLAYED = 816, // open player profile from main menu, journal: page 1
+};
+
 struct TextureDefinition
 {
     std::string texture_path;

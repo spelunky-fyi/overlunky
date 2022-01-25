@@ -64,12 +64,12 @@ const char* entity_flags[]{
     "23: Shop item",
     "24: Shop floor (break to aggro)",
     "25: Passes through player",
-    "26: ",
-    "27: ",
+    "26: Exploded",
+    "27: Crushed",
     "28: Pause AI and physics",
     "29: Dead",
-    "30: ",
-    "31: ",
+    "30: Character",
+    "31: Movable",
     "32: ",
 };
 

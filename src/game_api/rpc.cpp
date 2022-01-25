@@ -939,26 +939,21 @@ void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_enti
 
 void modify_sparktraps(float angle_increment, float distance)
 {
-    static size_t angle_increment_offset = 0;
-    static size_t angle_increment_instruction = 0;
-    if (angle_increment_offset == 0)
+    static float* new_array;
+    if (new_array == nullptr)
     {
-        angle_increment_instruction = get_address("sparktrap_angle_increment");
-        angle_increment_offset = angle_increment_instruction - 0x32;
-        auto distance_offset_relative = static_cast<int32_t>(angle_increment_offset - (angle_increment_instruction + 8));
-        write_mem_prot(angle_increment_instruction + 4, distance_offset_relative, true);
-    }
-    write_mem_prot(angle_increment_offset, angle_increment, true);
+        const auto offset = get_address("sparktrap_angle_increment");
+        const int32_t distance_offset = 0xF1;
+        new_array = (float*)alloc_mem_rel32(offset + 4, sizeof(float) * 2);
+        if (!new_array)
+            return;
 
-    static size_t distance_offset = 0;
-    if (distance_offset == 0)
-    {
-        auto distance_instruction = angle_increment_instruction + 0x1F;
-        distance_offset = angle_increment_instruction - 0x2E;
-        auto distance_offset_relative = static_cast<int32_t>(distance_offset - (distance_instruction + 8));
-        write_mem_prot(distance_instruction + 4, distance_offset_relative, true);
+        int32_t rel = static_cast<int32_t>((size_t)new_array - (offset + 4));
+        write_mem_prot(offset, rel, true);
+        write_mem_prot(offset + distance_offset, (int32_t)(rel - distance_offset + sizeof(float)), true);
     }
-    write_mem_prot(distance_offset, distance, true);
+    *new_array = angle_increment;
+    *(new_array + 1) = distance;
 }
 
 void set_kapala_blood_threshold(uint8_t threshold)
@@ -1096,18 +1091,20 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
     // If you want to make Olmec stay in phase 0 (stomping) all the time, you can just set
     // the phase 1 y level to 70. Don't set it too low, from 1.25.0 onwards, Olmec's stomp
     // activation distance seems to be related to the y-level trigger point.
-    static size_t phase1_offset = 0;
-    static size_t phase2_offset = 0;
+    static size_t phase1_offset;
     if (phase1_offset == 0)
     {
         // from 1.23.x onwards, there are now two instructions per phase that reference the y-level float
-        size_t phase_1_instruction_a = get_address("olmec_transition_phase_1_y_level");
-        size_t phase_1_instruction_b = phase_1_instruction_a + 0xd;
-        phase1_offset = get_address("olmec_transition_phase_1_custom_floats");
+        const size_t phase_1_instruction_a = get_address("olmec_transition_phase_1_y_level");
+        const size_t phase_1_instruction_b = phase_1_instruction_a + 0xd;
 
-        size_t phase_2_instruction_a = get_address("olmec_transition_phase_2_y_level");
-        size_t phase_2_instruction_b = phase_2_instruction_a + 0x11;
-        phase2_offset = phase1_offset + 0x4;
+        const size_t phase_2_instruction_a = get_address("olmec_transition_phase_2_y_level");
+        const size_t phase_2_instruction_b = phase_2_instruction_a + 0x11;
+        phase1_offset = (size_t)alloc_mem_rel32(phase_2_instruction_b + 4, sizeof(float) * 2);
+        if (!phase1_offset)
+            return;
+
+        auto phase2_offset = phase1_offset + 0x4;
 
         // write the default values to our new floats
         write_mem_prot(phase1_offset, 100.0f, true);
@@ -1128,33 +1125,25 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
 
     if (phase == 1)
     {
-        write_mem_prot(phase1_offset, y, true);
+        *(float*)phase1_offset = y;
     }
     else if (phase == 2)
     {
-        write_mem_prot(phase2_offset, y, true);
+        *(float*)(phase1_offset + sizeof(float)) = y;
     }
 }
 
 void force_olmec_phase_0(bool b)
 {
-    static size_t offset = 0;
-    static char original_instruction[2] = {0};
-    if (offset == 0)
-    {
-        offset = get_address("olmec_transition_phase_1");
-        for (uint8_t x = 0; x < 2; ++x)
-        {
-            original_instruction[x] = read_u8(offset + x);
-        }
-    }
+    static size_t offset = get_address("olmec_transition_phase_1");
+
     if (b)
     {
-        write_mem_prot(offset, "\xEB\x2E"s, true); // jbe -> jmp
+        write_mem_recoverable("force_olmec_phase_0", offset, "\xEB\x2E"s, true); // jbe -> jmp
     }
     else
     {
-        write_mem_prot(offset, std::string(original_instruction, 2), true);
+        recover_mem("force_olmec_phase_0");
     }
 }
 
