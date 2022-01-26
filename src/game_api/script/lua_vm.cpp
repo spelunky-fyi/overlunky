@@ -1210,7 +1210,10 @@ end
 
     /// Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
     /// This edits custom string and in game strings but changing the language in settings will reset game strings
-    lua["change_string"] = change_string;
+    lua["change_string"] = [](STRINGID id, std::u16string str)
+    {
+        return change_string(id, str);
+    };
 
     /// Add custom string, currently can only be used for names of shop items (Entitydb->description)
     /// Returns STRINGID of the new string

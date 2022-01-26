@@ -166,8 +166,13 @@ void RenderAPI::reload_texture(const char** texture_name)
     class Renderer;
     using LoadTextureFunT = void(Renderer*, const char**);
 
+    // Find this by first finding a function that is called with "loading.DDS" as a first param
+    // That function contains a single virtual call (it's done on the render) which is a call
+    // to the wanted function
+    static constexpr size_t c_LoadTextureVirtualIndex = 0x2E;
+
     auto renderer_ptr = (Renderer*)renderer();
-    auto load_texture = *vtable_find<LoadTextureFunT*>(renderer_ptr, 0x2D);
+    auto load_texture = *vtable_find<LoadTextureFunT*>(renderer_ptr, c_LoadTextureVirtualIndex);
     load_texture(renderer_ptr, texture_name);
 }
 
