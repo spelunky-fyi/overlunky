@@ -161,7 +161,7 @@ std::string read_whole_file(const char* file_path)
         auto close_file = CloseFileOnScopeExit{file};
 
         fseek(file, 0, SEEK_END);
-        const std::size_t file_size = ftell(file);
+        const size_t file_size = ftell(file);
         fseek(file, 0, SEEK_SET);
 
         std::string code(file_size, '\0');
@@ -226,11 +226,11 @@ const char* SpelunkyScript_GetResult(SpelunkyScript* script)
 {
     return script->get_result().c_str();
 }
-std::size_t SpelunkyScript_GetNumMessages(SpelunkyScript* script)
+size_t SpelunkyScript_GetNumMessages(SpelunkyScript* script)
 {
     return script->get_messages().size();
 }
-SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, std::size_t message_idx)
+SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, size_t message_idx)
 {
     const auto& messages = script->get_messages();
     if (message_idx < messages.size())
@@ -238,7 +238,7 @@ SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, std::siz
         const auto& message = messages[message_idx];
         return SpelunkyScriptMessage{
             message.message.c_str(),
-            static_cast<std::size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(message.time.time_since_epoch()).count()),
+            static_cast<size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(message.time.time_since_epoch()).count()),
         };
     }
     return SpelunkyScriptMessage{};
@@ -311,11 +311,11 @@ bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* o
     out_buffer[num_written] = '\0';
     return static_cast<size_t>(num_written) < out_buffer_size;
 }
-std::size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console)
+size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console)
 {
     return console->get_messages().size();
 }
-const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, std::size_t message_idx)
+const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, size_t message_idx)
 {
     const auto& messages = console->get_messages();
     if (message_idx < messages.size())
@@ -357,46 +357,78 @@ SpelunkyScreen SpelunkyState_GetScreen()
     return static_cast<SpelunkyScreen>(get_state().screen);
 }
 
-std::int32_t Spelunky_SpawnEntity(std::uint32_t entity_id, std::int32_t layer, float x, float y, float vel_x, float vel_y)
+int32_t Spelunky_SpawnEntity(uint32_t entity_id, int32_t layer, float x, float y, float vel_x, float vel_y)
 {
     return spawn_entity_abs(entity_id, x, y, (LAYER)layer, vel_x, vel_y);
 }
 
-const char16_t* Spelunky_GetCharacterFullName(std::uint32_t character_index)
+const char16_t* Spelunky_GetCharacterFullName(uint32_t character_index)
 {
     return NCharacterDB::get_character_full_name(character_index);
 }
-const char16_t* Spelunky_GetCharacterShortName(std::uint32_t character_index)
+const char16_t* Spelunky_GetCharacterShortName(uint32_t character_index)
 {
     return NCharacterDB::get_character_short_name(character_index);
 }
-void Spelunky_GetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
+void Spelunky_GetCharacterHeartColor(uint32_t character_index, float (&color)[4])
 {
     NCharacterDB::get_character_heart_color(character_index).to_float(color);
 }
-bool Spelunky_GetCharacterGender(std::uint32_t character_index)
+bool Spelunky_GetCharacterGender(uint32_t character_index)
 {
     return NCharacterDB::get_character_gender(character_index);
 }
 
-void Spelunky_SetCharacterFullName(std::uint32_t character_index, const char16_t* name)
+void Spelunky_SetCharacterFullName(uint32_t character_index, const char16_t* name)
 {
     NCharacterDB::set_character_full_name(character_index, name);
 }
-void Spelunky_SetCharacterShortName(std::uint32_t character_index, const char16_t* name)
+void Spelunky_SetCharacterShortName(uint32_t character_index, const char16_t* name)
 {
     NCharacterDB::set_character_short_name(character_index, name);
 }
-void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&color)[4])
+void Spelunky_SetCharacterHeartColor(uint32_t character_index, float (&color)[4])
 {
     NCharacterDB::set_character_heart_color(character_index, Color{color});
 }
-void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female)
+void Spelunky_SetCharacterGender(uint32_t character_index, bool female)
 {
     NCharacterDB::set_character_gender(character_index, female);
 }
 
-void Spelunky_ReloadTexture(const char* texture_name)
+int64_t Spelunky_DefineTexture(Spelunky_TextureDefinition texture_defintion)
 {
-    RenderAPI::get().reload_texture(texture_name);
+    TextureDefinition real_texture_defintion{
+        texture_defintion.texture_path,
+        texture_defintion.width,
+        texture_defintion.height,
+        texture_defintion.tile_width,
+        texture_defintion.tile_height,
+        texture_defintion.sub_image_offset_x,
+        texture_defintion.sub_image_offset_y,
+        texture_defintion.sub_image_width,
+        texture_defintion.sub_image_height,
+    };
+    return RenderAPI::get().define_texture(real_texture_defintion);
+}
+void Spelunky_ReloadTexture(const char* texture_path)
+{
+    RenderAPI::get().reload_texture(texture_path);
+}
+
+int64_t SpelunkyEntity_GetTexture(Entity* entity)
+{
+    return entity->texture->id;
+}
+void SpelunkyEntity_SetTexture(Entity* entity, int64_t texture)
+{
+    entity->set_texture(texture);
+}
+uint16_t SpelunkyEntity_GetTextureTile(Entity* entity)
+{
+    return entity->animation_frame;
+}
+void SpelunkyEntity_SetTextureTile(Entity* entity, uint16_t texture_tile)
+{
+    entity->animation_frame = texture_tile;
 }
