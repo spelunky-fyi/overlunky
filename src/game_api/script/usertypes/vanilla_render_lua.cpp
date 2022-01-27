@@ -24,7 +24,7 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    draw_world_texture(texture_id, row, column, {left, top, right, bottom}, color);
+    draw_world_texture(texture_id, row, column, AABB{left, top, right, bottom}, color);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
@@ -33,7 +33,12 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
     {
         return;
     }
-    RenderAPI::get().draw_world_texture(texture_id, row, column, rect.left, rect.top, rect.right, rect.bottom, color);
+    draw_world_texture(texture_id, row, column, QuadTree{rect.left, rect.bottom, rect.right, rect.bottom, rect.right, rect.top, rect.left, rect.top}, color);
+}
+
+void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const QuadTree& quad, Color color)
+{
+    RenderAPI::get().draw_world_texture(texture_id, row, column, quad, color);
 }
 
 namespace NVanillaRender
@@ -64,6 +69,13 @@ void register_usertypes(sol::state& lua)
         "y",
         &TextureRenderingInfo::y,
 
+        "destination",
+        &TextureRenderingInfo::destination,
+        "source",
+        &TextureRenderingInfo::source,
+        "set_destination",
+        &TextureRenderingInfo::set_destination,
+
         "destination_top_left_x",
         &TextureRenderingInfo::destination_top_left_x,
         "destination_top_left_y",
@@ -80,9 +92,6 @@ void register_usertypes(sol::state& lua)
         &TextureRenderingInfo::destination_bottom_right_x,
         "destination_bottom_right_y",
         &TextureRenderingInfo::destination_bottom_right_y,
-        "set_destination",
-        &TextureRenderingInfo::set_destination,
-
         "source_top_left_x",
         &TextureRenderingInfo::source_top_left_x,
         "source_top_left_y",

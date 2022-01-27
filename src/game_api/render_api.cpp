@@ -378,31 +378,35 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
 
             // DESTINATION
             // top left:
-            -half_width,
-            half_height,
-            // top right:
-            half_width,
-            half_height,
-            // bottom left:
-            -half_width,
-            -half_height,
-            // bottom right:
-            half_width,
-            -half_height,
+            QuadTree{
+                -half_width,
+                half_height,
+                // top right:
+                half_width,
+                half_height,
+                // bottom left:
+                -half_width,
+                -half_height,
+                // bottom right:
+                half_width,
+                -half_height,
+            },
 
             // SOURCE
             // bottom left:
-            uv_left,
-            uv_bottom,
-            // bottom right:
-            uv_right,
-            uv_bottom,
-            // top left:
-            uv_left,
-            uv_top,
-            // top right:
-            uv_right,
-            uv_top,
+            QuadTree{
+                uv_left,
+                uv_bottom,
+                // bottom right:
+                uv_right,
+                uv_bottom,
+                // top left:
+                uv_left,
+                uv_top,
+                // top right:
+                uv_right,
+                uv_top,
+            },
         };
 
         typedef void render_func(TextureRenderingInfo*, uint8_t shader, const char**, Color*);
@@ -411,7 +415,7 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
     }
 }
 
-void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
+void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, QuadTree dest, Color color)
 {
     static size_t func_offset = 0;
     static size_t param_7 = 0;
@@ -432,23 +436,24 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
         }
 
         // destination and source float arrays are the same as in RenderInfo
-        float unknown = 21;
+        const float unknown = 21;
+        // this is also QuadTree, but some special one
         float destination[12] = {
             // bottom left:
-            left,
-            bottom,
+            dest.bottom_left_x,
+            dest.bottom_left_y,
             unknown,
             // bottom right:
-            right,
-            bottom,
+            dest.bottom_right_x,
+            dest.bottom_right_y,
             unknown,
             // top right:
-            right,
-            top,
+            dest.top_right_x,
+            dest.top_right_y,
             unknown,
             // top left:
-            left,
-            top,
+            dest.top_left_x,
+            dest.top_left_y,
             unknown};
 
         float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
@@ -456,7 +461,7 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
         float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
         float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
 
-        float source[8] = {
+        QuadTree source = {
             // bottom left:
             uv_left,
             uv_bottom,
@@ -471,10 +476,10 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
             uv_top,
         };
 
-        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, float* source, void*, Color*, float*);
+        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, QuadTree* source, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         auto texture_name = texture->name;
-        rf(renderer(), shader, &texture_name, 1, destination, source, (void*)param_7, &color, nullptr);
+        rf(renderer(), shader, &texture_name, 1, destination, &source, (void*)param_7, &color, nullptr);
     }
 }
 
@@ -605,12 +610,12 @@ void TextureRenderingInfo::set_destination(const AABB& bbox)
     x = bbox.left + half_w;
     y = bbox.top + half_h;
 
-    destination_top_left_x = -half_w;
-    destination_top_left_y = half_h;
-    destination_top_right_x = half_w;
-    destination_top_right_y = half_h;
-    destination_bottom_left_x = -half_w;
-    destination_bottom_left_y = -half_h;
-    destination_bottom_right_x = half_w;
-    destination_bottom_right_y = -half_h;
+    destination.top_left_x = -half_w;
+    destination.top_left_y = half_h;
+    destination.top_right_x = half_w;
+    destination.top_right_y = half_h;
+    destination.bottom_left_x = -half_w;
+    destination.bottom_left_y = -half_h;
+    destination.bottom_right_x = half_w;
+    destination.bottom_right_y = -half_h;
 }
