@@ -29,11 +29,42 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
 {
+    draw_world_texture(texture_id, row, column, rect, color, 0);
+}
+
+void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle)
+{
     if (bounding_box.is_valid() && !rect.overlaps_with(bounding_box))
     {
         return;
     }
-    draw_world_texture(texture_id, row, column, QuadTree{rect.left, rect.bottom, rect.right, rect.bottom, rect.right, rect.top, rect.left, rect.top}, color);
+    QuadTree new_quad = {rect.left, rect.bottom, rect.right, rect.bottom, rect.right, rect.top, rect.left, rect.top};
+    if (angle != 0)
+    {
+        const float sine = sin(angle);
+        const float csine = cos(angle);
+        const auto center = rect.center();
+        float x = (new_quad.bottom_left_x - center.first);
+        float y = (new_quad.bottom_left_y - center.second);
+        new_quad.bottom_left_x = x * csine - y * sine + center.first;
+        new_quad.bottom_left_y = y * csine + x * sine + center.second;
+
+        x = (new_quad.bottom_right_x - center.first);
+        y = (new_quad.bottom_right_y - center.second);
+        new_quad.bottom_right_x = x * csine - y * sine + center.first;
+        new_quad.bottom_right_y = y * csine + x * sine + center.second;
+
+        x = (new_quad.top_left_x = new_quad.top_left_x - center.first);
+        y = (new_quad.top_left_y = new_quad.top_left_y - center.second);
+        new_quad.top_left_x = x * csine - y * sine + center.first;
+        new_quad.top_left_y = y * csine + x * sine + center.second;
+
+        x = (new_quad.top_right_x - center.first);
+        y = (new_quad.top_right_y - center.second);
+        new_quad.top_right_x = x * csine - y * sine + center.first;
+        new_quad.top_right_y = y * csine + x * sine + center.second;
+    }
+    draw_world_texture(texture_id, row, column, new_quad, color);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const QuadTree& quad, Color color)
@@ -50,7 +81,9 @@ void register_usertypes(sol::state& lua)
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_screen_texture));
     auto draw_world_texture = sol::overload(
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, float, float, float, float, Color)>(&VanillaRenderContext::draw_world_texture),
-        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_world_texture));
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_world_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color, float)>(&VanillaRenderContext::draw_world_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const QuadTree&, Color)>(&VanillaRenderContext::draw_world_texture));
     lua.new_usertype<VanillaRenderContext>(
         "VanillaRenderContext",
         "draw_text",

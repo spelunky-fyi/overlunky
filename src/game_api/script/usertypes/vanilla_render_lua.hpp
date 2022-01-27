@@ -28,6 +28,9 @@ class VanillaRenderContext
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
     void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color);
 
+    /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle);
+
     /// Draw a texture in world coordinates with QuadTree using the built-in renderer. Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
     void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const QuadTree& quad, Color color);
 
