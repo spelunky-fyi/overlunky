@@ -508,6 +508,8 @@ end
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
     /// Enable/disable game engine pause.
+    /// This is just short for `state.pause == 32`, but that produces an audio bug
+    /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
     lua["pause"] = [](bool p)
     {
         if (p)
