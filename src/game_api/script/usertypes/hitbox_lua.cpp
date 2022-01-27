@@ -78,5 +78,31 @@ void register_usertypes(sol::state& lua)
         &AABB::width,
         "height",
         &AABB::height);
+
+    lua.new_usertype<QuadTree>(
+        "QuadTree",
+        sol::constructors<QuadTree(), QuadTree(const QuadTree&), QuadTree(const AABB&), QuadTree(float, float, float, float, float, float, float, float)>{},
+        "bottom_left_x",
+        &QuadTree::bottom_left_x,
+        "bottom_left_y",
+        &QuadTree::bottom_left_y,
+        "bottom_right_x",
+        &QuadTree::bottom_right_x,
+        "bottom_right_y",
+        &QuadTree::bottom_right_y,
+        "top_right_x",
+        &QuadTree::top_right_x,
+        "top_right_y",
+        &QuadTree::top_right_y,
+        "top_left_x",
+        &QuadTree::top_left_x,
+        "top_left_y",
+        &QuadTree::top_left_y,
+        "center",
+        &QuadTree::center,
+        "get_AABB",
+        &QuadTree::get_AABB,
+        "offset",
+        &QuadTree::offset);
 }
 } // namespace NHitbox

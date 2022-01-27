@@ -39,18 +39,6 @@ struct TextureDefinition
     uint32_t sub_image_height{0};
 };
 
-struct QuadTree
-{
-    float bottom_left_x;
-    float bottom_left_y;
-    float bottom_right_x;
-    float bottom_right_y;
-    float top_right_x;
-    float top_right_y;
-    float top_left_x;
-    float top_left_y;
-};
-
 struct RenderAPI
 {
     const size_t* api;

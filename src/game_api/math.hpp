@@ -10,9 +10,7 @@ struct AABB
 
     /// Create a new axis aligned bounding box by specifying its values
     AABB(float left_, float top_, float right_, float bottom_)
-        : left(left_), top(top_), right(right_), bottom(bottom_)
-    {
-    }
+        : left(left_), top(top_), right(right_), bottom(bottom_){};
 
     bool overlaps_with(const AABB& other) const
     {
@@ -89,4 +87,59 @@ struct AABB
     float top{0};
     float right{0};
     float bottom{0};
+};
+
+struct QuadTree
+{
+    QuadTree() = default;
+
+    QuadTree(const QuadTree&) = default;
+
+    QuadTree(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)
+        : bottom_left_x(_bottom_left_x), bottom_left_y(_bottom_left_y), bottom_right_x(_bottom_right_x), bottom_right_y(_bottom_right_y), top_right_x(_top_right_x), top_right_y(_top_right_y), top_left_x(_top_left_x), top_left_y(_top_left_y){};
+
+    QuadTree(const AABB& aabb)
+    {
+        QuadTree{aabb.left, aabb.bottom, aabb.right, aabb.bottom, aabb.right, aabb.top, aabb.left, aabb.top};
+    }
+
+    /// Short for `(quad.bottom_left_x + quad.top_right_x) / 2.0f, (quad.bottom_left_y + quad.top_right_y) / 2.0f`.
+    std::pair<float, float> center() const
+    {
+        return {(bottom_left_x + top_right_x) / 2.0f, (bottom_left_y + top_right_y) / 2.0f};
+    }
+
+    /// Returns the max/min values of the Quad
+    AABB get_AABB()
+    {
+        AABB result;
+        result.right = std::max(std::max(std::max(bottom_left_x, bottom_right_x), top_right_x), top_left_x);
+        result.left = std::min(std::min(std::min(bottom_left_x, bottom_right_x), top_right_x), top_left_x);
+        result.top = std::max(std::max(std::max(bottom_left_y, bottom_right_y), top_right_y), top_left_y);
+        result.bottom = std::min(std::min(std::min(bottom_left_y, bottom_right_y), top_right_y), top_left_y);
+        return result;
+    }
+
+    QuadTree& offset(float off_x, float off_y)
+    {
+        bottom_left_x += off_x;
+        bottom_right_x += off_x;
+        top_right_x += off_x;
+        top_left_x += off_x;
+
+        bottom_left_y += off_y;
+        bottom_right_y += off_y;
+        top_right_y += off_y;
+        top_left_y += off_y;
+        return *this;
+    }
+
+    float bottom_left_x{0};
+    float bottom_left_y{0};
+    float bottom_right_x{0};
+    float bottom_right_y{0};
+    float top_right_x{0};
+    float top_right_y{0};
+    float top_left_x{0};
+    float top_left_y{0};
 };
