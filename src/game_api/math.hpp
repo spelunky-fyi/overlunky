@@ -102,11 +102,25 @@ struct QuadTree
     {
         QuadTree{aabb.left, aabb.bottom, aabb.right, aabb.bottom, aabb.right, aabb.top, aabb.left, aabb.top};
     }
-
     /// Short for `(quad.bottom_left_x + quad.top_right_x) / 2.0f, (quad.bottom_left_y + quad.top_right_y) / 2.0f`.
     std::pair<float, float> center() const
     {
-        return {(bottom_left_x + top_right_x) / 2.0f, (bottom_left_y + top_right_y) / 2.0f};
+        float detL1 = bottom_left_x * bottom_right_y - bottom_left_y * bottom_right_x;
+        float detL2 = top_right_x * top_left_y - top_right_y * top_left_x;
+        float x1mx2 = bottom_left_x - bottom_right_x;
+        float x3mx4 = top_right_x - top_left_x;
+        float y1my2 = bottom_left_y - bottom_right_y;
+        float y3my4 = top_right_y - top_left_y;
+
+        float xnom = detL1 * x3mx4 - x1mx2 * detL2;
+        float ynom = detL1 * y3my4 - y1my2 * detL2;
+        float denom = x1mx2 * y3my4 - y1my2 * x3mx4;
+        if (denom == 0.0) //Lines don't seem to cross
+        {
+            return {NAN, NAN};
+        }
+
+        return {xnom / denom, ynom / denom};
     }
 
     /// Returns the max/min values of the Quad
