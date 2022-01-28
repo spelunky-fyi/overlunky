@@ -38,7 +38,7 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
     {
         return;
     }
-    Quad new_quad = {rect.left, rect.bottom, rect.right, rect.bottom, rect.right, rect.top, rect.left, rect.top};
+    Quad new_quad(rect);
     if (angle != 0)
     {
         const float sine = sin(angle);

@@ -99,22 +99,20 @@ struct Quad
         : bottom_left_x(_bottom_left_x), bottom_left_y(_bottom_left_y), bottom_right_x(_bottom_right_x), bottom_right_y(_bottom_right_y), top_right_x(_top_right_x), top_right_y(_top_right_y), top_left_x(_top_left_x), top_left_y(_top_left_y){};
 
     Quad(const AABB& aabb)
-    {
-        Quad{aabb.left, aabb.bottom, aabb.right, aabb.bottom, aabb.right, aabb.top, aabb.left, aabb.top};
-    }
-    /// Short for `(quad.bottom_left_x + quad.top_right_x) / 2.0f, (quad.bottom_left_y + quad.top_right_y) / 2.0f`.
+        : bottom_left_x(aabb.left), bottom_left_y(aabb.bottom), bottom_right_x(aabb.right), bottom_right_y(aabb.bottom), top_right_x(aabb.right), top_right_y(aabb.top), top_left_x(aabb.left), top_left_y(aabb.top){};
+
     std::pair<float, float> center() const
     {
-        float detL1 = bottom_left_x * bottom_right_y - bottom_left_y * bottom_right_x;
-        float detL2 = top_right_x * top_left_y - top_right_y * top_left_x;
-        float x1mx2 = bottom_left_x - bottom_right_x;
-        float x3mx4 = top_right_x - top_left_x;
-        float y1my2 = bottom_left_y - bottom_right_y;
-        float y3my4 = top_right_y - top_left_y;
+        const float detL1 = bottom_left_x * bottom_right_y - bottom_left_y * bottom_right_x;
+        const float detL2 = top_right_x * top_left_y - top_right_y * top_left_x;
+        const float x1mx2 = bottom_left_x - bottom_right_x;
+        const float x3mx4 = top_right_x - top_left_x;
+        const float y1my2 = bottom_left_y - bottom_right_y;
+        const float y3my4 = top_right_y - top_left_y;
 
-        float xnom = detL1 * x3mx4 - x1mx2 * detL2;
-        float ynom = detL1 * y3my4 - y1my2 * detL2;
-        float denom = x1mx2 * y3my4 - y1my2 * x3mx4;
+        const float xnom = detL1 * x3mx4 - x1mx2 * detL2;
+        const float ynom = detL1 * y3my4 - y1my2 * detL2;
+        const float denom = x1mx2 * y3my4 - y1my2 * x3mx4;
         if (denom == 0.0) //Lines don't seem to cross
         {
             return {NAN, NAN};
