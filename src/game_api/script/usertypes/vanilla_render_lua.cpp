@@ -24,15 +24,15 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    draw_world_texture(texture_id, row, column, AABB{left, top, right, bottom}, color);
+    draw_world_texture(texture_id, row, column, QuadTree{AABB{left, top, right, bottom}}, color);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
 {
-    draw_world_texture(texture_id, row, column, rect, color, 0);
+    draw_world_texture(texture_id, row, column, QuadTree{rect}, color);
 }
 
-void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle)
+void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle, float px, float py)
 {
     if (bounding_box.is_valid() && !rect.overlaps_with(bounding_box))
     {
@@ -43,7 +43,14 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
     {
         const float sine = sin(angle);
         const float csine = cos(angle);
-        const auto center = rect.center();
+
+        auto center = rect.center();
+        if (px != 0 || py != 0)
+        {
+            center.first += abs(center.first - rect.left) * px;
+            center.second += abs(center.second - rect.bottom) * py;
+        }
+
         float x = (new_quad.bottom_left_x - center.first);
         float y = (new_quad.bottom_left_y - center.second);
         new_quad.bottom_left_x = x * csine - y * sine + center.first;
@@ -82,7 +89,7 @@ void register_usertypes(sol::state& lua)
     auto draw_world_texture = sol::overload(
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, float, float, float, float, Color)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_world_texture),
-        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color, float)>(&VanillaRenderContext::draw_world_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color, float, float, float)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const QuadTree&, Color)>(&VanillaRenderContext::draw_world_texture));
     lua.new_usertype<VanillaRenderContext>(
         "VanillaRenderContext",
