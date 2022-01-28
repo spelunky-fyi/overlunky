@@ -89,18 +89,18 @@ struct AABB
     float bottom{0};
 };
 
-struct QuadTree
+struct Quad
 {
-    QuadTree() = default;
+    Quad() = default;
 
-    QuadTree(const QuadTree&) = default;
+    Quad(const Quad&) = default;
 
-    QuadTree(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)
+    Quad(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)
         : bottom_left_x(_bottom_left_x), bottom_left_y(_bottom_left_y), bottom_right_x(_bottom_right_x), bottom_right_y(_bottom_right_y), top_right_x(_top_right_x), top_right_y(_top_right_y), top_left_x(_top_left_x), top_left_y(_top_left_y){};
 
-    QuadTree(const AABB& aabb)
+    Quad(const AABB& aabb)
     {
-        QuadTree{aabb.left, aabb.bottom, aabb.right, aabb.bottom, aabb.right, aabb.top, aabb.left, aabb.top};
+        Quad{aabb.left, aabb.bottom, aabb.right, aabb.bottom, aabb.right, aabb.top, aabb.left, aabb.top};
     }
     /// Short for `(quad.bottom_left_x + quad.top_right_x) / 2.0f, (quad.bottom_left_y + quad.top_right_y) / 2.0f`.
     std::pair<float, float> center() const
@@ -134,7 +134,7 @@ struct QuadTree
         return result;
     }
 
-    QuadTree& offset(float off_x, float off_y)
+    Quad& offset(float off_x, float off_y)
     {
         bottom_left_x += off_x;
         bottom_right_x += off_x;

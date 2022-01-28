@@ -378,7 +378,7 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
 
             // DESTINATION
             // top left:
-            QuadTree{
+            Quad{
                 -half_width,
                 half_height,
                 // top right:
@@ -394,7 +394,7 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
 
             // SOURCE
             // bottom left:
-            QuadTree{
+            Quad{
                 uv_left,
                 uv_bottom,
                 // bottom right:
@@ -415,7 +415,7 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
     }
 }
 
-void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, QuadTree dest, Color color)
+void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color)
 {
     static size_t func_offset = 0;
     static size_t param_7 = 0;
@@ -437,7 +437,7 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
 
         // destination and source float arrays are the same as in RenderInfo
         const float unknown = 21;
-        // this is also QuadTree, but some special one
+        // this is also Quad, but some special one
         float destination[12] = {
             // bottom left:
             dest.bottom_left_x,
@@ -461,7 +461,7 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
         float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
         float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
 
-        QuadTree source = {
+        Quad source = {
             // bottom left:
             uv_left,
             uv_bottom,
@@ -476,7 +476,7 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
             uv_top,
         };
 
-        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, QuadTree* source, void*, Color*, float*);
+        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         auto texture_name = texture->name;
         rf(renderer(), shader, &texture_name, 1, destination, &source, (void*)param_7, &color, nullptr);

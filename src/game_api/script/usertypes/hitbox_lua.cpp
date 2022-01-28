@@ -79,30 +79,30 @@ void register_usertypes(sol::state& lua)
         "height",
         &AABB::height);
 
-    lua.new_usertype<QuadTree>(
-        "QuadTree",
-        sol::constructors<QuadTree(), QuadTree(const QuadTree&), QuadTree(const AABB&), QuadTree(float, float, float, float, float, float, float, float)>{},
+    lua.new_usertype<Quad>(
+        "Quad",
+        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float)>{},
         "bottom_left_x",
-        &QuadTree::bottom_left_x,
+        &Quad::bottom_left_x,
         "bottom_left_y",
-        &QuadTree::bottom_left_y,
+        &Quad::bottom_left_y,
         "bottom_right_x",
-        &QuadTree::bottom_right_x,
+        &Quad::bottom_right_x,
         "bottom_right_y",
-        &QuadTree::bottom_right_y,
+        &Quad::bottom_right_y,
         "top_right_x",
-        &QuadTree::top_right_x,
+        &Quad::top_right_x,
         "top_right_y",
-        &QuadTree::top_right_y,
+        &Quad::top_right_y,
         "top_left_x",
-        &QuadTree::top_left_x,
+        &Quad::top_left_x,
         "top_left_y",
-        &QuadTree::top_left_y,
+        &Quad::top_left_y,
         "center",
-        &QuadTree::center,
+        &Quad::center,
         "get_AABB",
-        &QuadTree::get_AABB,
+        &Quad::get_AABB,
         "offset",
-        &QuadTree::offset);
+        &Quad::offset);
 }
 } // namespace NHitbox
