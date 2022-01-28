@@ -101,28 +101,8 @@ struct Quad
     Quad(const AABB& aabb)
         : bottom_left_x(aabb.left), bottom_left_y(aabb.bottom), bottom_right_x(aabb.right), bottom_right_y(aabb.bottom), top_right_x(aabb.right), top_right_y(aabb.top), top_left_x(aabb.left), top_left_y(aabb.top){};
 
-    std::pair<float, float> center() const
-    {
-        const float detL1 = bottom_left_x * bottom_right_y - bottom_left_y * bottom_right_x;
-        const float detL2 = top_right_x * top_left_y - top_right_y * top_left_x;
-        const float x1mx2 = bottom_left_x - bottom_right_x;
-        const float x3mx4 = top_right_x - top_left_x;
-        const float y1my2 = bottom_left_y - bottom_right_y;
-        const float y3my4 = top_right_y - top_left_y;
-
-        const float xnom = detL1 * x3mx4 - x1mx2 * detL2;
-        const float ynom = detL1 * y3my4 - y1my2 * detL2;
-        const float denom = x1mx2 * y3my4 - y1my2 * x3mx4;
-        if (denom == 0.0) //Lines don't seem to cross
-        {
-            return {NAN, NAN};
-        }
-
-        return {xnom / denom, ynom / denom};
-    }
-
     /// Returns the max/min values of the Quad
-    AABB get_AABB()
+    AABB get_AABB() const
     {
         AABB result;
         result.right = std::max(std::max(std::max(bottom_left_x, bottom_right_x), top_right_x), top_left_x);
@@ -143,6 +123,35 @@ struct Quad
         bottom_right_y += off_y;
         top_right_y += off_y;
         top_left_y += off_y;
+        return *this;
+    }
+
+    /// Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
+    Quad& rotate(float angle, float px, float py)
+    {
+        const float sin_a{std::sin(angle)};
+        const float cos_a{std::cos(angle)};
+
+        float x = (bottom_left_x - px);
+        float y = (bottom_left_y - py);
+        bottom_left_x = x * cos_a - y * sin_a + px;
+        bottom_left_y = y * cos_a + x * sin_a + py;
+
+        x = (bottom_right_x - px);
+        y = (bottom_right_y - py);
+        bottom_right_x = x * cos_a - y * sin_a + px;
+        bottom_right_y = y * cos_a + x * sin_a + py;
+
+        x = (top_left_x - px);
+        y = (top_left_y - py);
+        top_left_x = x * cos_a - y * sin_a + px;
+        top_left_y = y * cos_a + x * sin_a + py;
+
+        x = (top_right_x - px);
+        y = (top_right_y - py);
+        top_right_x = x * cos_a - y * sin_a + px;
+        top_right_y = y * cos_a + x * sin_a + py;
+
         return *this;
     }
 

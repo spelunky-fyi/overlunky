@@ -41,35 +41,13 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
     Quad new_quad(rect);
     if (angle != 0)
     {
-        const float sine = sin(angle);
-        const float csine = cos(angle);
-
         auto center = rect.center();
         if (px != 0 || py != 0)
         {
             center.first += abs(center.first - rect.left) * px;
             center.second += abs(center.second - rect.bottom) * py;
         }
-
-        float x = (new_quad.bottom_left_x - center.first);
-        float y = (new_quad.bottom_left_y - center.second);
-        new_quad.bottom_left_x = x * csine - y * sine + center.first;
-        new_quad.bottom_left_y = y * csine + x * sine + center.second;
-
-        x = (new_quad.bottom_right_x - center.first);
-        y = (new_quad.bottom_right_y - center.second);
-        new_quad.bottom_right_x = x * csine - y * sine + center.first;
-        new_quad.bottom_right_y = y * csine + x * sine + center.second;
-
-        x = (new_quad.top_left_x = new_quad.top_left_x - center.first);
-        y = (new_quad.top_left_y = new_quad.top_left_y - center.second);
-        new_quad.top_left_x = x * csine - y * sine + center.first;
-        new_quad.top_left_y = y * csine + x * sine + center.second;
-
-        x = (new_quad.top_right_x - center.first);
-        y = (new_quad.top_right_y - center.second);
-        new_quad.top_right_x = x * csine - y * sine + center.first;
-        new_quad.top_right_y = y * csine + x * sine + center.second;
+        new_quad.rotate(angle, center.first, center.second);
     }
     draw_world_texture(texture_id, row, column, new_quad, color);
 }
