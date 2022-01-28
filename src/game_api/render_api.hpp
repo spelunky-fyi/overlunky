@@ -67,7 +67,7 @@ struct RenderAPI
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
-    void draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
+    void draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color);
     void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color);
 };
 
@@ -186,35 +186,27 @@ struct TextureRenderingInfo
     // where to draw on the screen:
     float x;
     float y;
-    union
-    {
-        struct
-        {
-            // destination is relative to the x,y centerpoint
-            Quad destination;
-            // source rectangle in the texture to render
-            Quad source;
-        };
-        struct
-        {
-            float destination_top_left_x;
-            float destination_top_left_y;
-            float destination_top_right_x;
-            float destination_top_right_y;
-            float destination_bottom_left_x;
-            float destination_bottom_left_y;
-            float destination_bottom_right_x;
-            float destination_bottom_right_y;
-            float source_top_left_x;
-            float source_top_left_y;
-            float source_top_right_x;
-            float source_top_right_y;
-            float source_bottom_left_x;
-            float source_bottom_left_y;
-            float source_bottom_right_x;
-            float source_bottom_right_y;
-        };
-    };
+
+    // destination is relative to the x,y centerpoint
+    float destination_bottom_left_x;
+    float destination_bottom_left_y;
+    float destination_bottom_right_x;
+    float destination_bottom_right_y;
+    float destination_top_left_x;
+    float destination_top_left_y;
+    float destination_top_right_x;
+    float destination_top_right_y;
+
+    // source rectangle in the texture to render
+    float source_bottom_left_x;
+    float source_bottom_left_y;
+    float source_bottom_right_x;
+    float source_bottom_right_y;
+    float source_top_left_x;
+    float source_top_left_y;
+    float source_top_right_x;
+    float source_top_right_y;
+
     void set_destination(const AABB& bbox);
 };
 

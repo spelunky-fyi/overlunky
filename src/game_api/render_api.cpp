@@ -343,7 +343,7 @@ std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float
     return std::make_pair(tri.width, tri.height);
 }
 
-void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
+void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color)
 {
     static size_t offset = 0;
 
@@ -359,54 +359,38 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
         {
             return;
         }
-
-        float width = right - left;
-        float height = bottom - top;
-        float half_width = width / 2.0f;
-        float half_height = height / 2.0f;
-        float center_x = left + half_width;
-        float center_y = top + half_height;
-
         float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
         float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
         float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
         float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
 
         TextureRenderingInfo tri = {
-            center_x,
-            center_y,
+            0,
+            0,
 
             // DESTINATION
-            // top left:
-            Quad{
-                -half_width,
-                half_height,
-                // top right:
-                half_width,
-                half_height,
-                // bottom left:
-                -half_width,
-                -half_height,
-                // bottom right:
-                half_width,
-                -half_height,
-            },
+            dest.bottom_left_x,
+            dest.bottom_left_y,
+            dest.bottom_right_x,
+            dest.bottom_right_y,
+            dest.top_left_x,
+            dest.top_left_y,
+            dest.top_right_x,
+            dest.top_right_y,
 
             // SOURCE
             // bottom left:
-            Quad{
-                uv_left,
-                uv_bottom,
-                // bottom right:
-                uv_right,
-                uv_bottom,
-                // top left:
-                uv_left,
-                uv_top,
-                // top right:
-                uv_right,
-                uv_top,
-            },
+            uv_left,
+            uv_bottom,
+            // bottom right:
+            uv_right,
+            uv_bottom,
+            // top left:
+            uv_left,
+            uv_top,
+            // top right:
+            uv_right,
+            uv_top,
         };
 
         typedef void render_func(TextureRenderingInfo*, uint8_t shader, const char**, Color*);
@@ -610,12 +594,12 @@ void TextureRenderingInfo::set_destination(const AABB& bbox)
     x = bbox.left + half_w;
     y = bbox.top + half_h;
 
-    destination.top_left_x = -half_w;
-    destination.top_left_y = half_h;
-    destination.top_right_x = half_w;
-    destination.top_right_y = half_h;
-    destination.bottom_left_x = -half_w;
-    destination.bottom_left_y = -half_h;
-    destination.bottom_right_x = half_w;
-    destination.bottom_right_y = -half_h;
+    destination_top_left_x = -half_w;
+    destination_top_left_y = half_h;
+    destination_top_right_x = half_w;
+    destination_top_right_y = half_h;
+    destination_bottom_left_x = -half_w;
+    destination_bottom_left_y = -half_h;
+    destination_bottom_right_x = half_w;
+    destination_bottom_right_y = -half_h;
 }

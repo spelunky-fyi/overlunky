@@ -98,11 +98,11 @@ void register_usertypes(sol::state& lua)
         &Quad::top_left_x,
         "top_left_y",
         &Quad::top_left_y,
-        "center",
-        &Quad::center,
         "get_AABB",
         &Quad::get_AABB,
         "offset",
-        &Quad::offset);
+        &Quad::offset,
+        "rotate",
+        &Quad::rotate);
 }
 } // namespace NHitbox

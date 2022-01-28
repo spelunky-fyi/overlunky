@@ -14,12 +14,45 @@ std::pair<float, float> VanillaRenderContext::draw_text_size(const std::string& 
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    RenderAPI::get().draw_screen_texture(texture_id, row, column, left, top, right, bottom, color);
+    draw_screen_texture(texture_id, row, column, AABB{left, top, right, bottom}, color, 0, 0, 0);
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
 {
-    RenderAPI::get().draw_screen_texture(texture_id, row, column, rect.left, rect.top, rect.right, rect.bottom, color);
+    draw_screen_texture(texture_id, row, column, rect, color, 0, 0, 0);
+}
+
+void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle, float px, float py)
+{
+    Quad dest{rect};
+    if (angle != 0)
+    {
+        constexpr float ratio = 9.0f / 16.0f;
+        constexpr float inverse_ratio = 16.0f / 9.0f;
+
+        dest.bottom_left_x *= inverse_ratio;
+        dest.bottom_right_x *= inverse_ratio;
+        dest.top_left_x *= inverse_ratio;
+        dest.top_right_x *= inverse_ratio;
+        auto center = dest.get_AABB().center();
+        if (px != 0 || py != 0)
+        {
+            center.first += abs(center.first - dest.bottom_left_x) * px;
+            center.second += abs(center.second - rect.bottom) * py;
+        }
+
+        dest.rotate(angle, center.first, center.second);
+        dest.bottom_left_x *= ratio;
+        dest.bottom_right_x *= ratio;
+        dest.top_left_x *= ratio;
+        dest.top_right_x *= ratio;
+    }
+    RenderAPI::get().draw_screen_texture(texture_id, row, column, dest, color);
+}
+
+void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& quad, Color color)
+{
+    RenderAPI::get().draw_screen_texture(texture_id, row, column, quad, color);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
@@ -63,7 +96,9 @@ void register_usertypes(sol::state& lua)
 {
     auto draw_screen_texture = sol::overload(
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, float, float, float, float, Color)>(&VanillaRenderContext::draw_screen_texture),
-        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_screen_texture));
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_screen_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color, float, float, float)>(&VanillaRenderContext::draw_screen_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color)>(&VanillaRenderContext::draw_screen_texture));
     auto draw_world_texture = sol::overload(
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, float, float, float, float, Color)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_world_texture),
@@ -86,11 +121,6 @@ void register_usertypes(sol::state& lua)
         &TextureRenderingInfo::x,
         "y",
         &TextureRenderingInfo::y,
-
-        "destination",
-        &TextureRenderingInfo::destination,
-        "source",
-        &TextureRenderingInfo::source,
         "set_destination",
         &TextureRenderingInfo::set_destination,
 
