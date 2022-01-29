@@ -388,7 +388,6 @@ class Torch : public Movable
     int8_t unknown1;
     int16_t unknown2;
 
-    virtual void v_91() = 0;
     virtual void light_up(bool lit) = 0;
 };
 
@@ -684,11 +683,7 @@ class PlayerBag : public Movable
 class Powerup : public Movable
 {
   public:
-    virtual void unknown_v87() = 0;
-    virtual void unknown_v88() = 0;
-    virtual void unknown_v89() = 0;
-    virtual void unknown_v90() = 0;
-    virtual void unknown_v91() = 0;
+    // thoes could be wrong becouse of the update
     virtual void apply_effect_to_player(Player* player) = 0;
     virtual void remove_effect_from_player(Player* player) = 0;
 };

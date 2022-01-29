@@ -1742,7 +1742,7 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
 
 void enter_door(int32_t player_uid, int32_t door_uid)
 {
-    auto addr = get_address("door_entry");
+    auto addr = Memory::get().at_exe(get_virtual_function_address(VTABLE_OFFSET::FLOOR_DOOR_EXIT, 42));
     auto player = get_entity_ptr(player_uid);
     auto door = get_entity_ptr(door_uid);
     if (player == nullptr || door == nullptr)

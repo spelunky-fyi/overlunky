@@ -293,7 +293,7 @@ class Entity
         return static_cast<T*>(this);
     }
 
-    virtual ~Entity() = 0;
+    virtual ~Entity() = 0; // vritual 0
     virtual void create_rendering_info() = 0;
     virtual void handle_state_machine() = 0;
 
@@ -306,7 +306,7 @@ class Entity
     virtual void destroy() = 0;
 
     virtual void apply_texture(Texture*) = 0;
-    virtual void hiredhand_description(char*) = 0;
+    virtual void format_shopitem_name(char16_t*) = 0;
     virtual void generate_stomp_damage_particles(Entity* victim) = 0; // particles when jumping on top of enemy
     virtual float get_type_field_a8() = 0;
     virtual bool block_pushing_related() = 0; // does a bittest for the 14 entities starting at pushblock, function hits when player pushes entity
