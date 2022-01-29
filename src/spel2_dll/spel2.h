@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
+#include <stddef.h>
+#include <stdint.h>
 
 enum class Spelunky_SoundFormat
 {
@@ -16,16 +16,16 @@ enum class Spelunky_SoundFormat
 
 struct Spelunky_DecodedAudioBuffer
 {
-    std::int32_t num_channels;
-    std::int32_t frequency;
+    int32_t num_channels;
+    int32_t frequency;
     Spelunky_SoundFormat format;
     const char* data;
-    std::size_t data_size;
+    size_t data_size;
 };
 
 using Spelunky_DecodeAudioFile = Spelunky_DecodedAudioBuffer (*)(const char* file_path);
 
-using OnInputFunc = bool (*)(std::uint32_t, std::uint64_t, std::int64_t);
+using OnInputFunc = bool (*)(uint32_t, uint64_t, int64_t);
 using ImguiInitFunc = void (*)(struct ImGuiContext*);
 using ImguiDrawFunc = void (*)();
 using PreDrawFunc = void (*)();
@@ -102,10 +102,10 @@ const char* SpelunkyScript_GetResult(SpelunkyScript* script);
 struct SpelunkyScriptMessage
 {
     const char* Message{nullptr};
-    std::size_t TimeMilliSecond{0};
+    size_t TimeMilliSecond{0};
 };
-std::size_t SpelunkyScript_GetNumMessages(SpelunkyScript* script);
-SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, std::size_t message_idx);
+size_t SpelunkyScript_GetNumMessages(SpelunkyScript* script);
+SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, size_t message_idx);
 
 struct SpelunkyScriptMeta
 {
@@ -131,8 +131,8 @@ bool SpelunkyConsole_IsToggled(SpelunkyConsole* console);
 void SpelunkyConsole_Toggle(SpelunkyConsole* console);
 bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* out_buffer, size_t out_buffer_size);
 
-std::size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console);
-const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, std::size_t message_idx);
+size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console);
+const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, size_t message_idx);
 void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console);
 
 bool SpelunkyConsole_HasNewHistory(SpelunkyConsole* console);
@@ -166,16 +166,35 @@ enum class SpelunkyScreen
 };
 SpelunkyScreen SpelunkyState_GetScreen();
 
-std::int32_t Spelunky_SpawnEntity(std::uint32_t entity_id, std::int32_t layer, float x, float y, float vel_x, float vel_y);
+int32_t Spelunky_SpawnEntity(uint32_t entity_id, int32_t layer, float x, float y, float vel_x, float vel_y);
 
-const char16_t* Spelunky_GetCharacterFullName(std::uint32_t character_index);
-const char16_t* Spelunky_GetCharacterShortName(std::uint32_t character_index);
-void Spelunky_GetCharacterHeartColor(std::uint32_t character_index, float (&color)[4]);
-bool Spelunky_GetCharacterGender(std::uint32_t character_index);
+const char16_t* Spelunky_GetCharacterFullName(uint32_t character_index);
+const char16_t* Spelunky_GetCharacterShortName(uint32_t character_index);
+void Spelunky_GetCharacterHeartColor(uint32_t character_index, float (&color)[4]);
+bool Spelunky_GetCharacterGender(uint32_t character_index);
 
-void Spelunky_SetCharacterFullName(std::uint32_t character_index, const char16_t* name);
-void Spelunky_SetCharacterShortName(std::uint32_t character_index, const char16_t* name);
-void Spelunky_SetCharacterHeartColor(std::uint32_t character_index, float (&color)[4]);
-void Spelunky_SetCharacterGender(std::uint32_t character_index, bool female);
+void Spelunky_SetCharacterFullName(uint32_t character_index, const char16_t* name);
+void Spelunky_SetCharacterShortName(uint32_t character_index, const char16_t* name);
+void Spelunky_SetCharacterHeartColor(uint32_t character_index, float (&color)[4]);
+void Spelunky_SetCharacterGender(uint32_t character_index, bool female);
 
-void Spelunky_ReloadTexture(const char* texture_name);
+struct Spelunky_TextureDefinition
+{
+    const char* texture_path;
+    uint32_t width;
+    uint32_t height;
+    uint32_t tile_width;
+    uint32_t tile_height;
+    uint32_t sub_image_offset_x{0};
+    uint32_t sub_image_offset_y{0};
+    uint32_t sub_image_width{0};
+    uint32_t sub_image_height{0};
+};
+int64_t Spelunky_DefineTexture(Spelunky_TextureDefinition texture_defintion);
+void Spelunky_ReloadTexture(const char* texture_path);
+
+class Entity;
+int64_t SpelunkyEntity_GetTexture(Entity* entity);
+void SpelunkyEntity_SetTexture(Entity* entity, int64_t texture);
+uint16_t SpelunkyEntity_GetTextureTile(Entity* entity);
+void SpelunkyEntity_SetTextureTile(Entity* entity, uint16_t texture_tile);
