@@ -208,6 +208,10 @@ struct TextureRenderingInfo
     float source_top_right_y;
 
     void set_destination(const AABB& bbox);
+    Quad dest_get_quad();
+    void dest_set_quad(const Quad& quad);
+    Quad source_get_quad();
+    void source_set_quad(const Quad& quad);
 };
 
 void init_render_api_hooks();

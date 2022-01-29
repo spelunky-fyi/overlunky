@@ -4089,42 +4089,67 @@ Current mouse cursor position in screen coordinates.
 ### `VanillaRenderContext`
 - [`nil draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) &VanillaRenderContext::draw_text
 \
-Draw text using the built-in renderer. Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
+Draw text using the built-in renderer
+Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
 - [`tuple<float, float> draw_text_size(const string& text, float scale_x, float scale_y, int fontstyle)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size) &VanillaRenderContext::draw_text_size
 \
 Measure the provided text using the built-in renderer
 - [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
+Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 - [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
 \
-Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
+Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+- [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
+\
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
+Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+- [`nil draw_screen_texture(TEXTURE texture_id, int row, int column, const Quad& dest, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) draw_screen_texture
+\
+Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
+Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 - [`nil draw_world_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
 \
-Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 - [`nil draw_world_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
 \
-Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer. Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+- [`nil draw_world_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color, float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
+\
+Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
+Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+- [`nil draw_world_texture(TEXTURE texture_id, int row, int column, const Quad& dest, Color color)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) draw_world_texture
+\
+Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 ### `TextureRenderingInfo`
 - [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &TextureRenderingInfo::x
 - [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &TextureRenderingInfo::y
-- [`float destination_top_left_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_top_left_x) &TextureRenderingInfo::destination_top_left_x
-- [`float destination_top_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_top_left_y) &TextureRenderingInfo::destination_top_left_y
-- [`float destination_top_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_top_right_x) &TextureRenderingInfo::destination_top_right_x
-- [`float destination_top_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_top_right_y) &TextureRenderingInfo::destination_top_right_y
 - [`float destination_bottom_left_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_bottom_left_x) &TextureRenderingInfo::destination_bottom_left_x
 - [`float destination_bottom_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_bottom_left_y) &TextureRenderingInfo::destination_bottom_left_y
 - [`float destination_bottom_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_bottom_right_x) &TextureRenderingInfo::destination_bottom_right_x
 - [`float destination_bottom_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_bottom_right_y) &TextureRenderingInfo::destination_bottom_right_y
+- [`float destination_top_left_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_top_left_x) &TextureRenderingInfo::destination_top_left_x
+- [`float destination_top_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_top_left_y) &TextureRenderingInfo::destination_top_left_y
+- [`float destination_top_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_top_right_x) &TextureRenderingInfo::destination_top_right_x
+- [`float destination_top_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_top_right_y) &TextureRenderingInfo::destination_top_right_y
 - [`nil set_destination(const AABB& bbox)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_destination) &TextureRenderingInfo::set_destination
-- [`float source_top_left_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_top_left_x) &TextureRenderingInfo::source_top_left_x
-- [`float source_top_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_top_left_y) &TextureRenderingInfo::source_top_left_y
-- [`float source_top_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_top_right_x) &TextureRenderingInfo::source_top_right_x
-- [`float source_top_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_top_right_y) &TextureRenderingInfo::source_top_right_y
+- [`Quad dest_get_quad()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dest_get_quad) &TextureRenderingInfo::dest_get_quad
+- [`nil dest_set_quad(const Quad& quad)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dest_set_quad) &TextureRenderingInfo::dest_set_quad
 - [`float source_bottom_left_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_left_x) &TextureRenderingInfo::source_bottom_left_x
 - [`float source_bottom_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_left_y) &TextureRenderingInfo::source_bottom_left_y
 - [`float source_bottom_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_right_x) &TextureRenderingInfo::source_bottom_right_x
 - [`float source_bottom_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_bottom_right_y) &TextureRenderingInfo::source_bottom_right_y
+- [`float source_top_left_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_top_left_x) &TextureRenderingInfo::source_top_left_x
+- [`float source_top_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_top_left_y) &TextureRenderingInfo::source_top_left_y
+- [`float source_top_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_top_right_x) &TextureRenderingInfo::source_top_right_x
+- [`float source_top_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_top_right_y) &TextureRenderingInfo::source_top_right_y
+- [`Quad source_get_quad()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_get_quad) &TextureRenderingInfo::source_get_quad
+- [`nil source_set_quad(const Quad& quad)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source_set_quad) &TextureRenderingInfo::source_set_quad
 ### `TextRenderingInfo`
 - [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &TextRenderingInfo::x
 - [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &TextRenderingInfo::y
@@ -4185,6 +4210,26 @@ Short for `aabb.right - aabb.left`.
 - [`float height()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) &AABB::height
 \
 Short for `aabb.top - aabb.bottom`.
+### `Quad`
+- [`Quad()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) 
+- [`Quad(const Quad&)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) 
+- [`Quad(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) 
+- [`Quad(const AABB& aabb)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) 
+- [`float bottom_left_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_left_x) &Quad::bottom_left_x
+- [`float bottom_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_left_y) &Quad::bottom_left_y
+- [`float bottom_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_right_x) &Quad::bottom_right_x
+- [`float bottom_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_right_y) &Quad::bottom_right_y
+- [`float top_right_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_right_x) &Quad::top_right_x
+- [`float top_right_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_right_y) &Quad::top_right_y
+- [`float top_left_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_left_x) &Quad::top_left_x
+- [`float top_left_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_left_y) &Quad::top_left_y
+- [`AABB get_AABB()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_AABB) &Quad::get_AABB
+\
+Returns the max/min values of the Quad
+- [`Quad& offset(float off_x, float off_y)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) &Quad::offset
+- [`Quad& rotate(float angle, float px, float py)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) &Quad::rotate
+\
+Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
 ### `Screen`
 - [`float render_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_timer) &Screen::render_timer
 ### `ScreenLogo`

@@ -27,25 +27,25 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
     Quad dest{rect};
     if (angle != 0)
     {
-        constexpr float ratio = 9.0f / 16.0f;
-        constexpr float inverse_ratio = 16.0f / 9.0f;
+        constexpr float ratio = 16.0f / 9.0f;
+        constexpr float inverse_ratio = 9.0f / 16.0f;
 
+        // fix ratio to 1/1 to properly rotate the coordinates
+        const AABB new_rect{rect.left * ratio, rect.top, rect.right * ratio, rect.bottom};
+        dest = Quad{new_rect};
+        auto pivot = new_rect.center();
+        if (px != 0 || py != 0)
+        {
+            pivot.first += abs(pivot.first - new_rect.left) * px;
+            pivot.second += abs(pivot.second - new_rect.bottom) * py;
+        }
+
+        dest.rotate(angle, pivot.first, pivot.second);
+        // bring back to the 16/9
         dest.bottom_left_x *= inverse_ratio;
         dest.bottom_right_x *= inverse_ratio;
         dest.top_left_x *= inverse_ratio;
         dest.top_right_x *= inverse_ratio;
-        auto center = dest.get_AABB().center();
-        if (px != 0 || py != 0)
-        {
-            center.first += abs(center.first - dest.bottom_left_x) * px;
-            center.second += abs(center.second - rect.bottom) * py;
-        }
-
-        dest.rotate(angle, center.first, center.second);
-        dest.bottom_left_x *= ratio;
-        dest.bottom_right_x *= ratio;
-        dest.top_left_x *= ratio;
-        dest.top_right_x *= ratio;
     }
     RenderAPI::get().draw_screen_texture(texture_id, row, column, dest, color);
 }
@@ -121,17 +121,7 @@ void register_usertypes(sol::state& lua)
         &TextureRenderingInfo::x,
         "y",
         &TextureRenderingInfo::y,
-        "set_destination",
-        &TextureRenderingInfo::set_destination,
 
-        "destination_top_left_x",
-        &TextureRenderingInfo::destination_top_left_x,
-        "destination_top_left_y",
-        &TextureRenderingInfo::destination_top_left_y,
-        "destination_top_right_x",
-        &TextureRenderingInfo::destination_top_right_x,
-        "destination_top_right_y",
-        &TextureRenderingInfo::destination_top_right_y,
         "destination_bottom_left_x",
         &TextureRenderingInfo::destination_bottom_left_x,
         "destination_bottom_left_y",
@@ -140,6 +130,28 @@ void register_usertypes(sol::state& lua)
         &TextureRenderingInfo::destination_bottom_right_x,
         "destination_bottom_right_y",
         &TextureRenderingInfo::destination_bottom_right_y,
+        "destination_top_left_x",
+        &TextureRenderingInfo::destination_top_left_x,
+        "destination_top_left_y",
+        &TextureRenderingInfo::destination_top_left_y,
+        "destination_top_right_x",
+        &TextureRenderingInfo::destination_top_right_x,
+        "destination_top_right_y",
+        &TextureRenderingInfo::destination_top_right_y,
+        "set_destination",
+        &TextureRenderingInfo::set_destination,
+        "dest_get_quad",
+        &TextureRenderingInfo::dest_get_quad,
+        "dest_set_quad",
+        &TextureRenderingInfo::dest_set_quad,
+        "source_bottom_left_x",
+        &TextureRenderingInfo::source_bottom_left_x,
+        "source_bottom_left_y",
+        &TextureRenderingInfo::source_bottom_left_y,
+        "source_bottom_right_x",
+        &TextureRenderingInfo::source_bottom_right_x,
+        "source_bottom_right_y",
+        &TextureRenderingInfo::source_bottom_right_y,
         "source_top_left_x",
         &TextureRenderingInfo::source_top_left_x,
         "source_top_left_y",
@@ -148,14 +160,10 @@ void register_usertypes(sol::state& lua)
         &TextureRenderingInfo::source_top_right_x,
         "source_top_right_y",
         &TextureRenderingInfo::source_top_right_y,
-        "source_bottom_left_x",
-        &TextureRenderingInfo::source_bottom_left_x,
-        "source_bottom_left_y",
-        &TextureRenderingInfo::source_bottom_left_y,
-        "source_bottom_right_x",
-        &TextureRenderingInfo::source_bottom_right_x,
-        "source_bottom_right_y",
-        &TextureRenderingInfo::source_bottom_right_y);
+        "source_get_quad",
+        &TextureRenderingInfo::source_get_quad,
+        "source_set_quad",
+        &TextureRenderingInfo::source_set_quad);
 
     lua.new_usertype<TextRenderingInfo>(
         "TextRenderingInfo",
