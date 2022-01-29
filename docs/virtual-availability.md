@@ -1,4 +1,4 @@
-# Virtual availability
+#Virtual availability
 
 The table below indicates which of the hook functions of the Lua API are available for each entity. It is important to not hook a function that does not exist. 
 The reason for this is because the "non existent" ones are shared among many objects/entities, so if you hooked that one, you'd potentially be hooking functionality of totally
@@ -14,7 +14,7 @@ FLOOR_SURFACE|||||kill|dstry|
 FLOOR_SURFACE_HIDDEN|||||kill|dstry|
 FLOOR_BASECAMP_SINGLEBED|||||kill|dstry|
 FLOOR_BASECAMP_DININGTABLE|||||kill|dstry|
-FLOOR_BASECAMP_LONGTABLE|?|?|?|?|?|?|?
+FLOOR_BASECAMP_LONGTABLE|||||kill|dstry|
 FLOOR_JUNGLE|||||kill|dstry|
 FLOOR_TUNNEL_CURRENT|||||kill|dstry|
 FLOOR_TUNNEL_NEXT|||||kill|dstry|
@@ -26,7 +26,7 @@ FLOOR_VINE|||||kill|dstry|stmchn
 FLOOR_VINE_TREE_TOP|||||kill|dstry|
 FLOOR_GROWABLE_VINE|||||kill|dstry|stmchn
 FLOOR_CLIMBING_POLE|||||kill|dstry|stmchn
-FLOOR_GROWABLE_CLIMBING_POLE|?|?|?|?|?|?|?
+FLOOR_GROWABLE_CLIMBING_POLE|||||kill|dstry|stmchn
 FLOOR_DOOR_ENTRANCE||col2|||kill|dstry|
 FLOOR_DOOR_EXIT||col2|||kill|dstry|stmchn
 FLOOR_DOOR_MAIN_EXIT||col2|||kill|dstry|stmchn
@@ -102,10 +102,10 @@ FLOOR_PEN|||||kill|dstry|
 FLOOR_TOMB|||||kill|dstry|
 FLOOR_YAMA_PLATFORM|||||kill|dstry|
 FLOOR_EMPRESS_GRAVE|||||kill|dstry|
-FLOOR_PALACE_TABLE_PLATFORM|?|?|?|?|?|?|?
-FLOOR_PALACE_TRAY_PLATFORM|?|?|?|?|?|?|?
-FLOOR_PALACE_CHANDELIER_PLATFORM|?|?|?|?|?|?|?
-FLOOR_PALACE_BOOKCASE_PLATFORM|?|?|?|?|?|?|?
+FLOOR_PALACE_TABLE_PLATFORM|||||kill|dstry|
+FLOOR_PALACE_TRAY_PLATFORM|||||kill|dstry|
+FLOOR_PALACE_CHANDELIER_PLATFORM|||||kill|dstry|
+FLOOR_PALACE_BOOKCASE_PLATFORM|||||kill|dstry|
 FLOOR_TENTACLE_BOTTOM|||||kill|dstry|stmchn
 FLOORSTYLED_MINEWOOD|||||kill|dstry|
 FLOORSTYLED_STONE|||||kill|dstry|
@@ -118,17 +118,17 @@ FLOORSTYLED_VLAD|||||kill|dstry|
 FLOORSTYLED_COG|||||kill|dstry|stmchn
 FLOORSTYLED_MOTHERSHIP|||||kill|dstry|
 FLOORSTYLED_DUAT|||||kill|dstry|
-FLOORSTYLED_PALACE|?|?|?|?|?|?|?
+FLOORSTYLED_PALACE|||||kill|dstry|
 FLOORSTYLED_GUTS|||||kill|dstry|
 DECORATION_BORDER|||||kill|dstry|
 DECORATION_GENERIC|||||kill|dstry|
 DECORATION_SURFACE|||||kill|dstry|
-DECORATION_SURFACE_COVER|?|?|?|?|?|?|?
+DECORATION_SURFACE_COVER|||||kill|dstry|
 DECORATION_JUNGLE|||||kill|dstry|
 DECORATION_MINEWOOD|||||kill|dstry|
 DECORATION_BONEBLOCK|||||kill|dstry|
 DECORATION_BUSHBLOCK|||||kill|dstry|
-DECORATION_STONE|?|?|?|?|?|?|?
+DECORATION_STONE|||||kill|dstry|
 DECORATION_TEMPLE|||||kill|dstry|
 DECORATION_PAGODA|||||kill|dstry|
 DECORATION_SUNKEN|||||kill|dstry|
@@ -149,9 +149,9 @@ DECORATION_JUNGLE_FLOWER|||||kill|dstry|
 DECORATION_BABYLON_FLOWER|||||kill|dstry|
 DECORATION_TIDEPOOL_CORAL|||||kill|dstry|
 DECORATION_JUNGLE_HANGING_FLOWER|||||kill|dstry|
-DECORATION_BABYLON_HANGING_FLOWER|?|?|?|?|?|?|?
+DECORATION_BABYLON_HANGING_FLOWER|||||kill|dstry|
 DECORATION_BABYLON_NEON_SIGN|||||kill|dstry|
-DECORATION_BRANCH|?|?|?|?|?|?|?
+DECORATION_BRANCH|||||kill|dstry|
 DECORATION_SPIKES_BLOOD|||||kill|dstry|
 DECORATION_SHOPFORE|||||kill|dstry|
 DECORATION_SHOPSIGN|||||kill|dstry|stmchn
@@ -162,30 +162,30 @@ DECORATION_TREE|||||kill|dstry|
 DECORATION_TREETRUNK_CLIMBINGHINT|||||kill|dstry|
 DECORATION_TREETRUNK_TOPFRONT|||||kill|dstry|
 DECORATION_TREETRUNK_TOPBACK|||||kill|dstry|
-DECORATION_TREETRUNK_BROKEN|?|?|?|?|?|?|?
+DECORATION_TREETRUNK_BROKEN|||||kill|dstry|
 DECORATION_TREE_VINE_TOP|||||kill|dstry|
 DECORATION_TREE_VINE|||||kill|dstry|
 DECORATION_MUSHROOM_HAT|||||kill|dstry|
 DECORATION_THORN_VINE|||||kill|dstry|
-DECORATION_BEEHIVE|?|?|?|?|?|?|?
+DECORATION_BEEHIVE|||||kill|dstry|
 DECORATION_CHAINANDBLOCKS_CHAINDECORATION|col1|col2||dmg|kill|dstry|stmchn
 DECORATION_CONVEYORBELT_RAILING|||||kill|dstry|
 DECORATION_VLAD|||||kill|dstry|
 DECORATION_KELP|||||kill|dstry|
 DECORATION_SLIDINGWALL_CHAINDECORATION|col1|col2||dmg|kill|dstry|stmchn
 DECORATION_TEMPLE_SAND|||||kill|dstry|
-DECORATION_COG|?|?|?|?|?|?|?
+DECORATION_COG|||||kill|dstry|
 DECORATION_MOTHERSHIP|||||kill|dstry|
 DECORATION_DUAT|||||kill|dstry|
 DECORATION_DUAT_SAND|||||kill|dstry|
 DECORATION_DUAT_DARKSAND|||||kill|dstry|
 DECORATION_DUAT_DESTRUCTIBLE_BG|||||kill|dstry|stmchn
-DECORATION_PALACE|?|?|?|?|?|?|?
-DECORATION_PALACE_SIGN|?|?|?|?|?|?|?
-DECORATION_PALACE_CHANDELIER|?|?|?|?|?|?|?
-DECORATION_PALACE_PORTRAIT|?|?|?|?|?|?|?
+DECORATION_PALACE|||||kill|dstry|
+DECORATION_PALACE_SIGN|||||kill|dstry|stmchn
+DECORATION_PALACE_CHANDELIER|||||kill|dstry|
+DECORATION_PALACE_PORTRAIT|||||kill|dstry|
 DECORATION_GUTS|||||kill|dstry|
-DECORATION_EGGPLANT_ALTAR|?|?|?|?|?|?|?
+DECORATION_EGGPLANT_ALTAR|||||kill|dstry|
 DECORATION_MOTHER_STATUE_HAND|||||kill|dstry|
 DECORATION_PIPE|||||kill|dstry|
 DECORATION_SUNKEN_BRIDGE|||||kill|dstry|stmchn
@@ -585,8 +585,8 @@ ACTIVEFLOOR_BONEBLOCK|col1|col2||dmg|kill|dstry|stmchn
 ACTIVEFLOOR_BUSHBLOCK|col1|col2||dmg|kill|dstry|stmchn
 ACTIVEFLOOR_POWDERKEG|col1|col2||dmg|kill|dstry|stmchn
 ACTIVEFLOOR_CHAINEDPUSHBLOCK|col1|col2|||kill|dstry|stmchn
-ACTIVEFLOOR_METALARROWPLATFORM|?|?|?|?|?|?|?
-ACTIVEFLOOR_LIGHTARROWPLATFORM|?|?|?|?|?|?|?
+ACTIVEFLOOR_METALARROWPLATFORM|col1|col2||dmg|kill|dstry|stmchn
+ACTIVEFLOOR_LIGHTARROWPLATFORM|col1|col2||dmg|kill|dstry|stmchn
 ACTIVEFLOOR_FALLING_PLATFORM|col1|col2||dmg|kill|dstry|stmchn
 ACTIVEFLOOR_CHAINED_SPIKEBALL|col1|col2||dmg|kill|dstry|stmchn
 ACTIVEFLOOR_UNCHAINED_SPIKEBALL|col1|col2||dmg|kill|dstry|stmchn
@@ -689,7 +689,7 @@ FX_TIAMAT_ARM_RIGHT1|col1|col2||dmg|kill|dstry|stmchn
 FX_TIAMAT_ARM_RIGHT2|col1|col2||dmg|kill|dstry|stmchn
 FX_TIAMAT_NECK|col1|col2||dmg|kill|dstry|stmchn
 FX_TIAMAT_HEAD|col1|col2||dmg|kill|dstry|stmchn
-FX_DIEINDICATOR|?|?|?|?|?|?|?
+FX_DIEINDICATOR|col1|col2||dmg|kill|dstry|stmchn
 FX_STORAGE_INDICATOR|col1|col2||dmg|kill|dstry|stmchn
 FX_LASERBEAM|col1|col2||dmg|kill|dstry|stmchn
 FX_HORIZONTALLASERBEAM|col1|col2||dmg|kill|dstry|stmchn
@@ -741,14 +741,14 @@ BG_SURFACE_SHOOTING_STAR_TRAIL_PARTICLE|||||kill|dstry|stmchn
 BG_SURFACE_MOVING_STAR|||||kill|dstry|stmchn
 BG_SURFACE_NEBULA|||||kill|dstry|stmchn
 BG_SURFACE_LAYER|||||kill|dstry|stmchn
-BG_SURFACE_LAYER_OCCLUDER|?|?|?|?|?|?|?
-BG_SURFACE_LAYER_HOLE|?|?|?|?|?|?|?
+BG_SURFACE_LAYER_OCCLUDER||col2|||kill|dstry|
+BG_SURFACE_LAYER_HOLE|||||kill|dstry|
 BG_SURFACE_ENTITY|||||kill|dstry|stmchn
 BG_SURFACE_OLMEC_LAYER|||||kill|dstry|stmchn
 BG_SURFACE_BACKGROUNDSEAM|||||kill|dstry|
 BG_CONSTELLATION_FLASH|||||kill|dstry|stmchn
 BG_CONSTELLATION_STAR|||||kill|dstry|stmchn
-BG_CONSTELLATION_HALO|?|?|?|?|?|?|?
+BG_CONSTELLATION_HALO|||||kill|dstry|
 BG_CONSTELLATION_GLOW|||||kill|dstry|
 BG_CONSTELLATION_CONNECTION|||||kill|dstry|stmchn
 BG_EGGSHIP_ROOM|||||kill|dstry|stmchn
@@ -786,7 +786,7 @@ BG_SHOP_DICEPOSTER|||||kill|dstry|
 BG_KALI_STATUE|||||kill|dstry|
 MIDBG|||||kill|dstry|
 MIDBG_STYLEDDECORATION|||||kill|dstry|
-MIDBG_PALACE_STYLEDDECORATION|?|?|?|?|?|?|?
+MIDBG_PALACE_STYLEDDECORATION|||||kill|dstry|
 MIDBG_BEEHIVE|||||kill|dstry|
 MIDBG_PLATFORM_STRUCTURE|||||kill|dstry|
 BG_UDJATSOCKET_DECORATION|||||kill|dstry|
@@ -808,7 +808,7 @@ BG_VAT_BACK|||||kill|dstry|
 BG_VAT_SHOPKEEPER_PRIME|||||kill|dstry|stmchn
 BG_VAT_FRONT|||||kill|dstry|
 BG_PALACE_CANDLE|||||kill|dstry|
-BG_PALACE_DISHES|?|?|?|?|?|?|?
+BG_PALACE_DISHES|||||kill|dstry|
 BG_MOTHER_STATUE|||||kill|dstry|
 BG_WATER_FOUNTAIN|||||kill|dstry|
 BG_YAMA_BODY|||||kill|dstry|
