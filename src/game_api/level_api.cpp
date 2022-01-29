@@ -1118,11 +1118,11 @@ void LevelGenData::init()
                 "\x74\x09"                     // JZ         FIRST_JUMP
                 "\x48\x8b\xbd\x60\x05\x00\x00" // MOV        RDI,qword ptr [RBP + 0x560]
                 "\xeb\x0c"                     // JMP        SECOND_JUMP
-                           //  Original Code End
-                /*FIST_JUMP*/ "\x48\xb8{}"   // MOV        RAX, get_room_size_first_jump
-                "\xff\xe0"                   // JMP        RAX
-                /*SECOND_JUMP*/ "\x48\xb8{}" // MOV        RAX, get_room_size_second_jump
-                "\xff\xe0"sv,                // JMP        RAX
+                                               //  Original Code End
+                /*FIST_JUMP*/ "\x48\xb8{}"     // MOV        RAX, get_room_size_first_jump
+                "\xff\xe0"                     // JMP        RAX
+                /*SECOND_JUMP*/ "\x48\xb8{}"   // MOV        RAX, get_room_size_second_jump
+                "\xff\xe0"sv,                  // JMP        RAX
                 to_le_bytes(get_room_size_addr),
                 to_le_bytes(get_room_size_first_jump),
                 to_le_bytes(get_room_size_second_jump));
