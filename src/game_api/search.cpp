@@ -615,7 +615,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "level_gen_entry"sv,
-        // Put a bp on the virtual LevelInfo::populate_level, start a new game, the caller is this function
+        // Put a bp on the virtual LevelInfo::spawn_level, start a new game, the caller is this function
         PatternCommandBuffer{}
             .find_inst("\xE8****\x41\x80\x7F**\x7C\x22"sv)
             .decode_call()

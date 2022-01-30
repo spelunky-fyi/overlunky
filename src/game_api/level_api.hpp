@@ -252,7 +252,7 @@ class ThemeInfo
     virtual void spawn_effects() = 0;
 
     // the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
-    virtual const char* level_file() = 0;
+    virtual const char* get_level_file() = 0;
 
     // for co: returns sub_theme->get_theme_id()
     virtual uint8_t get_theme_id() = 0;
@@ -483,11 +483,11 @@ void force_co_subtheme(int8_t subtheme);
 enum class DYNAMIC_TEXTURE : int32_t
 {
     INVISIBLE = -2,
-    SPAWN_PROCEDURAL = -4,
+    BACKGROUND = -4,
     FLOOR = -5,
     DOOR = -6,
     DOOR_LAYER = -7,
-    SPAWN_BACKGROUND = -8,
+    BACKGROUND_DECORATION = -8,
     KALI_STATUE = -9,
     COFFIN = -10
 };
