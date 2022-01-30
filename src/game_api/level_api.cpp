@@ -31,6 +31,7 @@ std::uint32_t g_last_community_chance_id;
 std::uint32_t g_current_chance_id;
 
 std::unordered_map<std::uint32_t, std::string_view> g_tile_code_id_to_name;
+std::unordered_map<std::string_view, std::uint32_t> g_name_to_tile_code_id;
 std::unordered_map<std::uint32_t, std::string_view> g_monster_chance_id_to_name;
 std::unordered_map<std::uint32_t, std::string_view> g_trap_chance_id_to_name;
 
@@ -545,6 +546,32 @@ std::array g_community_chances{
     CommunityChance{"sapphire", "ENT_TYPE_ITEM_SAPPHIRE"},
     CommunityChance{"ruby", "ENT_TYPE_ITEM_RUBY"},
 };
+// List of alternative names for existing game and community tile codes.
+// Map of new_name: existing_name
+std::unordered_map<std::string_view, std::string_view> g_community_tile_code_aliases
+{
+    {"skeleton_key", "bone_key"},
+    {"udjat_chest", "lockedchest"},
+    {"quillback", "cavemanboss"},
+    {"furniture_chair_looking_left", "chair_looking_left"},
+    {"furniture_chair_looking_right", "chair_looking_right"},
+    {"furniture_construction_sign", "construction_sign"},
+    {"furniture_diningtable", "diningtable"},
+    {"furniture_dresser", "dresser"},
+    {"furniture_sidetable", "sidetable"},
+    {"furniture_singlebed", "singlebed"},
+    {"thin_ice", "thinice"},
+    {"sparrow", "thief"},
+    {"proto_generator", "alien_generator"},
+    {"hundun_spikes", "crushing_elevator"},
+    {"eggplup", "jumpdog"},
+    {"tun", "merchant"},
+    {"van_horsing", "oldhunter"},
+    {"pangxie", "crabman"},
+    {"forcefield_timed", "timed_forcefield"},
+    {"powder_keg_timed", "timed_powder_keg"},
+    {"spikes_upsidedown", "upsidedown_spikes"},
+};
 
 struct ChanceLogicProviderImpl
 {
@@ -629,6 +656,13 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
         {
             tile_code = g_last_tile_code_id;
         }
+    }
+
+    if (g_community_tile_code_aliases.find(tile_code_name) != g_community_tile_code_aliases.end())
+    {
+        std::string_view tile_code_alias_name = g_community_tile_code_aliases[tile_code_name];
+        std::uint32_t tile_code_alias = g_name_to_tile_code_id[tile_code_alias_name];
+        tile_code = tile_code_alias;
     }
 
     if (tile_code > g_last_tile_code_id && tile_code < g_last_community_tile_code_id)
@@ -1006,6 +1040,7 @@ void LevelGenData::init()
         {
             max_id = std::max(def.id, max_id);
             g_tile_code_id_to_name[def.id] = name;
+            g_name_to_tile_code_id[name] = def.id;
         }
 
         // The game uses last id to check if the tilecode is valid using a != instead of a <
@@ -1052,6 +1087,13 @@ void LevelGenData::init()
             {
                 community_tile_code.entity_id = entity_id;
             }
+        }
+    }
+
+    for (auto& community_tile_code_alias : g_community_tile_code_aliases) {
+        std::string_view tile_code_name = community_tile_code_alias.first;
+        if (!get_tile_code(std::string{tile_code_name}).has_value()) {
+            define_tile_code(std::string{tile_code_name});
         }
     }
 
@@ -1194,6 +1236,7 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
     g_current_tile_code_id++;
 
     g_tile_code_id_to_name[it->second.id] = it->first;
+    g_name_to_tile_code_id[it->first] = it->second.id;
     return it->second.id;
 }
 
