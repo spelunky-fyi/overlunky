@@ -644,7 +644,6 @@ class CustomTheme : public ThemeInfo
             ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_theme_id();
         run_post_func<std::monostate>(index, ret);
         return ret;
-
     }
     uint8_t get_base_id()
     {
@@ -721,7 +720,7 @@ class CustomTheme : public ThemeInfo
     uint32_t get_backwall_type()
     {
         auto index = THEME_OVERRIDE::ENT_BACKWALL;
-        uint32_t ret =to_id("ENT_TYPE_BG_LEVEL_BACKWALL");
+        uint32_t ret = to_id("ENT_TYPE_BG_LEVEL_BACKWALL");
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
