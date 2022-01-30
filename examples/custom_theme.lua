@@ -3,7 +3,6 @@ meta.version = "WIP"
 meta.author = "Dregu"
 meta.description = "Testing custom themes."
 
-local borders = {ENT_TYPE.FLOOR_BORDERTILE, ENT_TYPE.FLOOR_BORDERTILE_METAL, ENT_TYPE.FLOOR_BORDERTILE_OCTOPUS}
 local crust_items = {ENT_TYPE.EMBED_GOLD, ENT_TYPE.EMBED_GOLD_BIG, ENT_TYPE.ITEM_DIAMOND, ENT_TYPE.ITEM_EMERALD, ENT_TYPE.ITEM_SAPPHIRE, ENT_TYPE.ITEM_RUBY}
 
 names = {}
@@ -14,6 +13,16 @@ end
 theme_names = {}
 for i,v in pairs(THEME) do
   theme_names[v] = i
+end
+
+texture_names = {}
+for i,v in pairs(TEXTURE) do
+  texture_names[v] = i
+end
+
+dynamic_texture_names = {}
+for i,v in pairs(DYNAMIC_TEXTURE) do
+  dynamic_texture_names[v] = i
 end
 
 local function pick(from)
@@ -52,9 +61,62 @@ for x = 0, 7 do
     room_templates[x] = room_templates_x
 end
 
+local function hide_decoration(uid, x, y)
+    local ent = get_entity(uid)
+    if not ent then return end
+    for i,v in ipairs(entity_get_items_by(uid, 0, MASK.DECORATION)) do
+        local deco = get_entity(v)
+        if deco.x == x and deco.y == y then
+            deco.color.a = 0
+        end
+    end
+end
+
+-- some hacks to hide decorations on connected edge tiles in looped theme, cause the game doesn't
+local function hide_border_decorations()
+    local x1, y1, x2, y2 = get_bounds()
+    for y=y1,y2,-1 do
+        local left = get_grid_entity_at(x1+0.5, y, 0)
+        local right = get_grid_entity_at(x2-0.5, y, 0)
+        if left ~= -1 and right ~= -1 then
+            hide_decoration(left, -0.5, 0)
+            hide_decoration(right, 0.5, 0)
+        end
+    end
+    for x=x1,x2,1 do
+        local top = get_grid_entity_at(x, y1-0.5, 0)
+        local bottom = get_grid_entity_at(x, y2+0.5, 0)
+        if top ~= -1 and bottom ~= -1 then
+            hide_decoration(top, 0, 0.5)
+            hide_decoration(bottom, 0, -0.5)
+        end
+    end
+end
+
 local levels = {
-    {file="level1.lvl", theme=THEME.DWELLING, floor=TEXTURE.DATA_TEXTURES_FLOOR_EGGPLANT_0, bg=TEXTURE.DATA_TEXTURES_BG_EGGPLANT_0},
-    {file="level2.lvl", theme=THEME.JUNGLE},
+    {file="level1.lvl", theme=THEME.TEMPLE, effect=THEME.VOLCANA, texture=THEME.DUAT, bg=TEXTURE.DATA_TEXTURES_BG_EGGPLANT_0},
+    {file="level2.lvl", theme=THEME.JUNGLE, subtheme=THEME.TIDE_POOL, floor=TEXTURE.DATA_TEXTURES_FLOOR_EGGPLANT_0, bg=TEXTURE.DATA_TEXTURES_BG_EGGPLANT_0, post_theme=function()
+        -- starry sky background
+        current.custom:override(THEME_OVERRIDE.SPAWN_BACKGROUND, THEME.COSMIC_OCEAN)
+        -- spawns the jellyfish (plural) and orbs, locks the door
+        current.custom:override(THEME_OVERRIDE.SPAWN_EFFECTS, THEME.COSMIC_OCEAN)
+        current.custom:post(THEME_OVERRIDE.SPAWN_EFFECTS, function()
+            -- fix camera position so it won't yank to place on level start
+            state.camera.adjusted_focus_x = state.level_gen.spawn_x
+            state.camera.adjusted_focus_y = state.level_gen.spawn_y + 0.05
+
+            -- these are only necessary if we're not using effects from co above
+            state.camera.bounds_left = -math.huge
+            state.camera.bounds_top = math.huge
+            state.camera.bounds_right = math.huge
+            state.camera.bounds_bottom = -math.huge
+        end)
+        -- spawn teleportingborder instead of tiles
+        current.custom:override(THEME_OVERRIDE.SPAWN_BORDER, THEME.COSMIC_OCEAN)
+        -- make level loop like co
+        current.custom:override(THEME_OVERRIDE.LOOP, THEME.COSMIC_OCEAN)
+    end,
+    post_level_gen=function() hide_border_decorations() end},
 }
 
 local function in_level()
@@ -90,42 +152,34 @@ set_callback(function(ctx)
         current = levels[num]
         next = levels[num+1]
         ctx:override_level_files({current.file})
-        local random_border = pick(borders)
 
         if not current.custom then
-            current.custom = CustomTheme:new()
-            --current.custom.level_file = current.file -- this may do something if we loaded multiple files
-            current.custom.theme = theme_index -- unique index that doesn't collide with the game themes
-            current.custom.base_theme = current.theme -- set base theme for enabled overrides that don't have a specific theme or function
+            current.custom = CustomTheme:new(theme_index, current.theme)
+            current.custom.level_file = current.file -- this may do something if we loaded multiple files
             current.custom.textures[DYNAMIC_TEXTURE.FLOOR] = current.floor or nil -- set texture used by FLOOR_GENERIC
             current.custom.textures[DYNAMIC_TEXTURE.BACKGROUND] = current.bg or nil
-            -- override(themeinfo_virtual_to_override, bool / theme / function)
-            current.custom:override(THEME_OVERRIDE.PLAYER_DAMAGE, false) -- disable player damage and resource use (like in camp)
-            current.custom:override(THEME_OVERRIDE.TEXTURE_DYNAMIC, THEME.NEO_BABYLON) -- get the rest of the textures from neobab
-            current.custom:override(THEME_OVERRIDE.EFFECTS, THEME.VOLCANA) -- get those hot effects from volcana
-            current.custom:post(THEME_OVERRIDE.EFFECTS, function() -- remove the camera bounds just set by the theme though
-                prinspect("Fix camera for the loop here, so it won't yank to position on level start")
-                state.camera.adjusted_focus_x = state.level_gen.spawn_x
-                state.camera.adjusted_focus_y = state.level_gen.spawn_y + 0.05
-                state.camera.bounds_left = -math.huge
-                state.camera.bounds_top = math.huge
-                state.camera.bounds_right = math.huge
-                state.camera.bounds_bottom = -math.huge
-            end)
-            -- make level loop like co
-            current.custom:override(THEME_OVERRIDE.BORDER, THEME.COSMIC_OCEAN)
-            current.custom:override(THEME_OVERRIDE.LOOP, THEME.COSMIC_OCEAN)
+
+            if current.texture then
+                current.custom:override(THEME_OVERRIDE.TEXTURE_DYNAMIC, current.texture) -- get the rest of the theme based textures from here, disregarding our actual theme
+            end
+
+            if current.effect then
+                current.custom:override(THEME_OVERRIDE.SPAWN_EFFECTS, current.effect) -- heat effect from volcana for example, but this does a lot of other stuff too
+            end
+
+            -- set theme_next for the right transition floor based on next level in our sequence
+            if next then
+                current.custom:override(THEME_OVERRIDE.PRE_TRANSITION, function()
+                    state.theme_next = next.theme
+                end)
+            end
+
+            -- run special stuff defined in the level sequence
+            if current.post_theme then current.post_theme() end
 
             theme_index = theme_index + 1
         end
         state.theme = current.theme
-
-        if next then
-            current.custom:override(THEME_OVERRIDE.PRE_TRANSITION, function()
-                prinspect("Set theme for the right transition floor based on next level in our sequence")
-                state.theme_next = next.theme
-            end)
-        end
 
         if all_checkpoint or current.checkpoint then
             checkpoint = state.level_count
@@ -133,6 +187,8 @@ set_callback(function(ctx)
         end
 
         force_custom_theme(current.custom)
+        -- you have to set this if overriding some things with CO
+        if current.subtheme then force_custom_subtheme(current.subtheme) end
     end
 end, ON.PRE_LOAD_LEVEL_FILES)
 
@@ -224,6 +280,10 @@ set_callback(function()
         p.inventory.bombs = stats[2]
         p.inventory.ropes = stats[3]
     end
+
+    -- run special stuff defined in the level sequence
+    if current.post_level_gen then current.post_level_gen() end
+
 end, ON.POST_LEVEL_GENERATION)
 
 -- add accumulated total time and run level hooks

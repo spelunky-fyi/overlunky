@@ -247,7 +247,8 @@ class ThemeInfo
     virtual void spawn_players() = 0;
 
     // when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail
-    // this actually also sets the camera bounds and various theme specific special effects, also spawns osiris
+    // this actually also sets the camera bounds and various theme specific special effects
+    // also spawns / sets the conditions for osiris, jelly, orbs...
     // also makes curse pots spawn the ghost
     virtual void spawn_effects() = 0;
 
