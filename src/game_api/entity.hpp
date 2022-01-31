@@ -286,6 +286,7 @@ class Entity
     void set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage);
     void set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1);
     void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
+    std::span<uint32_t> get_items();
 
     template <typename T>
     T* as()
@@ -297,8 +298,8 @@ class Entity
     virtual void create_rendering_info() = 0;
     virtual void handle_state_machine() = 0;
 
-    /// Kills the entity in the most violent way possible, for example cavemen turn into gibs
-    virtual void kill(bool, Entity* frm) = 0;
+    /// Kills the entity, you can set responsible to `nil` to ignore it
+    virtual void kill(bool destroy_corpse, Entity* responsible) = 0;
 
     virtual void on_collision1(Entity* other_entity) = 0; // triggers on collision between whip and hit object
 

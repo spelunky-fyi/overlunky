@@ -61,6 +61,9 @@ class Movable : public Entity
     uint8_t b126; // timer, after layer change?
     uint8_t b127;
 
+    // to not break backwards compatibility
+    void light_on_fire_broken();
+
     virtual bool can_jump() = 0;
     virtual void v38() = 0;
     virtual float sprint_factor() = 0;
@@ -78,7 +81,8 @@ class Movable : public Entity
     virtual void v51() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;
-    virtual void light_on_fire() = 0;
+    /// Does not damage entity
+    virtual void light_on_fire(uint8_t time) = 0;
     virtual void set_cursed(bool b) = 0;
     virtual void on_spiderweb_collision() = 0;
     virtual void set_last_owner_uid_b127(Entity* owner) = 0; // assigns player as last_owner_uid and also manipulates movable.b127
