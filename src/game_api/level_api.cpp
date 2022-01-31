@@ -548,8 +548,7 @@ std::array g_community_chances{
 };
 // List of alternative names for existing game and community tile codes.
 // Map of new_name: existing_name
-std::unordered_map<std::string_view, std::string_view> g_community_tile_code_aliases
-{
+std::unordered_map<std::string_view, std::string_view> g_community_tile_code_aliases{
     {"skeleton_key", "bone_key"},
     {"udjat_chest", "lockedchest"},
     {"quillback", "cavemanboss"},
@@ -1090,9 +1089,11 @@ void LevelGenData::init()
         }
     }
 
-    for (auto& community_tile_code_alias : g_community_tile_code_aliases) {
+    for (auto& community_tile_code_alias : g_community_tile_code_aliases)
+    {
         std::string_view tile_code_name = community_tile_code_alias.first;
-        if (!get_tile_code(std::string{tile_code_name}).has_value()) {
+        if (!get_tile_code(std::string{tile_code_name}).has_value())
+        {
             define_tile_code(std::string{tile_code_name});
         }
     }

@@ -52,7 +52,6 @@ Texture* RenderAPI::get_texture(TEXTURE texture_id)
 
 TEXTURE RenderAPI::define_texture(TextureDefinition data)
 {
-
     if (data.sub_image_width == 0 || data.sub_image_height == 0)
     {
         data.sub_image_width = data.width;
@@ -90,7 +89,11 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     for (auto& [id, texture] : custom_textures)
     {
         std::string_view existing_name{*texture.name};
-        existing_name.remove_prefix(sizeof("Data/Textures/../../") - 1);
+        constexpr char c_VanillaTexturePath[]{"Data/Textures/../../"};
+        if (existing_name.starts_with(c_VanillaTexturePath))
+        {
+            existing_name.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
+        }
         if (existing_name == data.texture_path && is_same(texture, new_texture))
         {
             reload_texture(texture.name);
@@ -113,6 +116,16 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     const auto backup_texture = *new_texture_target;
     textures->num_textures = 0;
     data.texture_path = "../../" + data.texture_path;
+
+    {
+        std::string_view path{data.texture_path};
+        constexpr char c_VanillaTexturePath[]{"../../Data/Textures/"};
+        if (path.starts_with(c_VanillaTexturePath))
+        {
+            path.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
+            data.texture_path = path.data();
+        }
+    }
 
     // clang-format off
     using DeclareTextureFunT = void(
