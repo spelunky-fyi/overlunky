@@ -114,6 +114,16 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     textures->num_textures = 0;
     data.texture_path = "../../" + data.texture_path;
 
+    {
+        std::string_view path{ data.texture_path };
+        constexpr char c_VanillaTexturePath[]{ "../../Data/Textures/" };
+        if (path.starts_with(c_VanillaTexturePath))
+        {
+            path.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
+            data.texture_path = path.data();
+        }
+    }
+
     // clang-format off
     using DeclareTextureFunT = void(
         uint8_t, uint32_t, const char*,
