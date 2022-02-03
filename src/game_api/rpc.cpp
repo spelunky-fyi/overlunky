@@ -545,9 +545,8 @@ std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
     return get_entities_by({}, mask, LAYER::BOTH);
 }
 
-template<class FunT>
-requires std::is_invocable_v<FunT, const EntityList&>
-void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)
+template <class FunT>
+requires std::is_invocable_v<FunT, const EntityList&> void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)
 {
     if (mask == 0)
     {

@@ -133,8 +133,8 @@ struct Quad
         const float cos_a{std::cos(angle)};
 
         using vec = std::pair<float, float>;
-        const vec p{ px, py };
-        const vec mp{ -px, -py };
+        const vec p{px, py};
+        const vec mp{-px, -py};
 
         auto rotate_around_pivot = [=](vec in) -> vec
         {
@@ -157,10 +157,10 @@ struct Quad
             return in;
         };
 
-        std::tie(bottom_left_x, bottom_left_y) = rotate_around_pivot({ bottom_left_x, bottom_left_y });
-        std::tie(bottom_right_x, bottom_right_y) = rotate_around_pivot({ bottom_right_x, bottom_right_y });
-        std::tie(top_left_x, top_left_y) = rotate_around_pivot({ top_left_x, top_left_y });
-        std::tie(top_right_x, top_right_y) = rotate_around_pivot({ top_right_x, top_right_y });
+        std::tie(bottom_left_x, bottom_left_y) = rotate_around_pivot({bottom_left_x, bottom_left_y});
+        std::tie(bottom_right_x, bottom_right_y) = rotate_around_pivot({bottom_right_x, bottom_right_y});
+        std::tie(top_left_x, top_left_y) = rotate_around_pivot({top_left_x, top_left_y});
+        std::tie(top_right_x, top_right_y) = rotate_around_pivot({top_right_x, top_right_y});
 
         return *this;
     }
