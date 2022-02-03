@@ -31,6 +31,7 @@ struct StateMemory
                                          // credits, ...)
     uint8_t ingame;
     uint8_t playing;
+    /// `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
     uint8_t pause;
     uint8_t b33;
     int32_t i34;
@@ -182,11 +183,7 @@ struct StateMemory
     uint8_t unknown31a;
     uint8_t unknown31b;
     uint8_t unknown31c;
-    size_t unknown32;
-    size_t unknown33;
-    size_t unknown34;
-    size_t unknown35;
-    size_t unknown36;
+    ShopsInfo shops;
     uint32_t time_startup;
     uint32_t special_visibility_flags;
     Camera* camera;

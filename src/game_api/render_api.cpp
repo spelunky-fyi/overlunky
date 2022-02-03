@@ -361,7 +361,7 @@ std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float
     return std::make_pair(tri.width, tri.height);
 }
 
-void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
+void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color)
 {
     static size_t offset = 0;
 
@@ -377,36 +377,24 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
         {
             return;
         }
-
-        float width = right - left;
-        float height = bottom - top;
-        float half_width = width / 2.0f;
-        float half_height = height / 2.0f;
-        float center_x = left + half_width;
-        float center_y = top + half_height;
-
         float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
         float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
         float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
         float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
 
         TextureRenderingInfo tri = {
-            center_x,
-            center_y,
+            0,
+            0,
 
             // DESTINATION
-            // top left:
-            -half_width,
-            half_height,
-            // top right:
-            half_width,
-            half_height,
-            // bottom left:
-            -half_width,
-            -half_height,
-            // bottom right:
-            half_width,
-            -half_height,
+            dest.bottom_left_x,
+            dest.bottom_left_y,
+            dest.bottom_right_x,
+            dest.bottom_right_y,
+            dest.top_left_x,
+            dest.top_left_y,
+            dest.top_right_x,
+            dest.top_right_y,
 
             // SOURCE
             // bottom left:
@@ -429,7 +417,7 @@ void RenderAPI::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t col
     }
 }
 
-void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
+void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color)
 {
     static size_t func_offset = 0;
     static size_t param_7 = 0;
@@ -450,23 +438,24 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
         }
 
         // destination and source float arrays are the same as in RenderInfo
-        float unknown = 21;
+        const float unknown = 21;
+        // this is also Quad, but some special one
         float destination[12] = {
             // bottom left:
-            left,
-            bottom,
+            dest.bottom_left_x,
+            dest.bottom_left_y,
             unknown,
             // bottom right:
-            right,
-            bottom,
+            dest.bottom_right_x,
+            dest.bottom_right_y,
             unknown,
             // top right:
-            right,
-            top,
+            dest.top_right_x,
+            dest.top_right_y,
             unknown,
             // top left:
-            left,
-            top,
+            dest.top_left_x,
+            dest.top_left_y,
             unknown};
 
         float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
@@ -474,7 +463,7 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
         float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
         float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
 
-        float source[8] = {
+        Quad source = {
             // bottom left:
             uv_left,
             uv_bottom,
@@ -489,10 +478,10 @@ void RenderAPI::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t colu
             uv_top,
         };
 
-        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, float* source, void*, Color*, float*);
+        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         auto texture_name = texture->name;
-        rf(renderer(), shader, &texture_name, 1, destination, source, (void*)param_7, &color, nullptr);
+        rf(renderer(), shader, &texture_name, 1, destination, &source, (void*)param_7, &color, nullptr);
     }
 }
 
@@ -631,4 +620,35 @@ void TextureRenderingInfo::set_destination(const AABB& bbox)
     destination_bottom_left_y = -half_h;
     destination_bottom_right_x = half_w;
     destination_bottom_right_y = -half_h;
+}
+
+Quad TextureRenderingInfo::dest_get_quad()
+{
+    return Quad{destination_bottom_left_x, destination_bottom_left_y, destination_bottom_right_x, destination_bottom_right_y, destination_top_right_x, destination_top_right_y, destination_top_left_x, destination_top_left_y};
+}
+void TextureRenderingInfo::dest_set_quad(const Quad& quad)
+{
+    destination_bottom_left_x = quad.bottom_left_x;
+    destination_bottom_left_y = quad.bottom_left_y;
+    destination_bottom_right_x = quad.bottom_right_x;
+    destination_bottom_right_y = quad.bottom_right_y;
+    destination_top_right_x = quad.top_right_x;
+    destination_top_right_y = quad.top_right_y;
+    destination_top_left_x = quad.top_left_x;
+    destination_top_left_y = quad.top_left_y;
+}
+Quad TextureRenderingInfo::source_get_quad()
+{
+    return Quad{source_bottom_left_x, source_bottom_left_y, source_bottom_right_x, source_bottom_right_y, source_top_right_x, source_top_right_y, source_top_left_x, source_top_left_y};
+}
+void TextureRenderingInfo::source_set_quad(const Quad& quad)
+{
+    source_bottom_left_x = quad.bottom_left_x;
+    source_bottom_left_y = quad.bottom_left_y;
+    source_bottom_right_x = quad.bottom_right_x;
+    source_bottom_right_y = quad.bottom_right_y;
+    source_top_right_x = quad.top_right_x;
+    source_top_right_y = quad.top_right_y;
+    source_top_left_x = quad.top_left_x;
+    source_top_left_y = quad.top_left_y;
 }

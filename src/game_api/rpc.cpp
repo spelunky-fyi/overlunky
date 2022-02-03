@@ -545,43 +545,79 @@ std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
     return get_entities_by({}, mask, LAYER::BOTH);
 }
 
+void foreach_mask(uint32_t mask, Layer* l, std::function<void(EntityList&)> fun)
+{
+    if (mask == 0)
+    {
+        fun(l->all_entities);
+    }
+    else
+    {
+        for (uint32_t test_flag = 1U; test_flag < 0x8000; test_flag <<= 1U)
+        {
+            if (mask & test_flag)
+            {
+                const auto& it = l->entities_by_mask.find(test_flag);
+                if (it != l->entities_by_mask.end())
+                {
+                    fun(it->second);
+                }
+            }
+        }
+    }
+}
+
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
 {
     auto state = State::get();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-    auto push_entities = [&mask, &proper_types, &found, &state](uint8_t l)
+
+    auto push_matching_types = [&proper_types, &found](EntityList entities)
     {
-        for (auto& item : state.layer(l)->all_entities)
-            if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
+        for (auto& item : entities)
+        {
+            if (entity_type_check(proper_types, item->type->id))
+            {
                 found.push_back(item->uid);
+            }
+        }
+    };
+    auto insert_all_uids = [&found](EntityList entities)
+    {
+        found.insert(found.end(), entities.uid_begin(), entities.uid_end());
     };
 
     if (layer == LAYER::BOTH)
     {
         if ((!proper_types.size() || !proper_types[0]) && !mask) // all entities
         {
+            // this exception for small improvments with calling reserve once
             found.reserve((size_t)state.layer(0)->all_entities.size + (size_t)state.layer(1)->all_entities.size);
             found.insert(found.end(), state.layer(0)->all_entities.uid_begin(), state.layer(0)->all_entities.uid_end());
             found.insert(found.end(), state.layer(1)->all_entities.uid_begin(), state.layer(1)->all_entities.uid_end());
         }
+        else if (!proper_types.size() || !proper_types[0]) // all types
+        {
+            foreach_mask(mask, state.layer(0), insert_all_uids);
+            foreach_mask(mask, state.layer(1), insert_all_uids);
+        }
         else
         {
-            push_entities(0);
-            push_entities(1);
+            foreach_mask(mask, state.layer(0), push_matching_types);
+            foreach_mask(mask, state.layer(1), push_matching_types);
         }
     }
     else
     {
         uint8_t correct_layer = enum_to_layer(layer);
-        if ((!proper_types.size() || !proper_types[0]) && !mask) // all entities
+        if (!proper_types.size() || !proper_types[0]) // all types
         {
-            found.reserve(state.layer(correct_layer)->all_entities.size);
-            found.insert(found.end(), state.layer(correct_layer)->all_entities.uid_begin(), state.layer(correct_layer)->all_entities.uid_end());
+            foreach_mask(mask, state.layer(correct_layer), insert_all_uids);
         }
         else
         {
-            push_entities(correct_layer);
+            foreach_mask(mask, state.layer(correct_layer), push_matching_types);
         }
     }
     return found;
@@ -596,24 +632,26 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
     auto state = State::get();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-    auto push_entities = [&x, &y, &radius, &mask, &proper_types, &found, &state](uint8_t l)
+    auto push_entities_at = [&x, &y, &radius, &proper_types, &found](EntityList entities)
     {
-        for (auto& item : state.layer(l)->all_entities)
+        for (auto& item : entities)
         {
             auto [ix, iy] = item->position();
             float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-            if ((mask == 0 || (item->type->search_flags & mask)) && distance < radius && entity_type_check(proper_types, item->type->id))
+            if (distance < radius && entity_type_check(proper_types, item->type->id))
+            {
                 found.push_back(item->uid);
+            }
         }
     };
     if (layer == LAYER::BOTH)
     {
-        push_entities(0);
-        push_entities(1);
+        foreach_mask(mask, state.layer(0), push_entities_at);
+        foreach_mask(mask, state.layer(1), push_entities_at);
     }
     else
     {
-        push_entities(enum_to_layer(layer));
+        foreach_mask(mask, state.layer(enum_to_layer(layer)), push_entities_at);
     }
     return found;
 }
@@ -658,13 +696,17 @@ std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t ma
 std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
 {
     std::vector<uint32_t> found;
-    for (auto& item : layer->all_entities)
-    {
-        if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(std::move(entity_types), item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
-        {
-            found.push_back(item->uid);
-        }
-    }
+    foreach_mask(mask, layer, [&entity_types, &found, &sx, &sy, &sx2, &sy2](EntityList entities)
+                 {
+                     for (auto& item : entities)
+                     {
+                         if (entity_type_check(std::move(entity_types), item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
+                         {
+                             found.push_back(item->uid);
+                         }
+                     }
+                 });
+
     return found;
 }
 std::vector<uint32_t> get_entities_overlapping_by_pointer(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
@@ -1118,54 +1160,38 @@ void set_time_ghost_enabled(bool b)
 {
     static size_t offset_trigger = 0;
     static size_t offset_toast_trigger = 0;
-    static char original_instruction_trigger[4] = {0};
-    static char original_instruction_toast_trigger[4] = {0};
     if (offset_trigger == 0)
     {
         auto memory = Memory::get();
         offset_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
-        for (uint8_t x = 0; x < 4; ++x)
-        {
-            original_instruction_trigger[x] = read_u8(offset_trigger + x);
-        }
         offset_toast_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TOAST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
-        for (uint8_t x = 0; x < 4; ++x)
-        {
-            original_instruction_toast_trigger[x] = read_u8(offset_toast_trigger + x);
-        }
     }
     if (b)
     {
-        write_mem_prot(offset_trigger, std::string(original_instruction_trigger, 4), true);
-        write_mem_prot(offset_toast_trigger, std::string(original_instruction_toast_trigger, 4), true);
+        recover_mem("set_time_ghost_enabled");
     }
     else
     {
-        write_mem_prot(offset_trigger, "\xC3\x90\x90\x90"s, true);
-        write_mem_prot(offset_toast_trigger, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_ghost_enabled", offset_trigger, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_ghost_enabled", offset_toast_trigger, "\xC3\x90\x90\x90"s, true);
     }
 }
 
 void set_time_jelly_enabled(bool b)
 {
     static size_t offset = 0;
-    static char original_instruction[4] = {0};
     if (offset == 0)
     {
         auto memory = Memory::get();
         offset = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_COSMIC_OCEAN, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
-        for (uint8_t x = 0; x < 4; ++x)
-        {
-            original_instruction[x] = read_u8(offset + x);
-        }
     }
     if (b)
     {
-        write_mem_prot(offset, std::string(original_instruction, 4), true);
+        recover_mem("set_time_jelly_enabled");
     }
     else
     {
-        write_mem_prot(offset, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_jelly_enabled", offset, "\xC3\x90\x90\x90"s, true);
     }
 }
 
@@ -1716,7 +1742,7 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
 
 void enter_door(int32_t player_uid, int32_t door_uid)
 {
-    auto addr = get_address("door_entry");
+    auto addr = Memory::get().at_exe(get_virtual_function_address(VTABLE_OFFSET::FLOOR_DOOR_EXIT, 42));
     auto player = get_entity_ptr(player_uid);
     auto door = get_entity_ptr(door_uid);
     if (player == nullptr || door == nullptr)
@@ -2037,6 +2063,53 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
                 entity->teleport_abs(static_cast<float>(ix), static_cast<float>(iy), 0, 0);
                 entity->set_layer(layer);
                 state.layer(actual_layer)->grid_entities[iy][ix] = entity;
+            }
+        }
+    }
+}
+
+void add_item_to_shop(int32_t item_uid, int32_t shop_owner)
+{
+    struct dummy // dummy struct
+    {
+        std::set<ShopRestrictedItem>::iterator __omg;
+        int __wow;
+    };
+    using AddRestrictedItemFun = size_t(std::set<ShopRestrictedItem>*, dummy, ShopRestrictedItem);
+
+    Movable* item = get_entity_ptr(item_uid)->as<Movable>();
+    Entity* owner = get_entity_ptr(shop_owner);
+    if (item && owner && item->is_movable())
+    {
+        const static auto room_owners = {
+            to_id("ENT_TYPE_MONS_SHOPKEEPER"),
+            to_id("ENT_TYPE_MONS_MERCHANT"),
+            to_id("ENT_TYPE_MONS_YANG"),
+            to_id("ENT_TYPE_MONS_MADAMETUSK"),
+            to_id("ENT_TYPE_MONS_STORAGEGUY"),
+            to_id("ENT_TYPE_MONS_CAVEMAN_SHOPKEEPER"), // exception: not actually room owner
+            to_id("ENT_TYPE_MONS_GHIST_SHOPKEEPE"),    // exception: not actually room owner
+        };
+        for (auto& it : room_owners)
+        {
+            if (owner->type->id == it) // TODO: check what happens if it's not room owner/shopkeeper
+            {
+                auto add_to_items_set = (AddRestrictedItemFun*)get_address("add_shopitem");
+                auto state = State::get();
+                item->flags = setflag(item->flags, 23); // shop item
+                item->flags = setflag(item->flags, 20); // Enable button prompt (flag is problably: show dialogs and other fx)
+                state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
+                state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
+
+                // This function actually only takes iterator and value as argument, but for some reason they need to be passed thru stack
+                // This is probably some standard `insert` function, but the items is a strange one, i would guess it's a map (item uid as a key and array/struct as a value)
+                // but standard function, no matter if i set it to map or set, also adds something at the end of a bucket (key hash?), so it's either very similar container or some special setup for set/map
+                const auto bucket = add_to_items_set(&state.ptr()->shops.items, {state.ptr()->shops.items.end(), 0}, {item_uid, 0, 0});
+
+                auto the_struct = (ShopRestrictedItem*)(bucket + 0x1C); // 0x1C - is just the internal map/set stuff
+                the_struct->owner_uid = shop_owner;
+                the_struct->owner_type = owner->type->id;
+                return;
             }
         }
     }

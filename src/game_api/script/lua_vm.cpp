@@ -508,6 +508,8 @@ end
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
     /// Enable/disable game engine pause.
+    /// This is just short for `state.pause == 32`, but that produces an audio bug
+    /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
     lua["pause"] = [](bool p)
     {
         if (p)
@@ -1261,6 +1263,9 @@ end
     /// `beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
     /// If you set `health` above the game max health it will be forced down to the game max
     lua["modify_ankh_health_gain"] = modify_ankh_health_gain;
+
+    /// Adds entity as shop item, has to be movable (haven't tested many)
+    lua["add_item_to_shop"] = add_item_to_shop;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

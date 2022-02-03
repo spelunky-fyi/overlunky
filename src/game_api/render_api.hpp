@@ -67,8 +67,8 @@ struct RenderAPI
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
-    void draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
-    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
+    void draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color);
+    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color);
 };
 
 // straight out of the x64dbg plugin
@@ -109,7 +109,7 @@ struct RenderInfo
     uint8_t unknown20b;
     uint8_t unknown20c;
 
-    // destination in world coords
+    // destination in world coords // this is also Quad, but some special one
     float destination_bottom_left_x; // entity.x - (entity.w/2)
     float destination_bottom_left_y; // entity.y - (entity.h/2)
     float destination_bottom_left_unknown;
@@ -124,14 +124,7 @@ struct RenderInfo
     float destination_top_left_unknown;
 
     // source in sprite sheet coords (multiply the floats by TextureDB.width and height)
-    float source_bottom_left_x;
-    float source_bottom_left_y;
-    float source_bottom_right_x;
-    float source_bottom_right_y;
-    float source_top_right_x;
-    float source_top_right_y;
-    float source_top_left_x;
-    float source_top_left_y;
+    Quad source;
 
     float tilew;
     float tileh;
@@ -193,26 +186,32 @@ struct TextureRenderingInfo
     // where to draw on the screen:
     float x;
     float y;
+
     // destination is relative to the x,y centerpoint
-    float destination_top_left_x;
-    float destination_top_left_y;
-    float destination_top_right_x;
-    float destination_top_right_y;
     float destination_bottom_left_x;
     float destination_bottom_left_y;
     float destination_bottom_right_x;
     float destination_bottom_right_y;
+    float destination_top_left_x;
+    float destination_top_left_y;
+    float destination_top_right_x;
+    float destination_top_right_y;
+
     // source rectangle in the texture to render
-    float source_top_left_x;
-    float source_top_left_y;
-    float source_top_right_x;
-    float source_top_right_y;
     float source_bottom_left_x;
     float source_bottom_left_y;
     float source_bottom_right_x;
     float source_bottom_right_y;
+    float source_top_left_x;
+    float source_top_left_y;
+    float source_top_right_x;
+    float source_top_right_y;
 
     void set_destination(const AABB& bbox);
+    Quad dest_get_quad();
+    void dest_set_quad(const Quad& quad);
+    Quad source_get_quad();
+    void source_set_quad(const Quad& quad);
 };
 
 void init_render_api_hooks();

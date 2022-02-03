@@ -64,11 +64,9 @@ class PowerupCapable : public Movable
     /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
     int32_t worn_backitem();
 
-    virtual void on_instakill_death() = 0; // seems to only trigger for enemies that die in one hit
-
+    // thoes could be wrong becous of the update
     virtual void on_blood_collision() = 0; // only triggers when player has kapala
-
-    virtual void unknown_v93() = 0;
+    virtual void unknown_v94() = 0;
 };
 
 class Player : public PowerupCapable

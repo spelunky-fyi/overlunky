@@ -10,9 +10,7 @@ struct AABB
 
     /// Create a new axis aligned bounding box by specifying its values
     AABB(float left_, float top_, float right_, float bottom_)
-        : left(left_), top(top_), right(right_), bottom(bottom_)
-    {
-    }
+        : left(left_), top(top_), right(right_), bottom(bottom_){};
 
     bool overlaps_with(const AABB& other) const
     {
@@ -89,4 +87,80 @@ struct AABB
     float top{0};
     float right{0};
     float bottom{0};
+};
+
+struct Quad
+{
+    Quad() = default;
+
+    Quad(const Quad&) = default;
+
+    Quad(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)
+        : bottom_left_x(_bottom_left_x), bottom_left_y(_bottom_left_y), bottom_right_x(_bottom_right_x), bottom_right_y(_bottom_right_y), top_right_x(_top_right_x), top_right_y(_top_right_y), top_left_x(_top_left_x), top_left_y(_top_left_y){};
+
+    Quad(const AABB& aabb)
+        : bottom_left_x(aabb.left), bottom_left_y(aabb.bottom), bottom_right_x(aabb.right), bottom_right_y(aabb.bottom), top_right_x(aabb.right), top_right_y(aabb.top), top_left_x(aabb.left), top_left_y(aabb.top){};
+
+    /// Returns the max/min values of the Quad
+    AABB get_AABB() const
+    {
+        AABB result;
+        result.right = std::max(std::max(std::max(bottom_left_x, bottom_right_x), top_right_x), top_left_x);
+        result.left = std::min(std::min(std::min(bottom_left_x, bottom_right_x), top_right_x), top_left_x);
+        result.top = std::max(std::max(std::max(bottom_left_y, bottom_right_y), top_right_y), top_left_y);
+        result.bottom = std::min(std::min(std::min(bottom_left_y, bottom_right_y), top_right_y), top_left_y);
+        return result;
+    }
+
+    Quad& offset(float off_x, float off_y)
+    {
+        bottom_left_x += off_x;
+        bottom_right_x += off_x;
+        top_right_x += off_x;
+        top_left_x += off_x;
+
+        bottom_left_y += off_y;
+        bottom_right_y += off_y;
+        top_right_y += off_y;
+        top_left_y += off_y;
+        return *this;
+    }
+
+    /// Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
+    Quad& rotate(float angle, float px, float py)
+    {
+        const float sin_a{std::sin(angle)};
+        const float cos_a{std::cos(angle)};
+
+        float x = (bottom_left_x - px);
+        float y = (bottom_left_y - py);
+        bottom_left_x = x * cos_a - y * sin_a + px;
+        bottom_left_y = y * cos_a + x * sin_a + py;
+
+        x = (bottom_right_x - px);
+        y = (bottom_right_y - py);
+        bottom_right_x = x * cos_a - y * sin_a + px;
+        bottom_right_y = y * cos_a + x * sin_a + py;
+
+        x = (top_left_x - px);
+        y = (top_left_y - py);
+        top_left_x = x * cos_a - y * sin_a + px;
+        top_left_y = y * cos_a + x * sin_a + py;
+
+        x = (top_right_x - px);
+        y = (top_right_y - py);
+        top_right_x = x * cos_a - y * sin_a + px;
+        top_right_y = y * cos_a + x * sin_a + py;
+
+        return *this;
+    }
+
+    float bottom_left_x{0};
+    float bottom_left_y{0};
+    float bottom_right_x{0};
+    float bottom_right_y{0};
+    float top_right_x{0};
+    float top_right_y{0};
+    float top_left_x{0};
+    float top_left_y{0};
 };

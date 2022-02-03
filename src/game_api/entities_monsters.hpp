@@ -32,6 +32,7 @@ class RoomOwner : public Monster
     uint16_t padding1;
     uint32_t padding2;
 
+    // thoes could be wrong becous of the update, also some of thoes are probably `Monster`
     virtual void increase_killcount() = 0; // increases state.kills_npc
 
     virtual void on_aggro() = 0; // updates state.quests in case of npc

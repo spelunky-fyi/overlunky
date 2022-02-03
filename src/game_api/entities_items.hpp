@@ -112,6 +112,7 @@ class CookFire : public Movable
 {
   public:
     int32_t unknown1;
+    /// Can set it on fire or extinguish
     bool lit;
     uint8_t unused1;
     uint16_t unused2;
@@ -382,9 +383,12 @@ class Torch : public Movable
 {
   public:
     int32_t flame_uid;
+    /// It's used just to check, to light/extinguish use `light_up` function
     bool is_lit;
     int8_t unknown1;
     int16_t unknown2;
+
+    virtual void light_up(bool lit) = 0;
 };
 
 class WallTorch : public Torch
@@ -679,11 +683,7 @@ class PlayerBag : public Movable
 class Powerup : public Movable
 {
   public:
-    virtual void unknown_v87() = 0;
-    virtual void unknown_v88() = 0;
-    virtual void unknown_v89() = 0;
-    virtual void unknown_v90() = 0;
-    virtual void unknown_v91() = 0;
+    // thoes could be wrong becouse of the update
     virtual void apply_effect_to_player(Player* player) = 0;
     virtual void remove_effect_from_player(Player* player) = 0;
 };
