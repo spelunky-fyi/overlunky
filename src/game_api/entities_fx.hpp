@@ -14,8 +14,8 @@ class LiquidSurface : public Movable
 {
   public:
     float glow_radius;
-    float sine_pos;           //x position to calculate sine wave, it moves the glow back and forth
-    float sine_pos_increment; //just an on frame increment for the value above
+    float sine_pos;           // x position to calculate sine wave, it moves the glow back and forth
+    float sine_pos_increment; // just an on frame increment for the value above
 };
 
 class EggshipCenterJetFlame : public Movable
@@ -77,13 +77,13 @@ class FxMainExitDoor : public Movable
     Illumination* emitted_light;
     /// When breaking open in tutorial
     int32_t timer;
-    float unknown; //increments by 0.15
+    float unknown; // increments by 0.15
 };
 
 class Birdies : public Movable
 {
   public:
-    uint8_t unknown; //animation_frame offset? , 0 for monsters, 160 for character
+    uint8_t unknown; // animation_frame offset? , 0 for monsters, 160 for character
 };
 
 class Explosion : public Movable
@@ -95,17 +95,17 @@ class Explosion : public Movable
 class FxOuroboroOccluder : public Movable
 {
   public:
-    float unknown; //counts from 0.0 to 10.0
+    float unknown; // counts from 0.0 to 10.0
 };
 
 class FxOuroboroDragonPart : public Movable
 {
   public:
-    float unknown1; //angle?
-    float unknown2; //fade in/fade out?
+    float unknown1; // angle?
+    float unknown2; // fade in/fade out?
     float unknown3;
-    float speed;   //increment value for unknown1
-    int16_t timer; //affects the speed and fade away
+    float speed;   // increment value for unknown1
+    int16_t timer; // affects the speed and fade away
     int16_t padding1;
     int32_t padding2;
     ParticleEmitterInfo* particle;
@@ -114,18 +114,18 @@ class FxOuroboroDragonPart : public Movable
 class Rubble : public Movable
 {
   public:
-    uint8_t unknown1; //is different depending of the block source
+    uint8_t unknown1; // is different depending of the block source
     int8_t unknown2;
     int16_t unknown3;
     int32_t unknown4;
     float unknown5;
-    bool unknown6; //shrinks it down to nothing?
+    bool unknown6; // shrinks it down to nothing?
 };
 
 class FxCompass : public Movable
 {
   public:
-    float unknown1; //moving distance
+    float unknown1; // moving distance
     /// Counts form 0 to 2*pi, responsible for moving back and forth
     float sine_angle;
     float visibility;
@@ -163,7 +163,7 @@ class FxPickupEffect : public Movable
 {
   public:
     float spawn_y;
-    float visibility; //or the disappearing animation progression
+    float visibility; // or the disappearing animation progression
 };
 
 class FxShotgunBlast : public Movable
@@ -201,7 +201,7 @@ class FxSpringtrapRing : public Movable
 class FxWitchdoctorHint : public Movable
 {
   public:
-    std::map<size_t, size_t> unknown;
+    std::set<int32_t> unknown; // uid of the witchdoctor, why the map/set?
 };
 
 class FxNecromancerANKH : public Movable
@@ -225,13 +225,13 @@ class FxUnderwaterBubble : public Movable
     int8_t direction;
     /// Setting it true makes it disappear/fade away
     bool pop;
-    bool inverted; //goes down instead of up
+    bool inverted; // goes down instead of up
 };
 
 class FxWaterDrop : public Movable
 {
   public:
-    bool inverted; //floats up instead of drooping down
+    bool inverted; // floats up instead of drooping down
     bool unknown1;
     int8_t unknown2;
     int8_t unknown3;
@@ -255,9 +255,9 @@ class FxSparkSmall : public Movable
 {
   public:
     float unknown1;
-    float step; //per frame increment for variable above
+    float step; // per frame increment for variable above
     float unknown3;
-    int8_t timer; //all values gets randomized when timer = 0
+    int8_t timer; // all values gets randomized when timer = 0
 };
 
 class FxTiamatHead : public Movable
@@ -315,15 +315,15 @@ class FxSorceressAttack : public Movable
 {
   public:
     float size;
-    float unknown2; //pulsing related
-    bool unknown3;  //pulsing related
+    float unknown2; // pulsing related
+    bool unknown3;  // pulsing related
 };
 
 class FxLamassuAttack : public Movable
 {
   public:
     float attack_angle;
-    float attack_angle2; //seams to be exactly the same as above
+    float attack_angle2; // seams to be exactly the same as above
     bool unknown;
 };
 
@@ -349,7 +349,7 @@ class FxAnkhRotatingSpark : public Movable
     float radius;
     float inclination;
     /// 0 - 1.0
-    float speed; //a weird one, it gets values lower then 1.0, if you set 1.0 or bigger it will stop
+    float speed; // a weird one, it gets values lower then 1.0, if you set 1.0 or bigger it will stop
     float sine_angle;
     float size;
 };

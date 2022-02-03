@@ -14,7 +14,7 @@ class Liquid : public Entity
     uint8_t unknown_timer1;
     uint8_t pos_update_timer; // when 0, updates x_pos and y_pos
     uint8_t unknown_timer3;
-    uint8_t unk21; //probably padding
+    uint8_t unk21; // probably padding
 
     uint32_t get_liquid_flags();
     void set_liquid_flags(uint32_t flags);

@@ -31,6 +31,7 @@ std::uint32_t g_last_community_chance_id;
 std::uint32_t g_current_chance_id;
 
 std::unordered_map<std::uint32_t, std::string_view> g_tile_code_id_to_name;
+std::unordered_map<std::string_view, std::uint32_t> g_name_to_tile_code_id;
 std::unordered_map<std::uint32_t, std::string_view> g_monster_chance_id_to_name;
 std::unordered_map<std::uint32_t, std::string_view> g_trap_chance_id_to_name;
 
@@ -471,7 +472,7 @@ std::array g_community_tile_codes{
             g_attachee_requiring_entities.push_back({{{x, y - 1}}, do_spawn});
         }},
     CommunityTileCode{"boombox", "ENT_TYPE_ITEM_BOOMBOX"},
-    //CommunityTileCode{
+    // CommunityTileCode{
     //    "lake_imposter",
     //    "ENT_TYPE_LIQUID_IMPOSTOR_LAKE",
     //    [](const CommunityTileCode& self, float x, float y, [[maybe_unused]] Layer* layer)
@@ -544,6 +545,31 @@ std::array g_community_chances{
     CommunityChance{"emerald", "ENT_TYPE_ITEM_EMERALD"},
     CommunityChance{"sapphire", "ENT_TYPE_ITEM_SAPPHIRE"},
     CommunityChance{"ruby", "ENT_TYPE_ITEM_RUBY"},
+};
+// List of alternative names for existing game and community tile codes.
+// Map of new_name: existing_name
+std::unordered_map<std::string_view, std::string_view> g_community_tile_code_aliases{
+    {"skeleton_key", "bone_key"},
+    {"udjat_chest", "lockedchest"},
+    {"quillback", "cavemanboss"},
+    {"furniture_chair_looking_left", "chair_looking_left"},
+    {"furniture_chair_looking_right", "chair_looking_right"},
+    {"furniture_construction_sign", "construction_sign"},
+    {"furniture_diningtable", "diningtable"},
+    {"furniture_dresser", "dresser"},
+    {"furniture_sidetable", "sidetable"},
+    {"furniture_singlebed", "singlebed"},
+    {"thin_ice", "thinice"},
+    {"sparrow", "thief"},
+    {"proto_generator", "alien_generator"},
+    {"hundun_spikes", "crushing_elevator"},
+    {"eggplup", "jumpdog"},
+    {"tun", "merchant"},
+    {"van_horsing", "oldhunter"},
+    {"pangxie", "crabman"},
+    {"forcefield_timed", "timed_forcefield"},
+    {"powder_keg_timed", "timed_powder_keg"},
+    {"spikes_upsidedown", "upsidedown_spikes"},
 };
 
 struct ChanceLogicProviderImpl
@@ -629,6 +655,13 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
         {
             tile_code = g_last_tile_code_id;
         }
+    }
+
+    if (g_community_tile_code_aliases.find(tile_code_name) != g_community_tile_code_aliases.end())
+    {
+        std::string_view tile_code_alias_name = g_community_tile_code_aliases[tile_code_name];
+        std::uint32_t tile_code_alias = g_name_to_tile_code_id[tile_code_alias_name];
+        tile_code = tile_code_alias;
     }
 
     if (tile_code > g_last_tile_code_id && tile_code < g_last_community_tile_code_id)
@@ -1006,6 +1039,7 @@ void LevelGenData::init()
         {
             max_id = std::max(def.id, max_id);
             g_tile_code_id_to_name[def.id] = name;
+            g_name_to_tile_code_id[name] = def.id;
         }
 
         // The game uses last id to check if the tilecode is valid using a != instead of a <
@@ -1055,6 +1089,15 @@ void LevelGenData::init()
         }
     }
 
+    for (auto& community_tile_code_alias : g_community_tile_code_aliases)
+    {
+        std::string_view tile_code_name = community_tile_code_alias.first;
+        if (!get_tile_code(std::string{tile_code_name}).has_value())
+        {
+            define_tile_code(std::string{tile_code_name});
+        }
+    }
+
     // Add new community chances
     for (auto& community_chance : g_community_chances)
     {
@@ -1089,40 +1132,40 @@ void LevelGenData::init()
             const size_t get_room_size_addr = (size_t) static_cast<void (*)(const char*, uint32_t&, uint32_t&)>(&get_room_size);
 
             const std::string redirect_code = fmt::format(
-                "\x50"                         //PUSH       RAX
-                "\x51"                         //PUSH       RCX
-                "\x52"                         //PUSH       RDX
-                "\x41\x50"                     //PUSH       R8
-                "\x41\x51"                     //PUSH       R9
-                "\x41\x52"                     //PUSH       R10
-                "\x41\x53"                     //PUSH       R11
-                "\x41\x53"                     //PUSH       R11
-                "\x48\x8d\x8d\xa0\x02\x00\x00" //LEA        RCX, [RBP + 0x2a0] == room_template_name
-                "\x48\x8d\x95\x78\x05\x00\x00" //LEA        RDX, [RBP + 0x578] == room_width
-                "\x4c\x8d\x85\xe0\x05\x00\x00" //LEA        R8, [RBP + 0x5e0] == room_height
-                "\x48\xb8{}"                   //MOV        RAX, &get_room_size
-                "\xff\xd0"                     //CALL       RAX
-                "\x41\x5b"                     //POP        R11
-                "\x41\x5b"                     //POP        R11
-                "\x41\x5a"                     //POP        R10
-                "\x41\x59"                     //POP        R9
-                "\x41\x58"                     //POP        R8
-                "\x5a"                         //POP        RDX
-                "\x59"                         //POP        RCX
-                "\x58"                         //POP        RAX
-                // Original Code Begin
-                "\x44\x8b\xbd\xe4\x05\x00\x00" //MOV        R15D,dword ptr [RBP + 0x5e4]
-                "\x41\x83\xe7\x08"             //AND        R15D,0x8
-                "\x4c\x8b\xb5\x70\x05\x00\x00" //MOV        R14,qword ptr [RBP + 0x570]
-                "\x4d\x85\xf6"                 //TEST       R14,R14
-                "\x74\x09"                     //JZ         FIRST_JUMP
-                "\x48\x8b\xbd\x60\x05\x00\x00" //MOV        RDI,qword ptr [RBP + 0x560]
-                "\xeb\x0c"                     //JMP        SECOND_JUMP
+                "\x50"                         // PUSH       RAX
+                "\x51"                         // PUSH       RCX
+                "\x52"                         // PUSH       RDX
+                "\x41\x50"                     // PUSH       R8
+                "\x41\x51"                     // PUSH       R9
+                "\x41\x52"                     // PUSH       R10
+                "\x41\x53"                     // PUSH       R11
+                "\x41\x53"                     // PUSH       R11
+                "\x48\x8d\x8d\xa0\x02\x00\x00" // LEA        RCX, [RBP + 0x2a0] == room_template_name
+                "\x48\x8d\x95\x78\x05\x00\x00" // LEA        RDX, [RBP + 0x578] == room_width
+                "\x4c\x8d\x85\xe0\x05\x00\x00" // LEA        R8, [RBP + 0x5e0] == room_height
+                "\x48\xb8{}"                   // MOV        RAX, &get_room_size
+                "\xff\xd0"                     // CALL       RAX
+                "\x41\x5b"                     // POP        R11
+                "\x41\x5b"                     // POP        R11
+                "\x41\x5a"                     // POP        R10
+                "\x41\x59"                     // POP        R9
+                "\x41\x58"                     // POP        R8
+                "\x5a"                         // POP        RDX
+                "\x59"                         // POP        RCX
+                "\x58"                         // POP        RAX
+                                               // Original Code Begin
+                "\x44\x8b\xbd\xe4\x05\x00\x00" // MOV        R15D,dword ptr [RBP + 0x5e4]
+                "\x41\x83\xe7\x08"             // AND        R15D,0x8
+                "\x4c\x8b\xb5\x70\x05\x00\x00" // MOV        R14,qword ptr [RBP + 0x570]
+                "\x4d\x85\xf6"                 // TEST       R14,R14
+                "\x74\x09"                     // JZ         FIRST_JUMP
+                "\x48\x8b\xbd\x60\x05\x00\x00" // MOV        RDI,qword ptr [RBP + 0x560]
+                "\xeb\x0c"                     // JMP        SECOND_JUMP
                                                // Original Code End
-                /*FIST_JUMP*/ "\x48\xb8{}"     //MOV        RAX, get_room_size_first_jump
-                "\xff\xe0"                     //JMP        RAX
-                /*SECOND_JUMP*/ "\x48\xb8{}"   //MOV        RAX, get_room_size_second_jump
-                "\xff\xe0"sv,                  //JMP        RAX
+                /*FIST_JUMP*/ "\x48\xb8{}"     // MOV        RAX, get_room_size_first_jump
+                "\xff\xe0"                     // JMP        RAX
+                /*SECOND_JUMP*/ "\x48\xb8{}"   // MOV        RAX, get_room_size_second_jump
+                "\xff\xe0"sv,                  // JMP        RAX
                 to_le_bytes(get_room_size_addr),
                 to_le_bytes(get_room_size_first_jump),
                 to_le_bytes(get_room_size_second_jump));
@@ -1130,8 +1173,8 @@ void LevelGenData::init()
             g_get_room_size_redirect = ExecutableMemory{redirect_code};
 
             std::string code = fmt::format(
-                "\x48\xb8{}"  //MOV         RAX, g_get_room_size_redirect.get()
-                "\xff\xe0"sv, //JMP         RAX
+                "\x48\xb8{}"  // MOV         RAX, g_get_room_size_redirect.get()
+                "\xff\xe0"sv, // JMP         RAX
                 to_le_bytes((size_t)g_get_room_size_redirect.get()));
 
             // Fill with nop, code is not performance-critical either way
@@ -1194,6 +1237,7 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
     g_current_tile_code_id++;
 
     g_tile_code_id_to_name[it->second.id] = it->first;
+    g_name_to_tile_code_id[it->first] = it->second.id;
     return it->second.id;
 }
 
@@ -1428,8 +1472,7 @@ void LevelGenSystem::init()
                     }
                 }
 
-                original(self, param_2, param_3, param_4);
-            },
+                original(self, param_2, param_3, param_4); },
             0xd);
         using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
         hook_vtable<DoProceduralSpawnFun>(
@@ -1443,8 +1486,7 @@ void LevelGenSystem::init()
                 {
                     return;
                 }
-                original(self, spawn_info);
-            },
+                original(self, spawn_info); },
             0x33);
     }
 }

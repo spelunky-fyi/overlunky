@@ -139,7 +139,11 @@ void register_usertypes(sol::state& lua)
         "sound_killed_by_other",
         &EntityDB::sound_killed_by_other,
         "description",
-        &EntityDB::description);
+        &EntityDB::description,
+        "tilex",
+        &EntityDB::tile_x,
+        "tiley",
+        &EntityDB::tile_y);
 
     auto get_overlay = [&lua](Entity& entity)
     {
@@ -410,5 +414,59 @@ void register_usertypes(sol::state& lua)
         0x6000,
         "ANY",
         0x0);
+    /* MASK
+    // PLAYER
+    // All CHAR_* entities, only `Player` type
+    // MOUNT
+    // All MOUNT_* entities, only `Mount` type
+    // MONSTER
+    // All MONS_* entities, various types, all `Movable`
+    // ITEM
+    // All ITEM_* entities except: ITEM_POWERUP_*, ITEM_ROPE, ITEM_CLIMBABLE_ROPE, ITEM_UNROLLED_ROPE, ITEM_RUBBLE, ITEM_FLAMETHROWER_FIREBALL, ITEM_CURSING_CLOUD
+    // Also includes: FX_JETPACKFLAME, FX_OLMECPART_FLOATER, FX_SMALLFLAME, FX_TELEPORTSHADOW
+    // Various types, all `Movable`
+    // EXPLOSION
+    // Only: FX_EXPLOSION, FX_POWEREDEXPLOSION, FX_MODERNEXPLOSION
+    // All `Explosion` type
+    // ROPE
+    // Only: ITEM_ROPE, ITEM_CLIMBABLE_ROPE, ITEM_UNROLLED_ROPE
+    // Various types, all `Movable`
+    // FX
+    // All FX_* entities except: FX_COMPASS, FX_SPECIALCOMPASS, FX_EXPLOSION, FX_POWEREDEXPLOSION, FX_MODERNEXPLOSION, FX_JETPACKFLAME, FX_OLMECPART_FLOATER, FX_SMALLFLAME, FX_TELEPORTSHADOW, FX_LEADER_FLAG, FX_PLAYERINDICATOR, FX_PLAYERINDICATORPORTRAIT
+    // Also includes: DECORATION_CHAINANDBLOCKS_CHAINDECORATION, DECORATION_SLIDINGWALL_CHAINDECORATION, ITEM_RUBBLE, ITEM_FLAMETHROWER_FIREBALL, ITEM_CURSING_CLOUD
+    // Various types, all `Movable`
+    // ACTIVEFLOOR
+    // All ACTIVEFLOOR_* entities
+    // Various types, all `Movable`
+    // FLOOR
+    // All FLOOR_* and FLOORSTYLED_* entities
+    // Various types, all `Floor`
+    // DECORATION
+    // All DECORATION_* entities except: DECORATION_CHAINANDBLOCKS_CHAINDECORATION, DECORATION_SLIDINGWALL_CHAINDECORATION, DECORATION_PALACE_PORTRAIT
+    // Also includes: EMBED_GOLD, ENT_TYPE_EMBED_GOLD_BIG
+    // Various types, all `Entity`
+    // BG
+    // All MIDBG* entities and most of the BG_* entities
+    // does not include: a lot .. check [default_flags_more_flags.txt](internal\entity.type.default_flags_more_flags.txt) for full list
+    // Also includes: DECORATION_PALACE_PORTRAIT
+    // Various types, all `Entity`
+    // SHADOW
+    // All the BG_* entities excluded from `BG` (MASK.BG | MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above
+    // Various types, all `Entity`
+    // LOGICAL
+    // All LOGICAL_* entities
+    // Also includes: ITEM_POWERUP_*, FX_COMPASS, FX_SPECIALCOMPASS, FX_LEADER_FLAG, FX_PLAYERINDICATOR, FX_PLAYERINDICATORPORTRAIT
+    // Various types, all `Entity`
+    // WATER
+    // Only: LIQUID_WATER, LIQUID_COARSE_WATER, LIQUID_IMPOSTOR_LAKE
+    // Various types, all `Entity`
+    // LAVA
+    // Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA
+    // Various types, all `Entity`
+    // LIQUID
+    // Short for (MASK.WATER | MASK.LAVA)
+    // ANY
+    // Value of 0, treated by all the functions as ANY mask
+    */
 }
 }; // namespace NEntity

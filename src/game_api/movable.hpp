@@ -7,8 +7,8 @@
 class Movable : public Entity
 {
   public:
-    std::map<int64_t, int64_t> pa0;
-    std::map<int, int> pb0;
+    std::map<uint32_t, size_t> pa0;
+    std::set<size_t> pb0;
     size_t anim_func;
     int64_t ic8;
     float movex;
@@ -17,7 +17,7 @@ class Movable : public Entity
     BUTTON buttons_previous;
     int16_t unknown_padding; // garbage?
     uint32_t stand_counter;
-    float jump_height_multiplier; //entitydb.jump gets multiplied by this value
+    float jump_height_multiplier; // entitydb.jump gets multiplied by this value
     int32_t price;
     int32_t owner_uid;
     int32_t last_owner_uid;
@@ -47,7 +47,7 @@ class Movable : public Entity
     int16_t poison_tick_timer;
     uint8_t onfire_effect_timer;
     uint8_t exit_invincibility_timer;   // when exiting a door or a pipe, ...
-    uint8_t invincibility_frames_timer; //blinks the entity
+    uint8_t invincibility_frames_timer; // blinks the entity
     uint8_t frozen_timer;
     uint8_t unknown_damage_counter_a;
     uint8_t unknown_damage_counter_b;
@@ -60,6 +60,21 @@ class Movable : public Entity
     uint8_t falling_timer;
     uint8_t b126; // timer, after layer change?
     uint8_t b127;
+
+    void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
+    bool is_poisoned();
+
+    /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+    void damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint16_t iframes);
+    // the original damage function was added to the API without the iframes param, but for backwards compatibility we preserve the broken one
+    void broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
+
+    bool is_button_pressed(BUTTON button);
+    bool is_button_held(BUTTON button);
+    bool is_button_released(BUTTON button);
+
+    void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
+    void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);
 
     // to not break backwards compatibility
     void light_on_fire_broken();
@@ -75,10 +90,10 @@ class Movable : public Entity
     virtual bool is_on_fire() = 0;
     virtual void v46() = 0;
     virtual void v47() = 0;
-    //virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
+    // virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
     virtual void on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint32_t stun_amount, uint32_t iframes) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost)
     virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                                         // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
-    virtual void v51() = 0;
+    virtual void v50() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;
     /// Does not damage entity
@@ -117,28 +132,14 @@ class Movable : public Entity
     virtual void handle_fall_logic() = 0;                // adjusts entity.velocityy when falling
     virtual void apply_friction() = 0;                   // applies entity.type.friction to entity.velocityx
     virtual void boss_related() = 0;                     // when disabled, quillback keeps stomping through the level, including border tiles
-    virtual void v84() = 0;                              // triggers when tusk is angered, calls get_last_owner_uid
+    virtual void v85() = 0;                              // triggers when tusk is angered, calls get_last_owner_uid
     virtual void gravity_related() = 0;
-    virtual void v86() = 0;
     virtual void v87() = 0;
+    virtual void v88() = 0;
     virtual void stack_plus_28_is_0() = 0;   // unknown; triggers on item_rubble
     virtual void on_crushed_by(Entity*) = 0; // e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
     virtual void on_fall_onto(uint32_t unknown, Entity* fell_on_entity) = 0;
-
-    void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
-    bool is_poisoned();
-
-    /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
-    void damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint16_t iframes);
-    // the original damage function was added to the API without the iframes param, but for backwards compatibility we preserve the broken one
-    void broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
-
-    bool is_button_pressed(BUTTON button);
-    bool is_button_held(BUTTON button);
-    bool is_button_released(BUTTON button);
-
-    void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
-    void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);
+    virtual void on_instakill_death() = 0; // seems to only trigger for enemies that die in one hit, // virtual 92
 };
 
 class PlayerTracker

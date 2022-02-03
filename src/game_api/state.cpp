@@ -421,13 +421,13 @@ void State::set_camera_position(float cx, float cy)
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)
 {
-    //if (ptr()->screen < 11 || ptr()->screen > 20)
-    //    return;
+    // if (ptr()->screen < 11 || ptr()->screen > 20)
+    //     return;
     if (ptr()->items->player_count < 1)
     {
         ptr()->items->player_select_slots[0].activated = true;
         ptr()->items->player_select_slots[0].character = savedata()->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-        ptr()->items->player_select_slots[0].texture_id = savedata()->players[0] + 285; //TODO: magic numbers
+        ptr()->items->player_select_slots[0].texture_id = savedata()->players[0] + 285; // TODO: magic numbers
         ptr()->items->player_count = 1;
     }
     ptr()->world_next = w;

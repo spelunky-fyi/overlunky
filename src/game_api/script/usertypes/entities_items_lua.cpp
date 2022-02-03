@@ -161,7 +161,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
-    lua.new_usertype<WebGun>( //left to not break compability
+    lua.new_usertype<WebGun>( // left to not break compability
         "WebGun",
         sol::base_classes,
         sol::bases<Entity, Movable, Gun>());
@@ -457,6 +457,8 @@ void register_usertypes(sol::state& lua)
         &Torch::flame_uid,
         "is_lit",
         &Torch::is_lit,
+        "light_up",
+        &Torch::light_up,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 

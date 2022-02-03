@@ -1,5 +1,7 @@
 #pragma once
 
+#include "aliases.hpp"
+
 class Entity;
 
 struct EntityList
@@ -64,16 +66,17 @@ struct Layer
     bool is_back_layer;
     // int8_t padding[7];
     EntityList all_entities;
-    //char + fx + mons + item + logical + mount + activefloor + BG (excluding BG_SHOP, BG_LEVEL_*)
+    // char + fx + mons + item + logical + mount + activefloor + BG (excluding BG_SHOP, BG_LEVEL_*)
     EntityList unknown_entities1;
     size_t unknown1;
-    std::map<int, int> unknown2;
+    // key is the mask
+    std::map<uint32_t, EntityList> entities_by_mask;
 
     char stuff0[0xF430]; // Just wanna get to grid_entities
 
     Entity* grid_entities[0x7e][0x56];
 
-    char stuff1[0x3FD08]; // Just wanna get to expired_items_
+    char stuff1[0x3FD08];
 
     EntityList unknown_entities2; // debris, explosions, laserbeams etc. ?
     EntityList unknown_entities3; // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
@@ -95,7 +98,7 @@ struct Layer
     size_t unknown21;
     size_t unknown22;
     bool unknown23;
-    bool layer_freeze; //locking mechanism?
+    bool layer_freeze; // locking mechanism?
     uint8_t unknown25;
     uint8_t unknown26;
     uint32_t unknown27;
@@ -117,13 +120,13 @@ struct Layer
     uint64_t unknown43;
     uint64_t unknown44;
     uint64_t unknown45;
-    uint64_t unknown46; //next layer below
+    uint64_t unknown46; // next layer below
 
-    Entity* spawn_entity(size_t id, float x, float y, bool screen, float vx, float vy, bool snap);
+    Entity* spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx, float vy, bool snap);
 
-    Entity* spawn_entity_snap_to_floor(size_t id, float x, float y);
+    Entity* spawn_entity_snap_to_floor(ENT_TYPE id, float x, float y);
 
-    Entity* spawn_entity_over(size_t id, Entity* overlay, float x, float y);
+    Entity* spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y);
 
     Entity* spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
 

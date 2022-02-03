@@ -63,7 +63,7 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
             uint32_t flags = 0x63;
 
             using construct_illumination_ptr_fun_t = Illumination*(std::vector<Illumination*>*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
-            static auto construct_illumination_ptr_call = (construct_illumination_ptr_fun_t*)get_address("construct_illumination_ptr");
+            static auto construct_illumination_ptr_call = (construct_illumination_ptr_fun_t*)get_address("generate_illumination");
 
             auto ill_ptr = construct_illumination_ptr_call(state->lightsources, position, color, 2, light_size, flags, lava->uid, lava->layer);
             lava->emitted_light = ill_ptr;
@@ -238,7 +238,7 @@ int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t) // ui only
 
     auto state = State::get();
 
-    auto player = state.items()->player(0); //do the same stuff as in spawn_entity?
+    auto player = state.items()->player(0); // do the same stuff as in spawn_entity?
     if (player == nullptr)
         return -1;
     auto [_x, _y] = player->position();

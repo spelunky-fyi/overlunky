@@ -10,7 +10,7 @@ class Monster : public PowerupCapable
   public:
     int32_t chased_target_uid;
     uint32_t target_selection_timer;
-
+    // those could be wrong because of the update
     virtual void increase_killcount() = 0; // increases state.kills_npc
 
     virtual void on_aggro() = 0; // updates state.quests in case of npc

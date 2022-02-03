@@ -7,7 +7,7 @@
 using namespace std::string_literals;
 
 std::vector<DropEntry> drop_entries{
-    {"ALTAR_DICE_CLIMBINGGLOVES", "\xBA\x0D\x02\x00\x00\xEB\x05"s, VTABLE_OFFSET::NONE, 0, 1},
+    {"ALTAR_DICE_CLIMBINGGLOVES", "\xBA\x0D\x02\x00\x00\xEB\x05"s, VTABLE_OFFSET::NONE, 0, 1}, // VTABLE_OFFSET::FLOOR_ALTAR, 26
     {"ALTAR_DICE_COOKEDTURKEY", "\xBA\x06\x02\x00\x00\xEB\x0C"s, VTABLE_OFFSET::NONE, 0, 1},
     {"ALTAR_DICE_DIAMOND", "\xBA\xF1\x01\x00\x00\xE9\x87\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1},
     {"ALTAR_DICE_MACHETE", "\xBA\x48\x02\x00\x00\xEB\x1A"s, VTABLE_OFFSET::NONE, 0, 1},
@@ -17,6 +17,8 @@ std::vector<DropEntry> drop_entries{
     {"ALTAR_DICE_TELEPACK", "\xBA\x3A\x02\x00\x00\xEB\x2F"s, VTABLE_OFFSET::NONE, 0, 1},
     {"ALTAR_DICE_VAMPIRE", "\xEB\x05\xBA\xF5\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_DICE_WEBGUN", "\xBA\x40\x02\x00\x00\xEB\x13"s, VTABLE_OFFSET::NONE, 0, 1},
+    /// Has to be ENT_TYPE_CHAR_*
+    {"ALTAR_DICE_HIREDHAND", "\x48\x0F\x45\xCE\xC7\x44\x24\x20\xD7\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 8},
     {"ALTAR_IDOL_GOLDEN_MONKEY", "\x20\x00\xBA\x35\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_KAPALA", "\x20\x00\xBA\x16\x02\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_PRESENT_EGGPLANT", "\x20\x00\xBA\xE7\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
@@ -25,6 +27,14 @@ std::vector<DropEntry> drop_entries{
     {"ALTAR_USHABTI_CAVEMAN", "\x20\x00\xBA\xE1\x00\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_USHABTI_TURKEY", "\x20\x00\xBA\x83\x03\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_USHABTI_VAMPIRE", "\x20\x00\xBA\xF5\x00\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
+    /// Has to be ENT_TYPE_CHAR_*
+    {"ALTAR_USHABTI_HIREDHAND", "\xC7\x44\x24\x20\xD7\x00\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 4}, // this relies on the fact that this it is the first pattern
+    /// Shotgun for HH above, if you have enough favor, has to be pickable item
+    {"ALTAR_HIREDHAND_SHOTGUN", "\xBA\x41\x02\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1}, // this relies on the fact that this it is the first pattern
+    /// Gift from Kali when reaching 8 favor, this is what you get if you have all the powerups
+    {"ALTAR_GIFT_BOMBBAG", "\xBA\x01\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_ALTAR, 26, 1},
+    /* Kali gifts are potentially possible, but the game checks if player has the powerup
+    which is more complicated */
     {"ANUBIS2_JETPACK", "\x37\x02\x00\x00"s, VTABLE_OFFSET::MONS_ANUBIS2, 3},
     {"ANUBIS_SCEPTER", "\x4C\x02\x00\x00"s, VTABLE_OFFSET::MONS_ANUBIS, 3},
     {"BEG_BOMBBAG", "\xBA\x01\x02\x00\x00\xE8****\x31"s, VTABLE_OFFSET::NONE, 0, 1},
@@ -108,9 +118,9 @@ std::vector<DropEntry> drop_entries{
     /// Keep in mind that shopkeeper generator spawns two types of entities, the second one will be this + 1
     {"SHOPKEEPER_GENERATOR_1", "\x81\xCA\x10\x01\x00\x00\x4C\x89\xE1"s, VTABLE_OFFSET::NONE, 0, 2},
     /* set conditional bp on load_item for spider, break some scrap until you hit bp, execute return, you will see spaider id right above the spawn function
-    * scroll up to find the same pattern but for snake
-    * just above the snake you can find cobra and scorpion id, with jump to the spawn function after snake 
-    * little higher up, same thing for alien */
+     * scroll up to find the same pattern but for snake
+     * just above the snake you can find cobra and scorpion id, with jump to the spawn function after snake
+     * little higher up, same thing for alien */
     {"SCRAP_SPIDER", "\xC6\x44\x24\x20\x00\xBA\xDD\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"SCRAP_SNAKE", "\xC6\x44\x24\x20\x00\xBA\xDC\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"SCRAP_COBRA", "\xC6\x44\x24\x20\x00\xBA\xF8\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
@@ -145,7 +155,7 @@ std::vector<DropEntry> drop_entries{
     {"QUILLBACK_COOKEDTURKEY", "\xBA\x06\x02\x00\x00"s, VTABLE_OFFSET::MONS_CAVEMAN_BOSS, 3, 1},
     {"LAVAPOT_MAGMAMAN", "\xBA\xEF\x00\x00\x00"s, VTABLE_OFFSET::ITEM_LAVAPOT, 3, 1},
     /// Always spawns 5
-    {"LAVAMANDER_RUBY", "\xBA\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAVAMANDER, 3, 1}, //41 80 FE 05 - 05 ammount
+    {"LAVAMANDER_RUBY", "\xBA\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAVAMANDER, 3, 1}, // 41 80 FE 05 - 05 ammount
     {"CATMUMMY_DIAMOND", "\xBA\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_CATMUMMY, 3, 1},
     /// Has to be ENT_TYPE_CHAR_*
     {"HUMPHEAD_HIREDHAND", "\xC7\x44\x24\x20\xD7\x00\x00\x00"s, VTABLE_OFFSET::MONS_GIANTFISH, 3, 4},
@@ -256,7 +266,7 @@ std::vector<DropEntry> drop_entries{
     /* can't do elixir as there are some calculations for cursed, poisoned etc.
     can't do pet, it has some complex calculation for some reason
     can't do ankh as it is a byte, and some complex stuff
-    can't do initial health (camp, level, duat, coffin) as it's a word/byte 
+    can't do initial health (camp, level, duat, coffin) as it's a word/byte
     can't do drops for: humphead, yetiking, yetiqueen, alien queen, pangxie (gems) those are stored in array, need special funciton for that
     */
 

@@ -569,7 +569,7 @@ CustomSound SoundManager::get_event(std::string_view event_name)
     }
     return CustomSound{nullptr, nullptr};
 }
-PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, bool paused, [[maybe_unused]] bool as_music) //TODO: fix as_music being not used
+PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, bool paused, [[maybe_unused]] bool as_music) // TODO: fix as_music being not used
 {
     FMODStudio::EventInstance* instance{nullptr};
     m_EventCreateInstance(fmod_event, &instance);

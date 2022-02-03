@@ -225,11 +225,13 @@ void register_usertypes(sol::state& lua)
     };
 
     /// Gets a short tile code based on definition, returns `nil` if it can't be found
-    lua["get_short_tile_code"] = [](ShortTileCodeDef short_tile_code_def) -> std::optional<uint8_t> {
+    lua["get_short_tile_code"] = [](ShortTileCodeDef short_tile_code_def) -> std::optional<uint8_t>
+    {
         return State::get().ptr_local()->level_gen->data->get_short_tile_code(short_tile_code_def);
     };
     /// Gets the definition of a short tile code (if available), will vary depending on which file is loaded
-    lua["get_short_tile_code_definition"] = [](SHORT_TILE_CODE short_tile_code) -> std::optional<ShortTileCodeDef> {
+    lua["get_short_tile_code_definition"] = [](SHORT_TILE_CODE short_tile_code) -> std::optional<ShortTileCodeDef>
+    {
         return State::get().ptr_local()->level_gen->data->get_short_tile_code_def(short_tile_code);
     };
 
@@ -294,16 +296,19 @@ void register_usertypes(sol::state& lua)
     /// Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.
     /// Returns missing spawns in the front layer and missing spawns in the back layer in that order.
     /// The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.
-    lua["get_missing_extra_spawns"] = [](std::uint32_t extra_spawn_chance_id) -> std::pair<std::uint32_t, std::uint32_t> {
+    lua["get_missing_extra_spawns"] = [](std::uint32_t extra_spawn_chance_id) -> std::pair<std::uint32_t, std::uint32_t>
+    {
         return State::get().ptr()->level_gen->data->get_missing_extra_spawns(extra_spawn_chance_id);
     };
 
     /// Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
-    lua["get_room_index"] = [](float x, float y) -> std::pair<int, int> {
+    lua["get_room_index"] = [](float x, float y) -> std::pair<int, int>
+    {
         return State::get().ptr_local()->level_gen->get_room_index(x, y);
     };
     /// Transform a room index into the top left corner position in the room
-    lua["get_room_pos"] = [](int x, int y) -> std::pair<float, float> {
+    lua["get_room_pos"] = [](int x, int y) -> std::pair<float, float>
+    {
         return State::get().ptr_local()->level_gen->get_room_pos(x, y);
     };
     /// Get the room template given a certain index, returns `nil` if coordinates are out of bounds

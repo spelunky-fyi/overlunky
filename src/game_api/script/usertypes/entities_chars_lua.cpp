@@ -44,8 +44,7 @@ void register_usertypes(sol::state& lua)
                           if (i.player_slot >= 0)
                               return i.player_slot + 1;
                           else
-                              return i.player_slot;
-                      },
+                              return i.player_slot; },
                       [](Inventory& i, int8_t s)
                       {
                           if (s > 0)
