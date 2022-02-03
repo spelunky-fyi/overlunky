@@ -105,10 +105,10 @@ struct Quad
     AABB get_AABB() const
     {
         AABB result;
-        result.right = std::max(std::max(std::max(bottom_left_x, bottom_right_x), top_right_x), top_left_x);
-        result.left = std::min(std::min(std::min(bottom_left_x, bottom_right_x), top_right_x), top_left_x);
-        result.top = std::max(std::max(std::max(bottom_left_y, bottom_right_y), top_right_y), top_left_y);
-        result.bottom = std::min(std::min(std::min(bottom_left_y, bottom_right_y), top_right_y), top_left_y);
+        result.right = std::max({bottom_left_x, bottom_right_x, top_right_x, top_left_x});
+        result.left = std::min({bottom_left_x, bottom_right_x, top_right_x, top_left_x});
+        result.top = std::max({bottom_left_y, bottom_right_y, top_right_y, top_left_y});
+        result.bottom = std::min({bottom_left_y, bottom_right_y, top_right_y, top_left_y});
         return result;
     }
 
@@ -132,25 +132,35 @@ struct Quad
         const float sin_a{std::sin(angle)};
         const float cos_a{std::cos(angle)};
 
-        float x = (bottom_left_x - px);
-        float y = (bottom_left_y - py);
-        bottom_left_x = x * cos_a - y * sin_a + px;
-        bottom_left_y = y * cos_a + x * sin_a + py;
+        using vec = std::pair<float, float>;
+        const vec p{ px, py };
+        const vec mp{ -px, -py };
 
-        x = (bottom_right_x - px);
-        y = (bottom_right_y - py);
-        bottom_right_x = x * cos_a - y * sin_a + px;
-        bottom_right_y = y * cos_a + x * sin_a + py;
+        auto rotate_around_pivot = [=](vec in) -> vec
+        {
+            auto add = [](vec lhs, vec rhs) -> vec
+            {
+                return {
+                    lhs.first + rhs.first,
+                    lhs.second + rhs.second,
+                };
+            };
+            in = add(in, mp);
+            {
+                auto [x, y] = in;
+                in = {
+                    x * cos_a - y * sin_a,
+                    y * cos_a + x * sin_a,
+                };
+            }
+            in = add(in, p);
+            return in;
+        };
 
-        x = (top_left_x - px);
-        y = (top_left_y - py);
-        top_left_x = x * cos_a - y * sin_a + px;
-        top_left_y = y * cos_a + x * sin_a + py;
-
-        x = (top_right_x - px);
-        y = (top_right_y - py);
-        top_right_x = x * cos_a - y * sin_a + px;
-        top_right_y = y * cos_a + x * sin_a + py;
+        std::tie(bottom_left_x, bottom_left_y) = rotate_around_pivot({ bottom_left_x, bottom_left_y });
+        std::tie(bottom_right_x, bottom_right_y) = rotate_around_pivot({ bottom_right_x, bottom_right_y });
+        std::tie(top_left_x, top_left_y) = rotate_around_pivot({ top_left_x, top_left_y });
+        std::tie(top_right_x, top_right_y) = rotate_around_pivot({ top_right_x, top_right_y });
 
         return *this;
     }
