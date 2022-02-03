@@ -1,7 +1,7 @@
 #include "entities_mounts_lua.hpp"
 
+#include "entities_chars.hpp"
 #include "entities_mounts.hpp"
-#include "entity.hpp"
 
 #include <sol/sol.hpp>
 
@@ -33,14 +33,14 @@ void register_usertypes(sol::state& lua)
         "taming_timer",
         &Mount::taming_timer,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, PowerupCapable>());
 
     lua.new_usertype<Rockdog>(
         "Rockdog",
         "attack_cooldown",
         &Rockdog::attack_cooldown,
         sol::base_classes,
-        sol::bases<Entity, Movable, Mount>());
+        sol::bases<Entity, Movable, PowerupCapable, Mount>());
 
     lua.new_usertype<Axolotl>(
         "Axolotl",
@@ -49,7 +49,7 @@ void register_usertypes(sol::state& lua)
         "can_teleport",
         &Axolotl::can_teleport,
         sol::base_classes,
-        sol::bases<Entity, Movable, Mount>());
+        sol::bases<Entity, Movable, PowerupCapable, Mount>());
 
     lua.new_usertype<Mech>(
         "Mech",
@@ -60,13 +60,13 @@ void register_usertypes(sol::state& lua)
         "breaking_wall",
         &Mech::breaking_wall,
         sol::base_classes,
-        sol::bases<Entity, Movable, Mount>());
+        sol::bases<Entity, Movable, PowerupCapable, Mount>());
 
     lua.new_usertype<Qilin>(
         "Qilin",
         "attack_cooldown",
         &Qilin::attack_cooldown,
         sol::base_classes,
-        sol::bases<Entity, Movable, Mount>());
+        sol::bases<Entity, Movable, PowerupCapable, Mount>());
 }
 } // namespace NEntitiesMounts

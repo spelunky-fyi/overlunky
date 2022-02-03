@@ -4679,11 +4679,11 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::SameLine();
             ImGui::Text("%s", theme_name(target->theme));
         }
-        else if ((entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD")) || (entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")))
+        else if ((entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD")) || (entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")) || (entity_type >= to_id("ENT_TYPE_MOUNT_TURKEY") && entity_type <= to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH")))
         {
             for (const auto& [powerup_id, powerup_entity] : entity->powerups)
             {
-                render_powerup(powerup_entity->uid, "CharPowerups");
+                render_powerup(powerup_entity->uid, "Powerups");
             }
             ImGui::Text("  Add: ");
             ImGui::SameLine();

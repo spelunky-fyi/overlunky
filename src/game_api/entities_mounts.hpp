@@ -1,8 +1,8 @@
 #pragma once
 
-#include "movable.hpp"
+#include "entities_chars.hpp"
 
-class Mount : public Movable
+class Mount : public PowerupCapable
 {
   public:
     size_t unknown1;
@@ -21,6 +21,19 @@ class Mount : public Movable
     void carry(Movable* rider);
 
     void tame(bool value);
+
+    virtual void v95() = 0;
+    virtual void v96() = 0;
+    virtual void v97() = 0;
+    virtual void v98() = 0;
+    virtual void v99() = 0;
+    virtual void v100() = 0;
+    virtual void v101() = 0;
+    virtual void v102() = 0;
+    virtual void v103() = 0;
+    virtual void v104() = 0;
+    virtual void v105() = 0;
+    virtual void v106() = 0;
 };
 
 class Rockdog : public Mount
