@@ -704,8 +704,7 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> 
                          {
                              found.push_back(item->uid);
                          }
-                     }
-                 });
+                     } });
 
     return found;
 }

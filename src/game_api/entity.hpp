@@ -449,16 +449,16 @@ struct SoundPosition
     size_t __vftable;
     float x;
     float y;
-    SoundInfo* sound_effect_info; //param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
-    uint64_t fmod_param_id;       //param to FMOD::Studio::EventInstance::SetParameterByID
-    float POS_SCREEN_X;           //VANILLA_SOUND_PARAM names, for now
+    SoundInfo* sound_effect_info; // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
+    uint64_t fmod_param_id;       // param to FMOD::Studio::EventInstance::SetParameterByID
+    float POS_SCREEN_X;           // VANILLA_SOUND_PARAM names, for now
     float DIST_CENTER_X;
     float DIST_CENTER_Y;
     float DIST_Z;
-    float DIST_PLAYER; //seams to be always here, even you you get nil in lua
+    float DIST_PLAYER; // seams to be always here, even you you get nil in lua
     float SUBMERGED;
     float LIQUID_STREAM;
-    float unknown10; //LIQUID_STREAM related? , maybe LIQUID_INTENSITY?
+    float unknown10; // LIQUID_STREAM related? , maybe LIQUID_INTENSITY?
     float VALUE;
     float unknown12;
     float unknown13;

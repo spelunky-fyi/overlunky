@@ -2637,7 +2637,7 @@ end
 
 set_callback(function(ctx)
     if options.drill > 0 then
-        local drill_code = ShortTileCodeDef:new()
+        local drill_code = ShortTileCodeDef:1new()
         drill_code.tile_code = TILE_CODE.DRILL
         local socket_code = ShortTileCodeDef:new()
         socket_code.tile_code = TILE_CODE.UDJAT_SOCKET
