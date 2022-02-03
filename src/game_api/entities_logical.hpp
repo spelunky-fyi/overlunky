@@ -31,7 +31,7 @@ class LogicalDoor : public Entity
 {
   public:
     ENT_TYPE door_type;
-    int32_t unk2; //always 37?
+    int32_t unk2; // always 37?
     bool not_hidden;
     /// Is set true when you bomb the door, no matter what door, can't be reset
     bool platform_spawned;
@@ -55,7 +55,7 @@ class LogicalStaticSound : public LogicalSound
 class LogicalLiquidStreamSound : public LogicalStaticSound
 {
   public:
-    float unknown; //soundpositionpointer unknown10
+    float unknown; // soundpositionpointer unknown10
 };
 
 class LogicalTrapTrigger : public Entity
@@ -74,8 +74,8 @@ class LogicalTrapTrigger : public Entity
 class JungleTrapTrigger : public LogicalTrapTrigger
 {
   public:
-    int32_t counter1; //one of those wierd counters that counts all the traps, not only this single one
-    int32_t counter2; //also there are 3 of them?
+    int32_t counter1; // one of those wierd counters that counts all the traps, not only this single one
+    int32_t counter2; // also there are 3 of them?
     int32_t counter3;
 };
 
@@ -187,7 +187,7 @@ class LimbAnchor : public Entity
 class LogicalConveyorbeltSound : public LogicalSound
 {
   public:
-    UnknownPointerGroup unknown; //why?
+    UnknownPointerGroup unknown; // why?
 };
 
 class LogicalAnchovyFlock : public Entity
@@ -207,7 +207,7 @@ class MummyFliesSound : public LogicalSound
     uint8_t flies;
     int8_t padding1;
     int16_t padding2;
-    UnknownPointerGroup unknown; //why? because of this this entity falls into the larger bucket
+    UnknownPointerGroup unknown; // why? because of this this entity falls into the larger bucket
 };
 
 class QuickSandSound : public LogicalSound
@@ -240,8 +240,8 @@ class BoulderSpawner : public Entity
 class PipeTravelerSound : public LogicalSound
 {
   public:
-    float sound_speed; //unsure, soundpositionpointer -> VALUE
-    int32_t counter;   //unsure, probably unsigned?
+    float sound_speed; // unsure, soundpositionpointer -> VALUE
+    int32_t counter;   // unsure, probably unsigned?
     int8_t unknown1;   // enter/exit sound time duration?
     int8_t unknown2;   // enter/exit sound time duration?
     bool enter_exit;
@@ -291,5 +291,5 @@ class DMSpawning : public Entity
 class DMAlienBlast : public Entity
 {
   public:
-    int32_t unknown; //EntityUID? it's always -1
+    int32_t unknown; // EntityUID? it's always -1
 };

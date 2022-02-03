@@ -42,7 +42,8 @@ sol::object custom_require(std::string path)
     }
 
     // Walk up the stack until we find an _ENV that is not global, then grab the source from that stack index
-    auto [short_source, source] = []() -> std::pair<std::string_view, std::string_view> {
+    auto [short_source, source] = []() -> std::pair<std::string_view, std::string_view>
+    {
         return lua.safe_script(R"(
 -- Not available in Lua 5.2+
 local getfenv = getfenv or function(f)

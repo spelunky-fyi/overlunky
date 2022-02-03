@@ -486,7 +486,7 @@ void register_usertypes(sol::state& lua)
         &StateMemory::time_startup,
         */
         "logic",
-        &StateMemory::logic); //had to have something at the at for the "comma" before the big comment block
+        &StateMemory::logic); // had to have something at the at for the "comma" before the big comment block
 
     state_usertype["speedrun_character"] = &StateMemory::speedrun_character;
     state_usertype["speedrun_activation_trigger"] = &StateMemory::speedrun_activation_trigger;

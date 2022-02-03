@@ -391,8 +391,8 @@ int32_t Floor::get_decoration_entity_type() const
         return 0x75;
     case 0x5: // FLOOR_SURFACE
         return 0x76;
-    //case 0x6: // FLOOR_SURFACE_HIDDEN
-    //    return 0x77;
+    // case 0x6: // FLOOR_SURFACE_HIDDEN
+    //     return 0x77;
     case 0xa: // FLOOR_JUNGLE
         return 0x77;
     case 0x31: // IDOL_TRAP_CEILING
