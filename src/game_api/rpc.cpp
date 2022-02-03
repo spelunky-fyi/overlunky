@@ -545,7 +545,9 @@ std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
     return get_entities_by({}, mask, LAYER::BOTH);
 }
 
-void foreach_mask(uint32_t mask, Layer* l, std::function<void(EntityList&)> fun)
+template<class FunT>
+requires std::is_invocable_v<FunT, const EntityList&>
+void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)
 {
     if (mask == 0)
     {
@@ -573,9 +575,9 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
 
-    auto push_matching_types = [&proper_types, &found](EntityList entities)
+    auto push_matching_types = [&proper_types, &found](const EntityList& entities)
     {
-        for (auto& item : entities)
+        for (auto& item : entities.entities())
         {
             if (entity_type_check(proper_types, item->type->id))
             {
@@ -583,24 +585,29 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
             }
         }
     };
-    auto insert_all_uids = [&found](EntityList entities)
+    auto insert_all_uids = [&found](const EntityList& entities)
     {
-        found.insert(found.end(), entities.uid_begin(), entities.uid_end());
+        found.reserve(found.size() + entities.size);
+        const auto uids = entities.uids();
+        found.insert(found.end(), uids.begin(), uids.end());
     };
 
     if (layer == LAYER::BOTH)
     {
-        if ((!proper_types.size() || !proper_types[0]) && !mask) // all entities
+        if (proper_types.empty() || proper_types[0] == 0)
         {
-            // this exception for small improvments with calling reserve once
-            found.reserve((size_t)state.layer(0)->all_entities.size + (size_t)state.layer(1)->all_entities.size);
-            found.insert(found.end(), state.layer(0)->all_entities.uid_begin(), state.layer(0)->all_entities.uid_end());
-            found.insert(found.end(), state.layer(1)->all_entities.uid_begin(), state.layer(1)->all_entities.uid_end());
-        }
-        else if (!proper_types.size() || !proper_types[0]) // all types
-        {
-            foreach_mask(mask, state.layer(0), insert_all_uids);
-            foreach_mask(mask, state.layer(1), insert_all_uids);
+            if (mask == 0) // all entities
+            {
+                // this exception for small improvments with calling reserve once
+                found.reserve(found.size() + (size_t)state.layer(0)->all_entities.size + (size_t)state.layer(1)->all_entities.size);
+                found.insert(found.end(), state.layer(0)->all_entities.uids().begin(), state.layer(0)->all_entities.uids().end());
+                found.insert(found.end(), state.layer(1)->all_entities.uids().begin(), state.layer(1)->all_entities.uids().end());
+            }
+            else // all types
+            {
+                foreach_mask(mask, state.layer(0), insert_all_uids);
+                foreach_mask(mask, state.layer(1), insert_all_uids);
+            }
         }
         else
         {
@@ -611,7 +618,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
     else
     {
         uint8_t correct_layer = enum_to_layer(layer);
-        if (!proper_types.size() || !proper_types[0]) // all types
+        if (proper_types.empty() || proper_types[0] == 0) // all types
         {
             foreach_mask(mask, state.layer(correct_layer), insert_all_uids);
         }
@@ -632,9 +639,9 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
     auto state = State::get();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-    auto push_entities_at = [&x, &y, &radius, &proper_types, &found](EntityList entities)
+    auto push_entities_at = [&x, &y, &radius, &proper_types, &found](const EntityList& entities)
     {
-        for (auto& item : entities)
+        for (auto& item : entities.entities())
         {
             auto [ix, iy] = item->position();
             float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
@@ -696,9 +703,9 @@ std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t ma
 std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
 {
     std::vector<uint32_t> found;
-    foreach_mask(mask, layer, [&entity_types, &found, &sx, &sy, &sx2, &sy2](EntityList entities)
+    foreach_mask(mask, layer, [&entity_types, &found, &sx, &sy, &sx2, &sy2](const EntityList& entities)
                  {
-                     for (auto& item : entities)
+                     for (auto& item : entities.entities())
                      {
                          if (entity_type_check(std::move(entity_types), item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
                          {
@@ -795,8 +802,9 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
         const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
         if ((!proper_types.size() || !proper_types[0]) && !mask) // all items
         {
-            found.reserve(entity->items.size);
-            found.insert(found.end(), entity->items.uid_begin(), entity->items.uid_end());
+            found.reserve(found.size() + entity->items.size);
+            const auto uids = entity->items.uids();
+            found.insert(found.end(), uids.begin(), uids.end());
         }
         else
         {
