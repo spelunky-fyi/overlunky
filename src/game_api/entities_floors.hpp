@@ -58,9 +58,10 @@ class Floor : public Entity
     static bool get_perpendicular_sides(FLOOR_SIDE side, FLOOR_SIDE (&perp_sides)[2]);
     static bool get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2]);
 
-    virtual void decorate_internal() = 0; // decorates undecorated floor and floorstyled, doesn't remove old decorations
-    virtual void v39() = 0;
-    virtual void v40() = 0;
+    virtual void decorate_internal() = 0;     // decorates undecorated floor and floorstyled, doesn't remove old decorations, runs only on level gen
+    virtual void on_neighbor_destroyed() = 0; // called on every neighbor of destroyed floor (probably to decorate it)
+    /// Returns it's ENT_TYPE except for FLOOR_PEN (returns FLOORSTYLED_MINEWOOD) and FLOOR_QUICKSAND, FLOOR_TOMB, FLOOR_EMPRESS_GRAVE which return FLOOR_GENERIC
+    virtual ENT_TYPE get_floor_type() = 0; // Used for spawning decorations
 };
 
 class Door : public Floor
@@ -70,13 +71,13 @@ class Door : public Floor
     int8_t unused1[7];
     Entity* fx_button;
 
+    virtual void v40() = 0;
     virtual void v41() = 0;
-    virtual void enter(Entity* who) = 0;
+    virtual uint8_t enter(Entity* who) = 0;
     virtual void v43() = 0;
     virtual void v44() = 0;
     virtual void v45() = 0;
     virtual void v46() = 0;
-    virtual void v47() = 0;
 };
 
 class ExitDoor : public Door

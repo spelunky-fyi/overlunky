@@ -61,6 +61,8 @@ void register_usertypes(sol::state& lua)
         &Floor::remove_decoration,
         "decorate_internal",
         &Floor::decorate_internal,
+        "get_floor_type",
+        &Floor::get_floor_type,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -90,6 +92,8 @@ void register_usertypes(sol::state& lua)
         &Door::counter,
         "fx_button",
         &Door::fx_button,
+        "enter",
+        &ExitDoor::enter,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
