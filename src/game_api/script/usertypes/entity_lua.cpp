@@ -139,7 +139,11 @@ void register_usertypes(sol::state& lua)
         "sound_killed_by_other",
         &EntityDB::sound_killed_by_other,
         "description",
-        &EntityDB::description);
+        &EntityDB::description,
+        "tilex",
+        &EntityDB::tile_x,
+        "tiley",
+        &EntityDB::tile_y);
 
     auto get_overlay = [&lua](Entity& entity)
     {
