@@ -4,7 +4,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) I
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.6a"
+meta.version = "2.6b"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -70,7 +70,8 @@ local real_default_options = {
     bias_15 = 4,
     drill = 20,
     kali = true,
-    jellyless_chance = 40
+    jellyless_chance = 40,
+    crust_chance = 0.5
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -135,6 +136,7 @@ local function register_options()
     register_option_int("drill", "Drill chance (x2 in echoes)", default_options.drill, 0, 100)
     register_option_bool("kali", "Random kali items", default_options.kali)
     register_option_float("jellyless_chance", "Easy CO chance (no jelly)", default_options.jellyless_chance, 0, 100)
+    register_option_float("crust_chance", "Crust item chance", default_options.crust_chance, 0, 100)
     register_option_button("_reset", "Reset options to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -300,7 +302,9 @@ local function trap_ceiling_valid(x, y, l)
     if has({THEME.CITY_OF_GOLD, THEME.ICE_CAVES, THEME.TIAMAT, THEME.OLMEC}, state.theme) then
         return false
     end
-    if (map(x, y+1) & MASK.LAVA) > 0 then return false end
+    if (map(x, y+1) & MASK.LIQUID) > 0 then return false end
+    if (map(x-1, y) & MASK.LIQUID) > 0 then return false end
+    if (map(x+1, y) & MASK.LIQUID) > 0 then return false end
     if (map(x, y-1) & MASK.ACTIVEFLOOR) > 0 then return false end
     local rx, ry = get_room_index(x, y)
     if y == state.level_gen.spawn_y and (ry >= state.level_gen.spawn_room_y and ry <= state.level_gen.spawn_room_y-1) then return false end
@@ -333,7 +337,9 @@ local function trap_floor_spawn(x, y, l)
 end
 local function trap_floor_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
-    if (map(x, y+1) & MASK.LAVA) > 0 then return false end
+    if (map(x, y+1) & MASK.LIQUID) > 0 then return false end
+    if (map(x-1, y) & MASK.LIQUID) > 0 then return false end
+    if (map(x+1, y) & MASK.LIQUID) > 0 then return false end
     local floor = get_grid_entity_at(x, y, l)
     local above = get_grid_entity_at(x, y+1, l)
     if floor ~= -1 and above == -1 then
@@ -366,6 +372,8 @@ local function trap_wall_spawn(x, y, l)
 end
 local function trap_wall_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
+    if (map(x-1, y) & MASK.LIQUID) > 0 then return false end
+    if (map(x+1, y) & MASK.LIQUID) > 0 then return false end
     local rx, ry = get_room_index(x, y)
     if y == state.level_gen.spawn_y and (rx >= state.level_gen.spawn_room_x-1 and rx <= state.level_gen.spawn_room_x+1) then return false end
     local floor = get_grid_entity_at(x, y, l)
@@ -388,7 +396,9 @@ local function trap_generic_spawn(x, y, l)
 end
 local function trap_generic_valid(x, y, l)
     if state.theme == THEME.TIDE_POOL and state.level == 3 and y >= 80 and y <= 90 then return false end
-    if (map(x, y+1) & MASK.LAVA) > 0 then return false end
+    if (map(x, y+1) & MASK.LIQUID) > 0 then return false end
+    if (map(x-1, y) & MASK.LIQUID) > 0 then return false end
+    if (map(x+1, y) & MASK.LIQUID) > 0 then return false end
     local rx, ry = get_room_index(x, y)
     if x == state.level_gen.spawn_x and (ry >= state.level_gen.spawn_room_y and ry <= state.level_gen.spawn_room_y-1) then return false end
     local floor = get_grid_entity_at(x, y, l)
@@ -1217,7 +1227,7 @@ local shop_names = {
     [ENT_TYPE.ITEM_SNAP_TRAP] = "Who put this here?!",
     [ENT_TYPE.MOUNT_QILIN] = "Updog"
 }
-local wrong_stringid = 1948
+local wrong_stringid = 1967
 
 set_callback(function()
     for i,v in ipairs(shop_names) do
@@ -1572,10 +1582,95 @@ local function get_chain_item()
     return pick(crate_items)
 end
 
---[[TODO
-    HUNDUN_FIREBALL
-    TIAMAT_*
-]]
+local crust_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_BOMBBOX,
+         ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY, ENT_TYPE.ITEM_PICKUP_GIANTFOOD,
+         ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECTACLES,
+         ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES,
+         ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_COMPASS,
+         ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE,
+         ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_CROWN,
+         ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH,
+         ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_CAPE,
+         ENT_TYPE.ITEM_VLADS_CAPE, ENT_TYPE.ITEM_JETPACK, ENT_TYPE.ITEM_TELEPORTER_BACKPACK, ENT_TYPE.ITEM_HOVERPACK,
+         ENT_TYPE.ITEM_POWERPACK, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_SHOTGUN, ENT_TYPE.ITEM_FREEZERAY,
+         ENT_TYPE.ITEM_CROSSBOW, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_MATTOCK,
+         ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_BROKENEXCALIBUR,
+         ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_SCEPTER, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW,
+         ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ITEM_CRATE,
+         ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_DIAMOND, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_PASTEBOMB, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_KEY, ENT_TYPE.ITEM_LOCKEDCHEST_KEY, ENT_TYPE.ITEM_IDOL, ENT_TYPE.ITEM_MADAMETUSK_IDOL}
+
+local crust_item_frames = {
+    [ENT_TYPE.ITEM_LIGHT_ARROW] = 169,
+    [ENT_TYPE.ITEM_PRESENT] = 255,
+    [ENT_TYPE.ITEM_PICKUP_BOMBBOX] = 23,
+    [ENT_TYPE.ITEM_PICKUP_ROYALJELLY] = 236,
+    [ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY] = 239,
+    [ENT_TYPE.ITEM_PICKUP_GIANTFOOD] = 207,
+    [ENT_TYPE.ITEM_PICKUP_ELIXIR] = 171,
+    [ENT_TYPE.ITEM_PICKUP_CLOVER] = 242,
+    [ENT_TYPE.ITEM_PICKUP_SPECTACLES] = 58,
+    [ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES] = 36,
+    [ENT_TYPE.ITEM_PICKUP_PITCHERSMITT] = 37,
+    [ENT_TYPE.ITEM_PICKUP_SPRINGSHOES] = 39,
+    [ENT_TYPE.ITEM_PICKUP_SPIKESHOES] = 38,
+    [ENT_TYPE.ITEM_PICKUP_PASTE] = 34,
+    [ENT_TYPE.ITEM_PICKUP_COMPASS] = 35,
+    [ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS] = 51,
+    [ENT_TYPE.ITEM_PICKUP_PARACHUTE] = 43,
+    [ENT_TYPE.ITEM_PICKUP_UDJATEYE] = 22,
+    [ENT_TYPE.ITEM_PICKUP_KAPALA] = 23,
+    [ENT_TYPE.ITEM_PICKUP_HEDJET] = 28,
+    [ENT_TYPE.ITEM_PICKUP_CROWN] = 30,
+    [ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN] = 223,
+    [ENT_TYPE.ITEM_PICKUP_TRUECROWN] = 75,
+    [ENT_TYPE.ITEM_PICKUP_ANKH] = 27,
+    [ENT_TYPE.ITEM_PICKUP_SKELETON_KEY] = 210,
+    [ENT_TYPE.ITEM_CAPE] = 40,
+    [ENT_TYPE.ITEM_VLADS_CAPE] = 99,
+    [ENT_TYPE.ITEM_JETPACK] = 41,
+    [ENT_TYPE.ITEM_TELEPORTER_BACKPACK] = 71,
+    [ENT_TYPE.ITEM_HOVERPACK] = 148,
+    [ENT_TYPE.ITEM_POWERPACK] = 183,
+    [ENT_TYPE.ITEM_WEBGUN] = 49,
+    [ENT_TYPE.ITEM_SHOTGUN] = 48,
+    [ENT_TYPE.ITEM_FREEZERAY] = 50,
+    [ENT_TYPE.ITEM_CROSSBOW] = 64,
+    [ENT_TYPE.ITEM_CAMERA] = 74,
+    [ENT_TYPE.ITEM_TELEPORTER] = 54,
+    [ENT_TYPE.ITEM_MATTOCK] = 128,
+    [ENT_TYPE.ITEM_BOOMERANG] = 55,
+    [ENT_TYPE.ITEM_MACHETE] = 112,
+    [ENT_TYPE.ITEM_EXCALIBUR] = 144,
+    [ENT_TYPE.ITEM_BROKENEXCALIBUR] = 195,
+    [ENT_TYPE.ITEM_PLASMACANNON] = 52,
+    [ENT_TYPE.ITEM_SCEPTER] = 29,
+    [ENT_TYPE.ITEM_CLONEGUN] = 152,
+    [ENT_TYPE.ITEM_HOUYIBOW] = 167,
+    [ENT_TYPE.ITEM_METAL_SHIELD] = 214,
+    [ENT_TYPE.ITEM_CRATE] = 2,
+    [ENT_TYPE.ITEM_VAULTCHEST] = 0,
+    [ENT_TYPE.ITEM_DIAMOND] = 6,
+    [ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY] = 47,
+    [ENT_TYPE.ITEM_BOMB] = 80,
+    [ENT_TYPE.ITEM_PASTEBOMB] = 83,
+    [ENT_TYPE.ITEM_LANDMINE] = 178,
+    [ENT_TYPE.ITEM_KEY] = 209,
+    [ENT_TYPE.ITEM_LOCKEDCHEST_KEY] = 24,
+    [ENT_TYPE.ITEM_IDOL] = 31,
+    [ENT_TYPE.ITEM_MADAMETUSK_IDOL] = 172
+}
+
+local function embed_crust_item(uid, item)
+    if not crust_item_frames[item] then
+        prinspect("no", item)
+        return
+    end
+    local embed_uid = spawn_over(ENT_TYPE.ITEM_ALIVE_EMBEDDED_ON_ICE, uid, 0, 0)
+    local embed = get_entity(embed_uid)
+    embed.inside = item
+    embed.animation_frame = crust_item_frames[item]
+    embed.angle = prng:random()*math.pi*2
+end
 
 set_post_entity_spawn(function(ent)
     replace_drop(DROP.HUMPHEAD_HIREDHAND, pick(friends))
@@ -1760,7 +1855,10 @@ local function shuffle_tile_codes()
             if forced_tiles[tile_key(x, y, layer)] ~= nil then
                 spawn_grid_entity(forced_tiles[tile_key(x, y, layer)], x, y, layer)
             else
-                spawn_grid_entity(floor_tilecodes[type], x, y, layer)
+                local uid = spawn_grid_entity(floor_tilecodes[type], x, y, layer)
+                if prng:random() < options.crust_chance / 100 then
+                    embed_crust_item(uid, pick(crust_items))
+                end
             end
             return true
         end, type)
