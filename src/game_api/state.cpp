@@ -1,4 +1,5 @@
 #include "state.hpp"
+#include "entities_liquids.hpp"
 #include "game_manager.hpp"
 #include "level_api.hpp"
 #include "logger.h"
@@ -16,6 +17,62 @@ uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabt
 void StateMemory::set_correct_ushabti(uint16_t animation_frame)
 {
     correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
+}
+
+void fix_liquid_out_of_bounds()
+{
+    constexpr uint8_t N_POOLS = 5; // needs to be the same size as LiquidPhysics::pools
+
+    const static std::array<ENT_TYPE, N_POOLS> liquid_type_by_pool = {
+        to_id("ENT_TYPE_LIQUID_WATER"),
+        to_id("ENT_TYPE_LIQUID_COARSE_WATER"),
+        to_id("ENT_TYPE_LIQUID_LAVA"),
+        to_id("ENT_TYPE_LIQUID_COARSE_LAVA"),
+        to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"),
+    };
+
+    auto state = State::get();
+    std::vector<int32_t> liquid_ids_to_destroy[N_POOLS];
+    uint8_t pool = 0;
+    // gather the liquid ids to destroy
+    if (!state.ptr() || !state.ptr()->liquid_physics || !state.ptr()->liquid_physics->pools[0].physics_engine)
+        return;
+
+    for (auto& it : state.ptr()->liquid_physics->pools)
+    {
+        if (it.physics_engine->entity_count > 0) // is the engine running?
+        {
+            for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
+            {
+                if ((it.physics_engine->entity_coordinates + i)->second < 0.1) // 0.1 just to be safe
+                {
+                    liquid_ids_to_destroy[pool].push_back(i);
+                }
+            }
+        }
+        ++pool;
+    }
+    // destroy entities that mach the liauid id and pool
+    for (pool = 0; pool < N_POOLS; ++pool)
+    {
+        if (liquid_ids_to_destroy[pool].size() > 0)
+        {
+            const auto& it = state.layer(0)->entities_by_mask.find(pool < 2 ? 0x2000 : 0x4000);
+            if (!it->second.empty())
+            {
+                for (auto ent : it->second)
+                {
+                    if (ent->type->id == liquid_type_by_pool[pool])
+                    {
+                        if (std::find(liquid_ids_to_destroy[pool].begin(), liquid_ids_to_destroy[pool].end(), *ent->as<Liquid>()->liquid_id) != liquid_ids_to_destroy[pool].end())
+                        {
+                            ent->kill(true, nullptr);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 inline bool& get_is_init()
