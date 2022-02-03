@@ -74,16 +74,6 @@ struct EntityList
         return size == 0;
     }
 
-    // Keeping these two for now so we don't need to port old code
-    Entity** begin()
-    {
-        return ent_list;
-    }
-    Entity** end()
-    {
-        return ent_list + size;
-    }
-
     EntityRange entities()
     {
         return {ent_list, size};

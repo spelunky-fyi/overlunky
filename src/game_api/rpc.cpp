@@ -166,7 +166,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // 
     if (player == nullptr)
         return -1;
     std::vector<std::tuple<int32_t, float, Entity*>> found;
-    for (auto& item : state.layer(player->layer)->all_entities)
+    for (auto& item : state.layer(player->layer)->all_entities.entities())
     {
         auto [ix, iy] = item->position();
         auto flags = item->type->search_flags;
@@ -777,7 +777,7 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
     if (entity->items.size > 0)
     {
         const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-        for (auto item : entity->items)
+        for (auto item : entity->items.entities())
         {
             if (entity_type_check(proper_types, item->type->id))
                 return true;
@@ -807,7 +807,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
         }
         else
         {
-            for (auto item : entity->items)
+            for (auto item : entity->items.entities())
             {
                 if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
                 {
@@ -907,7 +907,7 @@ void flip_entity(uint32_t uid)
     ent->flags = flipflag(ent->flags, 17);
     if (ent->items.size > 0)
     {
-        for (auto item : ent->items)
+        for (auto item : ent->items.entities())
         {
             item->flags = flipflag(item->flags, 17);
         }
