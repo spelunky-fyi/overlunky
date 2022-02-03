@@ -1275,7 +1275,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "sparktrap_angle_increment"sv,
-        // Put a read bp on Spark:rotatnio_angle, the next instruction adds a hardcoded float from constant, we want address of that constant
+        // Put a read bp on Spark:rotatnio_angle, the next instruction adds a hardcoded float from constant, we want address of that constant (not the whole instruction)
         PatternCommandBuffer{}
             .find_after_inst("\xF3\x0F\x10\x89\x58\x01\x00\x00\xF3\x0F\x58\x0D"sv)
             .at_exe(),
@@ -1347,14 +1347,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "mount_carry_rider"sv,
-        // Put a write bp on Player.overlay and hop on a mount
-        PatternCommandBuffer{}
-            .find_inst("\x48\xC7\x87\x08\x01\x00\x00\x00\x00\x00\x00\xC6\x87\x2D\x01"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
         "toast"sv,
         // Put a write bp on State.toast
         PatternCommandBuffer{}
@@ -1395,19 +1387,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "construct_illumination_ptr"sv,
-        // Put a conditional bp on load_item (rdx ENT_TYPE_LIQUID_LAVA) and warp to Volcana
-        // Continue execution once so that a LIQUID_LAVA entity gets made with a missing Illumination*
-        // Put a write bp on that Illumination nullptr, disable the load_item bp and continue execution
-        // The function just above where it breaks constructs the Illumination ptr (rax will be put into
-        // LIQUID_LAVA entity)
-        PatternCommandBuffer{}
-            .find_inst("\xC7\x44\x24\x20\x9A\x99\x19\x3F"sv)
-            .offset(0x13)
-            .decode_call()
-            .at_exe(),
-    },
-    {
         "construct_soundposition_ptr"sv,
         // Put a write bp on ACTIVEFLOOR_DRILL sound_pos1 and release the drill
         PatternCommandBuffer{}
@@ -1424,15 +1403,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(-0x7)
             .decode_pc()
             .at_exe(),
-    },
-    {
-        // Put bp on Entitydb->description and walk into a shop that has this entity
-        // Can also get string_table_here, you will see the id from description used as an offset of the first string in string_table
-        "format_shopitem_name"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x48\x83\xEC\x28\x48\x89\xD0"sv) // minimum pattern: \x28\x48\x89\xD0\x48
-            .at_exe()
-            .function_start(),
     },
     {
         // Put bp on state->basecamp_dialogue choose base/extra _dialogue, which ever the character you speak to responses ->line
@@ -1479,14 +1449,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x48\x8d")
             .decode_pc()
             .at_exe(),
-    },
-    {
-        // Do the same thing as for transition_func but execute to the return, it will put you in this function
-        "door_entry"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x48\x83\xEC\x38\x48\x89\xD7\x48\x89\xCE\x48\x8B\x42\x08"sv)
-            .at_exe()
-            .function_start(),
     },
     {
         // Set condition bp on spawn_entity (not load_item) for one of the entities spawned by this generator
@@ -1561,6 +1523,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "ankh_health"sv,
         PatternCommandBuffer{}
             .find_after_inst("\x41\x0F\xB6\x87\x17\x01\x00\x00\x83\xF8"sv)
+            .at_exe(),
+    },
+    {
+        // Set write bp on State->shops->restricted_item_count, this structure is quite common so i chosen pattern before the call
+        "add_shopitem"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x4C\x8D\x84\x24\xD0\x00\x00\x00\xE8"sv)
+            .offset(-0x1)
+            .decode_call()
             .at_exe(),
     },
 };

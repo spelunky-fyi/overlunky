@@ -180,6 +180,8 @@ void register_usertypes(sol::state& lua)
         &LaserTrap::reset_timer,
         "phase_2",
         &LaserTrap::phase_2,
+        "trigger",
+        &LaserTrap::trigger,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 

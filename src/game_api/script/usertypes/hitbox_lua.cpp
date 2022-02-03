@@ -78,5 +78,31 @@ void register_usertypes(sol::state& lua)
         &AABB::width,
         "height",
         &AABB::height);
+
+    lua.new_usertype<Quad>(
+        "Quad",
+        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float)>{},
+        "bottom_left_x",
+        &Quad::bottom_left_x,
+        "bottom_left_y",
+        &Quad::bottom_left_y,
+        "bottom_right_x",
+        &Quad::bottom_right_x,
+        "bottom_right_y",
+        &Quad::bottom_right_y,
+        "top_right_x",
+        &Quad::top_right_x,
+        "top_right_y",
+        &Quad::top_right_y,
+        "top_left_x",
+        &Quad::top_left_x,
+        "top_left_y",
+        &Quad::top_left_y,
+        "get_AABB",
+        &Quad::get_AABB,
+        "offset",
+        &Quad::offset,
+        "rotate",
+        &Quad::rotate);
 }
 } // namespace NHitbox

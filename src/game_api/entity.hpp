@@ -77,8 +77,8 @@ struct EntityDB
     EntityCreate create_func;
     EntityDestroy destroy_func;
     int32_t field_10;
-    /* Entity id (ENT_...) */
     ENT_TYPE id;
+    /// MASK
     uint32_t search_flags;
     float width;
     float height;
@@ -293,7 +293,7 @@ class Entity
         return static_cast<T*>(this);
     }
 
-    virtual ~Entity() = 0;
+    virtual ~Entity() = 0; // vritual 0
     virtual void create_rendering_info() = 0;
     virtual void handle_state_machine() = 0;
 
@@ -306,7 +306,7 @@ class Entity
     virtual void destroy() = 0;
 
     virtual void apply_texture(Texture*) = 0;
-    virtual void hiredhand_description(char*) = 0;
+    virtual void format_shopitem_name(char16_t*) = 0;
     virtual void generate_stomp_damage_particles(Entity* victim) = 0; // particles when jumping on top of enemy
     virtual float get_type_field_a8() = 0;
     virtual bool block_pushing_related() = 0; // does a bittest for the 14 entities starting at pushblock, function hits when player pushes entity
@@ -322,7 +322,7 @@ class Entity
     virtual void v20() = 0;
     virtual void remove_item_ptr(Entity*) = 0;
     virtual Entity* get_held_entity() = 0;
-    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // spawns LASERTRAP_SHOT from LASERTRAP
+    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", tiggers use self as the first parameter
     /// Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
     virtual bool trigger_action(Entity* user) = 0;
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
@@ -433,21 +433,63 @@ struct Inventory
     uint32_t collected_money_total;
 };
 
-class SoundPosition
+struct SoundInfo
 {
-  public:
+    int64_t unknown1;
+    uint32_t sound_id;
+    int32_t unknown2;
+    const char* sound_name;
+    int64_t unknown3;
+    int64_t unknown4;
+    int64_t unknown5;
+};
+
+struct SoundPosition
+{
     size_t __vftable;
     float x;
     float y;
-    size_t sound_effect_pointer; // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30); soundeffect doesn't seem to change when you pick a similar object around it
-    uint64_t fmod_param_id;      // param to FMOD::Studio::EventInstance::SetParameterByID
-    float sound_x_coord_1;
-    float sound_x_coord_2; // sometimes similar as coord_1, sometimes inverted, sometimes different
-    float unknown5;
-    float unknown6;
-    float unknown7;
-    float unknown8;
-    float unknown9;
+    SoundInfo* sound_effect_info; //param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
+    uint64_t fmod_param_id;       //param to FMOD::Studio::EventInstance::SetParameterByID
+    float POS_SCREEN_X;           //VANILLA_SOUND_PARAM names, for now
+    float DIST_CENTER_X;
+    float DIST_CENTER_Y;
+    float DIST_Z;
+    float DIST_PLAYER; //seams to be always here, even you you get nil in lua
+    float SUBMERGED;
+    float LIQUID_STREAM;
+    float unknown10; //LIQUID_STREAM related? , maybe LIQUID_INTENSITY?
+    float VALUE;
+    float unknown12;
+    float unknown13;
+    float unknown14;
+    float unknown15;
+    float unknown16;
+    float unknown17;
+    float unknown18;
+    float unknown19;
+    float unknown20;
+    float unknown21;
+    float unknown22;
+    float unknown23;
+    float unknown24;
+    float unknown25;
+    float unknown26;
+    float unknown27;
+    float unknown28;
+    float unknown29;
+    float POISONED;
+    float CURSED;
+    float unknown32;
+    float unknown33;
+    float unknown34;
+    float unknown35;
+    float unknown36;
+    float unknown37;
+    float unknown38;
+    float unknown39;
+    float unknown40;
+    float unknown41; // all the values repeat from this point, maybe all those floats are just an array?
 };
 
 std::vector<EntityItem> list_entities();

@@ -9,9 +9,15 @@ namespace NSound
 {
 void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 {
-    if (sound_manager == nullptr || !sound_manager->is_init())
+    assert(sound_manager != nullptr && sound_manager->is_init());
+    if (sound_manager == nullptr)
     {
         DEBUG("Audio API is not available!");
+        return;
+    }
+    if (!sound_manager->is_init())
+    {
+        DEBUG("Audio API is not initialized!");
         return;
     }
 

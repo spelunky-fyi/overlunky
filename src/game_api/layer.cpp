@@ -6,12 +6,12 @@
 #include "rpc.hpp"
 #include "state.hpp"
 
-Entity* Layer::spawn_entity(size_t id, float x, float y, bool screen, float vx, float vy, bool snap)
+Entity* Layer::spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx, float vy, bool snap)
 {
     if (id == 0)
         return nullptr;
 
-    using LoadItem = Entity*(Layer*, size_t, float, float, bool);
+    using LoadItem = Entity*(Layer*, ENT_TYPE, float, float, bool);
     static auto load_item = (LoadItem*)get_address("load_item");
 
     float min_speed_check = 0.01f;
@@ -55,9 +55,9 @@ void snap_to_floor(Entity* ent, float y)
     }
 }
 
-Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
+Entity* Layer::spawn_entity_snap_to_floor(ENT_TYPE id, float x, float y)
 {
-    const EntityDB* type = get_type(static_cast<uint32_t>(id));
+    const EntityDB* type = get_type(id);
     const float y_center = roundf(y) - 0.5f;
     const float snapped_y = y_center + type->rect_collision.hitboxy - type->rect_collision.offsety;
     Entity* ent = spawn_entity(id, x, snapped_y, false, 0.0f, 0.0f, false);
@@ -68,9 +68,9 @@ Entity* Layer::spawn_entity_snap_to_floor(size_t id, float x, float y)
     return ent;
 }
 
-Entity* Layer::spawn_entity_over(size_t id, Entity* overlay, float x, float y)
+Entity* Layer::spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y)
 {
-    using SpawnEntityFun = Entity*(EntityFactory*, size_t, float, float, bool, Entity*, bool);
+    using SpawnEntityFun = Entity*(EntityFactory*, ENT_TYPE, float, float, bool, Entity*, bool);
     static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
     using AddToLayer = void(Layer*, Entity*);
     static auto add_to_layer = (AddToLayer*)get_address("add_to_layer");
