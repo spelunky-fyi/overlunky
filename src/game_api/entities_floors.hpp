@@ -59,6 +59,8 @@ class Floor : public Entity
     static bool get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2]);
 
     virtual void decorate_internal() = 0; // decorates undecorated floor and floorstyled, doesn't remove old decorations
+    virtual void v39() = 0;
+    virtual void v40() = 0;
 };
 
 class Door : public Floor
@@ -67,6 +69,14 @@ class Door : public Floor
     uint8_t counter; // counts down as you go thru it
     int8_t unused1[7];
     Entity* fx_button;
+
+    virtual void v41() = 0;
+    virtual void enter(Entity* who) = 0;
+    virtual void v43() = 0;
+    virtual void v44() = 0;
+    virtual void v45() = 0;
+    virtual void v46() = 0;
+    virtual void v47() = 0;
 };
 
 class ExitDoor : public Door
@@ -138,6 +148,8 @@ class Arrowtrap : public Floor
     {
         return trigger_trap(this, who_uid);
     }
+
+    virtual void v41() = 0;
 };
 
 class TotemTrap : public Floor
@@ -238,6 +250,8 @@ class Generator : public Floor
     uint8_t start_counter;
     /// works only for star challenge
     bool on_off;
+
+    virtual void v41() = 0;
 };
 
 class SlidingWallCeiling : public Floor

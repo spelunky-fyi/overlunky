@@ -10,6 +10,18 @@ class Monster : public PowerupCapable
   public:
     int32_t chased_target_uid;
     uint32_t target_selection_timer;
+
+    virtual void increase_killcount() = 0; // increases state.kills_npc
+
+    virtual void on_aggro() = 0; // updates state.quests in case of npc
+
+    virtual void unknown_v96() = 0;
+
+    virtual void on_shop_entered() = 0;
+
+    virtual void on_player_picked_up_shopitem() = 0; // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
+
+    virtual void on_fire_weapon() = 0; // if deactivated, they can pick up weapons but won't shoot them
 };
 
 class RoomOwner : public Monster
@@ -31,18 +43,6 @@ class RoomOwner : public Monster
     bool was_hurt;
     uint16_t padding1;
     uint32_t padding2;
-
-    virtual void increase_killcount() = 0; // increases state.kills_npc
-
-    virtual void on_aggro() = 0; // updates state.quests in case of npc
-
-    virtual void unknown_v96() = 0;
-
-    virtual void on_shop_entered() = 0;
-
-    virtual void on_player_picked_up_shopitem() = 0; // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
-
-    virtual void on_fire_weapon() = 0; // if deactivated, they can pick up weapons but won't shoot them
 
     virtual void on_criminal_act_committed() = 0; // shows the appropriate message (vandal, cheater, ...)
 
