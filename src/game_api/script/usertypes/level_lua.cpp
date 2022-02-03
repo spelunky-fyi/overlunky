@@ -1044,7 +1044,7 @@ void register_usertypes(sol::state& lua)
     /// The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.
     lua["get_missing_extra_spawns"] = [](std::uint32_t extra_spawn_chance_id) -> std::pair<std::uint32_t, std::uint32_t>
     {
-        return State::get().ptr_local()->level_gen->data->get_missing_extra_spawns(extra_spawn_chance_id);
+        return State::get().ptr()->level_gen->data->get_missing_extra_spawns(extra_spawn_chance_id);
     };
 
     /// Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`

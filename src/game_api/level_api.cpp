@@ -1153,7 +1153,7 @@ void LevelGenData::init()
                 "\x5a"                         // POP        RDX
                 "\x59"                         // POP        RCX
                 "\x58"                         // POP        RAX
-                // Original Code Begin
+                                               // Original Code Begin
                 "\x44\x8b\xbd\xe4\x05\x00\x00" // MOV        R15D,dword ptr [RBP + 0x5e4]
                 "\x41\x83\xe7\x08"             // AND        R15D,0x8
                 "\x4c\x8b\xb5\x70\x05\x00\x00" // MOV        R14,qword ptr [RBP + 0x570]
@@ -1161,7 +1161,7 @@ void LevelGenData::init()
                 "\x74\x09"                     // JZ         FIRST_JUMP
                 "\x48\x8b\xbd\x60\x05\x00\x00" // MOV        RDI,qword ptr [RBP + 0x560]
                 "\xeb\x0c"                     // JMP        SECOND_JUMP
-                                               //  Original Code End
+                                               // Original Code End
                 /*FIST_JUMP*/ "\x48\xb8{}"     // MOV        RAX, get_room_size_first_jump
                 "\xff\xe0"                     // JMP        RAX
                 /*SECOND_JUMP*/ "\x48\xb8{}"   // MOV        RAX, get_room_size_second_jump
