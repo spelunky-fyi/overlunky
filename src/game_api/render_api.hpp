@@ -104,7 +104,7 @@ struct RenderInfo
     bool unknown17;
     bool unknown18;
     uint32_t unknown19;
-    uint8_t shader; //0 - 36, game crash at around 55
+    uint8_t shader; // 0 - 36, game crash at around 55
     uint8_t unknown20a;
     uint8_t unknown20b;
     uint8_t unknown20c;
@@ -160,7 +160,7 @@ struct RenderInfo
     float darkness; // 0.0 = completely black ; 1.0 = normal (dark effect like when on fire)
     uint32_t unknown56;
     uint32_t unknown57;
-    uint32_t unknown58; //end, next RenderInfo below
+    uint32_t unknown58; // end, next RenderInfo below
 };
 
 struct TextRenderingInfo

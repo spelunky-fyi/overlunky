@@ -16,7 +16,7 @@
 #include <unordered_set>
 #include <utility>
 
-uint32_t setflag(uint32_t flags, int bit) //shouldn't we change those to #define ?
+uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
 {
     return flags | (1U << (bit - 1));
 }
@@ -33,7 +33,7 @@ uint32_t flipflag(uint32_t flags, int bit)
     return (flags ^ (1U << (bit - 1)));
 }
 
-void teleport(float x, float y, bool s, float vx, float vy, bool snap) //ui only
+void teleport(float x, float y, bool s, float vx, float vy, bool snap) // ui only
 {
     auto state = State::get();
 
@@ -161,7 +161,7 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // 
         x = rx;
         y = ry;
     }
-    //DEBUG("Items at {}:", (x, y));
+    // DEBUG("Items at {}:", (x, y));
     auto player = state.items()->player(0);
     if (player == nullptr)
         return -1;
@@ -188,8 +188,8 @@ int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // 
         std::sort(found.begin(), found.end(), [](auto a, auto b) -> bool
                   { return std::get<1>(a) < std::get<1>(b); });
         auto picked = found[0];
-        //auto entity = std::get<2>(picked);
-        //DEBUG("{}", (void*)entity);
+        // auto entity = std::get<2>(picked);
+        // DEBUG("{}", (void*)entity);
         return std::get<0>(picked);
     }
     return -1;
@@ -704,8 +704,7 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> 
                          {
                              found.push_back(item->uid);
                          }
-                     }
-                 });
+                     } });
 
     return found;
 }
@@ -1858,13 +1857,13 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
         if (original_instr)
         {
             std::string new_code = fmt::format("\x50\x31\xC0\x41\xB3{}\x88\xD0\x41\xF6\xF3\x88\xE2\x58"sv, to_le_bytes((uint8_t)ent_types.size()));
-            //push rax
-            //xor eax, eax
-            //mov r11b, (size)
-            //mov al, dl
-            //divb r11b
-            //mov dl, ah
-            //pop rax
+            // push rax
+            // xor eax, eax
+            // mov r11b, (size)
+            // mov al, dl
+            // divb r11b
+            // mov dl, ah
+            // pop rax
             write_mem_recoverable("diceshop_prizes", offset, new_code, true);
         }
         else
@@ -1915,12 +1914,12 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
         if (original_instr)
         {
             std::string new_code = fmt::format("\x41\xB1{}\x48\xC1\xE8\x38\x41\xF6\xF1\x49\x89\xC1"sv, to_le_bytes((uint8_t)ent_types.size()));
-            //mov R9b, (size)
-            //shr RAX, 0x38
-            //divb R9b
-            //mov R9, RAX
+            // mov R9b, (size)
+            // shr RAX, 0x38
+            // divb R9b
+            // mov R9, RAX
             write_mem_recoverable("altar_damage_spawn", code_offset, new_code, true);
-            write_mem_recoverable("altar_damage_spawn", instruction_shr, "\x49\xC1\xE9\x08"sv, true); //shr r9,0x8
+            write_mem_recoverable("altar_damage_spawn", instruction_shr, "\x49\xC1\xE9\x08"sv, true); // shr r9,0x8
             write_mem_recoverable("altar_damage_spawn", instruction_to_modifiy, (uint8_t)0x8C, true); // r9+r12 => r12+r9*4
         }
         else

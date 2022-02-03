@@ -38,7 +38,7 @@ class Ai
     int8_t unknown24;
     int8_t unknown25;
     int32_t unknown26;
-    //Map unknown27;
+    // Map unknown27;
 };
 
 class PowerupCapable : public Movable
@@ -83,7 +83,7 @@ class Player : public PowerupCapable
     int32_t i16c;
     float y_pos; // not sure why, seams to be the same as abs_y
     uint32_t jump_flags;
-    uint8_t timer_since_last_jump; //something different happens before or after 6
+    uint8_t timer_since_last_jump; // something different happens before or after 6
     uint8_t can_use;               // is compared with bit numbers, so probably flags
 
     void set_jetpack_fuel(uint8_t fuel);
