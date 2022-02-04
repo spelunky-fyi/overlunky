@@ -715,3 +715,64 @@ void ForceField::activate_laserbeam(bool turn_on)
         animation_frame = 50;
     }
 }
+
+void Door::unlock(bool unlock)
+{
+    static const ENT_TYPE locked_door = to_id("ENT_TYPE_FLOOR_DOOR_LOCKED");
+    static const ENT_TYPE COG_door = to_id("ENT_TYPE_FLOOR_DOOR_COG");
+    static const ENT_TYPE eggchild_room_door = to_id("ENT_TYPE_FLOOR_DOOR_MOAI_STATUE");
+    static const ENT_TYPE EW_door = to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD");
+    const auto ent_type = this->type->id;
+    if (ent_type == locked_door || ent_type == locked_door + 1) // plus one for DOOR_LOCKED_PEN
+    {
+        auto door_ent = this->as<LockedDoor>();
+        if (unlock)
+        {
+            door_ent->unlocked = true;
+            door_ent->set_invisible(true);
+        }
+        else
+        {
+            door_ent->unlocked = false;
+            door_ent->set_invisible(false);
+        }
+    }
+    // works also for DOOR_EXIT and DOOR_LAYER, but the virtual `is_door_unlocked` will still return true
+    // so i din't do it to avoid confusion
+    else if (ent_type == EW_door)
+    {
+        if (unlock)
+        {
+            this->flags |= 0x80000; // set flag 20 (Enable button prompt)
+        }
+        else
+        {
+            this->flags &= ~0x80000; //clr flag 20 (Enable button prompt)
+        }
+    }
+    else if (ent_type == COG_door)
+    {
+        auto door_ent = this->as<CityOfGoldDoor>();
+        if (unlock)
+        {
+            door_ent->unlocked = true;
+            door_ent->special_bg->animation_frame = 1;
+        }
+        else
+        {
+            door_ent->unlocked = false;
+            door_ent->special_bg->animation_frame = 0;
+        }
+    }
+    else if (ent_type == eggchild_room_door)
+    {
+        if (unlock)
+        {
+            this->set_invisible(false);
+        }
+        else
+        {
+            this->set_invisible(true);
+        }
+    }
+}

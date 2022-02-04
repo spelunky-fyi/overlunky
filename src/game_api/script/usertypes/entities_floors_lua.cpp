@@ -93,7 +93,11 @@ void register_usertypes(sol::state& lua)
         "fx_button",
         &Door::fx_button,
         "enter",
-        &ExitDoor::enter,
+        &Door::enter,
+        "is_door_unlocked",
+        &Door::is_door_unlocked,
+        "unlock",
+        &Door::unlock,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 

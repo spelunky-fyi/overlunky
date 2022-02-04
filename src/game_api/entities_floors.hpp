@@ -71,13 +71,24 @@ class Door : public Floor
     int8_t unused1[7];
     Entity* fx_button;
 
-    virtual void v40() = 0;
-    virtual void v41() = 0;
+    void unlock(bool unlock);
+
+    // this function doesnt do much, checks if it's CHAR_*, checks if hes holding anything (if yes calls some function), then checks if Player.can_use is equal to 4 calls some other function
+    // can't be bother to look into the functions
+    virtual void on_enter_attempt(Entity* who) = 0;
+
+    // check if it's CHAR_*, then sets State.level_flags -> 21 (Hide hud, transition)
+    virtual void hide_ui(Entity* who) = 0;
     virtual uint8_t enter(Entity* who) = 0;
-    virtual void v43() = 0;
-    virtual void v44() = 0;
-    virtual void v45() = 0;
-    virtual void v46() = 0;
+
+    // checks layer of the Entity entering, except for FLOOR_DOOR_EGGSHIP_ROOM which gets the overlay (BG_EGGSHIP_ROOM) and returns BGEggshipRoom.player_in
+    virtual bool entered_from_front_layer(Entity* who) = 0;
+
+    // returns 0.0 except for eggship doors
+    // for example: FLOOR_DOOR_EGGSHIP_ROOM returns 0.75 when entering the room, and 1.0 when exiting, runs every frame while entering/exiting
+    virtual float v44() = 0;
+    virtual bool is_door_unlocked() = 0;
+    virtual bool v46() = 0; // dunno, runs every frame when player overlays door
 };
 
 class ExitDoor : public Door
@@ -150,7 +161,8 @@ class Arrowtrap : public Floor
         return trigger_trap(this, who_uid);
     }
 
-    virtual void v41() = 0;
+    /// Just that, nothing fancy. The rest is done by the logical trigger i believe
+    virtual Entity* spawn_arrow(float x, float y) = 0;
 };
 
 class TotemTrap : public Floor
@@ -251,7 +263,7 @@ class Generator : public Floor
     /// works only for star challenge
     bool on_off;
 
-    virtual void v41() = 0;
+    virtual void randomize_timer() = 0; // called after it spawns entity and it's "ready" (have proper flags set etc.)
 };
 
 class SlidingWallCeiling : public Floor
