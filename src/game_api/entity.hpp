@@ -166,7 +166,7 @@ class Entity
     uint16_t animation_frame;
     /// Don't edit this dirrectly, use `set_draw_depth`
     uint8_t draw_depth;
-    uint8_t b3f; //depth related, changed when going thru doors etc.
+    uint8_t b3f; // depth related, changed when going thru doors etc.
     float x;
     float y;
     float abs_x; // only for movable entities, or entities that can be spawned without overlay, for the rest it's FLOAT_MIN?
@@ -187,7 +187,7 @@ class Entity
     float tilew;
     float tileh;
     uint8_t layer;
-    uint8_t b99; //this looks like FLOORSTYLED post-processing
+    uint8_t b99; // this looks like FLOORSTYLED post-processing
     uint8_t b9a;
     uint8_t b9b;
     uint32_t i9c;
@@ -342,7 +342,7 @@ class Entity
     /// Applies changes made in `entity.type`
     virtual void apply_db() = 0;
 
-    //virtual void v38() = 0;
+    // virtual void v38() = 0;
 };
 
 struct Inventory
@@ -375,7 +375,7 @@ struct Inventory
     /// Used to transfer information to transition/next level. Is not updated during a level
     /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     int16_t held_item_metadata;
-    uint8_t unknown5c; //padding?
+    uint8_t unknown5c; // padding?
 
     int8_t player_slot;
     /// Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
@@ -449,16 +449,16 @@ struct SoundPosition
     size_t __vftable;
     float x;
     float y;
-    SoundInfo* sound_effect_info; //param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
-    uint64_t fmod_param_id;       //param to FMOD::Studio::EventInstance::SetParameterByID
-    float POS_SCREEN_X;           //VANILLA_SOUND_PARAM names, for now
+    SoundInfo* sound_effect_info; // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
+    uint64_t fmod_param_id;       // param to FMOD::Studio::EventInstance::SetParameterByID
+    float POS_SCREEN_X;           // VANILLA_SOUND_PARAM names, for now
     float DIST_CENTER_X;
     float DIST_CENTER_Y;
     float DIST_Z;
-    float DIST_PLAYER; //seams to be always here, even you you get nil in lua
+    float DIST_PLAYER; // seams to be always here, even you you get nil in lua
     float SUBMERGED;
     float LIQUID_STREAM;
-    float unknown10; //LIQUID_STREAM related? , maybe LIQUID_INTENSITY?
+    float unknown10; // LIQUID_STREAM related? , maybe LIQUID_INTENSITY?
     float VALUE;
     float unknown12;
     float unknown13;

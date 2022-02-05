@@ -381,8 +381,7 @@ void hook_savegame()
                                   {
                                       if (file == "savegame.sav"sv and options["disable_savegame"])
                                           return;
-                                      original(backup_file, file, data, data_size);
-                                  });
+                                      original(backup_file, file, data, data_size); });
         savegame_hooked = true;
     }
 }
@@ -1521,7 +1520,7 @@ bool dragging(std::string keyname)
 
 bool dragged(std::string keyname) // unused
 {
-    //int wParam = OL_BUTTON_MOUSE;
+    // int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -1539,7 +1538,7 @@ bool dragged(std::string keyname) // unused
 
 float drag_delta(std::string keyname)
 {
-    //int wParam = OL_BUTTON_MOUSE;
+    // int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -1557,7 +1556,7 @@ float drag_delta(std::string keyname)
 
 float held_duration(std::string keyname) // unused
 {
-    //int wParam = OL_BUTTON_MOUSE;
+    // int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -2119,12 +2118,12 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("speedhack_turbo", wParam) && !repeat)
     {
         g_speedhack_old_multiplier = g_speedhack_multiplier;
-        speedhack(5.f); //TODO: configurable
+        speedhack(5.f); // TODO: configurable
     }
     else if (pressed("speedhack_slow", wParam) && !repeat)
     {
         g_speedhack_old_multiplier = g_speedhack_multiplier;
-        speedhack(0.2f); //TODO: configurable
+        speedhack(0.2f); // TODO: configurable
     }
     else
     {
@@ -2146,7 +2145,7 @@ void update_filter(std::string s)
     int count = 0;
     std::string last = last_word(s);
     uint32_t searchid = 0;
-    //auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
+    // auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
     for (unsigned int i = 0; i < g_items.size(); i++)
     {
         if (s[0] == '\0' || std::isspace(s.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
@@ -3235,13 +3234,13 @@ void render_clickhandler()
         {
             ImVec2 mpos = normalize(io.MousePos);
             std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
-            //std::pair<float, float> campos = get_camera_position();
+            // std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
             std::string buf = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
-            //char buf2[32];
-            //sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
+            // char buf2[32];
+            // sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
             dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
-            //dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
+            // dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
             unsigned int mask = safe_entity_mask;
             if (GetAsyncKeyState(VK_SHIFT)) // TODO: Get the right modifier from mouse_destroy_unsafe
             {
@@ -4813,7 +4812,7 @@ void render_entity_props(int uid, bool detached = false)
     }
     if (ImGui::CollapsingHeader("Illumination"))
     {
-        if ((entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))) //TODO: show all lit entities
+        if ((entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))) // TODO: show all lit entities
         {
             if (entity->emitted_light)
                 render_illumination(entity->emitted_light, "Entity illumination");
@@ -5353,7 +5352,7 @@ void render_keyconfig()
 
 void render_spawner()
 {
-    //ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
+    // ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
     render_input();
     render_list();
 }

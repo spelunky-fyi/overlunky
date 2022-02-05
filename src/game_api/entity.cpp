@@ -504,8 +504,7 @@ EntityHooksInfo& Entity::get_hooks()
                               cb.fun((Entity*)self);
                           }
                           g_entity_hooks.erase(_it);
-                      }
-                  });
+                      } });
         g_entity_hooks.push_back({this});
         return g_entity_hooks.back();
     }

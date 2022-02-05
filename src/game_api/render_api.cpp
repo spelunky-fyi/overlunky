@@ -518,17 +518,17 @@ void init_render_api_hooks()
 
         // Manually assembled code, let's hope it won't have to change ever
         std::string code = fmt::format(
-            "\x48\x89\xc1"                         //mov    rcx, rax
-            "\x48\xba{}"                           //mov    rdx, 0x0
-            "\xff\xd2"                             //call   rdx
-            "\x48\x89\x86\x90\x00\x00\x00"         //mov    QWORD PTR[rsi + 0x90], rax
-            "\x48\x85\xc0"                         //test   rax, rax
-            "\x74\x17"                             //jz     0x17
-            "\x48\x0f\xb7\x40\x18"                 //movzx  rax, WORD PTR[rax + 0x18]
-            "\x66\x0f\xaf\x84\x1f\x90\x00\x00\x00" //imul   ax, WORD PTR[rdi + rbx * 1 + 0x90]
-            "\x66\x03\x84\x1f\x8c\x00\x00\x00"     //add    ax, WORD PTR[rdi + rbx * 1 + 0x8c]
-            "\xeb\x02"                             //jmp    0x2
-            "\x31\xc0"sv,                          //xor    rax, rax
+            "\x48\x89\xc1"                         // mov    rcx, rax
+            "\x48\xba{}"                           // mov    rdx, 0x0
+            "\xff\xd2"                             // call   rdx
+            "\x48\x89\x86\x90\x00\x00\x00"         // mov    QWORD PTR[rsi + 0x90], rax
+            "\x48\x85\xc0"                         // test   rax, rax
+            "\x74\x17"                             // jz     0x17
+            "\x48\x0f\xb7\x40\x18"                 // movzx  rax, WORD PTR[rax + 0x18]
+            "\x66\x0f\xaf\x84\x1f\x90\x00\x00\x00" // imul   ax, WORD PTR[rdi + rbx * 1 + 0x90]
+            "\x66\x03\x84\x1f\x8c\x00\x00\x00"     // add    ax, WORD PTR[rdi + rbx * 1 + 0x8c]
+            "\xeb\x02"                             // jmp    0x2
+            "\x31\xc0"sv,                          // xor    rax, rax
             to_le_bytes(fetch_texture_addr));
 
         // Fill with nop, code is not performance-critical either way

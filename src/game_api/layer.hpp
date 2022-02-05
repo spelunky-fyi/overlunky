@@ -111,7 +111,7 @@ struct Layer
     bool is_back_layer;
     // int8_t padding[7];
     EntityList all_entities;
-    //char + fx + mons + item + logical + mount + activefloor + BG (excluding BG_SHOP, BG_LEVEL_*)
+    // char + fx + mons + item + logical + mount + activefloor + BG (excluding BG_SHOP, BG_LEVEL_*)
     EntityList unknown_entities1;
     size_t unknown1;
     // key is the mask
@@ -143,7 +143,7 @@ struct Layer
     size_t unknown21;
     size_t unknown22;
     bool unknown23;
-    bool layer_freeze; //locking mechanism?
+    bool layer_freeze; // locking mechanism?
     uint8_t unknown25;
     uint8_t unknown26;
     uint32_t unknown27;
@@ -165,7 +165,7 @@ struct Layer
     uint64_t unknown43;
     uint64_t unknown44;
     uint64_t unknown45;
-    uint64_t unknown46; //next layer below
+    uint64_t unknown46; // next layer below
 
     Entity* spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx, float vy, bool snap);
 
