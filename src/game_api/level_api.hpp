@@ -365,6 +365,23 @@ struct LevelGenRoomsMeta
     std::array<bool, 8 * 16> rooms;
 };
 
+enum class ShopType : uint8_t {
+    General,
+    Clothing,
+    Weapon,
+    Specialty,
+    HiredHand,
+    Pet,
+    Dice,
+    Unkown07,
+    Hedjet,
+    Curio,
+    Caveman,
+    Turkey,
+    Ghist,
+    Tusk,
+};
+
 struct LevelGenSystem
 {
     void init();
@@ -427,8 +444,8 @@ struct LevelGenSystem
     uint8_t flags;
     uint8_t unknown39;
     uint8_t unknown40;
-    uint8_t shop_type;
-    uint8_t unknown42;
+    ShopType shop_type;
+    ShopType backlayer_shop_type;
     uint8_t unknown43;
     uint8_t unknown44;
     uint8_t unknown45;
