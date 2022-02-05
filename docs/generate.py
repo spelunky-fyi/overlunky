@@ -784,6 +784,8 @@ for type in types:
             print(" [`" + base + "`](#" + base.lower() + ")", end="")
         print()
     for var in type["vars"]:
+        if "comment" in var and "NoDoc" in var["comment"]:
+            continue
         search_link = (
             "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
         )

@@ -747,7 +747,7 @@ void Door::unlock(bool unlock)
         }
         else
         {
-            this->flags &= ~0x80000; //clr flag 20 (Enable button prompt)
+            this->flags &= ~0x80000; // clr flag 20 (Enable button prompt)
         }
     }
     else if (ent_type == COG_door)
