@@ -1604,6 +1604,8 @@ MASK
 - [`int sound_killed_by_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_player) &EntityDB::sound_killed_by_player
 - [`int sound_killed_by_other`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_other) &EntityDB::sound_killed_by_other
 - [`STRINGID description`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) &EntityDB::description
+- [`int tilex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilex) &EntityDB::tile_x
+- [`int tiley`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiley) &EntityDB::tile_y
 ### `Entity`
 - [`EntityDB type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &Entity::type
 - [`Entity overlay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlay) overlay
@@ -1653,6 +1655,9 @@ Moves the entity to the limbo-layer where it can later be retrieved from again v
 - [`nil respawn(LAYER layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=respawn) &Entity::respawn
 \
 Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
+- [`nil kill(bool destroy_corpse, Entity responsible)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill) &Entity::kill
+\
+Kills the entity, you can set responsible to `nil` to ignore it
 - [`nil destroy()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy) &Entity::destroy
 \
 Completely removes the entity from existence
@@ -1667,6 +1672,8 @@ Performs a teleport as if the entity had a teleporter and used it. The delta coo
 Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
 - [`get_metadata`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) &Entity::get_metadata
 - [`nil apply_metadata(int metadata)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) &Entity::apply_metadata
+- [`nil set_invisible(bool)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) &Entity::set_invisible
+- [`span<int> get_items()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) &Entity::get_items
 ### `Movable`
 Derived from [`Entity`](#entity)
 - [`float movex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) &Movable::movex
@@ -1715,7 +1722,9 @@ airtime = falling_timer
 - [`int price`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) &Movable::price
 - [`nil stun(int framecount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun) &Movable::stun
 - [`nil freeze(int framecount)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=freeze) &Movable::freeze
-- [`nil light_on_fire()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_on_fire) &Movable::light_on_fire
+- [`nil light_on_fire(int time)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_on_fire) light_on_fire
+\
+Does not damage entity
 - [`nil set_cursed(bool b)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursed) &Movable::set_cursed
 - [`nil drop(Entity entity_to_drop)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop) &Movable::drop
 - [`nil pick_up(Entity entity_to_pick_up)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) &Movable::pick_up
@@ -1727,6 +1736,8 @@ Adds or subtracts the specified amount of money to the movable's (player's) inve
 - [`nil damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) damage
 \
 Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+- [`bool is_on_fire()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on_fire) &Movable::is_on_fire
+- [`is_in_liquid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) &Movable::is_in_liquid
 ### `PowerupCapable`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`nil remove_powerup(ENT_TYPE powerup_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_powerup) &PowerupCapable::remove_powerup
@@ -1900,10 +1911,16 @@ Explicitly add a decoration on the given side. Corner decorations only exist for
 \
 Explicitly remove a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
 - [`nil decorate_internal()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=decorate_internal) &Floor::decorate_internal
+- [`ENT_TYPE get_floor_type()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_type) &Floor::get_floor_type
+\
+Returns it's ENT_TYPE except for FLOOR_PEN (returns FLOORSTYLED_MINEWOOD) and FLOOR_QUICKSAND, FLOOR_TOMB, FLOOR_EMPRESS_GRAVE which return FLOOR_GENERIC
 ### `Door`
 Derived from [`Entity`](#entity) [`Floor`](#floor)
 - [`int counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter) &Door::counter
 - [`Entity fx_button`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) &Door::fx_button
+- [`int enter(Entity who)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter) &Door::enter
+- [`bool is_door_unlocked()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_door_unlocked) &Door::is_door_unlocked
+- [`nil unlock(bool unlock)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlock) &Door::unlock
 ### `ExitDoor`
 Derived from [`Entity`](#entity) [`Floor`](#floor) [`Door`](#door)
 - [`bool entered`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entered) &ExitDoor::entered
@@ -2143,12 +2160,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`Illumination emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &LightArrowPlatform::emitted_light
 ### `FallingPlatform`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
-- [`int emitted_light`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) &FallingPlatform::timer
-\
-The name `emitted_light` is false here, don't use it, it should be called `timer`
 - [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &FallingPlatform::timer
-\
-The name `emitted_light` is false here, don't use it, it should be called `timer`
 - [`float shaking_factor`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shaking_factor) &FallingPlatform::shaking_factor
 - [`float y_pos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_pos) &FallingPlatform::y_pos
 ### `UnchainedSpikeBall`
@@ -2186,7 +2198,7 @@ Derived from [`Entity`](#entity) [`Movable`](#movable) [`PushBlock`](#pushblock)
 \
 timer till explosion, -1 = pause, counts down
 ### `Mount`
-Derived from [`Entity`](#entity) [`Movable`](#movable)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable)
 - [`nil carry(Movable rider)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) &Mount::carry
 - [`nil tame(bool value)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tame) &Mount::tame
 - [`int rider_uid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rider_uid) &Mount::rider_uid
@@ -2195,19 +2207,19 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`int walk_pause_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) &Mount::walk_pause_timer
 - [`int taming_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=taming_timer) &Mount::taming_timer
 ### `Rockdog`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Mount`](#mount)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Mount`](#mount)
 - [`int attack_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown) &Rockdog::attack_cooldown
 ### `Axolotl`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Mount`](#mount)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Mount`](#mount)
 - [`int attack_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown) &Axolotl::attack_cooldown
 - [`bool can_teleport`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_teleport) &Axolotl::can_teleport
 ### `Mech`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Mount`](#mount)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Mount`](#mount)
 - [`int gun_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gun_cooldown) &Mech::gun_cooldown
 - [`bool walking`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking) &Mech::walking
 - [`bool breaking_wall`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=breaking_wall) &Mech::breaking_wall
 ### `Qilin`
-Derived from [`Entity`](#entity) [`Movable`](#movable) [`Mount`](#mount)
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable) [`Mount`](#mount)
 - [`int attack_cooldown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown) &Qilin::attack_cooldown
 ### `Monster`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`PowerupCapable`](#powerupcapable)
@@ -3761,6 +3773,8 @@ All `.lvl` files are loaded relative to `Data/Levels`, but they can be completel
 - [`float door1_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_x) &DoorCoords::door1_x
 - [`float door1_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_y) &DoorCoords::door1_y
 - [`float door2_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_x) &DoorCoords::door2_x
+\
+door2 only valid when there are two in the level, like Volcana drill, Olmec, ...
 - [`float door2_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) &DoorCoords::door2_y
 ### `LevelGenSystem`
 - [`int shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
@@ -3768,7 +3782,7 @@ All `.lvl` files are loaded relative to `Data/Levels`, but they can be completel
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &LevelGenSystem::spawn_y
 - [`int spawn_room_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) &LevelGenSystem::spawn_room_x
 - [`int spawn_room_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) &LevelGenSystem::spawn_room_y
-- [`DoorCoords exits`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exits) &LevelGenSystem::exit_doors_locations
+- [`array<ImVec2> exit_doors`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_doors) &LevelGenSystem::exit_doors
 ### `PostRoomGenerationContext`
 - [`bool set_room_template(int x, int y, LAYER layer, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
 \

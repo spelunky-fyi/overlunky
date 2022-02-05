@@ -355,6 +355,8 @@ void register_usertypes(sol::state& lua)
         damage,
         "is_on_fire",
         &Movable::is_on_fire,
+        "is_in_liquid",
+        &Movable::is_in_liquid,
         sol::base_classes,
         sol::bases<Entity>());
 
