@@ -586,7 +586,6 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
     };
     auto insert_all_uids = [&found](const EntityList& entities)
     {
-        found.reserve(found.size() + entities.size);
         const auto uids = entities.uids();
         found.insert(found.end(), uids.begin(), uids.end());
     };
@@ -800,7 +799,6 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
         const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
         if ((!proper_types.size() || !proper_types[0]) && !mask) // all items
         {
-            found.reserve(found.size() + entity->items.size);
             const auto uids = entity->items.uids();
             found.insert(found.end(), uids.begin(), uids.end());
         }
