@@ -52,6 +52,11 @@ Texture* RenderAPI::get_texture(TEXTURE texture_id)
 
 TEXTURE RenderAPI::define_texture(TextureDefinition data)
 {
+    if (const std::optional<TEXTURE> existing = get_texture(data))
+    {
+        return existing.value();
+    }
+
     if (data.sub_image_width == 0 || data.sub_image_height == 0)
     {
         data.sub_image_width = data.width;
@@ -59,8 +64,6 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     }
 
     auto* textures = get_textures();
-
-    std::lock_guard lock{custom_textures_lock};
 
     Texture new_texture{
         static_cast<int64_t>(textures->texture_map.size() + custom_textures.size() + 1),
@@ -86,29 +89,7 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         return memcmp((char*)&lhs + compare_offset, (char*)&rhs + compare_offset, compare_size) == 0;
     };
 
-    for (auto& [id, texture] : custom_textures)
-    {
-        std::string_view existing_name{*texture.name};
-        constexpr char c_VanillaTexturePath[]{"Data/Textures/../../"};
-        if (existing_name.starts_with(c_VanillaTexturePath))
-        {
-            existing_name.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
-        }
-        if (existing_name == data.texture_path && is_same(texture, new_texture))
-        {
-            reload_texture(texture.name);
-            return texture.id;
-        }
-    }
-
-    for (auto& texture : textures->textures)
-    {
-        if (texture.name != nullptr && *texture.name == data.texture_path && is_same(texture, new_texture))
-        {
-            reload_texture(texture.name);
-            return texture.id;
-        }
-    }
+    std::lock_guard lock{ custom_textures_lock };
 
     auto* new_texture_target = textures->texture_map[0];
 
@@ -142,9 +123,105 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     new_texture.name = new_texture_target->name;
     textures->num_textures = backup_num_textures;
     *new_texture_target = backup_texture;
+
     custom_textures[new_texture.id] = new_texture;
 
     return new_texture.id;
+}
+std::optional<TEXTURE> RenderAPI::get_texture(TextureDefinition data)
+{
+
+    if (data.sub_image_width == 0 || data.sub_image_height == 0)
+    {
+        data.sub_image_width = data.width;
+        data.sub_image_height = data.height;
+    }
+
+    auto* textures = get_textures();
+
+    Texture new_texture{
+        static_cast<int64_t>(textures->texture_map.size() + custom_textures.size() + 1),
+        nullptr,
+        data.width,
+        data.height,
+        data.sub_image_width / data.tile_width,
+        data.sub_image_height / data.tile_height,
+        (data.sub_image_offset_x + 0.5f) / data.width,
+        (data.sub_image_offset_y + 0.5f) / data.height,
+        (float)data.tile_width / data.width,
+        (float)data.tile_height / data.height,
+        (data.tile_width - 1.0f) / data.width,
+        (data.tile_height - 1.0f) / data.height,
+        1.0f / data.width,
+        1.0f / data.height,
+    };
+    constexpr auto compare_offset = offsetof(Texture, width);
+    constexpr auto compare_size = sizeof(Texture) - offsetof(Texture, width);
+    auto is_same = [](const Texture& lhs, const Texture& rhs)
+    {
+        // Note, even bits for floats should be the same here since all calculations are matched 1-to-1 from the games code
+        return memcmp((char*)&lhs + compare_offset, (char*)&rhs + compare_offset, compare_size) == 0;
+    };
+
+    std::lock_guard lock{ custom_textures_lock };
+
+    for (auto& [id, texture] : custom_textures)
+    {
+        std::string_view existing_name{ *texture.name };
+        constexpr char c_VanillaTexturePath[]{ "Data/Textures/../../" };
+        if (existing_name.starts_with(c_VanillaTexturePath))
+        {
+            existing_name.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
+        }
+        if (existing_name == data.texture_path && is_same(texture, new_texture))
+        {
+            reload_texture(texture.name);
+            return texture.id;
+        }
+    }
+
+    for (auto& texture : textures->textures)
+    {
+        if (texture.name != nullptr && *texture.name == data.texture_path && is_same(texture, new_texture))
+        {
+            reload_texture(texture.name);
+            return texture.id;
+        }
+    }
+
+    return std::nullopt;
+}
+std::optional<TEXTURE> RenderAPI::get_texture(std::string_view texture_name)
+{
+    auto* textures = get_textures();
+
+    std::lock_guard lock{ custom_textures_lock };
+
+    for (auto& [id, texture] : custom_textures)
+    {
+        std::string_view existing_name{ *texture.name };
+        constexpr char c_VanillaTexturePath[]{ "Data/Textures/../../" };
+        if (existing_name.starts_with(c_VanillaTexturePath))
+        {
+            existing_name.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
+        }
+        if (existing_name == texture_name)
+        {
+            reload_texture(texture.name);
+            return texture.id;
+        }
+    }
+
+    for (auto& texture : textures->textures)
+    {
+        if (texture.name != nullptr && *texture.name == texture_name)
+        {
+            reload_texture(texture.name);
+            return texture.id;
+        }
+    }
+
+    return std::nullopt;
 }
 
 void RenderAPI::reload_texture(const char* texture_name)
