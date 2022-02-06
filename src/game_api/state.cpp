@@ -34,20 +34,17 @@ void fix_liquid_out_of_bounds()
     auto state = State::get();
     std::vector<int32_t> liquid_ids_to_destroy[N_POOLS];
     uint8_t pool = 0;
-    // gather the liquid ids to destroy
+
     if (!state.ptr() || !state.ptr()->liquid_physics || !state.ptr()->liquid_physics->pools[0].physics_engine)
         return;
-
-    for (auto& it : state.ptr()->liquid_physics->pools)
+    // gather the liquid ids to destroy
+    for (const auto& it : state.ptr()->liquid_physics->pools)
     {
-        if (it.physics_engine->entity_count > 0) // is the engine running?
+        for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
         {
-            for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
+            if ((it.physics_engine->entity_coordinates + i)->second < 0.1) // 0.1 just to be safe
             {
-                if ((it.physics_engine->entity_coordinates + i)->second < 0.1) // 0.1 just to be safe
-                {
-                    liquid_ids_to_destroy[pool].push_back(i);
-                }
+                liquid_ids_to_destroy[pool].push_back(i);
             }
         }
         ++pool;
@@ -60,7 +57,7 @@ void fix_liquid_out_of_bounds()
             const auto& it = state.layer(0)->entities_by_mask.find(pool < 2 ? 0x2000 : 0x4000);
             if (!it->second.empty())
             {
-                for (auto ent : it->second)
+                for (const auto ent : it->second)
                 {
                     if (ent->type->id == liquid_type_by_pool[pool])
                     {
