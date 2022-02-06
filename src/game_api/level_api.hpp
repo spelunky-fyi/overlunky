@@ -85,6 +85,7 @@ struct LevelGenData
     std::uint16_t define_room_template(std::string room_template, RoomTemplateType type);
     bool set_room_template_size(std::uint16_t room_template, uint16_t width, uint16_t height);
     RoomTemplateType get_room_template_type(std::uint16_t room_template);
+    uint16_t get_pretend_room_template(std::uint16_t room_template);
 
     union
     {
