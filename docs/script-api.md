@@ -944,6 +944,9 @@ Gets a `TextureDefinition` for equivalent to the one used to define the texture 
 `TEXTURE define_texture(TextureDefinition texture_data)`<br/>
 Defines a new texture that can be used in Entity::set_texture
 If a texture with the same definition already exists the texture will be reloaded from disk.
+### [`get_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture)
+`optional<TEXTURE> get_texture(TextureDefinition texture_data)`<br/>
+Gets a texture with the same definition as the given, if none exists returns `nil`
 ### [`reload_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_texture)
 `nil reload_texture(string texture_path)`<br/>
 Reloads a texture from disk, use this only as a development tool for example in the console
@@ -1604,6 +1607,8 @@ MASK
 - [`int sound_killed_by_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_player) &EntityDB::sound_killed_by_player
 - [`int sound_killed_by_other`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_other) &EntityDB::sound_killed_by_other
 - [`STRINGID description`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) &EntityDB::description
+- [`int tilex`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilex) &EntityDB::tile_x
+- [`int tiley`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiley) &EntityDB::tile_y
 ### `Entity`
 - [`EntityDB type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) &Entity::type
 - [`Entity overlay`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlay) overlay
@@ -1719,7 +1724,7 @@ airtime = falling_timer
 - [`nil set_cursed(bool b)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursed) &Movable::set_cursed
 - [`nil drop(Entity entity_to_drop)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop) &Movable::drop
 - [`nil pick_up(Entity entity_to_pick_up)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) &Movable::pick_up
-- [`bool can_jump()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_jump) &Movable::can_jump
+- [`can_jump`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_jump) &Movable::can_jump
 - [`Entity standing_on()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=standing_on) &Movable::standing_on
 - [`nil add_money(int money)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money) &Movable::add_money
 \
@@ -3763,7 +3768,7 @@ All `.lvl` files are loaded relative to `Data/Levels`, but they can be completel
 - [`float door2_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_x) &DoorCoords::door2_x
 - [`float door2_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) &DoorCoords::door2_y
 ### `LevelGenSystem`
-- [`int shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
+- [`ShopType shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
 - [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &LevelGenSystem::spawn_x
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &LevelGenSystem::spawn_y
 - [`int spawn_room_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) &LevelGenSystem::spawn_room_x
@@ -3783,6 +3788,9 @@ Marks the room as a set-room, a corresponding `setroomy-x` template must be load
 - [`bool unmark_as_set_room(int x, int y, LAYER layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unmark_as_set_room) &PostRoomGenerationContext::unmark_as_set_room
 \
 Unmarks the room as a set-room
+- [`bool set_shop_type(int x, int y, LAYER layer, int shop_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_shop_type) &PostRoomGenerationContext::set_shop_type
+\
+Set the shop type for a specific room, does nothing if the room is not a shop
 - [`bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, int inverse_chance)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_procedural_spawn_chance) &PostRoomGenerationContext::set_procedural_spawn_chance
 \
 Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
@@ -5695,7 +5703,6 @@ Use in `define_room_template` to declare whether a room template has any special
 - [`SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.SHOP) 3
 - [`MACHINE_ROOM`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.MACHINE_ROOM) 4
 ### SHOP_TYPE
-Determines which kind of shop spawns in the level, if any
 - [`GENERAL_STORE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.GENERAL_STORE) 0
 - [`CLOTHING_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.CLOTHING_SHOP) 1
 - [`WEAPON_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.WEAPON_SHOP) 2
@@ -5703,6 +5710,11 @@ Determines which kind of shop spawns in the level, if any
 - [`HIRED_HAND_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.HIRED_HAND_SHOP) 4
 - [`PET_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.PET_SHOP) 5
 - [`DICE_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.DICE_SHOP) 6
+- [`HEDJET_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.HEDJET_SHOP) 8
+- [`CURIO_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.CURIO_SHOP) 9
+- [`CAVEMAN_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.CAVEMAN_SHOP) 10
+- [`TURKEY_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.TURKEY_SHOP) 11
+- [`GHIST_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.GHIST_SHOP) 12
 - [`TUSK_DICE_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.TUSK_DICE_SHOP) 13
 ### LEVEL_CONFIG
 Use with `get_level_config`
