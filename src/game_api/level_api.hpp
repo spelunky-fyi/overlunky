@@ -366,7 +366,8 @@ struct LevelGenRoomsMeta
     std::array<bool, 8 * 16> rooms;
 };
 
-enum class ShopType : uint8_t {
+enum class ShopType : uint8_t
+{
     General,
     Clothing,
     Weapon,

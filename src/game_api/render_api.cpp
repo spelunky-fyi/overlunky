@@ -89,7 +89,7 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         return memcmp((char*)&lhs + compare_offset, (char*)&rhs + compare_offset, compare_size) == 0;
     };
 
-    std::lock_guard lock{ custom_textures_lock };
+    std::lock_guard lock{custom_textures_lock};
 
     auto* new_texture_target = textures->texture_map[0];
 
@@ -163,12 +163,12 @@ std::optional<TEXTURE> RenderAPI::get_texture(TextureDefinition data)
         return memcmp((char*)&lhs + compare_offset, (char*)&rhs + compare_offset, compare_size) == 0;
     };
 
-    std::lock_guard lock{ custom_textures_lock };
+    std::lock_guard lock{custom_textures_lock};
 
     for (auto& [id, texture] : custom_textures)
     {
-        std::string_view existing_name{ *texture.name };
-        constexpr char c_VanillaTexturePath[]{ "Data/Textures/../../" };
+        std::string_view existing_name{*texture.name};
+        constexpr char c_VanillaTexturePath[]{"Data/Textures/../../"};
         if (existing_name.starts_with(c_VanillaTexturePath))
         {
             existing_name.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
@@ -195,12 +195,12 @@ std::optional<TEXTURE> RenderAPI::get_texture(std::string_view texture_name)
 {
     auto* textures = get_textures();
 
-    std::lock_guard lock{ custom_textures_lock };
+    std::lock_guard lock{custom_textures_lock};
 
     for (auto& [id, texture] : custom_textures)
     {
-        std::string_view existing_name{ *texture.name };
-        constexpr char c_VanillaTexturePath[]{ "Data/Textures/../../" };
+        std::string_view existing_name{*texture.name};
+        constexpr char c_VanillaTexturePath[]{"Data/Textures/../../"};
         if (existing_name.starts_with(c_VanillaTexturePath))
         {
             existing_name.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
