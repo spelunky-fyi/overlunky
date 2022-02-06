@@ -613,6 +613,9 @@ std::optional<uint16_t> g_overridden_room_templates[2];
 // Used for making custom any room template work
 LevelGenRooms g_CustomRoomShims[2];
 
+// Used for making per-room shop types possible
+std::array<std::array<std::optional<ShopType>, 16>, 8> g_CustomShopTypes[2]{};
+
 // Some select room templates
 enum class RoomTemplate : uint16_t
 {
@@ -659,6 +662,9 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
 
     g_CustomRoomShims[0] = {};
     g_CustomRoomShims[1] = {};
+
+    g_CustomShopTypes[0] = {};
+    g_CustomShopTypes[1] = {};
 
     pre_level_generation();
     g_level_gen_trampoline(level_gen_sys, param_2, param_3);
@@ -1026,6 +1032,19 @@ using SpawnRoomFromTileCodes = void(LevelGenData*, int, int, SingleRoomData*, Si
 SpawnRoomFromTileCodes* g_spawn_room_from_tile_codes_trampoline{nullptr};
 void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, int room_idx_y, SingleRoomData* front_room_data, SingleRoomData* back_room_data, uint16_t param_6, bool dual_room, uint16_t room_template)
 {
+    auto level_gen = State::get().ptr()->level_gen;
+
+    std::optional<ShopType> before[2];
+    for (size_t i = 0; i < 2; i++)
+    {
+        const std::optional<ShopType> custom_type = g_CustomShopTypes[i][room_idx_x][room_idx_y];
+        if (custom_type != std::nullopt)
+        {
+            before[i] = level_gen->shop_type;
+            level_gen->shop_types[i] = custom_type.value();
+        }
+    }
+
     LevelGenRoomData room_data{};
     std::memcpy(room_data.front_layer.data(), front_room_data, 10 * 8);
     if (dual_room)
@@ -1042,6 +1061,15 @@ void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, in
     }
 
     g_spawn_room_from_tile_codes_trampoline(level_gen_data, room_idx_x, room_idx_y, front_room_data, back_room_data, param_6, dual_room, room_template);
+
+    for (size_t i = 0; i < 2; i++)
+    {
+        const std::optional<ShopType> before_type = before[i];
+        if (before_type != std::nullopt)
+        {
+            level_gen->shop_types[i] = before_type.value();
+        }
+    }
 }
 
 using TestChance = bool(LevelGenData**, std::uint32_t chance_id);
@@ -1669,6 +1697,17 @@ bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is
         set_room_back_layer->rooms[x + y * 8] = is_set_room;
     }
 
+    return true;
+}
+
+bool LevelGenSystem::set_shop_type(uint32_t x, uint32_t y, uint8_t l, ShopType _shop_type)
+{
+    auto* state_ptr = State::get().ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
+        return false;
+
+    g_CustomShopTypes[l][x][y] = _shop_type;
     return true;
 }
 

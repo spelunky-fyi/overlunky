@@ -446,8 +446,15 @@ struct LevelGenSystem
     uint8_t flags;
     uint8_t unknown39;
     uint8_t unknown40;
-    ShopType shop_type;
-    ShopType backlayer_shop_type;
+    union
+    {
+        ShopType shop_types[2];
+        struct
+        {
+            ShopType shop_type;
+            ShopType backlayer_shop_type;
+        };
+    };
     uint8_t unknown43;
     uint8_t unknown44;
     uint8_t unknown45;
@@ -467,6 +474,8 @@ struct LevelGenSystem
     bool is_room_flipped(uint32_t x, uint32_t y);
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t l);
     bool mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is_set_room);
+
+    bool set_shop_type(uint32_t x, uint32_t y, uint8_t l, ShopType shop_type);
 
     std::string_view get_room_template_name(uint16_t room_template);
 
