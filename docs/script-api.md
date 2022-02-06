@@ -708,7 +708,6 @@ Clears the name set with `add_custom_name`
 ### [`enter_door`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_door)
 `nil enter_door(int player_uid, int door_uid)`<br/>
 Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
-Doesn't really work for layer doors
 ### [`change_sunchallenge_spawns`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_sunchallenge_spawns)
 `nil change_sunchallenge_spawns(array<ENT_TYPE> ent_types)`<br/>
 Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
@@ -747,6 +746,9 @@ If you set `health` above the game max health it will be forced down to the game
 ### [`add_item_to_shop`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_item_to_shop)
 `nil add_item_to_shop(int item_uid, int shop_owner)`<br/>
 Adds entity as shop item, has to be movable (haven't tested many)
+### [`change_poison_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_poison_timer)
+`nil change_poison_timer(int frames)`<br/>
+Change the amount of frames after the damage from poison is applied
 ### [`create_illumination`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 `Illumination create_illumination(Color color, float size, float x, float y)`<br/>
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
@@ -1710,7 +1712,6 @@ airtime = falling_timer
 \
 airtime = falling_timer
 - [`bool is_poisoned()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned) &Movable::is_poisoned
-- [`nil poison(int frames)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison) &Movable::poison
 - [`int dark_shadow_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_shadow_timer) &Movable::onfire_effect_timer
 - [`int onfire_effect_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=onfire_effect_timer) &Movable::onfire_effect_timer
 - [`int exit_invincibility_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_invincibility_timer) &Movable::exit_invincibility_timer

@@ -61,7 +61,8 @@ class Movable : public Entity
     uint8_t b126; // timer, after layer change?
     uint8_t b127;
 
-    void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
+    /// NoDoc
+    void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison // Changes default poison_tick_timer
     bool is_poisoned();
 
     /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities

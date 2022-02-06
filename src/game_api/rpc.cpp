@@ -704,7 +704,8 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> 
                          {
                              found.push_back(item->uid);
                          }
-                     } });
+                     }
+                 });
 
     return found;
 }
@@ -2108,5 +2109,21 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner)
                 return;
             }
         }
+    }
+}
+
+void change_poison_timer(int16_t frames)
+{
+    const static size_t offset_first = get_address("first_poison_tick_timer_default");
+    const static size_t offset_subsequent = get_address("subsequent_poison_tick_timer_default");
+
+    if (frames == -1)
+    {
+        recover_mem("change_poison_timer");
+    }
+    else
+    {
+        write_mem_recoverable("change_poison_timer", offset_first, frames, true);
+        write_mem_recoverable("change_poison_timer", offset_subsequent, frames, true);
     }
 }

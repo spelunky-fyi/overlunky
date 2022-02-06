@@ -1229,7 +1229,6 @@ end
     lua["clear_custom_name"] = clear_custom_name;
 
     /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
-    /// Doesn't really work for layer doors
     lua["enter_door"] = enter_door;
 
     /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
@@ -1269,6 +1268,9 @@ end
 
     /// Adds entity as shop item, has to be movable (haven't tested many)
     lua["add_item_to_shop"] = add_item_to_shop;
+
+    /// Change the amount of frames after the damage from poison is applied
+    lua["change_poison_timer"] = change_poison_timer;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
