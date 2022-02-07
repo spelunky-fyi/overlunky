@@ -72,17 +72,15 @@ struct Layer
     // key is the mask
     std::map<uint32_t, EntityList> entities_by_mask;
 
-    char stuff0[0xF430]; // Just wanna get to grid_entities
+    char stuff0[0xF430]; // unknown
 
     Entity* grid_entities[0x7e][0x56];
-
-    char stuff1[0x3FD08];
-
-    EntityList unknown_entities2; // debris, explosions, laserbeams etc. ?
-    EntityList unknown_entities3; // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
-    size_t unknown3;
-    size_t unknown4;
-    size_t unknown5;
+    char stuff1[0x3F7E0]; // unknown
+    EntityList unknown_entities2;
+    EntityList entities_by_draw_depth[53];
+    EntityList unknown_entities3; // debris, explosions, laserbeams etc. ?
+    EntityList unknown_entities4; // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
+    std::vector<Entity*> unknown; // add_to_layer uses this
     size_t unknown6;
     // List of items that were destroyed and are waiting to have the dtor called
     // and then be returned to the entity pool
@@ -94,7 +92,7 @@ struct Layer
     uint32_t unknown17;
     uint32_t unknown18;
     uint32_t unknown19;
-    size_t entity_items_begin; // begin of the memory that holds the items of entities
+    size_t entity_items_begin; // begin of the memory that holds the items of entities, maybe vector?
     size_t unknown21;
     size_t unknown22;
     bool unknown23;
@@ -109,7 +107,7 @@ struct Layer
     uint64_t unknown32;
     uint32_t unknown33;
     uint32_t unknown34;
-    size_t unknown35;
+    size_t unknown35; // maybe vector?
     size_t unknown36;
     size_t unknown37;
     bool unknown38;
