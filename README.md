@@ -133,7 +133,8 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + If you have lag or crashes, check previous question.
   - If you're running **Linux**
     + The game and OL should run fine with the latest Wine if you install DXVK.
-    + Also works with Proton 5.13 if you first start the game on Steam and then run `STEAM_COMPAT_DATA_PATH=~/.steam/steam/steamapps/compatdata/418530 WINEPREFIX=~/.steam/steam/steamapps/compatdata/418530/pfx ~/.steam/root/steamapps/common/Proton\ 5.13/proton run ~/.steam/steam/steamapps/common/Spelunky\ 2/Overlunky/Overlunky.exe` adjusting the paths for your setup.
+    + Also works with Proton 5.13+ if you first start the game on Steam and then run `STEAM_COMPAT_DATA_PATH=~/.steam/steam/steamapps/compatdata/418530 WINEPREFIX=~/.steam/steam/steamapps/compatdata/418530/pfx ~/.steam/root/steamapps/common/Proton\ 5.13/proton run ~/.steam/steam/steamapps/common/Spelunky\ 2/Overlunky/Overlunky.exe` adjusting the paths for your setup.
+    + Also works with [proton-ge-custom](https://github.com/GloriousEggroll/proton-ge-custom) using the [command line switch](#command-line-switches) from Steam.
     + Put the Segoe UI ttf files to your wineprefixes Windows/Fonts to show the ui correctly.
     + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
   - If you **don't have scripts** in the Scripts tab
@@ -150,3 +151,6 @@ cmake ..
 cmake --build . --config Release --target ALL_BUILD
 ```
 The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode. Set `OL_DEBUG=1` in the *game environment* to enable logging to console.
+
+## Command line switches
+  - `--launch_game <path_to_game_directory>` will launch Spel2.exe from that directory and hook to the game process, rather than trying to find it. Might be useful on linux for example.
