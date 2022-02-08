@@ -5,7 +5,7 @@ uint8_t Olmec::broken_floaters()
 {
     static auto olmec_floater_id = to_id("ENT_TYPE_FX_OLMECPART_FLOATER");
     uint8_t broken = 0;
-    for (auto item : items)
+    for (auto item : items.entities())
     {
         if (item->type->id == olmec_floater_id)
         {

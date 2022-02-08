@@ -2912,7 +2912,7 @@ void render_olmec(Entity* ent, ImColor color)
 {
     std::pair<float, float> render_position = {0.0f, 0.0f};
     bool got_rendering = false;
-    for (auto ent_item : ent->items) // get the olmec position from one of the fx
+    for (auto ent_item : ent->items.entities()) // get the olmec position from one of the fx
     {
         if (ent_item && ent_item->rendering_info && !ent_item->rendering_info->stop_render)
         {
@@ -4595,12 +4595,9 @@ void render_entity_props(int uid, bool detached = false)
     }
     if (ImGui::CollapsingHeader("Items"))
     {
-        if (entity->items.size > 0)
+        for (uint32_t item_uid : entity->items.uids())
         {
-            for (auto i = entity->items.uid_begin(); i < entity->items.uid_end(); ++i)
-            {
-                render_uid(*i, "EntityItems", true);
-            }
+            render_uid(item_uid, "EntityItems", true);
         }
     }
     if (ImGui::CollapsingHeader("Global attributes") && entity->type)
