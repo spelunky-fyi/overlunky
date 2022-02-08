@@ -804,33 +804,32 @@ void setup_level_files(LevelGenData* level_gen_data, const char* level_file_name
 ExecutableMemory g_get_room_size_redirect;
 void get_room_size(uint16_t room_template, uint32_t& room_width, uint32_t& room_height)
 {
-    using enum RoomTemplate;
-    if (room_template >= to_uint(Cache) && room_template <= to_uint(GhistRoom))
+    if (room_template >= to_uint(RoomTemplate::Cache) && room_template <= to_uint(RoomTemplate::GhistRoom))
     {
         room_width = 5;
         room_height = 5;
     }
-    else if (room_template >= to_uint(ChunkGround) && room_template <= to_uint(ChunkAir))
+    else if (room_template >= to_uint(RoomTemplate::ChunkGround) && room_template <= to_uint(RoomTemplate::ChunkAir))
     {
         room_width = 5;
         room_height = 3;
     }
-    else if (room_template == to_uint(ChunkDoor))
+    else if (room_template == to_uint(RoomTemplate::ChunkDoor))
     {
         room_width = 6;
         room_height = 3;
     }
-    else if (room_template >= to_uint(MachineBigroomPath) && room_template <= to_uint(FeelingTomb))
+    else if (room_template >= to_uint(RoomTemplate::MachineBigroomPath) && room_template <= to_uint(RoomTemplate::FeelingTomb))
     {
         room_width = 20;
         room_height = 16;
     }
-    else if (room_template >= to_uint(MachineWideroomPath) && room_template <= to_uint(MachineWideroomSide))
+    else if (room_template >= to_uint(RoomTemplate::MachineWideroomPath) && room_template <= to_uint(RoomTemplate::MachineWideroomSide))
     {
         room_width = 20;
         room_height = 8;
     }
-    else if (room_template >= to_uint(MachineTallroomPath) && room_template <= to_uint(CoffinFrog))
+    else if (room_template >= to_uint(RoomTemplate::MachineTallroomPath) && room_template <= to_uint(RoomTemplate::CoffinFrog))
     {
         room_width = 10;
         room_height = 16;
@@ -1119,21 +1118,20 @@ bool handle_chance(SpawnInfo* spawn_info)
 void LevelGenData::init()
 {
     {
-        using enum RoomTemplate;
-        assert(get_room_template("entrance") == to_uint(Entrance));
-        assert(get_room_template("exit") == to_uint(Exit));
-        assert(get_room_template("cache") == to_uint(Cache));
-        assert(get_room_template("ghistroom") == to_uint(GhistRoom));
-        assert(get_room_template("chunk_air") == to_uint(ChunkAir));
-        assert(get_room_template("chunk_ground") == to_uint(ChunkGround));
-        assert(get_room_template("chunk_door") == to_uint(ChunkDoor));
-        assert(get_room_template("shop") == to_uint(Shop));
-        assert(get_room_template("machine_bigroom_path") == to_uint(MachineBigroomPath));
-        assert(get_room_template("feeling_tomb") == to_uint(FeelingTomb));
-        assert(get_room_template("machine_wideroom_path") == to_uint(MachineWideroomPath));
-        assert(get_room_template("machine_wideroom_side") == to_uint(MachineWideroomSide));
-        assert(get_room_template("machine_tallroom_path") == to_uint(MachineTallroomPath));
-        assert(get_room_template("coffin_frog") == to_uint(CoffinFrog));
+        assert(get_room_template("entrance") == to_uint(RoomTemplate::Entrance));
+        assert(get_room_template("exit") == to_uint(RoomTemplate::Exit));
+        assert(get_room_template("cache") == to_uint(RoomTemplate::Cache));
+        assert(get_room_template("ghistroom") == to_uint(RoomTemplate::GhistRoom));
+        assert(get_room_template("chunk_air") == to_uint(RoomTemplate::ChunkAir));
+        assert(get_room_template("chunk_ground") == to_uint(RoomTemplate::ChunkGround));
+        assert(get_room_template("chunk_door") == to_uint(RoomTemplate::ChunkDoor));
+        assert(get_room_template("shop") == to_uint(RoomTemplate::Shop));
+        assert(get_room_template("machine_bigroom_path") == to_uint(RoomTemplate::MachineBigroomPath));
+        assert(get_room_template("feeling_tomb") == to_uint(RoomTemplate::FeelingTomb));
+        assert(get_room_template("machine_wideroom_path") == to_uint(RoomTemplate::MachineWideroomPath));
+        assert(get_room_template("machine_wideroom_side") == to_uint(RoomTemplate::MachineWideroomSide));
+        assert(get_room_template("machine_tallroom_path") == to_uint(RoomTemplate::MachineTallroomPath));
+        assert(get_room_template("coffin_frog") == to_uint(RoomTemplate::CoffinFrog));
     }
 
     // Scan tile codes to know what id to start at
@@ -1557,18 +1555,17 @@ RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_templat
 }
 uint16_t LevelGenData::get_pretend_room_template(std::uint16_t room_template)
 {
-    using enum RoomTemplate;
     switch (get_room_template_type(room_template))
     {
     default:
     case RoomTemplateType::None:
         return room_template;
     case RoomTemplateType::Entrance:
-        return to_uint(Entrance);
+        return to_uint(RoomTemplate::Entrance);
     case RoomTemplateType::Exit:
-        return to_uint(Exit);
+        return to_uint(RoomTemplate::Exit);
     case RoomTemplateType::Shop:
-        return to_uint(Shop);
+        return to_uint(RoomTemplate::Shop);
     }
 }
 
