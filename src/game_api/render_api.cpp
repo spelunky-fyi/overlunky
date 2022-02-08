@@ -81,13 +81,6 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         1.0f / data.width,
         1.0f / data.height,
     };
-    constexpr auto compare_offset = offsetof(Texture, width);
-    constexpr auto compare_size = sizeof(Texture) - offsetof(Texture, width);
-    auto is_same = [](const Texture& lhs, const Texture& rhs)
-    {
-        // Note, even bits for floats should be the same here since all calculations are matched 1-to-1 from the games code
-        return memcmp((char*)&lhs + compare_offset, (char*)&rhs + compare_offset, compare_size) == 0;
-    };
 
     std::lock_guard lock{custom_textures_lock};
 
