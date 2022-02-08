@@ -206,13 +206,13 @@ class CustomTheme : public ThemeInfo
     uint8_t base_theme;
     LuaBackend* backend;
 
-    std::map<THEME_OVERRIDE, ThemeOverride*> overrides;
+    std::map<THEME_OVERRIDE, std::unique_ptr<ThemeOverride>> overrides;
     std::map<DYNAMIC_TEXTURE, uint32_t> textures;
 
     void override(THEME_OVERRIDE index, bool enabled_)
     {
         if (overrides.find(index) == overrides.end())
-            overrides[index] = new ThemeOverride{enabled_, UINT8_MAX};
+            overrides[index] = std::unique_ptr<ThemeOverride>{new ThemeOverride{enabled_, UINT8_MAX}};
         else
             overrides[index]->enabled = enabled_;
     }
@@ -220,7 +220,7 @@ class CustomTheme : public ThemeInfo
     void override(THEME_OVERRIDE index, uint8_t theme_)
     {
         if (overrides.find(index) == overrides.end())
-            overrides[index] = new ThemeOverride{true, theme_};
+            overrides[index] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, theme_}};
         else
             overrides[index]->theme = theme_;
     }
@@ -228,7 +228,7 @@ class CustomTheme : public ThemeInfo
     void override(THEME_OVERRIDE index, sol::function func_)
     {
         if (overrides.find(index) == overrides.end())
-            overrides[index] = new ThemeOverride{true, UINT8_MAX, std::move(func_)};
+            overrides[index] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX, std::move(func_)}};
         else
         {
             overrides[index]->func = std::move(func_);
@@ -238,7 +238,7 @@ class CustomTheme : public ThemeInfo
     void pre(THEME_OVERRIDE index, sol::function func_)
     {
         if (overrides.find(index) == overrides.end())
-            overrides[index] = new ThemeOverride{true, UINT8_MAX, std::nullopt, std::move(func_)};
+            overrides[index] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX, std::nullopt, std::move(func_)}};
         else
         {
             overrides[index]->pre = std::move(func_);
@@ -248,7 +248,7 @@ class CustomTheme : public ThemeInfo
     void post(THEME_OVERRIDE index, sol::function func_)
     {
         if (overrides.find(index) == overrides.end())
-            overrides[index] = new ThemeOverride{true, UINT8_MAX, std::nullopt, std::nullopt, std::move(func_)};
+            overrides[index] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX, std::nullopt, std::nullopt, std::move(func_)}};
         else
         {
             overrides[index]->post = std::move(func_);
@@ -347,28 +347,28 @@ class CustomTheme : public ThemeInfo
         backend = LuaBackend::get_calling_backend();
         if (defaults)
         {
-            overrides[THEME_OVERRIDE::INIT_FLAGS] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::SPAWN_LEVEL] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::SPAWN_PLAYERS] = new ThemeOverride{true, 0};
-            overrides[THEME_OVERRIDE::SPAWN_TRANSITION] = new ThemeOverride{true, 0};
-            overrides[THEME_OVERRIDE::POST_TRANSITION] = new ThemeOverride{true, 0};
-            overrides[THEME_OVERRIDE::SPAWN_PROCEDURAL] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::SPAWN_BACKGROUND] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::SPAWN_BORDER] = new ThemeOverride{true, 0};
-            overrides[THEME_OVERRIDE::ENT_BORDER] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::TEXTURE_DYNAMIC] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::PLAYER_DAMAGE] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::GRAVITY] = new ThemeOverride{true, UINT8_MAX};
+            overrides[THEME_OVERRIDE::INIT_FLAGS] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::SPAWN_LEVEL] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::SPAWN_PLAYERS] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, 0}};
+            overrides[THEME_OVERRIDE::SPAWN_TRANSITION] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, 0}};
+            overrides[THEME_OVERRIDE::POST_TRANSITION] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, 0}};
+            overrides[THEME_OVERRIDE::SPAWN_PROCEDURAL] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::SPAWN_BACKGROUND] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::SPAWN_BORDER] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, 0}};
+            overrides[THEME_OVERRIDE::ENT_BORDER] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::TEXTURE_DYNAMIC] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::PLAYER_DAMAGE] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::GRAVITY] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
             /*
-            overrides[THEME_OVERRIDE::INIT_LEVEL] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::INIT_FLAGS] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::SPAWN_EFFECTS] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::TRANSITION_MODIFIER] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::UNKNOWN_V32] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::UNKNOWN_V38] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::UNKNOWN_V47] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::SPAWN_DECORATION] = new ThemeOverride{true, UINT8_MAX};
-            overrides[THEME_OVERRIDE::SPAWN_DECORATION2] = new ThemeOverride{true, UINT8_MAX};
+            overrides[THEME_OVERRIDE::INIT_LEVEL] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::INIT_FLAGS] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::SPAWN_EFFECTS] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::TRANSITION_MODIFIER] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::UNKNOWN_V32] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::UNKNOWN_V38] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::UNKNOWN_V47] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::SPAWN_DECORATION] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
+            overrides[THEME_OVERRIDE::SPAWN_DECORATION2] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
             */
         }
     }
@@ -382,6 +382,7 @@ class CustomTheme : public ThemeInfo
     }
     ~CustomTheme()
     {
+        overrides.clear();
     }
     bool get_unknown1()
     {
