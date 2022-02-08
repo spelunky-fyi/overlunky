@@ -65,6 +65,7 @@ struct Layer
 {
     bool is_back_layer;
     // int8_t padding[7];
+
     EntityList all_entities;
     // char + fx + mons + item + logical + mount + activefloor + BG (excluding BG_SHOP, BG_LEVEL_*)
     EntityList unknown_entities1;
@@ -72,10 +73,14 @@ struct Layer
     // key is the mask
     std::map<uint32_t, EntityList> entities_by_mask;
 
-    char stuff0[0xF430]; // unknown
+    EntityList entities_by_unknown[647]; // could be more, not sure what for, each holds like 1 entity for split second
+    char stuff0[0xB778];                 // unknown, maybe more of the array above?
+
+    std::map<int32_t, size_t> unknown_map; // some movable and liquids and something else maybe?, key is uid
 
     Entity* grid_entities[0x7e][0x56];
-    char stuff1[0x3F7E0]; // unknown
+    EntityList entities_overlaping_grid[0x7e][0x56]; // static entities (like midbg, decorations) that overlap this grid position
+
     EntityList unknown_entities2;
     EntityList entities_by_draw_depth[53];
     EntityList unknown_entities3; // debris, explosions, laserbeams etc. ?
