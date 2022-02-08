@@ -7,58 +7,103 @@ class Entity;
 struct EntityList
 {
     Entity** ent_list;
-    uint32_t* uids;
+    uint32_t* uid_list;
     uint32_t cap;
     uint32_t size;
 
-    constexpr bool empty()
+    template <class T>
+    struct Range
+    {
+        T* values;
+        uint32_t size;
+
+        T* begin()
+        {
+            return values;
+        }
+        T* end()
+        {
+            return values + size;
+        }
+        T* begin() const
+        {
+            return values;
+        }
+        T* end() const
+        {
+            return values + size;
+        }
+        T* cbegin() const
+        {
+            return begin();
+        }
+        T* cend() const
+        {
+            return end();
+        }
+
+        T& front()
+        {
+            return *values;
+        }
+        T& back()
+        {
+            return values[size - 1];
+        }
+        const T& front() const
+        {
+            return *values;
+        }
+        const T& back() const
+        {
+            return values[size - 1];
+        }
+
+        bool contains(const T& val) const
+        {
+            return std::find(begin(), end(), val) != end();
+        }
+    };
+    using EntityRange = Range<Entity*>;
+    using ConstEntityRange = Range<Entity* const>;
+    using UidRange = Range<uint32_t>;
+    using ConstUidRange = Range<const uint32_t>;
+
+    bool empty()
     {
         return size == 0;
-    };
+    }
 
-    constexpr Entity** begin()
+    EntityRange entities()
     {
-        return ent_list;
-    };
-    constexpr Entity** end()
+        return {ent_list, size};
+    }
+    ConstEntityRange entities() const
     {
-        return ent_list + size;
-    };
-    constexpr Entity* at(uint32_t idx)
+        return {ent_list, size};
+    }
+    UidRange uids()
     {
-        return ent_list[idx];
-    };
-    constexpr Entity* front()
+        return {uid_list, size};
+    }
+    ConstUidRange uids() const
     {
-        return *ent_list;
-    };
-    constexpr Entity* back()
-    {
-        return ent_list[size - 1];
-    };
+        return {uid_list, size};
+    }
 
-    constexpr uint32_t* uid_begin()
+    bool contains(Entity* ent) const
     {
-        return uids;
-    };
-    constexpr uint32_t* uid_end()
+        return entities().contains(ent);
+    }
+    bool contains(uint32_t uid) const
     {
-        return uids + size;
-    };
-
-    constexpr bool contains(Entity* ent)
-    {
-        return std::find(begin(), end(), ent) != end();
-    };
-    constexpr bool contains(uint32_t uid)
-    {
-        return std::find(uid_begin(), uid_end(), uid) != uid_end();
-    };
+        return uids().contains(uid);
+    }
 
     std::pair<Entity*, uint32_t> operator[](const uint32_t idx) const
     {
-        return std::make_pair(ent_list[idx], uids[idx]);
-    };
+        return std::make_pair(ent_list[idx], uid_list[idx]);
+    }
 };
 
 struct Layer
