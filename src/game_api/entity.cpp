@@ -720,7 +720,7 @@ void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::functio
 std::span<uint32_t> Entity::get_items()
 {
     if (items.size)
-        return std::span<uint32_t>(items.uid_begin(), items.uid_end());
+        return std::span<uint32_t>(items.uids().begin(), items.uids().end());
 
     return {};
 }

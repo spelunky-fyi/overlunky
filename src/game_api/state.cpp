@@ -57,7 +57,7 @@ void fix_liquid_out_of_bounds()
             const auto& it = state.layer(0)->entities_by_mask.find(pool < 2 ? 0x2000 : 0x4000);
             if (!it->second.empty())
             {
-                for (const auto ent : it->second)
+                for (const auto ent : it->second.entities())
                 {
                     if (ent->type->id == liquid_type_by_pool[pool])
                     {
