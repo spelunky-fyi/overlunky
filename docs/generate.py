@@ -495,7 +495,7 @@ for file in api_files:
         enum_to_mod = next((item for item in enums if item["name"] == enum), dict())
         current_var_to_mod = dict()
         if enum_to_mod:
-            sub_matches = re.findall(r"\/\/\s*([^\/\/]+)", extended_enum_info.strip())
+            sub_matches = extended_enum_info.strip().split("//")
             collected_docs = ""
             for sub_match in sub_matches:
                 var_name = sub_match.strip()
@@ -581,7 +581,7 @@ print(
 
 print("## Lua libraries")
 print(
-    "The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6)."
+    "The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6). We're using Lua 5.4 with the [Sol C++ binding](https://sol2.readthedocs.io/en/latest/)."
 )
 for lib in lualibs:
     print("### `" + lib + "`")

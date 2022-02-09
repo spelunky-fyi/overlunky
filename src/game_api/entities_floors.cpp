@@ -236,7 +236,7 @@ Entity* Floor::find_corner_decoration(FLOOR_SIDE side)
         {-0.42f, -0.42f},
         {+0.42f, -0.42f}};
 
-    for (auto item : items)
+    for (auto item : items.entities())
     {
         auto [x_pos, y_pos] = item->position_self();
         if (std::abs(x_pos - offsets[side - 4][0]) < 0.0001f && std::abs(y_pos - offsets[side - 4][1]) < 0.0001f)
@@ -656,7 +656,7 @@ void trigger_trap(Entity* trap, int32_t who_uid, uint8_t direction)
     static const ENT_TYPE laser_trap = to_id("ENT_TYPE_FLOOR_LASER_TRAP");
     if (who)
     {
-        for (auto item : trap->items)
+        for (auto item : trap->items.entities())
         {
             if ((item->type->id >= ar_logical_trigger && item->type->id < ar_logical_trigger + 6) || item->type->id == bs_logical_trigger)
             {
