@@ -35,9 +35,53 @@ int main(int argc, char** argv)
     Process game_proc = [&cmd_line_parser]()
     {
         std::string_view spel2_exe_dir = GetCmdLineParam<std::string_view>(cmd_line_parser, "launch_game", "");
+        std::string_view playlunky_exe_dir = GetCmdLineParam<std::string_view>(cmd_line_parser, "launch_playlunky", "");
         if (spel2_exe_dir.empty() || !fs::exists(spel2_exe_dir))
         {
-            INFO("Searching for Spel2.exe process...");
+            if (!playlunky_exe_dir.empty() && fs::exists(playlunky_exe_dir))
+            {
+                INFO("Launching playlunky...");
+
+                const std::string spel2_dir{playlunky_exe_dir};
+
+                char spel2_cmd_line[MAX_PATH];
+                sprintf_s(spel2_cmd_line, "%s/playlunky_launcher.exe", spel2_dir.c_str());
+
+                STARTUPINFO si{};
+                si.cb = sizeof(si);
+
+                const auto child_env = []()
+                {
+                    std::string childenv = "SteamAppId=418530";
+
+                    const auto this_env = GetEnvironmentStrings();
+                    auto lpszVariable = this_env;
+                    while (*lpszVariable)
+                    {
+                        childenv += '\0';
+                        childenv += lpszVariable;
+                        lpszVariable += strlen(lpszVariable) + 1;
+                    }
+                    FreeEnvironmentStrings(this_env);
+
+                    childenv += '\0';
+                    return childenv;
+                }();
+
+                PROCESS_INFORMATION pi{};
+
+                if (CreateProcess(spel2_cmd_line, NULL, NULL, NULL, TRUE, 0, (LPVOID)child_env.c_str(), spel2_dir.c_str(), &si, &pi))
+                {
+                    WaitForInputIdle(pi.hProcess, 1000);
+
+                    INFO("Waiting a few seconds before injecting...");
+                    std::this_thread::sleep_for(10s);
+
+                    CloseHandle(pi.hThread);
+                }
+            }
+
+            INFO("Searching for Spel2.exe process... Pro tip: You have to launch it yourself.");
             bool started = true;
             Process proc;
             while (true)
