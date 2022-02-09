@@ -276,6 +276,13 @@ class PatternCommandBuffer
         return *this;
     }
 
+    // Rapid prototyping only please
+    PatternCommandBuffer& from_exe_base(uint64_t offset)
+    {
+        commands.push_back({ CommandType::FromExeBase, {.base_offset{ offset } } });
+        return *this;
+    }
+
     std::optional<size_t> operator()(Memory mem, const char* exe, std::string_view address_name) const
     {
         size_t offset = mem.after_bundle;
@@ -350,6 +357,9 @@ class PatternCommandBuffer
             case CommandType::FunctionStart:
                 offset = ::function_start(offset);
                 break;
+            case CommandType::FromExeBase:
+                offset = data.base_offset;
+                break;
             default:
                 DEBUG("Unkown command...");
                 break;
@@ -394,6 +404,7 @@ class PatternCommandBuffer
         DecodeCall,
         AtExe,
         FunctionStart,
+        FromExeBase,
     };
     union CommandData
     {
@@ -404,6 +415,7 @@ class PatternCommandBuffer
         DecodePcArgs decode_pc_args;
         uint8_t decode_imm_prefix;
         GetVirtualFunctionAddressArgs get_vfunc_addr_args;
+        uint64_t base_offset;
     };
     struct Command
     {
