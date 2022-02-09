@@ -75,7 +75,7 @@ int main(int argc, char** argv)
                     WaitForInputIdle(pi.hProcess, 1000);
 
                     INFO("Waiting a few seconds before injecting...");
-                    std::this_thread::sleep_for(10s);
+                    std::this_thread::sleep_for(5s);
 
                     CloseHandle(pi.hThread);
                 }
