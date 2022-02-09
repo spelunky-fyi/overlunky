@@ -16,6 +16,8 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 ## Disclaimer
 You are strongly discouraged from using any modding tools in your actual online Steam installation as to prevent unlocking achievements, ruining or corrupting your savefile and cheating while using online features. You should make a copy of your game somewhere else and install [Mr. Goldbergs Steam Emulator](https://mr_goldberg.gitlab.io/goldberg_emulator/) in the game directory. (Just replace steam_api64.dll with the one in the zip and that copy of the game can't talk to Steam no more!) If you break anything using this tool you get to keep both pieces. Do not report modding related bugs to BlitWorks.
 
+**Steam achievements and game saves are disabled by default while running Overlunky though.**
+
 ## Installation and usage
 **[YouTube tutorial](https://youtu.be/Zzba4cV9f2c) for kids who can't read good and who wanna learn to do other stuff good too.**
 
@@ -99,7 +101,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **Ctrl+C**: Quick return to camp from anywhere
 
 ### Scripts
-Lua scripting is still buggy and unfinished and the **API might change**, although we will try to deprecate old stuff without breaking anything. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md), [internal details](https://github.com/spelunky-fyi/overlunky/tree/main/docs) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started. The examples should be considered [Unlicensed](https://unlicense.org/), so please DO NOT credit the author when copying them. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Optionally you can also load *main.lua* files from `Mods/Packs`. Check the [Playlunky documentation](https://github.com/spelunky-fyi/Playlunky/wiki#script-mods) on how to run your scripts as PL mods.
+Lua scripting is still buggy and unfinished and the **API might change**, although we will try to deprecate old stuff without breaking anything. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md), [internal details](https://github.com/spelunky-fyi/overlunky/tree/main/docs) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started. The examples should be considered [Unlicensed](https://unlicense.org/), so please DO NOT credit the author when copying them. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Optionally you can also load *main.lua* files from `Mods/Packs`. Check the [Playlunky documentation](https://github.com/spelunky-fyi/Playlunky/wiki#script-mods) on how to run your scripts as PL mods. Set `OL_DEBUG=1` in the *game environment* to enable logging script messages to console.
 
 **Scripts don't work online either!** While technically they can work, and there's some work being done on this, yours truly has little interest in making any online features.
 
@@ -119,13 +121,9 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
   - If you're **missing** some overlay **windows** or tabs:
     + Try resetting window positions. (See hotkeys above.)
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
-    + Maybe the overlay is just really tiny? You can resize it.
+    + Maybe the overlay is just really tiny or collapsed? You can resize it. Just try your magic with the mouse.
   - If you mess up your **keyboard shortcuts** or UI:
     + Delete `Spelunky 2/overlunky.ini`.
-  - If **keyboard input** no longer works in game after using the tools:
-    + This shouldn't be a problem anymore in 0.4.8+. File an issue if this still happens.
-  - If your UI is all black or you want to change the color
-    + Change the color then. The [keyboard shortcuts](#features) are right there.
   - If stuff just don't work and you're running **Windows 7** or a machine not designed to play games
     + You're on your own here. We don't test on or make this for ancient software/hardware.
   - If you have problems with **OBS**
