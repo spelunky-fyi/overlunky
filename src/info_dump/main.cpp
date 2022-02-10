@@ -293,6 +293,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
     {
         SpelunkyConsole api_gen_script(&sound_mgr);
         file << api_gen_script.dump_api() << std::endl;
+        file << "---@diagnostic disable: lowercase-global,deprecated" << std::endl;
     }
 
     auto* state = State::get().ptr();
