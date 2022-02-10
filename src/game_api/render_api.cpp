@@ -259,6 +259,34 @@ void RenderAPI::reload_texture(const char** texture_name)
     load_texture(renderer_ptr, texture_name);
 }
 
+std::optional<TEXTURE> g_forced_lut_textures[2]{};
+
+using RenderLayer = void(const std::vector<Illumination*>&, uint8_t, const Camera&, const char**, const char**);
+RenderLayer* g_render_layer = nullptr;
+void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer, const Camera& camera, const char** lut_lhs, const char** lut_rhs)
+{
+    // The lhs and rhs LUTs are blended in the shader, but we don't know where that value is CPU side so we can only override
+    // with a single LUT for now
+    if (g_forced_lut_textures[layer])
+    {
+        Texture* lut = RenderAPI::get().get_texture(g_forced_lut_textures[layer].value());
+        g_render_layer(lightsources, layer, camera, lut->name, lut->name);
+    }
+    else
+    {
+        g_render_layer(lightsources, layer, camera, lut_lhs, lut_rhs);
+    }
+}
+
+void RenderAPI::set_lut(TEXTURE texture_id, uint8_t layer)
+{
+    g_forced_lut_textures[layer] = texture_id;
+}
+void RenderAPI::reset_lut(uint8_t layer)
+{
+    g_forced_lut_textures[layer] = std::nullopt;
+}
+
 using VanillaRenderHudFun = void(size_t, float, float, size_t);
 VanillaRenderHudFun* g_render_hud_trampoline{nullptr};
 void render_hud(size_t hud_data, float y, float opacity, size_t hud_data2)
@@ -608,6 +636,7 @@ void init_render_api_hooks()
         write_mem_prot(fetch_texture_begin, code, true);
     }
 
+    g_render_layer = (RenderLayer*)get_address("render_layer"sv);
     g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud"sv);
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
     g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth"sv);
@@ -647,6 +676,7 @@ void init_render_api_hooks()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
+    DetourAttach((void**)&g_render_layer, render_layer);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
     DetourAttach((void**)&g_render_draw_depth_trampoline, &render_draw_depth);
