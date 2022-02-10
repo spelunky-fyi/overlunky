@@ -280,6 +280,7 @@ class PatternCommandBuffer
     PatternCommandBuffer& from_exe_base(uint64_t offset)
     {
         commands.push_back({ CommandType::FromExeBase, {.base_offset{ offset } } });
+        commands.push_back({ CommandType::AtExe });
         return *this;
     }
 
@@ -821,6 +822,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\xe8****\xc7\x44\x24\x50"sv)
             .find_next_inst("\xe8****\xc7\x44\x24\x50"sv)
             .find_next_inst("\xe8****\xc7\x44\x24\x50"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "render_layer"sv,
+        // Put a bp into LevelInfo::get_backlayer_lut, step out to the caller
+        // The next function that is called is this function
+        PatternCommandBuffer{}
+            .find_after_inst("\x49\x8b\x8f\x38\x13\x00\x00\x4d\x8b\x87\xa8\x13\x00\x00"sv)
+            .find_inst("\xe8"sv)
             .decode_call()
             .at_exe(),
     },
