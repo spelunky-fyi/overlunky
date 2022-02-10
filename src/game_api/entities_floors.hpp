@@ -59,7 +59,7 @@ class Floor : public Entity
     static bool get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2]);
 
     virtual void decorate_internal() = 0;     // decorates undecorated floor and floorstyled, doesn't remove old decorations, runs only on level gen
-    virtual void on_neighbor_destroyed() = 0; // called on every neighbor of destroyed floor (probably to decorate it)
+    virtual void on_neighbor_destroyed() = 0; // called on every neighbor of destroyed floor to decorate it
     /// Returns it's ENT_TYPE except for FLOOR_PEN (returns FLOORSTYLED_MINEWOOD) and FLOOR_QUICKSAND, FLOOR_TOMB, FLOOR_EMPRESS_GRAVE which return FLOOR_GENERIC
     virtual ENT_TYPE get_floor_type() = 0; // Used for spawning decorations
 };

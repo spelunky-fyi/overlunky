@@ -49,7 +49,7 @@ void fix_liquid_out_of_bounds()
         }
         ++pool;
     }
-    // destroy entities that mach the liauid id and pool
+    // destroy entities that mach the liquid id and pool
     for (pool = 0; pool < N_POOLS; ++pool)
     {
         if (liquid_ids_to_destroy[pool].size() > 0)

@@ -15,7 +15,7 @@ class Monster : public PowerupCapable
 
     virtual void on_aggro() = 0; // updates state.quests in case of npc
 
-    virtual void unknown_v96() = 0;
+    virtual void unknown_v97() = 0;
 
     virtual void on_shop_entered() = 0;
 
@@ -61,11 +61,9 @@ class RoomOwner : public Monster
 
     virtual uint32_t weapon_type() = 0; // the entity type of the weapon that will be spawned to attack the player
 
-    virtual void unknown_v106_attack_weapon_related() = 0;
+    virtual void unknown_v107_attack_weapon_related() = 0;
 
-    virtual void unknown_v107() = 0; // for shopkeepers, it loops over (some of) the items for sale
-
-    virtual void unknown_v108() = 0;
+    virtual void unknown_v108() = 0; // for shopkeepers, it loops over (some of) the items for sale
 
     virtual void on_death_treasure_drop() = 0; // random number calc, e.g. whether the shopkeeper drops gold bars on death
 };
@@ -78,6 +76,9 @@ class WalkingMonster : public Monster
     int16_t walk_pause_timer;
     /// used for chatting with other monsters, attack cooldowns etc.
     int16_t cooldown_timer;
+
+    virtual void v_101() = 0;
+    virtual void v_102() = 0;
 };
 
 class NPC : public Monster
@@ -94,6 +95,15 @@ class NPC : public Monster
     uint8_t padding1;
     uint8_t padding2;
     uint32_t padding3;
+
+    virtual void v_101() = 0;
+    virtual void v_102() = 0;
+    virtual void v_103() = 0;
+    virtual void v_104() = 0;
+    virtual void v_105() = 0;
+    virtual void v_106() = 0;
+    virtual void v_107() = 0;
+    virtual void v_108() = 0;
 };
 
 enum class GHOST_BEHAVIOR : uint8_t
@@ -191,6 +201,10 @@ class Spider : public Monster
     uint16_t padding2;
     /// only in the x coord
     float trigger_distance;
+
+    virtual void v_101() = 0;
+    virtual void v_102() = 0;
+    virtual void v_103() = 0;
 };
 
 class HangSpider : public Monster
@@ -555,6 +569,10 @@ class Anubis : public Monster
     uint8_t next_attack_timer;
     uint8_t psychic_orbs_counter;
     bool awake;
+
+    virtual void v_101() = 0;
+    virtual void v_102() = 0;
+    virtual void v_103() = 0;
 };
 
 class Cobra : public Monster
@@ -835,6 +853,8 @@ class Ghist : public Monster
     uint8_t transparency;
     uint8_t padding3;
     uint16_t fadeout; // when 0, ghist fades out/dies
+
+    virtual void v_101() = 0;
 };
 
 class JumpDog : public Monster
