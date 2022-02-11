@@ -1129,6 +1129,24 @@ void force_lights()
     }
 }
 
+void set_camera_bounds(bool enabled)
+{
+    if (enabled)
+    {
+        g_state->camera->bounds_left = 0.5f;
+        g_state->camera->bounds_right = g_state->w * 10.0f + 4.5f;
+        g_state->camera->bounds_top = 124.5f;
+        g_state->camera->bounds_bottom = 120.5f - g_state->h * 8.0f;
+    }
+    else
+    {
+        g_state->camera->bounds_left = -FLT_MAX;
+        g_state->camera->bounds_right = FLT_MAX;
+        g_state->camera->bounds_top = FLT_MAX;
+        g_state->camera->bounds_bottom = -FLT_MAX;
+    }
+}
+
 void force_zoom()
 {
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
@@ -1588,7 +1606,7 @@ float drag_delta(std::string keyname)
     return false;
 }
 
-float held_duration(std::string keyname) // unused
+float held_duration(std::string keyname)
 {
     // int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1601,6 +1619,24 @@ float held_duration(std::string keyname) // unused
         if (keycode == i + 1)
         {
             return ImGui::GetIO().MouseDownDuration[i];
+        }
+    }
+    return -1.0;
+}
+
+float held_duration_last(std::string keyname)
+{
+    // int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname] & 0xff;
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (keycode == i + 1)
+        {
+            return ImGui::GetIO().MouseDownDurationPrev[i];
         }
     }
     return -1.0;
@@ -3177,14 +3213,14 @@ void render_clickhandler()
         {
             if (g_zoom == 0.0f)
                 g_zoom = get_zoom_level();
-            g_zoom += 1.0;
+            g_zoom += g_zoom / 13.5f;
             set_zoom();
         }
         else if (clicked("mouse_zoom_in") || (held("mouse_camera_drag") && io.MouseWheel > 0))
         {
             if (g_zoom == 0.0f)
                 g_zoom = get_zoom_level();
-            g_zoom -= 1.0;
+            g_zoom -= g_zoom / 13.5f;
             set_zoom();
         }
     }
@@ -3534,6 +3570,25 @@ void render_clickhandler()
             {
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
             }
+            set_camera_bounds(true);
+        }
+
+        else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.5f)
+        {
+            if (!g_players.empty())
+            {
+                g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+            }
+            set_camera_bounds(true);
+        }
+
+        else if (released("mouse_camera_drag") && !dblclicked("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 3.0f && held_duration_last("mouse_camera_drag") < 0.2f)
+        {
+            if (ImGui::IsMousePosValid())
+            {
+                g_state->camera->focused_entity_uid = get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
+            }
+            set_camera_bounds(true);
         }
 
         else if (clicked("mouse_camera_drag"))
@@ -3541,7 +3596,6 @@ void render_clickhandler()
             if (ImGui::IsMousePosValid())
             {
                 startpos = normalize(io.MousePos);
-                g_state->camera->focused_entity_uid = get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
             }
         }
 
@@ -3557,6 +3611,7 @@ void render_clickhandler()
                 g_state->camera->focus_x -= current_pos.first - oryginal_pos.first;
                 g_state->camera->focus_y -= current_pos.second - oryginal_pos.second;
                 startpos = normalize(io.MousePos);
+                set_camera_bounds(false);
             }
         }
 
