@@ -215,7 +215,7 @@ std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, disable_ghost_timer = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
@@ -3672,6 +3672,11 @@ void render_options()
         g_ui_scripts["light"]->set_enabled(test_flag(g_dark_mode, 2));
     }
     tooltip("Forces every level to be lit af.");
+    if (ImGui::Checkbox("Disable ghost timer", &disable_ghost_timer))
+    {
+        set_time_ghost_enabled(!disable_ghost_timer);
+        set_time_jelly_enabled(!disable_ghost_timer);
+    }
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
     {
         force_hud_flags();
