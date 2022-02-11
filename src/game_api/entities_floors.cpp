@@ -756,7 +756,6 @@ void Door::unlock(bool unlock)
         if (ent_type == entrence_door || ent_type == entrence_door + 1 || ent_type == entrence_door + 3)
         {
             static const ENT_TYPE door_bg = to_id("ENT_TYPE_BG_DOOR");
-            static const ENT_TYPE door_bg_large = to_id("ENT_TYPE_BG_DOOR_LARGE");
             const auto state_layer = state.layer(this->layer);
             for (const auto& item : state_layer->entities_overlaping_grid[static_cast<int>(y)][static_cast<int>(x)].entities())
             {
@@ -770,6 +769,7 @@ void Door::unlock(bool unlock)
         else if (ent_type == entrence_door + 2) // main exit
         {
             static const ENT_TYPE fx_maindoor = to_id("ENT_TYPE_FX_MAIN_EXIT_DOOR");
+            static const ENT_TYPE door_bg_large = to_id("ENT_TYPE_BG_DOOR_LARGE");
             const auto main_door = this->as<MainExit>();
             if (unlock)
             {
@@ -791,7 +791,7 @@ void Door::unlock(bool unlock)
             {
                 if (!main_door->door_blocker)
                 {
-                    main_door->door_blocker = state.layer_local(layer)->spawn_entity_over(to_id("ENT_TYPE_BG_DOOR_LARGE"), this, 0, 0);
+                    main_door->door_blocker = state.layer_local(layer)->spawn_entity_over(door_bg_large, this, 0, 0);
                     main_door->door_blocker->y = 2.0;
                     main_door->door_blocker->animation_frame = 1;
                 }
