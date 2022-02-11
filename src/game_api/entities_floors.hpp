@@ -71,6 +71,7 @@ class Door : public Floor
     int8_t unused1[7];
     Entity* fx_button;
 
+    /// Lock/Unlock doors
     void unlock(bool unlock);
 
     // this function doesnt do much, checks if it's CHAR_*, checks if hes holding anything (if yes calls some function), then checks if Player.can_use is equal to 4 calls some other function
@@ -87,7 +88,8 @@ class Door : public Floor
     // returns 0.0 except for eggship doors
     // for example: FLOOR_DOOR_EGGSHIP_ROOM returns 0.75 when entering the room, and 1.0 when exiting, runs every frame while entering/exiting
     virtual float v44() = 0;
-    virtual bool is_door_unlocked() = 0;
+    /// Will alwyas return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
+    virtual bool is_unlocked() = 0;
     virtual bool v46() = 0; // dunno, runs every frame when player overlays door
 };
 
@@ -127,7 +129,8 @@ class CityOfGoldDoor : public DecoratedDoor
 class MainExit : public ExitDoor
 {
   public:
-    int64_t unknown;
+    /// Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
+    Entity* door_blocker;
     SoundPosition* sound_pos;
     float top_value; // unsure
     float value;     // unsure

@@ -718,14 +718,18 @@ void ForceField::activate_laserbeam(bool turn_on)
 
 void Door::unlock(bool unlock)
 {
+    // TODO: DOOR_EGGSHIP, DOOR_EGGSHIP_ATREZZO, DOOR_EGGSHIP_ROOM ?
+    static const ENT_TYPE entrence_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static const ENT_TYPE locked_door = to_id("ENT_TYPE_FLOOR_DOOR_LOCKED");
     static const ENT_TYPE COG_door = to_id("ENT_TYPE_FLOOR_DOOR_COG");
     static const ENT_TYPE eggchild_room_door = to_id("ENT_TYPE_FLOOR_DOOR_MOAI_STATUE");
     static const ENT_TYPE EW_door = to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD");
     const auto ent_type = this->type->id;
+    auto state = State::get();
+
     if (ent_type == locked_door || ent_type == locked_door + 1) // plus one for DOOR_LOCKED_PEN
     {
-        auto door_ent = this->as<LockedDoor>();
+        const auto door_ent = this->as<LockedDoor>();
         if (unlock)
         {
             door_ent->unlocked = true;
@@ -737,9 +741,7 @@ void Door::unlock(bool unlock)
             door_ent->set_invisible(false);
         }
     }
-    // works also for DOOR_EXIT and DOOR_LAYER, but the virtual `is_door_unlocked` will still return true
-    // so i din't do it to avoid confusion
-    else if (ent_type == EW_door)
+    else if (ent_type == EW_door || (ent_type >= entrence_door && ent_type < locked_door))
     {
         if (unlock)
         {
@@ -749,20 +751,59 @@ void Door::unlock(bool unlock)
         {
             this->flags &= ~0x80000; // clr flag 20 (Enable button prompt)
         }
+
+        // entrence, exit, starting exit
+        if (ent_type == entrence_door || ent_type == entrence_door + 1 || ent_type == entrence_door + 3)
+        {
+            static const ENT_TYPE door_bg = to_id("ENT_TYPE_BG_DOOR");
+            static const ENT_TYPE door_bg_large = to_id("ENT_TYPE_BG_DOOR_LARGE");
+            const auto state_layer = state.layer(this->layer);
+            for (const auto& item : state_layer->entities_overlaping_grid[static_cast<int>(y)][static_cast<int>(x)].entities())
+            {
+                if (item->type->id == door_bg)
+                {
+                    item->animation_frame = unlock ? 1 : 0;
+                    break;
+                }
+            }
+        }
+        else if (ent_type == entrence_door + 2) // main exit
+        {
+            static const ENT_TYPE fx_maindoor = to_id("ENT_TYPE_FX_MAIN_EXIT_DOOR");
+            const auto main_door = this->as<MainExit>();
+            if (unlock)
+            {
+                if (main_door->door_blocker)
+                {
+                    if (main_door->door_blocker->type->id == fx_maindoor)
+                    {
+                        main_door->door_blocker->as<Movable>()->move_state = 5; // this will kill it and hide the blocking BG
+                        main_door->door_blocker = nullptr;
+                    }
+                    else
+                    {
+                        main_door->door_blocker->destroy(); // destroy entity if it's something else
+                        main_door->door_blocker = nullptr;
+                    }
+                }
+            }
+            else
+            {
+                if (!main_door->door_blocker)
+                {
+                    main_door->door_blocker = state.layer_local(layer)->spawn_entity_over(to_id("ENT_TYPE_BG_DOOR_LARGE"), this, 0, 0);
+                    main_door->door_blocker->y = 2.0;
+                    main_door->door_blocker->animation_frame = 1;
+                }
+            }
+        }
     }
     else if (ent_type == COG_door)
     {
         auto door_ent = this->as<CityOfGoldDoor>();
-        if (unlock)
-        {
-            door_ent->unlocked = true;
-            door_ent->special_bg->animation_frame = 1;
-        }
-        else
-        {
-            door_ent->unlocked = false;
-            door_ent->special_bg->animation_frame = 0;
-        }
+        door_ent->unlocked = unlock;
+        if (door_ent->special_bg)
+            door_ent->special_bg->animation_frame = unlock ? 1 : 0;
     }
     else if (ent_type == eggchild_room_door)
     {
