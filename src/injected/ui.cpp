@@ -1162,6 +1162,29 @@ void force_hud_flags()
         g_state->level_flags &= ~(1U << 19);
 }
 
+void toggle_noclip()
+{
+    g_players = get_players();
+    for (auto ent : g_players)
+    {
+        auto player = (Movable*)ent->topmost_mount();
+        if (options["noclip"])
+        {
+            if (player->overlay)
+                player->overlay->remove_item(player->uid);
+            player->overlay = NULL;
+            player->type->max_speed = 0.3f;
+        }
+        else
+        {
+            player->flags &= ~(1U << 9);
+            player->flags |= 1U << 10;
+            player->flags &= ~(1U << 4);
+            player->type->max_speed = 0.0725f;
+        }
+    }
+}
+
 void force_noclip()
 {
     g_players = get_players();
@@ -1170,6 +1193,17 @@ void force_noclip()
         for (auto ent : g_players)
         {
             auto player = (Movable*)(ent->topmost_mount());
+            if (player->overlay)
+            {
+                if (player->state == 6 && (player->movex != 0 || player->movey != 0))
+                {
+                    auto [x, y] = player->position();
+                    move_entity_abs(player->uid, x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
+                }
+                else
+                    player->overlay->remove_item(player->uid);
+            }
+            player->overlay = NULL;
             player->standing_on_uid = -1;
             player->flags |= 1U << 9;
             player->flags &= ~(1U << 10);
@@ -1773,22 +1807,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("toggle_noclip", wParam))
     {
         options["noclip"] = !options["noclip"];
-        g_players = get_players();
-        for (auto ent : g_players)
-        {
-            auto player = (Movable*)ent->topmost_mount();
-            if (options["noclip"])
-            {
-                player->type->max_speed = 0.3f;
-            }
-            else
-            {
-                player->flags &= ~(1U << 9);
-                player->flags |= 1U << 10;
-                player->flags &= ~(1U << 4);
-                player->type->max_speed = 0.0725f;
-            }
-        }
+        toggle_noclip();
     }
     else if (pressed("toggle_hitboxes", wParam))
     {
@@ -3638,22 +3657,7 @@ void render_options()
     tooltip("Make the hired hands completely deathproof.");
     if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
     {
-        g_players = get_players();
-        for (auto ent : g_players)
-        {
-            auto player = (Movable*)ent->topmost_mount();
-            if (options["noclip"])
-            {
-                player->type->max_speed = 0.3f;
-            }
-            else
-            {
-                player->flags &= ~(1U << 9);
-                player->flags |= 1U << 10;
-                player->flags &= ~(1U << 4);
-                player->type->max_speed = 0.0725f;
-            }
-        }
+        toggle_noclip();
     }
     tooltip("Fly through walls and ignored by enemies.", "toggle_noclip");
     ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
