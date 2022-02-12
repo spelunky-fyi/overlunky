@@ -295,6 +295,58 @@ void register_usertypes(sol::state& lua)
         sol::property([](Items& s)
                       { return std::ref(s.player_inventories); }));
 
+    lua.new_usertype<LiquidPhysicsEngine>(
+        "LiquidPhysicsEngine",
+        "pause",
+        &LiquidPhysicsEngine::pause_physics,
+        "gravity",
+        &LiquidPhysicsEngine::gravity,
+        "cohesion",
+        &LiquidPhysicsEngine::cohesion,
+        "elasticity",
+        &LiquidPhysicsEngine::agitation,
+        "size",
+        &LiquidPhysicsEngine::blob_size,
+        "weight",
+        &LiquidPhysicsEngine::weight,
+        "count",
+        &LiquidPhysicsEngine::entity_count);
+
+    lua.new_usertype<LiquidPhysicsParams>(
+        "LiquidPhysicsParams",
+        "gravity",
+        &LiquidPhysicsParams::gravity,
+        "cohesion",
+        &LiquidPhysicsParams::cohesion,
+        "elasticity",
+        &LiquidPhysicsParams::agitation);
+
+    lua.new_usertype<LiquidPool>(
+        "LiquidPool",
+        "default",
+        &LiquidPool::physics_defaults,
+        "engine",
+        &LiquidPool::physics_engine);
+
+    lua.new_usertype<LiquidPhysics>(
+        "LiquidPhysics",
+        "pools",
+        sol::property([](LiquidPhysics& lp)
+                      { return std::ref(lp.pools) /**/; }));
+
+    lua.create_named_table(
+        "LIQUID_POOL",
+        "WATER",
+        1,
+        "COARSE_WATER",
+        2,
+        "LAVA",
+        3,
+        "COARSE_LAVA",
+        4,
+        "STAGNANT_LAVA",
+        5);
+
     auto state_usertype = lua.new_usertype<StateMemory>(
         "StateMemory",
         "screen_last",
@@ -486,7 +538,9 @@ void register_usertypes(sol::state& lua)
         &StateMemory::time_startup,
         */
         "logic",
-        &StateMemory::logic); // had to have something at the at for the "comma" before the big comment block
+        &StateMemory::logic,
+        "liquid",
+        &StateMemory::liquid_physics); // had to have something at the at for the "comma" before the big comment block
 
     state_usertype["speedrun_character"] = &StateMemory::speedrun_character;
     state_usertype["speedrun_activation_trigger"] = &StateMemory::speedrun_activation_trigger;
