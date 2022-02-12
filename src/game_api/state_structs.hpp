@@ -652,13 +652,6 @@ struct LogicList
     LogicArenaLooseBombs* arena_loose_bombs;
 };
 
-struct SomeUnknownArray
-{
-    size_t array_pointer;
-    int32_t unknown1; // resizing related
-    int32_t padding;
-};
-
 struct LiquidPhysicsEngine
 {
     bool pause_physics;

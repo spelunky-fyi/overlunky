@@ -661,3 +661,11 @@ const char* direction_flags[]{
     "Up",
     "Right",
 };
+
+const char* liquid_pool_names[]{
+    "Water",
+    "Coarse Water",
+    "Lava",
+    "Coarse Lava",
+    "Stagnant Lava",
+};

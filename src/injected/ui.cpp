@@ -2310,6 +2310,26 @@ void render_illumination(Illumination* light, const char* sect = "")
     ImGui::PopID();
 }
 
+void render_liquid_pool(int i)
+{
+    ImGui::PushID(i);
+    if (ImGui::CollapsingHeader(liquid_pool_names[i]))
+    {
+        auto engine = g_state->liquid_physics->pools[i].physics_engine;
+        auto defaults = g_state->liquid_physics->pools[i].physics_defaults;
+        if (engine)
+        {
+            ImGui::Text("Entity count: %u/%u", engine->entity_count, engine->allocated_size);
+            ImGui::Checkbox("Pause physics##LiquidEnginePause", &engine->pause_physics);
+            ImGui::DragFloat("Gravity##LiquidEngineGravity", &engine->gravity, 0.01f, -5.f, 5.f);
+            ImGui::DragFloat("Elasticity##LiquidEngineElasticity", &engine->agitation, 0.01f, -1.f, 5.f);
+        }
+        ImGui::DragFloat("Default gravity##LiquidDefaultGravity", &defaults.gravity, 0.01f, -5.f, 5.f);
+        ImGui::DragFloat("Default elasticity##LiquidDefaultElasticity", &defaults.agitation, 0.01f, -1.f, 5.f);
+    }
+    ImGui::PopID();
+}
+
 void render_list()
 {
     // ImGui::ListBox with filter
@@ -5276,6 +5296,24 @@ void render_game_props()
     {
         if (g_state->illumination)
             render_illumination(g_state->illumination, "Global illumination");
+    }
+    if (ImGui::CollapsingHeader("Liquid pools"))
+    {
+        static bool global_pause = false;
+        bool global_pause_changed = ImGui::Checkbox("Global pause physics##LiquidGlobalPause", &global_pause);
+        static float global_gravity = 1.0f;
+        bool global_gravity_changed = ImGui::DragFloat("Global gravity##LiquidGlobalGravity", &global_gravity, 0.01f, -5.f, 5.f);
+        for (int i = 0; i < 5; ++i)
+        {
+            render_liquid_pool(i);
+            if (g_state->liquid_physics->pools[i].physics_engine)
+            {
+                if (global_pause_changed)
+                    g_state->liquid_physics->pools[i].physics_engine->pause_physics = global_pause;
+                if (global_gravity_changed)
+                    g_state->liquid_physics->pools[i].physics_engine->gravity = global_gravity;
+            }
+        }
     }
     ImGui::PopItemWidth();
 }
