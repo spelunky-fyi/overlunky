@@ -711,6 +711,12 @@ class YetiQueen : public Monster
   public:
     uint32_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     uint8_t unknown_timer;
+
+    virtual void v_101() = 0;          // can't trigger
+    virtual void attack_related() = 0; // parameter is some struct, if disabled it doesn't do jump attack, but still does the protect head thing
+    virtual void v_103() = 0;          // return
+    virtual void jump_related() = 0;   // if disabled she squads but never makes the jump
+    virtual void on_death() = 0;       // spawns the drops
 };
 
 class YetiKing : public Monster
@@ -724,6 +730,12 @@ class YetiKing : public Monster
     ParticleEmitterInfo* particle_fog;
     ParticleEmitterInfo* particle_dust;
     ParticleEmitterInfo* particle_sparkles;
+
+    virtual void v_101() = 0;          // can't trigger
+    virtual void attack_related() = 0; // parameter is some struct, if disabled it doesn't do jump attack, but still does the protect head thing
+    virtual void on_attack() = 0;      // freezes stuff when attacks and spawns particles
+    virtual void screem_related() = 0; // if disabled he opens the mount but never screams
+    virtual void on_death() = 0;       // spawns the drops
 };
 
 class Lamassu : public Monster
