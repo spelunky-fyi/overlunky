@@ -78,6 +78,8 @@ std::vector<DropEntry> drop_entries{
     {"ROBOT_METALSHIELD", "\x50\x02\x00\x00"s, VTABLE_OFFSET::MONS_ROBOT, 3},
     /// It's actually for all RoomOwner's, so: shopkeeper, tun, yang and madame tusk
     {"SHOPKEEPER_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::MONS_YANG, 109, 1},
+    /// Rare goldbar from shopkeeper
+    {"SHOPKEEPER_GOLDBAR", "\xBA\xEF\x01\x00\x00"s, VTABLE_OFFSET::MONS_SHOPKEEPER, 109, 1},
     /// GHIST and GHIST_SHOPKEEPER
     {"GHIST_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::MONS_GHIST_SHOPKEEPER, 105, 1},
     {"SKELETON_SKELETONKEY", "\x1D\x02\x00\x00"s, VTABLE_OFFSET::MONS_SKELETON, 3},
