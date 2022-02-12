@@ -799,7 +799,7 @@ void Door::unlock(bool unlock)
     }
     else if (ent_type == COG_door)
     {
-        auto door_ent = this->as<CityOfGoldDoor>();
+        const auto door_ent = this->as<CityOfGoldDoor>();
         door_ent->unlocked = unlock;
         if (door_ent->special_bg)
             door_ent->special_bg->animation_frame = unlock ? 1 : 0;

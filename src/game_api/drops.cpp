@@ -81,7 +81,7 @@ std::vector<DropEntry> drop_entries{
     /// Rare goldbar from shopkeeper
     {"SHOPKEEPER_GOLDBAR", "\xBA\xEF\x01\x00\x00"s, VTABLE_OFFSET::MONS_SHOPKEEPER, 109, 1},
     /// GHIST and GHIST_SHOPKEEPER
-    {"GHIST_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::MONS_GHIST_SHOPKEEPER, 105, 1},
+    {"GHIST_GOLDCOIN", "\xBA\xF6\x01\x00\x00"s, VTABLE_OFFSET::MONS_GHIST_SHOPKEEPER, 105, 1}, // there is no 105 function for ghist
     {"SKELETON_SKELETONKEY", "\x1D\x02\x00\x00"s, VTABLE_OFFSET::MONS_SKELETON, 3},
     {"SKELETON_SKULL", "\xE2\x01\x00\x00"s, VTABLE_OFFSET::MONS_SKELETON, 3},
     {"SORCERESS_RUBY", "\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_SORCERESS, 3},
@@ -133,6 +133,7 @@ std::vector<DropEntry> drop_entries{
     /* set write bp on Altar->unknown (second byte after timer)
     {"SACRIFICE_DIE", "\x3D\xC0\x01\x00\x00\x0F"s, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame
     {"SACRIFICE_USHABTI", "\x3D\xBA\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame */
+
     /// Game does: (this value & 0xFFFFFFFE) to get idol and tusk idol
     /// Essentially clearing last bit, so it's ether this entity + 1 or -1 or just one entity, depending of the chosen type
     {"SACRIFICE_IDOL", "\x81\xF9\x64\x01\x00\x00\x0F"s, VTABLE_OFFSET::NONE, 0, 2},
@@ -220,7 +221,7 @@ std::vector<DropEntry> drop_entries{
     {"OLMEC_UFO", "\x0A\x01\x00\x00"s, VTABLE_OFFSET::ITEM_OLMECCANNON_UFO, 93},
     {"YETIKING_ICESPIRE", "\xE8\x01\x00\x00"s, VTABLE_OFFSET::MONS_YETIKING, 104},
     /// Anubis regular shot = new_drop_uid - 1 !
-    {"SCEPTER_ANUBISSPECIALSHOT", "\x79\x01\x00\x00"s, VTABLE_OFFSET::MONS_ANUBIS, 101},
+    {"SCEPTER_ANUBISSPECIALSHOT", "\x79\x01\x00\x00"s, VTABLE_OFFSET::MONS_ANUBIS, 101}, // should probably be 102
     {"SCEPTER_PLAYERSHOT", "\x7A\x01\x00\x00"s, VTABLE_OFFSET::ITEM_SCEPTER, 24},
     {"PLASMACANNON_SHOT", "\xBA\x77\x01\x00\x00"s, VTABLE_OFFSET::ITEM_PLASMACANNON, 24, 1},
     {"FREEZERAY_SHOT", "\xBA\xA9\x01\x00\x00"s, VTABLE_OFFSET::ITEM_FREEZERAY, 24, 1},

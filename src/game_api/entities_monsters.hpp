@@ -10,18 +10,20 @@ class Monster : public PowerupCapable
   public:
     int32_t chased_target_uid;
     uint32_t target_selection_timer;
-    // those could be wrong because of the update
-    virtual void increase_killcount() = 0; // increases state.kills_npc
 
-    virtual void on_aggro() = 0; // updates state.quests in case of npc
+    virtual void increase_killcount() = 0; // increases state.kills_npc, is not called for normal monsters but they all have the same function
 
-    virtual void unknown_v97() = 0;
+    virtual void on_aggro(uint8_t, bool) = 0; // updates state.quests in case of npc
+
+    virtual void unknown_v97() = 0; // can't trigger it
 
     virtual void on_shop_entered() = 0;
 
-    virtual void on_player_picked_up_shopitem() = 0; // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
+    // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
+    // if disabled some monster will stop moving (like bats, jiangshi) some wont attack (crabman), shopkeeper can still kick you but won't fire hes weapon
+    virtual void attack_logic_related() = 0;
 
-    virtual void on_fire_weapon() = 0; // if deactivated, they can pick up weapons but won't shoot them
+    virtual bool update_target(Entity* ent) = 0;
 };
 
 class RoomOwner : public Monster
@@ -44,9 +46,9 @@ class RoomOwner : public Monster
     uint16_t padding1;
     uint32_t padding2;
 
-    virtual void on_criminal_act_committed() = 0; // shows the appropriate message (vandal, cheater, ...)
+    virtual void on_criminal_act_committed(uint8_t) = 0; // shows the appropriate message (vandal, cheater, ...)
 
-    // for shopkeepers: checks state.shoppie_aggro_levels
+    // for shopkeepers: checks state.shoppie_aggro_levels, for waddler checks the state.quest_flags
     // if you return false, but you have attacked them before, they will be patrolling but won't attack you on sight
     virtual bool should_attack_on_sight() = 0;
 
@@ -59,13 +61,13 @@ class RoomOwner : public Monster
 
     virtual Entity* on_spawn_weapon() = 0; // return the weapon entity that will be used to attack the player
 
-    virtual uint32_t weapon_type() = 0; // the entity type of the weapon that will be spawned to attack the player
+    virtual ENT_TYPE weapon_type() = 0; // the entity type of the weapon that will be spawned to attack the player
 
-    virtual void unknown_v107_attack_weapon_related() = 0;
+    virtual bool can_attack() = 0; // parameter is some struct that contains the target
 
     virtual void unknown_v108() = 0; // for shopkeepers, it loops over (some of) the items for sale
 
-    virtual void on_death_treasure_drop() = 0; // random number calc, e.g. whether the shopkeeper drops gold bars on death
+    virtual void on_death_treasure_drop() = 0; // coins and if you're lucky, gold bar from shopkeeper
 };
 
 class WalkingMonster : public Monster
@@ -76,9 +78,9 @@ class WalkingMonster : public Monster
     int16_t walk_pause_timer;
     /// used for chatting with other monsters, attack cooldowns etc.
     int16_t cooldown_timer;
-
-    virtual void v_101() = 0;
-    virtual void v_102() = 0;
+    // Aggro or calm, if forced to return 0 it will not aggro unless you overlap his hitbox. For caveman this is called when he wakes up (from sleep or stun)
+    virtual bool can_aggro() = 0;
+    virtual void v_102() = 0; // parameter is some struct, that it changes and returns it (looks like 3x bool and more)
 };
 
 class NPC : public Monster
@@ -96,14 +98,14 @@ class NPC : public Monster
     uint8_t padding2;
     uint32_t padding3;
 
-    virtual void v_101() = 0;
-    virtual void v_102() = 0;
-    virtual void v_103() = 0;
-    virtual void v_104() = 0;
-    virtual void v_105() = 0;
-    virtual void v_106() = 0;
-    virtual void v_107() = 0;
-    virtual void v_108() = 0;
+    virtual void on_criminal_act_committed() = 0;
+    virtual bool should_attack_on_sight() = 0;
+    virtual void v_103() = 0;          // take some struct as parameter, sets the first qword to some constant (also returns it?), the first thing in the struct is acutally two floats
+    virtual void on_interaction() = 0; // does the quests stuff etc.
+    virtual Entity* on_spawn_weapon() = 0;
+    virtual ENT_TYPE weapon_type() = 0;
+    virtual bool can_attack() = 0;                 // parameter is some struct that contains the target
+    virtual void on_criminal_act_committed2() = 0; // calls the on_criminal_act_committed except for bodyguard which calls the should_attack_on_sight and turns off any speechbubble
 };
 
 enum class GHOST_BEHAVIOR : uint8_t
@@ -202,9 +204,9 @@ class Spider : public Monster
     /// only in the x coord
     float trigger_distance;
 
-    virtual void v_101() = 0;
-    virtual void v_102() = 0;
-    virtual void v_103() = 0;
+    virtual void spawn_offset_related() = 0; // disabling this function makes the spider spawn in wierd position
+    virtual float v_102() = 0;               // for spider returns 0.02, for giant spider 0.025, game does some calculations with this when triggered by player
+    virtual bool on_ceiling() = 0;
 };
 
 class HangSpider : public Monster
@@ -223,9 +225,10 @@ class Shopkeeper : public RoomOwner
     uint8_t name;
     /// can't shot when the timer is running
     uint8_t shotgun_attack_delay;
-    uint8_t unknown3; // accessed on stun/dmg? probably bool
+    /// will drop key after stun/kill
+    bool have_key;
     bool shop_owner;
-    bool unknown5a; // sometimes set to true
+    bool unknown5a; // use 1.0 instead of entityDB->animations->max_load_factor ???
     uint8_t padding11;
     uint8_t padding21;
     uint8_t padding31;
@@ -570,9 +573,9 @@ class Anubis : public Monster
     uint8_t psychic_orbs_counter;
     bool awake;
 
-    virtual void v_101() = 0;
-    virtual void v_102() = 0;
-    virtual void v_103() = 0;
+    virtual void set_next_attack_timer() = 0; // sets next_attack_timer based on the psychic_orbs_counter
+    virtual void attack() = 0;
+    virtual void play_attack_sound() = 0; // also calls virtual 20
 };
 
 class Cobra : public Monster
@@ -854,7 +857,7 @@ class Ghist : public Monster
     uint8_t padding3;
     uint16_t fadeout; // when 0, ghist fades out/dies
 
-    virtual void v_101() = 0;
+    virtual void on_body_destroyed() = 0; // clears level_flags "Angry ghist shopkeeper" and other stuff, then calls ->destroy()
 };
 
 class JumpDog : public Monster
@@ -1042,6 +1045,8 @@ class CritterSnail : public Critter
     float rotation_center_y;
     float rotation_angle;
     float rotation_speed;
+
+    virtual float get_speed() = 0;
 };
 
 class CritterFish : public Critter
@@ -1095,4 +1100,6 @@ class CritterSlime : public Critter
     float rotation_angle;
     float rotation_speed;
     int16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
+
+    virtual float get_speed() = 0;
 };
