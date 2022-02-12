@@ -66,7 +66,7 @@ class PowerupCapable : public Movable
 
     // thoes could be wrong becous of the update
     virtual void on_blood_collision() = 0; // only triggers when player has kapala
-    
+
     // called for stunned entities, check bounch of stuff like state, hold entity, standing on entity etc. runs until returned 1
     // this is used to clear the last_owner of stunned entity when it is no longed stunned
     virtual bool can_clear_last_owner() = 0;
