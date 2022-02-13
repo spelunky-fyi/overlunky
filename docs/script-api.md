@@ -929,6 +929,10 @@ Returns: [ImGuiIO](#imguiio) for raw keyboard, mouse and xinput gamepad stuff. T
 - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
 - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
 - Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+### [`set_lut`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_lut)
+`nil set_lut(optional<TEXTURE> texture_id, LAYER layer)`<br/>
+### [`reset_lut`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_lut)
+`nil reset_lut(LAYER layer)`<br/>
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 `nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
