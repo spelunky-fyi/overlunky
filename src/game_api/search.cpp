@@ -279,8 +279,8 @@ class PatternCommandBuffer
     // Rapid prototyping only please
     PatternCommandBuffer& from_exe_base(uint64_t offset)
     {
-        commands.push_back({ CommandType::FromExeBase, {.base_offset{ offset } } });
-        commands.push_back({ CommandType::AtExe });
+        commands.push_back({CommandType::FromExeBase, {.base_offset = offset}});
+        commands.push_back({CommandType::AtExe});
         return *this;
     }
 
