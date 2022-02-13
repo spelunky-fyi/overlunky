@@ -701,8 +701,8 @@ struct LiquidPhysicsEngine
     int64_t unknown58;
     int64_t unknown59;
     size_t unknown60;
-    Entity*** unknown61;  // it's actually array of pointers to some struct, but the entity is first in that struct
-    size_t unknown61a; // stuff for array above
+    Entity*** unknown61; // it's actually array of pointers to some struct, but the entity is first in that struct
+    size_t unknown61a;   // stuff for array above
     char skip[256];
     float unknown95;     // LiquidParam->unknown3
     float cohesion;      // LiquidParam->cohesion?, surface tension? setting it to -1 makes the blobs repel each other

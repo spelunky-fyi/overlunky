@@ -21,15 +21,6 @@ void StateMemory::set_correct_ushabti(uint16_t animation_frame)
 
 void fix_liquid_out_of_bounds()
 {
-    const static std::array<ENT_TYPE, 5> liquid_type_by_pool = {
-        // needs to be correct with the state->liquid_physics pools etc.
-        to_id("ENT_TYPE_LIQUID_WATER"),
-        to_id("ENT_TYPE_LIQUID_COARSE_WATER"),
-        to_id("ENT_TYPE_LIQUID_LAVA"),
-        to_id("ENT_TYPE_LIQUID_COARSE_LAVA"),
-        to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"),
-    };
-
     auto state = State::get().ptr();
     if (!state || !state->liquid_physics)
         return;
