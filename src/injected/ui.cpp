@@ -83,6 +83,7 @@ std::map<std::string, int64_t> keys{
     {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'H'},
     {"toggle_hud", OL_KEY_CTRL | 'H'},
     {"toggle_lights", OL_KEY_CTRL | 'L'},
+    {"toggle_ghost", OL_KEY_CTRL | 'O'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
     {"tool_entity", VK_F1},
@@ -217,7 +218,7 @@ std::vector<Player*> g_players;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, disable_ghost_timer = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
@@ -272,6 +273,7 @@ std::map<std::string, bool> options = {
     {"lights", false},
     {"disable_achievements", true},
     {"disable_savegame", true},
+    {"disable_ghost_timer", false},
     {"draw_hud", true},
     {"draw_script_messages", true},
     {"fade_script_messages", true},
@@ -1907,6 +1909,12 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             if ((g_state->level_flags & (1U << 17)) > 0)
                 g_state->illumination->flags &= ~(1U << 24);
         }
+    }
+    else if (pressed("toggle_ghost", wParam))
+    {
+        options["disable_ghost_timer"] = !options["disable_ghost_timer"];
+        set_time_ghost_enabled(!options["disable_ghost_timer"]);
+        set_time_jelly_enabled(!options["disable_ghost_timer"]);
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -3753,11 +3761,12 @@ void render_options()
         g_ui_scripts["light"]->set_enabled(test_flag(g_dark_mode, 2));
     }
     tooltip("Forces every level to be lit af.");
-    if (ImGui::Checkbox("Disable ghost timer", &disable_ghost_timer))
+    if (ImGui::Checkbox("Disable ghost timer", &options["disable_ghost_timer"]))
     {
-        set_time_ghost_enabled(!disable_ghost_timer);
-        set_time_jelly_enabled(!disable_ghost_timer);
+        set_time_ghost_enabled(!options["disable_ghost_timer"]);
+        set_time_jelly_enabled(!options["disable_ghost_timer"]);
     }
+    tooltip("Disables the timed ghost and jelly.", "toggle_ghost");
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
     {
         force_hud_flags();
@@ -5517,7 +5526,7 @@ void render_prohud()
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, 2}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
+    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 }
