@@ -27,4 +27,4 @@ target_precompile_headers(shared INTERFACE
         <locale>
         <mutex>)
 
-target_sources(shared INTERFACE logger.h)
+target_sources(shared INTERFACE logger.h olfont.h)

@@ -60,7 +60,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Ctrl+2345**: Zoom to X level width
       + **Shift+ArrowKey**: Move camera in desired direction
       + **Mouse 4**: Drag camera around or focus on an entity
-      + **Mouse 4 doubleclick**: Reset camera focus to player
+      + **Mouse 4 longpress**: Reset camera focus to player
       + **Mouse 4+Wheel**: Zoom
       + **Ctrl+Wheel**: Zoom
   - **F4**: Entity properties

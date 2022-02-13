@@ -1260,6 +1260,23 @@ Pet information for level transition
 - [`array<bool, 4> is_pet_poisoned`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_poisoned) &Items::is_pet_poisoned
 - [`array<Inventory, MAX_PLAYERS> player_inventory`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) &Items::player_inventories
 - [`array<SelectPlayerSlot, MAX_PLAYERS> player_select`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) &Items::player_select_slots
+### `LiquidPhysicsEngine`
+- [`bool pause`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) &LiquidPhysicsEngine::pause_physics
+- [`float gravity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gravity) &LiquidPhysicsEngine::gravity
+- [`float cohesion`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cohesion) &LiquidPhysicsEngine::cohesion
+- [`float elasticity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elasticity) &LiquidPhysicsEngine::agitation
+- [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &LiquidPhysicsEngine::blob_size
+- [`float weight`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=weight) &LiquidPhysicsEngine::weight
+- [`int count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=count) &LiquidPhysicsEngine::entity_count
+### `LiquidPhysicsParams`
+- [`float gravity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gravity) &LiquidPhysicsParams::gravity
+- [`float cohesion`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cohesion) &LiquidPhysicsParams::cohesion
+- [`float elasticity`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elasticity) &LiquidPhysicsParams::agitation
+### `LiquidPool`
+- [`LiquidPhysicsParams default`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default) &LiquidPool::physics_defaults
+- [`LiquidPhysicsEngine engine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=engine) &LiquidPool::physics_engine
+### `LiquidPhysics`
+- [`pools`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pools) sol::property([](LiquidPhysics&lp){returnstd::ref(lp.pools)/**/;})
 ### `StateMemory`
 - [`int screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
 - [`int screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) &StateMemory::screen
@@ -1372,6 +1389,7 @@ Who pops out the spaceship for a tiamat/hundun win, this is set upon the spacesh
 - [`int screen_change_counter`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_change_counter) &StateMemory::screen_change_counter
 - [`int time_startup`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) &StateMemory::time_startup
 - [`LogicList logic`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) &StateMemory::logic
+- [`LiquidPhysics liquid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) &StateMemory::liquid_physics
 ### `GameManager`
 - [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
 - [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
@@ -5537,6 +5555,12 @@ Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of 
 Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
 - [`ITALIC`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.ITALIC) 1
 - [`BOLD`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.BOLD) 2
+### LIQUID_POOL
+- [`WATER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.WATER) 1
+- [`COARSE_WATER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.COARSE_WATER) 2
+- [`LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.LAVA) 3
+- [`COARSE_LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.COARSE_LAVA) 4
+- [`STAGNANT_LAVA`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.STAGNANT_LAVA) 5
 ### CAUSE_OF_DEATH
 - [`DEATH`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.DEATH) 0
 - [`ENTITY`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CAUSE_OF_DEATH.ENTITY) 1
