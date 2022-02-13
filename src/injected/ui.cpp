@@ -23,6 +23,8 @@
 #pragma warning(pop)
 #include <fmt/core.h>
 
+#include "olfont.h"
+
 #include "console.hpp"
 #include "custom_types.hpp"
 #include "entities_chars.hpp"
@@ -81,6 +83,7 @@ std::map<std::string, int64_t> keys{
     {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'H'},
     {"toggle_hud", OL_KEY_CTRL | 'H'},
     {"toggle_lights", OL_KEY_CTRL | 'L'},
+    {"toggle_ghost", OL_KEY_CTRL | 'O'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
     {"tool_entity", VK_F1},
@@ -233,8 +236,8 @@ const char* inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
 std::string scriptpath = "Overlunky/Scripts";
 
-std::string fontfile = "segoeuib.ttf";
-std::vector<float> fontsize = {18.0f, 32.0f, 72.0f};
+std::string fontfile = "";
+std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
 
 [[maybe_unused]] const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 [[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17, u8_draw_depth_max = 53;
@@ -270,6 +273,7 @@ std::map<std::string, bool> options = {
     {"lights", false},
     {"disable_achievements", true},
     {"disable_savegame", true},
+    {"disable_ghost_timer", false},
     {"draw_hud", true},
     {"draw_script_messages", true},
     {"fade_script_messages", true},
@@ -693,7 +697,7 @@ void save_config(std::string file)
         writeData << std::endl;
     writeData << "]" << std::endl;
 
-    writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\"" << std::endl;
+    writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\" or empty to use the embedded font \"Hack\"" << std::endl;
     writeData << "font_size = [";
     for (unsigned int i = 0; i < fontsize.size(); i++)
     {
@@ -777,8 +781,8 @@ void load_config(std::string file)
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
-    fontfile = toml::find_or<std::string>(opts, "font_file", "segoeuib.ttf");
-    auto ini_fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {18.0f, 32.0f, 72.0f});
+    fontfile = toml::find_or<std::string>(opts, "font_file", "");
+    auto ini_fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {14.0f, 32.0f, 72.0f});
     if (ini_fontsize.size() >= 3)
         fontsize = ini_fontsize;
     godmode(options["god_mode"]);
@@ -1129,6 +1133,24 @@ void force_lights()
     }
 }
 
+void set_camera_bounds(bool enabled)
+{
+    if (enabled)
+    {
+        g_state->camera->bounds_left = 0.5f;
+        g_state->camera->bounds_right = g_state->w * 10.0f + 4.5f;
+        g_state->camera->bounds_top = 124.5f;
+        g_state->camera->bounds_bottom = 120.5f - g_state->h * 8.0f;
+    }
+    else
+    {
+        g_state->camera->bounds_left = -FLT_MAX;
+        g_state->camera->bounds_right = FLT_MAX;
+        g_state->camera->bounds_top = FLT_MAX;
+        g_state->camera->bounds_bottom = -FLT_MAX;
+    }
+}
+
 void force_zoom()
 {
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
@@ -1162,6 +1184,29 @@ void force_hud_flags()
         g_state->level_flags &= ~(1U << 19);
 }
 
+void toggle_noclip()
+{
+    g_players = get_players();
+    for (auto ent : g_players)
+    {
+        auto player = (Movable*)ent->topmost_mount();
+        if (options["noclip"])
+        {
+            if (player->overlay)
+                player->overlay->remove_item(player->uid);
+            player->overlay = NULL;
+            player->type->max_speed = 0.3f;
+        }
+        else
+        {
+            player->flags &= ~(1U << 9);
+            player->flags |= 1U << 10;
+            player->flags &= ~(1U << 4);
+            player->type->max_speed = 0.0725f;
+        }
+    }
+}
+
 void force_noclip()
 {
     g_players = get_players();
@@ -1170,6 +1215,17 @@ void force_noclip()
         for (auto ent : g_players)
         {
             auto player = (Movable*)(ent->topmost_mount());
+            if (player->overlay)
+            {
+                if (player->state == 6 && (player->movex != 0 || player->movey != 0))
+                {
+                    auto [x, y] = player->position();
+                    move_entity_abs(player->uid, x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
+                }
+                else
+                    player->overlay->remove_item(player->uid);
+            }
+            player->overlay = NULL;
             player->standing_on_uid = -1;
             player->flags |= 1U << 9;
             player->flags &= ~(1U << 10);
@@ -1554,7 +1610,7 @@ float drag_delta(std::string keyname)
     return false;
 }
 
-float held_duration(std::string keyname) // unused
+float held_duration(std::string keyname)
 {
     // int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -1567,6 +1623,24 @@ float held_duration(std::string keyname) // unused
         if (keycode == i + 1)
         {
             return ImGui::GetIO().MouseDownDuration[i];
+        }
+    }
+    return -1.0;
+}
+
+float held_duration_last(std::string keyname)
+{
+    // int wParam = OL_BUTTON_MOUSE;
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int keycode = keys[keyname] & 0xff;
+    for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
+    {
+        if (keycode == i + 1)
+        {
+            return ImGui::GetIO().MouseDownDurationPrev[i];
         }
     }
     return -1.0;
@@ -1773,22 +1847,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("toggle_noclip", wParam))
     {
         options["noclip"] = !options["noclip"];
-        g_players = get_players();
-        for (auto ent : g_players)
-        {
-            auto player = (Movable*)ent->topmost_mount();
-            if (options["noclip"])
-            {
-                player->type->max_speed = 0.3f;
-            }
-            else
-            {
-                player->flags &= ~(1U << 9);
-                player->flags |= 1U << 10;
-                player->flags &= ~(1U << 4);
-                player->type->max_speed = 0.0725f;
-            }
-        }
+        toggle_noclip();
     }
     else if (pressed("toggle_hitboxes", wParam))
     {
@@ -1850,6 +1909,12 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             if ((g_state->level_flags & (1U << 17)) > 0)
                 g_state->illumination->flags &= ~(1U << 24);
         }
+    }
+    else if (pressed("toggle_ghost", wParam))
+    {
+        options["disable_ghost_timer"] = !options["disable_ghost_timer"];
+        set_time_ghost_enabled(!options["disable_ghost_timer"]);
+        set_time_jelly_enabled(!options["disable_ghost_timer"]);
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -2251,6 +2316,26 @@ void render_illumination(Illumination* light, const char* sect = "")
     for (int i = 0; i < 11; i++)
     {
         ImGui::CheckboxFlags(illumination_flags[i], &light->flags, int_pow(2, i));
+    }
+    ImGui::PopID();
+}
+
+void render_liquid_pool(int i)
+{
+    ImGui::PushID(i);
+    if (ImGui::CollapsingHeader(liquid_pool_names[i]))
+    {
+        auto engine = g_state->liquid_physics->pools[i].physics_engine;
+        auto defaults = g_state->liquid_physics->pools[i].physics_defaults;
+        if (engine)
+        {
+            ImGui::Text("Entity count: %u/%u", engine->entity_count, engine->allocated_size);
+            ImGui::Checkbox("Pause physics##LiquidEnginePause", &engine->pause_physics);
+            ImGui::DragFloat("Gravity##LiquidEngineGravity", &engine->gravity, 0.01f, -5.f, 5.f);
+            ImGui::DragFloat("Elasticity##LiquidEngineElasticity", &engine->agitation, 0.01f, -1.f, 5.f);
+        }
+        ImGui::DragFloat("Default gravity##LiquidDefaultGravity", &defaults.gravity, 0.01f, -5.f, 5.f);
+        ImGui::DragFloat("Default elasticity##LiquidDefaultElasticity", &defaults.agitation, 0.01f, -1.f, 5.f);
     }
     ImGui::PopID();
 }
@@ -3091,7 +3176,7 @@ void render_messages()
                   { return options["fade_script_messages"] && now - 12s > message.time; });
 
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::PushFont(bigfont);
+    // ImGui::PushFont(bigfont);
 
     std::sort(queue.begin(), queue.end(), [](Message a, Message b)
               { return std::get<2>(a) < std::get<2>(b); });
@@ -3116,7 +3201,7 @@ void render_messages()
         queue = newqueue;
     }
 
-    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * font_size - 20});
+    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * font_size - 40});
     for (auto message : queue)
     {
         float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 12000.0f;
@@ -3128,7 +3213,7 @@ void render_messages()
         color.w = alpha;
         ImGui::TextColored(color, "[%s] %s", std::get<0>(message).c_str(), std::get<1>(message).c_str());
     }
-    ImGui::PopFont();
+    // ImGui::PopFont();
     ImGui::End();
 }
 
@@ -3158,14 +3243,14 @@ void render_clickhandler()
         {
             if (g_zoom == 0.0f)
                 g_zoom = get_zoom_level();
-            g_zoom += 1.0;
+            g_zoom += g_zoom / 13.5f;
             set_zoom();
         }
         else if (clicked("mouse_zoom_in") || (held("mouse_camera_drag") && io.MouseWheel > 0))
         {
             if (g_zoom == 0.0f)
                 g_zoom = get_zoom_level();
-            g_zoom -= 1.0;
+            g_zoom -= g_zoom / 13.5f;
             set_zoom();
         }
     }
@@ -3515,6 +3600,25 @@ void render_clickhandler()
             {
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
             }
+            set_camera_bounds(true);
+        }
+
+        else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.5f)
+        {
+            if (!g_players.empty())
+            {
+                g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+            }
+            set_camera_bounds(true);
+        }
+
+        else if (released("mouse_camera_drag") && !dblclicked("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 3.0f && held_duration_last("mouse_camera_drag") < 0.2f)
+        {
+            if (ImGui::IsMousePosValid())
+            {
+                g_state->camera->focused_entity_uid = get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
+            }
+            set_camera_bounds(true);
         }
 
         else if (clicked("mouse_camera_drag"))
@@ -3522,7 +3626,6 @@ void render_clickhandler()
             if (ImGui::IsMousePosValid())
             {
                 startpos = normalize(io.MousePos);
-                g_state->camera->focused_entity_uid = get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
             }
         }
 
@@ -3538,6 +3641,7 @@ void render_clickhandler()
                 g_state->camera->focus_x -= current_pos.first - oryginal_pos.first;
                 g_state->camera->focus_y -= current_pos.second - oryginal_pos.second;
                 startpos = normalize(io.MousePos);
+                set_camera_bounds(false);
             }
         }
 
@@ -3638,22 +3742,7 @@ void render_options()
     tooltip("Make the hired hands completely deathproof.");
     if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
     {
-        g_players = get_players();
-        for (auto ent : g_players)
-        {
-            auto player = (Movable*)ent->topmost_mount();
-            if (options["noclip"])
-            {
-                player->type->max_speed = 0.3f;
-            }
-            else
-            {
-                player->flags &= ~(1U << 9);
-                player->flags |= 1U << 10;
-                player->flags &= ~(1U << 4);
-                player->type->max_speed = 0.0725f;
-            }
-        }
+        toggle_noclip();
     }
     tooltip("Fly through walls and ignored by enemies.", "toggle_noclip");
     ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
@@ -3672,6 +3761,12 @@ void render_options()
         g_ui_scripts["light"]->set_enabled(test_flag(g_dark_mode, 2));
     }
     tooltip("Forces every level to be lit af.");
+    if (ImGui::Checkbox("Disable ghost timer", &options["disable_ghost_timer"]))
+    {
+        set_time_ghost_enabled(!options["disable_ghost_timer"]);
+        set_time_jelly_enabled(!options["disable_ghost_timer"]);
+    }
+    tooltip("Disables the timed ghost and jelly.", "toggle_ghost");
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
     {
         force_hud_flags();
@@ -3742,7 +3837,7 @@ void render_options()
     {
         toggle("tool_style");
     }
-    tooltip("Edit the colors of Overlunky windows,\nor adjust the global scale if things are looking too big for you.", "tool_style");
+    tooltip("Edit the colors and fonts of Overlunky windows,\nor adjust the global scale if things are looking too big for you.", "tool_style");
     ImGui::SameLine();
     if (ImGui::Button("Edit keys"))
     {
@@ -4021,20 +4116,20 @@ void render_savegame()
         if (ImGui::CollapsingHeader("People"))
         {
             ImGui::Text("");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
             ImGui::Text("Killed");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
             ImGui::Text("By");
             for (int i = 0; i < 38; ++i)
             {
                 ImGui::PushID(i);
-                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
+                ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.245f);
                 ImGui::Checkbox(people_flags[i], &g_save->people[i]);
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
                 ImGui::PushID("killed");
                 ImGui::DragInt("", &g_save->people_killed[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
                 ImGui::PushID("killed_by");
                 ImGui::DragInt("", &g_save->people_killed_by[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
@@ -4047,20 +4142,20 @@ void render_savegame()
         if (ImGui::CollapsingHeader("Bestiary"))
         {
             ImGui::Text("");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
             ImGui::Text("Killed");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
             ImGui::Text("By");
             for (int i = 0; i < 78; ++i)
             {
                 ImGui::PushID(i);
-                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
+                ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.245f);
                 ImGui::Checkbox(bestiary_flags[i], &g_save->bestiary[i]);
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
                 ImGui::PushID("killed");
                 ImGui::DragInt("", &g_save->bestiary_killed[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
                 ImGui::PushID("killed_by");
                 ImGui::DragInt("", &g_save->bestiary_killed_by[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
@@ -4099,14 +4194,14 @@ void render_savegame()
     if (ImGui::CollapsingHeader("Characters"))
     {
         ImGui::Text("");
-        ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+        ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
         ImGui::Text("Deaths");
         for (int i = 0; i < 20; ++i)
         {
             ImGui::PushID(i);
-            ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.245f);
             ImGui::CheckboxFlags(people_flags[i], &g_save->characters, int_pow(2, i));
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
             ImGui::PushID("character_deaths");
             ImGui::DragInt("", &g_save->character_deaths[i], 0.5f, 0, INT_MAX);
             ImGui::PopID();
@@ -4134,7 +4229,7 @@ void render_savegame()
     ImGui::PushID("Player Profile");
     if (ImGui::CollapsingHeader("Player Profile"))
     {
-        ImGui::PushItemWidth(-ImGui::GetContentRegionAvailWidth() * 0.5f);
+        ImGui::PushItemWidth(-ImGui::GetContentRegionAvail().x * 0.5f);
         ImGui::DragInt("Plays", &g_save->plays);
         ImGui::DragInt("Deaths", &g_save->deaths);
         ImGui::DragInt("Normal wins", &g_save->wins_normal);
@@ -5213,13 +5308,80 @@ void render_game_props()
         if (g_state->illumination)
             render_illumination(g_state->illumination, "Global illumination");
     }
+    if (ImGui::CollapsingHeader("Liquid pools"))
+    {
+        static bool global_pause = false;
+        bool global_pause_changed = ImGui::Checkbox("Global pause physics##LiquidGlobalPause", &global_pause);
+        static float global_gravity = 1.0f;
+        bool global_gravity_changed = ImGui::DragFloat("Global gravity##LiquidGlobalGravity", &global_gravity, 0.01f, -5.f, 5.f);
+        for (int i = 0; i < 5; ++i)
+        {
+            render_liquid_pool(i);
+            if (g_state->liquid_physics->pools[i].physics_engine)
+            {
+                if (global_pause_changed)
+                    g_state->liquid_physics->pools[i].physics_engine->pause_physics = global_pause;
+                if (global_gravity_changed)
+                    g_state->liquid_physics->pools[i].physics_engine->gravity = global_gravity;
+            }
+        }
+    }
     ImGui::PopItemWidth();
+}
+
+void load_font()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.FontAllowUserScaling = false;
+    PWSTR fontdir;
+    if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
+    {
+        if (fontfile != "")
+        {
+            using cvt_type = std::codecvt_utf8<wchar_t>;
+            std::wstring_convert<cvt_type, wchar_t> cvt;
+
+            std::string fontpath(cvt.to_bytes(fontdir) + "\\" + fontfile);
+            if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
+            {
+                font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[0]);
+                bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[1]);
+                hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[2]);
+            }
+            else if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &fontdir) == S_OK)
+            {
+                std::string localfontpath(cvt.to_bytes(fontdir) + "\\Microsoft\\Windows\\Fonts\\" + fontfile);
+                DEBUG("{}", localfontpath);
+                if (GetFileAttributesA(localfontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
+                {
+                    font = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[0]);
+                    bigfont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[1]);
+                    hugefont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[2]);
+                }
+            }
+        }
+        CoTaskMemFree(fontdir);
+    }
+
+    if (!font || !bigfont || !hugefont)
+    {
+        font = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[0]);
+        bigfont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[1]);
+        hugefont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[2]);
+    }
 }
 
 void render_style_editor()
 {
     ImGuiStyle& style = ImGui::GetStyle();
     ImGuiIO& io = ImGui::GetIO();
+    ImGui::TextWrapped("Leave empty to use embedded font 'Hack'. You must save and restart for font changes to take effect.");
+    ImGui::InputText("Font file##FontFile", &fontfile);
+    tooltip("Just the filename, e.g. comic.ttf");
+    ImGui::DragFloat("Small print##FontSmall", &fontsize[0], 0.1f, 6.0f, 32.0f);
+    ImGui::DragFloat("Medium print##FontMedium", &fontsize[1], 0.1f, 16.0f, 48.0f);
+    ImGui::DragFloat("Large print##FontLarge", &fontsize[2], 0.1f, 24.0f, 96.0f);
+    ImGui::Separator();
     ImGui::DragFloat("Hue##StyleHue", &g_hue, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Saturation##StyleSaturation", &g_sat, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01f, 0.0f, 1.0f);
@@ -5233,12 +5395,12 @@ void render_style_editor()
         style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Save##StyleSave"))
+    if (ImGui::Button("Save options##StyleSave"))
     {
         save_config(cfgfile);
     }
     ImGui::SameLine();
-    if (ImGui::Button("Load##StyleLoad"))
+    if (ImGui::Button("Load options##StyleLoad"))
     {
         load_config(cfgfile);
         refresh_script_files();
@@ -5364,7 +5526,7 @@ void render_prohud()
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, 2}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
+    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 }
@@ -5397,42 +5559,9 @@ void render_tool(std::string tool)
 
 void imgui_init(ImGuiContext*)
 {
-    ImGuiIO& io = ImGui::GetIO();
     show_cursor();
     load_config(cfgfile);
-    io.FontAllowUserScaling = false;
-    PWSTR fontdir;
-    if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
-    {
-        using cvt_type = std::codecvt_utf8<wchar_t>;
-        std::wstring_convert<cvt_type, wchar_t> cvt;
-
-        std::string fontpath(cvt.to_bytes(fontdir) + "\\" + fontfile);
-        if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
-        {
-            font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[0]);
-            bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[1]);
-            hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[2]);
-        }
-        else if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &fontdir) == S_OK)
-        {
-            std::string localfontpath(cvt.to_bytes(fontdir) + "\\Microsoft\\Windows\\Fonts\\" + fontfile);
-            DEBUG("{}", localfontpath);
-            if (GetFileAttributesA(localfontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
-            {
-                font = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[0]);
-                bigfont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[1]);
-                hugefont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[2]);
-            }
-        }
-
-        CoTaskMemFree(fontdir);
-    }
-
-    if (!font)
-    {
-        font = io.Fonts->AddFontDefault();
-    }
+    load_font();
     refresh_script_files();
     autorun_scripts();
     set_colors();

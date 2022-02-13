@@ -696,7 +696,40 @@ struct LiquidPhysicsEngine
     std::pair<float, float>* unknown53;
     size_t unknown54;
     std::pair<float, float>* unknown55;
-    // 3 more size_t here
+    int64_t unknown56;
+    int64_t unknown57;
+    int64_t unknown58;
+    int64_t unknown59;
+    size_t unknown60;
+    size_t unknown61;  // array of some pointers, amongst them is MysteryLiquidPointer2? maybe?
+    size_t unknown61a; // stuff for array above
+    char skip[256];
+    float unknown95;     // LiquidParam->unknown3
+    float cohesion;      // LiquidParam->cohesion?, surface tension? setting it to -1 makes the blobs repel each other
+    float gravity;       // LiquidParam->gravity
+    float unknown96;     // LiquidParam->unknown6
+    float unknown97a;    // LiquidParam->unknown7
+    float agitation;     // LiquidParam->agitation
+    float unknown98a;    // LiquidParam->unknown9
+    float unknown98b;    // LiquidParam->unknown10
+    float unknown99a;    // LiquidParam->unknown11
+    float unknown99b;    // LiquidParam->unknown12
+    float unknown100a;   // LiquidParam->unknown13
+    float unknown100b;   // LiquidParam->unknown14
+    float unknown101a;   // LiquidParam->unknown15
+    float unknown101b;   // LiquidParam->unknown16
+    float unknown102a;   // LiquidParam->unknown17
+    float unknown102b;   // LiquidParam->unknown18
+    float unknown103a;   // LiquidParam->unknown19
+    int32_t unknown103b; // LiquidParam->unknown20
+    float unknown104a;   // LiquidParam->unknown21
+    int32_t unknown104b; // LiquidParam->unknown22
+    float unknown105a;   // LiquidParam->unknown23
+    int32_t unknown105b; // LiquidParam->unknown24
+    size_t unknown106;
+    size_t unknown107;
+    int64_t unknown108;
+    int64_t unknown109;
 };
 
 struct LiquidPhysicsParams
@@ -750,17 +783,19 @@ struct LiquidTileSpawnData
     uint32_t unknown42;
 };
 
+struct LiquidPool
+{
+    LiquidPhysicsParams physics_defaults;
+    LiquidPhysicsEngine* physics_engine;
+    LiquidTileSpawnData tile_spawn_data;
+};
+
 struct LiquidPhysics
 {
     size_t unknown1; // MysteryLiquidPointer1 in plugin
     union
     {
-        struct
-        {
-            LiquidPhysicsParams physics_defaults;
-            LiquidPhysicsEngine* physics_engine;
-            LiquidTileSpawnData tile_spawn_data;
-        } pools[5];
+        LiquidPool pools[5];
         struct
         {
             LiquidPhysicsParams water_physics_defaults;

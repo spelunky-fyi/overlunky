@@ -486,6 +486,13 @@ uint32_t lowbias32(uint32_t x)
 Entity* State::find(uint32_t uid)
 {
     // Ported from MauveAlert's python code in the CAT tracker
+
+    // -1 (0xFFFFFFFF) is used as a null-like value for uids.
+    if (uid == ~0)
+    {
+        return nullptr;
+    }
+
     const uint32_t mask = ptr()->uid_to_entity_mask;
     const uint32_t target_uid_plus_one = lowbias32(uid + 1);
     uint32_t cur_index = target_uid_plus_one & mask;
