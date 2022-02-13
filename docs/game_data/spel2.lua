@@ -6225,3 +6225,4 @@ window = function(...) end
 worn_backitem = function(...) end
 zoom = function(...) end
 
+---@diagnostic disable: lowercase-global,deprecated

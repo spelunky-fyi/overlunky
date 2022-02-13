@@ -821,7 +821,7 @@ end
 
     /// Gets the resolution (width and height) of the screen
     lua["get_window_size"] = []() -> std::tuple<int, int>
-    { return {(int)ImGui::GetWindowWidth(), (int)ImGui::GetWindowHeight()}; };
+    { return {(int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y}; };
 
     /// Steal input from a Player or HH.
     lua["steal_input"] = [](int uid)

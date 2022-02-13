@@ -774,7 +774,9 @@ bool LuaConsole::pre_draw()
             return 0;
         };
 
-        ImGui::PushItemWidth(ImGui::GetWindowWidth());
+        const float indent_size = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, "000", nullptr, nullptr).x + 8.0f;
+        ImGui::PushItemWidth(ImGui::GetWindowWidth() - indent_size);
+        ImGui::Indent(indent_size);
         ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine;
         if (ImGui::InputTextMultiline("", console_input, IM_ARRAYSIZE(console_input), ImVec2{-1, -1}, input_text_flags, input_callback, this))
         {
@@ -823,9 +825,21 @@ bool LuaConsole::pre_draw()
             }
             set_focus = true;
         }
+        ImGui::Unindent(indent_size);
         ImGui::PopItemWidth();
 
         ImGui::SetWindowPos({io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y / 2 - window_height / 2}, ImGuiCond_Always);
+        auto drawlist = ImGui::GetWindowDrawList();
+        int num = 1;
+        const char* str;
+        for (str = console_input; *str; ++str)
+            num += *str == '\n';
+        for (int i = 1; i <= num; ++i)
+        {
+            std::string buf = fmt::format("{}", i);
+            auto linesize = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, buf.c_str(), nullptr, nullptr);
+            drawlist->AddText(ImVec2(indent_size - linesize.x, io.DisplaySize.y - linesize.y * (num - i + 2) + 1.0f), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+        }
         ImGui::End();
     }
 

@@ -5,16 +5,18 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 
 **Please read the [![open issues](https://img.shields.io/github/issues-raw/spelunky-fyi/overlunky)](https://github.com/spelunky-fyi/overlunky/issues) before complaining about them in the discord.**
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.0b-green) (Steam version)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.2-green) (Steam version)
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.2-green) (Steam version)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (latest prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.2-green) (Steam version)
 
-**Overlunky does not support the GamePass/Xbox version**, but it might be considered in the future.
+**Overlunky (or any other modding tool for that matter) does not support the GamePass/Xbox version**, but it might be considered in the future.
 
 [WHIP builds](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) are whipped together automatically from the latest changes and are not tested or documented at all. They are mainly to keep up with the ever changing scripting api and usually contain bugfixes for that. Use at your own discretion, but if you want the latest scripts, get this. ![WHIP commits](https://img.shields.io/github/commits-since/spelunky-fyi/overlunky/latest)
 
 ## Disclaimer
 You are strongly discouraged from using any modding tools in your actual online Steam installation as to prevent unlocking achievements, ruining or corrupting your savefile and cheating while using online features. You should make a copy of your game somewhere else and install [Mr. Goldbergs Steam Emulator](https://mr_goldberg.gitlab.io/goldberg_emulator/) in the game directory. (Just replace steam_api64.dll with the one in the zip and that copy of the game can't talk to Steam no more!) If you break anything using this tool you get to keep both pieces. Do not report modding related bugs to BlitWorks.
+
+**Steam achievements and game saves are disabled by default while running Overlunky though.**
 
 ## Installation and usage
 **[YouTube tutorial](https://youtu.be/Zzba4cV9f2c) for kids who can't read good and who wanna learn to do other stuff good too.**
@@ -58,7 +60,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Ctrl+2345**: Zoom to X level width
       + **Shift+ArrowKey**: Move camera in desired direction
       + **Mouse 4**: Drag camera around or focus on an entity
-      + **Mouse 4 doubleclick**: Reset camera focus to player
+      + **Mouse 4 longpress**: Reset camera focus to player
       + **Mouse 4+Wheel**: Zoom
       + **Ctrl+Wheel**: Zoom
   - **F4**: Entity properties
@@ -99,7 +101,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **Ctrl+C**: Quick return to camp from anywhere
 
 ### Scripts
-Lua scripting is still buggy and unfinished and the **API might change**, although we will try to deprecate old stuff without breaking anything. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md), [internal details](https://github.com/spelunky-fyi/overlunky/tree/main/docs) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started. The examples should be considered [Unlicensed](https://unlicense.org/), so please DO NOT credit the author when copying them. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Optionally you can also load *main.lua* files from `Mods/Packs`. Check the [Playlunky documentation](https://github.com/spelunky-fyi/Playlunky/wiki#script-mods) on how to run your scripts as PL mods.
+Lua scripting is still buggy and unfinished and the **API might change**, although we will try to deprecate old stuff without breaking anything. There's some [documentation](https://github.com/spelunky-fyi/overlunky/blob/main/docs/script-api.md), [internal details](https://github.com/spelunky-fyi/overlunky/tree/main/docs) and [examples](https://github.com/spelunky-fyi/overlunky/tree/main/examples) to get you started. The examples should be considered [Unlicensed](https://unlicense.org/), so please DO NOT credit the author when copying them. Scripts are loaded from `Spelunky 2/Overlunky/Scripts` by default, but you can change this in the ini. Optionally you can also load *main.lua* files from `Mods/Packs`. Check the [Playlunky documentation](https://github.com/spelunky-fyi/Playlunky/wiki#script-mods) on how to run your scripts as PL mods. Set `OL_DEBUG=1` in the *game environment* to enable logging script messages to console.
 
 **Scripts don't work online either!** While technically they can work, and there's some work being done on this, yours truly has little interest in making any online features.
 
@@ -119,13 +121,9 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
   - If you're **missing** some overlay **windows** or tabs:
     + Try resetting window positions. (See hotkeys above.)
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
-    + Maybe the overlay is just really tiny? You can resize it.
+    + Maybe the overlay is just really tiny or collapsed? You can resize it. Just try your magic with the mouse.
   - If you mess up your **keyboard shortcuts** or UI:
     + Delete `Spelunky 2/overlunky.ini`.
-  - If **keyboard input** no longer works in game after using the tools:
-    + This shouldn't be a problem anymore in 0.4.8+. File an issue if this still happens.
-  - If your UI is all black or you want to change the color
-    + Change the color then. The [keyboard shortcuts](#features) are right there.
   - If stuff just don't work and you're running **Windows 7** or a machine not designed to play games
     + You're on your own here. We don't test on or make this for ancient software/hardware.
   - If you have problems with **OBS**
@@ -133,7 +131,7 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + If you have lag or crashes, check previous question.
   - If you're running **Linux**
     + The game and OL should run fine with the latest Wine if you install DXVK.
-    + Also works with Proton 5.13 if you first start the game on Steam and then run `STEAM_COMPAT_DATA_PATH=~/.steam/steam/steamapps/compatdata/418530 WINEPREFIX=~/.steam/steam/steamapps/compatdata/418530/pfx ~/.steam/root/steamapps/common/Proton\ 5.13/proton run ~/.steam/steam/steamapps/common/Spelunky\ 2/Overlunky/Overlunky.exe` adjusting the paths for your setup.
+    + Also works with [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom) using the [command line switch](#command-line-switches) `--launch_playlunky ..` for a non-Steam game shortcut. Just make sure the game and the OL shortcut are set to use Proton-GE.
     + Put the Segoe UI ttf files to your wineprefixes Windows/Fonts to show the ui correctly.
     + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
   - If you **don't have scripts** in the Scripts tab
@@ -150,3 +148,8 @@ cmake ..
 cmake --build . --config Release --target ALL_BUILD
 ```
 The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode. Set `OL_DEBUG=1` in the *game environment* to enable logging to console.
+
+## Command line switches
+  - `--launch_game <path_to_game_directory>` will launch Spel2.exe from that directory and hook to the game process, rather than trying to find it.
+  - `--launch_playlunky <path_to_game_directory>` will launch playlunky_launcher.exe from that directory and hook to the game process.
+These can be used with Steam, also on Linux, by adding Overlunky.exe as a non-Steam game and adding to launch options.

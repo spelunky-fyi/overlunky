@@ -179,7 +179,7 @@ void Entity::set_layer(LAYER layer_to)
     static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
     add_to_layer(ptr_to, this);
 
-    for (auto item : items)
+    for (auto item : items.entities())
     {
         item->set_layer(layer_to);
     }
@@ -197,7 +197,7 @@ void Entity::remove()
             static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
             remove_from_layer(ptr_from, this);
 
-            for (auto item : items)
+            for (auto item : items.entities())
             {
                 item->remove();
             }
@@ -248,7 +248,7 @@ void Entity::remove_item(uint32_t item_uid)
 void Player::set_jetpack_fuel(uint8_t fuel)
 {
     static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
-    for (auto item : items)
+    for (auto item : items.entities())
     {
         if (item->type->id == jetpackID)
         {
@@ -261,7 +261,7 @@ void Player::set_jetpack_fuel(uint8_t fuel)
 uint8_t Player::kapala_blood_amount()
 {
     static auto kapalaPowerupID = to_id("ENT_TYPE_ITEM_POWERUP_KAPALA");
-    for (auto item : items)
+    for (auto item : items.entities())
     {
         if (item->type->id == kapalaPowerupID)
         {
