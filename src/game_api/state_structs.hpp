@@ -701,7 +701,7 @@ struct LiquidPhysicsEngine
     int64_t unknown58;
     int64_t unknown59;
     size_t unknown60;
-    size_t unknown61;  // array of some pointers, amongst them is MysteryLiquidPointer2? maybe?
+    Entity*** unknown61;  // it's actually array of pointers to some struct, but the entity is first in that struct
     size_t unknown61a; // stuff for array above
     char skip[256];
     float unknown95;     // LiquidParam->unknown3

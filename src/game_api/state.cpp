@@ -21,9 +21,8 @@ void StateMemory::set_correct_ushabti(uint16_t animation_frame)
 
 void fix_liquid_out_of_bounds()
 {
-    constexpr uint8_t N_POOLS = 5; // needs to be the same size as LiquidPhysics::pools
-
-    const static std::array<ENT_TYPE, N_POOLS> liquid_type_by_pool = {
+    const static std::array<ENT_TYPE, 5> liquid_type_by_pool = {
+        // needs to be correct with the state->liquid_physics pools etc.
         to_id("ENT_TYPE_LIQUID_WATER"),
         to_id("ENT_TYPE_LIQUID_COARSE_WATER"),
         to_id("ENT_TYPE_LIQUID_LAVA"),
@@ -31,41 +30,23 @@ void fix_liquid_out_of_bounds()
         to_id("ENT_TYPE_LIQUID_STAGNANT_LAVA"),
     };
 
-    auto state = State::get();
-    std::vector<int32_t> liquid_ids_to_destroy[N_POOLS];
-    uint8_t pool = 0;
-
-    if (!state.ptr() || !state.ptr()->liquid_physics || !state.ptr()->liquid_physics->pools[0].physics_engine)
+    auto state = State::get().ptr();
+    if (!state || !state->liquid_physics)
         return;
-    // gather the liquid ids to destroy
-    for (const auto& it : state.ptr()->liquid_physics->pools)
+
+    for (const auto& it : state->liquid_physics->pools)
     {
-        for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
+        if (it.physics_engine && !it.physics_engine->pause_physics)
         {
-            if ((it.physics_engine->entity_coordinates + i)->second < 0.1) // 0.1 just to be safe
+            for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
             {
-                liquid_ids_to_destroy[pool].push_back(i);
-            }
-        }
-        ++pool;
-    }
-    // destroy entities that mach the liquid id and pool
-    for (pool = 0; pool < N_POOLS; ++pool)
-    {
-        if (liquid_ids_to_destroy[pool].size() > 0)
-        {
-            const auto& it = state.layer(0)->entities_by_mask.find(pool < 2 ? 0x2000 : 0x4000);
-            if (!it->second.empty())
-            {
-                for (const auto ent : it->second.entities())
+                if ((it.physics_engine->entity_coordinates + i)->second < 0.1) // 0.1 just to be safe
                 {
-                    if (ent->type->id == liquid_type_by_pool[pool])
-                    {
-                        if (std::find(liquid_ids_to_destroy[pool].begin(), liquid_ids_to_destroy[pool].end(), *ent->as<Liquid>()->liquid_id) != liquid_ids_to_destroy[pool].end())
-                        {
-                            ent->kill(true, nullptr);
-                        }
-                    }
+                    if (!*(it.physics_engine->unknown61 + i)) // just some bs
+                        continue;
+
+                    const auto ent = **(it.physics_engine->unknown61 + i);
+                    ent->kill(true, nullptr);
                 }
             }
         }
