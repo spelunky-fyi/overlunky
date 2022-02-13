@@ -23,6 +23,8 @@
 #pragma warning(pop)
 #include <fmt/core.h>
 
+#include "olfont.h"
+
 #include "console.hpp"
 #include "custom_types.hpp"
 #include "entities_chars.hpp"
@@ -233,8 +235,8 @@ const char* inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
 std::string scriptpath = "Overlunky/Scripts";
 
-std::string fontfile = "segoeuib.ttf";
-std::vector<float> fontsize = {18.0f, 32.0f, 72.0f};
+std::string fontfile = "";
+std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
 
 [[maybe_unused]] const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
 [[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17, u8_draw_depth_max = 53;
@@ -693,7 +695,7 @@ void save_config(std::string file)
         writeData << std::endl;
     writeData << "]" << std::endl;
 
-    writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\"" << std::endl;
+    writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\" or empty to use the embedded font \"Hack\"" << std::endl;
     writeData << "font_size = [";
     for (unsigned int i = 0; i < fontsize.size(); i++)
     {
@@ -777,8 +779,8 @@ void load_config(std::string file)
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
-    fontfile = toml::find_or<std::string>(opts, "font_file", "segoeuib.ttf");
-    auto ini_fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {18.0f, 32.0f, 72.0f});
+    fontfile = toml::find_or<std::string>(opts, "font_file", "");
+    auto ini_fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {14.0f, 32.0f, 72.0f});
     if (ini_fontsize.size() >= 3)
         fontsize = ini_fontsize;
     godmode(options["god_mode"]);
@@ -3166,7 +3168,7 @@ void render_messages()
                   { return options["fade_script_messages"] && now - 12s > message.time; });
 
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::PushFont(bigfont);
+    // ImGui::PushFont(bigfont);
 
     std::sort(queue.begin(), queue.end(), [](Message a, Message b)
               { return std::get<2>(a) < std::get<2>(b); });
@@ -3191,7 +3193,7 @@ void render_messages()
         queue = newqueue;
     }
 
-    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * font_size - 20});
+    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * font_size - 40});
     for (auto message : queue)
     {
         float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 12000.0f;
@@ -3203,7 +3205,7 @@ void render_messages()
         color.w = alpha;
         ImGui::TextColored(color, "[%s] %s", std::get<0>(message).c_str(), std::get<1>(message).c_str());
     }
-    ImGui::PopFont();
+    // ImGui::PopFont();
     ImGui::End();
 }
 
@@ -3826,7 +3828,7 @@ void render_options()
     {
         toggle("tool_style");
     }
-    tooltip("Edit the colors of Overlunky windows,\nor adjust the global scale if things are looking too big for you.", "tool_style");
+    tooltip("Edit the colors and fonts of Overlunky windows,\nor adjust the global scale if things are looking too big for you.", "tool_style");
     ImGui::SameLine();
     if (ImGui::Button("Edit keys"))
     {
@@ -4105,20 +4107,20 @@ void render_savegame()
         if (ImGui::CollapsingHeader("People"))
         {
             ImGui::Text("");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
             ImGui::Text("Killed");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
             ImGui::Text("By");
             for (int i = 0; i < 38; ++i)
             {
                 ImGui::PushID(i);
-                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
+                ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.245f);
                 ImGui::Checkbox(people_flags[i], &g_save->people[i]);
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
                 ImGui::PushID("killed");
                 ImGui::DragInt("", &g_save->people_killed[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
                 ImGui::PushID("killed_by");
                 ImGui::DragInt("", &g_save->people_killed_by[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
@@ -4131,20 +4133,20 @@ void render_savegame()
         if (ImGui::CollapsingHeader("Bestiary"))
         {
             ImGui::Text("");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
             ImGui::Text("Killed");
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
             ImGui::Text("By");
             for (int i = 0; i < 78; ++i)
             {
                 ImGui::PushID(i);
-                ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
+                ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.245f);
                 ImGui::Checkbox(bestiary_flags[i], &g_save->bestiary[i]);
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.5f);
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
                 ImGui::PushID("killed");
                 ImGui::DragInt("", &g_save->bestiary_killed[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
-                ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
                 ImGui::PushID("killed_by");
                 ImGui::DragInt("", &g_save->bestiary_killed_by[i], 0.5f, 0, INT_MAX);
                 ImGui::PopID();
@@ -4183,14 +4185,14 @@ void render_savegame()
     if (ImGui::CollapsingHeader("Characters"))
     {
         ImGui::Text("");
-        ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+        ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
         ImGui::Text("Deaths");
         for (int i = 0; i < 20; ++i)
         {
             ImGui::PushID(i);
-            ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.245f);
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.245f);
             ImGui::CheckboxFlags(people_flags[i], &g_save->characters, int_pow(2, i));
-            ImGui::SameLine(ImGui::GetContentRegionAvailWidth() * 0.75f);
+            ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
             ImGui::PushID("character_deaths");
             ImGui::DragInt("", &g_save->character_deaths[i], 0.5f, 0, INT_MAX);
             ImGui::PopID();
@@ -4218,7 +4220,7 @@ void render_savegame()
     ImGui::PushID("Player Profile");
     if (ImGui::CollapsingHeader("Player Profile"))
     {
-        ImGui::PushItemWidth(-ImGui::GetContentRegionAvailWidth() * 0.5f);
+        ImGui::PushItemWidth(-ImGui::GetContentRegionAvail().x * 0.5f);
         ImGui::DragInt("Plays", &g_save->plays);
         ImGui::DragInt("Deaths", &g_save->deaths);
         ImGui::DragInt("Normal wins", &g_save->wins_normal);
@@ -5318,10 +5320,59 @@ void render_game_props()
     ImGui::PopItemWidth();
 }
 
+void load_font()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.FontAllowUserScaling = false;
+    PWSTR fontdir;
+    if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
+    {
+        if (fontfile != "")
+        {
+            using cvt_type = std::codecvt_utf8<wchar_t>;
+            std::wstring_convert<cvt_type, wchar_t> cvt;
+
+            std::string fontpath(cvt.to_bytes(fontdir) + "\\" + fontfile);
+            if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
+            {
+                font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[0]);
+                bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[1]);
+                hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[2]);
+            }
+            else if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &fontdir) == S_OK)
+            {
+                std::string localfontpath(cvt.to_bytes(fontdir) + "\\Microsoft\\Windows\\Fonts\\" + fontfile);
+                DEBUG("{}", localfontpath);
+                if (GetFileAttributesA(localfontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
+                {
+                    font = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[0]);
+                    bigfont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[1]);
+                    hugefont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[2]);
+                }
+            }
+        }
+        CoTaskMemFree(fontdir);
+    }
+
+    if (!font || !bigfont || !hugefont)
+    {
+        font = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[0]);
+        bigfont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[1]);
+        hugefont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[2]);
+    }
+}
+
 void render_style_editor()
 {
     ImGuiStyle& style = ImGui::GetStyle();
     ImGuiIO& io = ImGui::GetIO();
+    ImGui::TextWrapped("Leave empty to use embedded font 'Hack'. You must save and restart for font changes to take effect.");
+    ImGui::InputText("Font file##FontFile", &fontfile);
+    tooltip("Just the filename, e.g. comic.ttf");
+    ImGui::DragFloat("Small print##FontSmall", &fontsize[0], 0.1f, 6.0f, 32.0f);
+    ImGui::DragFloat("Medium print##FontMedium", &fontsize[1], 0.1f, 16.0f, 48.0f);
+    ImGui::DragFloat("Large print##FontLarge", &fontsize[2], 0.1f, 24.0f, 96.0f);
+    ImGui::Separator();
     ImGui::DragFloat("Hue##StyleHue", &g_hue, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Saturation##StyleSaturation", &g_sat, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01f, 0.0f, 1.0f);
@@ -5335,12 +5386,12 @@ void render_style_editor()
         style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Save##StyleSave"))
+    if (ImGui::Button("Save options##StyleSave"))
     {
         save_config(cfgfile);
     }
     ImGui::SameLine();
-    if (ImGui::Button("Load##StyleLoad"))
+    if (ImGui::Button("Load options##StyleLoad"))
     {
         load_config(cfgfile);
         refresh_script_files();
@@ -5499,42 +5550,9 @@ void render_tool(std::string tool)
 
 void imgui_init(ImGuiContext*)
 {
-    ImGuiIO& io = ImGui::GetIO();
     show_cursor();
     load_config(cfgfile);
-    io.FontAllowUserScaling = false;
-    PWSTR fontdir;
-    if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
-    {
-        using cvt_type = std::codecvt_utf8<wchar_t>;
-        std::wstring_convert<cvt_type, wchar_t> cvt;
-
-        std::string fontpath(cvt.to_bytes(fontdir) + "\\" + fontfile);
-        if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
-        {
-            font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[0]);
-            bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[1]);
-            hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[2]);
-        }
-        else if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &fontdir) == S_OK)
-        {
-            std::string localfontpath(cvt.to_bytes(fontdir) + "\\Microsoft\\Windows\\Fonts\\" + fontfile);
-            DEBUG("{}", localfontpath);
-            if (GetFileAttributesA(localfontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
-            {
-                font = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[0]);
-                bigfont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[1]);
-                hugefont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[2]);
-            }
-        }
-
-        CoTaskMemFree(fontdir);
-    }
-
-    if (!font)
-    {
-        font = io.Fonts->AddFontDefault();
-    }
+    load_font();
     refresh_script_files();
     autorun_scripts();
     set_colors();
