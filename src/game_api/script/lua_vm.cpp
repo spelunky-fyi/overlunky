@@ -269,37 +269,35 @@ end
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->required_scripts.push_back(sanitize(id));
-            sol::state_view lua_view(*backend->vm);
             LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(id));
             if (!import_backend)
             {
-                luaL_error(lua_view, "Imported script not found");
-                return sol::make_object(lua_view, sol::lua_nil);
+                luaL_error(lua, "Imported script not found");
+                return sol::make_object(lua, sol::lua_nil);
             }
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
                 import_backend->update();
             }
-            return sol::make_object(lua_view, import_backend->lua["exports"]);
+            return sol::make_object(lua, import_backend->lua["exports"]);
         },
         [&lua](std::string id, std::string version)
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->required_scripts.push_back(sanitize(id));
-            sol::state_view lua_view(*backend->vm);
             LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(id), std::string_view(version));
             if (!import_backend)
             {
-                luaL_error(lua_view, "Imported script not found");
-                return sol::make_object(lua_view, sol::lua_nil);
+                luaL_error(lua, "Imported script not found");
+                return sol::make_object(lua, sol::lua_nil);
             }
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
                 import_backend->update();
             }
-            return sol::make_object(lua_view, import_backend->lua["exports"]);
+            return sol::make_object(lua, import_backend->lua["exports"]);
         });
     lua["load_script"] = lua["import"];
 
