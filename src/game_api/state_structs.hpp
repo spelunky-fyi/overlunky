@@ -655,10 +655,8 @@ struct LogicList
 struct LiquidPhysicsEngine
 {
     bool pause_physics;
-    int8_t padding1;
-    int8_t padding2;
-    int8_t padding3;
-    int32_t physics_tick_timer;
+    uint8_t padding[3];
+    int32_t physics_tick_timer; /* unsure */
     int32_t unknown1;
     int32_t unknown2;
     int8_t unknown3;
@@ -676,18 +674,36 @@ struct LiquidPhysicsEngine
     float unknown15;
     uint32_t entity_count;
     uint32_t allocated_size;
-    uint32_t unk23; // padding probably
-    std::list<size_t> unk1;
-    uint32_t resize_value; // used to resize the arrays
-    uint32_t unk3b;        // padding probably
+    uint32_t unk23;         // padding probably
+    std::list<size_t> unk1; // seams to be empty, or have one element 0?
+    uint32_t resize_value;  // used to resive the arrays?
+    uint32_t unk3b;         // padding probably
     std::list<int32_t> liquid_ids;
-    std::list<int32_t> unknown44;                // all of them are -1
-    uint32_t* liquid_flags;                      // array
-    int32_t unknown47a;                          // size related for the array above
-    int32_t unknown47b;                          // padding
-    std::pair<float, float>* entity_coordinates; // std::pair<float, float>*
-    std::pair<float, float>* entity_velocities;  // std::pair<float, float>*
-    int8_t skipidi[376];
+    std::list<int32_t> unknown44;                        // all of them are -1
+    std::list<int32_t>::const_iterator* list_liquid_ids; // list of all iterators of liquid_ids?
+    int32_t unknown45a;                                  // size related for the array above
+    int32_t unknown45b;                                  // padding
+    uint32_t* liquid_flags;                              // array
+    int32_t unknown47a;                                  // size related for the array above
+    int32_t unknown47b;                                  // padding
+    std::pair<float, float>* entity_coordinates;         // array
+    int32_t unknown49a;                                  // size related for the array above
+    int32_t unknown49b;                                  // padding
+    std::pair<float, float>* entity_velocities;          // array
+    int32_t unknown51a;                                  // size related for the array above
+    int32_t unknown51b;                                  // padding
+    std::pair<float, float>* unknown52;                  // not sure about the type, it's defenetly a 64bit
+    std::pair<float, float>* unknown53;
+    size_t unknown54;
+    std::pair<float, float>* unknown55;
+    int64_t unknown56;
+    int64_t unknown57;
+    int64_t unknown58;
+    int64_t unknown59;
+    size_t unknown60;
+    size_t unknown61;  // array of some pointers, amongst them is MysteryLiquidPointer2? maybe?
+    size_t unknown61a; // stuff for array above
+    char skip[256];
     float unknown95;     // LiquidParam->unknown3
     float cohesion;      // LiquidParam->cohesion?, surface tension? setting it to -1 makes the blobs repel each other
     float gravity;       // LiquidParam->gravity

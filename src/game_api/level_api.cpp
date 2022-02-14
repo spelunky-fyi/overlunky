@@ -608,7 +608,36 @@ std::vector<std::pair<uint16_t, RoomTemplateType>> g_room_template_types;
 std::vector<std::pair<uint16_t, std::pair<uint32_t, uint32_t>>> g_room_template_sizes;
 
 // Used for making custom machine rooms work
-std::optional<uint16_t> g_overridden_room_template;
+std::optional<uint16_t> g_overridden_room_templates[2];
+
+// Used for making custom any room template work
+LevelGenRooms g_CustomRoomShims[2];
+
+// Used for making per-room shop types possible
+std::array<std::array<std::optional<ShopType>, 16>, 8> g_CustomShopTypes[2]{};
+
+// Some select room templates
+enum class RoomTemplate : uint16_t
+{
+    Entrance = 5,
+    Exit = 7,
+    Cache = 14,
+    GhistRoom = 15,
+    ChunkGround = 16,
+    ChunkAir = 17,
+    ChunkDoor = 18,
+    Shop = 65,
+    MachineBigroomPath = 102,
+    FeelingTomb = 106,
+    MachineWideroomPath = 107,
+    MachineWideroomSide = 108,
+    MachineTallroomPath = 109,
+    CoffinFrog = 111,
+};
+constexpr uint16_t to_uint(RoomTemplate room_template) noexcept
+{
+    return static_cast<uint16_t>(room_template);
+}
 
 // Stores manually created rooms for the duration of level gen
 struct ManualRoomData
@@ -631,9 +660,27 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
 
     g_manual_room_datas.clear();
 
+    g_CustomRoomShims[0] = {};
+    g_CustomRoomShims[1] = {};
+
+    g_CustomShopTypes[0] = {};
+    g_CustomShopTypes[1] = {};
+
     pre_level_generation();
     g_level_gen_trampoline(level_gen_sys, param_2, param_3);
     post_level_generation();
+
+    for (size_t i = 0; i < sizeof(LevelGenRooms) / sizeof(uint16_t); i++)
+    {
+        for (size_t j = 0; j < 2; j++)
+        {
+            const uint16_t shimmed_room_template = g_CustomRoomShims[j].rooms[i];
+            if (shimmed_room_template != 0)
+            {
+                level_gen_sys->rooms[j]->rooms[i] = level_gen_sys->data->get_pretend_room_template(shimmed_room_template);
+            }
+        }
+    }
 
     g_replace_level_loads = false;
     g_levels_to_load.clear();
@@ -672,23 +719,21 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
     }
     else
     {
-        uint16_t pretend_room_template = room_template;
-        switch (self->data->get_room_template_type(room_template))
+        const uint16_t pretend_room_template = self->data->get_pretend_room_template(room_template);
+
+        const auto [ix, iy] = self->get_room_index(x, y);
+        const int32_t flat_room_idx = ix + iy * 8;
+        if (pretend_room_template != room_template)
         {
-        default:
-        case RoomTemplateType::None:
-            break;
-        case RoomTemplateType::Entrance:
-            pretend_room_template = 5;
-            break;
-        case RoomTemplateType::Exit:
-            pretend_room_template = 7;
-            break;
-        case RoomTemplateType::Shop:
-            pretend_room_template = 65;
-            break;
+            self->rooms_frontlayer->rooms[flat_room_idx] = pretend_room_template;
         }
+
         g_handle_tile_code_trampoline(self, tile_code, pretend_room_template, x, y, layer);
+
+        if (pretend_room_template != room_template)
+        {
+            self->rooms_frontlayer->rooms[flat_room_idx] = room_template;
+        }
     }
 
     post_tile_code_spawn(tile_code_name, x, y, layer, room_template);
@@ -759,38 +804,32 @@ void setup_level_files(LevelGenData* level_gen_data, const char* level_file_name
 ExecutableMemory g_get_room_size_redirect;
 void get_room_size(uint16_t room_template, uint32_t& room_width, uint32_t& room_height)
 {
-    // cache, ghistroom
-    if (room_template >= 14 && room_template <= 15)
+    if (room_template >= to_uint(RoomTemplate::Cache) && room_template <= to_uint(RoomTemplate::GhistRoom))
     {
         room_width = 5;
         room_height = 5;
     }
-    // chunk_ground, chunk_air
-    else if (room_template >= 16 && room_template <= 17)
+    else if (room_template >= to_uint(RoomTemplate::ChunkGround) && room_template <= to_uint(RoomTemplate::ChunkAir))
     {
         room_width = 5;
         room_height = 3;
     }
-    // chunk_door
-    else if (room_template == 18)
+    else if (room_template == to_uint(RoomTemplate::ChunkDoor))
     {
         room_width = 6;
         room_height = 3;
     }
-    // bigroom
-    else if (room_template >= 102 && room_template <= 106)
+    else if (room_template >= to_uint(RoomTemplate::MachineBigroomPath) && room_template <= to_uint(RoomTemplate::FeelingTomb))
     {
         room_width = 20;
         room_height = 16;
     }
-    // wideroom
-    else if (room_template >= 107 && room_template <= 108)
+    else if (room_template >= to_uint(RoomTemplate::MachineWideroomPath) && room_template <= to_uint(RoomTemplate::MachineWideroomSide))
     {
         room_width = 20;
         room_height = 8;
     }
-    // tallroom
-    else if (room_template >= 109 && room_template <= 111)
+    else if (room_template >= to_uint(RoomTemplate::MachineTallroomPath) && room_template <= to_uint(RoomTemplate::CoffinFrog))
     {
         room_width = 10;
         room_height = 16;
@@ -900,24 +939,45 @@ using GenerateRoom = void(LevelGenSystem*, int32_t, int32_t);
 GenerateRoom* g_generate_room_trampoline{nullptr};
 void generate_room(LevelGenSystem* level_gen, int32_t room_idx_x, int32_t room_idx_y)
 {
-    if (g_overridden_room_template == std::nullopt)
+    const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
+
+    const uint16_t room_templates[2]{
+        level_gen->rooms[0]->rooms[flat_room_idx],
+        level_gen->rooms[1]->rooms[flat_room_idx],
+    };
+
+    for (size_t j = 0; j < 2; j++)
     {
-        const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
-        const uint16_t room_template = level_gen->rooms_frontlayer->rooms[flat_room_idx];
-        if (level_gen->data->get_room_template_type(room_template) == RoomTemplateType::MachineRoom)
+        const uint16_t room_template = room_templates[j];
+        if (g_overridden_room_templates[j] == std::nullopt)
         {
-            // Revert the room template the next time room data will be collected
-            g_overridden_room_template = room_template;
-            // Set it to any machine room for now, this will branch in g_generate_room_trampoline to allow for large levels
-            level_gen->rooms_frontlayer->rooms[flat_room_idx] = 109;
+            if (level_gen->data->get_room_template_type(room_template) == RoomTemplateType::MachineRoom)
+            {
+                // Revert the room template the next time room data will be collected
+                g_overridden_room_templates[j] = room_template;
+                // Set it to any machine room for now, this will branch in g_generate_room_trampoline to allow for large levels
+                level_gen->rooms[j]->rooms[flat_room_idx] = to_uint(RoomTemplate::MachineBigroomPath);
+            }
+        }
+
+        {
+            const uint16_t pretend_room_template = level_gen->data->get_pretend_room_template(room_template);
+            if (pretend_room_template != room_template)
+            {
+                g_CustomRoomShims[j].rooms[flat_room_idx] = room_template;
+            }
         }
     }
+
     g_generate_room_trampoline(level_gen, room_idx_x, room_idx_y);
-    if (g_overridden_room_template)
+
+    for (size_t j = 0; j < 2; j++)
     {
-        const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
-        State::get().ptr()->level_gen->rooms_frontlayer->rooms[flat_room_idx] = g_overridden_room_template.value();
-        g_overridden_room_template.reset();
+        if (g_overridden_room_templates[j])
+        {
+            level_gen->rooms_frontlayer->rooms[flat_room_idx] = g_overridden_room_templates[j].value();
+            g_overridden_room_templates[j].reset();
+        }
     }
 }
 
@@ -925,10 +985,14 @@ using GatherRoomData = void(LevelGenData*, byte, int room_x, int, bool, uint8_t*
 GatherRoomData* g_gather_room_data_trampoline{nullptr};
 void gather_room_data(LevelGenData* tile_storage, byte param_2, int room_idx_x, int room_idx_y, bool hard_level, uint8_t* param_6, uint8_t* param_7, size_t param_8, uint8_t* param_9, uint8_t* param_10, uint8_t* out_room_width, uint8_t* out_room_height)
 {
-    if (g_overridden_room_template.has_value())
+    const auto* level_gen = State::get().ptr()->level_gen;
+    for (size_t j = 0; j < 2; j++)
     {
-        const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
-        State::get().ptr()->level_gen->rooms_frontlayer->rooms[flat_room_idx] = g_overridden_room_template.value();
+        if (g_overridden_room_templates[j].has_value())
+        {
+            const int32_t flat_room_idx = room_idx_x + room_idx_y * 8;
+            level_gen->rooms_frontlayer->rooms[flat_room_idx] = g_overridden_room_templates[j].value();
+        }
     }
     g_gather_room_data_trampoline(tile_storage, param_2, room_idx_x, room_idx_y, hard_level, param_6, param_7, param_8, param_9, param_10, out_room_width, out_room_height);
 }
@@ -967,6 +1031,19 @@ using SpawnRoomFromTileCodes = void(LevelGenData*, int, int, SingleRoomData*, Si
 SpawnRoomFromTileCodes* g_spawn_room_from_tile_codes_trampoline{nullptr};
 void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, int room_idx_y, SingleRoomData* front_room_data, SingleRoomData* back_room_data, uint16_t param_6, bool dual_room, uint16_t room_template)
 {
+    auto level_gen = State::get().ptr()->level_gen;
+
+    std::optional<ShopType> before[2];
+    for (size_t i = 0; i < 2; i++)
+    {
+        const std::optional<ShopType> custom_type = g_CustomShopTypes[i][room_idx_x][room_idx_y];
+        if (custom_type != std::nullopt)
+        {
+            before[i] = level_gen->shop_type;
+            level_gen->shop_types[i] = custom_type.value();
+        }
+    }
+
     LevelGenRoomData room_data{};
     std::memcpy(room_data.front_layer.data(), front_room_data, 10 * 8);
     if (dual_room)
@@ -983,6 +1060,15 @@ void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, in
     }
 
     g_spawn_room_from_tile_codes_trampoline(level_gen_data, room_idx_x, room_idx_y, front_room_data, back_room_data, param_6, dual_room, room_template);
+
+    for (size_t i = 0; i < 2; i++)
+    {
+        const std::optional<ShopType> before_type = before[i];
+        if (before_type != std::nullopt)
+        {
+            level_gen->shop_types[i] = before_type.value();
+        }
+    }
 }
 
 using TestChance = bool(LevelGenData**, std::uint32_t chance_id);
@@ -1031,6 +1117,23 @@ bool handle_chance(SpawnInfo* spawn_info)
 
 void LevelGenData::init()
 {
+    {
+        assert(get_room_template("entrance") == to_uint(RoomTemplate::Entrance));
+        assert(get_room_template("exit") == to_uint(RoomTemplate::Exit));
+        assert(get_room_template("cache") == to_uint(RoomTemplate::Cache));
+        assert(get_room_template("ghistroom") == to_uint(RoomTemplate::GhistRoom));
+        assert(get_room_template("chunk_air") == to_uint(RoomTemplate::ChunkAir));
+        assert(get_room_template("chunk_ground") == to_uint(RoomTemplate::ChunkGround));
+        assert(get_room_template("chunk_door") == to_uint(RoomTemplate::ChunkDoor));
+        assert(get_room_template("shop") == to_uint(RoomTemplate::Shop));
+        assert(get_room_template("machine_bigroom_path") == to_uint(RoomTemplate::MachineBigroomPath));
+        assert(get_room_template("feeling_tomb") == to_uint(RoomTemplate::FeelingTomb));
+        assert(get_room_template("machine_wideroom_path") == to_uint(RoomTemplate::MachineWideroomPath));
+        assert(get_room_template("machine_wideroom_side") == to_uint(RoomTemplate::MachineWideroomSide));
+        assert(get_room_template("machine_tallroom_path") == to_uint(RoomTemplate::MachineTallroomPath));
+        assert(get_room_template("coffin_frog") == to_uint(RoomTemplate::CoffinFrog));
+    }
+
     // Scan tile codes to know what id to start at
     {
         // Getting the last id like this in case the game decides to skip some ids so that last_id != tile_codes.size()
@@ -1450,6 +1553,21 @@ RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_templat
     }
     return RoomTemplateType::None;
 }
+uint16_t LevelGenData::get_pretend_room_template(std::uint16_t room_template)
+{
+    switch (get_room_template_type(room_template))
+    {
+    default:
+    case RoomTemplateType::None:
+        return room_template;
+    case RoomTemplateType::Entrance:
+        return to_uint(RoomTemplate::Entrance);
+    case RoomTemplateType::Exit:
+        return to_uint(RoomTemplate::Exit);
+    case RoomTemplateType::Shop:
+        return to_uint(RoomTemplate::Shop);
+    }
+}
 
 void LevelGenSystem::init()
 {
@@ -1511,6 +1629,12 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return std::nullopt;
 
+    const int32_t flat_room_idx = x + y * 8;
+    if (g_CustomRoomShims[l].rooms[flat_room_idx] != 0)
+    {
+        return g_CustomRoomShims[l].rooms[flat_room_idx];
+    }
+
     LevelGenRooms* level_rooms = rooms[l];
     return level_rooms->rooms[x + y * 8];
 }
@@ -1570,6 +1694,17 @@ bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is
         set_room_back_layer->rooms[x + y * 8] = is_set_room;
     }
 
+    return true;
+}
+
+bool LevelGenSystem::set_shop_type(uint32_t x, uint32_t y, uint8_t l, ShopType _shop_type)
+{
+    auto* state_ptr = State::get().ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
+        return false;
+
+    g_CustomShopTypes[l][x][y] = _shop_type;
     return true;
 }
 

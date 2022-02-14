@@ -2682,6 +2682,13 @@ LEVEL_CONFIG = {
   MAX_LIQUID_PARTICLES = 15,
   MOUNT_CHANCE = 4
 }
+LIQUID_POOL = {
+  COARSE_LAVA = 4,
+  COARSE_WATER = 2,
+  LAVA = 3,
+  STAGNANT_LAVA = 5,
+  WATER = 1
+}
 Lahamu = {
   __index = "function",
   __name = "sol.Lahamu.user",
@@ -2767,6 +2774,18 @@ Liquid = {
   __index = "function",
   __name = "sol.Liquid.user",
   __newindex = "function"
+}
+LiquidPhysics = {
+  __name = "sol.LiquidPhysics.user"
+}
+LiquidPhysicsEngine = {
+  __name = "sol.LiquidPhysicsEngine.user"
+}
+LiquidPhysicsParams = {
+  __name = "sol.LiquidPhysicsParams.user"
+}
+LiquidPool = {
+  __name = "sol.LiquidPool.user"
 }
 LiquidSurface = {
   __index = "function",
@@ -3893,12 +3912,17 @@ SCREEN = {
   WIN = 16
 }
 SHOP_TYPE = {
+  CAVEMAN_SHOP = 10,
   CLOTHING_SHOP = 1,
+  CURIO_SHOP = 9,
   DICE_SHOP = 6,
   GENERAL_STORE = 0,
+  GHIST_SHOP = 12,
+  HEDJET_SHOP = 8,
   HIRED_HAND_SHOP = 4,
   PET_SHOP = 5,
   SPECIALTY_SHOP = 3,
+  TURKEY_SHOP = 11,
   TUSK_DICE_SHOP = 13,
   WEAPON_SHOP = 2
 }
@@ -6018,6 +6042,7 @@ get_short_tile_code = function(...) end
 get_short_tile_code_definition = function(...) end
 get_sound = function(...) end
 get_string = function(...) end
+get_texture = function(...) end
 get_texture_definition = function(...) end
 get_type = function(...) end
 get_velocity = function(...) end
@@ -6108,6 +6133,7 @@ register_option_string = function(...) end
 reload_texture = function(...) end
 render_screen_particles = function(...) end
 replace_drop = function(...) end
+reset_lut = function(...) end
 return_input = function(...) end
 rgba = function(...) end
 savegame = {}
@@ -6139,6 +6165,7 @@ set_journal_enabled = function(...) end
 set_kapala_blood_threshold = function(...) end
 set_kapala_hud_icon = function(...) end
 set_level_flags = function(...) end
+set_lut = function(...) end
 set_max_rope_length = function(...) end
 set_olmec_phase_y_level = function(...) end
 set_on_damage = function(...) end
