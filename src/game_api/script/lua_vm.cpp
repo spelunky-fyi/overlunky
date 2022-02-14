@@ -262,12 +262,47 @@ end
 
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
-    /// Load another script by id "author/name"
-    lua["load_script"] = [](std::string id)
-    {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->required_scripts.push_back(sanitize(id));
-    };
+
+    /// Load another script by id "author/name" and import its exports table
+    lua["import"] = sol::overload(
+        [&lua](std::string id)
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            backend->required_scripts.push_back(sanitize(id));
+            sol::state_view lua_view(*backend->vm);
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(id));
+            if (!import_backend)
+            {
+                luaL_error(lua_view, "Imported script not found");
+                return sol::make_object(lua_view, sol::lua_nil);
+            }
+            if (!import_backend->get_enabled())
+            {
+                import_backend->set_enabled(true);
+                import_backend->update();
+            }
+            return sol::make_object(lua_view, import_backend->lua["exports"]);
+        },
+        [&lua](std::string id, std::string version)
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            backend->required_scripts.push_back(sanitize(id));
+            sol::state_view lua_view(*backend->vm);
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(id), std::string_view(version));
+            if (!import_backend)
+            {
+                luaL_error(lua_view, "Imported script not found");
+                return sol::make_object(lua_view, sol::lua_nil);
+            }
+            if (!import_backend->get_enabled())
+            {
+                import_backend->set_enabled(true);
+                import_backend->update();
+            }
+            return sol::make_object(lua_view, import_backend->lua["exports"]);
+        });
+    lua["load_script"] = lua["import"];
+
     /// Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
     /// ```lua
     /// -- this should always print the same table D877...E555
