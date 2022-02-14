@@ -929,6 +929,10 @@ Returns: [ImGuiIO](#imguiio) for raw keyboard, mouse and xinput gamepad stuff. T
 - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
 - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
 - Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+### [`set_lut`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_lut)
+`nil set_lut(optional<TEXTURE> texture_id, LAYER layer)`<br/>
+### [`reset_lut`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_lut)
+`nil reset_lut(LAYER layer)`<br/>
 ### [`set_drop_chance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 `nil set_drop_chance(int dropchance_id, int new_drop_chance)`<br/>
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
@@ -944,6 +948,9 @@ Gets a `TextureDefinition` for equivalent to the one used to define the texture 
 `TEXTURE define_texture(TextureDefinition texture_data)`<br/>
 Defines a new texture that can be used in Entity::set_texture
 If a texture with the same definition already exists the texture will be reloaded from disk.
+### [`get_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture)
+`optional<TEXTURE> get_texture(TextureDefinition texture_data)`<br/>
+Gets a texture with the same definition as the given, if none exists returns `nil`
 ### [`reload_texture`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_texture)
 `nil reload_texture(string texture_path)`<br/>
 Reloads a texture from disk, use this only as a development tool for example in the console
@@ -3783,7 +3790,7 @@ All `.lvl` files are loaded relative to `Data/Levels`, but they can be completel
 - [`float door2_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_x) &DoorCoords::door2_x
 - [`float door2_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) &DoorCoords::door2_y
 ### `LevelGenSystem`
-- [`int shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
+- [`ShopType shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
 - [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &LevelGenSystem::spawn_x
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &LevelGenSystem::spawn_y
 - [`int spawn_room_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) &LevelGenSystem::spawn_room_x
@@ -3803,6 +3810,9 @@ Marks the room as a set-room, a corresponding `setroomy-x` template must be load
 - [`bool unmark_as_set_room(int x, int y, LAYER layer)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unmark_as_set_room) &PostRoomGenerationContext::unmark_as_set_room
 \
 Unmarks the room as a set-room
+- [`bool set_shop_type(int x, int y, LAYER layer, int shop_type)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_shop_type) &PostRoomGenerationContext::set_shop_type
+\
+Set the shop type for a specific room, does nothing if the room is not a shop
 - [`bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, int inverse_chance)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_procedural_spawn_chance) &PostRoomGenerationContext::set_procedural_spawn_chance
 \
 Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
@@ -5721,7 +5731,6 @@ Use in `define_room_template` to declare whether a room template has any special
 - [`SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.SHOP) 3
 - [`MACHINE_ROOM`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.MACHINE_ROOM) 4
 ### SHOP_TYPE
-Determines which kind of shop spawns in the level, if any
 - [`GENERAL_STORE`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.GENERAL_STORE) 0
 - [`CLOTHING_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.CLOTHING_SHOP) 1
 - [`WEAPON_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.WEAPON_SHOP) 2
@@ -5729,6 +5738,11 @@ Determines which kind of shop spawns in the level, if any
 - [`HIRED_HAND_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.HIRED_HAND_SHOP) 4
 - [`PET_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.PET_SHOP) 5
 - [`DICE_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.DICE_SHOP) 6
+- [`HEDJET_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.HEDJET_SHOP) 8
+- [`CURIO_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.CURIO_SHOP) 9
+- [`CAVEMAN_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.CAVEMAN_SHOP) 10
+- [`TURKEY_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.TURKEY_SHOP) 11
+- [`GHIST_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.GHIST_SHOP) 12
 - [`TUSK_DICE_SHOP`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHOP_TYPE.TUSK_DICE_SHOP) 13
 ### LEVEL_CONFIG
 Use with `get_level_config`

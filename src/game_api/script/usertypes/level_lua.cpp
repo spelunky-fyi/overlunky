@@ -38,6 +38,12 @@ bool PostRoomGenerationContext::unmark_as_set_room(uint32_t x, uint32_t y, LAYER
     return State::get().ptr_local()->level_gen->mark_as_set_room(x, y, real_layer, false);
 }
 
+bool PostRoomGenerationContext::set_shop_type(uint32_t x, uint32_t y, LAYER layer, int32_t shop_type)
+{
+    const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+    return State::get().ptr_local()->level_gen->set_shop_type(x, y, real_layer, static_cast<ShopType>(shop_type));
+}
+
 bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance)
 {
     return State::get().ptr_local()->level_gen->set_procedural_spawn_chance(chance_id, inverse_chance);
@@ -383,6 +389,8 @@ void register_usertypes(sol::state& lua)
         &PostRoomGenerationContext::mark_as_set_room,
         "unmark_as_set_room",
         &PostRoomGenerationContext::unmark_as_set_room,
+        "set_shop_type",
+        &PostRoomGenerationContext::set_shop_type,
         "set_procedural_spawn_chance",
         &PostRoomGenerationContext::set_procedural_spawn_chance,
         "set_num_extra_spawns",
@@ -649,7 +657,35 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("ROOM_TEMPLATE_TYPE", "NONE", 0, "ENTRANCE", 1, "EXIT", 2, "SHOP", 3, "MACHINE_ROOM", 4);
 
     /// Determines which kind of shop spawns in the level, if any
-    lua.create_named_table("SHOP_TYPE", "GENERAL_STORE", 0, "CLOTHING_SHOP", 1, "WEAPON_SHOP", 2, "SPECIALTY_SHOP", 3, "HIRED_HAND_SHOP", 4, "PET_SHOP", 5, "DICE_SHOP", 6, "TUSK_DICE_SHOP", 13);
+
+    lua.create_named_table(
+        "SHOP_TYPE",
+        "GENERAL_STORE",
+        0,
+        "CLOTHING_SHOP",
+        1,
+        "WEAPON_SHOP",
+        2,
+        "SPECIALTY_SHOP",
+        3,
+        "HIRED_HAND_SHOP",
+        4,
+        "PET_SHOP",
+        5,
+        "DICE_SHOP",
+        6,
+        "HEDJET_SHOP",
+        8,
+        "CURIO_SHOP",
+        9,
+        "CAVEMAN_SHOP",
+        10,
+        "TURKEY_SHOP",
+        11,
+        "GHIST_SHOP",
+        12,
+        "TUSK_DICE_SHOP",
+        13);
 
     /// Use with `get_level_config`
     lua.create_named_table(
