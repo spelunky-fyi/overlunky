@@ -600,7 +600,7 @@ const Texture* fetch_texture(int32_t texture_id)
 
     if (texture_id < -3)
     {
-        texture_id = State::get().ptr_local()->current_theme->get_dynamic_floor_texture_id(texture_id);
+        texture_id = State::get().ptr_local()->current_theme->get_dynamic_texture(texture_id);
     }
     return get_textures()->texture_map[texture_id];
 }
