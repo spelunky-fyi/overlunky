@@ -4,7 +4,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) I
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.6c"
+meta.version = "2.6d"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -361,7 +361,6 @@ local function trap_wall_spawn(x, y, l)
     local right = get_grid_entity_at(x+1, y, l)
     if has(traps_flip, id) then
         if left == -1 and right == -1 then
-            --math.randomseed(read_prng()[5])
             if prng:random() < 0.5 then
                 flip_entity(ent)
             end
@@ -989,7 +988,6 @@ local function tiamat_scream()
     if tiamat.move_state == 0 then
         tiamat.move_state = 2
     end
-    --math.randomseed(read_prng()[5])
     set_timeout(tiamat_scream, prng:random(180, 480))
 end
 
@@ -997,7 +995,6 @@ local function tiamat_attack()
     local tiamat = get_tiamat()
     if not tiamat then return end
     if tiamat.move_state == 6 then
-        --math.randomseed(read_prng()[6])
         local vx = prng:random()*0.8-0.4
         local vy = prng:random()*0.8-0.4
         local ammo = pick(tiamat_ammo)
@@ -1065,6 +1062,7 @@ local valid_rooms_with_shop_next = {
 }
 local new_rooms = {ROOM_TEMPLATE.SHOP}
 local new_rooms_left = {ROOM_TEMPLATE.SHOP_LEFT}
+local shop_types = {SHOP_TYPE.GENERAL_STORE, SHOP_TYPE.DICE_SHOP, SHOP_TYPE.HEDJET_SHOP, SHOP_TYPE.CURIO_SHOP}
 local big_level = false
 local new_width = 4
 local new_height = 4
@@ -1149,24 +1147,23 @@ set_callback(function(ctx)
         state.level_gen.spawn_room_x = spawn_x
         state.level_gen.spawn_room_y = spawn_y
     end
-    if state.level_gen.shop_type ~= SHOP_TYPE.DICE_SHOP and state.level_gen.shop_type ~= SHOP_TYPE.TUSK_DICE_SHOP then
-        for x = 0, state.width - 1 do
-            for y = 0, state.height - 1 do
-                local here = get_room_template(x, y, 0)
-                if here == ROOM_TEMPLATE.SIDE then
-                    local left = get_room_template(x - 1, y, 0)
-                    if valid_rooms_with_shop_next[left] then
-                        --math.randomseed(read_prng()[6]+x+y)
+    for x = 0, state.width - 1 do
+        for y = 0, state.height - 1 do
+            local here = get_room_template(x, y, 0)
+            if here == ROOM_TEMPLATE.SIDE then
+                local left = get_room_template(x - 1, y, 0)
+                local shoptype = pick(shop_types)
+                if valid_rooms_with_shop_next[left] then
+                    if prng:random() < options.room_shop_chance/100 then
+                        ctx:set_room_template(x, y, 0, pick(new_rooms_left))
+                        ctx:set_shop_type(x, y, 0, shoptype)
+                    end
+                else
+                    local right = get_room_template(x + 1, y, 0)
+                    if valid_rooms_with_shop_next[right] then
                         if prng:random() < options.room_shop_chance/100 then
-                            ctx:set_room_template(x, y, 0, pick(new_rooms_left))
-                        end
-                    else
-                        local right = get_room_template(x + 1, y, 0)
-                        if valid_rooms_with_shop_next[right] then
-                            --math.randomseed(read_prng()[6]+x+y)
-                            if prng:random() < options.room_shop_chance/100 then
-                                ctx:set_room_template(x, y, 0, pick(new_rooms))
-                            end
+                            ctx:set_room_template(x, y, 0, pick(new_rooms))
+                            ctx:set_shop_type(x, y, 0, shoptype)
                         end
                     end
                 end
@@ -1412,14 +1409,12 @@ local monkey_crap = join(crate_items, {ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.ITEM_LAN
 local sister_items = {ENT_TYPE.ITEM_PICKUP_ROPEPILE, ENT_TYPE.ITEM_PICKUP_BOMBBAG, ENT_TYPE.ITEM_PICKUP_BOMBBOX, ENT_TYPE.ITEM_PICKUP_12BAG, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY, ENT_TYPE.ITEM_PICKUP_GIANTFOOD, ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_SPECTACLES, ENT_TYPE.ITEM_PICKUP_CLIMBINGGLOVES, ENT_TYPE.ITEM_PICKUP_PITCHERSMITT, ENT_TYPE.ITEM_PICKUP_SPRINGSHOES, ENT_TYPE.ITEM_PICKUP_SPIKESHOES, ENT_TYPE.ITEM_PICKUP_PASTE, ENT_TYPE.ITEM_PICKUP_COMPASS, ENT_TYPE.ITEM_PICKUP_SPECIALCOMPASS, ENT_TYPE.ITEM_PICKUP_PARACHUTE, ENT_TYPE.ITEM_PICKUP_UDJATEYE, ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_HEDJET, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_PICKUP_TABLETOFDESTINY, ENT_TYPE.ITEM_PICKUP_SKELETON_KEY, ENT_TYPE.ITEM_CAPE, ENT_TYPE.ITEM_WEBGUN, ENT_TYPE.ITEM_SHOTGUN, ENT_TYPE.ITEM_FREEZERAY, ENT_TYPE.ITEM_CROSSBOW, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_TELEPORTER, ENT_TYPE.ITEM_MATTOCK, ENT_TYPE.ITEM_BOOMERANG, ENT_TYPE.ITEM_MACHETE, ENT_TYPE.ITEM_EXCALIBUR, ENT_TYPE.ITEM_BROKENEXCALIBUR, ENT_TYPE.ITEM_PLASMACANNON, ENT_TYPE.ITEM_SCEPTER, ENT_TYPE.ITEM_CLONEGUN, ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.ITEM_BOOMBOX}
 
 set_post_entity_spawn(function(ent)
-    --math.randomseed(read_prng()[5]+ent.uid)
     if prng:random() < options.pot_chance/100 then
         ent.inside = pick(pot_items)
     end
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_POT)
 
 set_post_entity_spawn(function(ent)
-    --math.randomseed(read_prng()[6]+ent.uid)
     if state.theme == THEME.ABZU and prng:random() < 0.75 then
         ent.inside = pick(abzu_crate_items)
     else
@@ -1437,7 +1432,6 @@ set_callback(function()
     local coffins = get_entities_by_type(ENT_TYPE.ITEM_COFFIN)
     for i,v in ipairs(coffins) do
         local ent = get_entity(v)
-        --math.randomseed(read_prng()[7]+ent.uid)
         local item = prng:random(ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_EGGPLANT_CHILD)
         if item == ENT_TYPE.CHAR_CLASSIC_GUY + 1 then
             item = ENT_TYPE.CHAR_HIREDHAND
@@ -1463,7 +1457,6 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_GOLDMONKEY)
 --[[STATS]]
 
 set_callback(function()
-    --math.randomseed(read_prng()[1])
     for i,p in ipairs(players) do
         local hmin = options.stats_health_min
         local hmax = options.stats_health_max
@@ -1568,8 +1561,6 @@ local function insert_chain(t, l)
 end
 
 local function fix_chain()
-    --math.randomseed(read_prng()[1])
-    --insert_chain(THEME.ABZU, { w = 4, l = 2, t = THEME.TIDE_POOL, b = false})
     if has(theme, THEME.NEO_BABYLON) then
         insert_chain(THEME.TIAMAT, { w = 6, l = 2, t = THEME.NEO_BABYLON, b = false})
     end
@@ -1912,7 +1903,6 @@ local function init_run()
     end
     --message("Started new run")
     state.level_count = 0
-    --math.randomseed(read_prng()[1])
     level_order = {}
     insert_bosses = {table.unpack(bosses)}
     chain_items = {table.unpack(orig_chain_items)}
