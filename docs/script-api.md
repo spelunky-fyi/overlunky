@@ -5718,7 +5718,7 @@ Overrides for different CustomTheme functions. Warning: We WILL change these, es
 - [`SPAWN_LEVEL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_LEVEL) THEME_OVERRIDE::SPAWN_LEVEL
 - [`SPAWN_BORDER`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_BORDER) THEME_OVERRIDE::SPAWN_BORDER
 - [`POST_PROCESS_LEVEL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_LEVEL) THEME_OVERRIDE::POST_PROCESS_LEVEL
-- [`POST_PROCESS_EXIT`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_EXIT) THEME_OVERRIDE::POST_PROCESS_EXIT
+- [`SPAWN_TRAPS`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_TRAPS) THEME_OVERRIDE::SPAWN_TRAPS
 - [`POST_PROCESS_ENTITIES`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_ENTITIES) THEME_OVERRIDE::POST_PROCESS_ENTITIES
 - [`SPAWN_PROCEDURAL`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_PROCEDURAL) THEME_OVERRIDE::SPAWN_PROCEDURAL
 - [`SPAWN_BACKGROUND`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_BACKGROUND) THEME_OVERRIDE::SPAWN_BACKGROUND
