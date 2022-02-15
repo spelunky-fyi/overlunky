@@ -3,6 +3,8 @@
 #include "entities_items.hpp"
 #include "movable.hpp"
 
+// Seams like all activefloors have one virtual function, but it just `return` so no reason to add it
+
 class Crushtrap : public Movable
 {
   public:

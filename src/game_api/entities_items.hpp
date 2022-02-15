@@ -65,13 +65,23 @@ class VladsCape : public Cape
     bool can_double_jump;
 };
 
-class Mattock : public Movable
+class Purchesable : public Movable
+{
+    virtual void buy() = 0;
+};
+
+class DummyPurchesableEntity : public Purchesable
+{
+    virtual Entity* switch_entities(void*) = 0; // switches the purchasable cape with normal one
+};
+
+class Mattock : public Purchesable
 {
   public:
     uint8_t remaining;
 };
 
-class Gun : public Movable
+class Gun : public Purchesable
 {
   public:
     uint8_t cooldown;
@@ -167,7 +177,15 @@ struct UnknownPointerGroup
     size_t unknown_uid3;
 };
 
-class WebShot : public Movable
+class Projectile : public Movable
+{
+    // called when shooting (entity it still not added to layer) and it's called like normal function, not thru this virtual
+    virtual void v93(float angle, float speed, Entity* responsible) = 0;
+    // called when shooting (entity it still not added to layer)
+    virtual bool v94(Entity* responsible, float x) = 0;
+};
+
+class WebShot : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -180,6 +198,13 @@ class HangStrand : public Movable
 {
   public:
     float start_pos_y;
+
+    virtual void v93() = 0;
+    virtual void v94() = 0;
+    virtual void v95() = 0;
+    virtual void v96() = 0;
+    virtual void v97() = 0;
+    virtual void v98() = 0;
 };
 
 class HangAnchor : public Movable
@@ -188,7 +213,7 @@ class HangAnchor : public Movable
     int32_t spider_uid;
 };
 
-class Arrow : public Movable
+class Arrow : public Purchesable
 {
   public:
     int32_t flame_uid;
@@ -196,6 +221,9 @@ class Arrow : public Movable
     bool is_poisoned;
     bool shot_from_trap;
     int8_t unused;
+
+    virtual void poison_arrow(bool poisoned) = 0;
+    virtual void light_up(bool lit) = 0;
 };
 
 class LightArrow : public Arrow
@@ -204,7 +232,7 @@ class LightArrow : public Arrow
     Illumination* emitted_light;
 };
 
-class LightShot : public Movable
+class LightShot : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -410,7 +438,7 @@ class LampFlame : public Flame
     ParticleEmitterInfo* flame_particle;
 };
 
-class Bullet : public Movable
+class Bullet : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -458,6 +486,12 @@ class Container : public Movable
     void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
 
+class Present : public Purchesable
+{
+  public:
+    ENT_TYPE inside;
+};
+
 class Coffin : public Movable
 {
   public:
@@ -478,6 +512,8 @@ class OlmecCannon : public Movable
   public:
     uint16_t timer;
     uint8_t bombs_left;
+
+    virtual void v93() = 0;
 };
 
 class Landmine : public LightEmitter
@@ -513,7 +549,7 @@ class PlayerGhost : public LightEmitter
     size_t unknown;
 };
 
-class GhostBreath : public Movable
+class GhostBreath : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -535,7 +571,7 @@ class TreasureHook : public Movable
     SoundPosition* sound_pos;
 };
 
-class AxolotlShot : public Movable
+class AxolotlShot : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -625,7 +661,7 @@ class MiniGameAsteroid : public Movable
     float spin_speed;
 };
 
-class Pot : public Movable
+class Pot : public Purchesable
 {
   public:
     ENT_TYPE inside;
@@ -664,10 +700,12 @@ class Coin : public Movable
     uint32_t nominal_price;
 };
 
-class RollingItem : public Movable
+class RollingItem : public Purchesable
 {
   public:
     float roll_speed; // only positive numbers
+
+    virtual void v94() = 0;
 };
 
 class PlayerBag : public Movable
@@ -683,6 +721,8 @@ class Powerup : public Movable
     // thoes could be wrong becouse of the update
     virtual void apply_effect_to_player(Player* player) = 0;
     virtual void remove_effect_from_player(Player* player) = 0;
+    virtual void v95() = 0;
+    // 3 more here, but they just return instantly
 };
 
 class KapalaPowerup : public Powerup
@@ -730,13 +770,13 @@ class YellowCape : public Cape
     SoundPosition* sound_pos;
 };
 
-class Teleporter : public Movable
+class Teleporter : public Purchesable
 {
   public:
     uint16_t teleport_number; // max 3, need to stand on the ground to reset
 };
 
-class Boomerang : public Movable
+class Boomerang : public Purchesable
 {
   public:
     SoundPosition* sound_pos;
@@ -758,7 +798,7 @@ class Excalibur : public Movable
     bool in_stone;
 };
 
-class Shield : public Movable
+class Shield : public Purchesable
 {
   public:
     float shake;
@@ -772,4 +812,10 @@ class PrizeDispenser : public Movable
     std::array<uint8_t, 6> item_ids;
     uint8_t prizes_spawned;
     int8_t padding;
+};
+
+class Bow : public Purchesable
+{
+    // When lain on the ground
+    virtual float get_arrow_special_offset() = 0;
 };
