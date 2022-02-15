@@ -32,6 +32,10 @@ void register_usertypes(sol::state& lua)
         &Mount::walk_pause_timer,
         "taming_timer",
         &Mount::taming_timer,
+        "used_double_jump",
+        &Mount::used_double_jump,
+        "remove_rider",
+        &Mount::remove_rider,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable>());
 

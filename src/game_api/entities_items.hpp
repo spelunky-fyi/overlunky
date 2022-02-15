@@ -108,21 +108,6 @@ class GiantClamTop : public Movable
     uint8_t open_timer;
 };
 
-class CookFire : public Movable
-{
-  public:
-    int32_t unknown1;
-    /// Can set it on fire or extinguish
-    bool lit;
-    uint8_t unused1;
-    uint16_t unused2;
-    Illumination* emitted_light;
-    ParticleEmitterInfo* particles_smoke;
-    ParticleEmitterInfo* particles_flames;
-    ParticleEmitterInfo* particles_warp;
-    SoundPosition* sound_pos;
-};
-
 class Flame : public Movable
 {
   public:
@@ -389,6 +374,18 @@ class Torch : public Movable
     int16_t unknown2;
 
     virtual void light_up(bool lit) = 0;
+    virtual std::pair<float, float>& v_94(std::pair<float, float>& value) = 0; // sets the value to some constant, runs on spawn
+    virtual ENT_TYPE get_flame_type() = 0;
+};
+
+class CookFire : public Torch
+{
+  public:
+    Illumination* emitted_light;
+    ParticleEmitterInfo* particles_smoke;
+    ParticleEmitterInfo* particles_flames;
+    ParticleEmitterInfo* particles_warp;
+    SoundPosition* sound_pos;
 };
 
 class WallTorch : public Torch

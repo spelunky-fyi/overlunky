@@ -22,18 +22,18 @@ class Mount : public PowerupCapable
 
     void tame(bool value);
 
-    virtual void v95() = 0;
-    virtual void v96() = 0;
-    virtual void v97() = 0;
-    virtual void v98() = 0;
-    virtual void v99() = 0;
-    virtual void v100() = 0;
-    virtual void v101() = 0;
-    virtual void v102() = 0;
-    virtual void v103() = 0;
-    virtual void v104() = 0;
-    virtual void v105() = 0;
-    virtual void v106() = 0;
+    virtual std::pair<float, float>& get_special_offset(std::pair<float, float>& offset) = 0; // gets special offset for the raider when jumping on mount
+    virtual std::pair<float, float>& v96(std::pair<float, float>& value) = 0;                 // gets something for when crouching on mount
+    virtual bool used_double_jump() = 0;                                                      // checks can_doublejump and unknown9b
+    virtual uint32_t v98(bool) = 0;                                                           // returns some constant value
+    virtual uint32_t v99() = 0;                                                               // returns some constant value
+    virtual void play_jump_on_sound() = 0;                                                    // checks if it has rider
+    virtual void remove_rider() = 0;
+    virtual float v102() = 0;                // get offset? mech returns 0.9, the rest 0.5
+    virtual uint32_t v103() = 0;             // returns some constant value
+    virtual uint32_t v104() = 0;             // returns some constant value
+    virtual uint32_t v105() = 0;             // returns some constant value
+    virtual bool can_play_mount_sound() = 0; // called every frame, if returns true mount will make a sound
 };
 
 class Rockdog : public Mount

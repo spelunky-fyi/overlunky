@@ -459,6 +459,8 @@ void register_usertypes(sol::state& lua)
         &Torch::is_lit,
         "light_up",
         &Torch::light_up,
+        "get_flame_type",
+        &Torch::get_flame_type,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -769,7 +771,7 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<CookFire>(
         "CookFire",
         "lit",
-        &CookFire::lit,
+        &CookFire::is_lit,
         "emitted_light",
         &CookFire::emitted_light,
         "particles_smoke",
@@ -779,7 +781,7 @@ void register_usertypes(sol::state& lua)
         "particles_warp",
         &CookFire::particles_warp,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Torch>());
 
     lua.new_usertype<Orb>(
         "Orb",
