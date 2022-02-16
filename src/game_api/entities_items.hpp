@@ -66,7 +66,7 @@ class Cape : public Backpack
     uint8_t padding3;
     uint32_t floating_count; // it's per level, not per cape
 
-    virtual void v100()=0;
+    virtual void v100() = 0;
 };
 
 class VladsCape : public Cape
