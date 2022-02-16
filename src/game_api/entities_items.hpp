@@ -66,7 +66,7 @@ class Cape : public Backpack
     uint8_t padding3;
     uint32_t floating_count; // it's per level, not per cape
 
-    virtual void v100() = 0;
+    virtual void v100()=0;
 };
 
 class VladsCape : public Cape
@@ -75,24 +75,24 @@ class VladsCape : public Cape
     bool can_double_jump;
 };
 
-class Purchesable : public Movable
+class Purchasable : public Movable
 {
     virtual void buy() = 0;
 };
 
-class DummyPurchesableEntity : public Purchesable
+class DummyPurchasableEntity : public Purchasable
 {
     virtual Entity* switch_entities(void*) = 0; // switches the purchasable cape with normal one
 };
 
-class Mattock : public Purchesable
+class Mattock : public Purchasable
 {
   public:
     uint8_t remaining;
 };
 
-class Gun : public Purchesable
-{ // BIG NOTE: scepter is not a Purchesable, but that's the only Gun that isn't so i din't bother to make new type for it
+class Gun : public Purchasable
+{ // BIG NOTE: scepter is not a Purchasable, but that's the only Gun that isn't so i din't bother to make new type for it
   public:
     uint8_t cooldown;
     /// used only for webgun
@@ -223,7 +223,7 @@ class HangAnchor : public Movable
     int32_t spider_uid;
 };
 
-class Arrow : public Purchesable
+class Arrow : public Purchasable
 {
   public:
     int32_t flame_uid;
@@ -496,7 +496,7 @@ class Container : public Movable
     void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
 
-class Present : public Purchesable
+class Present : public Purchasable
 {
   public:
     ENT_TYPE inside;
@@ -671,7 +671,7 @@ class MiniGameAsteroid : public Movable
     float spin_speed;
 };
 
-class Pot : public Purchesable
+class Pot : public Purchasable
 {
   public:
     ENT_TYPE inside;
@@ -710,7 +710,7 @@ class Coin : public Movable
     uint32_t nominal_price;
 };
 
-class RollingItem : public Purchesable
+class RollingItem : public Purchasable
 {
   public:
     float roll_speed; // only positive numbers
@@ -780,13 +780,13 @@ class YellowCape : public Cape
     SoundPosition* sound_pos;
 };
 
-class Teleporter : public Purchesable
+class Teleporter : public Purchasable
 {
   public:
     uint16_t teleport_number; // max 3, need to stand on the ground to reset
 };
 
-class Boomerang : public Purchesable
+class Boomerang : public Purchasable
 {
   public:
     SoundPosition* sound_pos;
@@ -808,7 +808,7 @@ class Excalibur : public Movable
     bool in_stone;
 };
 
-class Shield : public Purchesable
+class Shield : public Purchasable
 {
   public:
     float shake;
@@ -824,7 +824,7 @@ class PrizeDispenser : public Movable
     int8_t padding;
 };
 
-class Bow : public Purchesable
+class Bow : public Purchasable
 {
     // When lain on the ground
     virtual float get_arrow_special_offset() = 0;
