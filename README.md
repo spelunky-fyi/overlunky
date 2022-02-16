@@ -89,8 +89,6 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
     - **"reset/reload"**: Clear all callbacks made in the console
     - **"quit"**: Ragequit
   - **Ctrl+Shift+K**: Edit keybindings
-  - **Ctrl+Shift+U**: Change UI color. You can also change the font in the ini.
-  - **Ctrl+Shift+I**: ImGui internal metrics and settings
   - **Ctrl+Shift+S**: Save options, hotkeys and UI colors
   - **Ctrl+Shift+L**: Load options, hotkeys and UI colors
   - **Ctrl+Shift+D**: Detach active tab in tabbed interface
@@ -130,9 +128,8 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + Use *Game Capture* and disable *Allow Transparency* if Overlunky looks weird/black.
     + If you have lag or crashes, check previous question.
   - If you're running **Linux**
-    + The game and OL should run fine with the latest Wine if you install DXVK.
-    + Also works with [Proton-GE](https://github.com/GloriousEggroll/proton-ge-custom) using the [command line switch](#command-line-switches) `--launch_playlunky ..` for a non-Steam game shortcut. Just make sure the game and the OL shortcut are set to use Proton-GE.
-    + Put the Segoe UI ttf files to your wineprefixes Windows/Fonts to show the ui correctly.
+    + The game and OL should run fine with Wine 7 if you install DXVK.
+    + Also works with Proton 7 using the [command line switch](#command-line-switches) `--launch_playlunky ..` for a non-Steam game shortcut. Just make sure the game and the OL shortcut are set to use Proton 7.
     + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
   - If you **don't have scripts** in the Scripts tab
     + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts).
