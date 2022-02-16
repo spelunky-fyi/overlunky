@@ -52,6 +52,11 @@ Texture* RenderAPI::get_texture(TEXTURE texture_id)
 
 TEXTURE RenderAPI::define_texture(TextureDefinition data)
 {
+    if (const std::optional<TEXTURE> existing = get_texture(data))
+    {
+        return existing.value();
+    }
+
     if (data.sub_image_width == 0 || data.sub_image_height == 0)
     {
         data.sub_image_width = data.width;
@@ -59,8 +64,6 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     }
 
     auto* textures = get_textures();
-
-    std::lock_guard lock{custom_textures_lock};
 
     Texture new_texture{
         static_cast<int64_t>(textures->texture_map.size() + custom_textures.size() + 1),
@@ -78,37 +81,8 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
         1.0f / data.width,
         1.0f / data.height,
     };
-    constexpr auto compare_offset = offsetof(Texture, width);
-    constexpr auto compare_size = sizeof(Texture) - offsetof(Texture, width);
-    auto is_same = [](const Texture& lhs, const Texture& rhs)
-    {
-        // Note, even bits for floats should be the same here since all calculations are matched 1-to-1 from the games code
-        return memcmp((char*)&lhs + compare_offset, (char*)&rhs + compare_offset, compare_size) == 0;
-    };
 
-    for (auto& [id, texture] : custom_textures)
-    {
-        std::string_view existing_name{*texture.name};
-        constexpr char c_VanillaTexturePath[]{"Data/Textures/../../"};
-        if (existing_name.starts_with(c_VanillaTexturePath))
-        {
-            existing_name.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
-        }
-        if (existing_name == data.texture_path && is_same(texture, new_texture))
-        {
-            reload_texture(texture.name);
-            return texture.id;
-        }
-    }
-
-    for (auto& texture : textures->textures)
-    {
-        if (texture.name != nullptr && *texture.name == data.texture_path && is_same(texture, new_texture))
-        {
-            reload_texture(texture.name);
-            return texture.id;
-        }
-    }
+    std::lock_guard lock{custom_textures_lock};
 
     auto* new_texture_target = textures->texture_map[0];
 
@@ -142,9 +116,105 @@ TEXTURE RenderAPI::define_texture(TextureDefinition data)
     new_texture.name = new_texture_target->name;
     textures->num_textures = backup_num_textures;
     *new_texture_target = backup_texture;
+
     custom_textures[new_texture.id] = new_texture;
 
     return new_texture.id;
+}
+std::optional<TEXTURE> RenderAPI::get_texture(TextureDefinition data)
+{
+
+    if (data.sub_image_width == 0 || data.sub_image_height == 0)
+    {
+        data.sub_image_width = data.width;
+        data.sub_image_height = data.height;
+    }
+
+    auto* textures = get_textures();
+
+    Texture new_texture{
+        static_cast<int64_t>(textures->texture_map.size() + custom_textures.size() + 1),
+        nullptr,
+        data.width,
+        data.height,
+        data.sub_image_width / data.tile_width,
+        data.sub_image_height / data.tile_height,
+        (data.sub_image_offset_x + 0.5f) / data.width,
+        (data.sub_image_offset_y + 0.5f) / data.height,
+        (float)data.tile_width / data.width,
+        (float)data.tile_height / data.height,
+        (data.tile_width - 1.0f) / data.width,
+        (data.tile_height - 1.0f) / data.height,
+        1.0f / data.width,
+        1.0f / data.height,
+    };
+    constexpr auto compare_offset = offsetof(Texture, width);
+    constexpr auto compare_size = sizeof(Texture) - offsetof(Texture, width);
+    auto is_same = [](const Texture& lhs, const Texture& rhs)
+    {
+        // Note, even bits for floats should be the same here since all calculations are matched 1-to-1 from the games code
+        return memcmp((char*)&lhs + compare_offset, (char*)&rhs + compare_offset, compare_size) == 0;
+    };
+
+    std::lock_guard lock{custom_textures_lock};
+
+    for (auto& [id, texture] : custom_textures)
+    {
+        std::string_view existing_name{*texture.name};
+        constexpr char c_VanillaTexturePath[]{"Data/Textures/../../"};
+        if (existing_name.starts_with(c_VanillaTexturePath))
+        {
+            existing_name.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
+        }
+        if (existing_name == data.texture_path && is_same(texture, new_texture))
+        {
+            reload_texture(texture.name);
+            return texture.id;
+        }
+    }
+
+    for (auto& texture : textures->textures)
+    {
+        if (texture.name != nullptr && *texture.name == data.texture_path && is_same(texture, new_texture))
+        {
+            reload_texture(texture.name);
+            return texture.id;
+        }
+    }
+
+    return std::nullopt;
+}
+std::optional<TEXTURE> RenderAPI::get_texture(std::string_view texture_name)
+{
+    auto* textures = get_textures();
+
+    std::lock_guard lock{custom_textures_lock};
+
+    for (auto& [id, texture] : custom_textures)
+    {
+        std::string_view existing_name{*texture.name};
+        constexpr char c_VanillaTexturePath[]{"Data/Textures/../../"};
+        if (existing_name.starts_with(c_VanillaTexturePath))
+        {
+            existing_name.remove_prefix(sizeof(c_VanillaTexturePath) - 1);
+        }
+        if (existing_name == texture_name)
+        {
+            reload_texture(texture.name);
+            return texture.id;
+        }
+    }
+
+    for (auto& texture : textures->textures)
+    {
+        if (texture.name != nullptr && *texture.name == texture_name)
+        {
+            reload_texture(texture.name);
+            return texture.id;
+        }
+    }
+
+    return std::nullopt;
 }
 
 void RenderAPI::reload_texture(const char* texture_name)
@@ -187,6 +257,34 @@ void RenderAPI::reload_texture(const char** texture_name)
     auto renderer_ptr = (Renderer*)renderer();
     auto load_texture = *vtable_find<LoadTextureFunT*>(renderer_ptr, c_LoadTextureVirtualIndex);
     load_texture(renderer_ptr, texture_name);
+}
+
+std::optional<TEXTURE> g_forced_lut_textures[2]{};
+
+using RenderLayer = void(const std::vector<Illumination*>&, uint8_t, const Camera&, const char**, const char**);
+RenderLayer* g_render_layer = nullptr;
+void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer, const Camera& camera, const char** lut_lhs, const char** lut_rhs)
+{
+    // The lhs and rhs LUTs are blended in the shader, but we don't know where that value is CPU side so we can only override
+    // with a single LUT for now
+    if (g_forced_lut_textures[layer])
+    {
+        Texture* lut = RenderAPI::get().get_texture(g_forced_lut_textures[layer].value());
+        g_render_layer(lightsources, layer, camera, lut->name, lut->name);
+    }
+    else
+    {
+        g_render_layer(lightsources, layer, camera, lut_lhs, lut_rhs);
+    }
+}
+
+void RenderAPI::set_lut(TEXTURE texture_id, uint8_t layer)
+{
+    g_forced_lut_textures[layer] = texture_id;
+}
+void RenderAPI::reset_lut(uint8_t layer)
+{
+    g_forced_lut_textures[layer] = std::nullopt;
 }
 
 using VanillaRenderHudFun = void(size_t, float, float, size_t);
@@ -457,7 +555,7 @@ const Texture* fetch_texture(int32_t texture_id)
 
     if (texture_id < -3)
     {
-        texture_id = State::get().ptr_local()->current_theme->get_dynamic_floor_texture_id(texture_id);
+        texture_id = State::get().ptr_local()->current_theme->get_dynamic_texture(texture_id);
     }
     return get_textures()->texture_map[texture_id];
 }
@@ -493,6 +591,7 @@ void init_render_api_hooks()
         write_mem_prot(fetch_texture_begin, code, true);
     }
 
+    g_render_layer = (RenderLayer*)get_address("render_layer"sv);
     g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud"sv);
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
     g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth"sv);
@@ -532,6 +631,7 @@ void init_render_api_hooks()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
+    DetourAttach((void**)&g_render_layer, render_layer);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
     DetourAttach((void**)&g_render_draw_depth_trampoline, &render_draw_depth);

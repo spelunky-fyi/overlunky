@@ -1,5 +1,6 @@
 #include "vanilla_render_lua.hpp"
 
+#include "rpc.hpp"
 #include "script/lua_backend.hpp"
 
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
@@ -163,6 +164,48 @@ namespace NVanillaRender
 {
 void register_usertypes(sol::state& lua)
 {
+    static const auto set_lut = [](sol::optional<TEXTURE> texture_id, LAYER layer)
+    {
+        RenderAPI& render_api = RenderAPI::get();
+        if (layer != LAYER::BOTH)
+        {
+            const uint8_t real_layer = enum_to_layer(layer);
+            if (texture_id)
+            {
+                render_api.set_lut(texture_id.value(), real_layer);
+            }
+            else
+            {
+                render_api.reset_lut(real_layer);
+            }
+        }
+        else
+        {
+            if (texture_id)
+            {
+                render_api.set_lut(texture_id.value(), 0);
+                render_api.set_lut(texture_id.value(), 1);
+            }
+            else
+            {
+                render_api.reset_lut(0);
+                render_api.reset_lut(1);
+            }
+        }
+    };
+
+    // Force the LUT texture for the given layer (or both) until it is reset
+    // Pass `nil` in the first parameter to reset
+    lua["set_lut"] = [](sol::optional<TEXTURE> texture_id, LAYER layer)
+    {
+        set_lut(texture_id, layer);
+    };
+    // Same as `set_lut(nil, layer)`
+    lua["reset_lut"] = [](LAYER layer)
+    {
+        set_lut(sol::nullopt, layer);
+    };
+
     auto draw_screen_texture = sol::overload(
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, float, float, float, float, Color)>(&VanillaRenderContext::draw_screen_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_screen_texture),

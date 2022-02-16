@@ -477,6 +477,9 @@ CursedPot = {
 CustomSound = {
   __name = "sol.CustomSound.user"
 }
+CustomTheme = {
+  __name = "sol.CustomTheme.user"
+}
 DMAlienBlast = {
   __index = "function",
   __name = "sol.DMAlienBlast.user",
@@ -694,6 +697,16 @@ DROPCHANCE = {
   SKELETON_SKELETONKEY = 8,
   UFO_PARACHUTE = 9,
   YETI_PITCHERSMITT = 10
+}
+DYNAMIC_TEXTURE = {
+  BACKGROUND = -4,
+  BACKGROUND_DECORATION = -8,
+  COFFIN = -10,
+  DOOR = -6,
+  DOOR_LAYER = -7,
+  FLOOR = -5,
+  INVISIBLE = -2,
+  KALI_STATUE = -9
 }
 DecoRegeneratingBlock = {
   __index = "function",
@@ -2682,6 +2695,13 @@ LEVEL_CONFIG = {
   MAX_LIQUID_PARTICLES = 15,
   MOUNT_CHANCE = 4
 }
+LIQUID_POOL = {
+  COARSE_LAVA = 4,
+  COARSE_WATER = 2,
+  LAVA = 3,
+  STAGNANT_LAVA = 5,
+  WATER = 1
+}
 Lahamu = {
   __index = "function",
   __name = "sol.Lahamu.user",
@@ -2767,6 +2787,18 @@ Liquid = {
   __index = "function",
   __name = "sol.Liquid.user",
   __newindex = "function"
+}
+LiquidPhysics = {
+  __name = "sol.LiquidPhysics.user"
+}
+LiquidPhysicsEngine = {
+  __name = "sol.LiquidPhysicsEngine.user"
+}
+LiquidPhysicsParams = {
+  __name = "sol.LiquidPhysicsParams.user"
+}
+LiquidPool = {
+  __name = "sol.LiquidPool.user"
 }
 LiquidSurface = {
   __index = "function",
@@ -3893,12 +3925,17 @@ SCREEN = {
   WIN = 16
 }
 SHOP_TYPE = {
+  CAVEMAN_SHOP = 10,
   CLOTHING_SHOP = 1,
+  CURIO_SHOP = 9,
   DICE_SHOP = 6,
   GENERAL_STORE = 0,
+  GHIST_SHOP = 12,
+  HEDJET_SHOP = 8,
   HIRED_HAND_SHOP = 4,
   PET_SHOP = 5,
   SPECIALTY_SHOP = 3,
+  TURKEY_SHOP = 11,
   TUSK_DICE_SHOP = 13,
   WEAPON_SHOP = 2
 }
@@ -4633,6 +4670,60 @@ THEME = {
   TIDE_POOL = 5,
   VOLCANA = 3
 }
+THEME_OVERRIDE = {
+  BACKLAYER_LIGHT_LEVEL = 40,
+  BASE = 0,
+  BASE_ID = 27,
+  COFFIN = 10,
+  ENT_BACKWALL = 33,
+  ENT_BORDER = 34,
+  ENT_CRITTER = 35,
+  ENT_FLOOR_SPREADING = 28,
+  ENT_FLOOR_SPREADING2 = 29,
+  FEELING = 11,
+  GET_UNKNOWN1_OR_2 = 43,
+  GRAVITY = 36,
+  INIT_FLAGS = 2,
+  INIT_LEVEL = 3,
+  LEVEL_HEIGHT = 46,
+  LOOP = 41,
+  LVL_FILE = 25,
+  PLAYER_DAMAGE = 37,
+  POST_PROCESS_ENTITIES = 17,
+  POST_PROCESS_LEVEL = 15,
+  POST_TRANSITION = 22,
+  PRE_TRANSITION = 45,
+  SPAWN_BACKGROUND = 19,
+  SPAWN_BORDER = 14,
+  SPAWN_DECORATION = 48,
+  SPAWN_DECORATION2 = 49,
+  SPAWN_EFFECTS = 24,
+  SPAWN_EXTRA = 50,
+  SPAWN_LEVEL = 13,
+  SPAWN_LIGHTS = 20,
+  SPAWN_PLAYERS = 23,
+  SPAWN_PROCEDURAL = 18,
+  SPAWN_TRANSITION = 21,
+  SPAWN_TRAPS = 16,
+  SPECIAL_ROOMS = 6,
+  TEXTURE_BACKLAYER_LUT = 39,
+  TEXTURE_DYNAMIC = 44,
+  THEME_ID = 26,
+  TRANSITION_MODIFIER = 31,
+  UNKNOWN_V1 = 1,
+  UNKNOWN_V4 = 4,
+  UNKNOWN_V5 = 5,
+  UNKNOWN_V7 = 7,
+  UNKNOWN_V8 = 8,
+  UNKNOWN_V12 = 12,
+  UNKNOWN_V30 = 30,
+  UNKNOWN_V32 = 32,
+  UNKNOWN_V38 = 38,
+  UNKNOWN_V47 = 47,
+  UNKNOWN_V51 = 51,
+  VAULT = 9,
+  VAULT_LEVEL = 42
+}
 TILE_CODE = {
   ADJACENT_FLOOR = 29,
   ALIEN = 148,
@@ -5107,6 +5198,9 @@ TextureDefinition = {
 }
 TextureRenderingInfo = {
   __name = "sol.TextureRenderingInfo.user"
+}
+ThemeInfo = {
+  __name = "sol.ThemeInfo.user"
 }
 ThinIce = {
   __index = "function",
@@ -5969,6 +6063,8 @@ f = {}
 filter_entities = function(...) end
 flip_entity = function(...) end
 force_co_subtheme = function(...) end
+force_custom_subtheme = function(...) end
+force_custom_theme = function(...) end
 force_dark_level = function(...) end
 force_olmec_phase_0 = function(...) end
 game_manager = {}
@@ -6018,6 +6114,7 @@ get_short_tile_code = function(...) end
 get_short_tile_code_definition = function(...) end
 get_sound = function(...) end
 get_string = function(...) end
+get_texture = function(...) end
 get_texture_definition = function(...) end
 get_type = function(...) end
 get_velocity = function(...) end
@@ -6108,6 +6205,7 @@ register_option_string = function(...) end
 reload_texture = function(...) end
 render_screen_particles = function(...) end
 replace_drop = function(...) end
+reset_lut = function(...) end
 return_input = function(...) end
 rgba = function(...) end
 savegame = {}
@@ -6139,6 +6237,7 @@ set_journal_enabled = function(...) end
 set_kapala_blood_threshold = function(...) end
 set_kapala_hud_icon = function(...) end
 set_level_flags = function(...) end
+set_lut = function(...) end
 set_max_rope_length = function(...) end
 set_olmec_phase_y_level = function(...) end
 set_on_damage = function(...) end

@@ -62,8 +62,13 @@ struct RenderAPI
     TextureDefinition get_texture_definition(TEXTURE texture_id);
     Texture* get_texture(TEXTURE texture_id);
     TEXTURE define_texture(TextureDefinition data);
+    std::optional<TEXTURE> get_texture(TextureDefinition data);
+    std::optional<TEXTURE> get_texture(std::string_view texture_name);
     void reload_texture(const char* texture_name);  // Does a lookup for the right texture to reload
     void reload_texture(const char** texture_name); // Reloads the texture directly
+
+    void set_lut(TEXTURE texture_id, uint8_t layer);
+    void reset_lut(uint8_t layer);
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);

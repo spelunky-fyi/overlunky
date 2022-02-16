@@ -24,6 +24,20 @@ void register_usertypes(sol::state& lua)
         texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
         return RenderAPI::get().define_texture(std::move(texture_data));
     };
+    /// Gets a texture with the same definition as the given, if none exists returns `nil`
+    lua["get_texture"] = [](TextureDefinition texture_data) -> std::optional<TEXTURE>
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
+        return RenderAPI::get().get_texture(std::move(texture_data));
+    };
+    /// Gets the first texture with the matching path, if none exists returns `nil`
+    lua["get_texture"] = [](std::string texture_path) -> std::optional<TEXTURE>
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        texture_path = get_image_file_path(backend->get_root(), std::move(texture_path));
+        return RenderAPI::get().get_texture(texture_path);
+    };
     /// Reloads a texture from disk, use this only as a development tool for example in the console
     /// Note that `define_texture` will also reload the texture if it already exists
     lua["reload_texture"] = [](std::string texture_path)
