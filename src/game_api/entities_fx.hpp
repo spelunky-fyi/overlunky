@@ -359,3 +359,9 @@ class FxAnkhBrokenPiece : public Movable
   public:
     float unknown;
 };
+
+class MegaJellyfishEye : public Movable
+{
+  public:
+    uint8_t timer;
+};

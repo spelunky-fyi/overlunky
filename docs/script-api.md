@@ -2935,6 +2935,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Purchasable`](#purchasable)
 ### `Bow`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Purchasable`](#purchasable)
+### `Present`
+Derived from [`Entity`](#entity) [`Movable`](#movable) [`Purchasable`](#purchasable)
+- [`ENT_TYPE inside`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) &Present::inside
 ### `Jetpack`
 Derived from [`Entity`](#entity) [`Movable`](#movable) [`Backpack`](#backpack)
 - [`bool flame_on`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_on) &Jetpack::flame_on
@@ -3546,6 +3549,9 @@ Derived from [`Entity`](#entity) [`Movable`](#movable)
 - [`float size`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) &FxAnkhRotatingSpark::size
 ### `FxAnkhBrokenPiece`
 Derived from [`Entity`](#entity) [`Movable`](#movable)
+### `MegaJellyfishEye`
+Derived from [`Entity`](#entity) [`Movable`](#movable)
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &MegaJellyfishEye::timer
 ### `Liquid`
 Derived from [`Entity`](#entity)
 - [`Entity fx_surface`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_surface) &Liquid::fx_surface
@@ -5016,7 +5022,6 @@ To figure out what type of entity you get back, consult the [entity hierarchy li
 You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks
 
 For reference, the available `as_<typename>` functions are listed below:
-- as_Purchasable
 - as_acidbubble
 - as_alien
 - as_altar
@@ -5101,7 +5106,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_dmspawning
 - as_door
 - as_drill
-- as_dummyPurchasableentity
+- as_dummypurchasableentity
 - as_dustwallapep
 - as_eggplantminister
 - as_eggplantthrower
@@ -5231,6 +5236,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_mattock
 - as_mech
 - as_megajellyfish
+- as_megajellyfisheye
 - as_minigameasteroid
 - as_minigameship
 - as_minigameshipoffset
@@ -5271,10 +5277,12 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_pot
 - as_powerup
 - as_powerupcapable
+- as_present
 - as_prizedispenser
 - as_projectile
 - as_protoshopkeeper
 - as_punishball
+- as_purchasable
 - as_pushblock
 - as_qilin
 - as_quicksand

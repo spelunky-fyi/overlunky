@@ -51,6 +51,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_fxempress"] = &Entity::as<FxEmpress>;
     lua["Entity"]["as_fxankhrotatingspark"] = &Entity::as<FxAnkhRotatingSpark>;
     lua["Entity"]["as_fxankhbrokenpiece"] = &Entity::as<FxAnkhBrokenPiece>;
+    lua["Entity"]["as_megajellyfisheye"] = &Entity::as<MegaJellyfishEye>;
 
     lua.new_usertype<LiquidSurface>(
         "LiquidSurface",
@@ -411,6 +412,13 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<FxAnkhBrokenPiece>(
         "FxAnkhBrokenPiece",
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<MegaJellyfishEye>(
+        "MegaJellyfishEye",
+        "timer",
+        &MegaJellyfishEye::timer,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 }
