@@ -13,6 +13,14 @@ class Backpack : public Movable
     uint8_t explosion_timer; // counts from 0 to 30
     uint16_t unknown1;
     uint32_t unknown2;
+
+    virtual void v93() = 0;
+    virtual void v94() = 0;
+    virtual void v95() = 0;
+    virtual void v96() = 0;
+    virtual void v97() = 0;
+    virtual void v98() = 0;
+    virtual void v99() = 0;
 };
 
 class Jetpack : public Backpack
@@ -57,6 +65,8 @@ class Cape : public Backpack
     uint8_t padding2;
     uint8_t padding3;
     uint32_t floating_count; // it's per level, not per cape
+
+    virtual void v100() = 0;
 };
 
 class VladsCape : public Cape
@@ -82,7 +92,7 @@ class Mattock : public Purchesable
 };
 
 class Gun : public Purchesable
-{
+{ // BIG NOTE: scepter is not a Purchesable, but that's the only Gun that isn't so i din't bother to make new type for it
   public:
     uint8_t cooldown;
     /// used only for webgun
@@ -691,7 +701,7 @@ class EggSac : public Movable
 class Goldbar : public Movable
 {
   public:
-    uint8_t unknown_shine; // get's updated every time animation_frame is changes by the game, setting it to 64 or less disables the effect
+    uint8_t unknown_shine; // get's updated every time animation_frame is changed by the game, setting it to 64 or less breaks it
 };
 
 class Coin : public Movable
