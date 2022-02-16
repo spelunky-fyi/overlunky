@@ -721,8 +721,8 @@ class RollingItem : public Purchasable
 class PlayerBag : public Movable
 {
   public:
-    uint8_t bombs;
-    uint8_t ropes;
+    int8_t bombs;
+    int8_t ropes;
 };
 
 class Powerup : public Movable
