@@ -253,7 +253,7 @@ end
             backend->callbacks[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
-    /// Clear previously added callback `id`
+    /// Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.
     lua["clear_callback"] = sol::overload(
         [](CallbackId id)
         {
@@ -276,7 +276,7 @@ end
                 backend->clear_screen_hooks.push_back({caller.uid, caller.id});
                 break;
             case CallbackType::None:
-                DEBUG("No callback to clear");
+                // DEBUG("No callback to clear");
             default:
                 break;
             }

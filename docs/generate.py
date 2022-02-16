@@ -46,6 +46,7 @@ header_files = [
     "../src/game_api/script/usertypes/hitbox_lua.hpp",
     "../src/game_api/script/usertypes/socket_lua.hpp",
     "../src/imgui/imgui.h",
+    "../src/game_api/script/usertypes/level_lua.cpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -559,24 +560,33 @@ for line in data:
             type = replace_all(m.group(2), replace)
             aliases.append({"name": name, "type": type})
 
-print("# Overlunky Lua API")
+print("# Overlunky/Playlunky Lua API")
 print(
-    "- Everything here is still changing, don't be sad if your scripts break next week!"
+    "- We try not to make breaking changes to the API, but some stupid errors or new stuff that was guessed wrong may have to be changed. Sorry!"
 )
 print(
-    "- This doc doesn't have a lot of examples, that's why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples)."
+    "- If you encounter something that doesn't seem quite right, please raise your voice instead of conforming to it outright."
+)
+print(
+    "- This doc is generated from dozens of C++ files by a janky-ass python script however, so there may be weird documentation errors that hopefully don't reflect weird errors in the API."
+)
+print(
+    "- This doc doesn't have a lot of examples, that's why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples). There are also [sample mods](https://spelunky.fyi/mods/?q=sample) for things that make more sense in Playlunky."
 )
 print(
     "- This doc and the examples are written for a person who already knows [how to program in Lua](http://lua-users.org/wiki/TutorialDirectory)."
 )
 print(
-    "- This doc is up to date for the [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip). If you're using an official release from the past, you might find some things here don't work."
+    "- This doc is up to date for the Overlunky [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) and Playlunky [nightly build](https://github.com/spelunky-fyi/Playlunky/releases/tag/nightly). If you're using a stable release from the past, you might find some things here don't work."
 )
 print(
     "- You can find changes to and earlier versions of this doc [here](https://github.com/spelunky-fyi/overlunky/commits/main/docs/script-api.md)."
 )
 print(
-    "- Click on the names of things to search for examples on how to use that function or variable."
+    "- Click on the names of functions or fields to search for examples on how to use that function or variable. **There's also a handy dandy sliced hamburger in the top left corner of this doc to search global functions, types and enums without clutter.**"
+)
+print(
+    "- Set `OL_DEBUG=1` in the same environment where the game is running to keep the Overlunky terminal open for better debug prints. This could be `cmd` or even the system environment variables if playing on Steam. Playlunky will also print the messages to terminal (even from Overlunky) if ran with the `-console` switch."
 )
 
 print("## Lua libraries")
