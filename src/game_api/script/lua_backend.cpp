@@ -314,6 +314,7 @@ bool LuaBackend::update()
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     std::optional<bool> keep_going = handle_function_with_return<bool>(cb->func);
+                    clear_current_callback();
                     cb->lastRan = now;
                     if (!keep_going.value_or(true))
                     {
@@ -329,6 +330,7 @@ bool LuaBackend::update()
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     handle_function(cbt->func);
+                    clear_current_callback();
                     it = global_timers.erase(it);
                 }
                 else
@@ -349,6 +351,7 @@ bool LuaBackend::update()
             {
                 set_current_callback(-1, id, CallbackType::Normal);
                 handle_function(callback.func, LoadContext{get_root(), get_name()});
+                clear_current_callback();
                 callback.lastRan = now;
             }
         }
@@ -443,6 +446,7 @@ bool LuaBackend::update()
                     break;
                 }
             }
+            clear_current_callback();
         }
         int now_l = g_state->time_level;
         for (auto it = level_timers.begin(); it != level_timers.end();)
@@ -453,6 +457,7 @@ bool LuaBackend::update()
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     std::optional<bool> keep_going = handle_function_with_return<bool>(cb->func);
+                    clear_current_callback();
                     cb->lastRan = now_l;
                     if (!keep_going.value_or(true))
                     {
@@ -468,6 +473,7 @@ bool LuaBackend::update()
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     handle_function(cbt->func);
+                    clear_current_callback();
                     it = level_timers.erase(it);
                 }
                 else
@@ -535,6 +541,7 @@ void LuaBackend::draw(ImDrawList* dl)
             {
                 set_current_callback(-1, id, CallbackType::Normal);
                 handle_function(callback.func, draw_ctx);
+                clear_current_callback();
                 callback.lastRan = now;
             }
         }
@@ -661,6 +668,7 @@ void LuaBackend::post_tile_code(std::string_view tile_code, float x, float y, in
         {
             set_current_callback(-1, callback.id, CallbackType::Normal);
             handle_function(callback.func, x, y, layer, room_template);
+            clear_current_callback();
         }
     }
 }
@@ -682,6 +690,7 @@ void LuaBackend::pre_load_level_files()
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function(callback.func, PreLoadLevelFilesContext{});
+            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -706,6 +715,7 @@ void LuaBackend::pre_level_generation()
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function(callback.func);
+            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -727,6 +737,7 @@ void LuaBackend::post_room_generation()
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function(callback.func, PostRoomGenerationContext{});
+            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -751,6 +762,7 @@ void LuaBackend::post_level_generation()
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function(callback.func);
+            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -774,6 +786,7 @@ std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
             std::string return_value = handle_function_with_return<std::string>(callback.func, x, y, layer, room_template).value_or(std::string{});
+            clear_current_callback();
             if (!return_value.empty())
             {
                 return return_value;
@@ -803,8 +816,10 @@ LuaBackend::PreHandleRoomTilesResult LuaBackend::pre_handle_room_tiles(LevelGenR
             set_current_callback(-1, id, CallbackType::Normal);
             if (handle_function_with_return<bool>(callback.func, x, y, room_template, ctx).value_or(false))
             {
+                clear_current_callback();
                 return {true, ctx.modded_room_data};
             }
+            clear_current_callback();
         }
     }
     return {false, ctx.modded_room_data};
@@ -830,8 +845,10 @@ Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y
                 set_current_callback(-1, callback.id, CallbackType::Normal);
                 if (auto spawn_replacement = handle_function_with_return<std::uint32_t>(callback.func, entity_type, x, y, layer, overlay, spawn_type_flags))
                 {
+                    clear_current_callback();
                     return get_entity_ptr(spawn_replacement.value());
                 }
+                clear_current_callback();
             }
         }
     }
@@ -856,6 +873,7 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
             {
                 set_current_callback(-1, callback.id, CallbackType::Normal);
                 handle_function(callback.func, lua["cast_entity"](entity), spawn_type_flags);
+                clear_current_callback();
             }
         }
     }
@@ -874,6 +892,7 @@ void LuaBackend::process_vanilla_render_callbacks(ON event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function(callback.func, render_ctx);
+            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -893,6 +912,7 @@ void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function(callback.func, render_ctx, draw_depth);
+            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -911,6 +931,7 @@ void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function(callback.func, render_ctx, page_type, page);
+            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -953,6 +974,7 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
             std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, lua["cast_entity"](entity), buffer).value_or(std::u16string{no_return_str});
+            clear_current_callback();
             return return_value;
         }
     }
@@ -977,6 +999,7 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
             std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, buffer).value_or(std::u16string{no_return_str});
+            clear_current_callback();
             return return_value;
         }
     }
@@ -1031,4 +1054,11 @@ void LuaBackend::set_current_callback(int uid, int id, CallbackType type)
     current_cb.uid = uid;
     current_cb.id = id;
     current_cb.type = type;
+}
+
+void LuaBackend::clear_current_callback()
+{
+    current_cb.uid = -1;
+    current_cb.id = -1;
+    current_cb.type = CallbackType::None;
 }

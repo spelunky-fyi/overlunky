@@ -310,6 +310,7 @@ class LuaBackend
 
     CurrentCallback get_current_callback();
     void set_current_callback(int uid, int id, CallbackType type);
+    void clear_current_callback();
 };
 
 template <class... Args>
