@@ -155,6 +155,21 @@ struct EntitySpawnCallback
 
 using TimerCallback = std::variant<IntervalCallback, TimeoutCallback>; // NoAlias
 
+enum class CallbackType
+{
+    None,
+    Normal,
+    Entity,
+    Screen
+};
+
+struct CurrentCallback
+{
+    int uid;
+    int id;
+    CallbackType type;
+};
+
 struct ScriptState
 {
     Player* player;
@@ -184,6 +199,7 @@ class LuaBackend
     ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;
+    CurrentCallback current_cb = {-1, 0, CallbackType::None};
 
     std::recursive_mutex gil;
 
@@ -291,6 +307,9 @@ class LuaBackend
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);
     static LuaBackend* get_calling_backend();
+
+    CurrentCallback get_current_callback();
+    void set_current_callback(int uid, int id, CallbackType type);
 };
 
 template <class... Args>

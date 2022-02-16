@@ -254,11 +254,32 @@ end
         return backend->cbcount++;
     };
     /// Clear previously added callback `id`
-    lua["clear_callback"] = [](CallbackId id)
-    {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->clear_callbacks.push_back(id);
-    };
+    lua["clear_callback"] = sol::overload(
+        [](CallbackId id)
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            backend->clear_callbacks.push_back(id);
+        },
+        []()
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto caller = backend->get_current_callback();
+            switch (caller.type)
+            {
+            case CallbackType::Normal:
+                backend->clear_callbacks.push_back(caller.id);
+                break;
+            case CallbackType::Entity:
+                backend->clear_entity_hooks.push_back({caller.uid, caller.id});
+                break;
+            case CallbackType::Screen:
+                backend->clear_screen_hooks.push_back({caller.uid, caller.id});
+                break;
+            case CallbackType::None:
+            default:
+                break;
+            }
+        });
 
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
@@ -928,6 +949,7 @@ end
                     }
 
                     VanillaRenderContext render_ctx;
+                    backend->set_current_callback(screen_id, id, CallbackType::Screen);
                     return backend->handle_function_with_return<bool>(fun, self, render_ctx).value_or(false);
                 });
             backend->screen_hooks.push_back({screen_id, id});
@@ -952,6 +974,7 @@ end
                         return;
                     }
                     VanillaRenderContext render_ctx;
+                    backend->set_current_callback(screen_id, id, CallbackType::Screen);
                     backend->handle_function(fun, self, render_ctx);
                 });
             backend->screen_hooks.push_back({screen_id, id});
@@ -983,7 +1006,7 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
-
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
                 });
             backend->hook_entity_dtor(movable);
@@ -1008,7 +1031,7 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
-
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     backend->handle_function(fun, lua["cast_entity"](self));
                 });
             backend->hook_entity_dtor(movable);
@@ -1033,7 +1056,7 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
-
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     backend->handle_function(fun, lua["cast_entity"](self));
                 });
             backend->hook_entity_dtor(entity);
@@ -1058,7 +1081,7 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
-
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](killer));
                 });
             backend->hook_entity_dtor(entity);
@@ -1085,7 +1108,7 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
-
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
                 });
             backend->hook_entity_dtor(entity);
@@ -1113,7 +1136,7 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
-
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](damage_dealer), damage_amount, velocity_x, velocity_y, stun_amount, iframes).value_or(false);
                 });
             backend->hook_entity_dtor(entity);
@@ -1139,7 +1162,7 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
-
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
                 });
             backend->hook_entity_dtor(entity);
@@ -1164,7 +1187,7 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
-
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](collision_entity)).value_or(false);
                 });
             backend->hook_entity_dtor(e);
@@ -1189,7 +1212,7 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
-
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     return backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](collision_entity)).value_or(false);
                 });
             backend->hook_entity_dtor(e);
