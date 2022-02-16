@@ -32,6 +32,7 @@
 #include "usertypes/entity_casting_lua.hpp"
 #include "usertypes/entity_lua.hpp"
 #include "usertypes/flags_lua.hpp"
+#include "usertypes/game_manager_lua.hpp"
 #include "usertypes/gui_lua.hpp"
 #include "usertypes/hitbox_lua.hpp"
 #include "usertypes/level_lua.hpp"
@@ -120,6 +121,7 @@ end
     NEntitiesLiquids::register_usertypes(lua);
     NParticles::register_usertypes(lua);
     NSaveContext::register_usertypes(lua);
+    NGM::register_usertypes(lua);
     NState::register_usertypes(lua);
     NPRNG::register_usertypes(lua);
     NScreen::register_usertypes(lua);
@@ -1271,6 +1273,14 @@ end
 
     /// Change the amount of frames after the damage from poison is applied
     lua["change_poison_timer"] = change_poison_timer;
+
+    auto create_illumination = sol::overload(
+        static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),
+        static_cast<Illumination* (*)(Color color, float size, uint32_t uid)>(::create_illumination));
+    /// Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+    lua["create_illumination"] = create_illumination;
+    /// Refreshes an Illumination, keeps it from fading out
+    lua["refresh_illumination"] = refresh_illumination;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

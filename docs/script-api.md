@@ -1399,38 +1399,6 @@ Who pops out the spaceship for a tiamat/hundun win, this is set upon the spacesh
 - [`int time_startup`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) &StateMemory::time_startup
 - [`LogicList logic`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) &StateMemory::logic
 - [`LiquidPhysics liquid`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) &StateMemory::liquid_physics
-### `GameManager`
-- [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
-- [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
-- [`ScreenIntro screen_intro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_intro) &GameManager::screen_intro
-- [`ScreenPrologue screen_prologue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_prologue) &GameManager::screen_prologue
-- [`ScreenTitle screen_title`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_title) &GameManager::screen_title
-- [`ScreenMenu screen_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_menu) &GameManager::screen_menu
-- [`ScreenOptions screen_options`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_options) &GameManager::screen_options
-- [`ScreenPlayerProfile screen_player_profile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_player_profile) &GameManager::screen_player_profile
-- [`ScreenLeaderboards screen_leaderboards`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_leaderboards) &GameManager::screen_leaderboards
-- [`ScreenSeedInput screen_seed_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_seed_input) &GameManager::screen_seed_input
-- [`ScreenCamp screen_camp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) &GameManager::screen_camp
-- [`ScreenLevel screen_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) &GameManager::screen_level
-- [`ScreenOnlineLoading screen_online_loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_loading) &GameManager::screen_online_loading
-- [`ScreenOnlineLobby screen_online_lobby`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_lobby) &GameManager::screen_online_lobby
-- [`PauseUI pause_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_ui) &GameManager::pause_ui
-- [`JournalUI journal_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) &GameManager::journal_ui
-- [`SaveRelated save_related`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_related) &GameManager::save_related
-### `SaveRelated`
-- [`JournalPopupUI journal_popup_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_popup_ui) &SaveRelated::journal_popup_ui
-### `JournalPopupUI`
-- [`TextureRenderingInfo wiggling_page_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggling_page_icon) &JournalPopupUI::wiggling_page_icon
-- [`TextureRenderingInfo black_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black_background) &JournalPopupUI::black_background
-- [`TextureRenderingInfo button_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_icon) &JournalPopupUI::button_icon
-- [`float wiggling_page_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggling_page_angle) &JournalPopupUI::wiggling_page_angle
-- [`int chapter_to_show`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_to_show) &JournalPopupUI::chapter_to_show
-- [`int entry_to_show`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entry_to_show) &JournalPopupUI::entry_to_show
-- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &JournalPopupUI::timer
-- [`float slide_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=slide_position) &JournalPopupUI::slide_position
-### `GameProps`
-- [`int buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &GameProps::buttons
-- [`bool game_has_focus`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) &GameProps::game_has_focus
 ### `LightParams`
 - [`float red`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) &LightParams::red
 - [`float green`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) &LightParams::green
@@ -1528,6 +1496,38 @@ Derived from [`Logic`](#logic)
 - [`int result_announcement_timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=result_announcement_timer) &LogicDiceShop::result_announcement_timer
 - [`int won_prizes_count`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=won_prizes_count) &LogicDiceShop::won_prizes_count
 - [`int balance`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=balance) &LogicDiceShop::balance
+### `GameManager`
+- [`GameProps game_props`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) &GameManager::game_props
+- [`ScreenLogo screen_logo`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) &GameManager::screen_logo
+- [`ScreenIntro screen_intro`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_intro) &GameManager::screen_intro
+- [`ScreenPrologue screen_prologue`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_prologue) &GameManager::screen_prologue
+- [`ScreenTitle screen_title`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_title) &GameManager::screen_title
+- [`ScreenMenu screen_menu`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_menu) &GameManager::screen_menu
+- [`ScreenOptions screen_options`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_options) &GameManager::screen_options
+- [`ScreenPlayerProfile screen_player_profile`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_player_profile) &GameManager::screen_player_profile
+- [`ScreenLeaderboards screen_leaderboards`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_leaderboards) &GameManager::screen_leaderboards
+- [`ScreenSeedInput screen_seed_input`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_seed_input) &GameManager::screen_seed_input
+- [`ScreenCamp screen_camp`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) &GameManager::screen_camp
+- [`ScreenLevel screen_level`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) &GameManager::screen_level
+- [`ScreenOnlineLoading screen_online_loading`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_loading) &GameManager::screen_online_loading
+- [`ScreenOnlineLobby screen_online_lobby`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_online_lobby) &GameManager::screen_online_lobby
+- [`PauseUI pause_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_ui) &GameManager::pause_ui
+- [`JournalUI journal_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) &GameManager::journal_ui
+- [`SaveRelated save_related`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_related) &GameManager::save_related
+### `SaveRelated`
+- [`JournalPopupUI journal_popup_ui`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_popup_ui) &SaveRelated::journal_popup_ui
+### `JournalPopupUI`
+- [`TextureRenderingInfo wiggling_page_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggling_page_icon) &JournalPopupUI::wiggling_page_icon
+- [`TextureRenderingInfo black_background`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black_background) &JournalPopupUI::black_background
+- [`TextureRenderingInfo button_icon`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_icon) &JournalPopupUI::button_icon
+- [`float wiggling_page_angle`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggling_page_angle) &JournalPopupUI::wiggling_page_angle
+- [`int chapter_to_show`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_to_show) &JournalPopupUI::chapter_to_show
+- [`int entry_to_show`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entry_to_show) &JournalPopupUI::entry_to_show
+- [`int timer`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) &JournalPopupUI::timer
+- [`float slide_position`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=slide_position) &JournalPopupUI::slide_position
+### `GameProps`
+- [`int buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &GameProps::buttons
+- [`bool game_has_focus`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) &GameProps::game_has_focus
 ### `PRNG`
 PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.

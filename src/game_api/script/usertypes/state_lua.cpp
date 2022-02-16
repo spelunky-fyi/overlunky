@@ -1,9 +1,7 @@
 #include "state_lua.hpp"
 
-#include "game_manager.hpp"
 #include "level_api.hpp"
 #include "online.hpp"
-#include "rpc.hpp"
 #include "state.hpp"
 
 #include <sol/sol.hpp>
@@ -556,70 +554,6 @@ void register_usertypes(sol::state& lua)
     state_usertype["screen_change_counter"] = &StateMemory::screen_change_counter;
     state_usertype["time_startup"] = &StateMemory::time_startup;
 
-    lua.new_usertype<GameManager>(
-        "GameManager",
-        "game_props",
-        &GameManager::game_props,
-        "screen_logo",
-        &GameManager::screen_logo,
-        "screen_intro",
-        &GameManager::screen_intro,
-        "screen_prologue",
-        &GameManager::screen_prologue,
-        "screen_title",
-        &GameManager::screen_title,
-        "screen_menu",
-        &GameManager::screen_menu,
-        "screen_options",
-        &GameManager::screen_options,
-        "screen_player_profile",
-        &GameManager::screen_player_profile,
-        "screen_leaderboards",
-        &GameManager::screen_leaderboards,
-        "screen_seed_input",
-        &GameManager::screen_seed_input,
-        "screen_camp",
-        &GameManager::screen_camp,
-        "screen_level",
-        &GameManager::screen_level,
-        "screen_online_loading",
-        &GameManager::screen_online_loading,
-        "screen_online_lobby",
-        &GameManager::screen_online_lobby,
-        "pause_ui",
-        &GameManager::pause_ui,
-        "journal_ui",
-        &GameManager::journal_ui,
-        "save_related",
-        &GameManager::save_related);
-    lua.new_usertype<SaveRelated>(
-        "SaveRelated",
-        "journal_popup_ui",
-        &SaveRelated::journal_popup_ui);
-    lua.new_usertype<JournalPopupUI>(
-        "JournalPopupUI",
-        "wiggling_page_icon",
-        &JournalPopupUI::wiggling_page_icon,
-        "black_background",
-        &JournalPopupUI::black_background,
-        "button_icon",
-        &JournalPopupUI::button_icon,
-        "wiggling_page_angle",
-        &JournalPopupUI::wiggling_page_angle,
-        "chapter_to_show",
-        &JournalPopupUI::chapter_to_show,
-        "entry_to_show",
-        &JournalPopupUI::entry_to_show,
-        "timer",
-        &JournalPopupUI::timer,
-        "slide_position",
-        &JournalPopupUI::slide_position);
-    lua.new_usertype<GameProps>(
-        "GameProps",
-        "buttons",
-        &GameProps::buttons,
-        "game_has_focus",
-        &GameProps::game_has_focus);
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",
@@ -666,14 +600,6 @@ void register_usertypes(sol::state& lua)
         &Illumination::enabled,
         "layer",
         &Illumination::layer);
-
-    auto create_illumination = sol::overload(
-        static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),
-        static_cast<Illumination* (*)(Color color, float size, uint32_t uid)>(::create_illumination));
-    /// Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
-    lua["create_illumination"] = create_illumination;
-    /// Refreshes an Illumination, keeps it from fading out
-    lua["refresh_illumination"] = refresh_illumination;
 
     lua.new_usertype<Camera>(
         "Camera",
