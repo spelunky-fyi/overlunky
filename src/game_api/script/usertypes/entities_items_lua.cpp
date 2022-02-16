@@ -11,9 +11,9 @@ void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_bomb"] = &Entity::as<Bomb>;
     lua["Entity"]["as_projectile"] = &Entity::as<Projectile>;
-    lua["Entity"]["as_Purchasable"] = &Entity::as<Purchasable>;
+    lua["Entity"]["as_purchasable"] = &Entity::as<Purchasable>;
     lua["Entity"]["as_bow"] = &Entity::as<Bow>;
-    lua["Entity"]["as_dummyPurchasableentity"] = &Entity::as<DummyPurchasableEntity>;
+    lua["Entity"]["as_dummypurchasableentity"] = &Entity::as<DummyPurchasableEntity>;
     lua["Entity"]["as_backpack"] = &Entity::as<Backpack>;
     lua["Entity"]["as_jetpack"] = &Entity::as<Jetpack>;
     lua["Entity"]["as_teleporterbackpack"] = &Entity::as<TeleporterBackpack>;
