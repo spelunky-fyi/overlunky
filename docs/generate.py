@@ -389,7 +389,10 @@ for file in api_files:
                 if paramMatch:
                     varName = paramMatch[1]
                     mVarReturn = re.search(fr"return[^;]*{varName}\.([\w.]+)", cpp)
-                    cpp_name = mVarReturn[1] if mVarReturn else cpp
+                    if mVarReturn:
+                        cpp_name = mVarReturn[1]
+                        cpp_name = cpp_name.replace(".", "::")
+                        cpp = f"&{underlying_cpp_type['name']}::{cpp_name}"
                 else:
                     cpp_name = cpp
             else:
@@ -443,7 +446,7 @@ for file in api_files:
                         }
                     )
                 else:
-                    mReturnType = re.search(r"->(\w+){", cpp)
+                    mReturnType = re.search(r"->(\w+){", var[1]) #Use var[1] instead of cpp because it could be replaced on the sol::property stuff
                     if mReturnType:
                         sig = f"{mReturnType[1]} {var_name}"
                         vars.append({"name": var_name, "type": cpp, "signature": sig})
