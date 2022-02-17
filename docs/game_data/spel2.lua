@@ -2944,6 +2944,11 @@ MegaJellyfish = {
   __name = "sol.MegaJellyfish.user",
   __newindex = "function"
 }
+MegaJellyfishEye = {
+  __index = "function",
+  __name = "sol.MegaJellyfishEye.user",
+  __newindex = "function"
+}
 MiniGameAsteroid = {
   __index = "function",
   __name = "sol.MiniGameAsteroid.user",
@@ -3554,6 +3559,11 @@ PreHandleRoomTilesContext = {
 }
 PreLoadLevelFilesContext = {
   __name = "sol.PreLoadLevelFilesContext.user"
+}
+Present = {
+  __index = "function",
+  __name = "sol.Present.user",
+  __newindex = "function"
 }
 PrizeDispenser = {
   __index = "function",
@@ -5994,6 +6004,9 @@ WoodenlogTrap = {
   __index = "function",
   __name = "sol.WoodenlogTrap.user",
   __newindex = "function"
+}
+XY = {
+  __name = "sol.XY.user"
 }
 YANG = {
   ANGRY = -1,
