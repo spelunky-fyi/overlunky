@@ -26,3 +26,5 @@ jobs:
         env:
           WIKI_DIR: overlunky.wiki/
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_MAIL: fake.user@github.com
+          GH_NAME: Build-Wiki Bot
