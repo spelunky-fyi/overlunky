@@ -270,9 +270,23 @@ for file in header_files:
                         r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line
                     )
                     if m:
-                        member_vars.append(
-                            {"type": m[1], "name": m[2], "comment": comment}
-                        )
+                        if m[1].endswith(",") and not (m[2].endswith(">") or m[2].endswith(")")): #Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
+                            typesAndVars = m[1]
+                            varsMatch = re.search(r"(?: *\w*,)*$", typesAndVars)
+                            varsExceptLast = varsMatch.group() #Last var is m[2]
+                            start, end = varsMatch.span()
+                            varsType = typesAndVars[:start]
+                            for mVar in re.finditer(r"(\w*),", varsExceptLast):
+                                member_vars.append(
+                                    {"type": varsType, "name": mVar[1], "comment": comment}
+                                )
+                            member_vars.append(
+                                {"type": varsType, "name": m[2], "comment": comment}
+                            )
+                        else:
+                            member_vars.append(
+                                {"type": m[1], "name": m[2], "comment": comment}
+                            )
                         comment = []
             elif brackets_depth == 0:
                 classes.append(

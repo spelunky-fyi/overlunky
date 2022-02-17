@@ -3813,7 +3813,6 @@ Derived from [`Entity`](#entity)
 - [`nil spawn_effects()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_effects) &ThemeInfo::spawn_effects
 - [`string get_level_file()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_file) &ThemeInfo::get_level_file
 - [`int get_theme_id()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_id) &ThemeInfo::get_theme_id
-- [`// whereas get_theme_id()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_id) &ThemeInfo::get_theme_id
 - [`int get_base_id()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_id) &ThemeInfo::get_base_id
 - [`int get_floor_spreading_type()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type) &ThemeInfo::get_floor_spreading_type
 - [`int get_floor_spreading_type2()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type2) &ThemeInfo::get_floor_spreading_type2
@@ -3924,6 +3923,7 @@ All `.lvl` files are loaded relative to `Data/Levels`, but they can be completel
 - [`float door2_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) &DoorCoords::door2_y
 ### `LevelGenSystem`
 - [`ShopType shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
+- [`ShopType backlayer_shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer_shop_type) &LevelGenSystem::backlayer_shop_type
 - [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &LevelGenSystem::spawn_x
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &LevelGenSystem::spawn_y
 - [`int spawn_room_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) &LevelGenSystem::spawn_room_x
@@ -4229,8 +4229,8 @@ Pop unique identifier from the stack. Put after the input.
 Draw image to window.
 ### `ImVec2`
 Current mouse cursor position in screen coordinates.
-- [`x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ImVec2::x
-- [`float                                   x, y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ImVec2::y
+- [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ImVec2::x
+- [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ImVec2::y
 ### `ImGuiIO`
 - [`ImVec2      displaysize`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) &ImGuiIO::DisplaySize
 - [`float       framerate`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) &ImGuiIO::Framerate
