@@ -1,7 +1,6 @@
 #pragma once
 
 #include "game_allocator.hpp"
-#include "imgui.h"
 #include "level_api_types.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
