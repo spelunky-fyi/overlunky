@@ -18,13 +18,12 @@ jobs:
       - name: Build
         run: |
           cd docs
-          mkdir overlunky.wiki
           python ./generate.py
 
       - name: Publish
         uses: Andrew-Chen-Wang/github-wiki-action@v2
         env:
-          WIKI_DIR: overlunky.wiki/
+          WIKI_DIR: docs/overlunky.wiki/
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_MAIL: fake.user@github.com
-          GH_NAME: Build-Wiki Bot
+          GH_NAME: Build-Wiki-Bot

@@ -12,6 +12,10 @@ def setup_stdout(filename):
     sys.stdout = open(f"overlunky.wiki/{filename}.md", "w")
 
 
+def print_collecting_info(data):
+    print(f"Collecting {data} data...")
+
+
 if not os.path.exists("overlunky.wiki"):
     os.makedirs("overlunky.wiki")
 
@@ -184,7 +188,7 @@ def print_af(lf, af):
         print(com)
 
 
-print("Collecting rpc data...")
+print_collecting_info("rpc")
 for file in header_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -209,7 +213,7 @@ for file in header_files:
         else:
             comment = []
 
-print("Collecting class data...")
+print_collecting_info("class")
 for file in header_files:
     if file.endswith("script.hpp"):
         continue
@@ -301,7 +305,7 @@ for file in header_files:
                 member_funs = {}
                 member_vars = []
 
-print("Collecting events data...")
+print_collecting_info("events")
 for file in api_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -318,7 +322,7 @@ for file in api_files:
         else:
             comment = []
 
-print("Collecting functions data...")
+print_collecting_info("functions")
 for file in api_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -342,7 +346,7 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
-print("Collecting usertypes data...")
+print_collecting_info("usertypes")
 for file in api_files:
     data = open(file, "r").read()
     data = data.replace("\n", "")
@@ -437,7 +441,7 @@ for file in api_files:
                     vars.append({"name": var_name, "type": cpp})
         types.append({"name": name, "vars": vars, "base": base})
 
-print("Collecting entity casts data...")
+print_collecting_info("entitys")
 for file in api_files:
     with open(file) as fp:
         line = fp.readline()
@@ -448,7 +452,7 @@ for file in api_files:
             line = fp.readline()
 known_casts.sort()
 
-print("Collecting additional usertypes data...")
+print_collecting_info("additional usertypes")
 for file in api_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -467,7 +471,7 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
-print("Collecting enums data...")
+print_collecting_info("enums")
 for file in api_files:
     data = open(file, "r").read()
     data = data.replace("\n", "")
@@ -561,7 +565,7 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
-print("Collecting libraries data...")
+print_collecting_info("libraries")
 for file in api_files:
     data = open(file, "r").read()
     data = data.replace("\n", "")
@@ -572,7 +576,7 @@ for file in api_files:
         for lib in libs:
             lualibs.append(lib.replace("sol::lib::", ""))
 
-print("Collecting aliases data...")
+print_collecting_info("aliases")
 data = open("../src/game_api/aliases.hpp", "r").read().split("\n")
 for line in data:
     if not line.endswith("NoAlias"):
