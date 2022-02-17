@@ -254,6 +254,7 @@ end
         return backend->cbcount++;
     };
     /// Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.
+    // lua["clear_callback"] = [](sol::optional<CallbackId> id) -> void {};
     lua["clear_callback"] = sol::overload(
         [](CallbackId id)
         {
