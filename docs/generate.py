@@ -1,9 +1,7 @@
 import re
 
-# redirect stdout to script-api.md
+# redirect stdout to the right files
 import sys
-
-sys.stdout = open("script-api.md", "w")
 
 header_files = [
     "../src/game_api/math.hpp",
@@ -152,8 +150,8 @@ def rpcfunc(name):
 def replace_all(text, dic):
     for i, j in dic.items():
         pos = text.find(i)
-        br2 = text.find('`', pos + len(i))
-        br1 = text.rfind('`', 0, pos)
+        br2 = text.find("`", pos + len(i))
+        br1 = text.rfind("`", 0, pos)
         if pos > 0 and br1 >= 0 and br2 > 0:
             continue
         text = text.replace(i, j)
@@ -252,7 +250,9 @@ for file in header_files:
                     if m:
                         name = m[3]
                         # move ctor is useless for Lua
-                        is_move_ctr = re.fullmatch(fr"\s*{name}\s*&&[^,]*", m[4]) and not m[2]
+                        is_move_ctr = (
+                            re.fullmatch(fr"\s*{name}\s*&&[^,]*", m[4]) and not m[2]
+                        )
                         if not is_move_ctr:
                             if name not in member_funs:
                                 member_funs[name] = []
@@ -347,7 +347,7 @@ for file in api_files:
             (item for item in classes if item["name"] == cpp_type), dict()
         )
         if "member_funs" not in underlying_cpp_type:
-            continue # whatever, I'm not fixing this
+            continue  # whatever, I'm not fixing this
             raise RuntimeError(
                 "No member_funs found. Did you forget to include a header file at the top of the generate script?"
             )
@@ -560,6 +560,8 @@ for line in data:
             type = replace_all(m.group(2), replace)
             aliases.append({"name": name, "type": type})
 
+sys.stdout = open("overlunky.wiki/Home.md", "w")
+
 print("# Overlunky/Playlunky Lua API")
 print(
     "- We try not to make breaking changes to the API, but some stupid errors or new stuff that was guessed wrong may have to be changed. Sorry!"
@@ -670,6 +672,23 @@ print(
 Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules."""
 )
 
+print("## Aliases")
+print(
+    "We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id."
+)
+for alias in aliases:
+    name = alias["name"]
+    type = alias["type"]
+    print(f"### {name} == {type}")
+
+print("## External Function Library")
+print(
+    'If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting'
+)
+
+
+sys.stdout = open("overlunky.wiki/Globals.md", "w")
+
 print("## Global variables")
 print("""These variables are always there to use.""")
 for lf in funcs:
@@ -764,6 +783,9 @@ for lf in deprecated_funcs:
         for com in lf["comment"]:
             print(com)
 
+
+sys.stdout = open("overlunky.wiki/Types.md", "w")
+
 print("## Types")
 print(
     "Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:"
@@ -817,6 +839,9 @@ for type in types:
             for com in var["comment"]:
                 print(com)
 
+
+sys.stdout = open("overlunky.wiki/Automatic casting of entities.md", "w")
+
 print("## Automatic casting of entities")
 print(
     "When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions."
@@ -825,11 +850,16 @@ print("")
 print(
     "To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)"
 )
-print("You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks")
+print(
+    "You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks"
+)
 print("")
 print("For reference, the available `as_<typename>` functions are listed below:")
 for known_cast in known_casts:
     print("- " + known_cast)
+
+
+sys.stdout = open("overlunky.wiki/Enums.md", "w")
 
 print("## Enums")
 print("Enums are like numbers but in text that's easier to remember. Example:")
@@ -864,17 +894,3 @@ for type in enums:
             print("- " + var["type"])
         if "docs" in var:
             print(var["docs"])
-
-print("## Aliases")
-print(
-    "We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id."
-)
-for alias in aliases:
-    name = alias["name"]
-    type = alias["type"]
-    print(f"### {name} == {type}")
-
-print("## External Function Library")
-print(
-    'If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting'
-)
