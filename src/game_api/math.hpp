@@ -89,11 +89,118 @@ struct AABB
     float bottom{0};
 };
 
+struct XY
+{
+    XY() = default;
+
+    XY(const XY&) = default;
+
+    XY(float x_, float y_)
+        : x(x_), y(y_){};
+
+    XY(std::pair<float, float> p)
+        : x(p.first), y(p.second){};
+
+    XY& rotate(float angle, float px, float py)
+    {
+        const float sin_a{std::sin(angle)};
+        const float cos_a{std::cos(angle)};
+        const XY p{px, py};
+        const XY mp{-px, -py};
+
+        *this += mp;
+        {
+            const XY copy = *this;
+            *this = {
+                copy.x * cos_a - copy.y * sin_a,
+                copy.y * cos_a + copy.x * sin_a,
+            };
+        }
+        *this = *this + p;
+        return *this;
+    }
+
+    XY operator+(const XY& a) const
+    {
+        return XY{x + a.x, y + a.y};
+    }
+    XY operator-(const XY& a) const
+    {
+        return XY{x - a.x, y - a.y};
+    }
+    XY operator*(const XY& a) const
+    {
+        return XY{x * a.x, y * a.y};
+    }
+    XY operator/(const XY& a) const
+    {
+        return XY{x / a.x, y / a.y};
+    }
+    XY& operator+=(const XY& a)
+    {
+        x += a.x;
+        y += a.y;
+        return *this;
+    }
+    XY& operator-=(const XY& a)
+    {
+        x -= a.x;
+        y -= a.y;
+        return *this;
+    }
+    XY& operator++()
+    {
+        x++;
+        y++;
+        return *this;
+    }
+    XY operator++(int)
+    {
+        XY old = *this;
+        operator++();
+        return old;
+    }
+    XY& operator--()
+    {
+        x--;
+        y--;
+        return *this;
+    }
+    XY operator--(int)
+    {
+        XY old = *this;
+        operator--();
+        return old;
+    }
+    bool operator==(const XY a) const
+    {
+        return x == a.x && y == a.y;
+    }
+    operator std::pair<float, float>()
+    {
+        return {x, y};
+    }
+    operator std::tuple<float, float>()
+    {
+        return {x, y};
+    }
+    operator std::tuple<float&, float&>()
+    {
+        return {x, y};
+    }
+
+    float x{0};
+    float y{0};
+};
+
 struct Quad
 {
     Quad() = default;
 
     Quad(const Quad&) = default;
+
+    Quad(XY& bottom_left_, XY& bottom_right_, XY& top_right_, XY& top_left_)
+        : bottom_left_x(bottom_left_.x), bottom_left_y(bottom_left_.y), bottom_right_x(bottom_right_.x), bottom_right_y(bottom_right_.y), top_right_x(top_right_.x), top_right_y(top_right_.y), top_left_x(top_left_.x), top_left_y(top_left_.y){};
 
     Quad(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)
         : bottom_left_x(_bottom_left_x), bottom_left_y(_bottom_left_y), bottom_right_x(_bottom_right_x), bottom_right_y(_bottom_right_y), top_right_x(_top_right_x), top_right_y(_top_right_y), top_left_x(_top_left_x), top_left_y(_top_left_y){};
@@ -132,28 +239,18 @@ struct Quad
         const float sin_a{std::sin(angle)};
         const float cos_a{std::cos(angle)};
 
-        using vec = std::pair<float, float>;
-        const vec p{px, py};
-        const vec mp{-px, -py};
+        const XY p{px, py};
+        const XY mp{-px, -py};
 
-        auto rotate_around_pivot = [=](vec in) -> vec
+        auto rotate_around_pivot = [=](XY in) -> XY
         {
-            auto add = [](vec lhs, vec rhs) -> vec
-            {
-                return {
-                    lhs.first + rhs.first,
-                    lhs.second + rhs.second,
-                };
+            in += mp;
+            const XY old = in;
+            in = {
+                old.x * cos_a - old.y * sin_a,
+                old.y * cos_a + old.x * sin_a,
             };
-            in = add(in, mp);
-            {
-                auto [x, y] = in;
-                in = {
-                    x * cos_a - y * sin_a,
-                    y * cos_a + x * sin_a,
-                };
-            }
-            in = add(in, p);
+            in += p;
             return in;
         };
 

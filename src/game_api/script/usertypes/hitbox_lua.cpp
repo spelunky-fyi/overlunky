@@ -50,6 +50,28 @@ void register_usertypes(sol::state& lua)
         return AABB{sx1, sy1, sx2, sy2};
     };
 
+    lua.new_usertype<XY>(
+        "XY",
+        sol::constructors<XY(), XY(const XY&), XY(float, float)>{},
+        sol::meta_function::addition,
+        &XY::operator+,
+        sol::meta_function::subtraction,
+        &XY::operator-,
+        sol::meta_function::equal_to,
+        &XY::operator==,
+        sol::meta_function::multiplication,
+        &XY::operator*,
+        sol::meta_function::division,
+        &XY::operator/,
+        "x",
+        &XY::x,
+        "y",
+        &XY::y,
+        "rotate",
+        &XY::rotate,
+        "split",
+        &XY::operator std::pair<float, float>);
+
     /// Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
     lua.new_usertype<AABB>(
         "AABB",
@@ -81,7 +103,7 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Quad>(
         "Quad",
-        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float)>{},
+        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float), Quad(XY&, XY&, XY&, XY&)>{},
         "bottom_left_x",
         &Quad::bottom_left_x,
         "bottom_left_y",
