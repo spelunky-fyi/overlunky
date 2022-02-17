@@ -443,7 +443,12 @@ for file in api_files:
                         }
                     )
                 else:
-                    vars.append({"name": var_name, "type": cpp})
+                    mReturnType = re.search(r"->(\w+){", cpp)
+                    if mReturnType:
+                        sig = f"{mReturnType[1]} {var_name}"
+                        vars.append({"name": var_name, "type": cpp, "signature": sig})
+                    else:
+                        vars.append({"name": var_name, "type": cpp})
         types.append({"name": name, "vars": vars, "base": base})
 
 for file in api_files:
