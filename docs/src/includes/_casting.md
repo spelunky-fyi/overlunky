@@ -1,0 +1,679 @@
+# Automatic casting of entities
+When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
+
+To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)
+You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks
+
+For reference, the available `as_<typename>` functions are listed below:
+
+- as_acidbubble
+
+- as_alien
+
+- as_altar
+
+- as_ammit
+
+- as_ankhpowerup
+
+- as_anubis
+
+- as_apephead
+
+- as_apeppart
+
+- as_arrow
+
+- as_arrowtrap
+
+- as_axolotl
+
+- as_axolotlshot
+
+- as_backpack
+
+- as_bat
+
+- as_bee
+
+- as_beg
+
+- as_bgbacklayerdoor
+
+- as_bgeggshiproom
+
+- as_bgfloatingdebris
+
+- as_bgmovingstar
+
+- as_bgrelativeelement
+
+- as_bgshootingstar
+
+- as_bgshopentrence
+
+- as_bgshopkeeperprime
+
+- as_bgsurfacelayer
+
+- as_bgsurfacestar
+
+- as_bgtutorialsign
+
+- as_bigspeartrap
+
+- as_birdies
+
+- as_bodyguard
+
+- as_bomb
+
+- as_boneblock
+
+- as_boombox
+
+- as_boomerang
+
+- as_boulder
+
+- as_boulderspawner
+
+- as_bullet
+
+- as_burningropeeffect
+
+- as_button
+
+- as_cameraflash
+
+- as_cape
+
+- as_catmummy
+
+- as_caveman
+
+- as_cavemanshopkeeper
+
+- as_chain
+
+- as_chainedpushblock
+
+- as_chest
+
+- as_cinematicanchor
+
+- as_cityofgolddoor
+
+- as_clambase
+
+- as_claw
+
+- as_climbablerope
+
+- as_clonegunshot
+
+- as_cobra
+
+- as_coffin
+
+- as_coin
+
+- as_container
+
+- as_conveyorbelt
+
+- as_cookfire
+
+- as_crabman
+
+- as_critter
+
+- as_critterbeetle
+
+- as_critterbutterfly
+
+- as_crittercrab
+
+- as_critterdrone
+
+- as_critterfirefly
+
+- as_critterfish
+
+- as_critterlocust
+
+- as_critterpenguin
+
+- as_critterslime
+
+- as_crittersnail
+
+- as_crocman
+
+- as_crossbeam
+
+- as_crushtrap
+
+- as_cursedeffect
+
+- as_cursedpot
+
+- as_decorateddoor
+
+- as_decoregeneratingblock
+
+- as_destructiblebg
+
+- as_dmalienblast
+
+- as_dmspawning
+
+- as_door
+
+- as_drill
+
+- as_dustwallapep
+
+- as_eggplantminister
+
+- as_eggplantthrower
+
+- as_eggsac
+
+- as_eggshipcenterjetflame
+
+- as_eggshipdoor
+
+- as_eggshipdoors
+
+- as_elevator
+
+- as_empressgrave
+
+- as_entity
+
+- as_excalibur
+
+- as_exitdoor
+
+- as_explosion
+
+- as_fallingplatform
+
+- as_fireball
+
+- as_firebug
+
+- as_firebugunchained
+
+- as_firefrog
+
+- as_fish
+
+- as_flame
+
+- as_flamesize
+
+- as_floor
+
+- as_fly
+
+- as_flyhead
+
+- as_forcefield
+
+- as_forestsister
+
+- as_frog
+
+- as_frostbreatheffect
+
+- as_frozenliquid
+
+- as_fxalienblast
+
+- as_fxankhbrokenpiece
+
+- as_fxankhrotatingspark
+
+- as_fxcompass
+
+- as_fxempress
+
+- as_fxfireflylight
+
+- as_fxhundunneckpiece
+
+- as_fxjellyfishstar
+
+- as_fxjetpackflame
+
+- as_fxkingusliding
+
+- as_fxlamassuattack
+
+- as_fxmainexitdoor
+
+- as_fxnecromancerankh
+
+- as_fxouroborodragonpart
+
+- as_fxouroborooccluder
+
+- as_fxpickupeffect
+
+- as_fxplayerindicator
+
+- as_fxquicksand
+
+- as_fxsalecontainer
+
+- as_fxshotgunblast
+
+- as_fxsorceressattack
+
+- as_fxsparksmall
+
+- as_fxspringtrapring
+
+- as_fxtiamathead
+
+- as_fxtiamattail
+
+- as_fxtiamattorso
+
+- as_fxtornjournalpage
+
+- as_fxunderwaterbubble
+
+- as_fxvatbubble
+
+- as_fxwaterdrop
+
+- as_fxwebbedeffect
+
+- as_fxwitchdoctorhint
+
+- as_generator
+
+- as_ghist
+
+- as_ghost
+
+- as_ghostbreath
+
+- as_giantclamtop
+
+- as_giantfish
+
+- as_giantfly
+
+- as_giantfrog
+
+- as_goldbar
+
+- as_goldmonkey
+
+- as_grub
+
+- as_gun
+
+- as_hanganchor
+
+- as_hangspider
+
+- as_hangstrand
+
+- as_hermitcrab
+
+- as_honey
+
+- as_horizontalforcefield
+
+- as_hornedlizard
+
+- as_hoverpack
+
+- as_hundun
+
+- as_hundunchest
+
+- as_hundunhead
+
+- as_iceslidingsound
+
+- as_idol
+
+- as_imp
+
+- as_jetpack
+
+- as_jiangshi
+
+- as_jumpdog
+
+- as_junglespearcosmetic
+
+- as_junglespeartrap
+
+- as_jungletraptrigger
+
+- as_kapalapowerup
+
+- as_kingu
+
+- as_lahamu
+
+- as_lamassu
+
+- as_lampflame
+
+- as_landmine
+
+- as_laserbeam
+
+- as_lasertrap
+
+- as_lava
+
+- as_lavamander
+
+- as_leaf
+
+- as_leprechaun
+
+- as_lightarrow
+
+- as_lightarrowplatform
+
+- as_lightemitter
+
+- as_lightshot
+
+- as_limbanchor
+
+- as_liquid
+
+- as_liquidsurface
+
+- as_lockeddoor
+
+- as_logicalanchovyflock
+
+- as_logicalconveyorbeltsound
+
+- as_logicaldoor
+
+- as_logicaldrain
+
+- as_logicalliquidstreamsound
+
+- as_logicalminigame
+
+- as_logicalregeneratingblock
+
+- as_logicalsound
+
+- as_logicalstaticsound
+
+- as_logicaltraptrigger
+
+- as_magmaman
+
+- as_mainexit
+
+- as_mantrap
+
+- as_mattock
+
+- as_mech
+
+- as_megajellyfish
+
+- as_minigameasteroid
+
+- as_minigameship
+
+- as_minigameshipoffset
+
+- as_mole
+
+- as_monkey
+
+- as_monster
+
+- as_mosquito
+
+- as_motherstatue
+
+- as_mount
+
+- as_movable
+
+- as_movingicon
+
+- as_mummy
+
+- as_mummyfliessound
+
+- as_necromancer
+
+- as_npc
+
+- as_octopus
+
+- as_olmec
+
+- as_olmeccannon
+
+- as_olmecfloater
+
+- as_olmite
+
+- as_onfireeffect
+
+- as_orb
+
+- as_osirishand
+
+- as_osirishead
+
+- as_ouroborocameraanchor
+
+- as_ouroborocamerazoomin
+
+- as_palacesign
+
+- as_parachutepowerup
+
+- as_pet
+
+- as_pipe
+
+- as_pipetravelersound
+
+- as_player
+
+- as_playerbag
+
+- as_playerghost
+
+- as_poisonedeffect
+
+- as_poledeco
+
+- as_portal
+
+- as_pot
+
+- as_powerup
+
+- as_powerupcapable
+
+- as_prizedispenser
+
+- as_protoshopkeeper
+
+- as_punishball
+
+- as_pushblock
+
+- as_qilin
+
+- as_quicksand
+
+- as_quicksandsound
+
+- as_quillback
+
+- as_regenblock
+
+- as_robot
+
+- as_rockdog
+
+- as_rollingitem
+
+- as_roomlight
+
+- as_roomowner
+
+- as_rubble
+
+- as_scarab
+
+- as_sceptershot
+
+- as_scorpion
+
+- as_shield
+
+- as_shootingstarspawner
+
+- as_shopkeeper
+
+- as_skeleton
+
+- as_skulldroptrap
+
+- as_sleepbubble
+
+- as_slidingwallceiling
+
+- as_snaptrap
+
+- as_sorceress
+
+- as_soundshot
+
+- as_spark
+
+- as_sparktrap
+
+- as_spear
+
+- as_specialshot
+
+- as_spider
+
+- as_spikeballtrap
+
+- as_splashbubblegenerator
+
+- as_stickytrap
+
+- as_stretchchain
+
+- as_switch
+
+- as_tadpole
+
+- as_teleporter
+
+- as_teleporterbackpack
+
+- as_teleportingborder
+
+- as_telescope
+
+- as_tentacle
+
+- as_tentaclebottom
+
+- as_terra
+
+- as_thinice
+
+- as_tiamat
+
+- as_tiamatshot
+
+- as_timedforcefield
+
+- as_timedpowderkeg
+
+- as_timedshot
+
+- as_torch
+
+- as_torchflame
+
+- as_totemtrap
+
+- as_transferfloor
+
+- as_trappart
+
+- as_treasure
+
+- as_treasurehook
+
+- as_truecrownpowerup
+
+- as_tun
+
+- as_tv
+
+- as_udjatsocket
+
+- as_ufo
+
+- as_unchainedspikeball
+
+- as_ushabti
+
+- as_vampire
+
+- as_vanhorsing
+
+- as_vlad
+
+- as_vladscape
+
+- as_waddler
+
+- as_walkingmonster
+
+- as_walltorch
+
+- as_webgun
+
+- as_webshot
+
+- as_weteffect
+
+- as_witchdoctor
+
+- as_witchdoctorskull
+
+- as_woodenlogtrap
+
+- as_yama
+
+- as_yang
+
+- as_yellowcape
+
+- as_yetiking
+
+- as_yetiqueen

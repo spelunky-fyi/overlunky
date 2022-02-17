@@ -9,15 +9,15 @@ import sys
 def setup_stdout(filename):
     sys.stdout = sys.__stdout__
     print(f"Generating file '{filename}'...")
-    sys.stdout = open(f"overlunky.wiki/{filename}.md", "w")
+    sys.stdout = open(f"src/includes/{filename}.md", "w")
 
 
 def print_collecting_info(data):
     print(f"Collecting {data} data...")
 
 
-if not os.path.exists("overlunky.wiki"):
-    os.makedirs("overlunky.wiki")
+if not os.path.exists("src/includes"):
+    os.makedirs("src/includes")
 
 header_files = [
     "../src/game_api/math.hpp",
@@ -182,7 +182,8 @@ def print_af(lf, af):
     param = replace_all(af["param"], replace)
     fun = f"{ret} {name}({param})".strip()
     search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-    print(f"### [`{name}`]({search_link})")
+    print(f"## {name}")
+    print(f"\n> Search examples for [`{name}`]({search_link})\n")
     print(f"`{fun}`<br/>")
     for com in lf["comment"]:
         print(com)
@@ -534,7 +535,7 @@ for file in api_files:
                     current_var_to_mod = var_to_mod
                     collected_docs = ""
                 else:
-                    collected_docs += "\\\n" + var_name
+                    collected_docs += var_name
         if current_var_to_mod:
             current_var_to_mod["docs"] = collected_docs
 
@@ -586,9 +587,10 @@ for line in data:
             type = replace_all(m.group(2), replace)
             aliases.append({"name": name, "type": type})
 
-setup_stdout("Home")
+setup_stdout("_home")
 
 print("# Overlunky/Playlunky Lua API")
+print("## Read this first\n")
 print(
     "- We try not to make breaking changes to the API, but some stupid errors or new stuff that was guessed wrong may have to be changed. Sorry!"
 )
@@ -608,25 +610,25 @@ print(
     "- This doc is up to date for the Overlunky [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) and Playlunky [nightly build](https://github.com/spelunky-fyi/Playlunky/releases/tag/nightly). If you're using a stable release from the past, you might find some things here don't work."
 )
 print(
-    "- You can find changes to and earlier versions of this doc [here](https://github.com/spelunky-fyi/overlunky/commits/main/docs/script-api.md)."
-)
-print(
-    "- Click on the names of functions or fields to search for examples on how to use that function or variable. **There's also a handy dandy sliced hamburger in the top left corner of this doc to search global functions, types and enums without clutter.**"
-)
-print(
     "- Set `OL_DEBUG=1` in the same environment where the game is running to keep the Overlunky terminal open for better debug prints. This could be `cmd` or even the system environment variables if playing on Steam. Playlunky will also print the messages to terminal (even from Overlunky) if ran with the `-console` switch."
 )
 
-print("## Lua libraries")
+print("\n## External Function Library")
+print(
+    'If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting'
+)
+
+print("\n# Lua libraries")
 print(
     "The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6). We're using Lua 5.4 with the [Sol C++ binding](https://sol2.readthedocs.io/en/latest/)."
 )
 for lib in lualibs:
-    print("### `" + lib + "`")
-print("### `json`")
+    print("\n## " + lib + "")
+print("\n## json")
 print(
     """To save data in your mod it makes a lot of sense to use `json` to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:
-```Lua
+
+```lua
 local some_mod_data_that_should_be_saved = {{
     kills = 0,
     unlocked = false
@@ -644,10 +646,11 @@ set_callback(function(load_ctx)
 end, ON.LOAD)
 ```"""
 )
-print("### `inspect`")
+print("\n## inspect")
 print(
     """This module is a great substitute for `tostring` because it can convert any type to a string and thus helps a lot with debugging. Use for example like this:
-```Lua
+
+```lua
 local look_ma_no_tostring = {
     number = 15,
     nested_table = {
@@ -669,10 +672,11 @@ message(inspect(look_ma_no_tostring))
 ]]
 ```"""
 )
-print("### `format`")
+print("\n## format")
 print(
     """This allows you to make strings without having to do a lot of `tostring` and `..` by placing your variables directly inside of the string. Use `F` in front of your string and wrap variables you want to print in `{}`, for example like this:
-```Lua
+
+```lua
 for _, player in players do
     local royal_title = nil
     if player:is_female() then
@@ -686,45 +690,42 @@ end
 ```"""
 )
 
-print("## Unsafe mode")
+print("\n# Unsafe mode")
 print(
     "Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory."
 )
 
-print("## Modules")
+print("\n# Modules")
 print(
     """You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
 
 Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules."""
 )
 
-print("## Aliases")
+print("\n# Aliases\n")
 print(
-    "We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id."
+    "We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.\n"
 )
 for alias in aliases:
     name = alias["name"]
     type = alias["type"]
-    print(f"### {name} == {type}")
-
-print("## External Function Library")
-print(
-    'If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting'
-)
+    print(f"- **{name} == {type}**")
 
 
-setup_stdout("Globals")
+setup_stdout("_globals")
 
-print("## Global variables")
+print("# Global variables")
 print("""These variables are always there to use.""")
 for lf in funcs:
     if lf["name"] in not_functions:
         print(
-            "### [`"
+            "## "
+            + lf["name"]
+            + "\n> Search examples for [`"
             + lf["name"]
             + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
             + lf["name"]
-            + ")"
+            + ")\n"
         )
         for com in lf["comment"]:
             print(com)
@@ -738,9 +739,9 @@ funcs = [
     if not func["comment"] or not func["comment"][0] == "Deprecated"
 ]
 
-print("## Functions")
+print("# Functions")
 print(
-    "Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen."
+    "The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen."
 )
 for lf in funcs:
     if len(rpcfunc(lf["cpp"])):
@@ -761,25 +762,23 @@ for lf in funcs:
         name = lf["name"]
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-        print(f"### [`{name}`]({search_link})")
+        print(f"## {name}")
+        print(f"\n> Search examples for [`{name}`]({search_link})\n")
         print(f"`{fun}`<br/>")
         for com in lf["comment"]:
             print(com)
 
 
-print("## Deprecated Functions")
+print("# Deprecated Functions")
 print(
-    "#### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!"
+    "<aside class='warning'>These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!</aside>"
 )
 
 for lf in events:
     if lf["name"].startswith("on_"):
         print(
-            "### [`"
+            "## "
             + lf["name"]
-            + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
-            + lf["name"]
-            + ")"
         )
         for com in lf["comment"]:
             print(com)
@@ -804,20 +803,20 @@ for lf in deprecated_funcs:
         name = lf["name"]
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-        print(f"### [`{name}`]({search_link})")
+        print(f"## {name}")
+        print(f"\> Search examples for [`{name}`]({search_link})\n")
         print(f"`{fun}`<br/>")
         for com in lf["comment"]:
             print(com)
 
 
-setup_stdout("Types")
+setup_stdout("_types")
 
-print("## Types")
+print("\n# Types\n")
 print(
-    "Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:"
-)
-print(
-    """```lua
+    """<aside class='notice'>Using the api through these directly might be dangerous, as there are no safeguards preventing you from setting invalid values.</aside>
+
+```lua
 -- This doesn't make any sense, as you could just access the variables directly from players[]
 -- It's just a weird example OK!
 ids = get_entities_by_mask(MASK.PLAYER) -- This just covers CHARs
@@ -831,7 +830,7 @@ end
 ```"""
 )
 for type in types:
-    print("### `" + type["name"] + "`")
+    print("\n## " + type["name"] + "\n")
     if "comment" in type:
         for com in type["comment"]:
             print(com)
@@ -840,7 +839,7 @@ for type in types:
         bases = type["base"].split(",")
         for base in bases:
             print(" [`" + base + "`](#" + base.lower() + ")", end="")
-        print()
+        print("\n")
     for var in type["vars"]:
         search_link = (
             "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
@@ -855,20 +854,19 @@ for type in types:
                 signature = ret + " " + name + "(" + param + ")"
             signature = signature.strip()
             type_str = var["type"].replace("<", "&lt;").replace(">", "&gt;")
-            print(f"- [`{signature}`]({search_link}) {type_str}")
+            print(f"- [`{signature}`]({search_link}) {type_str}  ")
         else:
             name = var["name"]
             type_str = var["type"].replace("<", "&lt;").replace(">", "&gt;")
-            print(f"- [`{name}`]({search_link}) {type_str}")
+            print(f"- [`{name}`]({search_link}) {type_str}  ")
         if "comment" in var and var["comment"]:
-            print("\\")
             for com in var["comment"]:
-                print(com)
+                print("  " + com)
 
 
-setup_stdout("Automatic casting of entities")
+setup_stdout("_casting")
 
-print("## Automatic casting of entities")
+print("# Automatic casting of entities")
 print(
     "When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions."
 )
@@ -882,15 +880,15 @@ print(
 print("")
 print("For reference, the available `as_<typename>` functions are listed below:")
 for known_cast in known_casts:
-    print("- " + known_cast)
+    print("\n- " + known_cast)
 
 
-setup_stdout("Enums")
+setup_stdout("_enums")
 
-print("## Enums")
-print("Enums are like numbers but in text that's easier to remember. Example:")
-print(
-    """```lua
+print("\n# Enums\n")
+print("""Enums are like numbers but in text that's easier to remember.
+
+```lua
 set_callback(function()
     if state.theme == THEME.COSMIC_OCEAN then
         x, y, l = get_position(players[1].uid)
@@ -900,7 +898,7 @@ end, ON.LEVEL)
 ```"""
 )
 for type in enums:
-    print("### " + type["name"])
+    print("\n## " + type["name"] + "\n")
     if "comment" in type:
         for com in type["comment"]:
             print(com)
