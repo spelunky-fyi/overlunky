@@ -1412,9 +1412,6 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
-    const auto themes = sol::property([](LevelGenSystem& lgs)
-                                      { return std::ref(lgs.themes); });
-
     // Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect
     lua.new_usertype<LevelGenSystem>(
         "LevelGenSystem",
@@ -1434,7 +1431,8 @@ void register_usertypes(sol::state& lua)
         "exits",
         &LevelGenSystem::exit_doors_locations,
         "themes",
-        themes,
+        sol::property([](LevelGenSystem& lgs)
+                      { return std::ref(lgs.themes); }),
         "flags",
         &LevelGenSystem::flags);
 
