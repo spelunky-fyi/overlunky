@@ -22,3 +22,6 @@
 [submodule "src/sockpp"]
 	path = src/sockpp
 	url = https://github.com/fpagliughi/sockpp
+[submodule "docs/overlunky.wiki"]
+	path = docs/overlunky.wiki
+	url = git://github.com/spelunky-fyi/overlunky.wiki
