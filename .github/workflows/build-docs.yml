@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Build Wiki
 
 on:
   push:
@@ -22,8 +22,7 @@ jobs:
           python ./generate.py
 
       - name: Publish
-        uses: SwiftDocOrg/github-wiki-publish-action@v1
-        with:
-          path: "overlunky.wiki"
+        uses: Andrew-Chen-Wang/github-wiki-action@v2
         env:
-          GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WIKI_DIR: overlunky.wiki/
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
