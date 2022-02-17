@@ -1,0 +1,29 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build Docs
+    runs-on: windows-2019
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          submodules: true
+
+      - name: Build
+        run: |
+          cd docs
+          mkdir overlunky.wiki
+          python ./generate.py
+
+      - name: Publish
+        uses: SwiftDocOrg/github-wiki-publish-action@v1
+        with:
+          path: "overlunky.wiki"
+        env:
+          GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
