@@ -1417,6 +1417,8 @@ void register_usertypes(sol::state& lua)
         sol::no_constructor,
         "shop_type",
         &LevelGenSystem::shop_type,
+        "backlayer_shop_type",
+        &LevelGenSystem::backlayer_shop_type,
         "spawn_x",
         &LevelGenSystem::spawn_x,
         "spawn_y",

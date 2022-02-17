@@ -1,10 +1,13 @@
-# Overlunky Lua API
-- Everything here is still changing, don't be sad if your scripts break next week!
-- This doc doesn't have a lot of examples, that's why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples).
+# Overlunky/Playlunky Lua API
+- We try not to make breaking changes to the API, but some stupid errors or new stuff that was guessed wrong may have to be changed. Sorry!
+- If you encounter something that doesn't seem quite right, please raise your voice instead of conforming to it outright.
+- This doc is generated from dozens of C++ files by a janky-ass python script however, so there may be weird documentation errors that hopefully don't reflect weird errors in the API.
+- This doc doesn't have a lot of examples, that's why we have [examples/](https://github.com/spelunky-fyi/overlunky/tree/main/examples). There are also [sample mods](https://spelunky.fyi/mods/?q=sample) for things that make more sense in Playlunky.
 - This doc and the examples are written for a person who already knows [how to program in Lua](http://lua-users.org/wiki/TutorialDirectory).
-- This doc is up to date for the [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip). If you're using an official release from the past, you might find some things here don't work.
+- This doc is up to date for the Overlunky [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) and Playlunky [nightly build](https://github.com/spelunky-fyi/Playlunky/releases/tag/nightly). If you're using a stable release from the past, you might find some things here don't work.
 - You can find changes to and earlier versions of this doc [here](https://github.com/spelunky-fyi/overlunky/commits/main/docs/script-api.md).
-- Click on the names of things to search for examples on how to use that function or variable.
+- Click on the names of functions or fields to search for examples on how to use that function or variable. **There's also a handy dandy sliced hamburger in the top left corner of this doc to search global functions, types and enums without clutter.**
+- Set `OL_DEBUG=1` in the same environment where the game is running to keep the Overlunky terminal open for better debug prints. This could be `cmd` or even the system environment variables if playing on Steam. Playlunky will also print the messages to terminal (even from Overlunky) if ran with the `-console` switch.
 ## Lua libraries
 The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6). We're using Lua 5.4 with the [Sol C++ binding](https://sol2.readthedocs.io/en/latest/).
 ### `math`
@@ -157,8 +160,8 @@ Add global callback function to be called after `frames` engine frames. This tim
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 Add global callback function to be called on an [event](#on).
 ### [`clear_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_callback)
-`nil clear_callback(CallbackId id)`<br/>
-Clear previously added callback `id`
+`nil clear_callback()`<br/>
+Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.
 ### [`load_script`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
 `nil load_script(string id)`<br/>
 Load another script by id "author/name"
@@ -3871,6 +3874,74 @@ Derived from [`Entity`](#entity)
 - [`nil spawn_decoration2()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_decoration2) &ThemeInfo::spawn_decoration2
 - [`nil spawn_extra()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_extra) &ThemeInfo::spawn_extra
 - [`nil unknown_v51()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v51) &ThemeInfo::unknown_v51
+### `CustomTheme`
+Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
+- [`CustomTheme(int theme_id_, int base_theme_, bool defaults)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CustomTheme) 
+- [`CustomTheme(int theme_id_, int base_theme_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CustomTheme) 
+- [`CustomTheme()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CustomTheme) 
+- [`string level_file`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_file) &CustomTheme::level_file
+- [`int theme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) &CustomTheme::theme
+- [`base_theme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=base_theme) sol::property([](CustomTheme&ct)-&gt;uint8_t{if(ct.base_theme&lt;UINT8_MAX)returnct.base_theme+1;returnUINT8_MAX;}
+- [`sub_theme`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_theme) &CustomTheme::sub_theme
+- [`map<DYNAMIC_TEXTURE, int> textures`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=textures) &CustomTheme::textures
+- [`override`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) theme_override
+- [`nil pre(THEME_OVERRIDE index, function func_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre) &CustomTheme::pre
+- [`nil post(THEME_OVERRIDE index, function func_)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post) &CustomTheme::post
+- [`unknown1`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown1) &CustomTheme::unknown1
+- [`unknown2`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown2) &CustomTheme::unknown2
+- [`unknown3`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown3) &CustomTheme::unknown3
+- [`unknown4`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown4) &CustomTheme::unknown4
+- [`bool get_unknown1()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_unknown1) &CustomTheme::get_unknown1
+- [`nil init_flags()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_flags) &CustomTheme::init_flags
+- [`nil init_level()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_level) &CustomTheme::init_level
+- [`nil unknown_v4()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v4) &CustomTheme::unknown_v4
+- [`nil unknown_v5()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v5) &CustomTheme::unknown_v5
+- [`nil add_special_rooms()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_special_rooms) &CustomTheme::add_special_rooms
+- [`nil unknown_v7()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v7) &CustomTheme::unknown_v7
+- [`nil unknown_v8()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v8) &CustomTheme::unknown_v8
+- [`nil add_vault()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_vault) &CustomTheme::add_vault
+- [`nil add_coffin()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_coffin) &CustomTheme::add_coffin
+- [`nil add_special_feeling()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_special_feeling) &CustomTheme::add_special_feeling
+- [`bool unknown_v12()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v12) &CustomTheme::unknown_v12
+- [`nil spawn_level()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_level) &CustomTheme::spawn_level
+- [`nil spawn_border()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_border) &CustomTheme::spawn_border
+- [`nil post_process_level()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post_process_level) &CustomTheme::post_process_level
+- [`nil spawn_traps()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_traps) &CustomTheme::spawn_traps
+- [`nil post_process_entities()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post_process_entities) &CustomTheme::post_process_entities
+- [`nil spawn_procedural()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_procedural) &CustomTheme::spawn_procedural
+- [`nil spawn_background()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_background) &CustomTheme::spawn_background
+- [`nil spawn_lights()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_lights) &CustomTheme::spawn_lights
+- [`nil spawn_transition()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_transition) &CustomTheme::spawn_transition
+- [`nil post_transition()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post_transition) &CustomTheme::post_transition
+- [`nil spawn_players()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_players) &CustomTheme::spawn_players
+- [`nil spawn_effects()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_effects) &CustomTheme::spawn_effects
+- [`string get_level_file()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_file) &CustomTheme::get_level_file
+- [`int get_theme_id()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_id) &CustomTheme::get_theme_id
+- [`int get_base_id()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_id) &CustomTheme::get_base_id
+- [`int get_floor_spreading_type()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type) &CustomTheme::get_floor_spreading_type
+- [`int get_floor_spreading_type2()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type2) &CustomTheme::get_floor_spreading_type2
+- [`bool unknown_v30()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v30) &CustomTheme::unknown_v30
+- [`int get_transition_block_modifier()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_transition_block_modifier) &CustomTheme::get_transition_block_modifier
+- [`int unknown_v32()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v32) &CustomTheme::unknown_v32
+- [`int get_backwall_type()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_backwall_type) &CustomTheme::get_backwall_type
+- [`int get_border_type()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_border_type) &CustomTheme::get_border_type
+- [`int get_critter_type()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_critter_type) &CustomTheme::get_critter_type
+- [`float get_liquid_gravity()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_liquid_gravity) &CustomTheme::get_liquid_gravity
+- [`bool get_player_damage()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_player_damage) &CustomTheme::get_player_damage
+- [`bool unknown_v38()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v38) &CustomTheme::unknown_v38
+- [`int get_backlayer_lut()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_backlayer_lut) &CustomTheme::get_backlayer_lut
+- [`float get_backlayer_light_level()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_backlayer_light_level) &CustomTheme::get_backlayer_light_level
+- [`bool get_loop()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_loop) &CustomTheme::get_loop
+- [`int get_vault_level()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_vault_level) &CustomTheme::get_vault_level
+- [`bool get_unknown_1_or_2(int index)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_unknown_1_or_2) &CustomTheme::get_unknown_1_or_2
+- [`int get_dynamic_texture(int texture_id)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dynamic_texture) &CustomTheme::get_dynamic_texture
+- [`nil pre_transition()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre_transition) &CustomTheme::pre_transition
+- [`int get_level_height()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_height) &CustomTheme::get_level_height
+- [`int unknown_v47()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v47) &CustomTheme::unknown_v47
+- [`nil spawn_decoration()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_decoration) &CustomTheme::spawn_decoration
+- [`nil spawn_decoration2()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_decoration2) &CustomTheme::spawn_decoration2
+- [`nil spawn_extra()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_extra) &CustomTheme::spawn_extra
+- [`nil unknown_v51()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v51) &CustomTheme::unknown_v51
 ### `PreLoadLevelFilesContext`
 - [`nil override_level_files(array<string> levels)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) &PreLoadLevelFilesContext::override_level_files
 \

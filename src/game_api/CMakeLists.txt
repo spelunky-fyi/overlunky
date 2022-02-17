@@ -19,6 +19,7 @@ target_precompile_headers(spel2_api PRIVATE
         <sol/sol.hpp>
         <d3d11.h>)
 target_link_libraries(spel2_api PRIVATE overlunky_warnings)
+target_compile_options(spel2_api PRIVATE /Zm80)
 if (MSVC)
         target_compile_options(spel2_api PRIVATE /bigobj)
 endif()
