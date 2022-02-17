@@ -1286,7 +1286,7 @@ Pet information for level transition
 - [`LiquidPhysicsParams default`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default) &LiquidPool::physics_defaults
 - [`LiquidPhysicsEngine engine`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=engine) &LiquidPool::physics_engine
 ### `LiquidPhysics`
-- [`LiquidPool pools[5]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pools[5]) sol::property([](LiquidPhysics&lp){returnstd::ref(lp.pools)/**/;})
+- [`LiquidPool pools[5]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pools) sol::property([](LiquidPhysics&lp){returnstd::ref(lp.pools)/**/;})
 ### `StateMemory`
 - [`int screen_last`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) &StateMemory::screen_last
 - [`int screen`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) &StateMemory::screen
@@ -1491,7 +1491,7 @@ Rectangle always uses light1, even when it's disabled in flags
 ### `OnlinePlayer`
 - [`int ready_state`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready_state) &OnlinePlayer::ready_state
 - [`int character`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) &OnlinePlayer::character
-- [`char player_name[37]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_name[37]) &OnlinePlayer::player_name
+- [`char player_name[37]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_name) &OnlinePlayer::player_name
 ### `OnlineLobby`
 - [`int code`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=code) &OnlineLobby::code
 - [`string get_code()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_code) &OnlineLobby::get_code
@@ -3929,7 +3929,7 @@ All `.lvl` files are loaded relative to `Data/Levels`, but they can be completel
 - [`int spawn_room_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) &LevelGenSystem::spawn_room_x
 - [`int spawn_room_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) &LevelGenSystem::spawn_room_y
 - [`DoorCoords exits`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exits) &LevelGenSystem::exit_doors_locations
-- [`ThemeInfo themes[18]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes[18]) sol::property([](LevelGenSystem&lgs){returnstd::ref(lgs.themes
+- [`ThemeInfo themes[18]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) sol::property([](LevelGenSystem&lgs){returnstd::ref(lgs.themes
 ### `PostRoomGenerationContext`
 - [`bool set_room_template(int x, int y, LAYER layer, ROOM_TEMPLATE room_template)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template) &PostRoomGenerationContext::set_room_template
 \
@@ -4015,7 +4015,7 @@ Alternative tile code, ignored if `chance == 100`. Defaults to 0.
 - [`array<bool, 38> people`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people) &SaveData::people
 - [`array<bool, 54> items`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) &SaveData::items
 - [`array<bool, 24> traps`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=traps) &SaveData::traps
-- [`char last_daily[8]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily[8]) &SaveData::last_daily
+- [`char last_daily[8]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily) &SaveData::last_daily
 - [`int characters`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters) &SaveData::characters
 - [`int shortcuts`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shortcuts) &SaveData::shortcuts
 - [`array<int, 78> bestiary_killed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed) &SaveData::bestiary_killed
@@ -4235,7 +4235,7 @@ Current mouse cursor position in screen coordinates.
 - [`ImVec2      displaysize`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) &ImGuiIO::DisplaySize
 - [`float       framerate`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) &ImGuiIO::Framerate
 - [`bool        wantkeyboard`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) &ImGuiIO::WantCaptureKeyboard
-- [`bool        keysdown[512]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown[512]) sol::property([](ImGuiIO&io){returnstd::ref(io.KeysDown)/**/;})
+- [`bool        keysdown[512]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) sol::property([](ImGuiIO&io){returnstd::ref(io.KeysDown)/**/;})
 - [`keydown`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) keydown
 - [`keypressed`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) keypressed
 - [`keyreleased`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) keyreleased
@@ -4245,9 +4245,9 @@ Current mouse cursor position in screen coordinates.
 - [`bool        keysuper`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) &ImGuiIO::KeySuper
 - [`bool        wantmouse`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) &ImGuiIO::WantCaptureMouse
 - [`ImVec2      mousepos`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) &ImGuiIO::MousePos
-- [`bool        mousedown[5]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown[5]) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseDown)/**/;})
-- [`bool        mouseclicked[5]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked[5]) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseClicked)/**/;})
-- [`bool        mousedoubleclicked[5]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked[5]) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseDoubleClicked)/**/;})
+- [`bool        mousedown[5]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseDown)/**/;})
+- [`bool        mouseclicked[5]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseClicked)/**/;})
+- [`bool        mousedoubleclicked[5]`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) sol::property([](ImGuiIO&io){returnstd::ref(io.MouseDoubleClicked)/**/;})
 - [`float       mousewheel`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) &ImGuiIO::MouseWheel
 - [`gamepad`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) sol::property([](){g_WantUpdateHasGamepad=true;returnget_gamepad()/**/;})
 ### `VanillaRenderContext`

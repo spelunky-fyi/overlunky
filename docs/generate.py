@@ -431,9 +431,9 @@ for file in api_files:
                 )
                 if underlying_cpp_var:
                     type = underlying_cpp_var["type"]
-                    if underlying_cpp_var["name"].endswith("]"):
-                        var_name = var_name + underlying_cpp_var["name"][underlying_cpp_var["name"].find("["):]
                     sig = f"{type} {var_name}"
+                    if underlying_cpp_var["name"].endswith("]"):
+                        sig += underlying_cpp_var["name"][underlying_cpp_var["name"].find("["):]
                     vars.append(
                         {
                             "name": var_name,
