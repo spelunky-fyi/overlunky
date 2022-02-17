@@ -383,7 +383,17 @@ for file in api_files:
 
             var_name = var[0]
             cpp = var[1]
-            cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
+
+            if var[1].startswith("sol::property"):
+                paramMatch = re.match(fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)", cpp)
+                if paramMatch:
+                    varName = paramMatch[1]
+                    mVarReturn = re.search(fr"return[^;]*{varName}\.([\w.]+)", cpp)
+                    cpp_name = mVarReturn[1] if mVarReturn else cpp
+                else:
+                    cpp_name = cpp
+            else:
+                cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
 
             if var[0].startswith("sol::constructors"):
                 for fun in underlying_cpp_type["member_funs"][cpp_type]:
@@ -415,12 +425,14 @@ for file in api_files:
                     (
                         item
                         for item in underlying_cpp_type["member_vars"]
-                        if item["name"] == cpp_name
+                        if item["name"] == cpp_name or (item["name"].endswith("]") and f"{cpp_name}[" in item["name"])
                     ),
                     dict(),
                 )
                 if underlying_cpp_var:
                     type = underlying_cpp_var["type"]
+                    if underlying_cpp_var["name"].endswith("]"):
+                        var_name = var_name + underlying_cpp_var["name"][underlying_cpp_var["name"].find("["):]
                     sig = f"{type} {var_name}"
                     vars.append(
                         {
