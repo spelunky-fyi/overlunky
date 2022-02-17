@@ -1,7 +1,19 @@
 import re
 
+import os
+
 # redirect stdout to the right files
 import sys
+
+
+def setup_stdout(filename):
+    sys.stdout = sys.__stdout__
+    print(f"Generating file '{filename}'...")
+    sys.stdout = open(f"overlunky.wiki/{filename}.md", "w")
+
+
+if not os.path.exists("overlunky.wiki"):
+    os.makedirs("overlunky.wiki")
 
 header_files = [
     "../src/game_api/math.hpp",
@@ -172,6 +184,7 @@ def print_af(lf, af):
         print(com)
 
 
+print("Collecting rpc data...")
 for file in header_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -196,6 +209,7 @@ for file in header_files:
         else:
             comment = []
 
+print("Collecting class data...")
 for file in header_files:
     if file.endswith("script.hpp"):
         continue
@@ -287,6 +301,7 @@ for file in header_files:
                 member_funs = {}
                 member_vars = []
 
+print("Collecting events data...")
 for file in api_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -303,6 +318,7 @@ for file in api_files:
         else:
             comment = []
 
+print("Collecting functions data...")
 for file in api_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -326,6 +342,7 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
+print("Collecting usertypes data...")
 for file in api_files:
     data = open(file, "r").read()
     data = data.replace("\n", "")
@@ -420,6 +437,7 @@ for file in api_files:
                     vars.append({"name": var_name, "type": cpp})
         types.append({"name": name, "vars": vars, "base": base})
 
+print("Collecting entity casts data...")
 for file in api_files:
     with open(file) as fp:
         line = fp.readline()
@@ -430,6 +448,7 @@ for file in api_files:
             line = fp.readline()
 known_casts.sort()
 
+print("Collecting additional usertypes data...")
 for file in api_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -448,6 +467,7 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
+print("Collecting enums data...")
 for file in api_files:
     data = open(file, "r").read()
     data = data.replace("\n", "")
@@ -541,6 +561,7 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
+print("Collecting libraries data...")
 for file in api_files:
     data = open(file, "r").read()
     data = data.replace("\n", "")
@@ -551,6 +572,7 @@ for file in api_files:
         for lib in libs:
             lualibs.append(lib.replace("sol::lib::", ""))
 
+print("Collecting aliases data...")
 data = open("../src/game_api/aliases.hpp", "r").read().split("\n")
 for line in data:
     if not line.endswith("NoAlias"):
@@ -560,7 +582,7 @@ for line in data:
             type = replace_all(m.group(2), replace)
             aliases.append({"name": name, "type": type})
 
-sys.stdout = open("overlunky.wiki/Home.md", "w")
+setup_stdout("Home")
 
 print("# Overlunky/Playlunky Lua API")
 print(
@@ -687,7 +709,7 @@ print(
 )
 
 
-sys.stdout = open("overlunky.wiki/Globals.md", "w")
+setup_stdout("Globals")
 
 print("## Global variables")
 print("""These variables are always there to use.""")
@@ -784,7 +806,7 @@ for lf in deprecated_funcs:
             print(com)
 
 
-sys.stdout = open("overlunky.wiki/Types.md", "w")
+setup_stdout("Types")
 
 print("## Types")
 print(
@@ -840,7 +862,7 @@ for type in types:
                 print(com)
 
 
-sys.stdout = open("overlunky.wiki/Automatic casting of entities.md", "w")
+setup_stdout("Automatic casting of entities")
 
 print("## Automatic casting of entities")
 print(
@@ -859,7 +881,7 @@ for known_cast in known_casts:
     print("- " + known_cast)
 
 
-sys.stdout = open("overlunky.wiki/Enums.md", "w")
+setup_stdout("Enums")
 
 print("## Enums")
 print("Enums are like numbers but in text that's easier to remember. Example:")
