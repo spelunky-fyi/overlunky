@@ -243,8 +243,8 @@ for file in header_files:
                     comment.append(m[1])
                 else:
                     m = re.search(
-                        r"^\s*:.*$", line
-                    )  # skip lines that start with a colon (constructor parameter initialization)
+                        r"^\s*(?::|\/\/)", line
+                    )  # skip lines that start with a colon (constructor parameter initialization) or are comments
                     if m:
                         continue
 
