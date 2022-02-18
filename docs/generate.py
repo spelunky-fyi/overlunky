@@ -210,7 +210,7 @@ def print_af(lf, af):
     print(f"\n## {name}\n")
     include_example(name)
     print(f"\n> Search script examples for [{name}]({search_link})\n")
-    print(f"### {fun}\n")
+    print(f"#### {fun}\n")
     for com in lf["comment"]:
         print(com)
 
@@ -800,7 +800,7 @@ for lf in funcs:
         print(f"\n## {name}\n")
         include_example(name)
         print(f"\n> Search script examples for [{name}]({search_link})\n")
-        print(f"### {fun}<br/>")
+        print(f"#### {fun}<br/>")
         for com in lf["comment"]:
             print(com + "<br/>", end="")
 
