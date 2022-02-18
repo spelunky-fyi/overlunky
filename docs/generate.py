@@ -278,9 +278,9 @@ for file in header_files:
                             vars_except_last = vars_match.group() #Last var is m[2]
                             start, end = vars_match.span()
                             vars_type = types_and_vars[:start]
-                            for m_var in re.finditer(r"(\w*),", vars_except_last):
+                            for m_var in re.findall(r"(\w*),", vars_except_last):
                                 member_vars.append(
-                                    {"type": vars_type, "name": m_var[1], "comment": comment}
+                                    {"type": vars_type, "name": m_var, "comment": comment}
                                 )
                             member_vars.append(
                                 {"type": vars_type, "name": m[2], "comment": comment}
