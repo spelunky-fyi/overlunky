@@ -273,17 +273,17 @@ for file in header_files:
                     )
                     if m:
                         if m[1].endswith(",") and not (m[2].endswith(">") or m[2].endswith(")")): #Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
-                            typesAndVars = m[1]
-                            varsMatch = re.search(r"(?: *\w*,)*$", typesAndVars)
-                            varsExceptLast = varsMatch.group() #Last var is m[2]
-                            start, end = varsMatch.span()
-                            varsType = typesAndVars[:start]
-                            for mVar in re.finditer(r"(\w*),", varsExceptLast):
+                            types_and_vars = m[1]
+                            vars_match = re.search(r"(?: *\w*,)*$", types_and_vars)
+                            vars_except_last = vars_match.group() #Last var is m[2]
+                            start, end = vars_match.span()
+                            vars_type = types_and_vars[:start]
+                            for m_var in re.finditer(r"(\w*),", vars_except_last):
                                 member_vars.append(
-                                    {"type": varsType, "name": mVar[1], "comment": comment}
+                                    {"type": vars_type, "name": m_var[1], "comment": comment}
                                 )
                             member_vars.append(
-                                {"type": varsType, "name": m[2], "comment": comment}
+                                {"type": vars_type, "name": m[2], "comment": comment}
                             )
                         else:
                             member_vars.append(
@@ -389,12 +389,12 @@ for file in api_files:
             cpp = var[1]
 
             if var[1].startswith("sol::property"):
-                paramMatch = re.match(fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)", cpp)
-                if paramMatch:
-                    varName = paramMatch[1]
-                    mVarReturn = re.search(fr"return[^;]*{varName}\.([\w.]+)", cpp)
-                    if mVarReturn:
-                        cpp_name = mVarReturn[1]
+                param_match = re.match(fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)", cpp)
+                if param_match:
+                    type_var_name = param_match[1]
+                    m_var_return = re.search(fr"return[^;]*{type_var_name}\.([\w.]+)", cpp)
+                    if m_var_return:
+                        cpp_name = m_var_return[1]
                         cpp_name = cpp_name.replace(".", "::")
                         cpp = f"&{underlying_cpp_type['name']}::{cpp_name}"
                 else:
@@ -450,9 +450,9 @@ for file in api_files:
                         }
                     )
                 else:
-                    mReturnType = re.search(r"->(\w+){", var[1]) #Use var[1] instead of cpp because it could be replaced on the sol::property stuff
-                    if mReturnType:
-                        sig = f"{mReturnType[1]} {var_name}"
+                    m_return_type = re.search(r"->(\w+){", var[1]) #Use var[1] instead of cpp because it could be replaced on the sol::property stuff
+                    if m_return_type:
+                        sig = f"{m_return_type[1]} {var_name}"
                         vars.append({"name": var_name, "type": cpp, "signature": sig})
                     else:
                         vars.append({"name": var_name, "type": cpp})
