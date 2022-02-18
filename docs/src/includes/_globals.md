@@ -2013,7 +2013,9 @@ Start an UDP server on specified address and run callback when data arrives. Ret
 > Search script examples for [udp_send](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_send)
 
 ### nil udp_send(string host, in_port_t port, string msg)<br/>
-Send data to specified UDP address. Requires unsafe mode.<br/># Deprecated Functions
+Send data to specified UDP address. Requires unsafe mode.<br/>
+## Deprecated Functions
+
 <aside class='warning'>These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!</aside>
 
 ## on_frame

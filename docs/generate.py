@@ -805,7 +805,7 @@ for lf in funcs:
             print(com + "<br/>", end="")
 
 
-print("# Deprecated Functions")
+print("\n## Deprecated Functions\n")
 print(
     "<aside class='warning'>These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!</aside>"
 )
