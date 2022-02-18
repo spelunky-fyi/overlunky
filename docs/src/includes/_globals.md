@@ -193,7 +193,7 @@ Load another script by id "author/name"<br/>
 
 > Search script examples for [read_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_prng)
 
-### array<int> read_prng()<br/>
+### array&lt;int&gt; read_prng()<br/>
 Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:<br/>```lua<br/>-- this should always print the same table D877...E555<br/>set_callback(function()<br/>  seed_prng(42069)<br/>  local prng = read_prng()<br/>  for i,v in ipairs(prng) do<br/>    message(string.format("%08X", v))<br/>  end<br/>end, ON.LEVEL)<br/>```<br/>
 ## toast
 
@@ -583,7 +583,7 @@ Gets a grid entity, such as floor or spikes, at the given position and layer.
 
 > Search script examples for [filter_entities](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=filter_entities)
 
-### array<int> filter_entities(array<int> entities, function predicate)<br/>
+### array&lt;int&gt; filter_entities(array<int> entities, function predicate)<br/>
 Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true<br/>
 ## get_entities_by
 
@@ -608,7 +608,7 @@ Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to i
 
 > Search script examples for [get_entities_by_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
 
-### array<int> get_entities_by_type(int, int...)<br/>
+### array&lt;int&gt; get_entities_by_type(int, int...)<br/>
 Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.<br/>You can even pass a table! Example:<br/>```lua<br/>types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}<br/>function on_level()<br/>    uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)<br/>    -- is not the same thing as this, but also works<br/>    uids2 = get_entities_by_type(entity_types)<br/>    message(tostring(#uids).." == "..tostring(#uids2))<br/>end<br/>```<br/>
 ## get_entities_at
 
@@ -1188,7 +1188,7 @@ Calculate the tile distance of two entities by uid<br/>
 
 > Search script examples for [get_bounds](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bounds)
 
-### tuple<float, float, float, float> get_bounds()<br/>
+### tuple&lt;float, float, float, float&gt; get_bounds()<br/>
 Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be<br/>inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:<br/>```lua<br/>-- Draw the level boundaries<br/>set_callback(function(draw_ctx)<br/>    xmin, ymin, xmax, ymax = get_bounds()<br/>    sx, sy = screen_position(xmin, ymin) -- top left<br/>    sx2, sy2 = screen_position(xmax, ymax) -- bottom right<br/>    draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))<br/>end, ON.GUIFRAME)<br/>```<br/>
 ## get_camera_position
 
@@ -1246,7 +1246,7 @@ Returns true if a bit is set in the flags<br/>
 
 > Search script examples for [get_window_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_window_size)
 
-### tuple<int, int> get_window_size()<br/>
+### tuple&lt;int, int&gt; get_window_size()<br/>
 Gets the resolution (width and height) of the screen<br/>
 ## steal_input
 
@@ -1295,14 +1295,14 @@ Clears a callback that is specific to a screen.<br/>
 
 > Search script examples for [set_pre_render_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render_screen)
 
-### optional<CallbackId> set_pre_render_screen(int screen_id, function fun)<br/>
+### optional&lt;CallbackId&gt; set_pre_render_screen(int screen_id, function fun)<br/>
 Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.<br/>Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.<br/>
 ## set_post_render_screen
 
 
 > Search script examples for [set_post_render_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render_screen)
 
-### optional<CallbackId> set_post_render_screen(int screen_id, function fun)<br/>
+### optional&lt;CallbackId&gt; set_post_render_screen(int screen_id, function fun)<br/>
 Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.<br/>Sets a callback that is called right after the screen is drawn.<br/>
 ## clear_entity_callback
 
@@ -1316,63 +1316,63 @@ Clears a callback that is specific to an entity.<br/>
 
 > Search script examples for [set_pre_statemachine](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_statemachine)
 
-### optional<CallbackId> set_pre_statemachine(int uid, function fun)<br/>
+### optional&lt;CallbackId&gt; set_pre_statemachine(int uid, function fun)<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>`uid` has to be the uid of a `Movable` or else stuff will break.<br/>Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
 ## set_post_statemachine
 
 
 > Search script examples for [set_post_statemachine](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_statemachine)
 
-### optional<CallbackId> set_post_statemachine(int uid, function fun)<br/>
+### optional&lt;CallbackId&gt; set_post_statemachine(int uid, function fun)<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>`uid` has to be the uid of a `Movable` or else stuff will break.<br/>Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
 ## set_on_destroy
 
 
 > Search script examples for [set_on_destroy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_destroy)
 
-### optional<CallbackId> set_on_destroy(int uid, function fun)<br/>
+### optional&lt;CallbackId&gt; set_on_destroy(int uid, function fun)<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.<br/>The callback signature is `nil on_destroy(Entity self)`<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>
 ## set_on_kill
 
 
 > Search script examples for [set_on_kill](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_kill)
 
-### optional<CallbackId> set_on_kill(int uid, function fun)<br/>
+### optional&lt;CallbackId&gt; set_on_kill(int uid, function fun)<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.<br/>The callback signature is `nil on_kill(Entity self, Entity killer)`<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>
 ## set_on_player_instagib
 
 
 > Search script examples for [set_on_player_instagib](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_player_instagib)
 
-### optional<CallbackId> set_on_player_instagib(int uid, function fun)<br/>
+### optional&lt;CallbackId&gt; set_on_player_instagib(int uid, function fun)<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.<br/>The callback signature is `bool on_player_instagib(Entity self)`<br/>The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.<br/>This is so that when the entity dies (from other causes), the death screen still gets shown.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>
 ## set_on_damage
 
 
 > Search script examples for [set_on_damage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_damage)
 
-### optional<CallbackId> set_on_damage(int uid, function fun)<br/>
+### optional&lt;CallbackId&gt; set_on_damage(int uid, function fun)<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.<br/>The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`<br/>Note that damage_dealer can be nil ! (long fall, ...)<br/>DO NOT CALL `self:damage()` in the callback !<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
 ## set_on_open
 
 
 > Search script examples for [set_on_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
 
-### optional<CallbackId> set_on_open(int uid, function fun)<br/>
+### optional&lt;CallbackId&gt; set_on_open(int uid, function fun)<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right when a container is opened via up+door, or weapon is shot.<br/>The callback signature is `nil on_open(Entity entity_self, Entity opener)`<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
 ## set_pre_collision1
 
 
 > Search script examples for [set_pre_collision1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision1)
 
-### optional<CallbackId> set_pre_collision1(int uid, function fun)<br/>
+### optional&lt;CallbackId&gt; set_pre_collision1(int uid, function fun)<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
 ## set_pre_collision2
 
 
 > Search script examples for [set_pre_collision2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision2)
 
-### optional<CallbackId> set_pre_collision2(int uid, function fun)<br/>
+### optional&lt;CallbackId&gt; set_pre_collision2(int uid, function fun)<br/>
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
 ## raise
 
@@ -1723,14 +1723,14 @@ Define a new tile code, to make this tile code do anything you have to use eithe
 
 > Search script examples for [get_short_tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code)
 
-### optional<int> get_short_tile_code(ShortTileCodeDef short_tile_code_def)<br/>
+### optional&lt;int&gt; get_short_tile_code(ShortTileCodeDef short_tile_code_def)<br/>
 Gets a short tile code based on definition, returns `nil` if it can't be found<br/>
 ## get_short_tile_code_definition
 
 
 > Search script examples for [get_short_tile_code_definition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code_definition)
 
-### optional<ShortTileCodeDef> get_short_tile_code_definition(SHORT_TILE_CODE short_tile_code)<br/>
+### optional&lt;ShortTileCodeDef&gt; get_short_tile_code_definition(SHORT_TILE_CODE short_tile_code)<br/>
 Gets the definition of a short tile code (if available), will vary depending on which file is loaded<br/>
 ## define_procedural_spawn
 
@@ -1751,28 +1751,28 @@ Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixe
 
 > Search script examples for [get_missing_extra_spawns](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_missing_extra_spawns)
 
-### tuple<int, int> get_missing_extra_spawns(int extra_spawn_chance_id)<br/>
+### tuple&lt;int, int&gt; get_missing_extra_spawns(int extra_spawn_chance_id)<br/>
 Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.<br/>Returns missing spawns in the front layer and missing spawns in the back layer in that order.<br/>The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.<br/>
 ## get_room_index
 
 
 > Search script examples for [get_room_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_index)
 
-### tuple<int, int> get_room_index(float x, float y)<br/>
+### tuple&lt;int, int&gt; get_room_index(float x, float y)<br/>
 Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`<br/>
 ## get_room_pos
 
 
 > Search script examples for [get_room_pos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_pos)
 
-### tuple<float, float> get_room_pos(int x, int y)<br/>
+### tuple&lt;float, float&gt; get_room_pos(int x, int y)<br/>
 Transform a room index into the top left corner position in the room<br/>
 ## get_room_template
 
 
 > Search script examples for [get_room_template](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template)
 
-### optional<int> get_room_template(int x, int y, LAYER layer)<br/>
+### optional&lt;int&gt; get_room_template(int x, int y, LAYER layer)<br/>
 Get the room template given a certain index, returns `nil` if coordinates are out of bounds<br/>
 ## is_room_flipped
 
@@ -1853,14 +1853,14 @@ Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeIn
 
 > Search script examples for [create_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 
-### optional<CustomSound> create_sound(string path)<br/>
+### optional&lt;CustomSound&gt; create_sound(string path)<br/>
 Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found<br/>
 ## get_sound
 
 
 > Search script examples for [get_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_sound)
 
-### optional<CustomSound> get_sound(string path_or_vanilla_sound)<br/>
+### optional&lt;CustomSound&gt; get_sound(string path_or_vanilla_sound)<br/>
 Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game<br/>
 ## set_vanilla_sound_callback
 
@@ -1888,21 +1888,21 @@ Converts a color to int to be used in drawing functions. Use values from `0..255
 
 > Search script examples for [draw_text_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size)
 
-### tuple<float, float> draw_text_size(float size, string text)<br/>
+### tuple&lt;float, float&gt; draw_text_size(float size, string text)<br/>
 Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.<br/>Example:<br/>```lua<br/>function on_guiframe(draw_ctx)<br/>    -- get a random color<br/>    color = math.random(0, 0xffffffff)<br/>    -- zoom the font size based on frame<br/>    size = (get_frame() % 199)+1<br/>    text = 'Awesome!'<br/>    -- calculate size of text<br/>    w, h = draw_text_size(size, text)<br/>    -- draw to the center of screen<br/>    draw_ctx:draw_text(0-w/2, 0-h/2, size, text, color)<br/>end<br/>```<br/>
 ## create_image
 
 
 > Search script examples for [create_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image)
 
-### tuple<IMAGE, int, int> create_image(string path)<br/>
+### tuple&lt;IMAGE, int, int&gt; create_image(string path)<br/>
 Create image from file. Returns a tuple containing id, width and height.<br/>
 ## mouse_position
 
 
 > Search script examples for [mouse_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouse_position)
 
-### tuple<float, float> mouse_position()<br/>
+### tuple&lt;float, float&gt; mouse_position()<br/>
 Current mouse cursor position in screen coordinates.<br/>
 ## get_io
 
@@ -1970,7 +1970,7 @@ Defines a new texture that can be used in Entity::set_texture<br/>If a texture w
 
 > Search script examples for [get_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture)
 
-### optional<TEXTURE> get_texture(TextureDefinition texture_data)<br/>
+### optional&lt;TEXTURE&gt; get_texture(TextureDefinition texture_data)<br/>
 Gets a texture with the same definition as the given, if none exists returns `nil`<br/>
 ## reload_texture
 

@@ -794,6 +794,7 @@ for lf in funcs:
         name = lf["name"]
         if is_custom_type(ret):
             ret = f"[{ret}](#{ret.lower()})"
+        ret = ret.replace("<", "&lt;").replace(">", "&gt;")
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
         print(f"\n## {name}\n")
