@@ -1558,8 +1558,8 @@ Drop-in replacement for `math.random(i)`
 - [`optional<int> random(int min, int max)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) random
 \
 Drop-in replacement for `math.random(min, max)`
-- [`get_pair`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) &PRNG::get_pair
-- [`set_pair`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) &PRNG::set_pair
+- [`tuple<int, int> get_pair(size_t index)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) &PRNG::get_pair
+- [`nil set_pair(size_t index, int first, int second)`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) &PRNG::set_pair
 ### `Color`
 - [`Color()`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) 
 \

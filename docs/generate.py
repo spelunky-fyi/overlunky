@@ -113,7 +113,7 @@ replace = {
     "wstring": "string",
     "u16string": "string",
     "char16_t": "string",
-    "pair": "tuple",
+    "pair<": "tuple<",
     "std::": "",
     "sol::": "",
     "void": "",
