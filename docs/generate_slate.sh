@@ -1,6 +1,6 @@
 #!/bin/bash
 python generate.py
-cp src/index.html.md slate/source/
+cp -r src/* slate/source/
 cd slate
 bundle config set deployment 'true'
 bundle config path vendor/bundle

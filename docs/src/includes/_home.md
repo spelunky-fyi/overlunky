@@ -99,10 +99,13 @@ Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples 
 
 # Aliases
 
+
 We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
 
-- **CallbackId == int;**
-- **Flags == int;**
-- **uColor == int;**
-- **SHORT_TILE_CODE == int;**
-- **STRINGID == int;**
+Name | Type
+---- | ----
+CallbackId | int;
+Flags | int;
+uColor | int;
+SHORT_TILE_CODE | int;
+STRINGID | int;

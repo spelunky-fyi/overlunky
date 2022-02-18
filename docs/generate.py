@@ -126,7 +126,7 @@ replace = {
     "wstring": "string",
     "u16string": "string",
     "char16_t": "string",
-    "pair": "tuple",
+    "pair<": "tuple<",
     "std::": "",
     "sol::": "",
     "void": "",
@@ -173,6 +173,28 @@ def replace_all(text, dic):
         text = text.replace(i, j)
     return text
 
+def is_custom_type(name):
+    for type in types:
+        if type["name"] == name:
+            return True
+    return False
+
+def include_example(name):
+    example = "examples/" + name + ".md"
+    if os.path.exists(example):
+        sys.stderr.write("Including " + example + "\n")
+        file = open(example, "r")
+        data = file.read()
+        file.close()
+        print("\n" + data + "\n")
+
+    example = "examples/" + name + ".lua"
+    if os.path.exists(example):
+        sys.stderr.write("Including " + example + "\n")
+        file = open(example, "r")
+        data = file.read()
+        file.close()
+        print("\n```lua\n" + data + "\n```\n")
 
 def print_af(lf, af):
     if lf["comment"] and lf["comment"][0] == "NoDoc":
@@ -182,9 +204,10 @@ def print_af(lf, af):
     param = replace_all(af["param"], replace)
     fun = f"{ret} {name}({param})".strip()
     search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-    print(f"## {name}")
-    print(f"\n> Search examples for [`{name}`]({search_link})\n")
-    print(f"`{fun}`<br/>")
+    print(f"\n## {name}\n")
+    include_example(name)
+    print(f"\n> Search script examples for [{name}]({search_link})\n")
+    print(f"`{fun}`\n")
     for com in lf["comment"]:
         print(com)
 
@@ -535,7 +558,7 @@ for file in api_files:
                     current_var_to_mod = var_to_mod
                     collected_docs = ""
                 else:
-                    collected_docs += var_name
+                    collected_docs += var_name + "<br/>"
         if current_var_to_mod:
             current_var_to_mod["docs"] = collected_docs
 
@@ -581,7 +604,7 @@ print_collecting_info("aliases")
 data = open("../src/game_api/aliases.hpp", "r").read().split("\n")
 for line in data:
     if not line.endswith("NoAlias"):
-        m = re.search(r"using\s*(\S*)\s*=\s*(\S*)", line)
+        m = re.search(r"using\s*(\S*)\s*=\s*(\S*);?", line)
         if m:
             name = m.group(1)
             type = replace_all(m.group(2), replace)
@@ -625,6 +648,7 @@ print(
 for lib in lualibs:
     print("\n## " + lib + "")
 print("\n## json")
+include_example("json")
 print(
     """To save data in your mod it makes a lot of sense to use `json` to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:
 
@@ -647,6 +671,7 @@ end, ON.LOAD)
 ```"""
 )
 print("\n## inspect")
+include_example("inspect")
 print(
     """This module is a great substitute for `tostring` because it can convert any type to a string and thus helps a lot with debugging. Use for example like this:
 
@@ -673,6 +698,7 @@ message(inspect(look_ma_no_tostring))
 ```"""
 )
 print("\n## format")
+include_example("format")
 print(
     """This allows you to make strings without having to do a lot of `tostring` and `..` by placing your variables directly inside of the string. Use `F` in front of your string and wrap variables you want to print in `{}`, for example like this:
 
@@ -703,13 +729,16 @@ Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples 
 )
 
 print("\n# Aliases\n")
-print(
-    "We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.\n"
-)
+print("""
+We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
+
+Name | Type
+---- | ----""")
+
 for alias in aliases:
     name = alias["name"]
     type = alias["type"]
-    print(f"- **{name} == {type}**")
+    print(f"{name} | {type}")
 
 
 setup_stdout("_globals")
@@ -718,12 +747,12 @@ print("# Global variables")
 print("""These variables are always there to use.""")
 for lf in funcs:
     if lf["name"] in not_functions:
+        print("## " + lf["name"] + "\n")
+        include_example(lf["name"])
         print(
-            "## "
+            "> Search script examples for ["
             + lf["name"]
-            + "\n> Search examples for [`"
-            + lf["name"]
-            + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
+            + "](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
             + lf["name"]
             + ")\n"
         )
@@ -762,11 +791,12 @@ for lf in funcs:
         name = lf["name"]
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-        print(f"## {name}")
-        print(f"\n> Search examples for [`{name}`]({search_link})\n")
+        print(f"\n## {name}\n")
+        include_example(name)
+        print(f"\n> Search script examples for [{name}]({search_link})\n")
         print(f"`{fun}`<br/>")
         for com in lf["comment"]:
-            print(com)
+            print(com + "<br/>", end="")
 
 
 print("# Deprecated Functions")
@@ -776,10 +806,8 @@ print(
 
 for lf in events:
     if lf["name"].startswith("on_"):
-        print(
-            "## "
-            + lf["name"]
-        )
+        print("\n## "+ lf["name"] + "\n")
+        include_example(lf["name"])
         for com in lf["comment"]:
             print(com)
 
@@ -803,8 +831,9 @@ for lf in deprecated_funcs:
         name = lf["name"]
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-        print(f"## {name}")
-        print(f"\> Search examples for [`{name}`]({search_link})\n")
+        print(f"\n## {name}\n")
+        include_example(name)
+        print(f"\n> Search script examples for [{name}]({search_link})\n")
         print(f"`{fun}`<br/>")
         for com in lf["comment"]:
             print(com)
@@ -831,6 +860,7 @@ end
 )
 for type in types:
     print("\n## " + type["name"] + "\n")
+    include_example(type["name"])
     if "comment" in type:
         for com in type["comment"]:
             print(com)
@@ -838,50 +868,67 @@ for type in types:
         print("Derived from", end="")
         bases = type["base"].split(",")
         for base in bases:
-            print(" [`" + base + "`](#" + base.lower() + ")", end="")
+            print(" [" + base + "](#" + base.lower() + ")", end="")
         print("\n")
+    print("""
+Type | Name | Description
+---- | ---- | -----------""")
     for var in type["vars"]:
         search_link = (
             "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
         )
         if "signature" in var:
             signature = var["signature"]
-            m = re.search(r"\s*(.*)\s+([^\(]*)\(([^\)]*)", var["signature"])
-            if m:
+            n = re.search(r"^\s*([^\( ]*)(\(([^\)]*))", var["signature"])
+            m = re.search(r"\s*([^\(]*)\s+([^\( ]*)(\(([^\)]*))?", var["signature"])
+            ret = ""
+            name = ""
+            param = ""
+            if n:
+                name = n.group(1)
+                ret = name == type["name"] and name or ""
+                name = name == type["name"] and "new" or name
+                param = ""
+                if n.group(2):
+                    param = replace_all(n.group(2), replace) + ")" or ""
+                signature = name + param
+            elif m:
                 ret = replace_all(m.group(1), replace) or "nil"
                 name = m.group(2)
-                param = replace_all(m.group(3), replace)
-                signature = ret + " " + name + "(" + param + ")"
+                param = ""
+                if m.group(3):
+                    param = replace_all(m.group(3), replace) + ")" or ""
+                signature = name + param
             signature = signature.strip()
-            type_str = var["type"].replace("<", "&lt;").replace(">", "&gt;")
-            print(f"- [`{signature}`]({search_link}) {type_str}  ")
+            ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+            if is_custom_type(ret):
+                ret = f"[{ret}](#{ret.lower()})"
+            print(f"{ret} | [{signature}]({search_link}) | ", end="")
         else:
+            ret = ""
             name = var["name"]
-            type_str = var["type"].replace("<", "&lt;").replace(">", "&gt;")
-            print(f"- [`{name}`]({search_link}) {type_str}  ")
+            print(f"{ret} | [{name}]({search_link}) | ", end="")
         if "comment" in var and var["comment"]:
-            for com in var["comment"]:
-                print("  " + com)
+            print("<br/>".join(var["comment"]))
+        else:
+            print("")
 
 
 setup_stdout("_casting")
 
-print("# Automatic casting of entities")
-print(
-    "When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions."
-)
-print("")
-print(
-    "To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)"
-)
-print(
-    "You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks"
-)
-print("")
-print("For reference, the available `as_<typename>` functions are listed below:")
-for known_cast in known_casts:
-    print("\n- " + known_cast)
+print("""
+# Automatic casting of entities
 
+When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
+
+To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md).
+
+You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks
+
+For reference, the available `as_<typename>` functions are listed below:\n""")
+
+for known_cast in known_casts:
+    print("- " + known_cast)
 
 setup_stdout("_enums")
 
@@ -899,22 +946,30 @@ end, ON.LEVEL)
 )
 for type in enums:
     print("\n## " + type["name"] + "\n")
+    search_link = (
+        "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + type["name"]
+    )
+    print(f"\n> Search script examples for [{type['name']}]({search_link})\n")
     if "comment" in type:
-        for com in type["comment"]:
-            print(com)
+        print("<br/>".join(type["comment"]))
+    print("""
+Name | Data | Description
+---- | ---- | -----------""")
     for var in type["vars"]:
         if var["name"]:
             print(
-                "- [`"
+                "["
                 + var["name"]
-                + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
+                + "](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
                 + type["name"]
                 + "."
                 + var["name"]
-                + ") "
-                + var["type"]
-            )
+                + ") | "
+                + var["type"] + " | "
+            , end="")
         else:
-            print("- " + var["type"])
+            print(var["type"] + " |  | ", end="")
         if "docs" in var:
             print(var["docs"])
+        else:
+            print("")
