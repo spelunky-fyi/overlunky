@@ -324,18 +324,11 @@ for file in api_files:
     data = open(file, "r").read().split("\n")
     for line in data:
         line = line.replace("*", "")
-        a = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*);', line)
-        b = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*)$', line)
-        if a and not a.group(1).startswith("__"):
-            if not getfunc(a.group(1)):
+        m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', line)
+        if m and not m.group(1).startswith("__"):
+            if not getfunc(m.group(1)):
                 funcs.append(
-                    {"name": a.group(1), "cpp": a.group(2), "comment": comment}
-                )
-            comment = []
-        elif b and not b.group(1).startswith("__"):
-            if not getfunc(b.group(1)):
-                funcs.append(
-                    {"name": b.group(1), "cpp": b.group(2), "comment": comment}
+                    {"name": m.group(1), "cpp": m.group(2), "comment": comment}
                 )
             comment = []
         c = re.search(r"/// ?(.*)$", line)
