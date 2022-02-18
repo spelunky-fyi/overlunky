@@ -47,6 +47,7 @@ header_files = [
     "../src/game_api/script/usertypes/socket_lua.hpp",
     "../src/imgui/imgui.h",
     "../src/game_api/script/usertypes/level_lua.cpp",
+    "../src/game_api/script/usertypes/gui_lua.cpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -131,6 +132,7 @@ not_functions = [
     "meta",
     "prng",
 ]
+cpp_type_exceptions = []
 skip = False
 
 
@@ -361,10 +363,12 @@ for file in api_files:
             (item for item in classes if item["name"] == cpp_type), dict()
         )
         if "member_funs" not in underlying_cpp_type:
-            continue # whatever, I'm not fixing this
-            raise RuntimeError(
-                "No member_funs found. Did you forget to include a header file at the top of the generate script?"
-            )
+            if cpp_type in cpp_type_exceptions:
+                underlying_cpp_type = {"name": cpp_type, "member_funs": {}, "member_vars": {}}
+            else:
+                raise RuntimeError(
+                    f"No member_funs found in \"{cpp_type}\" while looking for usertypes in file \"{file}\". Did you forget to include a header file at the top of the generate script? (if it isn't the problem then add it to cpp_type_exceptions list)"
+                )
 
         for var in attr:
             if not var:

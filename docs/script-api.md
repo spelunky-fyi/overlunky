@@ -4231,6 +4231,15 @@ Draw image to window.
 Current mouse cursor position in screen coordinates.
 - [`float x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) &ImVec2::x
 - [`float y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) &ImVec2::y
+### `Gamepad`
+- [`bool enabled`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) &Gamepad::enabled
+- [`buttons`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) &Gamepad::wButtons
+- [`float lt`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lt) &Gamepad::bLeftTrigger
+- [`float rt`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rt) &Gamepad::bRightTrigger
+- [`float lx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lx) &Gamepad::sThumbLX
+- [`float ly`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ly) &Gamepad::sThumbLY
+- [`float rx`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rx) &Gamepad::sThumbRX
+- [`float ry`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ry) &Gamepad::sThumbRY
 ### `ImGuiIO`
 - [`ImVec2      displaysize`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) &ImGuiIO::DisplaySize
 - [`float       framerate`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) &ImGuiIO::Framerate
