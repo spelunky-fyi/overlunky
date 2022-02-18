@@ -22,6 +22,3 @@
 [submodule "src/sockpp"]
 	path = src/sockpp
 	url = https://github.com/fpagliughi/sockpp
-[submodule "docs/slate"]
-	path = docs/slate
-	url = https://github.com/slatedocs/slate

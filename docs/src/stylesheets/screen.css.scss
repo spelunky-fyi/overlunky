@@ -179,6 +179,15 @@ body.light {
     font-size: 12px;
   }
 
+  .toc-list-h3 {
+    background-color: $nav-subitem-bg;
+  }
+
+  .toc-h3 {
+    padding-left: $nav-padding + $nav-padding +  $nav-indent;
+    font-size: 12px;
+  }
+
   .toc-footer {
     padding: 1em 0;
     margin-top: 1em;
@@ -345,7 +354,7 @@ body.light {
     @extend %left-col;
   }
 
-  &>h3 {
+  &>h4 {
     display: block;
     background-color: rgba(255, 255, 255, 0.05);
     padding: 0 $main-padding;
@@ -359,7 +368,7 @@ body.light {
   }
 
   // the div is the tocify hidden div for placeholding stuff
-  &>h1, &>h2, &>div {
+  &>h1, &>h2, &>h3, &>div {
     clear:both;
   }
 
@@ -391,6 +400,17 @@ body.light {
     // background-image: linear-gradient(to bottom, rgba(#fff, 0.07), rgba(#fff, 0));
   }
 
+  h3 {
+    @extend %header-font;
+    font-size: 16px;
+    margin-top: 0.5em;
+    margin-bottom: 0;
+    border-top: 1px solid #555;
+    padding-top: 1.2em;
+    padding-bottom: 1.2em;
+    // background-image: linear-gradient(to bottom, rgba(#fff, 0.07), rgba(#fff, 0));
+  }
+
   // h2s right after h1s should bump right up
   // against the h1s.
   h1 + h2, h1 + div + h2 {
@@ -398,14 +418,14 @@ body.light {
     border-top: none;
   }
 
-  h3, h4, h5, h6 {
+  h4, h5, h6 {
     @extend %header-font;
     font-size: 15px;
     margin-top: 2.5em;
     margin-bottom: 0.8em;
   }
 
-  h3 {
+  h4 {
     margin-top: 0;
     margin-bottom: 0.5em;
   }
@@ -525,8 +545,8 @@ body.light {
     padding: 2px;
     margin: -3px;
     border-radius: 4px;
-    border: 1px solid #F7E633;
-    background: linear-gradient(to top left, #F7E633 0%, #F1D32F 100%);
+    border: 1px solid #ea74e366;
+    background: #ea74e344;
   }
 }
 
@@ -544,7 +564,7 @@ body.light {
     background-color: rgba(0, 0, 0, 0.07);
     border-color: #ccc;
   }
-  &>h3 {
+  &>h4 {
     background-color: rgba(0, 0, 0, 0.05);
   }
 }
