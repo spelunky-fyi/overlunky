@@ -36,6 +36,11 @@ html, body {
   -webkit-text-size-adjust: none; /* Never autoresize text */
 }
 
+body.light {
+  color: $light-color;
+  background-color: $light-bg;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // TABLE OF CONTENTS
 ////////////////////////////////////////////////////////////////////////////////
@@ -277,6 +282,10 @@ html, body {
   }
 }
 
+.light .page-wrapper {
+  background-color: $light-bg;
+}
+
 .lang-selector {
   display: flex;
   background-color: $lang-select-bg;
@@ -338,7 +347,7 @@ html, body {
 
   &>h3 {
     display: block;
-    background-color: rgba(0,0,0,0.05);
+    background-color: rgba(255, 255, 255, 0.05);
     padding: 0 $main-padding;
     @extend %left-col;
     @extend %break-words;
@@ -361,9 +370,9 @@ html, body {
     padding-bottom: 0.5em;
     margin-bottom: $h1-margin-bottom;
     margin-top: 2em;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-    background-color: #fdfdfd;
+    border-top: 1px solid #555;
+    border-bottom: 1px solid #555;
+    background-color: rgba(255, 255, 255, 0.07);
   }
 
   h1:first-child, div:first-child + h1 {
@@ -376,10 +385,10 @@ html, body {
     font-size: 19px;
     margin-top: 4em;
     margin-bottom: 0;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid #555;
     padding-top: 1.2em;
     padding-bottom: 1.2em;
-    background-image: linear-gradient(to bottom, rgba(#fff, 0.2), rgba(#fff, 0));
+    // background-image: linear-gradient(to bottom, rgba(#fff, 0.07), rgba(#fff, 0));
   }
 
   // h2s right after h1s should bump right up
@@ -425,7 +434,7 @@ html, body {
 
     th {
       padding: 5px 5px;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid #555;
       vertical-align: bottom;
     }
 
@@ -434,7 +443,7 @@ html, body {
     }
 
     tr:last-child {
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid #555;
     }
 
     tr:nth-child(odd)>td {
@@ -482,6 +491,7 @@ html, body {
     margin-top: 1.5em;
     margin-bottom: 1.5em;
     background: $aside-notice-bg;
+    color: #222;
     line-height: 1.6;
 
     &.warning {
@@ -517,6 +527,25 @@ html, body {
     border-radius: 4px;
     border: 1px solid #F7E633;
     background: linear-gradient(to top left, #F7E633 0%, #F1D32F 100%);
+  }
+}
+
+.light .content {
+  table {
+    tr:nth-child(odd)>td {
+      background-color: darken($light-bg,4.2%);
+    }
+
+    tr:nth-child(even)>td {
+      background-color: darken($light-bg,2.4%);
+    }
+  }
+  h1 {
+    background-color: rgba(0, 0, 0, 0.07);
+    border-color: #ccc;
+  }
+  &>h3 {
+    background-color: rgba(0, 0, 0, 0.05);
   }
 }
 
@@ -644,4 +673,12 @@ html, body {
 
 .copy-clipboard:hover {
   opacity: 0.8;
+}
+
+.content a, .content a:visited {
+  color: #ea74e3 !important;
+  text-decoration: none;
+}
+.content a:active, .content a:hover {
+  text-decoration: underline;
 }

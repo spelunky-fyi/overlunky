@@ -1,9 +1,6 @@
 ---
 title: Overlunky/Playlunky Lua API
 
-language_tabs: # must be one of https://git.io/vQNgJ
-  - lua
-
 includes:
   - home
   - globals

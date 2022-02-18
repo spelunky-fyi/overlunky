@@ -1,5 +1,4 @@
 #!/bin/bash
-python generate.py
 rm -rf fonts images javascripts stylesheets
 cp -r src/* slate/source/
 cd slate
