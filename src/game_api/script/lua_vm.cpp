@@ -130,7 +130,7 @@ end
     NEntityFlags::register_usertypes(lua);
     NEntityCasting::register_usertypes(lua);
 
-    /// 
+    ///
     /// ```lua
     /// if state.time_level > 300 and state.theme == THEME.DWELLING then
     ///     toast("Congratulations for lasting 5 seconds in Dwelling")

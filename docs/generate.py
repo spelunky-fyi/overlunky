@@ -200,6 +200,8 @@ def print_af(lf, af):
     if lf["comment"] and lf["comment"][0] == "NoDoc":
         return
     ret = replace_all(af["return"], replace) or "nil"
+    if is_custom_type(ret):
+        ret = f"[{ret}](#{ret.lower()})"
     name = lf["name"]
     param = replace_all(af["param"], replace)
     fun = f"{ret} {name}({param})".strip()
@@ -207,7 +209,7 @@ def print_af(lf, af):
     print(f"\n## {name}\n")
     include_example(name)
     print(f"\n> Search script examples for [{name}]({search_link})\n")
-    print(f"`{fun}`\n")
+    print(f"### {fun}\n")
     for com in lf["comment"]:
         print(com)
 
@@ -789,12 +791,14 @@ for lf in funcs:
             param = (m or m2).group(1)
             param = replace_all(param, replace).strip()
         name = lf["name"]
+        if is_custom_type(ret):
+            ret = f"[{ret}](#{ret.lower()})"
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
         print(f"\n## {name}\n")
         include_example(name)
         print(f"\n> Search script examples for [{name}]({search_link})\n")
-        print(f"`{fun}`<br/>")
+        print(f"### {fun}<br/>")
         for com in lf["comment"]:
             print(com + "<br/>", end="")
 
