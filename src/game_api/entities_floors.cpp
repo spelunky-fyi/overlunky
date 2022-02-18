@@ -777,8 +777,8 @@ void Door::unlock(bool unlock)
                 {
                     if (main_door->door_blocker->type->id == fx_maindoor)
                     {
-                        main_door->door_blocker->as<Movable>()->move_state = 5; // this will kill it and hide the blocking BG
-                        main_door->door_blocker = nullptr;
+                        main_door->door_blocker->as<Movable>()->move_state = 5; // this will kill it
+                        main_door->door_blocker = nullptr;                      // unlock the door, but the backgound still stays
                     }
                     else
                     {

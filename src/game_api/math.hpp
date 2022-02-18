@@ -109,15 +109,10 @@ struct XY
         const XY mp{-px, -py};
 
         *this += mp;
-        {
-            const XY copy = *this;
-            *this = {
-                copy.x * cos_a - copy.y * sin_a,
-                copy.y * cos_a + copy.x * sin_a,
-            };
-        }
-        *this = *this + p;
-        return *this;
+        const XY copy = *this;
+        this->x = copy.x * cos_a - copy.y * sin_a;
+        this->y = copy.y * cos_a + copy.x * sin_a;
+        return *this += p;
     }
 
     XY operator+(const XY& a) const
