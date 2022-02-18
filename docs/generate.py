@@ -200,6 +200,7 @@ def print_af(lf, af):
     if lf["comment"] and lf["comment"][0] == "NoDoc":
         return
     ret = replace_all(af["return"], replace) or "nil"
+    ret = ret.replace("<", "&lt;").replace(">", "&gt;")
     if is_custom_type(ret):
         ret = f"[{ret}](#{ret.lower()})"
     name = lf["name"]

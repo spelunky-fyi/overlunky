@@ -10,3 +10,5 @@ bundle exec middleman build
 cp -r build/* ..
 rm -rf build
 cd ..
+git add *
+git commit -am "update slate[no ci]"

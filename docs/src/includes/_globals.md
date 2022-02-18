@@ -540,7 +540,7 @@ Short for [set_door_target](#set_door_target).
 
 > Search script examples for [get_door_target](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_door_target)
 
-### tuple<int, int, int> get_door_target(int uid)
+### tuple&lt;int, int, int&gt; get_door_target(int uid)
 
 Get door target `world`, `level`, `theme`
 
@@ -590,7 +590,7 @@ Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` 
 
 > Search script examples for [get_entities_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 
-### array<int> get_entities_by(array<ENT_TYPE> entity_types, int mask, LAYER layer)
+### array&lt;int&gt; get_entities_by(array<ENT_TYPE> entity_types, int mask, LAYER layer)
 
 Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -599,7 +599,7 @@ Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to i
 
 > Search script examples for [get_entities_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 
-### array<int> get_entities_by(ENT_TYPE entity_type, int mask, LAYER layer)
+### array&lt;int&gt; get_entities_by(ENT_TYPE entity_type, int mask, LAYER layer)
 
 Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -615,7 +615,7 @@ Get uids of entities matching id. This function is variadic, meaning it accepts 
 
 > Search script examples for [get_entities_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 
-### array<int> get_entities_at(array<ENT_TYPE> entity_types, int mask, float x, float y, LAYER layer, float radius)
+### array&lt;int&gt; get_entities_at(array<ENT_TYPE> entity_types, int mask, float x, float y, LAYER layer, float radius)
 
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -624,7 +624,7 @@ Get uids of matching entities inside some radius. Set `entity_type` or `mask` to
 
 > Search script examples for [get_entities_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 
-### array<int> get_entities_at(ENT_TYPE entity_type, int mask, float x, float y, LAYER layer, float radius)
+### array&lt;int&gt; get_entities_at(ENT_TYPE entity_type, int mask, float x, float y, LAYER layer, float radius)
 
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -633,7 +633,7 @@ Get uids of matching entities inside some radius. Set `entity_type` or `mask` to
 
 > Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
-### array<int> get_entities_overlapping_hitbox(array<ENT_TYPE> entity_types, int mask, AABB hitbox, LAYER layer)
+### array&lt;int&gt; get_entities_overlapping_hitbox(array<ENT_TYPE> entity_types, int mask, AABB hitbox, LAYER layer)
 
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -642,7 +642,7 @@ Get uids of matching entities overlapping with the given hitbox. Set `entity_typ
 
 > Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
-### array<int> get_entities_overlapping_hitbox(ENT_TYPE entity_type, int mask, AABB hitbox, LAYER layer)
+### array&lt;int&gt; get_entities_overlapping_hitbox(ENT_TYPE entity_type, int mask, AABB hitbox, LAYER layer)
 
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -733,7 +733,7 @@ Get the current set zoom level
 
 > Search script examples for [game_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_position)
 
-### tuple<float, float> game_position(float x, float y)
+### tuple&lt;float, float&gt; game_position(float x, float y)
 
 Get the game coordinates at the screen position (`x`, `y`)
 
@@ -742,7 +742,7 @@ Get the game coordinates at the screen position (`x`, `y`)
 
 > Search script examples for [screen_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_position)
 
-### tuple<float, float> screen_position(float x, float y)
+### tuple&lt;float, float&gt; screen_position(float x, float y)
 
 Translate an entity position to screen position to be used in drawing functions
 
@@ -760,7 +760,7 @@ Translate a distance of `x` tiles to screen distance to be be used in drawing fu
 
 > Search script examples for [get_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_position)
 
-### tuple<float, float, int> get_position(int uid)
+### tuple&lt;float, float, int&gt; get_position(int uid)
 
 Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
 you're standing on, not real level coordinates.
@@ -770,7 +770,7 @@ you're standing on, not real level coordinates.
 
 > Search script examples for [get_render_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_render_position)
 
-### tuple<float, float, int> get_render_position(int uid)
+### tuple&lt;float, float, int&gt; get_render_position(int uid)
 
 Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
 
@@ -779,7 +779,7 @@ Get interpolated render position `x, y, layer` of entity by uid. This gives smoo
 
 > Search script examples for [get_velocity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_velocity)
 
-### tuple<float, float> get_velocity(int uid)
+### tuple&lt;float, float&gt; get_velocity(int uid)
 
 Get velocity `vx, vy` of an entity by uid. Use this, don't use `Entity.velocityx/velocityy` because those are relative to `Entity.overlay`.
 
@@ -851,7 +851,7 @@ Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, ca
 
 > Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
-### array<int> entity_get_items_by(int uid, array<ENT_TYPE> entity_types, int mask)
+### array&lt;int&gt; entity_get_items_by(int uid, array<ENT_TYPE> entity_types, int mask)
 
 Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
 
@@ -860,7 +860,7 @@ Gets uids of entities attached to given entity uid. Use `entity_type` and `mask`
 
 > Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
-### array<int> entity_get_items_by(int uid, ENT_TYPE entity_type, int mask)
+### array&lt;int&gt; entity_get_items_by(int uid, ENT_TYPE entity_type, int mask)
 
 Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
 
@@ -1195,7 +1195,7 @@ Basically gets the absolute coordinates of the area inside the unbreakable bedro
 
 > Search script examples for [get_camera_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_camera_position)
 
-### tuple<float, float> get_camera_position()
+### tuple&lt;float, float&gt; get_camera_position()
 
 Gets the current camera position in the level
 
@@ -2071,7 +2071,7 @@ end, ON.POST_ROOM_GENERATION)
 
 > Search script examples for [get_entities](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
 
-### array<int> get_entities()
+### array&lt;int&gt; get_entities()
 
 Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
@@ -2080,7 +2080,7 @@ Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_mask)
 
-### array<int> get_entities_by_mask(int mask)
+### array&lt;int&gt; get_entities_by_mask(int mask)
 
 Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
@@ -2089,7 +2089,7 @@ Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
 
-### array<int> get_entities_by_layer(LAYER layer)
+### array&lt;int&gt; get_entities_by_layer(LAYER layer)
 
 Use `get_entities_by(0, MASK.ANY, layer)` instead
 
@@ -2098,7 +2098,7 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-### array<int> get_entities_overlapping(array<ENT_TYPE> entity_types, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)
+### array&lt;int&gt; get_entities_overlapping(array<ENT_TYPE> entity_types, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 
 Use `get_entities_overlapping_hitbox` instead
 
@@ -2107,7 +2107,7 @@ Use `get_entities_overlapping_hitbox` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-### array<int> get_entities_overlapping(ENT_TYPE entity_type, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)
+### array&lt;int&gt; get_entities_overlapping(ENT_TYPE entity_type, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)
 
 Use `get_entities_overlapping_hitbox` instead
 
