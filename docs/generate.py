@@ -864,60 +864,83 @@ for i,id in ipairs(ids) do
 end
 ```"""
 )
+
+type_cats = dict()
+
 for type in types:
-    print("\n## " + type["name"] + "\n")
-    include_example(type["name"])
-    if "comment" in type:
-        for com in type["comment"]:
-            print(com)
-    if type["base"]:
-        print("Derived from", end="")
-        bases = type["base"].split(",")
-        for base in bases:
-            print(" [" + base + "](#" + base.lower() + ")", end="")
-        print("\n")
-    print("""
-Type | Name | Description
----- | ---- | -----------""")
-    for var in type["vars"]:
-        search_link = (
-            "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
-        )
-        if "signature" in var:
-            signature = var["signature"]
-            n = re.search(r"^\s*([^\( ]*)(\(([^\)]*))", var["signature"])
-            m = re.search(r"\s*([^\(]*)\s+([^\( ]*)(\(([^\)]*))?", var["signature"])
-            ret = ""
-            name = ""
-            param = ""
-            if n:
-                name = n.group(1)
-                ret = name == type["name"] and name or ""
-                name = name == type["name"] and "new" or name
+    cat = "Generic"
+    if "Floor" in type["base"] or type["name"] == "Floor":
+        cat = "Floors"
+    elif "PowerupCapable" in type["base"] or type["name"] == "PowerupCapable":
+        cat = "Monsters, Inc."
+    elif "Movable" in type["base"] or type["name"] == "Movable":
+        cat = "Movable entities"
+    elif "Entity" in type["base"] or type["name"] == "Entity":
+        cat = "Other entities"
+    elif "Screen" in type["base"] or type["name"] == "Screen":
+        cat = "Game screens"
+    elif "JournalPage" in type["base"] or type["name"] == "JournalPage":
+        cat = "Journal pages"
+    if not cat in type_cats:
+        type_cats[cat] = []
+    type_cats[cat].append(type)
+
+for cat in type_cats:
+    print("\n## " + cat + "\n")
+    for type in type_cats[cat]:
+        print("\n### " + type["name"] + "\n")
+        include_example(type["name"])
+        if "comment" in type:
+            for com in type["comment"]:
+                print(com)
+        if type["base"]:
+            print("Derived from", end="")
+            bases = type["base"].split(",")
+            for base in bases:
+                print(" [" + base + "](#" + base.lower() + ")", end="")
+            print("\n")
+        print("""
+    Type | Name | Description
+    ---- | ---- | -----------""")
+        for var in type["vars"]:
+            search_link = (
+                "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
+            )
+            if "signature" in var:
+                signature = var["signature"]
+                n = re.search(r"^\s*([^\( ]*)(\(([^\)]*))", var["signature"])
+                m = re.search(r"\s*([^\(]*)\s+([^\( ]*)(\(([^\)]*))?", var["signature"])
+                ret = ""
+                name = ""
                 param = ""
-                if n.group(2):
-                    param = replace_all(n.group(2), replace) + ")" or ""
-                signature = name + param
-            elif m:
-                ret = replace_all(m.group(1), replace) or "nil"
-                name = m.group(2)
-                param = ""
-                if m.group(3):
-                    param = replace_all(m.group(3), replace) + ")" or ""
-                signature = name + param
-            signature = signature.strip()
-            ret = ret.replace("<", "&lt;").replace(">", "&gt;")
-            if is_custom_type(ret):
-                ret = f"[{ret}](#{ret.lower()})"
-            print(f"{ret} | [{signature}]({search_link}) | ", end="")
-        else:
-            ret = ""
-            name = var["name"]
-            print(f"{ret} | [{name}]({search_link}) | ", end="")
-        if "comment" in var and var["comment"]:
-            print("<br/>".join(var["comment"]))
-        else:
-            print("")
+                if n:
+                    name = n.group(1)
+                    ret = name == type["name"] and name or ""
+                    name = name == type["name"] and "new" or name
+                    param = ""
+                    if n.group(2):
+                        param = replace_all(n.group(2), replace) + ")" or ""
+                    signature = name + param
+                elif m:
+                    ret = replace_all(m.group(1), replace) or "nil"
+                    name = m.group(2)
+                    param = ""
+                    if m.group(3):
+                        param = replace_all(m.group(3), replace) + ")" or ""
+                    signature = name + param
+                signature = signature.strip()
+                ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+                if is_custom_type(ret):
+                    ret = f"[{ret}](#{ret.lower()})"
+                print(f"{ret} | [{signature}]({search_link}) | ", end="")
+            else:
+                ret = ""
+                name = var["name"]
+                print(f"{ret} | [{name}]({search_link}) | ", end="")
+            if "comment" in var and var["comment"]:
+                print("<br/>".join(var["comment"]))
+            else:
+                print("")
 
 
 setup_stdout("_casting")
