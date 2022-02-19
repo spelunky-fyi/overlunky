@@ -276,6 +276,14 @@ class PatternCommandBuffer
         return *this;
     }
 
+    // Rapid prototyping only please
+    PatternCommandBuffer& from_exe_base(uint64_t offset)
+    {
+        commands.push_back({CommandType::FromExeBase, {.base_offset = offset}});
+        commands.push_back({CommandType::AtExe});
+        return *this;
+    }
+
     std::optional<size_t> operator()(Memory mem, const char* exe, std::string_view address_name) const
     {
         size_t offset = mem.after_bundle;
@@ -350,6 +358,9 @@ class PatternCommandBuffer
             case CommandType::FunctionStart:
                 offset = ::function_start(offset);
                 break;
+            case CommandType::FromExeBase:
+                offset = data.base_offset;
+                break;
             default:
                 DEBUG("Unkown command...");
                 break;
@@ -394,6 +405,7 @@ class PatternCommandBuffer
         DecodeCall,
         AtExe,
         FunctionStart,
+        FromExeBase,
     };
     union CommandData
     {
@@ -404,6 +416,7 @@ class PatternCommandBuffer
         DecodePcArgs decode_pc_args;
         uint8_t decode_imm_prefix;
         GetVirtualFunctionAddressArgs get_vfunc_addr_args;
+        uint64_t base_offset;
     };
     struct Command
     {
@@ -615,7 +628,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "level_gen_entry"sv,
-        // Put a bp on the virtual LevelInfo::populate_level, start a new game, the caller is this function
+        // Put a bp on the virtual LevelInfo::spawn_level, start a new game, the caller is this function
         PatternCommandBuffer{}
             .find_inst("\xE8****\x41\x80\x7F**\x7C\x22"sv)
             .decode_call()
@@ -809,6 +822,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\xe8****\xc7\x44\x24\x50"sv)
             .find_next_inst("\xe8****\xc7\x44\x24\x50"sv)
             .find_next_inst("\xe8****\xc7\x44\x24\x50"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "render_layer"sv,
+        // Put a bp into LevelInfo::get_backlayer_lut, step out to the caller
+        // The next function that is called is this function
+        PatternCommandBuffer{}
+            .find_after_inst("\x49\x8b\x8f\x38\x13\x00\x00\x4d\x8b\x87\xa8\x13\x00\x00"sv)
+            .find_inst("\xe8"sv)
             .decode_call()
             .at_exe(),
     },

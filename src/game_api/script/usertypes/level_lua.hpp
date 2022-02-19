@@ -29,6 +29,8 @@ struct PostRoomGenerationContext
     bool mark_as_set_room(uint32_t x, uint32_t y, LAYER layer);
     /// Unmarks the room as a set-room
     bool unmark_as_set_room(uint32_t x, uint32_t y, LAYER layer);
+    /// Set the shop type for a specific room, does nothing if the room is not a shop
+    bool set_shop_type(uint32_t x, uint32_t y, LAYER layer, int32_t shop_type);
     /// Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.
     /// Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
     /// Returns `false` if the given chance is not defined.

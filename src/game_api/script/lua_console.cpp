@@ -778,7 +778,7 @@ bool LuaConsole::pre_draw()
         ImGui::PushItemWidth(ImGui::GetWindowWidth() - indent_size);
         ImGui::Indent(indent_size);
         ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine;
-        if (ImGui::InputTextMultiline("", console_input, IM_ARRAYSIZE(console_input), ImVec2{-1, -1}, input_text_flags, input_callback, this))
+        if (ImGui::InputTextMultiline("##ConsoleInput", console_input, IM_ARRAYSIZE(console_input), ImVec2{-1, -1}, input_text_flags, input_callback, this))
         {
             if (console_input[0] != '\0')
             {

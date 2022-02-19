@@ -9,7 +9,7 @@ jobs:
   build:
     name: Build
 
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
       - uses: actions/checkout@v2
         with:
@@ -24,8 +24,8 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DBUILD_INFO_DUMP=OFF
-          cmake --build . --config Release --target ALL_BUILD
+          cmake .. -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=OFF
+          cmake --build . --config Release
 
       - name: Create artifacts
         run: |
