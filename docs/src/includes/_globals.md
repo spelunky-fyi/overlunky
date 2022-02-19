@@ -1,6 +1,6 @@
 # Global variables
 These variables are always there to use.
-## meta
+### meta
 
 > Search script examples for [meta](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=meta)
 
@@ -9,7 +9,7 @@ Table of strings where you should set some script metadata shown in the UI.
 - `meta.version` Version
 - `meta.description` Short description of the script
 - `meta.author` Your name
-## state
+### state
 
 > Search script examples for [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state)
 
@@ -20,22 +20,22 @@ if state.time_level > 300 and state.theme == THEME.DWELLING then
 end
 ```
 A bunch of [game state](#statememory) variables
-## game_manager
+### game_manager
 
 > Search script examples for [game_manager](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_manager)
 
 The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
-## online
+### online
 
 > Search script examples for [online](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online)
 
 The Online object has information about the online lobby and its players
-## players
+### players
 
 > Search script examples for [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players)
 
 An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
-## savegame
+### savegame
 
 
 > Print best time from savegame
@@ -48,12 +48,12 @@ prinspect(savegame.time_best
 > Search script examples for [savegame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=savegame)
 
 Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
-## options
+### options
 
 > Search script examples for [options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 
 Table of options set in the UI, added with the [register_option_functions](#register_option_int).
-## prng
+### prng
 
 > Search script examples for [prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prng)
 
@@ -74,21 +74,35 @@ The game functions like `spawn` use [level coordinates](#get_position). Draw fun
 > Search script examples for [register_console_command](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_console_command)
 
 #### nil register_console_command(string name, function cmd)<br/>
-Adds a command that can be used in the console.<br/>
+Adds a command that can be used in the console.
+
 ### load_script
 
 
 > Search script examples for [load_script](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
 
 #### nil load_script(string id)<br/>
-Load another script by id "author/name"<br/>
+Load another script by id "author/name"
+
 ### read_prng
 
 
 > Search script examples for [read_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_prng)
 
 #### array&lt;int&gt; read_prng()<br/>
-Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:<br/>```lua<br/>-- this should always print the same table D877...E555<br/>set_callback(function()<br/>  seed_prng(42069)<br/>  local prng = read_prng()<br/>  for i,v in ipairs(prng) do<br/>    message(string.format("%08X", v))<br/>  end<br/>end, ON.LEVEL)<br/>```<br/>
+Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
+
+```lua
+-- this should always print the same table D877...E555
+set_callback(function()
+  seed_prng(42069)
+  local prng = read_prng()
+  for i,v in ipairs(prng) do
+    message(string.format("%08X", v))
+  end
+end, ON.LEVEL)
+```
+
 ### warp
 
 
@@ -131,7 +145,10 @@ Enable/disable godmode for companions.
 > Search script examples for [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause)
 
 #### nil pause(bool p)<br/>
-Enable/disable game engine pause.<br/>This is just short for `state.pause == 32`, but that produces an audio bug<br/>I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work<br/>
+Enable/disable game engine pause.
+This is just short for `state.pause == 32`, but that produces an audio bug
+I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
+
 ### get_frame
 
 
@@ -147,7 +164,8 @@ Get the current global frame count since the game was started. You can use this 
 > Search script examples for [get_ms](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ms)
 
 #### nil get_ms()<br/>
-Get the current timestamp in milliseconds since the Unix Epoch.<br/>
+Get the current timestamp in milliseconds since the Unix Epoch.
+
 ### set_blood_multiplication
 
 
@@ -209,7 +227,8 @@ Enables or disables the journal
 > Search script examples for [raise](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
 
 #### nil raise()<br/>
-Raise a signal and probably crash the game<br/>
+Raise a signal and probably crash the game
+
 ### modify_ankh_health_gain
 
 
@@ -227,7 +246,8 @@ If you set `health` above the game max health it will be forced down to the game
 > Search script examples for [seed_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_prng)
 
 #### nil seed_prng(int seed)<br/>
-Seed the game prng.<br/>
+Seed the game prng.
+
 ### get_character_heart_color
 
 
@@ -261,21 +281,24 @@ Same as `Player.set_heart_color`
 > Search script examples for [get_level_config](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_config)
 
 #### int get_level_config([LEVEL_CONFIG](#level_config) config)<br/>
-Gets the value for the specified config<br/>
+Gets the value for the specified config
+
 ### rgba
 
 
 > Search script examples for [rgba](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rgba)
 
 #### [uColor](#aliases) rgba(int r, int g, int b, int a)<br/>
-Converts a color to int to be used in drawing functions. Use values from `0..255`.<br/>
+Converts a color to int to be used in drawing functions. Use values from `0..255`.
+
 ### create_image
 
 
 > Search script examples for [create_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image)
 
 #### tuple&lt;IMAGE, int, int&gt; create_image(string path)<br/>
-Create image from file. Returns a tuple containing id, width and height.<br/>
+Create image from file. Returns a tuple containing id, width and height.
+
 ## Message functions
 
 
@@ -285,49 +308,66 @@ Create image from file. Returns a tuple containing id, width and height.<br/>
 > Search script examples for [lua_print](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
 
 #### nil lua_print()<br/>
-Standard lua print function, prints directly to the console but not to the game<br/>
+Standard lua print function, prints directly to the console but not to the game
+
 ### print
 
 
 > Search script examples for [print](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=print)
 
 #### nil print(string message)<br/>
-Print a log message on screen.<br/>
+Print a log message on screen.
+
 ### message
 
 
 > Search script examples for [message](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=message)
 
 #### nil message(string message)<br/>
-Same as `print`<br/>
+Same as `print`
+
 ### prinspect
 
 
 > Search script examples for [prinspect](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prinspect)
 
 #### nil prinspect(variadic_args objects)<br/>
-Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.<br/>For example use it like this<br/>```lua<br/>prinspect(state.level, state.level_next)<br/>local some_stuff_in_a_table = {<br/>    some = state.time_total,<br/>    stuff = state.world<br/>}<br/>prinspect(some_stuff_in_a_table)<br/>```<br/>
+Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
+For example use it like this
+
+```lua
+prinspect(state.level, state.level_next)
+local some_stuff_in_a_table = {
+    some = state.time_total,
+    stuff = state.world
+}
+prinspect(some_stuff_in_a_table)
+```
+
 ### messpect
 
 
 > Search script examples for [messpect](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=messpect)
 
 #### nil messpect(variadic_args objects)<br/>
-Same as `prinspect`<br/>
+Same as `prinspect`
+
 ### toast
 
 
 > Search script examples for [toast](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast)
 
 #### nil toast(string message)<br/>
-Show a message that looks like a level feeling.<br/>
+Show a message that looks like a level feeling.
+
 ### say
 
 
 > Search script examples for [say](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=say)
 
 #### nil say(int entity_uid, string message, int unk_type, bool top)<br/>
-Show a message coming from an entity<br/>
+Show a message coming from an entity
+
 ### toast_visible
 
 
@@ -381,35 +421,45 @@ end, 60)
 > Search script examples for [set_interval](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_interval)
 
 #### [CallbackId](#aliases) set_interval(function cb, int frames)<br/>
-Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.<br/>Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.<br/>
+Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
+Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+
 ### set_timeout
 
 
 > Search script examples for [set_timeout](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_timeout)
 
 #### [CallbackId](#aliases) set_timeout(function cb, int frames)<br/>
-Returns unique id for the callback to be used in [clear_callback](#clear_callback).<br/>Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.<br/>
+Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
+
 ### set_global_interval
 
 
 > Search script examples for [set_global_interval](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_global_interval)
 
 #### [CallbackId](#aliases) set_global_interval(function cb, int frames)<br/>
-Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.<br/>Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.<br/>
+Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
+Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
+
 ### set_global_timeout
 
 
 > Search script examples for [set_global_timeout](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_global_timeout)
 
 #### [CallbackId](#aliases) set_global_timeout(function cb, int frames)<br/>
-Returns unique id for the callback to be used in [clear_callback](#clear_callback).<br/>Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.<br/>
+Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
+
 ### set_callback
 
 
 > Search script examples for [set_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback)
 
 #### [CallbackId](#aliases) set_callback(function cb, int screen)<br/>
-Returns unique id for the callback to be used in [clear_callback](#clear_callback).<br/>Add global callback function to be called on an [event](#on).<br/>
+Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+Add global callback function to be called on an [event](#on).
+
 ### clear_callback
 
 
@@ -432,126 +482,190 @@ end, 60)
 > Search script examples for [clear_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_callback)
 
 #### nil clear_callback(optional<[CallbackId](#aliases)> id)<br/>
-Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.<br/>
+Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.
+
 ### set_pre_entity_spawn
 
 
 > Search script examples for [set_pre_entity_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 
 #### [CallbackId](#aliases) set_pre_entity_spawn(function cb, [SPAWN_TYPE](#spawn_type) flags, int mask, variadic_args entity_types)<br/>
-Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.<br/>This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.<br/>In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.<br/>The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`<br/>
+Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
+This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
+In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
+The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
+
 ### set_post_entity_spawn
 
 
 > Search script examples for [set_post_entity_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_entity_spawn)
 
 #### [CallbackId](#aliases) set_post_entity_spawn(function cb, [SPAWN_TYPE](#spawn_type) flags, int mask, variadic_args entity_types)<br/>
-Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.<br/>This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.<br/>The callback signature is `nil post_entity_spawn(entity, spawn_flags)`<br/>
+Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
+This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
+The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
+
 ### clear_screen_callback
 
 
 > Search script examples for [clear_screen_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_screen_callback)
 
 #### nil clear_screen_callback(int screen_id, [CallbackId](#aliases) cb_id)<br/>
-Clears a callback that is specific to a screen.<br/>
+Clears a callback that is specific to a screen.
+
 ### set_pre_render_screen
 
 
 > Search script examples for [set_pre_render_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render_screen)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_pre_render_screen(int screen_id, function fun)<br/>
-Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.<br/>Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.<br/>
+Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
+
 ### set_post_render_screen
 
 
 > Search script examples for [set_post_render_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render_screen)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_post_render_screen(int screen_id, function fun)<br/>
-Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.<br/>Sets a callback that is called right after the screen is drawn.<br/>
+Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+Sets a callback that is called right after the screen is drawn.
+
 ### clear_entity_callback
 
 
 > Search script examples for [clear_entity_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_entity_callback)
 
 #### nil clear_entity_callback(int uid, [CallbackId](#aliases) cb_id)<br/>
-Clears a callback that is specific to an entity.<br/>
+Clears a callback that is specific to an entity.
+
 ### set_pre_statemachine
 
 
 > Search script examples for [set_pre_statemachine](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_statemachine)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_pre_statemachine(int uid, function fun)<br/>
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>`uid` has to be the uid of a `Movable` or else stuff will break.<br/>Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+`uid` has to be the uid of a `Movable` or else stuff will break.
+Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+
 ### set_post_statemachine
 
 
 > Search script examples for [set_post_statemachine](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_statemachine)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_post_statemachine(int uid, function fun)<br/>
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>`uid` has to be the uid of a `Movable` or else stuff will break.<br/>Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+`uid` has to be the uid of a `Movable` or else stuff will break.
+Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+
 ### set_on_destroy
 
 
 > Search script examples for [set_on_destroy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_destroy)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_on_destroy(int uid, function fun)<br/>
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.<br/>The callback signature is `nil on_destroy(Entity self)`<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
+The callback signature is `nil on_destroy(Entity self)`
+Use this only when no other approach works, this call can be expensive if overused.
+
 ### set_on_kill
 
 
 > Search script examples for [set_on_kill](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_kill)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_on_kill(int uid, function fun)<br/>
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.<br/>The callback signature is `nil on_kill(Entity self, Entity killer)`<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
+The callback signature is `nil on_kill(Entity self, Entity killer)`
+Use this only when no other approach works, this call can be expensive if overused.
+
 ### set_on_player_instagib
 
 
 > Search script examples for [set_on_player_instagib](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_player_instagib)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_on_player_instagib(int uid, function fun)<br/>
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.<br/>The callback signature is `bool on_player_instagib(Entity self)`<br/>The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.<br/>This is so that when the entity dies (from other causes), the death screen still gets shown.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
+The callback signature is `bool on_player_instagib(Entity self)`
+The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
+This is so that when the entity dies (from other causes), the death screen still gets shown.
+Use this only when no other approach works, this call can be expensive if overused.
+
 ### set_on_damage
 
 
 > Search script examples for [set_on_damage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_damage)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_on_damage(int uid, function fun)<br/>
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.<br/>The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`<br/>Note that damage_dealer can be nil ! (long fall, ...)<br/>DO NOT CALL `self:damage()` in the callback !<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
+The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
+Note that damage_dealer can be nil ! (long fall, ...)
+DO NOT CALL `self:damage()` in the callback !
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+
 ### set_on_open
 
 
 > Search script examples for [set_on_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_on_open(int uid, function fun)<br/>
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right when a container is opened via up+door, or weapon is shot.<br/>The callback signature is `nil on_open(Entity entity_self, Entity opener)`<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+The callback signature is `nil on_open(Entity entity_self, Entity opener)`
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+
 ### set_pre_collision1
 
 
 > Search script examples for [set_pre_collision1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision1)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_pre_collision1(int uid, function fun)<br/>
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+
 ### set_pre_collision2
 
 
 > Search script examples for [set_pre_collision2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collision2)
 
 #### optional&lt;[CallbackId](#aliases)&gt; set_pre_collision2(int uid, function fun)<br/>
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.<br/>Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.<br/>
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+
 ### set_vanilla_sound_callback
 
 
 > Search script examples for [set_vanilla_sound_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_vanilla_sound_callback)
 
 #### [CallbackId](#aliases) set_vanilla_sound_callback([VANILLA_SOUND](#vanilla_sound) name, [VANILLA_SOUND_CALLBACK_TYPE](#vanilla_sound_callback_type) types, function cb)<br/>
-Returns unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).<br/>Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound<br/>Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected<br/>If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any<br/>properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`<br/>
+Returns unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
+Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
+Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
+If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
+properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`
+
 ### clear_vanilla_sound_callback
 
 
 > Search script examples for [clear_vanilla_sound_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_vanilla_sound_callback)
 
 #### nil clear_vanilla_sound_callback([CallbackId](#aliases) id)<br/>
-Clears a previously set callback<br/>
+Clears a previously set callback
+
 ## Option functions
 
 
@@ -561,42 +675,51 @@ Clears a previously set callback<br/>
 > Search script examples for [register_option_int](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_int)
 
 #### nil register_option_int(string name, string desc, string long_desc, int value, int min, int max)<br/>
-Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft<br/>limits, you can override them in the UI with double click.<br/>
+Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
+limits, you can override them in the UI with double click.
+
 ### register_option_float
 
 
 > Search script examples for [register_option_float](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_float)
 
 #### nil register_option_float(string name, string desc, string long_desc, float value, float min, float max)<br/>
-Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft<br/>limits, you can override them in the UI with double click.<br/>
+Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
+limits, you can override them in the UI with double click.
+
 ### register_option_bool
 
 
 > Search script examples for [register_option_bool](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_bool)
 
 #### nil register_option_bool(string name, string desc, string long_desc, bool value)<br/>
-Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.<br/>
+Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
+
 ### register_option_string
 
 
 > Search script examples for [register_option_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_string)
 
 #### nil register_option_string(string name, string desc, string long_desc, string value)<br/>
-Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.<br/>
+Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
+
 ### register_option_combo
 
 
 > Search script examples for [register_option_combo](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_combo)
 
 #### nil register_option_combo(string name, string desc, string long_desc, string opts)<br/>
-Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,<br/>with a double `\0\0` at the end.<br/>
+Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
+with a double `\0\0` at the end.
+
 ### register_option_button
 
 
 > Search script examples for [register_option_button](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_button)
 
 #### nil register_option_button(string name, string desc, string long_desc, function on_click)<br/>
-Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.<br/>
+Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
+
 ## Spawn functions
 
 
@@ -867,28 +990,45 @@ Default function in spawn definitions to check whether a spawn is valid or not
 > Search script examples for [define_procedural_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_procedural_spawn)
 
 #### [PROCEDURAL_CHANCE](#procedural_chance) define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)<br/>
-Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.<br/>The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.<br/>Use for example when you can spawn only on the ceiling, under water or inside a shop.<br/>Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).<br/>If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.<br/>
+Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+Use for example when you can spawn only on the ceiling, under water or inside a shop.
+Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
+
 ### define_extra_spawn
 
 
 > Search script examples for [define_extra_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_extra_spawn)
 
 #### int define_extra_spawn(function do_spawn, function is_valid, int num_spawns_frontlayer, int num_spawns_backlayer)<br/>
-Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.<br/>The function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.<br/>The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.<br/>Use for example when you can spawn only on the ceiling, under water or inside a shop.<br/>Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).<br/>To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`<br/>No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.<br/>
+Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.
+The function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+Use for example when you can spawn only on the ceiling, under water or inside a shop.
+Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
+No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
+
 ### get_missing_extra_spawns
 
 
 > Search script examples for [get_missing_extra_spawns](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_missing_extra_spawns)
 
 #### tuple&lt;int, int&gt; get_missing_extra_spawns(int extra_spawn_chance_id)<br/>
-Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.<br/>Returns missing spawns in the front layer and missing spawns in the back layer in that order.<br/>The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.<br/>
+Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.
+Returns missing spawns in the front layer and missing spawns in the back layer in that order.
+The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.
+
 ### get_procedural_spawn_chance
 
 
 > Search script examples for [get_procedural_spawn_chance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_procedural_spawn_chance)
 
 #### int get_procedural_spawn_chance([PROCEDURAL_CHANCE](#procedural_chance) chance_id)<br/>
-Get the inverse chance of a procedural spawn for the current level.<br/>A return value of 0 does not mean the chance is infinite, it means the chance is zero.<br/>
+Get the inverse chance of a procedural spawn for the current level.
+A return value of 0 does not mean the chance is infinite, it means the chance is zero.
+
 ## Position functions
 
 
@@ -980,14 +1120,27 @@ Enables or disables the default position based camp camera bounds, to set them m
 > Search script examples for [distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance)
 
 #### float distance(int uid_a, int uid_b)<br/>
-Calculate the tile distance of two entities by uid<br/>
+Calculate the tile distance of two entities by uid
+
 ### get_bounds
 
 
 > Search script examples for [get_bounds](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bounds)
 
 #### tuple&lt;float, float, float, float&gt; get_bounds()<br/>
-Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be<br/>inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:<br/>```lua<br/>-- Draw the level boundaries<br/>set_callback(function(draw_ctx)<br/>    xmin, ymin, xmax, ymax = get_bounds()<br/>    sx, sy = screen_position(xmin, ymin) -- top left<br/>    sx2, sy2 = screen_position(xmax, ymax) -- bottom right<br/>    draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))<br/>end, ON.GUIFRAME)<br/>```<br/>
+Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
+inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
+
+```lua
+-- Draw the level boundaries
+set_callback(function(draw_ctx)
+    xmin, ymin, xmax, ymax = get_bounds()
+    sx, sy = screen_position(xmin, ymin) -- top left
+    sx2, sy2 = screen_position(xmax, ymax) -- bottom right
+    draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
+end, ON.GUIFRAME)
+```
+
 ### get_camera_position
 
 
@@ -1003,35 +1156,55 @@ Gets the current camera position in the level
 > Search script examples for [get_window_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_window_size)
 
 #### tuple&lt;int, int&gt; get_window_size()<br/>
-Gets the resolution (width and height) of the screen<br/>
+Gets the resolution (width and height) of the screen
+
 ### draw_text_size
 
 
 > Search script examples for [draw_text_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size)
 
 #### tuple&lt;float, float&gt; draw_text_size(float size, string text)<br/>
-Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.<br/>Example:<br/>```lua<br/>function on_guiframe(draw_ctx)<br/>    -- get a random color<br/>    color = math.random(0, 0xffffffff)<br/>    -- zoom the font size based on frame<br/>    size = (get_frame() % 199)+1<br/>    text = 'Awesome!'<br/>    -- calculate size of text<br/>    w, h = draw_text_size(size, text)<br/>    -- draw to the center of screen<br/>    draw_ctx:draw_text(0-w/2, 0-h/2, size, text, color)<br/>end<br/>```<br/>
+Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
+Example:
+
+```lua
+function on_guiframe(draw_ctx)
+    -- get a random color
+    color = math.random(0, 0xffffffff)
+    -- zoom the font size based on frame
+    size = (get_frame() % 199)+1
+    text = 'Awesome!'
+    -- calculate size of text
+    w, h = draw_text_size(size, text)
+    -- draw to the center of screen
+    draw_ctx:draw_text(0-w/2, 0-h/2, size, text, color)
+end
+```
+
 ### get_hitbox
 
 
 > Search script examples for [get_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox)
 
 #### [AABB](#aabb) get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)<br/>
-Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction<br/>
+Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
+
 ### get_render_hitbox
 
 
 > Search script examples for [get_render_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_render_hitbox)
 
 #### [AABB](#aabb) get_render_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)<br/>
-Same as `get_hitbox` but based on `get_render_position`<br/>
+Same as `get_hitbox` but based on `get_render_position`
+
 ### screen_aabb
 
 
 > Search script examples for [screen_aabb](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_aabb)
 
 #### [AABB](#aabb) screen_aabb([AABB](#aabb) box)<br/>
-Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions<br/>
+Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
+
 ## Entity functions
 
 
@@ -1095,7 +1268,8 @@ Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFF
 > Search script examples for [get_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
 
 #### [Entity](#entity) get_entity(int uid)<br/>
-Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)<br/>
+Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
+
 ### get_type
 
 
@@ -1120,7 +1294,8 @@ Gets a grid entity, such as floor or spikes, at the given position and layer.
 > Search script examples for [filter_entities](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=filter_entities)
 
 #### array&lt;int&gt; filter_entities(array<int> entities, function predicate)<br/>
-Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true<br/>
+Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
+
 ### get_entities_by
 
 
@@ -1145,7 +1320,19 @@ Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to i
 > Search script examples for [get_entities_by_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
 
 #### array&lt;int&gt; get_entities_by_type(int, int...)<br/>
-Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.<br/>You can even pass a table! Example:<br/>```lua<br/>types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}<br/>function on_level()<br/>    uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)<br/>    -- is not the same thing as this, but also works<br/>    uids2 = get_entities_by_type(entity_types)<br/>    message(tostring(#uids).." == "..tostring(#uids2))<br/>end<br/>```<br/>
+Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
+You can even pass a table! Example:
+
+```lua
+types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
+function on_level()
+    uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
+    -- is not the same thing as this, but also works
+    uids2 = get_entities_by_type(entity_types)
+    message(tostring(#uids).." == "..tostring(#uids2))
+end
+```
+
 ### get_entities_at
 
 
@@ -1564,7 +1751,8 @@ Set `state.level_flags`
 > Search script examples for [set_flag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_flag)
 
 #### [Flags](#aliases) set_flag([Flags](#aliases) flags, int bit)<br/>
-Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.<br/>
+Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+
 ### setflag
 
 
@@ -1578,7 +1766,8 @@ Set a bit in a number. This doesn't actually change the bit in the entity you pa
 > Search script examples for [clr_flag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_flag)
 
 #### [Flags](#aliases) clr_flag([Flags](#aliases) flags, int bit)<br/>
-Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.<br/>
+Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+
 ### clrflag
 
 
@@ -1592,7 +1781,8 @@ Clears a bit in a number. This doesn't actually change the bit in the entity you
 > Search script examples for [test_flag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_flag)
 
 #### bool test_flag([Flags](#aliases) flags, int bit)<br/>
-Returns true if a bit is set in the flags<br/>
+Returns true if a bit is set in the flags
+
 ### testflag
 
 
@@ -1654,42 +1844,48 @@ Adds entity as shop item, has to be movable (haven't tested many)
 > Search script examples for [steal_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
 
 #### nil steal_input(int uid)<br/>
-Steal input from a Player or HH.<br/>
+Steal input from a Player or HH.
+
 ### return_input
 
 
 > Search script examples for [return_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=return_input)
 
 #### nil return_input(int uid)<br/>
-Return input<br/>
+Return input
+
 ### send_input
 
 
 > Search script examples for [send_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
 
 #### nil send_input(int uid, [INPUTS](#inputs) buttons)<br/>
-Send input<br/>
+Send input
+
 ### read_input
 
 
 > Search script examples for [read_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
 
 #### [INPUTS](#inputs) read_input(int uid)<br/>
-Read input<br/>
+Read input
+
 ### read_stolen_input
 
 
 > Search script examples for [read_stolen_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
 
 #### [INPUTS](#inputs) read_stolen_input(int uid)<br/>
-Read input that has been previously stolen with steal_input<br/>
+Read input that has been previously stolen with steal_input
+
 ### mouse_position
 
 
 > Search script examples for [mouse_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouse_position)
 
 #### tuple&lt;float, float&gt; mouse_position()<br/>
-Current mouse cursor position in screen coordinates.<br/>
+Current mouse cursor position in screen coordinates.
+
 ### get_io
 
 
@@ -1732,7 +1928,9 @@ Will return the string of currently choosen language
 > Search script examples for [change_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_string)
 
 #### nil change_string([STRINGID](#aliases) id, string str)<br/>
-Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)<br/>This edits custom string and in game strings but changing the language in settings will reset game strings<br/>
+Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+This edits custom string and in game strings but changing the language in settings will reset game strings
+
 ### add_string
 
 
@@ -1876,35 +2074,47 @@ Extinguish a particle emitter (use the return value of `generate_world_particles
 > Search script examples for [set_pre_tile_code_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_tile_code_callback)
 
 #### [CallbackId](#aliases) set_pre_tile_code_callback(function cb, string tile_code)<br/>
-Add a callback for a specific tile code that is called before the game handles the tile code.<br/>The callback signature is `bool pre_tile_code(x, y, layer, room_template)`<br/>Return true in order to stop the game or scripts loaded after this script from handling this tile code.<br/>For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)<br/>
+Add a callback for a specific tile code that is called before the game handles the tile code.
+The callback signature is `bool pre_tile_code(x, y, layer, room_template)`
+Return true in order to stop the game or scripts loaded after this script from handling this tile code.
+For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
+
 ### set_post_tile_code_callback
 
 
 > Search script examples for [set_post_tile_code_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_tile_code_callback)
 
 #### [CallbackId](#aliases) set_post_tile_code_callback(function cb, string tile_code)<br/>
-Add a callback for a specific tile code that is called after the game handles the tile code.<br/>The callback signature is `nil post_tile_code(x, y, layer, room_template)`<br/>Use this to affect what the game or other scripts spawned in this position.<br/>This is received even if a previous pre-tile-code-callback has returned true<br/>
+Add a callback for a specific tile code that is called after the game handles the tile code.
+The callback signature is `nil post_tile_code(x, y, layer, room_template)`
+Use this to affect what the game or other scripts spawned in this position.
+This is received even if a previous pre-tile-code-callback has returned true
+
 ### define_tile_code
 
 
 > Search script examples for [define_tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_tile_code)
 
 #### [TILE_CODE](#tile_code) define_tile_code(string tile_code)<br/>
-Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.<br/>If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.<br/>
+Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
+If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
+
 ### get_short_tile_code
 
 
 > Search script examples for [get_short_tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code)
 
 #### optional&lt;int&gt; get_short_tile_code([ShortTileCodeDef](#shorttilecodedef) short_tile_code_def)<br/>
-Gets a short tile code based on definition, returns `nil` if it can't be found<br/>
+Gets a short tile code based on definition, returns `nil` if it can't be found
+
 ### get_short_tile_code_definition
 
 
 > Search script examples for [get_short_tile_code_definition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code_definition)
 
 #### optional&lt;[ShortTileCodeDef](#shorttilecodedef)&gt; get_short_tile_code_definition([SHORT_TILE_CODE](#aliases) short_tile_code)<br/>
-Gets the definition of a short tile code (if available), will vary depending on which file is loaded<br/>
+Gets the definition of a short tile code (if available), will vary depending on which file is loaded
+
 ## Room functions
 
 
@@ -1914,49 +2124,56 @@ Gets the definition of a short tile code (if available), will vary depending on 
 > Search script examples for [get_room_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_index)
 
 #### tuple&lt;int, int&gt; get_room_index(float x, float y)<br/>
-Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`<br/>
+Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
+
 ### get_room_pos
 
 
 > Search script examples for [get_room_pos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_pos)
 
 #### tuple&lt;float, float&gt; get_room_pos(int x, int y)<br/>
-Transform a room index into the top left corner position in the room<br/>
+Transform a room index into the top left corner position in the room
+
 ### get_room_template
 
 
 > Search script examples for [get_room_template](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template)
 
 #### optional&lt;int&gt; get_room_template(int x, int y, [LAYER](#layer) layer)<br/>
-Get the room template given a certain index, returns `nil` if coordinates are out of bounds<br/>
+Get the room template given a certain index, returns `nil` if coordinates are out of bounds
+
 ### is_room_flipped
 
 
 > Search script examples for [is_room_flipped](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_room_flipped)
 
 #### bool is_room_flipped(int x, int y)<br/>
-Get whether a room is flipped at the given index, returns `false` if coordinates are out of bounds<br/>
+Get whether a room is flipped at the given index, returns `false` if coordinates are out of bounds
+
 ### get_room_template_name
 
 
 > Search script examples for [get_room_template_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 
 #### string_view get_room_template_name(int room_template)<br/>
-For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined<br/>
+For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
+
 ### define_room_template
 
 
 > Search script examples for [define_room_template](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_room_template)
 
 #### int define_room_template(string room_template, [ROOM_TEMPLATE_TYPE](#room_template_type) type)<br/>
-Define a new room remplate to use with `set_room_template`<br/>
+Define a new room remplate to use with `set_room_template`
+
 ### set_room_template_size
 
 
 > Search script examples for [set_room_template_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_room_template_size)
 
 #### bool set_room_template_size(int room_template, int width, int height)<br/>
-Set the size of room template in tiles, the template must be of type `ROOM_TEMPLATE_TYPE.MACHINE_ROOM`.<br/>
+Set the size of room template in tiles, the template must be of type `ROOM_TEMPLATE_TYPE.MACHINE_ROOM`.
+
 ## Theme functions
 
 
@@ -1984,14 +2201,18 @@ Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(
 > Search script examples for [force_custom_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_theme)
 
 #### nil force_custom_theme()<br/>
-Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.<br/>Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.<br/>Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.<br/>
+Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
+Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
+Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
+
 ### force_custom_subtheme
 
 
 > Search script examples for [force_custom_subtheme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_subtheme)
 
 #### nil force_custom_subtheme()<br/>
-Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.<br/>
+Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.
+
 ## Sound functions
 
 
@@ -2001,14 +2222,16 @@ Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeIn
 > Search script examples for [create_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_sound)
 
 #### optional&lt;[CustomSound](#customsound)&gt; create_sound(string path)<br/>
-Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found<br/>
+Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
+
 ### get_sound
 
 
 > Search script examples for [get_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_sound)
 
 #### optional&lt;[CustomSound](#customsound)&gt; get_sound(string path_or_vanilla_sound)<br/>
-Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game<br/>
+Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
+
 ## Texture functions
 
 
@@ -2032,28 +2255,34 @@ Gets an existing sound, either if a file at the same path was already loaded or 
 > Search script examples for [get_texture_definition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture_definition)
 
 #### [TextureDefinition](#texturedefinition) get_texture_definition([TEXTURE](#texture) texture_id)<br/>
-Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`<br/>
+Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
+
 ### define_texture
 
 
 > Search script examples for [define_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_texture)
 
 #### [TEXTURE](#texture) define_texture([TextureDefinition](#texturedefinition) texture_data)<br/>
-Defines a new texture that can be used in Entity::set_texture<br/>If a texture with the same definition already exists the texture will be reloaded from disk.<br/>
+Defines a new texture that can be used in Entity::set_texture
+If a texture with the same definition already exists the texture will be reloaded from disk.
+
 ### get_texture
 
 
 > Search script examples for [get_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture)
 
 #### optional&lt;[TEXTURE](#texture)&gt; get_texture([TextureDefinition](#texturedefinition) texture_data)<br/>
-Gets a texture with the same definition as the given, if none exists returns `nil`<br/>
+Gets a texture with the same definition as the given, if none exists returns `nil`
+
 ### reload_texture
 
 
 > Search script examples for [reload_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reload_texture)
 
 #### nil reload_texture(string texture_path)<br/>
-Reloads a texture from disk, use this only as a development tool for example in the console<br/>Note that `define_texture` will also reload the texture if it already exists<br/>
+Reloads a texture from disk, use this only as a development tool for example in the console
+Note that `define_texture` will also reload the texture if it already exists
+
 ## Network functions
 
 
@@ -2063,14 +2292,16 @@ Reloads a texture from disk, use this only as a development tool for example in 
 > Search script examples for [udp_listen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
 
 #### UdpServer udp_listen(string host, in_port_t port, function cb)<br/>
-Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.<br/>
+Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
+
 ### udp_send
 
 
 > Search script examples for [udp_send](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_send)
 
 #### nil udp_send(string host, in_port_t port, string msg)<br/>
-Send data to specified UDP address. Requires unsafe mode.<br/>
+Send data to specified UDP address. Requires unsafe mode.
+
 ## Deprecated functions
 
 <aside class='warning'>These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!</aside>

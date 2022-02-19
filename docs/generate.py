@@ -651,6 +651,9 @@ print(
     "- This doc and the examples are written for a person who already knows [how to program in Lua](http://lua-users.org/wiki/TutorialDirectory)."
 )
 print(
+    "- This doc doesn't cover how to actually load scripts. Check the [README](https://github.com/spelunky-fyi/overlunky/#scripts) for instructions."
+)
+print(
     "- This doc is up to date for the Overlunky [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) and Playlunky [nightly build](https://github.com/spelunky-fyi/Playlunky/releases/tag/nightly). If you're using a stable release from the past, you might find some things here don't work."
 )
 print(
@@ -768,7 +771,7 @@ print("# Global variables")
 print("""These variables are always there to use.""")
 for lf in funcs:
     if lf["name"] in not_functions:
-        print("## " + lf["name"] + "\n")
+        print("### " + lf["name"] + "\n")
         include_example(lf["name"])
         print(
             "> Search script examples for ["
@@ -868,7 +871,7 @@ for cat in func_cats:
             print(f"\n> Search script examples for [{name}]({search_link})\n")
             print(f"#### {fun}<br/>")
             for com in lf["comment"]:
-                print(com + "<br/>", end="")
+                print(com.replace("```lua", "\n```lua"))
 
 print("\n## Deprecated functions\n")
 print(
