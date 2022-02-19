@@ -65,7 +65,7 @@ The global prng state, calling any function on it will advance the prng state, t
 # Functions
 The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 
-## Generic fuctions
+## Generic functions
 
 
 ### register_console_command
