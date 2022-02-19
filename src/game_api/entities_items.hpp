@@ -14,13 +14,13 @@ class Backpack : public Movable
     uint16_t unknown1;
     uint32_t unknown2;
 
-    virtual void v93() = 0;
-    virtual void v94() = 0;
-    virtual void v95() = 0;
-    virtual void v96() = 0;
-    virtual void v97() = 0;
-    virtual void v98() = 0;
-    virtual void v99() = 0;
+    virtual void v93() = 0; // always returns 0x100000007 (maybe two 32bit values, 1 and 7 ?)
+    virtual void v94() = 0; // just return
+    virtual void v95() = 0; // just return
+    virtual void on_putting_on(Entity* who) = 0;
+    virtual void on_putting_off(Entity* who) = 0;
+    virtual bool is_active() = 0;          // for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack, hoverpack.is_on, teleporter and powerpack return false
+    virtual void play_warning_sound() = 0; // plays the warning sound before explosion for jet, teleporter, hover and power pack
 };
 
 class Jetpack : public Backpack
@@ -66,7 +66,9 @@ class Cape : public Backpack
     uint8_t padding3;
     uint32_t floating_count; // it's per level, not per cape
 
-    virtual void v100() = 0;
+    // clear particle? called when using backpack.trigger_explosion when the cape is about to disappear
+    // it's a common funciton
+    virtual void v100(size_t unknown) = 0;
 };
 
 class VladsCape : public Cape
@@ -77,7 +79,7 @@ class VladsCape : public Cape
 
 class Purchasable : public Movable
 {
-    virtual void buy() = 0;
+    virtual void buy(Entity* who) = 0;
 };
 
 class DummyPurchasableEntity : public Purchasable
@@ -208,13 +210,6 @@ class HangStrand : public Movable
 {
   public:
     float start_pos_y;
-
-    virtual void v93() = 0;
-    virtual void v94() = 0;
-    virtual void v95() = 0;
-    virtual void v96() = 0;
-    virtual void v97() = 0;
-    virtual void v98() = 0;
 };
 
 class HangAnchor : public Movable
@@ -523,7 +518,7 @@ class OlmecCannon : public Movable
     uint16_t timer;
     uint8_t bombs_left;
 
-    virtual void v93() = 0;
+    virtual void spawn_projectile() = 0;
 };
 
 class Landmine : public LightEmitter
@@ -715,7 +710,7 @@ class RollingItem : public Purchasable
   public:
     float roll_speed; // only positive numbers
 
-    virtual void v94() = 0;
+    virtual void on_purchase(Entity* who, int32_t unknown) = 0; // give you the powerup if you buy it
 };
 
 class PlayerBag : public Movable
@@ -728,10 +723,9 @@ class PlayerBag : public Movable
 class Powerup : public Movable
 {
   public:
-    // thoes could be wrong becouse of the update
-    virtual void apply_effect_to_player(Player* player) = 0;
-    virtual void remove_effect_from_player(Player* player) = 0;
-    virtual void v95() = 0;
+    virtual size_t& v93(size_t&) = 0;                      // get powerup id/type?
+    virtual void apply_effect(PowerupCapable* player) = 0; // runs when getting the powerup
+    virtual void remove_effect(PowerupCapable* player) = 0;
     // 3 more here, but they just return instantly
 };
 
