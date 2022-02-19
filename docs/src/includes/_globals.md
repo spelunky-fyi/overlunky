@@ -233,7 +233,7 @@ Seed the game prng.<br/>
 
 > Search script examples for [get_character_heart_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_character_heart_color)
 
-#### [Color](#color) get_character_heart_color(ENT_TYPE type_id)
+#### [Color](#color) get_character_heart_color([ENT_TYPE](#ent_type) type_id)
 
 Same as `Player.get_heart_color`
 
@@ -242,7 +242,7 @@ Same as `Player.get_heart_color`
 
 > Search script examples for [is_character_female](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_character_female)
 
-#### bool is_character_female(ENT_TYPE type_id)
+#### bool is_character_female([ENT_TYPE](#ent_type) type_id)
 
 Same as `Player.is_female`
 
@@ -251,7 +251,7 @@ Same as `Player.is_female`
 
 > Search script examples for [set_character_heart_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_character_heart_color)
 
-#### nil set_character_heart_color(ENT_TYPE type_id, Color color)
+#### nil set_character_heart_color([ENT_TYPE](#ent_type) type_id, [Color](#color) color)
 
 Same as `Player.set_heart_color`
 
@@ -260,7 +260,7 @@ Same as `Player.set_heart_color`
 
 > Search script examples for [get_level_config](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_config)
 
-#### int get_level_config(LEVEL_CONFIG config)<br/>
+#### int get_level_config([LEVEL_CONFIG](#level_config) config)<br/>
 Gets the value for the specified config<br/>
 ### rgba
 
@@ -431,28 +431,28 @@ end, 60)
 
 > Search script examples for [clear_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_callback)
 
-#### nil clear_callback(optional<CallbackId> id)<br/>
+#### nil clear_callback(optional<[CallbackId](#aliases)> id)<br/>
 Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.<br/>
 ### set_pre_entity_spawn
 
 
 > Search script examples for [set_pre_entity_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 
-#### [CallbackId](#aliases) set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)<br/>
+#### [CallbackId](#aliases) set_pre_entity_spawn(function cb, [SPAWN_TYPE](#spawn_type) flags, int mask, variadic_args entity_types)<br/>
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.<br/>This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.<br/>In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.<br/>The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`<br/>
 ### set_post_entity_spawn
 
 
 > Search script examples for [set_post_entity_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_entity_spawn)
 
-#### [CallbackId](#aliases) set_post_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)<br/>
+#### [CallbackId](#aliases) set_post_entity_spawn(function cb, [SPAWN_TYPE](#spawn_type) flags, int mask, variadic_args entity_types)<br/>
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.<br/>This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.<br/>The callback signature is `nil post_entity_spawn(entity, spawn_flags)`<br/>
 ### clear_screen_callback
 
 
 > Search script examples for [clear_screen_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_screen_callback)
 
-#### nil clear_screen_callback(int screen_id, CallbackId cb_id)<br/>
+#### nil clear_screen_callback(int screen_id, [CallbackId](#aliases) cb_id)<br/>
 Clears a callback that is specific to a screen.<br/>
 ### set_pre_render_screen
 
@@ -473,7 +473,7 @@ Returns unique id for the callback to be used in [clear_screen_callback](#clear_
 
 > Search script examples for [clear_entity_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_entity_callback)
 
-#### nil clear_entity_callback(int uid, CallbackId cb_id)<br/>
+#### nil clear_entity_callback(int uid, [CallbackId](#aliases) cb_id)<br/>
 Clears a callback that is specific to an entity.<br/>
 ### set_pre_statemachine
 
@@ -543,14 +543,14 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 
 > Search script examples for [set_vanilla_sound_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_vanilla_sound_callback)
 
-#### [CallbackId](#aliases) set_vanilla_sound_callback(VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, function cb)<br/>
+#### [CallbackId](#aliases) set_vanilla_sound_callback([VANILLA_SOUND](#vanilla_sound) name, [VANILLA_SOUND_CALLBACK_TYPE](#vanilla_sound_callback_type) types, function cb)<br/>
 Returns unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).<br/>Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound<br/>Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected<br/>If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any<br/>properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`<br/>
 ### clear_vanilla_sound_callback
 
 
 > Search script examples for [clear_vanilla_sound_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_vanilla_sound_callback)
 
-#### nil clear_vanilla_sound_callback(CallbackId id)<br/>
+#### nil clear_vanilla_sound_callback([CallbackId](#aliases) id)<br/>
 Clears a previously set callback<br/>
 ## Option functions
 
@@ -605,7 +605,7 @@ Add a button that the user can click in the UI. Sets the timestamp of last click
 
 > Search script examples for [spawn_liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_liquid)
 
-#### nil spawn_liquid(ENT_TYPE entity_type, float x, float y)
+#### nil spawn_liquid([ENT_TYPE](#ent_type) entity_type, float x, float y)
 
 Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
 Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
@@ -617,7 +617,7 @@ Don't overuse this, you are still restricted by the liquid pool sizes and thus m
 
 > Search script examples for [spawn_liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_liquid)
 
-#### nil spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, int liquid_flags, int amount, float blobs_separation)
+#### nil spawn_liquid([ENT_TYPE](#ent_type) entity_type, float x, float y, float velocityx, float velocityy, int liquid_flags, int amount, float blobs_separation)
 
 Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
 Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
@@ -629,7 +629,7 @@ Don't overuse this, you are still restricted by the liquid pool sizes and thus m
 
 > Search script examples for [spawn_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity)
 
-#### int spawn_entity(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
+#### int spawn_entity([ENT_TYPE](#ent_type) entity_type, float x, float y, [LAYER](#layer) layer, float vx, float vy)
 
 Spawn an entity in position with some velocity and return the uid of spawned entity.
 Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
@@ -658,7 +658,7 @@ spawn(ENT_TYPE.ITEM_JETPACK, 1, 0, LAYER.PLAYER, 0, 0)
 
 > Search script examples for [spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn)
 
-#### int spawn(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
+#### int spawn([ENT_TYPE](#ent_type) entity_type, float x, float y, [LAYER](#layer) layer, float vx, float vy)
 
 Short for [spawn_entity](#spawn_entity).
 
@@ -667,7 +667,7 @@ Short for [spawn_entity](#spawn_entity).
 
 > Search script examples for [spawn_entity_snapped_to_floor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_snapped_to_floor)
 
-#### int spawn_entity_snapped_to_floor(ENT_TYPE entity_type, float x, float y, LAYER layer)
+#### int spawn_entity_snapped_to_floor([ENT_TYPE](#ent_type) entity_type, float x, float y, [LAYER](#layer) layer)
 
 Spawns an entity directly on the floor below the tile at the given position.
 Use this to avoid the little fall that some entities do when spawned during level gen callbacks.
@@ -677,7 +677,7 @@ Use this to avoid the little fall that some entities do when spawned during leve
 
 > Search script examples for [spawn_on_floor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_on_floor)
 
-#### int spawn_on_floor(ENT_TYPE entity_type, float x, float y, LAYER layer)
+#### int spawn_on_floor([ENT_TYPE](#ent_type) entity_type, float x, float y, [LAYER](#layer) layer)
 
 Short for [spawn_entity_snapped_to_floor](#spawn_entity_snapped_to_floor).
 
@@ -686,7 +686,7 @@ Short for [spawn_entity_snapped_to_floor](#spawn_entity_snapped_to_floor).
 
 > Search script examples for [spawn_grid_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_grid_entity)
 
-#### int spawn_grid_entity(ENT_TYPE entity_type, float x, float y, LAYER layer)
+#### int spawn_grid_entity([ENT_TYPE](#ent_type) entity_type, float x, float y, [LAYER](#layer) layer)
 
 Spawn a grid entity, such as floor or traps, that snaps to the grid.
 
@@ -695,7 +695,7 @@ Spawn a grid entity, such as floor or traps, that snaps to the grid.
 
 > Search script examples for [spawn_entity_nonreplaceable](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_nonreplaceable)
 
-#### int spawn_entity_nonreplaceable(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
+#### int spawn_entity_nonreplaceable([ENT_TYPE](#ent_type) entity_type, float x, float y, [LAYER](#layer) layer, float vx, float vy)
 
 Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
 
@@ -704,7 +704,7 @@ Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so i
 
 > Search script examples for [spawn_critical](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_critical)
 
-#### int spawn_critical(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
+#### int spawn_critical([ENT_TYPE](#ent_type) entity_type, float x, float y, [LAYER](#layer) layer, float vx, float vy)
 
 Short for [spawn_entity_nonreplaceable](#spawn_entity_nonreplaceable).
 
@@ -713,7 +713,7 @@ Short for [spawn_entity_nonreplaceable](#spawn_entity_nonreplaceable).
 
 > Search script examples for [spawn_door](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_door)
 
-#### int spawn_door(float x, float y, LAYER layer, int w, int l, int t)
+#### int spawn_door(float x, float y, [LAYER](#layer) layer, int w, int l, int t)
 
 Spawn a door to another world, level and theme and return the uid of spawned entity.
 Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
@@ -723,7 +723,7 @@ Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coor
 
 > Search script examples for [door](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door)
 
-#### int door(float x, float y, LAYER layer, int w, int l, int t)
+#### int door(float x, float y, [LAYER](#layer) layer, int w, int l, int t)
 
 Short for [spawn_door](#spawn_door).
 
@@ -750,7 +750,7 @@ Short for [spawn_layer_door](#spawn_layer_door).
 
 > Search script examples for [spawn_apep](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_apep)
 
-#### int spawn_apep(float x, float y, LAYER layer, bool right)
+#### int spawn_apep(float x, float y, [LAYER](#layer) layer, bool right)
 
 Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
 
@@ -759,7 +759,7 @@ Spawns apep with the choice if it going left or right, if you want the game to c
 
 > Search script examples for [spawn_tree](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
 
-#### nil spawn_tree(float x, float y, LAYER layer)
+#### nil spawn_tree(float x, float y, [LAYER](#layer) layer)
 
 Spawns and grows a tree
 
@@ -787,7 +787,7 @@ Short for [set_door_target](#set_door_target).
 
 > Search script examples for [spawn_entity_over](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_over)
 
-#### int spawn_entity_over(ENT_TYPE entity_type, int over_uid, float x, float y)
+#### int spawn_entity_over([ENT_TYPE](#ent_type) entity_type, int over_uid, float x, float y)
 
 Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
 
@@ -796,7 +796,7 @@ Spawn an entity of `entity_type` attached to some other entity `over_uid`, in of
 
 > Search script examples for [spawn_over](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_over)
 
-#### int spawn_over(ENT_TYPE entity_type, int over_uid, float x, float y)
+#### int spawn_over([ENT_TYPE](#ent_type) entity_type, int over_uid, float x, float y)
 
 Short for [spawn_entity_over](#spawn_entity_over)
 
@@ -814,7 +814,7 @@ Determines when the ghost appears, either when the player is cursed or not
 
 > Search script examples for [spawn_companion](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_companion)
 
-#### int spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
+#### int spawn_companion([ENT_TYPE](#ent_type) companion_type, float x, float y, [LAYER](#layer) layer)
 
 Spawn a companion (hired hand, player character, eggplant child)
 
@@ -833,7 +833,7 @@ Doesn't really work for layer doors
 
 > Search script examples for [change_sunchallenge_spawns](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_sunchallenge_spawns)
 
-#### nil change_sunchallenge_spawns(array<ENT_TYPE> ent_types)
+#### nil change_sunchallenge_spawns(array<[ENT_TYPE](#ent_type)> ent_types)
 
 Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
 {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
@@ -845,7 +845,7 @@ Use empty table as argument to reset to the game default
 
 > Search script examples for [change_altar_damage_spawns](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_altar_damage_spawns)
 
-#### nil change_altar_damage_spawns(array<ENT_TYPE> ent_types)
+#### nil change_altar_damage_spawns(array<[ENT_TYPE](#ent_type)> ent_types)
 
 Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
 {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
@@ -887,7 +887,7 @@ Use to query whether any of the requested spawns could not be made, usually beca
 
 > Search script examples for [get_procedural_spawn_chance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_procedural_spawn_chance)
 
-#### int get_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id)<br/>
+#### int get_procedural_spawn_chance([PROCEDURAL_CHANCE](#procedural_chance) chance_id)<br/>
 Get the inverse chance of a procedural spawn for the current level.<br/>A return value of 0 does not mean the chance is infinite, it means the chance is zero.<br/>
 ## Position functions
 
@@ -1030,7 +1030,7 @@ Same as `get_hitbox` but based on `get_render_position`<br/>
 
 > Search script examples for [screen_aabb](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_aabb)
 
-#### [AABB](#aabb) screen_aabb(AABB box)<br/>
+#### [AABB](#aabb) screen_aabb([AABB](#aabb) box)<br/>
 Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions<br/>
 ## Entity functions
 
@@ -1049,7 +1049,7 @@ Teleport entity to coordinates with optional velocity
 
 > Search script examples for [move_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
 
-#### nil move_entity(int uid, float x, float y, float vx, float vy, LAYER layer)
+#### nil move_entity(int uid, float x, float y, float vx, float vy, [LAYER](#layer) layer)
 
 Teleport entity to coordinates with optional velocity
 
@@ -1058,7 +1058,7 @@ Teleport entity to coordinates with optional velocity
 
 > Search script examples for [move_grid_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_grid_entity)
 
-#### nil move_grid_entity(int uid, float x, float y, LAYER layer)
+#### nil move_grid_entity(int uid, float x, float y, [LAYER](#layer) layer)
 
 Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
 
@@ -1085,7 +1085,7 @@ Get door target `world`, `level`, `theme`
 
 > Search script examples for [set_contents](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_contents)
 
-#### nil set_contents(int uid, ENT_TYPE item_entity_type)
+#### nil set_contents(int uid, [ENT_TYPE](#ent_type) item_entity_type)
 
 Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
 
@@ -1110,7 +1110,7 @@ Get the [EntityDB](#entitydb) behind an ENT_TYPE...
 
 > Search script examples for [get_grid_entity_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_grid_entity_at)
 
-#### int get_grid_entity_at(float x, float y, LAYER layer)
+#### int get_grid_entity_at(float x, float y, [LAYER](#layer) layer)
 
 Gets a grid entity, such as floor or spikes, at the given position and layer.
 
@@ -1126,7 +1126,7 @@ Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` 
 
 > Search script examples for [get_entities_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 
-#### array&lt;int&gt; get_entities_by(array<ENT_TYPE> entity_types, int mask, LAYER layer)
+#### array&lt;int&gt; get_entities_by(array<[ENT_TYPE](#ent_type)> entity_types, int mask, [LAYER](#layer) layer)
 
 Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -1135,7 +1135,7 @@ Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to i
 
 > Search script examples for [get_entities_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 
-#### array&lt;int&gt; get_entities_by(ENT_TYPE entity_type, int mask, LAYER layer)
+#### array&lt;int&gt; get_entities_by([ENT_TYPE](#ent_type) entity_type, int mask, [LAYER](#layer) layer)
 
 Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -1151,7 +1151,7 @@ Get uids of entities matching id. This function is variadic, meaning it accepts 
 
 > Search script examples for [get_entities_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 
-#### array&lt;int&gt; get_entities_at(array<ENT_TYPE> entity_types, int mask, float x, float y, LAYER layer, float radius)
+#### array&lt;int&gt; get_entities_at(array<[ENT_TYPE](#ent_type)> entity_types, int mask, float x, float y, [LAYER](#layer) layer, float radius)
 
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -1160,7 +1160,7 @@ Get uids of matching entities inside some radius. Set `entity_type` or `mask` to
 
 > Search script examples for [get_entities_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 
-#### array&lt;int&gt; get_entities_at(ENT_TYPE entity_type, int mask, float x, float y, LAYER layer, float radius)
+#### array&lt;int&gt; get_entities_at([ENT_TYPE](#ent_type) entity_type, int mask, float x, float y, [LAYER](#layer) layer, float radius)
 
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -1169,7 +1169,7 @@ Get uids of matching entities inside some radius. Set `entity_type` or `mask` to
 
 > Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
-#### array&lt;int&gt; get_entities_overlapping_hitbox(array<ENT_TYPE> entity_types, int mask, AABB hitbox, LAYER layer)
+#### array&lt;int&gt; get_entities_overlapping_hitbox(array<[ENT_TYPE](#ent_type)> entity_types, int mask, [AABB](#aabb) hitbox, [LAYER](#layer) layer)
 
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -1178,7 +1178,7 @@ Get uids of matching entities overlapping with the given hitbox. Set `entity_typ
 
 > Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
-#### array&lt;int&gt; get_entities_overlapping_hitbox(ENT_TYPE entity_type, int mask, AABB hitbox, LAYER layer)
+#### array&lt;int&gt; get_entities_overlapping_hitbox([ENT_TYPE](#ent_type) entity_type, int mask, [AABB](#aabb) hitbox, [LAYER](#layer) layer)
 
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -1233,7 +1233,7 @@ Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 
 > Search script examples for [entity_has_item_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_type)
 
-#### bool entity_has_item_type(int uid, array<ENT_TYPE> entity_types)
+#### bool entity_has_item_type(int uid, array<[ENT_TYPE](#ent_type)> entity_types)
 
 Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
 
@@ -1242,7 +1242,7 @@ Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, ca
 
 > Search script examples for [entity_has_item_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_type)
 
-#### bool entity_has_item_type(int uid, ENT_TYPE entity_type)
+#### bool entity_has_item_type(int uid, [ENT_TYPE](#ent_type) entity_type)
 
 Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
 
@@ -1251,7 +1251,7 @@ Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, ca
 
 > Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
-#### array&lt;int&gt; entity_get_items_by(int uid, array<ENT_TYPE> entity_types, int mask)
+#### array&lt;int&gt; entity_get_items_by(int uid, array<[ENT_TYPE](#ent_type)> entity_types, int mask)
 
 Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
 
@@ -1260,7 +1260,7 @@ Gets uids of entities attached to given entity uid. Use `entity_type` and `mask`
 
 > Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
-#### array&lt;int&gt; entity_get_items_by(int uid, ENT_TYPE entity_type, int mask)
+#### array&lt;int&gt; entity_get_items_by(int uid, [ENT_TYPE](#ent_type) entity_type, int mask)
 
 Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
 
@@ -1411,7 +1411,7 @@ Sets the maximum length of a thrown rope (anchor segment not included). Unfortun
 
 > Search script examples for [waddler_count_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_count_entity)
 
-#### int waddler_count_entity(ENT_TYPE entity_type)
+#### int waddler_count_entity([ENT_TYPE](#ent_type) entity_type)
 
 Returns how many of a specific entity type Waddler has stored
 
@@ -1420,7 +1420,7 @@ Returns how many of a specific entity type Waddler has stored
 
 > Search script examples for [waddler_store_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_store_entity)
 
-#### int waddler_store_entity(ENT_TYPE entity_type)
+#### int waddler_store_entity([ENT_TYPE](#ent_type) entity_type)
 
 Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
 
@@ -1429,7 +1429,7 @@ Store an entity type in Waddler's storage. Returns the slot number the item was 
 
 > Search script examples for [waddler_remove_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_remove_entity)
 
-#### nil waddler_remove_entity(ENT_TYPE entity_type, int amount_to_remove = 99)
+#### nil waddler_remove_entity([ENT_TYPE](#ent_type) entity_type, int amount_to_remove = 99)
 
 Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
 
@@ -1465,7 +1465,7 @@ Gets the entity type of the item in the provided slot
 
 > Search script examples for [change_waddler_drop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_waddler_drop)
 
-#### nil change_waddler_drop(array<ENT_TYPE> ent_types)
+#### nil change_waddler_drop(array<[ENT_TYPE](#ent_type)> ent_types)
 
 Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
 {ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
@@ -1496,7 +1496,7 @@ Use `-1` as dropchance_id to reset all to default
 
 > Search script examples for [replace_drop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_drop)
 
-#### nil replace_drop(int drop_id, ENT_TYPE new_drop_entity_type)
+#### nil replace_drop(int drop_id, [ENT_TYPE](#ent_type) new_drop_entity_type)
 
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
 Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
@@ -1563,7 +1563,7 @@ Set `state.level_flags`
 
 > Search script examples for [set_flag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_flag)
 
-#### [Flags](#aliases) set_flag(Flags flags, int bit)<br/>
+#### [Flags](#aliases) set_flag([Flags](#aliases) flags, int bit)<br/>
 Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.<br/>
 ### setflag
 
@@ -1577,7 +1577,7 @@ Set a bit in a number. This doesn't actually change the bit in the entity you pa
 
 > Search script examples for [clr_flag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_flag)
 
-#### [Flags](#aliases) clr_flag(Flags flags, int bit)<br/>
+#### [Flags](#aliases) clr_flag([Flags](#aliases) flags, int bit)<br/>
 Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.<br/>
 ### clrflag
 
@@ -1591,7 +1591,7 @@ Clears a bit in a number. This doesn't actually change the bit in the entity you
 
 > Search script examples for [test_flag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_flag)
 
-#### bool test_flag(Flags flags, int bit)<br/>
+#### bool test_flag([Flags](#aliases) flags, int bit)<br/>
 Returns true if a bit is set in the flags<br/>
 ### testflag
 
@@ -1608,7 +1608,7 @@ Returns true if a bit is set in the flags<br/>
 
 > Search script examples for [is_inside_active_shop_room](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_inside_active_shop_room)
 
-#### bool is_inside_active_shop_room(float x, float y, LAYER layer)
+#### bool is_inside_active_shop_room(float x, float y, [LAYER](#layer) layer)
 
 Checks whether a coordinate is inside a room containing an active shop. This function checks whether the shopkeeper is still alive.
 
@@ -1617,7 +1617,7 @@ Checks whether a coordinate is inside a room containing an active shop. This fun
 
 > Search script examples for [is_inside_shop_zone](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_inside_shop_zone)
 
-#### bool is_inside_shop_zone(float x, float y, LAYER layer)
+#### bool is_inside_shop_zone(float x, float y, [LAYER](#layer) layer)
 
 Checks whether a coordinate is inside a shop zone, the rectangle where the camera zooms in a bit. Does not check if the shop is still active!
 
@@ -1626,7 +1626,7 @@ Checks whether a coordinate is inside a shop zone, the rectangle where the camer
 
 > Search script examples for [change_diceshop_prizes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_diceshop_prizes)
 
-#### nil change_diceshop_prizes(array<ENT_TYPE> ent_types)
+#### nil change_diceshop_prizes(array<[ENT_TYPE](#ent_type)> ent_types)
 
 Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
 {ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
@@ -1667,7 +1667,7 @@ Return input<br/>
 
 > Search script examples for [send_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
 
-#### nil send_input(int uid, INPUTS buttons)<br/>
+#### nil send_input(int uid, [INPUTS](#inputs) buttons)<br/>
 Send input<br/>
 ### read_input
 
@@ -1721,7 +1721,7 @@ Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values
 
 > Search script examples for [get_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_string)
 
-#### const string get_string(STRINGID string_id)
+#### const string get_string([STRINGID](#aliases) string_id)
 
 Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
 Will return the string of currently choosen language
@@ -1731,7 +1731,7 @@ Will return the string of currently choosen language
 
 > Search script examples for [change_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_string)
 
-#### nil change_string(STRINGID id, string str)<br/>
+#### nil change_string([STRINGID](#aliases) id, string str)<br/>
 Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)<br/>This edits custom string and in game strings but changing the language in settings will reset game strings<br/>
 ### add_string
 
@@ -1767,7 +1767,7 @@ Clears the name set with `add_custom_name`
 
 > Search script examples for [get_character_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_character_name)
 
-#### string get_character_name(ENT_TYPE type_id)
+#### string get_character_name([ENT_TYPE](#ent_type) type_id)
 
 Same as `Player.get_name`
 
@@ -1776,7 +1776,7 @@ Same as `Player.get_name`
 
 > Search script examples for [get_character_short_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_character_short_name)
 
-#### string get_character_short_name(ENT_TYPE type_id)
+#### string get_character_short_name([ENT_TYPE](#ent_type) type_id)
 
 Same as `Player.get_short_name`
 
@@ -1788,7 +1788,7 @@ Same as `Player.get_short_name`
 
 > Search script examples for [create_illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 
-#### [Illumination](#illumination) create_illumination(Color color, float size, float x, float y)
+#### [Illumination](#illumination) create_illumination([Color](#color) color, float size, float x, float y)
 
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
 
@@ -1797,7 +1797,7 @@ Creates a new Illumination. Don't forget to continuously call `refresh_illuminat
 
 > Search script examples for [create_illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 
-#### [Illumination](#illumination) create_illumination(Color color, float size, int uid)
+#### [Illumination](#illumination) create_illumination([Color](#color) color, float size, int uid)
 
 Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
 
@@ -1806,7 +1806,7 @@ Creates a new Illumination. Don't forget to continuously call `refresh_illuminat
 
 > Search script examples for [refresh_illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=refresh_illumination)
 
-#### nil refresh_illumination(Illumination illumination)
+#### nil refresh_illumination([Illumination](#illumination) illumination)
 
 Refreshes an Illumination, keeps it from fading out
 
@@ -1845,7 +1845,7 @@ Generate particles of the specified type at a certain screen coordinate (use e.g
 
 > Search script examples for [advance_screen_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=advance_screen_particles)
 
-#### nil advance_screen_particles(ParticleEmitterInfo particle_emitter)
+#### nil advance_screen_particles([ParticleEmitterInfo](#particleemitterinfo) particle_emitter)
 
 Advances the state of the screen particle emitter (simulates the next positions, ... of all the particles in the emitter). Only used with screen particle emitters. See the `particles.lua` example script for more details.
 
@@ -1854,7 +1854,7 @@ Advances the state of the screen particle emitter (simulates the next positions,
 
 > Search script examples for [render_screen_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_screen_particles)
 
-#### nil render_screen_particles(ParticleEmitterInfo particle_emitter)
+#### nil render_screen_particles([ParticleEmitterInfo](#particleemitterinfo) particle_emitter)
 
 Renders the particles to the screen. Only used with screen particle emitters. See the `particles.lua` example script for more details.
 
@@ -1863,7 +1863,7 @@ Renders the particles to the screen. Only used with screen particle emitters. Se
 
 > Search script examples for [extinguish_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=extinguish_particles)
 
-#### nil extinguish_particles(ParticleEmitterInfo particle_emitter)
+#### nil extinguish_particles([ParticleEmitterInfo](#particleemitterinfo) particle_emitter)
 
 Extinguish a particle emitter (use the return value of `generate_world_particles` or `generate_screen_particles` as the parameter in this function)
 
@@ -1896,14 +1896,14 @@ Define a new tile code, to make this tile code do anything you have to use eithe
 
 > Search script examples for [get_short_tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code)
 
-#### optional&lt;int&gt; get_short_tile_code(ShortTileCodeDef short_tile_code_def)<br/>
+#### optional&lt;int&gt; get_short_tile_code([ShortTileCodeDef](#shorttilecodedef) short_tile_code_def)<br/>
 Gets a short tile code based on definition, returns `nil` if it can't be found<br/>
 ### get_short_tile_code_definition
 
 
 > Search script examples for [get_short_tile_code_definition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code_definition)
 
-#### optional&lt;[ShortTileCodeDef](#shorttilecodedef)&gt; get_short_tile_code_definition(SHORT_TILE_CODE short_tile_code)<br/>
+#### optional&lt;[ShortTileCodeDef](#shorttilecodedef)&gt; get_short_tile_code_definition([SHORT_TILE_CODE](#aliases) short_tile_code)<br/>
 Gets the definition of a short tile code (if available), will vary depending on which file is loaded<br/>
 ## Room functions
 
@@ -1927,7 +1927,7 @@ Transform a room index into the top left corner position in the room<br/>
 
 > Search script examples for [get_room_template](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template)
 
-#### optional&lt;int&gt; get_room_template(int x, int y, LAYER layer)<br/>
+#### optional&lt;int&gt; get_room_template(int x, int y, [LAYER](#layer) layer)<br/>
 Get the room template given a certain index, returns `nil` if coordinates are out of bounds<br/>
 ### is_room_flipped
 
@@ -1948,7 +1948,7 @@ For debugging only, get the name of a room template, returns `'invalid'` if room
 
 > Search script examples for [define_room_template](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_room_template)
 
-#### int define_room_template(string room_template, ROOM_TEMPLATE_TYPE type)<br/>
+#### int define_room_template(string room_template, [ROOM_TEMPLATE_TYPE](#room_template_type) type)<br/>
 Define a new room remplate to use with `set_room_template`<br/>
 ### set_room_template_size
 
@@ -2017,35 +2017,35 @@ Gets an existing sound, either if a file at the same path was already loaded or 
 
 > Search script examples for [set_lut](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_lut)
 
-#### nil set_lut(optional<TEXTURE> texture_id, LAYER layer)<br/>
+#### nil set_lut(optional<[TEXTURE](#texture)> texture_id, [LAYER](#layer) layer)<br/>
 
 ### reset_lut
 
 
 > Search script examples for [reset_lut](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_lut)
 
-#### nil reset_lut(LAYER layer)<br/>
+#### nil reset_lut([LAYER](#layer) layer)<br/>
 
 ### get_texture_definition
 
 
 > Search script examples for [get_texture_definition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture_definition)
 
-#### [TextureDefinition](#texturedefinition) get_texture_definition(TEXTURE texture_id)<br/>
+#### [TextureDefinition](#texturedefinition) get_texture_definition([TEXTURE](#texture) texture_id)<br/>
 Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`<br/>
 ### define_texture
 
 
 > Search script examples for [define_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_texture)
 
-#### [TEXTURE](#texture) define_texture(TextureDefinition texture_data)<br/>
+#### [TEXTURE](#texture) define_texture([TextureDefinition](#texturedefinition) texture_data)<br/>
 Defines a new texture that can be used in Entity::set_texture<br/>If a texture with the same definition already exists the texture will be reloaded from disk.<br/>
 ### get_texture
 
 
 > Search script examples for [get_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture)
 
-#### optional&lt;[TEXTURE](#texture)&gt; get_texture(TextureDefinition texture_data)<br/>
+#### optional&lt;[TEXTURE](#texture)&gt; get_texture([TextureDefinition](#texturedefinition) texture_data)<br/>
 Gets a texture with the same definition as the given, if none exists returns `nil`<br/>
 ### reload_texture
 
@@ -2148,7 +2148,7 @@ Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
 
-#### array&lt;int&gt; get_entities_by_layer(LAYER layer)
+#### array&lt;int&gt; get_entities_by_layer([LAYER](#layer) layer)
 
 Use `get_entities_by(0, MASK.ANY, layer)` instead
 
@@ -2157,7 +2157,7 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-#### array&lt;int&gt; get_entities_overlapping(array<ENT_TYPE> entity_types, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)
+#### array&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ent_type)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#layer) layer)
 
 Use `get_entities_overlapping_hitbox` instead
 
@@ -2166,7 +2166,7 @@ Use `get_entities_overlapping_hitbox` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-#### array&lt;int&gt; get_entities_overlapping(ENT_TYPE entity_type, int mask, float sx, float sy, float sx2, float sy2, LAYER layer)
+#### array&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ent_type) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#layer) layer)
 
 Use `get_entities_overlapping_hitbox` instead
 
@@ -2184,7 +2184,7 @@ As the name is misleading. use entity `move_state` field instead
 
 > Search script examples for [set_arrowtrap_projectile](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
 
-#### nil set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
+#### nil set_arrowtrap_projectile([ENT_TYPE](#ent_type) regular_entity_type, [ENT_TYPE](#ent_type) poison_entity_type)
 
 Use `replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)` and `replace_drop(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type)` instead
 

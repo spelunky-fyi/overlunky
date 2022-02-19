@@ -221,6 +221,7 @@ def print_af(lf, af):
     ret = link_custom_type(ret)
     name = lf["name"]
     param = replace_all(af["param"], replace)
+    param = link_custom_type(param)
     fun = f"{ret} {name}({param})".strip()
     search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
     print(f"\n### {name}\n")
@@ -858,6 +859,7 @@ for cat in func_cats:
             name = lf["name"]
             ret = link_custom_type(ret)
             ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+            param = link_custom_type(param)
             fun = f"{ret} {name}({param})".strip()
             search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
             print(f"\n### {name}\n")
