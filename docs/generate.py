@@ -61,6 +61,7 @@ header_files = [
     "../src/game_api/script/usertypes/socket_lua.hpp",
     "../src/imgui/imgui.h",
     "../src/game_api/script/usertypes/level_lua.cpp",
+    "../src/game_api/script/usertypes/gui_lua.cpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",

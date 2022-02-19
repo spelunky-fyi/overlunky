@@ -1138,6 +1138,20 @@ Current mouse cursor position in screen coordinates.
  | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float                                   x, | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 
+### Gamepad
+
+
+        Type | Name | Description
+        ---- | ---- | -----------
+bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
+ | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+ | [lt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lt) | 
+ | [rt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rt) | 
+ | [lx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lx) | 
+ | [ly](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ly) | 
+ | [rx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rx) | 
+ | [ry](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ry) | 
+
 ### ImGuiIO
 
 
