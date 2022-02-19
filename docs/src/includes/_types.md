@@ -167,7 +167,7 @@ bool | [punish_ball](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pu
         Type | Name | Description
         ---- | ---- | -----------
 bool | [activated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activated) | 
-ENT_TYPE | [character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) | 
+[ENT_TYPE](#ent_type) | [character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) | 
 int | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
 
 ### Items
@@ -177,11 +177,11 @@ int | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture
         ---- | ---- | -----------
 int | [player_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) | 
 int | [saved_pets_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets_count) | 
-array&lt;ENT_TYPE, 4&gt; | [saved_pets](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets) | Pet information for level transition
+array&lt;[ENT_TYPE](#ent_type), 4&gt; | [saved_pets](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets) | Pet information for level transition
 array&lt;bool, 4&gt; | [is_pet_cursed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_cursed) | 
 array&lt;bool, 4&gt; | [is_pet_poisoned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_poisoned) | 
-array&lt;Inventory, MAX_PLAYERS&gt; | [player_inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) | 
-array&lt;SelectPlayerSlot, MAX_PLAYERS&gt; | [player_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) | 
+array&lt;[Inventory](#inventory), MAX_PLAYERS&gt; | [player_inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) | 
+array&lt;[SelectPlayerSlot](#selectplayerslot), MAX_PLAYERS&gt; | [player_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) | 
 
 ### LiquidPhysicsEngine
 
@@ -278,7 +278,7 @@ int | [money_shop_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 [Camera](#camera) | [camera](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera) | 
 int | [special_visibility_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_visibility_flags) | 
 int | [cause_of_death](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cause_of_death) | 
-ENT_TYPE | [cause_of_death_entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cause_of_death_entity_type) | 
+[ENT_TYPE](#ent_type) | [cause_of_death_entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cause_of_death_entity_type) | 
 int | [toast_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_timer) | 
 int | [speechbubble_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_timer) | 
 int | [speechbubble_owner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_owner) | 
@@ -304,17 +304,17 @@ int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ca
 int | [get_correct_ushabti()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_correct_ushabti) | Returns animation_frame of the correct ushabti
  | [set_correct_ushabti(int animation_frame)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) | 
 [ArenaState](#arenastate) | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | 
-ENT_TYPE | [speedrun_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) | 
+[ENT_TYPE](#ent_type) | [speedrun_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) | 
 int | [speedrun_activation_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_activation_trigger) | 
-ENT_TYPE | [end_spaceship_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_spaceship_character) | Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
+[ENT_TYPE](#ent_type) | [end_spaceship_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_spaceship_character) | Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
 bool | [world2_coffin_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world2_coffin_spawned) | 
 bool | [world4_coffin_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world4_coffin_spawned) | 
 bool | [world6_coffin_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world6_coffin_spawned) | 
-ENT_TYPE | [first_damage_cause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_cause) | 
+[ENT_TYPE](#ent_type) | [first_damage_cause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_cause) | 
 int | [first_damage_world](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_world) | 
 int | [first_damage_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_level) | 
 int | [time_speedrun](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_speedrun) | 
-ENT_TYPE | [coffin_contents](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffin_contents) | 
+[ENT_TYPE](#ent_type) | [coffin_contents](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffin_contents) | 
 int | [screen_change_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_change_counter) | 
 int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) | 
 [LogicList](#logiclist) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | 
@@ -387,7 +387,7 @@ float | [size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) |
 
         Type | Name | Description
         ---- | ---- | -----------
-array&lt;LightParams, 4&gt; | [lights](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lights) | Table of light1, light2, ... etc.
+array&lt;[LightParams](#lightparams), 4&gt; | [lights](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lights) | Table of light1, light2, ... etc.
 [LightParams](#lightparams) | [light1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light1) | 
 [LightParams](#lightparams) | [light2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light2) | 
 [LightParams](#lightparams) | [light3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light3) | 
@@ -435,7 +435,7 @@ float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inert
 
         Type | Name | Description
         ---- | ---- | -----------
-array&lt;OnlinePlayer, 4&gt; | [online_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online_players) | 
+array&lt;[OnlinePlayer](#onlineplayer), 4&gt; | [online_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online_players) | 
 OnlinePlayerShort | [local_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=local_player) | 
 [OnlineLobby](#onlinelobby) | [lobby](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lobby) | 
 
@@ -561,7 +561,7 @@ float | [a](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=a) |
 [Color](#color) | [purple()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=purple) | 
 tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rgba) | Returns RGBA colors in 0..255 range
  | [set_rgba(int red, int green, int blue, int alpha)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_rgba) | Changes color based on given RGBA colors in 0..255 range
-uColor | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
+[uColor](#aliases) | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
  | [set_ucolor(uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ucolor) | Changes color based on given uColor
 
 ### Animation
@@ -572,14 +572,14 @@ uColor | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 int | [first_tile](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_tile) | 
 int | [num_tiles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=num_tiles) | 
 int | [interval](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=interval) | 
-REPEAT_TYPE | [repeat_mode](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=repeat_mode) | 
+[REPEAT_TYPE](#repeat_type) | [repeat_mode](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=repeat_mode) | 
 
 ### EntityDB
 
 
         Type | Name | Description
         ---- | ---- | -----------
-ENT_TYPE | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
+[ENT_TYPE](#ent_type) | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
 int | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) | MASK
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
@@ -603,14 +603,14 @@ int | [damage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) 
 int | [life](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=life) | 
 int | [blood_content](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blood_content) | 
 int | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
-map&lt;int, Animation&gt; | [animations](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) | 
+map&lt;int, [Animation](#animation)&gt; | [animations](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) | 
 int | [properties_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=properties_flags) | 
 int | [default_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_flags) | 
 int | [default_more_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_more_flags) | 
 bool | [leaves_corpse_behind](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leaves_corpse_behind) | 
 int | [sound_killed_by_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_player) | 
 int | [sound_killed_by_other](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_other) | 
-STRINGID | [description](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) | 
+[STRINGID](#aliases) | [description](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) | 
 int | [tilex](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilex) | 
 int | [tiley](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiley) | 
 
@@ -629,19 +629,19 @@ bool | [elixir_buff](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=el
 int | [health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 int | [kapala_blood_amount](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 int | [time_of_death](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_of_death) | Is set to state.time_total when player dies in coop (to determinate who should be first to re-spawn from coffin)
-ENT_TYPE | [held_item](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+[ENT_TYPE](#ent_type) | [held_item](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 int | [held_item_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_item_metadata) | Metadata of the held item (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-ENT_TYPE | [mount_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_type) | Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+[ENT_TYPE](#ent_type) | [mount_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_type) | Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 int | [mount_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_metadata) | Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 int | [kills_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) | 
 int | [kills_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) | 
 int | [collected_money_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) | Total money collected during previous levels (not the current one)
-array&lt;ENT_TYPE, 512&gt; | [collected_money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money) | Types of gold/gems collected during this level, used later to display during the transition
+array&lt;[ENT_TYPE](#ent_type), 512&gt; | [collected_money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money) | Types of gold/gems collected during this level, used later to display during the transition
 array&lt;int, 512&gt; | [collected_money_values](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_values) | Values of gold/gems collected during this level, used later to display during the transition
-array&lt;ENT_TYPE, 256&gt; | [killed_enemies](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_enemies) | Types of enemies killed during this level, used later to display during the transition
+array&lt;[ENT_TYPE](#ent_type), 256&gt; | [killed_enemies](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_enemies) | Types of enemies killed during this level, used later to display during the transition
 int | [companion_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_count) | Number of companions, it will determinate how many companions will be transfered to next level<br/>Increments when player acquires new companion, decrements when one of them dies
-array&lt;ENT_TYPE, 8&gt; | [companions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companions) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-array&lt;ENT_TYPE, 8&gt; | [companion_held_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_held_items) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+array&lt;[ENT_TYPE](#ent_type), 8&gt; | [companions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companions) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+array&lt;[ENT_TYPE](#ent_type), 8&gt; | [companion_held_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_held_items) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 array&lt;int, 8&gt; | [companion_held_item_metadatas](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_held_item_metadatas) | Metadata of items held by companions (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 array&lt;int, 8&gt; | [companion_trust](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_trust) | (0..3) Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 array&lt;int, 8&gt; | [companion_health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_health) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
@@ -781,7 +781,7 @@ string | [level_file](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=l
 int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
  | [base_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=base_theme) | 
  | [sub_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_theme) | 
-map&lt;DYNAMIC_TEXTURE, int&gt; | [textures](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=textures) | 
+map&lt;[DYNAMIC_TEXTURE](#dynamic_texture), int&gt; | [textures](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=textures) | 
  | [override](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) | 
  | [pre(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre) | 
  | [post(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post) | 
@@ -885,7 +885,7 @@ bool | [unmark_as_set_room(int x, int y, LAYER layer)](https://github.com/spelun
 bool | [set_shop_type(int x, int y, LAYER layer, int shop_type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_shop_type) | Set the shop type for a specific room, does nothing if the room is not a shop
 bool | [set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, int inverse_chance)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_procedural_spawn_chance) | Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.<br/>Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.<br/>Returns `false` if the given chance is not defined.
  | [set_num_extra_spawns(int extra_spawn_id, int num_spawns_front_layer, int num_spawns_back_layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_num_extra_spawns) | Change the amount of extra spawns for the given `extra_spawn_id`.
-optional&lt;SHORT_TILE_CODE&gt; | [define_short_tile_code(ShortTileCodeDef short_tile_code_def)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_short_tile_code) | Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match<br/>Returns `nil` if all possible short tile codes are already in use
+optional&lt;[SHORT_TILE_CODE](#aliases)&gt; | [define_short_tile_code(ShortTileCodeDef short_tile_code_def)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=define_short_tile_code) | Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match<br/>Returns `nil` if all possible short tile codes are already in use
  | [change_short_tile_code(SHORT_TILE_CODE short_tile_code, ShortTileCodeDef short_tile_code_def)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_short_tile_code) | Overrides a specific short tile code, this means it will change for the whole level
 
 ### PreHandleRoomTilesContext
@@ -893,9 +893,9 @@ optional&lt;SHORT_TILE_CODE&gt; | [define_short_tile_code(ShortTileCodeDef short
 
         Type | Name | Description
         ---- | ---- | -----------
-optional&lt;SHORT_TILE_CODE&gt; | [get_short_tile_code(int tx, int ty, LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code) | Gets the tile code at the specified tile coordinate<br/>Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK}`<br/>Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
+optional&lt;[SHORT_TILE_CODE](#aliases)&gt; | [get_short_tile_code(int tx, int ty, LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code) | Gets the tile code at the specified tile coordinate<br/>Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK}`<br/>Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
 bool | [set_short_tile_code(int tx, int ty, LAYER layer, SHORT_TILE_CODE short_tile_code)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_short_tile_code) | Sets the tile code at the specified tile coordinate<br/>Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
-array&lt;tuple&lt;int, int, LAYER&gt;&gt; | [find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=find_all_short_tile_codes) | Finds all places a short tile code is used in the room, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Returns an empty list if `layer == LAYER.BACK` and the room does not have a back layer
+array&lt;tuple&lt;int, int, [LAYER](#layer)&gt;&gt; | [find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=find_all_short_tile_codes) | Finds all places a short tile code is used in the room, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Returns an empty list if `layer == LAYER.BACK` and the room does not have a back layer
 bool | [replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_short_tile_code) | Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
 bool | [has_back_layer()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=has_back_layer) | Check whether the room has a back layer
  | [add_empty_back_layer()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_empty_back_layer) | Add a back layer filled with all `0` if there is no back layer yet<br/>Does nothing if there already is a backlayer
@@ -906,9 +906,9 @@ bool | [has_back_layer()](https://github.com/spelunky-fyi/overlunky/search?l=Lua
 
         Type | Name | Description
         ---- | ---- | -----------
-TILE_CODE | [tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_code) | Tile code that is used by default when this short tile code is encountered. Defaults to 0.
+[TILE_CODE](#tile_code) | [tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_code) | Tile code that is used by default when this short tile code is encountered. Defaults to 0.
 int | [chance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chance) | Chance in percent to pick `tile_code` over `alt_tile_code`, ignored if `chance == 0`. Defaults to 100.
-TILE_CODE | [alt_tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=alt_tile_code) | Alternative tile code, ignored if `chance == 100`. Defaults to 0.
+[TILE_CODE](#tile_code) | [alt_tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=alt_tile_code) | Alternative tile code, ignored if `chance == 100`. Defaults to 0.
 
 ### QuestsInfo
 
@@ -972,10 +972,10 @@ array&lt;int, 4&gt; | [players](https://github.com/spelunky-fyi/overlunky/search
         Type | Name | Description
         ---- | ---- | -----------
 int | [star_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=star_count) | 
-array&lt;ConstellationStar, 45&gt; | [stars](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stars) | 
+array&lt;[ConstellationStar](#constellationstar), 45&gt; | [stars](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stars) | 
 float | [scale](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale) | 
 int | [line_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line_count) | 
-array&lt;ConstellationLine, 90&gt; | [lines](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lines) | 
+array&lt;[ConstellationLine](#constellationline), 90&gt; | [lines](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lines) | 
 float | [line_red_intensity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line_red_intensity) | 
 
 ### ConstellationStar
@@ -1016,7 +1016,7 @@ It is up to you to not release this as long as any sounds returned by `CustomSou
 [PlayingSound](#playingsound) | [play()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) | 
 [PlayingSound](#playingsound) | [play(bool paused)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) | 
 [PlayingSound](#playingsound) | [play(bool paused, SOUND_TYPE sound_type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) | 
-map&lt;VANILLA_SOUND_PARAM, string&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
+map&lt;[VANILLA_SOUND_PARAM](#vanilla_sound_param), string&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
 
 ### PlayingSound
 
@@ -1034,7 +1034,7 @@ bool | [set_pan(float pan)](https://github.com/spelunky-fyi/overlunky/search?l=L
 bool | [set_volume(float volume)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_volume) | 
 bool | [set_looping(SOUND_LOOP_MODE loop_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_looping) | 
 bool | [set_callback(SoundCallbackFunction callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback) | 
-map&lt;VANILLA_SOUND_PARAM, string&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
+map&lt;[VANILLA_SOUND_PARAM](#vanilla_sound_param), string&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
 optional&lt;float&gt; | [get_parameter(VANILLA_SOUND_PARAM parameter_index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter) | 
 bool | [set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter) | 
 
@@ -1052,8 +1052,8 @@ bool | [controller_right_stick](https://github.com/spelunky-fyi/overlunky/search
 
         Type | Name | Description
         ---- | ---- | -----------
-INPUTS | [buttons_gameplay](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_gameplay) | 
-INPUTS | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+[INPUTS](#inputs) | [buttons_gameplay](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_gameplay) | 
+[INPUTS](#inputs) | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
 [InputMapping](#inputmapping) | [input_mapping_keyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_keyboard) | 
 [InputMapping](#inputmapping) | [input_mapping_controller](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_controller) | 
 int | [player_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_id) | 
@@ -1082,12 +1082,12 @@ int | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) |
 
         Type | Name | Description
         ---- | ---- | -----------
-array&lt;PlayerSlot, MAX_PLAYERS&gt; | [player_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slots) | 
+array&lt;[PlayerSlot](#playerslot), MAX_PLAYERS&gt; | [player_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slots) | 
 [PlayerSlot](#playerslot) | [player_slot_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1) | 
 [PlayerSlot](#playerslot) | [player_slot_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2) | 
 [PlayerSlot](#playerslot) | [player_slot_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3) | 
 [PlayerSlot](#playerslot) | [player_slot_4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4) | 
-array&lt;PlayerSlotSettings, MAX_PLAYERS&gt; | [player_settings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_settings) | 
+array&lt;[PlayerSlotSettings](#playerslotsettings), MAX_PLAYERS&gt; | [player_settings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_settings) | 
 [PlayerSlotSettings](#playerslotsettings) | [player_slot_1_settings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_1_settings) | 
 [PlayerSlotSettings](#playerslotsettings) | [player_slot_2_settings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2_settings) | 
 [PlayerSlotSettings](#playerslotsettings) | [player_slot_3_settings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3_settings) | 
@@ -1143,7 +1143,7 @@ float                                   x, | [y](https://github.com/spelunky-fyi
 
         Type | Name | Description
         ---- | ---- | -----------
-ImVec2      | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
+[ImVec2](#imvec2)      | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
 float       | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
 bool        | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
  | [keysdown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
@@ -1155,7 +1155,7 @@ bool        | [keyshift](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 bool        | [keyalt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) | 
 bool        | [keysuper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) | 
 bool        | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | 
-ImVec2      | [mousepos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) | 
+[ImVec2](#imvec2)      | [mousepos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) | 
  | [mousedown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
  | [mouseclicked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
  | [mousedoubleclicked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
@@ -1253,9 +1253,9 @@ float | [bottom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom
 float | [right](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) | 
 float | [top](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top) | 
 bool | [overlaps_with(const AABB& other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
-AABB& | [abs()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs) | Fixes the AABB if any of the sides have negative length
-AABB& | [extrude(float amount)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=extrude) | Grows or shrinks the AABB by the given amount in all directions.<br/>If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
-AABB& | [offset(float off_x, float off_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | Offsets the AABB by the given offset.
+[AABB](#aabb)& | [abs()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs) | Fixes the AABB if any of the sides have negative length
+[AABB](#aabb)& | [extrude(float amount)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=extrude) | Grows or shrinks the AABB by the given amount in all directions.<br/>If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
+[AABB](#aabb)& | [offset(float off_x, float off_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | Offsets the AABB by the given offset.
 float | [area()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) | Compute area of the AABB, can be zero if one dimension is zero or negative if one dimension is inverted.
 tuple&lt;float, float&gt; | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
 float | [width()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | Short for `aabb.right - aabb.left`.
@@ -1279,8 +1279,8 @@ float | [top_right_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=t
 float | [top_left_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_left_x) | 
 float | [top_left_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_left_y) | 
 [AABB](#aabb) | [get_AABB()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_AABB) | Returns the max/min values of the Quad
-Quad& | [offset(float off_x, float off_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | 
-Quad& | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
+[Quad](#quad)& | [offset(float off_x, float off_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | 
+[Quad](#quad)& | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
 
 ### FlyingThing
 
@@ -1374,9 +1374,9 @@ Derived from [Screen](#screen)
 
         Type | Name | Description
         ---- | ---- | -----------
-STRINGID | [line1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line1) | 
-STRINGID | [line2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line2) | 
-STRINGID | [line3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line3) | 
+[STRINGID](#aliases) | [line1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line1) | 
+[STRINGID](#aliases) | [line2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line2) | 
+[STRINGID](#aliases) | [line3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=line3) | 
 
 ### ScreenTitle
 
@@ -1427,7 +1427,7 @@ float | [menu_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=L
 array&lt;float, 6&gt; | [spear_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_position) | 
 array&lt;SpearDanglerAnimFrames, 6&gt; | [spear_dangler](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangler) | 
 float | [play_scroll_descend_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_scroll_descend_timer) | 
-STRINGID | [scroll_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text) | 
+[STRINGID](#aliases) | [scroll_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text) | 
 
 ### ScreenOptions
 
@@ -1447,8 +1447,8 @@ float | [top_bottom_woodpanels_slide_in_related](https://github.com/spelunky-fyi
 [TextureRenderingInfo](#texturerenderinginfo) | [top_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [top_woodpanel_left_scrollhandle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_left_scrollhandle) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [top_woodpanel_right_scrollhandle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_right_scrollhandle) | 
-STRINGID | [button_right_caption](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_right_caption) | 
-STRINGID | [button_middle_caption](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_middle_caption) | 
+[STRINGID](#aliases) | [button_right_caption](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_right_caption) | 
+[STRINGID](#aliases) | [button_middle_caption](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_middle_caption) | 
 bool | [top_woodpanel_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_visible) | 
 bool | [bottom_woodpanel_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_visible) | 
 bool | [toggle_woodpanel_slidein_animation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_woodpanel_slidein_animation) | 
@@ -1498,10 +1498,10 @@ Derived from [Screen](#screen)
 float | [bottom_woodpanel_slideup_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_slideup_timer) | 
 float | [bottom_woodpanel_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_y) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [bottom_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel) | 
-STRINGID | [buttons_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_text_id) | 
+[STRINGID](#aliases) | [buttons_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_text_id) | 
 float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc_slidein_timer) | 
-STRINGID | [scroll_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) | 
-STRINGID | [start_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_text_id) | 
+[STRINGID](#aliases) | [scroll_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) | 
+[STRINGID](#aliases) | [start_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_text_id) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [main_woodpanel_left_border](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_left_border) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [main_woodpanel_center](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_center) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [main_woodpanel_right_border](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_right_border) | 
@@ -1525,9 +1525,9 @@ float | [top_scroll_unfurl_timer](https://github.com/spelunky-fyi/overlunky/sear
 [TextureRenderingInfo](#texturerenderinginfo) | [top_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [left_scroll_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_scroll_handle) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [right_scroll_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_scroll_handle) | 
-STRINGID | [left_button_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_button_text_id) | 
-STRINGID | [right_button_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_button_text_id) | 
-STRINGID | [middle_button_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=middle_button_text_id) | 
+[STRINGID](#aliases) | [left_button_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_button_text_id) | 
+[STRINGID](#aliases) | [right_button_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_button_text_id) | 
+[STRINGID](#aliases) | [middle_button_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=middle_button_text_id) | 
 bool | [top_woodpanel_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_visible) | 
 bool | [bottom_woodpanel_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_visible) | 
 bool | [toggle_woodpanel_slidein_animation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_woodpanel_slidein_animation) | 
@@ -1566,7 +1566,7 @@ int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons
 float | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
 bool | [start_pressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_pressed) | 
 bool | [transition_to_game_started](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transition_to_game_started) | 
-array&lt;FlyingThing, 6&gt; | [flying_things](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flying_things) | 
+array&lt;[FlyingThing](#flyingthing), 6&gt; | [flying_things](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flying_things) | 
 int | [flying_thing_countdown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flying_thing_countdown) | 
 [ParticleEmitterInfo](#particleemitterinfo) | [particle_ceilingdust_smoke](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_ceilingdust_smoke) | 
 [ParticleEmitterInfo](#particleemitterinfo) | [particle_ceilingdust_rubble](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_ceilingdust_rubble) | 
@@ -1653,7 +1653,7 @@ bool | [hide_press_to_go_next_level](https://github.com/spelunky-fyi/overlunky/s
 [TextureRenderingInfo](#texturerenderinginfo) | [speechbubble](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [speechbubble_arrow](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_arrow) | 
 float | [mama_tunnel_fade_targetvalue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_fade_targetvalue) | 
-STRINGID | [mama_tunnel_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_text_id) | 
+[STRINGID](#aliases) | [mama_tunnel_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_text_id) | 
 bool | [mama_tunnel_choice_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_choice_visible) | 
 bool | [mama_tunnel_agree_with_gift](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_agree_with_gift) | 
 bool | [mama_tunnel_face_invisible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mama_tunnel_face_invisible) | 
@@ -1666,8 +1666,8 @@ float | [mama_tunnel_face_transparency](https://github.com/spelunky-fyi/overlunk
 [TextureRenderingInfo](#texturerenderinginfo) | [big_dollar_sign](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=big_dollar_sign) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [unknown26](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown26) | 
 array&lt;int, MAX_PLAYERS&gt; | [player_stats_scroll_numeric_value](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_stats_scroll_numeric_value) | 
-array&lt;TextureRenderingInfo, MAX_PLAYERS&gt; | [player_secondary_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_secondary_icon) | 
-array&lt;TextureRenderingInfo, MAX_PLAYERS&gt; | [player_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_icon) | 
+array&lt;[TextureRenderingInfo](#texturerenderinginfo), MAX_PLAYERS&gt; | [player_secondary_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_secondary_icon) | 
+array&lt;[TextureRenderingInfo](#texturerenderinginfo), MAX_PLAYERS&gt; | [player_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_icon) | 
 array&lt;int, MAX_PLAYERS&gt; | [player_secondary_icon_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_secondary_icon_type) | 
 array&lt;int, MAX_PLAYERS&gt; | [player_icon_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_icon_index) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [hourglasses](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hourglasses) | 
@@ -1761,10 +1761,10 @@ float | [scroll_unfurl_timer](https://github.com/spelunky-fyi/overlunky/search?l
 [TextureRenderingInfo](#texturerenderinginfo) | [woodpanel_top](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [left_scroll_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_scroll_handle) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [right_scroll_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_scroll_handle) | 
-STRINGID | [scroll_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) | 
-STRINGID | [btn_left_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_left_text_id) | 
-STRINGID | [btn_right_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_right_text_id) | 
-STRINGID | [btn_center_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_center_text_id) | 
+[STRINGID](#aliases) | [scroll_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) | 
+[STRINGID](#aliases) | [btn_left_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_left_text_id) | 
+[STRINGID](#aliases) | [btn_right_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_right_text_id) | 
+[STRINGID](#aliases) | [btn_center_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=btn_center_text_id) | 
 bool | [woodpanel_top_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top_visible) | 
 bool | [woodpanel_bottom_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_bottom_visible) | 
 bool | [toggle_panels_slidein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_panels_slidein) | 
@@ -1787,15 +1787,15 @@ bool | [searching_for_players](https://github.com/spelunky-fyi/overlunky/search?
 bool | [show_code_panel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_code_panel) | 
 float | [enter_code_woodpanel_bottom_slidein_pos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_bottom_slidein_pos) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [enter_code_woodpanel_bottom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_bottom) | 
-STRINGID | [enter_code_btn_right_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_btn_right_text_id) | 
+[STRINGID](#aliases) | [enter_code_btn_right_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_btn_right_text_id) | 
 bool | [enter_code_woodpanel_top_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_top_visible) | 
 bool | [enter_code_woodpanel_bottom_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_woodpanel_bottom_visible) | 
 bool | [enter_code_toggle_panels_slidein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_toggle_panels_slidein) | 
 int | [selected_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_character) | 
 int | [characters_entered_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters_entered_count) | 
 float | [enter_code_topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_topleft_woodpanel_esc_slidein_timer) | 
-STRINGID | [enter_code_banner_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_banner_text_id) | 
-STRINGID | [enter_code_OK_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_OK_text_id) | 
+[STRINGID](#aliases) | [enter_code_banner_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_banner_text_id) | 
+[STRINGID](#aliases) | [enter_code_OK_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_OK_text_id) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [enter_code_main_woodpanel_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_main_woodpanel_left) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [enter_code_main_woodpanel_center](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_main_woodpanel_center) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [enter_code_main_woodpanel_right](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_code_main_woodpanel_right) | 
@@ -1826,10 +1826,10 @@ float | [top_scroll_unfurl_timer](https://github.com/spelunky-fyi/overlunky/sear
 [TextureRenderingInfo](#texturerenderinginfo) | [unknown15](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown15) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [left_scroll_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_scroll_handle) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [right_scroll_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_scroll_handle) | 
-STRINGID | [scroll_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) | 
-STRINGID | [unknown17_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown17_text_id) | 
-STRINGID | [unknown18_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown18_text_id) | 
-STRINGID | [unknown19_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown19_text_id) | 
+[STRINGID](#aliases) | [scroll_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) | 
+[STRINGID](#aliases) | [unknown17_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown17_text_id) | 
+[STRINGID](#aliases) | [unknown18_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown18_text_id) | 
+[STRINGID](#aliases) | [unknown19_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown19_text_id) | 
 bool | [top_woodpanel_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_visible) | 
 bool | [bottom_woodpanel_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_visible) | 
 bool | [woodpanels_toggle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanels_toggle) | 
@@ -1875,10 +1875,10 @@ float | [woodenpanel_top_scroll_unfurl_timer](https://github.com/spelunky-fyi/ov
 [TextureRenderingInfo](#texturerenderinginfo) | [woodenpanel_top](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_top) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [woodenpanel_top_left_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_top_left_scroll) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [woodenpanel_top_right_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_top_right_scroll) | 
-STRINGID | [text_id_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_1) | 
-STRINGID | [text_id_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) | 
-STRINGID | [text_id_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_3) | 
-STRINGID | [text_id_4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_4) | 
+[STRINGID](#aliases) | [text_id_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_1) | 
+[STRINGID](#aliases) | [text_id_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) | 
+[STRINGID](#aliases) | [text_id_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_3) | 
+[STRINGID](#aliases) | [text_id_4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_4) | 
 bool | [woodenpanel_top_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_top_visible) | 
 bool | [woodenpanel_bottom_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanel_bottom_visible) | 
 bool | [woodenpanels_toggle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodenpanels_toggle) | 
@@ -1923,10 +1923,10 @@ float | [woodpanel_top_scroll_unfurl_timer](https://github.com/spelunky-fyi/over
 [TextureRenderingInfo](#texturerenderinginfo) | [unknown11](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown11) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [top_scroll_left_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_scroll_left_handle) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [top_scroll_right_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_scroll_right_handle) | 
-STRINGID | [scroll_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) | 
-STRINGID | [text_id_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) | 
-STRINGID | [text_id_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_3) | 
-STRINGID | [text_id_4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_4) | 
+[STRINGID](#aliases) | [scroll_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) | 
+[STRINGID](#aliases) | [text_id_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) | 
+[STRINGID](#aliases) | [text_id_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_3) | 
+[STRINGID](#aliases) | [text_id_4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_4) | 
 bool | [woodpanel_top_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top_visible) | 
 bool | [woodpanel_bottom_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_bottom_visible) | 
 bool | [woodpanels_toggle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanels_toggle) | 
@@ -1995,8 +1995,8 @@ float | [scroll_unfurl_timer](https://github.com/spelunky-fyi/overlunky/search?l
 [TextureRenderingInfo](#texturerenderinginfo) | [unknown_all_forced](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_all_forced) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [woodpanel_left_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_left_scroll) | 
 [TextureRenderingInfo](#texturerenderinginfo) | [woodpanel_right_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_right_scroll) | 
-STRINGID | [text_id_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_1) | 
-STRINGID | [text_id_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) | 
+[STRINGID](#aliases) | [text_id_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_1) | 
+[STRINGID](#aliases) | [text_id_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_id_2) | 
 bool | [woodpanel_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_visible) | 
 bool | [woodpanel_slide_toggle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_slide_toggle) | 
 int | [animation_sequence](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_sequence) | 
@@ -2221,7 +2221,7 @@ Derived from [JournalPage](#journalpage)
 [TextRenderingInfo](#textrenderinginfo) | [time_text_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_text_info) | 
 [TextRenderingInfo](#textrenderinginfo) | [time_value_text_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_value_text_info) | 
 int | [sticker_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sticker_count) | 
-array&lt;TextureRenderingInfo, 20&gt; | [stickers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) | 
+array&lt;[TextureRenderingInfo](#texturerenderinginfo), 20&gt; | [stickers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) | 
 
 # Entity types
 
@@ -2261,7 +2261,7 @@ float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offse
 bool | [overlaps_with(AABB hitbox)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
 bool | [overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | Deprecated<br/>Use `overlaps_with(AABB hitbox)` instead
 bool | [overlaps_with(Entity other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
-TEXTURE | [get_texture()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) | 
+[TEXTURE](#texture) | [get_texture()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) | 
 bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) | Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
  | [set_draw_depth(int draw_depth)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) | 
  | [liberate_from_shop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | 
@@ -2482,7 +2482,7 @@ Derived from [Entity](#entity)
 
         Type | Name | Description
         ---- | ---- | -----------
-ENT_TYPE | [door_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_type) | 
+[ENT_TYPE](#ent_type) | [door_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_type) | 
 bool | [visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visible) | 
 bool | [platform_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_spawned) | Is set true when you bomb the door, no matter what door, can't be reset
 
@@ -2798,8 +2798,8 @@ Derived from [Entity](#entity)
         ---- | ---- | -----------
 float | [movex](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) | 
 float | [movey](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movey) | 
-BUTTON | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
-BUTTON | [buttons_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_previous) | 
+[BUTTON](#button) | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+[BUTTON](#button) | [buttons_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_previous) | 
 int | [stand_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stand_counter) | 
 float | [jump_height_multiplier](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_height_multiplier) | 
 int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
@@ -2986,7 +2986,7 @@ Derived from [Entity](#entity) [Movable](#movable)
 
         Type | Name | Description
         ---- | ---- | -----------
-ENT_TYPE | [treasure_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=treasure_type) | 
+[ENT_TYPE](#ent_type) | [treasure_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=treasure_type) | 
 int | [treasure_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=treasure_uid) | 
 float | [treasure_x_pos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=treasure_x_pos) | 
 float | [treasure_y_pos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=treasure_y_pos) | 
@@ -3550,7 +3550,7 @@ Derived from [Entity](#entity) [Movable](#movable)
 
         Type | Name | Description
         ---- | ---- | -----------
-ENT_TYPE | [inside](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) | 
+[ENT_TYPE](#ent_type) | [inside](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) | 
 
 ### Coffin
 
@@ -3559,7 +3559,7 @@ Derived from [Entity](#entity) [Movable](#movable)
 
         Type | Name | Description
         ---- | ---- | -----------
-ENT_TYPE | [inside](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) | 
+[ENT_TYPE](#ent_type) | [inside](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 bool | [player_respawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_respawn) | 
 
@@ -3791,7 +3791,7 @@ Derived from [Entity](#entity) [Movable](#movable)
 
         Type | Name | Description
         ---- | ---- | -----------
-ENT_TYPE | [inside](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) | 
+[ENT_TYPE](#ent_type) | [inside](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside) | 
 bool | [dont_transfer_dmg](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dont_transfer_dmg) | 
 
 ### CursedPot
@@ -4404,7 +4404,7 @@ Derived from [Entity](#entity) [Movable](#movable)
  | [remove_powerup(ENT_TYPE powerup_type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_powerup) | Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
  | [give_powerup(ENT_TYPE powerup_type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=give_powerup) | Gives the player/monster the specified powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Giving true crown to a monster crashes the game.
 bool | [has_powerup(ENT_TYPE powerup_type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=has_powerup) | Checks whether the player/monster has a certain powerup
-array&lt;ENT_TYPE&gt; | [get_powerups()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_powerups) | Return all powerups that the entity has
+array&lt;[ENT_TYPE](#ent_type)&gt; | [get_powerups()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_powerups) | Return all powerups that the entity has
  | [unequip_backitem()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip_backitem) | Unequips the currently worn backitem
 int | [worn_backitem()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=worn_backitem) | Returns the uid of the currently worn backitem, or -1 if wearing nothing
 
@@ -4487,7 +4487,7 @@ Derived from [Entity](#entity) [Movable](#movable) [PowerupCapable](#powerupcapa
         ---- | ---- | -----------
 int | [split_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split_timer) | for SMALL_HAPPY this is also the sequence timer of its various states
 float | [velocity_multiplier](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_multiplier) | 
-GHOST_BEHAVIOR | [ghost_behaviour](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost_behaviour) | 
+[GHOST_BEHAVIOR](#ghost_behavior) | [ghost_behaviour](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost_behaviour) | 
 [Illumination](#illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
 [Entity](#entity) | [linked_ghost](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_ghost) | 
 
@@ -5336,7 +5336,7 @@ Derived from [Entity](#entity) [Movable](#movable) [PowerupCapable](#powerupcapa
 
         Type | Name | Description
         ---- | ---- | -----------
-ENT_TYPE | [carried_entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carried_entity_type) | 
+[ENT_TYPE](#ent_type) | [carried_entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carried_entity_type) | 
 int | [carried_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carried_entity_uid) | 
 int | [walk_spit_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_spit_timer) | 
 bool | [is_active](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_active) | whether it is hidden behind the carried block or not, if true you can damage him
@@ -5629,7 +5629,7 @@ Derived from [Entity](#entity) [Floor](#floor)
 
         Type | Name | Description
         ---- | ---- | -----------
-ENT_TYPE | [spawn_entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) | 
+[ENT_TYPE](#ent_type) | [spawn_entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) | 
 int | [first_sound_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_sound_id) | 
  | [trigger(int who_uid, bool left)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) | The uid must be movable entity for ownership transfers
 

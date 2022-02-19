@@ -286,7 +286,7 @@
   color: #859900;
 }
     </style>
-    <link href="stylesheets/screen-ef16a399.css" rel="stylesheet" media="screen" />
+    <link href="stylesheets/screen-1770f26f.css" rel="stylesheet" media="screen" />
     <link href="stylesheets/print-953e3353.css" rel="stylesheet" media="print" />
       <script src="javascripts/all-1b920087.js"></script>
 
@@ -3180,7 +3180,7 @@ If you set <code>health</code> above the game max health it will be forced down 
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rgba">rgba</a></p>
 </blockquote>
-<h4 id='ucolor-rgba-int-r-int-g-int-b-int-a'>uColor rgba(int r, int g, int b, int a)<br/></h4>
+<h4 id='ucolor-rgba-int-r-int-g-int-b-int-a'><a href="#aliases">uColor</a> rgba(int r, int g, int b, int a)<br/></h4>
 <p>Converts a color to int to be used in drawing functions. Use values from <code>0..255</code>.<br/></p>
 <h3 id='create_image'>create_image</h3>
 <blockquote>
@@ -3263,31 +3263,31 @@ If you set <code>health</code> above the game max health it will be forced down 
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_interval">set_interval</a></p>
 </blockquote>
-<h4 id='callbackid-set_interval-function-cb-int-frames'>CallbackId set_interval(function cb, int frames)<br/></h4>
+<h4 id='callbackid-set_interval-function-cb-int-frames'><a href="#aliases">CallbackId</a> set_interval(function cb, int frames)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_callback">clear_callback</a>. You can also return <code>false</code> from your function to clear the callback.<br/>Add per level callback function to be called every <code>frames</code> engine frames. Timer is paused on pause and cleared on level transition.<br/></p>
 <h3 id='set_timeout'>set_timeout</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_timeout">set_timeout</a></p>
 </blockquote>
-<h4 id='callbackid-set_timeout-function-cb-int-frames'>CallbackId set_timeout(function cb, int frames)<br/></h4>
+<h4 id='callbackid-set_timeout-function-cb-int-frames'><a href="#aliases">CallbackId</a> set_timeout(function cb, int frames)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_callback">clear_callback</a>.<br/>Add per level callback function to be called after <code>frames</code> engine frames. Timer is paused on pause and cleared on level transition.<br/></p>
 <h3 id='set_global_interval'>set_global_interval</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_global_interval">set_global_interval</a></p>
 </blockquote>
-<h4 id='callbackid-set_global_interval-function-cb-int-frames'>CallbackId set_global_interval(function cb, int frames)<br/></h4>
+<h4 id='callbackid-set_global_interval-function-cb-int-frames'><a href="#aliases">CallbackId</a> set_global_interval(function cb, int frames)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_callback">clear_callback</a>. You can also return <code>false</code> from your function to clear the callback.<br/>Add global callback function to be called every <code>frames</code> engine frames. This timer is never paused or cleared.<br/></p>
 <h3 id='set_global_timeout'>set_global_timeout</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_global_timeout">set_global_timeout</a></p>
 </blockquote>
-<h4 id='callbackid-set_global_timeout-function-cb-int-frames'>CallbackId set_global_timeout(function cb, int frames)<br/></h4>
+<h4 id='callbackid-set_global_timeout-function-cb-int-frames'><a href="#aliases">CallbackId</a> set_global_timeout(function cb, int frames)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_callback">clear_callback</a>.<br/>Add global callback function to be called after <code>frames</code> engine frames. This timer is never paused or cleared.<br/></p>
 <h3 id='set_callback'>set_callback</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_callback">set_callback</a></p>
 </blockquote>
-<h4 id='callbackid-set_callback-function-cb-int-screen'>CallbackId set_callback(function cb, int screen)<br/></h4>
+<h4 id='callbackid-set_callback-function-cb-int-screen'><a href="#aliases">CallbackId</a> set_callback(function cb, int screen)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_callback">clear_callback</a>.<br/>Add global callback function to be called on an <a href="#on">event</a>.<br/></p>
 <h3 id='clear_callback'>clear_callback</h3>
 <blockquote>
@@ -3312,13 +3312,13 @@ If you set <code>health</code> above the game max health it will be forced down 
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_entity_spawn">set_pre_entity_spawn</a></p>
 </blockquote>
-<h4 id='callbackid-set_pre_entity_spawn-function-cb-spawn_type-flags-int-mask-variadic_args-entity_types'>CallbackId set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)<br/></h4>
+<h4 id='callbackid-set_pre_entity_spawn-function-cb-spawn_type-flags-int-mask-variadic_args-entity_types'><a href="#aliases">CallbackId</a> set_pre_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)<br/></h4>
 <p>Add a callback for a spawn of specific entity types or mask. Set <code>mask</code> to <code>MASK.ANY</code> to ignore that.<br/>This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.<br/>In many cases replacing the intended entity won&#39;t have the indended effect or will even break the game, so use only if you really know what you&#39;re doing.<br/>The callback signature is <code>optional&lt;int&gt; pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)</code><br/></p>
 <h3 id='set_post_entity_spawn'>set_post_entity_spawn</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_entity_spawn">set_post_entity_spawn</a></p>
 </blockquote>
-<h4 id='callbackid-set_post_entity_spawn-function-cb-spawn_type-flags-int-mask-variadic_args-entity_types'>CallbackId set_post_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)<br/></h4>
+<h4 id='callbackid-set_post_entity_spawn-function-cb-spawn_type-flags-int-mask-variadic_args-entity_types'><a href="#aliases">CallbackId</a> set_post_entity_spawn(function cb, SPAWN_TYPE flags, int mask, variadic_args entity_types)<br/></h4>
 <p>Add a callback for a spawn of specific entity types or mask. Set <code>mask</code> to <code>MASK.ANY</code> to ignore that.<br/>This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.<br/>The callback signature is <code>nil post_entity_spawn(entity, spawn_flags)</code><br/></p>
 <h3 id='clear_screen_callback'>clear_screen_callback</h3>
 <blockquote>
@@ -3330,13 +3330,13 @@ If you set <code>health</code> above the game max health it will be forced down 
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_render_screen">set_pre_render_screen</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_pre_render_screen-int-screen_id-function-fun'>optional&lt;CallbackId&gt; set_pre_render_screen(int screen_id, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_pre_render_screen-int-screen_id-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_pre_render_screen(int screen_id, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_screen_callback">clear_screen_callback</a> or <code>nil</code> if screen_id is not valid.<br/>Sets a callback that is called right before the screen is drawn, return <code>true</code> to skip the default rendering.<br/></p>
 <h3 id='set_post_render_screen'>set_post_render_screen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_render_screen">set_post_render_screen</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_post_render_screen-int-screen_id-function-fun'>optional&lt;CallbackId&gt; set_post_render_screen(int screen_id, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_post_render_screen-int-screen_id-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_post_render_screen(int screen_id, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_screen_callback">clear_screen_callback</a> or <code>nil</code> if screen_id is not valid.<br/>Sets a callback that is called right after the screen is drawn.<br/></p>
 <h3 id='clear_entity_callback'>clear_entity_callback</h3>
 <blockquote>
@@ -3348,61 +3348,61 @@ If you set <code>health</code> above the game max health it will be forced down 
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_statemachine">set_pre_statemachine</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_pre_statemachine-int-uid-function-fun'>optional&lt;CallbackId&gt; set_pre_statemachine(int uid, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_pre_statemachine-int-uid-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_pre_statemachine(int uid, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.<br/><code>uid</code> has to be the uid of a <code>Movable</code> or else stuff will break.<br/>Sets a callback that is called right before the statemachine, return <code>true</code> to skip the statemachine update.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check <a href="virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.<br/></p>
 <h3 id='set_post_statemachine'>set_post_statemachine</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_statemachine">set_post_statemachine</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_post_statemachine-int-uid-function-fun'>optional&lt;CallbackId&gt; set_post_statemachine(int uid, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_post_statemachine-int-uid-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_post_statemachine(int uid, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.<br/><code>uid</code> has to be the uid of a <code>Movable</code> or else stuff will break.<br/>Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. <code>animation_frame</code>).<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check <a href="virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.<br/></p>
 <h3 id='set_on_destroy'>set_on_destroy</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_destroy">set_on_destroy</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_on_destroy-int-uid-function-fun'>optional&lt;CallbackId&gt; set_on_destroy(int uid, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_on_destroy-int-uid-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_on_destroy(int uid, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.<br/>Sets a callback that is called right when an entity is destroyed, e.g. as if by <code>Entity.destroy()</code> before the game applies any side effects.<br/>The callback signature is <code>nil on_destroy(Entity self)</code><br/>Use this only when no other approach works, this call can be expensive if overused.<br/></p>
 <h3 id='set_on_kill'>set_on_kill</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_kill">set_on_kill</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_on_kill-int-uid-function-fun'>optional&lt;CallbackId&gt; set_on_kill(int uid, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_on_kill-int-uid-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_on_kill(int uid, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.<br/>Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.<br/>The callback signature is <code>nil on_kill(Entity self, Entity killer)</code><br/>Use this only when no other approach works, this call can be expensive if overused.<br/></p>
 <h3 id='set_on_player_instagib'>set_on_player_instagib</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_player_instagib">set_on_player_instagib</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_on_player_instagib-int-uid-function-fun'>optional&lt;CallbackId&gt; set_on_player_instagib(int uid, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_on_player_instagib-int-uid-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_on_player_instagib(int uid, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.<br/>Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return <code>true</code> to skip the game&#39;s crush handling.<br/>The callback signature is <code>bool on_player_instagib(Entity self)</code><br/>The game&#39;s instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity&#39;s health is zero.<br/>This is so that when the entity dies (from other causes), the death screen still gets shown.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/></p>
 <h3 id='set_on_damage'>set_on_damage</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_damage">set_on_damage</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_on_damage-int-uid-function-fun'>optional&lt;CallbackId&gt; set_on_damage(int uid, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_on_damage-int-uid-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_on_damage(int uid, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.<br/>Sets a callback that is called right before an entity is damaged, return <code>true</code> to skip the game&#39;s damage handling.<br/>The callback signature is <code>bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)</code><br/>Note that damage_dealer can be nil ! (long fall, ...)<br/>DO NOT CALL <code>self:damage()</code> in the callback !<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check <a href="virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.<br/></p>
 <h3 id='set_on_open'>set_on_open</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_open">set_on_open</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_on_open-int-uid-function-fun'>optional&lt;CallbackId&gt; set_on_open(int uid, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_on_open-int-uid-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_on_open(int uid, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.<br/>Sets a callback that is called right when a container is opened via up+door, or weapon is shot.<br/>The callback signature is <code>nil on_open(Entity entity_self, Entity opener)</code><br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check <a href="virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.<br/></p>
 <h3 id='set_pre_collision1'>set_pre_collision1</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_collision1">set_pre_collision1</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_pre_collision1-int-uid-function-fun'>optional&lt;CallbackId&gt; set_pre_collision1(int uid, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_pre_collision1-int-uid-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_pre_collision1(int uid, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.<br/>Sets a callback that is called right before the collision 1 event, return <code>true</code> to skip the game&#39;s collision handling.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check <a href="virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.<br/></p>
 <h3 id='set_pre_collision2'>set_pre_collision2</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_collision2">set_pre_collision2</a></p>
 </blockquote>
-<h4 id='optional-lt-callbackid-gt-set_pre_collision2-int-uid-function-fun'>optional&lt;CallbackId&gt; set_pre_collision2(int uid, function fun)<br/></h4>
+<h4 id='optional-lt-callbackid-gt-set_pre_collision2-int-uid-function-fun'>optional&lt;<a href="#aliases">CallbackId</a>&gt; set_pre_collision2(int uid, function fun)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.<br/>Sets a callback that is called right before the collision 2 event, return <code>true</code> to skip the game&#39;s collision handling.<br/>Use this only when no other approach works, this call can be expensive if overused.<br/>Check <a href="virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.<br/></p>
 <h3 id='set_vanilla_sound_callback'>set_vanilla_sound_callback</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_vanilla_sound_callback">set_vanilla_sound_callback</a></p>
 </blockquote>
-<h4 id='callbackid-set_vanilla_sound_callback-vanilla_sound-name-vanilla_sound_callback_type-types-function-cb'>CallbackId set_vanilla_sound_callback(VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, function cb)<br/></h4>
+<h4 id='callbackid-set_vanilla_sound_callback-vanilla_sound-name-vanilla_sound_callback_type-types-function-cb'><a href="#aliases">CallbackId</a> set_vanilla_sound_callback(VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, function cb)<br/></h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_vanilla_sound_callback">clear_vanilla_sound_callback</a>.<br/>Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound<br/>Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected<br/>If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any<br/>properties on the sound. Otherwise you may cause a deadlock. The callback signature is <code>nil on_vanilla_sound(PlayingSound sound)</code><br/></p>
 <h3 id='clear_vanilla_sound_callback'>clear_vanilla_sound_callback</h3>
 <blockquote>
@@ -3632,7 +3632,7 @@ Use empty table as argument to reset to the game default</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_procedural_spawn">define_procedural_spawn</a></p>
 </blockquote>
-<h4 id='procedural_chance-define_procedural_spawn-string-procedural_spawn-function-do_spawn-function-is_valid'>PROCEDURAL_CHANCE define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)<br/></h4>
+<h4 id='procedural_chance-define_procedural_spawn-string-procedural_spawn-function-do_spawn-function-is_valid'><a href="#procedural_chance">PROCEDURAL_CHANCE</a> define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)<br/></h4>
 <p>Define a new procedural spawn, the function <code>nil do_spawn(x, y, layer)</code> contains your code to spawn the thing, whatever it is.<br/>The function <code>bool is_valid(x, y, layer)</code> determines whether the spawn is legal in the given position and layer.<br/>Use for example when you can spawn only on the ceiling, under water or inside a shop.<br/>Set <code>is_valid</code> to <code>nil</code> in order to use the default rule (aka. on top of floor and not obstructed).<br/>If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.<br/></p>
 <h3 id='define_extra_spawn'>define_extra_spawn</h3>
 <blockquote>
@@ -3868,7 +3868,7 @@ However this function offsets <code>attachee</code> (so you don&#39;t have to) a
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_type">get_entity_type</a></p>
 </blockquote>
-<h4 id='ent_type-get_entity_type-int-uid'>ENT_TYPE get_entity_type(int uid)</h4>
+<h4 id='ent_type-get_entity_type-int-uid'><a href="#ent_type">ENT_TYPE</a> get_entity_type(int uid)</h4>
 <p>Get the ENT_TYPE... of the entity by uid</p>
 <h3 id='entity_remove_item'>entity_remove_item</h3>
 <blockquote>
@@ -4114,7 +4114,7 @@ Use <code>0</code> as type to reset this drop to default, use <code>-1</code> as
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_flag">set_flag</a></p>
 </blockquote>
-<h4 id='flags-set_flag-flags-flags-int-bit'>Flags set_flag(Flags flags, int bit)<br/></h4>
+<h4 id='flags-set_flag-flags-flags-int-bit'><a href="#aliases">Flags</a> set_flag(Flags flags, int bit)<br/></h4>
 <p>Set a bit in a number. This doesn&#39;t actually change the bit in the entity you pass it, it just returns the new value you can use.<br/></p>
 <h3 id='setflag'>setflag</h3>
 <blockquote>
@@ -4124,7 +4124,7 @@ Use <code>0</code> as type to reset this drop to default, use <code>-1</code> as
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clr_flag">clr_flag</a></p>
 </blockquote>
-<h4 id='flags-clr_flag-flags-flags-int-bit'>Flags clr_flag(Flags flags, int bit)<br/></h4>
+<h4 id='flags-clr_flag-flags-flags-int-bit'><a href="#aliases">Flags</a> clr_flag(Flags flags, int bit)<br/></h4>
 <p>Clears a bit in a number. This doesn&#39;t actually change the bit in the entity you pass it, it just returns the new value you can use.<br/></p>
 <h3 id='clrflag'>clrflag</h3>
 <blockquote>
@@ -4192,13 +4192,13 @@ Use empty table as argument to reset to the game default</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read_input">read_input</a></p>
 </blockquote>
-<h4 id='inputs-read_input-int-uid'>INPUTS read_input(int uid)<br/></h4>
+<h4 id='inputs-read_input-int-uid'><a href="#inputs">INPUTS</a> read_input(int uid)<br/></h4>
 <p>Read input<br/></p>
 <h3 id='read_stolen_input'>read_stolen_input</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read_stolen_input">read_stolen_input</a></p>
 </blockquote>
-<h4 id='inputs-read_stolen_input-int-uid'>INPUTS read_stolen_input(int uid)<br/></h4>
+<h4 id='inputs-read_stolen_input-int-uid'><a href="#inputs">INPUTS</a> read_stolen_input(int uid)<br/></h4>
 <p>Read input that has been previously stolen with steal_input<br/></p>
 <h3 id='mouse_position'>mouse_position</h3>
 <blockquote>
@@ -4220,7 +4220,7 @@ Use empty table as argument to reset to the game default</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=hash_to_stringid">hash_to_stringid</a></p>
 </blockquote>
-<h4 id='stringid-hash_to_stringid-int-hash'>STRINGID hash_to_stringid(int hash)</h4>
+<h4 id='stringid-hash_to_stringid-int-hash'><a href="#aliases">STRINGID</a> hash_to_stringid(int hash)</h4>
 <p>Convert the hash to stringid
 Check <a href="game_data/strings00_hashed.str">strings00_hashed.str</a> for the hash values, or extract assets with modlunky and check those.</p>
 <h3 id='get_string'>get_string</h3>
@@ -4240,7 +4240,7 @@ Will return the string of currently choosen language</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_string">add_string</a></p>
 </blockquote>
-<h4 id='stringid-add_string-string-str'>STRINGID add_string(string str)</h4>
+<h4 id='stringid-add_string-string-str'><a href="#aliases">STRINGID</a> add_string(string str)</h4>
 <p>Add custom string, currently can only be used for names of shop items (Entitydb-&gt;description)
 Returns STRINGID of the new string</p>
 <h3 id='add_custom_name'>add_custom_name</h3>
@@ -4326,19 +4326,19 @@ This is better alternative to <code>add_string</code> but instead of changing th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_tile_code_callback">set_pre_tile_code_callback</a></p>
 </blockquote>
-<h4 id='callbackid-set_pre_tile_code_callback-function-cb-string-tile_code'>CallbackId set_pre_tile_code_callback(function cb, string tile_code)<br/></h4>
+<h4 id='callbackid-set_pre_tile_code_callback-function-cb-string-tile_code'><a href="#aliases">CallbackId</a> set_pre_tile_code_callback(function cb, string tile_code)<br/></h4>
 <p>Add a callback for a specific tile code that is called before the game handles the tile code.<br/>The callback signature is <code>bool pre_tile_code(x, y, layer, room_template)</code><br/>Return true in order to stop the game or scripts loaded after this script from handling this tile code.<br/>For example, when returning true in this callback set for <code>&quot;floor&quot;</code> then no floor will spawn in the game (unless you spawn it yourself)<br/></p>
 <h3 id='set_post_tile_code_callback'>set_post_tile_code_callback</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_tile_code_callback">set_post_tile_code_callback</a></p>
 </blockquote>
-<h4 id='callbackid-set_post_tile_code_callback-function-cb-string-tile_code'>CallbackId set_post_tile_code_callback(function cb, string tile_code)<br/></h4>
+<h4 id='callbackid-set_post_tile_code_callback-function-cb-string-tile_code'><a href="#aliases">CallbackId</a> set_post_tile_code_callback(function cb, string tile_code)<br/></h4>
 <p>Add a callback for a specific tile code that is called after the game handles the tile code.<br/>The callback signature is <code>nil post_tile_code(x, y, layer, room_template)</code><br/>Use this to affect what the game or other scripts spawned in this position.<br/>This is received even if a previous pre-tile-code-callback has returned true<br/></p>
 <h3 id='define_tile_code'>define_tile_code</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_tile_code">define_tile_code</a></p>
 </blockquote>
-<h4 id='tile_code-define_tile_code-string-tile_code'>TILE_CODE define_tile_code(string tile_code)<br/></h4>
+<h4 id='tile_code-define_tile_code-string-tile_code'><a href="#tile_code">TILE_CODE</a> define_tile_code(string tile_code)<br/></h4>
 <p>Define a new tile code, to make this tile code do anything you have to use either <code>set_pre_tile_code_callback</code> or <code>set_post_tile_code_callback</code>.<br/>If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.<br/></p>
 <h3 id='get_short_tile_code'>get_short_tile_code</h3>
 <blockquote>
@@ -4350,7 +4350,7 @@ This is better alternative to <code>add_string</code> but instead of changing th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_short_tile_code_definition">get_short_tile_code_definition</a></p>
 </blockquote>
-<h4 id='optional-lt-shorttilecodedef-gt-get_short_tile_code_definition-short_tile_code-short_tile_code'>optional&lt;ShortTileCodeDef&gt; get_short_tile_code_definition(SHORT_TILE_CODE short_tile_code)<br/></h4>
+<h4 id='optional-lt-shorttilecodedef-gt-get_short_tile_code_definition-short_tile_code-short_tile_code'>optional&lt;<a href="#shorttilecodedef">ShortTileCodeDef</a>&gt; get_short_tile_code_definition(SHORT_TILE_CODE short_tile_code)<br/></h4>
 <p>Gets the definition of a short tile code (if available), will vary depending on which file is loaded<br/></p>
 <h2 id='room-functions'>Room functions</h2><h3 id='get_room_index'>get_room_index</h3>
 <blockquote>
@@ -4422,13 +4422,13 @@ This is better alternative to <code>add_string</code> but instead of changing th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_sound">create_sound</a></p>
 </blockquote>
-<h4 id='optional-lt-customsound-gt-create_sound-string-path'>optional&lt;CustomSound&gt; create_sound(string path)<br/></h4>
+<h4 id='optional-lt-customsound-gt-create_sound-string-path'>optional&lt;<a href="#customsound">CustomSound</a>&gt; create_sound(string path)<br/></h4>
 <p>Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can&#39;t be found<br/></p>
 <h3 id='get_sound'>get_sound</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_sound">get_sound</a></p>
 </blockquote>
-<h4 id='optional-lt-customsound-gt-get_sound-string-path_or_vanilla_sound'>optional&lt;CustomSound&gt; get_sound(string path_or_vanilla_sound)<br/></h4>
+<h4 id='optional-lt-customsound-gt-get_sound-string-path_or_vanilla_sound'>optional&lt;<a href="#customsound">CustomSound</a>&gt; get_sound(string path_or_vanilla_sound)<br/></h4>
 <p>Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game<br/></p>
 <h2 id='texture-functions'>Texture functions</h2><h3 id='set_lut'>set_lut</h3>
 <blockquote>
@@ -4448,13 +4448,13 @@ This is better alternative to <code>add_string</code> but instead of changing th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_texture">define_texture</a></p>
 </blockquote>
-<h4 id='texture-define_texture-texturedefinition-texture_data'>TEXTURE define_texture(TextureDefinition texture_data)<br/></h4>
+<h4 id='texture-define_texture-texturedefinition-texture_data'><a href="#texture">TEXTURE</a> define_texture(TextureDefinition texture_data)<br/></h4>
 <p>Defines a new texture that can be used in Entity::set_texture<br/>If a texture with the same definition already exists the texture will be reloaded from disk.<br/></p>
 <h3 id='get_texture'>get_texture</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_texture">get_texture</a></p>
 </blockquote>
-<h4 id='optional-lt-texture-gt-get_texture-texturedefinition-texture_data'>optional&lt;TEXTURE&gt; get_texture(TextureDefinition texture_data)<br/></h4>
+<h4 id='optional-lt-texture-gt-get_texture-texturedefinition-texture_data'>optional&lt;<a href="#texture">TEXTURE</a>&gt; get_texture(TextureDefinition texture_data)<br/></h4>
 <p>Gets a texture with the same definition as the given, if none exists returns <code>nil</code><br/></p>
 <h3 id='reload_texture'>reload_texture</h3>
 <blockquote>
@@ -5409,7 +5409,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td></td>
 </tr>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=character">character</a></td>
 <td></td>
 </tr>
@@ -5438,7 +5438,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td></td>
 </tr>
 <tr>
-<td>array&lt;ENT_TYPE, 4&gt;</td>
+<td>array&lt;<a href="#ent_type">ENT_TYPE</a>, 4&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=saved_pets">saved_pets</a></td>
 <td>Pet information for level transition</td>
 </tr>
@@ -5453,12 +5453,12 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td></td>
 </tr>
 <tr>
-<td>array&lt;Inventory, MAX_PLAYERS&gt;</td>
+<td>array&lt;<a href="#inventory">Inventory</a>, MAX_PLAYERS&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_inventory">player_inventory</a></td>
 <td></td>
 </tr>
 <tr>
-<td>array&lt;SelectPlayerSlot, MAX_PLAYERS&gt;</td>
+<td>array&lt;<a href="#selectplayerslot">SelectPlayerSlot</a>, MAX_PLAYERS&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_select">player_select</a></td>
 <td></td>
 </tr>
@@ -5838,7 +5838,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td></td>
 </tr>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=cause_of_death_entity_type">cause_of_death_entity_type</a></td>
 <td></td>
 </tr>
@@ -5968,7 +5968,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td></td>
 </tr>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=speedrun_character">speedrun_character</a></td>
 <td></td>
 </tr>
@@ -5978,7 +5978,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td></td>
 </tr>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=end_spaceship_character">end_spaceship_character</a></td>
 <td>Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open</td>
 </tr>
@@ -5998,7 +5998,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td></td>
 </tr>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=first_damage_cause">first_damage_cause</a></td>
 <td></td>
 </tr>
@@ -6018,7 +6018,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td></td>
 </tr>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=coffin_contents">coffin_contents</a></td>
 <td></td>
 </tr>
@@ -6257,7 +6257,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>array&lt;LightParams, 4&gt;</td>
+<td>array&lt;<a href="#lightparams">LightParams</a>, 4&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lights">lights</a></td>
 <td>Table of light1, light2, ... etc.</td>
 </tr>
@@ -6455,7 +6455,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>array&lt;OnlinePlayer, 4&gt;</td>
+<td>array&lt;<a href="#onlineplayer">OnlinePlayer</a>, 4&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=online_players">online_players</a></td>
 <td></td>
 </tr>
@@ -6878,7 +6878,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Changes color based on given RGBA colors in 0..255 range</td>
 </tr>
 <tr>
-<td>uColor</td>
+<td><a href="#aliases">uColor</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_ucolor">get_ucolor()</a></td>
 <td>Returns the <code>uColor</code> used in <code>GuiDrawContext</code> drawing functions</td>
 </tr>
@@ -6912,7 +6912,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td>REPEAT_TYPE</td>
+<td><a href="#repeat_type">REPEAT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=repeat_mode">repeat_mode</a></td>
 <td></td>
 </tr>
@@ -6926,7 +6926,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </thead><tbody>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=id">id</a></td>
 <td></td>
 </tr>
@@ -7046,7 +7046,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td>map&lt;int, Animation&gt;</td>
+<td>map&lt;int, <a href="#animation">Animation</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=animations">animations</a></td>
 <td></td>
 </tr>
@@ -7081,7 +7081,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=description">description</a></td>
 <td></td>
 </tr>
@@ -7155,7 +7155,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Is set to state.time_total when player dies in coop (to determinate who should be first to re-spawn from coffin)</td>
 </tr>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=held_item">held_item</a></td>
 <td>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
 </tr>
@@ -7165,7 +7165,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Metadata of the held item (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
 </tr>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mount_type">mount_type</a></td>
 <td>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
 </tr>
@@ -7190,7 +7190,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Total money collected during previous levels (not the current one)</td>
 </tr>
 <tr>
-<td>array&lt;ENT_TYPE, 512&gt;</td>
+<td>array&lt;<a href="#ent_type">ENT_TYPE</a>, 512&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=collected_money">collected_money</a></td>
 <td>Types of gold/gems collected during this level, used later to display during the transition</td>
 </tr>
@@ -7200,7 +7200,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Values of gold/gems collected during this level, used later to display during the transition</td>
 </tr>
 <tr>
-<td>array&lt;ENT_TYPE, 256&gt;</td>
+<td>array&lt;<a href="#ent_type">ENT_TYPE</a>, 256&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=killed_enemies">killed_enemies</a></td>
 <td>Types of enemies killed during this level, used later to display during the transition</td>
 </tr>
@@ -7210,12 +7210,12 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Number of companions, it will determinate how many companions will be transfered to next level<br/>Increments when player acquires new companion, decrements when one of them dies</td>
 </tr>
 <tr>
-<td>array&lt;ENT_TYPE, 8&gt;</td>
+<td>array&lt;<a href="#ent_type">ENT_TYPE</a>, 8&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=companions">companions</a></td>
 <td>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
 </tr>
 <tr>
-<td>array&lt;ENT_TYPE, 8&gt;</td>
+<td>array&lt;<a href="#ent_type">ENT_TYPE</a>, 8&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=companion_held_items">companion_held_items</a></td>
 <td>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
 </tr>
@@ -7807,7 +7807,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td>map&lt;DYNAMIC_TEXTURE, int&gt;</td>
+<td>map&lt;<a href="#dynamic_texture">DYNAMIC_TEXTURE</a>, int&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=textures">textures</a></td>
 <td></td>
 </tr>
@@ -8243,7 +8243,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Change the amount of extra spawns for the given <code>extra_spawn_id</code>.</td>
 </tr>
 <tr>
-<td>optional&lt;SHORT_TILE_CODE&gt;</td>
+<td>optional&lt;<a href="#aliases">SHORT_TILE_CODE</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_short_tile_code">define_short_tile_code(ShortTileCodeDef short_tile_code_def)</a></td>
 <td>Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match<br/>Returns <code>nil</code> if all possible short tile codes are already in use</td>
 </tr>
@@ -8262,7 +8262,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </thead><tbody>
 <tr>
-<td>optional&lt;SHORT_TILE_CODE&gt;</td>
+<td>optional&lt;<a href="#aliases">SHORT_TILE_CODE</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_short_tile_code">get_short_tile_code(int tx, int ty, LAYER layer)</a></td>
 <td>Gets the tile code at the specified tile coordinate<br/>Valid coordinates are <code>0 &lt;= tx &lt; CONST.ROOM_WIDTH</code>, <code>0 &lt;= ty &lt; CONST.ROOM_HEIGHT</code> and <code>layer</code> in <code>{LAYER.FRONT, LAYER.BACK}</code><br/>Also returns <code>nil</code> if <code>layer == LAYER.BACK</code> and the room does not have a back layer</td>
 </tr>
@@ -8272,7 +8272,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Sets the tile code at the specified tile coordinate<br/>Valid coordinates are <code>0 &lt;= tx &lt; CONST.ROOM_WIDTH</code>, <code>0 &lt;= ty &lt; CONST.ROOM_HEIGHT</code> and <code>layer</code> in <code>{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}</code><br/>Also returns <code>false</code> if <code>layer == LAYER.BACK</code> and the room does not have a back layer</td>
 </tr>
 <tr>
-<td>array&lt;tuple&lt;int, int, LAYER&gt;&gt;</td>
+<td>array&lt;tuple&lt;int, int, <a href="#layer">LAYER</a>&gt;&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=find_all_short_tile_codes">find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)</a></td>
 <td>Finds all places a short tile code is used in the room, <code>layer</code> must be in <code>{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}</code><br/>Returns an empty list if <code>layer == LAYER.BACK</code> and the room does not have a back layer</td>
 </tr>
@@ -8306,7 +8306,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </thead><tbody>
 <tr>
-<td>TILE_CODE</td>
+<td><a href="#tile_code">TILE_CODE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tile_code">tile_code</a></td>
 <td>Tile code that is used by default when this short tile code is encountered. Defaults to 0.</td>
 </tr>
@@ -8316,7 +8316,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Chance in percent to pick <code>tile_code</code> over <code>alt_tile_code</code>, ignored if <code>chance == 0</code>. Defaults to 100.</td>
 </tr>
 <tr>
-<td>TILE_CODE</td>
+<td><a href="#tile_code">TILE_CODE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=alt_tile_code">alt_tile_code</a></td>
 <td>Alternative tile code, ignored if <code>chance == 100</code>. Defaults to 0.</td>
 </tr>
@@ -8573,7 +8573,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td>array&lt;ConstellationStar, 45&gt;</td>
+<td>array&lt;<a href="#constellationstar">ConstellationStar</a>, 45&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=stars">stars</a></td>
 <td></td>
 </tr>
@@ -8588,7 +8588,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td>array&lt;ConstellationLine, 90&gt;</td>
+<td>array&lt;<a href="#constellationline">ConstellationLine</a>, 90&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lines">lines</a></td>
 <td></td>
 </tr>
@@ -8723,7 +8723,7 @@ It is up to you to not release this as long as any sounds returned by <code>Cust
 <td></td>
 </tr>
 <tr>
-<td>map&lt;VANILLA_SOUND_PARAM, string&gt;</td>
+<td>map&lt;<a href="#vanilla_sound_param">VANILLA_SOUND_PARAM</a>, string&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_parameters">get_parameters()</a></td>
 <td></td>
 </tr>
@@ -8785,7 +8785,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>map&lt;VANILLA_SOUND_PARAM, string&gt;</td>
+<td>map&lt;<a href="#vanilla_sound_param">VANILLA_SOUND_PARAM</a>, string&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_parameters">get_parameters()</a></td>
 <td></td>
 </tr>
@@ -8833,12 +8833,12 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>INPUTS</td>
+<td><a href="#inputs">INPUTS</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_gameplay">buttons_gameplay</a></td>
 <td></td>
 </tr>
 <tr>
-<td>INPUTS</td>
+<td><a href="#inputs">INPUTS</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
 <td></td>
 </tr>
@@ -8941,7 +8941,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>array&lt;PlayerSlot, MAX_PLAYERS&gt;</td>
+<td>array&lt;<a href="#playerslot">PlayerSlot</a>, MAX_PLAYERS&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_slots">player_slots</a></td>
 <td></td>
 </tr>
@@ -8966,7 +8966,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>array&lt;PlayerSlotSettings, MAX_PLAYERS&gt;</td>
+<td>array&lt;<a href="#playerslotsettings">PlayerSlotSettings</a>, MAX_PLAYERS&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_settings">player_settings</a></td>
 <td></td>
 </tr>
@@ -9180,7 +9180,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>ImVec2</td>
+<td><a href="#imvec2">ImVec2</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=displaysize">displaysize</a></td>
 <td></td>
 </tr>
@@ -9240,7 +9240,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>ImVec2</td>
+<td><a href="#imvec2">ImVec2</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousepos">mousepos</a></td>
 <td></td>
 </tr>
@@ -9603,17 +9603,17 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>AABB&amp;</td>
+<td><a href="#aabb">AABB</a>&amp;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs">abs()</a></td>
 <td>Fixes the AABB if any of the sides have negative length</td>
 </tr>
 <tr>
-<td>AABB&amp;</td>
+<td><a href="#aabb">AABB</a>&amp;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=extrude">extrude(float amount)</a></td>
 <td>Grows or shrinks the AABB by the given amount in all directions.<br/>If <code>amount &lt; 0</code> and <code>abs(amount) &gt; right/top - left/bottom</code> the respective dimension of the AABB will become <code>0</code>.</td>
 </tr>
 <tr>
-<td>AABB&amp;</td>
+<td><a href="#aabb">AABB</a>&amp;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(float off_x, float off_y)</a></td>
 <td>Offsets the AABB by the given offset.</td>
 </tr>
@@ -9712,12 +9712,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Returns the max/min values of the Quad</td>
 </tr>
 <tr>
-<td>Quad&amp;</td>
+<td><a href="#quad">Quad</a>&amp;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(float off_x, float off_y)</a></td>
 <td></td>
 </tr>
 <tr>
-<td>Quad&amp;</td>
+<td><a href="#quad">Quad</a>&amp;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, float px, float py)</a></td>
 <td>Rotates a Quad by an angle, px/py are not offsets, use <code>:get_AABB():center()</code> to get approximated center for simetrical quadrangle</td>
 </tr>
@@ -9980,17 +9980,17 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=line1">line1</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=line2">line2</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=line3">line3</a></td>
 <td></td>
 </tr>
@@ -10187,7 +10187,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scroll_text">scroll_text</a></td>
 <td></td>
 </tr>
@@ -10258,12 +10258,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=button_right_caption">button_right_caption</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=button_middle_caption">button_middle_caption</a></td>
 <td></td>
 </tr>
@@ -10426,7 +10426,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_text_id">buttons_text_id</a></td>
 <td></td>
 </tr>
@@ -10436,12 +10436,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scroll_text_id">scroll_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=start_text_id">start_text_id</a></td>
 <td></td>
 </tr>
@@ -10532,17 +10532,17 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=left_button_text_id">left_button_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=right_button_text_id">right_button_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=middle_button_text_id">middle_button_text_id</a></td>
 <td></td>
 </tr>
@@ -10737,7 +10737,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>array&lt;FlyingThing, 6&gt;</td>
+<td>array&lt;<a href="#flyingthing">FlyingThing</a>, 6&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flying_things">flying_things</a></td>
 <td></td>
 </tr>
@@ -11056,7 +11056,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mama_tunnel_text_id">mama_tunnel_text_id</a></td>
 <td></td>
 </tr>
@@ -11121,12 +11121,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>array&lt;TextureRenderingInfo, MAX_PLAYERS&gt;</td>
+<td>array&lt;<a href="#texturerenderinginfo">TextureRenderingInfo</a>, MAX_PLAYERS&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_secondary_icon">player_secondary_icon</a></td>
 <td></td>
 </tr>
 <tr>
-<td>array&lt;TextureRenderingInfo, MAX_PLAYERS&gt;</td>
+<td>array&lt;<a href="#texturerenderinginfo">TextureRenderingInfo</a>, MAX_PLAYERS&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_icon">player_icon</a></td>
 <td></td>
 </tr>
@@ -11364,22 +11364,22 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scroll_text_id">scroll_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=btn_left_text_id">btn_left_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=btn_right_text_id">btn_right_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=btn_center_text_id">btn_center_text_id</a></td>
 <td></td>
 </tr>
@@ -11494,7 +11494,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enter_code_btn_right_text_id">enter_code_btn_right_text_id</a></td>
 <td></td>
 </tr>
@@ -11529,12 +11529,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enter_code_banner_text_id">enter_code_banner_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enter_code_OK_text_id">enter_code_OK_text_id</a></td>
 <td></td>
 </tr>
@@ -11660,22 +11660,22 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scroll_text_id">scroll_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown17_text_id">unknown17_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown18_text_id">unknown18_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown19_text_id">unknown19_text_id</a></td>
 <td></td>
 </tr>
@@ -11876,22 +11876,22 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_id_1">text_id_1</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_id_2">text_id_2</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_id_3">text_id_3</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_id_4">text_id_4</a></td>
 <td></td>
 </tr>
@@ -12087,22 +12087,22 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scroll_text_id">scroll_text_id</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_id_2">text_id_2</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_id_3">text_id_3</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_id_4">text_id_4</a></td>
 <td></td>
 </tr>
@@ -12360,12 +12360,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_id_1">text_id_1</a></td>
 <td></td>
 </tr>
 <tr>
-<td>STRINGID</td>
+<td><a href="#aliases">STRINGID</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_id_2">text_id_2</a></td>
 <td></td>
 </tr>
@@ -13019,7 +13019,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>array&lt;TextureRenderingInfo, 20&gt;</td>
+<td>array&lt;<a href="#texturerenderinginfo">TextureRenderingInfo</a>, 20&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=stickers">stickers</a></td>
 <td></td>
 </tr>
@@ -13168,7 +13168,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>TEXTURE</td>
+<td><a href="#texture">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_texture">get_texture()</a></td>
 <td></td>
 </tr>
@@ -13693,7 +13693,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door_type">door_type</a></td>
 <td></td>
 </tr>
@@ -14301,12 +14301,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>BUTTON</td>
+<td><a href="#button">BUTTON</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
 <td></td>
 </tr>
 <tr>
-<td>BUTTON</td>
+<td><a href="#button">BUTTON</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_previous">buttons_previous</a></td>
 <td></td>
 </tr>
@@ -14835,7 +14835,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=treasure_type">treasure_type</a></td>
 <td></td>
 </tr>
@@ -16060,7 +16060,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inside">inside</a></td>
 <td></td>
 </tr>
@@ -16076,7 +16076,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inside">inside</a></td>
 <td></td>
 </tr>
@@ -16569,7 +16569,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inside">inside</a></td>
 <td></td>
 </tr>
@@ -17821,7 +17821,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Checks whether the player/monster has a certain powerup</td>
 </tr>
 <tr>
-<td>array&lt;ENT_TYPE&gt;</td>
+<td>array&lt;<a href="#ent_type">ENT_TYPE</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_powerups">get_powerups()</a></td>
 <td>Return all powerups that the entity has</td>
 </tr>
@@ -18062,7 +18062,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>GHOST_BEHAVIOR</td>
+<td><a href="#ghost_behavior">GHOST_BEHAVIOR</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ghost_behaviour">ghost_behaviour</a></td>
 <td></td>
 </tr>
@@ -20161,7 +20161,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=carried_entity_type">carried_entity_type</a></td>
 <td></td>
 </tr>
@@ -20857,7 +20857,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td>ENT_TYPE</td>
+<td><a href="#ent_type">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_entity_type">spawn_entity_type</a></td>
 <td></td>
 </tr>

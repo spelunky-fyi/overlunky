@@ -179,6 +179,23 @@ def is_custom_type(name):
             return True
     return False
 
+def link_custom_type(ret):
+    parts = re.findall(r"[\w]+|[^\w]+", ret)
+    ret = ""
+    for part in parts:
+        for type in types:
+            if part == type["name"]:
+                part = f"[{part}](#{part.lower()})"
+        for enum in enums:
+            if part == enum["name"]:
+                part = f"[{part}](#{part.lower()})"
+        for alias in aliases:
+            if part == alias["name"]:
+                part = f"[{part}](#aliases)"
+        ret += part
+    return ret
+
+
 def include_example(name):
     example = "examples/" + name + ".md"
     if os.path.exists(example):
@@ -201,8 +218,7 @@ def print_af(lf, af):
         return
     ret = replace_all(af["return"], replace) or "nil"
     ret = ret.replace("<", "&lt;").replace(">", "&gt;")
-    if is_custom_type(ret):
-        ret = f"[{ret}](#{ret.lower()})"
+    ret = link_custom_type(ret)
     name = lf["name"]
     param = replace_all(af["param"], replace)
     fun = f"{ret} {name}({param})".strip()
@@ -840,8 +856,7 @@ for cat in func_cats:
                 param = (m or m2).group(1)
                 param = replace_all(param, replace).strip()
             name = lf["name"]
-            if is_custom_type(ret):
-                ret = f"[{ret}](#{ret.lower()})"
+            ret = link_custom_type(ret)
             ret = ret.replace("<", "&lt;").replace(">", "&gt;")
             fun = f"{ret} {name}({param})".strip()
             search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
@@ -969,8 +984,7 @@ for type_cat in type_cats:
                         signature = name + param
                     signature = signature.strip()
                     ret = ret.replace("<", "&lt;").replace(">", "&gt;")
-                    if is_custom_type(ret):
-                        ret = f"[{ret}](#{ret.lower()})"
+                    ret = link_custom_type(ret)
                     print(f"{ret} | [{signature}]({search_link}) | ", end="")
                 else:
                     ret = ""
