@@ -9,5 +9,3 @@ bundle exec middleman build
 cp -r build/* ..
 rm -rf build
 cd ..
-#git add fonts images javascripts stylesheets
-#git commit -am "update slate[no ci]"

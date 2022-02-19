@@ -207,7 +207,7 @@ def print_af(lf, af):
     param = replace_all(af["param"], replace)
     fun = f"{ret} {name}({param})".strip()
     search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-    print(f"\n## {name}\n")
+    print(f"\n### {name}\n")
     include_example(name)
     print(f"\n> Search script examples for [{name}]({search_link})\n")
     print(f"#### {fun}\n")
@@ -775,44 +775,91 @@ print("# Functions")
 print(
     "The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen."
 )
-for lf in funcs:
-    if len(rpcfunc(lf["cpp"])):
-        for af in rpcfunc(lf["cpp"]):
-            print_af(lf, af)
-    elif not (lf["name"].startswith("on_") or lf["name"] in not_functions):
-        if lf["comment"] and lf["comment"][0] == "NoDoc":
-            continue
-        m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
-        m2 = re.search(r"\(([^\{]*)\)", lf["cpp"])
-        ret = "nil"
-        param = ""
-        if m:
-            ret = replace_all(m.group(2), replace).strip() or "nil"
-        if m or m2:
-            param = (m or m2).group(1)
-            param = replace_all(param, replace).strip()
-        name = lf["name"]
-        if is_custom_type(ret):
-            ret = f"[{ret}](#{ret.lower()})"
-        ret = ret.replace("<", "&lt;").replace(">", "&gt;")
-        fun = f"{ret} {name}({param})".strip()
-        search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-        print(f"\n## {name}\n")
-        include_example(name)
-        print(f"\n> Search script examples for [{name}]({search_link})\n")
-        print(f"#### {fun}<br/>")
-        for com in lf["comment"]:
-            print(com + "<br/>", end="")
 
+func_cats = dict()
 
-print("\n## Deprecated Functions\n")
+for func in funcs:
+    cat = "Generic functions"
+    if any(subs in func["name"] for subs in ["prinspect", "messpect", "print", "message", "say", "speechbubble", "toast"]):
+        cat = "Message functions"
+    elif any(subs in func["name"] for subs in ["tile_code"]):
+        cat = "Tile code functions"
+    elif any(subs in func["name"] for subs in ["interval", "timeout", "callback", "set_on", "set_pre", "set_post"]):
+        cat = "Callback functions"
+    elif any(subs in func["name"] for subs in ["flag"]):
+        cat = "Flag functions"
+    elif any(subs in func["name"] for subs in ["shop"]):
+        cat = "Shop functions"
+    elif any(subs in func["name"] for subs in ["_room"]):
+        cat = "Room functions"
+    elif any(subs in func["name"] for subs in ["spawn"]) or func["name"].endswith("door"):
+        cat = "Spawn functions"
+    elif any(subs in func["name"] for subs in ["entity", "entities", "set_door", "get_door", "contents", "attach", "pick_up", "drop", "backitem", "carry", "door_at", "get_type", "kapala", "sparktrap", "explosion", "rope"]):
+        cat = "Entity functions"
+    elif any(subs in func["name"] for subs in ["theme"]):
+        cat = "Theme functions"
+    elif any(subs in func["name"] for subs in ["_lut", "_texture"]):
+        cat = "Texture functions"
+    elif any(subs in func["name"] for subs in ["_option"]):
+        cat = "Option functions"
+    elif any(subs in func["name"] for subs in ["_input", "_io", "mouse_"]):
+        cat = "Input functions"
+    elif any(subs in func["name"] for subs in ["bounds", "move", "position", "velocity", "distance", "size", "hitbox", "aabb", "zoom"]):
+        cat = "Position functions"
+    elif any(subs in func["name"] for subs in ["particle"]):
+        cat = "Particle functions"
+    elif any(subs in func["name"] for subs in ["string", "_name"]):
+        cat = "String functions"
+    elif any(subs in func["name"] for subs in ["udp_"]):
+        cat = "Network functions"
+    elif any(subs in func["name"] for subs in ["illuminati"]):
+        cat = "Lighting functions"
+    elif any(subs in func["name"] for subs in ["sound"]):
+        cat = "Sound functions"
+    if not cat in func_cats:
+        func_cats[cat] = []
+    func_cats[cat].append(func)
+
+for cat in func_cats:
+    print("\n## " + cat + "\n")
+    for lf in func_cats[cat]:
+
+        if len(rpcfunc(lf["cpp"])):
+            for af in rpcfunc(lf["cpp"]):
+                print_af(lf, af)
+        elif not (lf["name"].startswith("on_") or lf["name"] in not_functions):
+            if lf["comment"] and lf["comment"][0] == "NoDoc":
+                continue
+            m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
+            m2 = re.search(r"\(([^\{]*)\)", lf["cpp"])
+            ret = "nil"
+            param = ""
+            if m:
+                ret = replace_all(m.group(2), replace).strip() or "nil"
+            if m or m2:
+                param = (m or m2).group(1)
+                param = replace_all(param, replace).strip()
+            name = lf["name"]
+            if is_custom_type(ret):
+                ret = f"[{ret}](#{ret.lower()})"
+            ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+            fun = f"{ret} {name}({param})".strip()
+            search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
+            print(f"\n### {name}\n")
+            include_example(name)
+            print(f"\n> Search script examples for [{name}]({search_link})\n")
+            print(f"#### {fun}<br/>")
+            for com in lf["comment"]:
+                print(com + "<br/>", end="")
+
+print("\n## Deprecated functions\n")
 print(
     "<aside class='warning'>These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!</aside>"
 )
 
 for lf in events:
     if lf["name"].startswith("on_"):
-        print("\n## "+ lf["name"] + "\n")
+        print("\n### "+ lf["name"] + "\n")
         include_example(lf["name"])
         for com in lf["comment"]:
             print(com)
@@ -837,7 +884,7 @@ for lf in deprecated_funcs:
         name = lf["name"]
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-        print(f"\n## {name}\n")
+        print(f"\n### {name}\n")
         include_example(name)
         print(f"\n> Search script examples for [{name}]({search_link})\n")
         print(f"`{fun}`<br/>")
@@ -847,100 +894,92 @@ for lf in deprecated_funcs:
 
 setup_stdout("_types")
 
-print("\n# Types\n")
-print(
-    """<aside class='notice'>Using the api through these directly might be dangerous, as there are no safeguards preventing you from setting invalid values.</aside>
-
-```lua
--- This doesn't make any sense, as you could just access the variables directly from players[]
--- It's just a weird example OK!
-ids = get_entities_by_mask(MASK.PLAYER) -- This just covers CHARs
-for i,id in ipairs(ids) do
-    e = get_entity(id)     -- casts Entity to Player automatically
-    e.health = 99          -- setting Player::health
-    e.inventory.bombs = 99 -- setting Inventory::bombs
-    e.inventory.ropes = 99 -- setting Inventory::ropes
-    e.type.jump = 0.36     -- setting EntityDB::jump
-end
-```"""
-)
-
 type_cats = dict()
 
 for type in types:
     cat = "Generic"
+    type_cat = "Non-Entity types"
+
     if "Floor" in type["base"] or type["name"] == "Floor":
         cat = "Floors"
+        type_cat = "Entity types"
     elif "PowerupCapable" in type["base"] or type["name"] == "PowerupCapable":
         cat = "Monsters, Inc."
+        type_cat = "Entity types"
     elif "Movable" in type["base"] or type["name"] == "Movable":
         cat = "Movable entities"
+        type_cat = "Entity types"
     elif "Entity" in type["base"] or type["name"] == "Entity":
-        cat = "Other entities"
+        cat = "Generic entities"
+        type_cat = "Entity types"
     elif "Screen" in type["base"] or type["name"] == "Screen":
         cat = "Game screens"
     elif "JournalPage" in type["base"] or type["name"] == "JournalPage":
         cat = "Journal pages"
-    if not cat in type_cats:
-        type_cats[cat] = []
-    type_cats[cat].append(type)
+    if not type_cat in type_cats:
+        type_cats[type_cat] = dict()
+    if not cat in type_cats[type_cat]:
+        type_cats[type_cat][cat] = [];
+    type_cats[type_cat][cat].append(type)
 
-for cat in type_cats:
-    print("\n## " + cat + "\n")
-    for type in type_cats[cat]:
-        print("\n### " + type["name"] + "\n")
-        include_example(type["name"])
-        if "comment" in type:
-            for com in type["comment"]:
-                print(com)
-        if type["base"]:
-            print("Derived from", end="")
-            bases = type["base"].split(",")
-            for base in bases:
-                print(" [" + base + "](#" + base.lower() + ")", end="")
-            print("\n")
-        print("""
-    Type | Name | Description
-    ---- | ---- | -----------""")
-        for var in type["vars"]:
-            search_link = (
-                "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
-            )
-            if "signature" in var:
-                signature = var["signature"]
-                n = re.search(r"^\s*([^\( ]*)(\(([^\)]*))", var["signature"])
-                m = re.search(r"\s*([^\(]*)\s+([^\( ]*)(\(([^\)]*))?", var["signature"])
-                ret = ""
-                name = ""
-                param = ""
-                if n:
-                    name = n.group(1)
-                    ret = name == type["name"] and name or ""
-                    name = name == type["name"] and "new" or name
+for type_cat in type_cats:
+    print("\n# " + type_cat + "\n")
+    for cat in type_cats[type_cat]:
+        print("\n## " + cat + "\n")
+        for type in type_cats[type_cat][cat]:
+            print("\n### " + type["name"] + "\n")
+            include_example(type["name"])
+            if "comment" in type:
+                for com in type["comment"]:
+                    print(com)
+            if type["base"]:
+                print("Derived from", end="")
+                bases = type["base"].split(",")
+                for base in bases:
+                    print(" [" + base + "](#" + base.lower() + ")", end="")
+                print("\n")
+            print("""
+        Type | Name | Description
+        ---- | ---- | -----------""")
+            for var in type["vars"]:
+                search_link = (
+                    "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
+                )
+                if "signature" in var:
+                    signature = var["signature"]
+                    n = re.search(r"^\s*([^\( ]*)(\(([^\)]*))", var["signature"])
+                    m = re.search(r"\s*([^\(]*)\s+([^\( ]*)(\(([^\)]*))?", var["signature"])
+                    ret = ""
+                    name = ""
                     param = ""
-                    if n.group(2):
-                        param = replace_all(n.group(2), replace) + ")" or ""
-                    signature = name + param
-                elif m:
-                    ret = replace_all(m.group(1), replace) or "nil"
-                    name = m.group(2)
-                    param = ""
-                    if m.group(3):
-                        param = replace_all(m.group(3), replace) + ")" or ""
-                    signature = name + param
-                signature = signature.strip()
-                ret = ret.replace("<", "&lt;").replace(">", "&gt;")
-                if is_custom_type(ret):
-                    ret = f"[{ret}](#{ret.lower()})"
-                print(f"{ret} | [{signature}]({search_link}) | ", end="")
-            else:
-                ret = ""
-                name = var["name"]
-                print(f"{ret} | [{name}]({search_link}) | ", end="")
-            if "comment" in var and var["comment"]:
-                print("<br/>".join(var["comment"]))
-            else:
-                print("")
+                    if n:
+                        name = n.group(1)
+                        ret = name == type["name"] and name or ""
+                        name = name == type["name"] and "new" or name
+                        param = ""
+                        if n.group(2):
+                            param = replace_all(n.group(2), replace) + ")" or ""
+                        signature = name + param
+                    elif m:
+                        ret = replace_all(m.group(1), replace) or "nil"
+                        name = m.group(2)
+                        param = ""
+                        if m.group(3):
+                            param = replace_all(m.group(3), replace) + ")" or ""
+                        signature = name + param
+                    signature = signature.strip()
+                    ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+                    if is_custom_type(ret):
+                        ret = f"[{ret}](#{ret.lower()})"
+                    print(f"{ret} | [{signature}]({search_link}) | ", end="")
+                else:
+                    ret = ""
+                    name = var["name"]
+                    print(f"{ret} | [{name}]({search_link}) | ", end="")
+                if "comment" in var and var["comment"]:
+                    print("<br/>".join(var["comment"]))
+                else:
+                    print("")
 
 
 setup_stdout("_casting")
