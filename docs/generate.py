@@ -186,13 +186,13 @@ def link_custom_type(ret):
     for part in parts:
         for type in types:
             if part == type["name"]:
-                part = f"[{part}](#{part.lower()})"
+                part = f"[{part}](#{part})"
         for enum in enums:
             if part == enum["name"]:
-                part = f"[{part}](#{part.lower()})"
+                part = f"[{part}](#{part})"
         for alias in aliases:
             if part == alias["name"]:
-                part = f"[{part}](#aliases)"
+                part = f"[{part}](#Aliases)"
         ret += part
     return ret
 
@@ -767,12 +767,28 @@ for alias in aliases:
 
 setup_stdout("_globals")
 
+global_types = {
+  "meta": "array<string>",
+  "state": "StateMemory",
+  "game_manager": "GameManager",
+  "online": "Online",
+  "players": "array<Player>",
+  "savegame": "SaveData",
+  "options": "array<mixed>",
+  "prng": "PRNG"
+}
+
 print("# Global variables")
 print("""These variables are always there to use.""")
 for lf in funcs:
     if lf["name"] in not_functions:
         print("### " + lf["name"] + "\n")
         include_example(lf["name"])
+        if lf["name"] in global_types:
+            ret = global_types[lf["name"]]
+            ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+            ret = link_custom_type(ret)
+            print("#### " + ret + " " + lf["name"] + "\n")
         print(
             "> Search script examples for ["
             + lf["name"]
@@ -957,7 +973,7 @@ for type_cat in type_cats:
                 print("Derived from", end="")
                 bases = type["base"].split(",")
                 for base in bases:
-                    print(" [" + base + "](#" + base.lower() + ")", end="")
+                    print(" [" + base + "](#" + base + ")", end="")
                 print("\n")
             print("""
         Type | Name | Description
