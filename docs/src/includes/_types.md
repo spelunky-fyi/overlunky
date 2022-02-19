@@ -2,7 +2,7 @@
 # Non-Entity types
 
 
-## Generic
+## Generic types
 
 
 ### SaveContext

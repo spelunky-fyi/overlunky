@@ -912,7 +912,7 @@ setup_stdout("_types")
 type_cats = dict()
 
 for type in types:
-    cat = "Generic"
+    cat = "Generic types"
     type_cat = "Non-Entity types"
 
     if "Floor" in type["base"] or type["name"] == "Floor":
