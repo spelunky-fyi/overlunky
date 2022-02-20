@@ -1412,6 +1412,7 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
+    // Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect
     lua.new_usertype<LevelGenSystem>(
         "LevelGenSystem",
         sol::no_constructor,
@@ -1718,7 +1719,6 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("ROOM_TEMPLATE_TYPE", "NONE", 0, "ENTRANCE", 1, "EXIT", 2, "SHOP", 3, "MACHINE_ROOM", 4);
 
     /// Determines which kind of shop spawns in the level, if any
-
     lua.create_named_table(
         "SHOP_TYPE",
         "GENERAL_STORE",
