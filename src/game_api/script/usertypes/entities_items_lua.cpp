@@ -193,6 +193,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, Purchasable>());
 
+    /// NoDoc
     lua.new_usertype<WebGun>( // left to not break compability
         "WebGun",
         sol::base_classes,
@@ -806,8 +807,9 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<CookFire>(
         "CookFire",
+        /// NoDoc
         "lit",
-        &CookFire::is_lit,
+        &Torch::is_lit, // left to not break backwards compatibility
         "emitted_light",
         &CookFire::emitted_light,
         "particles_smoke",

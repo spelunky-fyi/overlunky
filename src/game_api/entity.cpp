@@ -724,4 +724,3 @@ std::span<uint32_t> Entity::get_items()
 
     return {};
 }
-

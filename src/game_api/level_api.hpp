@@ -509,7 +509,7 @@ struct LevelGenSystem
     uint32_t get_procedural_spawn_chance(uint32_t chance_id);
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 
-    ~LevelGenSystem(){}; // cuz it was complaining
+    ~LevelGenSystem() = delete; // cuz it was complaining
 };
 
 bool default_spawn_is_valid(float x, float y, uint8_t layer);
