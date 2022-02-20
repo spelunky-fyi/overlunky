@@ -1,0 +1,46 @@
+name: Build Slate Docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+
+jobs:
+  build:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    env:
+      ruby-version: 3.0
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+        submodules: true
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ env.ruby-version }}
+
+    - uses: actions/cache@v2
+      with:
+        path: vendor/bundle
+        key: gems-${{ runner.os }}-${{ env.ruby-version }}-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          gems-${{ runner.os }}-${{ env.ruby-version }}-
+          gems-${{ runner.os }}-
+
+    - name: Build
+      run: |
+        cd docs
+        chmod +x generate_all.sh
+        chmod +x generate_slate.sh
+        ./generate_all.sh
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}

@@ -1,9 +1,23 @@
 import re
 
-# redirect stdout to script-api.md
+import os
+
+# redirect stdout to the right files
 import sys
 
-sys.stdout = open("script-api.md", "w")
+
+def setup_stdout(filename):
+    sys.stdout = sys.__stdout__
+    print(f"Generating file '{filename}'...")
+    sys.stdout = open(f"src/includes/{filename}.md", "w")
+
+
+def print_collecting_info(data):
+    print(f"Collecting {data} data...")
+
+
+if not os.path.exists("src/includes"):
+    os.makedirs("src/includes")
 
 header_files = [
     "../src/game_api/math.hpp",
@@ -47,6 +61,7 @@ header_files = [
     "../src/game_api/script/usertypes/socket_lua.hpp",
     "../src/imgui/imgui.h",
     "../src/game_api/script/usertypes/level_lua.cpp",
+    "../src/game_api/script/usertypes/gui_lua.cpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -112,7 +127,7 @@ replace = {
     "wstring": "string",
     "u16string": "string",
     "char16_t": "string",
-    "pair": "tuple",
+    "pair<": "tuple<",
     "std::": "",
     "sol::": "",
     "void": "",
@@ -152,28 +167,73 @@ def rpcfunc(name):
 def replace_all(text, dic):
     for i, j in dic.items():
         pos = text.find(i)
-        br2 = text.find('`', pos + len(i))
-        br1 = text.rfind('`', 0, pos)
+        br2 = text.find("`", pos + len(i))
+        br1 = text.rfind("`", 0, pos)
         if pos > 0 and br1 >= 0 and br2 > 0:
             continue
         text = text.replace(i, j)
     return text
 
+def is_custom_type(name):
+    for type in types:
+        if type["name"] == name:
+            return True
+    return False
+
+def link_custom_type(ret):
+    parts = re.findall(r"[\w]+|[^\w]+", ret)
+    ret = ""
+    for part in parts:
+        for type in types:
+            if part == type["name"]:
+                part = f"[{part}](#{part})"
+        for enum in enums:
+            if part == enum["name"]:
+                part = f"[{part}](#{part})"
+        for alias in aliases:
+            if part == alias["name"]:
+                part = f"[{part}](#Aliases)"
+        ret += part
+    return ret
+
+
+def include_example(name):
+    example = "examples/" + name + ".md"
+    if os.path.exists(example):
+        sys.stderr.write("Including " + example + "\n")
+        file = open(example, "r")
+        data = file.read()
+        file.close()
+        print("\n" + data + "\n")
+
+    example = "examples/" + name + ".lua"
+    if os.path.exists(example):
+        sys.stderr.write("Including " + example + "\n")
+        file = open(example, "r")
+        data = file.read()
+        file.close()
+        print("\n```lua\n" + data + "\n```\n")
 
 def print_af(lf, af):
     if lf["comment"] and lf["comment"][0] == "NoDoc":
         return
     ret = replace_all(af["return"], replace) or "nil"
+    ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+    ret = link_custom_type(ret)
     name = lf["name"]
     param = replace_all(af["param"], replace)
+    param = link_custom_type(param)
     fun = f"{ret} {name}({param})".strip()
     search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-    print(f"### [`{name}`]({search_link})")
-    print(f"`{fun}`<br/>")
+    print(f"\n### {name}\n")
+    include_example(name)
+    print(f"\n> Search script examples for [{name}]({search_link})\n")
+    print(f"#### {fun}\n")
     for com in lf["comment"]:
         print(com)
 
 
+print_collecting_info("rpc")
 for file in header_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -198,6 +258,7 @@ for file in header_files:
         else:
             comment = []
 
+print_collecting_info("class")
 for file in header_files:
     if file.endswith("script.hpp"):
         continue
@@ -252,7 +313,9 @@ for file in header_files:
                     if m:
                         name = m[3]
                         # move ctor is useless for Lua
-                        is_move_ctr = re.fullmatch(fr"\s*{name}\s*&&[^,]*", m[4]) and not m[2]
+                        is_move_ctr = (
+                            re.fullmatch(fr"\s*{name}\s*&&[^,]*", m[4]) and not m[2]
+                        )
                         if not is_move_ctr:
                             if name not in member_funs:
                                 member_funs[name] = []
@@ -287,6 +350,7 @@ for file in header_files:
                 member_funs = {}
                 member_vars = []
 
+print_collecting_info("events")
 for file in api_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -303,6 +367,7 @@ for file in api_files:
         else:
             comment = []
 
+print_collecting_info("functions")
 for file in api_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -326,6 +391,7 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
+print_collecting_info("usertypes")
 for file in api_files:
     data = open(file, "r").read()
     data = data.replace("\n", "")
@@ -347,7 +413,7 @@ for file in api_files:
             (item for item in classes if item["name"] == cpp_type), dict()
         )
         if "member_funs" not in underlying_cpp_type:
-            continue # whatever, I'm not fixing this
+            continue  # whatever, I'm not fixing this
             raise RuntimeError(
                 "No member_funs found. Did you forget to include a header file at the top of the generate script?"
             )
@@ -420,6 +486,7 @@ for file in api_files:
                     vars.append({"name": var_name, "type": cpp})
         types.append({"name": name, "vars": vars, "base": base})
 
+print_collecting_info("entitys")
 for file in api_files:
     with open(file) as fp:
         line = fp.readline()
@@ -430,6 +497,7 @@ for file in api_files:
             line = fp.readline()
 known_casts.sort()
 
+print_collecting_info("additional usertypes")
 for file in api_files:
     comment = []
     data = open(file, "r").read().split("\n")
@@ -448,6 +516,7 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
+print_collecting_info("enums")
 for file in api_files:
     data = open(file, "r").read()
     data = data.replace("\n", "")
@@ -510,7 +579,7 @@ for file in api_files:
                     current_var_to_mod = var_to_mod
                     collected_docs = ""
                 else:
-                    collected_docs += "\\\n" + var_name
+                    collected_docs += var_name + "<br/>"
         if current_var_to_mod:
             current_var_to_mod["docs"] = collected_docs
 
@@ -541,6 +610,7 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
+print_collecting_info("libraries")
 for file in api_files:
     data = open(file, "r").read()
     data = data.replace("\n", "")
@@ -551,16 +621,20 @@ for file in api_files:
         for lib in libs:
             lualibs.append(lib.replace("sol::lib::", ""))
 
+print_collecting_info("aliases")
 data = open("../src/game_api/aliases.hpp", "r").read().split("\n")
 for line in data:
     if not line.endswith("NoAlias"):
-        m = re.search(r"using\s*(\S*)\s*=\s*(\S*)", line)
+        m = re.search(r"using\s*(\S*)\s*=\s*(\S*);?", line)
         if m:
             name = m.group(1)
             type = replace_all(m.group(2), replace)
             aliases.append({"name": name, "type": type})
 
+setup_stdout("_home")
+
 print("# Overlunky/Playlunky Lua API")
+print("## Read this first\n")
 print(
     "- We try not to make breaking changes to the API, but some stupid errors or new stuff that was guessed wrong may have to be changed. Sorry!"
 )
@@ -577,28 +651,32 @@ print(
     "- This doc and the examples are written for a person who already knows [how to program in Lua](http://lua-users.org/wiki/TutorialDirectory)."
 )
 print(
+    "- This doc doesn't cover how to actually load scripts. Check the [README](https://github.com/spelunky-fyi/overlunky/#scripts) for instructions."
+)
+print(
     "- This doc is up to date for the Overlunky [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) and Playlunky [nightly build](https://github.com/spelunky-fyi/Playlunky/releases/tag/nightly). If you're using a stable release from the past, you might find some things here don't work."
-)
-print(
-    "- You can find changes to and earlier versions of this doc [here](https://github.com/spelunky-fyi/overlunky/commits/main/docs/script-api.md)."
-)
-print(
-    "- Click on the names of functions or fields to search for examples on how to use that function or variable. **There's also a handy dandy sliced hamburger in the top left corner of this doc to search global functions, types and enums without clutter.**"
 )
 print(
     "- Set `OL_DEBUG=1` in the same environment where the game is running to keep the Overlunky terminal open for better debug prints. This could be `cmd` or even the system environment variables if playing on Steam. Playlunky will also print the messages to terminal (even from Overlunky) if ran with the `-console` switch."
 )
 
-print("## Lua libraries")
+print("\n## External Function Library")
+print(
+    'If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting'
+)
+
+print("\n# Lua libraries")
 print(
     "The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6). We're using Lua 5.4 with the [Sol C++ binding](https://sol2.readthedocs.io/en/latest/)."
 )
 for lib in lualibs:
-    print("### `" + lib + "`")
-print("### `json`")
+    print("\n## " + lib + "")
+print("\n## json")
+include_example("json")
 print(
     """To save data in your mod it makes a lot of sense to use `json` to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:
-```Lua
+
+```lua
 local some_mod_data_that_should_be_saved = {{
     kills = 0,
     unlocked = false
@@ -616,10 +694,12 @@ set_callback(function(load_ctx)
 end, ON.LOAD)
 ```"""
 )
-print("### `inspect`")
+print("\n## inspect")
+include_example("inspect")
 print(
     """This module is a great substitute for `tostring` because it can convert any type to a string and thus helps a lot with debugging. Use for example like this:
-```Lua
+
+```lua
 local look_ma_no_tostring = {
     number = 15,
     nested_table = {
@@ -641,10 +721,12 @@ message(inspect(look_ma_no_tostring))
 ]]
 ```"""
 )
-print("### `format`")
+print("\n## format")
+include_example("format")
 print(
     """This allows you to make strings without having to do a lot of `tostring` and `..` by placing your variables directly inside of the string. Use `F` in front of your string and wrap variables you want to print in `{}`, for example like this:
-```Lua
+
+```lua
 for _, player in players do
     local royal_title = nil
     if player:is_female() then
@@ -658,28 +740,61 @@ end
 ```"""
 )
 
-print("## Unsafe mode")
+print("\n# Unsafe mode")
 print(
     "Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory."
 )
 
-print("## Modules")
+print("\n# Modules")
 print(
     """You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
 
 Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules."""
 )
 
-print("## Global variables")
+print("\n# Aliases\n")
+print("""
+We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
+
+Name | Type
+---- | ----""")
+
+for alias in aliases:
+    name = alias["name"]
+    type = alias["type"]
+    print(f"{name} | {type}")
+
+
+setup_stdout("_globals")
+
+global_types = {
+  "meta": "array<string>",
+  "state": "StateMemory",
+  "game_manager": "GameManager",
+  "online": "Online",
+  "players": "array<Player>",
+  "savegame": "SaveData",
+  "options": "array<mixed>",
+  "prng": "PRNG"
+}
+
+print("# Global variables")
 print("""These variables are always there to use.""")
 for lf in funcs:
     if lf["name"] in not_functions:
+        print("### " + lf["name"] + "\n")
+        include_example(lf["name"])
+        if lf["name"] in global_types:
+            ret = global_types[lf["name"]]
+            ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+            ret = link_custom_type(ret)
+            print("#### " + ret + " " + lf["name"] + "\n")
         print(
-            "### [`"
+            "> Search script examples for ["
             + lf["name"]
-            + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
+            + "](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
             + lf["name"]
-            + ")"
+            + ")\n"
         )
         for com in lf["comment"]:
             print(com)
@@ -693,49 +808,96 @@ funcs = [
     if not func["comment"] or not func["comment"][0] == "Deprecated"
 ]
 
-print("## Functions")
+print("# Functions")
 print(
-    "Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen."
+    "The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen."
 )
-for lf in funcs:
-    if len(rpcfunc(lf["cpp"])):
-        for af in rpcfunc(lf["cpp"]):
-            print_af(lf, af)
-    elif not (lf["name"].startswith("on_") or lf["name"] in not_functions):
-        if lf["comment"] and lf["comment"][0] == "NoDoc":
-            continue
-        m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
-        m2 = re.search(r"\(([^\{]*)\)", lf["cpp"])
-        ret = "nil"
-        param = ""
-        if m:
-            ret = replace_all(m.group(2), replace).strip() or "nil"
-        if m or m2:
-            param = (m or m2).group(1)
-            param = replace_all(param, replace).strip()
-        name = lf["name"]
-        fun = f"{ret} {name}({param})".strip()
-        search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-        print(f"### [`{name}`]({search_link})")
-        print(f"`{fun}`<br/>")
-        for com in lf["comment"]:
-            print(com)
 
+func_cats = dict()
 
-print("## Deprecated Functions")
+for func in funcs:
+    cat = "Generic functions"
+    if any(subs in func["name"] for subs in ["prinspect", "messpect", "print", "message", "say", "speechbubble", "toast"]):
+        cat = "Message functions"
+    elif any(subs in func["name"] for subs in ["tile_code"]):
+        cat = "Tile code functions"
+    elif any(subs in func["name"] for subs in ["interval", "timeout", "callback", "set_on", "set_pre", "set_post"]):
+        cat = "Callback functions"
+    elif any(subs in func["name"] for subs in ["flag"]):
+        cat = "Flag functions"
+    elif any(subs in func["name"] for subs in ["shop"]):
+        cat = "Shop functions"
+    elif any(subs in func["name"] for subs in ["_room"]):
+        cat = "Room functions"
+    elif any(subs in func["name"] for subs in ["spawn"]) or func["name"].endswith("door"):
+        cat = "Spawn functions"
+    elif any(subs in func["name"] for subs in ["entity", "entities", "set_door", "get_door", "contents", "attach", "pick_up", "drop", "backitem", "carry", "door_at", "get_type", "kapala", "sparktrap", "explosion", "rope"]):
+        cat = "Entity functions"
+    elif any(subs in func["name"] for subs in ["theme"]):
+        cat = "Theme functions"
+    elif any(subs in func["name"] for subs in ["_lut", "_texture"]):
+        cat = "Texture functions"
+    elif any(subs in func["name"] for subs in ["_option"]):
+        cat = "Option functions"
+    elif any(subs in func["name"] for subs in ["_input", "_io", "mouse_"]):
+        cat = "Input functions"
+    elif any(subs in func["name"] for subs in ["bounds", "move", "position", "velocity", "distance", "size", "hitbox", "aabb", "zoom"]):
+        cat = "Position functions"
+    elif any(subs in func["name"] for subs in ["particle"]):
+        cat = "Particle functions"
+    elif any(subs in func["name"] for subs in ["string", "_name"]):
+        cat = "String functions"
+    elif any(subs in func["name"] for subs in ["udp_"]):
+        cat = "Network functions"
+    elif any(subs in func["name"] for subs in ["illuminati"]):
+        cat = "Lighting functions"
+    elif any(subs in func["name"] for subs in ["sound"]):
+        cat = "Sound functions"
+    if not cat in func_cats:
+        func_cats[cat] = []
+    func_cats[cat].append(func)
+
+for cat in func_cats:
+    print("\n## " + cat + "\n")
+    for lf in func_cats[cat]:
+
+        if len(rpcfunc(lf["cpp"])):
+            for af in rpcfunc(lf["cpp"]):
+                print_af(lf, af)
+        elif not (lf["name"].startswith("on_") or lf["name"] in not_functions):
+            if lf["comment"] and lf["comment"][0] == "NoDoc":
+                continue
+            m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
+            m2 = re.search(r"\(([^\{]*)\)", lf["cpp"])
+            ret = "nil"
+            param = ""
+            if m:
+                ret = replace_all(m.group(2), replace).strip() or "nil"
+            if m or m2:
+                param = (m or m2).group(1)
+                param = replace_all(param, replace).strip()
+            name = lf["name"]
+            ret = link_custom_type(ret)
+            ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+            param = link_custom_type(param)
+            fun = f"{ret} {name}({param})".strip()
+            search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
+            print(f"\n### {name}\n")
+            include_example(name)
+            print(f"\n> Search script examples for [{name}]({search_link})\n")
+            print(f"#### {fun}<br/>")
+            for com in lf["comment"]:
+                print(com.replace("```lua", "\n```lua"))
+
+print("\n## Deprecated functions\n")
 print(
-    "#### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!"
+    "<aside class='warning'>These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!</aside>"
 )
 
 for lf in events:
     if lf["name"].startswith("on_"):
-        print(
-            "### [`"
-            + lf["name"]
-            + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
-            + lf["name"]
-            + ")"
-        )
+        print("\n### "+ lf["name"] + "\n")
+        include_example(lf["name"])
         for com in lf["comment"]:
             print(com)
 
@@ -759,82 +921,125 @@ for lf in deprecated_funcs:
         name = lf["name"]
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
-        print(f"### [`{name}`]({search_link})")
+        print(f"\n### {name}\n")
+        include_example(name)
+        print(f"\n> Search script examples for [{name}]({search_link})\n")
         print(f"`{fun}`<br/>")
         for com in lf["comment"]:
             print(com)
 
-print("## Types")
-print(
-    "Using the api through these directly is kinda dangerous, but such is life. I got pretty bored writing this doc generator at this point, so you can find the variable types in the [source files](https://github.com/spelunky-fyi/overlunky/tree/main/src/game_api). They're mostly just ints and floats. Example:"
-)
-print(
-    """```lua
--- This doesn't make any sense, as you could just access the variables directly from players[]
--- It's just a weird example OK!
-ids = get_entities_by_mask(MASK.PLAYER) -- This just covers CHARs
-for i,id in ipairs(ids) do
-    e = get_entity(id)     -- casts Entity to Player automatically
-    e.health = 99          -- setting Player::health
-    e.inventory.bombs = 99 -- setting Inventory::bombs
-    e.inventory.ropes = 99 -- setting Inventory::ropes
-    e.type.jump = 0.36     -- setting EntityDB::jump
-end
-```"""
-)
-for type in types:
-    print("### `" + type["name"] + "`")
-    if "comment" in type:
-        for com in type["comment"]:
-            print(com)
-    if type["base"]:
-        print("Derived from", end="")
-        bases = type["base"].split(",")
-        for base in bases:
-            print(" [`" + base + "`](#" + base.lower() + ")", end="")
-        print()
-    for var in type["vars"]:
-        search_link = (
-            "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
-        )
-        if "signature" in var:
-            signature = var["signature"]
-            m = re.search(r"\s*(.*)\s+([^\(]*)\(([^\)]*)", var["signature"])
-            if m:
-                ret = replace_all(m.group(1), replace) or "nil"
-                name = m.group(2)
-                param = replace_all(m.group(3), replace)
-                signature = ret + " " + name + "(" + param + ")"
-            signature = signature.strip()
-            type_str = var["type"].replace("<", "&lt;").replace(">", "&gt;")
-            print(f"- [`{signature}`]({search_link}) {type_str}")
-        else:
-            name = var["name"]
-            type_str = var["type"].replace("<", "&lt;").replace(">", "&gt;")
-            print(f"- [`{name}`]({search_link}) {type_str}")
-        if "comment" in var and var["comment"]:
-            print("\\")
-            for com in var["comment"]:
-                print(com)
 
-print("## Automatic casting of entities")
-print(
-    "When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions."
-)
-print("")
-print(
-    "To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md)"
-)
-print("You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks")
-print("")
-print("For reference, the available `as_<typename>` functions are listed below:")
+setup_stdout("_types")
+
+type_cats = dict()
+
+for type in types:
+    cat = "Generic types"
+    type_cat = "Non-Entity types"
+
+    if "Floor" in type["base"] or type["name"] == "Floor":
+        cat = "Floors"
+        type_cat = "Entity types"
+    elif "PowerupCapable" in type["base"] or type["name"] == "PowerupCapable":
+        cat = "Monsters, Inc."
+        type_cat = "Entity types"
+    elif "Movable" in type["base"] or type["name"] == "Movable":
+        cat = "Movable entities"
+        type_cat = "Entity types"
+    elif "Entity" in type["base"] or type["name"] == "Entity":
+        cat = "Generic entities"
+        type_cat = "Entity types"
+    elif "Screen" in type["base"] or type["name"] == "Screen":
+        cat = "Game screens"
+    elif "JournalPage" in type["base"] or type["name"] == "JournalPage":
+        cat = "Journal pages"
+    if not type_cat in type_cats:
+        type_cats[type_cat] = dict()
+    if not cat in type_cats[type_cat]:
+        type_cats[type_cat][cat] = [];
+    type_cats[type_cat][cat].append(type)
+
+for type_cat in type_cats:
+    print("\n# " + type_cat + "\n")
+    for cat in type_cats[type_cat]:
+        print("\n## " + cat + "\n")
+        for type in type_cats[type_cat][cat]:
+            print("\n### " + type["name"] + "\n")
+            include_example(type["name"])
+            if "comment" in type:
+                for com in type["comment"]:
+                    print(com)
+            if type["base"]:
+                print("Derived from", end="")
+                bases = type["base"].split(",")
+                for base in bases:
+                    print(" [" + base + "](#" + base + ")", end="")
+                print("\n")
+            print("""
+Type | Name | Description
+---- | ---- | -----------""")
+            for var in type["vars"]:
+                search_link = (
+                    "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
+                )
+                if "signature" in var:
+                    signature = var["signature"]
+                    n = re.search(r"^\s*([^\( ]*)(\(([^\)]*))", var["signature"])
+                    m = re.search(r"\s*([^\(]*)\s+([^\( ]*)(\(([^\)]*))?", var["signature"])
+                    ret = ""
+                    name = ""
+                    param = ""
+                    if n:
+                        name = n.group(1)
+                        ret = name == type["name"] and name or ""
+                        name = name == type["name"] and "new" or name
+                        param = ""
+                        if n.group(2):
+                            param = replace_all(n.group(2), replace) + ")" or ""
+                        signature = name + param
+                    elif m:
+                        ret = replace_all(m.group(1), replace) or "nil"
+                        name = m.group(2)
+                        param = ""
+                        if m.group(3):
+                            param = replace_all(m.group(3), replace) + ")" or ""
+                        signature = name + param
+                    signature = signature.strip()
+                    ret = ret.replace("<", "&lt;").replace(">", "&gt;")
+                    ret = link_custom_type(ret)
+                    print(f"{ret} | [{signature}]({search_link}) | ", end="")
+                else:
+                    ret = ""
+                    name = var["name"]
+                    print(f"{ret} | [{name}]({search_link}) | ", end="")
+                if "comment" in var and var["comment"]:
+                    print("<br/>".join(var["comment"]))
+                else:
+                    print("")
+
+
+setup_stdout("_casting")
+
+print("""
+# Automatic casting of entities
+
+When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
+
+To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md).
+
+You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks
+
+For reference, the available `as_<typename>` functions are listed below:\n""")
+
 for known_cast in known_casts:
     print("- " + known_cast)
 
-print("## Enums")
-print("Enums are like numbers but in text that's easier to remember. Example:")
-print(
-    """```lua
+setup_stdout("_enums")
+
+print("\n# Enums\n")
+print("""Enums are like numbers but in text that's easier to remember.
+
+```lua
 set_callback(function()
     if state.theme == THEME.COSMIC_OCEAN then
         x, y, l = get_position(players[1].uid)
@@ -844,37 +1049,31 @@ end, ON.LEVEL)
 ```"""
 )
 for type in enums:
-    print("### " + type["name"])
+    print("\n## " + type["name"] + "\n")
+    search_link = (
+        "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + type["name"]
+    )
+    print(f"\n> Search script examples for [{type['name']}]({search_link})\n")
     if "comment" in type:
-        for com in type["comment"]:
-            print(com)
+        print("<br/>".join(type["comment"]))
+    print("""
+Name | Data | Description
+---- | ---- | -----------""")
     for var in type["vars"]:
         if var["name"]:
             print(
-                "- [`"
+                "["
                 + var["name"]
-                + "`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
+                + "](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
                 + type["name"]
                 + "."
                 + var["name"]
-                + ") "
-                + var["type"]
-            )
+                + ") | "
+                + var["type"] + " | "
+            , end="")
         else:
-            print("- " + var["type"])
+            print(var["type"] + " |  | ", end="")
         if "docs" in var:
             print(var["docs"])
-
-print("## Aliases")
-print(
-    "We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id."
-)
-for alias in aliases:
-    name = alias["name"]
-    type = alias["type"]
-    print(f"### {name} == {type}")
-
-print("## External Function Library")
-print(
-    'If you use a text editor/IDE that has a Lua linter available you can download [spel2.lua](https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua), place it in a folder of your choice and specify that folder as a "external function library". For example [VSCode](https://code.visualstudio.com/) with the [Lua Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) offers this feature. This will allow you to get auto-completion of API functions along with linting'
-)
+        else:
+            print("")
