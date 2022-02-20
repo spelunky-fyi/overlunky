@@ -25,7 +25,7 @@ class LuaConsole : public LuaBackend
     bool scroll_to_bottom{false};
     std::optional<size_t> set_scroll_to_history_item;
     std::optional<size_t> last_force_scroll;
-    char console_input[2048]{};
+    char console_input[8192]{};
 
     bool has_new_history{false};
     size_t max_history{30};

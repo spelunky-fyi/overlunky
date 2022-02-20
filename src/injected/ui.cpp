@@ -790,6 +790,8 @@ void load_config(std::string file)
         disable_steam_achievements();
     if (options["disable_savegame"])
         hook_savegame();
+    set_time_ghost_enabled(!options["disable_ghost_timer"]);
+    set_time_jelly_enabled(!options["disable_ghost_timer"]);
     save_config(file);
 }
 
@@ -3356,6 +3358,8 @@ void render_clickhandler()
     {
         update_script(script.get());
     }
+    if (g_last_id > -1)
+        g_Console.get()->set_selected_uid(g_last_id);
     update_script(g_Console.get());
     for (auto& [name, script] : g_scripts)
     {

@@ -142,8 +142,48 @@ end
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
     lua["online"] = get_online();
-    /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
+    /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See [`get_player()`](#get_player).
     lua["players"] = std::vector<Player*>(get_players());
+    /// Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
+    lua["get_player"] = sol::overload(
+        [&lua](int8_t slot) -> sol::object
+        {
+            for (auto player : get_players())
+            {
+                if (player->inventory_ptr->player_slot == slot - 1)
+                    return sol::make_object_userdata(lua, player);
+            }
+            return sol::nil;
+        },
+        [&lua](int8_t slot, bool or_ghost) -> sol::object
+        {
+            for (auto player : get_players())
+            {
+                if (player->inventory_ptr->player_slot == slot - 1)
+                    return sol::make_object_userdata(lua, player);
+            }
+            if (or_ghost)
+            {
+                for (auto uid : get_entities_by_type(to_id("ENT_TYPE_ITEM_PLAYERGHOST")))
+                {
+                    auto player = lua["get_entity"](uid).get<PlayerGhost*>();
+                    if (player->inventory->player_slot == slot - 1)
+                        return sol::make_object_userdata(lua, player);
+                }
+            }
+            return sol::nil;
+        });
+    /// Returns PlayerGhost with this player slot 1..4
+    lua["get_playerghost"] = [&lua](int8_t slot) -> PlayerGhost*
+    {
+        for (auto uid : get_entities_by_type(to_id("ENT_TYPE_ITEM_PLAYERGHOST")))
+        {
+            auto player = lua["get_entity"](uid).get<PlayerGhost*>();
+            if (player->inventory->player_slot == slot - 1)
+                return player;
+        }
+        return nullptr;
+    };
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
     lua["savegame"] = savedata();
 

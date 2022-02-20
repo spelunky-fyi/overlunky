@@ -112,6 +112,12 @@ If you don't care what part of the game you affect just use `prng.random`.
 The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
 ## Functions
 Note: The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
+### [`get_player`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_player)
+`nil get_player()`<br/>
+Get Player (or PlayerGhost) with this player slot 1..4
+### [`get_playerghost`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_playerghost)
+`PlayerGhost get_playerghost(int slot)`<br/>
+Get PlayerGhost with this player slot 1..4
 ### [`lua_print`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lua_print)
 `nil lua_print()`<br/>
 Standard lua print function, prints directly to the console but not to the game
@@ -162,9 +168,11 @@ Add global callback function to be called on an [event](#on).
 ### [`clear_callback`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_callback)
 `nil clear_callback()`<br/>
 Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.
+### [`import`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=import)
+`nil import()`<br/>
+Load another script by id "author/name" and import its exports table
 ### [`load_script`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
-`nil load_script(string id)`<br/>
-Load another script by id "author/name"
+`nil load_script()`<br/>
 ### [`read_prng`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_prng)
 `array<int> read_prng()`<br/>
 Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
@@ -3924,6 +3932,7 @@ All `.lvl` files are loaded relative to `Data/Levels`, but they can be completel
 - [`float door2_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) &DoorCoords::door2_y
 ### `LevelGenSystem`
 - [`ShopType shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) &LevelGenSystem::shop_type
+- [`ShopType backlayer_shop_type`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer_shop_type) &LevelGenSystem::backlayer_shop_type
 - [`float spawn_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) &LevelGenSystem::spawn_x
 - [`float spawn_y`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) &LevelGenSystem::spawn_y
 - [`int spawn_room_x`](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) &LevelGenSystem::spawn_room_x
