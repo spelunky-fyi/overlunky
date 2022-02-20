@@ -325,13 +325,13 @@ end
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
 
-    /// Load another script by id "author/name" and import its exports table
+    /// Load another script by id "author/name" and import its `exports` table
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->required_scripts.push_back(sanitize(id));
-            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(id));
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)));
             if (!import_backend)
             {
                 luaL_error(lua, "Imported script not found");
@@ -348,7 +348,7 @@ end
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             backend->required_scripts.push_back(sanitize(id));
-            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(id), std::string_view(version));
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)), std::string_view(version));
             if (!import_backend)
             {
                 luaL_error(lua, "Imported script not found");
