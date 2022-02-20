@@ -164,9 +164,9 @@ end
             }
             if (or_ghost)
             {
-                for (auto uid : get_entities_by_type(to_id("ENT_TYPE_ITEM_PLAYERGHOST")))
+                for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), 0x8u, LAYER::BOTH))
                 {
-                    auto player = lua["get_entity"](uid).get<PlayerGhost*>();
+                    auto player = get_entity_ptr(uid)->as<PlayerGhost>();
                     if (player->inventory->player_slot == slot - 1)
                         return sol::make_object_userdata(lua, player);
                 }
@@ -176,9 +176,9 @@ end
     /// Returns PlayerGhost with this player slot 1..4
     lua["get_playerghost"] = [&lua](int8_t slot) -> PlayerGhost*
     {
-        for (auto uid : get_entities_by_type(to_id("ENT_TYPE_ITEM_PLAYERGHOST")))
+        for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), 0x8u, LAYER::BOTH))
         {
-            auto player = lua["get_entity"](uid).get<PlayerGhost*>();
+            auto player = get_entity_ptr(uid)->as<PlayerGhost>();
             if (player->inventory->player_slot == slot - 1)
                 return player;
         }
