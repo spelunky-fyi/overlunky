@@ -725,7 +725,3 @@ std::span<uint32_t> Entity::get_items()
     return {};
 }
 
-void Movable::light_on_fire_broken()
-{
-    this->light_on_fire(0x64);
-}

@@ -77,8 +77,11 @@ class Movable : public Entity
     void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
     void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);
 
-    // to not break backwards compatibility
-    void light_on_fire_broken();
+    // don't use this, it's only to not break backwards compatibility
+    void light_on_fire_broken()
+    {
+        this->light_on_fire(0x64); // kind of stanrad value that the game uses
+    }
 
     virtual bool can_jump() = 0;
     virtual void v38() = 0;

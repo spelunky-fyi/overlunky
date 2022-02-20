@@ -107,7 +107,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
-    auto falling_platform = lua.new_usertype<FallingPlatform>(
+    lua.new_usertype<FallingPlatform>(
         "FallingPlatform",
         "timer",
         &FallingPlatform::timer,
@@ -117,8 +117,6 @@ void register_usertypes(sol::state& lua)
         &FallingPlatform::y_pos,
         sol::base_classes,
         sol::bases<Entity, Movable>());
-
-    falling_platform["emitted_light"] = &FallingPlatform::timer; // wrong name, kept for backwards compatibility
 
     lua.new_usertype<UnchainedSpikeBall>(
         "UnchainedSpikeBall",

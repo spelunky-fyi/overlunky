@@ -461,7 +461,7 @@ struct LevelGenSystem
     float spawn_y;
     union
     {
-        std::vector<XY> exit_doors;
+        std::vector<Vec2> exit_doors;
         struct
         {
             /// NoDoc

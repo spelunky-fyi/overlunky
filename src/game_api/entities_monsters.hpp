@@ -226,7 +226,7 @@ class Shopkeeper : public RoomOwner
     /// can't shot when the timer is running
     uint8_t shotgun_attack_delay;
     /// will drop key after stun/kill
-    bool have_key;
+    bool has_key;
     bool shop_owner;
     bool unknown5a; // use 1.0 instead of entityDB->animations->max_load_factor ???
     uint8_t padding11;
