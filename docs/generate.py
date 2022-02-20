@@ -976,8 +976,8 @@ for type_cat in type_cats:
                     print(" [" + base + "](#" + base + ")", end="")
                 print("\n")
             print("""
-        Type | Name | Description
-        ---- | ---- | -----------""")
+Type | Name | Description
+---- | ---- | -----------""")
             for var in type["vars"]:
                 search_link = (
                     "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
