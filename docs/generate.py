@@ -499,7 +499,7 @@ for file in api_files:
                     sig = f"{type} {var_name}"
                     if underlying_cpp_var["name"].endswith("]"):
                         if type == "char":
-                            sig = f"---@field {var_name} string"
+                            sig = f"string {var_name}"
                         else:
                             sig += underlying_cpp_var["name"][underlying_cpp_var["name"].find("["):]
                     vars.append(

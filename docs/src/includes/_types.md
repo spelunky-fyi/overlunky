@@ -446,7 +446,7 @@ Type | Name | Description
 ---- | ---- | -----------
 int | [ready_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready_state) | 
 int | [character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) | 
----@field player_name | [string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_name) | 
+string | [player_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_name) | 
 
 ### OnlineLobby
 
@@ -943,7 +943,7 @@ array&lt;bool, 78&gt; | [bestiary](https://github.com/spelunky-fyi/overlunky/sea
 array&lt;bool, 38&gt; | [people](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people) | 
 array&lt;bool, 54&gt; | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | 
 array&lt;bool, 24&gt; | [traps](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=traps) | 
----@field last_daily | [string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily) | 
+string | [last_daily](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily) | 
 int | [characters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters) | 
 int | [shortcuts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shortcuts) | 
 array&lt;int, 78&gt; | [bestiary_killed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed) | 
