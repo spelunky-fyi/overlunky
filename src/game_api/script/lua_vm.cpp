@@ -174,7 +174,7 @@ end
             return sol::nil;
         });
     /// Returns PlayerGhost with this player slot 1..4
-    lua["get_playerghost"] = [&lua](int8_t slot) -> PlayerGhost*
+    lua["get_playerghost"] = [](int8_t slot) -> PlayerGhost*
     {
         for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), 0x8u, LAYER::BOTH))
         {
