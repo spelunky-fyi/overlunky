@@ -1,4 +1,4 @@
-name: Build Wiki
+name: Build Slate Docs
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     name: Build Docs
     runs-on: ubuntu-latest
     env:
-      ruby-version: 2.5
+      ruby-version: 3.0
 
     steps:
     - uses: actions/checkout@v2
@@ -36,6 +36,7 @@ jobs:
       run: |
         cd docs
         chmod +x generate_all.sh
+        chmod +x generate_slate.sh
         ./generate_all.sh
 
     - name: Push changes
