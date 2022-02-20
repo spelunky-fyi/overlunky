@@ -6873,7 +6873,15 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 </tbody></table>
-<h3 id='Color'>Color</h3>
+<h3 id='Color'>Color</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- make a semi transparent red color and print it in different formats</span>
+<span class="kd">local</span> <span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="p">:</span><span class="n">red</span><span class="p">()</span>
+<span class="n">color</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span>
+<span class="kd">local</span> <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">color</span><span class="p">:</span><span class="n">get_rgba</span><span class="p">()</span>
+<span class="n">prinspect</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="c1">-- 255, 0, 0, 128</span>
+<span class="n">prinspect</span><span class="p">(</span><span class="n">color</span><span class="p">.</span><span class="n">r</span><span class="p">,</span> <span class="n">color</span><span class="p">.</span><span class="n">g</span><span class="p">,</span> <span class="n">color</span><span class="p">.</span><span class="n">b</span><span class="p">,</span> <span class="n">color</span><span class="p">.</span><span class="n">a</span><span class="p">)</span> <span class="c1">-- 1.0, 0.0, 0.0, 0.5</span>
+<span class="n">prinspect</span><span class="p">(</span><span class="nb">string.format</span><span class="p">(</span><span class="s2">"%x"</span><span class="p">),</span> <span class="n">color</span><span class="p">:</span><span class="n">get_ucolor</span><span class="p">())</span> <span class="c1">-- 800000ff</span>
+
+</code></pre></div>
 <table><thead>
 <tr>
 <th>Type</th>
