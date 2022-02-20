@@ -146,6 +146,7 @@ not_functions = [
     "meta",
     "prng",
 ]
+cpp_type_exceptions = []
 skip = False
 
 
@@ -304,8 +305,8 @@ for file in header_files:
                     comment.append(m[1])
                 else:
                     m = re.search(
-                        r"^\s*:.*$", line
-                    )  # skip lines that start with a colon (constructor parameter initialization)
+                        r"^\s*(?::|\/\/)", line
+                    )  # skip lines that start with a colon (constructor parameter initialization) or are comments
                     if m:
                         continue
 
@@ -333,9 +334,23 @@ for file in header_files:
                         r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line
                     )
                     if m:
-                        member_vars.append(
-                            {"type": m[1], "name": m[2], "comment": comment}
-                        )
+                        if m[1].endswith(",") and not (m[2].endswith(">") or m[2].endswith(")")): #Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
+                            types_and_vars = m[1]
+                            vars_match = re.search(r"(?: *\w*,)*$", types_and_vars)
+                            vars_except_last = vars_match.group() #Last var is m[2]
+                            start, end = vars_match.span()
+                            vars_type = types_and_vars[:start]
+                            for m_var in re.findall(r"(\w*),", vars_except_last):
+                                member_vars.append(
+                                    {"type": vars_type, "name": m_var, "comment": comment}
+                                )
+                            member_vars.append(
+                                {"type": vars_type, "name": m[2], "comment": comment}
+                            )
+                        else:
+                            member_vars.append(
+                                {"type": m[1], "name": m[2], "comment": comment}
+                            )
                         comment = []
             elif brackets_depth == 0:
                 classes.append(
@@ -373,18 +388,11 @@ for file in api_files:
     data = open(file, "r").read().split("\n")
     for line in data:
         line = line.replace("*", "")
-        a = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*);', line)
-        b = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*)$', line)
-        if a and not a.group(1).startswith("__"):
-            if not getfunc(a.group(1)):
+        m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', line)
+        if m and not m.group(1).startswith("__"):
+            if not getfunc(m.group(1)):
                 funcs.append(
-                    {"name": a.group(1), "cpp": a.group(2), "comment": comment}
-                )
-            comment = []
-        elif b and not b.group(1).startswith("__"):
-            if not getfunc(b.group(1)):
-                funcs.append(
-                    {"name": b.group(1), "cpp": b.group(2), "comment": comment}
+                    {"name": m.group(1), "cpp": m.group(2), "comment": comment}
                 )
             comment = []
         c = re.search(r"/// ?(.*)$", line)
@@ -413,10 +421,12 @@ for file in api_files:
             (item for item in classes if item["name"] == cpp_type), dict()
         )
         if "member_funs" not in underlying_cpp_type:
-            continue  # whatever, I'm not fixing this
-            raise RuntimeError(
-                "No member_funs found. Did you forget to include a header file at the top of the generate script?"
-            )
+            if cpp_type in cpp_type_exceptions:
+                underlying_cpp_type = {"name": cpp_type, "member_funs": {}, "member_vars": {}}
+            else:
+                raise RuntimeError(
+                    f"No member_funs found in \"{cpp_type}\" while looking for usertypes in file \"{file}\". Did you forget to include a header file at the top of the generate script? (if it isn't the problem then add it to cpp_type_exceptions list)"
+                )
 
         for var in attr:
             if not var:
@@ -435,7 +445,20 @@ for file in api_files:
 
             var_name = var[0]
             cpp = var[1]
-            cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
+
+            if var[1].startswith("sol::property"):
+                param_match = re.match(fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)", cpp)
+                if param_match:
+                    type_var_name = param_match[1]
+                    m_var_return = re.search(fr"return[^;]*{type_var_name}\.([\w.]+)", cpp)
+                    if m_var_return:
+                        cpp_name = m_var_return[1]
+                        cpp_name = cpp_name.replace(".", "::")
+                        cpp = f"&{underlying_cpp_type['name']}::{cpp_name}"
+                else:
+                    cpp_name = cpp
+            else:
+                cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
 
             if var[0].startswith("sol::constructors"):
                 for fun in underlying_cpp_type["member_funs"][cpp_type]:
@@ -467,13 +490,18 @@ for file in api_files:
                     (
                         item
                         for item in underlying_cpp_type["member_vars"]
-                        if item["name"] == cpp_name
+                        if item["name"] == cpp_name or (item["name"].endswith("]") and f"{cpp_name}[" in item["name"])
                     ),
                     dict(),
                 )
                 if underlying_cpp_var:
                     type = underlying_cpp_var["type"]
                     sig = f"{type} {var_name}"
+                    if underlying_cpp_var["name"].endswith("]"):
+                        if type == "char":
+                            sig = f"string {var_name}"
+                        else:
+                            sig += underlying_cpp_var["name"][underlying_cpp_var["name"].find("["):]
                     vars.append(
                         {
                             "name": var_name,
@@ -483,7 +511,12 @@ for file in api_files:
                         }
                     )
                 else:
-                    vars.append({"name": var_name, "type": cpp})
+                    m_return_type = re.search(r"->(\w+){", var[1]) #Use var[1] instead of cpp because it could be replaced on the sol::property stuff
+                    if m_return_type:
+                        sig = f"{m_return_type[1]} {var_name}"
+                        vars.append({"name": var_name, "type": cpp, "signature": sig})
+                    else:
+                        vars.append({"name": var_name, "type": cpp})
         types.append({"name": name, "vars": vars, "base": base})
 
 print_collecting_info("entitys")

@@ -218,7 +218,7 @@ Type | Name | Description
 
 Type | Name | Description
 ---- | ---- | -----------
- | [pools](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pools) | 
+[LiquidPool](#LiquidPool) | [pools[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pools) | 
 
 ### StateMemory
 
@@ -446,7 +446,7 @@ Type | Name | Description
 ---- | ---- | -----------
 int | [ready_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready_state) | 
 int | [character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) | 
- | [player_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_name) | 
+string | [player_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_name) | 
 
 ### OnlineLobby
 
@@ -595,10 +595,10 @@ Type | Name | Description
 int | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) | MASK
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
- | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
- | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
- | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | 
- | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | 
+float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
+float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
+float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | 
+float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | 
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
 float | [friction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=friction) | 
 float | [elasticity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elasticity) | 
@@ -753,7 +753,6 @@ bool | [unknown_v12()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
  | [spawn_effects()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_effects) | 
 string | [get_level_file()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_file) | 
 int | [get_theme_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_id) | 
-// whereas | [get_theme_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_id) | 
 int | [get_base_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_id) | 
 int | [get_floor_spreading_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type) | 
 int | [get_floor_spreading_type2()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type2) | 
@@ -791,7 +790,7 @@ Type | Name | Description
 [CustomTheme](#CustomTheme) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CustomTheme) | 
 string | [level_file](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_file) | 
 int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
- | [base_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=base_theme) | 
+int | [base_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=base_theme) | 
  | [sub_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_theme) | 
 map&lt;[DYNAMIC_TEXTURE](#DYNAMIC_TEXTURE), int&gt; | [textures](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=textures) | 
  | [override](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) | 
@@ -883,7 +882,7 @@ float | [spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn
 int | [spawn_room_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) | 
 int | [spawn_room_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) | 
 [DoorCoords](#DoorCoords) | [exits](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exits) | 
- | [themes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) | 
+[ThemeInfo](#ThemeInfo) | [themes[18]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) | 
 
 ### PostRoomGenerationContext
 
@@ -944,7 +943,7 @@ array&lt;bool, 78&gt; | [bestiary](https://github.com/spelunky-fyi/overlunky/sea
 array&lt;bool, 38&gt; | [people](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people) | 
 array&lt;bool, 54&gt; | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | 
 array&lt;bool, 24&gt; | [traps](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=traps) | 
- | [last_daily](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily) | 
+string | [last_daily](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily) | 
 int | [characters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters) | 
 int | [shortcuts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shortcuts) | 
 array&lt;int, 78&gt; | [bestiary_killed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed) | 
@@ -1147,8 +1146,8 @@ Current mouse cursor position in screen coordinates.
 
 Type | Name | Description
 ---- | ---- | -----------
- | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
-float                                   x, | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 
 ### Gamepad
 
@@ -1157,12 +1156,12 @@ Type | Name | Description
 ---- | ---- | -----------
 bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
  | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
- | [lt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lt) | 
- | [rt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rt) | 
- | [lx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lx) | 
- | [ly](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ly) | 
- | [rx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rx) | 
- | [ry](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ry) | 
+float | [lt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lt) | 
+float | [rt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rt) | 
+float | [lx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lx) | 
+float | [ly](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ly) | 
+float | [rx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rx) | 
+float | [ry](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ry) | 
 
 ### ImGuiIO
 
@@ -1172,7 +1171,7 @@ Type | Name | Description
 [ImVec2](#ImVec2)      | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
 float       | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
 bool        | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
- | [keysdown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
+bool        | [keysdown[512]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
  | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | 
  | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | 
  | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | 
@@ -1182,9 +1181,9 @@ bool        | [keyalt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 bool        | [keysuper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) | 
 bool        | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | 
 [ImVec2](#ImVec2)      | [mousepos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) | 
- | [mousedown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
- | [mouseclicked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
- | [mousedoubleclicked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
+bool        | [mousedown[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
+bool        | [mouseclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
+bool        | [mousedoubleclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
 float       | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) | 
  | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
 
