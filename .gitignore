@@ -8,3 +8,4 @@ out
 .vs
 /CMakePresets.json
 *.aps
+docs/slate

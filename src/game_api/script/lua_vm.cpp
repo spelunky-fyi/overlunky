@@ -130,13 +130,13 @@ end
     NEntityFlags::register_usertypes(lua);
     NEntityCasting::register_usertypes(lua);
 
-    /// A bunch of [game state](#statememory) variables
-    /// Example:
+    ///
     /// ```lua
     /// if state.time_level > 300 and state.theme == THEME.DWELLING then
     ///     toast("Congratulations for lasting 5 seconds in Dwelling")
     /// end
     /// ```
+    /// A bunch of [game state](#statememory) variables
     lua["state"] = get_state_ptr();
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
@@ -254,6 +254,7 @@ end
         return backend->cbcount++;
     };
     /// Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.
+    // lua["clear_callback"] = [](sol::optional<CallbackId> id) -> void {};
     lua["clear_callback"] = sol::overload(
         [](CallbackId id)
         {
