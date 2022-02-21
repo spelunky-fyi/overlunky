@@ -1137,7 +1137,7 @@ set_callback(function()
 end, ON.LEVEL)
 ```"""
 )
-for type in enums:
+for type in sorted(enums, key=lambda x: x["name"]):
     print("\n## " + type["name"] + "\n")
     search_link = (
         "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + type["name"]
