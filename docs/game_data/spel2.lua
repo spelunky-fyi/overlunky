@@ -731,22 +731,16 @@ function get_camera_position() end
 ---@param bit integer
 ---@return Flags
 function set_flag(flags, bit) end
----@return nil
-function setflag() end
 ---Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
 ---@return Flags
 function clr_flag(flags, bit) end
----@return nil
-function clrflag() end
 ---Returns true if a bit is set in the flags
 ---@param flags Flags
 ---@param bit integer
 ---@return boolean
 function test_flag(flags, bit) end
----@return nil
-function testflag() end
 ---Gets the resolution (width and height) of the screen
 ---@return integer, integer
 function get_window_size() end
