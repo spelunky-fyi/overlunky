@@ -26,7 +26,7 @@ jobs:
 
     - uses: actions/cache@v2
       with:
-        path: vendor/bundle
+        path: docs/slate/vendor/bundle
         key: gems-${{ runner.os }}-${{ env.ruby-version }}-${{ hashFiles('**/Gemfile.lock') }}
         restore-keys: |
           gems-${{ runner.os }}-${{ env.ruby-version }}-
