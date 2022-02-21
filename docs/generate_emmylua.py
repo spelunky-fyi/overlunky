@@ -367,7 +367,11 @@ for file in header_files:
                     if m:
                         name = m[3]
                         # move ctor is useless for Lua
-                        is_move_ctr = re.fullmatch(fr"\s*{name}\s*&&[^,]*", m[4]) and not m[2]
+                        is_move_ctr = (
+                            re.fullmatch(r"^[a-zA-Z0-9_]*$", name)
+                            and re.fullmatch(fr"\s*{name}\s*&&[^,]*", m[4])
+                            and not m[2]
+                        )
                         if not is_move_ctr:
                             if name not in member_funs:
                                 member_funs[name] = []
@@ -476,11 +480,18 @@ for file in api_files:
                         f"No member_funs found in \"{cpp_type}\" while looking for usertypes in file \"{file}\". Did you forget to include a header file at the top of the generate script? (if it isn't the problem then add it to cpp_type_exceptions list)"
                 )
 
+        skip = False
         for var in attr:
+            if skip:
+                skip = False
+                continue
             if not var:
                 continue
             var = var.split(",")
             if var[0] == "sol::base_classes" or var[0] == "sol::no_constructor":
+                continue
+            if "NoDoc" in var[0]:
+                skip = True
                 continue
             if "table_of" in var[1]:
                 var[1] = var[1].replace("table_of(", "") + "[]"

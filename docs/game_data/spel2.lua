@@ -902,7 +902,6 @@ function add_custom_name(uid, name) end
 ---@return nil
 function clear_custom_name(uid) end
 ---Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
----Doesn't really work for layer doors
 ---@param player_uid integer
 ---@param door_uid integer
 ---@return nil
@@ -954,6 +953,10 @@ function modify_ankh_health_gain(max_health, beat_add_health) end
 ---@param shop_owner integer
 ---@return nil
 function add_item_to_shop(item_uid, shop_owner) end
+---Change the amount of frames after the damage from poison is applied
+---@param frames integer
+---@return nil
+function change_poison_timer(frames) end
 ---Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
 ---@param color Color
 ---@param size number
@@ -1536,42 +1539,6 @@ function udp_send(host, port, msg) end
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
 
----@class GameManager
-    ---@field game_props GameProps
-    ---@field screen_logo ScreenLogo
-    ---@field screen_intro ScreenIntro
-    ---@field screen_prologue ScreenPrologue
-    ---@field screen_title ScreenTitle
-    ---@field screen_menu ScreenMenu
-    ---@field screen_options ScreenOptions
-    ---@field screen_player_profile ScreenPlayerProfile
-    ---@field screen_leaderboards ScreenLeaderboards
-    ---@field screen_seed_input ScreenSeedInput
-    ---@field screen_camp ScreenCamp
-    ---@field screen_level ScreenLevel
-    ---@field screen_online_loading ScreenOnlineLoading
-    ---@field screen_online_lobby ScreenOnlineLobby
-    ---@field pause_ui PauseUI
-    ---@field journal_ui JournalUI
-    ---@field save_related SaveRelated
-
----@class SaveRelated
-    ---@field journal_popup_ui JournalPopupUI
-
----@class JournalPopupUI
-    ---@field wiggling_page_icon TextureRenderingInfo
-    ---@field black_background TextureRenderingInfo
-    ---@field button_icon TextureRenderingInfo
-    ---@field wiggling_page_angle number
-    ---@field chapter_to_show integer
-    ---@field entry_to_show integer
-    ---@field timer integer
-    ---@field slide_position number
-
----@class GameProps
-    ---@field buttons integer
-    ---@field game_has_focus boolean
-
 ---@class LightParams
     ---@field red number
     ---@field green number
@@ -1768,12 +1735,15 @@ local function PRNG_random(self, min, max) end
     ---@field set_layer fun(self, layer: LAYER): nil
     ---@field remove fun(self, ): nil
     ---@field respawn fun(self, layer: LAYER): nil
+    ---@field kill fun(self, destroy_corpse: boolean, responsible: Entity): nil
     ---@field destroy fun(self, ): nil
     ---@field activate fun(self, activator: Entity): nil
     ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil
     ---@field trigger_action fun(self, user: Entity): boolean
     ---@field get_metadata any @&Entity::get_metadata
     ---@field apply_metadata fun(self, metadata: integer): nil
+    ---@field set_invisible fun(self, n: boolea): nil
+    ---@field get_items fun(self, ): span<integer>
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -1820,14 +1790,16 @@ local function Entity_overlaps_with(self, other) end
     ---@field price integer
     ---@field stun fun(self, framecount: integer): nil
     ---@field freeze fun(self, framecount: integer): nil
-    ---@field light_on_fire fun(self, ): nil
+    ---@field light_on_fire fun(self, time: integer): nil
     ---@field set_cursed fun(self, b: boolean): nil
     ---@field drop fun(self, entity_to_drop: Entity): nil
     ---@field pick_up fun(self, entity_to_pick_up: Entity): nil
-    ---@field can_jump any @&Movable::can_jump
+    ---@field can_jump fun(self, ): boolean
     ---@field standing_on fun(self, ): Entity
     ---@field add_money fun(self, money: integer): nil
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
+    ---@field is_on_fire fun(self, ): boolean
+    ---@field is_in_liquid any @&Movable::is_in_liquid
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
@@ -1899,10 +1871,14 @@ local function Entity_overlaps_with(self, other) end
     ---@field add_decoration fun(self, side: FLOOR_SIDE): nil
     ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil
     ---@field decorate_internal fun(self, ): nil
+    ---@field get_floor_type fun(self, ): ENT_TYPE
 
 ---@class Door : Floor
     ---@field counter integer
     ---@field fx_button Entity
+    ---@field enter fun(self, who: Entity): integer
+    ---@field is_unlocked fun(self, ): boolean
+    ---@field unlock fun(self, unlock: boolean): nil
 
 ---@class ExitDoor : Door
     ---@field entered boolean
@@ -2082,7 +2058,6 @@ local function Entity_overlaps_with(self, other) end
     ---@field emitted_light Illumination
 
 ---@class FallingPlatform : Movable
-    ---@field emitted_light integer
     ---@field timer integer
     ---@field shaking_factor number
     ---@field y_pos number
@@ -2115,7 +2090,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class TimedPowderkeg : PushBlock
     ---@field timer integer
 
----@class Mount : Movable
+---@class Mount : PowerupCapable
     ---@field carry fun(self, rider: Movable): nil
     ---@field tame fun(self, value: boolean): nil
     ---@field rider_uid integer
@@ -2123,6 +2098,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field tamed boolean
     ---@field walk_pause_timer integer
     ---@field taming_timer integer
+    ---@field used_double_jump fun(self, ): boolean
+    ---@field remove_rider fun(self, ): nil
 
 ---@class Rockdog : Mount
     ---@field attack_cooldown integer
@@ -2214,6 +2191,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class Shopkeeper : RoomOwner
     ---@field name integer
     ---@field shotgun_attack_delay integer
+    ---@field has_key boolean
     ---@field shop_owner boolean
 
 ---@class Yang : RoomOwner
@@ -2670,6 +2648,17 @@ local function Entity_overlaps_with(self, other) end
     ---@field explosion_trigger boolean
     ---@field explosion_timer integer
 
+---@class Projectile : Movable
+
+---@class Purchasable : Movable
+
+---@class DummyPurchasableEntity : Purchasable
+
+---@class Bow : Purchasable
+
+---@class Present : Purchasable
+    ---@field inside ENT_TYPE
+
 ---@class Jetpack : Backpack
     ---@field flame_on boolean
     ---@field fuel integer
@@ -2686,10 +2675,10 @@ local function Entity_overlaps_with(self, other) end
 ---@class VladsCape : Cape
     ---@field can_double_jump boolean
 
----@class Mattock : Movable
+---@class Mattock : Purchasable
     ---@field remaining integer
 
----@class Gun : Movable
+---@class Gun : Purchasable
     ---@field cooldown integer
     ---@field shots integer
     ---@field shots2 integer
@@ -2721,7 +2710,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field move_x number
     ---@field move_y number
 
----@class WebShot : Movable
+---@class WebShot : Projectile
     ---@field shot boolean
 
 ---@class HangStrand : Movable
@@ -2730,16 +2719,18 @@ local function Entity_overlaps_with(self, other) end
 ---@class HangAnchor : Movable
     ---@field spider_uid integer
 
----@class Arrow : Movable
+---@class Arrow : Purchasable
     ---@field flame_uid integer
     ---@field is_on_fire boolean
     ---@field is_poisoned boolean
     ---@field shot_from_trap boolean
+    ---@field poison_arrow fun(self, poisoned: boolean): nil
+    ---@field light_up fun(self, lit: boolean): nil
 
 ---@class LightArrow : Arrow
     ---@field emitted_light Illumination
 
----@class LightShot : Movable
+---@class LightShot : Projectile
     ---@field emitted_light Illumination
 
 ---@class LightEmitter : Movable
@@ -2827,6 +2818,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field flame_uid integer
     ---@field is_lit boolean
     ---@field light_up fun(self, lit: boolean): nil
+    ---@field get_flame_type fun(self, ): ENT_TYPE
 
 ---@class WallTorch : Torch
     ---@field dropped_gold boolean
@@ -2840,7 +2832,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class LampFlame : Flame
     ---@field flame_particle ParticleEmitterInfo
 
----@class Bullet : Movable
+---@class Bullet : Projectile
 
 ---@class TimedShot : LightShot
     ---@field timer integer
@@ -2898,7 +2890,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field shake_timer integer
     ---@field boost_timer integer
 
----@class GhostBreath : Movable
+---@class GhostBreath : Projectile
     ---@field timer integer
     ---@field big_cloud boolean
 
@@ -2908,7 +2900,7 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class TreasureHook : Movable
 
----@class AxolotlShot : Movable
+---@class AxolotlShot : Projectile
     ---@field trapped_uid integer
     ---@field size number
     ---@field swing number
@@ -2955,7 +2947,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class MiniGameAsteroid : Movable
     ---@field spin_speed number
 
----@class Pot : Movable
+---@class Pot : Purchasable
     ---@field inside ENT_TYPE
     ---@field dont_transfer_dmg boolean
 
@@ -2963,8 +2955,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field smoke ParticleEmitterInfo
     ---@field smoke2 ParticleEmitterInfo
 
----@class CookFire : Movable
-    ---@field lit boolean
+---@class CookFire : Torch
     ---@field emitted_light Illumination
     ---@field particles_smoke ParticleEmitterInfo
     ---@field particles_flames ParticleEmitterInfo
@@ -2981,7 +2972,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class Coin : Movable
     ---@field nominal_price integer
 
----@class RollingItem : Movable
+---@class RollingItem : Purchasable
     ---@field roll_speed number
 
 ---@class PlayerBag : Movable
@@ -3011,10 +3002,10 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class YellowCape : Cape
 
----@class Teleporter : Movable
+---@class Teleporter : Purchasable
     ---@field teleport_number integer
 
----@class Boomerang : Movable
+---@class Boomerang : Purchasable
     ---@field trail ParticleEmitterInfo
     ---@field distance number
     ---@field rotation number
@@ -3023,7 +3014,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class Excalibur : Movable
     ---@field in_stone boolean
 
----@class Shield : Movable
+---@class Shield : Purchasable
     ---@field shake number
 
 ---@class PrizeDispenser : Movable
@@ -3189,6 +3180,9 @@ local function Entity_overlaps_with(self, other) end
     ---@field size number
 
 ---@class FxAnkhBrokenPiece : Movable
+
+---@class MegaJellyfishEye : Movable
+    ---@field timer integer
 
 ---@class Liquid : Entity
     ---@field fx_surface Entity
@@ -3566,6 +3560,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field spawn_room_x integer
     ---@field spawn_room_y integer
     ---@field exits DoorCoords
+    ---@field exit_doors Vec2[]
     ---@field themes ThemeInfo[] @size: 18
 
 ---@class PostRoomGenerationContext
@@ -3837,25 +3832,25 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
 
 ---@class VanillaRenderContext_draw_screen_texture
 ---@param texture_id TEXTURE
----@param row integer
----@param column integer
+---@param source Quad
 ---@param dest Quad
 ---@param color Color
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
-local function VanillaRenderContext_draw_screen_texture(self, texture_id, row, column, dest, color) end
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
+local function VanillaRenderContext_draw_screen_texture(self, texture_id, source, dest, color) end
 
 ---@class VanillaRenderContext_draw_world_texture
 ---@param texture_id TEXTURE
----@param row integer
----@param column integer
+---@param source Quad
 ---@param dest Quad
 ---@param color Color
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
-local function VanillaRenderContext_draw_world_texture(self, texture_id, row, column, dest, color) end
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
+local function VanillaRenderContext_draw_world_texture(self, texture_id, source, dest, color) end
 
 ---@class TextureRenderingInfo
     ---@field x number
@@ -3901,6 +3896,12 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, row, co
     ---@field sub_image_width integer
     ---@field sub_image_height integer
 
+---@class Vec2
+    ---@field x number
+    ---@field y number
+    ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
+    ---@field split any @&Vec2::operatorstd::pair<float
+
 ---@class AABB
     ---@field left number
     ---@field bottom number
@@ -3927,6 +3928,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, row, co
     ---@field get_AABB fun(self, ): AABB
     ---@field offset fun(self, off_x: number, off_y: number): Quad
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad
+    ---@field split fun(self, ): Vec2, Vec2, Vec2, Vec2
 
 ---@class Screen
     ---@field render_timer number
@@ -4611,6 +4613,20 @@ function CustomTheme.new(self, theme_id_, base_theme_) end
 ---@return CustomTheme
 function CustomTheme.new(self) end
 
+Vec2 = nil
+---@return Vec2
+function Vec2.new(self) end
+---@param Vec2 Vec2
+---@return Vec2
+function Vec2.new(self, Vec2) end
+---@param x_ number
+---@param y_ number
+---@return Vec2
+function Vec2.new(self, x_, y_) end
+---@param number> p tuple<number,
+---@return Vec2
+function Vec2.new(self, number> p) end
+
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
 ---@return AABB
@@ -4633,6 +4649,12 @@ function Quad.new(self) end
 ---@param Quad Quad
 ---@return Quad
 function Quad.new(self, Quad) end
+---@param bottom_left_ Vec2
+---@param bottom_right_ Vec2
+---@param top_right_ Vec2
+---@param top_left_ Vec2
+---@return Quad
+function Quad.new(self, bottom_left_, bottom_right_, top_right_, top_left_) end
 ---@param _bottom_left_x number
 ---@param _bottom_left_y number
 ---@param _bottom_right_x number
