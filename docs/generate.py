@@ -930,7 +930,7 @@ for cat in func_cats:
             print(f"\n### {name}\n")
             include_example(name)
             print(f"\n> Search script examples for [{name}]({search_link})\n")
-            print(f"#### {fun}<br/>")
+            print(f"#### {fun}\n")
             for com in lf["comment"]:
                 com = link_custom_type(com)
                 print(com.replace("```lua", "\n```lua"))
