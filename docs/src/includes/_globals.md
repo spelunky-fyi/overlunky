@@ -16,7 +16,7 @@ Table of strings where you should set some script metadata shown in the UI.
 
 ```lua
 if state.time_level > 300 and state.theme == THEME.DWELLING then
-     toast("Congratulations for lasting 5 seconds in Dwelling")
+    toast("Congratulations for lasting 5 seconds in Dwelling")
 end
 
 ```
@@ -730,16 +730,6 @@ Add a button that the user can click in the UI. Sets the timestamp of last click
 
 #### nil spawn_liquid([ENT_TYPE](#ENT_TYPE) entity_type, float x, float y)
 
-Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
-Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
-`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
-`amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
-
-### spawn_liquid
-
-
-> Search script examples for [spawn_liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_liquid)
-
 #### nil spawn_liquid([ENT_TYPE](#ENT_TYPE) entity_type, float x, float y, float velocityx, float velocityy, int liquid_flags, int amount, float blobs_separation)
 
 Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
@@ -1222,13 +1212,6 @@ Convert an `AABB` to a screen `AABB` that can be directly passed to draw functio
 
 #### nil move_entity(int uid, float x, float y, float vx, float vy)
 
-Teleport entity to coordinates with optional velocity
-
-### move_entity
-
-
-> Search script examples for [move_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_entity)
-
 #### nil move_entity(int uid, float x, float y, float vx, float vy, [LAYER](#LAYER) layer)
 
 Teleport entity to coordinates with optional velocity
@@ -1321,24 +1304,6 @@ end
 
 #### array&lt;int&gt; get_entities_by(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [LAYER](#LAYER) layer)
 
-Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
-
-### get_entities_by
-
-
-```lua
--- find all cavemen and give them bombs
--- using a type and mask in get_entities_by speeds up the search, cause the api knows which bucket to search in
-for i,uid in ipairs(get_entities_by(ENT_TYPE.MONS_CAVEMAN, MASK.MONSTER, LAYER.BOTH)) do
-    local x, y, l = get_position(uid)
-    spawn_entity_snapped_to_floor(ENT_TYPE.ITEM_BOMB, x, y, l)
-end
-
-```
-
-
-> Search script examples for [get_entities_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
-
 #### array&lt;int&gt; get_entities_by([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [LAYER](#LAYER) layer)
 
 Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
@@ -1371,13 +1336,6 @@ You can even pass a table!
 
 #### array&lt;int&gt; get_entities_at(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
-Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
-
-### get_entities_at
-
-
-> Search script examples for [get_entities_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
-
 #### array&lt;int&gt; get_entities_at([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
 Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
@@ -1388,13 +1346,6 @@ Get uids of matching entities inside some radius. Set `entity_type` or `mask` to
 > Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
 #### array&lt;int&gt; get_entities_overlapping_hitbox(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
-
-Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
-
-### get_entities_overlapping_hitbox
-
-
-> Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
 #### array&lt;int&gt; get_entities_overlapping_hitbox([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
 
@@ -1453,13 +1404,6 @@ Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 
 #### bool entity_has_item_type(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types)
 
-Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
-
-### entity_has_item_type
-
-
-> Search script examples for [entity_has_item_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_type)
-
 #### bool entity_has_item_type(int uid, [ENT_TYPE](#ENT_TYPE) entity_type)
 
 Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
@@ -1470,13 +1414,6 @@ Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, ca
 > Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
 #### array&lt;int&gt; entity_get_items_by(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask)
-
-Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
-
-### entity_get_items_by
-
-
-> Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
 #### array&lt;int&gt; entity_get_items_by(int uid, [ENT_TYPE](#ENT_TYPE) entity_type, int mask)
 
@@ -2022,13 +1959,6 @@ Same as `Player.get_short_name`
 
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, float x, float y)
 
-Creates a new [Illumination](#Illumination). Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
-
-### create_illumination
-
-
-> Search script examples for [create_illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
-
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, int uid)
 
 Creates a new [Illumination](#Illumination). Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
@@ -2435,13 +2365,6 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
 #### array&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
-
-Use `get_entities_overlapping_hitbox` instead
-
-### get_entities_overlapping
-
-
-> Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
 #### array&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
 

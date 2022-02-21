@@ -215,9 +215,9 @@ def include_example(name):
         file.close()
         print("\n```lua\n" + data + "\n```\n")
 
-def print_af(lf, af):
-    if lf["comment"] and lf["comment"][0] == "NoDoc":
-        return
+printed_funcs = []
+
+def format_af(lf, af):
     ret = replace_all(af["return"], replace) or "nil"
     ret = ret.replace("<", "&lt;").replace(">", "&gt;")
     ret = link_custom_type(ret)
@@ -225,15 +225,25 @@ def print_af(lf, af):
     param = replace_all(af["param"], replace)
     param = link_custom_type(param)
     fun = f"{ret} {name}({param})".strip()
+    return fun
+
+def print_af(lf, af):
+    if lf["comment"] and lf["comment"][0] == "NoDoc":
+        return
+    if lf["name"] in printed_funcs:
+        return
+    name = lf["name"]
     search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
     print(f"\n### {name}\n")
     include_example(name)
     print(f"\n> Search script examples for [{name}]({search_link})\n")
-    print(f"#### {fun}\n")
+    for ol in rpcfunc(lf["cpp"]):
+        fun = format_af(lf, ol)
+        print(f"#### {fun}\n")
     for com in lf["comment"]:
         com = link_custom_type(com)
         print(com)
-
+    printed_funcs.append(lf["name"])
 
 print_collecting_info("rpc")
 for file in header_files:
