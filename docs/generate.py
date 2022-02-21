@@ -147,6 +147,7 @@ not_functions = [
     "meta",
     "prng",
 ]
+cpp_type_exceptions = []
 skip = False
 
 
@@ -182,17 +183,17 @@ def is_custom_type(name):
     return False
 
 def link_custom_type(ret):
-    parts = re.findall(r"[\w]+|[^\w]+", ret)
+    parts = re.findall(r"[\w_]+|[^\w_]+", ret)
     ret = ""
-    for part in parts:
+    for i,part in enumerate(parts):
         for type in types:
-            if part == type["name"]:
+            if part == type["name"] and (len(parts) <= i+1 or not parts[i+1][0] in ")]") and not "`" in ret:
                 part = f"[{part}](#{part})"
         for enum in enums:
-            if part == enum["name"]:
+            if part == enum["name"] and (len(parts) <= i+1 or not parts[i+1][0] in ")]") and not "`" in ret:
                 part = f"[{part}](#{part})"
         for alias in aliases:
-            if part == alias["name"]:
+            if part == alias["name"] and (len(parts) <= i+1 or not parts[i+1][0] in ")]") and not "`" in ret:
                 part = f"[{part}](#Aliases)"
         ret += part
     return ret
@@ -215,9 +216,9 @@ def include_example(name):
         file.close()
         print("\n```lua\n" + data + "\n```\n")
 
-def print_af(lf, af):
-    if lf["comment"] and lf["comment"][0] == "NoDoc":
-        return
+printed_funcs = []
+
+def format_af(lf, af):
     ret = replace_all(af["return"], replace) or "nil"
     ret = ret.replace("<", "&lt;").replace(">", "&gt;")
     ret = link_custom_type(ret)
@@ -225,14 +226,25 @@ def print_af(lf, af):
     param = replace_all(af["param"], replace)
     param = link_custom_type(param)
     fun = f"{ret} {name}({param})".strip()
+    return fun
+
+def print_af(lf, af):
+    if lf["comment"] and lf["comment"][0] == "NoDoc":
+        return
+    if lf["name"] in printed_funcs:
+        return
+    name = lf["name"]
     search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
     print(f"\n### {name}\n")
     include_example(name)
     print(f"\n> Search script examples for [{name}]({search_link})\n")
-    print(f"#### {fun}\n")
+    for ol in rpcfunc(lf["cpp"]):
+        fun = format_af(lf, ol)
+        print(f"#### {fun}\n")
     for com in lf["comment"]:
+        com = link_custom_type(com)
         print(com)
-
+    printed_funcs.append(lf["name"])
 
 print_collecting_info("rpc")
 for file in header_files:
@@ -305,8 +317,8 @@ for file in header_files:
                     comment.append(m[1])
                 else:
                     m = re.search(
-                        r"^\s*:.*$", line
-                    )  # skip lines that start with a colon (constructor parameter initialization)
+                        r"^\s*(?::|\/\/)", line
+                    )  # skip lines that start with a colon (constructor parameter initialization) or are comments
                     if m:
                         continue
 
@@ -336,9 +348,23 @@ for file in header_files:
                         r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line
                     )
                     if m:
-                        member_vars.append(
-                            {"type": m[1], "name": m[2], "comment": comment}
-                        )
+                        if m[1].endswith(",") and not (m[2].endswith(">") or m[2].endswith(")")): #Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
+                            types_and_vars = m[1]
+                            vars_match = re.search(r"(?: *\w*,)*$", types_and_vars)
+                            vars_except_last = vars_match.group() #Last var is m[2]
+                            start, end = vars_match.span()
+                            vars_type = types_and_vars[:start]
+                            for m_var in re.findall(r"(\w*),", vars_except_last):
+                                member_vars.append(
+                                    {"type": vars_type, "name": m_var, "comment": comment}
+                                )
+                            member_vars.append(
+                                {"type": vars_type, "name": m[2], "comment": comment}
+                            )
+                        else:
+                            member_vars.append(
+                                {"type": m[1], "name": m[2], "comment": comment}
+                            )
                         comment = []
             elif brackets_depth == 0:
                 classes.append(
@@ -376,18 +402,11 @@ for file in api_files:
     data = open(file, "r").read().split("\n")
     for line in data:
         line = line.replace("*", "")
-        a = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*);', line)
-        b = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*)$', line)
-        if a and not a.group(1).startswith("__"):
-            if not getfunc(a.group(1)):
+        m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', line)
+        if m and not m.group(1).startswith("__"):
+            if not getfunc(m.group(1)):
                 funcs.append(
-                    {"name": a.group(1), "cpp": a.group(2), "comment": comment}
-                )
-            comment = []
-        elif b and not b.group(1).startswith("__"):
-            if not getfunc(b.group(1)):
-                funcs.append(
-                    {"name": b.group(1), "cpp": b.group(2), "comment": comment}
+                    {"name": m.group(1), "cpp": m.group(2), "comment": comment}
                 )
             comment = []
         c = re.search(r"/// ?(.*)$", line)
@@ -416,10 +435,13 @@ for file in api_files:
             (item for item in classes if item["name"] == cpp_type), dict()
         )
         if "member_funs" not in underlying_cpp_type:
-            continue  # whatever, I'm not fixing this
-            raise RuntimeError(
-                "No member_funs found. Did you forget to include a header file at the top of the generate script?"
-            )
+            if cpp_type in cpp_type_exceptions:
+                underlying_cpp_type = {"name": cpp_type, "member_funs": {}, "member_vars": {}}
+            else:
+                raise RuntimeError(
+                    f"No member_funs found in \"{cpp_type}\" while looking for usertypes in file \"{file}\". Did you forget to include a header file at the top of the generate script? (if it isn't the problem then add it to cpp_type_exceptions list)"
+                )
+
         skip = False
         for var in attr:
             if skip:
@@ -444,7 +466,20 @@ for file in api_files:
 
             var_name = var[0]
             cpp = var[1]
-            cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
+
+            if var[1].startswith("sol::property"):
+                param_match = re.match(fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)", cpp)
+                if param_match:
+                    type_var_name = param_match[1]
+                    m_var_return = re.search(fr"return[^;]*{type_var_name}\.([\w.]+)", cpp)
+                    if m_var_return:
+                        cpp_name = m_var_return[1]
+                        cpp_name = cpp_name.replace(".", "::")
+                        cpp = f"&{underlying_cpp_type['name']}::{cpp_name}"
+                else:
+                    cpp_name = cpp
+            else:
+                cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
 
             if var[0].startswith("sol::constructors"):
                 for fun in underlying_cpp_type["member_funs"][cpp_type]:
@@ -476,13 +511,18 @@ for file in api_files:
                     (
                         item
                         for item in underlying_cpp_type["member_vars"]
-                        if item["name"] == cpp_name
+                        if item["name"] == cpp_name or (item["name"].endswith("]") and f"{cpp_name}[" in item["name"])
                     ),
                     dict(),
                 )
                 if underlying_cpp_var:
                     type = underlying_cpp_var["type"]
                     sig = f"{type} {var_name}"
+                    if underlying_cpp_var["name"].endswith("]"):
+                        if type == "char":
+                            sig = f"string {var_name}"
+                        else:
+                            sig += underlying_cpp_var["name"][underlying_cpp_var["name"].find("["):]
                     vars.append(
                         {
                             "name": var_name,
@@ -492,7 +532,12 @@ for file in api_files:
                         }
                     )
                 else:
-                    vars.append({"name": var_name, "type": cpp})
+                    m_return_type = re.search(r"->(\w+){", var[1]) #Use var[1] instead of cpp because it could be replaced on the sol::property stuff
+                    if m_return_type:
+                        sig = f"{m_return_type[1]} {var_name}"
+                        vars.append({"name": var_name, "type": cpp, "signature": sig})
+                    else:
+                        vars.append({"name": var_name, "type": cpp})
         types.append({"name": name, "vars": vars, "base": base})
 
 print_collecting_info("entitys")
@@ -806,6 +851,7 @@ for lf in funcs:
             + ")\n"
         )
         for com in lf["comment"]:
+            com = link_custom_type(com)
             print(com)
 
 deprecated_funcs = [
@@ -838,9 +884,9 @@ for func in funcs:
         cat = "Shop functions"
     elif any(subs in func["name"] for subs in ["_room"]):
         cat = "Room functions"
-    elif any(subs in func["name"] for subs in ["spawn"]) or func["name"].endswith("door"):
+    elif any(subs in func["name"] for subs in ["spawn"]) or func["name"] in ["door", "layer_door"]:
         cat = "Spawn functions"
-    elif any(subs in func["name"] for subs in ["entity", "entities", "set_door", "get_door", "contents", "attach", "pick_up", "drop", "backitem", "carry", "door_at", "get_type", "kapala", "sparktrap", "explosion", "rope"]):
+    elif any(subs in func["name"] for subs in ["entity", "entities", "set_door", "get_door", "contents", "attach", "pick_up", "drop", "backitem", "carry", "door_at", "get_type", "kapala", "sparktrap", "explosion", "rope", "door", "blood", "olmec", "ghost", "jelly", "ankh"]):
         cat = "Entity functions"
     elif any(subs in func["name"] for subs in ["theme"]):
         cat = "Theme functions"
@@ -866,10 +912,9 @@ for func in funcs:
         func_cats[cat] = []
     func_cats[cat].append(func)
 
-for cat in func_cats:
+for cat in sorted(func_cats):
     print("\n## " + cat + "\n")
-    for lf in func_cats[cat]:
-
+    for lf in sorted(func_cats[cat], key=lambda x: x["name"]):
         if len(rpcfunc(lf["cpp"])):
             for af in rpcfunc(lf["cpp"]):
                 print_af(lf, af)
@@ -894,8 +939,9 @@ for cat in func_cats:
             print(f"\n### {name}\n")
             include_example(name)
             print(f"\n> Search script examples for [{name}]({search_link})\n")
-            print(f"#### {fun}<br/>")
+            print(f"#### {fun}\n")
             for com in lf["comment"]:
+                com = link_custom_type(com)
                 print(com.replace("```lua", "\n```lua"))
 
 print("\n## Deprecated functions\n")
@@ -908,6 +954,7 @@ for lf in events:
         print("\n### "+ lf["name"] + "\n")
         include_example(lf["name"])
         for com in lf["comment"]:
+            com = link_custom_type(com)
             print(com)
 
 for lf in deprecated_funcs:
@@ -935,6 +982,7 @@ for lf in deprecated_funcs:
         print(f"\n> Search script examples for [{name}]({search_link})\n")
         print(f"`{fun}`<br/>")
         for com in lf["comment"]:
+            com = link_custom_type(com)
             print(com)
 
 
@@ -947,7 +995,7 @@ for type in types:
     type_cat = "Non-Entity types"
 
     if "Floor" in type["base"] or type["name"] == "Floor":
-        cat = "Floors"
+        cat = "Floor entities"
         type_cat = "Entity types"
     elif "PowerupCapable" in type["base"] or type["name"] == "PowerupCapable":
         cat = "Monsters, Inc."
@@ -955,13 +1003,54 @@ for type in types:
     elif "Movable" in type["base"] or type["name"] == "Movable":
         cat = "Movable entities"
         type_cat = "Entity types"
+    elif "Entity" in type["base"] and any(subs in type["name"] for subs in ["Logical"]):
+        cat = "Logical entities"
+        type_cat = "Entity types"
+    elif "Entity" in type["base"] and any(subs in type["name"] for subs in ["BG"]):
+        cat = "Background entities"
+        type_cat = "Entity types"
+    elif "Entity" in type["base"] and any(subs in type["name"] for subs in ["Effect"]):
+        cat = "Effect entities"
+        type_cat = "Entity types"
     elif "Entity" in type["base"] or type["name"] == "Entity":
         cat = "Generic entities"
         type_cat = "Entity types"
-    elif "Screen" in type["base"] or type["name"] == "Screen":
-        cat = "Game screens"
+
+
+    elif "Screen" in type["base"] or type["name"] == "Screen" or any(subs in type["name"] for subs in ["Screen", "UI", "FlyingThing", "SaveRelated"]):
+        cat = "Screen types"
     elif "JournalPage" in type["base"] or type["name"] == "JournalPage":
-        cat = "Journal pages"
+        cat = "Journal types"
+    elif any(subs in type["name"] for subs in ["Theme"]):
+        cat = "Theme types"
+    elif any(subs in type["name"] for subs in ["Context"]):
+        cat = "Callback context types"
+    elif any(subs in type["name"] for subs in ["SaveData", "Constellation"]):
+        cat = "Savegame types"
+    elif any(subs in type["name"] for subs in ["Arena"]):
+        cat = "Arena types"
+    elif any(subs in type["name"] for subs in ["Online"]):
+        cat = "Online types"
+    elif any(subs in type["name"] for subs in ["Liquid"]):
+        cat = "Liquid types"
+    elif any(subs in type["name"] for subs in ["Logic"]):
+        cat = "Logic types"
+    elif any(subs in type["name"] for subs in ["Light", "Illumination"]):
+        cat = "Lighting types"
+    elif any(subs in type["name"] for subs in ["Animation", "EntityDB", "Inventory", "Ai"]):
+        cat = "Entity related types"
+    elif any(subs in type["name"] for subs in ["StateMemory", "Items", "GameManager", "GameProps", "Camera", "QuestsInfo", "PlayerSlot"]):
+        cat = "State types"
+    elif any(subs in type["name"] for subs in ["Gamepad", "ImGuiIO", "Input"]):
+        cat = "Input types"
+    elif any(subs in type["name"] for subs in ["Texture", "Rendering"]):
+        cat = "Texture types"
+    elif any(subs in type["name"] for subs in ["Particle"]):
+        cat = "Particle types"
+    elif any(subs in type["name"] for subs in ["DoorCoords", "LevelGen"]):
+        cat = "Levelgen types"
+    elif any(subs in type["name"] for subs in ["Sound"]):
+        cat = "Sound types"
     if not type_cat in type_cats:
         type_cats[type_cat] = dict()
     if not cat in type_cats[type_cat]:
@@ -970,13 +1059,14 @@ for type in types:
 
 for type_cat in type_cats:
     print("\n# " + type_cat + "\n")
-    for cat in type_cats[type_cat]:
+    for cat in sorted(type_cats[type_cat], key=lambda x: x):
         print("\n## " + cat + "\n")
-        for type in type_cats[type_cat][cat]:
+        for type in sorted(type_cats[type_cat][cat], key=lambda x: x["name"]):
             print("\n### " + type["name"] + "\n")
             include_example(type["name"])
             if "comment" in type:
                 for com in type["comment"]:
+                    com = link_custom_type(com)
                     print(com)
             if type["base"]:
                 print("Derived from", end="")
@@ -1024,7 +1114,7 @@ Type | Name | Description
                     name = var["name"]
                     print(f"{ret} | [{name}]({search_link}) | ", end="")
                 if "comment" in var and var["comment"]:
-                    print("<br/>".join(var["comment"]))
+                    print(link_custom_type("<br/>".join(var["comment"])))
                 else:
                     print("")
 
@@ -1059,14 +1149,14 @@ set_callback(function()
 end, ON.LEVEL)
 ```"""
 )
-for type in enums:
+for type in sorted(enums, key=lambda x: x["name"]):
     print("\n## " + type["name"] + "\n")
     search_link = (
         "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + type["name"]
     )
     print(f"\n> Search script examples for [{type['name']}]({search_link})\n")
     if "comment" in type:
-        print("<br/>".join(type["comment"]))
+        print(link_custom_type("<br/>".join(type["comment"])))
     print("""
 Name | Data | Description
 ---- | ---- | -----------""")
