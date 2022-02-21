@@ -5499,8 +5499,8 @@ int | [price](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) |
 bool | [can_jump()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_jump) | 
 [Entity](#Entity) | [standing_on()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=standing_on) | 
  | [add_money(int money)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money) | Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
+bool | [is_on_fire()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on_fire) | 
  | [damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) | Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
- | [is_on_fire](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on_fire) | 
 
 ### MovingIcon
 
