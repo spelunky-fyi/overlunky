@@ -182,17 +182,17 @@ def is_custom_type(name):
     return False
 
 def link_custom_type(ret):
-    parts = re.findall(r"[\w]+|[^\w]+", ret)
+    parts = re.findall(r"[\w_]+|[^\w_]+", ret)
     ret = ""
-    for part in parts:
+    for i,part in enumerate(parts):
         for type in types:
-            if part == type["name"]:
+            if part == type["name"] and (len(parts) <= i+1 or not parts[i+1][0] in ")]") and not "`" in ret:
                 part = f"[{part}](#{part})"
         for enum in enums:
-            if part == enum["name"]:
+            if part == enum["name"] and (len(parts) <= i+1 or not parts[i+1][0] in ")]") and not "`" in ret:
                 part = f"[{part}](#{part})"
         for alias in aliases:
-            if part == alias["name"]:
+            if part == alias["name"] and (len(parts) <= i+1 or not parts[i+1][0] in ")]") and not "`" in ret:
                 part = f"[{part}](#Aliases)"
         ret += part
     return ret
@@ -231,6 +231,7 @@ def print_af(lf, af):
     print(f"\n> Search script examples for [{name}]({search_link})\n")
     print(f"#### {fun}\n")
     for com in lf["comment"]:
+        com = link_custom_type(com)
         print(com)
 
 
@@ -830,6 +831,7 @@ for lf in funcs:
             + ")\n"
         )
         for com in lf["comment"]:
+            com = link_custom_type(com)
             print(com)
 
 deprecated_funcs = [
@@ -920,6 +922,7 @@ for cat in func_cats:
             print(f"\n> Search script examples for [{name}]({search_link})\n")
             print(f"#### {fun}<br/>")
             for com in lf["comment"]:
+                com = link_custom_type(com)
                 print(com.replace("```lua", "\n```lua"))
 
 print("\n## Deprecated functions\n")
@@ -932,6 +935,7 @@ for lf in events:
         print("\n### "+ lf["name"] + "\n")
         include_example(lf["name"])
         for com in lf["comment"]:
+            com = link_custom_type(com)
             print(com)
 
 for lf in deprecated_funcs:
@@ -959,6 +963,7 @@ for lf in deprecated_funcs:
         print(f"\n> Search script examples for [{name}]({search_link})\n")
         print(f"`{fun}`<br/>")
         for com in lf["comment"]:
+            com = link_custom_type(com)
             print(com)
 
 
@@ -1001,6 +1006,7 @@ for type_cat in type_cats:
             include_example(type["name"])
             if "comment" in type:
                 for com in type["comment"]:
+                    com = link_custom_type(com)
                     print(com)
             if type["base"]:
                 print("Derived from", end="")
@@ -1046,7 +1052,7 @@ Type | Name | Description
                     name = var["name"]
                     print(f"{ret} | [{name}]({search_link}) | ", end="")
                 if "comment" in var and var["comment"]:
-                    print("<br/>".join(var["comment"]))
+                    print(link_custom_type("<br/>".join(var["comment"])))
                 else:
                     print("")
 
@@ -1088,7 +1094,7 @@ for type in enums:
     )
     print(f"\n> Search script examples for [{type['name']}]({search_link})\n")
     if "comment" in type:
-        print("<br/>".join(type["comment"]))
+        print(link_custom_type("<br/>".join(type["comment"])))
     print("""
 Name | Data | Description
 ---- | ---- | -----------""")

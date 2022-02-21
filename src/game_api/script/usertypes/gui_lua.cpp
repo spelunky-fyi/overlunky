@@ -553,7 +553,7 @@ void register_usertypes(sol::state& lua)
                           g_WantUpdateHasGamepad = true;
                           return get_gamepad() /**/; }));
 
-    /// Returns: [ImGuiIO](#imguiio) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+    /// Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
     /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
     /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
     /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.

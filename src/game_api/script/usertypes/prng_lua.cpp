@@ -18,7 +18,7 @@ void register_usertypes(sol::state& lua)
 
     /// PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
     /// The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
-    /// The used buffer is determined by [`PRNG_CLASS`](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
+    /// The used buffer is determined by [PRNG_CLASS](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
     /// If you don't care what part of the game you affect just use `prng.random`.
     lua.new_usertype<PRNG>(
         "PRNG",
@@ -42,7 +42,7 @@ void register_usertypes(sol::state& lua)
     /// The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
     lua["prng"] = &PRNG::get();
 
-    /// Determines what class of prng is used, which in turn determines which parts of the game's future prng is affected. See more info at (`PRNG`)[#PRNG]
+    /// Determines what class of prng is used, which in turn determines which parts of the game's future prng is affected. See more info at [PRNG](#PRNG)
     /// For example when choosing `PRNG_CLASS.PROCEDURAL_SPAWNS` to generate a random number, random Tiamat spawns will not be affected.
     /// Any integer in the range [0, 9] is a valid class, some are however not documented because of missing information.
     lua.create_named_table("PRNG_CLASS", "PROCEDURAL_SPAWNS", PRNG::PROCEDURAL_SPAWNS, "PARTICLES", PRNG::PARTICLES, "ENTITY_VARIATION", PRNG::ENTITY_VARIATION, "EXTRA_SPAWNS", PRNG::EXTRA_SPAWNS, "LEVEL_DECO", PRNG::LEVEL_DECO);

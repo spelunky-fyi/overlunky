@@ -130,13 +130,13 @@ end
     NEntityFlags::register_usertypes(lua);
     NEntityCasting::register_usertypes(lua);
 
-    /// A bunch of [game state](#statememory) variables
+    /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
     lua["state"] = get_state_ptr();
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
     lua["online"] = get_online();
-    /// An array of [Player](#player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
+    /// An array of [Player](#Player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
     lua["players"] = std::vector<Player*>(get_players());
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
     lua["savegame"] = savedata();
@@ -227,7 +227,7 @@ end
         return backend->cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add global callback function to be called on an [event](#on).
+    /// Add global callback function to be called on an [event](#ON).
     lua["set_callback"] = [](sol::function cb, int screen) -> CallbackId
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
@@ -398,7 +398,7 @@ end
     /// `amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
     lua["spawn_liquid"] = spawn_liquid;
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
-    /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
+    /// Uses level coordinates with [LAYER.FRONT](#LAYER) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
     lua["spawn_entity"] = spawn_entity_abs;
     /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
@@ -515,10 +515,10 @@ end
     lua["get_door_target"] = get_door_target;
     /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
     lua["set_contents"] = set_contents;
-    /// Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
+    /// Get the Entity behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
     // lua["get_entity"] = [](uint32_t uid) -> Entity* {};
     /// NoDoc
-    /// Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
+    /// Get the [Entity](#Entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
     lua["get_entity_raw"] = get_entity_ptr;
     lua.script(R"##(
         function cast_entity(entity_raw)
@@ -546,7 +546,7 @@ end
             return cast_entity(entity_raw)
         end
         )##");
-    /// Get the [EntityDB](#entitydb) behind an ENT_TYPE...
+    /// Get the [EntityDB](#EntityDB) behind an ENT_TYPE...
     lua["get_type"] = get_type;
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
@@ -935,7 +935,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -962,7 +962,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1072,7 +1072,7 @@ end
     /// Note that damage_dealer can be nil ! (long fall, ...)
     /// DO NOT CALL `self:damage()` in the callback !
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1100,7 +1100,7 @@ end
     /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
     /// The callback signature is `nil on_open(Entity entity_self, Entity opener)`
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
@@ -1126,7 +1126,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_collision1"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1153,7 +1153,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_collision2"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))

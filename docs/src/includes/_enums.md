@@ -250,7 +250,7 @@ Name | Data | Description
 
 > Search script examples for [WIN_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE)
 
-After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
+After setting the [WIN_STATE](#WIN_STATE), the exit door on the current level will lead to the chosen ending
 
 Name | Data | Description
 ---- | ---- | -----------
@@ -320,7 +320,7 @@ Name | Data | Description
 
 > Search script examples for [PRNG_CLASS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS)
 
-Determines what class of prng is used, which in turn determines which parts of the game's future prng is affected. See more info at (`PRNG`)[#PRNG]<br/>For example when choosing `PRNG_CLASS.PROCEDURAL_SPAWNS` to generate a random number, random Tiamat spawns will not be affected.<br/>Any integer in the range [0, 9] is a valid class, some are however not documented because of missing information.
+Determines what class of prng is used, which in turn determines which parts of the game's future prng is affected. See more info at [PRNG](#PRNG)<br/>For example when choosing `PRNG_CLASS.PROCEDURAL_SPAWNS` to generate a random number, random Tiamat spawns will not be affected.<br/>Any integer in the range [0, 9] is a valid class, some are however not documented because of missing information.
 
 Name | Data | Description
 ---- | ---- | -----------
@@ -459,7 +459,7 @@ Name | Data | Description
 
 > Search script examples for [THEME_OVERRIDE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE)
 
-Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
+Overrides for different [CustomTheme](#CustomTheme) functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
 
 Name | Data | Description
 ---- | ---- | -----------
@@ -587,7 +587,7 @@ Name | Data | Description
 
 > Search script examples for [YANG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=YANG)
 
-Yang quest states
+[Yang](#Yang) quest states
 
 Name | Data | Description
 ---- | ---- | -----------
@@ -674,7 +674,7 @@ Name | Data | Description
 
 > Search script examples for [BEG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=BEG)
 
-Beg quest states
+[Beg](#Beg) quest states
 
 Name | Data | Description
 ---- | ---- | -----------
