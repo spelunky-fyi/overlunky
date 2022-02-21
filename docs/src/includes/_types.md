@@ -1154,7 +1154,6 @@ int | [win_combo(string label, int selected, string opts)](https://github.com/sp
 
 ### ImVec2
 
-Current mouse cursor position in screen coordinates.
 
 Type | Name | Description
 ---- | ---- | -----------

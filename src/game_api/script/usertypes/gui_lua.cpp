@@ -440,6 +440,7 @@ void register_usertypes(sol::state& lua)
         auto pos = normalize(ImGui::GetMousePos());
         return std::make_pair(pos.x, pos.y);
     };
+
     lua.new_usertype<ImVec2>(
         "ImVec2",
         "x",
