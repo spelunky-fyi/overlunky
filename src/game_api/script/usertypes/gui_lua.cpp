@@ -390,20 +390,6 @@ void register_usertypes(sol::state& lua)
         return (uColor)(a << 24) + (b << 16) + (g << 8) + (r);
     };
     /// Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
-    /// Example:
-    /// ```lua
-    /// function on_guiframe(draw_ctx)
-    ///     -- get a random color
-    ///     color = math.random(0, 0xffffffff)
-    ///     -- zoom the font size based on frame
-    ///     size = (get_frame() % 199)+1
-    ///     text = 'Awesome!'
-    ///     -- calculate size of text
-    ///     w, h = draw_text_size(size, text)
-    ///     -- draw to the center of screen
-    ///     draw_ctx:draw_text(0-w/2, 0-h/2, size, text, color)
-    /// end
-    /// ```
     lua["draw_text_size"] = [](float size, std::string text) -> std::pair<float, float>
     {
         ImGuiIO& io = ImGui::GetIO();

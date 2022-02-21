@@ -130,12 +130,6 @@ end
     NEntityFlags::register_usertypes(lua);
     NEntityCasting::register_usertypes(lua);
 
-    ///
-    /// ```lua
-    /// if state.time_level > 300 and state.theme == THEME.DWELLING then
-    ///     toast("Congratulations for lasting 5 seconds in Dwelling")
-    /// end
-    /// ```
     /// A bunch of [game state](#statememory) variables
     lua["state"] = get_state_ptr();
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
@@ -163,15 +157,6 @@ end
     lua["message"] = [&lua](std::string message) -> void
     { lua["print"](message); };
     /// Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
-    /// For example use it like this
-    /// ```lua
-    /// prinspect(state.level, state.level_next)
-    /// local some_stuff_in_a_table = {
-    ///     some = state.time_total,
-    ///     stuff = state.world
-    /// }
-    /// prinspect(some_stuff_in_a_table)
-    /// ```
     lua["prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
         if (objects.size() > 0)
@@ -291,17 +276,8 @@ end
         LuaBackend* backend = LuaBackend::get_calling_backend();
         backend->required_scripts.push_back(sanitize(id));
     };
-    /// Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
-    /// ```lua
-    /// -- this should always print the same table D877...E555
-    /// set_callback(function()
-    ///   seed_prng(42069)
-    ///   local prng = read_prng()
-    ///   for i,v in ipairs(prng) do
-    ///     message(string.format("%08X", v))
-    ///   end
-    /// end, ON.LEVEL)
-    /// ```
+    /// Deprecated
+    /// Read the game prng state. Use [prng](#PRNG):get_pair() instead.
     lua["read_prng"] = []() -> std::vector<int64_t>
     { return read_prng(); };
     /// Show a message that looks like a level feeling.
@@ -423,18 +399,6 @@ end
     lua["spawn_liquid"] = spawn_liquid;
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
     /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
-    /// Example:
-    /// ```lua
-    /// -- spawn megajelly using absolute coordinates
-    /// set_callback(function()
-    ///     x, y, layer = get_position(players[1].uid)
-    ///     spawn_entity(ENT_TYPE.MONS_MEGAJELLYFISH, x, y+3, layer, 0, 0)
-    /// end, ON.LEVEL)
-    /// -- spawn clover using player-relative coordinates
-    /// set_callback(function()
-    ///     spawn(ENT_TYPE.ITEM_PICKUP_CLOVER, 0, 1, LAYER.PLAYER1, 0, 0)
-    /// end, ON.LEVEL)
-    /// ```
     lua["spawn_entity"] = spawn_entity_abs;
     /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
@@ -523,11 +487,6 @@ end
     lua["god_companions"] = godmode_companions;
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
-    /// ```lua
-    /// set_callback(function()
-    ///     state.level_flags = set_flag(state.level_flags, 18)
-    /// end, ON.POST_ROOM_GENERATION)
-    /// ```
     lua["force_dark_level"] = darkmode;
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
@@ -607,16 +566,7 @@ end
     /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
     lua["get_entities_by"] = get_entities_by;
     /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
-    /// You can even pass a table! Example:
-    /// ```lua
-    /// types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
-    /// function on_level()
-    ///     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
-    ///     -- is not the same thing as this, but also works
-    ///     uids2 = get_entities_by_type(entity_types)
-    ///     message(tostring(#uids).." == "..tostring(#uids2))
-    /// end
-    /// ```
+    /// You can even pass a table!
     lua["get_entities_by_type"] = [](sol::variadic_args va) -> std::vector<uint32_t>
     {
         sol::type type = va.get_type();
@@ -718,11 +668,7 @@ end
     lua["entity_get_items_by"] = entity_get_items_by;
     /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
     lua["kill_entity"] = kill_entity;
-    /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
-    /// ```lua
-    /// -- spawn and equip a jetpack
-    /// pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
-    /// ```
+    /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen.
     lua["pick_up"] = pick_up;
     /// Drop an entity by uid
     lua["drop"] = drop;
@@ -808,16 +754,7 @@ end
             return (float)sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
     };
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
-    /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
-    /// ```lua
-    /// -- Draw the level boundaries
-    /// set_callback(function(draw_ctx)
-    ///     xmin, ymin, xmax, ymax = get_bounds()
-    ///     sx, sy = screen_position(xmin, ymin) -- top left
-    ///     sx2, sy2 = screen_position(xmax, ymax) -- bottom right
-    ///     draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
-    /// end, ON.GUIFRAME)
-    /// ```
+    /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y
     lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
