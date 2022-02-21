@@ -988,13 +988,22 @@ std::string LuaConsole::dump_api()
         if (!excluded_keys.contains(key_str))
         {
             std::string value_str = serpent(value, opts).get<std::string>();
+            std::regex re("__", std::regex::extended);
             if (value_str.starts_with("\"function"))
             {
-                value_str = "function(...) end";
+                continue;
             }
             else if (value_str.starts_with("\"userdata"))
             {
-                value_str = "{}";
+                continue;
+            }
+            else if (std::regex_search(value_str.c_str(), re))
+            {
+                continue;
+            }
+            else if (key_str.find_first_of("abcdefghijklmnopqrstuvwxyz") != std::string::npos)
+            {
+                continue;
             }
             sorted_output[std::move(key_str)] = std::move(value_str);
         }

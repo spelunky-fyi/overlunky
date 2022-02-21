@@ -1,147 +1,4731 @@
-AABB = {
-  __name = "sol.AABB.user"
-}
-AcidBubble = {
-  __index = "function",
-  __name = "sol.AcidBubble.user",
-  __newindex = "function"
-}
-Ai = {
-  __name = "sol.Ai.user"
-}
-Alien = {
-  __index = "function",
-  __name = "sol.Alien.user",
-  __newindex = "function"
-}
-Altar = {
-  __index = "function",
-  __name = "sol.Altar.user",
-  __newindex = "function"
-}
-Ammit = {
-  __index = "function",
-  __name = "sol.Ammit.user",
-  __newindex = "function"
-}
-Animation = {
-  __name = "sol.Animation.user"
-}
-AnkhPowerup = {
-  __index = "function",
-  __name = "sol.AnkhPowerup.user",
-  __newindex = "function"
-}
-Anubis = {
-  __index = "function",
-  __name = "sol.Anubis.user",
-  __newindex = "function"
-}
-ApepHead = {
-  __index = "function",
-  __name = "sol.ApepHead.user",
-  __newindex = "function"
-}
-ApepPart = {
-  __index = "function",
-  __name = "sol.ApepPart.user",
-  __newindex = "function"
-}
-ArenaConfigArenas = {
-  __name = "sol.ArenaConfigArenas.user"
-}
-ArenaConfigEquippedItems = {
-  __name = "sol.ArenaConfigEquippedItems.user"
-}
-ArenaConfigItems = {
-  __name = "sol.ArenaConfigItems.user"
-}
-ArenaState = {
-  __name = "sol.ArenaState.user"
-}
-Arrow = {
-  __index = "function",
-  __name = "sol.Arrow.user",
-  __newindex = "function"
-}
-Arrowtrap = {
-  __index = "function",
-  __name = "sol.Arrowtrap.user",
-  __newindex = "function"
-}
-Axolotl = {
-  __index = "function",
-  __name = "sol.Axolotl.user",
-  __newindex = "function"
-}
-AxolotlShot = {
-  __index = "function",
-  __name = "sol.AxolotlShot.user",
-  __newindex = "function"
-}
-BEG = {
-  ALTAR_DESTROYED = 1,
-  BOMBBAG_THROWN = 3,
-  QUEST_NOT_STARTED = 0,
-  SPAWNED_WITH_BOMBBAG = 2,
-  SPAWNED_WITH_TRUECROWN = 4,
-  TRUECROWN_THROWN = 5
-}
-BGBackLayerDoor = {
-  __index = "function",
-  __name = "sol.BGBackLayerDoor.user",
-  __newindex = "function"
-}
-BGEggshipRoom = {
-  __index = "function",
-  __name = "sol.BGEggshipRoom.user",
-  __newindex = "function"
-}
-BGFloatingDebris = {
-  __index = "function",
-  __name = "sol.BGFloatingDebris.user",
-  __newindex = "function"
-}
-BGMovingStar = {
-  __index = "function",
-  __name = "sol.BGMovingStar.user",
-  __newindex = "function"
-}
-BGRelativeElement = {
-  __index = "function",
-  __name = "sol.BGRelativeElement.user",
-  __newindex = "function"
-}
-BGShootingStar = {
-  __index = "function",
-  __name = "sol.BGShootingStar.user",
-  __newindex = "function"
-}
-BGShopEntrence = {
-  __index = "function",
-  __name = "sol.BGShopEntrence.user",
-  __newindex = "function"
-}
-BGShopKeeperPrime = {
-  __index = "function",
-  __name = "sol.BGShopKeeperPrime.user",
-  __newindex = "function"
-}
-BGSurfaceLayer = {
-  __index = "function",
-  __name = "sol.BGSurfaceLayer.user",
-  __newindex = "function"
-}
-BGSurfaceStar = {
-  __index = "function",
-  __name = "sol.BGSurfaceStar.user",
-  __newindex = "function"
-}
-BGTutorialSign = {
-  __index = "function",
-  __name = "sol.BGTutorialSign.user",
-  __newindex = "function"
-}
+---@diagnostic disable: unused-function,lowercase-global
+---@class Meta
+---@field name string
+---@field version string
+---@field description string
+---@field author string
+
+---@type Meta
+meta = nil
+
+---@type StateMemory
+state = nil
+---@type GameManager
+game_manager = nil
+---@type Online
+online = nil
+---@type Player[]
+players = nil
+---@type SaveData
+savegame = nil
+---@type any
+options = nil
+---@type PRNG
+prng = nil
+
+-- Functions
+
+---Standard lua print function, prints directly to the console but not to the game
+---@return nil
+function lua_print() end
+---Print a log message on screen.
+---@param message string
+---@return nil
+function print(message) end
+---Same as `print`
+---@param message string
+---@return nil
+function message(message) end
+---Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
+---For example use it like this
+---```lua
+---prinspect(state.level, state.level_next)
+---local some_stuff_in_a_table = {
+---    some = state.time_total,
+---    stuff = state.world
+---}
+---prinspect(some_stuff_in_a_table)
+---```
+---@vararg any
+---@return nil
+function prinspect(...) end
+---Same as `prinspect`
+---@vararg any
+---@return nil
+function messpect(...) end
+---Adds a command that can be used in the console.
+---@param name string
+---@param cmd fun(): any
+---@return nil
+function register_console_command(name, cmd) end
+---Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
+---Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+---@param cb fun(): any
+---@param frames integer
+---@return CallbackId
+function set_interval(cb, frames) end
+---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+---Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
+---@param cb fun(): any
+---@param frames integer
+---@return CallbackId
+function set_timeout(cb, frames) end
+---Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
+---Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
+---@param cb fun(): any
+---@param frames integer
+---@return CallbackId
+function set_global_interval(cb, frames) end
+---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+---Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
+---@param cb fun(): any
+---@param frames integer
+---@return CallbackId
+function set_global_timeout(cb, frames) end
+---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+---Add global callback function to be called on an [event](#on).
+---@param cb fun(): any
+---@param screen integer
+---@return CallbackId
+function set_callback(cb, screen) end
+---Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.
+---@param id CallbackId?
+---@return nil
+function clear_callback(id) end
+---Load another script by id "author/name"
+---@param id string
+---@return nil
+function load_script(id) end
+---Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
+---```lua
+----- this should always print the same table D877...E555
+---set_callback(function()
+---  seed_prng(42069)
+---  local prng = read_prng()
+---  for i,v in ipairs(prng) do
+---    message(string.format("%08X", v))
+---  end
+---end, ON.LEVEL)
+---```
+---@return integer[]
+function read_prng() end
+---Show a message that looks like a level feeling.
+---@param message string
+---@return nil
+function toast(message) end
+---Show a message coming from an entity
+---@param entity_uid integer
+---@param message string
+---@param unk_type integer
+---@param top boolean
+---@return nil
+function say(entity_uid, message, unk_type, top) end
+---Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
+---limits, you can override them in the UI with double click.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param value integer
+---@param min integer
+---@param max integer
+---@return nil
+function register_option_int(name, desc, long_desc, value, min, max) end
+---Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
+---limits, you can override them in the UI with double click.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param value number
+---@param min number
+---@param max number
+---@return nil
+function register_option_float(name, desc, long_desc, value, min, max) end
+---Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param value boolean
+---@return nil
+function register_option_bool(name, desc, long_desc, value) end
+---Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param value string
+---@return nil
+function register_option_string(name, desc, long_desc, value) end
+---Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
+---with a double `\0\0` at the end.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param opts string
+---@return nil
+function register_option_combo(name, desc, long_desc, opts) end
+---Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param on_click fun(): any
+---@return nil
+function register_option_button(name, desc, long_desc, on_click) end
+---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
+---Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
+---`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
+---`amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@return nil
+function spawn_liquid(entity_type, x, y) end
+---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
+---Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
+---`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
+---`amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param velocityx number
+---@param velocityy number
+---@param liquid_flags integer
+---@param amount integer
+---@param blobs_separation number
+---@return nil
+function spawn_liquid(entity_type, x, y, velocityx, velocityy, liquid_flags, amount, blobs_separation) end
+---Spawn an entity in position with some velocity and return the uid of spawned entity.
+---Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
+---Example:
+---```lua
+----- spawn megajelly using absolute coordinates
+---set_callback(function()
+---    x, y, layer = get_position(players[1].uid)
+---    spawn_entity(ENT_TYPE.MONS_MEGAJELLYFISH, x, y+3, layer, 0, 0)
+---end, ON.LEVEL)
+----- spawn clover using player-relative coordinates
+---set_callback(function()
+---    spawn(ENT_TYPE.ITEM_PICKUP_CLOVER, 0, 1, LAYER.PLAYER1, 0, 0)
+---end, ON.LEVEL)
+---```
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param vx number
+---@param vy number
+---@return integer
+function spawn_entity(entity_type, x, y, layer, vx, vy) end
+---Short for [spawn_entity](#spawn_entity).
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param vx number
+---@param vy number
+---@return integer
+function spawn(entity_type, x, y, layer, vx, vy) end
+---Spawns an entity directly on the floor below the tile at the given position.
+---Use this to avoid the little fall that some entities do when spawned during level gen callbacks.
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_entity_snapped_to_floor(entity_type, x, y, layer) end
+---Short for [spawn_entity_snapped_to_floor](#spawn_entity_snapped_to_floor).
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_on_floor(entity_type, x, y, layer) end
+---Spawn a grid entity, such as floor or traps, that snaps to the grid.
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_grid_entity(entity_type, x, y, layer) end
+---Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param vx number
+---@param vy number
+---@return integer
+function spawn_entity_nonreplaceable(entity_type, x, y, layer, vx, vy) end
+---Short for [spawn_entity_nonreplaceable](#spawn_entity_nonreplaceable).
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param vx number
+---@param vy number
+---@return integer
+function spawn_critical(entity_type, x, y, layer, vx, vy) end
+---Spawn a door to another world, level and theme and return the uid of spawned entity.
+---Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param w integer
+---@param l integer
+---@param t integer
+---@return integer
+function spawn_door(x, y, layer, w, l, t) end
+---Short for [spawn_door](#spawn_door).
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param w integer
+---@param l integer
+---@param t integer
+---@return integer
+function door(x, y, layer, w, l, t) end
+---Spawn a door to backlayer.
+---@param x number
+---@param y number
+---@return nil
+function spawn_layer_door(x, y) end
+---Short for [spawn_layer_door](#spawn_layer_door).
+---@param x number
+---@param y number
+---@return nil
+function layer_door(x, y) end
+---Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param right boolean
+---@return integer
+function spawn_apep(x, y, layer, right) end
+---Spawns and grows a tree
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return nil
+function spawn_tree(x, y, layer) end
+---Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
+---If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
+---@param player_slot integer
+---@param x number
+---@param y number
+---@return nil
+function spawn_player(player_slot, x, y) end
+---Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
+---This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
+---In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
+---The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
+---@param cb fun(): any
+---@param flags SPAWN_TYPE
+---@param mask integer
+---@vararg any
+---@return CallbackId
+function set_pre_entity_spawn(cb, flags, mask, ...) end
+---Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
+---This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
+---The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
+---@param cb fun(): any
+---@param flags SPAWN_TYPE
+---@param mask integer
+---@vararg any
+---@return CallbackId
+function set_post_entity_spawn(cb, flags, mask, ...) end
+---Warp to a level immediately.
+---@param w integer
+---@param l integer
+---@param t integer
+---@return nil
+function warp(w, l, t) end
+---Set seed and reset run.
+---@param seed integer
+---@return nil
+function set_seed(seed) end
+---Enable/disable godmode for players.
+---@param g boolean
+---@return nil
+function god(g) end
+---Enable/disable godmode for companions.
+---@param g boolean
+---@return nil
+function god_companions(g) end
+---Set the zoom level used in levels and shops. 13.5 is the default.
+---@param level number
+---@return nil
+function zoom(level) end
+---Enable/disable game engine pause.
+---This is just short for `state.pause == 32`, but that produces an audio bug
+---I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
+---@param p boolean
+---@return nil
+function pause(p) end
+---Teleport entity to coordinates with optional velocity
+---@param uid integer
+---@param x number
+---@param y number
+---@param vx number
+---@param vy number
+---@return nil
+function move_entity(uid, x, y, vx, vy) end
+---Teleport entity to coordinates with optional velocity
+---@param uid integer
+---@param x number
+---@param y number
+---@param vx number
+---@param vy number
+---@param layer LAYER
+---@return nil
+function move_entity(uid, x, y, vx, vy, layer) end
+---Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
+---@param uid integer
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return nil
+function move_grid_entity(uid, x, y, layer) end
+---Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
+---@param uid integer
+---@param w integer
+---@param l integer
+---@param t integer
+---@return nil
+function set_door_target(uid, w, l, t) end
+---Short for [set_door_target](#set_door_target).
+---@param uid integer
+---@param w integer
+---@param l integer
+---@param t integer
+---@return nil
+function set_door(uid, w, l, t) end
+---Get door target `world`, `level`, `theme`
+---@param uid integer
+---@return integer, integer, integer
+function get_door_target(uid) end
+---Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
+---@param uid integer
+---@param item_entity_type ENT_TYPE
+---@return nil
+function set_contents(uid, item_entity_type) end
+---Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
+---@param uid integer
+---@return Entity
+function get_entity(uid) end
+---Get the [EntityDB](#entitydb) behind an ENT_TYPE...
+---@param id integer
+---@return EntityDB
+function get_type(id) end
+---Gets a grid entity, such as floor or spikes, at the given position and layer.
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function get_grid_entity_at(x, y, layer) end
+---Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
+---@param entities integer[]
+---@param predicate fun(): any
+---@return integer[]
+function filter_entities(entities, predicate) end
+---Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---@param entity_types ENT_TYPE[]
+---@param mask integer
+---@param layer LAYER
+---@return integer[]
+function get_entities_by(entity_types, mask, layer) end
+---Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---@param entity_type ENT_TYPE
+---@param mask integer
+---@param layer LAYER
+---@return integer[]
+function get_entities_by(entity_type, mask, layer) end
+---Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
+---You can even pass a table! Example:
+---```lua
+---types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
+---function on_level()
+---    uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
+---    -- is not the same thing as this, but also works
+---    uids2 = get_entities_by_type(entity_types)
+---    message(tostring(#uids).." == "..tostring(#uids2))
+---end
+---```
+---@vararg any
+---@return integer[]
+function get_entities_by_type(...) end
+---Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---@param entity_types ENT_TYPE[]
+---@param mask integer
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param radius number
+---@return integer[]
+function get_entities_at(entity_types, mask, x, y, layer, radius) end
+---Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---@param entity_type ENT_TYPE
+---@param mask integer
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param radius number
+---@return integer[]
+function get_entities_at(entity_type, mask, x, y, layer, radius) end
+---Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---@param entity_types ENT_TYPE[]
+---@param mask integer
+---@param hitbox AABB
+---@param layer LAYER
+---@return integer[]
+function get_entities_overlapping_hitbox(entity_types, mask, hitbox, layer) end
+---Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---@param entity_type ENT_TYPE
+---@param mask integer
+---@param hitbox AABB
+---@param layer LAYER
+---@return integer[]
+function get_entities_overlapping_hitbox(entity_type, mask, hitbox, layer) end
+---Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
+---However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
+---@param overlay_uid integer
+---@param attachee_uid integer
+---@return nil
+function attach_entity(overlay_uid, attachee_uid) end
+---Get the `flags` field from entity by uid
+---@param uid integer
+---@return integer
+function get_entity_flags(uid) end
+---Set the `flags` field from entity by uid
+---@param uid integer
+---@param flags integer
+---@return nil
+function set_entity_flags(uid, flags) end
+---Get the `more_flags` field from entity by uid
+---@param id integer
+---@return integer
+function get_entity_flags2(id) end
+---Set the `more_flags` field from entity by uid
+---@param uid integer
+---@param flags integer
+---@return nil
+function set_entity_flags2(uid, flags) end
+---Get `state.level_flags`
+---@return integer
+function get_level_flags() end
+---Set `state.level_flags`
+---@param flags integer
+---@return nil
+function set_level_flags(flags) end
+---Get the ENT_TYPE... of the entity by uid
+---@param uid integer
+---@return ENT_TYPE
+function get_entity_type(uid) end
+---Get the current set zoom level
+---@return number
+function get_zoom_level() end
+---Get the game coordinates at the screen position (`x`, `y`)
+---@param x number
+---@param y number
+---@return number, number
+function game_position(x, y) end
+---Translate an entity position to screen position to be used in drawing functions
+---@param x number
+---@param y number
+---@return number, number
+function screen_position(x, y) end
+---Translate a distance of `x` tiles to screen distance to be be used in drawing functions
+---@param x number
+---@return number
+function screen_distance(x) end
+---Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
+---you're standing on, not real level coordinates.
+---@param uid integer
+---@return number, number, integer
+function get_position(uid) end
+---Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
+---@param uid integer
+---@return number, number, integer
+function get_render_position(uid) end
+---Get velocity `vx, vy` of an entity by uid. Use this, don't use `Entity.velocityx/velocityy` because those are relative to `Entity.overlay`.
+---@param uid integer
+---@return number, number
+function get_velocity(uid) end
+---Remove item by uid from entity
+---@param id integer
+---@param item_uid integer
+---@return nil
+function entity_remove_item(id, item_uid) end
+---Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
+---@param uid integer
+---@param off_x number
+---@param off_y number
+---@return integer
+function attach_ball_and_chain(uid, off_x, off_y) end
+---Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
+---@param entity_type ENT_TYPE
+---@param over_uid integer
+---@param x number
+---@param y number
+---@return integer
+function spawn_entity_over(entity_type, over_uid, x, y) end
+---Short for [spawn_entity_over](#spawn_entity_over)
+---@param entity_type ENT_TYPE
+---@param over_uid integer
+---@param x number
+---@param y number
+---@return integer
+function spawn_over(entity_type, over_uid, x, y) end
+---Check if the entity `uid` has some specific `item_uid` by uid in their inventory
+---@param uid integer
+---@param item_uid integer
+---@return boolean
+function entity_has_item_uid(uid, item_uid) end
+---Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
+---@param uid integer
+---@param entity_types ENT_TYPE[]
+---@return boolean
+function entity_has_item_type(uid, entity_types) end
+---Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
+---@param uid integer
+---@param entity_type ENT_TYPE
+---@return boolean
+function entity_has_item_type(uid, entity_type) end
+---Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
+---@param uid integer
+---@param entity_types ENT_TYPE[]
+---@param mask integer
+---@return integer[]
+function entity_get_items_by(uid, entity_types, mask) end
+---Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
+---@param uid integer
+---@param entity_type ENT_TYPE
+---@param mask integer
+---@return integer[]
+function entity_get_items_by(uid, entity_type, mask) end
+---Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
+---@param uid integer
+---@param destroy_corpse boolean?
+---@return nil
+function kill_entity(uid, destroy_corpse) end
+---Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
+---```lua
+----- spawn and equip a jetpack
+---pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
+---```
+---@param who_uid integer
+---@param what_uid integer
+---@return nil
+function pick_up(who_uid, what_uid) end
+---Drop an entity by uid
+---@param who_uid integer
+---@param what_uid integer
+---@return nil
+function drop(who_uid, what_uid) end
+---Unequips the currently worn backitem
+---@param who_uid integer
+---@return nil
+function unequip_backitem(who_uid) end
+---Returns the uid of the currently worn backitem, or -1 if wearing nothing
+---@param who_uid integer
+---@return integer
+function worn_backitem(who_uid) end
+---Apply changes made in [get_type](#get_type)() to entity instance by uid.
+---@param uid integer
+---@return nil
+function apply_entity_db(uid) end
+---Try to lock the exit at coordinates
+---@param x number
+---@param y number
+---@return nil
+function lock_door_at(x, y) end
+---Try to unlock the exit at coordinates
+---@param x number
+---@param y number
+---@return nil
+function unlock_door_at(x, y) end
+---Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
+---@return integer
+function get_frame() end
+---Get the current timestamp in milliseconds since the Unix Epoch.
+---@return nil
+function get_ms() end
+---Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
+---@param mount_uid integer
+---@param rider_uid integer
+---@return nil
+function carry(mount_uid, rider_uid) end
+---Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
+---@param threshold integer
+---@return nil
+function set_kapala_blood_threshold(threshold) end
+---Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour).
+---If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
+---@param icon_index integer
+---@return nil
+function set_kapala_hud_icon(icon_index) end
+---Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center
+---Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
+---Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
+---@param angle_increment number
+---@param distance number
+---@return nil
+function modify_sparktraps(angle_increment, distance) end
+---Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
+---Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
+---@param default_multiplier integer
+---@param vladscape_multiplier integer
+---@return nil
+function set_blood_multiplication(default_multiplier, vladscape_multiplier) end
+---Flip entity around by uid. All new entities face right by default.
+---@param uid integer
+---@return nil
+function flip_entity(uid) end
+---Sets the Y-level at which Olmec changes phases
+---@param phase integer
+---@param y number
+---@return nil
+function set_olmec_phase_y_level(phase, y) end
+---Forces Olmec to stay on phase 0 (stomping)
+---@param b boolean
+---@return nil
+function force_olmec_phase_0(b) end
+---Determines when the ghost appears, either when the player is cursed or not
+---@param normal integer
+---@param cursed integer
+---@return nil
+function set_ghost_spawn_times(normal, cursed) end
+---Determines whether the time ghost appears, including the showing of the ghost toast
+---@param b boolean
+---@return nil
+function set_time_ghost_enabled(b) end
+---Determines whether the time jelly appears in cosmic ocean
+---@param b boolean
+---@return nil
+function set_time_jelly_enabled(b) end
+---Enables or disables the journal
+---@param b boolean
+---@return nil
+function set_journal_enabled(b) end
+---Enables or disables the default position based camp camera bounds, to set them manually yourself
+---@param b boolean
+---@return nil
+function set_camp_camera_bounds_enabled(b) end
+---Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR
+---@param mask integer
+---@return nil
+function set_explosion_mask(mask) end
+---Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
+---@param length integer
+---@return nil
+function set_max_rope_length(length) end
+---Checks whether a coordinate is inside a room containing an active shop. This function checks whether the shopkeeper is still alive.
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return boolean
+function is_inside_active_shop_room(x, y, layer) end
+---Checks whether a coordinate is inside a shop zone, the rectangle where the camera zooms in a bit. Does not check if the shop is still active!
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return boolean
+function is_inside_shop_zone(x, y, layer) end
+---Returns how many of a specific entity type Waddler has stored
+---@param entity_type ENT_TYPE
+---@return integer
+function waddler_count_entity(entity_type) end
+---Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
+---@param entity_type ENT_TYPE
+---@return integer
+function waddler_store_entity(entity_type) end
+---Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
+---@param entity_type ENT_TYPE
+---@param amount_to_remove integer
+---@return nil
+function waddler_remove_entity(entity_type, amount_to_remove) end
+---Gets the 16-bit meta-value associated with the entity type in the associated slot
+---@param slot integer
+---@return integer
+function waddler_get_entity_meta(slot) end
+---Sets the 16-bit meta-value associated with the entity type in the associated slot
+---@param slot integer
+---@param meta integer
+---@return nil
+function waddler_set_entity_meta(slot, meta) end
+---Gets the entity type of the item in the provided slot
+---@param slot integer
+---@return integer
+function waddler_entity_type_in_slot(slot) end
+---Spawn a companion (hired hand, player character, eggplant child)
+---@param companion_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_companion(companion_type, x, y, layer) end
+---Calculate the tile distance of two entities by uid
+---@param uid_a integer
+---@param uid_b integer
+---@return number
+function distance(uid_a, uid_b) end
+---Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
+---inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
+---```lua
+----- Draw the level boundaries
+---set_callback(function(draw_ctx)
+---    xmin, ymin, xmax, ymax = get_bounds()
+---    sx, sy = screen_position(xmin, ymin) -- top left
+---    sx2, sy2 = screen_position(xmax, ymax) -- bottom right
+---    draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
+---end, ON.GUIFRAME)
+---```
+---@return number, number, number, number
+function get_bounds() end
+---Gets the current camera position in the level
+---@return number, number
+function get_camera_position() end
+---Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+---@param flags Flags
+---@param bit integer
+---@return Flags
+function set_flag(flags, bit) end
+---@return nil
+function setflag() end
+---Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+---@param flags Flags
+---@param bit integer
+---@return Flags
+function clr_flag(flags, bit) end
+---@return nil
+function clrflag() end
+---Returns true if a bit is set in the flags
+---@param flags Flags
+---@param bit integer
+---@return boolean
+function test_flag(flags, bit) end
+---@return nil
+function testflag() end
+---Gets the resolution (width and height) of the screen
+---@return integer, integer
+function get_window_size() end
+---Steal input from a Player or HH.
+---@param uid integer
+---@return nil
+function steal_input(uid) end
+---Return input
+---@param uid integer
+---@return nil
+function return_input(uid) end
+---Send input
+---@param uid integer
+---@param buttons INPUTS
+---@return nil
+function send_input(uid, buttons) end
+---Read input
+---@param uid integer
+---@return INPUTS
+function read_input(uid) end
+---Read input that has been previously stolen with steal_input
+---@param uid integer
+---@return INPUTS
+function read_stolen_input(uid) end
+---Clears a callback that is specific to a screen.
+---@param screen_id integer
+---@param cb_id CallbackId
+---@return nil
+function clear_screen_callback(screen_id, cb_id) end
+---Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+---Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
+---@param screen_id integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_render_screen(screen_id, fun) end
+---Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
+---Sets a callback that is called right after the screen is drawn.
+---@param screen_id integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_render_screen(screen_id, fun) end
+---Clears a callback that is specific to an entity.
+---@param uid integer
+---@param cb_id CallbackId
+---@return nil
+function clear_entity_callback(uid, cb_id) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---`uid` has to be the uid of a `Movable` or else stuff will break.
+---Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_statemachine(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---`uid` has to be the uid of a `Movable` or else stuff will break.
+---Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_statemachine(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
+---The callback signature is `nil on_destroy(Entity self)`
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_on_destroy(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
+---The callback signature is `nil on_kill(Entity self, Entity killer)`
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_on_kill(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
+---The callback signature is `bool on_player_instagib(Entity self)`
+---The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
+---This is so that when the entity dies (from other causes), the death screen still gets shown.
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_on_player_instagib(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
+---The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
+---Note that damage_dealer can be nil ! (long fall, ...)
+---DO NOT CALL `self:damage()` in the callback !
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_on_damage(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+---The callback signature is `nil on_open(Entity entity_self, Entity opener)`
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_on_open(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_collision1(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_collision2(uid, fun) end
+---Raise a signal and probably crash the game
+---@return nil
+function raise() end
+---Convert the hash to stringid
+---Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+---@param hash integer
+---@return STRINGID
+function hash_to_stringid(hash) end
+---Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+---Will return the string of currently choosen language
+---@param string_id STRINGID
+---@return string
+function get_string(string_id) end
+---Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+---This edits custom string and in game strings but changing the language in settings will reset game strings
+---@param id STRINGID
+---@param str string
+---@return nil
+function change_string(id, str) end
+---Add custom string, currently can only be used for names of shop items (Entitydb->description)
+---Returns STRINGID of the new string
+---@param str string
+---@return STRINGID
+function add_string(str) end
+---Adds custom name to the item by uid used in the shops
+---This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
+---@param uid integer
+---@param name string
+---@return nil
+function add_custom_name(uid, name) end
+---Clears the name set with `add_custom_name`
+---@param uid integer
+---@return nil
+function clear_custom_name(uid) end
+---Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
+---Doesn't really work for layer doors
+---@param player_uid integer
+---@param door_uid integer
+---@return nil
+function enter_door(player_uid, door_uid) end
+---Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
+---{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
+---Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance")
+---Use empty table as argument to reset to the game default
+---@param ent_types ENT_TYPE[]
+---@return nil
+function change_sunchallenge_spawns(ent_types) end
+---Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
+---{ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
+---ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
+---ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
+---Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
+---If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser)
+---Use empty table as argument to reset to the game default
+---@param ent_types ENT_TYPE[]
+---@return nil
+function change_diceshop_prizes(ent_types) end
+---Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
+---{MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
+---Max 255 types
+---Use empty table as argument to reset to the game default
+---@param ent_types ENT_TYPE[]
+---@return nil
+function change_altar_damage_spawns(ent_types) end
+---Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
+---{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
+---Max 255 types
+---Use empty table as argument to reset to the game default
+---@param ent_types ENT_TYPE[]
+---@return nil
+function change_waddler_drop(ent_types) end
+---Poisons entity, to cure poison set `poison_tick_timer` to -1
+---@param entity_uid integer
+---@return nil
+function poison_entity(entity_uid) end
+---Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
+---`beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
+---If you set `health` above the game max health it will be forced down to the game max
+---@param max_health integer
+---@param beat_add_health integer
+---@return nil
+function modify_ankh_health_gain(max_health, beat_add_health) end
+---Adds entity as shop item, has to be movable (haven't tested many)
+---@param item_uid integer
+---@param shop_owner integer
+---@return nil
+function add_item_to_shop(item_uid, shop_owner) end
+---Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+---@param color Color
+---@param size number
+---@param x number
+---@param y number
+---@return Illumination
+function create_illumination(color, size, x, y) end
+---Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+---@param color Color
+---@param size number
+---@param uid integer
+---@return Illumination
+function create_illumination(color, size, uid) end
+---Refreshes an Illumination, keeps it from fading out
+---@param illumination Illumination
+---@return nil
+function refresh_illumination(illumination) end
+---@return boolean
+function toast_visible() end
+---@return boolean
+function speechbubble_visible() end
+---@return nil
+function cancel_toast() end
+---@return nil
+function cancel_speechbubble() end
+---Seed the game prng.
+---@param seed integer
+---@return nil
+function seed_prng(seed) end
+---Same as `Player.get_name`
+---@param type_id ENT_TYPE
+---@return string
+function get_character_name(type_id) end
+---Same as `Player.get_short_name`
+---@param type_id ENT_TYPE
+---@return string
+function get_character_short_name(type_id) end
+---Same as `Player.get_heart_color`
+---@param type_id ENT_TYPE
+---@return Color
+function get_character_heart_color(type_id) end
+---Same as `Player.is_female`
+---@param type_id ENT_TYPE
+---@return boolean
+function is_character_female(type_id) end
+---Same as `Player.set_heart_color`
+---@param type_id ENT_TYPE
+---@param color Color
+---@return nil
+function set_character_heart_color(type_id, color) end
+---Get the [ParticleDB](#particledb) details of the specified ID
+---@param id integer
+---@return ParticleDB
+function get_particle_type(id) end
+---Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
+---@param particle_emitter_id integer
+---@param uid integer
+---@return ParticleEmitterInfo
+function generate_world_particles(particle_emitter_id, uid) end
+---Generate particles of the specified type at a certain screen coordinate (use e.g. `local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)`). See the `particles.lua` example script for more details.
+---@param particle_emitter_id integer
+---@param x number
+---@param y number
+---@return ParticleEmitterInfo
+function generate_screen_particles(particle_emitter_id, x, y) end
+---Advances the state of the screen particle emitter (simulates the next positions, ... of all the particles in the emitter). Only used with screen particle emitters. See the `particles.lua` example script for more details.
+---@param particle_emitter ParticleEmitterInfo
+---@return nil
+function advance_screen_particles(particle_emitter) end
+---Renders the particles to the screen. Only used with screen particle emitters. See the `particles.lua` example script for more details.
+---@param particle_emitter ParticleEmitterInfo
+---@return nil
+function render_screen_particles(particle_emitter) end
+---Extinguish a particle emitter (use the return value of `generate_world_particles` or `generate_screen_particles` as the parameter in this function)
+---@param particle_emitter ParticleEmitterInfo
+---@return nil
+function extinguish_particles(particle_emitter) end
+---Default function in spawn definitions to check whether a spawn is valid or not
+---@param x number
+---@param y number
+---@param layer integer
+---@return boolean
+function default_spawn_is_valid(x, y, layer) end
+---Add a callback for a specific tile code that is called before the game handles the tile code.
+---The callback signature is `bool pre_tile_code(x, y, layer, room_template)`
+---Return true in order to stop the game or scripts loaded after this script from handling this tile code.
+---For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
+---@param cb fun(): any
+---@param tile_code string
+---@return CallbackId
+function set_pre_tile_code_callback(cb, tile_code) end
+---Add a callback for a specific tile code that is called after the game handles the tile code.
+---The callback signature is `nil post_tile_code(x, y, layer, room_template)`
+---Use this to affect what the game or other scripts spawned in this position.
+---This is received even if a previous pre-tile-code-callback has returned true
+---@param cb fun(): any
+---@param tile_code string
+---@return CallbackId
+function set_post_tile_code_callback(cb, tile_code) end
+---Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
+---If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
+---@param tile_code string
+---@return TILE_CODE
+function define_tile_code(tile_code) end
+---Gets a short tile code based on definition, returns `nil` if it can't be found
+---@param short_tile_code_def ShortTileCodeDef
+---@return integer?
+function get_short_tile_code(short_tile_code_def) end
+---Gets the definition of a short tile code (if available), will vary depending on which file is loaded
+---@param short_tile_code SHORT_TILE_CODE
+---@return ShortTileCodeDef?
+function get_short_tile_code_definition(short_tile_code) end
+---Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+---The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+---Use for example when you can spawn only on the ceiling, under water or inside a shop.
+---Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+---If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
+---@param procedural_spawn string
+---@param do_spawn fun(): any
+---@param is_valid fun(): any
+---@return PROCEDURAL_CHANCE
+function define_procedural_spawn(procedural_spawn, do_spawn, is_valid) end
+---Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.
+---The function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
+---The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+---Use for example when you can spawn only on the ceiling, under water or inside a shop.
+---Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
+---To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
+---No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
+---@param do_spawn fun(): any
+---@param is_valid fun(): any
+---@param num_spawns_frontlayer integer
+---@param num_spawns_backlayer integer
+---@return integer
+function define_extra_spawn(do_spawn, is_valid, num_spawns_frontlayer, num_spawns_backlayer) end
+---Use to query whether any of the requested spawns could not be made, usually because there were not enough valid spaces in the level.
+---Returns missing spawns in the front layer and missing spawns in the back layer in that order.
+---The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.
+---@param extra_spawn_chance_id integer
+---@return integer, integer
+function get_missing_extra_spawns(extra_spawn_chance_id) end
+---Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
+---@param x number
+---@param y number
+---@return integer, integer
+function get_room_index(x, y) end
+---Transform a room index into the top left corner position in the room
+---@param x integer
+---@param y integer
+---@return number, number
+function get_room_pos(x, y) end
+---Get the room template given a certain index, returns `nil` if coordinates are out of bounds
+---@param x integer
+---@param y integer
+---@param layer LAYER
+---@return integer?
+function get_room_template(x, y, layer) end
+---Get whether a room is flipped at the given index, returns `false` if coordinates are out of bounds
+---@param x integer
+---@param y integer
+---@return boolean
+function is_room_flipped(x, y) end
+---For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
+---@param room_template integer
+---@return string
+function get_room_template_name(room_template) end
+---Define a new room remplate to use with `set_room_template`
+---@param room_template string
+---@param type ROOM_TEMPLATE_TYPE
+---@return integer
+function define_room_template(room_template, type) end
+---Set the size of room template in tiles, the template must be of type `ROOM_TEMPLATE_TYPE.MACHINE_ROOM`.
+---@param room_template integer
+---@param width integer
+---@param height integer
+---@return boolean
+function set_room_template_size(room_template, width, height) end
+---Get the inverse chance of a procedural spawn for the current level.
+---A return value of 0 does not mean the chance is infinite, it means the chance is zero.
+---@param chance_id PROCEDURAL_CHANCE
+---@return integer
+function get_procedural_spawn_chance(chance_id) end
+---Gets the sub theme of the current cosmic ocean level, returns `COSUBTHEME.NONE` if the current level is not a CO level.
+---@return integer
+function get_co_subtheme() end
+---Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use `COSUBTHEME.RESET` to reset to default random behaviour)
+---@param subtheme integer
+---@return nil
+function force_co_subtheme(subtheme) end
+---Gets the value for the specified config
+---@param config LEVEL_CONFIG
+---@return integer
+function get_level_config(config) end
+---Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
+---Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
+---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
+---@return nil
+function force_custom_theme() end
+---Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.
+---@return nil
+function force_custom_subtheme() end
+---Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
+---@param path string
+---@return CustomSound?
+function create_sound(path) end
+---Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
+---@param path_or_vanilla_sound string
+---@return CustomSound?
+function get_sound(path_or_vanilla_sound) end
+---Returns unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
+---Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
+---Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
+---If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
+---properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`
+---@param name VANILLA_SOUND
+---@param types VANILLA_SOUND_CALLBACK_TYPE
+---@param cb fun(): any
+---@return CallbackId
+function set_vanilla_sound_callback(name, types, cb) end
+---Clears a previously set callback
+---@param id CallbackId
+---@return nil
+function clear_vanilla_sound_callback(id) end
+---Converts a color to int to be used in drawing functions. Use values from `0..255`.
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return uColor
+function rgba(r, g, b, a) end
+---Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
+---Example:
+---```lua
+---function on_guiframe(draw_ctx)
+---    -- get a random color
+---    color = math.random(0, 0xffffffff)
+---    -- zoom the font size based on frame
+---    size = (get_frame() % 199)+1
+---    text = 'Awesome!'
+---    -- calculate size of text
+---    w, h = draw_text_size(size, text)
+---    -- draw to the center of screen
+---    draw_ctx:draw_text(0-w/2, 0-h/2, size, text, color)
+---end
+---```
+---@param size number
+---@param text string
+---@return number, number
+function draw_text_size(size, text) end
+---Create image from file. Returns a tuple containing id, width and height.
+---@param path string
+---@return IMAGE, integer, integer
+function create_image(path) end
+---Current mouse cursor position in screen coordinates.
+---@return number, number
+function mouse_position() end
+---Returns: [ImGuiIO](#imguiio) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+---- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
+---- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+---- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
+---- Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+---@return ImGuiIO
+function get_io() end
+---@param texture_id TEXTURE?
+---@param layer LAYER
+---@return nil
+function set_lut(texture_id, layer) end
+---@param layer LAYER
+---@return nil
+function reset_lut(layer) end
+---Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
+---Use `-1` as dropchance_id to reset all to default
+---@param dropchance_id integer
+---@param new_drop_chance integer
+---@return nil
+function set_drop_chance(dropchance_id, new_drop_chance) end
+---Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
+---Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
+---@param drop_id integer
+---@param new_drop_entity_type ENT_TYPE
+---@return nil
+function replace_drop(drop_id, new_drop_entity_type) end
+---Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
+---@param texture_id TEXTURE
+---@return TextureDefinition
+function get_texture_definition(texture_id) end
+---Defines a new texture that can be used in Entity::set_texture
+---If a texture with the same definition already exists the texture will be reloaded from disk.
+---@param texture_data TextureDefinition
+---@return TEXTURE
+function define_texture(texture_data) end
+---Gets a texture with the same definition as the given, if none exists returns `nil`
+---@param texture_data TextureDefinition
+---@return TEXTURE?
+function get_texture(texture_data) end
+---Reloads a texture from disk, use this only as a development tool for example in the console
+---Note that `define_texture` will also reload the texture if it already exists
+---@param texture_path string
+---@return nil
+function reload_texture(texture_path) end
+---Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
+---@param uid integer
+---@param extrude number?
+---@param offsetx number?
+---@param offsety number?
+---@return AABB
+function get_hitbox(uid, extrude, offsetx, offsety) end
+---Same as `get_hitbox` but based on `get_render_position`
+---@param uid integer
+---@param extrude number?
+---@param offsetx number?
+---@param offsety number?
+---@return AABB
+function get_render_hitbox(uid, extrude, offsetx, offsety) end
+---Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
+---@param box AABB
+---@return AABB
+function screen_aabb(box) end
+---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
+---@param host string
+---@param port in_port_t
+---@param cb fun(): any
+---@return UdpServer
+function udp_listen(host, port, cb) end
+---Send data to specified UDP address. Requires unsafe mode.
+---@param host string
+---@param port in_port_t
+---@param msg string
+---@return nil
+function udp_send(host, port, msg) end
+
+--## Types
+
+---@class SaveContext
+    ---@field save fun(self, data: string): boolean
+
+---@class LoadContext
+    ---@field load fun(self, ): string
+
+---@class ArenaConfigArenas
+    ---@field dwelling_1 boolean
+    ---@field dwelling_2 boolean
+    ---@field dwelling_3 boolean
+    ---@field dwelling_4 boolean
+    ---@field dwelling_5 boolean
+    ---@field jungle_1 boolean
+    ---@field jungle_2 boolean
+    ---@field jungle_3 boolean
+    ---@field jungle_4 boolean
+    ---@field jungle_5 boolean
+    ---@field volcana_1 boolean
+    ---@field volcana_2 boolean
+    ---@field volcana_3 boolean
+    ---@field volcana_4 boolean
+    ---@field volcana_5 boolean
+    ---@field tidepool_1 boolean
+    ---@field tidepool_2 boolean
+    ---@field tidepool_3 boolean
+    ---@field tidepool_4 boolean
+    ---@field tidepool_5 boolean
+    ---@field temple_1 boolean
+    ---@field temple_2 boolean
+    ---@field temple_3 boolean
+    ---@field temple_4 boolean
+    ---@field temple_5 boolean
+    ---@field icecaves_1 boolean
+    ---@field icecaves_2 boolean
+    ---@field icecaves_3 boolean
+    ---@field icecaves_4 boolean
+    ---@field icecaves_5 boolean
+    ---@field neobabylon_1 boolean
+    ---@field neobabylon_2 boolean
+    ---@field neobabylon_3 boolean
+    ---@field neobabylon_4 boolean
+    ---@field neobabylon_5 boolean
+    ---@field sunkencity_1 boolean
+    ---@field sunkencity_2 boolean
+    ---@field sunkencity_3 boolean
+    ---@field sunkencity_4 boolean
+    ---@field sunkencity_5 boolean
+
+---@class ArenaConfigItems
+    ---@field rock boolean
+    ---@field pot boolean
+    ---@field bombbag boolean
+    ---@field bombbox boolean
+    ---@field ropepile boolean
+    ---@field pickup_12bag boolean
+    ---@field pickup_24bag boolean
+    ---@field cooked_turkey boolean
+    ---@field royal_jelly boolean
+    ---@field torch boolean
+    ---@field boomerang boolean
+    ---@field machete boolean
+    ---@field mattock boolean
+    ---@field crossbow boolean
+    ---@field webgun boolean
+    ---@field freezeray boolean
+    ---@field shotgun boolean
+    ---@field camera boolean
+    ---@field plasma_cannon boolean
+    ---@field wooden_shield boolean
+    ---@field metal_shield boolean
+    ---@field teleporter boolean
+    ---@field mine boolean
+    ---@field snaptrap boolean
+    ---@field paste boolean
+    ---@field climbing_gloves boolean
+    ---@field pitchers_mitt boolean
+    ---@field spike_shoes boolean
+    ---@field spring_shoes boolean
+    ---@field parachute boolean
+    ---@field cape boolean
+    ---@field vlads_cape boolean
+    ---@field jetpack boolean
+    ---@field hoverpack boolean
+    ---@field telepack boolean
+    ---@field powerpack boolean
+    ---@field excalibur boolean
+    ---@field scepter boolean
+    ---@field kapala boolean
+    ---@field true_crown boolean
+
+---@class ArenaConfigEquippedItems
+    ---@field paste boolean
+    ---@field climbing_gloves boolean
+    ---@field pitchers_mitt boolean
+    ---@field spike_shoes boolean
+    ---@field spring_shoes boolean
+    ---@field parachute boolean
+    ---@field kapala boolean
+    ---@field scepter boolean
+
+---@class ArenaState
+    ---@field current_arena integer
+    ---@field player_teams integer[]
+    ---@field format integer
+    ---@field ruleset integer
+    ---@field player_lives integer[]
+    ---@field player_totalwins integer[]
+    ---@field player_won boolean[]
+    ---@field timer integer
+    ---@field timer_ending integer
+    ---@field wins integer
+    ---@field lives integer
+    ---@field player_idolheld_countdown integer[]
+    ---@field health integer
+    ---@field bombs integer
+    ---@field ropes integer
+    ---@field stun_time integer
+    ---@field mount integer
+    ---@field arena_select integer
+    ---@field arenas ArenaConfigArenas
+    ---@field dark_level_chance integer
+    ---@field crate_frequency integer
+    ---@field items_enabled ArenaConfigItems
+    ---@field items_in_crate ArenaConfigItems
+    ---@field held_item integer
+    ---@field equipped_backitem integer
+    ---@field equipped_items ArenaConfigEquippedItems
+    ---@field whip_damage integer
+    ---@field final_ghost boolean
+    ---@field breath_cooldown integer
+    ---@field punish_ball boolean
+
+---@class SelectPlayerSlot
+    ---@field activated boolean
+    ---@field character ENT_TYPE
+    ---@field texture integer
+
+---@class Items
+    ---@field player_count integer
+    ---@field saved_pets_count integer
+    ---@field saved_pets ENT_TYPE[]
+    ---@field is_pet_cursed boolean[]
+    ---@field is_pet_poisoned boolean[]
+    ---@field player_inventory Inventory[]
+    ---@field player_select SelectPlayerSlot[]
+
+---@class LiquidPhysicsEngine
+    ---@field pause boolean
+    ---@field gravity number
+    ---@field cohesion number
+    ---@field elasticity number
+    ---@field size number
+    ---@field weight number
+    ---@field count integer
+
+---@class LiquidPhysicsParams
+    ---@field gravity number
+    ---@field cohesion number
+    ---@field elasticity number
+
+---@class LiquidPool
+    ---@field default LiquidPhysicsParams
+    ---@field engine LiquidPhysicsEngine
+
+---@class LiquidPhysics
+    ---@field pools LiquidPool[] @size: 5
+
+---@class StateMemory
+    ---@field screen_last integer
+    ---@field screen integer
+    ---@field screen_next integer
+    ---@field ingame integer
+    ---@field playing integer
+    ---@field pause integer
+    ---@field width integer
+    ---@field height integer
+    ---@field kali_favor integer
+    ---@field kali_status integer
+    ---@field kali_altars_destroyed integer
+    ---@field kali_gifts integer
+    ---@field seed integer
+    ---@field time_total integer
+    ---@field world integer
+    ---@field world_next integer
+    ---@field world_start integer
+    ---@field level integer
+    ---@field level_next integer
+    ---@field level_start integer
+    ---@field theme integer
+    ---@field theme_next integer
+    ---@field theme_start integer
+    ---@field force_current_theme fun(self, t: integer): nil
+    ---@field shoppie_aggro integer
+    ---@field shoppie_aggro_next integer
+    ---@field merchant_aggro integer
+    ---@field kills_npc integer
+    ---@field level_count integer
+    ---@field damage_taken integer
+    ---@field journal_flags integer
+    ---@field time_last_level integer
+    ---@field time_level integer
+    ---@field level_flags integer
+    ---@field loading integer
+    ---@field quest_flags integer
+    ---@field presence_flags integer
+    ---@field fadevalue number
+    ---@field fadeout integer
+    ---@field fadein integer
+    ---@field loading_black_screen_timer integer
+    ---@field saved_dogs integer
+    ---@field saved_cats integer
+    ---@field saved_hamsters integer
+    ---@field win_state integer
+    ---@field illumination Illumination
+    ---@field money_last_levels integer
+    ---@field money_shop_total integer
+    ---@field player_inputs PlayerInputs
+    ---@field quests QuestsInfo
+    ---@field camera Camera
+    ---@field special_visibility_flags integer
+    ---@field cause_of_death integer
+    ---@field cause_of_death_entity_type ENT_TYPE
+    ---@field toast_timer integer
+    ---@field speechbubble_timer integer
+    ---@field speechbubble_owner integer
+    ---@field level_gen LevelGenSystem
+    ---@field correct_ushabti integer
+    ---@field items Items
+    ---@field camera_layer integer
+    ---@field screen_team_select ScreenTeamSelect
+    ---@field screen_character_select ScreenCharacterSelect
+    ---@field screen_transition ScreenTransition
+    ---@field screen_death ScreenDeath
+    ---@field screen_win ScreenWin
+    ---@field screen_credits ScreenCredits
+    ---@field screen_scores ScreenScores
+    ---@field screen_constellation ScreenConstellation
+    ---@field screen_recap ScreenRecap
+    ---@field screen_arena_stages_select ScreenArenaStagesSelect
+    ---@field screen_arena_intro ScreenArenaIntro
+    ---@field screen_arena_level ScreenArenaLevel
+    ---@field screen_arena_score ScreenArenaScore
+    ---@field screen_arena_menu ScreenArenaMenu
+    ---@field screen_arena_items ScreenArenaItems
+    ---@field get_correct_ushabti fun(self, ): integer
+    ---@field set_correct_ushabti fun(self, animation_frame: integer): nil
+    ---@field arena ArenaState
+    ---@field speedrun_character ENT_TYPE
+    ---@field speedrun_activation_trigger integer
+    ---@field end_spaceship_character ENT_TYPE
+    ---@field world2_coffin_spawned boolean
+    ---@field world4_coffin_spawned boolean
+    ---@field world6_coffin_spawned boolean
+    ---@field first_damage_cause ENT_TYPE
+    ---@field first_damage_world integer
+    ---@field first_damage_level integer
+    ---@field time_speedrun integer
+    ---@field coffin_contents ENT_TYPE
+    ---@field screen_change_counter integer
+    ---@field time_startup integer
+    ---@field logic LogicList
+    ---@field liquid LiquidPhysics
+
+---@class GameManager
+    ---@field game_props GameProps
+    ---@field screen_logo ScreenLogo
+    ---@field screen_intro ScreenIntro
+    ---@field screen_prologue ScreenPrologue
+    ---@field screen_title ScreenTitle
+    ---@field screen_menu ScreenMenu
+    ---@field screen_options ScreenOptions
+    ---@field screen_player_profile ScreenPlayerProfile
+    ---@field screen_leaderboards ScreenLeaderboards
+    ---@field screen_seed_input ScreenSeedInput
+    ---@field screen_camp ScreenCamp
+    ---@field screen_level ScreenLevel
+    ---@field screen_online_loading ScreenOnlineLoading
+    ---@field screen_online_lobby ScreenOnlineLobby
+    ---@field pause_ui PauseUI
+    ---@field journal_ui JournalUI
+    ---@field save_related SaveRelated
+
+---@class SaveRelated
+    ---@field journal_popup_ui JournalPopupUI
+
+---@class JournalPopupUI
+    ---@field wiggling_page_icon TextureRenderingInfo
+    ---@field black_background TextureRenderingInfo
+    ---@field button_icon TextureRenderingInfo
+    ---@field wiggling_page_angle number
+    ---@field chapter_to_show integer
+    ---@field entry_to_show integer
+    ---@field timer integer
+    ---@field slide_position number
+
+---@class GameProps
+    ---@field buttons integer
+    ---@field game_has_focus boolean
+
+---@class LightParams
+    ---@field red number
+    ---@field green number
+    ---@field blue number
+    ---@field size number
+
+---@class Illumination
+    ---@field lights LightParams[]
+    ---@field light1 LightParams
+    ---@field light2 LightParams
+    ---@field light3 LightParams
+    ---@field light4 LightParams
+    ---@field brightness number
+    ---@field brightness_multiplier number
+    ---@field light_pos_x number
+    ---@field light_pos_y number
+    ---@field offset_x number
+    ---@field offset_y number
+    ---@field distortion number
+    ---@field entity_uid integer
+    ---@field flags integer
+    ---@field type_flags integer
+    ---@field enabled boolean
+    ---@field layer integer
+
+---@class Camera
+    ---@field bounds_left number
+    ---@field bounds_right number
+    ---@field bounds_bottom number
+    ---@field bounds_top number
+    ---@field adjusted_focus_x number
+    ---@field adjusted_focus_y number
+    ---@field focus_offset_x number
+    ---@field focus_offset_y number
+    ---@field focus_x number
+    ---@field focus_y number
+    ---@field vertical_pan number
+    ---@field shake_countdown_start integer
+    ---@field shake_countdown integer
+    ---@field shake_amplitude number
+    ---@field shake_multiplier_x number
+    ---@field shake_multiplier_y number
+    ---@field uniform_shake boolean
+    ---@field focused_entity_uid integer
+    ---@field inertia number
+
+---@class Online
+    ---@field online_players OnlinePlayer[]
+    ---@field local_player OnlinePlayerShort
+    ---@field lobby OnlineLobby
+
+---@class OnlinePlayer
+    ---@field ready_state integer
+    ---@field character integer
+    ---@field player_name string
+
+---@class OnlineLobby
+    ---@field code integer
+    ---@field get_code fun(self, ): string
+
+---@class LogicList
+    ---@field olmec_cutscene LogicOlmecCutscene
+    ---@field tiamat_cutscene LogicTiamatCutscene
+    ---@field diceshop LogicDiceShop
+
+---@class LogicOlmecCutscene : Logic
+    ---@field olmec Entity
+    ---@field player Entity
+    ---@field cinematic_anchor Entity
+    ---@field timer integer
+
+---@class LogicTiamatCutscene : Logic
+    ---@field tiamat Entity
+    ---@field player Entity
+    ---@field cinematic_anchor Entity
+    ---@field timer integer
+
+---@class LogicDiceShop : Logic
+    ---@field bet_machine integer
+    ---@field die1 integer
+    ---@field die2 integer
+    ---@field die_1_value integer
+    ---@field die_2_value integer
+    ---@field prize_dispenser integer
+    ---@field prize integer
+    ---@field forcefield integer
+    ---@field bet_active boolean
+    ---@field forcefield_deactivated boolean
+    ---@field boss_angry boolean
+    ---@field result_announcement_timer integer
+    ---@field won_prizes_count integer
+    ---@field balance integer
+
+---@class PRNG
+    ---@field seed fun(self, seed: integer): nil
+    ---@field random_float fun(self, type: PRNG_CLASS): number
+    ---@field random_chance fun(self, inverse_chance: integer, type: PRNG_CLASS): boolean
+    ---@field random_index fun(self, i: integer, type: PRNG_CLASS): integer?
+    ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer?
+    ---@field random PRNG_random
+    ---@field get_pair any @&PRNG::get_pair
+    ---@field set_pair any @&PRNG::set_pair
+
+---@class PRNG_random
+---@param min integer
+---@param max integer
+---@overload fun(self): number
+---@overload fun(self, i: integer): integer?
+local function PRNG_random(self, min, max) end
+
+---@class Color
+    ---@field r number
+    ---@field g number
+    ---@field b number
+    ---@field a number
+    ---@field get_rgba fun(self, ): integer, integer, integer, integer
+    ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): nil
+    ---@field get_ucolor fun(self, ): uColor
+    ---@field set_ucolor fun(self, color: uColor): nil
+
+---@class Animation
+    ---@field first_tile integer
+    ---@field num_tiles integer
+    ---@field interval integer
+    ---@field repeat_mode REPEAT_TYPE
+
+---@class EntityDB
+    ---@field id ENT_TYPE
+    ---@field search_flags integer
+    ---@field width number
+    ---@field height number
+    ---@field offsetx number
+    ---@field offsety number
+    ---@field hitboxx number
+    ---@field hitboxy number
+    ---@field draw_depth integer
+    ---@field friction number
+    ---@field elasticity number
+    ---@field weight number
+    ---@field acceleration number
+    ---@field max_speed number
+    ---@field sprint_factor number
+    ---@field jump number
+    ---@field glow_red number
+    ---@field glow_green number
+    ---@field glow_blue number
+    ---@field glow_alpha number
+    ---@field damage integer
+    ---@field life integer
+    ---@field blood_content integer
+    ---@field texture integer
+    ---@field animations table<integer, Animation>
+    ---@field properties_flags integer
+    ---@field default_flags integer
+    ---@field default_more_flags integer
+    ---@field leaves_corpse_behind boolean
+    ---@field sound_killed_by_player integer
+    ---@field sound_killed_by_other integer
+    ---@field description STRINGID
+    ---@field tilex integer
+    ---@field tiley integer
+
+---@class Entity
+    ---@field type EntityDB
+    ---@field overlay Entity
+    ---@field flags integer
+    ---@field more_flags integer
+    ---@field uid integer
+    ---@field animation_frame integer
+    ---@field draw_depth integer
+    ---@field x number
+    ---@field y number
+    ---@field layer integer
+    ---@field width number
+    ---@field height number
+    ---@field special_offsetx number
+    ---@field special_offsety number
+    ---@field tile_width number
+    ---@field tile_height number
+    ---@field angle number
+    ---@field color Color
+    ---@field hitboxx number
+    ---@field hitboxy number
+    ---@field offsetx number
+    ---@field offsety number
+    ---@field topmost fun(self, ): Entity
+    ---@field topmost_mount fun(self, ): Entity
+    ---@field overlaps_with Entity_overlaps_with
+    ---@field get_texture fun(self, ): TEXTURE
+    ---@field set_texture fun(self, texture_id: TEXTURE): boolean
+    ---@field set_draw_depth fun(self, draw_depth: integer): nil
+    ---@field liberate_from_shop any @&Entity::liberate_from_shop
+    ---@field get_held_entity fun(self, ): Entity
+    ---@field set_layer fun(self, layer: LAYER): nil
+    ---@field remove fun(self, ): nil
+    ---@field respawn fun(self, layer: LAYER): nil
+    ---@field destroy fun(self, ): nil
+    ---@field activate fun(self, activator: Entity): nil
+    ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil
+    ---@field trigger_action fun(self, user: Entity): boolean
+    ---@field get_metadata any @&Entity::get_metadata
+    ---@field apply_metadata fun(self, metadata: integer): nil
+
+---@class Entity_overlaps_with
+---@param other Entity
+---@overload fun(self, hitbox: AABB): boolean
+---@overload fun(self, rect_left: number, rect_bottom: number, rect_right: number, rect_top: number): boolean
+local function Entity_overlaps_with(self, other) end
+
+---@class Movable : Entity
+    ---@field movex number
+    ---@field movey number
+    ---@field buttons BUTTON
+    ---@field buttons_previous BUTTON
+    ---@field stand_counter integer
+    ---@field jump_height_multiplier number
+    ---@field owner_uid integer
+    ---@field last_owner_uid integer
+    ---@field idle_counter integer
+    ---@field standing_on_uid integer
+    ---@field velocityx number
+    ---@field velocityy number
+    ---@field holding_uid integer
+    ---@field state integer
+    ---@field last_state integer
+    ---@field move_state integer
+    ---@field health integer
+    ---@field stun_timer integer
+    ---@field stun_state integer
+    ---@field lock_input_timer integer
+    ---@field some_state integer
+    ---@field wet_effect_timer integer
+    ---@field poison_tick_timer integer
+    ---@field airtime integer
+    ---@field falling_timer integer
+    ---@field is_poisoned fun(self, ): boolean
+    ---@field poison fun(self, frames: integer): nil
+    ---@field dark_shadow_timer integer
+    ---@field onfire_effect_timer integer
+    ---@field exit_invincibility_timer integer
+    ---@field invincibility_frames_timer integer
+    ---@field frozen_timer integer
+    ---@field is_button_pressed fun(self, button: BUTTON): boolean
+    ---@field is_button_held fun(self, button: BUTTON): boolean
+    ---@field is_button_released fun(self, button: BUTTON): boolean
+    ---@field price integer
+    ---@field stun fun(self, framecount: integer): nil
+    ---@field freeze fun(self, framecount: integer): nil
+    ---@field light_on_fire fun(self, ): nil
+    ---@field set_cursed fun(self, b: boolean): nil
+    ---@field drop fun(self, entity_to_drop: Entity): nil
+    ---@field pick_up fun(self, entity_to_pick_up: Entity): nil
+    ---@field can_jump any @&Movable::can_jump
+    ---@field standing_on fun(self, ): Entity
+    ---@field add_money fun(self, money: integer): nil
+    ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
+
+---@class PowerupCapable : Movable
+    ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
+    ---@field give_powerup fun(self, powerup_type: ENT_TYPE): nil
+    ---@field has_powerup fun(self, powerup_type: ENT_TYPE): boolean
+    ---@field get_powerups fun(self, ): ENT_TYPE[]
+    ---@field unequip_backitem fun(self, ): nil
+    ---@field worn_backitem fun(self, ): integer
+
+---@class Inventory
+    ---@field money integer
+    ---@field bombs integer
+    ---@field ropes integer
+    ---@field player_slot integer
+    ---@field poison_tick_timer integer
+    ---@field cursed boolean
+    ---@field elixir_buff boolean
+    ---@field health integer
+    ---@field kapala_blood_amount integer
+    ---@field time_of_death integer
+    ---@field held_item ENT_TYPE
+    ---@field held_item_metadata integer
+    ---@field mount_type ENT_TYPE
+    ---@field mount_metadata integer
+    ---@field kills_level integer
+    ---@field kills_total integer
+    ---@field collected_money_total integer
+    ---@field collected_money ENT_TYPE[]
+    ---@field collected_money_values integer[]
+    ---@field killed_enemies ENT_TYPE[]
+    ---@field companion_count integer
+    ---@field companions ENT_TYPE[]
+    ---@field companion_held_items ENT_TYPE[]
+    ---@field companion_held_item_metadatas integer[]
+    ---@field companion_trust integer[]
+    ---@field companion_health integer[]
+    ---@field companion_poison_tick_timers integer[]
+    ---@field is_companion_cursed boolean[]
+
+---@class Ai
+    ---@field target Entity
+    ---@field target_uid integer
+    ---@field timer integer
+    ---@field state integer
+    ---@field trust integer
+    ---@field whipped integer
+
+---@class Player : PowerupCapable
+    ---@field inventory Inventory
+    ---@field emitted_light Illumination
+    ---@field linked_companion_parent integer
+    ---@field linked_companion_child integer
+    ---@field ai Ai
+    ---@field set_jetpack_fuel fun(self, fuel: integer): nil
+    ---@field kapala_blood_amount fun(self, ): integer
+    ---@field get_name fun(self, ): string
+    ---@field get_short_name fun(self, ): string
+    ---@field get_heart_color fun(self, ): Color
+    ---@field is_female fun(self, ): boolean
+    ---@field set_heart_color fun(self, hcolor: Color): nil
+
+---@class Floor : Entity
+    ---@field deco_top integer
+    ---@field deco_bottom integer
+    ---@field deco_left integer
+    ---@field deco_right integer
+    ---@field fix_border_tile_animation fun(self, ): nil
+    ---@field fix_decorations fun(self, fix_also_neighbors: boolean, fix_styled_floor: boolean): nil
+    ---@field add_decoration fun(self, side: FLOOR_SIDE): nil
+    ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil
+    ---@field decorate_internal fun(self, ): nil
+
+---@class Door : Floor
+    ---@field counter integer
+    ---@field fx_button Entity
+
+---@class ExitDoor : Door
+    ---@field entered boolean
+    ---@field special_door boolean
+    ---@field level integer
+    ---@field timer integer
+    ---@field world integer
+    ---@field theme integer
+
+---@class DecoratedDoor : ExitDoor
+    ---@field special_bg Entity
+
+---@class LockedDoor : Door
+    ---@field unlocked boolean
+
+---@class CityOfGoldDoor : DecoratedDoor
+    ---@field unlocked boolean
+
+---@class MainExit : ExitDoor
+
+---@class EggShipDoor : Door
+    ---@field timer integer
+
+---@class EggShipDoorS : EggShipDoor
+    ---@field entered boolean
+
+---@class Arrowtrap : Floor
+    ---@field arrow_shot boolean
+    ---@field rearm fun(self, ): nil
+    ---@field trigger fun(self, who_uid: integer): nil
+
+---@class TotemTrap : Floor
+    ---@field spawn_entity_type ENT_TYPE
+    ---@field first_sound_id integer
+    ---@field trigger fun(self, who_uid: integer, left: boolean): nil
+
+---@class LaserTrap : Floor
+    ---@field emitted_light Illumination
+    ---@field reset_timer integer
+    ---@field phase_2 boolean
+    ---@field trigger fun(self, who_uid: integer): nil
+
+---@class SparkTrap : Floor
+    ---@field emitted_light Illumination
+    ---@field spark_uid integer
+
+---@class Altar : Floor
+    ---@field timer integer
+
+---@class SpikeballTrap : Floor
+    ---@field chain Entity
+    ---@field end_piece Entity
+    ---@field state integer
+    ---@field timer integer
+
+---@class TransferFloor : Floor
+    ---@field transferred_entities table<integer, integer>
+
+---@class ConveyorBelt : TransferFloor
+    ---@field timer integer
+
+---@class Pipe : Floor
+    ---@field direction_type integer
+    ---@field end_pipe boolean
+
+---@class Generator : Floor
+    ---@field spawned_uid integer
+    ---@field set_timer integer
+    ---@field timer integer
+    ---@field start_counter integer
+    ---@field on_off boolean
+
+---@class SlidingWallCeiling : Floor
+    ---@field attached_piece Entity
+    ---@field active_floor_part_uid integer
+    ---@field state integer
+
+---@class QuickSand : Floor
+
+---@class BigSpearTrap : Floor
+    ---@field spear_uid integer
+    ---@field left_part boolean
+    ---@field trigger fun(self, who_uid: integer, left: boolean): nil
+
+---@class StickyTrap : Floor
+    ---@field attached_piece_uid integer
+    ---@field ball_uid integer
+    ---@field state integer
+    ---@field timer integer
+
+---@class MotherStatue : Floor
+    ---@field players_standing boolean[]
+    ---@field player1_standing boolean
+    ---@field player2_standing boolean
+    ---@field player3_standing boolean
+    ---@field player4_standing boolean
+    ---@field players_health_received boolean[]
+    ---@field player1_health_received boolean
+    ---@field player2_health_received boolean
+    ---@field player3_health_received boolean
+    ---@field player4_health_received boolean
+    ---@field players_health_timer integer[]
+    ---@field player1_health_timer integer
+    ---@field player2_health_timer integer
+    ---@field player3_health_timer integer
+    ---@field player4_health_timer integer
+    ---@field eggplantchild_timer integer
+    ---@field eggplantchild_detected boolean
+
+---@class TeleportingBorder : Floor
+    ---@field direction integer
+
+---@class ForceField : Floor
+    ---@field first_item_beam Entity
+    ---@field fx Entity
+    ---@field emitted_light Illumination
+    ---@field is_on boolean
+    ---@field activate_laserbeam fun(self, turn_on: boolean): nil
+
+---@class TimedForceField : ForceField
+    ---@field timer integer
+    ---@field pause boolean
+
+---@class HorizontalForceField : Floor
+    ---@field first_item_beam Entity
+    ---@field fx Entity
+    ---@field timer integer
+    ---@field is_on boolean
+
+---@class TentacleBottom : Floor
+    ---@field attached_piece_uid integer
+    ---@field tentacle_uid integer
+    ---@field state integer
+
+---@class PoleDeco : Floor
+    ---@field deco_up integer
+    ---@field deco_down integer
+
+---@class JungleSpearTrap : Floor
+    ---@field trigger fun(self, who_uid: integer, direction: integer): nil
+
+---@class Crushtrap : Movable
+    ---@field dirx number
+    ---@field diry number
+    ---@field timer integer
+    ---@field bounce_back_timer integer
+
+---@class Olmec : Movable
+    ---@field target_uid integer
+    ---@field attack_phase integer
+    ---@field attack_timer integer
+    ---@field ai_timer integer
+    ---@field move_direction integer
+    ---@field jump_timer integer
+    ---@field phase1_amount_of_bomb_salvos integer
+    ---@field unknown_attack_state integer
+    ---@field broken_floaters fun(self, ): integer
+
+---@class WoodenlogTrap : Movable
+    ---@field ceiling_1_uid integer
+    ---@field ceiling_2_uid integer
+    ---@field falling_speed number
+
+---@class Boulder : Movable
+    ---@field is_rolling integer
+
+---@class PushBlock : Movable
+    ---@field dust_particle ParticleEmitterInfo
+    ---@field dest_pos_x number
+
+---@class BoneBlock : Movable
+
+---@class ChainedPushBlock : PushBlock
+    ---@field is_chained boolean
+
+---@class LightArrowPlatform : Movable
+    ---@field emitted_light Illumination
+
+---@class FallingPlatform : Movable
+    ---@field emitted_light integer
+    ---@field timer integer
+    ---@field shaking_factor number
+    ---@field y_pos number
+
+---@class UnchainedSpikeBall : Movable
+    ---@field bounce boolean
+
+---@class Drill : Movable
+    ---@field top_chain_piece Entity
+    ---@field trigger fun(self, ): nil
+
+---@class ThinIce : Movable
+    ---@field strength integer
+
+---@class Elevator : Movable
+    ---@field emitted_light Illumination
+    ---@field timer integer
+    ---@field moving_up boolean
+
+---@class ClamBase : Movable
+    ---@field treasure_type ENT_TYPE
+    ---@field treasure_uid integer
+    ---@field treasure_x_pos number
+    ---@field treasure_y_pos number
+    ---@field top_part_uid integer
+
+---@class RegenBlock : Movable
+    ---@field on_breaking boolean
+
+---@class TimedPowderkeg : PushBlock
+    ---@field timer integer
+
+---@class Mount : Movable
+    ---@field carry fun(self, rider: Movable): nil
+    ---@field tame fun(self, value: boolean): nil
+    ---@field rider_uid integer
+    ---@field can_doublejump boolean
+    ---@field tamed boolean
+    ---@field walk_pause_timer integer
+    ---@field taming_timer integer
+
+---@class Rockdog : Mount
+    ---@field attack_cooldown integer
+
+---@class Axolotl : Mount
+    ---@field attack_cooldown integer
+    ---@field can_teleport boolean
+
+---@class Mech : Mount
+    ---@field gun_cooldown integer
+    ---@field walking boolean
+    ---@field breaking_wall boolean
+
+---@class Qilin : Mount
+    ---@field attack_cooldown integer
+
+---@class Monster : PowerupCapable
+    ---@field chased_target_uid integer
+    ---@field target_selection_timer integer
+
+---@class RoomOwner : Monster
+    ---@field room_index integer
+    ---@field climb_y_direction number
+    ---@field ai_state integer
+    ---@field patrol_timer integer
+    ---@field lose_interest_timer integer
+    ---@field countdown_timer integer
+    ---@field is_patrolling boolean
+    ---@field aggro_trigger boolean
+    ---@field was_hurt boolean
+
+---@class WalkingMonster : Monster
+    ---@field chatting_to_uid integer
+    ---@field walk_pause_timer integer
+    ---@field cooldown_timer integer
+
+---@class NPC : Monster
+    ---@field climb_direction number
+    ---@field target_in_sight_timer integer
+    ---@field ai_state integer
+    ---@field aggro boolean
+
+---@class Ghost : Monster
+    ---@field split_timer integer
+    ---@field velocity_multiplier number
+    ---@field ghost_behaviour GHOST_BEHAVIOR
+    ---@field emitted_light Illumination
+    ---@field linked_ghost Entity
+
+---@class Bat : Monster
+    ---@field spawn_x number
+    ---@field spawn_y number
+
+---@class Jiangshi : Monster
+    ---@field wait_timer integer
+    ---@field jump_counter integer
+    ---@field on_ceiling boolean
+
+---@class Monkey : Monster
+    ---@field jump_timer integer
+    ---@field on_vine boolean
+
+---@class GoldMonkey : Monster
+    ---@field jump_timer integer
+    ---@field poop_timer integer
+    ---@field poop_count integer
+
+---@class Mole : Monster
+    ---@field burrowing_particle ParticleEmitterInfo
+    ---@field burrow_dir_x number
+    ---@field burrow_dir_y number
+    ---@field burrowing_in_uid integer
+    ---@field counter_burrowing integer
+    ---@field counter_nonburrowing integer
+    ---@field countdown_for_appearing integer
+    ---@field digging_state integer
+
+---@class Spider : Monster
+    ---@field ceiling_pos_x number
+    ---@field ceiling_pos_y number
+    ---@field jump_timer integer
+    ---@field trigger_distance number
+
+---@class HangSpider : Monster
+    ---@field dangle_jump_timer integer
+    ---@field ceiling_pos_x number
+    ---@field ceiling_pos_y number
+
+---@class Shopkeeper : RoomOwner
+    ---@field name integer
+    ---@field shotgun_attack_delay integer
+    ---@field shop_owner boolean
+
+---@class Yang : RoomOwner
+    ---@field turkeys_in_den integer[]
+    ---@field first_message_shown boolean
+    ---@field quest_incomplete boolean
+    ---@field special_message_shown boolean
+
+---@class Tun : RoomOwner
+    ---@field arrows_left integer
+    ---@field reload_timer integer
+    ---@field challenge_fee_paid boolean
+    ---@field congrats_challenge boolean
+    ---@field murdered boolean
+    ---@field shop_entered boolean
+    ---@field tiamat_encounter boolean
+
+---@class Pet : Monster
+    ---@field fx_button Entity
+    ---@field petting_by_uid integer
+    ---@field yell_counter integer
+    ---@field func_timer integer
+    ---@field active_state integer
+
+---@class Caveman : WalkingMonster
+    ---@field wake_up_timer integer
+    ---@field can_pick_up_timer integer
+    ---@field aggro_timer integer
+
+---@class CavemanShopkeeper : WalkingMonster
+    ---@field tripping boolean
+    ---@field shop_entered boolean
+
+---@class HornedLizard : Monster
+    ---@field eaten_uid integer
+    ---@field walk_pause_timer integer
+    ---@field attack_cooldown_timer integer
+    ---@field blood_squirt_timer integer
+    ---@field particle ParticleEmitterInfo
+
+---@class Mosquito : Monster
+    ---@field direction_x number
+    ---@field direction_y number
+    ---@field stuck_rel_pos_x number
+    ---@field stuck_rel_pos_y number
+    ---@field timer integer
+
+---@class Mantrap : Monster
+    ---@field walk_pause_timer integer
+    ---@field eaten_uid integer
+
+---@class Skeleton : Monster
+    ---@field explosion_timer integer
+
+---@class Scarab : Monster
+    ---@field emitted_light Illumination
+    ---@field timer integer
+
+---@class Imp : Monster
+    ---@field carrying_uid integer
+    ---@field patrol_y_level number
+
+---@class Lavamander : Monster
+    ---@field emitted_light Illumination
+    ---@field shoot_lava_timer integer
+    ---@field jump_pause_timer integer
+    ---@field lava_detection_timer integer
+    ---@field is_hot boolean
+    ---@field player_detect_state integer
+
+---@class Firebug : Monster
+    ---@field fire_timer integer
+    ---@field going_up boolean
+    ---@field detached_from_chain boolean
+
+---@class FirebugUnchained : Monster
+    ---@field max_flight_height number
+    ---@field ai_timer integer
+    ---@field walking_timer integer
+
+---@class Robot : WalkingMonster
+    ---@field emitted_light_explosion Illumination
+
+---@class Quillback : WalkingMonster
+    ---@field particle ParticleEmitterInfo
+    ---@field seen_player boolean
+
+---@class Leprechaun : WalkingMonster
+    ---@field hump_timer integer
+    ---@field target_in_sight_timer integer
+    ---@field gold integer
+    ---@field timer_after_humping integer
+
+---@class Crocman : WalkingMonster
+    ---@field teleport_cooldown integer
+
+---@class Mummy : Monster
+    ---@field walk_pause_timer integer
+
+---@class VanHorsing : NPC
+    ---@field show_text boolean
+
+---@class WitchDoctor : WalkingMonster
+    ---@field skull_regen_timer integer
+
+---@class WitchDoctorSkull : Monster
+    ---@field witch_doctor_uid integer
+    ---@field emitted_light Illumination
+    ---@field rotation_angle number
+
+---@class ForestSister : NPC
+    ---@field walk_pause_timer integer
+
+---@class Vampire : Monster
+    ---@field jump_trigger_distance_x number
+    ---@field jump_trigger_distance_y number
+    ---@field sleep_pos_x number
+    ---@field sleep_pos_y number
+    ---@field walk_pause_timer integer
+
+---@class Vlad : Vampire
+    ---@field teleport_timer integer
+    ---@field aggro boolean
+
+---@class Waddler : RoomOwner
+    ---@field player_detected boolean
+    ---@field on_the_ground boolean
+    ---@field air_timer integer
+
+---@class Octopus : WalkingMonster
+
+---@class Bodyguard : NPC
+    ---@field position_state integer
+    ---@field message_shown boolean
+
+---@class Fish : Monster
+    ---@field change_direction_timer integer
+
+---@class GiantFish : Monster
+    ---@field change_direction_timer integer
+    ---@field lose_interest_timer integer
+
+---@class Crabman : Monster
+    ---@field walk_pause_timer integer
+    ---@field invincibility_timer integer
+    ---@field poison_attack_timer integer
+    ---@field attacking_claw_uid integer
+    ---@field at_maximum_attack boolean
+
+---@class Kingu : Monster
+    ---@field climb_direction_x number
+    ---@field climb_direction_y number
+    ---@field climb_pause_timer integer
+    ---@field shell_invincibility_timer integer
+    ---@field monster_spawn_timer integer
+    ---@field initial_shell_health integer
+    ---@field player_seen_by_kingu boolean
+
+---@class Anubis : Monster
+    ---@field spawn_x number
+    ---@field spawn_y number
+    ---@field attack_proximity_y number
+    ---@field attack_proximity_x number
+    ---@field ai_timer integer
+    ---@field next_attack_timer integer
+    ---@field psychic_orbs_counter integer
+    ---@field awake boolean
+
+---@class Cobra : Monster
+    ---@field spit_timer integer
+
+---@class CatMummy : Monster
+    ---@field ai_state integer
+    ---@field attack_timer integer
+
+---@class Sorceress : WalkingMonster
+    ---@field inbetween_attack_timer integer
+    ---@field in_air_timer number
+    ---@field halo_emitted_light Illumination
+    ---@field fx_entity Entity
+    ---@field hover_timer integer
+
+---@class MagmaMan : Monster
+    ---@field emitted_light Illumination
+    ---@field particle ParticleEmitterInfo
+    ---@field jump_timer integer
+    ---@field alive_timer integer
+
+---@class Bee : Monster
+    ---@field can_rest boolean
+    ---@field fly_hang_timer integer
+    ---@field targeting_timer integer
+    ---@field wobble_x number
+    ---@field wobble_y number
+
+---@class Ammit : Monster
+    ---@field walk_pause_timer integer
+    ---@field particle ParticleEmitterInfo
+
+---@class ApepPart : Monster
+    ---@field y_pos number
+    ---@field sine_angle number
+    ---@field sync_timer integer
+
+---@class ApepHead : ApepPart
+    ---@field distance_traveled number
+    ---@field tail_uid integer
+    ---@field fx_mouthpiece1_uid integer
+    ---@field fx_mouthpiece2_uid integer
+
+---@class OsirisHead : Monster
+    ---@field right_hand_uid integer
+    ---@field left_hand_uid integer
+    ---@field moving_left boolean
+    ---@field targeting_timer integer
+    ---@field invincibility_timer integer
+
+---@class OsirisHand : Monster
+    ---@field attack_cooldown_timer integer
+
+---@class Alien : Monster
+    ---@field jump_timer integer
+
+---@class UFO : Monster
+    ---@field patrol_distance integer
+    ---@field attack_cooldown_timer integer
+    ---@field is_falling boolean
+
+---@class Lahamu : Monster
+    ---@field attack_cooldown_timer integer
+
+---@class YetiQueen : Monster
+    ---@field walk_pause_timer integer
+
+---@class YetiKing : Monster
+    ---@field walk_pause_timer integer
+    ---@field emitted_light Illumination
+    ---@field particle_fog ParticleEmitterInfo
+    ---@field particle_dust ParticleEmitterInfo
+    ---@field particle_sparkles ParticleEmitterInfo
+
+---@class Lamassu : Monster
+    ---@field attack_effect_entity Entity
+    ---@field particle ParticleEmitterInfo
+    ---@field emitted_light Illumination
+    ---@field walk_pause_timer integer
+    ---@field flight_timer integer
+    ---@field attack_timer integer
+    ---@field attack_angle number
+
+---@class Olmite : WalkingMonster
+    ---@field armor_on boolean
+    ---@field in_stack boolean
+    ---@field in_stack2 boolean
+    ---@field on_top_uid integer
+    ---@field y_offset number
+    ---@field attack_cooldown_timer integer
+
+---@class Tiamat : Monster
+    ---@field fx_tiamat_head integer
+    ---@field fx_tiamat_arm_right1 integer
+    ---@field fx_tiamat_arm_right2 integer
+    ---@field frown_timer integer
+    ---@field damage_timer integer
+    ---@field attack_timer integer
+    ---@field tail_angle number
+    ---@field tail_radian number
+    ---@field tail_move_speed number
+    ---@field right_arm_angle number
+
+---@class GiantFrog : Monster
+    ---@field door_front_layer Entity
+    ---@field door_back_layer Entity
+    ---@field platform Entity
+    ---@field attack_timer integer
+    ---@field frogs_ejected_in_cycle integer
+    ---@field invincibility_timer integer
+    ---@field mouth_close_timer integer
+    ---@field mouth_open_trigger boolean
+
+---@class Frog : Monster
+    ---@field grub_being_eaten_uid integer
+    ---@field jump_timer integer
+    ---@field pause boolean
+
+---@class FireFrog : Frog
+
+---@class Grub : Monster
+    ---@field rotation_delta number
+    ---@field drop boolean
+    ---@field looking_for_new_direction_timer integer
+    ---@field walk_pause_timer integer
+    ---@field turn_into_fly_timer integer
+    ---@field particle ParticleEmitterInfo
+
+---@class Tadpole : Monster
+    ---@field acceleration_timer integer
+    ---@field player_spotted boolean
+
+---@class GiantFly : Monster
+    ---@field head_entity Entity
+    ---@field particle ParticleEmitterInfo
+    ---@field sine_amplitude number
+    ---@field sine_frequency number
+    ---@field delta_y_angle number
+    ---@field sine_counter integer
+
+---@class Ghist : Monster
+    ---@field body_uid integer
+    ---@field idle_timer integer
+    ---@field transparency integer
+    ---@field fadeout integer
+
+---@class JumpDog : Monster
+    ---@field walk_pause_timer integer
+    ---@field squish_timer integer
+
+---@class EggplantMinister : Monster
+    ---@field walk_pause_timer integer
+    ---@field squish_timer integer
+
+---@class Yama : Monster
+    ---@field message_shown boolean
+
+---@class Hundun : Monster
+    ---@field applied_hor_velocity number
+    ---@field applied_ver_velocity number
+    ---@field birdhead_entity_uid integer
+    ---@field snakehead_entity_uid integer
+    ---@field y_level number
+    ---@field bounce_timer integer
+    ---@field fireball_timer integer
+    ---@field birdhead_defeated boolean
+    ---@field snakehead_defeated boolean
+    ---@field hundun_flags integer
+
+---@class HundunHead : Monster
+    ---@field attack_position_x number
+    ---@field attack_position_y number
+    ---@field egg_crack_effect_uid integer
+    ---@field targeted_player_uid integer
+    ---@field looking_for_target_timer integer
+    ---@field invincibility_timer integer
+
+---@class MegaJellyfish : Monster
+    ---@field flipper1 Entity
+    ---@field flipper2 Entity
+    ---@field orb_uid integer
+    ---@field tail_bg_uid integer
+    ---@field applied_velocity number
+    ---@field wagging_tail_counter number
+    ---@field flipper_distance integer
+    ---@field velocity_application_timer integer
+
+---@class Scorpion : Monster
+    ---@field walk_pause_timer integer
+    ---@field jump_cooldown_timer integer
+
+---@class Hermitcrab : Monster
+    ---@field carried_entity_type ENT_TYPE
+    ---@field carried_entity_uid integer
+    ---@field walk_spit_timer integer
+    ---@field is_active boolean
+    ---@field is_inactive boolean
+    ---@field spawn_new_carried_item boolean
+
+---@class Necromancer : WalkingMonster
+    ---@field red_skeleton_spawn_x number
+    ---@field red_skeleton_spawn_y number
+    ---@field resurrection_uid integer
+    ---@field resurrection_timer integer
+
+---@class ProtoShopkeeper : Monster
+    ---@field movement_state integer
+    ---@field walk_pause_explode_timer integer
+    ---@field walking_speed integer
+
+---@class Beg : NPC
+    ---@field walk_pause_timer integer
+    ---@field disappear_timer integer
+
+---@class Terra : Monster
+    ---@field fx_button Entity
+    ---@field x_pos number
+    ---@field abuse_speechbubble_timer integer
+
+---@class Critter : Monster
+    ---@field last_picked_up_by_uid integer
+    ---@field holding_state integer
+
+---@class CritterBeetle : Critter
+    ---@field pause boolean
+
+---@class CritterCrab : Critter
+    ---@field walk_pause_timer integer
+    ---@field walking_left boolean
+
+---@class CritterButterfly : Critter
+    ---@field change_direction_timer integer
+    ---@field vertical_flight_direction integer
+
+---@class CritterLocust : Critter
+    ---@field jump_timer integer
+
+---@class CritterSnail : Critter
+    ---@field x_direction number
+    ---@field y_direction number
+    ---@field pos_x number
+    ---@field pos_y number
+    ---@field rotation_center_x number
+    ---@field rotation_center_y number
+    ---@field rotation_angle number
+    ---@field rotation_speed number
+
+---@class CritterFish : Critter
+    ---@field swim_pause_timer integer
+    ---@field player_in_proximity boolean
+
+---@class CritterPenguin : Critter
+    ---@field walk_pause_timer integer
+    ---@field jump_timer integer
+
+---@class CritterFirefly : Critter
+    ---@field sine_amplitude number
+    ---@field sine_frequency number
+    ---@field sine_angle number
+    ---@field change_direction_timer integer
+    ---@field sit_timer integer
+    ---@field sit_cooldown_timer integer
+
+---@class CritterDrone : Critter
+    ---@field emitted_light Illumination
+    ---@field applied_hor_momentum number
+    ---@field applied_ver_momentum number
+    ---@field move_timer integer
+
+---@class CritterSlime : Critter
+    ---@field x_direction number
+    ---@field y_direction number
+    ---@field pos_x number
+    ---@field pos_y number
+    ---@field rotation_center_x number
+    ---@field rotation_center_y number
+    ---@field rotation_angle number
+    ---@field rotation_speed number
+    ---@field walk_pause_timer integer
+
+---@class Bomb : Movable
+    ---@field scale_hor number
+    ---@field scale_ver number
+    ---@field is_big_bomb boolean
+
+---@class Backpack : Movable
+    ---@field explosion_trigger boolean
+    ---@field explosion_timer integer
+
+---@class Jetpack : Backpack
+    ---@field flame_on boolean
+    ---@field fuel integer
+
+---@class TeleporterBackpack : Backpack
+    ---@field teleport_number integer
+
+---@class Hoverpack : Backpack
+    ---@field is_on boolean
+
+---@class Cape : Backpack
+    ---@field floating_down boolean
+
+---@class VladsCape : Cape
+    ---@field can_double_jump boolean
+
+---@class Mattock : Movable
+    ---@field remaining integer
+
+---@class Gun : Movable
+    ---@field cooldown integer
+    ---@field shots integer
+    ---@field shots2 integer
+    ---@field in_chamber integer
+
+---@class Flame : Movable
+    ---@field emitted_light Illumination
+
+---@class FlameSize : Flame
+    ---@field flame_size number
+
+---@class ClimbableRope : Movable
+    ---@field segment_nr_inverse integer
+    ---@field burn_timer integer
+    ---@field above_part Entity
+    ---@field below_part Entity
+    ---@field segment_nr integer
+
+---@class Idol : Movable
+    ---@field trap_triggered boolean
+    ---@field touch integer
+    ---@field spawn_x number
+    ---@field spawn_y number
+
+---@class Spear : Movable
+    ---@field sound_id integer
+
+---@class JungleSpearCosmetic : Movable
+    ---@field move_x number
+    ---@field move_y number
+
+---@class WebShot : Movable
+    ---@field shot boolean
+
+---@class HangStrand : Movable
+    ---@field start_pos_y number
+
+---@class HangAnchor : Movable
+    ---@field spider_uid integer
+
+---@class Arrow : Movable
+    ---@field flame_uid integer
+    ---@field is_on_fire boolean
+    ---@field is_poisoned boolean
+    ---@field shot_from_trap boolean
+
+---@class LightArrow : Arrow
+    ---@field emitted_light Illumination
+
+---@class LightShot : Movable
+    ---@field emitted_light Illumination
+
+---@class LightEmitter : Movable
+    ---@field emitted_light Illumination
+
+---@class ScepterShot : LightEmitter
+    ---@field speed number
+    ---@field idle_timer integer
+
+---@class SpecialShot : LightEmitter
+    ---@field target_x number
+    ---@field target_y number
+
+---@class SoundShot : LightShot
+
+---@class Spark : Flame
+    ---@field particle ParticleEmitterInfo
+    ---@field fx_entity Entity
+    ---@field rotation_center_x number
+    ---@field rotation_center_y number
+    ---@field rotation_angle number
+    ---@field size number
+    ---@field size_multiply number
+    ---@field next_size number
+    ---@field size_change_timer integer
+
+---@class TiamatShot : LightEmitter
+
+---@class Fireball : SoundShot
+    ---@field particle ParticleEmitterInfo
+
+---@class Leaf : Movable
+    ---@field fade_away_counter number
+    ---@field swing_direction integer
+    ---@field fade_away_trigger boolean
+
+---@class AcidBubble : Movable
+    ---@field speed_x number
+    ---@field speed_y number
+    ---@field float_counter number
+
+---@class Claw : Movable
+    ---@field crabman_uid integer
+    ---@field spawn_x number
+    ---@field spawn_y number
+
+---@class StretchChain : Movable
+    ---@field at_end_of_chain_uid integer
+    ---@field dot_offset number
+    ---@field position_in_chain integer
+    ---@field inverse_doubled_position_in_chain integer
+    ---@field is_dot_hidden boolean
+
+---@class Chest : Movable
+    ---@field leprechaun boolean
+    ---@field bomb boolean
+
+---@class Treasure : Movable
+    ---@field cashed boolean
+
+---@class HundunChest : Treasure
+    ---@field timer integer
+
+---@class Boombox : Movable
+    ---@field fx_button Entity
+    ---@field music_note1 ParticleEmitterInfo
+    ---@field music_note2 ParticleEmitterInfo
+    ---@field spawn_y number
+    ---@field station integer
+    ---@field station_change_delay integer
+    ---@field jump_timer integer
+    ---@field jump_state integer
+
+---@class TV : Movable
+    ---@field fx_button Entity
+    ---@field emitted_light Illumination
+    ---@field station integer
+
+---@class Telescope : Movable
+    ---@field fx_button Entity
+    ---@field camera_anchor Entity
+    ---@field looked_through_by_uid integer
+
+---@class Torch : Movable
+    ---@field flame_uid integer
+    ---@field is_lit boolean
+    ---@field light_up fun(self, lit: boolean): nil
+
+---@class WallTorch : Torch
+    ---@field dropped_gold boolean
+
+---@class TorchFlame : Flame
+    ---@field smoke_particle ParticleEmitterInfo
+    ---@field flame_particle ParticleEmitterInfo
+    ---@field warp_particle ParticleEmitterInfo
+    ---@field flame_size number
+
+---@class LampFlame : Flame
+    ---@field flame_particle ParticleEmitterInfo
+
+---@class Bullet : Movable
+
+---@class TimedShot : LightShot
+    ---@field timer integer
+
+---@class CloneGunShot : LightShot
+    ---@field timer integer
+    ---@field spawn_y number
+
+---@class PunishBall : Movable
+    ---@field attached_to_uid integer
+    ---@field x_pos number
+    ---@field y_pos number
+
+---@class Chain : Movable
+    ---@field attached_to_uid integer
+    ---@field timer integer
+
+---@class Container : Movable
+    ---@field inside ENT_TYPE
+
+---@class Coffin : Movable
+    ---@field inside ENT_TYPE
+    ---@field timer integer
+    ---@field player_respawn boolean
+
+---@class Fly : Movable
+    ---@field timer integer
+
+---@class OlmecCannon : Movable
+    ---@field timer integer
+    ---@field bombs_left integer
+
+---@class Landmine : LightEmitter
+    ---@field timer integer
+
+---@class UdjatSocket : Movable
+    ---@field fx_button Entity
+
+---@class Ushabti : Movable
+    ---@field wiggle_timer integer
+    ---@field shine_timer integer
+
+---@class Honey : Movable
+    ---@field wiggle_timer integer
+
+---@class GiantClamTop : Movable
+    ---@field close_timer integer
+    ---@field open_timer integer
+
+---@class PlayerGhost : LightEmitter
+    ---@field sparkles_particle ParticleEmitterInfo
+    ---@field player_inputs PlayerInputs
+    ---@field inventory Inventory
+    ---@field body_uid integer
+    ---@field shake_timer integer
+    ---@field boost_timer integer
+
+---@class GhostBreath : Movable
+    ---@field timer integer
+    ---@field big_cloud boolean
+
+---@class LaserBeam : Movable
+    ---@field sparks ParticleEmitterInfo
+    ---@field emitted_light Illumination
+
+---@class TreasureHook : Movable
+
+---@class AxolotlShot : Movable
+    ---@field trapped_uid integer
+    ---@field size number
+    ---@field swing number
+    ---@field swing_periodicity number
+    ---@field distance_after_capture number
+
+---@class TrapPart : Movable
+    ---@field ceiling Entity
+
+---@class SkullDropTrap : Movable
+    ---@field left_skull_uid integer
+    ---@field middle_skull_uid integer
+    ---@field right_skull_uid integer
+    ---@field left_skull_drop_time integer
+    ---@field middle_skull_drop_time integer
+    ---@field right_skull_drop_time integer
+    ---@field timer integer
+
+---@class FrozenLiquid : Movable
+
+---@class Switch : Movable
+    ---@field timer integer
+
+---@class FlyHead : Movable
+    ---@field vored_entity_uid integer
+
+---@class SnapTrap : Movable
+    ---@field bait_uid integer
+    ---@field reload_timer integer
+
+---@class EmpressGrave : Movable
+    ---@field fx_button Entity
+    ---@field ghost Entity
+
+---@class Tentacle : Chain
+    ---@field bottom Entity
+
+---@class MiniGameShip : Movable
+    ---@field velocity_x number
+    ---@field velocity_y number
+    ---@field swing number
+    ---@field up_down_normal number
+
+---@class MiniGameAsteroid : Movable
+    ---@field spin_speed number
+
+---@class Pot : Movable
+    ---@field inside ENT_TYPE
+    ---@field dont_transfer_dmg boolean
+
+---@class CursedPot : Movable
+    ---@field smoke ParticleEmitterInfo
+    ---@field smoke2 ParticleEmitterInfo
+
+---@class CookFire : Movable
+    ---@field lit boolean
+    ---@field emitted_light Illumination
+    ---@field particles_smoke ParticleEmitterInfo
+    ---@field particles_flames ParticleEmitterInfo
+    ---@field particles_warp ParticleEmitterInfo
+
+---@class Orb : Movable
+    ---@field timer integer
+
+---@class EggSac : Movable
+    ---@field timer integer
+
+---@class Goldbar : Movable
+
+---@class Coin : Movable
+    ---@field nominal_price integer
+
+---@class RollingItem : Movable
+    ---@field roll_speed number
+
+---@class PlayerBag : Movable
+    ---@field bombs integer
+    ---@field ropes integer
+
+---@class Powerup : Movable
+
+---@class KapalaPowerup : Powerup
+    ---@field amount_of_blood integer
+
+---@class ParachutePowerup : Powerup
+    ---@field falltime_deploy integer
+    ---@field deployed boolean
+    ---@field deploy fun(self, ): nil
+
+---@class TrueCrownPowerup : Powerup
+    ---@field timer integer
+
+---@class AnkhPowerup : Powerup
+    ---@field player Entity
+    ---@field fx_glow Entity
+    ---@field timer1 integer
+    ---@field timer2 integer
+    ---@field timer3 integer
+    ---@field music_on_off boolean
+
+---@class YellowCape : Cape
+
+---@class Teleporter : Movable
+    ---@field teleport_number integer
+
+---@class Boomerang : Movable
+    ---@field trail ParticleEmitterInfo
+    ---@field distance number
+    ---@field rotation number
+    ---@field returns_to_uid integer
+
+---@class Excalibur : Movable
+    ---@field in_stone boolean
+
+---@class Shield : Movable
+    ---@field shake number
+
+---@class PrizeDispenser : Movable
+    ---@field item_ids integer[]
+    ---@field prizes_spawned integer
+
+---@class LiquidSurface : Movable
+    ---@field glow_radius number
+    ---@field sine_pos number
+    ---@field sine_pos_increment number
+
+---@class OlmecFloater : Movable
+    ---@field both_floaters_intact boolean
+    ---@field on_breaking boolean
+
+---@class EggshipCenterJetFlame : Movable
+    ---@field emitted_light Illumination
+    ---@field particle ParticleEmitterInfo
+    ---@field smoke_on boolean
+
+---@class MiniGameShipOffset : Movable
+    ---@field offset_x number
+    ---@field offset_y number
+    ---@field normal_y_offset number
+
+---@class Button : Movable
+    ---@field button_sprite integer
+    ---@field visibility number
+    ---@field is_visible boolean
+    ---@field player_trigger boolean
+    ---@field seen integer
+
+---@class FxTornJournalPage : Movable
+    ---@field page_number integer
+
+---@class FxMainExitDoor : Movable
+    ---@field emitted_light Illumination
+    ---@field timer integer
+
+---@class Birdies : Movable
+
+---@class Explosion : Movable
+    ---@field emitted_light Illumination
+
+---@class FxOuroboroOccluder : Movable
+
+---@class FxOuroboroDragonPart : Movable
+    ---@field speed number
+    ---@field timer integer
+    ---@field particle ParticleEmitterInfo
+
+---@class Rubble : Movable
+
+---@class FxCompass : Movable
+    ---@field sine_angle number
+    ---@field visibility number
+    ---@field is_active boolean
+
+---@class SleepBubble : Movable
+    ---@field show_hide_timer integer
+
+---@class MovingIcon : Movable
+    ---@field movement_timer integer
+
+---@class FxSaleContainer : Movable
+    ---@field fx_value Entity
+    ---@field fx_icon Entity
+    ---@field fx_button Entity
+    ---@field shake_amplitude number
+    ---@field sound_trigger boolean
+    ---@field pop_in_out_procentage integer
+
+---@class FxPickupEffect : Movable
+    ---@field spawn_y number
+    ---@field visibility number
+
+---@class FxShotgunBlast : Movable
+    ---@field illumination Illumination
+
+---@class FxJetpackFlame : Movable
+    ---@field particle_smoke ParticleEmitterInfo
+    ---@field particle_flame ParticleEmitterInfo
+    ---@field illumination Illumination
+
+---@class FxPlayerIndicator : Movable
+    ---@field attached_to integer
+    ---@field pos_x number
+    ---@field pos_y number
+
+---@class FxSpringtrapRing : Movable
+    ---@field timer integer
+    ---@field illumination Illumination
+
+---@class FxWitchdoctorHint : Movable
+
+---@class FxNecromancerANKH : Movable
+
+---@class FxWebbedEffect : Movable
+    ---@field visible boolean
+
+---@class FxUnderwaterBubble : Movable
+    ---@field bubble_source_uid integer
+    ---@field direction integer
+    ---@field pop boolean
+    ---@field inverted boolean
+
+---@class FxWaterDrop : Movable
+    ---@field inverted boolean
+    ---@field droplet_source_uid integer
+
+---@class FxKinguSliding : Movable
+    ---@field particle ParticleEmitterInfo
+
+---@class FxAlienBlast : Movable
+
+---@class FxSparkSmall : Movable
+    ---@field timer integer
+
+---@class FxTiamatHead : Movable
+    ---@field timer integer
+
+---@class FxTiamatTorso : Movable
+    ---@field timer integer
+    ---@field torso_target_size number
+
+---@class FxTiamatTail : Movable
+    ---@field angle_two number
+    ---@field x_pos number
+    ---@field y_pos number
+
+---@class FxVatBubble : Movable
+    ---@field max_y number
+
+---@class FxHundunNeckPiece : Movable
+    ---@field kill_timer integer
+
+---@class FxJellyfishStar : Movable
+    ---@field rotation_angle number
+    ---@field radius number
+    ---@field speed number
+
+---@class FxQuickSand : Movable
+
+---@class FxSorceressAttack : Movable
+    ---@field size number
+
+---@class FxLamassuAttack : Movable
+    ---@field attack_angle number
+
+---@class FxFireflyLight : Movable
+    ---@field illumination Illumination
+    ---@field light_timer integer
+    ---@field cooldown_timer integer
+
+---@class FxEmpress : Movable
+    ---@field sine_angle number
+
+---@class FxAnkhRotatingSpark : Movable
+    ---@field radius number
+    ---@field inclination number
+    ---@field speed number
+    ---@field sine_angle number
+    ---@field size number
+
+---@class FxAnkhBrokenPiece : Movable
+
+---@class Liquid : Entity
+    ---@field fx_surface Entity
+    ---@field get_liquid_flags fun(self, ): integer
+    ---@field set_liquid_flags fun(self, flags: integer): nil
+
+---@class Lava : Liquid
+    ---@field emitted_light Illumination
+
+---@class BGBackLayerDoor : Entity
+    ---@field illumination1 Illumination
+    ---@field illumination2 Illumination
+
+---@class BGSurfaceStar : Entity
+    ---@field blink_timer integer
+    ---@field relative_x number
+    ---@field relative_y number
+
+---@class BGRelativeElement : Entity
+    ---@field relative_x number
+    ---@field relative_y number
+
+---@class BGSurfaceLayer : BGRelativeElement
+    ---@field relative_offset_x number
+    ---@field relative_offset_y number
+
+---@class BGEggshipRoom : Entity
+    ---@field fx_shell Entity
+    ---@field fx_door Entity
+    ---@field platform_left Entity
+    ---@field platform_middle Entity
+    ---@field platform_right Entity
+    ---@field player_in boolean
+
+---@class BGMovingStar : BGSurfaceStar
+    ---@field falling_speed number
+
+---@class BGTutorialSign : Entity
+    ---@field is_shown boolean
+
+---@class BGShootingStar : BGRelativeElement
+    ---@field x_increment number
+    ---@field y_increment number
+    ---@field timer integer
+    ---@field max_timer integer
+    ---@field size number
+
+---@class BGShopEntrence : Entity
+    ---@field on_entering boolean
+
+---@class BGFloatingDebris : BGSurfaceLayer
+    ---@field distance number
+    ---@field speed number
+    ---@field sine_angle number
+
+---@class BGShopKeeperPrime : Entity
+    ---@field normal_y number
+    ---@field sine_pos number
+    ---@field bubbles_timer integer
+    ---@field bubble_spawn_trigger boolean
+    ---@field bubble_spawn_delay integer
+
+---@class CrossBeam : Entity
+    ---@field attached_to_side_uid integer
+    ---@field attached_to_top_uid integer
+
+---@class DestructibleBG : Entity
+
+---@class PalaceSign : Entity
+    ---@field illumination Illumination
+    ---@field arrow_illumination Illumination
+    ---@field arrow_change_timer integer
+
+---@class DecoRegeneratingBlock : Entity
+
+---@class Portal : Entity
+    ---@field emitted_light Illumination
+    ---@field transition_timer integer
+    ---@field level integer
+    ---@field world integer
+    ---@field theme integer
+    ---@field timer integer
+
+---@class ShootingStarSpawner : Entity
+    ---@field timer integer
+
+---@class LogicalDoor : Entity
+    ---@field door_type ENT_TYPE
+    ---@field visible boolean
+    ---@field platform_spawned boolean
+
+---@class LogicalSound : Entity
+
+---@class LogicalStaticSound : LogicalSound
+
+---@class LogicalLiquidStreamSound : LogicalStaticSound
+
+---@class LogicalTrapTrigger : Entity
+    ---@field min_empty_distance integer
+    ---@field trigger_distance integer
+    ---@field vertical boolean
+
+---@class JungleTrapTrigger : LogicalTrapTrigger
+
+---@class WetEffect : Entity
+    ---@field particle ParticleEmitterInfo
+
+---@class OnFireEffect : Entity
+    ---@field particle_smoke ParticleEmitterInfo
+    ---@field particle_flame ParticleEmitterInfo
+    ---@field illumination Illumination
+
+---@class PoisonedEffect : Entity
+    ---@field particle_burst ParticleEmitterInfo
+    ---@field particle_base ParticleEmitterInfo
+    ---@field burst_timer integer
+    ---@field burst_active boolean
+
+---@class CursedEffect : Entity
+    ---@field particle ParticleEmitterInfo
+
+---@class OuroboroCameraAnchor : Entity
+    ---@field target_x number
+    ---@field target_y number
+    ---@field velocity_x number
+    ---@field velocity_y number
+
+---@class OuroboroCameraZoomin : Entity
+    ---@field zoomin_level number
+
+---@class CinematicAnchor : Entity
+    ---@field blackbar_top Entity
+    ---@field blackbar_bottom Entity
+    ---@field roll_in number
+
+---@class BurningRopeEffect : Entity
+    ---@field illumination Illumination
+
+---@class DustWallApep : Entity
+    ---@field particle ParticleEmitterInfo
+
+---@class CameraFlash : Entity
+    ---@field illumination1 Illumination
+    ---@field illumination2 Illumination
+    ---@field timer integer
+
+---@class RoomLight : Entity
+    ---@field illumination Illumination
+
+---@class LimbAnchor : Entity
+    ---@field move_timer integer
+    ---@field flip_vertical boolean
+
+---@class LogicalConveyorbeltSound : LogicalSound
+
+---@class LogicalAnchovyFlock : Entity
+    ---@field current_speed number
+    ---@field max_speed number
+    ---@field timer integer
+
+---@class MummyFliesSound : LogicalSound
+    ---@field mummy_uid integer
+    ---@field flies integer
+
+---@class QuickSandSound : LogicalSound
+
+---@class IceSlidingSound : LogicalSound
+
+---@class FrostBreathEffect : Entity
+    ---@field timer integer
+
+---@class BoulderSpawner : Entity
+    ---@field timer integer
+
+---@class PipeTravelerSound : LogicalSound
+    ---@field enter_exit boolean
+
+---@class LogicalDrain : Entity
+    ---@field timer integer
+
+---@class LogicalRegeneratingBlock : Entity
+    ---@field timer integer
+
+---@class SplashBubbleGenerator : Entity
+    ---@field timer integer
+
+---@class EggplantThrower : Entity
+
+---@class LogicalMiniGame : Entity
+    ---@field timer integer
+
+---@class DMSpawning : Entity
+    ---@field spawn_x number
+    ---@field spawn_y number
+    ---@field sine_pos number
+    ---@field timer integer
+
+---@class DMAlienBlast : Entity
+
+---@class ParticleDB
+    ---@field id integer
+    ---@field spawn_count_min integer
+    ---@field spawn_count integer
+    ---@field lifespan_min integer
+    ---@field lifespan integer
+    ---@field sheet_id integer
+    ---@field animation_sequence_length integer
+    ---@field spawn_interval number
+    ---@field shrink_growth_factor number
+    ---@field rotation_speed number
+    ---@field opacity number
+    ---@field hor_scattering number
+    ---@field ver_scattering number
+    ---@field scale_x_min number
+    ---@field scale_x number
+    ---@field scale_y_min number
+    ---@field scale_y number
+    ---@field hor_deflection_1 number
+    ---@field ver_deflection_1 number
+    ---@field hor_deflection_2 number
+    ---@field ver_deflection_2 number
+    ---@field hor_velocity number
+    ---@field ver_velocity number
+    ---@field red integer
+    ---@field green integer
+    ---@field blue integer
+    ---@field permanent boolean
+    ---@field invisible boolean
+    ---@field get_texture fun(self, ): integer
+    ---@field set_texture fun(self, texture_id: integer): boolean
+
+---@class ParticleEmitterInfo
+    ---@field particle_type ParticleDB
+    ---@field particle_count integer
+    ---@field entity_uid integer
+    ---@field x number
+    ---@field y number
+    ---@field offset_x number
+    ---@field offset_y number
+
+---@class ThemeInfo
+    ---@field sub_theme ThemeInfo
+    ---@field get_unknown1 fun(self, ): boolean
+    ---@field init_flags fun(self, ): nil
+    ---@field init_level fun(self, ): nil
+    ---@field unknown_v4 fun(self, ): nil
+    ---@field unknown_v5 fun(self, ): nil
+    ---@field add_special_rooms fun(self, ): nil
+    ---@field unknown_v7 fun(self, ): nil
+    ---@field unknown_v8 fun(self, ): nil
+    ---@field add_vault fun(self, ): nil
+    ---@field add_coffin fun(self, ): nil
+    ---@field add_special_feeling fun(self, ): nil
+    ---@field unknown_v12 fun(self, ): boolean
+    ---@field spawn_level fun(self, ): nil
+    ---@field spawn_border fun(self, ): nil
+    ---@field post_process_level fun(self, ): nil
+    ---@field spawn_traps fun(self, ): nil
+    ---@field post_process_entities fun(self, ): nil
+    ---@field spawn_procedural fun(self, ): nil
+    ---@field spawn_background fun(self, ): nil
+    ---@field spawn_lights fun(self, ): nil
+    ---@field spawn_transition fun(self, ): nil
+    ---@field post_transition fun(self, ): nil
+    ---@field spawn_players fun(self, ): nil
+    ---@field spawn_effects fun(self, ): nil
+    ---@field get_level_file fun(self, ): string
+    ---@field get_theme_id fun(self, ): integer
+    ---@field get_base_id fun(self, ): integer
+    ---@field get_floor_spreading_type fun(self, ): integer
+    ---@field get_floor_spreading_type2 fun(self, ): integer
+    ---@field unknown_v30 fun(self, ): boolean
+    ---@field get_transition_block_modifier fun(self, ): integer
+    ---@field unknown_v32 fun(self, ): integer
+    ---@field get_backwall_type fun(self, ): integer
+    ---@field get_border_type fun(self, ): integer
+    ---@field get_critter_type fun(self, ): integer
+    ---@field get_liquid_gravity fun(self, ): number
+    ---@field get_player_damage fun(self, ): boolean
+    ---@field unknown_v38 fun(self, ): boolean
+    ---@field get_backlayer_lut fun(self, ): integer
+    ---@field get_backlayer_light_level fun(self, ): number
+    ---@field get_loop fun(self, ): boolean
+    ---@field get_vault_level fun(self, ): integer
+    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
+    ---@field get_dynamic_texture fun(self, texture_id: integer): integer
+    ---@field pre_transition fun(self, ): nil
+    ---@field get_level_height fun(self, ): integer
+    ---@field unknown_v47 fun(self, ): integer
+    ---@field spawn_decoration fun(self, ): nil
+    ---@field spawn_decoration2 fun(self, ): nil
+    ---@field spawn_extra fun(self, ): nil
+    ---@field unknown_v51 fun(self, ): nil
+
+---@class CustomTheme
+    ---@field level_file string
+    ---@field theme integer
+    ---@field base_theme integer
+    ---@field sub_theme any @&CustomTheme::sub_theme
+    ---@field textures table<DYNAMIC_TEXTURE, integer>
+    ---@field override any @theme_override
+    ---@field pre any @&CustomTheme::pre
+    ---@field post any @&CustomTheme::post
+    ---@field unknown1 any @&CustomTheme::unknown1
+    ---@field unknown2 any @&CustomTheme::unknown2
+    ---@field unknown3 any @&CustomTheme::unknown3
+    ---@field unknown4 any @&CustomTheme::unknown4
+    ---@field get_unknown1 fun(self, ): boolean
+    ---@field init_flags fun(self, ): nil
+    ---@field init_level fun(self, ): nil
+    ---@field unknown_v4 fun(self, ): nil
+    ---@field unknown_v5 fun(self, ): nil
+    ---@field add_special_rooms fun(self, ): nil
+    ---@field unknown_v7 fun(self, ): nil
+    ---@field unknown_v8 fun(self, ): nil
+    ---@field add_vault fun(self, ): nil
+    ---@field add_coffin fun(self, ): nil
+    ---@field add_special_feeling fun(self, ): nil
+    ---@field unknown_v12 fun(self, ): boolean
+    ---@field spawn_level fun(self, ): nil
+    ---@field spawn_border fun(self, ): nil
+    ---@field post_process_level fun(self, ): nil
+    ---@field spawn_traps fun(self, ): nil
+    ---@field post_process_entities fun(self, ): nil
+    ---@field spawn_procedural fun(self, ): nil
+    ---@field spawn_background fun(self, ): nil
+    ---@field spawn_lights fun(self, ): nil
+    ---@field spawn_transition fun(self, ): nil
+    ---@field post_transition fun(self, ): nil
+    ---@field spawn_players fun(self, ): nil
+    ---@field spawn_effects fun(self, ): nil
+    ---@field get_level_file fun(self, ): string
+    ---@field get_theme_id fun(self, ): integer
+    ---@field get_base_id fun(self, ): integer
+    ---@field get_floor_spreading_type fun(self, ): integer
+    ---@field get_floor_spreading_type2 fun(self, ): integer
+    ---@field unknown_v30 fun(self, ): boolean
+    ---@field get_transition_block_modifier fun(self, ): integer
+    ---@field unknown_v32 fun(self, ): integer
+    ---@field get_backwall_type fun(self, ): integer
+    ---@field get_border_type fun(self, ): integer
+    ---@field get_critter_type fun(self, ): integer
+    ---@field get_liquid_gravity fun(self, ): number
+    ---@field get_player_damage fun(self, ): boolean
+    ---@field unknown_v38 fun(self, ): boolean
+    ---@field get_backlayer_lut fun(self, ): integer
+    ---@field get_backlayer_light_level fun(self, ): number
+    ---@field get_loop fun(self, ): boolean
+    ---@field get_vault_level fun(self, ): integer
+    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
+    ---@field get_dynamic_texture fun(self, texture_id: integer): integer
+    ---@field pre_transition fun(self, ): nil
+    ---@field get_level_height fun(self, ): integer
+    ---@field unknown_v47 fun(self, ): integer
+    ---@field spawn_decoration fun(self, ): nil
+    ---@field spawn_decoration2 fun(self, ): nil
+    ---@field spawn_extra fun(self, ): nil
+    ---@field unknown_v51 fun(self, ): nil
+
+---@class PreLoadLevelFilesContext
+    ---@field override_level_files fun(self, levels: string[]): nil
+    ---@field add_level_files fun(self, levels: string[]): nil
+
+---@class DoorCoords
+    ---@field door1_x number
+    ---@field door1_y number
+    ---@field door2_x number
+    ---@field door2_y number
+
+---@class LevelGenSystem
+    ---@field shop_type SHOP_TYPE
+    ---@field backlayer_shop_type SHOP_TYPE
+    ---@field spawn_x number
+    ---@field spawn_y number
+    ---@field spawn_room_x integer
+    ---@field spawn_room_y integer
+    ---@field exits DoorCoords
+    ---@field themes ThemeInfo[] @size: 18
+
+---@class PostRoomGenerationContext
+    ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean
+    ---@field mark_as_machine_room_origin fun(self, x: integer, y: integer, layer: LAYER): boolean
+    ---@field mark_as_set_room fun(self, x: integer, y: integer, layer: LAYER): boolean
+    ---@field unmark_as_set_room fun(self, x: integer, y: integer, layer: LAYER): boolean
+    ---@field set_shop_type fun(self, x: integer, y: integer, layer: LAYER, shop_type: integer): boolean
+    ---@field set_procedural_spawn_chance fun(self, chance_id: PROCEDURAL_CHANCE, inverse_chance: integer): boolean
+    ---@field set_num_extra_spawns fun(self, extra_spawn_id: integer, num_spawns_front_layer: integer, num_spawns_back_layer: integer): nil
+    ---@field define_short_tile_code fun(self, short_tile_code_def: ShortTileCodeDef): SHORT_TILE_CODE?
+    ---@field change_short_tile_code fun(self, short_tile_code: SHORT_TILE_CODE, short_tile_code_def: ShortTileCodeDef): nil
+
+---@class PreHandleRoomTilesContext
+    ---@field get_short_tile_code fun(self, tx: integer, ty: integer, layer: LAYER): SHORT_TILE_CODE?
+    ---@field set_short_tile_code fun(self, tx: integer, ty: integer, layer: LAYER, short_tile_code: SHORT_TILE_CODE): boolean
+    ---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): integer[][]
+    ---@field replace_short_tile_code fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE, replacement_short_tile_code: SHORT_TILE_CODE): boolean
+    ---@field has_back_layer fun(self, ): boolean
+    ---@field add_empty_back_layer fun(self, ): nil
+    ---@field add_copied_back_layer fun(self, ): nil
+
+---@class ShortTileCodeDef
+    ---@field tile_code TILE_CODE
+    ---@field chance integer
+    ---@field alt_tile_code TILE_CODE
+
+---@class QuestsInfo
+    ---@field yang_state integer
+    ---@field jungle_sisters_flags integer
+    ---@field van_horsing_state integer
+    ---@field sparrow_state integer
+    ---@field madame_tusk_state integer
+    ---@field beg_state integer
+
+---@class SaveData
+    ---@field places boolean[]
+    ---@field bestiary boolean[]
+    ---@field people boolean[]
+    ---@field items boolean[]
+    ---@field traps boolean[]
+    ---@field last_daily string
+    ---@field characters integer
+    ---@field shortcuts integer
+    ---@field bestiary_killed integer[]
+    ---@field bestiary_killed_by integer[]
+    ---@field people_killed integer[]
+    ---@field people_killed_by integer[]
+    ---@field plays integer
+    ---@field deaths integer
+    ---@field wins_normal integer
+    ---@field wins_hard integer
+    ---@field wins_special integer
+    ---@field score_total integer
+    ---@field score_top integer
+    ---@field deepest_area integer
+    ---@field deepest_level integer
+    ---@field time_best integer
+    ---@field time_total integer
+    ---@field time_tutorial integer
+    ---@field character_deaths integer[]
+    ---@field pets_rescued integer[]
+    ---@field completed_normal boolean
+    ---@field completed_ironman boolean
+    ---@field completed_hard boolean
+    ---@field profile_seen boolean
+    ---@field seeded_unlocked boolean
+    ---@field world_last integer
+    ---@field level_last integer
+    ---@field score_last integer
+    ---@field time_last integer
+    ---@field stickers integer[]
+    ---@field players integer[]
+    ---@field constellation Constellation
+
+---@class Constellation
+    ---@field star_count integer
+    ---@field stars ConstellationStar[]
+    ---@field scale number
+    ---@field line_count integer
+    ---@field lines ConstellationLine[]
+    ---@field line_red_intensity number
+
+---@class ConstellationStar
+    ---@field type integer
+    ---@field x number
+    ---@field y number
+    ---@field size number
+    ---@field red number
+    ---@field green number
+    ---@field blue number
+    ---@field alpha number
+    ---@field halo_red number
+    ---@field halo_green number
+    ---@field halo_blue number
+    ---@field halo_alpha number
+    ---@field canis_ring boolean
+    ---@field fidelis_ring boolean
+
+---@class ConstellationLine
+    ---@field from integer
+    ---@field to integer
+
+---@class CustomSound
+    ---@field play CustomSound_play
+    ---@field get_parameters fun(self, ): table<VANILLA_SOUND_PARAM, string>
+
+---@class CustomSound_play
+---@param paused boolean
+---@param sound_type SOUND_TYPE
+---@overload fun(self): PlayingSound
+---@overload fun(self, paused: boolean): PlayingSound
+local function CustomSound_play(self, paused, sound_type) end
+
+---@class PlayingSound
+    ---@field is_playing fun(self, ): boolean
+    ---@field stop fun(self, ): boolean
+    ---@field set_pause fun(self, pause: boolean): boolean
+    ---@field set_mute fun(self, mute: boolean): boolean
+    ---@field set_pitch fun(self, pitch: number): boolean
+    ---@field set_pan fun(self, pan: number): boolean
+    ---@field set_volume fun(self, volume: number): boolean
+    ---@field set_looping fun(self, loop_mode: SOUND_LOOP_MODE): boolean
+    ---@field set_callback fun(self, callback: SoundCallbackFunction): boolean
+    ---@field get_parameters fun(self, ): table<VANILLA_SOUND_PARAM, string>
+    ---@field get_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM): number?
+    ---@field set_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM, value: number): boolean
+
+---@class PlayerSlotSettings
+    ---@field controller_vibration boolean
+    ---@field auto_run_enabled boolean
+    ---@field controller_right_stick boolean
+
+---@class PlayerSlot
+    ---@field buttons_gameplay INPUTS
+    ---@field buttons INPUTS
+    ---@field input_mapping_keyboard InputMapping
+    ---@field input_mapping_controller InputMapping
+    ---@field player_id integer
+    ---@field is_participating boolean
+
+---@class InputMapping
+    ---@field jump integer
+    ---@field attack integer
+    ---@field bomb integer
+    ---@field rope integer
+    ---@field walk_run integer
+    ---@field use_door_buy integer
+    ---@field pause_menu integer
+    ---@field journal integer
+    ---@field left integer
+    ---@field right integer
+    ---@field up integer
+    ---@field down integer
+
+---@class PlayerInputs
+    ---@field player_slots PlayerSlot[]
+    ---@field player_slot_1 PlayerSlot
+    ---@field player_slot_2 PlayerSlot
+    ---@field player_slot_3 PlayerSlot
+    ---@field player_slot_4 PlayerSlot
+    ---@field player_settings PlayerSlotSettings[]
+    ---@field player_slot_1_settings PlayerSlotSettings
+    ---@field player_slot_2_settings PlayerSlotSettings
+    ---@field player_slot_3_settings PlayerSlotSettings
+    ---@field player_slot_4_settings PlayerSlotSettings
+
+---@class GuiDrawContext
+    ---@field draw_line fun(self, x1: number, y1: number, x2: number, y2: number, thickness: number, color: uColor): nil
+    ---@field draw_rect GuiDrawContext_draw_rect
+    ---@field draw_rect_filled GuiDrawContext_draw_rect_filled
+    ---@field draw_circle fun(self, x: number, y: number, radius: number, thickness: number, color: uColor): nil
+    ---@field draw_circle_filled fun(self, x: number, y: number, radius: number, color: uColor): nil
+    ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil
+    ---@field draw_image GuiDrawContext_draw_image
+    ---@field draw_image_rotated GuiDrawContext_draw_image_rotated
+    ---@field window any @&GuiDrawContext::window
+    ---@field win_text fun(self, text: string): nil
+    ---@field win_separator fun(self, ): nil
+    ---@field win_inline fun(self, ): nil
+    ---@field win_sameline fun(self, offset: number, spacing: number): nil
+    ---@field win_button fun(self, text: string): boolean
+    ---@field win_input_text fun(self, label: string, value: string): string
+    ---@field win_input_int fun(self, label: string, value: integer): integer
+    ---@field win_input_float fun(self, label: string, value: number): number
+    ---@field win_slider_int fun(self, label: string, value: integer, min: integer, max: integer): integer
+    ---@field win_drag_int fun(self, label: string, value: integer, min: integer, max: integer): integer
+    ---@field win_slider_float fun(self, label: string, value: number, min: number, max: number): number
+    ---@field win_drag_float fun(self, label: string, value: number, min: number, max: number): number
+    ---@field win_check fun(self, label: string, value: boolean): boolean
+    ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer
+    ---@field win_pushid fun(self, id: integer): nil
+    ---@field win_popid fun(self, ): nil
+    ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil
+
+---@class GuiDrawContext_draw_rect
+---@param rect AABB
+---@param thickness number
+---@param rounding number
+---@param color uColor
+---@overload fun(self, left: number, top: number, right: number, bottom: number, thickness: number, rounding: number, color: uColor): nil
+local function GuiDrawContext_draw_rect(self, rect, thickness, rounding, color) end
+
+---@class GuiDrawContext_draw_rect_filled
+---@param rect AABB
+---@param rounding number
+---@param color uColor
+---@overload fun(self, left: number, top: number, right: number, bottom: number, rounding: number, color: uColor): nil
+local function GuiDrawContext_draw_rect_filled(self, rect, rounding, color) end
+
+---@class GuiDrawContext_draw_image
+---@param image IMAGE
+---@param rect AABB
+---@param uv_rect AABB
+---@param color uColor
+---@overload fun(self, image: IMAGE, left: number, top: number, right: number, bottom: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number, color: uColor): nil
+local function GuiDrawContext_draw_image(self, image, rect, uv_rect, color) end
+
+---@class GuiDrawContext_draw_image_rotated
+---@param image IMAGE
+---@param rect AABB
+---@param uv_rect AABB
+---@param color uColor
+---@param angle number
+---@param px number
+---@param py number
+---@overload fun(self, image: IMAGE, left: number, top: number, right: number, bottom: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number, color: uColor, angle: number, px: number, py: number): nil
+local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, color, angle, px, py) end
+
+---@class ImVec2
+    ---@field x number
+    ---@field y number
+
+---@class Gamepad
+    ---@field enabled boolean
+    ---@field buttons any @&Gamepad::wButtons
+    ---@field lt number
+    ---@field rt number
+    ---@field lx number
+    ---@field ly number
+    ---@field rx number
+    ---@field ry number
+
+---@class ImGuiIO
+    ---@field displaysize ImVec2
+    ---@field framerate number
+    ---@field wantkeyboard boolean
+    ---@field keysdown boolean       [] @size: 512. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+    ---@field keydown fun(key: number | string): boolean
+    ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
+    ---@field keyreleased fun(key: number | string): boolean
+    ---@field keyctrl boolean
+    ---@field keyshift boolean
+    ---@field keyalt boolean
+    ---@field keysuper boolean
+    ---@field wantmouse boolean
+    ---@field mousepos ImVec2
+    ---@field mousedown boolean       [] @size: 5
+    ---@field mouseclicked boolean       [] @size: 5
+    ---@field mousedoubleclicked boolean       [] @size: 5
+    ---@field mousewheel number
+    ---@field gamepad Gamepad
+
+---@class VanillaRenderContext
+    ---@field draw_text fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
+    ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number
+    ---@field draw_screen_texture VanillaRenderContext_draw_screen_texture
+    ---@field draw_world_texture VanillaRenderContext_draw_world_texture
+
+---@class VanillaRenderContext_draw_screen_texture
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest Quad
+---@param color Color
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
+local function VanillaRenderContext_draw_screen_texture(self, texture_id, row, column, dest, color) end
+
+---@class VanillaRenderContext_draw_world_texture
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest Quad
+---@param color Color
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
+local function VanillaRenderContext_draw_world_texture(self, texture_id, row, column, dest, color) end
+
+---@class TextureRenderingInfo
+    ---@field x number
+    ---@field y number
+    ---@field destination_bottom_left_x number
+    ---@field destination_bottom_left_y number
+    ---@field destination_bottom_right_x number
+    ---@field destination_bottom_right_y number
+    ---@field destination_top_left_x number
+    ---@field destination_top_left_y number
+    ---@field destination_top_right_x number
+    ---@field destination_top_right_y number
+    ---@field set_destination fun(self, bbox: AABB): nil
+    ---@field dest_get_quad fun(self, ): Quad
+    ---@field dest_set_quad fun(self, quad: Quad): nil
+    ---@field source_bottom_left_x number
+    ---@field source_bottom_left_y number
+    ---@field source_bottom_right_x number
+    ---@field source_bottom_right_y number
+    ---@field source_top_left_x number
+    ---@field source_top_left_y number
+    ---@field source_top_right_x number
+    ---@field source_top_right_y number
+    ---@field source_get_quad fun(self, ): Quad
+    ---@field source_set_quad fun(self, quad: Quad): nil
+
+---@class TextRenderingInfo
+    ---@field x number
+    ---@field y number
+    ---@field text_length integer
+    ---@field width number
+    ---@field height number
+    ---@field font Texture
+
+---@class TextureDefinition
+    ---@field texture_path string
+    ---@field width integer
+    ---@field height integer
+    ---@field tile_width integer
+    ---@field tile_height integer
+    ---@field sub_image_offset_x integer
+    ---@field sub_image_offset_y integer
+    ---@field sub_image_width integer
+    ---@field sub_image_height integer
+
+---@class AABB
+    ---@field left number
+    ---@field bottom number
+    ---@field right number
+    ---@field top number
+    ---@field overlaps_with fun(self, other: AABB): boolean
+    ---@field abs fun(self, ): AABB
+    ---@field extrude fun(self, amount: number): AABB
+    ---@field offset fun(self, off_x: number, off_y: number): AABB
+    ---@field area fun(self, ): number
+    ---@field center fun(self, ): number, number
+    ---@field width fun(self, ): number
+    ---@field height fun(self, ): number
+
+---@class Quad
+    ---@field bottom_left_x number
+    ---@field bottom_left_y number
+    ---@field bottom_right_x number
+    ---@field bottom_right_y number
+    ---@field top_right_x number
+    ---@field top_right_y number
+    ---@field top_left_x number
+    ---@field top_left_y number
+    ---@field get_AABB fun(self, ): AABB
+    ---@field offset fun(self, off_x: number, off_y: number): Quad
+    ---@field rotate fun(self, angle: number, px: number, py: number): Quad
+
+---@class Screen
+    ---@field render_timer number
+
+---@class ScreenLogo : Screen
+    ---@field logo_mossmouth TextureRenderingInfo
+    ---@field logo_blitworks TextureRenderingInfo
+    ---@field logo_fmod TextureRenderingInfo
+
+---@class ScreenIntro : Screen
+    ---@field unknown4 TextureRenderingInfo
+
+---@class ScreenPrologue : Screen
+    ---@field line1 STRINGID
+    ---@field line2 STRINGID
+    ---@field line3 STRINGID
+
+---@class ScreenTitle : Screen
+    ---@field logo_spelunky2 TextureRenderingInfo
+    ---@field ana TextureRenderingInfo
+    ---@field ana_right_eyeball_torch_reflection TextureRenderingInfo
+    ---@field ana_left_eyeball_torch_reflection TextureRenderingInfo
+    ---@field particle_torchflame_smoke ParticleEmitterInfo
+    ---@field particle_torchflame_backflames ParticleEmitterInfo
+    ---@field particle_torchflame_flames ParticleEmitterInfo
+    ---@field particle_torchflame_backflames_animated ParticleEmitterInfo
+    ---@field particle_torchflame_flames_animated ParticleEmitterInfo
+    ---@field particle_torchflame_ash ParticleEmitterInfo
+
+---@class ScreenMenu : Screen
+    ---@field tunnel_background TextureRenderingInfo
+    ---@field cthulhu_disc TextureRenderingInfo
+    ---@field tunnel_ring_darkbrown TextureRenderingInfo
+    ---@field cthulhu_body TextureRenderingInfo
+    ---@field tunnel_ring_lightbrown TextureRenderingInfo
+    ---@field vine_left TextureRenderingInfo
+    ---@field vine_right TextureRenderingInfo
+    ---@field skull_left TextureRenderingInfo
+    ---@field salamander_right TextureRenderingInfo
+    ---@field left_spear TextureRenderingInfo
+    ---@field right_spear TextureRenderingInfo
+    ---@field spear_dangler_related TextureRenderingInfo
+    ---@field play_scroll TextureRenderingInfo
+    ---@field info_toast TextureRenderingInfo
+    ---@field cthulhu_disc_ring_angle number
+    ---@field cthulhu_disc_split_progress number
+    ---@field cthulhu_disc_y number
+    ---@field cthulhu_timer number
+    ---@field selected_menu_index integer
+---@field menu_text_opacity number
+    ---@field spear_position number[]
+    ---@field spear_dangler SpearDanglerAnimFrames[]
+    ---@field play_scroll_descend_timer number
+    ---@field scroll_text STRINGID
+
+---@class ScreenOptions : Screen
+    ---@field selected_menu_index integer
+    ---@field brick_border TextureRenderingInfo
+    ---@field top_bottom_woodpanels_velocity number
+    ---@field top_bottom_woodpanels_progress number
+    ---@field scroll_unfurl_progress number
+    ---@field bottom_woodpanel_y number
+    ---@field top_bottom_woodpanels_slide_in_related number
+    ---@field bottom_woodpanel TextureRenderingInfo
+    ---@field top_woodpanel TextureRenderingInfo
+    ---@field top_woodpanel_left_scrollhandle TextureRenderingInfo
+    ---@field top_woodpanel_right_scrollhandle TextureRenderingInfo
+    ---@field button_right_caption STRINGID
+    ---@field button_middle_caption STRINGID
+    ---@field top_woodpanel_visible boolean
+    ---@field bottom_woodpanel_visible boolean
+    ---@field toggle_woodpanel_slidein_animation boolean
+    ---@field capitalize_top_woodpanel boolean
+    ---@field current_menu_1 integer
+    ---@field current_menu_2 integer
+    ---@field topleft_woodpanel_esc TextureRenderingInfo
+    ---@field brick_background TextureRenderingInfo
+    ---@field brick_middlelayer TextureRenderingInfo
+    ---@field brick_foreground TextureRenderingInfo
+    ---@field selected_item_rounded_rect TextureRenderingInfo
+    ---@field selected_item_scarab TextureRenderingInfo
+    ---@field item_option_arrow_left TextureRenderingInfo
+    ---@field item_option_arrow_right TextureRenderingInfo
+    ---@field tooltip_background TextureRenderingInfo
+    ---@field progressbar_background TextureRenderingInfo
+    ---@field progressbar_foreground TextureRenderingInfo
+    ---@field progressbar_position_indicator TextureRenderingInfo
+    ---@field sectionheader_background TextureRenderingInfo
+    ---@field topleft_woodpanel_esc_slidein_timer number
+    ---@field text_fadein_timer number
+    ---@field vertical_scroll_effect_timer number
+
+---@class ScreenPlayerProfile : Screen
+
+---@class ScreenLeaderboards : Screen
+
+---@class ScreenSeedInput : Screen
+    ---@field bottom_woodpanel_slideup_timer number
+    ---@field bottom_woodpanel_y number
+    ---@field bottom_woodpanel TextureRenderingInfo
+    ---@field buttons_text_id STRINGID
+    ---@field topleft_woodpanel_esc_slidein_timer number
+    ---@field scroll_text_id STRINGID
+    ---@field start_text_id STRINGID
+    ---@field main_woodpanel_left_border TextureRenderingInfo
+    ---@field main_woodpanel_center TextureRenderingInfo
+    ---@field main_woodpanel_right_border TextureRenderingInfo
+    ---@field seed_letter_cutouts TextureRenderingInfo
+    ---@field topleft_woodpanel_esc TextureRenderingInfo
+    ---@field start_sidepanel TextureRenderingInfo
+    ---@field start_sidepanel_slidein_timer number
+
+---@class ScreenCharacterSelect : Screen
+    ---@field main_background_zoom_target number
+    ---@field blurred_border_zoom_target number
+    ---@field top_bottom_woodpanel_slidein_timer number
+    ---@field top_scroll_unfurl_timer number
+    ---@field bottom_woodpanel TextureRenderingInfo
+    ---@field top_woodpanel TextureRenderingInfo
+    ---@field left_scroll_handle TextureRenderingInfo
+    ---@field right_scroll_handle TextureRenderingInfo
+    ---@field left_button_text_id STRINGID
+    ---@field right_button_text_id STRINGID
+    ---@field middle_button_text_id STRINGID
+    ---@field top_woodpanel_visible boolean
+    ---@field bottom_woodpanel_visible boolean
+    ---@field toggle_woodpanel_slidein_animation boolean
+    ---@field mine_entrance_background TextureRenderingInfo
+    ---@field character TextureRenderingInfo
+    ---@field character_shadow TextureRenderingInfo
+    ---@field character_flag TextureRenderingInfo
+    ---@field character_left_arrow TextureRenderingInfo
+    ---@field character_right_arrow TextureRenderingInfo
+    ---@field mine_entrance_border TextureRenderingInfo
+    ---@field mine_entrance_shutter TextureRenderingInfo
+    ---@field background TextureRenderingInfo
+    ---@field blurred_border TextureRenderingInfo
+    ---@field blurred_border2 TextureRenderingInfo
+    ---@field topleft_woodpanel_esc TextureRenderingInfo
+    ---@field start_sidepanel TextureRenderingInfo
+    ---@field quick_select_panel TextureRenderingInfo
+    ---@field quick_select_selected_char_background TextureRenderingInfo
+    ---@field quick_select_panel_related TextureRenderingInfo
+    ---@field player_shutter_timer number[]
+    ---@field player_x number[]
+    ---@field player_y number[]
+    ---@field player_arrow_slidein_timer number[][]
+    ---@field player_facing_left boolean[]
+    ---@field player_quickselect_shown boolean[]
+    ---@field player_quickselect_fadein_timer number[]
+    ---@field player_quickselect_coords number[][]
+    ---@field player_quickselect_wiggle_angle number[]
+    ---@field topleft_woodpanel_esc_slidein_timer number
+    ---@field start_panel_slidein_timer number
+    ---@field action_buttons_keycap_size number
+    ---@field not_ready_to_start_yet boolean
+    ---@field available_mine_entrances integer
+    ---@field amount_of_mine_entrances_activated integer
+    ---@field buttons integer
+    ---@field opacity number
+    ---@field start_pressed boolean
+    ---@field transition_to_game_started boolean
+    ---@field flying_things FlyingThing[]
+    ---@field flying_thing_countdown integer
+    ---@field particle_ceilingdust_smoke ParticleEmitterInfo
+    ---@field particle_ceilingdust_rubble ParticleEmitterInfo
+    ---@field particle_mist ParticleEmitterInfo
+    ---@field particle_torchflame_smoke1 ParticleEmitterInfo
+    ---@field particle_torchflame_flames1 ParticleEmitterInfo
+    ---@field particle_torchflame_smoke2 ParticleEmitterInfo
+    ---@field particle_torchflame_flames2 ParticleEmitterInfo
+    ---@field particle_torchflame_smoke3 ParticleEmitterInfo
+    ---@field particle_torchflame_flames3 ParticleEmitterInfo
+    ---@field particle_torchflame_smoke4 ParticleEmitterInfo
+    ---@field particle_torchflame_flames4 ParticleEmitterInfo
+
+---@class FlyingThing
+    ---@field texture_info TextureRenderingInfo
+    ---@field entity_type integer
+    ---@field spritesheet_column number
+    ---@field spritesheet_row number
+    ---@field spritesheet_animation_length number
+    ---@field velocity_x number
+    ---@field amplitude number
+    ---@field frequency number
+    ---@field sinewave_angle number
+
+---@class ScreenTeamSelect : Screen
+    ---@field ana_carrying_torch TextureRenderingInfo
+    ---@field scroll_bottom_left TextureRenderingInfo
+    ---@field scrollend_bottom_left TextureRenderingInfo
+    ---@field four_ropes TextureRenderingInfo
+    ---@field unknown4 TextureRenderingInfo
+    ---@field four_characters TextureRenderingInfo
+    ---@field left_arrow TextureRenderingInfo
+    ---@field right_arrow TextureRenderingInfo
+    ---@field start_panel TextureRenderingInfo
+    ---@field start_panel_slide_timer number
+    ---@field pulsating_arrows_timer number
+    ---@field selected_player integer
+    ---@field buttons integer
+    ---@field ready boolean
+
+---@class ScreenCamp : Screen
+    ---@field buttons integer
+
+---@class ScreenLevel : Screen
+    ---@field buttons integer
+
+---@class ScreenTransition : Screen
+    ---@field woodpanel_pos number
+    ---@field stats_scroll_horizontal_posaa number
+    ---@field stats_scroll_vertical_pos number
+    ---@field level_completed_pos number
+    ---@field stats_scroll_unfurl_targetvalue number
+    ---@field woodpanel1 TextureRenderingInfo
+    ---@field woodpanel2 TextureRenderingInfo
+    ---@field woodpanel3 TextureRenderingInfo
+    ---@field woodpanel_cutout1 TextureRenderingInfo
+    ---@field woodpanel_cutout2 TextureRenderingInfo
+    ---@field woodpanel_cutout3 TextureRenderingInfo
+    ---@field woodplank TextureRenderingInfo
+    ---@field woodpanel_bottomcutout1 TextureRenderingInfo
+    ---@field woodpanel_bottomcutout2 TextureRenderingInfo
+    ---@field woodpanel_bottomcutout3 TextureRenderingInfo
+    ---@field unknown_all_forced TextureRenderingInfo
+    ---@field stats_scroll_top_bottom TextureRenderingInfo
+    ---@field killcount_rounded_rect TextureRenderingInfo
+    ---@field level_completed_panel TextureRenderingInfo
+    ---@field stats_scroll_state_1 integer
+    ---@field stats_scroll_state_2 integer
+    ---@field hide_press_to_go_next_level boolean
+    ---@field mama_tunnel TextureRenderingInfo
+    ---@field speechbubble TextureRenderingInfo
+    ---@field speechbubble_arrow TextureRenderingInfo
+    ---@field mama_tunnel_fade_targetvalue number
+    ---@field mama_tunnel_text_id STRINGID
+    ---@field mama_tunnel_choice_visible boolean
+    ---@field mama_tunnel_agree_with_gift boolean
+    ---@field mama_tunnel_face_invisible boolean
+    ---@field mama_tunnel_face_transparency number
+    ---@field mama_tunnel_agree_panel TextureRenderingInfo
+    ---@field mama_tunnel_agree_panel_indicator TextureRenderingInfo
+    ---@field woodpanel_cutout_big_money1 TextureRenderingInfo
+    ---@field woodpanel_cutout_big_money2 TextureRenderingInfo
+    ---@field woodpanel_cutout_big_money3 TextureRenderingInfo
+    ---@field big_dollar_sign TextureRenderingInfo
+    ---@field unknown26 TextureRenderingInfo
+    ---@field player_stats_scroll_numeric_value integer[]
+    ---@field player_secondary_icon TextureRenderingInfo[]
+    ---@field player_icon TextureRenderingInfo[]
+    ---@field player_secondary_icon_type integer[]
+    ---@field player_icon_index integer[]
+    ---@field hourglasses TextureRenderingInfo
+    ---@field small_dollar_signs TextureRenderingInfo
+    ---@field this_level_money_color Color
+
+---@class ScreenDeath : Screen
+
+---@class ScreenWin : Screen
+    ---@field sequence_timer integer
+    ---@field frame_timer integer
+    ---@field animation_state integer
+    ---@field rescuing_ship_entity Entity
+
+---@class ScreenCredits : Screen
+
+---@class ScreenScores : Screen
+    ---@field animation_state integer
+    ---@field woodpanel1 TextureRenderingInfo
+    ---@field woodpanel2 TextureRenderingInfo
+    ---@field woodpanel3 TextureRenderingInfo
+    ---@field woodpanel_cutout TextureRenderingInfo
+    ---@field dollarsign TextureRenderingInfo
+    ---@field hourglass TextureRenderingInfo
+    ---@field animation_timer integer
+    ---@field woodpanel_slidedown_timer number
+
+---@class ScreenConstellation : Screen
+    ---@field sequence_state integer
+    ---@field animation_timer integer
+    ---@field constellation_text_opacity number
+
+---@class ScreenRecap : Screen
+
+---@class ScreenOnlineLoading : Screen
+    ---@field ouroboros TextureRenderingInfo
+    ---@field ouroboros_angle number
+
+---@class ScreenOnlineLobby : Screen
+    ---@field woodpanels_slidein_timer number
+    ---@field scroll_unfurl_timer number
+    ---@field woodpanel_bottom TextureRenderingInfo
+    ---@field woodpanel_top TextureRenderingInfo
+    ---@field left_scroll_handle TextureRenderingInfo
+    ---@field right_scroll_handle TextureRenderingInfo
+    ---@field scroll_text_id STRINGID
+    ---@field btn_left_text_id STRINGID
+    ---@field btn_right_text_id STRINGID
+    ---@field btn_center_text_id STRINGID
+    ---@field woodpanel_top_visible boolean
+    ---@field woodpanel_bottom_visible boolean
+    ---@field toggle_panels_slidein boolean
+    ---@field players OnlineLobbyScreenPlayer[]
+    ---@field background_image TextureRenderingInfo
+    ---@field topleft_woodpanel_esc TextureRenderingInfo
+    ---@field topleft_woodpanel_esc_slidein_timer number
+    ---@field character_walk_offset number
+    ---@field character_facing_left boolean
+    ---@field move_direction integer
+    ---@field character TextureRenderingInfo
+    ---@field player_ready_icon TextureRenderingInfo
+    ---@field arrow_left TextureRenderingInfo
+    ---@field arrow_right TextureRenderingInfo
+    ---@field arrow_left_hor_offset number
+    ---@field arrow_right_hor_offset number
+    ---@field platform_icon TextureRenderingInfo
+    ---@field player_count integer
+    ---@field searching_for_players boolean
+    ---@field show_code_panel boolean
+    ---@field enter_code_woodpanel_bottom_slidein_pos number
+    ---@field enter_code_woodpanel_bottom TextureRenderingInfo
+    ---@field enter_code_btn_right_text_id STRINGID
+    ---@field enter_code_woodpanel_top_visible boolean
+    ---@field enter_code_woodpanel_bottom_visible boolean
+    ---@field enter_code_toggle_panels_slidein boolean
+    ---@field selected_character integer
+    ---@field characters_entered_count integer
+    ---@field enter_code_topleft_woodpanel_esc_slidein_timer number
+    ---@field enter_code_banner_text_id STRINGID
+    ---@field enter_code_OK_text_id STRINGID
+    ---@field enter_code_main_woodpanel_left TextureRenderingInfo
+    ---@field enter_code_main_woodpanel_center TextureRenderingInfo
+    ---@field enter_code_main_woodpanel_right TextureRenderingInfo
+    ---@field enter_code_banner TextureRenderingInfo
+    ---@field enter_code_char_cutouts TextureRenderingInfo
+    ---@field enter_code_pointing_hand TextureRenderingInfo
+    ---@field enter_code_buttons TextureRenderingInfo
+    ---@field enter_code_OK_panel TextureRenderingInfo
+    ---@field enter_code_OK_panel_slidein_timer number
+    ---@field enter_code_your_code_scroll TextureRenderingInfo
+    ---@field enter_code_your_code_scroll_left_handle TextureRenderingInfo
+    ---@field enter_code_your_code_scroll_right_handle TextureRenderingInfo
+    ---@field set_code fun(self, code: string): nil
+
+---@class PauseUI
+    ---@field menu_slidein_progress number
+    ---@field blurred_background TextureRenderingInfo
+    ---@field woodpanel_left TextureRenderingInfo
+    ---@field woodpanel_middle TextureRenderingInfo
+    ---@field woodpanel_right TextureRenderingInfo
+    ---@field woodpanel_top TextureRenderingInfo
+    ---@field scroll TextureRenderingInfo
+    ---@field confirmation_panel TextureRenderingInfo
+    ---@field previously_selected_menu_index integer
+    ---@field visibility integer
+
+---@class JournalUI
+    ---@field state integer
+    ---@field chapter_shown integer
+    ---@field current_page integer
+    ---@field flipping_to_page integer
+    ---@field max_page_count integer
+    ---@field book_background TextureRenderingInfo
+    ---@field arrow_left TextureRenderingInfo
+    ---@field arrow_right TextureRenderingInfo
+    ---@field unknown23 TextureRenderingInfo
+    ---@field entire_book TextureRenderingInfo
+    ---@field page_timer integer
+
+---@class JournalPage
+    ---@field background TextureRenderingInfo
+    ---@field page_number integer
+
+---@class JournalPageProgress : JournalPage
+    ---@field coffeestain_top TextureRenderingInfo
+
+---@class JournalPageJournalMenu : JournalPage
+    ---@field selected_menu_index integer
+    ---@field journal_text_info TextRenderingInfo
+    ---@field completion_badge TextureRenderingInfo
+
+---@class JournalPageDiscoverable : JournalPage
+    ---@field show_main_image boolean
+    ---@field title_text_info TextRenderingInfo
+    ---@field entry_text_info TextRenderingInfo
+    ---@field chapter_title_text_info TextRenderingInfo
+
+---@class JournalPagePlaces : JournalPageDiscoverable
+    ---@field main_image TextureRenderingInfo
+
+---@class JournalPagePeople : JournalPageDiscoverable
+    ---@field character_background TextureRenderingInfo
+    ---@field character_icon TextureRenderingInfo
+    ---@field character_drawing TextureRenderingInfo
+
+---@class JournalPageBestiary : JournalPageDiscoverable
+    ---@field monster_background TextureRenderingInfo
+    ---@field monster_icon TextureRenderingInfo
+    ---@field defeated_killedby_black_bars TextureRenderingInfo
+    ---@field defeated_text_info TextRenderingInfo
+    ---@field defeated_value_text_info TextRenderingInfo
+    ---@field killedby_text_info TextRenderingInfo
+    ---@field killedby_value_text_info TextRenderingInfo
+
+---@class JournalPageItems : JournalPageDiscoverable
+    ---@field item_icon TextureRenderingInfo
+    ---@field item_background TextureRenderingInfo
+
+---@class JournalPageTraps : JournalPageDiscoverable
+    ---@field trap_icon TextureRenderingInfo
+    ---@field trap_background TextureRenderingInfo
+
+---@class JournalPageStory : JournalPage
+
+---@class JournalPageFeats : JournalPage
+    ---@field chapter_title_text_info TextRenderingInfo
+    ---@field feat_icons TextureRenderingInfo
+
+---@class JournalPageDeathCause : JournalPage
+    ---@field death_cause_text_info TextRenderingInfo
+
+---@class JournalPageDeathMenu : JournalPage
+    ---@field selected_menu_index integer
+    ---@field game_over_text_info TextRenderingInfo
+    ---@field level_text_info TextRenderingInfo
+    ---@field level_value_text_info TextRenderingInfo
+    ---@field money_text_info TextRenderingInfo
+    ---@field money_value_text_info TextRenderingInfo
+    ---@field time_text_info TextRenderingInfo
+    ---@field time_value_text_info TextRenderingInfo
+
+---@class JournalPageRecap : JournalPage
+
+---@class JournalPagePlayerProfile : JournalPage
+    ---@field player_icon TextureRenderingInfo
+    ---@field player_icon_id integer
+    ---@field player_profile_text_info TextRenderingInfo
+    ---@field plays_text_info TextRenderingInfo
+    ---@field plays_value_text_info TextRenderingInfo
+    ---@field wins_text_info TextRenderingInfo
+    ---@field wins_value_text_info TextRenderingInfo
+    ---@field deaths_text_info TextRenderingInfo
+    ---@field deaths_value_text_info TextRenderingInfo
+    ---@field win_pct_text_info TextRenderingInfo
+    ---@field win_pct_value_text_info TextRenderingInfo
+    ---@field average_score_text_info TextRenderingInfo
+    ---@field average_score_value_text_info TextRenderingInfo
+    ---@field top_score_text_info TextRenderingInfo
+    ---@field top_score_value_text_info TextRenderingInfo
+    ---@field deepest_level_text_info TextRenderingInfo
+    ---@field deepest_level_value_text_info TextRenderingInfo
+    ---@field deadliest_level_text_info TextRenderingInfo
+    ---@field deadliest_level_value_text_info TextRenderingInfo
+    ---@field average_time_text_info TextRenderingInfo
+    ---@field average_time_value_text_info TextRenderingInfo
+    ---@field best_time_text_info TextRenderingInfo
+    ---@field best_time_value_text_info TextRenderingInfo
+
+---@class JournalPageLastGamePlayed : JournalPage
+    ---@field main_image TextureRenderingInfo
+    ---@field last_game_played_text_info TextRenderingInfo
+    ---@field level_text_info TextRenderingInfo
+    ---@field level_value_text_info TextRenderingInfo
+    ---@field money_text_info TextRenderingInfo
+    ---@field money_value_text_info TextRenderingInfo
+    ---@field time_text_info TextRenderingInfo
+    ---@field time_value_text_info TextRenderingInfo
+    ---@field sticker_count integer
+    ---@field stickers TextureRenderingInfo[]
+
+---@class ScreenArenaMenu : Screen
+    ---@field brick_background_animation ScreenZoomAnimation
+    ---@field blurry_border_animation ScreenZoomAnimation
+    ---@field top_woodpanel_slidein_timer number
+    ---@field top_scroll_unfurl_timer number
+    ---@field unknown13 TextureRenderingInfo
+    ---@field woodpanel_top TextureRenderingInfo
+    ---@field unknown15 TextureRenderingInfo
+    ---@field left_scroll_handle TextureRenderingInfo
+    ---@field right_scroll_handle TextureRenderingInfo
+    ---@field scroll_text_id STRINGID
+    ---@field unknown17_text_id STRINGID
+    ---@field unknown18_text_id STRINGID
+    ---@field unknown19_text_id STRINGID
+    ---@field top_woodpanel_visible boolean
+    ---@field bottom_woodpanel_visible boolean
+    ---@field woodpanels_toggle boolean
+    ---@field brick_background TextureRenderingInfo
+    ---@field blurry_border TextureRenderingInfo
+    ---@field blurry_border2 TextureRenderingInfo
+    ---@field characters_drawing TextureRenderingInfo
+    ---@field info_black_background TextureRenderingInfo
+    ---@field main_panel_top_left_corner TextureRenderingInfo
+    ---@field main_panel_top TextureRenderingInfo
+    ---@field main_panel_top_right_corner TextureRenderingInfo
+    ---@field main_panel_left TextureRenderingInfo
+    ---@field main_panel_center TextureRenderingInfo
+    ---@field main_panel_right TextureRenderingInfo
+    ---@field main_panel_bottom_left_corner TextureRenderingInfo
+    ---@field main_panel_bottom TextureRenderingInfo
+    ---@field main_panel_bottom_right_corner TextureRenderingInfo
+    ---@field rules_scroll TextureRenderingInfo
+    ---@field black_option_boxes_left TextureRenderingInfo
+    ---@field black_option_boxes_center TextureRenderingInfo
+    ---@field black_option_boxes_right TextureRenderingInfo
+    ---@field gold_option_outline TextureRenderingInfo
+    ---@field option_icons TextureRenderingInfo
+    ---@field option_left_arrow TextureRenderingInfo
+    ---@field option_right_arrow TextureRenderingInfo
+    ---@field bottom_left_bricks TextureRenderingInfo
+    ---@field top_left_esc_panel TextureRenderingInfo
+    ---@field next_panel TextureRenderingInfo
+    ---@field center_panels_hor_slide_position number
+    ---@field esc_next_panels_slide_timer number
+    ---@field main_panel_vertical_scroll_position number
+    ---@field selected_option_index integer
+
+---@class ScreenZoomAnimation
+    ---@field zoom_target number
+
+---@class ScreenArenaStagesSelect : Screen
+    ---@field woodenpanel_top_slidein_timer number
+    ---@field woodenpanel_top_scroll_unfurl_timer number
+    ---@field woodenpanel_top TextureRenderingInfo
+    ---@field woodenpanel_top_left_scroll TextureRenderingInfo
+    ---@field woodenpanel_top_right_scroll TextureRenderingInfo
+    ---@field text_id_1 STRINGID
+    ---@field text_id_2 STRINGID
+    ---@field text_id_3 STRINGID
+    ---@field text_id_4 STRINGID
+    ---@field woodenpanel_top_visible boolean
+    ---@field woodenpanel_bottom_visible boolean
+    ---@field woodenpanels_toggle boolean
+    ---@field buttons integer
+    ---@field brick_background TextureRenderingInfo
+    ---@field info_black_background TextureRenderingInfo
+    ---@field woodenpanel_center TextureRenderingInfo
+    ---@field blocky_level_representation TextureRenderingInfo
+    ---@field theme_indicator TextureRenderingInfo
+    ---@field bricks_bottom_left TextureRenderingInfo
+    ---@field grid_background_row_0 TextureRenderingInfo
+    ---@field grid_background_row_1 TextureRenderingInfo
+    ---@field grid_background_row_2 TextureRenderingInfo
+    ---@field grid_background_row_3 TextureRenderingInfo
+    ---@field grid_background_row_4 TextureRenderingInfo
+    ---@field grid_background_row_5 TextureRenderingInfo
+    ---@field grid_background_row_6 TextureRenderingInfo
+    ---@field grid_background_row_7 TextureRenderingInfo
+    ---@field grid_background_disabled_cross TextureRenderingInfo
+    ---@field grid_background_manipulators TextureRenderingInfo
+    ---@field unknown21 TextureRenderingInfo
+    ---@field grid_disabled_cross TextureRenderingInfo
+    ---@field grid_yellow_highlighter TextureRenderingInfo
+    ---@field woodpanel_esc TextureRenderingInfo
+    ---@field woodpanel_fight TextureRenderingInfo
+    ---@field big_player_drawing TextureRenderingInfo
+    ---@field players_turn_scroll TextureRenderingInfo
+    ---@field players_turn_scroll_handle TextureRenderingInfo
+    ---@field grid_player_icon TextureRenderingInfo
+
+---@class ScreenArenaItems : Screen
+    ---@field woodpanel_top_slidein_timer number
+    ---@field woodpanel_top_scroll_unfurl_timer number
+    ---@field unknown9 TextureRenderingInfo
+    ---@field woodpanel_top TextureRenderingInfo
+    ---@field unknown11 TextureRenderingInfo
+    ---@field top_scroll_left_handle TextureRenderingInfo
+    ---@field top_scroll_right_handle TextureRenderingInfo
+    ---@field scroll_text_id STRINGID
+    ---@field text_id_2 STRINGID
+    ---@field text_id_3 STRINGID
+    ---@field text_id_4 STRINGID
+    ---@field woodpanel_top_visible boolean
+    ---@field woodpanel_bottom_visible boolean
+    ---@field woodpanels_toggle boolean
+    ---@field brick_background TextureRenderingInfo
+    ---@field black_background_bottom_right TextureRenderingInfo
+    ---@field woodpanel_bottom TextureRenderingInfo
+    ---@field scroll_bottom TextureRenderingInfo
+    ---@field scroll_right_handle_bottom TextureRenderingInfo
+    ---@field held_item_crate_on_scroll TextureRenderingInfo
+    ---@field held_item_on_scroll TextureRenderingInfo
+    ---@field item_background TextureRenderingInfo
+    ---@field toggles_background TextureRenderingInfo
+    ---@field item_selection_gold_outline TextureRenderingInfo
+    ---@field item_icons TextureRenderingInfo
+    ---@field item_held_badge TextureRenderingInfo
+    ---@field item_equipped_badge TextureRenderingInfo
+    ---@field item_off_gray_overlay TextureRenderingInfo
+    ---@field esc_woodpanel TextureRenderingInfo
+    ---@field center_panels_horizontal_slide_position number
+    ---@field esc_panel_slide_timer number
+    ---@field selected_item_index integer
+
+---@class ScreenArenaIntro : Screen
+    ---@field players TextureRenderingInfo
+    ---@field background_colors TextureRenderingInfo
+    ---@field vertical_lines TextureRenderingInfo
+    ---@field vertical_line_electricity_effect TextureRenderingInfo
+    ---@field unknown_all_forced TextureRenderingInfo
+    ---@field left_scroll TextureRenderingInfo
+    ---@field right_scroll TextureRenderingInfo
+    ---@field scroll_unfurl_timer number
+    ---@field waiting boolean
+    ---@field names_opacity number
+    ---@field line_electricity_effect_timer number
+    ---@field state integer
+    ---@field countdown integer
+
+---@class ScreenArenaLevel : Screen
+    ---@field get_ready TextureRenderingInfo
+    ---@field get_ready_gray_background TextureRenderingInfo
+    ---@field get_ready_outline TextureRenderingInfo
+
+---@class ScreenArenaScore : Screen
+    ---@field woodpanel_slide_timer number
+    ---@field scroll_unfurl_timer number
+    ---@field unknown10 TextureRenderingInfo
+    ---@field woodpanel TextureRenderingInfo
+    ---@field unknown_all_forced TextureRenderingInfo
+    ---@field woodpanel_left_scroll TextureRenderingInfo
+    ---@field woodpanel_right_scroll TextureRenderingInfo
+    ---@field text_id_1 STRINGID
+    ---@field text_id_2 STRINGID
+    ---@field woodpanel_visible boolean
+    ---@field woodpanel_slide_toggle boolean
+    ---@field animation_sequence integer
+    ---@field background TextureRenderingInfo
+    ---@field ok_panel TextureRenderingInfo
+    ---@field ready_panel TextureRenderingInfo
+    ---@field ready_speechbubble_indicator TextureRenderingInfo
+    ---@field pillars TextureRenderingInfo
+    ---@field bottom_lava TextureRenderingInfo
+    ---@field players TextureRenderingInfo
+    ---@field player_shadows TextureRenderingInfo
+    ---@field unknown24 TextureRenderingInfo
+    ---@field unknown25 TextureRenderingInfo
+    ---@field score_counter TextureRenderingInfo
+    ---@field unknown27 TextureRenderingInfo
+    ---@field lava_bubbles TextureRenderingInfo
+    ---@field player_won boolean[]
+    ---@field victory_jump_y_pos number
+    ---@field victory_jump_velocity number
+    ---@field animation_frame integer
+    ---@field squash_and_celebrate boolean
+    ---@field player_ready boolean[]
+    ---@field next_transition_timer integer
+    ---@field player_bottom_pillar_offset number[]
+    ---@field player_crushing_pillar_height number[]
+    ---@field player_create_giblets boolean[]
+    ---@field next_sidepanel_slidein_timer number
+
+
+--## Constructors
+
+Color = nil
+---Create a new color - defaults to black
+---@return Color
+function Color.new(self) end
+---@param Color Color
+---@return Color
+function Color.new(self, Color) end
+---Create a new color by specifying its values
+---@param r_ number
+---@param g_ number
+---@param b_ number
+---@param a_ number
+---@return Color
+function Color.new(self, r_, g_, b_, a_) end
+
+CustomTheme = nil
+---@param theme_id_ integer
+---@param base_theme_ integer
+---@param defaults boolean
+---@return CustomTheme
+function CustomTheme.new(self, theme_id_, base_theme_, defaults) end
+---@param theme_id_ integer
+---@param base_theme_ integer
+---@return CustomTheme
+function CustomTheme.new(self, theme_id_, base_theme_) end
+---@return CustomTheme
+function CustomTheme.new(self) end
+
+AABB = nil
+---Create a new axis aligned bounding box - defaults to all zeroes
+---@return AABB
+function AABB.new(self) end
+---Copy an axis aligned bounding box
+---@param AABB AABB
+---@return AABB
+function AABB.new(self, AABB) end
+---Create a new axis aligned bounding box by specifying its values
+---@param left_ number
+---@param top_ number
+---@param right_ number
+---@param bottom_ number
+---@return AABB
+function AABB.new(self, left_, top_, right_, bottom_) end
+
+Quad = nil
+---@return Quad
+function Quad.new(self) end
+---@param Quad Quad
+---@return Quad
+function Quad.new(self, Quad) end
+---@param _bottom_left_x number
+---@param _bottom_left_y number
+---@param _bottom_right_x number
+---@param _bottom_right_y number
+---@param _top_right_x number
+---@param _top_right_y number
+---@param _top_left_x number
+---@param _top_left_y number
+---@return Quad
+function Quad.new(self, _bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right_y, _top_right_x, _top_right_y, _top_left_x, _top_left_y) end
+---@param AABB AABB
+---@return Quad
+function Quad.new(self, AABB) end
+
+--## Enums
+
+
 BUTTON = {
   BOMB = 4,
   DOOR = 32,
@@ -150,86 +4734,7 @@ BUTTON = {
   RUN = 16,
   WHIP = 2
 }
-Backpack = {
-  __index = "function",
-  __name = "sol.Backpack.user",
-  __newindex = "function"
-}
-Bat = {
-  __index = "function",
-  __name = "sol.Bat.user",
-  __newindex = "function"
-}
-Bee = {
-  __index = "function",
-  __name = "sol.Bee.user",
-  __newindex = "function"
-}
-Beg = {
-  __index = "function",
-  __name = "sol.Beg.user",
-  __newindex = "function"
-}
-BigSpearTrap = {
-  __index = "function",
-  __name = "sol.BigSpearTrap.user",
-  __newindex = "function"
-}
-Birdies = {
-  __index = "function",
-  __name = "sol.Birdies.user",
-  __newindex = "function"
-}
-Bodyguard = {
-  __index = "function",
-  __name = "sol.Bodyguard.user",
-  __newindex = "function"
-}
-Bomb = {
-  __index = "function",
-  __name = "sol.Bomb.user",
-  __newindex = "function"
-}
-BoneBlock = {
-  __index = "function",
-  __name = "sol.BoneBlock.user",
-  __newindex = "function"
-}
-Boombox = {
-  __index = "function",
-  __name = "sol.Boombox.user",
-  __newindex = "function"
-}
-Boomerang = {
-  __index = "function",
-  __name = "sol.Boomerang.user",
-  __newindex = "function"
-}
-Boulder = {
-  __index = "function",
-  __name = "sol.Boulder.user",
-  __newindex = "function"
-}
-BoulderSpawner = {
-  __index = "function",
-  __name = "sol.BoulderSpawner.user",
-  __newindex = "function"
-}
-Bullet = {
-  __index = "function",
-  __name = "sol.Bullet.user",
-  __newindex = "function"
-}
-BurningRopeEffect = {
-  __index = "function",
-  __name = "sol.BurningRopeEffect.user",
-  __newindex = "function"
-}
-Button = {
-  __index = "function",
-  __name = "sol.Button.user",
-  __newindex = "function"
-}
+---@alias BUTTON integer
 CAUSE_OF_DEATH = {
   DEATH = 0,
   ENTITY = 1,
@@ -238,6 +4743,7 @@ CAUSE_OF_DEATH = {
   POISONED = 5,
   STILL_FALLING = 3
 }
+---@alias CAUSE_OF_DEATH integer
 CHAR_STATE = {
   ATTACKING = 12,
   CLIMBING = 6,
@@ -257,11 +4763,13 @@ CHAR_STATE = {
   STUNNED = 18,
   THROWING = 17
 }
+---@alias CHAR_STATE integer
 CONST = {
   ENGINE_FPS = 60,
   ROOM_HEIGHT = 8,
   ROOM_WIDTH = 10
 }
+---@alias CONST integer
 COSUBTHEME = {
   DWELLING = 0,
   ICE_CAVES = 5,
@@ -274,222 +4782,7 @@ COSUBTHEME = {
   TIDE_POOL = 3,
   VOLCANA = 2
 }
-Camera = {
-  __name = "sol.Camera.user"
-}
-CameraFlash = {
-  __index = "function",
-  __name = "sol.CameraFlash.user",
-  __newindex = "function"
-}
-Cape = {
-  __index = "function",
-  __name = "sol.Cape.user",
-  __newindex = "function"
-}
-CatMummy = {
-  __index = "function",
-  __name = "sol.CatMummy.user",
-  __newindex = "function"
-}
-Caveman = {
-  __index = "function",
-  __name = "sol.Caveman.user",
-  __newindex = "function"
-}
-CavemanShopkeeper = {
-  __index = "function",
-  __name = "sol.CavemanShopkeeper.user",
-  __newindex = "function"
-}
-Chain = {
-  __index = "function",
-  __name = "sol.Chain.user",
-  __newindex = "function"
-}
-ChainedPushBlock = {
-  __index = "function",
-  __name = "sol.ChainedPushBlock.user",
-  __newindex = "function"
-}
-Chest = {
-  __index = "function",
-  __name = "sol.Chest.user",
-  __newindex = "function"
-}
-CinematicAnchor = {
-  __index = "function",
-  __name = "sol.CinematicAnchor.user",
-  __newindex = "function"
-}
-CityOfGoldDoor = {
-  __index = "function",
-  __name = "sol.CityOfGoldDoor.user",
-  __newindex = "function"
-}
-ClamBase = {
-  __index = "function",
-  __name = "sol.ClamBase.user",
-  __newindex = "function"
-}
-Claw = {
-  __index = "function",
-  __name = "sol.Claw.user",
-  __newindex = "function"
-}
-ClimbableRope = {
-  __index = "function",
-  __name = "sol.ClimbableRope.user",
-  __newindex = "function"
-}
-CloneGunShot = {
-  __index = "function",
-  __name = "sol.CloneGunShot.user",
-  __newindex = "function"
-}
-Cobra = {
-  __index = "function",
-  __name = "sol.Cobra.user",
-  __newindex = "function"
-}
-Coffin = {
-  __index = "function",
-  __name = "sol.Coffin.user",
-  __newindex = "function"
-}
-Coin = {
-  __index = "function",
-  __name = "sol.Coin.user",
-  __newindex = "function"
-}
-Color = {
-  __name = "sol.Color.user"
-}
-Constellation = {
-  __name = "sol.Constellation.user"
-}
-ConstellationLine = {
-  __name = "sol.ConstellationLine.user"
-}
-ConstellationStar = {
-  __name = "sol.ConstellationStar.user"
-}
-Container = {
-  __index = "function",
-  __name = "sol.Container.user",
-  __newindex = "function"
-}
-ConveyorBelt = {
-  __index = "function",
-  __name = "sol.ConveyorBelt.user",
-  __newindex = "function"
-}
-CookFire = {
-  __index = "function",
-  __name = "sol.CookFire.user",
-  __newindex = "function"
-}
-Crabman = {
-  __index = "function",
-  __name = "sol.Crabman.user",
-  __newindex = "function"
-}
-Critter = {
-  __index = "function",
-  __name = "sol.Critter.user",
-  __newindex = "function"
-}
-CritterBeetle = {
-  __index = "function",
-  __name = "sol.CritterBeetle.user",
-  __newindex = "function"
-}
-CritterButterfly = {
-  __index = "function",
-  __name = "sol.CritterButterfly.user",
-  __newindex = "function"
-}
-CritterCrab = {
-  __index = "function",
-  __name = "sol.CritterCrab.user",
-  __newindex = "function"
-}
-CritterDrone = {
-  __index = "function",
-  __name = "sol.CritterDrone.user",
-  __newindex = "function"
-}
-CritterFirefly = {
-  __index = "function",
-  __name = "sol.CritterFirefly.user",
-  __newindex = "function"
-}
-CritterFish = {
-  __index = "function",
-  __name = "sol.CritterFish.user",
-  __newindex = "function"
-}
-CritterLocust = {
-  __index = "function",
-  __name = "sol.CritterLocust.user",
-  __newindex = "function"
-}
-CritterPenguin = {
-  __index = "function",
-  __name = "sol.CritterPenguin.user",
-  __newindex = "function"
-}
-CritterSlime = {
-  __index = "function",
-  __name = "sol.CritterSlime.user",
-  __newindex = "function"
-}
-CritterSnail = {
-  __index = "function",
-  __name = "sol.CritterSnail.user",
-  __newindex = "function"
-}
-Crocman = {
-  __index = "function",
-  __name = "sol.Crocman.user",
-  __newindex = "function"
-}
-CrossBeam = {
-  __index = "function",
-  __name = "sol.CrossBeam.user",
-  __newindex = "function"
-}
-Crushtrap = {
-  __index = "function",
-  __name = "sol.Crushtrap.user",
-  __newindex = "function"
-}
-CursedEffect = {
-  __index = "function",
-  __name = "sol.CursedEffect.user",
-  __newindex = "function"
-}
-CursedPot = {
-  __index = "function",
-  __name = "sol.CursedPot.user",
-  __newindex = "function"
-}
-CustomSound = {
-  __name = "sol.CustomSound.user"
-}
-CustomTheme = {
-  __name = "sol.CustomTheme.user"
-}
-DMAlienBlast = {
-  __index = "function",
-  __name = "sol.DMAlienBlast.user",
-  __newindex = "function"
-}
-DMSpawning = {
-  __index = "function",
-  __name = "sol.DMSpawning.user",
-  __newindex = "function"
-}
+---@alias COSUBTHEME integer
 DROP = {
   ALIENQUEEN_ALIENBLAST = 182,
   ALIENQUEEN_ALIENBLAST_RE = 184,
@@ -685,6 +4978,7 @@ DROP = {
   YETIQUEEN_POWERPACK = 90,
   YETI_PITCHERSMITT = 91
 }
+---@alias DROP integer
 DROPCHANCE = {
   BONEBLOCK_SKELETONKEY = 0,
   CROCMAN_TELEPACK = 1,
@@ -698,6 +4992,7 @@ DROPCHANCE = {
   UFO_PARACHUTE = 9,
   YETI_PITCHERSMITT = 10
 }
+---@alias DROPCHANCE integer
 DYNAMIC_TEXTURE = {
   BACKGROUND = -4,
   BACKGROUND_DECORATION = -8,
@@ -708,39 +5003,7 @@ DYNAMIC_TEXTURE = {
   INVISIBLE = -2,
   KALI_STATUE = -9
 }
-DecoRegeneratingBlock = {
-  __index = "function",
-  __name = "sol.DecoRegeneratingBlock.user",
-  __newindex = "function"
-}
-DecoratedDoor = {
-  __index = "function",
-  __name = "sol.DecoratedDoor.user",
-  __newindex = "function"
-}
-DestructibleBG = {
-  __index = "function",
-  __name = "sol.DestructibleBG.user",
-  __newindex = "function"
-}
-Door = {
-  __index = "function",
-  __name = "sol.Door.user",
-  __newindex = "function"
-}
-DoorCoords = {
-  __name = "sol.DoorCoords.user"
-}
-Drill = {
-  __index = "function",
-  __name = "sol.Drill.user",
-  __newindex = "function"
-}
-DustWallApep = {
-  __index = "function",
-  __name = "sol.DustWallApep.user",
-  __newindex = "function"
-}
+---@alias DYNAMIC_TEXTURE integer
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
   CLIMBABLE = 9,
@@ -771,6 +5034,7 @@ ENT_FLAG = {
   THROWABLE_OR_KNOCKBACKABLE = 7,
   USABLE_ITEM = 19
 }
+---@alias ENT_FLAG integer
 ENT_MORE_FLAG = {
   CURSED_EFFECT = 15,
   DISABLE_INPUT = 17,
@@ -781,6 +5045,7 @@ ENT_MORE_FLAG = {
   HIT_WALL = 13,
   SWIMMING = 11
 }
+---@alias ENT_MORE_FLAG integer
 ENT_TYPE = {
   ACIDBUBBLE = 1000,
   ACTIVEFLOOR_BONEBLOCK = 601,
@@ -1992,68 +6257,7 @@ ENT_TYPE = {
   YETIKING = 1332,
   YETIQUEEN = 1333
 }
-EggSac = {
-  __index = "function",
-  __name = "sol.EggSac.user",
-  __newindex = "function"
-}
-EggShipDoor = {
-  __index = "function",
-  __name = "sol.EggShipDoor.user",
-  __newindex = "function"
-}
-EggShipDoorS = {
-  __index = "function",
-  __name = "sol.EggShipDoorS.user",
-  __newindex = "function"
-}
-EggplantMinister = {
-  __index = "function",
-  __name = "sol.EggplantMinister.user",
-  __newindex = "function"
-}
-EggplantThrower = {
-  __index = "function",
-  __name = "sol.EggplantThrower.user",
-  __newindex = "function"
-}
-EggshipCenterJetFlame = {
-  __index = "function",
-  __name = "sol.EggshipCenterJetFlame.user",
-  __newindex = "function"
-}
-Elevator = {
-  __index = "function",
-  __name = "sol.Elevator.user",
-  __newindex = "function"
-}
-EmpressGrave = {
-  __index = "function",
-  __name = "sol.EmpressGrave.user",
-  __newindex = "function"
-}
-Entity = {
-  __name = "sol.Entity.user"
-}
-EntityDB = {
-  __name = "sol.EntityDB.user"
-}
-Excalibur = {
-  __index = "function",
-  __name = "sol.Excalibur.user",
-  __newindex = "function"
-}
-ExitDoor = {
-  __index = "function",
-  __name = "sol.ExitDoor.user",
-  __newindex = "function"
-}
-Explosion = {
-  __index = "function",
-  __name = "sol.Explosion.user",
-  __newindex = "function"
-}
-F = {}
+---@alias ENT_TYPE integer
 FLOOR_SIDE = {
   BOTTOM = 1,
   BOTTOM_LEFT = 6,
@@ -2064,249 +6268,7 @@ FLOOR_SIDE = {
   TOP_LEFT = 4,
   TOP_RIGHT = 5
 }
-FallingPlatform = {
-  __index = "function",
-  __name = "sol.FallingPlatform.user",
-  __newindex = "function"
-}
-FireFrog = {
-  __index = "function",
-  __name = "sol.FireFrog.user",
-  __newindex = "function"
-}
-Fireball = {
-  __index = "function",
-  __name = "sol.Fireball.user",
-  __newindex = "function"
-}
-Firebug = {
-  __index = "function",
-  __name = "sol.Firebug.user",
-  __newindex = "function"
-}
-FirebugUnchained = {
-  __index = "function",
-  __name = "sol.FirebugUnchained.user",
-  __newindex = "function"
-}
-Fish = {
-  __index = "function",
-  __name = "sol.Fish.user",
-  __newindex = "function"
-}
-Flame = {
-  __index = "function",
-  __name = "sol.Flame.user",
-  __newindex = "function"
-}
-FlameSize = {
-  __index = "function",
-  __name = "sol.FlameSize.user",
-  __newindex = "function"
-}
-Floor = {
-  __index = "function",
-  __name = "sol.Floor.user",
-  __newindex = "function"
-}
-Fly = {
-  __index = "function",
-  __name = "sol.Fly.user",
-  __newindex = "function"
-}
-FlyHead = {
-  __index = "function",
-  __name = "sol.FlyHead.user",
-  __newindex = "function"
-}
-FlyingThing = {
-  __name = "sol.FlyingThing.user"
-}
-ForceField = {
-  __index = "function",
-  __name = "sol.ForceField.user",
-  __newindex = "function"
-}
-ForestSister = {
-  __index = "function",
-  __name = "sol.ForestSister.user",
-  __newindex = "function"
-}
-Frog = {
-  __index = "function",
-  __name = "sol.Frog.user",
-  __newindex = "function"
-}
-FrostBreathEffect = {
-  __index = "function",
-  __name = "sol.FrostBreathEffect.user",
-  __newindex = "function"
-}
-FrozenLiquid = {
-  __index = "function",
-  __name = "sol.FrozenLiquid.user",
-  __newindex = "function"
-}
-FxAlienBlast = {
-  __index = "function",
-  __name = "sol.FxAlienBlast.user",
-  __newindex = "function"
-}
-FxAnkhBrokenPiece = {
-  __index = "function",
-  __name = "sol.FxAnkhBrokenPiece.user",
-  __newindex = "function"
-}
-FxAnkhRotatingSpark = {
-  __index = "function",
-  __name = "sol.FxAnkhRotatingSpark.user",
-  __newindex = "function"
-}
-FxCompass = {
-  __index = "function",
-  __name = "sol.FxCompass.user",
-  __newindex = "function"
-}
-FxEmpress = {
-  __index = "function",
-  __name = "sol.FxEmpress.user",
-  __newindex = "function"
-}
-FxFireflyLight = {
-  __index = "function",
-  __name = "sol.FxFireflyLight.user",
-  __newindex = "function"
-}
-FxHundunNeckPiece = {
-  __index = "function",
-  __name = "sol.FxHundunNeckPiece.user",
-  __newindex = "function"
-}
-FxJellyfishStar = {
-  __index = "function",
-  __name = "sol.FxJellyfishStar.user",
-  __newindex = "function"
-}
-FxJetpackFlame = {
-  __index = "function",
-  __name = "sol.FxJetpackFlame.user",
-  __newindex = "function"
-}
-FxKinguSliding = {
-  __index = "function",
-  __name = "sol.FxKinguSliding.user",
-  __newindex = "function"
-}
-FxLamassuAttack = {
-  __index = "function",
-  __name = "sol.FxLamassuAttack.user",
-  __newindex = "function"
-}
-FxMainExitDoor = {
-  __index = "function",
-  __name = "sol.FxMainExitDoor.user",
-  __newindex = "function"
-}
-FxNecromancerANKH = {
-  __index = "function",
-  __name = "sol.FxNecromancerANKH.user",
-  __newindex = "function"
-}
-FxOuroboroDragonPart = {
-  __index = "function",
-  __name = "sol.FxOuroboroDragonPart.user",
-  __newindex = "function"
-}
-FxOuroboroOccluder = {
-  __index = "function",
-  __name = "sol.FxOuroboroOccluder.user",
-  __newindex = "function"
-}
-FxPickupEffect = {
-  __index = "function",
-  __name = "sol.FxPickupEffect.user",
-  __newindex = "function"
-}
-FxPlayerIndicator = {
-  __index = "function",
-  __name = "sol.FxPlayerIndicator.user",
-  __newindex = "function"
-}
-FxQuickSand = {
-  __index = "function",
-  __name = "sol.FxQuickSand.user",
-  __newindex = "function"
-}
-FxSaleContainer = {
-  __index = "function",
-  __name = "sol.FxSaleContainer.user",
-  __newindex = "function"
-}
-FxShotgunBlast = {
-  __index = "function",
-  __name = "sol.FxShotgunBlast.user",
-  __newindex = "function"
-}
-FxSorceressAttack = {
-  __index = "function",
-  __name = "sol.FxSorceressAttack.user",
-  __newindex = "function"
-}
-FxSparkSmall = {
-  __index = "function",
-  __name = "sol.FxSparkSmall.user",
-  __newindex = "function"
-}
-FxSpringtrapRing = {
-  __index = "function",
-  __name = "sol.FxSpringtrapRing.user",
-  __newindex = "function"
-}
-FxTiamatHead = {
-  __index = "function",
-  __name = "sol.FxTiamatHead.user",
-  __newindex = "function"
-}
-FxTiamatTail = {
-  __index = "function",
-  __name = "sol.FxTiamatTail.user",
-  __newindex = "function"
-}
-FxTiamatTorso = {
-  __index = "function",
-  __name = "sol.FxTiamatTorso.user",
-  __newindex = "function"
-}
-FxTornJournalPage = {
-  __index = "function",
-  __name = "sol.FxTornJournalPage.user",
-  __newindex = "function"
-}
-FxUnderwaterBubble = {
-  __index = "function",
-  __name = "sol.FxUnderwaterBubble.user",
-  __newindex = "function"
-}
-FxVatBubble = {
-  __index = "function",
-  __name = "sol.FxVatBubble.user",
-  __newindex = "function"
-}
-FxWaterDrop = {
-  __index = "function",
-  __name = "sol.FxWaterDrop.user",
-  __newindex = "function"
-}
-FxWebbedEffect = {
-  __index = "function",
-  __name = "sol.FxWebbedEffect.user",
-  __newindex = "function"
-}
-FxWitchdoctorHint = {
-  __index = "function",
-  __name = "sol.FxWitchdoctorHint.user",
-  __newindex = "function"
-}
+---@alias FLOOR_SIDE integer
 GHOST_BEHAVIOR = {
   MEDIUM_HAPPY = 1,
   MEDIUM_SAD = 0,
@@ -2316,78 +6278,7 @@ GHOST_BEHAVIOR = {
   SMALL_SAD = 2,
   SMALL_SURPRISED = 1
 }
-GameManager = {
-  __name = "sol.GameManager.user"
-}
-GameProps = {
-  __name = "sol.GameProps.user"
-}
-Gamepad = {
-  __name = "sol.Gamepad.user"
-}
-Generator = {
-  __index = "function",
-  __name = "sol.Generator.user",
-  __newindex = "function"
-}
-Ghist = {
-  __index = "function",
-  __name = "sol.Ghist.user",
-  __newindex = "function"
-}
-Ghost = {
-  __index = "function",
-  __name = "sol.Ghost.user",
-  __newindex = "function"
-}
-GhostBreath = {
-  __index = "function",
-  __name = "sol.GhostBreath.user",
-  __newindex = "function"
-}
-GiantClamTop = {
-  __index = "function",
-  __name = "sol.GiantClamTop.user",
-  __newindex = "function"
-}
-GiantFish = {
-  __index = "function",
-  __name = "sol.GiantFish.user",
-  __newindex = "function"
-}
-GiantFly = {
-  __index = "function",
-  __name = "sol.GiantFly.user",
-  __newindex = "function"
-}
-GiantFrog = {
-  __index = "function",
-  __name = "sol.GiantFrog.user",
-  __newindex = "function"
-}
-GoldMonkey = {
-  __index = "function",
-  __name = "sol.GoldMonkey.user",
-  __newindex = "function"
-}
-Goldbar = {
-  __index = "function",
-  __name = "sol.Goldbar.user",
-  __newindex = "function"
-}
-Grub = {
-  __index = "function",
-  __name = "sol.Grub.user",
-  __newindex = "function"
-}
-GuiDrawContext = {
-  __name = "sol.GuiDrawContext.user"
-}
-Gun = {
-  __index = "function",
-  __name = "sol.Gun.user",
-  __newindex = "function"
-}
+---@alias GHOST_BEHAVIOR integer
 HUNDUNFLAGS = {
   BIRDHEADEMERGED = 2,
   BIRDHEADSHOTLAST = 16,
@@ -2395,61 +6286,7 @@ HUNDUNFLAGS = {
   TOPLEVELARENAREACHED = 8,
   WILLMOVELEFT = 1
 }
-HangAnchor = {
-  __index = "function",
-  __name = "sol.HangAnchor.user",
-  __newindex = "function"
-}
-HangSpider = {
-  __index = "function",
-  __name = "sol.HangSpider.user",
-  __newindex = "function"
-}
-HangStrand = {
-  __index = "function",
-  __name = "sol.HangStrand.user",
-  __newindex = "function"
-}
-Hermitcrab = {
-  __index = "function",
-  __name = "sol.Hermitcrab.user",
-  __newindex = "function"
-}
-Honey = {
-  __index = "function",
-  __name = "sol.Honey.user",
-  __newindex = "function"
-}
-HorizontalForceField = {
-  __index = "function",
-  __name = "sol.HorizontalForceField.user",
-  __newindex = "function"
-}
-HornedLizard = {
-  __index = "function",
-  __name = "sol.HornedLizard.user",
-  __newindex = "function"
-}
-Hoverpack = {
-  __index = "function",
-  __name = "sol.Hoverpack.user",
-  __newindex = "function"
-}
-Hundun = {
-  __index = "function",
-  __name = "sol.Hundun.user",
-  __newindex = "function"
-}
-HundunChest = {
-  __index = "function",
-  __name = "sol.HundunChest.user",
-  __newindex = "function"
-}
-HundunHead = {
-  __index = "function",
-  __name = "sol.HundunHead.user",
-  __newindex = "function"
-}
+---@alias HUNDUNFLAGS integer
 INPUTS = {
   BOMB = 4,
   DOOR = 32,
@@ -2465,39 +6302,7 @@ INPUTS = {
   UP = 1024,
   WHIP = 2
 }
-IceSlidingSound = {
-  __index = "function",
-  __name = "sol.IceSlidingSound.user",
-  __newindex = "function"
-}
-Idol = {
-  __index = "function",
-  __name = "sol.Idol.user",
-  __newindex = "function"
-}
-Illumination = {
-  __name = "sol.Illumination.user"
-}
-ImGuiIO = {
-  __name = "sol.ImGuiIO.user"
-}
-ImVec2 = {
-  __name = "sol.ImVec2.user"
-}
-Imp = {
-  __index = "function",
-  __name = "sol.Imp.user",
-  __newindex = "function"
-}
-InputMapping = {
-  __name = "sol.InputMapping.user"
-}
-Inventory = {
-  __name = "sol.Inventory.user"
-}
-Items = {
-  __name = "sol.Items.user"
-}
+---@alias INPUTS integer
 JOURNALUI_PAGE_SHOWN = {
   BESTIARY = 5,
   DEATH = 10,
@@ -2510,6 +6315,7 @@ JOURNALUI_PAGE_SHOWN = {
   STORY = 8,
   TRAPS = 7
 }
+---@alias JOURNALUI_PAGE_SHOWN integer
 JOURNALUI_STATE = {
   FADING_IN = 1,
   FADING_OUT = 5,
@@ -2518,6 +6324,7 @@ JOURNALUI_STATE = {
   INVISIBLE = 0,
   STABLE = 2
 }
+---@alias JOURNALUI_STATE integer
 JOURNAL_PAGE_TYPE = {
   BESTIARY = 4,
   DEATH_CAUSE = 9,
@@ -2534,6 +6341,7 @@ JOURNAL_PAGE_TYPE = {
   STORY = 7,
   TRAPS = 6
 }
+---@alias JOURNAL_PAGE_TYPE integer
 JUNGLESISTERS = {
   GREAT_PARTY_HUH = 5,
   I_WISH_BROUGHT_A_JACKET = 6,
@@ -2542,130 +6350,7 @@ JUNGLESISTERS = {
   PARSNIP_RESCUED = 2,
   WARNING_ONE_WAY_DOOR = 4
 }
-Jetpack = {
-  __index = "function",
-  __name = "sol.Jetpack.user",
-  __newindex = "function"
-}
-Jiangshi = {
-  __index = "function",
-  __name = "sol.Jiangshi.user",
-  __newindex = "function"
-}
-JournalPage = {
-  __name = "sol.JournalPage.user"
-}
-JournalPageBestiary = {
-  __index = "function",
-  __name = "sol.JournalPageBestiary.user",
-  __newindex = "function"
-}
-JournalPageDeathCause = {
-  __index = "function",
-  __name = "sol.JournalPageDeathCause.user",
-  __newindex = "function"
-}
-JournalPageDeathMenu = {
-  __index = "function",
-  __name = "sol.JournalPageDeathMenu.user",
-  __newindex = "function"
-}
-JournalPageDiscoverable = {
-  __index = "function",
-  __name = "sol.JournalPageDiscoverable.user",
-  __newindex = "function"
-}
-JournalPageFeats = {
-  __index = "function",
-  __name = "sol.JournalPageFeats.user",
-  __newindex = "function"
-}
-JournalPageItems = {
-  __index = "function",
-  __name = "sol.JournalPageItems.user",
-  __newindex = "function"
-}
-JournalPageJournalMenu = {
-  __index = "function",
-  __name = "sol.JournalPageJournalMenu.user",
-  __newindex = "function"
-}
-JournalPageLastGamePlayed = {
-  __index = "function",
-  __name = "sol.JournalPageLastGamePlayed.user",
-  __newindex = "function"
-}
-JournalPagePeople = {
-  __index = "function",
-  __name = "sol.JournalPagePeople.user",
-  __newindex = "function"
-}
-JournalPagePlaces = {
-  __index = "function",
-  __name = "sol.JournalPagePlaces.user",
-  __newindex = "function"
-}
-JournalPagePlayerProfile = {
-  __index = "function",
-  __name = "sol.JournalPagePlayerProfile.user",
-  __newindex = "function"
-}
-JournalPageProgress = {
-  __index = "function",
-  __name = "sol.JournalPageProgress.user",
-  __newindex = "function"
-}
-JournalPageRecap = {
-  __index = "function",
-  __name = "sol.JournalPageRecap.user",
-  __newindex = "function"
-}
-JournalPageStory = {
-  __index = "function",
-  __name = "sol.JournalPageStory.user",
-  __newindex = "function"
-}
-JournalPageTraps = {
-  __index = "function",
-  __name = "sol.JournalPageTraps.user",
-  __newindex = "function"
-}
-JournalPopupUI = {
-  __name = "sol.JournalPopupUI.user"
-}
-JournalUI = {
-  __name = "sol.JournalUI.user"
-}
-JumpDog = {
-  __index = "function",
-  __name = "sol.JumpDog.user",
-  __newindex = "function"
-}
-JungleSpearCosmetic = {
-  __index = "function",
-  __name = "sol.JungleSpearCosmetic.user",
-  __newindex = "function"
-}
-JungleSpearTrap = {
-  __index = "function",
-  __name = "sol.JungleSpearTrap.user",
-  __newindex = "function"
-}
-JungleTrapTrigger = {
-  __index = "function",
-  __name = "sol.JungleTrapTrigger.user",
-  __newindex = "function"
-}
-KapalaPowerup = {
-  __index = "function",
-  __name = "sol.KapalaPowerup.user",
-  __newindex = "function"
-}
-Kingu = {
-  __index = "function",
-  __name = "sol.Kingu.user",
-  __newindex = "function"
-}
+---@alias JUNGLESISTERS integer
 LAYER = {
   BACK = 1,
   BOTH = -128,
@@ -2676,6 +6361,7 @@ LAYER = {
   PLAYER3 = -3,
   PLAYER4 = -4
 }
+---@alias LAYER integer
 LEVEL_CONFIG = {
   ALTAR_ROOM_CHANCE = 5,
   BACKGROUND_CHANCE = 9,
@@ -2695,6 +6381,7 @@ LEVEL_CONFIG = {
   MAX_LIQUID_PARTICLES = 15,
   MOUNT_CHANCE = 4
 }
+---@alias LEVEL_CONFIG integer
 LIQUID_POOL = {
   COARSE_LAVA = 4,
   COARSE_WATER = 2,
@@ -2702,188 +6389,7 @@ LIQUID_POOL = {
   STAGNANT_LAVA = 5,
   WATER = 1
 }
-Lahamu = {
-  __index = "function",
-  __name = "sol.Lahamu.user",
-  __newindex = "function"
-}
-Lamassu = {
-  __index = "function",
-  __name = "sol.Lamassu.user",
-  __newindex = "function"
-}
-LampFlame = {
-  __index = "function",
-  __name = "sol.LampFlame.user",
-  __newindex = "function"
-}
-Landmine = {
-  __index = "function",
-  __name = "sol.Landmine.user",
-  __newindex = "function"
-}
-LaserBeam = {
-  __index = "function",
-  __name = "sol.LaserBeam.user",
-  __newindex = "function"
-}
-LaserTrap = {
-  __index = "function",
-  __name = "sol.LaserTrap.user",
-  __newindex = "function"
-}
-Lava = {
-  __index = "function",
-  __name = "sol.Lava.user",
-  __newindex = "function"
-}
-Lavamander = {
-  __index = "function",
-  __name = "sol.Lavamander.user",
-  __newindex = "function"
-}
-Leaf = {
-  __index = "function",
-  __name = "sol.Leaf.user",
-  __newindex = "function"
-}
-Leprechaun = {
-  __index = "function",
-  __name = "sol.Leprechaun.user",
-  __newindex = "function"
-}
-LevelGenSystem = {
-  __name = "sol.LevelGenSystem.user"
-}
-LightArrow = {
-  __index = "function",
-  __name = "sol.LightArrow.user",
-  __newindex = "function"
-}
-LightArrowPlatform = {
-  __index = "function",
-  __name = "sol.LightArrowPlatform.user",
-  __newindex = "function"
-}
-LightEmitter = {
-  __index = "function",
-  __name = "sol.LightEmitter.user",
-  __newindex = "function"
-}
-LightParams = {
-  __name = "sol.LightParams.user"
-}
-LightShot = {
-  __index = "function",
-  __name = "sol.LightShot.user",
-  __newindex = "function"
-}
-LimbAnchor = {
-  __index = "function",
-  __name = "sol.LimbAnchor.user",
-  __newindex = "function"
-}
-Liquid = {
-  __index = "function",
-  __name = "sol.Liquid.user",
-  __newindex = "function"
-}
-LiquidPhysics = {
-  __name = "sol.LiquidPhysics.user"
-}
-LiquidPhysicsEngine = {
-  __name = "sol.LiquidPhysicsEngine.user"
-}
-LiquidPhysicsParams = {
-  __name = "sol.LiquidPhysicsParams.user"
-}
-LiquidPool = {
-  __name = "sol.LiquidPool.user"
-}
-LiquidSurface = {
-  __index = "function",
-  __name = "sol.LiquidSurface.user",
-  __newindex = "function"
-}
-LoadContext = {
-  __name = "sol.LoadContext.user"
-}
-LockedDoor = {
-  __index = "function",
-  __name = "sol.LockedDoor.user",
-  __newindex = "function"
-}
-Logic = {
-  __name = "sol.Logic.user"
-}
-LogicDiceShop = {
-  __index = "function",
-  __name = "sol.LogicDiceShop.user",
-  __newindex = "function"
-}
-LogicList = {
-  __name = "sol.LogicList.user"
-}
-LogicOlmecCutscene = {
-  __index = "function",
-  __name = "sol.LogicOlmecCutscene.user",
-  __newindex = "function"
-}
-LogicTiamatCutscene = {
-  __index = "function",
-  __name = "sol.LogicTiamatCutscene.user",
-  __newindex = "function"
-}
-LogicalAnchovyFlock = {
-  __index = "function",
-  __name = "sol.LogicalAnchovyFlock.user",
-  __newindex = "function"
-}
-LogicalConveyorbeltSound = {
-  __index = "function",
-  __name = "sol.LogicalConveyorbeltSound.user",
-  __newindex = "function"
-}
-LogicalDoor = {
-  __index = "function",
-  __name = "sol.LogicalDoor.user",
-  __newindex = "function"
-}
-LogicalDrain = {
-  __index = "function",
-  __name = "sol.LogicalDrain.user",
-  __newindex = "function"
-}
-LogicalLiquidStreamSound = {
-  __index = "function",
-  __name = "sol.LogicalLiquidStreamSound.user",
-  __newindex = "function"
-}
-LogicalMiniGame = {
-  __index = "function",
-  __name = "sol.LogicalMiniGame.user",
-  __newindex = "function"
-}
-LogicalRegeneratingBlock = {
-  __index = "function",
-  __name = "sol.LogicalRegeneratingBlock.user",
-  __newindex = "function"
-}
-LogicalSound = {
-  __index = "function",
-  __name = "sol.LogicalSound.user",
-  __newindex = "function"
-}
-LogicalStaticSound = {
-  __index = "function",
-  __name = "sol.LogicalStaticSound.user",
-  __newindex = "function"
-}
-LogicalTrapTrigger = {
-  __index = "function",
-  __name = "sol.LogicalTrapTrigger.user",
-  __newindex = "function"
-}
+---@alias LIQUID_POOL integer
 MASK = {
   ACTIVEFLOOR = 128,
   ANY = 0,
@@ -2903,111 +6409,7 @@ MASK = {
   SHADOW = 2048,
   WATER = 8192
 }
-MagmaMan = {
-  __index = "function",
-  __name = "sol.MagmaMan.user",
-  __newindex = "function"
-}
-MainExit = {
-  __index = "function",
-  __name = "sol.MainExit.user",
-  __newindex = "function"
-}
-Mantrap = {
-  __index = "function",
-  __name = "sol.Mantrap.user",
-  __newindex = "function"
-}
-Mattock = {
-  __index = "function",
-  __name = "sol.Mattock.user",
-  __newindex = "function"
-}
-Mech = {
-  __index = "function",
-  __name = "sol.Mech.user",
-  __newindex = "function"
-}
-MegaJellyfish = {
-  __index = "function",
-  __name = "sol.MegaJellyfish.user",
-  __newindex = "function"
-}
-MiniGameAsteroid = {
-  __index = "function",
-  __name = "sol.MiniGameAsteroid.user",
-  __newindex = "function"
-}
-MiniGameShip = {
-  __index = "function",
-  __name = "sol.MiniGameShip.user",
-  __newindex = "function"
-}
-MiniGameShipOffset = {
-  __index = "function",
-  __name = "sol.MiniGameShipOffset.user",
-  __newindex = "function"
-}
-Mole = {
-  __index = "function",
-  __name = "sol.Mole.user",
-  __newindex = "function"
-}
-Monkey = {
-  __index = "function",
-  __name = "sol.Monkey.user",
-  __newindex = "function"
-}
-Monster = {
-  __index = "function",
-  __name = "sol.Monster.user",
-  __newindex = "function"
-}
-Mosquito = {
-  __index = "function",
-  __name = "sol.Mosquito.user",
-  __newindex = "function"
-}
-MotherStatue = {
-  __index = "function",
-  __name = "sol.MotherStatue.user",
-  __newindex = "function"
-}
-Mount = {
-  __index = "function",
-  __name = "sol.Mount.user",
-  __newindex = "function"
-}
-Movable = {
-  __index = "function",
-  __name = "sol.Movable.user",
-  __newindex = "function"
-}
-MovingIcon = {
-  __index = "function",
-  __name = "sol.MovingIcon.user",
-  __newindex = "function"
-}
-Mummy = {
-  __index = "function",
-  __name = "sol.Mummy.user",
-  __newindex = "function"
-}
-MummyFliesSound = {
-  __index = "function",
-  __name = "sol.MummyFliesSound.user",
-  __newindex = "function"
-}
-NPC = {
-  __index = "function",
-  __name = "sol.NPC.user",
-  __newindex = "function"
-}
-Necromancer = {
-  __index = "function",
-  __name = "sol.Necromancer.user",
-  __newindex = "function"
-}
+---@alias MASK integer
 ON = {
   ARENA_INTRO = 25,
   ARENA_MATCH = 26,
@@ -3061,70 +6463,7 @@ ON = {
   TRANSITION = 13,
   WIN = 16
 }
-Octopus = {
-  __index = "function",
-  __name = "sol.Octopus.user",
-  __newindex = "function"
-}
-Olmec = {
-  __index = "function",
-  __name = "sol.Olmec.user",
-  __newindex = "function"
-}
-OlmecCannon = {
-  __index = "function",
-  __name = "sol.OlmecCannon.user",
-  __newindex = "function"
-}
-OlmecFloater = {
-  __index = "function",
-  __name = "sol.OlmecFloater.user",
-  __newindex = "function"
-}
-Olmite = {
-  __index = "function",
-  __name = "sol.Olmite.user",
-  __newindex = "function"
-}
-OnFireEffect = {
-  __index = "function",
-  __name = "sol.OnFireEffect.user",
-  __newindex = "function"
-}
-Online = {
-  __name = "sol.Online.user"
-}
-OnlineLobby = {
-  __name = "sol.OnlineLobby.user"
-}
-OnlinePlayer = {
-  __name = "sol.OnlinePlayer.user"
-}
-Orb = {
-  __index = "function",
-  __name = "sol.Orb.user",
-  __newindex = "function"
-}
-OsirisHand = {
-  __index = "function",
-  __name = "sol.OsirisHand.user",
-  __newindex = "function"
-}
-OsirisHead = {
-  __index = "function",
-  __name = "sol.OsirisHead.user",
-  __newindex = "function"
-}
-OuroboroCameraAnchor = {
-  __index = "function",
-  __name = "sol.OuroboroCameraAnchor.user",
-  __newindex = "function"
-}
-OuroboroCameraZoomin = {
-  __index = "function",
-  __name = "sol.OuroboroCameraZoomin.user",
-  __newindex = "function"
-}
+---@alias ON integer
 PARTICLEEMITTER = {
   ACIDBUBBLEBURST_BUBBLES = 101,
   ACIDBUBBLEBURST_SPARKS = 102,
@@ -3347,15 +6686,14 @@ PARTICLEEMITTER = {
   YETIKING_YELL_SPARKLES = 182,
   YETIQUEEN_LANDING_SNOWDUST = 183
 }
+---@alias PARTICLEEMITTER integer
 PAUSEUI_VISIBILITY = {
   INVISIBLE = 0,
   SLIDING_DOWN = 1,
   SLIDING_UP = 3,
   VISIBLE = 2
 }
-PRNG = {
-  __name = "sol.PRNG.user"
-}
+---@alias PAUSEUI_VISIBILITY integer
 PRNG_CLASS = {
   ENTITY_VARIATION = 3,
   EXTRA_SPAWNS = 5,
@@ -3363,6 +6701,7 @@ PRNG_CLASS = {
   PARTICLES = 2,
   PROCEDURAL_SPAWNS = 0
 }
+---@alias PRNG_CLASS integer
 PROCEDURAL_CHANCE = {
   ADD_GOLD_BAR = 444,
   ADD_GOLD_BARS = 445,
@@ -3444,157 +6783,13 @@ PROCEDURAL_CHANCE = {
   WITCHDOCTOR = 235,
   YETI = 268
 }
-PalaceSign = {
-  __index = "function",
-  __name = "sol.PalaceSign.user",
-  __newindex = "function"
-}
-ParachutePowerup = {
-  __index = "function",
-  __name = "sol.ParachutePowerup.user",
-  __newindex = "function"
-}
-ParticleDB = {
-  __name = "sol.ParticleDB.user"
-}
-ParticleEmitterInfo = {
-  __name = "sol.ParticleEmitterInfo.user"
-}
-PauseUI = {
-  __name = "sol.PauseUI.user"
-}
-Pet = {
-  __index = "function",
-  __name = "sol.Pet.user",
-  __newindex = "function"
-}
-Pipe = {
-  __index = "function",
-  __name = "sol.Pipe.user",
-  __newindex = "function"
-}
-PipeTravelerSound = {
-  __index = "function",
-  __name = "sol.PipeTravelerSound.user",
-  __newindex = "function"
-}
-Player = {
-  __index = "function",
-  __name = "sol.Player.user",
-  __newindex = "function"
-}
-PlayerBag = {
-  __index = "function",
-  __name = "sol.PlayerBag.user",
-  __newindex = "function"
-}
-PlayerGhost = {
-  __index = "function",
-  __name = "sol.PlayerGhost.user",
-  __newindex = "function"
-}
-PlayerInputs = {
-  __name = "sol.PlayerInputs.user"
-}
-PlayerSlot = {
-  __name = "sol.PlayerSlot.user"
-}
-PlayerSlotSettings = {
-  __name = "sol.PlayerSlotSettings.user"
-}
-PlayingSound = {
-  __name = "sol.PlayingSound.user"
-}
-PoisonedEffect = {
-  __index = "function",
-  __name = "sol.PoisonedEffect.user",
-  __newindex = "function"
-}
-PoleDeco = {
-  __index = "function",
-  __name = "sol.PoleDeco.user",
-  __newindex = "function"
-}
-Portal = {
-  __index = "function",
-  __name = "sol.Portal.user",
-  __newindex = "function"
-}
-PostRoomGenerationContext = {
-  __name = "sol.PostRoomGenerationContext.user"
-}
-Pot = {
-  __index = "function",
-  __name = "sol.Pot.user",
-  __newindex = "function"
-}
-Powerup = {
-  __index = "function",
-  __name = "sol.Powerup.user",
-  __newindex = "function"
-}
-PowerupCapable = {
-  __index = "function",
-  __name = "sol.PowerupCapable.user",
-  __newindex = "function"
-}
-PreHandleRoomTilesContext = {
-  __name = "sol.PreHandleRoomTilesContext.user"
-}
-PreLoadLevelFilesContext = {
-  __name = "sol.PreLoadLevelFilesContext.user"
-}
-PrizeDispenser = {
-  __index = "function",
-  __name = "sol.PrizeDispenser.user",
-  __newindex = "function"
-}
-ProtoShopkeeper = {
-  __index = "function",
-  __name = "sol.ProtoShopkeeper.user",
-  __newindex = "function"
-}
-PunishBall = {
-  __index = "function",
-  __name = "sol.PunishBall.user",
-  __newindex = "function"
-}
-PushBlock = {
-  __index = "function",
-  __name = "sol.PushBlock.user",
-  __newindex = "function"
-}
-Qilin = {
-  __index = "function",
-  __name = "sol.Qilin.user",
-  __newindex = "function"
-}
-Quad = {
-  __name = "sol.Quad.user"
-}
-QuestsInfo = {
-  __name = "sol.QuestsInfo.user"
-}
-QuickSand = {
-  __index = "function",
-  __name = "sol.QuickSand.user",
-  __newindex = "function"
-}
-QuickSandSound = {
-  __index = "function",
-  __name = "sol.QuickSandSound.user",
-  __newindex = "function"
-}
-Quillback = {
-  __index = "function",
-  __name = "sol.Quillback.user",
-  __newindex = "function"
-}
+---@alias PROCEDURAL_CHANCE integer
 REPEAT_TYPE = {
   BACK_AND_FORTH = 2,
   LINEAR = 1,
   NO_REPEAT = 0
 }
+---@alias REPEAT_TYPE integer
 ROOM_TEMPLATE = {
   ABZU_BACKDOOR = 132,
   ALTAR = 115,
@@ -3850,6 +7045,7 @@ ROOM_TEMPLATE = {
   VLAD_TUNNEL = 124,
   WADDLER = 86
 }
+---@alias ROOM_TEMPLATE integer
 ROOM_TEMPLATE_TYPE = {
   ENTRANCE = 1,
   EXIT = 2,
@@ -3857,41 +7053,7 @@ ROOM_TEMPLATE_TYPE = {
   NONE = 0,
   SHOP = 3
 }
-RegenBlock = {
-  __index = "function",
-  __name = "sol.RegenBlock.user",
-  __newindex = "function"
-}
-Robot = {
-  __index = "function",
-  __name = "sol.Robot.user",
-  __newindex = "function"
-}
-Rockdog = {
-  __index = "function",
-  __name = "sol.Rockdog.user",
-  __newindex = "function"
-}
-RollingItem = {
-  __index = "function",
-  __name = "sol.RollingItem.user",
-  __newindex = "function"
-}
-RoomLight = {
-  __index = "function",
-  __name = "sol.RoomLight.user",
-  __newindex = "function"
-}
-RoomOwner = {
-  __index = "function",
-  __name = "sol.RoomOwner.user",
-  __newindex = "function"
-}
-Rubble = {
-  __index = "function",
-  __name = "sol.Rubble.user",
-  __newindex = "function"
-}
+---@alias ROOM_TEMPLATE_TYPE integer
 SCREEN = {
   ARENA_INTRO = 25,
   ARENA_ITEMS = 23,
@@ -3924,6 +7086,7 @@ SCREEN = {
   TRANSITION = 13,
   WIN = 16
 }
+---@alias SCREEN integer
 SHOP_TYPE = {
   CAVEMAN_SHOP = 10,
   CLOTHING_SHOP = 1,
@@ -3939,15 +7102,18 @@ SHOP_TYPE = {
   TUSK_DICE_SHOP = 13,
   WEAPON_SHOP = 2
 }
+---@alias SHOP_TYPE integer
 SOUND_LOOP_MODE = {
   BIDIRECTIONAL = 2,
   LOOP = 1,
   OFF = 0
 }
+---@alias SOUND_LOOP_MODE integer
 SOUND_TYPE = {
   MUSIC = 1,
   SFX = 0
 }
+---@alias SOUND_TYPE integer
 SPARROW = {
   FINISHED_LEVEL_WITH_THIEF_STATUS = 2,
   FIRST_ENCOUNTER_ROPES_THROWN = 4,
@@ -3959,6 +7125,7 @@ SPARROW = {
   THIEF_STATUS = 1,
   TUSK_IDOL_STOLEN = 5
 }
+---@alias SPARROW integer
 SPAWN_TYPE = {
   ANY = 63,
   LEVEL_GEN = 15,
@@ -3969,285 +7136,7 @@ SPAWN_TYPE = {
   SCRIPT = 16,
   SYSTEMIC = 32
 }
-SaveContext = {
-  __name = "sol.SaveContext.user"
-}
-SaveData = {
-  __name = "sol.SaveData.user"
-}
-SaveRelated = {
-  __name = "sol.SaveRelated.user"
-}
-Scarab = {
-  __index = "function",
-  __name = "sol.Scarab.user",
-  __newindex = "function"
-}
-ScepterShot = {
-  __index = "function",
-  __name = "sol.ScepterShot.user",
-  __newindex = "function"
-}
-Scorpion = {
-  __index = "function",
-  __name = "sol.Scorpion.user",
-  __newindex = "function"
-}
-Screen = {
-  __name = "sol.Screen.user"
-}
-ScreenArenaIntro = {
-  __index = "function",
-  __name = "sol.ScreenArenaIntro.user",
-  __newindex = "function"
-}
-ScreenArenaItems = {
-  __index = "function",
-  __name = "sol.ScreenArenaItems.user",
-  __newindex = "function"
-}
-ScreenArenaLevel = {
-  __index = "function",
-  __name = "sol.ScreenArenaLevel.user",
-  __newindex = "function"
-}
-ScreenArenaMenu = {
-  __index = "function",
-  __name = "sol.ScreenArenaMenu.user",
-  __newindex = "function"
-}
-ScreenArenaScore = {
-  __index = "function",
-  __name = "sol.ScreenArenaScore.user",
-  __newindex = "function"
-}
-ScreenArenaStagesSelect = {
-  __index = "function",
-  __name = "sol.ScreenArenaStagesSelect.user",
-  __newindex = "function"
-}
-ScreenCamp = {
-  __index = "function",
-  __name = "sol.ScreenCamp.user",
-  __newindex = "function"
-}
-ScreenCharacterSelect = {
-  __index = "function",
-  __name = "sol.ScreenCharacterSelect.user",
-  __newindex = "function"
-}
-ScreenConstellation = {
-  __index = "function",
-  __name = "sol.ScreenConstellation.user",
-  __newindex = "function"
-}
-ScreenCredits = {
-  __index = "function",
-  __name = "sol.ScreenCredits.user",
-  __newindex = "function"
-}
-ScreenDeath = {
-  __index = "function",
-  __name = "sol.ScreenDeath.user",
-  __newindex = "function"
-}
-ScreenIntro = {
-  __index = "function",
-  __name = "sol.ScreenIntro.user",
-  __newindex = "function"
-}
-ScreenLeaderboards = {
-  __index = "function",
-  __name = "sol.ScreenLeaderboards.user",
-  __newindex = "function"
-}
-ScreenLevel = {
-  __index = "function",
-  __name = "sol.ScreenLevel.user",
-  __newindex = "function"
-}
-ScreenLogo = {
-  __index = "function",
-  __name = "sol.ScreenLogo.user",
-  __newindex = "function"
-}
-ScreenMenu = {
-  __index = "function",
-  __name = "sol.ScreenMenu.user",
-  __newindex = "function"
-}
-ScreenOnlineLoading = {
-  __index = "function",
-  __name = "sol.ScreenOnlineLoading.user",
-  __newindex = "function"
-}
-ScreenOnlineLobby = {
-  __index = "function",
-  __name = "sol.ScreenOnlineLobby.user",
-  __newindex = "function"
-}
-ScreenOptions = {
-  __index = "function",
-  __name = "sol.ScreenOptions.user",
-  __newindex = "function"
-}
-ScreenPlayerProfile = {
-  __index = "function",
-  __name = "sol.ScreenPlayerProfile.user",
-  __newindex = "function"
-}
-ScreenPrologue = {
-  __index = "function",
-  __name = "sol.ScreenPrologue.user",
-  __newindex = "function"
-}
-ScreenRecap = {
-  __index = "function",
-  __name = "sol.ScreenRecap.user",
-  __newindex = "function"
-}
-ScreenScores = {
-  __index = "function",
-  __name = "sol.ScreenScores.user",
-  __newindex = "function"
-}
-ScreenSeedInput = {
-  __index = "function",
-  __name = "sol.ScreenSeedInput.user",
-  __newindex = "function"
-}
-ScreenTeamSelect = {
-  __index = "function",
-  __name = "sol.ScreenTeamSelect.user",
-  __newindex = "function"
-}
-ScreenTitle = {
-  __index = "function",
-  __name = "sol.ScreenTitle.user",
-  __newindex = "function"
-}
-ScreenTransition = {
-  __index = "function",
-  __name = "sol.ScreenTransition.user",
-  __newindex = "function"
-}
-ScreenWin = {
-  __index = "function",
-  __name = "sol.ScreenWin.user",
-  __newindex = "function"
-}
-ScreenZoomAnimation = {
-  __name = "sol.ScreenZoomAnimation.user"
-}
-SelectPlayerSlot = {
-  __name = "sol.SelectPlayerSlot.user"
-}
-Shield = {
-  __index = "function",
-  __name = "sol.Shield.user",
-  __newindex = "function"
-}
-ShootingStarSpawner = {
-  __index = "function",
-  __name = "sol.ShootingStarSpawner.user",
-  __newindex = "function"
-}
-Shopkeeper = {
-  __index = "function",
-  __name = "sol.Shopkeeper.user",
-  __newindex = "function"
-}
-ShortTileCodeDef = {
-  __name = "sol.ShortTileCodeDef.user"
-}
-Skeleton = {
-  __index = "function",
-  __name = "sol.Skeleton.user",
-  __newindex = "function"
-}
-SkullDropTrap = {
-  __index = "function",
-  __name = "sol.SkullDropTrap.user",
-  __newindex = "function"
-}
-SleepBubble = {
-  __index = "function",
-  __name = "sol.SleepBubble.user",
-  __newindex = "function"
-}
-SlidingWallCeiling = {
-  __index = "function",
-  __name = "sol.SlidingWallCeiling.user",
-  __newindex = "function"
-}
-SnapTrap = {
-  __index = "function",
-  __name = "sol.SnapTrap.user",
-  __newindex = "function"
-}
-Sorceress = {
-  __index = "function",
-  __name = "sol.Sorceress.user",
-  __newindex = "function"
-}
-SoundShot = {
-  __index = "function",
-  __name = "sol.SoundShot.user",
-  __newindex = "function"
-}
-Spark = {
-  __index = "function",
-  __name = "sol.Spark.user",
-  __newindex = "function"
-}
-SparkTrap = {
-  __index = "function",
-  __name = "sol.SparkTrap.user",
-  __newindex = "function"
-}
-Spear = {
-  __index = "function",
-  __name = "sol.Spear.user",
-  __newindex = "function"
-}
-SpecialShot = {
-  __index = "function",
-  __name = "sol.SpecialShot.user",
-  __newindex = "function"
-}
-Spider = {
-  __index = "function",
-  __name = "sol.Spider.user",
-  __newindex = "function"
-}
-SpikeballTrap = {
-  __index = "function",
-  __name = "sol.SpikeballTrap.user",
-  __newindex = "function"
-}
-SplashBubbleGenerator = {
-  __index = "function",
-  __name = "sol.SplashBubbleGenerator.user",
-  __newindex = "function"
-}
-StateMemory = {
-  __name = "sol.StateMemory.user"
-}
-StickyTrap = {
-  __index = "function",
-  __name = "sol.StickyTrap.user",
-  __newindex = "function"
-}
-StretchChain = {
-  __index = "function",
-  __name = "sol.StretchChain.user",
-  __newindex = "function"
-}
-Switch = {
-  __index = "function",
-  __name = "sol.Switch.user",
-  __newindex = "function"
-}
+---@alias SPAWN_TYPE integer
 TEXTURE = {
   DATA_TEXTURES_BASE_EGGSHIP2_0 = 108,
   DATA_TEXTURES_BASE_EGGSHIP2_1 = 109,
@@ -4650,6 +7539,7 @@ TEXTURE = {
   DATA_TEXTURES_SPLASH1_0 = 4,
   DATA_TEXTURES_SPLASH2_0 = 5
 }
+---@alias TEXTURE integer
 THEME = {
   ABZU = 13,
   ARENA = 18,
@@ -4670,6 +7560,7 @@ THEME = {
   TIDE_POOL = 5,
   VOLCANA = 3
 }
+---@alias THEME integer
 THEME_OVERRIDE = {
   BACKLAYER_LIGHT_LEVEL = 40,
   BASE = 0,
@@ -4724,6 +7615,7 @@ THEME_OVERRIDE = {
   VAULT = 9,
   VAULT_LEVEL = 42
 }
+---@alias THEME_OVERRIDE integer
 TILE_CODE = {
   ADJACENT_FLOOR = 29,
   ALIEN = 148,
@@ -5137,6 +8029,7 @@ TILE_CODE = {
   YETI_QUEEN = 256,
   ZOO_EXHIBIT = 165
 }
+---@alias TILE_CODE integer
 TUSK = {
   ANGRY = -2,
   DEAD = -1,
@@ -5145,158 +8038,7 @@ TUSK = {
   PALACE_WELCOME_MESSAGE = 3,
   QUEST_NOT_STARTED = 0
 }
-TV = {
-  __index = "function",
-  __name = "sol.TV.user",
-  __newindex = "function"
-}
-Tadpole = {
-  __index = "function",
-  __name = "sol.Tadpole.user",
-  __newindex = "function"
-}
-Teleporter = {
-  __index = "function",
-  __name = "sol.Teleporter.user",
-  __newindex = "function"
-}
-TeleporterBackpack = {
-  __index = "function",
-  __name = "sol.TeleporterBackpack.user",
-  __newindex = "function"
-}
-TeleportingBorder = {
-  __index = "function",
-  __name = "sol.TeleportingBorder.user",
-  __newindex = "function"
-}
-Telescope = {
-  __index = "function",
-  __name = "sol.Telescope.user",
-  __newindex = "function"
-}
-Tentacle = {
-  __index = "function",
-  __name = "sol.Tentacle.user",
-  __newindex = "function"
-}
-TentacleBottom = {
-  __index = "function",
-  __name = "sol.TentacleBottom.user",
-  __newindex = "function"
-}
-Terra = {
-  __index = "function",
-  __name = "sol.Terra.user",
-  __newindex = "function"
-}
-TextRenderingInfo = {
-  __name = "sol.TextRenderingInfo.user"
-}
-TextureDefinition = {
-  __name = "sol.TextureDefinition.user"
-}
-TextureRenderingInfo = {
-  __name = "sol.TextureRenderingInfo.user"
-}
-ThemeInfo = {
-  __name = "sol.ThemeInfo.user"
-}
-ThinIce = {
-  __index = "function",
-  __name = "sol.ThinIce.user",
-  __newindex = "function"
-}
-Tiamat = {
-  __index = "function",
-  __name = "sol.Tiamat.user",
-  __newindex = "function"
-}
-TiamatShot = {
-  __index = "function",
-  __name = "sol.TiamatShot.user",
-  __newindex = "function"
-}
-TimedForceField = {
-  __index = "function",
-  __name = "sol.TimedForceField.user",
-  __newindex = "function"
-}
-TimedPowderkeg = {
-  __index = "function",
-  __name = "sol.TimedPowderkeg.user",
-  __newindex = "function"
-}
-TimedShot = {
-  __index = "function",
-  __name = "sol.TimedShot.user",
-  __newindex = "function"
-}
-Torch = {
-  __index = "function",
-  __name = "sol.Torch.user",
-  __newindex = "function"
-}
-TorchFlame = {
-  __index = "function",
-  __name = "sol.TorchFlame.user",
-  __newindex = "function"
-}
-TotemTrap = {
-  __index = "function",
-  __name = "sol.TotemTrap.user",
-  __newindex = "function"
-}
-TransferFloor = {
-  __index = "function",
-  __name = "sol.TransferFloor.user",
-  __newindex = "function"
-}
-TrapPart = {
-  __index = "function",
-  __name = "sol.TrapPart.user",
-  __newindex = "function"
-}
-Treasure = {
-  __index = "function",
-  __name = "sol.Treasure.user",
-  __newindex = "function"
-}
-TreasureHook = {
-  __index = "function",
-  __name = "sol.TreasureHook.user",
-  __newindex = "function"
-}
-TrueCrownPowerup = {
-  __index = "function",
-  __name = "sol.TrueCrownPowerup.user",
-  __newindex = "function"
-}
-Tun = {
-  __index = "function",
-  __name = "sol.Tun.user",
-  __newindex = "function"
-}
-UFO = {
-  __index = "function",
-  __name = "sol.UFO.user",
-  __newindex = "function"
-}
-UdjatSocket = {
-  __index = "function",
-  __name = "sol.UdjatSocket.user",
-  __newindex = "function"
-}
-UnchainedSpikeBall = {
-  __index = "function",
-  __name = "sol.UnchainedSpikeBall.user",
-  __newindex = "function"
-}
-Ushabti = {
-  __index = "function",
-  __name = "sol.Ushabti.user",
-  __newindex = "function"
-}
+---@alias TUSK integer
 VANHORSING = {
   FIRST_ENCOUNTER_DIAMOND_THROWN = 2,
   JAILCELL_SPAWNED = 1,
@@ -5307,10 +8049,12 @@ VANHORSING = {
   TEMPLE_HIDEOUT_SPAWNED = 5,
   TUSK_CELLAR = 7
 }
+---@alias VANHORSING integer
 VANILLA_FONT_STYLE = {
   BOLD = 2,
   ITALIC = 1
 }
+---@alias VANILLA_FONT_STYLE integer
 VANILLA_SOUND = {
   BGM_BGM_BASECAMP = "BGM/BGM_basecamp",
   BGM_BGM_CREDITS = "BGM/BGM_credits",
@@ -5847,6 +8591,7 @@ VANILLA_SOUND = {
   UI_ZOOM_IN = "UI/Zoom_in",
   UI_ZOOM_OUT = "UI/Zoom_out"
 }
+---@alias VANILLA_SOUND integer
 VANILLA_SOUND_CALLBACK_TYPE = {
   CREATED = 1,
   DESTROYED = 2,
@@ -5855,6 +8600,7 @@ VANILLA_SOUND_CALLBACK_TYPE = {
   START_FAILED = 64,
   STOPPED = 32
 }
+---@alias VANILLA_SOUND_CALLBACK_TYPE integer
 VANILLA_SOUND_PARAM = {
   ANGER_PROXIMITY = 11,
   ANGER_STATE = 12,
@@ -5895,85 +8641,20 @@ VANILLA_SOUND_PARAM = {
   VALUE = 8,
   VELOCITY = 15
 }
+---@alias VANILLA_SOUND_PARAM integer
 VANILLA_TEXT_ALIGNMENT = {
   CENTER = 1,
   LEFT = 0,
   RIGHT = 2
 }
-Vampire = {
-  __index = "function",
-  __name = "sol.Vampire.user",
-  __newindex = "function"
-}
-VanHorsing = {
-  __index = "function",
-  __name = "sol.VanHorsing.user",
-  __newindex = "function"
-}
-VanillaRenderContext = {
-  __name = "sol.VanillaRenderContext.user"
-}
-Vlad = {
-  __index = "function",
-  __name = "sol.Vlad.user",
-  __newindex = "function"
-}
-VladsCape = {
-  __index = "function",
-  __name = "sol.VladsCape.user",
-  __newindex = "function"
-}
+---@alias VANILLA_TEXT_ALIGNMENT integer
 WIN_STATE = {
   COSMIC_OCEAN_WIN = 3,
   HUNDUN_WIN = 2,
   NO_WIN = 0,
   TIAMAT_WIN = 1
 }
-Waddler = {
-  __index = "function",
-  __name = "sol.Waddler.user",
-  __newindex = "function"
-}
-WalkingMonster = {
-  __index = "function",
-  __name = "sol.WalkingMonster.user",
-  __newindex = "function"
-}
-WallTorch = {
-  __index = "function",
-  __name = "sol.WallTorch.user",
-  __newindex = "function"
-}
-WebGun = {
-  __index = "function",
-  __name = "sol.WebGun.user",
-  __newindex = "function"
-}
-WebShot = {
-  __index = "function",
-  __name = "sol.WebShot.user",
-  __newindex = "function"
-}
-WetEffect = {
-  __index = "function",
-  __name = "sol.WetEffect.user",
-  __newindex = "function"
-}
-WitchDoctor = {
-  __index = "function",
-  __name = "sol.WitchDoctor.user",
-  __newindex = "function"
-}
-WitchDoctorSkull = {
-  __index = "function",
-  __name = "sol.WitchDoctorSkull.user",
-  __newindex = "function"
-}
-WoodenlogTrap = {
-  __index = "function",
-  __name = "sol.WoodenlogTrap.user",
-  __newindex = "function"
-}
+---@alias WIN_STATE integer
 YANG = {
   ANGRY = -1,
   BOTH_TURKEYS_DELIVERED = 3,
@@ -5984,338 +8665,24 @@ YANG = {
   TURKEY_SHOP_SPAWNED = 4,
   TWO_TURKEYS_BOUGHT = 6
 }
-Yama = {
-  __index = "function",
-  __name = "sol.Yama.user",
-  __newindex = "function"
-}
-Yang = {
-  __index = "function",
-  __name = "sol.Yang.user",
-  __newindex = "function"
-}
-YellowCape = {
-  __index = "function",
-  __name = "sol.YellowCape.user",
-  __newindex = "function"
-}
-YetiKing = {
-  __index = "function",
-  __name = "sol.YetiKing.user",
-  __newindex = "function"
-}
-YetiQueen = {
-  __index = "function",
-  __name = "sol.YetiQueen.user",
-  __newindex = "function"
-}
-add_custom_name = function(...) end
-add_item_to_shop = function(...) end
-add_string = function(...) end
-advance_screen_particles = function(...) end
-apply_entity_db = function(...) end
-attach_ball_and_chain = function(...) end
-attach_entity = function(...) end
-cancel_speechbubble = function(...) end
-cancel_toast = function(...) end
-carry = function(...) end
-cast_entity = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n        function cast_entity(entity_raw)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_u...Çç\1\0\4ë<\0\0\0∏\0\0Äà\0\0\0»\0\2\0ã\0\0\1\14\1\0\2\14\1\2\3å\0\1\2ºÄ\0\0008\2\0Ä\0\1\1\0Ä\1\0\0E\1\2\0F\1\0\0008\0\0ÄH\0\2\0G\1\1\0Ñ\0\4âTYPE_MAP\4Ötype\4ÉidÅ\0\0\0Äë\1\0\1\0\3\0\0\0\1\0\1\0\0\0\0\2\2ÄÇãentity_rawÄëâcast_funàëÅÖ_ENV",'@serialized'))
-change_altar_damage_spawns = function(...) end
-change_diceshop_prizes = function(...) end
-change_string = function(...) end
-change_sunchallenge_spawns = function(...) end
-change_waddler_drop = function(...) end
-clear_callback = function(...) end
-clear_custom_name = function(...) end
-clear_entity_callback = function(...) end
-clear_screen_callback = function(...) end
-clear_vanilla_sound_callback = function(...) end
-clr_flag = function(...) end
-clrflag = function(...) end
-create_illumination = function(...) end
-create_image = function(...) end
-create_sound = function(...) end
-default_spawn_is_valid = function(...) end
-define_extra_spawn = function(...) end
-define_procedural_spawn = function(...) end
-define_room_template = function(...) end
-define_texture = function(...) end
-define_tile_code = function(...) end
-distance = function(...) end
-door = function(...) end
-draw_circle = function(...) end
-draw_circle_filled = function(...) end
-draw_image = function(...) end
-draw_image_rotated = function(...) end
-draw_line = function(...) end
-draw_rect = function(...) end
-draw_rect_filled = function(...) end
-draw_text = function(...) end
-draw_text_size = function(...) end
-drop = function(...) end
-enter_door = function(...) end
-entity_get_items_by = function(...) end
-entity_has_item_type = function(...) end
-entity_has_item_uid = function(...) end
-entity_remove_item = function(...) end
-extinguish_particles = function(...) end
-f = {}
-filter_entities = function(...) end
-flip_entity = function(...) end
-force_co_subtheme = function(...) end
-force_custom_subtheme = function(...) end
-force_custom_theme = function(...) end
-force_dark_level = function(...) end
-force_olmec_phase_0 = function(...) end
-game_manager = {}
-game_position = function(...) end
-generate_particles = function(...) end
-generate_screen_particles = function(...) end
-generate_world_particles = function(...) end
-get_bounds = function(...) end
-get_camera_position = function(...) end
-get_character_heart_color = function(...) end
-get_character_name = function(...) end
-get_character_short_name = function(...) end
-get_co_subtheme = function(...) end
-get_door_target = function(...) end
-get_entities = function(...) end
-get_entities_at = function(...) end
-get_entities_by = function(...) end
-get_entities_by_layer = function(...) end
-get_entities_by_mask = function(...) end
-get_entities_by_type = function(...) end
-get_entities_overlapping = function(...) end
-get_entities_overlapping_hitbox = function(...) end
-get_entity = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n        function cast_entity(entity_raw)\n            if entity_raw == nil then\n                return nil\n            end\n\n            local cast_fun = TYPE_MAP[entity_raw.type.id]\n            if cast_fun ~= nil then\n                return cast_fun(entity_raw)\n            else\n                return entity_raw\n            end\n        end\n        function get_entity(ent_uid)\n            if ent_uid == nil then\n                return nil\n            end\n\n            local entity_raw = get_entity_raw(ent_u...éô\1\0\4ê<\0\0\0∏\0\0Äà\0\0\0»\0\2\0ã\0\0\1\0\1\0\0ƒ\0\2\2º\0\0\0∏\0\0Ä\8\1\0\0H\1\2\0\11\1\0\2Ä\1\1\0E\1\2\0F\1\0\0G\1\1\0É\0\4èget_entity_raw\4åcast_entityÅ\0\0\0Äê\1\0\1\0\3\0\0\1\0\1\0\3\0\0\0\1ÄÇàent_uidÄêãentity_rawáêÅÖ_ENV",'@serialized'))
-get_entity_ai_state = function(...) end
-get_entity_flags = function(...) end
-get_entity_flags2 = function(...) end
-get_entity_raw = function(...) end
-get_entity_type = function(...) end
-get_frame = function(...) end
-get_grid_entity_at = function(...) end
-get_hitbox = function(...) end
-get_io = function(...) end
-get_level_config = function(...) end
-get_level_flags = function(...) end
-get_missing_extra_spawns = function(...) end
-get_ms = function(...) end
-get_particle_type = function(...) end
-get_position = function(...) end
-get_procedural_spawn_chance = function(...) end
-get_render_hitbox = function(...) end
-get_render_position = function(...) end
-get_room_index = function(...) end
-get_room_pos = function(...) end
-get_room_template = function(...) end
-get_room_template_name = function(...) end
-get_short_tile_code = function(...) end
-get_short_tile_code_definition = function(...) end
-get_sound = function(...) end
-get_string = function(...) end
-get_texture = function(...) end
-get_texture_definition = function(...) end
-get_type = function(...) end
-get_velocity = function(...) end
-get_window_size = function(...) end
-get_zoom_level = function(...) end
-god = function(...) end
-god_companions = function(...) end
-hash_to_stringid = function(...) end
-inspect = {
-  KEY = {},
-  METATABLE = {},
-  _DESCRIPTION = "human-readable representations of tables",
-  _LICENSE = "    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, modify, merge, publish,\n    distribute, sublicense, and/or sell copies of the Software, and to\n    permit persons to whom the Software is furnished to do so, subject to\n    the following conditions:\n\n    The above copyright notice and this permission notice shall be included\n    in all copies or substantial portions of the Software.\n\n    THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS\n    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n  ",
-  _URL = "http://github.com/kikito/inspect.lua",
-  _VERSION = "inspect.lua 3.1.0",
-  inspect = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\4\4Ä\nlocal inspect ={\n  _VERSION = 'inspect.lua 3.1.0',\n  _URL     = 'http://github.com/kikito/inspect.lua',\n  _DESCRIPTION = 'human-readable representations of tables',\n  _LICENSE = [[\n    MIT LICENSE\n\n    Copyright (c) 2013 Enrique GarcÔøΩa Cota\n\n    Permission is hereby granted, free of charge, to any person obtaining a\n    copy of this software and associated documentation files (the\n    \"Software\"), to deal in the Software without restriction, including\n    without limitation the rights to use, copy, m...\2∞\2 \2\0\11Ω¬Ä\0\0008\1\0Ä\19\1\0\0R\0\0\0Ä\0\2\0\14\1\1\0BÅ\0\0∏\0\0Ä\11\1\0\1\14\1\2\2é\1\1\3¬Å\0\0008\0\0ÄÉ\1\2\0\14\2\1\5BÇ\0\0008\0\0Ä\3\2\3\0é\2\1\7¬\2\0\0008\4\0Ä\9\3\1\0Ä\3\5\0\0\4\0\0ì\4\0\0R\0\0\0\19\5\0\0R\0\0\0D\3\5\2\0\0\6\0\11\3\0\8ì\3\4\0R\0\0\0í\3\0\2íÉ\9\n\19\4\0\0R\0\0\0í\3\11\8\19\4\0\0R\0\0\0í\3\12\8\19\4\0\0R\0\0\0í\3\13\8í\3\3\3í\3\5\4\9\4\2\0Ä\4\0\0D\4\2\2í\3\14\8\9\4\3\0D\3\3\2îÉ\6\15Ä\4\0\0ƒ\3\3\1ã\3\0\16é\3\7\17\14\4\6\11≈\3\2\0∆\3\0\0«\3\1\0í\4Üdepth\4Ömath\4Öhuge\4ànewline\4Ç\n\4áindent\4É  \4àprocess\4çsetmetatable\4Ülevel\3\0\0\0\0\0\0\0\0\4ábuffer\4Ñids\4ámaxIds\4ëtableAppearances\4âputValue\4Ütable\4áconcatÑ\0\0\0\1\16\0\1\13\0\1\18\0ÄΩ\1\0\0\0\0\2\0\0\0\0\1\0\0\0\1\0\0\0\1\2\0\1\0\0\0\0\0\0\0\0\3\0\0\1\1\1\0\0\1\0\0\1\0\0\1\1\1\0\0\0\1˜\11\0\0\2\0\0\0\0\1ÄáÖrootÄΩàoptionsÄΩÜdepthäΩànewlineéΩáindentíΩàprocessìΩäinspector¥ΩÑÖ_ENVëprocessRecursiveñcountTableAppearancesçInspector_mt",'@serialized'))
-}
-io = {
-  close = "function",
-  flush = "function",
-  input = "function",
-  lines = "function",
-  open = "function",
-  output = "function",
-  popen = "function",
-  read = "function",
-  stderr = "userdata",
-  stdin = "userdata",
-  stdout = "userdata",
-  tmpfile = "function",
-  type = "function",
-  write = "function"
-}
-is_character_female = function(...) end
-is_inside_active_shop_room = function(...) end
-is_inside_shop_zone = function(...) end
-is_room_flipped = function(...) end
-json = {
-  _version = "0.1.2",
-  decode = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\5\4Ä\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\2¯\3Ç\1\0\8¶ã\0\0\0\0\1\0\0ƒ\0\2\2ºÄ\1\0008\3\0Äã\0\0\2\3Å\1\0ã\1\0\0\0\2\0\0ƒ\1\2\0025\1\2\0ƒ\0\2\1â\0\1\0\0\1\0\0â\1\2\0\0\2\0\0Å\2\0Ä\9\3\3\0á\3\0\0ƒ\1\5\0ƒ\0\0\3â\1\2\0\0\2\0\0Ä\2\2\0\9\3\3\0á\3\0\0ƒ\1\5\2\0\1\3\0¥\1\0\0;\1\3\0008\2\0Äâ\1\4\0\0\2\0\0Ä\2\2\0\3\3\2\0ƒ\1\4\1»\0\2\0«\1\1\0Ö\4Ötype\4ástring\4Üerror\4ßexpected argument of type string, got \4ëtrailing garbageÖ\0\0\0\1\n\0\1\17\0\1\12\0\1\18\0Ä¶\1\0\0\0\0\1\0\0\0\0\0\0\2\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\1\0\0\1\0\0\0\0\2\1ÄÉÑstrÄ¶Ñresï¶Ñidxï¶ÖÖ_ENVÜparseänext_charåspace_charsçdecode_error",'@serialized')),
-  encode = ((loadstring or load)("\27LuaT\0\25ì\13\n\26\n\4\8\8xV\0\0\0\0\0\0\0\0\0\0\0(w@\1\4Ä\n--\n-- json.lua\n--\n-- Copyright (c) 2020 rxi\n--\n-- Permission is hereby granted, free of charge, to any person obtaining a copy of\n-- this software and associated documentation files (the \"Software\"), to deal in\n-- the Software without restriction, including without limitation the rights to\n-- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies\n-- of the Software, and to permit persons to whom the Software is furnished to do\n-- so, subject to the following conditions:\n--\n-- The...\1á\1â\1\0\3Öâ\0\0\0\0\1\0\0ƒ\0\2\2»\0\2\0«\0\1\0ÄÅ\1\1\0ÄÖ\1\0\0\0\1ÄÅÑvalÄÖÅáencode",'@serialized'))
-}
-kill_entity = function(...) end
-layer_door = function(...) end
-load_script = function(...) end
-lock_door_at = function(...) end
-lua_print = print
-message = function(...) end
-messpect = function(...) end
-modify_ankh_health_gain = function(...) end
-modify_sparktraps = function(...) end
-mouse_position = function(...) end
-move_entity = function(...) end
-move_grid_entity = function(...) end
-online = {}
-options = {}
-os = {
-  clock = "function",
-  date = "function",
-  difftime = "function",
-  execute = "function",
-  exit = "function",
-  getenv = "function",
-  remove = "function",
-  rename = "function",
-  setlocale = "function",
-  time = "function",
-  tmpname = "function"
-}
-pause = function(...) end
-pick_up = function(...) end
-players = {}
-poison_entity = function(...) end
-prinspect = function(...) end
-prng = {}
-raise = function(...) end
-read_input = function(...) end
-read_prng = function(...) end
-read_stolen_input = function(...) end
-refresh_illumination = function(...) end
-register_console_command = function(...) end
-register_option_bool = function(...) end
-register_option_button = function(...) end
-register_option_combo = function(...) end
-register_option_float = function(...) end
-register_option_int = function(...) end
-register_option_string = function(...) end
-reload_texture = function(...) end
-render_screen_particles = function(...) end
-replace_drop = function(...) end
-reset_lut = function(...) end
-return_input = function(...) end
-rgba = function(...) end
-savegame = {}
-say = function(...) end
-screen_aabb = function(...) end
-screen_distance = function(...) end
-screen_position = function(...) end
-seed_prng = function(...) end
-send_input = function(...) end
-set_arrowtrap_projectile = function(...) end
-set_blood_multiplication = function(...) end
-set_callback = function(...) end
-set_camera_position = function(...) end
-set_camp_camera_bounds_enabled = function(...) end
-set_character_heart_color = function(...) end
-set_contents = function(...) end
-set_door = function(...) end
-set_door_target = function(...) end
-set_drop_chance = function(...) end
-set_entity_flags = function(...) end
-set_entity_flags2 = function(...) end
-set_explosion_mask = function(...) end
-set_flag = function(...) end
-set_ghost_spawn_times = function(...) end
-set_global_interval = function(...) end
-set_global_timeout = function(...) end
-set_interval = function(...) end
-set_journal_enabled = function(...) end
-set_kapala_blood_threshold = function(...) end
-set_kapala_hud_icon = function(...) end
-set_level_flags = function(...) end
-set_lut = function(...) end
-set_max_rope_length = function(...) end
-set_olmec_phase_y_level = function(...) end
-set_on_damage = function(...) end
-set_on_destroy = function(...) end
-set_on_kill = function(...) end
-set_on_open = function(...) end
-set_on_player_instagib = function(...) end
-set_post_entity_spawn = function(...) end
-set_post_render_screen = function(...) end
-set_post_statemachine = function(...) end
-set_post_tile_code_callback = function(...) end
-set_pre_collision1 = function(...) end
-set_pre_collision2 = function(...) end
-set_pre_entity_spawn = function(...) end
-set_pre_render_screen = function(...) end
-set_pre_statemachine = function(...) end
-set_pre_tile_code_callback = function(...) end
-set_room_template_size = function(...) end
-set_seed = function(...) end
-set_time_ghost_enabled = function(...) end
-set_time_jelly_enabled = function(...) end
-set_timeout = function(...) end
-set_vanilla_sound_callback = function(...) end
-setflag = function(...) end
-spawn = function(...) end
-spawn_apep = function(...) end
-spawn_companion = function(...) end
-spawn_critical = function(...) end
-spawn_door = function(...) end
-spawn_entity = function(...) end
-spawn_entity_nonreplaceable = function(...) end
-spawn_entity_over = function(...) end
-spawn_entity_snapped_to_floor = function(...) end
-spawn_grid_entity = function(...) end
-spawn_impostor_lake = function(...) end
-spawn_layer_door = function(...) end
-spawn_liquid = function(...) end
-spawn_on_floor = function(...) end
-spawn_over = function(...) end
-spawn_player = function(...) end
-spawn_tree = function(...) end
-speechbubble_visible = function(...) end
-state = {}
-steal_input = function(...) end
-test_flag = function(...) end
-testflag = function(...) end
-toast = function(...) end
-toast_visible = function(...) end
-udp_listen = function(...) end
-udp_send = function(...) end
-unequip_backitem = function(...) end
-unlock_door_at = function(...) end
-waddler_count_entity = function(...) end
-waddler_entity_type_in_slot = function(...) end
-waddler_get_entity_meta = function(...) end
-waddler_remove_entity = function(...) end
-waddler_set_entity_meta = function(...) end
-waddler_store_entity = function(...) end
-warp = function(...) end
-win_button = function(...) end
-win_check = function(...) end
-win_combo = function(...) end
-win_drag_float = function(...) end
-win_drag_int = function(...) end
-win_image = function(...) end
-win_inline = function(...) end
-win_input_float = function(...) end
-win_input_int = function(...) end
-win_input_text = function(...) end
-win_popid = function(...) end
-win_pushid = function(...) end
-win_sameline = function(...) end
-win_separator = function(...) end
-win_slider_float = function(...) end
-win_slider_int = function(...) end
-win_text = function(...) end
-window = function(...) end
-worn_backitem = function(...) end
-zoom = function(...) end
+---@alias YANG integer
+local MAX_PLAYERS = 4
 
----@diagnostic disable: lowercase-global,deprecated
+---@alias in_port_t number
+---@class Logic
+
+---@alias OnlinePlayerShort any
+---@alias UdpServer any
+---@alias Texture any
+---@alias SpearDanglerAnimFrames any
+---@alias OnlineLobbyScreenPlayer any
+---@alias SoundCallbackFunction fun(): any
+
+--## Aliases
+
+---@alias IMAGE number
+---@alias CallbackId integer;
+---@alias Flags integer;
+---@alias uColor integer;
+---@alias SHORT_TILE_CODE integer;
+---@alias STRINGID integer;
