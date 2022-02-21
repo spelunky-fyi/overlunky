@@ -3003,6 +3003,7 @@ bool | [trigger_action(Entity user)](https://github.com/spelunky-fyi/overlunky/s
  | [apply_metadata(int metadata)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) | 
  | [set_invisible(bool)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
 span&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
+bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | Returns true if entity is in water/lava
 
 ### IceSlidingSound
 
@@ -5499,8 +5500,7 @@ bool | [can_jump()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can
 [Entity](#Entity) | [standing_on()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=standing_on) | 
  | [add_money(int money)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money) | Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
  | [damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) | Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
-bool | [is_on_fire()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on_fire) | 
- | [is_in_liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | 
+ | [is_on_fire](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on_fire) | 
 
 ### MovingIcon
 

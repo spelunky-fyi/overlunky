@@ -251,7 +251,9 @@ void register_usertypes(sol::state& lua)
         "set_invisible",
         &Entity::set_invisible,
         "get_items",
-        &Entity::get_items);
+        &Entity::get_items,
+        "is_in_liquid",
+        &Entity::is_in_liquid);
 
     auto damage = sol::overload(
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
@@ -355,8 +357,6 @@ void register_usertypes(sol::state& lua)
         damage,
         "is_on_fire",
         &Movable::is_on_fire,
-        "is_in_liquid",
-        &Movable::is_in_liquid,
         sol::base_classes,
         sol::bases<Entity>());
 

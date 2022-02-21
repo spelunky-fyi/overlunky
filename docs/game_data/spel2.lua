@@ -1780,6 +1780,7 @@ local function PRNG_random(self, min, max) end
     ---@field apply_metadata fun(self, metadata: integer): nil
     ---@field set_invisible fun(self, n: boolea): nil
     ---@field get_items fun(self, ): span<integer>
+    ---@field is_in_liquid fun(self, ): boolean
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -1834,8 +1835,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field standing_on fun(self, ): Entity
     ---@field add_money fun(self, money: integer): nil
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
-    ---@field is_on_fire fun(self, ): boolean
-    ---@field is_in_liquid any @&Movable::is_in_liquid
+    ---@field is_on_fire any @&Movable::is_on_firesol::base_classes
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
