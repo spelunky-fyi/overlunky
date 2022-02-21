@@ -37,15 +37,6 @@ function print(message) end
 ---@return nil
 function message(message) end
 ---Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
----For example use it like this
----```lua
----prinspect(state.level, state.level_next)
----local some_stuff_in_a_table = {
----    some = state.time_total,
----    stuff = state.world
----}
----prinspect(some_stuff_in_a_table)
----```
 ---@vararg any
 ---@return nil
 function prinspect(...) end
@@ -83,7 +74,7 @@ function set_global_interval(cb, frames) end
 ---@return CallbackId
 function set_global_timeout(cb, frames) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
----Add global callback function to be called on an [event](#on).
+---Add global callback function to be called on an [event](#ON).
 ---@param cb fun(): any
 ---@param screen integer
 ---@return CallbackId
@@ -96,19 +87,6 @@ function clear_callback(id) end
 ---@param id string
 ---@return nil
 function load_script(id) end
----Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
----```lua
------ this should always print the same table D877...E555
----set_callback(function()
----  seed_prng(42069)
----  local prng = read_prng()
----  for i,v in ipairs(prng) do
----    message(string.format("%08X", v))
----  end
----end, ON.LEVEL)
----```
----@return integer[]
-function read_prng() end
 ---Show a message that looks like a level feeling.
 ---@param message string
 ---@return nil
@@ -193,19 +171,7 @@ function spawn_liquid(entity_type, x, y) end
 ---@return nil
 function spawn_liquid(entity_type, x, y, velocityx, velocityy, liquid_flags, amount, blobs_separation) end
 ---Spawn an entity in position with some velocity and return the uid of spawned entity.
----Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
----Example:
----```lua
------ spawn megajelly using absolute coordinates
----set_callback(function()
----    x, y, layer = get_position(players[1].uid)
----    spawn_entity(ENT_TYPE.MONS_MEGAJELLYFISH, x, y+3, layer, 0, 0)
----end, ON.LEVEL)
------ spawn clover using player-relative coordinates
----set_callback(function()
----    spawn(ENT_TYPE.ITEM_PICKUP_CLOVER, 0, 1, LAYER.PLAYER1, 0, 0)
----end, ON.LEVEL)
----```
+---Uses level coordinates with [LAYER.FRONT](#LAYER) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
 ---@param entity_type ENT_TYPE
 ---@param x number
 ---@param y number
@@ -406,11 +372,11 @@ function get_door_target(uid) end
 ---@param item_entity_type ENT_TYPE
 ---@return nil
 function set_contents(uid, item_entity_type) end
----Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
+---Get the Entity behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
 ---@param uid integer
 ---@return Entity
 function get_entity(uid) end
----Get the [EntityDB](#entitydb) behind an ENT_TYPE...
+---Get the [EntityDB](#EntityDB) behind an ENT_TYPE...
 ---@param id integer
 ---@return EntityDB
 function get_type(id) end
@@ -438,16 +404,7 @@ function get_entities_by(entity_types, mask, layer) end
 ---@return integer[]
 function get_entities_by(entity_type, mask, layer) end
 ---Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
----You can even pass a table! Example:
----```lua
----types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
----function on_level()
----    uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
----    -- is not the same thing as this, but also works
----    uids2 = get_entities_by_type(entity_types)
----    message(tostring(#uids).." == "..tostring(#uids2))
----end
----```
+---You can even pass a table!
 ---@vararg any
 ---@return integer[]
 function get_entities_by_type(...) end
@@ -605,11 +562,7 @@ function entity_get_items_by(uid, entity_type, mask) end
 ---@param destroy_corpse boolean?
 ---@return nil
 function kill_entity(uid, destroy_corpse) end
----Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
----```lua
------ spawn and equip a jetpack
----pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
----```
+---Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen.
 ---@param who_uid integer
 ---@param what_uid integer
 ---@return nil
@@ -767,16 +720,7 @@ function spawn_companion(companion_type, x, y, layer) end
 ---@return number
 function distance(uid_a, uid_b) end
 ---Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
----inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
----```lua
------ Draw the level boundaries
----set_callback(function(draw_ctx)
----    xmin, ymin, xmax, ymax = get_bounds()
----    sx, sy = screen_position(xmin, ymin) -- top left
----    sx2, sy2 = screen_position(xmax, ymax) -- bottom right
----    draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
----end, ON.GUIFRAME)
----```
+---inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y
 ---@return number, number, number, number
 function get_bounds() end
 ---Gets the current camera position in the level
@@ -853,7 +797,7 @@ function clear_entity_callback(uid, cb_id) end
 ---`uid` has to be the uid of a `Movable` or else stuff will break.
 ---Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
 ---Use this only when no other approach works, this call can be expensive if overused.
----Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -862,7 +806,7 @@ function set_pre_statemachine(uid, fun) end
 ---`uid` has to be the uid of a `Movable` or else stuff will break.
 ---Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
 ---Use this only when no other approach works, this call can be expensive if overused.
----Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -899,7 +843,7 @@ function set_on_player_instagib(uid, fun) end
 ---Note that damage_dealer can be nil ! (long fall, ...)
 ---DO NOT CALL `self:damage()` in the callback !
 ---Use this only when no other approach works, this call can be expensive if overused.
----Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -908,7 +852,7 @@ function set_on_damage(uid, fun) end
 ---Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
 ---The callback signature is `nil on_open(Entity entity_self, Entity opener)`
 ---Use this only when no other approach works, this call can be expensive if overused.
----Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -916,7 +860,7 @@ function set_on_open(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
 ---Use this only when no other approach works, this call can be expensive if overused.
----Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -924,7 +868,7 @@ function set_pre_collision1(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
 ---Use this only when no other approach works, this call can be expensive if overused.
----Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -1066,7 +1010,7 @@ function is_character_female(type_id) end
 ---@param color Color
 ---@return nil
 function set_character_heart_color(type_id, color) end
----Get the [ParticleDB](#particledb) details of the specified ID
+---Get the [ParticleDB](#ParticleDB) details of the specified ID
 ---@param id integer
 ---@return ParticleDB
 function get_particle_type(id) end
@@ -1247,20 +1191,6 @@ function clear_vanilla_sound_callback(id) end
 ---@return uColor
 function rgba(r, g, b, a) end
 ---Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
----Example:
----```lua
----function on_guiframe(draw_ctx)
----    -- get a random color
----    color = math.random(0, 0xffffffff)
----    -- zoom the font size based on frame
----    size = (get_frame() % 199)+1
----    text = 'Awesome!'
----    -- calculate size of text
----    w, h = draw_text_size(size, text)
----    -- draw to the center of screen
----    draw_ctx:draw_text(0-w/2, 0-h/2, size, text, color)
----end
----```
 ---@param size number
 ---@param text string
 ---@return number, number
@@ -1272,7 +1202,7 @@ function create_image(path) end
 ---Current mouse cursor position in screen coordinates.
 ---@return number, number
 function mouse_position() end
----Returns: [ImGuiIO](#imguiio) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+---Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
 ---- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
 ---- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
 ---- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
