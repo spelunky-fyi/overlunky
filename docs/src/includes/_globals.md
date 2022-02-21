@@ -169,52 +169,6 @@ Get the current global frame count since the game was started. You can use this 
 
 Get the current timestamp in milliseconds since the Unix Epoch.
 
-### set_blood_multiplication
-
-
-> Search script examples for [set_blood_multiplication](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
-
-#### nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)
-
-Sets the multiplication factor for blood droplets upon death (default/no [Vlad](#Vlad)'s cape = 1, with [Vlad](#Vlad)'s cape = 2)
-Due to changes in 1.23.x only the [Vlad](#Vlad)'s cape value you provide will be used. The default is automatically [Vlad](#Vlad)'s cape value - 1
-
-### set_olmec_phase_y_level
-
-
-> Search script examples for [set_olmec_phase_y_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_olmec_phase_y_level)
-
-#### nil set_olmec_phase_y_level(int phase, float y)
-
-Sets the Y-level at which [Olmec](#Olmec) changes phases
-
-### force_olmec_phase_0
-
-
-> Search script examples for [force_olmec_phase_0](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_olmec_phase_0)
-
-#### nil force_olmec_phase_0(bool b)
-
-Forces [Olmec](#Olmec) to stay on phase 0 (stomping)
-
-### set_time_ghost_enabled
-
-
-> Search script examples for [set_time_ghost_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_ghost_enabled)
-
-#### nil set_time_ghost_enabled(bool b)
-
-Determines whether the time ghost appears, including the showing of the ghost toast
-
-### set_time_jelly_enabled
-
-
-> Search script examples for [set_time_jelly_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_jelly_enabled)
-
-#### nil set_time_jelly_enabled(bool b)
-
-Determines whether the time jelly appears in cosmic ocean
-
 ### set_journal_enabled
 
 
@@ -232,17 +186,6 @@ Enables or disables the journal
 #### nil raise()
 
 Raise a signal and probably crash the game
-
-### modify_ankh_health_gain
-
-
-> Search script examples for [modify_ankh_health_gain](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modify_ankh_health_gain)
-
-#### nil modify_ankh_health_gain(int max_health, int beat_add_health)
-
-Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
-`beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
-If you set `health` above the game max health it will be forced down to the game max
 
 ### seed_prng
 
@@ -938,15 +881,6 @@ Spawns and grows a tree
 Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 
-### set_door
-
-
-> Search script examples for [set_door](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door)
-
-#### nil set_door(int uid, int w, int l, int t)
-
-Short for [set_door_target](#set_door_target).
-
 ### spawn_entity_over
 
 
@@ -982,16 +916,6 @@ Determines when the ghost appears, either when the player is cursed or not
 #### int spawn_companion([ENT_TYPE](#ENT_TYPE) companion_type, float x, float y, [LAYER](#LAYER) layer)
 
 Spawn a companion (hired hand, player character, eggplant child)
-
-### enter_door
-
-
-> Search script examples for [enter_door](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_door)
-
-#### nil enter_door(int player_uid, int door_uid)
-
-Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
-Doesn't really work for layer doors
 
 ### change_sunchallenge_spawns
 
@@ -1293,6 +1217,15 @@ Teleport grid entity, the destination should be whole number, this ensures that 
 #### nil set_door_target(int uid, int w, int l, int t)
 
 Make an [ENT_TYPE](#ENT_TYPE).FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
+
+### set_door
+
+
+> Search script examples for [set_door](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_door)
+
+#### nil set_door(int uid, int w, int l, int t)
+
+Short for [set_door_target](#set_door_target).
 
 ### get_door_target
 
@@ -1600,6 +1533,16 @@ Changes characteristics of (all) sparktraps: speed, rotation direction and dista
 Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
 Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
 
+### set_blood_multiplication
+
+
+> Search script examples for [set_blood_multiplication](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
+
+#### nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)
+
+Sets the multiplication factor for blood droplets upon death (default/no [Vlad](#Vlad)'s cape = 1, with [Vlad](#Vlad)'s cape = 2)
+Due to changes in 1.23.x only the [Vlad](#Vlad)'s cape value you provide will be used. The default is automatically [Vlad](#Vlad)'s cape value - 1
+
 ### flip_entity
 
 
@@ -1608,6 +1551,42 @@ Distance from center: if you go above 3.0 the game might crash because a spark m
 #### nil flip_entity(int uid)
 
 Flip entity around by uid. All new entities face right by default.
+
+### set_olmec_phase_y_level
+
+
+> Search script examples for [set_olmec_phase_y_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_olmec_phase_y_level)
+
+#### nil set_olmec_phase_y_level(int phase, float y)
+
+Sets the Y-level at which [Olmec](#Olmec) changes phases
+
+### force_olmec_phase_0
+
+
+> Search script examples for [force_olmec_phase_0](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_olmec_phase_0)
+
+#### nil force_olmec_phase_0(bool b)
+
+Forces [Olmec](#Olmec) to stay on phase 0 (stomping)
+
+### set_time_ghost_enabled
+
+
+> Search script examples for [set_time_ghost_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_ghost_enabled)
+
+#### nil set_time_ghost_enabled(bool b)
+
+Determines whether the time ghost appears, including the showing of the ghost toast
+
+### set_time_jelly_enabled
+
+
+> Search script examples for [set_time_jelly_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_time_jelly_enabled)
+
+#### nil set_time_jelly_enabled(bool b)
+
+Determines whether the time jelly appears in cosmic ocean
 
 ### set_explosion_mask
 
@@ -1681,6 +1660,16 @@ Sets the 16-bit meta-value associated with the entity type in the associated slo
 
 Gets the entity type of the item in the provided slot
 
+### enter_door
+
+
+> Search script examples for [enter_door](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enter_door)
+
+#### nil enter_door(int player_uid, int door_uid)
+
+Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
+Doesn't really work for layer doors
+
 ### change_waddler_drop
 
 
@@ -1701,6 +1690,17 @@ Use empty table as argument to reset to the game default
 #### nil poison_entity(int entity_uid)
 
 Poisons entity, to cure poison set `poison_tick_timer` to -1
+
+### modify_ankh_health_gain
+
+
+> Search script examples for [modify_ankh_health_gain](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modify_ankh_health_gain)
+
+#### nil modify_ankh_health_gain(int max_health, int beat_add_health)
+
+Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
+`beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
+If you set `health` above the game max health it will be forced down to the game max
 
 ### set_drop_chance
 
@@ -1788,14 +1788,6 @@ Set `state.level_flags`
 
 Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
 
-### setflag
-
-
-> Search script examples for [setflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setflag)
-
-#### nil setflag()
-
-
 ### clr_flag
 
 
@@ -1805,14 +1797,6 @@ Set a bit in a number. This doesn't actually change the bit in the entity you pa
 
 Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
 
-### clrflag
-
-
-> Search script examples for [clrflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clrflag)
-
-#### nil clrflag()
-
-
 ### test_flag
 
 
@@ -1821,14 +1805,6 @@ Clears a bit in a number. This doesn't actually change the bit in the entity you
 #### bool test_flag([Flags](#Aliases) flags, int bit)
 
 Returns true if a bit is set in the flags
-
-### testflag
-
-
-> Search script examples for [testflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
-
-#### nil testflag()
-
 
 ## Shop functions
 
@@ -2496,6 +2472,27 @@ Use `replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)` and `replace_drop
 #### nil set_camera_position(float cx, float cy)
 
 this doesn't actually work at all. See State -> [Camera](#Camera) the for proper camera handling
+
+### setflag
+
+
+> Search script examples for [setflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setflag)
+
+`nil setflag()`<br/>
+
+### clrflag
+
+
+> Search script examples for [clrflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clrflag)
+
+`nil clrflag()`<br/>
+
+### testflag
+
+
+> Search script examples for [testflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
+
+`nil testflag()`<br/>
 
 ### generate_particles
 

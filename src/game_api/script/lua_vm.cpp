@@ -769,14 +769,17 @@ end
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
     lua["set_flag"] = [](Flags flags, int bit) -> Flags
     { return flags | (1U << (bit - 1)); };
+    /// Deprecated
     lua["setflag"] = lua["set_flag"];
     /// Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
     lua["clr_flag"] = [](Flags flags, int bit) -> Flags
     { return flags & ~(1U << (bit - 1)); };
+    /// Deprecated
     lua["clrflag"] = lua["clr_flag"];
     /// Returns true if a bit is set in the flags
     lua["test_flag"] = [](Flags flags, int bit) -> bool
     { return (flags & (1U << (bit - 1))) > 0; };
+    /// Deprecated
     lua["testflag"] = lua["test_flag"];
 
     /// Gets the resolution (width and height) of the screen
