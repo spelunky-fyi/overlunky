@@ -902,10 +902,9 @@ for func in funcs:
         func_cats[cat] = []
     func_cats[cat].append(func)
 
-for cat in func_cats:
+for cat in sorted(func_cats):
     print("\n## " + cat + "\n")
-    for lf in func_cats[cat]:
-
+    for lf in sorted(func_cats[cat], key=lambda x: x["name"]):
         if len(rpcfunc(lf["cpp"])):
             for af in rpcfunc(lf["cpp"]):
                 print_af(lf, af)
@@ -986,7 +985,7 @@ for type in types:
     type_cat = "Non-Entity types"
 
     if "Floor" in type["base"] or type["name"] == "Floor":
-        cat = "Floors"
+        cat = "Floor entities"
         type_cat = "Entity types"
     elif "PowerupCapable" in type["base"] or type["name"] == "PowerupCapable":
         cat = "Monsters, Inc."
@@ -994,13 +993,54 @@ for type in types:
     elif "Movable" in type["base"] or type["name"] == "Movable":
         cat = "Movable entities"
         type_cat = "Entity types"
+    elif "Entity" in type["base"] and any(subs in type["name"] for subs in ["Logical"]):
+        cat = "Logical entities"
+        type_cat = "Entity types"
+    elif "Entity" in type["base"] and any(subs in type["name"] for subs in ["BG"]):
+        cat = "Background entities"
+        type_cat = "Entity types"
+    elif "Entity" in type["base"] and any(subs in type["name"] for subs in ["Effect"]):
+        cat = "Effect entities"
+        type_cat = "Entity types"
     elif "Entity" in type["base"] or type["name"] == "Entity":
         cat = "Generic entities"
         type_cat = "Entity types"
-    elif "Screen" in type["base"] or type["name"] == "Screen":
-        cat = "Game screens"
+
+
+    elif "Screen" in type["base"] or type["name"] == "Screen" or any(subs in type["name"] for subs in ["Screen", "UI", "FlyingThing", "SaveRelated"]):
+        cat = "Screen types"
     elif "JournalPage" in type["base"] or type["name"] == "JournalPage":
-        cat = "Journal pages"
+        cat = "Journal types"
+    elif any(subs in type["name"] for subs in ["Theme"]):
+        cat = "Theme types"
+    elif any(subs in type["name"] for subs in ["Context"]):
+        cat = "Callback context types"
+    elif any(subs in type["name"] for subs in ["SaveData", "Constellation"]):
+        cat = "Savegame types"
+    elif any(subs in type["name"] for subs in ["Arena"]):
+        cat = "Arena types"
+    elif any(subs in type["name"] for subs in ["Online"]):
+        cat = "Online types"
+    elif any(subs in type["name"] for subs in ["Liquid"]):
+        cat = "Liquid types"
+    elif any(subs in type["name"] for subs in ["Logic"]):
+        cat = "Logic types"
+    elif any(subs in type["name"] for subs in ["Light", "Illumination"]):
+        cat = "Lighting types"
+    elif any(subs in type["name"] for subs in ["Animation", "EntityDB", "Inventory", "Ai"]):
+        cat = "Entity related types"
+    elif any(subs in type["name"] for subs in ["StateMemory", "Items", "GameManager", "GameProps", "Camera", "QuestsInfo", "PlayerSlot"]):
+        cat = "State types"
+    elif any(subs in type["name"] for subs in ["Gamepad", "ImGuiIO", "Input"]):
+        cat = "Input types"
+    elif any(subs in type["name"] for subs in ["Texture", "Rendering"]):
+        cat = "Texture types"
+    elif any(subs in type["name"] for subs in ["Particle"]):
+        cat = "Particle types"
+    elif any(subs in type["name"] for subs in ["DoorCoords", "LevelGen"]):
+        cat = "Levelgen types"
+    elif any(subs in type["name"] for subs in ["Sound"]):
+        cat = "Sound types"
     if not type_cat in type_cats:
         type_cats[type_cat] = dict()
     if not cat in type_cats[type_cat]:
@@ -1009,9 +1049,9 @@ for type in types:
 
 for type_cat in type_cats:
     print("\n# " + type_cat + "\n")
-    for cat in type_cats[type_cat]:
+    for cat in sorted(type_cats[type_cat], key=lambda x: x):
         print("\n## " + cat + "\n")
-        for type in type_cats[type_cat][cat]:
+        for type in sorted(type_cats[type_cat][cat], key=lambda x: x["name"]):
             print("\n### " + type["name"] + "\n")
             include_example(type["name"])
             if "comment" in type:
