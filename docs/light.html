@@ -2947,16 +2947,25 @@
 </tbody></table>
 <h1 id='Global-variables'>Global variables</h1>
 <p>These variables are always there to use.</p>
-<h3 id='meta'>meta</h3><h4 id='array-lt-string-gt-meta'>array&lt;string&gt; meta</h4>
+<h3 id='meta'>meta</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">meta</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"Awesome Mod"</span>
+<span class="n">meta</span><span class="p">.</span><span class="n">version</span> <span class="o">=</span> <span class="s2">"1.0"</span>
+<span class="n">meta</span><span class="p">.</span><span class="n">author</span> <span class="o">=</span> <span class="s2">"You"</span>
+<span class="n">meta</span><span class="p">.</span><span class="n">description</span> <span class="o">=</span> <span class="s">[[
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut at nulla porttitor, lobortis magna at, tempus dolor. Cras non ligula tellus. Duis tincidunt sodales velit et ornare. Mauris eu sapien finibus dolor dictum malesuada in non elit.
+
+    Aenean luctus leo ut diam ornare viverra. Nunc condimentum interdum elit, quis porttitor quam finibus ac. Nam mattis, lectus commodo placerat tristique, justo justo congue dui, sed sodales nunc sem ut neque.
+]]</span>
+<span class="c1">-- set this to enable unsafe mode</span>
+<span class="c1">--meta.unsafe = true</span>
+
+<span class="c1">-- rest of your mod goes here</span>
+
+</code></pre></div><h4 id='array-lt-string-gt-meta'>array&lt;string&gt; meta</h4>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=meta">meta</a></p>
 </blockquote>
 
-<p>Table of strings where you should set some script metadata shown in the UI.
-- <code>meta.name</code> Script name
-- <code>meta.version</code> Version
-- <code>meta.description</code> Short description of the script
-- <code>meta.author</code> Your name</p>
+<p>Table of strings where you should set some script metadata shown in the UI and used by other scripts to find your script.</p>
 <h3 id='state'>state</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">time_level</span> <span class="o">&gt;</span> <span class="mi">300</span> <span class="ow">and</span> <span class="n">state</span><span class="p">.</span><span class="n">theme</span> <span class="o">==</span> <span class="n">THEME</span><span class="p">.</span><span class="n">DWELLING</span> <span class="k">then</span>
     <span class="n">toast</span><span class="p">(</span><span class="s2">"Congratulations for lasting 5 seconds in Dwelling"</span><span class="p">)</span>
 <span class="k">end</span>
