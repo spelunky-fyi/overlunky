@@ -1632,6 +1632,42 @@ function udp_send(host, port, msg) end
     ---@field won_prizes_count integer
     ---@field balance integer
 
+---@class GameManager
+    ---@field game_props GameProps
+    ---@field screen_logo ScreenLogo
+    ---@field screen_intro ScreenIntro
+    ---@field screen_prologue ScreenPrologue
+    ---@field screen_title ScreenTitle
+    ---@field screen_menu ScreenMenu
+    ---@field screen_options ScreenOptions
+    ---@field screen_player_profile ScreenPlayerProfile
+    ---@field screen_leaderboards ScreenLeaderboards
+    ---@field screen_seed_input ScreenSeedInput
+    ---@field screen_camp ScreenCamp
+    ---@field screen_level ScreenLevel
+    ---@field screen_online_loading ScreenOnlineLoading
+    ---@field screen_online_lobby ScreenOnlineLobby
+    ---@field pause_ui PauseUI
+    ---@field journal_ui JournalUI
+    ---@field save_related SaveRelated
+
+---@class SaveRelated
+    ---@field journal_popup_ui JournalPopupUI
+
+---@class JournalPopupUI
+    ---@field wiggling_page_icon TextureRenderingInfo
+    ---@field black_background TextureRenderingInfo
+    ---@field button_icon TextureRenderingInfo
+    ---@field wiggling_page_angle number
+    ---@field chapter_to_show integer
+    ---@field entry_to_show integer
+    ---@field timer integer
+    ---@field slide_position number
+
+---@class GameProps
+    ---@field buttons integer
+    ---@field game_has_focus boolean
+
 ---@class PRNG
     ---@field seed fun(self, seed: integer): nil
     ---@field random_float fun(self, type: PRNG_CLASS): number

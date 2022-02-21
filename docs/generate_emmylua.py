@@ -58,6 +58,7 @@ api_files = [
     "../src/game_api/script/lua_backend.hpp",
     "../src/game_api/script/usertypes/save_context.cpp",
     "../src/game_api/script/usertypes/state_lua.cpp",
+    "../src/game_api/script/usertypes/game_manager_lua.cpp",
     "../src/game_api/script/usertypes/prng_lua.cpp",
     "../src/game_api/script/usertypes/entity_lua.cpp",
     "../src/game_api/script/usertypes/entities_chars_lua.cpp",
