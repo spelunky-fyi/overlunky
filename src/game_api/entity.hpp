@@ -3,6 +3,7 @@
 #include <array>
 #include <functional>
 #include <map>
+#include <span>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -286,6 +287,7 @@ class Entity
     void set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage);
     void set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1);
     void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
+    std::span<uint32_t> get_items();
 
     template <typename T>
     T* as()
@@ -297,8 +299,8 @@ class Entity
     virtual void create_rendering_info() = 0;
     virtual void handle_state_machine() = 0;
 
-    /// Kills the entity in the most violent way possible, for example cavemen turn into gibs
-    virtual void kill(bool, Entity* frm) = 0;
+    /// Kills the entity, you can set responsible to `nil` to ignore it
+    virtual void kill(bool destroy_corpse, Entity* responsible) = 0;
 
     virtual void on_collision1(Entity* other_entity) = 0; // triggers on collision between whip and hit object
 
@@ -309,10 +311,11 @@ class Entity
     virtual void format_shopitem_name(char16_t*) = 0;
     virtual void generate_stomp_damage_particles(Entity* victim) = 0; // particles when jumping on top of enemy
     virtual float get_type_field_a8() = 0;
-    virtual bool block_pushing_related() = 0; // does a bittest for the 14 entities starting at pushblock, function hits when player pushes entity
-    virtual void v11() = 0;
-    virtual bool v12() = 0;                            // disabling this functions stops stomp damage, jump falling calculations, running
-    virtual bool check_type_properties_flags_19() = 0; // checks (properties_flags >> 0x12) & 1; can't get it to trigger
+    virtual bool can_be_pushed() = 0; // (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
+    virtual bool v11() = 0;           // for arrows: returns true if it's moving (for y possibily checks for some speed as well?)
+    /// Returns true if entity is in water/lava
+    virtual bool is_in_liquid() = 0;
+    virtual bool check_type_properties_flags_19() = 0; // checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger
     virtual uint32_t get_type_field_60() = 0;
     virtual void set_invisible(bool) = 0;
     virtual void handle_turning_left(bool apply) = 0; // if disabled, monsters don't turn left and keep walking in the wall (and other right-left issues)
@@ -333,16 +336,14 @@ class Entity
     virtual void apply_metadata(uint16_t metadata) = 0;
     virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
     virtual void on_walked_off_by(Entity* walker) = 0; // appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item_ptr
-    virtual void v31() = 0;
-    virtual void on_stood_on_by(Entity* entity) = 0;  // e.g. pots, skulls, pushblocks, ... standing on floors
-    virtual void toggle_backlayer_illumination() = 0; // for the player: when going to the backlayer, turns on player emitted light
-    virtual void v34() = 0;
-    virtual void liberate_from_shop() = 0; // can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
+    virtual void on_ledge_grab(Entity* who) = 0;       // only ACTIVEFLOOR_FALLING_PLATFORM, does something with game menager
+    virtual void on_stood_on_by(Entity* entity) = 0;   // e.g. pots, skulls, pushblocks, ... standing on floors
+    virtual void toggle_backlayer_illumination() = 0;  // only for CHAR_*: when going to the backlayer, turns on player emitted light
+    virtual void v34() = 0;                            // only ITEM_TORCH, calls Torch.light_up(false), can't get it to trigger
+    virtual void liberate_from_shop() = 0;             // can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
 
     /// Applies changes made in `entity.type`
     virtual void apply_db() = 0;
-
-    // virtual void v38() = 0;
 };
 
 struct Inventory

@@ -1,5 +1,104 @@
 #pragma once
 
+struct Vec2
+{
+    Vec2() = default;
+
+    Vec2(const Vec2&) = default;
+
+    Vec2(float x_, float y_)
+        : x(x_), y(y_){};
+
+    Vec2(std::pair<float, float> p)
+        : x(p.first), y(p.second){};
+
+    Vec2& rotate(float angle, float px, float py)
+    {
+        const float sin_a{std::sin(angle)};
+        const float cos_a{std::cos(angle)};
+        const Vec2 p{px, py};
+        const Vec2 mp{-px, -py};
+
+        *this += mp;
+        const Vec2 copy = *this;
+        this->x = copy.x * cos_a - copy.y * sin_a;
+        this->y = copy.y * cos_a + copy.x * sin_a;
+        return *this += p;
+    }
+
+    Vec2 operator+(const Vec2& a) const
+    {
+        return Vec2{x + a.x, y + a.y};
+    }
+    Vec2 operator-(const Vec2& a) const
+    {
+        return Vec2{x - a.x, y - a.y};
+    }
+    Vec2 operator*(const Vec2& a) const
+    {
+        return Vec2{x * a.x, y * a.y};
+    }
+    Vec2 operator/(const Vec2& a) const
+    {
+        return Vec2{x / a.x, y / a.y};
+    }
+    Vec2& operator+=(const Vec2& a)
+    {
+        x += a.x;
+        y += a.y;
+        return *this;
+    }
+    Vec2& operator-=(const Vec2& a)
+    {
+        x -= a.x;
+        y -= a.y;
+        return *this;
+    }
+    Vec2& operator++()
+    {
+        x++;
+        y++;
+        return *this;
+    }
+    Vec2 operator++(int)
+    {
+        Vec2 old = *this;
+        operator++();
+        return old;
+    }
+    Vec2& operator--()
+    {
+        x--;
+        y--;
+        return *this;
+    }
+    Vec2 operator--(int)
+    {
+        Vec2 old = *this;
+        operator--();
+        return old;
+    }
+    bool operator==(const Vec2 a) const
+    {
+        return x == a.x && y == a.y;
+    }
+    operator std::pair<float, float>() const
+    {
+        return {x, y};
+    }
+    operator std::tuple<float, float>() const
+    {
+        return {x, y};
+    }
+    operator std::tuple<float&, float&>()
+    {
+        return {x, y};
+    }
+
+    float x{0};
+    float y{0};
+};
+
 struct AABB
 {
     /// Create a new axis aligned bounding box - defaults to all zeroes
@@ -62,6 +161,20 @@ struct AABB
         top += off_y;
         return *this;
     }
+    /// Same as offset
+    AABB operator+(const Vec2& a) const
+    {
+        AABB new_aabb{*this};
+        new_aabb.offset(a.x, a.y);
+        return new_aabb;
+    }
+    /// Same as offset
+    AABB operator-(const Vec2& a) const
+    {
+        AABB new_aabb{*this};
+        new_aabb.offset(-a.x, -a.y);
+        return new_aabb;
+    }
     /// Compute area of the AABB, can be zero if one dimension is zero or negative if one dimension is inverted.
     float area() const
     {
@@ -95,6 +208,9 @@ struct Quad
 
     Quad(const Quad&) = default;
 
+    Quad(Vec2& bottom_left_, Vec2& bottom_right_, Vec2& top_right_, Vec2& top_left_)
+        : bottom_left_x(bottom_left_.x), bottom_left_y(bottom_left_.y), bottom_right_x(bottom_right_.x), bottom_right_y(bottom_right_.y), top_right_x(top_right_.x), top_right_y(top_right_.y), top_left_x(top_left_.x), top_left_y(top_left_.y){};
+
     Quad(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)
         : bottom_left_x(_bottom_left_x), bottom_left_y(_bottom_left_y), bottom_right_x(_bottom_right_x), bottom_right_y(_bottom_right_y), top_right_x(_top_right_x), top_right_y(_top_right_y), top_left_x(_top_left_x), top_left_y(_top_left_y){};
 
@@ -125,6 +241,20 @@ struct Quad
         top_left_y += off_y;
         return *this;
     }
+    /// Same as offset
+    Quad operator+(const Vec2& a) const
+    {
+        Quad new_quad{*this};
+        new_quad.offset(a.x, a.y);
+        return new_quad;
+    }
+    /// Same as offset
+    Quad operator-(const Vec2& a) const
+    {
+        Quad new_quad{*this};
+        new_quad.offset(-a.x, -a.y);
+        return new_quad;
+    }
 
     /// Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
     Quad& rotate(float angle, float px, float py)
@@ -132,28 +262,16 @@ struct Quad
         const float sin_a{std::sin(angle)};
         const float cos_a{std::cos(angle)};
 
-        using vec = std::pair<float, float>;
-        const vec p{px, py};
-        const vec mp{-px, -py};
+        const Vec2 p{px, py};
+        const Vec2 mp{-px, -py};
 
-        auto rotate_around_pivot = [=](vec in) -> vec
+        auto rotate_around_pivot = [=](Vec2 in) -> Vec2
         {
-            auto add = [](vec lhs, vec rhs) -> vec
-            {
-                return {
-                    lhs.first + rhs.first,
-                    lhs.second + rhs.second,
-                };
-            };
-            in = add(in, mp);
-            {
-                auto [x, y] = in;
-                in = {
-                    x * cos_a - y * sin_a,
-                    y * cos_a + x * sin_a,
-                };
-            }
-            in = add(in, p);
+            in += mp;
+            const Vec2 old = in;
+            in.x = old.x * cos_a - old.y * sin_a;
+            in.y = old.y * cos_a + old.x * sin_a;
+            in += p;
             return in;
         };
 
@@ -163,6 +281,12 @@ struct Quad
         std::tie(top_right_x, top_right_y) = rotate_around_pivot({top_right_x, top_right_y});
 
         return *this;
+    }
+
+    /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
+    std::tuple<Vec2, Vec2, Vec2, Vec2> split()
+    {
+        return {{bottom_left_x, bottom_left_y}, {bottom_right_x, bottom_right_y}, {top_right_x, top_right_y}, {top_left_x, top_left_y}};
     }
 
     float bottom_left_x{0};

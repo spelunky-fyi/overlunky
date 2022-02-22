@@ -14,6 +14,7 @@ const float ZF = 0.737f;
 struct Layer;
 struct LevelGenSystem;
 class ThemeInfo;
+void fix_liquid_out_of_bounds();
 
 #pragma pack(push, 1) // disable struct padding
 struct StateMemory

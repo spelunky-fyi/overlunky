@@ -902,7 +902,6 @@ function add_custom_name(uid, name) end
 ---@return nil
 function clear_custom_name(uid) end
 ---Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
----Doesn't really work for layer doors
 ---@param player_uid integer
 ---@param door_uid integer
 ---@return nil
@@ -954,6 +953,10 @@ function modify_ankh_health_gain(max_health, beat_add_health) end
 ---@param shop_owner integer
 ---@return nil
 function add_item_to_shop(item_uid, shop_owner) end
+---Change the amount of frames after the damage from poison is applied
+---@param frames integer
+---@return nil
+function change_poison_timer(frames) end
 ---Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
 ---@param color Color
 ---@param size number
@@ -1536,42 +1539,6 @@ function udp_send(host, port, msg) end
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
 
----@class GameManager
-    ---@field game_props GameProps
-    ---@field screen_logo ScreenLogo
-    ---@field screen_intro ScreenIntro
-    ---@field screen_prologue ScreenPrologue
-    ---@field screen_title ScreenTitle
-    ---@field screen_menu ScreenMenu
-    ---@field screen_options ScreenOptions
-    ---@field screen_player_profile ScreenPlayerProfile
-    ---@field screen_leaderboards ScreenLeaderboards
-    ---@field screen_seed_input ScreenSeedInput
-    ---@field screen_camp ScreenCamp
-    ---@field screen_level ScreenLevel
-    ---@field screen_online_loading ScreenOnlineLoading
-    ---@field screen_online_lobby ScreenOnlineLobby
-    ---@field pause_ui PauseUI
-    ---@field journal_ui JournalUI
-    ---@field save_related SaveRelated
-
----@class SaveRelated
-    ---@field journal_popup_ui JournalPopupUI
-
----@class JournalPopupUI
-    ---@field wiggling_page_icon TextureRenderingInfo
-    ---@field black_background TextureRenderingInfo
-    ---@field button_icon TextureRenderingInfo
-    ---@field wiggling_page_angle number
-    ---@field chapter_to_show integer
-    ---@field entry_to_show integer
-    ---@field timer integer
-    ---@field slide_position number
-
----@class GameProps
-    ---@field buttons integer
-    ---@field game_has_focus boolean
-
 ---@class LightParams
     ---@field red number
     ---@field green number
@@ -1664,6 +1631,42 @@ function udp_send(host, port, msg) end
     ---@field result_announcement_timer integer
     ---@field won_prizes_count integer
     ---@field balance integer
+
+---@class GameManager
+    ---@field game_props GameProps
+    ---@field screen_logo ScreenLogo
+    ---@field screen_intro ScreenIntro
+    ---@field screen_prologue ScreenPrologue
+    ---@field screen_title ScreenTitle
+    ---@field screen_menu ScreenMenu
+    ---@field screen_options ScreenOptions
+    ---@field screen_player_profile ScreenPlayerProfile
+    ---@field screen_leaderboards ScreenLeaderboards
+    ---@field screen_seed_input ScreenSeedInput
+    ---@field screen_camp ScreenCamp
+    ---@field screen_level ScreenLevel
+    ---@field screen_online_loading ScreenOnlineLoading
+    ---@field screen_online_lobby ScreenOnlineLobby
+    ---@field pause_ui PauseUI
+    ---@field journal_ui JournalUI
+    ---@field save_related SaveRelated
+
+---@class SaveRelated
+    ---@field journal_popup_ui JournalPopupUI
+
+---@class JournalPopupUI
+    ---@field wiggling_page_icon TextureRenderingInfo
+    ---@field black_background TextureRenderingInfo
+    ---@field button_icon TextureRenderingInfo
+    ---@field wiggling_page_angle number
+    ---@field chapter_to_show integer
+    ---@field entry_to_show integer
+    ---@field timer integer
+    ---@field slide_position number
+
+---@class GameProps
+    ---@field buttons integer
+    ---@field game_has_focus boolean
 
 ---@class PRNG
     ---@field seed fun(self, seed: integer): nil
@@ -1768,12 +1771,16 @@ local function PRNG_random(self, min, max) end
     ---@field set_layer fun(self, layer: LAYER): nil
     ---@field remove fun(self, ): nil
     ---@field respawn fun(self, layer: LAYER): nil
+    ---@field kill fun(self, destroy_corpse: boolean, responsible: Entity): nil
     ---@field destroy fun(self, ): nil
     ---@field activate fun(self, activator: Entity): nil
     ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil
     ---@field trigger_action fun(self, user: Entity): boolean
     ---@field get_metadata any @&Entity::get_metadata
     ---@field apply_metadata fun(self, metadata: integer): nil
+    ---@field set_invisible fun(self, n: boolea): nil
+    ---@field get_items fun(self, ): span<integer>
+    ---@field is_in_liquid fun(self, ): boolean
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -1820,14 +1827,15 @@ local function Entity_overlaps_with(self, other) end
     ---@field price integer
     ---@field stun fun(self, framecount: integer): nil
     ---@field freeze fun(self, framecount: integer): nil
-    ---@field light_on_fire fun(self, ): nil
+    ---@field light_on_fire fun(self, time: integer): nil
     ---@field set_cursed fun(self, b: boolean): nil
     ---@field drop fun(self, entity_to_drop: Entity): nil
     ---@field pick_up fun(self, entity_to_pick_up: Entity): nil
-    ---@field can_jump any @&Movable::can_jump
+    ---@field can_jump fun(self, ): boolean
     ---@field standing_on fun(self, ): Entity
     ---@field add_money fun(self, money: integer): nil
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
+    ---@field is_on_fire any @&Movable::is_on_firesol::base_classes
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
@@ -1899,10 +1907,14 @@ local function Entity_overlaps_with(self, other) end
     ---@field add_decoration fun(self, side: FLOOR_SIDE): nil
     ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil
     ---@field decorate_internal fun(self, ): nil
+    ---@field get_floor_type fun(self, ): ENT_TYPE
 
 ---@class Door : Floor
     ---@field counter integer
     ---@field fx_button Entity
+    ---@field enter fun(self, who: Entity): integer
+    ---@field is_unlocked fun(self, ): boolean
+    ---@field unlock fun(self, unlock: boolean): nil
 
 ---@class ExitDoor : Door
     ---@field entered boolean
@@ -2082,7 +2094,6 @@ local function Entity_overlaps_with(self, other) end
     ---@field emitted_light Illumination
 
 ---@class FallingPlatform : Movable
-    ---@field emitted_light integer
     ---@field timer integer
     ---@field shaking_factor number
     ---@field y_pos number
@@ -2115,7 +2126,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class TimedPowderkeg : PushBlock
     ---@field timer integer
 
----@class Mount : Movable
+---@class Mount : PowerupCapable
     ---@field carry fun(self, rider: Movable): nil
     ---@field tame fun(self, value: boolean): nil
     ---@field rider_uid integer
@@ -2123,6 +2134,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field tamed boolean
     ---@field walk_pause_timer integer
     ---@field taming_timer integer
+    ---@field used_double_jump fun(self, ): boolean
+    ---@field remove_rider fun(self, ): nil
 
 ---@class Rockdog : Mount
     ---@field attack_cooldown integer
@@ -2214,6 +2227,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class Shopkeeper : RoomOwner
     ---@field name integer
     ---@field shotgun_attack_delay integer
+    ---@field has_key boolean
     ---@field shop_owner boolean
 
 ---@class Yang : RoomOwner
@@ -2670,6 +2684,17 @@ local function Entity_overlaps_with(self, other) end
     ---@field explosion_trigger boolean
     ---@field explosion_timer integer
 
+---@class Projectile : Movable
+
+---@class Purchasable : Movable
+
+---@class DummyPurchasableEntity : Purchasable
+
+---@class Bow : Purchasable
+
+---@class Present : Purchasable
+    ---@field inside ENT_TYPE
+
 ---@class Jetpack : Backpack
     ---@field flame_on boolean
     ---@field fuel integer
@@ -2686,10 +2711,10 @@ local function Entity_overlaps_with(self, other) end
 ---@class VladsCape : Cape
     ---@field can_double_jump boolean
 
----@class Mattock : Movable
+---@class Mattock : Purchasable
     ---@field remaining integer
 
----@class Gun : Movable
+---@class Gun : Purchasable
     ---@field cooldown integer
     ---@field shots integer
     ---@field shots2 integer
@@ -2721,7 +2746,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field move_x number
     ---@field move_y number
 
----@class WebShot : Movable
+---@class WebShot : Projectile
     ---@field shot boolean
 
 ---@class HangStrand : Movable
@@ -2730,16 +2755,18 @@ local function Entity_overlaps_with(self, other) end
 ---@class HangAnchor : Movable
     ---@field spider_uid integer
 
----@class Arrow : Movable
+---@class Arrow : Purchasable
     ---@field flame_uid integer
     ---@field is_on_fire boolean
     ---@field is_poisoned boolean
     ---@field shot_from_trap boolean
+    ---@field poison_arrow fun(self, poisoned: boolean): nil
+    ---@field light_up fun(self, lit: boolean): nil
 
 ---@class LightArrow : Arrow
     ---@field emitted_light Illumination
 
----@class LightShot : Movable
+---@class LightShot : Projectile
     ---@field emitted_light Illumination
 
 ---@class LightEmitter : Movable
@@ -2827,6 +2854,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field flame_uid integer
     ---@field is_lit boolean
     ---@field light_up fun(self, lit: boolean): nil
+    ---@field get_flame_type fun(self, ): ENT_TYPE
 
 ---@class WallTorch : Torch
     ---@field dropped_gold boolean
@@ -2840,7 +2868,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class LampFlame : Flame
     ---@field flame_particle ParticleEmitterInfo
 
----@class Bullet : Movable
+---@class Bullet : Projectile
 
 ---@class TimedShot : LightShot
     ---@field timer integer
@@ -2898,7 +2926,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field shake_timer integer
     ---@field boost_timer integer
 
----@class GhostBreath : Movable
+---@class GhostBreath : Projectile
     ---@field timer integer
     ---@field big_cloud boolean
 
@@ -2908,7 +2936,7 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class TreasureHook : Movable
 
----@class AxolotlShot : Movable
+---@class AxolotlShot : Projectile
     ---@field trapped_uid integer
     ---@field size number
     ---@field swing number
@@ -2955,7 +2983,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class MiniGameAsteroid : Movable
     ---@field spin_speed number
 
----@class Pot : Movable
+---@class Pot : Purchasable
     ---@field inside ENT_TYPE
     ---@field dont_transfer_dmg boolean
 
@@ -2963,8 +2991,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field smoke ParticleEmitterInfo
     ---@field smoke2 ParticleEmitterInfo
 
----@class CookFire : Movable
-    ---@field lit boolean
+---@class CookFire : Torch
     ---@field emitted_light Illumination
     ---@field particles_smoke ParticleEmitterInfo
     ---@field particles_flames ParticleEmitterInfo
@@ -2981,7 +3008,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class Coin : Movable
     ---@field nominal_price integer
 
----@class RollingItem : Movable
+---@class RollingItem : Purchasable
     ---@field roll_speed number
 
 ---@class PlayerBag : Movable
@@ -3011,10 +3038,10 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class YellowCape : Cape
 
----@class Teleporter : Movable
+---@class Teleporter : Purchasable
     ---@field teleport_number integer
 
----@class Boomerang : Movable
+---@class Boomerang : Purchasable
     ---@field trail ParticleEmitterInfo
     ---@field distance number
     ---@field rotation number
@@ -3023,7 +3050,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class Excalibur : Movable
     ---@field in_stone boolean
 
----@class Shield : Movable
+---@class Shield : Purchasable
     ---@field shake number
 
 ---@class PrizeDispenser : Movable
@@ -3189,6 +3216,9 @@ local function Entity_overlaps_with(self, other) end
     ---@field size number
 
 ---@class FxAnkhBrokenPiece : Movable
+
+---@class MegaJellyfishEye : Movable
+    ---@field timer integer
 
 ---@class Liquid : Entity
     ---@field fx_surface Entity
@@ -3566,6 +3596,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field spawn_room_x integer
     ---@field spawn_room_y integer
     ---@field exits DoorCoords
+    ---@field exit_doors Vec2[]
     ---@field themes ThemeInfo[] @size: 18
 
 ---@class PostRoomGenerationContext
@@ -3837,25 +3868,25 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
 
 ---@class VanillaRenderContext_draw_screen_texture
 ---@param texture_id TEXTURE
----@param row integer
----@param column integer
+---@param source Quad
 ---@param dest Quad
 ---@param color Color
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
-local function VanillaRenderContext_draw_screen_texture(self, texture_id, row, column, dest, color) end
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
+local function VanillaRenderContext_draw_screen_texture(self, texture_id, source, dest, color) end
 
 ---@class VanillaRenderContext_draw_world_texture
 ---@param texture_id TEXTURE
----@param row integer
----@param column integer
+---@param source Quad
 ---@param dest Quad
 ---@param color Color
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
-local function VanillaRenderContext_draw_world_texture(self, texture_id, row, column, dest, color) end
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
+local function VanillaRenderContext_draw_world_texture(self, texture_id, source, dest, color) end
 
 ---@class TextureRenderingInfo
     ---@field x number
@@ -3901,6 +3932,12 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, row, co
     ---@field sub_image_width integer
     ---@field sub_image_height integer
 
+---@class Vec2
+    ---@field x number
+    ---@field y number
+    ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
+    ---@field split any @&Vec2::operatorstd::pair<float
+
 ---@class AABB
     ---@field left number
     ---@field bottom number
@@ -3927,6 +3964,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, row, co
     ---@field get_AABB fun(self, ): AABB
     ---@field offset fun(self, off_x: number, off_y: number): Quad
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad
+    ---@field split fun(self, ): Vec2, Vec2, Vec2, Vec2
 
 ---@class Screen
     ---@field render_timer number
@@ -4611,6 +4649,20 @@ function CustomTheme.new(self, theme_id_, base_theme_) end
 ---@return CustomTheme
 function CustomTheme.new(self) end
 
+Vec2 = nil
+---@return Vec2
+function Vec2.new(self) end
+---@param Vec2 Vec2
+---@return Vec2
+function Vec2.new(self, Vec2) end
+---@param x_ number
+---@param y_ number
+---@return Vec2
+function Vec2.new(self, x_, y_) end
+---@param number> p tuple<number,
+---@return Vec2
+function Vec2.new(self, number> p) end
+
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
 ---@return AABB
@@ -4633,6 +4685,12 @@ function Quad.new(self) end
 ---@param Quad Quad
 ---@return Quad
 function Quad.new(self, Quad) end
+---@param bottom_left_ Vec2
+---@param bottom_right_ Vec2
+---@param top_right_ Vec2
+---@param top_left_ Vec2
+---@return Quad
+function Quad.new(self, bottom_left_, bottom_right_, top_right_, top_left_) end
 ---@param _bottom_left_x number
 ---@param _bottom_left_y number
 ---@param _bottom_right_x number
@@ -4708,9 +4766,9 @@ COSUBTHEME = {
 }
 ---@alias COSUBTHEME integer
 DROP = {
-  ALIENQUEEN_ALIENBLAST = 182,
-  ALIENQUEEN_ALIENBLAST_RE = 184,
-  ALIENQUEEN_ALIENBLAST_RI = 183,
+  ALIENQUEEN_ALIENBLAST = 183,
+  ALIENQUEEN_ALIENBLAST_RE = 185,
+  ALIENQUEEN_ALIENBLAST_RI = 184,
   ALTAR_DICE_CLIMBINGGLOVES = 0,
   ALTAR_DICE_COOKEDTURKEY = 1,
   ALTAR_DICE_DIAMOND = 2,
@@ -4733,174 +4791,175 @@ DROP = {
   ALTAR_USHABTI_HIREDHAND = 19,
   ALTAR_USHABTI_TURKEY = 17,
   ALTAR_USHABTI_VAMPIRE = 18,
-  ANUBIS2_ANUBIS_COFFIN = 157,
+  ANUBIS2_ANUBIS_COFFIN = 158,
   ANUBIS2_JETPACK = 22,
-  ANUBIS2_SPECIALSHOT_R = 187,
-  ANUBIS_COFFIN_SORCERESS = 109,
-  ANUBIS_COFFIN_VAMPIRE = 108,
-  ANUBIS_COFFIN_WITCHDOCTOR = 110,
+  ANUBIS2_SPECIALSHOT_R = 188,
+  ANUBIS_COFFIN_SORCERESS = 110,
+  ANUBIS_COFFIN_VAMPIRE = 109,
+  ANUBIS_COFFIN_WITCHDOCTOR = 111,
   ANUBIS_SCEPTER = 23,
-  ANUBIS_SPECIALSHOT_R = 186,
-  ARROWTRAP_WOODENARROW = 154,
-  AXOLOTL_BUBBLE = 175,
+  ANUBIS_SPECIALSHOT_R = 187,
+  ARROWTRAP_WOODENARROW = 155,
+  AXOLOTL_BUBBLE = 176,
   BEG_BOMBBAG = 24,
   BEG_TELEPACK = 26,
   BEG_TRUECROWN = 25,
   BONEPILE_SKELETONKEY = 27,
   BONEPILE_SKULL = 28,
-  CANDLE_NUGGET = 148,
-  CATMUMMY_CURSINGCLOUD = 185,
-  CATMUMMY_DIAMOND = 120,
-  CHEST_BOMB = 139,
-  CHEST_EMERALD = 134,
-  CHEST_LEPRECHAUN = 138,
-  CHEST_RUBY = 136,
-  CHEST_SAPPHIRE = 135,
-  CHEST_SMALLEMERALD = 133,
-  CHEST_SMALLRUBY = 137,
-  CLONEGUN_SHOT = 167,
-  COBRA_ACIDSPIT = 178,
-  COFFIN_SKULL = 151,
-  COOKEDTURKEY_HEALTH = 189,
-  COOKFIRE_TORCH = 149,
+  CANDLE_NUGGET = 149,
+  CATMUMMY_CURSINGCLOUD = 186,
+  CATMUMMY_DIAMOND = 121,
+  CHEST_BOMB = 140,
+  CHEST_EMERALD = 135,
+  CHEST_LEPRECHAUN = 139,
+  CHEST_RUBY = 137,
+  CHEST_SAPPHIRE = 136,
+  CHEST_SMALLEMERALD = 134,
+  CHEST_SMALLRUBY = 138,
+  CLONEGUN_SHOT = 168,
+  COBRA_ACIDSPIT = 179,
+  COFFIN_SKULL = 152,
+  COOKEDTURKEY_HEALTH = 190,
+  COOKFIRE_TORCH = 150,
   CROCMAN_TELEPACK = 29,
   CROCMAN_TELEPORTER = 30,
-  CRUSHTRAP_NUGGET = 130,
-  CUTSCENE_GOLDCOIN = 146,
-  DUATALTAR_BOMBBAG = 126,
-  DUATALTAR_BOMBBOX = 127,
-  DUATALTAR_COOKEDTURKEY = 128,
-  EGGSAC_GRUB_1 = 113,
-  EGGSAC_GRUB_2 = 114,
-  EGGSAC_GRUB_3 = 115,
-  EMBED_NUGGET = 132,
-  FACTORY_GENERATOR_SCRAP = 92,
-  FIREBUG_FIREBALL = 177,
-  FLOORSTYLEDCOG_NUGGET = 129,
-  FREEZERAY_SHOT = 166,
-  GHIST_GOLDCOIN = 62,
+  CRUSHTRAP_NUGGET = 131,
+  CUTSCENE_GOLDCOIN = 147,
+  DUATALTAR_BOMBBAG = 127,
+  DUATALTAR_BOMBBOX = 128,
+  DUATALTAR_COOKEDTURKEY = 129,
+  EGGSAC_GRUB_1 = 114,
+  EGGSAC_GRUB_2 = 115,
+  EGGSAC_GRUB_3 = 116,
+  EMBED_NUGGET = 133,
+  FACTORY_GENERATOR_SCRAP = 93,
+  FIREBUG_FIREBALL = 178,
+  FLOORSTYLEDCOG_NUGGET = 130,
+  FREEZERAY_SHOT = 167,
+  GHIST_GOLDCOIN = 63,
   GHOSTJAR_DIAMOND = 31,
   GHOST_DIAMOND = 32,
-  GIANTFOOD_HEALTH = 190,
-  GIANTFROG_FROG = 111,
-  GIANTFROG_TADPOLE = 112,
+  GIANTFOOD_HEALTH = 191,
+  GIANTFROG_FROG = 112,
+  GIANTFROG_TADPOLE = 113,
   GIANTSPIDER_PASTE = 33,
-  GIANTSPIDER_WEBSHOT = 159,
+  GIANTSPIDER_WEBSHOT = 160,
   GOLDENMONKEY_NUGGET = 37,
   GOLDENMONKEY_SMALLEMERALD = 34,
   GOLDENMONKEY_SMALLRUBY = 36,
   GOLDENMONKEY_SMALLSAPPHIRE = 35,
   HANGINGSPIDER_WEBGUN = 38,
-  HERMITCRAB_ACIDBUBBLE = 180,
-  HUMPHEAD_HIREDHAND = 121,
-  HUNDUN_FIREBALL = 176,
+  HERMITCRAB_ACIDBUBBLE = 181,
+  HUMPHEAD_HIREDHAND = 122,
+  HUNDUN_FIREBALL = 177,
   ICECAVE_BOULDER = 39,
   JIANGSHIASSASSIN_SPIKESHOES = 40,
   JIANGSHI_SPRINGSHOES = 41,
-  KAPALA_HEALTH = 192,
+  KAPALA_HEALTH = 193,
   KINGU_FEMALE_JIANGSHI = 45,
   KINGU_JIANGSHI = 44,
   KINGU_OCTOPUS = 43,
   KINGU_TABLETOFDESTINY = 42,
-  LAMASSU_DIAMOND = 125,
-  LAMASSU_EMERALD = 124,
-  LAMASSU_LASERSHOT = 170,
-  LAMASSU_RUBY = 123,
-  LAMASSU_SAPPHIRE = 122,
-  LASERTRAP_SHOT = 156,
-  LAVAMANDER_RUBY = 119,
-  LAVAPOT_MAGMAMAN = 118,
+  LAMASSU_DIAMOND = 126,
+  LAMASSU_EMERALD = 125,
+  LAMASSU_LASERSHOT = 171,
+  LAMASSU_RUBY = 124,
+  LAMASSU_SAPPHIRE = 123,
+  LASERTRAP_SHOT = 157,
+  LAVAMANDER_RUBY = 120,
+  LAVAPOT_MAGMAMAN = 119,
   LEPRECHAUN_CLOVER = 46,
-  LOCKEDCHEST_UDJATEYE = 143,
-  MADAME_TUSK_KEY = 107,
+  LOCKEDCHEST_UDJATEYE = 144,
+  MADAME_TUSK_KEY = 108,
   MATTOCK_BROKENMATTOCK = 47,
   MOLE_MATTOCK = 48,
   MOSQUITO_HOVERPACK = 49,
-  MOTHERSTATUE_HEALTH = 188,
+  MOTHERSTATUE_HEALTH = 189,
   MUMMY_DIAMOND = 50,
-  MUMMY_FLY = 158,
+  MUMMY_FLY = 159,
   NECROMANCER_RUBY = 51,
-  OCTOPUS_INKSPIT = 179,
-  OLMEC_BOMB = 160,
+  OCTOPUS_INKSPIT = 180,
+  OLMEC_BOMB = 161,
   OLMEC_CAVEMAN_1 = 52,
   OLMEC_CAVEMAN_2 = 53,
   OLMEC_CAVEMAN_3 = 54,
-  OLMEC_SISTERS_BOMBBOX = 153,
-  OLMEC_SISTERS_ROPEPILE = 152,
-  OLMEC_UFO = 161,
+  OLMEC_SISTERS_BOMBBOX = 154,
+  OLMEC_SISTERS_ROPEPILE = 153,
+  OLMEC_UFO = 162,
   OSIRIS_EMERALDS = 55,
   OSIRIS_PORTAL = 57,
   OSIRIS_TABLETOFDESTINY = 56,
-  PANGXIE_ACIDBUBBLE = 181,
+  PANGXIE_ACIDBUBBLE = 182,
   PANGXIE_WOODENSHIELD = 58,
-  PLASMACANNON_SHOT = 165,
-  POISONEDARROWTRAP_WOODENARROW = 155,
-  POTOFGOLD_GOLDCOIN = 145,
-  QILIN_FIREBALL = 174,
+  PLASMACANNON_SHOT = 166,
+  POISONEDARROWTRAP_WOODENARROW = 156,
+  POTOFGOLD_GOLDCOIN = 146,
+  QILIN_FIREBALL = 175,
   QUEENBEE_ROYALJELLY = 59,
-  QUILLBACK_BOMBBAG = 116,
-  QUILLBACK_COOKEDTURKEY = 117,
-  REDLANTERN_SMALLNUGGET = 147,
+  QUILLBACK_BOMBBAG = 117,
+  QUILLBACK_COOKEDTURKEY = 118,
+  REDLANTERN_SMALLNUGGET = 148,
   ROBOT_METALSHIELD = 60,
-  ROCKDOG_FIREBALL = 173,
-  ROYALJELLY_HEALTH = 191,
-  SACRIFICE_EGGPLANT = 103,
-  SACRIFICE_IDOL = 100,
-  SACRIFICE_PRESENT = 101,
-  SACRIFICE_ROCK = 102,
-  SCEPTER_ANUBISSPECIALSHOT = 163,
-  SCEPTER_PLAYERSHOT = 164,
-  SCRAP_ALIEN = 98,
-  SCRAP_COBRA = 96,
-  SCRAP_SCORPION = 97,
-  SCRAP_SNAKE = 95,
-  SCRAP_SPIDER = 94,
-  SHOPKEEPER_GENERATOR_1 = 93,
+  ROCKDOG_FIREBALL = 174,
+  ROYALJELLY_HEALTH = 192,
+  SACRIFICE_EGGPLANT = 104,
+  SACRIFICE_IDOL = 101,
+  SACRIFICE_PRESENT = 102,
+  SACRIFICE_ROCK = 103,
+  SCEPTER_ANUBISSPECIALSHOT = 164,
+  SCEPTER_PLAYERSHOT = 165,
+  SCRAP_ALIEN = 99,
+  SCRAP_COBRA = 97,
+  SCRAP_SCORPION = 98,
+  SCRAP_SNAKE = 96,
+  SCRAP_SPIDER = 95,
+  SHOPKEEPER_GENERATOR_1 = 94,
+  SHOPKEEPER_GOLDBAR = 62,
   SHOPKEEPER_GOLDCOIN = 61,
-  SHOTGUN_BULLET = 168,
-  SKELETON_SKELETONKEY = 63,
-  SKELETON_SKULL = 64,
-  SKULLDROPTRAP_SKULL = 150,
-  SLIDINGWALL_NUGGET = 131,
-  SORCERESS_DAGGERSHOT = 171,
-  SORCERESS_RUBY = 65,
-  SPARROW_ROPEPILE = 66,
-  SPARROW_SKELETONKEY = 67,
-  TIAMAT_BAT = 68,
-  TIAMAT_BEE = 69,
-  TIAMAT_CAVEMAN = 70,
-  TIAMAT_COBRA = 71,
-  TIAMAT_HERMITCRAB = 72,
-  TIAMAT_MONKEY = 73,
-  TIAMAT_MOSQUITO = 74,
-  TIAMAT_OCTOPUS = 75,
-  TIAMAT_OLMITE = 76,
-  TIAMAT_SCORPION = 77,
-  TIAMAT_SHOT = 78,
-  TIAMAT_SNAKE = 79,
-  TIAMAT_TIAMATSHOT = 172,
-  TIAMAT_UFO = 80,
-  TIAMAT_YETI = 81,
-  TORCH_SMALLNUGGET = 82,
-  TURKEY_COOKEDTURKEY = 83,
-  UFO_ALIEN = 99,
-  UFO_LASERSHOT = 169,
-  UFO_PARACHUTE = 84,
-  USHABTI_QILIN = 144,
-  VAMPIRE_CAPE = 85,
-  VAN_HORSING_COMPASS = 86,
-  VAN_HORSING_DIAMOND = 87,
-  VAULTCHEST_DIAMOND = 141,
-  VAULTCHEST_EMERALD = 140,
-  VAULTCHEST_RUBY = 142,
-  VLAD_VLADSCAPE = 88,
-  YAMA_EGGPLANTCROWN = 104,
-  YAMA_GIANTFOOD = 105,
-  YANG_KEY = 106,
-  YETIKING_FREEZERAY = 89,
-  YETIKING_ICESPIRE = 162,
-  YETIQUEEN_POWERPACK = 90,
-  YETI_PITCHERSMITT = 91
+  SHOTGUN_BULLET = 169,
+  SKELETON_SKELETONKEY = 64,
+  SKELETON_SKULL = 65,
+  SKULLDROPTRAP_SKULL = 151,
+  SLIDINGWALL_NUGGET = 132,
+  SORCERESS_DAGGERSHOT = 172,
+  SORCERESS_RUBY = 66,
+  SPARROW_ROPEPILE = 67,
+  SPARROW_SKELETONKEY = 68,
+  TIAMAT_BAT = 69,
+  TIAMAT_BEE = 70,
+  TIAMAT_CAVEMAN = 71,
+  TIAMAT_COBRA = 72,
+  TIAMAT_HERMITCRAB = 73,
+  TIAMAT_MONKEY = 74,
+  TIAMAT_MOSQUITO = 75,
+  TIAMAT_OCTOPUS = 76,
+  TIAMAT_OLMITE = 77,
+  TIAMAT_SCORPION = 78,
+  TIAMAT_SHOT = 79,
+  TIAMAT_SNAKE = 80,
+  TIAMAT_TIAMATSHOT = 173,
+  TIAMAT_UFO = 81,
+  TIAMAT_YETI = 82,
+  TORCH_SMALLNUGGET = 83,
+  TURKEY_COOKEDTURKEY = 84,
+  UFO_ALIEN = 100,
+  UFO_LASERSHOT = 170,
+  UFO_PARACHUTE = 85,
+  USHABTI_QILIN = 145,
+  VAMPIRE_CAPE = 86,
+  VAN_HORSING_COMPASS = 87,
+  VAN_HORSING_DIAMOND = 88,
+  VAULTCHEST_DIAMOND = 142,
+  VAULTCHEST_EMERALD = 141,
+  VAULTCHEST_RUBY = 143,
+  VLAD_VLADSCAPE = 89,
+  YAMA_EGGPLANTCROWN = 105,
+  YAMA_GIANTFOOD = 106,
+  YANG_KEY = 107,
+  YETIKING_FREEZERAY = 90,
+  YETIKING_ICESPIRE = 163,
+  YETIQUEEN_POWERPACK = 91,
+  YETI_PITCHERSMITT = 92
 }
 ---@alias DROP integer
 DROPCHANCE = {

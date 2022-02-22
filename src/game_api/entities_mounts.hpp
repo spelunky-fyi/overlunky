@@ -1,8 +1,8 @@
 #pragma once
 
-#include "movable.hpp"
+#include "entities_chars.hpp"
 
-class Mount : public Movable
+class Mount : public PowerupCapable
 {
   public:
     size_t unknown1;
@@ -21,6 +21,19 @@ class Mount : public Movable
     void carry(Movable* rider);
 
     void tame(bool value);
+
+    virtual std::pair<float, float>& get_special_offset(std::pair<float, float>& offset) = 0; // gets special offset for the raider when jumping on mount
+    virtual std::pair<float, float>& v96(std::pair<float, float>& value) = 0;                 // gets something for when crouching on mount
+    virtual bool used_double_jump() = 0;                                                      // checks can_doublejump and unknown9b
+    virtual uint32_t v98(bool) = 0;                                                           // returns some constant value
+    virtual uint32_t v99() = 0;                                                               // returns some constant value
+    virtual void play_jump_on_sound() = 0;                                                    // checks if it has rider
+    virtual void remove_rider() = 0;
+    virtual float v102() = 0;                // get offset? mech returns 0.9, the rest 0.5
+    virtual uint32_t v103() = 0;             // returns some constant value
+    virtual uint32_t v104() = 0;             // returns some constant value
+    virtual uint32_t v105() = 0;             // returns some constant value
+    virtual bool can_play_mount_sound() = 0; // called every frame, if returns true mount will make a sound
 };
 
 class Rockdog : public Mount

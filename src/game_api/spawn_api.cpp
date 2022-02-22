@@ -26,6 +26,9 @@ std::function<void(Entity*)> g_temp_entity_spawn_hook;
 
 void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 {
+    if (y < 0.1) // spawning below 0 crashes the game
+        return;
+
     using spawn_liquid_fun_t = void(void*, float, float, std::uint32_t, bool);
     static auto spawn_liquid_call = (spawn_liquid_fun_t*)get_address("spawn_liquid");
 

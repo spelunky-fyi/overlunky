@@ -13,6 +13,14 @@ class Backpack : public Movable
     uint8_t explosion_timer; // counts from 0 to 30
     uint16_t unknown1;
     uint32_t unknown2;
+
+    virtual void v93() = 0; // always returns 0x100000007 (maybe two 32bit values, 1 and 7 ?)
+    virtual void v94() = 0; // just return
+    virtual void v95() = 0; // just return
+    virtual void on_putting_on(Entity* who) = 0;
+    virtual void on_putting_off(Entity* who) = 0;
+    virtual bool is_active() = 0;          // for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack, hoverpack.is_on, teleporter and powerpack return false
+    virtual void play_warning_sound() = 0; // plays the warning sound before explosion for jet, teleporter, hover and power pack
 };
 
 class Jetpack : public Backpack
@@ -57,6 +65,10 @@ class Cape : public Backpack
     uint8_t padding2;
     uint8_t padding3;
     uint32_t floating_count; // it's per level, not per cape
+
+    // clear particle? called when using backpack.trigger_explosion when the cape is about to disappear
+    // it's a common funciton
+    virtual void v100(size_t unknown) = 0;
 };
 
 class VladsCape : public Cape
@@ -65,14 +77,24 @@ class VladsCape : public Cape
     bool can_double_jump;
 };
 
-class Mattock : public Movable
+class Purchasable : public Movable
+{
+    virtual void buy(Entity* who) = 0;
+};
+
+class DummyPurchasableEntity : public Purchasable
+{
+    virtual Entity* switch_entities(void*) = 0; // switches the purchasable cape with normal one
+};
+
+class Mattock : public Purchasable
 {
   public:
     uint8_t remaining;
 };
 
-class Gun : public Movable
-{
+class Gun : public Purchasable
+{ // BIG NOTE: scepter is not a Purchasable, but that's the only Gun that isn't so i din't bother to make new type for it
   public:
     uint8_t cooldown;
     /// used only for webgun
@@ -106,21 +128,6 @@ class GiantClamTop : public Movable
   public:
     int8_t close_timer;
     uint8_t open_timer;
-};
-
-class CookFire : public Movable
-{
-  public:
-    int32_t unknown1;
-    /// Can set it on fire or extinguish
-    bool lit;
-    uint8_t unused1;
-    uint16_t unused2;
-    Illumination* emitted_light;
-    ParticleEmitterInfo* particles_smoke;
-    ParticleEmitterInfo* particles_flames;
-    ParticleEmitterInfo* particles_warp;
-    SoundPosition* sound_pos;
 };
 
 class Flame : public Movable
@@ -182,7 +189,15 @@ struct UnknownPointerGroup
     size_t unknown_uid3;
 };
 
-class WebShot : public Movable
+class Projectile : public Movable
+{
+    // called when shooting (entity it still not added to layer) and it's called like normal function, not thru this virtual
+    virtual void v93(float angle, float speed, Entity* responsible) = 0;
+    // called when shooting (entity it still not added to layer)
+    virtual bool v94(Entity* responsible, float x) = 0;
+};
+
+class WebShot : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -203,7 +218,7 @@ class HangAnchor : public Movable
     int32_t spider_uid;
 };
 
-class Arrow : public Movable
+class Arrow : public Purchasable
 {
   public:
     int32_t flame_uid;
@@ -211,6 +226,9 @@ class Arrow : public Movable
     bool is_poisoned;
     bool shot_from_trap;
     int8_t unused;
+
+    virtual void poison_arrow(bool poisoned) = 0;
+    virtual void light_up(bool lit) = 0;
 };
 
 class LightArrow : public Arrow
@@ -219,7 +237,7 @@ class LightArrow : public Arrow
     Illumination* emitted_light;
 };
 
-class LightShot : public Movable
+class LightShot : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -389,6 +407,18 @@ class Torch : public Movable
     int16_t unknown2;
 
     virtual void light_up(bool lit) = 0;
+    virtual std::pair<float, float>& v_94(std::pair<float, float>& value) = 0; // sets the value to some constant, runs on spawn
+    virtual ENT_TYPE get_flame_type() = 0;
+};
+
+class CookFire : public Torch
+{
+  public:
+    Illumination* emitted_light;
+    ParticleEmitterInfo* particles_smoke;
+    ParticleEmitterInfo* particles_flames;
+    ParticleEmitterInfo* particles_warp;
+    SoundPosition* sound_pos;
 };
 
 class WallTorch : public Torch
@@ -413,7 +443,7 @@ class LampFlame : public Flame
     ParticleEmitterInfo* flame_particle;
 };
 
-class Bullet : public Movable
+class Bullet : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -461,6 +491,12 @@ class Container : public Movable
     void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
 
+class Present : public Purchasable
+{
+  public:
+    ENT_TYPE inside;
+};
+
 class Coffin : public Movable
 {
   public:
@@ -481,6 +517,8 @@ class OlmecCannon : public Movable
   public:
     uint16_t timer;
     uint8_t bombs_left;
+
+    virtual void spawn_projectile() = 0;
 };
 
 class Landmine : public LightEmitter
@@ -516,7 +554,7 @@ class PlayerGhost : public LightEmitter
     size_t unknown;
 };
 
-class GhostBreath : public Movable
+class GhostBreath : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -538,7 +576,7 @@ class TreasureHook : public Movable
     SoundPosition* sound_pos;
 };
 
-class AxolotlShot : public Movable
+class AxolotlShot : public Projectile
 {
   public:
     UnknownPointerGroup unknown1;
@@ -628,7 +666,7 @@ class MiniGameAsteroid : public Movable
     float spin_speed;
 };
 
-class Pot : public Movable
+class Pot : public Purchasable
 {
   public:
     ENT_TYPE inside;
@@ -658,7 +696,7 @@ class EggSac : public Movable
 class Goldbar : public Movable
 {
   public:
-    uint8_t unknown_shine; // get's updated every time animation_frame is changes by the game, setting it to 64 or less disables the effect
+    uint8_t unknown_shine; // get's updated every time animation_frame is changed by the game, setting it to 64 or less breaks it
 };
 
 class Coin : public Movable
@@ -667,25 +705,28 @@ class Coin : public Movable
     uint32_t nominal_price;
 };
 
-class RollingItem : public Movable
+class RollingItem : public Purchasable
 {
   public:
     float roll_speed; // only positive numbers
+
+    virtual void on_purchase(Entity* who, int32_t unknown) = 0; // give you the powerup if you buy it
 };
 
 class PlayerBag : public Movable
 {
   public:
-    uint8_t bombs;
-    uint8_t ropes;
+    int8_t bombs;
+    int8_t ropes;
 };
 
 class Powerup : public Movable
 {
   public:
-    // thoes could be wrong becouse of the update
-    virtual void apply_effect_to_player(Player* player) = 0;
-    virtual void remove_effect_from_player(Player* player) = 0;
+    virtual size_t& v93(size_t&) = 0;                      // get powerup id/type?
+    virtual void apply_effect(PowerupCapable* player) = 0; // runs when getting the powerup
+    virtual void remove_effect(PowerupCapable* player) = 0;
+    // 3 more here, but they just return instantly
 };
 
 class KapalaPowerup : public Powerup
@@ -733,13 +774,13 @@ class YellowCape : public Cape
     SoundPosition* sound_pos;
 };
 
-class Teleporter : public Movable
+class Teleporter : public Purchasable
 {
   public:
     uint16_t teleport_number; // max 3, need to stand on the ground to reset
 };
 
-class Boomerang : public Movable
+class Boomerang : public Purchasable
 {
   public:
     SoundPosition* sound_pos;
@@ -761,7 +802,7 @@ class Excalibur : public Movable
     bool in_stone;
 };
 
-class Shield : public Movable
+class Shield : public Purchasable
 {
   public:
     float shake;
@@ -775,4 +816,10 @@ class PrizeDispenser : public Movable
     std::array<uint8_t, 6> item_ids;
     uint8_t prizes_spawned;
     int8_t padding;
+};
+
+class Bow : public Purchasable
+{
+    // When lain on the ground
+    virtual float get_arrow_special_offset() = 0;
 };

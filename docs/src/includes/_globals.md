@@ -458,7 +458,6 @@ Drop an entity by uid
 #### nil enter_door(int player_uid, int door_uid)
 
 Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
-Doesn't really work for layer doors
 
 ### entity_get_items_by
 
@@ -1011,6 +1010,15 @@ Returns true if a bit is set in the flags
 
 ## Generic functions
 
+
+### change_poison_timer
+
+
+> Search script examples for [change_poison_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_poison_timer)
+
+#### nil change_poison_timer(int frames)
+
+Change the amount of frames after the damage from poison is applied
 
 ### create_image
 

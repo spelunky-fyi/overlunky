@@ -234,6 +234,8 @@ void register_usertypes(sol::state& lua)
         &Entity::remove,
         "respawn",
         &Entity::respawn,
+        "kill",
+        &Entity::kill,
         "destroy",
         &Entity::destroy,
         "activate",
@@ -245,11 +247,20 @@ void register_usertypes(sol::state& lua)
         "get_metadata",
         &Entity::get_metadata,
         "apply_metadata",
-        &Entity::apply_metadata);
+        &Entity::apply_metadata,
+        "set_invisible",
+        &Entity::set_invisible,
+        "get_items",
+        &Entity::get_items,
+        "is_in_liquid",
+        &Entity::is_in_liquid);
 
     auto damage = sol::overload(
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint16_t)>(&Movable::damage));
+    auto light_on_fire = sol::overload(
+        static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
+        static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
     lua.new_usertype<Movable>(
         "Movable",
         "movex",
@@ -329,7 +340,7 @@ void register_usertypes(sol::state& lua)
         "freeze",
         &Movable::freeze,
         "light_on_fire",
-        &Movable::light_on_fire,
+        light_on_fire,
         "set_cursed",
         &Movable::set_cursed,
         "drop",
@@ -342,6 +353,8 @@ void register_usertypes(sol::state& lua)
         &Movable::standing_on,
         "add_money",
         &Movable::add_money,
+        "is_on_fire",
+        &Movable::is_on_fire,
         "damage",
         damage,
         sol::base_classes,
