@@ -59,7 +59,7 @@ The [Online](#Online) object has information about the online lobby and its play
 
 > Search script examples for [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players)
 
-An array of [Player](#Player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
+An array of [Player](#Player) of the current players. This is just a list of existing [Player](#Player) entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See [`get_player()`](#get_player).
 ### savegame
 
 
@@ -628,6 +628,15 @@ Get the [ENT_TYPE](#ENT_TYPE)... of the entity by uid
 
 Gets a grid entity, such as floor or spikes, at the given position and layer.
 
+### get_playerghost
+
+
+> Search script examples for [get_playerghost](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_playerghost)
+
+#### [PlayerGhost](#PlayerGhost) get_playerghost(int slot)
+
+Returns [PlayerGhost](#PlayerGhost) with this player slot 1..4
+
 ### get_type
 
 
@@ -1047,6 +1056,15 @@ Same as `Player.get_heart_color`
 
 Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
 
+### get_id
+
+
+> Search script examples for [get_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_id)
+
+#### string get_id()
+
+Get your sanitized script id to be used in import.
+
 ### get_level_config
 
 
@@ -1064,6 +1082,15 @@ Gets the value for the specified config
 #### nil get_ms()
 
 Get the current timestamp in milliseconds since the Unix Epoch.
+
+### get_player
+
+
+> Search script examples for [get_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_player)
+
+#### [Player](#Player) get_player(int slot, bool or_ghost = false)
+
+Returns [Player](#Player) (or [PlayerGhost](#PlayerGhost) if `get_player(1, true)`) with this player slot
 
 ### god
 
@@ -1083,6 +1110,15 @@ Enable/disable godmode for players.
 
 Enable/disable godmode for companions.
 
+### import
+
+
+> Search script examples for [import](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=import)
+
+#### array import(string id, optional<string> version)
+
+Load another script by id "author/name" and import its `exports` table
+
 ### is_character_female
 
 
@@ -1091,15 +1127,6 @@ Enable/disable godmode for companions.
 #### bool is_character_female([ENT_TYPE](#ENT_TYPE) type_id)
 
 Same as `Player.is_female`
-
-### load_script
-
-
-> Search script examples for [load_script](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
-
-#### nil load_script(string id)
-
-Load another script by id "author/name"
 
 ### pause
 
@@ -2418,6 +2445,14 @@ Use `set_callback(function, ON.SCREEN)` instead
 ### on_guiframe
 
 Use `set_callback(function, ON.GUIFRAME)` instead
+
+### load_script
+
+
+> Search script examples for [load_script](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_script)
+
+`nil load_script()`<br/>
+Same as import().
 
 ### read_prng
 

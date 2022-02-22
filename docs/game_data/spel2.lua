@@ -25,6 +25,15 @@ prng = nil
 
 -- Functions
 
+---Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
+---@param slot integer
+---@param or_ghost boolean
+---@return Player
+function get_player(slot, or_ghost) end
+---Returns PlayerGhost with this player slot 1..4
+---@param slot integer
+---@return PlayerGhost
+function get_playerghost(slot) end
 ---Standard lua print function, prints directly to the console but not to the game
 ---@return nil
 function lua_print() end
@@ -83,10 +92,14 @@ function set_callback(cb, screen) end
 ---@param id CallbackId?
 ---@return nil
 function clear_callback(id) end
----Load another script by id "author/name"
+---Load another script by id "author/name" and import its `exports` table
 ---@param id string
----@return nil
-function load_script(id) end
+---@param version string?
+---@return Array
+function import(id, version) end
+---Get your sanitized script id to be used in import.
+---@return string
+function get_id() end
 ---Show a message that looks like a level feeling.
 ---@param message string
 ---@return nil

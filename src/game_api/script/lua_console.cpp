@@ -872,6 +872,10 @@ const char* LuaConsole::get_id() const
 {
     return "dev/lua_console";
 }
+const char* LuaConsole::get_version() const
+{
+    return "1.337";
+}
 const char* LuaConsole::get_path() const
 {
     return "console_proxy.lua";

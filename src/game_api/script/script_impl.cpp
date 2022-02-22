@@ -196,6 +196,10 @@ const char* ScriptImpl::get_id() const
 {
     return meta.id.c_str();
 }
+const char* ScriptImpl::get_version() const
+{
+    return meta.version.c_str();
+}
 const char* ScriptImpl::get_root() const
 {
     return meta.path.c_str();

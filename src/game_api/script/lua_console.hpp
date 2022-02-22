@@ -25,7 +25,7 @@ class LuaConsole : public LuaBackend
     bool scroll_to_bottom{false};
     std::optional<size_t> set_scroll_to_history_item;
     std::optional<size_t> last_force_scroll;
-    char console_input[2048]{};
+    char console_input[8192]{};
 
     bool has_new_history{false};
     size_t max_history{30};
@@ -51,6 +51,7 @@ class LuaConsole : public LuaBackend
     virtual bool get_unsafe() const override;
     virtual const char* get_name() const override;
     virtual const char* get_id() const override;
+    virtual const char* get_version() const override;
     virtual const char* get_path() const override;
     virtual const char* get_root() const override;
     virtual const std::filesystem::path& get_root_path() const override;

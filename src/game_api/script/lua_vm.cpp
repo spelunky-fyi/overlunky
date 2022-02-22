@@ -138,8 +138,53 @@ end
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
     lua["online"] = get_online();
-    /// An array of [Player](#Player) of the current players. Pro tip: You need `players[1].uid` in most entity functions.
+    /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See get_player().
     lua["players"] = std::vector<Player*>(get_players());
+
+    auto get_player = sol::overload(
+        [&lua](int8_t slot) -> sol::object // -> Player
+        {
+            for (auto player : get_players())
+            {
+                if (player->inventory_ptr->player_slot == slot - 1)
+                    return sol::make_object_userdata(lua, player);
+            }
+            return sol::nil;
+        },
+        [&lua](int8_t slot, bool or_ghost) -> sol::object
+        {
+            for (auto player : get_players())
+            {
+                if (player->inventory_ptr->player_slot == slot - 1)
+                    return sol::make_object_userdata(lua, player);
+            }
+            if (or_ghost)
+            {
+                for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), 0x8u, LAYER::BOTH))
+                {
+                    auto player = get_entity_ptr(uid)->as<PlayerGhost>();
+                    if (player->inventory->player_slot == slot - 1)
+                        return sol::make_object_userdata(lua, player);
+                }
+            }
+            return sol::nil;
+        });
+
+    /// Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
+    // lua["get_player"] = [](int8_t slot, bool or_ghost = false) -> Player
+    lua["get_player"] = get_player;
+
+    /// Returns PlayerGhost with this player slot 1..4
+    lua["get_playerghost"] = [](int8_t slot) -> PlayerGhost*
+    {
+        for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), 0x8u, LAYER::BOTH))
+        {
+            auto player = get_entity_ptr(uid)->as<PlayerGhost>();
+            if (player->inventory->player_slot == slot - 1)
+                return player;
+        }
+        return nullptr;
+    };
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
     lua["savegame"] = savedata();
 
@@ -272,12 +317,56 @@ end
 
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
-    /// Load another script by id "author/name"
-    lua["load_script"] = [](std::string id)
+
+    /// Load another script by id "author/name" and import its `exports` table
+    // lua["import"] = [](string id, optional<string> version) -> array
+    lua["import"] = sol::overload(
+        [&lua](std::string id)
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            backend->required_scripts.push_back(sanitize(id));
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)));
+            if (!import_backend)
+            {
+                luaL_error(lua, "Imported script not found");
+                return sol::make_object(lua, sol::lua_nil);
+            }
+            if (!import_backend->get_enabled())
+            {
+                import_backend->set_enabled(true);
+                import_backend->update();
+            }
+            return sol::make_object(lua, import_backend->lua["exports"]);
+        },
+        [&lua](std::string id, std::string version)
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            backend->required_scripts.push_back(sanitize(id));
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)), std::string_view(version));
+            if (!import_backend)
+            {
+                luaL_error(lua, "Imported script not found");
+                return sol::make_object(lua, sol::lua_nil);
+            }
+            if (!import_backend->get_enabled())
+            {
+                import_backend->set_enabled(true);
+                import_backend->update();
+            }
+            return sol::make_object(lua, import_backend->lua["exports"]);
+        });
+
+    /// Deprecated
+    /// Same as import().
+    lua["load_script"] = lua["import"];
+
+    /// Get your sanitized script id to be used in import.
+    lua["get_id"] = []() -> std::string
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->required_scripts.push_back(sanitize(id));
+        return backend->get_id();
     };
+
     /// Deprecated
     /// Read the game prng state. Use [prng](#PRNG):get_pair() instead.
     lua["read_prng"] = []() -> std::vector<int64_t>

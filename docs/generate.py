@@ -886,7 +886,7 @@ for func in funcs:
         cat = "Room functions"
     elif any(subs in func["name"] for subs in ["spawn"]) or func["name"] in ["door", "layer_door"]:
         cat = "Spawn functions"
-    elif any(subs in func["name"] for subs in ["entity", "entities", "set_door", "get_door", "contents", "attach", "pick_up", "drop", "backitem", "carry", "door_at", "get_type", "kapala", "sparktrap", "explosion", "rope", "door", "blood", "olmec", "ghost", "jelly", "ankh"]):
+    elif any(subs in func["name"] for subs in ["entity", "entities", "set_door", "get_door", "contents", "attach", "pick_up", "drop", "backitem", "carry", "door_at", "get_type", "kapala", "sparktrap", "explosion", "rope", "door", "blood", "olmec", "ghost", "jelly", "ankh", "player"]):
         cat = "Entity functions"
     elif any(subs in func["name"] for subs in ["theme"]):
         cat = "Theme functions"

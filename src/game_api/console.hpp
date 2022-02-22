@@ -39,6 +39,8 @@ class SpelunkyConsole
         return m_Impl.get();
     }
 
+    void set_selected_uid(uint32_t uid);
+
   private:
     std::unique_ptr<class LuaConsole> m_Impl;
 };

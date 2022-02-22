@@ -263,6 +263,7 @@ class LuaBackend
     virtual bool get_unsafe() const = 0;
     virtual const char* get_name() const = 0;
     virtual const char* get_id() const = 0;
+    virtual const char* get_version() const = 0;
     virtual const char* get_path() const = 0;
     virtual const char* get_root() const = 0;
     virtual const std::filesystem::path& get_root_path() const = 0;
@@ -306,6 +307,7 @@ class LuaBackend
 
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);
+    static LuaBackend* get_backend_by_id(std::string_view id, std::string_view ver = "");
     static LuaBackend* get_calling_backend();
 
     CurrentCallback get_current_callback();

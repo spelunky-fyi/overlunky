@@ -1029,6 +1029,18 @@ LuaBackend* LuaBackend::get_backend(std::string_view id)
     }
     return nullptr;
 }
+LuaBackend* LuaBackend::get_backend_by_id(std::string_view id, std::string_view ver)
+{
+    std::lock_guard lock{g_all_backends_mutex};
+    for (auto* backend : g_all_backends)
+    {
+        if (backend->get_id() == id && (ver == "" || ver == backend->get_version()))
+        {
+            return backend;
+        }
+    }
+    return nullptr;
+}
 LuaBackend* LuaBackend::get_calling_backend()
 {
     static const sol::state& lua = get_lua_vm();
