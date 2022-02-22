@@ -78,7 +78,7 @@ struct Vec2
         operator--();
         return old;
     }
-    bool operator==(const Vec2 a) const
+    bool operator==(const Vec2& a) const
     {
         return x == a.x && y == a.y;
     }
