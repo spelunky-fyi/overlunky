@@ -1264,6 +1264,9 @@ end
     /// Refreshes an Illumination, keeps it from fading out
     lua["refresh_illumination"] = refresh_illumination;
 
+    /// Removes all liquid that is about to go out of bounds, which crashes the game.
+    lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
