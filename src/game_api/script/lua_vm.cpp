@@ -138,11 +138,11 @@ end
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
     lua["online"] = get_online();
-    /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See [`get_player()`](#get_player).
+    /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See get_player().
     lua["players"] = std::vector<Player*>(get_players());
-    /// Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
-    lua["get_player"] = sol::overload(
-        [&lua](int8_t slot) -> sol::object
+
+    auto get_player = sol::overload(
+        [&lua](int8_t slot) -> sol::object // -> Player
         {
             for (auto player : get_players())
             {
@@ -169,6 +169,11 @@ end
             }
             return sol::nil;
         });
+
+    /// Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
+    // lua["get_player"] = [](int8_t slot, bool or_ghost = false) -> Player
+    lua["get_player"] = get_player;
+
     /// Returns PlayerGhost with this player slot 1..4
     lua["get_playerghost"] = [](int8_t slot) -> PlayerGhost*
     {
@@ -314,6 +319,7 @@ end
     lua["options"] = lua.create_named_table("options");
 
     /// Load another script by id "author/name" and import its `exports` table
+    // lua["import"] = [](string id, optional<string> version) -> array
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {
@@ -349,7 +355,17 @@ end
             }
             return sol::make_object(lua, import_backend->lua["exports"]);
         });
+
+    /// Deprecated
+    /// Same as import().
     lua["load_script"] = lua["import"];
+
+    /// Get your sanitized script id to be used in import.
+    lua["get_id"] = []() -> std::string
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        return backend->get_id();
+    };
 
     /// Deprecated
     /// Read the game prng state. Use [prng](#PRNG):get_pair() instead.
