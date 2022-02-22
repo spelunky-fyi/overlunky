@@ -868,6 +868,9 @@
                             <a href="#draw_text_size" class="toc-h3 toc-link" data-title="draw_text_size">draw_text_size</a>
                           </li>
                           <li>
+                            <a href="#fix_liquid_out_of_bounds" class="toc-h3 toc-link" data-title="fix_liquid_out_of_bounds">fix_liquid_out_of_bounds</a>
+                          </li>
+                          <li>
                             <a href="#game_position" class="toc-h3 toc-link" data-title="game_position">game_position</a>
                           </li>
                           <li>
@@ -4106,6 +4109,15 @@ limits, you can override them in the UI with double click.</p>
 </blockquote>
 <h4 id='tuple-lt-float-float-gt-draw_text_size-float-size-string-text'>tuple&lt;float, float&gt; draw_text_size(float size, string text)</h4>
 <p>Calculate the bounding box of text, so you can center it etc. Returns <code>width</code>, <code>height</code> in screen distance.</p>
+<h3 id='fix_liquid_out_of_bounds'>fix_liquid_out_of_bounds</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- call this in ON.FRAME if needed in your custom level</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="n">fix_liquid_out_of_bounds</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">FRAME</span><span class="p">)</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fix_liquid_out_of_bounds">fix_liquid_out_of_bounds</a></p>
+</blockquote>
+<h4 id='nil-fix_liquid_out_of_bounds'>nil fix_liquid_out_of_bounds()</h4>
+<p>Removes all liquid that is about to go out of bounds, which crashes the game.</p>
 <h3 id='game_position'>game_position</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=game_position">game_position</a></p>

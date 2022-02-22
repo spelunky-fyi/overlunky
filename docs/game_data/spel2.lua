@@ -974,6 +974,9 @@ function create_illumination(color, size, uid) end
 ---@param illumination Illumination
 ---@return nil
 function refresh_illumination(illumination) end
+---Removes all liquid that is about to go out of bounds, which crashes the game.
+---@return nil
+function fix_liquid_out_of_bounds() end
 ---@return boolean
 function toast_visible() end
 ---@return boolean

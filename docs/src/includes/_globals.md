@@ -1562,6 +1562,22 @@ end, ON.GUIFRAME)
 
 Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
 
+### fix_liquid_out_of_bounds
+
+
+```lua
+-- call this in ON.FRAME if needed in your custom level
+set_callback(fix_liquid_out_of_bounds, ON.FRAME)
+
+```
+
+
+> Search script examples for [fix_liquid_out_of_bounds](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fix_liquid_out_of_bounds)
+
+#### nil fix_liquid_out_of_bounds()
+
+Removes all liquid that is about to go out of bounds, which crashes the game.
+
 ### game_position
 
 
