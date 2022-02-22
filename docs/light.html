@@ -538,6 +538,12 @@
                             <a href="#get_grid_entity_at" class="toc-h3 toc-link" data-title="get_grid_entity_at">get_grid_entity_at</a>
                           </li>
                           <li>
+                            <a href="#get_player" class="toc-h3 toc-link" data-title="get_player">get_player</a>
+                          </li>
+                          <li>
+                            <a href="#get_playerghost" class="toc-h3 toc-link" data-title="get_playerghost">get_playerghost</a>
+                          </li>
+                          <li>
                             <a href="#get_type" class="toc-h3 toc-link" data-title="get_type">get_type</a>
                           </li>
                           <li>
@@ -680,6 +686,9 @@
                             <a href="#get_frame" class="toc-h3 toc-link" data-title="get_frame">get_frame</a>
                           </li>
                           <li>
+                            <a href="#get_id" class="toc-h3 toc-link" data-title="get_id">get_id</a>
+                          </li>
+                          <li>
                             <a href="#get_level_config" class="toc-h3 toc-link" data-title="get_level_config">get_level_config</a>
                           </li>
                           <li>
@@ -692,10 +701,10 @@
                             <a href="#god_companions" class="toc-h3 toc-link" data-title="god_companions">god_companions</a>
                           </li>
                           <li>
-                            <a href="#is_character_female" class="toc-h3 toc-link" data-title="is_character_female">is_character_female</a>
+                            <a href="#import" class="toc-h3 toc-link" data-title="import">import</a>
                           </li>
                           <li>
-                            <a href="#load_script" class="toc-h3 toc-link" data-title="load_script">load_script</a>
+                            <a href="#is_character_female" class="toc-h3 toc-link" data-title="is_character_female">is_character_female</a>
                           </li>
                           <li>
                             <a href="#pause" class="toc-h3 toc-link" data-title="pause">pause</a>
@@ -1172,6 +1181,9 @@
                           </li>
                           <li>
                             <a href="#on_guiframe" class="toc-h3 toc-link" data-title="on_guiframe">on_guiframe</a>
+                          </li>
+                          <li>
+                            <a href="#load_script" class="toc-h3 toc-link" data-title="load_script">load_script</a>
                           </li>
                           <li>
                             <a href="#read_prng" class="toc-h3 toc-link" data-title="read_prng">read_prng</a>
@@ -3110,7 +3122,7 @@
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=players">players</a></p>
 </blockquote>
 
-<p>An array of <a href="#Player">Player</a> of the current players. Pro tip: You need <code>players[1].uid</code> in most entity functions.</p>
+<p>An array of <a href="#Player">Player</a> of the current players. This is just a list of existing <a href="#Player">Player</a> entities in order, i.e., <code>players[1]</code> is not guaranteed to be P1 if they have been gibbed for example. See get_player().</p>
 <h3 id='savegame'>savegame</h3>
 <blockquote>
 <p>Print best time from savegame</p>
@@ -3507,6 +3519,18 @@ You can even pass a table!</p>
 </blockquote>
 <h4 id='int-get_grid_entity_at-float-x-float-y-LAYER-layer'>int get_grid_entity_at(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
 <p>Gets a grid entity, such as floor or spikes, at the given position and layer.</p>
+<h3 id='get_player'>get_player</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_player">get_player</a></p>
+</blockquote>
+<h4 id='Player-get_player-int-slot-bool-or_ghost-false'><a href="#Player">Player</a> get_player(int slot, bool or_ghost = false)</h4>
+<p>Returns <a href="#Player">Player</a> (or <a href="#PlayerGhost">PlayerGhost</a> if <code>get_player(1, true)</code>) with this player slot</p>
+<h3 id='get_playerghost'>get_playerghost</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_playerghost">get_playerghost</a></p>
+</blockquote>
+<h4 id='PlayerGhost-get_playerghost-int-slot'><a href="#PlayerGhost">PlayerGhost</a> get_playerghost(int slot)</h4>
+<p>Returns <a href="#PlayerGhost">PlayerGhost</a> with this player slot 1..4</p>
 <h3 id='get_type'>get_type</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_type">get_type</a></p>
@@ -3782,6 +3806,12 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='int-get_frame'>int get_frame()</h4>
 <p>Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.</p>
+<h3 id='get_id'>get_id</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_id">get_id</a></p>
+</blockquote>
+<h4 id='string-get_id'>string get_id()</h4>
+<p>Get your sanitized script id to be used in import.</p>
 <h3 id='get_level_config'>get_level_config</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_level_config">get_level_config</a></p>
@@ -3806,18 +3836,18 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='nil-god_companions-bool-g'>nil god_companions(bool g)</h4>
 <p>Enable/disable godmode for companions.</p>
+<h3 id='import'>import</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
+</blockquote>
+<h4 id='array-import-string-id-optional-version'>array import(string id, optional<string> version)</h4>
+<p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table</p>
 <h3 id='is_character_female'>is_character_female</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_character_female">is_character_female</a></p>
 </blockquote>
 <h4 id='bool-is_character_female-ENT_TYPE-type_id'>bool is_character_female(<a href="#ENT_TYPE">ENT_TYPE</a> type_id)</h4>
 <p>Same as <code>Player.is_female</code></p>
-<h3 id='load_script'>load_script</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_script">load_script</a></p>
-</blockquote>
-<h4 id='nil-load_script-string-id'>nil load_script(string id)</h4>
-<p>Load another script by id &quot;author/name&quot;</p>
 <h3 id='pause'>pause</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></p>
@@ -4668,6 +4698,13 @@ For example, when returning true in this callback set for <code>&quot;floor&quot
 <p>Use <code>set_callback(function, ON.SCREEN)</code> instead</p>
 <h3 id='on_guiframe'>on_guiframe</h3>
 <p>Use <code>set_callback(function, ON.GUIFRAME)</code> instead</p>
+<h3 id='load_script'>load_script</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_script">load_script</a></p>
+</blockquote>
+
+<p><code>nil load_script()</code><br/>
+Same as import().</p>
 <h3 id='read_prng'>read_prng</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read_prng">read_prng</a></p>

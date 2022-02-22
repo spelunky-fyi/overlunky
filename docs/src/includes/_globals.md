@@ -59,7 +59,7 @@ The [Online](#Online) object has information about the online lobby and its play
 
 > Search script examples for [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players)
 
-An array of [Player](#Player) of the current players. This is just a list of existing [Player](#Player) entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See [`get_player()`](#get_player).
+An array of [Player](#Player) of the current players. This is just a list of existing [Player](#Player) entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See get_player().
 ### savegame
 
 
@@ -628,6 +628,15 @@ Get the [ENT_TYPE](#ENT_TYPE)... of the entity by uid
 
 Gets a grid entity, such as floor or spikes, at the given position and layer.
 
+### get_player
+
+
+> Search script examples for [get_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_player)
+
+#### [Player](#Player) get_player(int slot, bool or_ghost = false)
+
+Returns [Player](#Player) (or [PlayerGhost](#PlayerGhost) if `get_player(1, true)`) with this player slot
+
 ### get_playerghost
 
 
@@ -1082,15 +1091,6 @@ Gets the value for the specified config
 #### nil get_ms()
 
 Get the current timestamp in milliseconds since the Unix Epoch.
-
-### get_player
-
-
-> Search script examples for [get_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_player)
-
-#### [Player](#Player) get_player(int slot, bool or_ghost = false)
-
-Returns [Player](#Player) (or [PlayerGhost](#PlayerGhost) if `get_player(1, true)`) with this player slot
 
 ### god
 
