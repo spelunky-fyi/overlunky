@@ -1398,6 +1398,23 @@ std::optional<uint8_t> LevelGenData::define_short_tile_code(ShortTileCodeDef sho
     return std::nullopt;
 }
 
+std::pair<const game_string, ChanceDef>& get_or_emplace_chance(game_unordered_map<game_string, ChanceDef>& chances, game_string chance_name)
+{
+    struct ChanceNode
+    {
+        void* ptr0;
+        void* ptr1;
+        std::pair<const game_string, ChanceDef> value;
+    };
+    using EmplaceChance = ChanceNode * *(void*, std::pair<ChanceNode*, bool>*, game_string&);
+    static EmplaceChance* emplace_level_chance = (EmplaceChance*)get_address("level_gen_emplace_chance");
+
+    std::pair<ChanceNode*, bool> node;
+    emplace_level_chance((void*)&chances, &node, chance_name);
+
+    return node.first->value;
+}
+
 std::optional<std::uint32_t> LevelGenData::get_chance(const std::string& chance)
 {
     {
@@ -1424,11 +1441,12 @@ std::uint32_t LevelGenData::define_chance(std::string chance)
     }
 
     // We use only monster chances to define new stuff, keep an eye out for whether this is dangerous
-    auto [it, success] = monster_chances.emplace(chance.c_str(), ChanceDef{g_current_chance_id});
+    auto& [chance_str, this_chance] = get_or_emplace_chance(monster_chances, chance.c_str());
+    this_chance.id = g_current_chance_id;
     g_current_chance_id++;
 
-    g_monster_chance_id_to_name[it->second.id] = it->first;
-    return it->second.id;
+    g_monster_chance_id_to_name[this_chance.id] = chance_str;
+    return this_chance.id;
 }
 
 std::uint32_t LevelGenData::register_chance_logic_provider(std::uint32_t chance_id, SpawnLogicProvider provider)
@@ -1741,7 +1759,7 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
 {
     if (g_monster_chance_id_to_name.contains(chance_id))
     {
-        LevelChanceDef this_chances = get_or_emplace_level_chance(data->level_monster_chances, chance_id);
+        LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_monster_chances, chance_id);
         if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();

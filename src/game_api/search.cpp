@@ -754,6 +754,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "level_gen_emplace_chance"sv,
+        // Called during init with a string of all the different monster and trap chances, e.g. "pushblock_chance"
+        PatternCommandBuffer{}
+            .find_inst("\x4c\x8d\x45\xe0\xe8****\x48\x8b\x45\xc8"sv)
+            .offset(0x4)
+            .decode_call()
+            .at_exe(),
+    },
+    {
         "level_gen_emplace_level_chance"sv,
         // Called in load_level_file on LevelGenData::level_trap_chances and LevelGenData::level_trap_chances
         PatternCommandBuffer{}
