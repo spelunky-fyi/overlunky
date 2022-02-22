@@ -1746,15 +1746,12 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
 
 void enter_door(int32_t player_uid, int32_t door_uid)
 {
-    auto addr = Memory::get().at_exe(get_virtual_function_address(VTABLE_OFFSET::FLOOR_DOOR_EXIT, 42));
     auto player = get_entity_ptr(player_uid);
-    auto door = get_entity_ptr(door_uid);
+    auto door = get_entity_ptr(door_uid)->as<Door>();
     if (player == nullptr || door == nullptr)
         return;
 
-    typedef void transition_fun(Entity*, Entity*);
-    static transition_fun* door_entry = (transition_fun*)(addr);
-    door_entry(door, player);
+    door->enter(player);
 }
 
 void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
@@ -2116,5 +2113,21 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner)
                 return;
             }
         }
+    }
+}
+
+void change_poison_timer(int16_t frames)
+{
+    const static size_t offset_first = get_address("first_poison_tick_timer_default");
+    const static size_t offset_subsequent = get_address("subsequent_poison_tick_timer_default");
+
+    if (frames == -1)
+    {
+        recover_mem("change_poison_timer");
+    }
+    else
+    {
+        write_mem_recoverable("change_poison_timer", offset_first, frames, true);
+        write_mem_recoverable("change_poison_timer", offset_subsequent, frames, true);
     }
 }

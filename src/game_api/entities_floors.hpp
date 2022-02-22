@@ -58,7 +58,10 @@ class Floor : public Entity
     static bool get_perpendicular_sides(FLOOR_SIDE side, FLOOR_SIDE (&perp_sides)[2]);
     static bool get_corner_sides(FLOOR_SIDE side, FLOOR_SIDE (&corner_sides)[2]);
 
-    virtual void decorate_internal() = 0; // decorates undecorated floor and floorstyled, doesn't remove old decorations
+    virtual void decorate_internal() = 0;     // decorates undecorated floor and floorstyled, doesn't remove old decorations, runs only on level gen
+    virtual void on_neighbor_destroyed() = 0; // called on every neighbor of destroyed floor to decorate it
+    /// Returns it's ENT_TYPE except for FLOOR_PEN (returns FLOORSTYLED_MINEWOOD) and FLOOR_QUICKSAND, FLOOR_TOMB, FLOOR_EMPRESS_GRAVE which return FLOOR_GENERIC
+    virtual ENT_TYPE get_floor_type() = 0; // Used for spawning decorations
 };
 
 class Door : public Floor
@@ -67,6 +70,27 @@ class Door : public Floor
     uint8_t counter; // counts down as you go thru it
     int8_t unused1[7];
     Entity* fx_button;
+
+    /// Lock/Unlock doors
+    void unlock(bool unlock);
+
+    // this function doesnt do much, checks if it's CHAR_*, checks if hes holding anything (if yes calls some function), then checks if Player.can_use is equal to 4 calls some other function
+    // can't be bother to look into the functions
+    virtual void on_enter_attempt(Entity* who) = 0;
+
+    // check if it's CHAR_*, then sets State.level_flags -> 21 (Hide hud, transition)
+    virtual void hide_ui(Entity* who) = 0;
+    virtual uint8_t enter(Entity* who) = 0;
+
+    // checks layer of the Entity entering, except for FLOOR_DOOR_EGGSHIP_ROOM which gets the overlay (BG_EGGSHIP_ROOM) and returns BGEggshipRoom.player_in
+    virtual bool entered_from_front_layer(Entity* who) = 0;
+
+    // returns 0.0 except for eggship doors
+    // for example: FLOOR_DOOR_EGGSHIP_ROOM returns 0.75 when entering the room, and 1.0 when exiting, runs every frame while entering/exiting
+    virtual float v44() = 0;
+    /// Will alwyas return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
+    virtual bool is_unlocked() = 0;
+    virtual bool v46() = 0; // dunno, runs every frame when player overlays door
 };
 
 class ExitDoor : public Door
@@ -105,7 +129,8 @@ class CityOfGoldDoor : public DecoratedDoor
 class MainExit : public ExitDoor
 {
   public:
-    int64_t unknown;
+    /// Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
+    Entity* door_blocker;
     SoundPosition* sound_pos;
     float top_value; // unsure
     float value;     // unsure
@@ -138,6 +163,9 @@ class Arrowtrap : public Floor
     {
         return trigger_trap(this, who_uid);
     }
+
+    /// Just that, nothing fancy. The rest is done by the logical trigger i believe
+    virtual Entity* spawn_arrow(float x, float y) = 0;
 };
 
 class TotemTrap : public Floor
@@ -237,6 +265,8 @@ class Generator : public Floor
     uint8_t start_counter;
     /// works only for star challenge
     bool on_off;
+
+    virtual void randomize_timer() = 0; // called after it spawns entity and it's "ready" (have proper flags set etc.)
 };
 
 class SlidingWallCeiling : public Floor

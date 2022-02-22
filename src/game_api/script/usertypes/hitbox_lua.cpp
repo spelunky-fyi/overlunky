@@ -50,6 +50,28 @@ void register_usertypes(sol::state& lua)
         return AABB{sx1, sy1, sx2, sy2};
     };
 
+    lua.new_usertype<Vec2>(
+        "Vec2",
+        sol::constructors<Vec2(), Vec2(const Vec2&), Vec2(float, float)>{},
+        sol::meta_function::addition,
+        &Vec2::operator+,
+        sol::meta_function::subtraction,
+        &Vec2::operator-,
+        sol::meta_function::equal_to,
+        &Vec2::operator==,
+        sol::meta_function::multiplication,
+        &Vec2::operator*,
+        sol::meta_function::division,
+        &Vec2::operator/,
+        "x",
+        &Vec2::x,
+        "y",
+        &Vec2::y,
+        "rotate",
+        &Vec2::rotate,
+        "split",
+        &Vec2::operator std::pair<float, float>);
+
     /// Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
     lua.new_usertype<AABB>(
         "AABB",
@@ -81,7 +103,7 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Quad>(
         "Quad",
-        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float)>{},
+        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float), Quad(Vec2&, Vec2&, Vec2&, Vec2&)>{},
         "bottom_left_x",
         &Quad::bottom_left_x,
         "bottom_left_y",
@@ -103,6 +125,8 @@ void register_usertypes(sol::state& lua)
         "offset",
         &Quad::offset,
         "rotate",
-        &Quad::rotate);
+        &Quad::rotate,
+        "split",
+        &Quad::split);
 }
 } // namespace NHitbox

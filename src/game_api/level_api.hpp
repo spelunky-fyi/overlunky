@@ -134,7 +134,8 @@ struct DoorCoords
 {
     float door1_x;
     float door1_y;
-    float door2_x; // door2 only valid when there are two in the level, like Volcana drill, Olmec, ..."
+    /// door2 only valid when there are two in the level, like Volcana drill, Olmec, ...
+    float door2_x;
     float door2_y;
 };
 
@@ -458,9 +459,17 @@ struct LevelGenSystem
     std::uint32_t spawn_room_y;
     float spawn_x;
     float spawn_y;
-    DoorCoords* exit_doors_locations;
-    void* unknown37;
-    void* unknown38;
+    union
+    {
+        std::vector<Vec2> exit_doors;
+        struct
+        {
+            /// NoDoc
+            DoorCoords* exit_doors_locations;
+            void* unknown37;
+            void* unknown38;
+        };
+    };
     uint8_t flags;
     uint8_t unknown39;
     uint8_t unknown40;
@@ -499,6 +508,8 @@ struct LevelGenSystem
 
     uint32_t get_procedural_spawn_chance(uint32_t chance_id);
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
+
+    ~LevelGenSystem() = delete; // cuz it was complaining
 };
 
 bool default_spawn_is_valid(float x, float y, uint8_t layer);

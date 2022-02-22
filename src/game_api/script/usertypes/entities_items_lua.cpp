@@ -10,6 +10,11 @@ namespace NEntitiesItems
 void register_usertypes(sol::state& lua)
 {
     lua["Entity"]["as_bomb"] = &Entity::as<Bomb>;
+    lua["Entity"]["as_projectile"] = &Entity::as<Projectile>;
+    lua["Entity"]["as_purchasable"] = &Entity::as<Purchasable>;
+    lua["Entity"]["as_bow"] = &Entity::as<Bow>;
+    lua["Entity"]["as_present"] = &Entity::as<Present>;
+    lua["Entity"]["as_dummypurchasableentity"] = &Entity::as<DummyPurchasableEntity>;
     lua["Entity"]["as_backpack"] = &Entity::as<Backpack>;
     lua["Entity"]["as_jetpack"] = &Entity::as<Jetpack>;
     lua["Entity"]["as_teleporterbackpack"] = &Entity::as<TeleporterBackpack>;
@@ -114,6 +119,33 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
+    lua.new_usertype<Projectile>(
+        "Projectile",
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<Purchasable>(
+        "Purchasable",
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<DummyPurchasableEntity>(
+        "DummyPurchasableEntity",
+        sol::base_classes,
+        sol::bases<Entity, Movable, Purchasable>());
+
+    lua.new_usertype<Bow>(
+        "Bow",
+        sol::base_classes,
+        sol::bases<Entity, Movable, Purchasable>());
+
+    lua.new_usertype<Present>(
+        "Present",
+        "inside",
+        &Present::inside,
+        sol::base_classes,
+        sol::bases<Entity, Movable, Purchasable>());
+
     lua.new_usertype<Jetpack>(
         "Jetpack",
         "flame_on",
@@ -146,7 +178,7 @@ void register_usertypes(sol::state& lua)
         "remaining",
         &Mattock::remaining,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Purchasable>());
 
     lua.new_usertype<Gun>(
         "Gun",
@@ -159,12 +191,13 @@ void register_usertypes(sol::state& lua)
         "in_chamber",
         &Gun::in_chamber,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Purchasable>());
 
+    /// NoDoc
     lua.new_usertype<WebGun>( // left to not break compability
         "WebGun",
         sol::base_classes,
-        sol::bases<Entity, Movable, Gun>());
+        sol::bases<Entity, Movable, Purchasable, Gun>());
 
     lua.new_usertype<Flame>(
         "Flame",
@@ -229,7 +262,7 @@ void register_usertypes(sol::state& lua)
         "shot",
         &WebShot::shot,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Projectile>());
 
     lua.new_usertype<HangStrand>(
         "HangStrand",
@@ -255,22 +288,26 @@ void register_usertypes(sol::state& lua)
         &Arrow::is_poisoned,
         "shot_from_trap",
         &Arrow::shot_from_trap,
+        "poison_arrow",
+        &Arrow::poison_arrow,
+        "light_up",
+        &Arrow::light_up,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Purchasable>());
 
     lua.new_usertype<LightArrow>(
         "LightArrow",
         "emitted_light",
         &LightArrow::emitted_light,
         sol::base_classes,
-        sol::bases<Entity, Movable, Arrow>());
+        sol::bases<Entity, Movable, Purchasable, Arrow>());
 
     lua.new_usertype<LightShot>(
         "LightShot",
         "emitted_light",
         &LightShot::emitted_light,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Projectile>());
 
     lua.new_usertype<LightEmitter>(
         "LightEmitter",
@@ -300,7 +337,7 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<SoundShot>(
         "SoundShot",
         sol::base_classes,
-        sol::bases<Entity, Movable, LightShot>());
+        sol::bases<Entity, Movable, Projectile, LightShot>());
 
     lua.new_usertype<Spark>(
         "Spark",
@@ -335,7 +372,7 @@ void register_usertypes(sol::state& lua)
         "particle",
         &Fireball::particle,
         sol::base_classes,
-        sol::bases<Entity, Movable, LightShot, SoundShot>());
+        sol::bases<Entity, Movable, Projectile, LightShot, SoundShot>());
 
     lua.new_usertype<Leaf>(
         "Leaf",
@@ -459,6 +496,8 @@ void register_usertypes(sol::state& lua)
         &Torch::is_lit,
         "light_up",
         &Torch::light_up,
+        "get_flame_type",
+        &Torch::get_flame_type,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -492,14 +531,14 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<Bullet>(
         "Bullet",
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Projectile>());
 
     lua.new_usertype<TimedShot>(
         "TimedShot",
         "timer",
         &TimedShot::timer,
         sol::base_classes,
-        sol::bases<Entity, Movable, LightShot>());
+        sol::bases<Entity, Movable, Projectile, LightShot>());
 
     lua.new_usertype<CloneGunShot>(
         "CloneGunShot",
@@ -508,7 +547,7 @@ void register_usertypes(sol::state& lua)
         "spawn_y",
         &CloneGunShot::spawn_y,
         sol::base_classes,
-        sol::bases<Entity, Movable, LightShot>());
+        sol::bases<Entity, Movable, Projectile, LightShot>());
 
     lua.new_usertype<PunishBall>(
         "PunishBall",
@@ -627,7 +666,7 @@ void register_usertypes(sol::state& lua)
         "big_cloud",
         &GhostBreath::big_cloud,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Projectile>());
 
     lua.new_usertype<LaserBeam>(
         "LaserBeam",
@@ -656,7 +695,7 @@ void register_usertypes(sol::state& lua)
         "distance_after_capture",
         &AxolotlShot::distance_after_capture,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Projectile>());
 
     lua.new_usertype<TrapPart>(
         "TrapPart",
@@ -755,7 +794,7 @@ void register_usertypes(sol::state& lua)
         "dont_transfer_dmg",
         &Pot::dont_transfer_dmg,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Purchasable>());
 
     lua.new_usertype<CursedPot>(
         "CursedPot",
@@ -768,8 +807,9 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<CookFire>(
         "CookFire",
+        /// NoDoc
         "lit",
-        &CookFire::lit,
+        &Torch::is_lit, // left to not break backwards compatibility
         "emitted_light",
         &CookFire::emitted_light,
         "particles_smoke",
@@ -779,7 +819,7 @@ void register_usertypes(sol::state& lua)
         "particles_warp",
         &CookFire::particles_warp,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Torch>());
 
     lua.new_usertype<Orb>(
         "Orb",
@@ -812,7 +852,7 @@ void register_usertypes(sol::state& lua)
         "roll_speed",
         &RollingItem::roll_speed,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Purchasable>());
 
     lua.new_usertype<PlayerBag>(
         "PlayerBag",
@@ -880,7 +920,7 @@ void register_usertypes(sol::state& lua)
         "teleport_number",
         &Teleporter::teleport_number,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Purchasable>());
 
     lua.new_usertype<Boomerang>(
         "Boomerang",
@@ -893,7 +933,7 @@ void register_usertypes(sol::state& lua)
         "returns_to_uid",
         &Boomerang::returns_to_uid,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Purchasable>());
 
     lua.new_usertype<Excalibur>(
         "Excalibur",
@@ -907,7 +947,7 @@ void register_usertypes(sol::state& lua)
         "shake",
         &Shield::shake,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Purchasable>());
 
     lua.new_usertype<PrizeDispenser>(
         "PrizeDispenser",

@@ -61,7 +61,8 @@ class Movable : public Entity
     uint8_t b126; // timer, after layer change?
     uint8_t b127;
 
-    void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison
+    /// NoDoc
+    void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison // Changes default poison_tick_timer
     bool is_poisoned();
 
     /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
@@ -76,7 +77,13 @@ class Movable : public Entity
     void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
     void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);
 
-    virtual bool can_jump() = 0; // virtual 37 (counting first as 0)
+    // don't use this, it's only to not break backwards compatibility
+    void light_on_fire_broken()
+    {
+        this->light_on_fire(0x64); // kind of stanrad value that the game uses
+    }
+
+    virtual bool can_jump() = 0;
     virtual void v38() = 0;
     virtual float sprint_factor() = 0;
     virtual void calculate_jump_height() = 0; // when disabled, jump height is very high
@@ -93,7 +100,8 @@ class Movable : public Entity
     virtual void v50() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;
-    virtual void light_on_fire() = 0;
+    /// Does not damage entity
+    virtual void light_on_fire(uint8_t time) = 0;
     virtual void set_cursed(bool b) = 0;
     virtual void on_spiderweb_collision() = 0;
     virtual void set_last_owner_uid_b127(Entity* owner) = 0; // assigns player as last_owner_uid and also manipulates movable.b127

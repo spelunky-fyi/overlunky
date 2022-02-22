@@ -109,8 +109,6 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<FallingPlatform>(
         "FallingPlatform",
-        "emitted_light",
-        &FallingPlatform::timer,
         "timer",
         &FallingPlatform::timer,
         "shaking_factor",

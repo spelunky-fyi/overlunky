@@ -1430,6 +1430,8 @@ void register_usertypes(sol::state& lua)
         &LevelGenSystem::spawn_room_y,
         "exits",
         &LevelGenSystem::exit_doors_locations,
+        "exit_doors",
+        &LevelGenSystem::exit_doors,
         "themes",
         sol::property([](LevelGenSystem& lgs)
                       { return std::ref(lgs.themes); }),

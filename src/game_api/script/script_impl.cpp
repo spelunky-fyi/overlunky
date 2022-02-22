@@ -24,11 +24,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
 
     enabled = enable;
 
-    /// Table of strings where you should set some script metadata shown in the UI.
-    /// - `meta.name` Script name
-    /// - `meta.version` Version
-    /// - `meta.description` Short description of the script
-    /// - `meta.author` Your name
+    /// Table of strings where you should set some script metadata shown in the UI and used by other scripts to find your script.
     lua["meta"] = get_lua_vm().create_named_table("meta");
 
     try

@@ -110,6 +110,7 @@ struct Layer
 {
     bool is_back_layer;
     // int8_t padding[7];
+
     EntityList all_entities;
     // char + fx + mons + item + logical + mount + activefloor + BG (excluding BG_SHOP, BG_LEVEL_*)
     EntityList unknown_entities1;
@@ -117,17 +118,19 @@ struct Layer
     // key is the mask
     std::map<uint32_t, EntityList> entities_by_mask;
 
-    char stuff0[0xF430]; // Just wanna get to grid_entities
+    EntityList entities_by_unknown[647]; // could be more, not sure what for, each holds like 1 entity for split second
+    char stuff0[0xB778];                 // unknown, maybe more of the array above?
+
+    std::map<int32_t, size_t> unknown_map; // some movable and liquids and something else maybe?, key is uid
 
     Entity* grid_entities[0x7e][0x56];
+    EntityList entities_overlaping_grid[0x7e][0x56]; // static entities (like midbg, decorations) that overlap this grid position
 
-    char stuff1[0x3FD08];
-
-    EntityList unknown_entities2; // debris, explosions, laserbeams etc. ?
-    EntityList unknown_entities3; // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
-    size_t unknown3;
-    size_t unknown4;
-    size_t unknown5;
+    EntityList unknown_entities2;
+    EntityList entities_by_draw_depth[53];
+    EntityList unknown_entities3; // debris, explosions, laserbeams etc. ?
+    EntityList unknown_entities4; // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
+    std::vector<Entity*> unknown; // add_to_layer uses this
     size_t unknown6;
     // List of items that were destroyed and are waiting to have the dtor called
     // and then be returned to the entity pool
@@ -139,7 +142,7 @@ struct Layer
     uint32_t unknown17;
     uint32_t unknown18;
     uint32_t unknown19;
-    size_t entity_items_begin; // begin of the memory that holds the items of entities
+    size_t entity_items_begin; // begin of the memory that holds the items of entities, maybe vector?
     size_t unknown21;
     size_t unknown22;
     bool unknown23;
@@ -154,7 +157,7 @@ struct Layer
     uint64_t unknown32;
     uint32_t unknown33;
     uint32_t unknown34;
-    size_t unknown35;
+    size_t unknown35; // maybe vector?
     size_t unknown36;
     size_t unknown37;
     bool unknown38;

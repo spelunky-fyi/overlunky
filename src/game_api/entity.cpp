@@ -716,3 +716,11 @@ void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::functio
     }
     hook_info.pre_collision2.push_back({reserved_callback_id, std::move(pre_collision2)});
 }
+
+std::span<uint32_t> Entity::get_items()
+{
+    if (items.size)
+        return std::span<uint32_t>(items.uids().begin(), items.uids().end());
+
+    return {};
+}

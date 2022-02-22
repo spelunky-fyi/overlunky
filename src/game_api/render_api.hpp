@@ -72,8 +72,8 @@ struct RenderAPI
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
-    void draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color);
-    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, Quad dest, Color color);
+    void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color);
+    void draw_world_texture(Texture* texture, Quad source, Quad dest, Color color);
 };
 
 // straight out of the x64dbg plugin

@@ -32,6 +32,7 @@
 #include "usertypes/entity_casting_lua.hpp"
 #include "usertypes/entity_lua.hpp"
 #include "usertypes/flags_lua.hpp"
+#include "usertypes/game_manager_lua.hpp"
 #include "usertypes/gui_lua.hpp"
 #include "usertypes/hitbox_lua.hpp"
 #include "usertypes/level_lua.hpp"
@@ -120,6 +121,7 @@ end
     NEntitiesLiquids::register_usertypes(lua);
     NParticles::register_usertypes(lua);
     NSaveContext::register_usertypes(lua);
+    NGM::register_usertypes(lua);
     NState::register_usertypes(lua);
     NPRNG::register_usertypes(lua);
     NScreen::register_usertypes(lua);
@@ -130,13 +132,7 @@ end
     NEntityFlags::register_usertypes(lua);
     NEntityCasting::register_usertypes(lua);
 
-    ///
-    /// ```lua
-    /// if state.time_level > 300 and state.theme == THEME.DWELLING then
-    ///     toast("Congratulations for lasting 5 seconds in Dwelling")
-    /// end
-    /// ```
-    /// A bunch of [game state](#statememory) variables
+    /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
     lua["state"] = get_state_ptr();
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
@@ -203,15 +199,6 @@ end
     lua["message"] = [&lua](std::string message) -> void
     { lua["print"](message); };
     /// Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
-    /// For example use it like this
-    /// ```lua
-    /// prinspect(state.level, state.level_next)
-    /// local some_stuff_in_a_table = {
-    ///     some = state.time_total,
-    ///     stuff = state.world
-    /// }
-    /// prinspect(some_stuff_in_a_table)
-    /// ```
     lua["prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
         if (objects.size() > 0)
@@ -282,7 +269,7 @@ end
         return backend->cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add global callback function to be called on an [event](#on).
+    /// Add global callback function to be called on an [event](#ON).
     lua["set_callback"] = [](sol::function cb, int screen) -> CallbackId
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
@@ -364,17 +351,8 @@ end
         });
     lua["load_script"] = lua["import"];
 
-    /// Read the game prng state. Maybe you can use these and math.randomseed() to make deterministic things, like online scripts :shrug:. Example:
-    /// ```lua
-    /// -- this should always print the same table D877...E555
-    /// set_callback(function()
-    ///   seed_prng(42069)
-    ///   local prng = read_prng()
-    ///   for i,v in ipairs(prng) do
-    ///     message(string.format("%08X", v))
-    ///   end
-    /// end, ON.LEVEL)
-    /// ```
+    /// Deprecated
+    /// Read the game prng state. Use [prng](#PRNG):get_pair() instead.
     lua["read_prng"] = []() -> std::vector<int64_t>
     { return read_prng(); };
     /// Show a message that looks like a level feeling.
@@ -495,19 +473,7 @@ end
     /// `amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
     lua["spawn_liquid"] = spawn_liquid;
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
-    /// Uses level coordinates with [LAYER.FRONT](#layer) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
-    /// Example:
-    /// ```lua
-    /// -- spawn megajelly using absolute coordinates
-    /// set_callback(function()
-    ///     x, y, layer = get_position(players[1].uid)
-    ///     spawn_entity(ENT_TYPE.MONS_MEGAJELLYFISH, x, y+3, layer, 0, 0)
-    /// end, ON.LEVEL)
-    /// -- spawn clover using player-relative coordinates
-    /// set_callback(function()
-    ///     spawn(ENT_TYPE.ITEM_PICKUP_CLOVER, 0, 1, LAYER.PLAYER1, 0, 0)
-    /// end, ON.LEVEL)
-    /// ```
+    /// Uses level coordinates with [LAYER.FRONT](#LAYER) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
     lua["spawn_entity"] = spawn_entity_abs;
     /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
@@ -596,11 +562,6 @@ end
     lua["god_companions"] = godmode_companions;
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
-    /// ```lua
-    /// set_callback(function()
-    ///     state.level_flags = set_flag(state.level_flags, 18)
-    /// end, ON.POST_ROOM_GENERATION)
-    /// ```
     lua["force_dark_level"] = darkmode;
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = zoom;
@@ -629,10 +590,10 @@ end
     lua["get_door_target"] = get_door_target;
     /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
     lua["set_contents"] = set_contents;
-    /// Get the [Entity](#entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](entities-hierarchy.md)
+    /// Get the Entity behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
     // lua["get_entity"] = [](uint32_t uid) -> Entity* {};
     /// NoDoc
-    /// Get the [Entity](#entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
+    /// Get the [Entity](#Entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
     lua["get_entity_raw"] = get_entity_ptr;
     lua.script(R"##(
         function cast_entity(entity_raw)
@@ -660,7 +621,7 @@ end
             return cast_entity(entity_raw)
         end
         )##");
-    /// Get the [EntityDB](#entitydb) behind an ENT_TYPE...
+    /// Get the [EntityDB](#EntityDB) behind an ENT_TYPE...
     lua["get_type"] = get_type;
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
@@ -680,16 +641,7 @@ end
     /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
     lua["get_entities_by"] = get_entities_by;
     /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
-    /// You can even pass a table! Example:
-    /// ```lua
-    /// types = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT}
-    /// function on_level()
-    ///     uids = get_entities_by_type(ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_BAT)
-    ///     -- is not the same thing as this, but also works
-    ///     uids2 = get_entities_by_type(entity_types)
-    ///     message(tostring(#uids).." == "..tostring(#uids2))
-    /// end
-    /// ```
+    /// You can even pass a table!
     lua["get_entities_by_type"] = [](sol::variadic_args va) -> std::vector<uint32_t>
     {
         sol::type type = va.get_type();
@@ -791,11 +743,7 @@ end
     lua["entity_get_items_by"] = entity_get_items_by;
     /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
     lua["kill_entity"] = kill_entity;
-    /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen. Example:
-    /// ```lua
-    /// -- spawn and equip a jetpack
-    /// pick_up(players[1].uid, spawn(ENT_TYPE.ITEM_JETPACK, 0, 0, LAYER.PLAYER, 0, 0))
-    /// ```
+    /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen.
     lua["pick_up"] = pick_up;
     /// Drop an entity by uid
     lua["drop"] = drop;
@@ -881,16 +829,7 @@ end
             return (float)sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
     };
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
-    /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y Example:
-    /// ```lua
-    /// -- Draw the level boundaries
-    /// set_callback(function(draw_ctx)
-    ///     xmin, ymin, xmax, ymax = get_bounds()
-    ///     sx, sy = screen_position(xmin, ymin) -- top left
-    ///     sx2, sy2 = screen_position(xmax, ymax) -- bottom right
-    ///     draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
-    /// end, ON.GUIFRAME)
-    /// ```
+    /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y
     lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
@@ -905,14 +844,17 @@ end
     /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
     lua["set_flag"] = [](Flags flags, int bit) -> Flags
     { return flags | (1U << (bit - 1)); };
+    /// Deprecated
     lua["setflag"] = lua["set_flag"];
     /// Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
     lua["clr_flag"] = [](Flags flags, int bit) -> Flags
     { return flags & ~(1U << (bit - 1)); };
+    /// Deprecated
     lua["clrflag"] = lua["clr_flag"];
     /// Returns true if a bit is set in the flags
     lua["test_flag"] = [](Flags flags, int bit) -> bool
     { return (flags & (1U << (bit - 1))) > 0; };
+    /// Deprecated
     lua["testflag"] = lua["test_flag"];
 
     /// Gets the resolution (width and height) of the screen
@@ -1071,7 +1013,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1098,7 +1040,7 @@ end
     /// `uid` has to be the uid of a `Movable` or else stuff will break.
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1208,7 +1150,7 @@ end
     /// Note that damage_dealer can be nil ! (long fall, ...)
     /// DO NOT CALL `self:damage()` in the callback !
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1236,7 +1178,7 @@ end
     /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
     /// The callback signature is `nil on_open(Entity entity_self, Entity opener)`
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
@@ -1262,7 +1204,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_collision1"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1289,7 +1231,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_collision2"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1344,7 +1286,6 @@ end
     lua["clear_custom_name"] = clear_custom_name;
 
     /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
-    /// Doesn't really work for layer doors
     lua["enter_door"] = enter_door;
 
     /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
@@ -1384,6 +1325,20 @@ end
 
     /// Adds entity as shop item, has to be movable (haven't tested many)
     lua["add_item_to_shop"] = add_item_to_shop;
+
+    /// Change the amount of frames after the damage from poison is applied
+    lua["change_poison_timer"] = change_poison_timer;
+
+    auto create_illumination = sol::overload(
+        static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),
+        static_cast<Illumination* (*)(Color color, float size, uint32_t uid)>(::create_illumination));
+    /// Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+    lua["create_illumination"] = create_illumination;
+    /// Refreshes an Illumination, keeps it from fading out
+    lua["refresh_illumination"] = refresh_illumination;
+
+    /// Removes all liquid that is about to go out of bounds, which crashes the game.
+    lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

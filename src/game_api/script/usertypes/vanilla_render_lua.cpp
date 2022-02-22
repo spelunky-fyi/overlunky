@@ -15,12 +15,12 @@ std::pair<float, float> VanillaRenderContext::draw_text_size(const std::string& 
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    draw_screen_texture(texture_id, row, column, AABB{left, top, right, bottom}, color, 0, 0, 0);
+    draw_screen_texture(texture_id, row, column, Quad(AABB(left, top, right, bottom)), color);
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
 {
-    draw_screen_texture(texture_id, row, column, rect, color, 0, 0, 0);
+    draw_screen_texture(texture_id, row, column, Quad(rect), color);
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle, float px, float py)
@@ -48,12 +48,46 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
         dest.top_left_x *= inverse_ratio;
         dest.top_right_x *= inverse_ratio;
     }
-    RenderAPI::get().draw_screen_texture(texture_id, row, column, dest, color);
+    draw_screen_texture(texture_id, row, column, dest, color);
 }
 
-void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& quad, Color color)
+void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color)
 {
-    RenderAPI::get().draw_screen_texture(texture_id, row, column, quad, color);
+    auto texture = RenderAPI::get().get_texture(texture_id);
+    if (texture == nullptr)
+    {
+        return;
+    }
+    float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
+    float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
+    float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
+    float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
+
+    const Quad source(
+        // bottom left:
+        uv_left,
+        uv_bottom,
+        // bottom right:
+        uv_right,
+        uv_bottom,
+        // top right:
+        uv_right,
+        uv_top,
+        // top left:
+        uv_left,
+        uv_top);
+
+    RenderAPI::get().draw_screen_texture(texture, source, dest, color);
+}
+
+void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& quad, Color color)
+{
+    auto texture = RenderAPI::get().get_texture(texture_id);
+    if (texture == nullptr)
+    {
+        return;
+    }
+    RenderAPI::get().draw_screen_texture(texture, source, quad, color);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
@@ -88,7 +122,42 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& quad, Color color)
 {
-    RenderAPI::get().draw_world_texture(texture_id, row, column, quad, color);
+    auto texture = RenderAPI::get().get_texture(texture_id);
+    if (texture == nullptr)
+    {
+        return;
+    }
+
+    float uv_left = (texture->tile_width_fraction * column) + texture->offset_x_weird_math;
+    float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
+    float uv_top = (texture->tile_height_fraction * row) + texture->offset_y_weird_math;
+    float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
+
+    Quad source = {
+        // bottom left:
+        uv_left,
+        uv_bottom,
+        // bottom right:
+        uv_right,
+        uv_bottom,
+        // top right:
+        uv_right,
+        uv_top,
+        // top left:
+        uv_left,
+        uv_top,
+    };
+    RenderAPI::get().draw_world_texture(texture, source, quad, color);
+}
+
+void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)
+{
+    auto texture = RenderAPI::get().get_texture(texture_id);
+    if (texture == nullptr)
+    {
+        return;
+    }
+    RenderAPI::get().draw_world_texture(texture, source, dest, color);
 }
 
 namespace NVanillaRender
@@ -141,12 +210,14 @@ void register_usertypes(sol::state& lua)
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, float, float, float, float, Color)>(&VanillaRenderContext::draw_screen_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_screen_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color, float, float, float)>(&VanillaRenderContext::draw_screen_texture),
-        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color)>(&VanillaRenderContext::draw_screen_texture));
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color)>(&VanillaRenderContext::draw_screen_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color)>(&VanillaRenderContext::draw_screen_texture));
     auto draw_world_texture = sol::overload(
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, float, float, float, float, Color)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color, float, float, float)>(&VanillaRenderContext::draw_world_texture),
-        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color)>(&VanillaRenderContext::draw_world_texture));
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color)>(&VanillaRenderContext::draw_world_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color)>(&VanillaRenderContext::draw_world_texture));
     lua.new_usertype<VanillaRenderContext>(
         "VanillaRenderContext",
         "draw_text",

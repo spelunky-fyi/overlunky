@@ -1,4 +1,5 @@
 #include "state.hpp"
+#include "entities_liquids.hpp"
 #include "game_manager.hpp"
 #include "level_api.hpp"
 #include "logger.h"
@@ -16,6 +17,31 @@ uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabt
 void StateMemory::set_correct_ushabti(uint16_t animation_frame)
 {
     correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
+}
+
+void fix_liquid_out_of_bounds()
+{
+    auto state = State::get().ptr();
+    if (!state || !state->liquid_physics)
+        return;
+
+    for (const auto& it : state->liquid_physics->pools)
+    {
+        if (it.physics_engine && !it.physics_engine->pause_physics)
+        {
+            for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
+            {
+                if ((it.physics_engine->entity_coordinates + i)->second < 0.1) // 0.1 just to be safe
+                {
+                    if (!*(it.physics_engine->unknown61 + i)) // just some bs
+                        continue;
+
+                    const auto ent = **(it.physics_engine->unknown61 + i);
+                    ent->kill(true, nullptr);
+                }
+            }
+        }
+    }
 }
 
 inline bool& get_is_init()

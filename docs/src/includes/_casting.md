@@ -45,6 +45,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_boomerang
 - as_boulder
 - as_boulderspawner
+- as_bow
 - as_bullet
 - as_burningropeeffect
 - as_button
@@ -92,6 +93,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_dmspawning
 - as_door
 - as_drill
+- as_dummypurchasableentity
 - as_dustwallapep
 - as_eggplantminister
 - as_eggplantthrower
@@ -221,6 +223,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_mattock
 - as_mech
 - as_megajellyfish
+- as_megajellyfisheye
 - as_minigameasteroid
 - as_minigameship
 - as_minigameshipoffset
@@ -261,9 +264,12 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_pot
 - as_powerup
 - as_powerupcapable
+- as_present
 - as_prizedispenser
+- as_projectile
 - as_protoshopkeeper
 - as_punishball
+- as_purchasable
 - as_pushblock
 - as_qilin
 - as_quicksand

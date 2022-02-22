@@ -9,7 +9,7 @@ namespace NParticles
 {
 void register_usertypes(sol::state& lua)
 {
-    /// Get the [ParticleDB](#particledb) details of the specified ID
+    /// Get the [ParticleDB](#ParticleDB) details of the specified ID
     lua["get_particle_type"] = get_particle_type;
     /// Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
     lua["generate_world_particles"] = generate_world_particles;
