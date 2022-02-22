@@ -1834,8 +1834,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field can_jump fun(self, ): boolean
     ---@field standing_on fun(self, ): Entity
     ---@field add_money fun(self, money: integer): nil
+    ---@field is_on_fire fun(self, ): boolean
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
-    ---@field is_on_fire any @&Movable::is_on_firesol::base_classes
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
