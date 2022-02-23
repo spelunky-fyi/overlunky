@@ -1,5 +1,4 @@
 #include "events.hpp"
-#include "strings.hpp"
 
 void pre_load_level_files()
 {

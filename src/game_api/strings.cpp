@@ -1,9 +1,11 @@
 #include "strings.hpp"
+
 #include "entity.hpp"
 #include "fix_entity_descriptions.hpp"
+#include "game_allocator.hpp"
+#include "memory.hpp"
 #include "script/events.hpp"
-
-#include "string_hashes.cpp"
+#include "virtual_table.hpp"
 
 #include "detours.h"
 #include <cassert>

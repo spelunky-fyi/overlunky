@@ -1,9 +1,9 @@
 #include "state.hpp"
-#include "entities_liquids.hpp"
+#include "entities_chars.hpp"
 #include "game_manager.hpp"
 #include "level_api.hpp"
-#include "logger.h"
-#include "render_api.hpp"
+#include "memory.hpp"
+#include "savedata.hpp"
 #include "spawn_api.hpp"
 #include "strings.hpp"
 #include "virtual_table.hpp"
@@ -18,7 +18,10 @@ void StateMemory::set_correct_ushabti(uint16_t animation_frame)
 {
     correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
 }
-
+StateMemory* get_state_ptr()
+{
+    return State::get().ptr();
+}
 void fix_liquid_out_of_bounds()
 {
     auto state = State::get().ptr();
@@ -519,4 +522,66 @@ LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
         return state->liquid_physics->coarse_lava_physics_engine;
     }
     return nullptr;
+}
+
+uint32_t State::get_frame_count() const
+{
+    return read_u32((size_t)ptr() - 0xd0);
+}
+
+std::vector<int64_t> State::read_prng() const
+{
+    std::vector<int64_t> prng;
+    for (int i = 0; i < 20; ++i)
+    {
+        prng.push_back(read_i64((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
+    }
+    return prng;
+}
+
+uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position)
+{
+    if (layer == LAYER::FRONT)
+    {
+        player_position = {0.0f, 0.0f};
+        return 0;
+    }
+    else if (layer == LAYER::BACK)
+    {
+        player_position = {0.0f, 0.0f};
+        return 1;
+    }
+    else if ((int)layer < -MAX_PLAYERS)
+        return 0;
+    else if (layer < LAYER::FRONT)
+    {
+        auto state = State::get();
+        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
+        if (player != nullptr)
+        {
+            player_position = player->position();
+            return player->layer;
+        }
+    }
+    return 0;
+}
+
+uint8_t enum_to_layer(const LAYER layer)
+{
+    if (layer == LAYER::FRONT)
+        return 0;
+    else if (layer == LAYER::BACK)
+        return 1;
+    else if ((int)layer < -MAX_PLAYERS)
+        return 0;
+    else if (layer < LAYER::FRONT)
+    {
+        auto state = State::get();
+        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
+        if (player != nullptr)
+        {
+            return player->layer;
+        }
+    }
+    return 0;
 }

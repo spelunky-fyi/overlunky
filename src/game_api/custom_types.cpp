@@ -1,4 +1,5 @@
 #include "custom_types.hpp"
+
 #include "entity.hpp"
 
 const std::map<CUSTOM_TYPE, std::string_view> custom_type_names = {

@@ -1,7 +1,6 @@
 #include "steam_api.hpp"
 
 #include "memory.hpp"
-#include "search.hpp"
 #include "vtable_hook.hpp"
 
 class ISteamUserStats* get_steam_user_stats()

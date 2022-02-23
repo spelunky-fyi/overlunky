@@ -383,7 +383,7 @@ void hook_savegame()
     {
         register_on_write_to_file([](const char* backup_file, const char* file, void* data, size_t data_size, WriteToFileOrig* original)
                                   {
-                                      if (file == "savegame.sav"sv and options["disable_savegame"])
+                                      if (strcmp(file, "savegame.sav") == 0 and options["disable_savegame"])
                                           return;
                                       original(backup_file, file, data, data_size); });
         savegame_hooked = true;

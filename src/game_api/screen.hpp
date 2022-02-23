@@ -1,8 +1,11 @@
 #pragma once
 
-#include "particles.hpp"
 #include "render_api.hpp"
 #include <cstdint>
+
+struct ParticleEmitterInfo;
+struct SoundPosition;
+class Entity;
 
 class Screen
 {
@@ -807,24 +810,6 @@ struct PauseUI
     uint32_t visibility;
 };
 
-enum class JournalPageType
-{
-    Progress,
-    JournalMenu,
-    Places,
-    People,
-    Bestiary,
-    Items,
-    Traps,
-    Story,
-    Feats,
-    DeathCause,
-    DeathMenu,
-    Recap,
-    PlayerProfile,
-    LastGamePlayed,
-};
-
 class JournalPage
 {
   public:
@@ -1100,3 +1085,5 @@ struct JournalUI
     float unknown31;
     uint32_t unknown30;
 };
+
+Screen* get_screen_ptr(uint32_t screen_id);

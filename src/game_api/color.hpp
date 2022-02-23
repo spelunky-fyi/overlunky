@@ -1,5 +1,7 @@
 #pragma once
 
+#include "aliases.hpp"
+
 struct Color
 {
     /// Create a new color - defaults to black

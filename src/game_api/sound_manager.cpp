@@ -1,6 +1,5 @@
 #include "sound_manager.hpp"
 
-#include "logger.h"
 #include "memory.hpp"
 #include "overloaded.hpp"
 

@@ -1,7 +1,7 @@
 #include "socket_lua.hpp"
 
 #include "script/lua_backend.hpp"
-#include "state.hpp"
+
 #include <sol/sol.hpp>
 
 void udp_data(sockpp::udp_socket socket, UdpServer* server)

@@ -1,13 +1,9 @@
 #pragma once
 
-#include "drops.hpp"
-#include "entities_chars.hpp"
-#include "entity.hpp"
+#include "aliases.hpp"
 #include "level_api_types.hpp"
-#include "render_api.hpp"
-#include "screen.hpp"
+#include "math.hpp"
 #include "script.hpp"
-#include "window_api.hpp"
 
 #include <algorithm>
 #include <deque>
@@ -23,6 +19,9 @@
 
 #include <imgui.h>
 #include <sol/sol.hpp>
+
+class Player;
+class JournalPage;
 
 enum class ON
 {

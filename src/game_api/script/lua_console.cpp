@@ -1,8 +1,6 @@
 #include "lua_console.hpp"
 
 #include "lua_vm.hpp"
-#include "rpc.hpp"
-#include "script_util.hpp"
 
 #include "lua_libs/lua_libs.hpp"
 

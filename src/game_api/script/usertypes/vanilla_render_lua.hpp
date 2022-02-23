@@ -1,7 +1,9 @@
 #pragma once
 
-#include "entity.hpp"
-#include "render_api.hpp"
+#include "aliases.hpp"
+#include "color.hpp"
+#include "math.hpp"
+
 #include <sol/forward.hpp>
 #include <string>
 

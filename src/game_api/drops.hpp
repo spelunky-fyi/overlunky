@@ -1,5 +1,6 @@
 #pragma once
 
+#include "aliases.hpp"
 #include "virtual_table.hpp"
 
 #include <cstdint>
@@ -26,6 +27,9 @@ struct DropChanceEntry
     uint8_t chance_sizeof = 4;
     size_t offset = 0;
 };
+
+void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance);
+void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type);
 
 extern std::vector<DropEntry> drop_entries;
 

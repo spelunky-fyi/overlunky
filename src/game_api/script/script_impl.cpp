@@ -1,8 +1,8 @@
 #include "script_impl.hpp"
 
 #include "lua_vm.hpp"
-#include "rpc.hpp"
 #include "script_util.hpp"
+#include "state.hpp"
 
 #include <sol/sol.hpp>
 
@@ -163,7 +163,7 @@ void ScriptImpl::set_enabled(bool enbl)
     if (enbl != enabled)
     {
         auto cb_type = enbl ? ON::SCRIPT_ENABLE : ON::SCRIPT_DISABLE;
-        auto now = get_frame_count();
+        auto now = State::get().get_frame_count();
         for (auto& [id, callback] : callbacks)
         {
             if (callback.screen == cb_type)

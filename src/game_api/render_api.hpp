@@ -1,7 +1,8 @@
 #pragma once
 
-#include "entity.hpp"
-#include "memory.hpp"
+#include "aliases.hpp"
+#include "color.hpp"
+#include "math.hpp"
 #include "texture.hpp"
 
 #include <mutex>
@@ -26,19 +27,6 @@ enum JOURNAL_VFTABLE
     LAST_GAME_PLAYED = 816, // open player profile from main menu, journal: page 1
 };
 
-struct TextureDefinition
-{
-    std::string texture_path;
-    uint32_t width;
-    uint32_t height;
-    uint32_t tile_width;
-    uint32_t tile_height;
-    uint32_t sub_image_offset_x{0};
-    uint32_t sub_image_offset_y{0};
-    uint32_t sub_image_width{0};
-    uint32_t sub_image_height{0};
-};
-
 struct RenderAPI
 {
     const size_t* api;
@@ -49,23 +37,8 @@ struct RenderAPI
 
     static RenderAPI& get();
 
-    size_t renderer() const
-    {
-        return read_u64(*api + 0x10);
-    }
-
-    size_t swap_chain() const
-    {
-        return read_u64(renderer() + swap_chain_off);
-    }
-
-    TextureDefinition get_texture_definition(TEXTURE texture_id);
-    Texture* get_texture(TEXTURE texture_id);
-    TEXTURE define_texture(TextureDefinition data);
-    std::optional<TEXTURE> get_texture(TextureDefinition data);
-    std::optional<TEXTURE> get_texture(std::string_view texture_name);
-    void reload_texture(const char* texture_name);  // Does a lookup for the right texture to reload
-    void reload_texture(const char** texture_name); // Reloads the texture directly
+    size_t renderer() const;
+    size_t swap_chain() const;
 
     void set_lut(TEXTURE texture_id, uint8_t layer);
     void reset_lut(uint8_t layer);

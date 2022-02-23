@@ -1,6 +1,7 @@
 #include "entity_lua.hpp"
+
+#include "color.hpp"
 #include "custom_types.hpp"
-#include "entity.hpp"
 #include "movable.hpp"
 
 #include <sol/sol.hpp>

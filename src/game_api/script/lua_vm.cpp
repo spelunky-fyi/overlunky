@@ -2,11 +2,12 @@
 
 #include <csignal>
 
-#include "entities_items.hpp"
-#include "entity.hpp"
+#include "entities_items.hpp" // TODO: remove
+#include "entity.hpp"         // TODO: remove
 #include "game_manager.hpp"
 #include "online.hpp"
 #include "rpc.hpp"
+#include "savedata.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
 #include "strings.hpp"

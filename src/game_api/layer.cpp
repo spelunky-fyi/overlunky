@@ -2,7 +2,7 @@
 
 #include "entities_floors.hpp"
 #include "entity.hpp"
-#include "logger.h"
+#include "memory.hpp"
 #include "rpc.hpp"
 #include "state.hpp"
 

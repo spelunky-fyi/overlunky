@@ -1,9 +1,7 @@
 #pragma once
 
-#include "level_api_types.hpp"
 #include "lua_backend.hpp"
-#include "render_api.hpp"
-#include "screen.hpp"
+#include "math.hpp"
 
 #include <cstdint>
 #include <optional>

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "sockpp/udp_socket.h"
-#include "sol/sol.hpp"
+
 #include <sol/forward.hpp>
 #include <string>
-#include <vector>
 
 class UdpServer
 {

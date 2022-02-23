@@ -1,5 +1,7 @@
 #include "screen_lua.hpp"
 
+#include "entity.hpp"
+#include "particles.hpp"
 #include "screen.hpp"
 #include "screen_arena.hpp"
 
