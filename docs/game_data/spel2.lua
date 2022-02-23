@@ -3328,6 +3328,7 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class LogicalDoor : Entity
     ---@field door_type ENT_TYPE
+    ---@field platform_type ENT_TYPE
     ---@field visible boolean
     ---@field platform_spawned boolean
 
