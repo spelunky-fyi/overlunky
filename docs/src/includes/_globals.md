@@ -1115,7 +1115,7 @@ Enable/disable godmode for companions.
 
 > Search script examples for [import](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=import)
 
-#### array import(string id, optional<string> version)
+#### table import(string id, optional<string> version)
 
 Load another script by id "author/name" and import its `exports` table
 
@@ -2214,6 +2214,15 @@ This edits custom string and in game strings but changing the language in settin
 #### nil clear_custom_name(int uid)
 
 Clears the name set with `add_custom_name`
+
+### enum_get_name
+
+
+> Search script examples for [enum_get_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enum_get_name)
+
+#### string enum_get_name(table enum, int value)
+
+Return the name of an unknown number in an enum table
 
 ### get_character_name
 

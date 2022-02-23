@@ -95,7 +95,7 @@ function clear_callback(id) end
 ---Load another script by id "author/name" and import its `exports` table
 ---@param id string
 ---@param version string?
----@return Array
+---@return table
 function import(id, version) end
 ---Get your sanitized script id to be used in import.
 ---@return string
@@ -990,6 +990,11 @@ function refresh_illumination(illumination) end
 ---Removes all liquid that is about to go out of bounds, which crashes the game.
 ---@return nil
 function fix_liquid_out_of_bounds() end
+---Return the name of an unknown number in an enum table
+---@param enum table
+---@param value integer
+---@return string
+function enum_get_name(enum, value) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean

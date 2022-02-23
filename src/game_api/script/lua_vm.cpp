@@ -319,7 +319,7 @@ end
     lua["options"] = lua.create_named_table("options");
 
     /// Load another script by id "author/name" and import its `exports` table
-    // lua["import"] = [](string id, optional<string> version) -> array
+    // lua["import"] = [](string id, optional<string> version) -> table
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {
@@ -1355,6 +1355,16 @@ end
 
     /// Removes all liquid that is about to go out of bounds, which crashes the game.
     lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
+
+    /// Return the name of an unknown number in an enum table
+    // lua["enum_get_name"] = [](table enum, int value) -> string
+    lua["enum_get_name"] = lua.safe_script(R"(
+        return function(table, value)
+            for k,v in pairs(table) do
+                if v == value then return k end
+            end
+        end
+    )");
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
