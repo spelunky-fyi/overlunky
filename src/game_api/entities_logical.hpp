@@ -31,7 +31,7 @@ class LogicalDoor : public Entity
 {
   public:
     ENT_TYPE door_type;
-    int32_t unk2; // always 37?
+    ENT_TYPE platform_type; // always 37? yeah, that's the floor platform...
     bool not_hidden;
     /// Is set true when you bomb the door, no matter what door, can't be reset
     bool platform_spawned;

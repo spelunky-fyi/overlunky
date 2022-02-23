@@ -73,6 +73,8 @@ void register_usertypes(sol::state& lua)
         "LogicalDoor",
         "door_type",
         &LogicalDoor::door_type,
+        "platform_type",
+        &LogicalDoor::platform_type,
         "visible",
         &LogicalDoor::not_hidden,
         "platform_spawned",
