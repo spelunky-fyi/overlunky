@@ -198,3 +198,5 @@ int64_t SpelunkyEntity_GetTexture(Entity* entity);
 void SpelunkyEntity_SetTexture(Entity* entity, int64_t texture);
 uint16_t SpelunkyEntity_GetTextureTile(Entity* entity);
 void SpelunkyEntity_SetTextureTile(Entity* entity, uint16_t texture_tile);
+
+void Spelunky_UpdateLiquidOutOfBoundsBugfix();

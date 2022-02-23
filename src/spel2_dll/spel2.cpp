@@ -432,3 +432,8 @@ void SpelunkyEntity_SetTextureTile(Entity* entity, uint16_t texture_tile)
 {
     entity->animation_frame = texture_tile;
 }
+
+void Spelunky_UpdateLiquidOutOfBoundsBugfix()
+{
+    fix_liquid_out_of_bounds();
+}
