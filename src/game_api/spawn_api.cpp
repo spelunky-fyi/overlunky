@@ -567,7 +567,6 @@ int32_t spawn_shopkeeper(float x, float y, LAYER layer, ROOM_TEMPLATE room_templ
     uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(to_id("ENT_TYPE_MONS_SHOPKEEPER"), x, y, layer, 0, 0);
     auto keeper = get_entity_ptr(keeper_uid)->as<Shopkeeper>();
     keeper->shop_owner = true;
-    keeper->name = 0;
     keeper->room_index = room_index;
     state_ptr->level_gen->set_room_template(ix, iy, real_layer, room_template);
     ShopOwnerDetails owner = {.layer = (uint8_t)layer, .room_index = room_index, .shop_owner_uid = keeper_uid};
@@ -577,13 +576,27 @@ int32_t spawn_shopkeeper(float x, float y, LAYER layer, ROOM_TEMPLATE room_templ
 
 int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int16_t room_template)
 {
+    static const auto waddler_id = to_id("ENT_TYPE_MONS_STORAGEGUY");
+    static const auto shoppie_id = to_id("ENT_TYPE_MONS_SHOPKEEPER");
+    static const auto yang_id = to_id("ENT_TYPE_MONS_YANG");
+    static const auto tun_id = to_id("ENT_TYPE_MONS_MERCHANT");
+
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
     StateMemory* state_ptr = State::get().ptr();
     auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
     uint32_t room_index = ix + iy * 8;
     uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(owner_type, x, y, layer, 0, 0);
-    auto keeper = get_entity_ptr(keeper_uid)->as<RoomOwner>();
-    keeper->room_index = room_index;
+    if (owner_type == waddler_id || owner_type == yang_id || owner_type == tun_id)
+    {
+        auto keeper = get_entity_ptr(keeper_uid)->as<RoomOwner>();
+        keeper->room_index = room_index;
+    }
+    else if (owner_type == shoppie_id)
+    {
+        auto keeper = get_entity_ptr(keeper_uid)->as<Shopkeeper>();
+        keeper->shop_owner = true;
+        keeper->room_index = room_index;
+    }
     if (room_template >= 0)
         state_ptr->level_gen->set_room_template(ix, iy, real_layer, (uint16_t)room_template);
     ShopOwnerDetails owner = {.layer = (uint8_t)layer, .room_index = room_index, .shop_owner_uid = keeper_uid};
