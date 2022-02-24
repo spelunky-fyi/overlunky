@@ -1,6 +1,7 @@
 #include "spawn_api.hpp"
 
 #include "entities_liquids.hpp"
+#include "entities_monsters.hpp"
 #include "entity.hpp"
 #include "layer.hpp"
 #include "level_api.hpp"
@@ -555,4 +556,21 @@ int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
         return spawned->uid;
     }
     return -1;
+}
+
+int32_t spawn_shopkeeper(float x, float y, LAYER layer, ROOM_TEMPLATE room_template)
+{
+    const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+    StateMemory* state_ptr = State::get().ptr();
+    auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
+    uint32_t room_index = ix + iy * 8;
+    uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(to_id("ENT_TYPE_MONS_SHOPKEEPER"), x, y, layer, 0, 0);
+    auto keeper = get_entity_ptr(keeper_uid)->as<Shopkeeper>();
+    keeper->shop_owner = true;
+    keeper->name = 0;
+    keeper->room_index = room_index;
+    state_ptr->level_gen->set_room_template(ix, iy, real_layer, room_template);
+    ShopOwnerDetails owner = {.layer = (uint8_t)layer, .room_index = room_index, .shop_owner_uid = keeper_uid};
+    state_ptr->shops.shop_owners.push_back(owner);
+    return keeper_uid;
 }

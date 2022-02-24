@@ -3,8 +3,10 @@
 #include <csignal>
 
 #include "entities_items.hpp"
+#include "entities_monsters.hpp"
 #include "entity.hpp"
 #include "game_manager.hpp"
+#include "level_api.hpp"
 #include "online.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
@@ -1365,6 +1367,18 @@ end
             end
         end
     )");
+
+    /// Spawn a shopkeeper in the coordinates and make the room a shop. Returns the shopkeeper uid.
+    // lua["spawn_shopkeeper"] = [](float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = ROOM_TEMPLATE.SHOP) -> uint32_t
+    lua["spawn_shopkeeper"] = sol::overload(
+        [](float x, float y, LAYER layer)
+        {
+            return spawn_shopkeeper(x, y, layer);
+        },
+        [](float x, float y, LAYER layer, ROOM_TEMPLATE room_template)
+        {
+            return spawn_shopkeeper(x, y, layer, room_template);
+        });
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
