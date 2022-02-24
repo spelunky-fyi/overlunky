@@ -564,13 +564,13 @@ int32_t spawn_shopkeeper(float x, float y, LAYER layer, ROOM_TEMPLATE room_templ
     StateMemory* state_ptr = State::get().ptr();
     auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
     uint32_t room_index = ix + iy * 8;
+    state_ptr->level_gen->set_room_template(ix, iy, real_layer, room_template);
     uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(to_id("ENT_TYPE_MONS_SHOPKEEPER"), x, y, layer, 0, 0);
     auto keeper = get_entity_ptr(keeper_uid)->as<Shopkeeper>();
     keeper->shop_owner = true;
     keeper->room_index = room_index;
-    state_ptr->level_gen->set_room_template(ix, iy, real_layer, room_template);
-    ShopOwnerDetails owner = {.layer = (uint8_t)layer, .room_index = room_index, .shop_owner_uid = keeper_uid};
-    state_ptr->shops.shop_owners.push_back(owner);
+    // ShopOwnerDetails owner = {.layer = (uint8_t)layer, .room_index = room_index, .shop_owner_uid = keeper_uid};
+    // state_ptr->shops.shop_owners.push_back(owner);
     return keeper_uid;
 }
 
@@ -585,6 +585,8 @@ int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int1
     StateMemory* state_ptr = State::get().ptr();
     auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
     uint32_t room_index = ix + iy * 8;
+    if (room_template >= 0)
+        state_ptr->level_gen->set_room_template(ix, iy, real_layer, (uint16_t)room_template);
     uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(owner_type, x, y, layer, 0, 0);
     if (owner_type == waddler_id || owner_type == yang_id || owner_type == tun_id)
     {
@@ -597,9 +599,7 @@ int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int1
         keeper->shop_owner = true;
         keeper->room_index = room_index;
     }
-    if (room_template >= 0)
-        state_ptr->level_gen->set_room_template(ix, iy, real_layer, (uint16_t)room_template);
-    ShopOwnerDetails owner = {.layer = (uint8_t)layer, .room_index = room_index, .shop_owner_uid = keeper_uid};
-    state_ptr->shops.shop_owners.push_back(owner);
+    // ShopOwnerDetails owner = {.layer = (uint8_t)layer, .room_index = room_index, .shop_owner_uid = keeper_uid};
+    // state_ptr->shops.shop_owners.push_back(owner);
     return keeper_uid;
 }
