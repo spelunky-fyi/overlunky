@@ -2,6 +2,9 @@
 
 #include "aliases.hpp"
 
+#include <cmath>
+#include <utility>
+
 struct Color
 {
     /// Create a new color - defaults to black

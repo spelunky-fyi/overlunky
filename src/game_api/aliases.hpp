@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 using CallbackId = uint32_t;
 using Flags = uint32_t;
