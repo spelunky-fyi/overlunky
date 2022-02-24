@@ -1368,7 +1368,7 @@ end
         end
     )");
 
-    /// Spawn a shopkeeper in the coordinates and make the room a shop. Returns the shopkeeper uid.
+    /// Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid.
     // lua["spawn_shopkeeper"] = [](float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = ROOM_TEMPLATE.SHOP) -> uint32_t
     lua["spawn_shopkeeper"] = sol::overload(
         [](float x, float y, LAYER layer)
@@ -1378,6 +1378,18 @@ end
         [](float x, float y, LAYER layer, ROOM_TEMPLATE room_template)
         {
             return spawn_shopkeeper(x, y, layer, room_template);
+        });
+
+    /// Spawn a RoomOwner in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
+    // lua["spawn_roomowner"] = [](ENT_TYPE owner_type, float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = -1) -> uint32_t
+    lua["spawn_roomowner"] = sol::overload(
+        [](ENT_TYPE owner_type, float x, float y, LAYER layer)
+        {
+            return spawn_roomowner(owner_type, x, y, layer);
+        },
+        [](ENT_TYPE owner_type, float x, float y, LAYER layer, int16_t room_template)
+        {
+            return spawn_roomowner(owner_type, x, y, layer, room_template);
         });
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);

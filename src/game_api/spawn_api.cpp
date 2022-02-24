@@ -574,3 +574,19 @@ int32_t spawn_shopkeeper(float x, float y, LAYER layer, ROOM_TEMPLATE room_templ
     state_ptr->shops.shop_owners.push_back(owner);
     return keeper_uid;
 }
+
+int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int16_t room_template)
+{
+    const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
+    StateMemory* state_ptr = State::get().ptr();
+    auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
+    uint32_t room_index = ix + iy * 8;
+    uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(owner_type, x, y, layer, 0, 0);
+    auto keeper = get_entity_ptr(keeper_uid)->as<RoomOwner>();
+    keeper->room_index = room_index;
+    if (room_template >= 0)
+        state_ptr->level_gen->set_room_template(ix, iy, real_layer, (uint16_t)room_template);
+    ShopOwnerDetails owner = {.layer = (uint8_t)layer, .room_index = room_index, .shop_owner_uid = keeper_uid};
+    state_ptr->shops.shop_owners.push_back(owner);
+    return keeper_uid;
+}
