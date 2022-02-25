@@ -4841,7 +4841,7 @@ void render_entity_props(int uid, bool detached = false)
             {
                 entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
-
+            ImGui::PopItemWidth();
             if (entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") && entity->ai != 0)
             {
                 ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &entity->ai->state, &u8_min, &s8_max);
@@ -4855,8 +4855,13 @@ void render_entity_props(int uid, bool detached = false)
             }
         }
     }
-    if (ImGui::CollapsingHeader("Style"))
+    if (ImGui::CollapsingHeader("Color, Size, Texture"))
     {
+        std::string textureid = g_Console.get()->execute(fmt::format("return get_entity({}):get_texture()", uid));
+        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture())", uid));
+        // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid));
+        texture = texture.substr(1, texture.length() - 2);
+        // texturepath = texturepath.substr(1, texturepath.length() - 2);
         ImGui::ColorEdit4("Color", (float*)&entity->color);
         ImGui::DragFloat("Width##EntityWidth", &entity->w, 0.5f, 0.0, 10.0, "%.3f");
         ImGui::DragFloat("Height##EntityHeight", &entity->h, 0.5f, 0.0, 10.0, "%.3f");
@@ -4864,10 +4869,13 @@ void render_entity_props(int uid, bool detached = false)
         ImGui::DragFloat("Box height##EntityBoxHeight", &entity->hitboxy, 0.5f, 0.0, 10.0, "%.3f");
         ImGui::DragFloat("Offset X##EntityOffsetX", &entity->offsetx, 0.5f, -10.0, 10.0, "%.3f");
         ImGui::DragFloat("Offset Y##EntityOffsetY", &entity->offsety, 0.5f, -10.0, 10.0, "%.3f");
-        ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &entity->animation_frame, 0.2f, &u16_zero, &u16_max);
         uint8_t draw_depth = entity->draw_depth;
         if (ImGui::DragScalar("Draw depth##EntityDrawDepth", ImGuiDataType_U8, &draw_depth, 0.2f, &u8_zero, &u8_draw_depth_max))
             entity->set_draw_depth(draw_depth);
+
+        ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &entity->animation_frame, 0.2f, &u16_zero, &u16_max);
+        ImGui::InputText(fmt::format("Texture: {}##EntityTexture", textureid).c_str(), &texture, ImGuiInputTextFlags_ReadOnly);
+        // ImGui::InputText("Texture path##EntityTexturePath", &texturepath, ImGuiInputTextFlags_ReadOnly);
     }
     if (ImGui::CollapsingHeader("Flags"))
     {

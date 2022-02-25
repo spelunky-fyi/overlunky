@@ -950,6 +950,9 @@
                           <li>
                             <a href="#set_room_template_size" class="toc-h3 toc-link" data-title="set_room_template_size">set_room_template_size</a>
                           </li>
+                          <li>
+                            <a href="#spawn_roomowner" class="toc-h3 toc-link" data-title="spawn_roomowner">spawn_roomowner</a>
+                          </li>
                       </ul>
                   </li>
                   <li>
@@ -966,6 +969,9 @@
                           </li>
                           <li>
                             <a href="#is_inside_shop_zone" class="toc-h3 toc-link" data-title="is_inside_shop_zone">is_inside_shop_zone</a>
+                          </li>
+                          <li>
+                            <a href="#spawn_shopkeeper" class="toc-h3 toc-link" data-title="spawn_shopkeeper">spawn_shopkeeper</a>
                           </li>
                       </ul>
                   </li>
@@ -1077,6 +1083,9 @@
                           </li>
                           <li>
                             <a href="#clear_custom_name" class="toc-h3 toc-link" data-title="clear_custom_name">clear_custom_name</a>
+                          </li>
+                          <li>
+                            <a href="#enum_get_name" class="toc-h3 toc-link" data-title="enum_get_name">enum_get_name</a>
                           </li>
                           <li>
                             <a href="#get_character_name" class="toc-h3 toc-link" data-title="get_character_name">get_character_name</a>
@@ -3840,7 +3849,7 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
 </blockquote>
-<h4 id='array-import-string-id-optional-version'>array import(string id, optional<string> version)</h4>
+<h4 id='table-import-string-id-optional-version'>table import(string id, optional<string> version)</h4>
 <p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table</p>
 <h3 id='is_character_female'>is_character_female</h3>
 <blockquote>
@@ -4290,6 +4299,31 @@ you&#39;re standing on, not real level coordinates.</p>
 </blockquote>
 <h4 id='bool-set_room_template_size-int-room_template-int-width-int-height'>bool set_room_template_size(int room_template, int width, int height)</h4>
 <p>Set the size of room template in tiles, the template must be of type <code>ROOM_TEMPLATE_TYPE.MACHINE_ROOM</code>.</p>
+<h3 id='spawn_roomowner'>spawn_roomowner</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- spawns waddler selling pets</span>
+<span class="c1">-- all the aggro etc mechanics from a normal shop still apply</span>
+<span class="kd">local</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span> <span class="o">=</span> <span class="n">get_position</span><span class="p">(</span><span class="n">get_player</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">uid</span><span class="p">)</span>
+<span class="kd">local</span> <span class="n">owner</span> <span class="o">=</span> <span class="n">spawn_roomowner</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_STORAGEGUY</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">ROOM_TEMPLATE</span><span class="p">.</span><span class="n">SHOP</span><span class="p">)</span>
+<span class="n">add_item_to_shop</span><span class="p">(</span><span class="n">spawn_on_floor</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_PET_DOG</span><span class="p">,</span> <span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">),</span> <span class="n">owner</span><span class="p">)</span>
+<span class="n">add_item_to_shop</span><span class="p">(</span><span class="n">spawn_on_floor</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_PET_CAT</span><span class="p">,</span> <span class="n">x</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">),</span> <span class="n">owner</span><span class="p">)</span>
+<span class="n">add_item_to_shop</span><span class="p">(</span><span class="n">spawn_on_floor</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_PET_HAMSTER</span><span class="p">,</span> <span class="n">x</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">),</span> <span class="n">owner</span><span class="p">)</span>
+
+<span class="c1">-- use in a tile code to add shops to custom levels</span>
+<span class="c1">-- this may spawn some shop related decorations too</span>
+<span class="n">define_tile_code</span><span class="p">(</span><span class="s2">"pet_shop_boys"</span><span class="p">)</span>
+<span class="n">set_pre_tile_code_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
+    <span class="kd">local</span> <span class="n">owner</span> <span class="o">=</span> <span class="n">spawn_roomowner</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_YANG</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">,</span> <span class="n">ROOM_TEMPLATE</span><span class="p">.</span><span class="n">SHOP</span><span class="p">)</span>
+    <span class="c1">-- another dude for the meme, this has nothing to do with the shop</span>
+    <span class="n">spawn_on_floor</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_BODYGUARD</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
+    <span class="n">add_item_to_shop</span><span class="p">(</span><span class="n">spawn_on_floor</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_PET_HAMSTER</span><span class="p">,</span> <span class="n">x</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">),</span> <span class="n">owner</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">true</span>
+<span class="k">end</span><span class="p">,</span> <span class="s2">"pet_shop_boys"</span><span class="p">)</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_roomowner">spawn_roomowner</a></p>
+</blockquote>
+<h4 id='int-spawn_roomowner-ENT_TYPE-owner_type-float-x-float-y-LAYER-layer-ROOM_TEMPLATE-room_template-1'>int spawn_roomowner(<a href="#ENT_TYPE">ENT_TYPE</a> owner_type, float x, float, y, <a href="#LAYER">LAYER</a> layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template = -1)</h4>
+<p>Spawn a <a href="#RoomOwner">RoomOwner</a> (or a few other like CavemanShopkeeper) in the coordinates and make them own the room, optionally changing the room template. Returns the <a href="#RoomOwner">RoomOwner</a> uid.</p>
 <h2 id='Shop-functions'>Shop functions</h2><h3 id='add_item_to_shop'>add_item_to_shop</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_item_to_shop">add_item_to_shop</a></p>
@@ -4320,6 +4354,28 @@ Use empty table as argument to reset to the game default</p>
 </blockquote>
 <h4 id='bool-is_inside_shop_zone-float-x-float-y-LAYER-layer'>bool is_inside_shop_zone(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
 <p>Checks whether a coordinate is inside a shop zone, the rectangle where the camera zooms in a bit. Does not check if the shop is still active!</p>
+<h3 id='spawn_shopkeeper'>spawn_shopkeeper</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- spawns a shopkeeper selling a shotgun next to you</span>
+<span class="c1">-- converts the current room to a ROOM_TEMPLATE.SHOP with shop music and zoom effect</span>
+<span class="kd">local</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span> <span class="o">=</span> <span class="n">get_position</span><span class="p">(</span><span class="n">get_player</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">uid</span><span class="p">)</span>
+<span class="kd">local</span> <span class="n">owner</span> <span class="o">=</span> <span class="n">spawn_shopkeeper</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+<span class="n">add_item_to_shop</span><span class="p">(</span><span class="n">spawn_on_floor</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">ITEM_SHOTGUN</span><span class="p">,</span> <span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">),</span> <span class="n">owner</span><span class="p">)</span>
+
+<span class="c1">-- spawns a shopkeeper selling a puppy next to you</span>
+<span class="c1">-- also converts the room to a shop, but after the shopkeeper is spawned</span>
+<span class="c1">-- this enables the safe zone for moving items, but disables shop music and zoom for whatever reason</span>
+<span class="kd">local</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span> <span class="o">=</span> <span class="n">get_position</span><span class="p">(</span><span class="n">get_player</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">uid</span><span class="p">)</span>
+<span class="kd">local</span> <span class="n">owner</span> <span class="o">=</span> <span class="n">spawn_shopkeeper</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">ROOM_TEMPLATE</span><span class="p">.</span><span class="n">SIDE</span><span class="p">)</span>
+<span class="n">add_item_to_shop</span><span class="p">(</span><span class="n">spawn_on_floor</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_PET_DOG</span><span class="p">,</span> <span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">l</span><span class="p">),</span> <span class="n">owner</span><span class="p">)</span>
+<span class="kd">local</span> <span class="n">ctx</span> <span class="o">=</span> <span class="n">PostRoomGenerationContext</span><span class="p">:</span><span class="n">new</span><span class="p">()</span>
+<span class="kd">local</span> <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span> <span class="o">=</span> <span class="n">get_room_index</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">ctx</span><span class="p">:</span><span class="n">set_room_template</span><span class="p">(</span><span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">ROOM_TEMPLATE</span><span class="p">.</span><span class="n">SHOP</span><span class="p">)</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_shopkeeper">spawn_shopkeeper</a></p>
+</blockquote>
+<h4 id='int-spawn_shopkeeper-float-x-float-y-LAYER-layer-ROOM_TEMPLATE-room_template-ROOM_TEMPLATE-SHOP'>int spawn_shopkeeper(float x, float, y, <a href="#LAYER">LAYER</a> layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template = <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a>.SHOP)</h4>
+<p>Spawn a <a href="#Shopkeeper">Shopkeeper</a> in the coordinates and make the room their shop. Returns the <a href="#Shopkeeper">Shopkeeper</a> uid. Also see spawn_roomowner.</p>
 <h2 id='Sound-functions'>Sound functions</h2><h3 id='create_sound'>create_sound</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_sound">create_sound</a></p>
@@ -4555,6 +4611,12 @@ This edits custom string and in game strings but changing the language in settin
 </blockquote>
 <h4 id='nil-clear_custom_name-int-uid'>nil clear_custom_name(int uid)</h4>
 <p>Clears the name set with <code>add_custom_name</code></p>
+<h3 id='enum_get_name'>enum_get_name</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enum_get_name">enum_get_name</a></p>
+</blockquote>
+<h4 id='string-enum_get_name-table-enum-int-value'>string enum_get_name(table enum, int value)</h4>
+<p>Return the name of an unknown number in an enum table</p>
 <h3 id='get_character_name'>get_character_name</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_character_name">get_character_name</a></p>
@@ -15363,6 +15425,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door_type">door_type</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=platform_type">platform_type</a></td>
 <td></td>
 </tr>
 <tr>

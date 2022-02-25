@@ -3181,6 +3181,7 @@ Derived from [Entity](#Entity)
 Type | Name | Description
 ---- | ---- | -----------
 [ENT_TYPE](#ENT_TYPE) | [door_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_type) | 
+[ENT_TYPE](#ENT_TYPE) | [platform_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_type) | 
 bool | [visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visible) | 
 bool | [platform_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_spawned) | Is set true when you bomb the door, no matter what door, can't be reset
 

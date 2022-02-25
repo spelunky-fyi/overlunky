@@ -95,7 +95,7 @@ function clear_callback(id) end
 ---Load another script by id "author/name" and import its `exports` table
 ---@param id string
 ---@param version string?
----@return Array
+---@return table
 function import(id, version) end
 ---Get your sanitized script id to be used in import.
 ---@return string
@@ -990,6 +990,26 @@ function refresh_illumination(illumination) end
 ---Removes all liquid that is about to go out of bounds, which crashes the game.
 ---@return nil
 function fix_liquid_out_of_bounds() end
+---Return the name of an unknown number in an enum table
+---@param enum table
+---@param value integer
+---@return string
+function enum_get_name(enum, value) end
+---Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see spawn_roomowner.
+---@param x number
+---@param y number,
+---@param layer LAYER
+---@param room_template ROOM_TEMPLATE
+---@return integer
+function spawn_shopkeeper(x, y, layer, room_template) end
+---Spawn a RoomOwner (or a few other like CavemanShopkeeper) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
+---@param owner_type ENT_TYPE
+---@param x number
+---@param y number,
+---@param layer LAYER
+---@param room_template ROOM_TEMPLATE
+---@return integer
+function spawn_roomowner(owner_type, x, y, layer, room_template) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -3323,6 +3343,7 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class LogicalDoor : Entity
     ---@field door_type ENT_TYPE
+    ---@field platform_type ENT_TYPE
     ---@field visible boolean
     ---@field platform_spawned boolean
 
