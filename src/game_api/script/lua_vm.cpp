@@ -1368,7 +1368,7 @@ end
         end
     )");
 
-    /// Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid.
+    /// Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see spawn_roomowner.
     // lua["spawn_shopkeeper"] = [](float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = ROOM_TEMPLATE.SHOP) -> uint32_t
     lua["spawn_shopkeeper"] = sol::overload(
         [](float x, float y, LAYER layer)
@@ -1380,7 +1380,7 @@ end
             return spawn_shopkeeper(x, y, layer, room_template);
         });
 
-    /// Spawn a RoomOwner in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
+    /// Spawn a RoomOwner (or a few other like CavemanShopkeeper) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
     // lua["spawn_roomowner"] = [](ENT_TYPE owner_type, float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = -1) -> uint32_t
     lua["spawn_roomowner"] = sol::overload(
         [](ENT_TYPE owner_type, float x, float y, LAYER layer)
