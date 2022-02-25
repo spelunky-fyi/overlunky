@@ -995,6 +995,21 @@ function fix_liquid_out_of_bounds() end
 ---@param value integer
 ---@return string
 function enum_get_name(enum, value) end
+---Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see spawn_roomowner.
+---@param x number
+---@param y number,
+---@param layer LAYER
+---@param room_template ROOM_TEMPLATE
+---@return integer
+function spawn_shopkeeper(x, y, layer, room_template) end
+---Spawn a RoomOwner (or a few other like CavemanShopkeeper) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
+---@param owner_type ENT_TYPE
+---@param x number
+---@param y number,
+---@param layer LAYER
+---@param room_template ROOM_TEMPLATE
+---@return integer
+function spawn_roomowner(owner_type, x, y, layer, room_template) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
