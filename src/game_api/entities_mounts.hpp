@@ -5,8 +5,8 @@
 class Mount : public PowerupCapable
 {
   public:
-    size_t unknown1;
-    uint64_t unknown2;
+    // size_t unknown1;
+    // uint64_t unknown2;
     int32_t rider_uid; // who rides it
     uint32_t unknown4;
     SoundPosition* sound_pos;

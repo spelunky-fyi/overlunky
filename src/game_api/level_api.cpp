@@ -1406,7 +1406,7 @@ std::pair<const game_string, ChanceDef>& get_or_emplace_chance(game_unordered_ma
         void* ptr1;
         std::pair<const game_string, ChanceDef> value;
     };
-    using EmplaceChance = ChanceNode * *(void*, std::pair<ChanceNode*, bool>*, game_string&);
+    using EmplaceChance = ChanceNode**(void*, std::pair<ChanceNode*, bool>*, game_string&);
     static EmplaceChance* emplace_level_chance = (EmplaceChance*)get_address("level_gen_emplace_chance");
 
     std::pair<ChanceNode*, bool> node;
