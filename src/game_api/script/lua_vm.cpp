@@ -7,6 +7,7 @@
 #include "game_manager.hpp"
 #include "online.hpp"
 #include "rpc.hpp"
+#include "settings_api.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
 #include "strings.hpp"
@@ -1355,6 +1356,9 @@ end
 
     /// Removes all liquid that is about to go out of bounds, which crashes the game.
     lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
+
+    /// Gets the specified setting, values might need to be interpreted differently per setting
+    lua["get_setting"] = get_setting;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

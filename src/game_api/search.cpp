@@ -1566,6 +1566,28 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
+    {
+        "settings_common_base"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\xb8\x1e\x00\x00\x00\x1e\x00\x00\x00"sv)
+            .find_inst("\x48\x8d"sv)
+            .at_exe()
+    },
+    {
+        "settings_map"sv,
+        PatternCommandBuffer{}
+            .get_address("settings_common_base"sv)
+            .decode_pc()
+            .at_exe()
+    },
+    {
+        "settings_map::_Try_emplace"sv,
+        PatternCommandBuffer{}
+            .get_address("settings_common_base"sv)
+            .find_inst("\xe8"sv)
+            .decode_call()
+            .at_exe()
+    }
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
