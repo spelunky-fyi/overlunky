@@ -1441,7 +1441,6 @@ void register_usertypes(sol::state& lua)
     // Used to change the room templates in the level and other shenanigans that affect level gen.
     lua.new_usertype<PostRoomGenerationContext>(
         "PostRoomGenerationContext",
-        sol::no_constructor,
         "set_room_template",
         &PostRoomGenerationContext::set_room_template,
         "mark_as_machine_room_origin",
