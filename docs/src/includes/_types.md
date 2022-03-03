@@ -431,9 +431,9 @@ float | [a](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=a) |
 [Color](#Color) | [fuchsia()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuchsia) | 
 [Color](#Color) | [purple()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=purple) | 
 tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rgba) | Returns RGBA colors in 0..255 range
- | [set_rgba(int red, int green, int blue, int alpha)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_rgba) | Changes color based on given RGBA colors in 0..255 range
+[Color](#Color)& | [set_rgba(int red, int green, int blue, int alpha)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_rgba) | Changes color based on given RGBA colors in 0..255 range
 [uColor](#Aliases) | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
- | [set_ucolor(uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ucolor) | Changes color based on given [uColor](#Aliases)
+[Color](#Color)& | [set_ucolor(const uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ucolor) | Changes color based on given [uColor](#Aliases)
 
 ### ImVec2
 

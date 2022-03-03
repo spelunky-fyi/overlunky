@@ -1707,9 +1707,9 @@ local function PRNG_random(self, min, max) end
     ---@field b number
     ---@field a number
     ---@field get_rgba fun(self, ): integer, integer, integer, integer
-    ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): nil
+    ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color
     ---@field get_ucolor fun(self, ): uColor
-    ---@field set_ucolor fun(self, color: uColor): nil
+    ---@field set_ucolor fun(self, color: uColor): Color
 
 ---@class Animation
     ---@field first_tile integer
