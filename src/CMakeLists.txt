@@ -147,11 +147,15 @@ if(BUILD_OVERLUNKY)
                                 add_custom_target(update_docs_overlunky
                                         COMMAND injector --launch_game ${SPELUNKY_INSTALL_DIR} --info_dump
                                         COMMAND ${CMAKE_COMMAND} -E copy_directory ${SPELUNKY_INSTALL_DIR}/game_data ./docs/game_data
-                                        COMMAND cd docs && ${Python3_EXECUTABLE} generate.py
+                                        COMMAND cd docs
+                                        COMMAND ${Python3_EXECUTABLE} generate.py
+                                        COMMAND ${Python3_EXECUTABLE} generate_emmylua.py
                                         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                                         COMMENT "Update docs, including collecting all game data.")
                                 add_custom_target(update_auto_docs_overlunky
-                                        COMMAND cd docs && ${Python3_EXECUTABLE} generate.py
+                                        COMMAND cd docs
+                                        COMMAND ${Python3_EXECUTABLE} generate.py
+                                        COMMAND ${Python3_EXECUTABLE} generate_emmylua.py
                                         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                                         COMMENT "Update only auto-docs.")
                         else()

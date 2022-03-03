@@ -1092,6 +1092,15 @@ Gets the value for the specified config
 
 Get the current timestamp in milliseconds since the Unix Epoch.
 
+### get_setting
+
+
+> Search script examples for [get_setting](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_setting)
+
+#### optional&lt;int&gt; get_setting([GAME_SETTING](#GAME_SETTING) setting)
+
+Gets the specified setting, values might need to be interpreted differently per setting
+
 ### god
 
 

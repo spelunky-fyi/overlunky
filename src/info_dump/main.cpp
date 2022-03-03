@@ -14,6 +14,7 @@
 #include "logger.h"
 #include "memory.h"
 #include "particles.hpp"
+#include "settings_api.hpp"
 #include "sound_manager.hpp"
 #include "state.hpp"
 #include "texture.hpp"
@@ -1318,6 +1319,17 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
         }
         for (const auto& [id, name] : ordered_templates)
             file << name << ": " << id << "\n";
+    }
+
+    if (auto file = std::ofstream("game_data/game_settings.txt"))
+    {
+        for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
+        {
+            std::string setting_name{setting_name_view};
+            std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)
+                           { return (unsigned char)std::toupper(c); });
+            file << setting_name << ": " << static_cast<std::int32_t>(setting_index) << "\n";
+        }
     }
 
     get_vtables();
