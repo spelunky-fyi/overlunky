@@ -4858,7 +4858,7 @@ void render_entity_props(int uid, bool detached = false)
     if (ImGui::CollapsingHeader("Color, Size, Texture"))
     {
         std::string textureid = g_Console.get()->execute(fmt::format("return get_entity({}):get_texture()", uid));
-        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture())", uid));
+        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid));
         // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid));
         texture = texture.substr(1, texture.length() - 2);
         // texturepath = texturepath.substr(1, texturepath.length() - 2);
