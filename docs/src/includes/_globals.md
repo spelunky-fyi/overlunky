@@ -1820,6 +1820,38 @@ Get whether a room is flipped at the given index, returns `false` if coordinates
 
 Set the size of room template in tiles, the template must be of type `ROOM_TEMPLATE_TYPE.MACHINE_ROOM`.
 
+### spawn_roomowner
+
+
+```lua
+-- spawns waddler selling pets
+-- all the aggro etc mechanics from a normal shop still apply
+local x, y, l = get_position(get_player(1).uid)
+local owner = spawn_roomowner(ENT_TYPE.MONS_STORAGEGUY, x+1, y, l, ROOM_TEMPLATE.SHOP)
+add_item_to_shop(spawn_on_floor(ENT_TYPE.MONS_PET_DOG, x-1, y, l), owner)
+add_item_to_shop(spawn_on_floor(ENT_TYPE.MONS_PET_CAT, x-2, y, l), owner)
+add_item_to_shop(spawn_on_floor(ENT_TYPE.MONS_PET_HAMSTER, x-3, y, l), owner)
+
+-- use in a tile code to add shops to custom levels
+-- this may spawn some shop related decorations too
+define_tile_code("pet_shop_boys")
+set_pre_tile_code_callback(function(x, y, layer)
+    local owner = spawn_roomowner(ENT_TYPE.MONS_YANG, x, y, layer, ROOM_TEMPLATE.SHOP)
+    -- another dude for the meme, this has nothing to do with the shop
+    spawn_on_floor(ENT_TYPE.MONS_BODYGUARD, x+1, y, layer)
+    add_item_to_shop(spawn_on_floor(ENT_TYPE.MONS_PET_HAMSTER, x+2, y, layer), owner)
+    return true
+end, "pet_shop_boys")
+
+```
+
+
+> Search script examples for [spawn_roomowner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_roomowner)
+
+#### int spawn_roomowner([ENT_TYPE](#ENT_TYPE) owner_type, float x, float, y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = -1)
+
+Spawn a [RoomOwner](#RoomOwner) (or a few other like CavemanShopkeeper) in the coordinates and make them own the room, optionally changing the room template. Returns the [RoomOwner](#RoomOwner) uid.
+
 ## Shop functions
 
 
@@ -1864,6 +1896,35 @@ Checks whether a coordinate is inside a room containing an active shop. This fun
 #### bool is_inside_shop_zone(float x, float y, [LAYER](#LAYER) layer)
 
 Checks whether a coordinate is inside a shop zone, the rectangle where the camera zooms in a bit. Does not check if the shop is still active!
+
+### spawn_shopkeeper
+
+
+```lua
+-- spawns a shopkeeper selling a shotgun next to you
+-- converts the current room to a ROOM_TEMPLATE.SHOP with shop music and zoom effect
+local x, y, l = get_position(get_player(1).uid)
+local owner = spawn_shopkeeper(x+1, y, l)
+add_item_to_shop(spawn_on_floor(ENT_TYPE.ITEM_SHOTGUN, x-1, y, l), owner)
+
+-- spawns a shopkeeper selling a puppy next to you
+-- also converts the room to a shop, but after the shopkeeper is spawned
+-- this enables the safe zone for moving items, but disables shop music and zoom for whatever reason
+local x, y, l = get_position(get_player(1).uid)
+local owner = spawn_shopkeeper(x+1, y, l, ROOM_TEMPLATE.SIDE)
+add_item_to_shop(spawn_on_floor(ENT_TYPE.MONS_PET_DOG, x-1, y, l), owner)
+local ctx = PostRoomGenerationContext:new()
+local rx, ry = get_room_index(x, y)
+ctx:set_room_template(rx, ry, l, ROOM_TEMPLATE.SHOP)
+
+```
+
+
+> Search script examples for [spawn_shopkeeper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_shopkeeper)
+
+#### int spawn_shopkeeper(float x, float, y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = [ROOM_TEMPLATE](#ROOM_TEMPLATE).SHOP)
+
+Spawn a [Shopkeeper](#Shopkeeper) in the coordinates and make the room their shop. Returns the [Shopkeeper](#Shopkeeper) uid. Also see spawn_roomowner.
 
 ## Sound functions
 
