@@ -1667,6 +1667,20 @@ end
         1,
         "BOLD",
         2);
+
+    /// Paramater to `get_setting()`
+    lua.create_named_table("GAME_SETTING"
+                           //, "DAMSEL_STYLE", 0
+                           //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
+                           //, "CURRENT_LAYER2", 37
+    );
+    for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
+    {
+        std::string setting_name{setting_name_view};
+        std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)
+                       { return (unsigned char)std::toupper(c); });
+        lua["GAME_SETTING"][std::move(setting_name)] = setting_index;
+    }
 }
 
 std::vector<std::string> safe_fields{};
