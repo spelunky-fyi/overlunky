@@ -20,7 +20,6 @@ struct SettingData
     SettingValue default_value;
     SettingValue& value;
 };
-constexpr auto b = sizeof(SettingData);
 
 SettingData* get_setting_data(GAME_SETTING setting)
 {
