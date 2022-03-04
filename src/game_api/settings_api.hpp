@@ -58,6 +58,9 @@ enum class GAME_SETTING
     CROSSPROGRESS_AUTOSYNC = 47,
 };
 
+// Returns false if the value is too big for the setting or the setting does not exist
+// most settings only hold 1 byte of data
+bool set_setting(GAME_SETTING setting, std::uint32_t value);
 std::optional<std::uint32_t> get_setting(GAME_SETTING setting);
 std::optional<std::uint32_t> get_setting_default(GAME_SETTING setting);
 std::vector<std::pair<std::string_view, GAME_SETTING>> get_settings_names_and_indices();

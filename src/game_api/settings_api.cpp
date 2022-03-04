@@ -41,6 +41,28 @@ SettingData* get_setting_data(GAME_SETTING setting)
     return nullptr;
 }
 
+bool set_setting(GAME_SETTING setting, std::uint32_t value)
+{
+    if (SettingData* data = get_setting_data(setting))
+    {
+        switch (setting)
+        {
+        case GAME_SETTING::FREQUENCY_NUMERATOR:
+        case GAME_SETTING::FREQUENCY_DENOMINATOR:
+            data->value.u32 = value;
+            return true;
+        case GAME_SETTING::RESOLUTIONX:
+        case GAME_SETTING::RESOLUTIONY:
+            data->value.u16 = value & 0xffff;
+            return data->value.u16 == value;
+        default:
+            data->value.u8 = value & 0xff;
+            return data->value.u8 == value;
+        }
+    }
+
+    return false;
+}
 std::optional<std::uint32_t> get_setting(GAME_SETTING setting)
 {
     if (SettingData* data = get_setting_data(setting))
