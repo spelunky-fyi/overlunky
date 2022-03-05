@@ -10,6 +10,7 @@
 #include "online.hpp"
 #include "rpc.hpp"
 #include "savedata.hpp"
+#include "settings_api.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
 #include "strings.hpp"
@@ -1359,6 +1360,9 @@ end
     /// Removes all liquid that is about to go out of bounds, which crashes the game.
     lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
 
+    /// Gets the specified setting, values might need to be interpreted differently per setting
+    lua["get_setting"] = get_setting;
+
     /// Return the name of an unknown number in an enum table
     // lua["enum_get_name"] = [](table enum, int value) -> string
     lua["enum_get_name"] = lua.safe_script(R"(
@@ -1664,6 +1668,20 @@ end
         1,
         "BOLD",
         2);
+
+    /// Paramater to `get_setting()`
+    lua.create_named_table("GAME_SETTING"
+                           //, "DAMSEL_STYLE", 0
+                           //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
+                           //, "CROSSPROGRESS_AUTOSYNC", 47
+    );
+    for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
+    {
+        std::string setting_name{setting_name_view};
+        std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)
+                       { return (unsigned char)std::toupper(c); });
+        lua["GAME_SETTING"][std::move(setting_name)] = setting_index;
+    }
 }
 
 std::vector<std::string> safe_fields{};

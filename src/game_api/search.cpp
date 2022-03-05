@@ -1565,6 +1565,25 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
+    {
+        // Find a string "Basic systems initialized", right after it's usage (found via XREFS)
+        // stuff gets emplaced to a map, it is this map
+        "graphics_settings_map"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\xb8\x77\x5f\x73\x63\x61\x6c\x65\x00"sv)
+            .find_inst("\x4c\x8d"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        // See graphics_settings_map, then go further down and another map is used, it is this map
+        "settings_map"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\xb8\x64\x61\x6d\x73\x65\x6c\x5f\x73"sv)
+            .find_inst("\x48\x8d"sv)
+            .decode_pc()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

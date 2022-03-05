@@ -55,6 +55,7 @@ header_files = [
     "../src/game_api/screen_arena.hpp",
     "../src/game_api/online.hpp",
     "../src/game_api/strings.hpp",
+    "../src/game_api/settings_api.hpp",
     "../src/game_api/script/usertypes/level_lua.hpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
