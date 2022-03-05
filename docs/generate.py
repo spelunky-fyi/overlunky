@@ -1143,7 +1143,7 @@ Type | Name | Description
                     name = var["name"]
                     print(f"{ret} | [{name}]({search_link}) | ", end="")
                 if "docs" in var:
-                    print(link_custom_type(var["docs"]))
+                    print(link_custom_type(var["docs"]), end=" ")
                 if "comment" in var and var["comment"]:
                     print(link_custom_type("<br/>".join(var["comment"])))
                 else:

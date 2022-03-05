@@ -2221,7 +2221,7 @@ set_callback(function(ctx)
 end, ON.PRE_LOAD_LEVEL_FILES)
 ```
 
-> You can call theme functions from other themes, for example to make growable tile codes work in your theme:
+> You can call theme functions from other themes, for example to make all growable tile codes work in your theme:
 ```lua
 local custom = CustomTheme:new()
 custom:post(THEME_OVERRIDE.SPAWN_LEVEL, function()
@@ -2236,8 +2236,7 @@ Customizable [ThemeInfo](#ThemeInfo) with ability to override certain theming fu
 
 Type | Name | Description
 ---- | ---- | -----------
-[CustomTheme](#CustomTheme) | [new(int theme_id_, int base_theme_, bool defaults)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CustomTheme) | 
-Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
+[CustomTheme](#CustomTheme) | [new(int theme_id_, int base_theme_, bool defaults)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CustomTheme) |  Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
 [CustomTheme](#CustomTheme) | [new(int theme_id_, int base_theme_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CustomTheme) | Create a new theme with defaults.
 [CustomTheme](#CustomTheme) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CustomTheme) | Create a new theme with base dwelling and id 100.
 string | [level_file](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_file) | Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
@@ -2245,8 +2244,7 @@ int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
 int | [base_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=base_theme) | Base [THEME](#THEME) to load enabled functions from, when no other theme is specified.
  | [sub_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_theme) | 
 map&lt;[DYNAMIC_TEXTURE](#DYNAMIC_TEXTURE), int&gt; | [textures](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=textures) | Add TEXTUREs here to override different dynamic textures.
- | [override](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) | `override(THEME_OVERRIDE override, bool enabled)` To disable or enable theme functions using the base_theme.<br/>`override(THEME_OVERRIDE override, THEME theme)` To override a theme function with another theme.<br/>`override(THEME_OVERRIDE override, function func)` To override a theme function with a lua function.<br/>
-
+ | [override](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) | `override(THEME_OVERRIDE override, bool enabled)` To disable or enable theme functions using the base_theme.<br/>`override(THEME_OVERRIDE override, THEME theme)` To override a theme function with another theme.<br/>`override(THEME_OVERRIDE override, function func)` To override a theme function with a lua function.<br/> 
  | [pre(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre) | Set a callback to be called before this theme function.
  | [post(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post) | Set a callback to be called after this theme function, to fix some changes it did for example.
  | [unknown1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown1) | 
