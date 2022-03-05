@@ -172,6 +172,12 @@ Type | Name | Description
  | [draw_rect(AABB rect, float thickness, float rounding, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect) | Draws a rectangle on screen from top-left to bottom-right.
  | [draw_rect_filled(float left, float top, float right, float bottom, float rounding, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) | Draws a filled rectangle on screen from top-left to bottom-right.
  | [draw_rect_filled(AABB rect, float rounding, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) | Draws a filled rectangle on screen from top-left to bottom-right.
+ | [draw_triangle(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_triangle) | Draws a triangle on screen.
+ | [draw_triangle_filled(Vec2 p1, Vec2 p2, Vec2 p3, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_triangle_filled) | Draws a filled triangle on screen.
+ | [draw_poly(array<Vec2> points, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_poly) | Draws a polyline on screen.
+ | [draw_poly_filled(array<Vec2> points, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_poly_filled) | Draws a filled convex polyline on screen.
+ | [draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_bezier_cubic) | Draws a cubic bezier curve on screen.
+ | [draw_bezier_quadratic(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_bezier_quadratic) | Draws a quadratic bezier curve on screen.
  | [draw_circle(float x, float y, float radius, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle) | Draws a circle on screen
  | [draw_circle_filled(float x, float y, float radius, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle_filled) | Draws a filled circle on screen
  | [draw_text(float x, float y, float size, string text, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) | Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.

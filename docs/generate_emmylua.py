@@ -41,6 +41,7 @@ header_files = [
     "../src/game_api/screen_arena.hpp",
     "../src/game_api/online.hpp",
     "../src/game_api/strings.hpp",
+    "../src/game_api/settings_api.hpp",
     "../src/game_api/script/usertypes/level_lua.hpp",
     "../src/game_api/script/usertypes/gui_lua.hpp",
     "../src/game_api/script/usertypes/vanilla_render_lua.hpp",
@@ -102,8 +103,8 @@ lualibs = []
 enums = []
 constructors = []
 replace = {
-    #"nil": "void",
-    #"bool": "boolean",
+    # "nil": "void",
+    # "bool": "boolean",
     "uint8_t": "integer",
     "uint16_t": "integer",
     "uint32_t": "integer",
@@ -124,21 +125,20 @@ replace = {
     "pair": "tuple",
     "std::": "",
     "sol::": "",
-    #"AABB&: const": "AABB",
+    # "AABB&: const": "AABB",
     "function": "fun(): any",
     " = nullopt": "",
-    #"const Color&": "color: Color",
+    # "const Color&": "color: Color",
     "void": "",
     "constexpr": "",
-    #"static": "",
-    #"variadic_args va": "...ent_type: number[]",
+    # "static": "",
+    # "variadic_args va": "...ent_type: number[]",
     "...va:": "...ent_type:",
     "// Access via": "ImGuiIO",
     "set<": "Array<",
     "&": "",
     "const string": "string",
     "ShopType": "SHOP_TYPE",
-
 }
 comment = []
 not_functions = [
@@ -169,7 +169,8 @@ def rpcfunc(name):
             ret.append(func)
     return ret
 
-#old reArr: r"(Array<(?:(?:\w*<\w*, \d>)|(?:\w+))), [^>]*?(>+)"
+
+# old reArr: r"(Array<(?:(?:\w*<\w*, \d>)|(?:\w+))), [^>]*?(>+)"
 reArr = re.compile(r"(\bArray<(?:(\w+<.+>)|(\w+(?:<.+>)?))(?:, )?.*>)")
 reTuple = re.compile(r"tuple<(.*?)>")
 reOptional = re.compile(r"optional<(.+?)>")
@@ -177,18 +178,20 @@ reBool = re.compile(r"bool\b")
 reMap = re.compile(r"\bmap<")
 reFloat = re.compile(r"\bfloat\b")
 reInt = re.compile(r"\bint\b")
+
+
 def replace_all(text, dic):
     for i, j in dic.items():
         pos = text.find(i)
-        br2 = text.find('`', pos + len(i))
-        br1 = text.rfind('`', 0, pos)
+        br2 = text.find("`", pos + len(i))
+        br1 = text.rfind("`", 0, pos)
         if pos > 0 and br1 >= 0 and br2 > 0:
             continue
         text = text.replace(i, j)
     text = reFloat.sub("number", text)
     text = reInt.sub("integer", text)
     text = reMap.sub("table<", text)
-    if "Array<" in text: #Array<Array<float, 2>, MAX_PLAYERS>
+    if "Array<" in text:  # Array<Array<float, 2>, MAX_PLAYERS>
         newText = text
         dimension = 1
         while True:
@@ -198,31 +201,34 @@ def replace_all(text, dic):
                     dimension += 1
                     newText = m[2]
                 elif m[3]:
-                    newText = f"{m[3]}" + ("[]"*dimension)
+                    newText = f"{m[3]}" + ("[]" * dimension)
                     text = reArr.sub(newText, text)
                     break
             else:
                 break
-            #newText = reArr.sub(r"FixedSizeArray\1", text)
-            #if newText == text:
+            # newText = reArr.sub(r"FixedSizeArray\1", text)
+            # if newText == text:
             #    break
-            #text = newText
+            # text = newText
 
-    #text = reTuple.sub(r"LuaMultiReturn<[\1]>", text)
+    # text = reTuple.sub(r"LuaMultiReturn<[\1]>", text)
     text = reBool.sub("boolean", text)
     text = reOptional.sub(r"\1?", text)
-    #match = re.search(r"(Array<.*), .*>", text)
-    #if match:
+    # match = re.search(r"(Array<.*), .*>", text)
+    # if match:
     #    text = text.replace(match.group(0), match.group(1) + ">")
-    #else:
+    # else:
     #    match = re.search(r"tuple<(.*)>", text)
     #    if match:
     #       text = text.replace(match.group(0), f"[{match.group(1)}]")
     return text
 
-reGetParam = re.compile(r"(?!const)(\b[^ ]+) *([^,]+),?")#r"([^ ]+) *([^,]+),?")
+
+reGetParam = re.compile(r"(?!const)(\b[^ ]+) *([^,]+),?")  # r"([^ ]+) *([^,]+),?")
 reRemoveDefault = re.compile(r" = .*")
 reHandleConst = re.compile(r"const (\w+) (\w+)")
+
+
 def cpp_params_to_emmy_lua(params_text):
     return_typed = ""
     return_normal = ""
@@ -244,6 +250,7 @@ def cpp_params_to_emmy_lua(params_text):
         return_normal += ", "
     return return_typed, return_normal[0:-2]
 
+
 def cpp_params_to_emmy_lua_fun(params_text):
     ret = ""
     params_iterator = reGetParam.finditer(params_text)
@@ -259,8 +266,11 @@ def cpp_params_to_emmy_lua_fun(params_text):
 
 
 reConstructorFix = re.compile(r"const (\w+)(?: \w+)?")
+
+
 def fix_constructor_param(params_text):
     return reConstructorFix.sub(r"\1 \1", params_text)
+
 
 def fix_return(ret):
     tuple_contents = reTuple.match(ret)
@@ -270,15 +280,18 @@ def fix_return(ret):
         ret = f"{ret}"
     return ret
 
+
 def print_func(name, params, ret, typed_params):
     ret = fix_return(ret)
     fun = f"{typed_params}\n---@return {ret}\nfunction {name}({params}) end".strip()
     print(fun)
 
+
 def print_comment(lf):
     if lf["comment"]:
         for com in lf["comment"]:
             print(f"---{com}")
+
 
 def print_af(lf, af):
     if lf["comment"] and lf["comment"][0] == "NoDoc":
@@ -392,15 +405,21 @@ for file in header_files:
                         r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line
                     )
                     if m:
-                        if m[1].endswith(",") and not (m[2].endswith(">") or m[2].endswith(")")): #Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
+                        if m[1].endswith(",") and not (
+                            m[2].endswith(">") or m[2].endswith(")")
+                        ):  # Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
                             types_and_vars = m[1]
                             vars_match = re.search(r"(?: *\w*,)*$", types_and_vars)
-                            vars_except_last = vars_match.group() #Last var is m[2]
+                            vars_except_last = vars_match.group()  # Last var is m[2]
                             start, end = vars_match.span()
                             vars_type = types_and_vars[:start]
                             for m_var in re.findall(r"(\w*),", vars_except_last):
                                 member_vars.append(
-                                    {"type": vars_type, "name": m_var, "comment": comment}
+                                    {
+                                        "type": vars_type,
+                                        "name": m_var,
+                                        "comment": comment,
+                                    }
                                 )
                             member_vars.append(
                                 {"type": vars_type, "name": m[2], "comment": comment}
@@ -477,10 +496,14 @@ for file in api_files:
         )
         if "member_funs" not in underlying_cpp_type:
             if cpp_type in cpp_type_exceptions:
-                underlying_cpp_type = {"name": cpp_type, "member_funs": {}, "member_vars": {}}
+                underlying_cpp_type = {
+                    "name": cpp_type,
+                    "member_funs": {},
+                    "member_vars": {},
+                }
             else:
                 raise RuntimeError(
-                        f"No member_funs found in \"{cpp_type}\" while looking for usertypes in file \"{file}\". Did you forget to include a header file at the top of the generate script? (if it isn't the problem then add it to cpp_type_exceptions list)"
+                    f'No member_funs found in "{cpp_type}" while looking for usertypes in file "{file}". Did you forget to include a header file at the top of the generate script? (if it isn\'t the problem then add it to cpp_type_exceptions list)'
                 )
 
         skip = False
@@ -509,10 +532,14 @@ for file in api_files:
             cpp = var[1]
 
             if var[1].startswith("sol::property"):
-                param_match = re.match(fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)", cpp)
+                param_match = re.match(
+                    fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)", cpp
+                )
                 if param_match:
                     type_var_name = param_match[1]
-                    m_var_return = re.search(fr"return[^;]*{type_var_name}\.([\w.]+)", cpp)
+                    m_var_return = re.search(
+                        fr"return[^;]*{type_var_name}\.([\w.]+)", cpp
+                    )
                     if m_var_return:
                         cpp_name = m_var_return[1]
                         cpp_name = cpp_name.replace(".", "::")
@@ -522,7 +549,7 @@ for file in api_files:
             else:
                 cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
 
-            if var[0].startswith("sol::constructors"): #TODO: New list of constructors
+            if var[0].startswith("sol::constructors"):  # TODO: New list of constructors
                 for fun in underlying_cpp_type["member_funs"][cpp_type]:
                     param = fun["param"]
                     if "const" in param:
@@ -530,7 +557,8 @@ for file in api_files:
                     elif param == fun["name"]:
                         continue
                     constructor = next(
-                        (item for item in constructors if item["name"] == cpp_type), dict()
+                        (item for item in constructors if item["name"] == cpp_type),
+                        dict(),
                     )
                     if "name" in constructor:
                         constructor["list"].append(
@@ -550,14 +578,14 @@ for file in api_files:
                                         "param": param,
                                         "comment": fun["comment"],
                                     }
-                                ]
+                                ],
                             }
                         )
             elif cpp_name in underlying_cpp_type["member_funs"]:
                 for fun in underlying_cpp_type["member_funs"][cpp_name]:
                     ret = fun["return"]
                     param = fun["param"]
-                    param = cpp_params_to_emmy_lua_fun(param) #TODO
+                    param = cpp_params_to_emmy_lua_fun(param)  # TODO
                     sig = f"{ret} {var_name}({param})"
                     vars.append(
                         {
@@ -573,7 +601,11 @@ for file in api_files:
                     (
                         item
                         for item in underlying_cpp_type["member_vars"]
-                        if item["name"] == cpp_name or (item["name"].endswith("]") and f"{cpp_name}[" in item["name"])
+                        if item["name"] == cpp_name
+                        or (
+                            item["name"].endswith("]")
+                            and f"{cpp_name}[" in item["name"]
+                        )
                     ),
                     dict(),
                 )
@@ -584,7 +616,9 @@ for file in api_files:
                         if type == "char":
                             sig = f"---@field {var_name} string"
                         else:
-                            arr_size = underlying_cpp_var["name"][underlying_cpp_var["name"].find("[")+1:-1]
+                            arr_size = underlying_cpp_var["name"][
+                                underlying_cpp_var["name"].find("[") + 1 : -1
+                            ]
                             sig = f"---@field {var_name} {type}[] @size: {arr_size}"
                     else:
                         sig = f"---@field {var_name} {type}"
@@ -597,7 +631,9 @@ for file in api_files:
                         }
                     )
                 else:
-                    m_return_type = re.search(r"->(\w+){", var[1]) #Use var[1] instead of cpp because it could be replaced on the sol::property stuff
+                    m_return_type = re.search(
+                        r"->(\w+){", var[1]
+                    )  # Use var[1] instead of cpp because it could be replaced on the sol::property stuff
                     if m_return_type:
                         type = replace_all(m_return_type[1], replace)
                         sig = f"---@field {var_name} {type}"
@@ -634,8 +670,8 @@ for file in api_files:
         if c:
             comment.append(c.group(1))
 
-#DELETED ENUM STUFF, we will get enums with spel2.lua
-#TODO: get some enums that have comments, like ON or SPAWN_TYPE
+# DELETED ENUM STUFF, we will get enums with spel2.lua
+# TODO: get some enums that have comments, like ON or SPAWN_TYPE
 
 for file in api_files:
     data = open(file, "r").read()
@@ -656,9 +692,9 @@ for line in data:
             type = replace_all(m.group(2), replace)
             aliases.append({"name": name, "type": type})
 
-#print("## Global variables")
-#print("""These variables are always there to use.""")
-#for lf in funcs:
+# print("## Global variables")
+# print("""These variables are always there to use.""")
+# for lf in funcs:
 #
 #    if lf["name"] in not_functions:
 #        print(
@@ -698,9 +734,9 @@ options = nil
 prng = nil"""
 )
 
-#deprecated_funcs = [
+# deprecated_funcs = [
 #    func for func in funcs if func["comment"] and func["comment"][0] == "Deprecated"
-#]
+# ]
 funcs = [
     func
     for func in funcs
@@ -725,19 +761,19 @@ for lf in funcs:
             ret = replace_all(m.group(2), replace).strip() or "nil"
         if m or m2:
             params = (m or m2).group(1)
-            typed_params, params = cpp_params_to_emmy_lua(params) #TODO
+            typed_params, params = cpp_params_to_emmy_lua(params)  # TODO
             typed_params = replace_all(typed_params, replace).strip()
         name = lf["name"]
         print_comment(lf)
         print_func(name, params, ret, typed_params)
 
 
-#print("//## Deprecated Functions")
-#print(
+# print("//## Deprecated Functions")
+# print(
 #    "//#### These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!"
-#)
+# )
 #
-#for lf in events:
+# for lf in events:
 #    if lf["name"].startswith("on_"):
 #        print(
 #            "### [`"
@@ -749,7 +785,7 @@ for lf in funcs:
 #        for com in lf["comment"]:
 #            print(com)
 #
-#for lf in deprecated_funcs:
+# for lf in deprecated_funcs:
 #    lf["comment"].pop(0)
 #    if len(rpcfunc(lf["cpp"])):
 #        for af in rpcfunc(lf["cpp"]):
@@ -795,14 +831,40 @@ for type in types:
                 param = replace_all(m.group(3), replace)
                 var_name = var["name"]
                 if "overloads" in type and var_name in type["overloads"]:
-                    type["overloads"][var_name].append({"name": name, "param": param, "ret": ret, "orig_params": var["orig_params"]})
+                    type["overloads"][var_name].append(
+                        {
+                            "name": name,
+                            "param": param,
+                            "ret": ret,
+                            "orig_params": var["orig_params"],
+                        }
+                    )
                     index += 1
                     continue
-                elif index+1 < len(type["vars"]) and type["vars"][index+1]["name"] == var_name:
+                elif (
+                    index + 1 < len(type["vars"])
+                    and type["vars"][index + 1]["name"] == var_name
+                ):
                     if "overloads" in type:
-                        type["overloads"][var_name] = [{ "name": name, "param": param, "ret": ret, "orig_params": var["orig_params"] }]
+                        type["overloads"][var_name] = [
+                            {
+                                "name": name,
+                                "param": param,
+                                "ret": ret,
+                                "orig_params": var["orig_params"],
+                            }
+                        ]
                     else:
-                        type["overloads"] = { var_name: [{ "name": name, "param": param, "ret": ret, "orig_params": var["orig_params"] }] }
+                        type["overloads"] = {
+                            var_name: [
+                                {
+                                    "name": name,
+                                    "param": param,
+                                    "ret": ret,
+                                    "orig_params": var["orig_params"],
+                                }
+                            ]
+                        }
                     print(f"    ---@field {name} {type['name']}_{name}")
                     index += 1
                     continue
@@ -824,8 +886,12 @@ for type in types:
             print(typed_params.strip())
             index = 0
             for overload in funcs:
-                if index+1 < len(funcs):
-                    overload_param = f"self, {overload['param']}" if overload["param"] != "" else "self"
+                if index + 1 < len(funcs):
+                    overload_param = (
+                        f"self, {overload['param']}"
+                        if overload["param"] != ""
+                        else "self"
+                    )
                     print(f"---@overload fun({overload_param}): {overload['ret']}")
                 else:
                     params = f"self, {params}" if params != "" else "self"
@@ -858,9 +924,9 @@ for match in match_i:
 
 print(enumStr)
 
-#EXTRA THINGS
+# EXTRA THINGS
 print(
-"""local MAX_PLAYERS = 4
+    """local MAX_PLAYERS = 4
 
 ---@alias in_port_t number
 ---@class Logic
@@ -883,28 +949,25 @@ for alias in aliases:
 sys.stdout.close()
 sys.stdout = sys.__stdout__
 
-#Replace some things
+# Replace some things
 final_replace_stuff = {
-"    ---@field menu_text_opacity number\n    ---@field menu_text_opacity number": "---@field menu_text_opacity number",
-"---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): Array<tuple<integer, integer, LAYER>>":
-"---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): integer[][]",
-
-"""---@field keysdown boolean       [] @size: 512
+    "    ---@field menu_text_opacity number\n    ---@field menu_text_opacity number": "---@field menu_text_opacity number",
+    "---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): Array<tuple<integer, integer, LAYER>>": "---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): integer[][]",
+    """---@field keysdown boolean       [] @size: 512
     ---@field keydown any @keydown
     ---@field keypressed any @keypressed
-    ---@field keyreleased any @keyreleased""":
-"""---@field keysdown boolean       [] @size: 512. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+    ---@field keyreleased any @keyreleased""": """---@field keysdown boolean       [] @size: 512. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
     ---@field keyreleased fun(key: number | string): boolean""",
-"---@field gamepad any @sol::property([](){g_WantUpdateHasGamepad=true;returnget_gamepad()/**/;})": "---@field gamepad Gamepad"
+    "---@field gamepad any @sol::property([](){g_WantUpdateHasGamepad=true;returnget_gamepad()/**/;})": "---@field gamepad Gamepad",
 }
 
-with open('./game_data/spel2.lua', 'r') as file :
-  declarations_text = file.read()
+with open("./game_data/spel2.lua", "r") as file:
+    declarations_text = file.read()
 
 for find, replacement in final_replace_stuff.items():
     declarations_text = declarations_text.replace(find, replacement)
 
-with open('./game_data/spel2.lua', 'w') as file:
-  file.write(declarations_text)
+with open("./game_data/spel2.lua", "w") as file:
+    file.write(declarations_text)

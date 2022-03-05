@@ -248,6 +248,18 @@ Name | Data | Description
 [BOTTOM_LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_LEFT) | FLOOR_SIDE::BOTTOM_LEFT | 
 [BOTTOM_RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_RIGHT) | FLOOR_SIDE::BOTTOM_RIGHT | 
 
+## GAME_SETTING
+
+
+> Search script examples for [GAME_SETTING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[DAMSEL_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.DAMSEL_STYLE) | 0 | 
+...check [game_settings.txt](game_data/game_settings.txt)... |  | 
+[CROSSPROGRESS_AUTOSYNC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.CROSSPROGRESS_AUTOSYNC) | 47 | 
+
 ## GHOST_BEHAVIOR
 
 

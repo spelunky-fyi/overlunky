@@ -1566,12 +1566,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // Set conditional bp on load_item for vine, continue executing until you get a break in a small function
-        "grow_vines"sv,
+        // Find a string "Basic systems initialized", right after it's usage (found via XREFS)
+        // stuff gets emplaced to a map, it is this map
+        "graphics_settings_map"sv,
         PatternCommandBuffer{}
-            .find_inst("\x48\x8B\x98\x00\x13\x00\x00\x41\xBF\x03\x00\x00\x00\xF3\x44"sv)
-            .at_exe()
-            .function_start(),
+            .find_after_inst("\x48\xb8\x77\x5f\x73\x63\x61\x6c\x65\x00"sv)
+            .find_inst("\x4c\x8d"sv)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        // See graphics_settings_map, then go further down and another map is used, it is this map
+        "settings_map"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\xb8\x64\x61\x6d\x73\x65\x6c\x5f\x73"sv)
+            .find_inst("\x48\x8d"sv)
+            .decode_pc()
+            .at_exe(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

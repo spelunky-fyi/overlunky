@@ -990,6 +990,10 @@ function refresh_illumination(illumination) end
 ---Removes all liquid that is about to go out of bounds, which crashes the game.
 ---@return nil
 function fix_liquid_out_of_bounds() end
+---Gets the specified setting, values might need to be interpreted differently per setting
+---@param setting GAME_SETTING
+---@return integer?
+function get_setting(setting) end
 ---Return the name of an unknown number in an enum table
 ---@param enum table
 ---@param value integer
@@ -3805,6 +3809,12 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_line fun(self, x1: number, y1: number, x2: number, y2: number, thickness: number, color: uColor): nil
     ---@field draw_rect GuiDrawContext_draw_rect
     ---@field draw_rect_filled GuiDrawContext_draw_rect_filled
+    ---@field draw_triangle fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil
+    ---@field draw_triangle_filled fun(self, p1: Vec2, p2: Vec2, p3: Vec2, color: uColor): nil
+    ---@field draw_poly fun(self, points: Vec2[], thickness: number, color: uColor): nil
+    ---@field draw_poly_filled fun(self, points: Vec2[], color: uColor): nil
+    ---@field draw_bezier_cubic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2, thickness: number, color: uColor): nil
+    ---@field draw_bezier_quadratic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil
     ---@field draw_circle fun(self, x: number, y: number, radius: number, thickness: number, color: uColor): nil
     ---@field draw_circle_filled fun(self, x: number, y: number, radius: number, color: uColor): nil
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil
@@ -6289,6 +6299,57 @@ FLOOR_SIDE = {
   TOP_RIGHT = 5
 }
 ---@alias FLOOR_SIDE integer
+GAME_SETTING = {
+  ANGRY_SHOPKEEPER = 28,
+  BRIGHTNESS = 10,
+  BRIGHT_FLASHES = 41,
+  BUTTON_PROMPTS = 30,
+  BUTTON_TEXTURE = 31,
+  CLASSIC_AGGRO_MUSIC = 29,
+  CROSSPLAY = 42,
+  CROSSPROGRESS_AUTOSYNC = 47,
+  CROSSPROGRESS_ENABLED = 46,
+  CURRENT_PROFILE = 18,
+  DAMSEL_STYLE = 20,
+  DIALOG_TEXT = 37,
+  FEAT_POPUPS = 32,
+  FREQUENCY_DENOMINATOR = 5,
+  FREQUENCY_NUMERATOR = 4,
+  GHOST_TEXT = 39,
+  HUD_SIZE = 24,
+  HUD_STYLE = 23,
+  INPUT_DELAY = 43,
+  INSTANT_RESTART = 22,
+  KALI_TEXT = 38,
+  LANGUAGE = 40,
+  LEVEL_FEELINGS = 36,
+  LEVEL_NUMBER = 27,
+  LEVEL_TIMER = 25,
+  MASTER_ENABLED = 15,
+  MASTER_VOLUME = 16,
+  MONITOR = 8,
+  MUSIC_ENABLED = 13,
+  MUSIC_VOLUME = 14,
+  OUTPUT_DELAY = 44,
+  OVERSCAN = 17,
+  PREV_LANGUAGE = 19,
+  PSEUDONYMIZATION = 45,
+  RESOLUTIONX = 2,
+  RESOLUTIONY = 3,
+  RESOLUTION_SCALE = 1,
+  SCREEN_SHAKE = 21,
+  SOUND_ENABLED = 11,
+  SOUND_VOLUME = 12,
+  TEXTBOX_DURATION = 34,
+  TEXTBOX_OPACITY = 35,
+  TEXTBOX_SIZE = 33,
+  TIMER_DETAIL = 26,
+  VFX = 9,
+  VSYNC = 7,
+  WINDOW_MODE = 6,
+  WINDOW_SCALE = 0
+}
+---@alias GAME_SETTING integer
 GHOST_BEHAVIOR = {
   MEDIUM_HAPPY = 1,
   MEDIUM_SAD = 0,

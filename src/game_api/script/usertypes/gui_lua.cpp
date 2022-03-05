@@ -88,6 +88,55 @@ void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
 {
     draw_rect_filled(rect.left, rect.top, rect.right, rect.bottom, rounding, color);
 }
+void GuiDrawContext::draw_poly(std::vector<Vec2> points, float thickness, uColor color)
+{
+    backend->draw_list->PathClear();
+    for (auto point : points)
+    {
+        ImVec2 a = screenify({point.x, point.y});
+        backend->draw_list->PathLineToMergeDuplicate(a);
+    }
+    backend->draw_list->PathStroke(color, 0, thickness);
+}
+void GuiDrawContext::draw_poly_filled(std::vector<Vec2> points, uColor color)
+{
+    backend->draw_list->PathClear();
+    for (auto point : points)
+    {
+        ImVec2 a = screenify({point.x, point.y});
+        backend->draw_list->PathLineToMergeDuplicate(a);
+    }
+    backend->draw_list->PathFillConvex(color);
+}
+void GuiDrawContext::draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float thickness, uColor color)
+{
+    ImVec2 a = screenify({p1.x, p1.y});
+    ImVec2 b = screenify({p2.x, p2.y});
+    ImVec2 c = screenify({p3.x, p3.y});
+    ImVec2 d = screenify({p4.x, p4.y});
+    backend->draw_list->AddBezierCubic(a, b, c, d, color, thickness);
+}
+void GuiDrawContext::draw_bezier_quadratic(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
+{
+    ImVec2 a = screenify({p1.x, p1.y});
+    ImVec2 b = screenify({p2.x, p2.y});
+    ImVec2 c = screenify({p3.x, p3.y});
+    backend->draw_list->AddBezierQuadratic(a, b, c, color, thickness);
+}
+void GuiDrawContext::draw_triangle(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
+{
+    ImVec2 a = screenify({p1.x, p1.y});
+    ImVec2 b = screenify({p2.x, p2.y});
+    ImVec2 c = screenify({p3.x, p3.y});
+    backend->draw_list->AddTriangle(a, b, c, color, thickness);
+}
+void GuiDrawContext::draw_triangle_filled(Vec2 p1, Vec2 p2, Vec2 p3, uColor color)
+{
+    ImVec2 a = screenify({p1.x, p1.y});
+    ImVec2 b = screenify({p2.x, p2.y});
+    ImVec2 c = screenify({p3.x, p3.y});
+    backend->draw_list->AddTriangleFilled(a, b, c, color);
+}
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
 {
     ImVec2 a = screenify({x, y});
@@ -335,6 +384,18 @@ void register_usertypes(sol::state& lua)
         draw_rect,
         "draw_rect_filled",
         draw_rect_filled,
+        "draw_triangle",
+        &GuiDrawContext::draw_triangle,
+        "draw_triangle_filled",
+        &GuiDrawContext::draw_triangle_filled,
+        "draw_poly",
+        &GuiDrawContext::draw_poly,
+        "draw_poly_filled",
+        &GuiDrawContext::draw_poly_filled,
+        "draw_bezier_cubic",
+        &GuiDrawContext::draw_bezier_cubic,
+        "draw_bezier_quadratic",
+        &GuiDrawContext::draw_bezier_quadratic,
         "draw_circle",
         &GuiDrawContext::draw_circle,
         "draw_circle_filled",
