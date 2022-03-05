@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity.hpp"
+#include "color.hpp"
 
 #include <cstdint>
 #include <string_view>

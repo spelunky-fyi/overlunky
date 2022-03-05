@@ -1,6 +1,7 @@
 #include "entities_activefloors_lua.hpp"
 
 #include "entities_activefloors.hpp"
+#include "state_structs.hpp"
 
 #include <sol/sol.hpp>
 

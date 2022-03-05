@@ -1,5 +1,10 @@
 #pragma once
 
+#include "aliases.hpp"
+
+#include <cmath>
+#include <utility>
+
 struct Color
 {
     /// Create a new color - defaults to black
@@ -8,6 +13,17 @@ struct Color
     constexpr Color(Color&&) = default;
     constexpr Color& operator=(const Color&) = default;
     constexpr Color& operator=(Color&&) = default;
+
+    /// Comparison using RGB to avoid non-precise float value
+    bool operator==(const Color& col) const
+    {
+        const auto current = get_rgba();
+        const auto compare = col.get_rgba();
+        return std::get<0>(current) == std::get<0>(compare) &&
+               std::get<1>(current) == std::get<1>(compare) &&
+               std::get<2>(current) == std::get<2>(compare) &&
+               std::get<3>(current) == std::get<3>(compare);
+    }
 
     /// Create a new color by specifying its values
     constexpr Color(float r_, float g_, float b_, float a_)
@@ -109,42 +125,43 @@ struct Color
         return Color(0.5f, 0.0f, 0.5f, 1.0f);
     }
 
-    float r{0.0f};
-    float g{0.0f};
-    float b{0.0f};
-    float a{1.0f};
-
     /// Returns RGBA colors in 0..255 range
-    std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> get_rgba()
+    std::tuple<uint8_t, uint8_t, uint8_t, uint8_t> get_rgba() const
     {
         return {toRGB(r), toRGB(g), toRGB(b), toRGB(a)};
     }
     /// Changes color based on given RGBA colors in 0..255 range
-    void set_rgba(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
+    Color& set_rgba(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
     {
         r = red / 255.0f;
         g = green / 255.0f;
         b = blue / 255.0f;
         a = alpha / 255.0f;
+        return *this;
     }
     /// Returns the `uColor` used in `GuiDrawContext` drawing functions
-    uColor get_ucolor()
+    uColor get_ucolor() const
     {
         return (toRGB(a) << 24) + (toRGB(b) << 16) + (toRGB(g) << 8) + (toRGB(r));
     }
     /// Changes color based on given uColor
-    void set_ucolor(uColor color)
+    Color& set_ucolor(const uColor color)
     {
         uint8_t red = color & 0xFF;
-        uint8_t green = (color >> 8) & 0xFF;
-        uint8_t blue = (color >> 16) & 0xFF;
-        uint8_t alpha = (color >> 24) & 0xFF;
-        set_rgba(red, green, blue, alpha);
+        uint8_t green = (color >> 8U) & 0xFF;
+        uint8_t blue = (color >> 16U) & 0xFF;
+        uint8_t alpha = (color >> 24U) & 0xFF;
+        return set_rgba(red, green, blue, alpha);
     }
 
+    float r{0.0f};
+    float g{0.0f};
+    float b{0.0f};
+    float a{1.0f};
+
   private:
-    uint8_t toRGB(float c)
+    uint8_t toRGB(const float c) const
     {
-        return static_cast<uint8_t>(round(255 * fmin(fmax(c, 0.0f), 1.0f)));
+        return static_cast<uint8_t>(std::round(255 * std::min(std::max(c, 0.0f), 1.0f)));
     }
 };

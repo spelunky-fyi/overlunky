@@ -1,7 +1,8 @@
 #include "vanilla_render_lua.hpp"
 
-#include "rpc.hpp"
+#include "render_api.hpp"
 #include "script/lua_backend.hpp"
+#include "state.hpp" // for enum_to_layer
 
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
@@ -53,7 +54,7 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color)
 {
-    auto texture = RenderAPI::get().get_texture(texture_id);
+    auto texture = get_texture(texture_id);
     if (texture == nullptr)
     {
         return;
@@ -82,7 +83,7 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& quad, Color color)
 {
-    auto texture = RenderAPI::get().get_texture(texture_id);
+    auto texture = get_texture(texture_id);
     if (texture == nullptr)
     {
         return;
@@ -122,7 +123,7 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& quad, Color color)
 {
-    auto texture = RenderAPI::get().get_texture(texture_id);
+    auto texture = get_texture(texture_id);
     if (texture == nullptr)
     {
         return;
@@ -152,7 +153,7 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)
 {
-    auto texture = RenderAPI::get().get_texture(texture_id);
+    auto texture = get_texture(texture_id);
     if (texture == nullptr)
     {
         return;

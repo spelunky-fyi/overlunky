@@ -1,6 +1,5 @@
 #include "entities_floors.hpp"
 
-#include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
 
@@ -708,8 +707,12 @@ void ForceField::activate_laserbeam(bool turn_on)
     else if (!turn_on && is_on)
     {
         is_on = false;
-        kill_entity(first_item_beam->uid);
-        kill_entity(fx->uid);
+        if (first_item_beam)
+            first_item_beam->kill(false, nullptr);
+
+        if (fx)
+            fx->kill(false, nullptr);
+
         first_item_beam = nullptr;
         fx = nullptr;
         animation_frame = 50;

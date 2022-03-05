@@ -3,14 +3,16 @@
 #include "custom_types.hpp"
 #include "drops.hpp"
 #include "entities_floors.hpp"
+#include "entities_items.hpp"
 #include "entities_liquids.hpp"
 #include "entities_mounts.hpp"
 #include "entity.hpp"
-#include "game_manager.hpp"
 #include "level_api.hpp"
-#include "logger.h"
+#include "memory.hpp"
+#include "savedata.hpp"
 #include "state.hpp"
-#include "virtual_table.hpp"
+#include "thread_utils.hpp"
+
 #include <cstdarg>
 #include <detours.h>
 #include <unordered_set>
@@ -318,143 +320,6 @@ void set_pause(uint8_t pause)
     state.set_pause(pause);
 }
 
-Screen* get_screen_ptr(uint32_t screen_id)
-{
-    auto game_manager = get_game_manager();
-    auto state = get_state_ptr();
-    switch (screen_id)
-    {
-    case 0:
-    {
-        return game_manager->screen_logo;
-    }
-    case 1:
-    {
-        return game_manager->screen_intro;
-    }
-    case 2:
-    {
-        return game_manager->screen_prologue;
-    }
-    case 3:
-    {
-        return game_manager->screen_title;
-    }
-    case 4:
-    {
-        return game_manager->screen_menu;
-    }
-    case 5:
-    {
-        return game_manager->screen_options;
-    }
-    case 6:
-    {
-        return game_manager->screen_player_profile;
-    }
-    case 7:
-    {
-        return game_manager->screen_leaderboards;
-    }
-    case 8:
-    {
-        return game_manager->screen_seed_input;
-    }
-    case 9:
-    {
-        return state->screen_character_select;
-    }
-    case 10:
-    {
-        return state->screen_team_select;
-    }
-    case 11:
-    {
-        // a screen_camp also exists in State, but its buttons flags do not work, so we use GameManager's one
-        return game_manager->screen_camp;
-    }
-    case 12:
-    {
-        // a screen_level also exists in State
-        return game_manager->screen_level;
-    }
-    case 13:
-    {
-        return state->screen_transition;
-    }
-    case 14:
-    {
-        return state->screen_death;
-    }
-    // 15 = spaceship -> the spots in State and GameManager where this should be are both nullptr -> has no UI
-    case 16:
-    {
-        return state->screen_win;
-    }
-    case 17:
-    {
-        return state->screen_credits;
-    }
-    case 18:
-    {
-        return state->screen_scores;
-    }
-    case 19:
-    {
-        return state->screen_constellation;
-    }
-    case 20:
-    {
-        return state->screen_recap;
-    }
-    case 21:
-    {
-        return state->screen_arena_menu;
-    }
-    case 22:
-    case 24:
-    {
-        return state->screen_arena_stages_select1;
-    }
-    case 23:
-    {
-        return state->screen_arena_items;
-    }
-    case 25:
-    {
-        return state->screen_arena_intro;
-    }
-    case 26:
-    {
-        // the one in GameManager has no UI entries
-        return state->screen_arena_level;
-    }
-    case 27:
-    {
-        return state->screen_arena_score;
-    }
-    case 28:
-    {
-        return game_manager->screen_online_loading;
-    }
-    case 29:
-    {
-        return game_manager->screen_online_lobby;
-    }
-    }
-    DEBUG("Screen pointer requested for unknown screen ID: {}", screen_id);
-    return nullptr;
-}
-
-Entity* get_entity_ptr(uint32_t uid)
-{
-    auto state = State::get();
-    auto p = state.find(uid);
-    if (IsBadWritePtr(p, 0x178))
-        return nullptr;
-    return p;
-}
-
 ENT_TYPE get_entity_type(uint32_t uid)
 {
     auto entity = get_entity_ptr(uid);
@@ -462,11 +327,6 @@ ENT_TYPE get_entity_type(uint32_t uid)
         return entity->type->id;
 
     return UINT32_MAX;
-}
-
-StateMemory* get_state_ptr()
-{
-    return State::get().ptr();
 }
 
 std::vector<Player*> get_players()
@@ -1235,103 +1095,6 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
     return false;
 }
 
-void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
-{
-    if (dropchance_id < (int32_t)dropchance_entries.size())
-    {
-        if (dropchance_id < 0)
-        {
-            if (dropchance_id == -1)
-                recover_mem("drop_chance");
-            return;
-        }
-        auto& entry = dropchance_entries.at(dropchance_id);
-        if (entry.offset == 0)
-        {
-            auto memory = Memory::get();
-            size_t offset = memory.at_exe(find_inst(memory.exe(), entry.pattern, get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)));
-            if (offset > memory.exe_ptr)
-            {
-                entry.offset = offset;
-            }
-        }
-
-        if (entry.offset != 0)
-        {
-            if (entry.chance_sizeof == 4)
-            {
-                write_mem_recoverable("drop_chance", entry.offset, new_drop_chance, true);
-            }
-            else if (entry.chance_sizeof == 1)
-            {
-                uint8_t value = static_cast<uint8_t>(new_drop_chance);
-                write_mem_recoverable("drop_chance", entry.offset, value, true);
-            }
-        }
-    }
-}
-
-void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
-{
-    if (drop_id < (int32_t)drop_entries.size())
-    {
-        if (drop_id < 0)
-        {
-            if (drop_id == -1)
-                recover_mem("replace_drop");
-
-            return;
-        }
-        auto& entry = drop_entries.at(drop_id);
-        if (new_drop_entity_type == 0)
-        {
-            for (int x = 0; x < 3; ++x)
-                if (entry.offsets[x])
-                    recover_mem("replace_drop", entry.offsets[x]);
-
-            return;
-        }
-        if (entry.offsets[0] == 0)
-        {
-            auto memory = Memory::get();
-            size_t offset = 0;
-            size_t exe_offset = 0;
-            const auto drop_name{"DROP." + entry.caption};
-            if (entry.vtable_offset == VTABLE_OFFSET::NONE)
-            {
-                offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : memory.after_bundle, std::nullopt, drop_name) + entry.value_offset;
-            }
-            else
-            {
-                offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset), std::nullopt, drop_name) + entry.value_offset;
-            }
-            exe_offset = memory.at_exe(offset);
-
-            for (auto x = 0; x < entry.vtable_occurrence; ++x)
-            {
-                if (exe_offset > memory.exe_ptr)
-                {
-                    entry.offsets[x] = exe_offset;
-                }
-
-                if (x + 1 < entry.vtable_occurrence)
-                {
-                    offset = find_inst(memory.exe(), entry.pattern, offset + 1) + entry.value_offset;
-                    exe_offset = memory.at_exe(offset);
-                }
-            }
-        }
-
-        if (entry.offsets[0] != 0)
-        {
-            for (auto x = 0; x < entry.vtable_occurrence; ++x)
-            {
-                write_mem_recoverable("replace_drop", entry.offsets[x], new_drop_entity_type, true);
-            }
-        }
-    }
-}
-
 ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint32_t uid)
 {
     static size_t offset = 0;
@@ -1662,53 +1425,6 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
     {
         auto state = get_state_ptr();
         return state->waddler_storage[slot];
-    }
-    return 0;
-}
-
-uint8_t enum_to_layer(const LAYER layer)
-{
-    if (layer == LAYER::FRONT)
-        return 0;
-    else if (layer == LAYER::BACK)
-        return 1;
-    else if ((int)layer < -MAX_PLAYERS)
-        return 0;
-    else if (layer < LAYER::FRONT)
-    {
-        auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
-        if (player != nullptr)
-        {
-            return player->layer;
-        }
-    }
-    return 0;
-}
-
-uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position)
-{
-    if (layer == LAYER::FRONT)
-    {
-        player_position = {0.0f, 0.0f};
-        return 0;
-    }
-    else if (layer == LAYER::BACK)
-    {
-        player_position = {0.0f, 0.0f};
-        return 1;
-    }
-    else if ((int)layer < -MAX_PLAYERS)
-        return 0;
-    else if (layer < LAYER::FRONT)
-    {
-        auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
-        if (player != nullptr)
-        {
-            player_position = player->position();
-            return player->layer;
-        }
     }
     return 0;
 }

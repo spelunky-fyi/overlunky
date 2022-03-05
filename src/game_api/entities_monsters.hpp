@@ -3,6 +3,7 @@
 #include "entities_chars.hpp"
 #include "movable.hpp"
 #include "particles.hpp"
+
 #include <cstdint>
 
 class Monster : public PowerupCapable

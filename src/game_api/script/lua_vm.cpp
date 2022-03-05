@@ -9,6 +9,7 @@
 #include "level_api.hpp"
 #include "online.hpp"
 #include "rpc.hpp"
+#include "savedata.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
 #include "strings.hpp"

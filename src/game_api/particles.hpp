@@ -1,6 +1,7 @@
 #pragma once
 
-#include "texture.hpp"
+struct Texture;
+
 #include <cstdint>
 #include <string>
 #include <vector>

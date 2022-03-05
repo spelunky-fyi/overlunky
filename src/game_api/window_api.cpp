@@ -11,7 +11,7 @@
 #include <chrono>
 
 #include "logger.h"
-#include "state.hpp"
+#include "memory.hpp"
 
 IDXGISwapChain* g_SwapChain{nullptr};
 ID3D11Device* g_Device{nullptr};

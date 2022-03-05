@@ -3,6 +3,9 @@
 #include "movable.hpp"
 #include <cstdint>
 
+struct Illumination;
+struct PlayerInputs;
+
 class Ai
 {
   public:

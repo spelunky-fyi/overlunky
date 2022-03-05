@@ -13,11 +13,10 @@
 #include "color.hpp"
 #include "layer.hpp"
 #include "math.hpp"
-#include "memory.hpp"
-#include "state_structs.hpp"
 
 struct RenderInfo;
 struct Texture;
+struct Illumination;
 
 enum class REPEAT_TYPE : uint8_t
 {
@@ -503,3 +502,4 @@ std::tuple<float, float> get_velocity(uint32_t uid);
 AABB get_hitbox(uint32_t uid, bool use_render_pos);
 
 struct EntityFactory* entity_factory();
+Entity* get_entity_ptr(uint32_t uid);

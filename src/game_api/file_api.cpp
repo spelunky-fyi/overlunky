@@ -7,7 +7,6 @@
 #include <detours.h>
 
 #include "game_allocator.hpp"
-#include "logger.h"
 #include "memory.hpp"
 #include "util.hpp"
 #include "window_api.hpp"
