@@ -958,7 +958,9 @@ void spawn_entities(bool s, std::string list = "")
                 if (old_block_id != -1)
                 {
                     auto old_block = get_entity_ptr(old_block_id);
-                    old_block->destroy();
+
+                    if (old_block) // grid entities can be messed up if you move them with mouse etc.
+                        old_block->destroy();
                 }
             }
             int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap);
