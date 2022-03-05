@@ -1536,7 +1536,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        // Set conditional bp on KEY spawn, execute til return, scroll up untill you find instruction writing const into r14
+        // Set conditional bp on load_item for KEY, execute til return, scroll up untill you find instruction writing const into r14
         "waddler_drop_array"sv,
         PatternCommandBuffer{}
             .find_after_inst("\x45\x0F\x57\xDB\x4C\x8D\x35"sv)
@@ -1565,6 +1565,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(-0x1)
             .decode_call()
             .at_exe(),
+    },
+    {
+        // Set conditional bp on load_item for vine, continue executing until you get a break in a small function
+        "grow_vines"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8B\x98\x00\x13\x00\x00\x41\xBF\x03\x00\x00\x00\xF3\x44"sv)
+            .at_exe()
+            .function_start(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
