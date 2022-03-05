@@ -4,6 +4,9 @@
 
 class Entity;
 
+constexpr uint32_t g_level_max_x = 0x56;
+constexpr uint32_t g_level_max_y = 0x7e;
+
 struct EntityList
 {
     Entity** ent_list;
@@ -123,8 +126,8 @@ struct Layer
 
     std::map<int32_t, size_t> unknown_map; // some movable and liquids and something else maybe?, key is uid
 
-    Entity* grid_entities[0x7e][0x56];
-    EntityList entities_overlaping_grid[0x7e][0x56]; // static entities (like midbg, decorations) that overlap this grid position
+    Entity* grid_entities[g_level_max_y][g_level_max_x];
+    EntityList entities_overlaping_grid[g_level_max_y][g_level_max_x]; // static entities (like midbg, decorations) that overlap this grid position
 
     EntityList unknown_entities2;
     EntityList entities_by_draw_depth[53];

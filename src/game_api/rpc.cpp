@@ -1774,7 +1774,7 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
             const uint32_t ix = static_cast<uint32_t>(offset.first + x + 0.5f);
             const uint32_t iy = static_cast<uint32_t>(offset.second + y + 0.5f);
 
-            if (ix < 0x56 && iy < 0x7e)
+            if (ix < g_level_max_x && iy < g_level_max_y)
             {
                 state.layer(entity->layer)->grid_entities[grid_y][grid_x] = nullptr;
                 entity->teleport_abs(static_cast<float>(ix), static_cast<float>(iy), 0, 0);
