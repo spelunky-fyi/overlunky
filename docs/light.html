@@ -12882,77 +12882,334 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#CustomTheme">CustomTheme</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CustomTheme">new(int theme_id_, int base_theme_, bool defaults)</a></td>
+<td>Create a new theme with an id and base theme, overriding defaults. Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp">theme functions that are default enabled here</a>.</td>
+</tr>
+<tr>
+<td><a href="#CustomTheme">CustomTheme</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CustomTheme">new(int theme_id_, int base_theme_)</a></td>
+<td>Create a new theme with defaults.</td>
+</tr>
+<tr>
+<td><a href="#CustomTheme">CustomTheme</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CustomTheme">new()</a></td>
+<td>Create a new theme with base dwelling and id 100.</td>
+</tr>
+<tr>
+<td>string</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_file">level_file</a></td>
+<td>Level file to load. Probably doesn&#39;t do much in custom themes, especially if you&#39;re forcing them in PRE_LOAD_LEVEL_FILES.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=theme">theme</a></td>
+<td>Theme index. Probably shouldn&#39;t collide with the vanilla ones. Purpose unknown.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=base_theme">base_theme</a></td>
+<td>Base <a href="#THEME">THEME</a> to load enabled functions from, when no other theme is specified.</td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sub_theme">sub_theme</a></td>
+<td></td>
+</tr>
+<tr>
+<td>map&lt;<a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a>, int&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=textures">textures</a></td>
+<td>Add TEXTUREs here to override different dynamic textures.</td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=override">override</a></td>
+<td><code>override(THEME_OVERRIDE override, bool enabled)</code> To disable or enable theme functions using the base_theme.<br/><code>override(THEME_OVERRIDE override, THEME theme)</code> To override a theme function with another theme.<br/><code>override(THEME_OVERRIDE override, function func)</code> To override a theme function with a lua function.<br/></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pre">pre(THEME_OVERRIDE index, function func_)</a></td>
+<td>Set a callback to be called before this theme function.</td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post">post(THEME_OVERRIDE index, function func_)</a></td>
+<td>Set a callback to be called after this theme function, to fix some changes it did for example.</td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown1">unknown1</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown2">unknown2</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown3">unknown3</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown4">unknown4</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_unknown1">get_unknown1()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_flags">init_flags()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_level">init_level()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v4">unknown_v4()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v5">unknown_v5()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_rooms">add_special_rooms()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v7">unknown_v7()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v8">unknown_v8()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_vault">add_vault()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_coffin">add_coffin()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_feeling">add_special_feeling()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v12">unknown_v12()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_level">spawn_level()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_border">spawn_border()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_level">post_process_level()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_traps">spawn_traps()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_entities">post_process_entities()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_procedural">spawn_procedural()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_background">spawn_background()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_lights">spawn_lights()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_transition">spawn_transition()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_transition">post_transition()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_players">spawn_players()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_effects">spawn_effects()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>string</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_level_file">get_level_file()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_theme_id">get_theme_id()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_base_id">get_base_id()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type">get_floor_spreading_type()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type2">get_floor_spreading_type2()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v30">unknown_v30()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_transition_block_modifier">get_transition_block_modifier()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v32">unknown_v32()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backwall_type">get_backwall_type()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_border_type">get_border_type()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_critter_type">get_critter_type()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_liquid_gravity">get_liquid_gravity()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_player_damage">get_player_damage()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v38">unknown_v38()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backlayer_lut">get_backlayer_lut()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backlayer_light_level">get_backlayer_light_level()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_loop">get_loop()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_vault_level">get_vault_level()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_unknown_1_or_2">get_unknown_1_or_2(int index)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(int texture_id)</a></td>
+<td>Add TEXTUREs to <code>textures</code> to override different dynamic textures easily.</td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pre_transition">pre_transition()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_level_height">get_level_height()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v47">unknown_v47()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration">spawn_decoration()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration2">spawn_decoration2()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_extra">spawn_extra()</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v51">unknown_v51()</a></td>
 <td></td>
 </tr>
 </tbody></table>
-
-<p>Create a new theme with an id and base theme, overriding defaults. Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp">theme functions that are default enabled here</a>.
-<a href="#CustomTheme">CustomTheme</a> | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CustomTheme">new(int theme_id_, int base_theme_)</a> | Create a new theme with defaults.
-<a href="#CustomTheme">CustomTheme</a> | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CustomTheme">new()</a> | Create a new theme with base dwelling and id 100.
-string | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_file">level_file</a> | Level file to load. Probably doesn&#39;t do much in custom themes, especially if you&#39;re forcing them in PRE_LOAD_LEVEL_FILES.
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=theme">theme</a> | Theme index. Probably shouldn&#39;t collide with the vanilla ones. Purpose unknown.
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=base_theme">base_theme</a> | Base <a href="#THEME">THEME</a> to load enabled functions from, when no other theme is specified.
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sub_theme">sub_theme</a> | 
-map&lt;<a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a>, int&gt; | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=textures">textures</a> | Add TEXTUREs here to override different dynamic textures.
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=override">override</a> | <code>override(THEME_OVERRIDE override, bool enabled)</code> To disable or enable theme functions using the base_theme.<br/><code>override(THEME_OVERRIDE override, THEME theme)</code> To override a theme function with another theme.<br/><code>override(THEME_OVERRIDE override, function func)</code> To override a theme function with a lua function.<br/></p>
-
-<p>| <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pre">pre(THEME_OVERRIDE index, function func_)</a> | Set a callback to be called before this theme function.
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post">post(THEME_OVERRIDE index, function func_)</a> | Set a callback to be called after this theme function, to fix some changes it did for example.
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown1">unknown1</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown2">unknown2</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown3">unknown3</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown4">unknown4</a> | 
-bool | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_unknown1">get_unknown1()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_flags">init_flags()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_level">init_level()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v4">unknown_v4()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v5">unknown_v5()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_rooms">add_special_rooms()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v7">unknown_v7()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v8">unknown_v8()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_vault">add_vault()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_coffin">add_coffin()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_feeling">add_special_feeling()</a> | 
-bool | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v12">unknown_v12()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_level">spawn_level()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_border">spawn_border()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_level">post_process_level()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_traps">spawn_traps()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_entities">post_process_entities()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_procedural">spawn_procedural()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_background">spawn_background()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_lights">spawn_lights()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_transition">spawn_transition()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_transition">post_transition()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_players">spawn_players()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_effects">spawn_effects()</a> | 
-string | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_level_file">get_level_file()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_theme_id">get_theme_id()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_base_id">get_base_id()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type">get_floor_spreading_type()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type2">get_floor_spreading_type2()</a> | 
-bool | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v30">unknown_v30()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_transition_block_modifier">get_transition_block_modifier()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v32">unknown_v32()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backwall_type">get_backwall_type()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_border_type">get_border_type()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_critter_type">get_critter_type()</a> | 
-float | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_liquid_gravity">get_liquid_gravity()</a> | 
-bool | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_player_damage">get_player_damage()</a> | 
-bool | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v38">unknown_v38()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backlayer_lut">get_backlayer_lut()</a> | 
-float | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backlayer_light_level">get_backlayer_light_level()</a> | 
-bool | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_loop">get_loop()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_vault_level">get_vault_level()</a> | 
-bool | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_unknown_1_or_2">get_unknown_1_or_2(int index)</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(int texture_id)</a> | Add TEXTUREs to <code>textures</code> to override different dynamic textures easily.
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pre_transition">pre_transition()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_level_height">get_level_height()</a> | 
-int | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v47">unknown_v47()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration">spawn_decoration()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration2">spawn_decoration2()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_extra">spawn_extra()</a> | 
- | <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v51">unknown_v51()</a> | </p>
 <h3 id='ThemeInfo'>ThemeInfo</h3>
 <table><thead>
 <tr>
