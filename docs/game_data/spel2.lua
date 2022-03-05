@@ -1074,6 +1074,16 @@ function render_screen_particles(particle_emitter) end
 ---@param particle_emitter ParticleEmitterInfo
 ---@return nil
 function extinguish_particles(particle_emitter) end
+---Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
+---Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
+---Base THEME to load enabled functions from, when no other theme is specified.
+---Add TEXTUREs here to override different dynamic textures.
+---Set a callback to be called before this theme function.
+---Set a callback to be called after this theme function, to fix some changes it did for example.
+---Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
+---Create a new theme with defaults.
+---Create a new theme with base dwelling and id 100.
+---Add TEXTUREs to `textures` to override different dynamic textures easily.
 ---Default function in spawn definitions to check whether a spawn is valid or not
 ---@param x number
 ---@param y number
@@ -1190,7 +1200,7 @@ function force_co_subtheme(subtheme) end
 ---@param config LEVEL_CONFIG
 ---@return integer
 function get_level_config(config) end
----Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
+---Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Check ThemeInfo for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
 ---Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
 ---@return nil
@@ -4684,15 +4694,18 @@ function Color.new(self, Color) end
 function Color.new(self, r_, g_, b_, a_) end
 
 CustomTheme = nil
+---Create a new theme with an id and base theme, overriding defaults. Check [theme fun(): anys that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
 ---@param theme_id_ integer
 ---@param base_theme_ integer
 ---@param defaults boolean
 ---@return CustomTheme
 function CustomTheme.new(self, theme_id_, base_theme_, defaults) end
+---Create a new theme with defaults.
 ---@param theme_id_ integer
 ---@param base_theme_ integer
 ---@return CustomTheme
 function CustomTheme.new(self, theme_id_, base_theme_) end
+---Create a new theme with base dwelling and id 100.
 ---@return CustomTheme
 function CustomTheme.new(self) end
 
