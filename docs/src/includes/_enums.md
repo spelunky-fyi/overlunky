@@ -475,7 +475,7 @@ Name | Data | Description
 [LOGICAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LOGICAL) | 0x1000 | All LOGICAL_* entities<br/>Also includes: ITEM_POWERUP_*, FX_COMPASS, FX_SPECIALCOMPASS, FX_LEADER_FLAG, FX_PLAYERINDICATOR, FX_PLAYERINDICATORPORTRAIT<br/>Various types, all `Entity`<br/>
 [WATER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.WATER) | 0x2000 | Only: LIQUID_WATER, LIQUID_COARSE_WATER, LIQUID_IMPOSTOR_LAKE<br/>Various types, all `Entity`<br/>
 [LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) | 0x4000 | Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA<br/>Various types, all `Entity`<br/>
-[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for (MASK.WATER | MASK.LAVA)<br/>
+[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for ([MASK](#MASK).WATER | [MASK](#MASK).LAVA)<br/>
 [ANY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ANY) | 0x0 | Value of 0, treated by all the functions as ANY mask<br/>
 
 ## ON
@@ -517,7 +517,7 @@ Name | Data | Description
 [FRAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.FRAME) | ON::FRAME | Runs while playing the game while the player is controllable, not in the base camp or the arena mode<br/>
 [GAMEFRAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GAMEFRAME) | ON::GAMEFRAME | Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen<br/>
 [SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCREEN) | ON::SCREEN | Runs whenever state.screen changes<br/>
-[START](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.START) | ON::START | Runs on the first ON.SCREEN of a run<br/>
+[START](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.START) | ON::START | Runs on the first [ON](#ON).[SCREEN](#SCREEN) of a run<br/>
 [LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOADING) | ON::LOADING | 
 [RESET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RESET) | ON::RESET | Runs when resetting a run<br/>
 [SAVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SAVE) | ON::SAVE | Params: `SaveContext save_ctx`<br/>Runs at the same times as ON.SCREEN, but receives the save_ctx<br/>

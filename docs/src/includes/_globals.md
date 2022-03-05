@@ -88,10 +88,6 @@ Table of options set in the UI, added with the [register_option_functions](#regi
 
 > Search script examples for [prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prng)
 
-[PRNG](#PRNG) (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
-The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
-The used buffer is determined by [PRNG_CLASS](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
-If you don't care what part of the game you affect just use `prng.random`.
 The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
 # Functions
 The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
@@ -2417,8 +2413,6 @@ Force current subtheme used in the CO theme. You can pass a [CustomTheme](#Custo
 
 #### nil force_custom_theme()
 
-Customizable [ThemeInfo](#ThemeInfo) with ability to override certain theming functions from different themes or write custom functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
-Overrides for different [CustomTheme](#CustomTheme) functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
 Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a [CustomTheme](#CustomTheme), [ThemeInfo](#ThemeInfo) or [THEME](#THEME).
 
 ### get_co_subtheme

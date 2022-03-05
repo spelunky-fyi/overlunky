@@ -155,34 +155,34 @@ class ThemeInfo
 
     virtual bool get_unknown1() = 0;
 
-    // dwelling,tidepool: unset levelgen.flags.flag12
-    // jungle,volcana.olmec,icecaves,neobab,cog,duat,abzu,tiamat,eggplant,hundun,basecamp,arena: nop
-    // temple: unset levelgen.flags.flag10 + calculate chance of grasshopper critter spawn
-    // sunken: unset levelgen.flags.flag9, 10, 17, 18 + if state.level == 1 -> unset flag 11
-    // cosmic: calls same virtual on its sub_theme
+    /// dwelling,tidepool: unset levelgen.flags.flag12
+    /// jungle,volcana.olmec,icecaves,neobab,cog,duat,abzu,tiamat,eggplant,hundun,basecamp,arena: nop
+    /// temple: unset levelgen.flags.flag10 + calculate chance of grasshopper critter spawn
+    /// sunken: unset levelgen.flags.flag9, 10, 17, 18 + if state.level == 1 -> unset flag 11
+    /// cosmic: calls same virtual on its sub_theme
     // ???
     virtual void init_flags() = 0;
 
-    // does random calculations and calls function to determine the start room in most themes
+    /// does random calculations and calls function to determine the start room in most themes
     // ???
     virtual void init_level() = 0;
 
-    // most themes call the same function, some check whether they are in CO
+    /// most themes call the same function, some check whether they are in CO
     virtual void unknown_v4() = 0;
 
     virtual void unknown_v5() = 0;
 
-    // dwelling: does stuff when level == 4 or udjat present
-    // jungle: when black market present
-    // volcana: when drill present
-    // touches the rooms and sometimes the meta info about the rooms
+    /// dwelling: does stuff when level == 4 or udjat present
+    /// jungle: when black market present
+    /// volcana: when drill present
+    /// touches the rooms and sometimes the meta info about the rooms
     // ???
     virtual void add_special_rooms() = 0;
 
-    // can't trigger, dwelling (quillback) and abzu do something special (arena just returns)
+    /// can't trigger, dwelling (quillback) and abzu do something special (arena just returns)
     virtual void unknown_v7() = 0;
 
-    // does something depending on levelgen.data.unknown7
+    /// does something depending on levelgen.data.unknown7
     virtual void unknown_v8() = 0;
 
     // ???
@@ -191,28 +191,28 @@ class ThemeInfo
     // ???
     virtual void add_coffin() = 0;
 
-    // metal clanking and air of oppression
+    /// metal clanking and air of oppression
     virtual void add_special_feeling() = 0;
 
     // Note: Inserted somewhere between init_flags and spawn_level
     virtual bool unknown_v12() = 0;
 
-    // spawns all floor etc tiles based on the room layout
-    // disable this and only the player is spawned in the level
+    /// spawns all floor etc tiles based on the room layout
+    /// disable this and only the player is spawned in the level
     virtual void spawn_level() = 0;
 
-    // spawns CO: teleportingborder / Duat: dust / theme specific border tiles around the level
+    /// spawns CO: teleportingborder / Duat: dust / theme specific border tiles around the level
     virtual void spawn_border() = 0;
 
-    // volcana: checks if state.coffin_contents = cocovondiamonds -> chooses one of the four coffins in vlad's castle at random to put her in
-    // tidepool: spawns impostor lake, some door and a litwalltorch, ...
-    // neobab: assigns the correct animation_frame to all the ushabtis
-    // co, arena: forwards to the same virtual of the sub_theme
-    // abzu, tiamat: spawns impostor lake
+    /// volcana: checks if state.coffin_contents = cocovondiamonds -> chooses one of the four coffins in vlad's castle at random to put her in
+    /// tidepool: spawns impostor lake, some door and a litwalltorch, ...
+    /// neobab: assigns the correct animation_frame to all the ushabtis
+    /// co, arena: forwards to the same virtual of the sub_theme
+    /// abzu, tiamat: spawns impostor lake
     // ???
     virtual void post_process_level() = 0;
 
-    // adds theme specific random traps and pushblocks
+    /// adds theme specific random traps and pushblocks
     // quillback: adds butterflies and snails + configures the door to go to the correct theme/level
     // olmec: same thing but crabs and grasshoppers
     // temple: spawns COG door
@@ -220,111 +220,110 @@ class ThemeInfo
     // other themes also do stuff, but nothing seemingly important
     virtual void spawn_traps() = 0;
 
-    // pleasure palace: applies correct texture to ladders and ladder platforms
-    // sunken city: randomly adds ENT_TYPE_DECORATION_SUNKEN_BRIDGE between entities (the slimy bridges)
-    // hundun: calls sunken city virtual, so has slimy bridges
+    /// pleasure palace: applies correct texture to ladders and ladder platforms
+    /// sunken city: randomly adds ENT_TYPE_DECORATION_SUNKEN_BRIDGE between entities (the slimy bridges)
+    /// hundun: calls sunken city virtual, so has slimy bridges
     // co: does nothing, so no slimy bridges in CO sunken city levels! (forgotten/bug?)
     virtual void post_process_entities() = 0;
 
-    // adds legs under platforms, random pots, goldbars, procedural spawns, compass indicator...
+    /// adds legs under platforms, random pots, goldbars, procedural spawns, compass indicator...
     virtual void spawn_procedural() = 0;
 
-    // adds a background, e.g. CO stars / Duat moon / Plain backwall for other themes
+    /// adds a background, e.g. CO stars / Duat moon / Plain backwall for other themes
     virtual void spawn_background() = 0;
 
-    // adds extra light where needed, e.g. in the udjat chest room, or the top layer of the black market: spawns ENT_TYPE_LOGICAL_ROOM_LIGHT
+    /// adds extra light where needed, e.g. in the udjat chest room, or the top layer of the black market: spawns ENT_TYPE_LOGICAL_ROOM_LIGHT
     virtual void spawn_lights() = 0;
 
-    // spawns a transition tunnel to the level
+    /// spawns a transition tunnel to the level
     virtual void spawn_transition() = 0;
 
-    // unsets flag 1 (Reset) of state.quest_flags
-    // sets the correct state.screen (0xC)
-    // sets state.ingame to true, adjust fade values and starts loading
+    /// unsets flag 1 (Reset) of state.quest_flags
+    /// sets the correct state.screen (0xC)
+    /// sets state.ingame to true, adjust fade values and starts loading
     virtual void post_transition() = 0;
 
-    // spawns the player(s) in the world, along with what they were holding
+    /// spawns the player(s) in the world, along with what they were holding
     virtual void spawn_players() = 0;
 
-    // when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail
-    // this actually also sets the camera bounds and various theme specific special effects
-    // also spawns / sets the conditions for osiris, jelly, orbs...
-    // also makes curse pots spawn the ghost
+    /// when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail
+    /// this actually also sets the camera bounds and various theme specific special effects
+    /// also spawns / sets the conditions for osiris, jelly, orbs...
+    /// also makes curse pots spawn the ghost
     virtual void spawn_effects() = 0;
 
-    // the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
+    /// the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
     virtual const char* get_level_file() = 0;
 
-    // for co: returns sub_theme->get_theme_id()
+    /// for co: returns sub_theme->get_theme_id()
     virtual uint8_t get_theme_id() = 0;
 
-    // whereas get_theme_id() returns a unique id for all ThemeInfo's, this function returns the id of the theme it logically belongs to
-    // e.g. theme_abzu->get_base_id() = 5 (tide_pool) as opposed to theme_abzu->get_theme_id() = 13 (abzu)
+    /// whereas get_theme_id() returns a unique id for all ThemeInfo's, this function returns the id of the theme it logically belongs to
+    /// e.g. theme_abzu->get_base_id() = 5 (tide_pool) as opposed to theme_abzu->get_theme_id() = 13 (abzu)
     virtual uint8_t get_base_id() = 0;
 
-    // all themes return 4 (ENT_TYPE_FLOOR_GENERIC), except:
-    // temple: 104 (ENT_TYPE_FLOORSTYLED_TEMPLE)
-    // neobab: 106 (ENT_TYPE_FLOORSTYLED_BABYLON)
-    // sunken: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
-    // cog: 110 (ENT_TYPE_FLOORSTYLED_COG)
-    // duat: 112 (ENT_TYPE_FLOORSTYLED_DUAT)
-    // hundun: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
-    // strangely, it's only applied to an odd block here and there (floorspreading)
+    /// all themes return 4 (ENT_TYPE_FLOOR_GENERIC), except:
+    /// temple: 104 (ENT_TYPE_FLOORSTYLED_TEMPLE)
+    /// neobab: 106 (ENT_TYPE_FLOORSTYLED_BABYLON)
+    /// sunken: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
+    /// cog: 110 (ENT_TYPE_FLOORSTYLED_COG)
+    /// duat: 112 (ENT_TYPE_FLOORSTYLED_DUAT)
+    /// hundun: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
     virtual uint32_t get_floor_spreading_type() = 0;
 
-    // similar to get_floor_spreading_type(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE) (floorspreading)
+    /// similar to get_floor_spreading_type(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE)
     virtual uint32_t get_floor_spreading_type2() = 0;
 
-    // all return false, except olmec, temple, neobab, cog, duat
+    /// all return false, except olmec, temple, neobab, cog, duat
     virtual bool unknown_v30() = 0;
 
-    // determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme
-    // returns 85 by default, except for: olmec: 15, cog: 23
+    /// determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme
+    /// returns 85 by default, except for: olmec: 15, cog: 23
     virtual uint32_t get_transition_block_modifier() = 0;
 
     virtual uint32_t unknown_v32() = 0;
 
-    // always returns 778 ENT_TYPE_BG_LEVEL_BACKWALL
+    /// always returns 778 ENT_TYPE_BG_LEVEL_BACKWALL
     virtual uint32_t get_backwall_type() = 0;
 
-    // returns ENT_TYPE_FLOOR_BORDERTILE by default, except:
-    // neobab ENT_TYPE_FLOOR_BORDERTILE_METAL
-    // sunken ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS
-    // duat ENT_TYPE_FLOOR_DUSTWALL
-    // tiamat ENT_TYPE_FLOOR_BORDERTILE_METAL
-    // hundun ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS
+    /// returns ENT_TYPE_FLOOR_BORDERTILE by default, except:
+    /// neobab ENT_TYPE_FLOOR_BORDERTILE_METAL
+    /// sunken ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS
+    /// duat ENT_TYPE_FLOOR_DUSTWALL
+    /// tiamat ENT_TYPE_FLOOR_BORDERTILE_METAL
+    /// hundun ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS
     virtual uint32_t get_border_type() = 0;
 
     virtual uint32_t get_critter_type() = 0;
 
-    // returns -1.0 (downwards) by default, except for sunken/hundun 1.0 (upwards); applies to both lava and water
+    /// returns -1.0 (downwards) by default, except for sunken/hundun 1.0 (upwards); applies to both lava and water
     virtual float get_liquid_gravity() = 0;
 
-    // used to make the player invincible in basecamp (but does an OOB check)
-    // if you return false in other themes you are invincible except for crushing deaths, and you do still experience knockback and stun
+    /// used to make the player invincible in basecamp (but does an OOB check)
+    /// if you return false in other themes you are invincible except for crushing deaths, and you do still experience knockback and stun
     virtual bool get_player_damage() = 0;
 
-    // returns true by default, except CO, duat (these also have no bg, but don't know if related)
+    /// returns true by default, except CO, duat (these also have no bg, but don't know if related)
     virtual bool unknown_v38() = 0;
 
-    // returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
+    /// returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
     virtual uint32_t get_backlayer_lut() = 0;
 
-    // a value between 0.0 (default) and 1.0 used to illuminate (backlayer) locations
-    // depending on camera level (thus player y-level), the brightness is increased gradually
-    // used in black market, vlad's castle, ice caves backlayer, pleasure palace
-    // for tiamat: the value is always 1.0 for full backlayer global illumination (ship)
+    /// a value between 0.0 (default) and 1.0 used to illuminate (backlayer) locations
+    /// depending on camera level (thus player y-level), the brightness is increased gradually
+    /// used in black market, vlad's castle, ice caves backlayer, pleasure palace
+    /// for tiamat: the value is always 1.0 for full backlayer global illumination (ship)
     virtual float get_backlayer_light_level() = 0;
 
-    // this is used for CO (checks that player is in the level, not in the transition)
-    // if enabled in another theme, it adds an extra border and if you zoom out, you see the level loop if you move to the side
+    /// this is used for CO (checks that player is in the level, not in the transition)
+    /// if enabled in another theme, it adds an extra border and if you zoom out, you see the level loop if you move to the side
     virtual bool get_loop() = 0;
 
-    // not 100% sure, this is used in a random calculation that determines whether a vault spawns
-    // looks to be the highest level a vault can spawn; it's mostly 3 or 4, but for neobab it's 1, which makes sense
+    /// not 100% sure, this is used in a random calculation that determines whether a vault spawns
+    /// looks to be the highest level a vault can spawn; it's mostly 3 or 4, but for neobab it's 1, which makes sense
     virtual uint8_t get_vault_level() = 0;
 
-    // index == 0 ? return unknown1 : return unknown2
+    /// index == 0 ? return unknown1 : return unknown2
     virtual bool get_unknown_1_or_2(uint8_t index) = 0;
 
     // e.g. for dwelling:
@@ -335,38 +334,38 @@ class ThemeInfo
     // texture_id == -8 -> returns 120 DECO_CAVE_0
     // texture_id == -10 -> returns 369 COFFINS_0
     // ...
-    // the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number
-    // that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)
+    /// the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number
+    /// that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)
     virtual uint32_t get_dynamic_texture(int32_t texture_id) = 0;
 
-    // manipulates state.level_next, world_next and theme_next; triggers when exiting a level
-    // for dwelling, it just increments level_next because the world/theme choice is made by which door you pick
-    // for jungle/volcana, it checks whether it's on the fourth level, if so, sets theme_next (4), world_next (3) and level_next (1) correctly for olmec
-    // for CO it checks whether the next level is 99, and set state.win_state to 3 to finish the game
+    /// manipulates state.level_next, world_next and theme_next; triggers when exiting a level
+    /// for dwelling, it just increments level_next because the world/theme choice is made by which door you pick
+    /// for jungle/volcana, it checks whether it's on the fourth level, if so, sets theme_next (4), world_next (3) and level_next (1) correctly for olmec
+    /// for CO it checks whether the next level is 99, and set state.win_state to 3 to finish the game
     virtual void pre_transition() = 0;
 
-    // default = return state.h - 1
-    // for special levels (black market, vlad, ...) fixed heights are returned
+    /// default = return state.h - 1
+    /// for special levels (black market, vlad, ...) fixed heights are returned
     virtual uint32_t get_level_height() = 0;
 
-    // returns a value that appears to affect room generation and is based on current world,level
+    /// returns a value that appears to affect room generation and is based on current world,level
     virtual uint32_t unknown_v47() = 0;
 
-    // used e.g. in Vlad's castle to insert the big banner in the center with the two demon statues
-    // also implemented for neobab (i think in the zoos)
-    // might do other things as well
+    /// used e.g. in Vlad's castle to insert the big banner in the center with the two demon statues
+    /// also implemented for neobab (i think in the zoos)
+    /// might do other things as well
     virtual void spawn_decoration() = 0;
 
-    // dwelling: adds the decal above the udjat chest
-    // jungle: adds the colorful jungle flowers on top of the blocks
-    // does lots of other things as well, not sure about difference between this and spawn_decoration
+    /// dwelling: adds the decal above the udjat chest
+    /// jungle: adds the colorful jungle flowers on top of the blocks
+    /// does lots of other things as well, not sure about difference between this and spawn_decoration
     virtual void spawn_decoration2() = 0;
 
-    // dwelling udjat level: adds the key in random place
-    // vlad's castle: adds decorative banners
-    // tidepool: adds hanging seaweed, red lanterns, ...
-    // temple: adds temple sand deco, ...
-    // neobab: adds neon signs, hanging wires, ...
+    /// dwelling udjat level: adds the key in random place
+    /// vlad's castle: adds decorative banners
+    /// tidepool: adds hanging seaweed, red lanterns, ...
+    /// temple: adds temple sand deco, ...
+    /// neobab: adds neon signs, hanging wires, ...
     virtual void spawn_extra() = 0;
 
     virtual void unknown_v51() = 0;
