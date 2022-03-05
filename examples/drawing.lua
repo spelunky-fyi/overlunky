@@ -22,6 +22,10 @@ set_callback(function(draw_ctx)
     sx, sy = screen_position(x-0.5, y-0.5)
     sx2, sy2 = screen_position(x+0.5, y+0.5)
     draw_ctx:draw_line(sx, sy, sx2, sy2, 3, rgba(255, 0, 0, 255))
+    p1x, p1y = screen_position(x, y+0.42)
+    p2x, p2y = screen_position(x-0.42, y-0.42)
+    p3x, p3y = screen_position(x+0.42, y-0.42)
+    draw_ctx:draw_triangle(Vec2:new(p1x, p1y), Vec2:new(p2x, p2y), Vec2:new(p3x, p3y), 2, rgba(255, 0, 255, 128))
 end, ON.GUIFRAME)
 
 -- custom yellow rounded hitbox
@@ -67,9 +71,8 @@ set_callback(function(draw_ctx)
         draw_ctx:draw_rect(sx, sy, sx2, sy2, 2, 10, rgba(255, 0, 255, 255))
 
         px, py = screen_position(x, y)
-        if #points < 4 then points[#points + 1] = Vec2:new(px, py) end
+        points[#points + 1] = Vec2:new(px, py)
     end
-    draw_ctx:draw_bezier(points, 4, rgba(255, 0, 255, 128))
     draw_ctx:draw_poly_filled(points, rgba(0, 255, 0, 40))
 end, ON.GUIFRAME)
 
