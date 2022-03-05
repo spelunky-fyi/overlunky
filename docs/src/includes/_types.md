@@ -2201,6 +2201,7 @@ float | [source_top_right_y](https://github.com/spelunky-fyi/overlunky/search?l=
 
 
 > Very basic example how to use a CustomTheme in the procedural levels. Search the examples or check [Eternal Flame of Gehenna](https://spelunky.fyi/mods/m/gehenna/) for custom levels.
+
 ```lua
 -- create a new theme based on dwelling
 local my_theme = CustomTheme:new()
@@ -2222,6 +2223,7 @@ end, ON.PRE_LOAD_LEVEL_FILES)
 ```
 
 > You can call theme functions from other themes, for example to make all growable tile codes work in your theme:
+
 ```lua
 local custom = CustomTheme:new()
 custom:post(THEME_OVERRIDE.SPAWN_LEVEL, function()
