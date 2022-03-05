@@ -22,6 +22,10 @@ set_callback(function(draw_ctx)
     sx, sy = screen_position(x-0.5, y-0.5)
     sx2, sy2 = screen_position(x+0.5, y+0.5)
     draw_ctx:draw_line(sx, sy, sx2, sy2, 3, rgba(255, 0, 0, 255))
+    p1x, p1y = screen_position(x, y+0.42)
+    p2x, p2y = screen_position(x-0.42, y-0.42)
+    p3x, p3y = screen_position(x+0.42, y-0.42)
+    draw_ctx:draw_triangle(Vec2:new(p1x, p1y), Vec2:new(p2x, p2y), Vec2:new(p3x, p3y), 2, rgba(255, 0, 255, 128))
 end, ON.GUIFRAME)
 
 -- custom yellow rounded hitbox
@@ -53,7 +57,8 @@ end, ON.GUIFRAME)
 set_callback(function(draw_ctx)
     if #players < 1 then return end
     px, py, pl = get_position(players[1].uid)
-    ents = get_entities_by_type(ENT_TYPE.LOGICAL_DOOR)
+    ents = get_entities_by(ENT_TYPE.LOGICAL_DOOR, MASK.LOGICAL, pl)
+    points = {}
     for i,v in ipairs(ents) do
         x, y, l = get_position(v)
         e = get_entity(v)
@@ -64,7 +69,11 @@ set_callback(function(draw_ctx)
         sx, sy = screen_position(x-e.hitboxx+e.offsetx, y+e.hitboxy+e.offsety) -- top left
         sx2, sy2 = screen_position(x+e.hitboxx+e.offsetx, y-e.hitboxy+e.offsety) -- bottom right
         draw_ctx:draw_rect(sx, sy, sx2, sy2, 2, 10, rgba(255, 0, 255, 255))
+
+        px, py = screen_position(x, y)
+        points[#points + 1] = Vec2:new(px, py)
     end
+    draw_ctx:draw_poly_filled(points, rgba(0, 255, 0, 40))
 end, ON.GUIFRAME)
 
 -- hilight shop walls

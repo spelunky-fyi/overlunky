@@ -3805,6 +3805,12 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_line fun(self, x1: number, y1: number, x2: number, y2: number, thickness: number, color: uColor): nil
     ---@field draw_rect GuiDrawContext_draw_rect
     ---@field draw_rect_filled GuiDrawContext_draw_rect_filled
+    ---@field draw_triangle fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil
+    ---@field draw_triangle_filled fun(self, p1: Vec2, p2: Vec2, p3: Vec2, color: uColor): nil
+    ---@field draw_poly fun(self, points: Vec2[], thickness: number, color: uColor): nil
+    ---@field draw_poly_filled fun(self, points: Vec2[], color: uColor): nil
+    ---@field draw_bezier_cubic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2, thickness: number, color: uColor): nil
+    ---@field draw_bezier_quadratic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil
     ---@field draw_circle fun(self, x: number, y: number, radius: number, thickness: number, color: uColor): nil
     ---@field draw_circle_filled fun(self, x: number, y: number, radius: number, color: uColor): nil
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil
