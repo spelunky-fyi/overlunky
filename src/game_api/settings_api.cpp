@@ -118,7 +118,14 @@ std::vector<std::pair<std::string_view, GAME_SETTING>> get_settings_names_and_in
         auto* settings_map = (std::map<GAME_SETTING, SettingData>*)get_address("settings_map");
         for (auto& [setting, data] : *settings_map)
         {
-            names_and_indices.push_back({data.setting_name, setting});
+            if (strstr(data.setting_name, "damsel"))
+            {
+                names_and_indices.push_back({"pet_style", setting});
+            }
+            else
+            {
+                names_and_indices.push_back({data.setting_name, setting});
+            }
             assert(!indices.contains(setting));
         }
     }
