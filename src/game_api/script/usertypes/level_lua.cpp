@@ -1109,6 +1109,13 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->data->level_config[config];
     };
 
+    auto grow_vines = sol::overload(
+        static_cast<void (*)(LAYER, int)>(::grow_vines),
+        static_cast<void (*)(LAYER, int, AABB, bool)>(::grow_vines));
+
+    /// Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
+    lua["grow_vines"] = grow_vines;
+
     lua.new_usertype<ThemeInfo>(
         "ThemeInfo",
         "sub_theme",

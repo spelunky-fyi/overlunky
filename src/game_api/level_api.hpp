@@ -518,6 +518,9 @@ void add_next_levels(std::vector<std::string> next_levels);
 int8_t get_co_subtheme();
 void force_co_subtheme(int8_t subtheme);
 
+void grow_vines(LAYER l, int max_lengh);
+void grow_vines(LAYER l, int max_lengh, AABB area, bool destroy_broken);
+
 enum class DYNAMIC_TEXTURE : int32_t
 {
     INVISIBLE = -2,
