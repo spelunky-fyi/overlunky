@@ -1,6 +1,5 @@
 #include "hitbox_lua.hpp"
 
-#include "entity.hpp"
 #include "rpc.hpp"
 
 #include <sol/sol.hpp>

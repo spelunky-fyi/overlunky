@@ -4,11 +4,9 @@
 #include <iostream>
 #include <thread>
 
-#include "logger.h"
-#include "memory.h"
+#include "entity.hpp"
 #include "render_api.hpp"
 #include "search.hpp"
-#include "state.hpp"
 #include "ui.hpp"
 #include "version.hpp"
 #include "window_api.hpp"

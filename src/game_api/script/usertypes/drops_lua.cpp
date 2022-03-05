@@ -1,7 +1,6 @@
 #include "drops_lua.hpp"
 
 #include "drops.hpp"
-#include "rpc.hpp"
 
 #include <sol/sol.hpp>
 

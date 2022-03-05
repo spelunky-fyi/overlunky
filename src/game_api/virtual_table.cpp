@@ -1,5 +1,4 @@
 #include "virtual_table.hpp"
-#include "logger.h"
 #include "memory.hpp"
 
 size_t get_virtual_function_address(VTABLE_OFFSET table_entry, uint32_t function_index)

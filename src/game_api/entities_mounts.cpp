@@ -1,5 +1,7 @@
 #include "entities_mounts.hpp"
 
+#include "memory.hpp"
+
 void Mount::carry(Movable* rider)
 {
     using Carry = void(Entity*, Entity*);

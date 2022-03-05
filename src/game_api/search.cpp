@@ -7,7 +7,6 @@
 
 #include <algorithm>
 
-#include "logger.h"
 #include "memory.hpp"
 #include "virtual_table.hpp"
 

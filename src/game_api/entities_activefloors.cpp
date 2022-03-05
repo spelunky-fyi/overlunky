@@ -1,5 +1,6 @@
 #include "entities_activefloors.hpp"
-#include "rpc.hpp"
+
+#include "memory.hpp"
 
 uint8_t Olmec::broken_floaters()
 {

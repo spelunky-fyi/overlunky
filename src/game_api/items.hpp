@@ -1,8 +1,9 @@
 #pragma once
 
-#include "entities_chars.hpp"
 #include "entity.hpp"
 #include "state_structs.hpp"
+
+class Player;
 
 struct Items
 {

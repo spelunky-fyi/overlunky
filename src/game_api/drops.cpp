@@ -1,6 +1,6 @@
 #include "drops.hpp"
+
 #include "memory.hpp"
-#include "search.hpp"
 
 #include <iostream>
 
@@ -289,6 +289,103 @@ std::vector<DropChanceEntry> dropchance_entries{
     {"UFO_PARACHUTE", "\xE8\x03\x00\x00"s, VTABLE_OFFSET::MONS_UFO, 78},
     {"YETI_PITCHERSMITT", "\xE8\x03\x00\x00"s, VTABLE_OFFSET::MONS_YETI, 3},
 };
+
+void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
+{
+    if (dropchance_id < (int32_t)dropchance_entries.size())
+    {
+        if (dropchance_id < 0)
+        {
+            if (dropchance_id == -1)
+                recover_mem("drop_chance");
+            return;
+        }
+        auto& entry = dropchance_entries.at(dropchance_id);
+        if (entry.offset == 0)
+        {
+            auto memory = Memory::get();
+            size_t offset = memory.at_exe(find_inst(memory.exe(), entry.pattern, get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)));
+            if (offset > memory.exe_ptr)
+            {
+                entry.offset = offset;
+            }
+        }
+
+        if (entry.offset != 0)
+        {
+            if (entry.chance_sizeof == 4)
+            {
+                write_mem_recoverable("drop_chance", entry.offset, new_drop_chance, true);
+            }
+            else if (entry.chance_sizeof == 1)
+            {
+                uint8_t value = static_cast<uint8_t>(new_drop_chance);
+                write_mem_recoverable("drop_chance", entry.offset, value, true);
+            }
+        }
+    }
+}
+
+void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
+{
+    if (drop_id < (int32_t)drop_entries.size())
+    {
+        if (drop_id < 0)
+        {
+            if (drop_id == -1)
+                recover_mem("replace_drop");
+
+            return;
+        }
+        auto& entry = drop_entries.at(drop_id);
+        if (new_drop_entity_type == 0)
+        {
+            for (int x = 0; x < 3; ++x)
+                if (entry.offsets[x])
+                    recover_mem("replace_drop", entry.offsets[x]);
+
+            return;
+        }
+        if (entry.offsets[0] == 0)
+        {
+            auto memory = Memory::get();
+            size_t offset = 0;
+            size_t exe_offset = 0;
+            const auto drop_name{"DROP." + entry.caption};
+            if (entry.vtable_offset == VTABLE_OFFSET::NONE)
+            {
+                offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : memory.after_bundle, std::nullopt, drop_name) + entry.value_offset;
+            }
+            else
+            {
+                offset = find_inst(memory.exe(), entry.pattern, offset ? offset + 1 : get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset), std::nullopt, drop_name) + entry.value_offset;
+            }
+            exe_offset = memory.at_exe(offset);
+
+            for (auto x = 0; x < entry.vtable_occurrence; ++x)
+            {
+                if (exe_offset > memory.exe_ptr)
+                {
+                    entry.offsets[x] = exe_offset;
+                }
+
+                if (x + 1 < entry.vtable_occurrence)
+                {
+                    offset = find_inst(memory.exe(), entry.pattern, offset + 1) + entry.value_offset;
+                    exe_offset = memory.at_exe(offset);
+                }
+            }
+        }
+
+        if (entry.offsets[0] != 0)
+        {
+            for (auto x = 0; x < entry.vtable_occurrence; ++x)
+            {
+                write_mem_recoverable("replace_drop", entry.offsets[x], new_drop_entity_type, true);
+            }
+        }
+    }
+}
 
 #ifdef PERFORM_DROPS_TEST
 void test_drops()

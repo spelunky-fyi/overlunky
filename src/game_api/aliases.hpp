@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 using CallbackId = uint32_t;
 using Flags = uint32_t;
@@ -23,6 +24,7 @@ using SHORT_TILE_CODE = uint8_t;
 using STRINGID = uint32_t;
 
 inline constexpr uint8_t MAX_PLAYERS = 4;
+const std::u16string no_return_str = u"~[:NO_RETURN:]#";
 
 enum class LAYER : int32_t
 {
@@ -34,4 +36,22 @@ enum class LAYER : int32_t
     PLAYER3 = -3,
     PLAYER4 = -4,
     BOTH = -128
+};
+
+enum class JournalPageType
+{
+    Progress,
+    JournalMenu,
+    Places,
+    People,
+    Bestiary,
+    Items,
+    Traps,
+    Story,
+    Feats,
+    DeathCause,
+    DeathMenu,
+    Recap,
+    PlayerProfile,
+    LastGamePlayed,
 };

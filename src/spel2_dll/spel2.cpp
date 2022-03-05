@@ -3,7 +3,7 @@
 #include "character_def.hpp"
 #include "console.hpp"
 #include "file_api.hpp"
-#include "render_api.hpp"
+#include "memory.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
@@ -409,11 +409,11 @@ int64_t Spelunky_DefineTexture(Spelunky_TextureDefinition texture_defintion)
         texture_defintion.sub_image_width,
         texture_defintion.sub_image_height,
     };
-    return RenderAPI::get().define_texture(real_texture_defintion);
+    return define_texture(real_texture_defintion);
 }
 void Spelunky_ReloadTexture(const char* texture_path)
 {
-    RenderAPI::get().reload_texture(texture_path);
+    reload_texture(texture_path);
 }
 
 int64_t SpelunkyEntity_GetTexture(Entity* entity)

@@ -1,7 +1,8 @@
-#include "savedata.hpp"
+#include "render_api.hpp"
 #include "screen.hpp"
-#include "screen_arena.hpp"
 #include "thread_utils.hpp"
+
+struct SaveData;
 
 struct JournalPopupUI
 {

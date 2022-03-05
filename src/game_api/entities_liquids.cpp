@@ -1,4 +1,5 @@
 #include "entities_liquids.hpp"
+
 #include "state.hpp"
 
 uint32_t Liquid::get_liquid_flags()

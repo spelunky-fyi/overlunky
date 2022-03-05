@@ -1,14 +1,13 @@
 #include "spawn_api.hpp"
 
+#include "entities_chars.hpp"
 #include "entities_liquids.hpp"
 #include "entities_monsters.hpp"
 #include "entity.hpp"
-#include "layer.hpp"
 #include "level_api.hpp"
-#include "logger.h"
 #include "memory.hpp"
 #include "prng.hpp"
-#include "rpc.hpp"
+#include "state.hpp"
 #include "util.hpp"
 
 #include "script/events.hpp"
