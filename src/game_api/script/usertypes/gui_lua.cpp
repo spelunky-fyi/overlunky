@@ -88,6 +88,44 @@ void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
 {
     draw_rect_filled(rect.left, rect.top, rect.right, rect.bottom, rounding, color);
 }
+void GuiDrawContext::draw_poly(std::vector<Vec2> points, float thickness, uColor color)
+{
+    backend->draw_list->PathClear();
+    for (auto point : points)
+    {
+        ImVec2 a = screenify({point.x, point.y});
+        backend->draw_list->PathLineToMergeDuplicate(a);
+    }
+    backend->draw_list->PathStroke(color, 0, thickness);
+}
+void GuiDrawContext::draw_poly_filled(std::vector<Vec2> points, uColor color)
+{
+    backend->draw_list->PathClear();
+    for (auto point : points)
+    {
+        ImVec2 a = screenify({point.x, point.y});
+        backend->draw_list->PathLineToMergeDuplicate(a);
+    }
+    backend->draw_list->PathFillConvex(color);
+}
+void GuiDrawContext::draw_bezier(std::vector<Vec2> points, float thickness, uColor color)
+{
+    if (points.size() == 3)
+    {
+        ImVec2 a = screenify({points[0].x, points[0].y});
+        ImVec2 b = screenify({points[1].x, points[1].y});
+        ImVec2 c = screenify({points[2].x, points[2].y});
+        backend->draw_list->AddBezierQuadratic(a, b, c, color, thickness);
+    }
+    else if (points.size() == 4)
+    {
+        ImVec2 a = screenify({points[0].x, points[0].y});
+        ImVec2 b = screenify({points[1].x, points[1].y});
+        ImVec2 c = screenify({points[2].x, points[2].y});
+        ImVec2 d = screenify({points[3].x, points[3].y});
+        backend->draw_list->AddBezierCubic(a, b, c, d, color, thickness);
+    }
+}
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
 {
     ImVec2 a = screenify({x, y});
@@ -335,6 +373,12 @@ void register_usertypes(sol::state& lua)
         draw_rect,
         "draw_rect_filled",
         draw_rect_filled,
+        "draw_poly",
+        &GuiDrawContext::draw_poly,
+        "draw_poly_filled",
+        &GuiDrawContext::draw_poly_filled,
+        "draw_bezier",
+        &GuiDrawContext::draw_bezier,
         "draw_circle",
         &GuiDrawContext::draw_circle,
         "draw_circle_filled",

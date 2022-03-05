@@ -3,6 +3,7 @@
 #include <sol/forward.hpp>
 
 #include <string>
+#include <vector>
 
 #include "aliases.hpp"
 #include "math.hpp"
@@ -24,6 +25,12 @@ class GuiDrawContext
     void draw_rect_filled(float left, float top, float right, float bottom, float rounding, uColor color);
     /// Draws a filled rectangle on screen from top-left to bottom-right.
     void draw_rect_filled(AABB rect, float rounding, uColor color);
+    /// Draws a polyline on screen.
+    void draw_poly(std::vector<Vec2> points, float thickness, uColor color);
+    /// Draws a filled convex polyline on screen.
+    void draw_poly_filled(std::vector<Vec2> points, uColor color);
+    /// Draws a cubic (4 points) or quadratic (3 points) bezier curve on screen.
+    void draw_bezier(std::vector<Vec2> points, float thickness, uColor color);
     /// Draws a circle on screen
     void draw_circle(float x, float y, float radius, float thickness, uColor color);
     /// Draws a filled circle on screen
