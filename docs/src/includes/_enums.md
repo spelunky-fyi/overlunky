@@ -258,7 +258,7 @@ Name | Data | Description
 ---- | ---- | -----------
 [DAMSEL_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.DAMSEL_STYLE) | 0 | 
 ...check [game_settings.txt](game_data/game_settings.txt)... |  | 
-[CURRENT_LAYER2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.CURRENT_LAYER2) | 37 | 
+[CROSSPROGRESS_AUTOSYNC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.CROSSPROGRESS_AUTOSYNC) | 47 | 
 
 ## GHOST_BEHAVIOR
 
