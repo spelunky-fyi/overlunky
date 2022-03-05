@@ -3,12 +3,11 @@
 #include "entities_monsters.hpp"
 #include "entity.hpp"
 #include "game_allocator.hpp"
-#include "layer.hpp"
-#include "logger.h"
 #include "memory.hpp"
 #include "prng.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
+#include "state.hpp"
 #include "util.hpp"
 #include "vtable_hook.hpp"
 

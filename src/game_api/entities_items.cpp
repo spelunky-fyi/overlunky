@@ -1,5 +1,6 @@
 #include "entities_items.hpp"
-#include "rpc.hpp"
+
+#include "vtable_hook.hpp"
 
 void ParachutePowerup::deploy()
 {
@@ -22,4 +23,28 @@ void ParachutePowerup::deploy()
         hitboxy = 0.285f;
         duckmask = 2143944961; // hehe funny number
     }
+}
+
+void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.on_open.empty())
+    {
+        hook_vtable<void(Container*, Movable*)>(
+            this,
+            [](Container* self, Movable* opener, void (*original)(Container*, Movable*))
+            {
+                if (opener->movey > 0)
+                {
+                    EntityHooksInfo& _hook_info = self->get_hooks();
+                    for (auto& [id, on_open] : _hook_info.on_open)
+                    {
+                        on_open(self, opener);
+                    }
+                }
+                original(self, opener);
+            },
+            0x18);
+    }
+    hook_info.on_open.push_back({reserved_callback_id, std::move(on_open)});
 }

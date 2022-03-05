@@ -2,9 +2,7 @@
 
 #include "game_allocator.hpp"
 #include "level_api_types.hpp"
-#include "rpc.hpp"
-#include "spawn_api.hpp"
-#include "state.hpp"
+#include "math.hpp"
 
 #include <cstdint>
 #include <optional>

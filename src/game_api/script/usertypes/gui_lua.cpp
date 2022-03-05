@@ -3,12 +3,10 @@
 #include "file_api.hpp"
 #include "script/lua_backend.hpp"
 #include "script/script_util.hpp"
-#include "state.hpp"
+#include "window_api.hpp"
 
 #include <imgui.h>
 #include <sol/sol.hpp>
-
-#include "logger.h"
 
 #include <xinput.h>
 typedef DWORD(WINAPI* PFN_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*);

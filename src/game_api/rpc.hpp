@@ -1,8 +1,11 @@
 #pragma once
 
-#include "entities_chars.hpp"
-#include "screen.hpp"
-#include "state.hpp"
+#include "entity.hpp"
+
+class Player;
+struct SaveData;
+struct ParticleEmitterInfo;
+struct Illumination;
 
 #include <cstdint>
 #include <functional>
@@ -30,11 +33,8 @@ void set_entity_flags2(uint32_t uid, uint32_t flags);
 void set_level_flags(uint32_t flags);
 uint32_t get_level_flags();
 void set_pause(uint8_t pause);
-Screen* get_screen_ptr(uint32_t screen_id);
-Entity* get_entity_ptr(uint32_t uid);
 ENT_TYPE get_entity_type(uint32_t uid);
 int get_entity_ai_state(uint32_t uid);
-StateMemory* get_state_ptr();
 std::vector<Player*> get_players();
 std::pair<float, float> click_position(float x, float y);
 std::pair<float, float> screen_position(float x, float y);
@@ -94,8 +94,6 @@ void force_olmec_phase_0(bool b);
 void set_ghost_spawn_times(uint32_t normal = 10800, uint32_t cursed = 9000);
 void set_time_ghost_enabled(bool b);
 void set_time_jelly_enabled(bool b);
-void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance);
-void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type);
 ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint32_t uid);
 ParticleEmitterInfo* generate_screen_particles(uint32_t particle_emitter_id, float x, float y);
 void advance_screen_particles(ParticleEmitterInfo* particle_emitter);
@@ -117,8 +115,6 @@ void waddler_remove_entity(ENT_TYPE entity_type, uint8_t amount_to_remove = 99);
 int16_t waddler_get_entity_meta(uint8_t slot);
 void waddler_set_entity_meta(uint8_t slot, int16_t meta);
 uint32_t waddler_entity_type_in_slot(uint8_t slot);
-uint8_t enum_to_layer(const LAYER layer);
-uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
 bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE find);
 std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types);
 void enter_door(int32_t player_uid, int32_t door_uid);

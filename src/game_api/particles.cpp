@@ -1,7 +1,6 @@
 #include "particles.hpp"
-#include "logger.h"
 #include "memory.hpp"
-#include "render_api.hpp"
+#include "texture.hpp"
 
 ParticleDB* particle_db_ptr()
 {
@@ -15,7 +14,7 @@ std::uint64_t ParticleDB::get_texture()
 }
 bool ParticleDB::set_texture(std::uint32_t texture_id)
 {
-    if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
+    if (auto* new_texture = ::get_texture(texture_id))
     {
         texture = new_texture;
         return true;

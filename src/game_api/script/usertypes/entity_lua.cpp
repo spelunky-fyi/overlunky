@@ -1,6 +1,7 @@
 #include "entity_lua.hpp"
+
+#include "color.hpp"
 #include "custom_types.hpp"
-#include "entity.hpp"
 #include "movable.hpp"
 
 #include <sol/sol.hpp>
@@ -12,6 +13,8 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<Color>(
         "Color",
         sol::constructors<Color(), Color(const Color&), Color(float, float, float, float)>{},
+        sol::meta_function::equal_to,
+        &Color::operator==,
         "r",
         &Color::r,
         "g",

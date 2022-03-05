@@ -1,9 +1,9 @@
-#include "entity.hpp"
-
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 
 #include <string>
+
+class Entity;
 
 using Toast = void (*)(wchar_t*);
 Toast get_toast();

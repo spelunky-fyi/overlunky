@@ -1,7 +1,7 @@
 #include "entities_fx_lua.hpp"
 
 #include "entities_fx.hpp"
-#include "entity.hpp"
+#include "state_structs.hpp"
 
 #include <sol/sol.hpp>
 

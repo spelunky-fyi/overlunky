@@ -1,12 +1,10 @@
 #pragma once
 #include "aliases.hpp"
-#include "game_allocator.hpp"
-#include "memory.hpp"
 
 #include <string>
 #include <string_view>
 
-const std::u16string no_return_str = u"~[:NO_RETURN:]#";
+extern const std::map<uint32_t, STRINGID> string_hashes;
 
 void strings_init();
 const char16_t** get_strings_table();

@@ -22,6 +22,7 @@ if not os.path.exists("src/includes"):
 header_files = [
     "../src/game_api/math.hpp",
     "../src/game_api/rpc.hpp",
+    "../src/game_api/drops.hpp",
     "../src/game_api/spawn_api.hpp",
     "../src/game_api/script.hpp",
     "../src/game_api/color.hpp",
@@ -43,6 +44,7 @@ header_files = [
     "../src/game_api/entities_decorations.hpp",
     "../src/game_api/entities_logical.hpp",
     "../src/game_api/sound_manager.hpp",
+    "../src/game_api/texture.hpp",
     "../src/game_api/render_api.hpp",
     "../src/game_api/particles.hpp",
     "../src/game_api/savedata.hpp",

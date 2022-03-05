@@ -1,8 +1,9 @@
 #pragma once
 
-#include "state_structs.hpp"
 #include <array>
 #include <cstdint>
+
+#include "state_structs.hpp"
 
 #pragma pack(push, 1)
 

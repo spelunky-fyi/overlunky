@@ -2,6 +2,7 @@
 
 #include "entities_items.hpp" // for UnknownPointerGroup
 #include "entity.hpp"
+
 #include <array>
 #include <cstdint>
 

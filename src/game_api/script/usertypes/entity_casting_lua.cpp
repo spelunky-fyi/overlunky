@@ -1,10 +1,5 @@
 #include "entity_casting_lua.hpp"
 
-#include "entities_items.hpp"
-#include "entities_monsters.hpp"
-#include "entities_mounts.hpp"
-#include "entity.hpp"
-
 namespace NEntityCasting
 {
 void register_usertypes(sol::state& lua)

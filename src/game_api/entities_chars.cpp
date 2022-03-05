@@ -1,5 +1,8 @@
 #include "entities_chars.hpp"
+
 #include "character_def.hpp"
+#include "entities_items.hpp"
+#include "memory.hpp"
 #include "rpc.hpp"
 
 void PowerupCapable::remove_powerup(ENT_TYPE powerup_type)
@@ -48,6 +51,32 @@ std::vector<ENT_TYPE> PowerupCapable::get_powerups()
         return_powerups.push_back(it.first);
     }
     return return_powerups;
+}
+
+uint8_t Player::kapala_blood_amount()
+{
+    static auto kapalaPowerupID = to_id("ENT_TYPE_ITEM_POWERUP_KAPALA");
+    for (auto item : items.entities())
+    {
+        if (item->type->id == kapalaPowerupID)
+        {
+            return item->as<KapalaPowerup>()->amount_of_blood;
+        }
+    }
+    return 0;
+}
+
+void Player::set_jetpack_fuel(uint8_t fuel)
+{
+    static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
+    for (auto item : items.entities())
+    {
+        if (item->type->id == jetpackID)
+        {
+            item->as<Jetpack>()->fuel = fuel;
+            break;
+        }
+    }
 }
 
 void PowerupCapable::unequip_backitem()

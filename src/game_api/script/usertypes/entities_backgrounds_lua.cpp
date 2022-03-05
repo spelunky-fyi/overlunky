@@ -1,7 +1,7 @@
 #include "entities_backgrounds_lua.hpp"
 
 #include "entities_backgrounds.hpp"
-#include "entity.hpp"
+#include "state_structs.hpp"
 
 #include <sol/sol.hpp>
 

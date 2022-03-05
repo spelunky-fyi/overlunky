@@ -1,16 +1,13 @@
 #pragma once
 
 #include "items.hpp"
-#include "layer.hpp"
-#include "memory.hpp"
-#include "savedata.hpp"
 #include "screen.hpp"
 #include "screen_arena.hpp"
 #include "state_structs.hpp"
-#include "thread_utils.hpp"
 
 const float ZF = 0.737f;
 
+struct SaveData;
 struct Layer;
 struct LevelGenSystem;
 class ThemeInfo;
@@ -198,6 +195,8 @@ struct StateMemory
 };
 #pragma pack(pop)
 
+StateMemory* get_state_ptr();
+
 struct State
 {
     size_t location;
@@ -252,20 +251,9 @@ struct State
         ptr()->pause = p;
     }
 
-    uint32_t get_frame_count()
-    {
-        return read_u32((size_t)ptr() - 0xd0);
-    }
+    uint32_t get_frame_count() const;
 
-    std::vector<int64_t> read_prng()
-    {
-        std::vector<int64_t> prng;
-        for (int i = 0; i < 20; ++i)
-        {
-            prng.push_back(read_i64((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
-        }
-        return prng;
-    }
+    std::vector<int64_t> read_prng() const;
 
     Entity* find(uint32_t uid);
 
@@ -276,3 +264,6 @@ struct State
     SaveData* savedata();
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
 };
+
+uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
+uint8_t enum_to_layer(const LAYER layer);

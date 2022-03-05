@@ -1,17 +1,14 @@
 #include "entity.hpp"
+#include "movable.hpp"
 
 #include <cstdio>
 #include <string>
 #include <vector>
 
-#include "character_def.hpp"
-#include "entities_items.hpp"
-#include "logger.h"
-#include "render_api.hpp"
-#include "rpc.hpp"
-#include "spawn_api.hpp"
+#include "entities_chars.hpp"
+#include "memory.hpp"
 #include "state.hpp"
-#include "texture.hpp"
+#include "thread_utils.hpp"
 #include "vtable_hook.hpp"
 
 using namespace std::chrono_literals;
@@ -245,32 +242,6 @@ void Entity::remove_item(uint32_t item_uid)
         remove_item_ptr(entity);
 }
 
-void Player::set_jetpack_fuel(uint8_t fuel)
-{
-    static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
-    for (auto item : items.entities())
-    {
-        if (item->type->id == jetpackID)
-        {
-            item->as<Jetpack>()->fuel = fuel;
-            break;
-        }
-    }
-}
-
-uint8_t Player::kapala_blood_amount()
-{
-    static auto kapalaPowerupID = to_id("ENT_TYPE_ITEM_POWERUP_KAPALA");
-    for (auto item : items.entities())
-    {
-        if (item->type->id == kapalaPowerupID)
-        {
-            return item->as<KapalaPowerup>()->amount_of_blood;
-        }
-    }
-    return 0;
-}
-
 void Movable::poison(int16_t frames)
 {
     static size_t offset_first = 0;
@@ -451,7 +422,7 @@ TEXTURE Entity::get_texture()
 }
 bool Entity::set_texture(TEXTURE texture_id)
 {
-    if (auto* new_texture = RenderAPI::get().get_texture(texture_id))
+    if (auto* new_texture = ::get_texture(texture_id))
     {
         apply_texture(new_texture);
         return true;
@@ -633,30 +604,6 @@ bool Entity::is_liquid()
     return false;
 }
 
-void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.on_open.empty())
-    {
-        hook_vtable<void(Container*, Movable*)>(
-            this,
-            [](Container* self, Movable* opener, void (*original)(Container*, Movable*))
-            {
-                if (opener->movey > 0)
-                {
-                    EntityHooksInfo& _hook_info = self->get_hooks();
-                    for (auto& [id, on_open] : _hook_info.on_open)
-                    {
-                        on_open(self, opener);
-                    }
-                }
-                original(self, opener);
-            },
-            0x18);
-    }
-    hook_info.on_open.push_back({reserved_callback_id, std::move(on_open)});
-}
-
 void Entity::set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1)
 {
     EntityHooksInfo& hook_info = get_hooks();
@@ -723,4 +670,13 @@ std::span<uint32_t> Entity::get_items()
         return std::span<uint32_t>(items.uids().begin(), items.uids().end());
 
     return {};
+}
+
+Entity* get_entity_ptr(uint32_t uid)
+{
+    auto state = State::get();
+    auto p = state.find(uid);
+    if (IsBadWritePtr(p, 0x178))
+        return nullptr;
+    return p;
 }

@@ -383,7 +383,7 @@ void hook_savegame()
     {
         register_on_write_to_file([](const char* backup_file, const char* file, void* data, size_t data_size, WriteToFileOrig* original)
                                   {
-                                      if (file == "savegame.sav"sv and options["disable_savegame"])
+                                      if (strcmp(file, "savegame.sav") == 0 and options["disable_savegame"])
                                           return;
                                       original(backup_file, file, data, data_size); });
         savegame_hooked = true;
@@ -4858,7 +4858,7 @@ void render_entity_props(int uid, bool detached = false)
     if (ImGui::CollapsingHeader("Color, Size, Texture"))
     {
         std::string textureid = g_Console.get()->execute(fmt::format("return get_entity({}):get_texture()", uid));
-        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture())", uid));
+        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid));
         // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid));
         texture = texture.substr(1, texture.length() - 2);
         // texturepath = texturepath.substr(1, texturepath.length() - 2);

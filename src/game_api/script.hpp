@@ -12,7 +12,8 @@
 
 #include <imgui.h>
 
-#include "entities_chars.hpp"
+struct PlayerInputs;
+class Ai;
 
 ImVec2 screenify(ImVec2 pos);
 float screenify(float dis);
