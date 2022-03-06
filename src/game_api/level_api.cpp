@@ -1906,46 +1906,52 @@ void force_co_subtheme(int8_t subtheme)
     }
 }
 
-void grow_vines(LAYER l, int max_lengh)
+void grow_vines(LAYER l, uint32_t max_lengh)
 {
     grow_vines(l, max_lengh, {0, 0, 0, 0}, false);
 }
 
-void grow_vines(LAYER l, int max_lengh, AABB area, bool destroy_broken)
+void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
 {
     area.abs();
 
-    const auto state = State::get();
+    const auto state = State::get().ptr();
     const static auto grow_vine = to_id("ENT_TYPE_FLOOR_GROWABLE_VINE");
     const static auto tree_vine = to_id("ENT_TYPE_FLOOR_VINE_TREE_TOP");
     const static auto vine = to_id("ENT_TYPE_FLOOR_VINE");
     const auto actual_layer = enum_to_layer(l);
 
-    const int start_x = static_cast<int>(area.left + 0.5f);
-    int end_x = static_cast<int>(area.right + 0.5f);
-    const int start_y = static_cast<int>(area.bottom + 0.5f);
-    int end_y = static_cast<int>(area.top + 0.5f);
+    const uint32_t start_x = static_cast<uint32_t>(area.left + 0.5f);
+    uint32_t end_x = static_cast<uint32_t>(area.right + 0.5f);
+    const uint32_t start_y = static_cast<uint32_t>(area.bottom + 0.5f);
+    uint32_t end_y = static_cast<uint32_t>(area.top + 0.5f);
 
     if (start_x >= g_level_max_x || start_y >= g_level_max_y)
         return;
 
-    if (end_x >= g_level_max_x || end_x == 0)
+    if (end_x == 0)
+        end_x = state->w * 10 + 6;
+
+    if (end_y == 0)
+        end_y = g_level_max_y - (state->h * 8 + 6);
+
+    if (end_x >= g_level_max_x)
         end_x = g_level_max_x - 1;
 
-    if (end_y >= g_level_max_y || end_y == 0)
+    if (end_y >= g_level_max_y)
         end_y = g_level_max_y - 1;
 
-    for (int i_x = start_x; i_x <= end_x; ++i_x)
+    for (uint32_t i_x = start_x; i_x <= end_x; ++i_x)
     {
-        for (int i_y = end_y; i_y >= start_y; --i_y)
+        for (uint32_t i_y = end_y; i_y >= start_y; --i_y)
         {
-            auto test_ent = state.layer(actual_layer)->grid_entities[i_y][i_x];
+            auto test_ent = state->layers[actual_layer]->grid_entities[i_y][i_x];
             if (!test_ent || !test_ent->type)
                 continue;
 
             if (test_ent->type->id == grow_vine || test_ent->type->id == tree_vine)
             {
-                if (i_y - 2 < 0 || state.layer(actual_layer)->grid_entities[i_y - 1][i_x] != nullptr || state.layer(actual_layer)->grid_entities[i_y - 2][i_x] != nullptr)
+                if (i_y - 2 < 0 || state->layers[actual_layer]->grid_entities[i_y - 1][i_x] != nullptr || state->layers[actual_layer]->grid_entities[i_y - 2][i_x] != nullptr)
                 {
                     if (destroy_broken)
                         test_ent->destroy();
@@ -1958,9 +1964,9 @@ void grow_vines(LAYER l, int max_lengh, AABB area, bool destroy_broken)
                 }
                 --i_y;
                 int32_t last_uid = -1;
-                for (int max = i_y - max_lengh; i_y > max && i_y >= 0; --i_y)
+                for (uint32_t max = i_y - max_lengh; i_y > max && i_y >= 0; --i_y)
                 {
-                    if (state.layer(actual_layer)->grid_entities[i_y - 1][i_x] != nullptr)
+                    if (state->layers[actual_layer]->grid_entities[i_y - 1][i_x] != nullptr)
                     {
                         break;
                     }
@@ -1977,4 +1983,98 @@ void grow_vines(LAYER l, int max_lengh, AABB area, bool destroy_broken)
     {
         grow_vines(LAYER::BACK, max_lengh, area, destroy_broken);
     }
+}
+
+void grow_poles(LAYER l, uint32_t max_lengh)
+{
+    grow_poles(l, max_lengh, {0, 0, 0, 0}, false);
+}
+
+void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
+{
+    area.abs();
+
+    const auto state = State::get().ptr();
+    const static auto grow_pole = to_id("ENT_TYPE_FLOOR_GROWABLE_CLIMBING_POLE");
+    const static auto pole = to_id("ENT_TYPE_FLOOR_CLIMBING_POLE");
+    const auto actual_layer = enum_to_layer(l);
+
+    const uint32_t start_x = static_cast<uint32_t>(area.left + 0.5f);
+    uint32_t end_x = static_cast<uint32_t>(area.right + 0.5f);
+    const uint32_t start_y = static_cast<uint32_t>(area.bottom + 0.5f);
+    uint32_t end_y = static_cast<uint32_t>(area.top + 0.5f);
+
+    if (start_x >= g_level_max_x || start_y >= g_level_max_y)
+        return;
+
+    if (end_x == 0)
+        end_x = state->w * 10 + 6;
+
+    if (end_y == 0)
+        end_y = g_level_max_y - (state->h * 8 + 6);
+
+    if (end_x >= g_level_max_x)
+        end_x = g_level_max_x - 1;
+
+    if (end_y >= g_level_max_y)
+        end_y = g_level_max_y - 1;
+
+    for (uint32_t i_x = start_x; i_x <= end_x; ++i_x)
+    {
+        for (uint32_t i_y = start_y; i_y <= end_y; ++i_y)
+        {
+            auto test_ent = state->layers[actual_layer]->grid_entities[i_y][i_x];
+            if (!test_ent || !test_ent->type)
+                continue;
+
+            if (test_ent->type->id == grow_pole)
+            {
+                if (i_y + 2 >= g_level_max_y || state->layers[actual_layer]->grid_entities[i_y + 1][i_x] != nullptr || state->layers[actual_layer]->grid_entities[i_y + 2][i_x] != nullptr)
+                {
+                    if (destroy_broken)
+                        test_ent->destroy();
+
+                    continue;
+                }
+                test_ent->destroy();
+                test_ent = get_entity_ptr(spawn_entity_snap_to_grid(pole, static_cast<float>(i_x), static_cast<float>(i_y), (LAYER)actual_layer));
+                if (!test_ent)
+                    continue;
+
+                test_ent->animation_frame = 40;
+
+                ++i_y;
+                int32_t last_uid = -1;
+                for (uint32_t max = i_y + max_lengh; i_y < max && i_y < g_level_max_y; ++i_y)
+                {
+                    if (state->layers[actual_layer]->grid_entities[i_y + 1][i_x] != nullptr)
+                    {
+                        break;
+                    }
+                    last_uid = spawn_entity_snap_to_grid(pole, static_cast<float>(i_x), static_cast<float>(i_y), (LAYER)actual_layer);
+                }
+                if (const auto last_piece = get_entity_ptr(last_uid))
+                {
+                    last_piece->animation_frame = 4;
+                }
+            }
+        }
+    }
+    if (l == LAYER::BOTH)
+    {
+        grow_poles(LAYER::BACK, max_lengh, area, destroy_broken);
+    }
+}
+
+bool grow_chain_and_blocks()
+{
+    const auto state = State::get().ptr();
+    return grow_chain_and_blocks(state->w * 10 + 6, state->h * 8 + 6);
+}
+
+bool grow_chain_and_blocks(uint32_t x, uint32_t y)
+{
+    using GrowChainAndBlocks = bool(uint32_t, uint32_t);
+    auto grow_fun = (GrowChainAndBlocks*)get_address("grow_chain_and_blocks");
+    return grow_fun(x, y);
 }

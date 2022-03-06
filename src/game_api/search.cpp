@@ -1584,6 +1584,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },
+    {
+        "grow_chain_and_blocks"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x31\xC0\x45\x31\xED\x89\x4C\x24\x3C"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
