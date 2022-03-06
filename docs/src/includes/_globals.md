@@ -1119,6 +1119,40 @@ Enable/disable godmode for players.
 
 Enable/disable godmode for companions.
 
+### grow_chainandblocks
+
+
+> Search script examples for [grow_chainandblocks](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_chainandblocks)
+
+#### bool grow_chainandblocks()
+
+#### bool grow_chainandblocks(int x, int y)
+
+Grow chains from `CHAIN_CEILING` and chain with blocks on it from `CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level
+To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
+
+### grow_poles
+
+
+> Search script examples for [grow_poles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_poles)
+
+#### nil grow_poles([LAYER](#LAYER) l, int max_lengh)
+
+#### nil grow_poles([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+
+### grow_vines
+
+
+> Search script examples for [grow_vines](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_vines)
+
+#### nil grow_vines([LAYER](#LAYER) l, int max_lengh)
+
+#### nil grow_vines([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
+
 ### import
 
 
