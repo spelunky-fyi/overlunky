@@ -405,6 +405,9 @@ for file in api_files:
     data = open(file, "r").read().split("\n")
     for line in data:
         line = line.replace("*", "")
+        line = line.strip()
+        if line == "":
+            comment = []
         m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', line)
         if m and not m.group(1).startswith("__"):
             if not getfunc(m.group(1)):
@@ -628,6 +631,29 @@ for file in api_files:
                 var_name = sub_match.strip()
                 var_to_mod = next(
                     (item for item in enum_to_mod["vars"] if item["name"] == var_name),
+                    dict(),
+                )
+                if var_to_mod:
+                    if current_var_to_mod:
+                        current_var_to_mod["docs"] = collected_docs
+                    current_var_to_mod = var_to_mod
+                    collected_docs = ""
+                else:
+                    collected_docs += var_name + "<br/>"
+        if current_var_to_mod:
+            current_var_to_mod["docs"] = collected_docs
+    for extended_type_info in m:
+        extended_type_info = extended_type_info.strip()
+        type = extended_type_info[: extended_type_info.find(" ")]
+        type_to_mod = next((item for item in types if item["name"] == type), dict())
+        current_var_to_mod = dict()
+        if type_to_mod:
+            sub_matches = extended_type_info.strip().split("//")
+            collected_docs = ""
+            for sub_match in sub_matches:
+                var_name = sub_match.strip()
+                var_to_mod = next(
+                    (item for item in type_to_mod["vars"] if item["name"] == var_name),
                     dict(),
                 )
                 if var_to_mod:
@@ -1116,6 +1142,8 @@ Type | Name | Description
                     ret = ""
                     name = var["name"]
                     print(f"{ret} | [{name}]({search_link}) | ", end="")
+                if "docs" in var:
+                    print(link_custom_type(var["docs"]), end=" ")
                 if "comment" in var and var["comment"]:
                     print(link_custom_type("<br/>".join(var["comment"])))
                 else:
@@ -1178,6 +1206,6 @@ Name | Data | Description
         else:
             print(var["type"] + " |  | ", end="")
         if "docs" in var:
-            print(var["docs"])
+            print(link_custom_type(var["docs"]))
         else:
             print("")

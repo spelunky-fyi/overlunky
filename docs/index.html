@@ -3160,11 +3160,7 @@
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=prng">prng</a></p>
 </blockquote>
 
-<p><a href="#PRNG">PRNG</a> (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
-The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
-The used buffer is determined by <a href="#PRNG_CLASS">PRNG_CLASS</a>. If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
-If you don&#39;t care what part of the game you affect just use <code>prng.random</code>.
-The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.</p>
+<p>The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.</p>
 <h1 id='Functions'>Functions</h1>
 <p>The game functions like <code>spawn</code> use <a href="#get_position">level coordinates</a>. Draw functions use normalized <a href="#screen_position">screen coordinates</a> from <code>-1.0 .. 1.0</code> where <code>0.0, 0.0</code> is the center of the screen.</p>
 <h2 id='Callback-functions'>Callback functions</h2><h3 id='clear_callback'>clear_callback</h3>
@@ -4706,9 +4702,7 @@ Note that <code>define_texture</code> will also reload the texture if it already
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_custom_theme">force_custom_theme</a></p>
 </blockquote>
 <h4 id='nil-force_custom_theme'>nil force_custom_theme()</h4>
-<p>Customizable <a href="#ThemeInfo">ThemeInfo</a> with ability to override certain theming functions from different themes or write custom functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
-Overrides for different <a href="#CustomTheme">CustomTheme</a> functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
-Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a <a href="#CustomTheme">CustomTheme</a>, <a href="#ThemeInfo">ThemeInfo</a> or <a href="#THEME">THEME</a>.</p>
+<p>Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a <a href="#CustomTheme">CustomTheme</a>, <a href="#ThemeInfo">ThemeInfo</a> or <a href="#THEME">THEME</a>.</p>
 <h3 id='get_co_subtheme'>get_co_subtheme</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_co_subtheme">get_co_subtheme</a></p>
@@ -12876,7 +12870,38 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </tbody></table>
 <h2 id='Theme-types'>Theme types</h2><h3 id='CustomTheme'>CustomTheme</h3>
-<p>Customizable <a href="#ThemeInfo">ThemeInfo</a> with ability to override certain theming functions from different themes or write custom functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.</p>
+<blockquote>
+<p>Very basic example how to use a CustomTheme in the procedural levels. Search the examples or check <a href="https://spelunky.fyi/mods/m/gehenna/">Eternal Flame of Gehenna</a> for custom levels.</p>
+</blockquote>
+<div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- create a new theme based on dwelling</span>
+<span class="kd">local</span> <span class="n">my_theme</span> <span class="o">=</span> <span class="n">CustomTheme</span><span class="p">:</span><span class="n">new</span><span class="p">()</span>
+<span class="c1">-- get some ember effects from volcana</span>
+<span class="n">my_theme</span><span class="p">:</span><span class="n">override</span><span class="p">(</span><span class="n">THEME_OVERRIDE</span><span class="p">.</span><span class="n">SPAWN_EFFECTS</span><span class="p">,</span> <span class="n">THEME</span><span class="p">.</span><span class="n">VOLCANA</span><span class="p">)</span>
+<span class="c1">-- change level size</span>
+<span class="n">my_theme</span><span class="p">:</span><span class="n">post</span><span class="p">(</span><span class="n">THEME_OVERRIDE</span><span class="p">.</span><span class="n">INIT_LEVEL</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span>
+    <span class="n">state</span><span class="p">.</span><span class="n">width</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">state</span><span class="p">.</span><span class="n">height</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="k">end</span><span class="p">)</span>
+<span class="c1">-- set floor textures to eggy</span>
+<span class="n">my_theme</span><span class="p">.</span><span class="n">textures</span><span class="p">[</span><span class="n">DYNAMIC_TEXTURE</span><span class="p">.</span><span class="n">FLOOR</span><span class="p">]</span> <span class="o">=</span> <span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_FLOOR_EGGPLANT_0</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+    <span class="c1">-- use the level gen from ice caves</span>
+    <span class="n">ctx</span><span class="p">:</span><span class="n">override_level_files</span><span class="p">({</span><span class="s2">"generic.lvl"</span><span class="p">,</span> <span class="s2">"icecavesarea.lvl"</span><span class="p">})</span>
+    <span class="c1">-- force our theme instead of the default</span>
+    <span class="n">force_custom_theme</span><span class="p">(</span><span class="n">my_theme</span><span class="p">)</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">PRE_LOAD_LEVEL_FILES</span><span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>You can call theme functions from other themes, for example to make all growable tile codes work in your theme:</p>
+</blockquote>
+<div class="highlight"><pre class="highlight lua tab-lua"><code><span class="kd">local</span> <span class="n">custom</span> <span class="o">=</span> <span class="n">CustomTheme</span><span class="p">:</span><span class="n">new</span><span class="p">()</span>
+<span class="n">custom</span><span class="p">:</span><span class="n">post</span><span class="p">(</span><span class="n">THEME_OVERRIDE</span><span class="p">.</span><span class="n">SPAWN_LEVEL</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span>
+    <span class="n">state</span><span class="p">.</span><span class="n">level_gen</span><span class="p">.</span><span class="n">themes</span><span class="p">[</span><span class="n">THEME</span><span class="p">.</span><span class="n">VOLCANA</span><span class="p">]:</span><span class="n">spawn_traps</span><span class="p">()</span>
+    <span class="n">state</span><span class="p">.</span><span class="n">level_gen</span><span class="p">.</span><span class="n">themes</span><span class="p">[</span><span class="n">THEME</span><span class="p">.</span><span class="n">TIDE_POOL</span><span class="p">]:</span><span class="n">spawn_traps</span><span class="p">()</span>
+    <span class="n">state</span><span class="p">.</span><span class="n">level_gen</span><span class="p">.</span><span class="n">themes</span><span class="p">[</span><span class="n">THEME</span><span class="p">.</span><span class="n">JUNGLE</span><span class="p">]:</span><span class="n">spawn_traps</span><span class="p">()</span>
+<span class="k">end</span><span class="p">)</span>
+</code></pre></div>
+<p>Customizable <a href="#ThemeInfo">ThemeInfo</a> with ability to override certain theming functions from different themes or write custom functions. Check <a href="#ThemeInfo">ThemeInfo</a> for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.</p>
 
 <table><thead>
 <tr>
@@ -12888,32 +12913,32 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#CustomTheme">CustomTheme</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CustomTheme">new(int theme_id_, int base_theme_, bool defaults)</a></td>
-<td></td>
+<td>Create a new theme with an id and base theme, overriding defaults. Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp">theme functions that are default enabled here</a>.</td>
 </tr>
 <tr>
 <td><a href="#CustomTheme">CustomTheme</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CustomTheme">new(int theme_id_, int base_theme_)</a></td>
-<td></td>
+<td>Create a new theme with defaults.</td>
 </tr>
 <tr>
 <td><a href="#CustomTheme">CustomTheme</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CustomTheme">new()</a></td>
-<td></td>
+<td>Create a new theme with base dwelling and id 100.</td>
 </tr>
 <tr>
 <td>string</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_file">level_file</a></td>
-<td></td>
+<td>Level file to load. Probably doesn&#39;t do much in custom themes, especially if you&#39;re forcing them in PRE_LOAD_LEVEL_FILES.</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=theme">theme</a></td>
-<td></td>
+<td>Theme index. Probably shouldn&#39;t collide with the vanilla ones. Purpose unknown.</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=base_theme">base_theme</a></td>
-<td></td>
+<td>Base <a href="#THEME">THEME</a> to load enabled functions from, when no other theme is specified.</td>
 </tr>
 <tr>
 <td></td>
@@ -12923,22 +12948,22 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>map&lt;<a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a>, int&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=textures">textures</a></td>
-<td></td>
+<td>Add TEXTUREs here to override different dynamic textures.</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=override">override</a></td>
-<td></td>
+<td><code>override(THEME_OVERRIDE override, bool enabled)</code> To disable or enable theme functions using the base_theme.<br/><code>override(THEME_OVERRIDE override, THEME theme)</code> To override a theme function with another theme.<br/><code>override(THEME_OVERRIDE override, function func)</code> To override a theme function with a lua function.<br/></td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pre">pre(THEME_OVERRIDE index, function func_)</a></td>
-<td></td>
+<td>Set a callback to be called before this theme function.</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post">post(THEME_OVERRIDE index, function func_)</a></td>
-<td></td>
+<td>Set a callback to be called after this theme function, to fix some changes it did for example.</td>
 </tr>
 <tr>
 <td></td>
@@ -13178,7 +13203,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(int texture_id)</a></td>
-<td></td>
+<td>Add TEXTUREs to <code>textures</code> to override different dynamic textures easily.</td>
 </tr>
 <tr>
 <td></td>
@@ -13237,17 +13262,17 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_flags">init_flags()</a></td>
-<td></td>
+<td>dwelling,tidepool: unset levelgen.flags.flag12<br/>jungle,volcana.olmec,icecaves,neobab,cog,duat,abzu,tiamat,eggplant,hundun,basecamp,arena: nop<br/>temple: unset levelgen.flags.flag10 + calculate chance of grasshopper critter spawn<br/>sunken: unset levelgen.flags.flag9, 10, 17, 18 + if state.level == 1 -&gt; unset flag 11<br/>cosmic: calls same virtual on its sub_theme</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_level">init_level()</a></td>
-<td></td>
+<td>does random calculations and calls function to determine the start room in most themes</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v4">unknown_v4()</a></td>
-<td></td>
+<td>most themes call the same function, some check whether they are in CO</td>
 </tr>
 <tr>
 <td></td>
@@ -13257,17 +13282,17 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_rooms">add_special_rooms()</a></td>
-<td></td>
+<td>dwelling: does stuff when level == 4 or udjat present<br/>jungle: when black market present<br/>volcana: when drill present<br/>touches the rooms and sometimes the meta info about the rooms</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v7">unknown_v7()</a></td>
-<td></td>
+<td>can&#39;t trigger, dwelling (quillback) and abzu do something special (arena just returns)</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v8">unknown_v8()</a></td>
-<td></td>
+<td>does something depending on levelgen.data.unknown7</td>
 </tr>
 <tr>
 <td></td>
@@ -13282,7 +13307,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_feeling">add_special_feeling()</a></td>
-<td></td>
+<td>metal clanking and air of oppression</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -13292,97 +13317,97 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_level">spawn_level()</a></td>
-<td></td>
+<td>spawns all floor etc tiles based on the room layout<br/>disable this and only the player is spawned in the level</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_border">spawn_border()</a></td>
-<td></td>
+<td>spawns CO: teleportingborder / Duat: dust / theme specific border tiles around the level</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_level">post_process_level()</a></td>
-<td></td>
+<td>volcana: checks if state.coffin_contents = cocovondiamonds -&gt; chooses one of the four coffins in vlad&#39;s castle at random to put her in<br/>tidepool: spawns impostor lake, some door and a litwalltorch, ...<br/>neobab: assigns the correct animation_frame to all the ushabtis<br/>co, arena: forwards to the same virtual of the sub_theme<br/>abzu, tiamat: spawns impostor lake</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_traps">spawn_traps()</a></td>
-<td></td>
+<td>adds theme specific random traps and pushblocks</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_entities">post_process_entities()</a></td>
-<td></td>
+<td>pleasure palace: applies correct texture to ladders and ladder platforms<br/>sunken city: randomly adds ENT_TYPE_DECORATION_SUNKEN_BRIDGE between entities (the slimy bridges)<br/>hundun: calls sunken city virtual, so has slimy bridges</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_procedural">spawn_procedural()</a></td>
-<td></td>
+<td>adds legs under platforms, random pots, goldbars, procedural spawns, compass indicator...</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_background">spawn_background()</a></td>
-<td></td>
+<td>adds a background, e.g. CO stars / Duat moon / Plain backwall for other themes</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_lights">spawn_lights()</a></td>
-<td></td>
+<td>adds extra light where needed, e.g. in the udjat chest room, or the top layer of the black market: spawns ENT_TYPE_LOGICAL_ROOM_LIGHT</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_transition">spawn_transition()</a></td>
-<td></td>
+<td>spawns a transition tunnel to the level</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_transition">post_transition()</a></td>
-<td></td>
+<td>unsets flag 1 (Reset) of state.quest_flags<br/>sets the correct state.screen (0xC)<br/>sets state.ingame to true, adjust fade values and starts loading</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_players">spawn_players()</a></td>
-<td></td>
+<td>spawns the player(s) in the world, along with what they were holding</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_effects">spawn_effects()</a></td>
-<td></td>
+<td>when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail<br/>this actually also sets the camera bounds and various theme specific special effects<br/>also spawns / sets the conditions for osiris, jelly, orbs...<br/>also makes curse pots spawn the ghost</td>
 </tr>
 <tr>
 <td>string</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_level_file">get_level_file()</a></td>
-<td></td>
+<td>the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_theme_id">get_theme_id()</a></td>
-<td></td>
+<td>for co: returns sub_theme-&gt;get_theme_id()</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_base_id">get_base_id()</a></td>
-<td></td>
+<td>whereas get_theme_id() returns a unique id for all <a href="#ThemeInfo">ThemeInfo</a>&#39;s, this function returns the id of the theme it logically belongs to<br/>e.g. theme_abzu-&gt;get_base_id() = 5 (tide_pool) as opposed to theme_abzu-&gt;get_theme_id() = 13 (abzu)</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type">get_floor_spreading_type()</a></td>
-<td></td>
+<td>all themes return 4 (ENT_TYPE_FLOOR_GENERIC), except:<br/>temple: 104 (ENT_TYPE_FLOORSTYLED_TEMPLE)<br/>neobab: 106 (ENT_TYPE_FLOORSTYLED_BABYLON)<br/>sunken: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)<br/>cog: 110 (ENT_TYPE_FLOORSTYLED_COG)<br/>duat: 112 (ENT_TYPE_FLOORSTYLED_DUAT)<br/>hundun: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type2">get_floor_spreading_type2()</a></td>
-<td></td>
+<td>similar to get_floor_spreading_type(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE)</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v30">unknown_v30()</a></td>
-<td></td>
+<td>all return false, except olmec, temple, neobab, cog, duat</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_transition_block_modifier">get_transition_block_modifier()</a></td>
-<td></td>
+<td>determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme<br/>returns 85 by default, except for: olmec: 15, cog: 23</td>
 </tr>
 <tr>
 <td>int</td>
@@ -13392,12 +13417,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backwall_type">get_backwall_type()</a></td>
-<td></td>
+<td>always returns 778 ENT_TYPE_BG_LEVEL_BACKWALL</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_border_type">get_border_type()</a></td>
-<td></td>
+<td>returns ENT_TYPE_FLOOR_BORDERTILE by default, except:<br/>neobab ENT_TYPE_FLOOR_BORDERTILE_METAL<br/>sunken ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS<br/>duat ENT_TYPE_FLOOR_DUSTWALL<br/>tiamat ENT_TYPE_FLOOR_BORDERTILE_METAL<br/>hundun ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS</td>
 </tr>
 <tr>
 <td>int</td>
@@ -13407,77 +13432,77 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_liquid_gravity">get_liquid_gravity()</a></td>
-<td></td>
+<td>returns -1.0 (downwards) by default, except for sunken/hundun 1.0 (upwards); applies to both lava and water</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_player_damage">get_player_damage()</a></td>
-<td></td>
+<td>used to make the player invincible in basecamp (but does an OOB check)<br/>if you return false in other themes you are invincible except for crushing deaths, and you do still experience knockback and stun</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v38">unknown_v38()</a></td>
-<td></td>
+<td>returns true by default, except CO, duat (these also have no bg, but don&#39;t know if related)</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backlayer_lut">get_backlayer_lut()</a></td>
-<td></td>
+<td>returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad&#39;s castle for the volcana theme</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backlayer_light_level">get_backlayer_light_level()</a></td>
-<td></td>
+<td>a value between 0.0 (default) and 1.0 used to illuminate (backlayer) locations<br/>depending on camera level (thus player y-level), the brightness is increased gradually<br/>used in black market, vlad&#39;s castle, ice caves backlayer, pleasure palace<br/>for tiamat: the value is always 1.0 for full backlayer global illumination (ship)</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_loop">get_loop()</a></td>
-<td></td>
+<td>this is used for CO (checks that player is in the level, not in the transition)<br/>if enabled in another theme, it adds an extra border and if you zoom out, you see the level loop if you move to the side</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_vault_level">get_vault_level()</a></td>
-<td></td>
+<td>not 100% sure, this is used in a random calculation that determines whether a vault spawns<br/>looks to be the highest level a vault can spawn; it&#39;s mostly 3 or 4, but for neobab it&#39;s 1, which makes sense</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_unknown_1_or_2">get_unknown_1_or_2(int index)</a></td>
-<td></td>
+<td>index == 0 ? return unknown1 : return unknown2</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(int texture_id)</a></td>
-<td></td>
+<td>the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number<br/>that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pre_transition">pre_transition()</a></td>
-<td></td>
+<td>manipulates state.level_next, world_next and theme_next; triggers when exiting a level<br/>for dwelling, it just increments level_next because the world/theme choice is made by which door you pick<br/>for jungle/volcana, it checks whether it&#39;s on the fourth level, if so, sets theme_next (4), world_next (3) and level_next (1) correctly for olmec<br/>for CO it checks whether the next level is 99, and set state.win_state to 3 to finish the game</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_level_height">get_level_height()</a></td>
-<td></td>
+<td>default = return state.h - 1<br/>for special levels (black market, vlad, ...) fixed heights are returned</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v47">unknown_v47()</a></td>
-<td></td>
+<td>returns a value that appears to affect room generation and is based on current world,level</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration">spawn_decoration()</a></td>
-<td></td>
+<td>used e.g. in <a href="#Vlad">Vlad</a>&#39;s castle to insert the big banner in the center with the two demon statues<br/>also implemented for neobab (i think in the zoos)<br/>might do other things as well</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration2">spawn_decoration2()</a></td>
-<td></td>
+<td>dwelling: adds the decal above the udjat chest<br/>jungle: adds the colorful jungle flowers on top of the blocks<br/>does lots of other things as well, not sure about difference between this and spawn_decoration</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_extra">spawn_extra()</a></td>
-<td></td>
+<td>dwelling udjat level: adds the key in random place<br/>vlad&#39;s castle: adds decorative banners<br/>tidepool: adds hanging seaweed, red lanterns, ...<br/>temple: adds temple sand deco, ...<br/>neobab: adds neon signs, hanging wires, ...</td>
 </tr>
 <tr>
 <td></td>
@@ -23454,7 +23479,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.LIQUID">LIQUID</a></td>
 <td>0x6000</td>
-<td>Short for (MASK.WATER</td>
+<td>Short for (<a href="#MASK">MASK</a>.WATER</td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.ANY">ANY</a></td>
@@ -23627,7 +23652,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.START">START</a></td>
 <td>ON::START</td>
-<td>Runs on the first ON.SCREEN of a run<br/></td>
+<td>Runs on the first <a href="#ON">ON</a>.<a href="#SCREEN">SCREEN</a> of a run<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.LOADING">LOADING</a></td>

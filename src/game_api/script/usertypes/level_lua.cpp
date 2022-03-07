@@ -206,12 +206,16 @@ struct ThemeOverride
 class CustomTheme : public ThemeInfo
 {
   public:
+    /// Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
     std::string level_file;
+    /// Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
     uint8_t theme;
+    /// Base THEME to load enabled functions from, when no other theme is specified.
     uint8_t base_theme;
     LuaBackend* backend;
 
     std::map<THEME_OVERRIDE, std::unique_ptr<ThemeOverride>> overrides;
+    /// Add TEXTUREs here to override different dynamic textures.
     std::map<DYNAMIC_TEXTURE, uint32_t> textures;
 
     void override(THEME_OVERRIDE index, bool enabled_)
@@ -240,6 +244,7 @@ class CustomTheme : public ThemeInfo
         }
     }
 
+    /// Set a callback to be called before this theme function.
     void pre(THEME_OVERRIDE index, sol::function func_)
     {
         if (overrides.find(index) == overrides.end())
@@ -250,6 +255,7 @@ class CustomTheme : public ThemeInfo
         }
     }
 
+    /// Set a callback to be called after this theme function, to fix some changes it did for example.
     void post(THEME_OVERRIDE index, sol::function func_)
     {
         if (overrides.find(index) == overrides.end())
@@ -344,6 +350,7 @@ class CustomTheme : public ThemeInfo
         return std::nullopt;
     }
 
+    /// Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
     CustomTheme(uint8_t theme_id_, uint8_t base_theme_, bool defaults)
     {
         level_file = "";
@@ -377,10 +384,12 @@ class CustomTheme : public ThemeInfo
             */
         }
     }
+    /// Create a new theme with defaults.
     CustomTheme(uint8_t theme_id_, uint8_t base_theme_)
         : CustomTheme(theme_id_, base_theme_, true)
     {
     }
+    /// Create a new theme with base dwelling and id 100.
     CustomTheme()
         : CustomTheme(100, 1, true)
     {
@@ -849,6 +858,8 @@ class CustomTheme : public ThemeInfo
             return unknown1;
         return unknown2;
     }
+
+    /// Add TEXTUREs to `textures` to override different dynamic textures easily.
     uint32_t get_dynamic_texture(int32_t texture_id)
     {
         auto index = THEME_OVERRIDE::TEXTURE_DYNAMIC;
@@ -1243,7 +1254,7 @@ void register_usertypes(sol::state& lua)
         static_cast<void (CustomTheme::*)(THEME_OVERRIDE, uint8_t)>(&CustomTheme::override),
         static_cast<void (CustomTheme::*)(THEME_OVERRIDE, sol::function)>(&CustomTheme::override));
 
-    /// Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
+    /// Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Check ThemeInfo for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
     lua.new_usertype<CustomTheme>(
         "CustomTheme",
         sol::constructors<CustomTheme(), CustomTheme(uint8_t, uint8_t), CustomTheme(uint8_t, uint8_t, bool)>(),
@@ -1384,6 +1395,13 @@ void register_usertypes(sol::state& lua)
         &CustomTheme::spawn_extra,
         "unknown_v51",
         &CustomTheme::unknown_v51);
+
+    /* CustomTheme
+    // override
+    // `override(THEME_OVERRIDE override, bool enabled)` To disable or enable theme functions using the base_theme.
+    // `override(THEME_OVERRIDE override, THEME theme)` To override a theme function with another theme.
+    // `override(THEME_OVERRIDE override, function func)` To override a theme function with a lua function.
+    */
 
     lua.create_named_table("DYNAMIC_TEXTURE", "INVISIBLE", DYNAMIC_TEXTURE::INVISIBLE, "BACKGROUND", DYNAMIC_TEXTURE::BACKGROUND, "FLOOR", DYNAMIC_TEXTURE::FLOOR, "DOOR", DYNAMIC_TEXTURE::DOOR, "DOOR_LAYER", DYNAMIC_TEXTURE::DOOR_LAYER, "BACKGROUND_DECORATION", DYNAMIC_TEXTURE::BACKGROUND_DECORATION, "KALI_STATUE", DYNAMIC_TEXTURE::KALI_STATUE, "COFFIN", DYNAMIC_TEXTURE::COFFIN);
 
