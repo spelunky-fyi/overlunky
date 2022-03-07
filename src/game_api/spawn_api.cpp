@@ -436,7 +436,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height)
         i_y += 3;
         for (uint32_t test_y = 0; test_y < height; ++test_y)
         {
-            if (layer_ptr->grid_entities[i_y + test_y][i_x] != nullptr)
+            if (i_y + test_y >= g_level_max_y - 2 || layer_ptr->grid_entities[i_y + test_y][i_x] != nullptr)
                 break;
 
             current_ent = layer_ptr->spawn_entity_over(trunk, current_ent, 0, 1);
