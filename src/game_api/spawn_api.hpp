@@ -37,6 +37,8 @@ void spawn_backdoor_abs(float x, float y);
 int32_t spawn_apep(float x, float y, LAYER layer, bool right);
 
 void spawn_tree(float x, float y, LAYER layer);
+int32_t spawn_mushroom(float x, float y, LAYER l);
+int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height);
 
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, float top_threshold);
 void setup_impostor_lake(Entity* lake_imposter, AABB aabb, float top_threshold);

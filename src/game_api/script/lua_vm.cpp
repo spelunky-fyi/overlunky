@@ -521,6 +521,14 @@ end
     lua["spawn_apep"] = spawn_apep;
     /// Spawns and grows a tree
     lua["spawn_tree"] = spawn_tree;
+
+    auto spawn_mushroom = sol::overload(
+        static_cast<int32_t (*)(float, float, LAYER)>(::spawn_mushroom),
+        static_cast<int32_t (*)(float x, float y, LAYER, uint16_t)>(::spawn_mushroom));
+    /// Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+    /// Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+    /// Returns uid of the base or -1 if it wasn't able to spawn
+    lua["spawn_mushroom"] = spawn_mushroom;
     /// NoDoc
     /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
     /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level

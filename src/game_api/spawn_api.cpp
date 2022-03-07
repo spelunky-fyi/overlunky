@@ -389,6 +389,70 @@ void spawn_tree(float x, float y, LAYER layer)
     }
 }
 
+int32_t spawn_mushroom(float x, float y, LAYER l)
+{
+    return spawn_mushroom(x, y, l, 0);
+}
+
+// height relates to trunk
+int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height)
+{
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
+    std::pair<float, float> offset(0.0f, 0.0f);
+    const auto actual_layer = enum_to_layer(l, offset);
+    const auto layer_ptr = get_state_ptr()->layers[actual_layer];
+    const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
+    uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
+    static const auto base = to_id("ENT_TYPE_FLOOR_MUSHROOM_BASE");
+    static const auto trunk = to_id("ENT_TYPE_FLOOR_MUSHROOM_TRUNK");
+    static const auto top = to_id("ENT_TYPE_FLOOR_MUSHROOM_TOP");
+    static const auto platform = to_id("ENT_TYPE_FLOOR_MUSHROOM_HAT_PLATFORM");
+    static const auto deco = to_id("ENT_TYPE_DECORATION_MUSHROOM_HAT");
+
+    if (height == 1 || i_x >= g_level_max_x || i_y >= g_level_max_y - 2 || // check parameters
+        layer_ptr->grid_entities[i_y - 1][i_x] == nullptr ||               // check spaces above, below etc.
+        layer_ptr->grid_entities[i_y][i_x] != nullptr ||
+        layer_ptr->grid_entities[i_y + 1][i_x] != nullptr ||
+        layer_ptr->grid_entities[i_y + 2][i_x] != nullptr)
+        return -1;
+
+    Entity* current_ent = layer_ptr->spawn_entity(base, x, y, false, 0, 0, true);
+    const auto base_uid = current_ent->uid;
+    if (layer_ptr->grid_entities[i_y + 3][i_x] == nullptr)
+    {
+        if (height != 0)
+        {
+            height -= 2; // remove the base and top of the trunk
+        }
+        else
+        {
+            auto& prng = PRNG::get_local();
+            height = static_cast<uint16_t>(prng.random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS).value_or(0));
+        }
+
+        i_y += 3;
+        for (uint32_t test_y = 0; test_y < height; ++test_y)
+        {
+            if (layer_ptr->grid_entities[i_y + test_y][i_x] != nullptr)
+                break;
+
+            current_ent = layer_ptr->spawn_entity_over(trunk, current_ent, 0, 1);
+        }
+    }
+    current_ent = layer_ptr->spawn_entity_over(top, current_ent, 0, 1);
+    layer_ptr->spawn_entity_over(deco, current_ent, 0, 1);
+
+    Entity* platform_left = layer_ptr->spawn_entity_over(platform, current_ent, -1, 0);
+    layer_ptr->spawn_entity_over(deco, platform_left, 0, 1)->animation_frame -= 1;
+
+    Entity* platform_right = layer_ptr->spawn_entity_over(platform, current_ent, 1, 0);
+    layer_ptr->spawn_entity_over(deco, platform_right, 0, 1)->animation_frame += 1;
+    return base_uid;
+}
+
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, float top_threshold)
 {
     static const auto impostor_lake_id = to_id("ENT_TYPE_LIQUID_IMPOSTOR_LAKE");
