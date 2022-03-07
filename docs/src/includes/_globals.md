@@ -2240,6 +2240,19 @@ Don't overuse this, you are still restricted by the liquid pool sizes and thus m
 `liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
 `amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
 
+### spawn_mushroom
+
+
+> Search script examples for [spawn_mushroom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_mushroom)
+
+#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l)
+
+#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l, int height)
+
+Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+Returns uid of the base or -1 if it wasn't able to spawn
+
 ### spawn_on_floor
 
 
