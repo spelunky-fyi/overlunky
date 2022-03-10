@@ -450,6 +450,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height)
 
     Entity* platform_right = layer_ptr->spawn_entity_over(platform, current_ent, 1, 0);
     layer_ptr->spawn_entity_over(deco, platform_right, 0, 1)->animation_frame += 1;
+    platform_right->animation_frame = 119;
     return base_uid;
 }
 
