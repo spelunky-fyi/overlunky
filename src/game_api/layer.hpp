@@ -181,4 +181,7 @@ struct Layer
     Entity* spawn_apep(float x, float y, bool right);
 
     Entity* get_grid_entity_at(float x, float y);
+
+    void move_grid_entity(Entity* ent, float x, float y, Layer* dest_layer);
+    void move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_layer);
 };

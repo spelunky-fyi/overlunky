@@ -93,8 +93,8 @@ Entity* Layer::spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y)
 
 Entity* Layer::get_grid_entity_at(float x, float y)
 {
-    const uint32_t ix = static_cast<uint32_t>(x + 0.5f);
-    const uint32_t iy = static_cast<uint32_t>(y + 0.5f);
+    const uint32_t ix = static_cast<uint32_t>(std::round(x));
+    const uint32_t iy = static_cast<uint32_t>(std::round(y));
     if (ix < 0x56 && iy < 0x7e)
     {
         return grid_entities[iy][ix];
@@ -172,4 +172,33 @@ Entity* Layer::spawn_apep(float x, float y, bool right)
     }
 
     return apep_head;
+}
+
+void Layer::move_grid_entity(Entity* ent, float x, float y, Layer* dest_layer)
+{
+    move_grid_entity(ent, static_cast<uint32_t>(std::round(x)), static_cast<uint32_t>(std::round(y)), dest_layer);
+}
+
+void Layer::move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_layer)
+{
+    if (ent)
+    {
+        if (ent->type->search_flags & 0x100) // MASK.FLOOR
+        {
+            const auto pos = ent->position();
+            const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.first));
+            const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.second));
+            if (current_grid_x < 0x56 && current_grid_y < 0x7e)
+            {
+                if (grid_entities[current_grid_y][current_grid_x] == ent)
+                    grid_entities[current_grid_y][current_grid_x] = nullptr;
+            }
+            if (x < 0x56 && y < 0x7e)
+                dest_layer->grid_entities[y][x] = ent;
+        }
+        for (auto item_ent : ent->items.entities())
+        {
+            move_grid_entity(item_ent, x + item_ent->x, y + item_ent->y, dest_layer);
+        }
+    }
 }
