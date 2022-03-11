@@ -22,6 +22,9 @@ class UI
     static int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask);
     static void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap);
     static SaveData* savedata();
+    static int32_t spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap);
+    static int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
+    static void spawn_backdoor(float x, float y);
 
     static void set_time_ghost_enabled(bool enable);
     static void set_time_jelly_enabled(bool enable);
@@ -31,4 +34,8 @@ class UI
     static Illumination* create_illumination(Color color, float size, float x, float y);
     static void set_camp_camera_bounds_enabled(bool b);
     static std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer);
+    static int32_t spawn_companion(ENT_TYPE compatnion_type, float x, float y, LAYER l);
+    static void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, uint32_t liquid_flags, uint32_t amount, float blobs_separation = INFINITY);
+    static void spawn_liquid(ENT_TYPE entity_type, float x, float y);
+    static int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, float y);
 };

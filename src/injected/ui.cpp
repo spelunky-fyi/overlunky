@@ -41,7 +41,6 @@
 #include "savedata.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
-#include "spawn_api.hpp"
 #include "state.hpp"
 #include "steam_api.hpp"
 #include "version.hpp"
@@ -941,7 +940,7 @@ void spawn_entities(bool s, std::string list = "")
         if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_CHAR") != std::string::npos)
         {
             std::pair<float, float> cpos = UI::click_position(g_x, g_y);
-            int spawned = spawn_companion(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second, LAYER::PLAYER);
+            int spawned = UI::spawn_companion(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second, LAYER::PLAYER);
             if (!lock_entity)
                 g_last_id = spawned;
         }
@@ -960,7 +959,7 @@ void spawn_entities(bool s, std::string list = "")
                     old_block->destroy();
                 }
             }
-            int spawned = spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap);
+            int spawned = UI::spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap);
             if (options["spawn_floor_decorated"])
             {
                 if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
@@ -977,7 +976,7 @@ void spawn_entities(bool s, std::string list = "")
         else
         {
             std::pair<float, float> cpos = UI::click_position(g_x, g_y);
-            spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second);
+            UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second);
         }
     }
     else
@@ -990,7 +989,7 @@ void spawn_entities(bool s, std::string list = "")
         int spawned{-1};
         while (textss >> id)
         {
-            spawned = spawn_entity(id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
+            spawned = UI::spawn_entity(id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
         }
         if (!lock_entity)
             g_last_id = spawned;
@@ -1005,7 +1004,7 @@ void spawn_entity_over()
             return;
         if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
         {
-            int spawned = spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
+            int spawned = UI::spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
             if (!lock_entity)
                 g_last_id = spawned;
         }
@@ -1015,7 +1014,7 @@ void spawn_entity_over()
             auto mpos = normalize(ImGui::GetMousePos());
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
-            spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+            UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
         }
     }
 }
@@ -1793,7 +1792,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("enter", wParam) && active("tool_door") && io.WantCaptureKeyboard)
     {
-        int spawned = spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
+        int spawned = UI::spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
         if (!lock_entity)
             g_last_id = spawned;
     }
@@ -1935,7 +1934,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("spawn_layer_door", wParam))
     {
-        spawn_backdoor(0.0, 0.0);
+        UI::spawn_backdoor(0.0, 0.0);
     }
     else if (pressed("teleport", wParam))
     {
@@ -2028,7 +2027,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("spawn_warp_door", wParam))
     {
-        int spawned = spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
+        int spawned = UI::spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
         if (!lock_entity)
             g_last_id = spawned;
     }
@@ -2522,7 +2521,7 @@ void render_narnia()
     ImGui::SameLine();
     if (ImGui::Button("Warp door##SpawnWarpDoor"))
     {
-        int spawned = spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
+        int spawned = UI::spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
         if (!lock_entity)
             g_last_id = spawned;
     }
@@ -2530,7 +2529,7 @@ void render_narnia()
     ImGui::SameLine();
     if (ImGui::Button("Layer door##SpawnLayerDoor"))
     {
-        spawn_backdoor(g_x, g_y);
+        UI::spawn_backdoor(g_x, g_y);
     }
     tooltip("Spawn a door to back layer.\nTip: You can instantly switch layers with (Shift+Tab).", "spawn_layer_door");
     ImGui::Checkbox("Increment level count on warp", &options["warp_increments_level_count"]);
@@ -3579,7 +3578,7 @@ void render_clickhandler()
         else if (released("mouse_clone"))
         {
             set_pos(ImGui::GetMousePos());
-            spawn_entity(to_id("ENT_TYPE_ITEM_CLONEGUNSHOT"), g_x, g_y, true, 0, 0, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_ITEM_CLONEGUNSHOT"), g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3590,7 +3589,7 @@ void render_clickhandler()
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
             set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y + 200));
-            spawn_entity(to_id("ENT_TYPE_ITEM_LAMASSU_LASER_SHOT"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_ITEM_LAMASSU_LASER_SHOT"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3652,7 +3651,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(to_id("ENT_TYPE_FX_ALIENBLAST"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_ALIENBLAST"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3662,7 +3661,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(to_id("ENT_TYPE_FX_EXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_EXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3672,7 +3671,7 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3682,15 +3681,15 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y - 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y + 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
-            spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y - 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y + 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
