@@ -229,12 +229,12 @@ struct State
     void godmode_companions(bool g);
     void darkmode(bool g);
 
-    size_t get_zoom_level_address();
-    float get_zoom_level();
+    static size_t get_zoom_level_address();
+    static float get_zoom_level();
     void zoom(float level);
 
-    std::pair<float, float> click_position(float x, float y);
-    std::pair<float, float> screen_position(float x, float y);
+    static std::pair<float, float> click_position(float x, float y);
+    static std::pair<float, float> screen_position(float x, float y);
 
     uint32_t flags()
     {
@@ -257,7 +257,7 @@ struct State
 
     Entity* find(uint32_t uid);
 
-    std::pair<float, float> get_camera_position();
+    static std::pair<float, float> get_camera_position();
     void set_camera_position(float cx, float cy);
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);

@@ -1,4 +1,5 @@
 #include "ui.hpp"
+#include "ui_util.hpp"
 
 #include <ShlObj.h>
 #include <Shlwapi.h>
@@ -37,7 +38,6 @@
 #include "level_api.hpp"
 #include "logger.h"
 #include "particles.hpp"
-#include "rpc.hpp"
 #include "savedata.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
@@ -785,13 +785,13 @@ void load_config(std::string file)
     auto ini_fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {14.0f, 32.0f, 72.0f});
     if (ini_fontsize.size() >= 3)
         fontsize = ini_fontsize;
-    godmode(options["god_mode"]);
+    UI::godmode(options["god_mode"]);
     if (options["disable_achievements"])
         disable_steam_achievements();
     if (options["disable_savegame"])
         hook_savegame();
-    set_time_ghost_enabled(!options["disable_ghost_timer"]);
-    set_time_jelly_enabled(!options["disable_ghost_timer"]);
+    UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
+    UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
     save_config(file);
 }
 
@@ -907,12 +907,12 @@ void save_search()
 
 uint32_t entity_type(int uid)
 {
-    return get_entity_type(uid);
+    return UI::get_entity_type(uid);
 }
 
 bool update_players()
 {
-    g_players = get_players();
+    g_players = UI::get_players();
     return true;
 }
 
@@ -940,7 +940,7 @@ void spawn_entities(bool s, std::string list = "")
             return;
         if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_CHAR") != std::string::npos)
         {
-            std::pair<float, float> cpos = click_position(g_x, g_y);
+            std::pair<float, float> cpos = UI::click_position(g_x, g_y);
             int spawned = spawn_companion(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second, LAYER::PLAYER);
             if (!lock_entity)
                 g_last_id = spawned;
@@ -951,10 +951,9 @@ void spawn_entities(bool s, std::string list = "")
             if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_FLOOR") != std::string::npos)
             {
                 snap = true;
-                g_vx = 0;
-                g_vy = 0;
-                std::pair<float, float> cpos = click_position(g_x, g_y);
-                auto old_block_id = get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
+
+                std::pair<float, float> cpos = UI::click_position(g_x, g_y);
+                auto old_block_id = UI::get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
                 if (old_block_id != -1)
                 {
                     auto old_block = get_entity_ptr(old_block_id);
@@ -977,7 +976,7 @@ void spawn_entities(bool s, std::string list = "")
         }
         else
         {
-            std::pair<float, float> cpos = click_position(g_x, g_y);
+            std::pair<float, float> cpos = UI::click_position(g_x, g_y);
             spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second);
         }
     }
@@ -1012,9 +1011,9 @@ void spawn_entity_over()
         }
         else
         {
-            auto cpos = click_position(g_x, g_y);
+            auto cpos = UI::click_position(g_x, g_y);
             auto mpos = normalize(ImGui::GetMousePos());
-            auto cpos2 = click_position(mpos.x, mpos.y);
+            auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
             spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
         }
@@ -1108,7 +1107,7 @@ void fix_co_coordinates(std::pair<float, float>& cpos)
 
 void set_zoom()
 {
-    zoom(g_zoom);
+    UI::zoom(g_zoom);
 }
 
 void force_lights()
@@ -1117,7 +1116,7 @@ void force_lights()
     {
         if (!g_state->illumination && g_state->screen == 12)
         {
-            g_state->illumination = create_illumination(Color::white(), 20000.0f, 172, 252);
+            g_state->illumination = UI::create_illumination(Color::white(), 20000.0f, 172, 252);
         }
         if (g_state->illumination)
         {
@@ -1163,7 +1162,7 @@ void force_zoom()
     if ((g_zoom > 13.5f || g_zoom == 0.0f) && g_state != 0 && g_state->screen == 11 && (enable_camp_camera || g_state->time_level == 1))
     {
         enable_camp_camera = false;
-        set_camp_camera_bounds_enabled(false);
+        UI::set_camp_camera_bounds_enabled(false);
         g_state->camera->bounds_left = 0.5;
         g_state->camera->bounds_right = 74.5;
         g_state->camera->bounds_top = 124.5;
@@ -1172,7 +1171,7 @@ void force_zoom()
     else if (g_zoom == 13.5f && g_state != 0 && g_state->screen == 11 && g_state->time_level == 1)
     {
         enable_camp_camera = true;
-        set_camp_camera_bounds_enabled(true);
+        UI::set_camp_camera_bounds_enabled(true);
     }
 }
 
@@ -1188,7 +1187,7 @@ void force_hud_flags()
 
 void toggle_noclip()
 {
-    g_players = get_players();
+    g_players = UI::get_players();
     for (auto ent : g_players)
     {
         auto player = (Movable*)ent->topmost_mount();
@@ -1211,7 +1210,7 @@ void toggle_noclip()
 
 void force_noclip()
 {
-    g_players = get_players();
+    g_players = UI::get_players();
     if (options["noclip"])
     {
         for (auto ent : g_players)
@@ -1222,7 +1221,7 @@ void force_noclip()
                 if (player->state == 6 && (player->movex != 0 || player->movey != 0))
                 {
                     auto [x, y] = player->position();
-                    move_entity_abs(player->uid, x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
+                    player->teleport_abs(x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
                 }
                 else
                     player->overlay->remove_item(player->uid);
@@ -1240,7 +1239,7 @@ void force_noclip()
                 fix_co_coordinates(cpos);
                 if (cpos.first != player->position().first || cpos.second != player->position().second)
                 {
-                    move_entity_abs(player->uid, cpos.first, cpos.second, player->velocityx, player->velocityy);
+                    player->teleport_abs(cpos.first, cpos.second, player->velocityx, player->velocityy);
                     // this just glitches the shaders, doesn't work
                     // set_camera_position(cpos.first, cpos.second);
                 }
@@ -1251,7 +1250,7 @@ void force_noclip()
 
 void frame_advance()
 {
-    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= get_frame_count())
+    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
     {
         g_state->pause = 0x20;
         g_pause_at = -1;
@@ -1291,7 +1290,7 @@ void warp_inc(uint8_t w, uint8_t l, uint8_t t)
 {
     if (options["warp_increments_level_count"])
         g_state->level_count += 1;
-    warp(w, l, t);
+    UI::warp(w, l, t);
 }
 
 void warp_next_level(size_t num)
@@ -1381,10 +1380,10 @@ void warp_next_level(size_t num)
     doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"));
     doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_COG"));
     doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"));
-    auto doors = get_entities_by_type(doortypes);
+    auto doors = UI::get_entities_by(doortypes, 0x100, LAYER::BOTH);
     for (auto doorid : doors)
     {
-        ExitDoor* doorent = (ExitDoor*)get_entity_ptr(doorid);
+        ExitDoor* doorent = get_entity_ptr(doorid)->as<ExitDoor>();
         if (!doorent->special_door)
             continue;
         targets.emplace_back(doorent->world, doorent->level, doorent->theme);
@@ -1805,14 +1804,14 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     if (pressed("zoom_out", wParam))
     {
         if (g_zoom == 0.0f)
-            g_zoom = get_zoom_level();
+            g_zoom = UI::get_zoom_level();
         g_zoom += 1.0f;
         set_zoom();
     }
     else if (pressed("zoom_in", wParam))
     {
         if (g_zoom == 0.0f)
-            g_zoom = get_zoom_level();
+            g_zoom = UI::get_zoom_level();
         g_zoom -= 1.0f;
         set_zoom();
     }
@@ -1844,7 +1843,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("toggle_godmode", wParam))
     {
         options["god_mode"] = !options["god_mode"];
-        godmode(options["god_mode"]);
+        UI::godmode(options["god_mode"]);
     }
     else if (pressed("toggle_noclip", wParam))
     {
@@ -1889,7 +1888,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (g_state->pause == 0x20)
         {
-            g_pause_at = get_frame_count() + 1;
+            g_pause_at = UI::get_frame_count() + 1;
             g_state->pause = 0;
         }
     }
@@ -1915,24 +1914,24 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("toggle_ghost", wParam))
     {
         options["disable_ghost_timer"] = !options["disable_ghost_timer"];
-        set_time_ghost_enabled(!options["disable_ghost_timer"]);
-        set_time_jelly_enabled(!options["disable_ghost_timer"]);
+        UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
+        UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
     }
     else if (pressed("teleport_left", wParam))
     {
-        teleport(-3, 0, false, 0, 0, options["snap_to_grid"]);
+        UI::teleport(-3, 0, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("teleport_right", wParam))
     {
-        teleport(3, 0, false, 0, 0, options["snap_to_grid"]);
+        UI::teleport(3, 0, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("teleport_up", wParam))
     {
-        teleport(0, 3, false, 0, 0, options["snap_to_grid"]);
+        UI::teleport(0, 3, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("teleport_down", wParam))
     {
-        teleport(0, -3, false, 0, 0, options["snap_to_grid"]);
+        UI::teleport(0, -3, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("spawn_layer_door", wParam))
     {
@@ -1940,7 +1939,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("teleport", wParam))
     {
-        teleport(g_x, g_y, false, 0, 0, options["snap_to_grid"]);
+        UI::teleport(g_x, g_y, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("camera_left", wParam))
     {
@@ -2629,7 +2628,7 @@ void render_narnia()
     doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"));
     doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_COG"));
     doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"));
-    auto doors = get_entities_by_type(doortypes);
+    auto doors = UI::get_entities_by(doortypes, 0x100, LAYER::BOTH);
     for (auto doorid : doors)
     {
         ExitDoor* target = (ExitDoor*)get_entity_ptr(doorid);
@@ -2872,7 +2871,7 @@ void render_camera()
         ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
         if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
         {
-            set_camp_camera_bounds_enabled(enable_camp_camera);
+            UI::set_camp_camera_bounds_enabled(enable_camp_camera);
             if (!enable_camp_camera && g_state->screen == 11)
             {
                 g_state->camera->bounds_left = 0.5;
@@ -2922,7 +2921,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     auto* draw_list = ImGui::GetWindowDrawList();
     for (int x = -1; x < 96; x++)
     {
-        std::pair<float, float> gridline = screen_position(x + 0.5f, 0);
+        std::pair<float, float> gridline = UI::screen_position(x + 0.5f, 0);
         if (abs(gridline.first) <= 1.0)
         {
             int width = 2;
@@ -2943,7 +2942,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     }
     for (int y = -1; y < 128; y++)
     {
-        std::pair<float, float> gridline = screen_position(0, y + 0.5f);
+        std::pair<float, float> gridline = UI::screen_position(0, y + 0.5f);
         if (abs(gridline.second) <= 1.0)
         {
             int width = 2;
@@ -2962,17 +2961,17 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
             draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, static_cast<float>(width));
         }
     }
-    g_players = get_players();
+    g_players = UI::get_players();
     for (auto player : g_players)
     {
-        std::pair<float, float> gridline = screen_position(round(player->position().first - 0.5f) + 0.5f, round(player->position().second) - 0.5f);
+        std::pair<float, float> gridline = UI::screen_position(round(player->position().first - 0.5f) + 0.5f, round(player->position().second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(255, 0, 255, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(255, 0, 255, 200), 2);
     }
     if (update_entity())
     {
-        std::pair<float, float> gridline = screen_position(round(g_entity->position().first - 0.5f) + 0.5f, round(g_entity->position().second) - 0.5f);
+        std::pair<float, float> gridline = UI::screen_position(round(g_entity->position().first - 0.5f) + 0.5f, round(g_entity->position().second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
@@ -2986,7 +2985,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
             {
                 auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
                 auto room_pos = g_state->level_gen->get_room_pos(x, y);
-                auto pos = screen_position(room_pos.first, room_pos.second);
+                auto pos = UI::screen_position(room_pos.first, room_pos.second);
                 ImVec2 spos = screenify({pos.first, pos.second});
                 std::string room_text = fmt::format("{:d},{:d} {:s} ({:d})", x, y, room_name, room_temp.value());
                 draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
@@ -3014,9 +3013,9 @@ void render_olmec(Entity* ent, ImColor color)
         render_position = ent->position();
 
     auto [boxa_x, boxa_y] =
-        screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
+        UI::screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
     auto [boxb_x, boxb_y] =
-        screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
+        UI::screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
     ImVec2 sboxa = screenify({boxa_x, boxa_y});
     ImVec2 sboxb = screenify({boxb_x, boxb_y});
     auto* draw_list = ImGui::GetWindowDrawList();
@@ -3044,9 +3043,9 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     else
         render_position = get_position(ent->uid);
     auto [boxa_x, boxa_y] =
-        screen_position(std::get<0>(render_position) - ent->hitboxx + ent->offsetx, std::get<1>(render_position) - ent->hitboxy + ent->offsety);
+        UI::screen_position(std::get<0>(render_position) - ent->hitboxx + ent->offsetx, std::get<1>(render_position) - ent->hitboxy + ent->offsety);
     auto [boxb_x, boxb_y] =
-        screen_position(std::get<0>(render_position) + ent->hitboxx + ent->offsetx, std::get<1>(render_position) + ent->hitboxy + ent->offsety);
+        UI::screen_position(std::get<0>(render_position) + ent->hitboxx + ent->offsetx, std::get<1>(render_position) + ent->hitboxy + ent->offsety);
     ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
     ImVec2 sboxa = screenify({boxa_x, boxa_y});
     ImVec2 sboxb = screenify({boxb_x, boxb_y});
@@ -3063,7 +3062,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
 
     if (type == to_id("ENT_TYPE_FLOOR_SPARK_TRAP") && ent->animation_frame == 7)
     {
-        auto [radx, rady] = screen_position(std::get<0>(render_position) + 3, std::get<1>(render_position) + 3);
+        auto [radx, rady] = UI::screen_position(std::get<0>(render_position) + 3, std::get<1>(render_position) + 3);
         auto srad = screenify({radx, rady});
         draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
@@ -3080,10 +3079,10 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
         pb = ps + ImRotate(pb, cosa, sina);
         pc = ps + ImRotate(pc, cosa, sina);
         pd = ps + ImRotate(pd, cosa, sina);
-        auto [pax, pay] = screen_position(pa.x, pa.y);
-        auto [pbx, pby] = screen_position(pb.x, pb.y);
-        auto [pcx, pcy] = screen_position(pc.x, pc.y);
-        auto [pdx, pdy] = screen_position(pd.x, pd.y);
+        auto [pax, pay] = UI::screen_position(pa.x, pa.y);
+        auto [pbx, pby] = UI::screen_position(pb.x, pb.y);
+        auto [pcx, pcy] = UI::screen_position(pc.x, pc.y);
+        auto [pdx, pdy] = UI::screen_position(pd.x, pd.y);
         const ImVec2 points[] = {screenify({pax, pay}), screenify({pbx, pby}), screenify({pcx, pcy}), screenify({pdx, pdy}), screenify({pax, pay})};
         draw_list->AddPolyline(points, 5, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
@@ -3131,8 +3130,8 @@ void set_vel(ImVec2 pos)
 {
     g_vx = normalize(pos).x;
     g_vy = normalize(pos).y;
-    auto cpos = click_position(g_x, g_y);
-    auto cpos2 = click_position(g_vx, g_vy);
+    auto cpos = UI::click_position(g_x, g_y);
+    auto cpos2 = UI::click_position(g_vx, g_vy);
     g_dx = floor(cpos2.first + 0.5f) - floor(cpos.first + 0.5f);
     g_dy = floor(cpos2.second + 0.5f) - floor(cpos.second + 0.5f);
     g_vx = 2 * (g_vx - g_x);
@@ -3244,14 +3243,14 @@ void render_clickhandler()
         if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
         {
             if (g_zoom == 0.0f)
-                g_zoom = get_zoom_level();
+                g_zoom = UI::get_zoom_level();
             g_zoom += g_zoom / 13.5f;
             set_zoom();
         }
         else if (clicked("mouse_zoom_in") || (held("mouse_camera_drag") && io.MouseWheel > 0))
         {
             if (g_zoom == 0.0f)
-                g_zoom = get_zoom_level();
+                g_zoom = UI::get_zoom_level();
             g_zoom -= g_zoom / 13.5f;
             set_zoom();
         }
@@ -3262,7 +3261,7 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"])
     {
-        for (auto entity : get_entities_by(0, 0xBF, LAYER::PLAYER))
+        for (auto entity : UI::get_entities_by({}, 0xBF, LAYER::PLAYER))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -3279,7 +3278,7 @@ void render_clickhandler()
 
             render_hitbox(ent, false, ImColor(0, 255, 255, 150));
         }
-        g_players = get_players();
+        g_players = UI::get_players();
         for (auto player : g_players)
         {
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
@@ -3308,7 +3307,7 @@ void render_clickhandler()
             to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
             to_id("ENT_TYPE_FLOOR_SPIKES"),
         };
-        for (auto entity : get_entities_by(additional_fixed_entities, 0, LAYER::PLAYER))
+        for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, LAYER::PLAYER))
         {
             auto ent = get_entity_ptr(entity);
             if (entity_names[ent->type->id].find("TRIGGER") != std::string::npos)
@@ -3320,7 +3319,7 @@ void render_clickhandler()
         if (ImGui::IsMousePosValid())
         {
             ImVec2 mpos = normalize(io.MousePos);
-            std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
+            std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
             // std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
             std::string buf = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
@@ -3333,7 +3332,7 @@ void render_clickhandler()
             {
                 mask = unsafe_entity_mask;
             }
-            auto hovered = get_entity_at(cpos.first, cpos.second, false, 2, mask);
+            auto hovered = UI::get_entity_at(cpos.first, cpos.second, false, 2, mask);
             if (hovered != -1)
             {
                 render_hitbox(get_entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
@@ -3423,7 +3422,7 @@ void render_clickhandler()
             io.MouseDrawCursor = false;
             startpos = ImGui::GetMousePos();
             set_pos(startpos);
-            g_over_id = get_entity_at(g_x, g_y, true, 2, safe_entity_mask);
+            g_over_id = UI::get_entity_at(g_x, g_y, true, 2, safe_entity_mask);
         }
         else if ((held("mouse_spawn_throw") || held("mouse_teleport_throw") || held("mouse_spawn_over")) && ImGui::IsWindowFocused())
         {
@@ -3473,11 +3472,11 @@ void render_clickhandler()
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
             ImVec2 mpos = normalize(startpos);
-            std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
+            std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
             auto player = (Movable*)g_players.at(0)->topmost_mount();
-            move_entity_abs(player->uid, cpos.first, cpos.second, g_vx, g_vy);
+            player->teleport_abs(cpos.first, cpos.second, g_vx, g_vy);
             // set_camera_position(cpos.first, cpos.second);
             g_x = 0;
             g_y = 0;
@@ -3490,11 +3489,11 @@ void render_clickhandler()
                 return;
             set_pos(startpos);
             ImVec2 mpos = normalize(io.MousePos);
-            std::pair<float, float> cpos = click_position(mpos.x, mpos.y);
+            std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
             auto player = (Movable*)g_players.at(0)->topmost_mount();
-            move_entity_abs(player->uid, cpos.first, cpos.second, g_vx, g_vy);
+            player->teleport_abs(cpos.first, cpos.second, g_vx, g_vy);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3509,7 +3508,7 @@ void render_clickhandler()
             {
                 mask = unsafe_entity_mask;
             }
-            g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
+            g_held_id = UI::get_entity_at(g_x, g_y, true, 2, mask);
             g_held_entity = get_entity_ptr(g_held_id)->as<Movable>();
             if (g_held_entity)
                 g_held_flags = g_held_entity->flags;
@@ -3524,7 +3523,7 @@ void render_clickhandler()
                 throw_held = true;
             }
             set_pos(startpos);
-            move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
+            UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             render_arrow();
         }
         else if ((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
@@ -3543,7 +3542,7 @@ void render_clickhandler()
                     g_held_entity->flags |= 1U << 4;
                     g_held_entity->flags |= 1U << 9;
                 }
-                move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
+                UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             }
         }
         if (released("mouse_grab_throw") && g_held_id > 0 && g_held_entity != 0)
@@ -3554,7 +3553,7 @@ void render_clickhandler()
                 g_held_entity->flags = g_held_flags;
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
-            move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3569,7 +3568,7 @@ void render_clickhandler()
                 g_held_entity->flags = g_held_flags;
             if (options["snap_to_grid"])
             {
-                move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
+                UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             }
             g_x = 0;
             g_y = 0;
@@ -3620,7 +3619,7 @@ void render_clickhandler()
         {
             if (ImGui::IsMousePosValid())
             {
-                g_state->camera->focused_entity_uid = get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
+                g_state->camera->focused_entity_uid = UI::get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
             }
             set_camera_bounds(true);
         }
@@ -3639,8 +3638,8 @@ void render_clickhandler()
             {
                 g_state->camera->focused_entity_uid = -1;
                 ImVec2 mpos = normalize(io.MousePos);
-                std::pair<float, float> oryginal_pos = click_position(startpos.x, startpos.y);
-                std::pair<float, float> current_pos = click_position(mpos.x, mpos.y);
+                std::pair<float, float> oryginal_pos = UI::click_position(startpos.x, startpos.y);
+                std::pair<float, float> current_pos = UI::click_position(mpos.x, mpos.y);
 
                 g_state->camera->focus_x -= current_pos.first - oryginal_pos.first;
                 g_state->camera->focus_y -= current_pos.second - oryginal_pos.second;
@@ -3706,14 +3705,14 @@ void render_clickhandler()
             {
                 mask = unsafe_entity_mask;
             }
-            g_held_id = get_entity_at(g_x, g_y, true, 2, mask);
+            g_held_id = UI::get_entity_at(g_x, g_y, true, 2, mask);
             if (g_held_id > 0)
             {
                 // move movables to void because they like to explode and drop stuff, but actually destroy blocks and such
                 Entity* to_kill = get_entity_ptr(g_held_id);
                 if (to_kill->is_movable())
                 {
-                    move_entity(g_held_id, 0, -1000, false, 0, 0, true);
+                    UI::move_entity(g_held_id, 0, -1000, false, 0, 0, true);
                 }
                 else
                 {
@@ -3736,12 +3735,12 @@ void render_options()
     ImGui::Text("Game cheats");
     if (ImGui::Checkbox("God mode (players)##Godmode", &options["god_mode"]))
     {
-        godmode(options["god_mode"]);
+        UI::godmode(options["god_mode"]);
     }
     tooltip("Make the players completely deathproof.", "toggle_godmode");
     if (ImGui::Checkbox("God mode (companions)##GodmodeCompanions", &options["god_mode_companions"]))
     {
-        godmode_companions(options["god_mode_companions"]);
+        UI::godmode_companions(options["god_mode_companions"]);
     }
     tooltip("Make the hired hands completely deathproof.");
     if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
@@ -3767,8 +3766,8 @@ void render_options()
     tooltip("Forces every level to be lit af.");
     if (ImGui::Checkbox("Disable ghost timer", &options["disable_ghost_timer"]))
     {
-        set_time_ghost_enabled(!options["disable_ghost_timer"]);
-        set_time_jelly_enabled(!options["disable_ghost_timer"]);
+        UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
+        UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
     }
     tooltip("Disables the timed ghost and jelly.", "toggle_ghost");
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
@@ -4549,7 +4548,7 @@ void render_entity_props(int uid, bool detached = false)
             entity_windows[uid]->open = false;
         return;
     }
-    auto entity_type = get_entity_type(uid);
+    auto entity_type = UI::get_entity_type(uid);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     render_uid(entity->uid, "EntityGeneral");
     ImGui::SameLine();
@@ -5534,7 +5533,7 @@ void render_spawner()
 void render_prohud()
 {
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{}", get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause);
+    std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, 2}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
@@ -5973,7 +5972,7 @@ void init_ui()
 
     g_state = get_state_ptr();
     g_state_addr = reinterpret_cast<uintptr_t>(g_state);
-    g_save = savedata();
+    g_save = UI::savedata();
     g_save_addr = reinterpret_cast<uintptr_t>(g_save);
 
     g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
