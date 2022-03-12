@@ -108,7 +108,7 @@ int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float v
     {
         if (state.items()->player(i) != nullptr)
         {
-            player = state.items()->player(i); // maybe spawn offset to camera focus uid then the player itself?
+            player = state.items()->player(i); // maybe spawn offset to camera focus instead of the player?
             break;
         }
     }

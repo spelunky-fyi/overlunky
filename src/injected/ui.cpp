@@ -32,7 +32,6 @@
 #include "entities_floors.hpp"
 #include "entities_items.hpp"
 #include "entities_logical.hpp"
-#include "entity.hpp"
 #include "file_api.hpp"
 #include "flags.hpp"
 #include "level_api.hpp"
@@ -206,10 +205,9 @@ ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1;
-unsigned int g_entity_type = 0, g_level_width = 0, g_level_height = 0;
+unsigned int g_level_width = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0;
-uintptr_t g_entity_addr = 0, g_state_addr = 0, g_save_addr = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
@@ -221,7 +219,6 @@ bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, 
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Player* g_entity = 0;
 Movable* g_held_entity = 0;
-Inventory* g_inventory = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
 std::map<int, std::string> entity_names;
@@ -387,19 +384,6 @@ void hook_savegame()
                                       original(backup_file, file, data, data_size); });
         savegame_hooked = true;
     }
-}
-
-int int_pow(int base, unsigned int exp)
-{
-    int result = 1;
-    while (exp)
-    {
-        if (exp & 1)
-            result *= base;
-        exp >>= 1;
-        base *= base;
-    }
-    return result;
 }
 
 ImVec4 hue_shift(ImVec4 in, float hue) // unused
@@ -904,30 +888,10 @@ void save_search()
     save_config(cfgfile);
 }
 
-uint32_t entity_type(int uid)
-{
-    return UI::get_entity_type(uid);
-}
-
 bool update_players()
 {
     g_players = UI::get_players();
     return true;
-}
-
-void set_flag(uint32_t& flags, int bit)
-{
-    flags |= (1U << (bit - 1));
-}
-
-void clr_flag(uint32_t& flags, int bit)
-{
-    flags &= ~(1U << (bit - 1));
-}
-
-bool test_flag(uint32_t flags, int bit)
-{
-    return (flags & (1U << (bit - 1))) > 0;
 }
 
 void spawn_entities(bool s, std::string list = "")
@@ -1054,36 +1018,17 @@ bool update_entity()
         return false;
     if (g_last_id > -1)
     {
-        g_entity_type = entity_type(g_last_id);
-        g_entity = (Player*)get_entity_ptr(g_last_id);
-        g_entity_addr = reinterpret_cast<uintptr_t>(g_entity);
-        if (g_entity == nullptr || IsBadWritePtr(g_entity, 0x178))
+        g_entity = get_entity_ptr(g_last_id)->as<Player>();
+        if (g_entity == nullptr)
         {
             g_entity = nullptr;
-            g_entity_type = 0;
-            g_entity_addr = 0;
-            g_inventory = nullptr;
             return false;
         }
-        if (g_entity != nullptr && (g_entity_type >= 194 && g_entity_type <= 213))
-        {
-            g_inventory = g_entity->inventory_ptr;
-            if (IsBadWritePtr(g_inventory, 0x1428))
-                g_inventory = nullptr;
-            return true;
-        }
-        else
-        {
-            g_inventory = nullptr;
-            return true;
-        }
+        return true;
     }
     else
     {
         g_entity = nullptr;
-        g_entity_type = 0;
-        g_inventory = nullptr;
-        g_entity_addr = 0;
     }
     return false;
 }
@@ -2255,7 +2200,7 @@ void tooltip(const char* tip, const char* key)
 void render_uid(int uid, const char* section, bool rembtn = false)
 {
     std::string uidc = std::to_string(uid);
-    auto ptype = entity_type(uid);
+    auto ptype = UI::get_entity_type(uid);
     if (ptype == 0)
         return;
     std::string typec = std::to_string(ptype);
@@ -2315,7 +2260,7 @@ void render_illumination(Illumination* light, const char* sect = "")
     ImGui::DragFloat("Distortion##LightDistortion", &light->distortion, 0.01f);
     for (int i = 0; i < 11; i++)
     {
-        ImGui::CheckboxFlags(illumination_flags[i], &light->flags, int_pow(2, i));
+        ImGui::CheckboxFlags(illumination_flags[i], &light->flags, (int)std::pow(2, i));
     }
     ImGui::PopID();
 }
@@ -3335,7 +3280,7 @@ void render_clickhandler()
             if (hovered != -1)
             {
                 render_hitbox(get_entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
-                auto ptype = entity_type(hovered);
+                auto ptype = UI::get_entity_type(hovered);
                 const char* pname = entity_names[ptype].c_str();
                 std::string buf3 = fmt::format("{}, {}", hovered, pname);
                 dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3.c_str());
@@ -3858,9 +3803,12 @@ void render_options()
 void render_debug()
 {
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    ImGui::InputScalar("State##StatePointer", ImGuiDataType_U64, &g_state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
-    ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &g_entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
-    ImGui::InputScalar("Save##SavePointer", ImGuiDataType_U64, &g_save_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+    size_t entity_addr = reinterpret_cast<size_t>(g_entity);
+    size_t state_addr = reinterpret_cast<size_t>(g_state);
+    size_t save_addr = reinterpret_cast<size_t>(g_save);
+    ImGui::InputScalar("State##StatePointer", ImGuiDataType_U64, &state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputScalar("Entity##EntityPointer", ImGuiDataType_U64, &entity_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+    ImGui::InputScalar("Save##SavePointer", ImGuiDataType_U64, &save_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
     ImGui::InputScalar(
         "Level flags##HudFlagsDebug",
         ImGuiDataType_U32,
@@ -4202,7 +4150,7 @@ void render_savegame()
         {
             ImGui::PushID(i);
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.245f);
-            ImGui::CheckboxFlags(people_flags[i], &g_save->characters, int_pow(2, i));
+            ImGui::CheckboxFlags(people_flags[i], &g_save->characters, (int)std::pow(2, i));
             ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
             ImGui::PushID("character_deaths");
             ImGui::DragInt("", &g_save->character_deaths[i], 0.5f, 0, INT_MAX);
@@ -4354,7 +4302,7 @@ void render_savegame()
 void render_powerup(int uid, const char* section)
 {
     std::string uidc = std::to_string(uid);
-    int ptype = entity_type(uid);
+    int ptype = UI::get_entity_type(uid);
     if (ptype == 0)
         return;
     std::string typec = std::to_string(ptype);
@@ -4713,7 +4661,7 @@ void render_entity_props(int uid, bool detached = false)
         {
             for (int i = 0; i < 32; i++)
             {
-                ImGui::CheckboxFlags(entity_type_properties_flags[i], &entity->type->properties_flags, int_pow(2, i));
+                ImGui::CheckboxFlags(entity_type_properties_flags[i], &entity->type->properties_flags, (int)std::pow(2, i));
             }
         }
     }
@@ -4879,14 +4827,14 @@ void render_entity_props(int uid, bool detached = false)
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(entity_flags[i], &entity->flags, int_pow(2, i));
+            ImGui::CheckboxFlags(entity_flags[i], &entity->flags, (int)std::pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("More Flags"))
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(more_flags[i], &entity->more_flags, int_pow(2, i));
+            ImGui::CheckboxFlags(more_flags[i], &entity->more_flags, (int)std::pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Input Display"))
@@ -4910,7 +4858,7 @@ void render_entity_props(int uid, bool detached = false)
         for (int i = 0; i < 6; i++)
         {
             int buttons = entity->buttons;
-            ImGui::CheckboxFlags(button_flags[i], &buttons, int_pow(2, i));
+            ImGui::CheckboxFlags(button_flags[i], &buttons, (int)std::pow(2, i));
             if (i < 5)
                 ImGui::SameLine(region.x / 6 * (i + 1));
         }
@@ -5245,35 +5193,35 @@ void render_game_props()
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(level_flags[i], &g_state->level_flags, int_pow(2, i));
+            ImGui::CheckboxFlags(level_flags[i], &g_state->level_flags, (int)std::pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Quest flags"))
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(quest_flags[i], &g_state->quest_flags, int_pow(2, i));
+            ImGui::CheckboxFlags(quest_flags[i], &g_state->quest_flags, (int)std::pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Journal flags"))
     {
         for (int i = 0; i < 21; i++)
         {
-            ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, int_pow(2, i));
+            ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, (int)std::pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Presence flags"))
     {
         for (int i = 0; i < 11; i++)
         {
-            ImGui::CheckboxFlags(presence_flags[i], &g_state->presence_flags, int_pow(2, i));
+            ImGui::CheckboxFlags(presence_flags[i], &g_state->presence_flags, (int)std::pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("Special visibility flags"))
     {
         for (int i = 0; i < 32; i++)
         {
-            ImGui::CheckboxFlags(special_visibility_flags[i], &g_state->special_visibility_flags, int_pow(2, i));
+            ImGui::CheckboxFlags(special_visibility_flags[i], &g_state->special_visibility_flags, (int)std::pow(2, i));
         }
     }
     if (ImGui::CollapsingHeader("AI targets"))
@@ -5970,9 +5918,7 @@ void init_ui()
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
     g_state = get_state_ptr();
-    g_state_addr = reinterpret_cast<uintptr_t>(g_state);
     g_save = UI::savedata();
-    g_save_addr = reinterpret_cast<uintptr_t>(g_save);
 
     g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
     g_Console->load_history("console_history.txt");

@@ -7,6 +7,21 @@ class Player;
 struct SaveData;
 struct Illumination;
 
+constexpr uint32_t set_flag(uint32_t& flags, int bit)
+{
+    return flags |= (1U << (bit - 1));
+}
+
+constexpr uint32_t clr_flag(uint32_t& flags, int bit)
+{
+    return flags &= ~(1U << (bit - 1));
+}
+
+constexpr bool test_flag(uint32_t flags, int bit)
+{
+    return (flags & (1U << (bit - 1))) > 0;
+}
+
 class UI
 {
   public:
