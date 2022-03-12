@@ -221,6 +221,7 @@ Player* g_entity = 0;
 Movable* g_held_entity = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
+ENT_TYPE g_ana_spelunky = 0, g_eggplant_child = 0;
 std::map<int, std::string> entity_names;
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
@@ -1203,12 +1204,10 @@ void frame_advance()
 
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
-    const auto ana_id = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-    const auto ana_type = get_type(ana_id);
-    const auto ana_texture = ana_type->texture;
+    const auto ana_texture = get_type(g_ana_spelunky)->texture;
 
     g_state->items->player_select_slots[0].activated = true;
-    g_state->items->player_select_slots[0].character = g_save->players[0] + ana_id;
+    g_state->items->player_select_slots[0].character = g_save->players[0] + g_ana_spelunky;
     g_state->items->player_select_slots[0].texture_id = g_save->players[0] + ana_texture;
     if (g_state->items->player_count < 1)
         g_state->items->player_count = 1;
@@ -1320,10 +1319,7 @@ void warp_next_level(size_t num)
         targets.emplace_back(target_world, target_level, target_theme);
     }
 
-    std::vector<uint32_t> doortypes;
-    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"));
-    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_COG"));
-    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"));
+    static const auto doortypes = {to_id("ENT_TYPE_FLOOR_DOOR_EXIT"), to_id("ENT_TYPE_FLOOR_DOOR_COG"), to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD")};
     auto doors = UI::get_entities_by(doortypes, 0x100, LAYER::BOTH);
     for (auto doorid : doors)
     {
@@ -2568,10 +2564,7 @@ void render_narnia()
         n++;
     }
 
-    std::vector<uint32_t> doortypes;
-    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"));
-    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_COG"));
-    doortypes.push_back(to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"));
+    static const auto doortypes = {to_id("ENT_TYPE_FLOOR_DOOR_EXIT"), to_id("ENT_TYPE_FLOOR_DOOR_COG"), to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD")};
     auto doors = UI::get_entities_by(doortypes, 0x100, LAYER::BOTH);
     for (auto doorid : doors)
     {
@@ -3004,13 +2997,18 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     else
         draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
 
-    if (type == to_id("ENT_TYPE_FLOOR_SPARK_TRAP") && ent->animation_frame == 7)
+    static const auto spark_trap = to_id("ENT_TYPE_FLOOR_SPARK_TRAP");
+    static const auto wooden_arrow = to_id("ENT_TYPE_ITEM_WOODEN_ARROW");
+    static const auto metal_arrow = to_id("ENT_TYPE_ITEM_METAL_ARROW");
+    static const auto light_arrow = to_id("ENT_TYPE_ITEM_LIGHT_ARROW");
+
+    if (type == spark_trap && ent->animation_frame == 7)
     {
         auto [radx, rady] = UI::screen_position(std::get<0>(render_position) + 3, std::get<1>(render_position) + 3);
         auto srad = screenify({radx, rady});
         draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
-    else if (type == to_id("ENT_TYPE_ITEM_WOODEN_ARROW") || type == to_id("ENT_TYPE_ITEM_METAL_ARROW") || type == to_id("ENT_TYPE_ITEM_LIGHT_ARROW"))
+    else if (type == wooden_arrow || type == metal_arrow || type == light_arrow)
     {
         ImVec2 ps = {get<0>(render_position), get<1>(render_position)};
         float cosa = ImCos(ent->angle);
@@ -3205,13 +3203,14 @@ void render_clickhandler()
     }
     if (options["draw_hitboxes"])
     {
+        static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
         for (auto entity : UI::get_entities_by({}, 0xBF, LAYER::PLAYER))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
                 continue;
 
-            if (ent->type->id == to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"))
+            if (ent->type->id == olmec)
             {
                 render_olmec(ent, ImColor(0, 255, 255, 150));
                 continue;
@@ -3228,8 +3227,7 @@ void render_clickhandler()
             render_hitbox(player, false, ImColor(255, 0, 255, 200));
         }
 
-        const auto additional_fixed_entities = {
-            (ENT_TYPE)CUSTOM_TYPE::TRIGGER,
+        static const auto additional_fixed_entities = {
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
             to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
             to_id("ENT_TYPE_ACTIVEFLOOR_EGGSHIPBLOCKER"),
@@ -3251,13 +3249,15 @@ void render_clickhandler()
             to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
             to_id("ENT_TYPE_FLOOR_SPIKES"),
         };
-        for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, LAYER::PLAYER))
+        for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, LAYER::PLAYER)) // FLOOR | ACTIVEFLOOR
         {
             auto ent = get_entity_ptr(entity);
-            if (entity_names[ent->type->id].find("TRIGGER") != std::string::npos)
-                render_hitbox(ent, false, ImColor(255, 0, 0, 150));
-            else
-                render_hitbox(ent, false, ImColor(0, 255, 255, 150));
+            render_hitbox(ent, false, ImColor(0, 255, 255, 150));
+        }
+        for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, LAYER::PLAYER)) // LOGICAL
+        {
+            auto ent = get_entity_ptr(entity);
+            render_hitbox(ent, false, ImColor(255, 0, 0, 150));
         }
 
         if (ImGui::IsMousePosValid())
@@ -3626,15 +3626,16 @@ void render_clickhandler()
         {
             g_last_gun = ImGui::GetFrameCount();
             set_pos(ImGui::GetMousePos());
-            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
-            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y - 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
-            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y + 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
-            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
-            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
-            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x + 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
-            UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x - 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            static const auto powered_explosion = to_id("ENT_TYPE_FX_POWEREDEXPLOSION");
+            UI::spawn_entity(powered_explosion, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(powered_explosion, g_x - 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(powered_explosion, g_x + 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(powered_explosion, g_x, g_y - 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(powered_explosion, g_x, g_y + 0.3f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(powered_explosion, g_x + 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(powered_explosion, g_x - 0.15f, g_y + 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(powered_explosion, g_x + 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
+            UI::spawn_entity(powered_explosion, g_x - 0.15f, g_y - 0.2f, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -4629,7 +4630,7 @@ void render_entity_props(int uid, bool detached = false)
     {
         ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&entity->health, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Price##Price", ImGuiDataType_S32, (char*)&entity->price, 0.5f, &s32_min, &s32_max);
-        if (entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") && entity->inventory_ptr != 0)
+        if (entity_type >= g_ana_spelunky && entity_type <= g_eggplant_child && entity->inventory_ptr != 0)
         {
             ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&entity->inventory_ptr->bombs, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Ropes##EntityRopes", ImGuiDataType_U8, (char*)&entity->inventory_ptr->ropes, 0.5f, &u8_one, &u8_max);
@@ -4671,7 +4672,7 @@ void render_entity_props(int uid, bool detached = false)
         {
             auto coffin = (Coffin*)entity;
             ImGui::Text("Character in coffin:");
-            ImGui::SliderInt("##CoffinSpawns", (int*)&coffin->inside, to_id("ENT_TYPE_CHAR_ANA_SPELUNKY"), to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD"));
+            ImGui::SliderInt("##CoffinSpawns", (int*)&coffin->inside, g_ana_spelunky, g_eggplant_child);
             if (coffin->inside == to_id("ENT_TYPE_CHAR_CLASSIC_GUY") + 1)
                 coffin->inside = to_id("ENT_TYPE_CHAR_HIREDHAND");
             ImGui::SameLine();
@@ -4720,7 +4721,7 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::SameLine();
             ImGui::Text("%s", theme_name(target->theme));
         }
-        else if ((entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD")) || (entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")) || (entity_type >= to_id("ENT_TYPE_MOUNT_TURKEY") && entity_type <= to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH")))
+        else if ((entity_type >= g_ana_spelunky && entity_type <= g_eggplant_child) || (entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")) || (entity_type >= to_id("ENT_TYPE_MOUNT_TURKEY") && entity_type <= to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH")))
         {
             for (const auto& [powerup_id, powerup_entity] : entity->powerups)
             {
@@ -4750,7 +4751,7 @@ void render_entity_props(int uid, bool detached = false)
                 "Tablet of Destiny",
                 "True crown",
                 "Udjat eye"};
-            static uint32_t powerupTypeIDOptions[] = {
+            static const uint32_t powerupTypeIDOptions[] = {
                 to_id("ENT_TYPE_ITEM_POWERUP_SPECIALCOMPASS"),
                 to_id("ENT_TYPE_ITEM_POWERUP_ANKH"),
                 to_id("ENT_TYPE_ITEM_POWERUP_CLIMBING_GLOVES"),
@@ -4788,7 +4789,7 @@ void render_entity_props(int uid, bool detached = false)
                 entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
             ImGui::PopItemWidth();
-            if (entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD") && entity->ai != 0)
+            if (entity_type >= g_ana_spelunky && entity_type <= g_eggplant_child && entity->ai != 0)
             {
                 ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &entity->ai->state, &u8_min, &s8_max);
                 ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &entity->ai->trust, &u8_min, &s8_max);
@@ -4865,7 +4866,7 @@ void render_entity_props(int uid, bool detached = false)
     }
     if (ImGui::CollapsingHeader("Illumination"))
     {
-        if ((entity_type >= to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") && entity_type <= to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))) // TODO: show all lit entities
+        if ((entity_type >= g_ana_spelunky && entity_type <= to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))) // TODO: show all lit entities
         {
             if (entity->emitted_light)
                 render_illumination(entity->emitted_light, "Entity illumination");
@@ -5916,6 +5917,9 @@ std::string make_save_path(std::string_view script_path, std::string_view script
 void init_ui()
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
+
+    g_ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+    g_eggplant_child = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
 
     g_state = get_state_ptr();
     g_save = UI::savedata();
