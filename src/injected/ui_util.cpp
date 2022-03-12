@@ -172,7 +172,7 @@ std::vector<Player*> UI::get_players()
 {
     return ::get_players();
 }
-int32_t UI::get_grid_entity_at(float x, float y, LAYER l)
+int32_t UI::get_grid_entity_at(float x, float y, LAYER l) // TODO get them in specific mask order
 {
     return ::get_grid_entity_at(x, y, l);
 }
@@ -184,7 +184,7 @@ void UI::set_camp_camera_bounds_enabled(bool b)
 {
     ::set_camp_camera_bounds_enabled(b);
 }
-std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
+std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer) // TODO: just return entities
 {
     return ::get_entities_by(entity_types, mask, layer);
 }

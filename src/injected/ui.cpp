@@ -217,7 +217,7 @@ bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, 
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
      enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
-Player* g_entity = 0;
+Entity* g_entity = 0;
 Movable* g_held_entity = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
@@ -248,8 +248,8 @@ std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
 [[maybe_unused]] const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 [[maybe_unused]] const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-const unsigned int safe_entity_mask = 0x18f;
-const unsigned int unsafe_entity_mask = 0xffffffff;
+constexpr unsigned int safe_entity_mask = 0x18f;
+constexpr unsigned int unsafe_entity_mask = 0xffffffff;
 
 std::map<std::string, bool> options = {
     {"mouse_control", true},
@@ -389,8 +389,8 @@ void hook_savegame()
 
 ImVec4 hue_shift(ImVec4 in, float hue) // unused
 {
-    float U = cos(hue * 3.14159265f / 180);
-    float W = sin(hue * 3.14159265f / 180);
+    float U = std::cos(hue * 3.14159265f / 180);
+    float W = std::sin(hue * 3.14159265f / 180);
     ImVec4 out = ImVec4(
         (.299f + .701f * U + .168f * W) * in.x + (.587f - .587f * U + .330f * W) * in.y + (.114f - .114f * U - .497f * W) * in.z,
         (.299f - .299f * U - .328f * W) * in.x + (.587f + .413f * U + .035f * W) * in.y + (.114f - .114f * U + .292f * W) * in.z,
@@ -1019,18 +1019,13 @@ bool update_entity()
         return false;
     if (g_last_id > -1)
     {
-        g_entity = get_entity_ptr(g_last_id)->as<Player>();
-        if (g_entity == nullptr)
-        {
-            g_entity = nullptr;
+        g_entity = get_entity_ptr(g_last_id);
+        if (!g_entity)
             return false;
-        }
+
         return true;
     }
-    else
-    {
-        g_entity = nullptr;
-    }
+    g_entity = nullptr;
     return false;
 }
 
@@ -1319,9 +1314,7 @@ void warp_next_level(size_t num)
         targets.emplace_back(target_world, target_level, target_theme);
     }
 
-    static const auto doortypes = {to_id("ENT_TYPE_FLOOR_DOOR_EXIT"), to_id("ENT_TYPE_FLOOR_DOOR_COG"), to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD")};
-    auto doors = UI::get_entities_by(doortypes, 0x100, LAYER::BOTH);
-    for (auto doorid : doors)
+    for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
     {
         ExitDoor* doorent = get_entity_ptr(doorid)->as<ExitDoor>();
         if (!doorent->special_door)
@@ -1545,7 +1538,7 @@ float drag_delta(std::string keyname)
     {
         if (keycode == i + 1)
         {
-            return abs(ImGui::GetMouseDragDelta(i).x) + abs(ImGui::GetMouseDragDelta(i).y);
+            return std::abs(ImGui::GetMouseDragDelta(i).x) + std::abs(ImGui::GetMouseDragDelta(i).y);
         }
     }
     return false;
@@ -1725,11 +1718,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("move_up", wParam) && active("tool_door") && io.WantCaptureKeyboard)
     {
-        g_to = static_cast<uint8_t>((std::min)((std::max)(g_to - 1, 0), 15));
+        g_to = static_cast<uint8_t>(std::min(std::max(g_to - 1, 0), 15));
     }
     else if (pressed("move_down", wParam) && active("tool_door") && io.WantCaptureKeyboard)
     {
-        g_to = static_cast<uint8_t>((std::min)((std::max)(g_to + 1, 0), 15));
+        g_to = static_cast<uint8_t>(std::min(std::max(g_to + 1, 0), 15));
     }
     else if (pressed("enter", wParam) && active("tool_door") && io.WantCaptureKeyboard)
     {
@@ -2564,9 +2557,7 @@ void render_narnia()
         n++;
     }
 
-    static const auto doortypes = {to_id("ENT_TYPE_FLOOR_DOOR_EXIT"), to_id("ENT_TYPE_FLOOR_DOOR_COG"), to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD")};
-    auto doors = UI::get_entities_by(doortypes, 0x100, LAYER::BOTH);
-    for (auto doorid : doors)
+    for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
     {
         ExitDoor* target = (ExitDoor*)get_entity_ptr(doorid);
         if (!target->special_door)
@@ -2825,10 +2816,10 @@ void render_arrow()
 {
     ImVec2 pos = ImGui::GetMousePos();
     ImVec2 line = ImVec2(pos.x - startpos.x, pos.y - startpos.y);
-    float length = sqrt(pow(line.x, 2.0f) + pow(line.y, 2.0f));
+    float length = (float)std::sqrt(std::pow(line.x, 2) + std::pow(line.y, 2));
     float theta = 0.7f;
     float width = 10.0f + length / 15.0f;
-    float tpoint = width / (2 * (tanf(theta) / 2) * length);
+    float tpoint = width / (2 * (std::tanf(theta) / 2) * length);
     ImVec2 point = ImVec2(pos.x + (-tpoint * line.x), pos.y + (-tpoint * line.y));
     ImVec2 normal = ImVec2(-line.x, line.y);
     float tnormal = width / (2 * length);
@@ -2859,7 +2850,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     for (int x = -1; x < 96; x++)
     {
         std::pair<float, float> gridline = UI::screen_position(x + 0.5f, 0);
-        if (abs(gridline.first) <= 1.0)
+        if (std::abs(gridline.first) <= 1.0)
         {
             int width = 2;
             ImColor color = gridcolor;
@@ -2880,7 +2871,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     for (int y = -1; y < 128; y++)
     {
         std::pair<float, float> gridline = UI::screen_position(0, y + 0.5f);
-        if (abs(gridline.second) <= 1.0)
+        if (std::abs(gridline.second) <= 1.0)
         {
             int width = 2;
             ImColor color = gridcolor;
@@ -2901,14 +2892,14 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     g_players = UI::get_players();
     for (auto player : g_players)
     {
-        std::pair<float, float> gridline = UI::screen_position(round(player->position().first - 0.5f) + 0.5f, round(player->position().second) - 0.5f);
+        std::pair<float, float> gridline = UI::screen_position(std::round(player->position().first - 0.5f) + 0.5f, std::round(player->position().second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(255, 0, 255, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(255, 0, 255, 200), 2);
     }
     if (update_entity())
     {
-        std::pair<float, float> gridline = UI::screen_position(round(g_entity->position().first - 0.5f) + 0.5f, round(g_entity->position().second) - 0.5f);
+        std::pair<float, float> gridline = UI::screen_position(std::round(g_entity->position().first - 0.5f) + 0.5f, std::round(g_entity->position().second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
@@ -3804,7 +3795,8 @@ void render_options()
 void render_debug()
 {
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    size_t entity_addr = reinterpret_cast<size_t>(g_entity);
+    const auto selected_entity = get_entity_ptr(g_last_id);
+    size_t entity_addr = reinterpret_cast<size_t>(selected_entity);
     size_t state_addr = reinterpret_cast<size_t>(g_state);
     size_t save_addr = reinterpret_cast<size_t>(g_save);
     ImGui::InputScalar("State##StatePointer", ImGuiDataType_U64, &state_addr, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
@@ -4322,7 +4314,7 @@ void render_powerup(int uid, const char* section)
     ImGui::PushID(uid);
     if (ImGui::Button("X"))
     {
-        g_entity->remove_powerup(ptype);
+        g_entity->as<Player>()->remove_powerup(ptype);
     }
     ImGui::PopID();
     ImGui::PopID();
