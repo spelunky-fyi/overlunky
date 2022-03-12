@@ -1765,7 +1765,7 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
         auto state = State::get();
         std::pair<float, float> offset;
         const auto actual_layer = enum_to_layer(layer, offset);
-        state.layer(entity->layer)->move_grid_entity(entity, x, y, state.layer(actual_layer));
+        state.layer(entity->layer)->move_grid_entity(entity, offset.first + x, offset.first + y, state.layer(actual_layer));
         entity->teleport_abs(offset.first + x, offset.first + y, 0, 0);
         entity->set_layer(layer);
     }
