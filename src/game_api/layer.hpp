@@ -4,8 +4,8 @@
 
 class Entity;
 
-constexpr uint32_t g_level_max_x = 0x56;
-constexpr uint32_t g_level_max_y = 0x7e;
+inline constexpr uint32_t g_level_max_x = 0x56;
+inline constexpr uint32_t g_level_max_y = 0x7e;
 
 struct EntityList
 {
