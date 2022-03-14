@@ -37,6 +37,7 @@
 #include "level_api.hpp"
 #include "logger.h"
 #include "particles.hpp"
+#include "render_api.hpp"
 #include "savedata.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
@@ -2912,7 +2913,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
             if (room_temp.has_value())
             {
                 auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
-                auto room_pos = g_state->level_gen->get_room_pos(x, y);
+                auto room_pos = LevelGenSystem::get_room_pos(x, y);
                 auto pos = UI::screen_position(room_pos.first, room_pos.second);
                 ImVec2 spos = screenify({pos.first, pos.second});
                 std::string room_text = fmt::format("{:d},{:d} {:s} ({:d})", x, y, room_name, room_temp.value());

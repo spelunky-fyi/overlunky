@@ -190,8 +190,7 @@ end
         return nullptr;
     };
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
-    lua["savegame"] = []() -> SaveData*
-    { return State::get().savedata(); };
+    lua["savegame"] = State::get().savedata();
 
     /// Standard lua print function, prints directly to the console but not to the game
     lua["lua_print"] = lua["print"];
