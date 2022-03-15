@@ -219,7 +219,7 @@ bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, 
      enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
-Movable* g_held_entity = 0;
+Entity* g_held_entity = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
 ENT_TYPE g_ana_spelunky = 0, g_eggplant_child = 0;
@@ -249,8 +249,8 @@ std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
 [[maybe_unused]] const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 [[maybe_unused]] const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-constexpr unsigned int safe_entity_mask = 0x18f;
-constexpr unsigned int unsafe_entity_mask = 0xffffffff;
+inline constexpr unsigned int safe_entity_mask = 0x18f;
+inline constexpr unsigned int unsafe_entity_mask = 0;
 
 std::map<std::string, bool> options = {
     {"mouse_control", true},
@@ -1692,24 +1692,24 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("move_up", wParam) && active("tool_entity") && io.WantCaptureKeyboard)
     {
-        g_current_item = (std::min)((std::max)(g_current_item - 1, 0), g_filtered_count - 1);
+        g_current_item = std::min(std::max(g_current_item - 1, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("move_down", wParam) && active("tool_entity") && io.WantCaptureKeyboard)
     {
-        g_current_item = (std::min)((std::max)(g_current_item + 1, 0), g_filtered_count - 1);
+        g_current_item = std::min(std::max(g_current_item + 1, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("move_pageup", wParam) && active("tool_entity"))
     {
-        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
-        g_current_item = (std::min)((std::max)(g_current_item - page, 0), g_filtered_count - 1);
+        int page = std::max((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = std::min(std::max(g_current_item - page, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("move_pagedown", wParam) && active("tool_entity"))
     {
-        int page = (std::max)((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
-        g_current_item = (std::min)((std::max)(g_current_item + page, 0), g_filtered_count - 1);
+        int page = std::max((int)((current->Size.y - 100) / ImGui::GetTextLineHeightWithSpacing() / 2), 1);
+        g_current_item = std::min(std::max(g_current_item + page, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
     else if (pressed("enter", wParam) && active("tool_entity") && io.WantCaptureKeyboard)
@@ -3269,12 +3269,10 @@ void render_clickhandler()
                 mask = unsafe_entity_mask;
             }
             auto hovered = UI::get_entity_at(cpos.first, cpos.second, false, 2, mask);
-            if (hovered != -1)
+            if (hovered != nullptr)
             {
-                render_hitbox(get_entity_ptr(hovered), true, ImColor(50, 50, 255, 200));
-                auto ptype = UI::get_entity_type(hovered);
-                const char* pname = entity_names[ptype].c_str();
-                std::string buf3 = fmt::format("{}, {}", hovered, pname);
+                render_hitbox(hovered, true, ImColor(50, 50, 255, 200));
+                std::string buf3 = fmt::format("{}, {}", hovered->uid, entity_names[hovered->type->id]);
                 dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3.c_str());
             }
         }
@@ -3358,7 +3356,8 @@ void render_clickhandler()
             io.MouseDrawCursor = false;
             startpos = ImGui::GetMousePos();
             set_pos(startpos);
-            g_over_id = UI::get_entity_at(g_x, g_y, true, 2, safe_entity_mask);
+            auto ent = UI::get_entity_at(g_x, g_y, true, 2, safe_entity_mask);
+            g_over_id = ent ? ent->uid : -1;
         }
         else if ((held("mouse_spawn_throw") || held("mouse_teleport_throw") || held("mouse_spawn_over")) && ImGui::IsWindowFocused())
         {
@@ -3444,10 +3443,12 @@ void render_clickhandler()
             {
                 mask = unsafe_entity_mask;
             }
-            g_held_id = UI::get_entity_at(g_x, g_y, true, 2, mask);
-            g_held_entity = get_entity_ptr(g_held_id)->as<Movable>();
+            g_held_entity = UI::get_entity_at(g_x, g_y, true, 2, mask);
             if (g_held_entity)
+            {
+                g_held_id = g_held_entity->uid;
                 g_held_flags = g_held_entity->flags;
+            }
             if (!lock_entity)
                 g_last_id = g_held_id;
         }
@@ -3473,7 +3474,7 @@ void render_clickhandler()
                 if (g_held_entity)
                 {
                     if (g_held_entity->is_movable())
-                        g_held_entity->standing_on_uid = -1;
+                        g_held_entity->as<Movable>()->standing_on_uid = -1;
 
                     g_held_entity->flags |= 1U << 4;
                     g_held_entity->flags |= 1U << 9;
@@ -3494,7 +3495,7 @@ void render_clickhandler()
             g_y = 0;
             g_vx = 0;
             g_vy = 0;
-            g_held_id = 0;
+            g_held_id = -1;
         }
         else if ((released("mouse_grab") || released("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
         {
@@ -3510,7 +3511,7 @@ void render_clickhandler()
             g_y = 0;
             g_vx = 0;
             g_vy = 0;
-            g_held_id = 0;
+            g_held_id = -1;
         }
         else if (released("mouse_clone"))
         {
@@ -3555,7 +3556,8 @@ void render_clickhandler()
         {
             if (ImGui::IsMousePosValid())
             {
-                g_state->camera->focused_entity_uid = UI::get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
+                auto ent = UI::get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
+                g_state->camera->focused_entity_uid = ent ? ent->uid : -1;
             }
             set_camera_bounds(true);
         }
@@ -3642,14 +3644,14 @@ void render_clickhandler()
             {
                 mask = unsafe_entity_mask;
             }
-            g_held_id = UI::get_entity_at(g_x, g_y, true, 2, mask);
-            if (g_held_id > 0)
+            Entity* to_kill = UI::get_entity_at(g_x, g_y, true, 2, mask);
+            if (to_kill)
             {
+                g_held_id = to_kill->uid;
                 // move movables to void because they like to explode and drop stuff, but actually destroy blocks and such
-                Entity* to_kill = get_entity_ptr(g_held_id);
                 if (to_kill->is_movable())
                 {
-                    UI::move_entity(g_held_id, 0, -1000, false, 0, 0, true);
+                    UI::move_entity(g_held_id, 0, -1000, false, 0, 0, true); // TODO: dead flag instead?
                 }
                 else
                 {
@@ -3660,7 +3662,7 @@ void render_clickhandler()
             g_y = 0;
             g_vx = 0;
             g_vy = 0;
-            g_held_id = 0;
+            g_held_id = -1;
         }
     }
 

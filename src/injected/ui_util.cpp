@@ -47,47 +47,70 @@ std::pair<float, float> UI::screen_position(float x, float y)
 {
     return State::get().screen_position(x, y);
 }
-int32_t UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
+Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // TODO get them in specific mask order
 {
     auto state = State::get();
+
+    static const auto masks_in_order = {
+        0x1,    // Player
+        0x2,    // Mount
+        0x4,    // Monster
+        0x8,    // Item
+        0x80,   // Activefloor
+        0x100,  // Floor
+        0x200,  // Decoration
+        0x400,  // BG
+        0x800,  // Shadow
+        0x2000, // Water
+        0x4000, // Lava
+        0x40,   // FX
+        0x10,   // Explosion
+        0x20,   // Rope
+        0x1000, // Logical
+    };
     if (s)
     {
-        auto [rx, ry] = state.click_position(x, y);
-        x = rx;
-        y = ry;
+        std::tie(x, y) = state.click_position(x, y);
     }
-    // DEBUG("Items at {}:", (x, y));
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return -1;
-    std::vector<std::tuple<int32_t, float, Entity*>> found;
-    for (auto& item : state.layer(player->layer)->all_entities.entities())
+    Entity* current_entity = nullptr;
+    float current_distance = radius;
+    auto check_distance = [&current_entity, &current_distance, &x, &y](Entity* test_entity)
     {
-        auto [ix, iy] = item->position();
-        auto flags = item->type->search_flags;
-        float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-        if (((mask & flags) > 0 || mask == 0) && distance < radius)
+        const auto [ix, iy] = test_entity->position();
+        const float distance = (float)std::sqrt(std::pow(x - ix, 2) + std::pow(y - iy, 2));
+        if (distance < current_distance)
         {
-            /*DEBUG(
-                "Item {}, {:x} type, {} position, {} distance, {:x}",
-                item->uid,
-                item->type->search_flags,
-                item->position_self(),
-                distance,
-                item->pointer());*/
-            found.push_back({item->uid, distance, item});
+            current_entity = test_entity;
+            current_distance = distance;
+        }
+    };
+
+    if (mask == 0)
+    {
+        for (auto& item : state.layer(state.ptr()->camera_layer)->all_entities.entities())
+        {
+            check_distance(item);
         }
     }
-    if (!found.empty())
+    else
     {
-        std::sort(found.begin(), found.end(), [](auto a, auto b) -> bool
-                  { return std::get<1>(a) < std::get<1>(b); });
-        auto picked = found[0];
-        // auto entity = std::get<2>(picked);
-        // DEBUG("{}", (void*)entity);
-        return std::get<0>(picked);
+        for (auto current_mask : masks_in_order)
+        {
+            if ((mask & current_mask) == 0)
+                continue;
+
+            const auto& entities = state.layer(state.ptr()->camera_layer)->entities_by_mask.find(current_mask);
+            if (entities == state.layer(state.ptr()->camera_layer)->entities_by_mask.end())
+                continue;
+
+            for (auto& item : entities->second.entities())
+            {
+                check_distance(item);
+            }
+        }
     }
-    return -1;
+
+    return current_entity;
 }
 void UI::move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap)
 {
@@ -148,7 +171,7 @@ void UI::spawn_backdoor(float x, float y)
     Layer* back_layer = state.layer_local(1);
     front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0f, false, 0.0, 0.0, true);
+    front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0f, false, 0.0, 0.0, true); // TODO: not needed if there is a floor
     back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0f, false, 0.0, 0.0, true);
     front_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
@@ -172,7 +195,7 @@ std::vector<Player*> UI::get_players()
 {
     return ::get_players();
 }
-int32_t UI::get_grid_entity_at(float x, float y, LAYER l) // TODO get them in specific mask order
+int32_t UI::get_grid_entity_at(float x, float y, LAYER l)
 {
     return ::get_grid_entity_at(x, y, l);
 }
