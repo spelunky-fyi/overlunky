@@ -704,6 +704,15 @@
                             <a href="#god_companions" class="toc-h3 toc-link" data-title="god_companions">god_companions</a>
                           </li>
                           <li>
+                            <a href="#grow_chainandblocks" class="toc-h3 toc-link" data-title="grow_chainandblocks">grow_chainandblocks</a>
+                          </li>
+                          <li>
+                            <a href="#grow_poles" class="toc-h3 toc-link" data-title="grow_poles">grow_poles</a>
+                          </li>
+                          <li>
+                            <a href="#grow_vines" class="toc-h3 toc-link" data-title="grow_vines">grow_vines</a>
+                          </li>
+                          <li>
                             <a href="#import" class="toc-h3 toc-link" data-title="import">import</a>
                           </li>
                           <li>
@@ -1057,6 +1066,9 @@
                           </li>
                           <li>
                             <a href="#spawn_liquid" class="toc-h3 toc-link" data-title="spawn_liquid">spawn_liquid</a>
+                          </li>
+                          <li>
+                            <a href="#spawn_mushroom" class="toc-h3 toc-link" data-title="spawn_mushroom">spawn_mushroom</a>
                           </li>
                           <li>
                             <a href="#spawn_on_floor" class="toc-h3 toc-link" data-title="spawn_on_floor">spawn_on_floor</a>
@@ -3853,6 +3865,25 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='nil-god_companions-bool-g'>nil god_companions(bool g)</h4>
 <p>Enable/disable godmode for companions.</p>
+<h3 id='grow_chainandblocks'>grow_chainandblocks</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=grow_chainandblocks">grow_chainandblocks</a></p>
+</blockquote>
+<h4 id='bool-grow_chainandblocks'>bool grow_chainandblocks()</h4><h4 id='bool-grow_chainandblocks-int-x-int-y'>bool grow_chainandblocks(int x, int y)</h4>
+<p>Grow chains from <code>CHAIN_CEILING</code> and chain with blocks on it from <code>CHAINANDBLOCKS_CEILING</code>, it starts looking for the ceilings from the top left corner of a level
+To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x &lt; 10, with y = 10 it&#39;s ceilings that have y &gt; (level bound top - 10)</p>
+<h3 id='grow_poles'>grow_poles</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=grow_poles">grow_poles</a></p>
+</blockquote>
+<h4 id='nil-grow_poles-LAYER-l-int-max_lengh'>nil grow_poles(<a href="#LAYER">LAYER</a> l, int max_lengh)</h4><h4 id='nil-grow_poles-LAYER-l-int-max_lengh-AABB-area-bool-destroy_broken'>nil grow_poles(<a href="#LAYER">LAYER</a> l, int max_lengh, <a href="#AABB">AABB</a> area, bool destroy_broken)</h4>
+<p>Grow pole from <code>GROWABLE_CLIMBING_POLE</code> entities in a level, <code>area</code> default is whole level, <code>destroy_broken</code> default is false</p>
+<h3 id='grow_vines'>grow_vines</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=grow_vines">grow_vines</a></p>
+</blockquote>
+<h4 id='nil-grow_vines-LAYER-l-int-max_lengh'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_lengh)</h4><h4 id='nil-grow_vines-LAYER-l-int-max_lengh-AABB-area-bool-destroy_broken'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_lengh, <a href="#AABB">AABB</a> area, bool destroy_broken)</h4>
+<p>Grow vines from <code>GROWABLE_VINE</code> and <code>VINE_TREE_TOP</code> entities in a level, <code>area</code> default is whole level, <code>destroy_broken</code> default is false</p>
 <h3 id='import'>import</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
@@ -4567,6 +4598,14 @@ Use this to avoid the little fall that some entities do when spawned during leve
 Don&#39;t overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 <code>liquid_flags</code> - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
 <code>amount</code> - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), <code>blobs_separation</code> is optional</p>
+<h3 id='spawn_mushroom'>spawn_mushroom</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_mushroom">spawn_mushroom</a></p>
+</blockquote>
+<h4 id='int-spawn_mushroom-float-x-float-y-LAYER-l'>int spawn_mushroom(float x, float y, <a href="#LAYER">LAYER</a> l)</h4><h4 id='int-spawn_mushroom-float-x-float-y-LAYER-l-int-height'>int spawn_mushroom(float x, float y, <a href="#LAYER">LAYER</a> l, int height)</h4>
+<p>Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+Returns uid of the base or -1 if it wasn&#39;t able to spawn</p>
 <h3 id='spawn_on_floor'>spawn_on_floor</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_on_floor">spawn_on_floor</a></p>

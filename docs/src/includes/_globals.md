@@ -1115,6 +1115,40 @@ Enable/disable godmode for players.
 
 Enable/disable godmode for companions.
 
+### grow_chainandblocks
+
+
+> Search script examples for [grow_chainandblocks](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_chainandblocks)
+
+#### bool grow_chainandblocks()
+
+#### bool grow_chainandblocks(int x, int y)
+
+Grow chains from `CHAIN_CEILING` and chain with blocks on it from `CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level
+To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
+
+### grow_poles
+
+
+> Search script examples for [grow_poles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_poles)
+
+#### nil grow_poles([LAYER](#LAYER) l, int max_lengh)
+
+#### nil grow_poles([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+
+### grow_vines
+
+
+> Search script examples for [grow_vines](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_vines)
+
+#### nil grow_vines([LAYER](#LAYER) l, int max_lengh)
+
+#### nil grow_vines([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
+
 ### import
 
 
@@ -2201,6 +2235,19 @@ Spawn liquids, always spawns in the front layer, will have fun effects if `entit
 Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 `liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
 `amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
+
+### spawn_mushroom
+
+
+> Search script examples for [spawn_mushroom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_mushroom)
+
+#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l)
+
+#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l, int height)
+
+Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+Returns uid of the base or -1 if it wasn't able to spawn
 
 ### spawn_on_floor
 
