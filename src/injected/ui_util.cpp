@@ -124,57 +124,43 @@ SaveData* UI::savedata()
 }
 int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap)
 {
-    auto state = State::get();
-    Player* player = nullptr;
+    auto state = State::get().ptr_local();
 
-    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
-    {
-        if (state.items()->player(i) != nullptr)
-        {
-            player = state.items()->player(i); // maybe spawn offset to camera focus instead of the player?
-            break;
-        }
-    }
-    if (player == nullptr)
-        return -1;
-
-    std::pair<float, float> offset_position;
     if (!s)
-        offset_position = player->position();
+    {
+        x += state->camera->focus_x;
+        y += state->camera->focus_y;
+    }
 
-    DEBUG("Spawning {} on {}, {}", entity_type, x + offset_position.first, y + offset_position.second);
-    return state.layer_local(player->layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, s, vx, vy, snap)->uid;
+    DEBUG("Spawning {} on {}, {}", entity_type, x, y);
+    return state->layers[state->camera_layer]->spawn_entity(entity_type, x, y, s, vx, vy, snap)->uid;
 }
 int32_t UI::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
-    auto state = State::get();
+    auto state = State::get().ptr_local();
+    x += state->camera->focus_x;
+    y += state->camera->focus_y;
 
-    auto player = state.items()->player(0); // do the same stuff as in spawn_entity?
-    if (player == nullptr)
-        return -1;
-    auto [_x, _y] = player->position();
-    DEBUG("Spawning door on {}, {}", x + _x, y + _y);
-    Layer* layer = state.layer_local(player->layer);
-    layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    return layer->spawn_door(x + _x, y + _y, w, l, t)->uid;
+    DEBUG("Spawning door on {}, {}", x, y);
+    Layer* layer = state->layers[state->camera_layer];
+    layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x, y, false, 0.0, 0.0, true);
+    return layer->spawn_door(x, y, w, l, t)->uid;
 }
 void UI::spawn_backdoor(float x, float y)
 {
-    auto state = State::get();
+    auto state = State::get().ptr_local();
+    x += state->camera->focus_x;
+    y += state->camera->focus_y;
 
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
-    auto [_x, _y] = player->position();
-    DEBUG("Spawning backdoor on {}, {}", x + _x, y + _y);
-    Layer* front_layer = state.layer_local(0);
-    Layer* back_layer = state.layer_local(1);
-    front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0f, false, 0.0, 0.0, true); // TODO: not needed if there is a floor
-    back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0f, false, 0.0, 0.0, true);
-    front_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    back_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
+    DEBUG("Spawning backdoor on {}, {}", x, y);
+    Layer* front_layer = state->layers[0];
+    Layer* back_layer = state->layers[1];
+    front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
+    back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
+    front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0f, false, 0.0, 0.0, true); // TODO: not needed if there is a floor
+    back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0f, false, 0.0, 0.0, true);
+    front_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x, y, false, 0.0, 0.0, true);
+    back_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x, y, false, 0.0, 0.0, true);
 }
 
 // Redirect to RPC / Spawn_API:
