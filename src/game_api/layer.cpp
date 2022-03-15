@@ -188,12 +188,12 @@ void Layer::move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_la
             const auto pos = ent->position();
             const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.first));
             const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.second));
-            if (current_grid_x < 0x56 && current_grid_y < 0x7e)
+            if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)
             {
                 if (grid_entities[current_grid_y][current_grid_x] == ent)
                     grid_entities[current_grid_y][current_grid_x] = nullptr;
             }
-            if (x < 0x56 && y < 0x7e)
+            if (x < g_level_max_x && y < g_level_max_y)
                 dest_layer->grid_entities[y][x] = ent;
         }
         for (auto item_ent : ent->items.entities())
