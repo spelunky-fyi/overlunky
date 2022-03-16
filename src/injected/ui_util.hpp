@@ -41,6 +41,8 @@ class UI
     static int32_t spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap);
     static int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
     static void spawn_backdoor(float x, float y);
+    static std::pair<float, float> get_position(Entity* ent, bool render = false);
+    static bool has_active_render(Entity* ent);
 
     static void set_time_ghost_enabled(bool enable);
     static void set_time_jelly_enabled(bool enable);

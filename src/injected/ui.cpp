@@ -37,7 +37,6 @@
 #include "level_api.hpp"
 #include "logger.h"
 #include "particles.hpp"
-#include "render_api.hpp"
 #include "savedata.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
@@ -1161,7 +1160,7 @@ void force_noclip()
             {
                 if (player->state == 6 && (player->movex != 0 || player->movey != 0))
                 {
-                    auto [x, y] = player->position();
+                    auto [x, y] = UI::get_position(player);
                     player->teleport_abs(x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
                 }
                 else
@@ -1176,9 +1175,9 @@ void force_noclip()
             player->velocityy = player->movey * player->type->max_speed;
             if (g_state->theme == 10)
             {
-                auto cpos = player->position();
+                auto cpos = UI::get_position(player);
                 fix_co_coordinates(cpos);
-                if (cpos.first != player->position().first || cpos.second != player->position().second)
+                if (cpos.first != UI::get_position(player).first || cpos.second != UI::get_position(player).second)
                 {
                     player->teleport_abs(cpos.first, cpos.second, player->velocityx, player->velocityy);
                     // this just glitches the shaders, doesn't work
@@ -2893,14 +2892,16 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     g_players = UI::get_players();
     for (auto player : g_players)
     {
-        std::pair<float, float> gridline = UI::screen_position(std::round(player->position().first - 0.5f) + 0.5f, std::round(player->position().second) - 0.5f);
+        auto p_pos = UI::get_position(player);
+        std::pair<float, float> gridline = UI::screen_position(std::round(p_pos.first - 0.5f) + 0.5f, std::round(p_pos.second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(255, 0, 255, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(255, 0, 255, 200), 2);
     }
     if (update_entity())
     {
-        std::pair<float, float> gridline = UI::screen_position(std::round(g_entity->position().first - 0.5f) + 0.5f, std::round(g_entity->position().second) - 0.5f);
+        auto e_pos = UI::get_position(g_entity);
+        std::pair<float, float> gridline = UI::screen_position(std::round(e_pos.first - 0.5f) + 0.5f, std::round(e_pos.second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
         draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
@@ -2923,34 +2924,6 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     }
 }
 
-void render_olmec(Entity* ent, ImColor color)
-{
-    std::pair<float, float> render_position = {0.0f, 0.0f};
-    bool got_rendering = false;
-    for (auto ent_item : ent->items.entities()) // get the olmec position from one of the fx
-    {
-        if (ent_item && ent_item->rendering_info && !ent_item->rendering_info->stop_render)
-        {
-            auto rend = get_render_position(ent_item->uid);
-            render_position.first = std::get<0>(rend) - ent_item->x;
-            render_position.second = std::get<1>(rend) - ent_item->y;
-            got_rendering = true;
-            break;
-        }
-    }
-    if (!got_rendering)
-        render_position = ent->position();
-
-    auto [boxa_x, boxa_y] =
-        UI::screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
-    auto [boxb_x, boxb_y] =
-        UI::screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
-    ImVec2 sboxa = screenify({boxa_x, boxa_y});
-    ImVec2 sboxb = screenify({boxb_x, boxb_y});
-    auto* draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
-}
-
 static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
 {
     return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
@@ -2962,19 +2935,12 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     if (!type)
         return;
 
-    bool circle = false;
-    if ((ent->type->search_flags & 0x10) > 0)
-        circle = true;
+    std::pair<float, float> render_position = UI::get_position(ent, options["draw_hitboxes_interpolated"]);
 
-    std::tuple<float, float, int8_t> render_position;
-    if (options["draw_hitboxes_interpolated"])
-        render_position = get_render_position(ent->uid);
-    else
-        render_position = get_position(ent->uid);
     auto [boxa_x, boxa_y] =
-        UI::screen_position(std::get<0>(render_position) - ent->hitboxx + ent->offsetx, std::get<1>(render_position) - ent->hitboxy + ent->offsety);
+        UI::screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
     auto [boxb_x, boxb_y] =
-        UI::screen_position(std::get<0>(render_position) + ent->hitboxx + ent->offsetx, std::get<1>(render_position) + ent->hitboxy + ent->offsety);
+        UI::screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
     ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
     ImVec2 sboxa = screenify({boxa_x, boxa_y});
     ImVec2 sboxb = screenify({boxb_x, boxb_y});
@@ -2984,7 +2950,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
     }
-    if (!circle)
+    if ((ent->type->search_flags & 0x10) == 0)
         draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
     else
         draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
@@ -2996,13 +2962,14 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
 
     if (type == spark_trap && ent->animation_frame == 7)
     {
-        auto [radx, rady] = UI::screen_position(std::get<0>(render_position) + 3, std::get<1>(render_position) + 3);
+        // TODO: get the real distance from game (can be changed thru API)
+        auto [radx, rady] = UI::screen_position(render_position.first + 3, render_position.second + 3);
         auto srad = screenify({radx, rady});
         draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
     else if (type == wooden_arrow || type == metal_arrow || type == light_arrow)
     {
-        ImVec2 ps = {get<0>(render_position), get<1>(render_position)};
+        ImVec2 ps = {render_position.first, render_position.second};
         float cosa = ImCos(ent->angle);
         float sina = ImSin(ent->angle);
         ImVec2 pa = {-ent->hitboxx, -ent->hitboxy};
@@ -3204,11 +3171,11 @@ void render_clickhandler()
 
             if (ent->type->id == olmec)
             {
-                render_olmec(ent, ImColor(0, 255, 255, 150));
+                render_hitbox(ent, false, ImColor(0, 255, 255, 150));
                 continue;
             }
 
-            if (ent->rendering_info->stop_render)
+            if (!UI::has_active_render(ent))
                 continue;
 
             render_hitbox(ent, false, ImColor(0, 255, 255, 150));

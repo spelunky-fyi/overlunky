@@ -162,6 +162,30 @@ void UI::spawn_backdoor(float x, float y)
     front_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x, y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x, y, false, 0.0, 0.0, true);
 }
+std::pair<float, float> UI::get_position(Entity* ent, bool render)
+{
+    if (!ent)
+        return {.0f, .0f};
+
+    if (!render)
+        return ent->position();
+
+    if (ent->rendering_info && !ent->rendering_info->stop_render)
+        return {ent->rendering_info->x, ent->rendering_info->y};
+
+    for (auto ent_item : ent->items.entities())
+    {
+        if (ent_item->rendering_info && ent_item->rendering_info->stop_render == false)
+        {
+            return {ent_item->rendering_info->x - ent_item->x, ent_item->rendering_info->y - ent_item->y};
+        }
+    }
+    return ent->position();
+}
+bool UI::has_active_render(Entity* ent)
+{
+    return (ent->rendering_info && !ent->rendering_info->stop_render);
+}
 
 // Redirect to RPC / Spawn_API:
 
