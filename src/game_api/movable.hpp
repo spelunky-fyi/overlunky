@@ -7,7 +7,7 @@
 class Movable : public Entity
 {
   public:
-    std::map<uint32_t, size_t> pa0;
+    std::map<uint32_t, size_t> anim_func_map;
     std::set<size_t> pb0;
     size_t anim_func;
     int64_t ic8;

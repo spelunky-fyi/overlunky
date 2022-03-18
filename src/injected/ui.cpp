@@ -32,11 +32,11 @@
 #include "entities_floors.hpp"
 #include "entities_items.hpp"
 #include "entities_logical.hpp"
+#include "entities_mounts.hpp"
 #include "file_api.hpp"
 #include "flags.hpp"
 #include "level_api.hpp"
 #include "logger.h"
-#include "particles.hpp"
 #include "savedata.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
@@ -221,7 +221,6 @@ Entity* g_entity = 0;
 Entity* g_held_entity = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
-ENT_TYPE g_ana_spelunky = 0, g_eggplant_child = 0;
 std::map<int, std::string> entity_names;
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
@@ -1199,10 +1198,11 @@ void frame_advance()
 
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
-    const auto ana_texture = get_type(g_ana_spelunky)->texture;
+    static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+    const auto ana_texture = get_type(ana_spelunky)->texture;
 
     g_state->items->player_select_slots[0].activated = true;
-    g_state->items->player_select_slots[0].character = g_save->players[0] + g_ana_spelunky;
+    g_state->items->player_select_slots[0].character = g_save->players[0] + ana_spelunky;
     g_state->items->player_select_slots[0].texture_id = g_save->players[0] + ana_texture;
     if (g_state->items->player_count < 1)
         g_state->items->player_count = 1;
@@ -4421,7 +4421,7 @@ void render_screen(const char* label, int state)
 
 void render_entity_props(int uid, bool detached = false)
 {
-    Player* entity = (Player*)get_entity_ptr(uid);
+    auto entity = get_entity_ptr(uid);
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     if (!detached)
     {
@@ -4458,15 +4458,15 @@ void render_entity_props(int uid, bool detached = false)
             entity_windows[uid]->open = false;
         return;
     }
-    auto entity_type = UI::get_entity_type(uid);
+    const auto is_movable = entity->is_movable();
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     render_uid(entity->uid, "EntityGeneral");
     ImGui::SameLine();
     if (ImGui::Button("Void##VoidEntity"))
     {
-        if (entity->overlay)
+        if (entity->overlay && entity->overlay->is_movable())
         {
-            Movable* mount = (Movable*)entity->overlay;
+            auto mount = entity->overlay->as<Movable>();
             if (mount->holding_uid == entity->uid)
             {
                 mount->holding_uid = -1;
@@ -4494,62 +4494,95 @@ void render_entity_props(int uid, bool detached = false)
         entity->destroy();
     }
     tooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.", "mouse_destroy");
-    if (ImGui::CollapsingHeader("State") && entity->is_movable())
+    if (ImGui::CollapsingHeader("State"))
     {
-        render_state("Current state", entity->state);
-        render_state("Last state", entity->last_state);
-        render_ai("AI state", entity->move_state);
-        if (entity->standing_on_uid != -1)
+        auto overlay = entity->overlay;
+        if (overlay && !IsBadReadPtr(overlay, 0x178))
         {
-            ImGui::Text("Standing on:");
-            render_uid(entity->standing_on_uid, "StateStanding");
-        }
-        if (entity->holding_uid != -1)
-        {
-            ImGui::Text("Holding:");
-            ImGui::SameLine();
-            if (ImGui::Button("Drop##DropHolding"))
+            if (overlay->type->search_flags & 0x2) // MOUNT
             {
-                Movable* holding = get_entity_ptr(entity->holding_uid)->as<Movable>();
-                holding->x = entity->x;
-                holding->y = entity->y;
-                holding->overlay = 0;
-                entity->holding_uid = -1;
-            }
-            render_uid(entity->holding_uid, "StateHolding");
-        }
-        auto* overlay = (Movable*)entity->overlay;
-        if (!IsBadReadPtr(overlay, 0x178))
-        {
-            ImGui::Text("Riding:");
-            ImGui::SameLine();
-            if (ImGui::Button("Unmount##UnmountRiding"))
-            {
-                auto* mount = (Movable*)entity->overlay;
-                if (mount->holding_uid == entity->uid)
+                ImGui::Text("Riding:");
+                ImGui::SameLine();
+                if (ImGui::Button("Unmount##UnmountRiding"))
                 {
-                    mount->holding_uid = -1;
+                    overlay->as<Mount>()->remove_rider();
                 }
-                entity->x = mount->x;
-                entity->y = mount->y;
-                entity->overlay = 0;
+                render_uid(overlay->uid, "StateRiding");
             }
-            render_uid(overlay->uid, "StateRiding");
-        }
-        if (entity->last_owner_uid != -1)
-        {
-            ImGui::Text("Owner / Attacker:");
-            ImGui::SameLine();
-            if (ImGui::Button("Remove##RemoveOwner"))
+            else
             {
-                entity->owner_uid = -1;
-                entity->last_owner_uid = -1;
+                ImGui::Text("Attached to:");
+                ImGui::SameLine();
+                if (ImGui::Button("Detach"))
+                {
+                    if (entity->type->search_flags & 0x1) // PLAYER
+                    {
+                        entity->as<Player>()->let_go();
+                    }
+                    else if (overlay->is_movable() && overlay->as<Movable>()->holding_uid == entity->uid)
+                    {
+                        overlay->as<Movable>()->drop(entity);
+                    }
+                    else
+                    {
+                        overlay->remove_item_ptr(entity);
+                    }
+                }
+                render_uid(overlay->uid, "StateAttached");
             }
-            render_uid(entity->last_owner_uid, "StateOwner");
+        }
+        else
+        {
+            ImGui::Text("Attached to:");
+            ImGui::Text("Nothing");
+        }
+        if (is_movable)
+        {
+            auto movable = entity->as<Movable>();
+            render_state("Current state", movable->state); // TODO: allow change
+            render_state("Last state", movable->last_state);
+            render_ai("AI state", movable->move_state); // TODO: allow change
+            ImGui::Text("Standing on:");
+            if (movable->standing_on_uid != -1)
+            {
+
+                render_uid(movable->standing_on_uid, "StateStanding");
+            }
+            else
+            {
+                ImGui::Text("Nothing");
+            }
+            if (movable->holding_uid != -1)
+            {
+                ImGui::Text("Holding:");
+                ImGui::SameLine();
+                if (ImGui::Button("Drop##DropHolding"))
+                {
+                    auto holding = get_entity_ptr(movable->holding_uid);
+                    if (holding)
+                        movable->drop(holding);
+                    else
+                        movable->holding_uid = -1;
+                }
+                render_uid(movable->holding_uid, "StateHolding");
+            }
+            if (movable->last_owner_uid != -1)
+            {
+                ImGui::Text("Owner:");
+                ImGui::SameLine();
+                if (ImGui::Button("Clear##RemoveOwner"))
+                {
+                    movable->owner_uid = -1;
+                    movable->last_owner_uid = -1;
+                }
+                render_uid(movable->owner_uid, "StateOwner");
+                render_uid(movable->last_owner_uid, "StateOwnerLast");
+            }
         }
     }
     if (ImGui::CollapsingHeader("Position"))
     {
+        auto movable = entity->as<Movable>();
         if (ImGui::Button("Change"))
         {
             auto layer_to = LAYER::FRONT;
@@ -4572,33 +4605,40 @@ void render_entity_props(int uid, bool detached = false)
         }
         ImGui::InputFloat("Position X##EntityPositionX", &entity->x, 0.2f, 1.0f);
         ImGui::InputFloat("Position Y##EntityPositionX", &entity->y, 0.2f, 1.0f);
-        ImGui::InputFloat("Velocity X##EntityVelocityX", &entity->velocityx, 0.2f, 1.0f);
-        ImGui::InputFloat("Velocity y##EntityVelocityY", &entity->velocityy, 0.2f, 1.0f);
-        ImGui::InputFloat("Angle##EntityAngle", &entity->angle, 0.2f, 1.0f);
-        SliderByte("Falling timer##EntityFallingTimer", (char*)&entity->falling_timer, 0, 98);
-        uint8_t falldamage = 0;
-        if (entity->falling_timer >= 98)
-            falldamage = 4;
-        else if (entity->falling_timer >= 78)
-            falldamage = 3;
-        else if (entity->falling_timer >= 58)
-            falldamage = 2;
-        else if (entity->falling_timer >= 38)
-            falldamage = 1;
-        const char* damagenum[] = {"0", "1", "2", "4", "99"};
-        SliderByte("Fall damage##EntityFallDamage", (char*)&falldamage, 0, 4, damagenum[falldamage]);
-    }
-    if (ImGui::CollapsingHeader("Stats"))
-    {
-        ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&entity->health, 0.5f, &u8_one, &u8_max);
-        ImGui::DragScalar("Price##Price", ImGuiDataType_S32, (char*)&entity->price, 0.5f, &s32_min, &s32_max);
-        if (entity_type >= g_ana_spelunky && entity_type <= g_eggplant_child && entity->inventory_ptr != 0)
+        if (is_movable)
         {
-            ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&entity->inventory_ptr->bombs, 0.5f, &u8_one, &u8_max);
-            ImGui::DragScalar("Ropes##EntityRopes", ImGuiDataType_U8, (char*)&entity->inventory_ptr->ropes, 0.5f, &u8_one, &u8_max);
-            ImGui::DragInt("Money##EntityMoney", (int*)&entity->inventory_ptr->money, 20.0f, INT_MIN, INT_MAX, "%d");
-            ImGui::DragInt("Level kills##EntityLevelKills", (int*)&entity->inventory_ptr->kills_level, 0.5f, 0, INT_MAX, "%d");
-            ImGui::DragInt("Total kills##EntityTotalKills", (int*)&entity->inventory_ptr->kills_total, 0.5f, 0, INT_MAX, "%d");
+            ImGui::InputFloat("Velocity X##EntityVelocityX", &movable->velocityx, 0.2f, 1.0f);
+            ImGui::InputFloat("Velocity y##EntityVelocityY", &movable->velocityy, 0.2f, 1.0f);
+        }
+        ImGui::InputFloat("Angle##EntityAngle", &entity->angle, 0.2f, 1.0f);
+        if (is_movable)
+        {
+            SliderByte("Falling timer##EntityFallingTimer", (char*)&movable->falling_timer, 0, 98);
+            uint8_t falldamage = 0;
+            if (movable->falling_timer >= 98)
+                falldamage = 4;
+            else if (movable->falling_timer >= 78)
+                falldamage = 3;
+            else if (movable->falling_timer >= 58)
+                falldamage = 2;
+            else if (movable->falling_timer >= 38)
+                falldamage = 1;
+            const char* damagenum[] = {"0", "1", "2", "4", "99"};
+            SliderByte("Fall damage##EntityFallDamage", (char*)&falldamage, 0, 4, damagenum[falldamage]);
+        }
+    }
+    if (is_movable && ImGui::CollapsingHeader("Stats"))
+    {
+        auto movable = entity->as<Player>();
+        ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&movable->health, 0.5f, &u8_one, &u8_max);
+        ImGui::DragScalar("Price##Price", ImGuiDataType_S32, (char*)&movable->price, 0.5f, &s32_min, &s32_max);
+        if ((entity->type->search_flags & 0x1) && movable->inventory_ptr != 0)
+        {
+            ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&movable->inventory_ptr->bombs, 0.5f, &u8_one, &u8_max);
+            ImGui::DragScalar("Ropes##EntityRopes", ImGuiDataType_U8, (char*)&movable->inventory_ptr->ropes, 0.5f, &u8_one, &u8_max);
+            ImGui::DragInt("Money##EntityMoney", (int*)&movable->inventory_ptr->money, 20.0f, INT_MIN, INT_MAX, "%d");
+            ImGui::DragInt("Level kills##EntityLevelKills", (int*)&movable->inventory_ptr->kills_level, 0.5f, 0, INT_MAX, "%d");
+            ImGui::DragInt("Total kills##EntityTotalKills", (int*)&movable->inventory_ptr->kills_total, 0.5f, 0, INT_MAX, "%d");
         }
     }
     if (ImGui::CollapsingHeader("Items"))
@@ -4630,11 +4670,14 @@ void render_entity_props(int uid, bool detached = false)
     }
     if (ImGui::CollapsingHeader("Special attributes"))
     {
+        const auto entity_type = entity->type->id;
         if (entity_type == to_id("ENT_TYPE_ITEM_COFFIN"))
         {
-            auto coffin = (Coffin*)entity;
+            auto coffin = entity->as<Coffin>();
+            static const auto eggplant_child = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
+            static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
             ImGui::Text("Character in coffin:");
-            ImGui::SliderInt("##CoffinSpawns", (int*)&coffin->inside, g_ana_spelunky, g_eggplant_child);
+            ImGui::SliderInt("##CoffinSpawns", (int*)&coffin->inside, ana_spelunky, eggplant_child);
             if (coffin->inside == to_id("ENT_TYPE_CHAR_CLASSIC_GUY") + 1)
                 coffin->inside = to_id("ENT_TYPE_CHAR_HIREDHAND");
             ImGui::SameLine();
@@ -4646,7 +4689,7 @@ void render_entity_props(int uid, bool detached = false)
             entity_type == to_id("ENT_TYPE_ITEM_GHIST_PRESENT") || entity_type == to_id("ENT_TYPE_ITEM_POT") ||
             entity_type == to_id("ENT_TYPE_ITEM_DMCRATE") || entity_type == to_id("ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE"))
         {
-            auto container = (Container*)entity;
+            auto container = entity->as<Container>();
             ImGui::Text("Item in container:");
             ImGui::InputInt("##EntitySpawns", (int*)&container->inside, 1, 10);
             if (container->inside > 0)
@@ -4657,14 +4700,14 @@ void render_entity_props(int uid, bool detached = false)
         }
         else if (entity_type == to_id("ENT_TYPE_ITEM_MATTOCK"))
         {
-            auto mattock = (Mattock*)entity;
+            auto mattock = entity->as<Mattock>();
             ImGui::SliderScalar("Uses left##MattockUses", ImGuiDataType_U8, &mattock->remaining, &u8_min, &u8_max);
         }
         else if (
             entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EXIT") || entity_type == to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT") ||
             entity_type == to_id("ENT_TYPE_FLOOR_DOOR_COG") || entity_type == to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
         {
-            auto target = (ExitDoor*)entity;
+            auto target = entity->as<ExitDoor>();
             ImGui::Text("Door target:");
             ImGui::Checkbox("Enabled##DoorEnabled", &target->special_door);
             ImGui::DragScalar("World##DoorWorldnumber", ImGuiDataType_U8, &target->world, 0.5f, &u8_one, &u8_max);
@@ -4675,7 +4718,7 @@ void render_entity_props(int uid, bool detached = false)
         }
         else if (entity_type == to_id("ENT_TYPE_LOGICAL_PORTAL"))
         {
-            auto target = (Portal*)entity;
+            auto target = entity->as<Portal>();
             ImGui::Text("Portal target:");
             ImGui::DragScalar("World##DoorWorldnumber", ImGuiDataType_U8, &target->world, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Level##DoorLevelnumber", ImGuiDataType_U8, &target->level, 0.5f, &u8_one, &u8_max);
@@ -4683,9 +4726,10 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::SameLine();
             ImGui::Text("%s", theme_name(target->theme));
         }
-        else if ((entity_type >= g_ana_spelunky && entity_type <= g_eggplant_child) || (entity_type >= to_id("ENT_TYPE_MONS_PET_TUTORIAL") && entity_type <= to_id("ENT_TYPE_MONS_CRITTERSLIME")) || (entity_type >= to_id("ENT_TYPE_MOUNT_TURKEY") && entity_type <= to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH")))
+        else if (entity->type->search_flags & 0x7) // PLYAER, MOUNT, MONSTER
         {
-            for (const auto& [powerup_id, powerup_entity] : entity->powerups)
+            auto entity_pow = entity->as<PowerupCapable>();
+            for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
             {
                 render_powerup(powerup_entity->uid, "Powerups");
             }
@@ -4748,18 +4792,19 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::SameLine();
             if (ImGui::Button("Add##AddPowerupButton"))
             {
-                entity->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
+                entity_pow->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
             ImGui::PopItemWidth();
-            if (entity_type >= g_ana_spelunky && entity_type <= g_eggplant_child && entity->ai != 0)
+            auto entity_player = entity->as<Player>();
+            if ((entity->type->search_flags & 0x1) && entity_player->ai != 0)
             {
-                ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &entity->ai->state, &u8_min, &s8_max);
-                ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &entity->ai->trust, &u8_min, &s8_max);
-                ImGui::InputScalar("Whipped##AiWhipped", ImGuiDataType_S8, &entity->ai->whipped, &u8_min, &s8_max);
-                if (entity->ai->target_uid != -1)
+                ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &entity_player->ai->state, &u8_min, &s8_max);
+                ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &entity_player->ai->trust, &u8_min, &s8_max);
+                ImGui::InputScalar("Whipped##AiWhipped", ImGuiDataType_S8, &entity_player->ai->whipped, &u8_min, &s8_max);
+                if (entity_player->ai->target_uid != -1)
                 {
                     ImGui::Text("Target:");
-                    render_uid(entity->ai->target_uid, "Ai");
+                    render_uid(entity_player->ai->target_uid, "Ai");
                 }
             }
         }
@@ -4800,17 +4845,18 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::CheckboxFlags(more_flags[i], &entity->more_flags, (int)std::pow(2, i));
         }
     }
-    if (ImGui::CollapsingHeader("Input Display"))
+    if (is_movable && ImGui::CollapsingHeader("Input Display"))
     {
+        auto const movable_entity = entity->as<Movable>();
         ImVec2 region = ImGui::GetContentRegionMax();
         bool dirs[4] = {false, false, false, false};
-        if (entity->movex < 0.0f)
+        if (movable_entity->movex < 0.0f)
             dirs[0] = true;
-        if (entity->movey < 0.0f)
+        if (movable_entity->movey < 0.0f)
             dirs[1] = true;
-        if (entity->movey > 0.0f)
+        if (movable_entity->movey > 0.0f)
             dirs[2] = true;
-        if (entity->movex > 0.0f)
+        if (movable_entity->movex > 0.0f)
             dirs[3] = true;
         for (int i = 0; i < 4; i++)
         {
@@ -4820,19 +4866,17 @@ void render_entity_props(int uid, bool detached = false)
         }
         for (int i = 0; i < 6; i++)
         {
-            int buttons = entity->buttons;
+            int buttons = movable_entity->buttons;
             ImGui::CheckboxFlags(button_flags[i], &buttons, (int)std::pow(2, i));
             if (i < 5)
                 ImGui::SameLine(region.x / 6 * (i + 1));
         }
     }
-    if (ImGui::CollapsingHeader("Illumination"))
+    if ((entity->type->search_flags & 0x1) && ImGui::CollapsingHeader("Illumination"))
     {
-        if ((entity_type >= g_ana_spelunky && entity_type <= to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))) // TODO: show all lit entities
-        {
-            if (entity->emitted_light)
-                render_illumination(entity->emitted_light, "Entity illumination");
-        }
+        auto entity_player = entity->as<Player>();
+        if (entity_player->emitted_light)
+            render_illumination(entity_player->emitted_light, "Entity illumination");
     }
     ImGui::PopItemWidth();
 }
@@ -5879,9 +5923,6 @@ std::string make_save_path(std::string_view script_path, std::string_view script
 void init_ui()
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
-
-    g_ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-    g_eggplant_child = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
 
     g_state = get_state_ptr();
     g_save = UI::savedata();
