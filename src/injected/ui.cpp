@@ -35,13 +35,11 @@
 #include "entities_mounts.hpp"
 #include "file_api.hpp"
 #include "flags.hpp"
-#include "level_api.hpp"
 #include "logger.h"
 #include "savedata.hpp"
 #include "script.hpp"
-#include "sound_manager.hpp"
+#include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"
-#include "steam_api.hpp"
 #include "version.hpp"
 #include "window_api.hpp"
 
@@ -770,7 +768,7 @@ void load_config(std::string file)
         fontsize = ini_fontsize;
     UI::godmode(options["god_mode"]);
     if (options["disable_achievements"])
-        disable_steam_achievements();
+        UI::steam_achievements(false);
     if (options["disable_savegame"])
         hook_savegame();
     UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
@@ -2910,11 +2908,11 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     {
         for (unsigned int y = 0; y < g_state->h; ++y)
         {
-            auto room_temp = g_state->level_gen->get_room_template(x, y, g_state->camera_layer);
+            auto room_temp = UI::get_room_template(x, y, g_state->camera_layer);
             if (room_temp.has_value())
             {
-                auto room_name = g_state->level_gen->get_room_template_name(room_temp.value());
-                auto room_pos = LevelGenSystem::get_room_pos(x, y);
+                auto room_name = UI::get_room_template_name(room_temp.value());
+                auto room_pos = UI::get_room_pos(x, y);
                 auto pos = UI::screen_position(room_pos.first, room_pos.second);
                 ImVec2 spos = screenify({pos.first, pos.second});
                 std::string room_text = fmt::format("{:d},{:d} {:s} ({:d})", x, y, room_name, room_temp.value());
@@ -3618,7 +3616,7 @@ void render_clickhandler()
                 // move movables to void because they like to explode and drop stuff, but actually destroy blocks and such
                 if (to_kill->is_movable())
                 {
-                    UI::move_entity(g_held_id, 0, -1000, false, 0, 0, true); // TODO: dead flag instead?
+                    to_kill->teleport_abs(0, -1000, 0, 0); // TODO: dead flag instead?
                 }
                 else
                 {
@@ -3684,9 +3682,9 @@ void render_options()
     if (ImGui::Checkbox("Block Steam achievements", &options["disable_achievements"]))
     {
         if (options["disable_achievements"])
-            disable_steam_achievements();
+            UI::steam_achievements(false);
         else
-            enable_steam_achievements();
+            UI::steam_achievements(true);
     }
     tooltip("Enable this if playing on Steam and don't want\nto unlock everything when fooling around.");
     if (ImGui::Checkbox("Block game saves", &options["disable_savegame"]))

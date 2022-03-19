@@ -56,4 +56,8 @@ class UI
     static void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, uint32_t liquid_flags, uint32_t amount, float blobs_separation = INFINITY);
     static void spawn_liquid(ENT_TYPE entity_type, float x, float y);
     static int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, float y);
+    static std::pair<float, float> get_room_pos(uint32_t x, uint32_t y);
+    static std::string_view get_room_template_name(uint16_t room_template);
+    static std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l);
+    static void steam_achievements(bool on);
 };

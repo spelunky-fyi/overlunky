@@ -1,9 +1,11 @@
 #include "ui_util.hpp"
 
 #include "entities_chars.hpp"
+#include "level_api.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
+#include "steam_api.hpp"
 
 void UI::godmode(bool g)
 {
@@ -15,7 +17,7 @@ void UI::godmode_companions(bool g)
 }
 std::pair<float, float> UI::click_position(float x, float y)
 {
-    return State::get().click_position(x, y);
+    return State::click_position(x, y);
 }
 void UI::zoom(float level)
 {
@@ -31,7 +33,7 @@ void UI::warp(uint8_t world, uint8_t level, uint8_t theme)
 }
 float UI::get_zoom_level()
 {
-    return State::get().get_zoom_level();
+    return State::get_zoom_level();
 }
 void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
 {
@@ -236,4 +238,25 @@ void UI::spawn_liquid(ENT_TYPE entity_type, float x, float y)
 int32_t UI::spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, float y)
 {
     return ::spawn_entity_over(entity_type, over_uid, x, y);
+}
+std::pair<float, float> UI::get_room_pos(uint32_t x, uint32_t y)
+{
+    return LevelGenSystem::get_room_pos(x, y);
+}
+std::string_view UI::get_room_template_name(uint16_t room_template)
+{
+    const auto state = State::get().ptr();
+    return state->level_gen->get_room_template_name(room_template);
+}
+std::optional<uint16_t> UI::get_room_template(uint32_t x, uint32_t y, uint8_t l)
+{
+    const auto state = State::get().ptr();
+    return state->level_gen->get_room_template(x, y, l);
+}
+void UI::steam_achievements(bool on)
+{
+    if (on)
+        enable_steam_achievements();
+    else
+        disable_steam_achievements();
 }
