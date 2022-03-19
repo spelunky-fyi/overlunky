@@ -2188,7 +2188,7 @@ void render_uid(int uid, const char* section, bool rembtn = false)
 {
     std::string uidc = std::to_string(uid);
     auto ptype = UI::get_entity_type(uid);
-    if (ptype == 0)
+    if (ptype == 0 || ptype == UINT32_MAX)
         return;
     std::string typec = std::to_string(ptype);
     std::string pname = entity_names[ptype];
@@ -4564,7 +4564,7 @@ void render_entity_props(int uid, bool detached = false)
                 }
                 render_uid(movable->holding_uid, "StateHolding");
             }
-            if (movable->last_owner_uid != -1)
+            if (movable->last_owner_uid != -1 || movable->owner_uid != -1)
             {
                 ImGui::Text("Owner:");
                 ImGui::SameLine();

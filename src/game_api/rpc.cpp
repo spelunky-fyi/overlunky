@@ -240,7 +240,7 @@ ENT_TYPE get_entity_type(uint32_t uid)
     if (entity)
         return entity->type->id;
 
-    return UINT32_MAX;
+    return UINT32_MAX; // TODO: shouldn't this be 0?
 }
 
 std::vector<Player*> get_players()

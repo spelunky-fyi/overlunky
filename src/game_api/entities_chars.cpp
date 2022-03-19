@@ -147,10 +147,10 @@ void Player::let_go()
     if (overlay)
     {
         overlay->remove_item_ptr(this);
-        jump_flags_b = 0xFF;
+        // jump_flags_b = 0xFF;
         // last_state = state;
         // state = 1, 9, 0xA; ?
         stand_counter = 0;
-        anim_func = anim_func_map[1];
+        anim_func = anim_func_map[2];
     }
 }
