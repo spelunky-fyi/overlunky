@@ -47,13 +47,13 @@ void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
 }
 std::pair<float, float> UI::screen_position(float x, float y)
 {
-    return State::get().screen_position(x, y);
+    return State::screen_position(x, y);
 }
-Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // TODO get them in specific mask order
+Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
     auto state = State::get();
 
-    static const auto masks_in_order = {
+    static const auto masks_order = {
         0x1,    // Player
         0x2,    // Mount
         0x4,    // Monster
@@ -96,7 +96,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     }
     else
     {
-        for (auto current_mask : masks_in_order)
+        for (auto current_mask : masks_order)
         {
             if ((mask & current_mask) == 0)
                 continue;
@@ -189,7 +189,7 @@ bool UI::has_active_render(Entity* ent)
     return (ent->rendering_info && !ent->rendering_info->stop_render);
 }
 
-// Redirect to RPC / Spawn_API:
+// Redirect to RPC / Spawn_API etc.:
 
 void UI::set_time_ghost_enabled(bool enable)
 {
@@ -219,7 +219,7 @@ void UI::set_camp_camera_bounds_enabled(bool b)
 {
     ::set_camp_camera_bounds_enabled(b);
 }
-std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer) // TODO: just return entities
+std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
 {
     return ::get_entities_by(entity_types, mask, layer);
 }

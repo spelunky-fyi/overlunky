@@ -2557,7 +2557,7 @@ void render_narnia()
 
     for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
     {
-        ExitDoor* target = (ExitDoor*)get_entity_ptr(doorid);
+        ExitDoor* target = get_entity_ptr(doorid)->as<ExitDoor>();
         if (!target->special_door)
             continue;
         std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
