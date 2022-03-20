@@ -7,9 +7,9 @@
 class Movable : public Entity
 {
   public:
-    std::map<uint32_t, size_t> pa0;
+    std::map<uint32_t, size_t> behavior_map;
     std::set<size_t> pb0;
-    size_t anim_func;
+    size_t behavior;
     int64_t ic8;
     float movex;
     float movey;
@@ -82,6 +82,13 @@ class Movable : public Entity
     {
         this->light_on_fire(0x64); // kind of stanrad value that the game uses
     }
+    /// Get all avaible behavior ids
+    std::vector<uint32_t> get_all_behaviors();
+    /// Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity
+    /// Returns false if entity doesn't have this behavior id
+    bool set_behavior(uint32_t behavior_id);
+    /// Get the current behavior id
+    uint32_t get_behavior();
 
     virtual bool can_jump() = 0;
     virtual void v38() = 0;

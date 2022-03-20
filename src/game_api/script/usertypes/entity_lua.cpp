@@ -360,6 +360,12 @@ void register_usertypes(sol::state& lua)
         &Movable::is_on_fire,
         "damage",
         damage,
+        "get_all_behaviors",
+        &Movable::get_all_behaviors,
+        "set_behavior",
+        &Movable::set_behavior,
+        "get_behavior",
+        &Movable::get_behavior,
         sol::base_classes,
         sol::bases<Entity>());
 

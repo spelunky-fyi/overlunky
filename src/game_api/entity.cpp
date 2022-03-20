@@ -680,3 +680,38 @@ Entity* get_entity_ptr(uint32_t uid)
         return nullptr;
     return p;
 }
+
+std::vector<uint32_t> Movable::get_all_behaviors()
+{
+    std::vector<uint32_t> anims;
+    anims.reserve(behavior_map.size());
+
+    for (auto& cur : behavior_map)
+    {
+        anims.push_back(cur.first);
+    }
+    return anims;
+}
+
+bool Movable::set_behavior(uint32_t an)
+{
+    const auto& it = behavior_map.find(an);
+    if (it != behavior_map.end())
+    {
+        behavior = it->second;
+        return true;
+    }
+    return false;
+}
+
+uint32_t Movable::get_behavior()
+{
+    for (auto& cur : behavior_map)
+    {
+        if (cur.second == behavior)
+        {
+            return cur.first;
+        }
+    }
+    return 0; // there is no id 0, be i can be wrong
+}
