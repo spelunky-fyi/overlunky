@@ -698,7 +698,7 @@ bool Movable::set_behavior(uint32_t an)
     const auto& it = behavior_map.find(an);
     if (it != behavior_map.end())
     {
-        behavior = it->second;
+        current_behavior = it->second;
         return true;
     }
     return false;
@@ -708,10 +708,10 @@ uint32_t Movable::get_behavior()
 {
     for (auto& cur : behavior_map)
     {
-        if (cur.second == behavior)
+        if (cur.second == current_behavior)
         {
             return cur.first;
         }
     }
-    return 0; // there is no id 0, be i can be wrong
+    return 0; // there is no id 0, but i can be wrong
 }
