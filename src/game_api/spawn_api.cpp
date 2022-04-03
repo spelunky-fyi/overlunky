@@ -324,16 +324,14 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
 
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
-    x += offset_position.first;
-    y += offset_position.second;
 
-    x = std::roundf(x);
-    y = std::roundf(y);
+    x = std::roundf(x + offset_position.first);
+    y = std::roundf(y + offset_position.second);
 
     Layer* layer_ptr = State::get().layer_local(actual_layer);
 
     // Needs some space on top
-    if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 0 || static_cast<int>(y) + 3 >= g_level_max_y || height == 1 ||
+    if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 0 || static_cast<int>(y) + 2 >= g_level_max_y || height == 1 ||
         layer_ptr->get_grid_entity_at(x, y - 1.0f) == nullptr ||
         layer_ptr->get_grid_entity_at(x, y) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 1.0f) != nullptr ||
@@ -369,12 +367,10 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
             }
         }
     }
-
     // spawn the top
     current_pice = layer_ptr->spawn_entity_over(tree_top, current_pice, 0.0f, 1.0f);
 
-    // spawn branches
-    do
+    do // spawn branches
     {
         auto spawn_deco = [&](Entity* branch, bool left)
         {
