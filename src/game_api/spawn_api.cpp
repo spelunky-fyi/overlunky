@@ -331,7 +331,7 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
     Layer* layer_ptr = State::get().layer_local(actual_layer);
 
     // Needs some space on top
-    if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 0 || static_cast<int>(y) + 2 >= g_level_max_y || height == 1 ||
+    if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 1 || static_cast<int>(y) + 2 >= g_level_max_y || height == 1 ||
         layer_ptr->get_grid_entity_at(x, y - 1.0f) == nullptr ||
         layer_ptr->get_grid_entity_at(x, y) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 1.0f) != nullptr ||
@@ -421,8 +421,8 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height)
     static const auto platform = to_id("ENT_TYPE_FLOOR_MUSHROOM_HAT_PLATFORM");
     static const auto deco = to_id("ENT_TYPE_DECORATION_MUSHROOM_HAT");
 
-    if (height == 1 || i_x >= g_level_max_x || i_y >= g_level_max_y - 2 || // check parameters
-        layer_ptr->grid_entities[i_y - 1][i_x] == nullptr ||               // check spaces above, below etc.
+    if (height == 1 || i_y == 0 || i_x >= g_level_max_x || i_y >= g_level_max_y - 2 || // check parameters
+        layer_ptr->grid_entities[i_y - 1][i_x] == nullptr ||                           // check spaces above, below etc.
         layer_ptr->grid_entities[i_y][i_x] != nullptr ||
         layer_ptr->grid_entities[i_y + 1][i_x] != nullptr ||
         layer_ptr->grid_entities[i_y + 2][i_x] != nullptr)
