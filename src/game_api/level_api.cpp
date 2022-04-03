@@ -2005,7 +2005,7 @@ void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
 
     const uint32_t start_x = static_cast<uint32_t>(area.left + 0.5f);
     uint32_t end_x = static_cast<uint32_t>(area.right + 0.5f);
-    const uint32_t start_y = static_cast<uint32_t>(area.bottom + 0.5f);
+    uint32_t start_y = static_cast<uint32_t>(area.bottom + 0.5f);
     uint32_t end_y = static_cast<uint32_t>(area.top + 0.5f);
 
     if (start_x >= g_level_max_x || start_y >= g_level_max_y)
@@ -2015,13 +2015,16 @@ void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
         end_x = state->w * 10 + 6;
 
     if (end_y == 0)
-        end_y = g_level_max_y - (state->h * 8 + 6);
+        end_y = g_level_max_y - 1;
+
+    if (start_y == 0)
+        start_y = g_level_max_y - (state->h * 8 + 6);
 
     if (end_x >= g_level_max_x)
         end_x = g_level_max_x - 1;
 
-    if (end_y >= g_level_max_y)
-        end_y = g_level_max_y - 1;
+    if (start_y >= g_level_max_y)
+        start_y = g_level_max_y - 1;
 
     for (uint32_t i_x = start_x; i_x <= end_x; ++i_x)
     {
