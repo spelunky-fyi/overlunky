@@ -284,6 +284,13 @@ function spawn_apep(x, y, layer, right) end
 ---@param layer LAYER
 ---@return nil
 function spawn_tree(x, y, layer) end
+---Spawns and grows a tree
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param height integer
+---@return nil
+function spawn_tree(x, y, layer, height) end
 ---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
 ---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
 ---Returns uid of the base or -1 if it wasn't able to spawn

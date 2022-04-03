@@ -2284,6 +2284,8 @@ If you want to respawn a player that is a ghost, set in his inventory `health` t
 
 #### nil spawn_tree(float x, float y, [LAYER](#LAYER) layer)
 
+#### nil spawn_tree(float x, float y, [LAYER](#LAYER) layer, int height)
+
 Spawns and grows a tree
 
 ## String functions
