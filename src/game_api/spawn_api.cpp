@@ -335,7 +335,7 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
     // Needs some space on top
     if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 0 || static_cast<int>(y) + 3 >= g_level_max_y || height == 1 ||
         layer_ptr->get_grid_entity_at(x, y - 1.0f) == nullptr ||
-        layer_ptr->get_grid_entity_at(x, y) == nullptr ||
+        layer_ptr->get_grid_entity_at(x, y) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 1.0f) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 2.0f) != nullptr)
         return;
