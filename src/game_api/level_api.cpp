@@ -1924,7 +1924,7 @@ void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
     const uint32_t start_x = static_cast<uint32_t>(area.left + 0.5f);
     uint32_t end_x = static_cast<uint32_t>(area.right + 0.5f);
     uint32_t start_y = static_cast<uint32_t>(area.top + 0.5f);
-    int end_y = static_cast<uint32_t>(area.bottom + 0.5f);
+    uint32_t end_y = static_cast<uint32_t>(area.bottom + 0.5f);
 
     if (start_x >= g_level_max_x || end_y >= g_level_max_y)
         return;
@@ -1946,7 +1946,7 @@ void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
 
     for (uint32_t i_x = start_x; i_x <= end_x; ++i_x)
     {
-        for (int i_y = start_y; i_y >= end_y; --i_y) // go from top to bottom
+        for (int i_y = start_y; i_y >= static_cast<int>(end_y); --i_y) // go from top to bottom
         {
             auto test_ent = state->layers[actual_layer]->grid_entities[i_y][i_x];
             if (!test_ent || !test_ent->type)
