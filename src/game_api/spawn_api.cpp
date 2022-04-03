@@ -313,6 +313,11 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
 
 void spawn_tree(float x, float y, LAYER layer)
 {
+    spawn_tree(x, y, layer, 0);
+}
+
+void spawn_tree(float x, float y, LAYER layer, uint16_t height)
+{
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
@@ -328,65 +333,73 @@ void spawn_tree(float x, float y, LAYER layer)
     Layer* layer_ptr = State::get().layer_local(actual_layer);
 
     // Needs some space on top
-    if (layer_ptr->get_grid_entity_at(x, y + 2.0f) == nullptr)
+    if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 0 || static_cast<int>(y) + 3 >= g_level_max_y || height == 1 ||
+        layer_ptr->get_grid_entity_at(x, y - 1.0f) == nullptr ||
+        layer_ptr->get_grid_entity_at(x, y) == nullptr ||
+        layer_ptr->get_grid_entity_at(x, y + 1.0f) != nullptr ||
+        layer_ptr->get_grid_entity_at(x, y + 2.0f) != nullptr)
+        return;
+
+    static const auto tree_base = to_id("ENT_TYPE_FLOOR_TREE_BASE");
+    static const auto tree_trunk = to_id("ENT_TYPE_FLOOR_TREE_TRUNK");
+    static const auto tree_top = to_id("ENT_TYPE_FLOOR_TREE_TOP");
+    static const auto tree_branch = to_id("ENT_TYPE_FLOOR_TREE_BRANCH");
+    static const auto tree_deco = to_id("ENT_TYPE_DECORATION_TREE");
+
+    PRNG& prng = PRNG::get_local();
+
+    // spawn the base
+    Entity* current_pice = layer_ptr->spawn_entity(tree_base, x, y, false, 0.0f, 0.0f, true);
+
+    // spawn segments
+    if (layer_ptr->get_grid_entity_at(x, y + 3.0f) == nullptr)
     {
-        static const auto tree_base = to_id("ENT_TYPE_FLOOR_TREE_BASE");
-        static const auto tree_trunk = to_id("ENT_TYPE_FLOOR_TREE_TRUNK");
-        static const auto tree_top = to_id("ENT_TYPE_FLOOR_TREE_TOP");
-        static const auto tree_branch = to_id("ENT_TYPE_FLOOR_TREE_BRANCH");
-        static const auto tree_deco = to_id("ENT_TYPE_DECORATION_TREE");
-
-        PRNG& prng = PRNG::get_local();
-
-        // spawn the base
-        Entity* base = layer_ptr->spawn_entity(tree_base, x, y, false, 0.0f, 0.0f, true);
-
-        // spawn segments
-        if (layer_ptr->get_grid_entity_at(x, y + 3.0f) == nullptr)
+        size_t i = height == 0 ? 5 : (height - 2); // -2 to remove the base and top
+        for (; i > 0; --i)
         {
-            size_t i = 5;
-            while (i > 0)
+            y += 1.0f;
+            if (static_cast<int>(y) + 2 >= g_level_max_y || layer_ptr->get_grid_entity_at(x, y + 2.0f) != nullptr)
             {
-                i--;
-                y = y + 1;
-                base = layer_ptr->spawn_entity_over(tree_trunk, base, 0.0f, 1.0f);
-                if (layer_ptr->get_grid_entity_at(x, y + 2.0f) != nullptr)
-                {
-                    break;
-                }
-                if (prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
-                {
-                    break;
-                }
+                break;
+            }
+            current_pice = layer_ptr->spawn_entity_over(tree_trunk, current_pice, 0.0f, 1.0f);
+            if (height == 0 && prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+            {
+                break;
             }
         }
-
-        // spawn the top
-        base = layer_ptr->spawn_entity_over(tree_top, base, 0.0f, 1.0f);
-
-        // spawn branches
-        do
-        {
-            auto spawn_deco = [&](Entity* branch, float w)
-            {
-                Entity* deco = layer_ptr->spawn_entity_over(tree_deco, branch, 0.0f, 0.49f);
-                deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION).value_or(0)) * 12;
-                deco->w *= w;
-            };
-            if (prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
-            {
-                Entity* branch = layer_ptr->spawn_entity_over(tree_branch, base, 1.02f, 0.0f);
-                spawn_deco(branch, 1.0f);
-            }
-            if (prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
-            {
-                Entity* branch = layer_ptr->spawn_entity_over(tree_branch, base, -1.02f, 0.0f);
-                branch->w = -1.0f;
-                spawn_deco(branch, -1.0f);
-            }
-            base = base->overlay;
-        } while (base->overlay);
     }
+
+    // spawn the top
+    current_pice = layer_ptr->spawn_entity_over(tree_top, current_pice, 0.0f, 1.0f);
+
+    // spawn branches
+    do
+    {
+        auto spawn_deco = [&](Entity* branch, bool left)
+        {
+            Entity* deco = layer_ptr->spawn_entity_over(tree_deco, branch, 0.0f, 0.49f);
+            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION).value_or(0)) * 12;
+            if (left)
+                deco->flags |= 1U << 16; // flag 17: facing left
+        };
+        auto test_pos = current_pice->position();
+
+        if (static_cast<int>(test_pos.first) + 1 < g_level_max_x && layer_ptr->get_grid_entity_at(test_pos.first + 1, test_pos.second) == nullptr &&
+            prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+        {
+            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_pice, 1.02f, 0.0f);
+            spawn_deco(branch, false);
+        }
+        if (static_cast<int>(test_pos.first) - 1 > 0 && layer_ptr->get_grid_entity_at(test_pos.first - 1, test_pos.second) == nullptr &&
+            prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+        {
+            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_pice, -1.02f, 0.0f);
+            branch->flags |= 1U << 16; // flag 17: facing left
+            spawn_deco(branch, true);
+        }
+        current_pice = current_pice->overlay;
+    } while (current_pice->overlay);
 }
 
 int32_t spawn_mushroom(float x, float y, LAYER l)
@@ -403,7 +416,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height)
 
     std::pair<float, float> offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(l, offset);
-    const auto layer_ptr = get_state_ptr()->layers[actual_layer];
+    const auto layer_ptr = State::get().layer_local(actual_layer);
     const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
     uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
     static const auto base = to_id("ENT_TYPE_FLOOR_MUSHROOM_BASE");
