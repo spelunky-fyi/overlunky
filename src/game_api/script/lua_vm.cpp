@@ -1061,6 +1061,7 @@ end
                 });
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
+            return id;
         }
         return sol::nullopt;
     };
