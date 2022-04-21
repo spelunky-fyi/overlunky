@@ -66,6 +66,8 @@ struct EntityHooksInfo
     std::vector<HookWithId<void(Container*, Movable*)>> on_open;
     std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision1;
     std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision2;
+    std::vector<HookWithId<bool(Entity*)>> pre_render;
+    std::vector<HookWithId<bool(Entity*)>> post_render;
 };
 
 // Creates an instance of this entity
@@ -286,6 +288,8 @@ class Entity
     void set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage);
     void set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1);
     void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
+    void set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render);
+    void set_post_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> post_render);
     std::span<uint32_t> get_items();
 
     template <typename T>

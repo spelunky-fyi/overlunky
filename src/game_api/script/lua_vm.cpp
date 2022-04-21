@@ -1288,6 +1288,60 @@ end
         }
         return sol::nullopt;
     };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after the entity is rendered.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_pre_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_pre_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    VanillaRenderContext render_ctx{};
+                    auto return_value = backend->handle_function_with_return<bool>(fun, render_ctx, lua["cast_entity"](self)).value_or(false);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after the entity is rendered.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_post_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_post_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    VanillaRenderContext render_ctx{};
+                    auto return_value = backend->handle_function_with_return<bool>(fun, render_ctx, lua["cast_entity"](self)).value_or(false);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
 
     /// Raise a signal and probably crash the game
     lua["raise"] = std::raise;
