@@ -82,6 +82,7 @@ void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float 
 {
     trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_PRE_DRAW_DEPTH, draw_depth, {bbox_left, bbox_top, bbox_right, bbox_bottom});
     g_render_draw_depth_trampoline(layer, draw_depth, bbox_left, bbox_bottom, bbox_right, bbox_top);
+    trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_POST_DRAW_DEPTH, draw_depth, {bbox_left, bbox_top, bbox_right, bbox_bottom});
 }
 
 using VanillaRenderJournalPageFun = void(JournalPage*);

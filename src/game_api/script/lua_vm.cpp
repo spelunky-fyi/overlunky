@@ -1510,6 +1510,8 @@ end
         ON::RENDER_POST_PAUSE_MENU,
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
+        "RENDER_POST_DRAW_DEPTH",
+        ON::RENDER_POST_DRAW_DEPTH,
         "RENDER_POST_JOURNAL_PAGE",
         ON::RENDER_POST_JOURNAL_PAGE,
         "SPEECH_BUBBLE",
@@ -1572,6 +1574,9 @@ end
     // RENDER_PRE_DRAW_DEPTH
     // Params: `VanillaRenderContext render_ctx, int draw_depth`
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_POST_DRAW_DEPTH
+    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     // RENDER_POST_JOURNAL_PAGE
     // Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`
     // Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
