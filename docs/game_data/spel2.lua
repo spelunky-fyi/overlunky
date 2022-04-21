@@ -904,6 +904,20 @@ function set_pre_collision1(uid, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_pre_collision2(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered.
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_render(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered.
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_render(uid, fun) end
 ---Raise a signal and probably crash the game
 ---@return nil
 function raise() end
@@ -6593,8 +6607,9 @@ ON = {
   PRE_LOAD_LEVEL_FILES = 109,
   PROLOGUE = 2,
   RECAP = 20,
+  RENDER_POST_DRAW_DEPTH = 122,
   RENDER_POST_HUD = 118,
-  RENDER_POST_JOURNAL_PAGE = 122,
+  RENDER_POST_JOURNAL_PAGE = 123,
   RENDER_POST_PAUSE_MENU = 120,
   RENDER_PRE_DRAW_DEPTH = 121,
   RENDER_PRE_HUD = 117,
@@ -6607,11 +6622,11 @@ ON = {
   SCRIPT_ENABLE = 115,
   SEED_INPUT = 8,
   SPACESHIP = 15,
-  SPEECH_BUBBLE = 123,
+  SPEECH_BUBBLE = 124,
   START = 103,
   TEAM_SELECT = 10,
   TITLE = 3,
-  TOAST = 124,
+  TOAST = 125,
   TRANSITION = 13,
   WIN = 16
 }
