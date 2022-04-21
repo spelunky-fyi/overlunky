@@ -3,6 +3,7 @@
 #include "game_manager.hpp"
 #include "level_api.hpp"
 #include "memory.hpp"
+#include "rpc.hpp"
 #include "savedata.hpp"
 #include "spawn_api.hpp"
 #include "strings.hpp"
@@ -97,6 +98,7 @@ State& State::get()
         init_render_api_hooks();
         get_is_init() = true;
         strings_init();
+        init_state_update();
     }
     return STATE;
 }

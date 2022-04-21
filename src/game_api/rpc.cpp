@@ -10,6 +10,7 @@
 #include "level_api.hpp"
 #include "memory.hpp"
 #include "savedata.hpp"
+#include "script/events.hpp"
 #include "state.hpp"
 #include "thread_utils.hpp"
 
@@ -1845,5 +1846,27 @@ void change_poison_timer(int16_t frames)
     {
         write_mem_recoverable("change_poison_timer", offset_first, frames, true);
         write_mem_recoverable("change_poison_timer", offset_subsequent, frames, true);
+    }
+}
+
+using OnStateUpdate = void(StateMemory*);
+OnStateUpdate* g_state_update_trampoline{nullptr};
+void StateUpdate(StateMemory* s)
+{
+    g_state_update_trampoline(s);
+    update_backends();
+}
+
+void init_state_update()
+{
+    g_state_update_trampoline = (OnStateUpdate*)get_address("state_refresh");
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach((void**)&g_state_update_trampoline, &StateUpdate);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        DEBUG("Failed hooking strings stuff: {}\n", error);
     }
 }

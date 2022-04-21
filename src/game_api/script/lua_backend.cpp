@@ -165,6 +165,19 @@ bool LuaBackend::update()
         return false;
     }
 
+
+    return true;
+}
+bool LuaBackend::update2()
+{
+    if (!get_enabled())
+        return true;
+
+    if (!pre_update())
+    {
+        return false;
+    }
+
     try
     {
         std::lock_guard gil_guard{gil};
