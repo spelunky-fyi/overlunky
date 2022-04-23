@@ -145,7 +145,7 @@ if(BUILD_OVERLUNKY)
                         find_package(Python3 COMPONENTS Interpreter)
                         if(Python3_FOUND)
                                 add_custom_target(update_docs_overlunky
-                                        COMMAND ${CMAKE_COMMAND} -E rm -Rf -f ${SPELUNKY_INSTALL_DIR}/game_data
+                                        COMMAND ${CMAKE_COMMAND} -E rm -Rf ${SPELUNKY_INSTALL_DIR}/game_data
                                         COMMAND injector --launch_game ${SPELUNKY_INSTALL_DIR} --info_dump
                                         COMMAND ${CMAKE_COMMAND} -E copy_directory ${SPELUNKY_INSTALL_DIR}/game_data ./docs/game_data
                                         COMMAND cd docs

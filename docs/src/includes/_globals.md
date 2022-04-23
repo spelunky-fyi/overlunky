@@ -288,7 +288,8 @@ The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
 #### optional&lt;[CallbackId](#Aliases)&gt; set_post_render(int uid, function fun)
 
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-Sets a callback that is called right after the entity is rendered.
+Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+where `render_ctx` is a `VanillaRenderContext`.
 Use this only when no other approach works, this call can be expensive if overused.
 
 ### set_post_render_screen
@@ -358,7 +359,8 @@ The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, lay
 #### optional&lt;[CallbackId](#Aliases)&gt; set_pre_render(int uid, function fun)
 
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-Sets a callback that is called right after the entity is rendered.
+Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
 Use this only when no other approach works, this call can be expensive if overused.
 
 ### set_pre_render_screen

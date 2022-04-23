@@ -905,14 +905,16 @@ function set_pre_collision1(uid, fun) end
 ---@return CallbackId?
 function set_pre_collision2(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after the entity is rendered.
+---Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+---where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_pre_render(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after the entity is rendered.
+---Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+---where `render_ctx` is a `VanillaRenderContext`.
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---@param uid integer
 ---@param fun fun(): any
