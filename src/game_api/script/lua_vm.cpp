@@ -1289,7 +1289,8 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-    /// Sets a callback that is called right after the entity is rendered.
+    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+    /// where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
     /// Use this only when no other approach works, this call can be expensive if overused.
     lua["set_pre_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
@@ -1303,8 +1304,8 @@ end
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     VanillaRenderContext render_ctx{};
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
                     auto return_value = backend->handle_function_with_return<bool>(fun, render_ctx, lua["cast_entity"](self)).value_or(false);
                     backend->clear_current_callback();
                     return return_value;
@@ -1316,7 +1317,8 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-    /// Sets a callback that is called right after the entity is rendered.
+    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+    /// where `render_ctx` is a `VanillaRenderContext`.
     /// Use this only when no other approach works, this call can be expensive if overused.
     lua["set_post_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
@@ -1329,12 +1331,11 @@ end
                 [=, &lua, fun = std::move(fun)](Entity* self)
                 {
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return false;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                        return;
                     VanillaRenderContext render_ctx{};
-                    auto return_value = backend->handle_function_with_return<bool>(fun, render_ctx, lua["cast_entity"](self)).value_or(false);
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    backend->handle_function(fun, render_ctx, lua["cast_entity"](self));
                     backend->clear_current_callback();
-                    return return_value;
                 });
             backend->hook_entity_dtor(e);
             backend->entity_hooks.push_back({uid, id});

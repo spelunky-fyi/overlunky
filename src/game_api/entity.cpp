@@ -668,52 +668,48 @@ void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::functio
     hook_info.pre_collision2.push_back({reserved_callback_id, std::move(pre_collision2)});
 }
 
+auto hook_render_callback(Entity* self, RenderInfo* self_rendering_info)
+{
+    hook_vtable<void(RenderInfo*, float*)>(
+        self_rendering_info,
+        [self](RenderInfo* render_info, float* floats, void (*original)(RenderInfo*, float* floats))
+        {
+            EntityHooksInfo& _hook_info = self->get_hooks();
+            bool skip_original{false};
+            for (auto& [id, pre] : _hook_info.pre_render)
+            {
+                if (pre(self))
+                {
+                    skip_original = true;
+                    break;
+                }
+            }
+            if (!skip_original)
+            {
+                original(render_info, floats);
+            }
+            for (auto& [id, post] : _hook_info.post_render)
+            {
+                post(self);
+            }
+        },
+        0x3);
+}
 void Entity::set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.pre_render.empty() || hook_info.pre_render.empty())
     {
-        hook_vtable<void(RenderInfo*)>(
-            rendering_info,
-            [this](RenderInfo* self, void (*original)(RenderInfo*))
-            {
-                EntityHooksInfo& _hook_info = this->get_hooks();
-                for (auto& [id, pre] : _hook_info.pre_render)
-                {
-                    pre(this);
-                }
-                original(self);
-                for (auto& [id, post] : _hook_info.post_render)
-                {
-                    post(this);
-                }
-            },
-            0x3);
+        hook_render_callback(this, rendering_info);
     }
     hook_info.pre_render.push_back({reserved_callback_id, std::move(pre_render)});
 }
-
-void Entity::set_post_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> post_render)
+void Entity::set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render)
 {
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.pre_render.empty() || hook_info.pre_render.empty())
     {
-        hook_vtable<void(RenderInfo*, float*)>(
-            rendering_info,
-            [this](RenderInfo* self, float* floats, void (*original)(RenderInfo*, float*))
-            {
-                EntityHooksInfo& _hook_info = this->get_hooks();
-                for (auto& [id, pre] : _hook_info.pre_render)
-                {
-                    pre(this);
-                }
-                original(self, floats);
-                for (auto& [id, post] : _hook_info.post_render)
-                {
-                    post(this);
-                }
-            },
-            0x3);
+        hook_render_callback(this, rendering_info);
     }
     hook_info.post_render.push_back({reserved_callback_id, std::move(post_render)});
 }
