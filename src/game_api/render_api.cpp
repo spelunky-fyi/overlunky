@@ -267,12 +267,10 @@ void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Co
     }
 }
 
-void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Color color)
+void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader)
 {
     static size_t func_offset = 0;
     static size_t param_7 = 0;
-    constexpr uint8_t shader = 0x7; // this comes from RenderInfo->shader
-
     if (func_offset == 0)
     {
         func_offset = get_address("draw_world_texture"sv);
@@ -302,7 +300,7 @@ void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Col
             dest.top_left_y,
             unknown};
 
-        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
+        typedef void render_func(size_t, WorldShader, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         auto texture_name = texture->name;
         rf(renderer(), shader, &texture_name, 1, destination, &source, (void*)param_7, &color, nullptr);

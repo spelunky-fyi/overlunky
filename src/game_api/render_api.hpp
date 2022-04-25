@@ -27,6 +27,30 @@ enum JOURNAL_VFTABLE
     LAST_GAME_PLAYED = 816, // open player profile from main menu, journal: page 1
 };
 
+enum class WorldShader : std::uint8_t
+{
+    Colors = 0x0,
+    Texture = 0x1,
+    TextureColor = 0x2,
+    TextureAlphaColor = 0x3,
+    CircleOccluder = 0x4,
+    TextureColorsWarp = 0x5,
+    DeferredColorTransparent = 0x6,
+    DeferredTextureColor = 0x7,
+    DeferredTextureColor_Poisoned = 0x8,
+    DeferredTextureColor_Cursed = 0x9,
+    DeferredTextureColor_PoisonedCursed = 0xa,
+    DeferredTextureColor_Transparent = 0xb,
+    DeferredTextureColor_TransparentCorrected = 0xc,
+    DeferredTextureColor_Emissive = 0x10,
+    DeferredTextureColor_EmissiveGlow = 0x12,
+    DeferredTextureColor_EmissiveGlowHeavy = 0x13,
+    DeferredTextureColor_EmissiveGlowBrightness = 0x14,
+    DeferredTextureColor_EmissiveColorizedGlow = 0x16,
+    DeferredTextureColor_EmissiveColorizedGlow_DynamicGlow = 0x17,
+    DeferredTextureColor_EmissiveColorizedGlow_Saturation = 0x18,
+};
+
 struct RenderAPI
 {
     const size_t* api;
@@ -46,7 +70,7 @@ struct RenderAPI
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
     void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color);
-    void draw_world_texture(Texture* texture, Quad source, Quad dest, Color color);
+    void draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader);
 };
 
 // straight out of the x64dbg plugin

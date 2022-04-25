@@ -4014,9 +4014,11 @@ local function VanillaRenderContext_draw_screen_texture(self, texture_id, source
 ---@param dest Quad
 ---@param color Color
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color, angle: number, px: number, py: number): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color, shader: WORLD_SHADER): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, source: Quad, dest: Quad, color: Color, shader: WORLD_SHADER): nil
 local function VanillaRenderContext_draw_world_texture(self, texture_id, source, dest, color) end
 
 ---@class TextureRenderingInfo
@@ -8824,6 +8826,28 @@ WIN_STATE = {
   TIAMAT_WIN = 1
 }
 ---@alias WIN_STATE integer
+WORLD_SHADER = {
+  COLOR = 0,
+  DEFERRED_COLOR_TRANSPARENT = 6,
+  DEFERRED_TEXTURE_COLOR = 7,
+  DEFERRED_TEXTURE_COLOR_CURSED = 9,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE = 16,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW = 22,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW = 23,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION = 24,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW = 18,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS = 20,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY = 19,
+  DEFERRED_TEXTURE_COLOR_POISONED = 8,
+  DEFERRED_TEXTURE_COLOR_POISONED_CURSED = 10,
+  DEFERRED_TEXTURE_COLOR_TRANSPARENT = 11,
+  DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED = 12,
+  TEXTURE = 1,
+  TEXTURE_ALPHA_COLOR = 3,
+  TEXTURE_COLOR = 2,
+  TEXTURE_COLORS_WARP = 5
+}
+---@alias WORLD_SHADER integer
 YANG = {
   ANGRY = -1,
   BOTH_TURKEYS_DELIVERED = 3,

@@ -983,6 +983,35 @@ Name | Data | Description
 [HUNDUN_WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.HUNDUN_WIN) | 2 | 
 [COSMIC_OCEAN_WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.COSMIC_OCEAN_WIN) | 3 | 
 
+## WORLD_SHADER
+
+
+> Search script examples for [WORLD_SHADER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[COLOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.COLOR) | WorldShader::Colors | Renders a solid color<br/>
+[TEXTURE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.TEXTURE) | WorldShader::Texture | Renders a texture without applying the given color<br/>
+[TEXTURE_ALPHA_COLOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.TEXTURE_ALPHA_COLOR) | WorldShader::TextureAlphaColor | Renders a texture by interpreting its red channel as alpha and applying the given color<br/>
+[TEXTURE_COLOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.TEXTURE_COLOR) | WorldShader::TextureColor | The default shader to be used, just renders a texture with transparancy and the given color<br/>
+[TEXTURE_COLORS_WARP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.TEXTURE_COLORS_WARP) | WorldShader::TextureColorsWarp | Renders the texture, with "gamma correction" of the color channels and multiplying everything by the input color alpha only<br/>
+[DEFERRED_COLOR_TRANSPARENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_COLOR_TRANSPARENT) | WorldShader::DeferredColorTransparent | Basically same as COLOR but goes through the deferred pipeline<br/>
+[DEFERRED_TEXTURE_COLOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR) | WorldShader::DeferredTextureColor | Basically same as TEXTURE_COLOR but goes through the deferred pipeline<br/>
+[DEFERRED_TEXTURE_COLOR_POISONED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_POISONED) | WorldShader::DeferredTextureColor_Poisoned | Same as DEFERRED_TEXTURE_COLOR but applies poison color effect<br/>
+[DEFERRED_TEXTURE_COLOR_CURSED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_CURSED) | WorldShader::DeferredTextureColor_Cursed | Same as DEFERRED_TEXTURE_COLOR but applies cursed color effect<br/>
+[DEFERRED_TEXTURE_COLOR_POISONED_CURSED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_POISONED_CURSED) | WorldShader::DeferredTextureColor_PoisonedCursed | Same as DEFERRED_TEXTURE_COLOR but applies poisoned and cursed color effect<br/>
+[DEFERRED_TEXTURE_COLOR_TRANSPARENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_TRANSPARENT) | WorldShader::DeferredTextureColor_Transparent | Basically same as DEFERRED_TEXTURE_COLOR<br/>
+[DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED) | WorldShader::DeferredTextureColor_TransparentCorrected | Same as DEFERRED_TEXTURE_COLOR_TRANSPARENT but applies gamma correction to alpha channel<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE) | WorldShader::DeferredTextureColor_Emissive | Same as DEFERRED_TEXTURE_COLOR but renders to the emissive channel<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW) | WorldShader::DeferredTextureColor_EmissiveGlow | Same as DEFERRED_TEXTURE_COLOR but renders to the emissive channel with glow<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY) | WorldShader::DeferredTextureColor_EmissiveGlowHeavy | Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW but renders to the emissive channel with heavy glow<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS) | WorldShader::DeferredTextureColor_EmissiveGlowBrightness | Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY but renders glow on top of the texture<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW) | WorldShader::DeferredTextureColor_EmissiveColorizedGlow | Same as DEFERRED_TEXTURE_COLOR but renders heavy glow behind the texture<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW) | WorldShader::DeferredTextureColor_EmissiveColorizedGlow_DynamicGlow | Basically same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION) | WorldShader::DeferredTextureColor_EmissiveColorizedGlow_Saturation | Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW but renders texture as solid color<br/>
+
 ## YANG
 
 
