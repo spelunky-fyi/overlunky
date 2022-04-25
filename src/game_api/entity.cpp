@@ -684,9 +684,9 @@ Entity* get_entity_ptr(uint32_t uid)
 std::vector<uint32_t> Movable::get_all_behaviors()
 {
     std::vector<uint32_t> anims;
-    anims.reserve(behavior_map.size());
+    anims.reserve(behaviors_map.size());
 
-    for (auto& cur : behavior_map)
+    for (auto& cur : behaviors_map)
     {
         anims.push_back(cur.first);
     }
@@ -695,8 +695,8 @@ std::vector<uint32_t> Movable::get_all_behaviors()
 
 bool Movable::set_behavior(uint32_t an)
 {
-    const auto& it = behavior_map.find(an);
-    if (it != behavior_map.end())
+    const auto& it = behaviors_map.find(an);
+    if (it != behaviors_map.end())
     {
         current_behavior = it->second;
         return true;
@@ -706,7 +706,7 @@ bool Movable::set_behavior(uint32_t an)
 
 uint32_t Movable::get_behavior()
 {
-    for (auto& cur : behavior_map)
+    for (auto& cur : behaviors_map)
     {
         if (cur.second == current_behavior)
         {
