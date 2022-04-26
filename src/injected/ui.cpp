@@ -4542,20 +4542,20 @@ void render_entity_props(int uid, bool detached = false)
             render_state("Current state", movable->state); // TODO: allow change
             render_state("Last state", movable->last_state);
             render_ai("AI state", movable->move_state); // TODO: allow change
-        const std::string current_behavior_str = fmt::format("{}", entity->get_behavior());
-        if (ImGui::BeginCombo("Current Behavior##ChangeBehaviorCombo", current_behavior_str.c_str()))
-        {
-            for (auto& item : entity->behaviors_map)
+            const std::string current_behavior_str = fmt::format("{}", movable->get_behavior());
+            if (ImGui::BeginCombo("Current Behavior##ChangeBehaviorCombo", current_behavior_str.c_str()))
             {
-                const std::string option_str = fmt::format("{}", item.first);
-                bool isSelected = entity->current_behavior == item.second;
-                if (ImGui::Selectable(option_str.c_str(), isSelected))
+                for (auto& item : movable->behaviors_map)
                 {
-                    entity->current_behavior = item.second;
+                    const std::string option_str = fmt::format("{}", item.first);
+                    bool isSelected = movable->current_behavior == item.second;
+                    if (ImGui::Selectable(option_str.c_str(), isSelected))
+                    {
+                        movable->current_behavior = item.second;
+                    }
                 }
+                ImGui::EndCombo();
             }
-            ImGui::EndCombo();
-        }
             ImGui::Text("Standing on:");
             if (movable->standing_on_uid != -1)
             {

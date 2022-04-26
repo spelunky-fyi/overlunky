@@ -151,8 +151,8 @@ void Player::let_go()
         // last_state = state;
         // state = 1, 9, 0xA; ?
         stand_counter = 0;
-        const auto& anim = anim_func_map.find(2);
-        if (anim != anim_func_map.end())
-            anim_func = anim->second;
+        const auto& anim = behaviors_map.find(2);
+        if (anim != behaviors_map.end())
+            current_behavior = anim->second;
     }
 }
