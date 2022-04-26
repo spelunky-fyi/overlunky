@@ -289,6 +289,12 @@ class Spark : public Flame
     float next_size;
     /// very short timer before next size change, giving a pulsing effect
     uint8_t size_change_timer;
+    uint8_t extra_padding[3];
+
+    /// This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+    float speed;
+    /// This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+    float distance;
 };
 
 class TiamatShot : public LightEmitter
