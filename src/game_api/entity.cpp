@@ -676,7 +676,7 @@ auto hook_render_callback(Entity* self, RenderInfo* self_rendering_info)
         {
             Entity* entity = get_entity_ptr_local(uid);
             EntityHooksInfo& _hook_info = entity->get_hooks();
-            bool skip_original{ false };
+            bool skip_original{false};
             for (auto& [id, pre] : _hook_info.pre_render)
             {
                 if (pre(entity))
