@@ -88,7 +88,7 @@ void OnToast(char16_t* buffer)
 void strings_init()
 {
     g_original_string_ids_end = get_type(1)->description; // get wrong stringid from bordertile
-    fix_entity_descriptions(g_original_string_ids_end);
+    // fix_entity_descriptions(g_original_string_ids_end); // disabled until someone wants to work on this
 
     auto addr_format_shopitem = Memory::get().at_exe(get_virtual_function_address(VTABLE_OFFSET::ITEM_PICKUP_ROPEPILE, 7));
     auto addr_npcdialogue = get_address("speech_bubble_fun");

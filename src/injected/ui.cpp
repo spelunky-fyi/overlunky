@@ -918,7 +918,9 @@ void spawn_entities(bool s, std::string list = "")
                 if (old_block_id != -1)
                 {
                     auto old_block = get_entity_ptr(old_block_id);
-                    old_block->destroy();
+
+                    if (old_block) // grid entities can be messed up if you move them with mouse etc.
+                        old_block->destroy();
                 }
             }
             int spawned = UI::spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap);
@@ -4540,6 +4542,20 @@ void render_entity_props(int uid, bool detached = false)
             render_state("Current state", movable->state); // TODO: allow change
             render_state("Last state", movable->last_state);
             render_ai("AI state", movable->move_state); // TODO: allow change
+        const std::string current_behavior_str = fmt::format("{}", entity->get_behavior());
+        if (ImGui::BeginCombo("Current Behavior##ChangeBehaviorCombo", current_behavior_str.c_str()))
+        {
+            for (auto& item : entity->behaviors_map)
+            {
+                const std::string option_str = fmt::format("{}", item.first);
+                bool isSelected = entity->current_behavior == item.second;
+                if (ImGui::Selectable(option_str.c_str(), isSelected))
+                {
+                    entity->current_behavior = item.second;
+                }
+            }
+            ImGui::EndCombo();
+        }
             ImGui::Text("Standing on:");
             if (movable->standing_on_uid != -1)
             {

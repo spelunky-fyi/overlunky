@@ -284,6 +284,30 @@ function spawn_apep(x, y, layer, right) end
 ---@param layer LAYER
 ---@return nil
 function spawn_tree(x, y, layer) end
+---Spawns and grows a tree
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param height integer
+---@return nil
+function spawn_tree(x, y, layer, height) end
+---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+---Returns uid of the base or -1 if it wasn't able to spawn
+---@param x number
+---@param y number
+---@param l LAYER
+---@return integer
+function spawn_mushroom(x, y, l) end
+---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+---Returns uid of the base or -1 if it wasn't able to spawn
+---@param x number
+---@param y number
+---@param l LAYER
+---@param height integer
+---@return integer
+function spawn_mushroom(x, y, l, height) end
 ---Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 ---If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 ---@param player_slot integer
@@ -634,6 +658,12 @@ function set_kapala_hud_icon(icon_index) end
 ---@param distance number
 ---@return nil
 function modify_sparktraps(angle_increment, distance) end
+---Activate custom variables for speed and distance in the `ITEM_SPARK`
+---note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+---default game values are: speed = -0.015, distance = 3.0
+---@param activate boolean
+---@return nil
+function activate_sparktraps_hack(activate) end
 ---Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ---Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
 ---@param default_multiplier integer
@@ -1200,6 +1230,40 @@ function force_co_subtheme(subtheme) end
 ---@param config LEVEL_CONFIG
 ---@return integer
 function get_level_config(config) end
+---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
+---@param l LAYER
+---@param max_lengh integer
+---@return nil
+function grow_vines(l, max_lengh) end
+---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
+---@param l LAYER
+---@param max_lengh integer
+---@param area AABB
+---@param destroy_broken boolean
+---@return nil
+function grow_vines(l, max_lengh, area, destroy_broken) end
+---Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+---@param l LAYER
+---@param max_lengh integer
+---@return nil
+function grow_poles(l, max_lengh) end
+---Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+---@param l LAYER
+---@param max_lengh integer
+---@param area AABB
+---@param destroy_broken boolean
+---@return nil
+function grow_poles(l, max_lengh, area, destroy_broken) end
+---Grow chains from `CHAIN_CEILING` and chain with blocks on it from `CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level
+---To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
+---@return boolean
+function grow_chainandblocks() end
+---Grow chains from `CHAIN_CEILING` and chain with blocks on it from `CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level
+---To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
+---@param x integer
+---@param y integer
+---@return boolean
+function grow_chainandblocks(x, y) end
 ---Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Check ThemeInfo for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
 ---Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
@@ -1886,6 +1950,9 @@ local function Entity_overlaps_with(self, other) end
     ---@field add_money fun(self, money: integer): nil
     ---@field is_on_fire fun(self, ): boolean
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
+    ---@field get_all_behaviors fun(self, ): integer[]
+    ---@field set_behavior fun(self, behavior_id: integer): boolean
+    ---@field get_behavior fun(self, ): integer
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
@@ -2842,6 +2909,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field size_multiply number
     ---@field next_size number
     ---@field size_change_timer integer
+    ---@field speed number
+    ---@field distance number
 
 ---@class TiamatShot : LightEmitter
 
@@ -6323,7 +6392,6 @@ GAME_SETTING = {
   CROSSPROGRESS_AUTOSYNC = 47,
   CROSSPROGRESS_ENABLED = 46,
   CURRENT_PROFILE = 18,
-  DAMSEL_STYLE = 20,
   DIALOG_TEXT = 37,
   FEAT_POPUPS = 32,
   FREQUENCY_DENOMINATOR = 5,
@@ -6345,6 +6413,7 @@ GAME_SETTING = {
   MUSIC_VOLUME = 14,
   OUTPUT_DELAY = 44,
   OVERSCAN = 17,
+  PET_STYLE = 20,
   PREV_LANGUAGE = 19,
   PSEUDONYMIZATION = 45,
   RESOLUTIONX = 2,

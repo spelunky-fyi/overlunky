@@ -3,6 +3,7 @@
 #include "aliases.hpp"
 #include <array>
 #include <cstdint>
+#include <optional>
 
 struct Texture
 {

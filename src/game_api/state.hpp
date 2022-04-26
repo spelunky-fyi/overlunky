@@ -210,19 +210,19 @@ struct State
     // Returns the local-thread version of StateMemory*
     StateMemory* ptr_local() const;
 
-    Layer* layer(uint8_t index)
+    Layer* layer(uint8_t index) const
     {
         return ptr()->layers[index];
     }
-    Layer* layer_local(uint8_t index)
+    Layer* layer_local(uint8_t index) const
     {
         return ptr_local()->layers[index];
     }
 
-    Items* items()
+    Items* items() const
     {
         auto pointer = ptr()->items;
-        return (Items*)(pointer);
+        return pointer;
     }
 
     void godmode(bool g);
@@ -236,7 +236,7 @@ struct State
     static std::pair<float, float> click_position(float x, float y);
     static std::pair<float, float> screen_position(float x, float y);
 
-    uint32_t flags()
+    uint32_t flags() const
     {
         return ptr()->level_flags;
     }

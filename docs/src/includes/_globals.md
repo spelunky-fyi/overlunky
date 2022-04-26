@@ -388,6 +388,35 @@ properties on the sound. Otherwise you may cause a deadlock. The callback signat
 ## Entity functions
 
 
+### activate_sparktraps_hack
+
+
+```lua
+activate_sparktraps_hack(true);
+
+-- set random speed, direction and distance for the spark
+set_post_entity_spawn(function(ent)
+
+	direction = 1
+	if prng:random_chance(2, PRNG_CLASS.ENTITY_VARIATION) then
+		direction = -1
+	end
+
+	ent.speed = prng:random_float(PRNG_CLASS.ENTITY_VARIATION) * 0.1 * direction
+	ent.distance = prng:random_float(PRNG_CLASS.ENTITY_VARIATION) * 10
+
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SPARK)
+```
+
+
+> Search script examples for [activate_sparktraps_hack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_sparktraps_hack)
+
+#### nil activate_sparktraps_hack(bool activate)
+
+Activate custom variables for speed and distance in the `ITEM_SPARK`
+note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+default game values are: speed = -0.015, distance = 3.0
+
 ### apply_entity_db
 
 
@@ -1114,6 +1143,40 @@ Enable/disable godmode for players.
 #### nil god_companions(bool g)
 
 Enable/disable godmode for companions.
+
+### grow_chainandblocks
+
+
+> Search script examples for [grow_chainandblocks](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_chainandblocks)
+
+#### bool grow_chainandblocks()
+
+#### bool grow_chainandblocks(int x, int y)
+
+Grow chains from `CHAIN_CEILING` and chain with blocks on it from `CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level
+To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
+
+### grow_poles
+
+
+> Search script examples for [grow_poles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_poles)
+
+#### nil grow_poles([LAYER](#LAYER) l, int max_lengh)
+
+#### nil grow_poles([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+
+### grow_vines
+
+
+> Search script examples for [grow_vines](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_vines)
+
+#### nil grow_vines([LAYER](#LAYER) l, int max_lengh)
+
+#### nil grow_vines([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
 ### import
 
@@ -2202,6 +2265,19 @@ Don't overuse this, you are still restricted by the liquid pool sizes and thus m
 `liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
 `amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
 
+### spawn_mushroom
+
+
+> Search script examples for [spawn_mushroom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_mushroom)
+
+#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l)
+
+#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l, int height)
+
+Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+Returns uid of the base or -1 if it wasn't able to spawn
+
 ### spawn_on_floor
 
 
@@ -2236,6 +2312,8 @@ If you want to respawn a player that is a ghost, set in his inventory `health` t
 > Search script examples for [spawn_tree](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
 
 #### nil spawn_tree(float x, float y, [LAYER](#LAYER) layer)
+
+#### nil spawn_tree(float x, float y, [LAYER](#LAYER) layer, int height)
 
 Spawns and grows a tree
 

@@ -95,7 +95,7 @@ Entity* Layer::get_grid_entity_at(float x, float y)
 {
     const uint32_t ix = static_cast<uint32_t>(x + 0.5f);
     const uint32_t iy = static_cast<uint32_t>(y + 0.5f);
-    if (ix < 0x56 && iy < 0x7e)
+    if (ix < g_level_max_x && iy < g_level_max_y)
     {
         return grid_entities[iy][ix];
     }

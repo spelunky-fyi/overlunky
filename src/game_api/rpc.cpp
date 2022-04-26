@@ -710,7 +710,11 @@ void modify_sparktraps(float angle_increment, float distance)
     static float* new_array;
     if (new_array == nullptr)
     {
-        const auto offset = get_address("sparktrap_angle_increment");
+        const auto offset = get_address("sparktrap_angle_increment") + 4;
+
+        if (read_u8(offset - 1) != 0x89) // check if sparktraps_hack is active
+            return;
+
         const int32_t distance_offset = 0xF1;
         new_array = (float*)alloc_mem_rel32(offset + 4, sizeof(float) * 2);
         if (!new_array)
@@ -722,6 +726,22 @@ void modify_sparktraps(float angle_increment, float distance)
     }
     *new_array = angle_increment;
     *(new_array + 1) = distance;
+}
+
+void activate_sparktraps_hack(bool activate)
+{
+    if (activate)
+    {
+        const auto offset = get_address("sparktrap_angle_increment");
+        const int32_t distance_offset = 0xF1;
+
+        write_mem_recoverable("sparktraps_hack", offset, "\xF3\x0F\x58\x89\x6C\x01\x00\x00"sv, true);
+        write_mem_recoverable("sparktraps_hack", offset + distance_offset, "\xF3\x0F\x10\xB9\x70\x01\x00\x00"sv, true);
+    }
+    else
+    {
+        recover_mem("sparktraps_hack");
+    }
 }
 
 void set_kapala_blood_threshold(uint8_t threshold)
@@ -1672,7 +1692,7 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
             const uint32_t ix = static_cast<uint32_t>(offset.first + x + 0.5f);
             const uint32_t iy = static_cast<uint32_t>(offset.second + y + 0.5f);
 
-            if (ix < 0x56 && iy < 0x7e)
+            if (ix < g_level_max_x && iy < g_level_max_y)
             {
                 state.layer(entity->layer)->grid_entities[grid_y][grid_x] = nullptr;
                 entity->teleport_abs(static_cast<float>(ix), static_cast<float>(iy), 0, 0);

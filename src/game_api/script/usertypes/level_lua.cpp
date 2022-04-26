@@ -1120,6 +1120,28 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->data->level_config[config];
     };
 
+    auto grow_vines = sol::overload(
+        static_cast<void (*)(LAYER, uint32_t)>(::grow_vines),
+        static_cast<void (*)(LAYER, uint32_t, AABB, bool)>(::grow_vines));
+
+    /// Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
+    lua["grow_vines"] = grow_vines;
+
+    auto grow_poles = sol::overload(
+        static_cast<void (*)(LAYER, uint32_t)>(::grow_poles),
+        static_cast<void (*)(LAYER, uint32_t, AABB, bool)>(::grow_poles));
+
+    /// Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+    lua["grow_poles"] = grow_poles;
+
+    auto grow_chain_and_blocks = sol::overload(
+        static_cast<bool (*)(uint32_t, uint32_t)>(::grow_chain_and_blocks),
+        static_cast<bool (*)()>(::grow_chain_and_blocks));
+
+    /// Grow chains from `CHAIN_CEILING` and chain with blocks on it from `CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level
+    /// To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
+    lua["grow_chainandblocks"] = grow_chain_and_blocks;
+
     lua.new_usertype<ThemeInfo>(
         "ThemeInfo",
         "sub_theme",
