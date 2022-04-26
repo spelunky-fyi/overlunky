@@ -1646,7 +1646,7 @@ end
     // Covers all of the above.
     */
     /// Some arbitrary constants of the engine
-    lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8);
+    lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8, "MAX_TILES_VERT", g_level_max_y, "MAX_TILES_HORIZ", g_level_max_x, "NOF_DRAW_DEPTHS", 53, "MAX_PLAYERS", 4);
     /* CONST
     // ENGINE_FPS
     // The framerate at which the engine updates, e.g. at which `ON.GAMEFRAME` and similar are called.
@@ -1655,6 +1655,16 @@ end
     // Width of a 1x1 room, both in world coordinates and in tiles.
     // ROOM_HEIGHT
     // Height of a 1x1 room, both in world coordinates and in tiles.
+    // MAX_TILES_VERT
+    // Maximum number of working floor tiles in vertical axis, 126 (0-125 coordinates)
+    // Floors spawned above or below will not have any collision
+    // MAX_TILES_HORIZ
+    // Maximum number of working floor tiles in horizontal axis, 86 (0-85 coordinates)
+    // Floors spawned above or below will not have any collision
+    // NOF_DRAW_DEPTHS
+    // Number of draw_depths, 53 (0-52)
+    // MAX_PLAYERS
+    // Just the max number of players in multiplayer
     */
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.create_named_table(
