@@ -1950,6 +1950,9 @@ local function Entity_overlaps_with(self, other) end
     ---@field add_money fun(self, money: integer): nil
     ---@field is_on_fire fun(self, ): boolean
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
+    ---@field get_all_behaviors fun(self, ): integer[]
+    ---@field set_behavior fun(self, behavior_id: integer): boolean
+    ---@field get_behavior fun(self, ): integer
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
