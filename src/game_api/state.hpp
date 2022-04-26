@@ -256,6 +256,7 @@ struct State
     std::vector<int64_t> read_prng() const;
 
     Entity* find(uint32_t uid);
+    Entity* find_local(uint32_t uid);
 
     std::pair<float, float> get_camera_position();
     void set_camera_position(float cx, float cy);

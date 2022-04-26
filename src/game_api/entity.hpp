@@ -54,7 +54,7 @@ struct HookWithId
 };
 struct EntityHooksInfo
 {
-    void* entity;
+    std::int32_t entity;
     std::uint32_t cbcount;
     std::vector<HookWithId<void(Entity*)>> on_dtor;
     std::vector<HookWithId<void(Entity*)>> on_destroy;
@@ -508,3 +508,4 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos);
 
 struct EntityFactory* entity_factory();
 Entity* get_entity_ptr(uint32_t uid);
+Entity* get_entity_ptr_local(uint32_t uid);

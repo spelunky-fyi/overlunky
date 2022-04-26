@@ -433,7 +433,7 @@ bool Entity::set_texture(TEXTURE texture_id)
 void Entity::unhook(std::uint32_t id)
 {
     auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [this](auto& hook)
-                           { return hook.entity == this; });
+                           { return hook.entity == uid; });
     if (it != g_entity_hooks.end())
     {
         std::erase_if(it->on_dtor, [id](auto& hook)
@@ -465,13 +465,13 @@ void Entity::unhook(std::uint32_t id)
 EntityHooksInfo& Entity::get_hooks()
 {
     auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [this](auto& hook)
-                           { return hook.entity == this; });
+                           { return hook.entity == uid; });
     if (it == g_entity_hooks.end())
     {
         hook_dtor(this, [](void* self)
                   {
                       auto _it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
-                                              { return hook.entity == self; });
+                                              { return hook.entity == ((Entity*)self)->uid; });
                       if (_it != g_entity_hooks.end())
                       {
                           for (auto& cb : _it->on_dtor)
@@ -480,7 +480,7 @@ EntityHooksInfo& Entity::get_hooks()
                           }
                           g_entity_hooks.erase(_it);
                       } });
-        g_entity_hooks.push_back({this});
+        g_entity_hooks.push_back({uid});
         return g_entity_hooks.back();
     }
     return *it;
@@ -672,13 +672,14 @@ auto hook_render_callback(Entity* self, RenderInfo* self_rendering_info)
 {
     hook_vtable<void(RenderInfo*, float*)>(
         self_rendering_info,
-        [self](RenderInfo* render_info, float* floats, void (*original)(RenderInfo*, float* floats))
+        [uid = self->uid](RenderInfo* render_info, float* floats, void (*original)(RenderInfo*, float* floats))
         {
-            EntityHooksInfo& _hook_info = self->get_hooks();
-            bool skip_original{false};
+            Entity* entity = get_entity_ptr_local(uid);
+            EntityHooksInfo& _hook_info = entity->get_hooks();
+            bool skip_original{ false };
             for (auto& [id, pre] : _hook_info.pre_render)
             {
-                if (pre(self))
+                if (pre(entity))
                 {
                     skip_original = true;
                     break;
@@ -690,7 +691,7 @@ auto hook_render_callback(Entity* self, RenderInfo* self_rendering_info)
             }
             for (auto& [id, post] : _hook_info.post_render)
             {
-                post(self);
+                post(entity);
             }
         },
         0x3);
@@ -726,6 +727,15 @@ Entity* get_entity_ptr(uint32_t uid)
 {
     auto state = State::get();
     auto p = state.find(uid);
+    if (IsBadWritePtr(p, 0x178))
+        return nullptr;
+    return p;
+}
+
+Entity* get_entity_ptr_local(uint32_t uid)
+{
+    auto state = State::get();
+    auto p = state.find_local(uid);
     if (IsBadWritePtr(p, 0x178))
         return nullptr;
     return p;
