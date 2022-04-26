@@ -658,6 +658,12 @@ function set_kapala_hud_icon(icon_index) end
 ---@param distance number
 ---@return nil
 function modify_sparktraps(angle_increment, distance) end
+---Activate custom variables for speed and distance in the `ITEM_SPARK`
+---note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+---default game values are: speed = -0.015, distance = 3.0
+---@param activate boolean
+---@return nil
+function activate_sparktraps_hack(activate) end
 ---Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ---Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
 ---@param default_multiplier integer
@@ -1960,6 +1966,9 @@ local function Entity_overlaps_with(self, other) end
     ---@field add_money fun(self, money: integer): nil
     ---@field is_on_fire fun(self, ): boolean
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
+    ---@field get_all_behaviors fun(self, ): integer[]
+    ---@field set_behavior fun(self, behavior_id: integer): boolean
+    ---@field get_behavior fun(self, ): integer
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
@@ -2916,6 +2925,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field size_multiply number
     ---@field next_size number
     ---@field size_change_timer integer
+    ---@field speed number
+    ---@field distance number
 
 ---@class TiamatShot : LightEmitter
 

@@ -103,9 +103,9 @@ struct EntityList
         return uids().contains(uid);
     }
 
-    std::pair<Entity*, uint32_t> operator[](const uint32_t idx) const
+    std::pair<Entity*&, uint32_t&> operator[](const uint32_t idx) const
     {
-        return std::make_pair(ent_list[idx], uid_list[idx]);
+        return {ent_list[idx], uid_list[idx]};
     }
 };
 

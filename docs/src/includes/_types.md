@@ -5545,6 +5545,9 @@ bool | [can_jump()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can
  | [add_money(int money)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money) | Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
 bool | [is_on_fire()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on_fire) | 
  | [damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) | Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+array&lt;int&gt; | [get_all_behaviors()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_all_behaviors) | Get all avaible behavior ids
+bool | [set_behavior(int behavior_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_behavior) | Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity<br/>Returns false if entity doesn't have this behavior id
+int | [get_behavior()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_behavior) | Get the current behavior id
 
 ### MovingIcon
 
@@ -5813,6 +5816,8 @@ float | [size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) | 
 float | [size_multiply](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size_multiply) | 0.0 when not on screen
 float | [next_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_size) | width and height will be set to this value  size_multiply next frame
 int | [size_change_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size_change_timer) | very short timer before next size change, giving a pulsing effect
+float | [speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) | This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+float | [distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) | This is cusome variable, you need to use `activate_sparktraps_hack` to use it
 
 ### Spear
 

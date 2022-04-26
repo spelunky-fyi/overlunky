@@ -472,6 +472,9 @@
                     <a href="#Entity-functions" class="toc-h2 toc-link" data-title="Entity functions">Entity functions</a>
                       <ul class="toc-list-h3">
                           <li>
+                            <a href="#activate_sparktraps_hack" class="toc-h3 toc-link" data-title="activate_sparktraps_hack">activate_sparktraps_hack</a>
+                          </li>
+                          <li>
                             <a href="#apply_entity_db" class="toc-h3 toc-link" data-title="apply_entity_db">apply_entity_db</a>
                           </li>
                           <li>
@@ -3390,7 +3393,29 @@ Sets a callback for a vanilla sound which lets you hook creation or playing even
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
 properties on the sound. Otherwise you may cause a deadlock. The callback signature is <code>nil on_vanilla_sound(PlayingSound sound)</code></p>
-<h2 id='Entity-functions'>Entity functions</h2><h3 id='apply_entity_db'>apply_entity_db</h3>
+<h2 id='Entity-functions'>Entity functions</h2><h3 id='activate_sparktraps_hack'>activate_sparktraps_hack</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">activate_sparktraps_hack</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+
+<span class="c1">-- set random speed, direction and distance for the spark</span>
+<span class="n">set_post_entity_spawn</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span>
+
+    <span class="n">direction</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">prng</span><span class="p">:</span><span class="n">random_chance</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">PRNG_CLASS</span><span class="p">.</span><span class="n">ENTITY_VARIATION</span><span class="p">)</span> <span class="k">then</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="k">end</span>
+
+    <span class="n">ent</span><span class="p">.</span><span class="n">speed</span> <span class="o">=</span> <span class="n">prng</span><span class="p">:</span><span class="n">random_float</span><span class="p">(</span><span class="n">PRNG_CLASS</span><span class="p">.</span><span class="n">ENTITY_VARIATION</span><span class="p">)</span> <span class="o">*</span> <span class="mi">0</span><span class="p">.</span><span class="mi">1</span> <span class="o">*</span> <span class="n">direction</span>
+    <span class="n">ent</span><span class="p">.</span><span class="n">distance</span> <span class="o">=</span> <span class="n">prng</span><span class="p">:</span><span class="n">random_float</span><span class="p">(</span><span class="n">PRNG_CLASS</span><span class="p">.</span><span class="n">ENTITY_VARIATION</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span>
+
+<span class="k">end</span><span class="p">,</span> <span class="n">SPAWN_TYPE</span><span class="p">.</span><span class="n">ANY</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">ITEM_SPARK</span><span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=activate_sparktraps_hack">activate_sparktraps_hack</a></p>
+</blockquote>
+<h4 id='nil-activate_sparktraps_hack-bool-activate'>nil activate_sparktraps_hack(bool activate)</h4>
+<p>Activate custom variables for speed and distance in the <code>ITEM_SPARK</code>
+note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending <code>set_post_entity_spawn</code>
+default game values are: speed = -0.015, distance = 3.0</p>
+<h3 id='apply_entity_db'>apply_entity_db</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=apply_entity_db">apply_entity_db</a></p>
 </blockquote>
@@ -20989,6 +21014,21 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=damage">damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</a></td>
 <td>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities</td>
 </tr>
+<tr>
+<td>array&lt;int&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_all_behaviors">get_all_behaviors()</a></td>
+<td>Get all avaible behavior ids</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_behavior">set_behavior(int behavior_id)</a></td>
+<td>Set behavior, this is more than just state as it&#39;s an active function, for example climbing ladder is a behavior and it doesn&#39;t actually need ladder/rope entity<br/>Returns false if entity doesn&#39;t have this behavior id</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_behavior">get_behavior()</a></td>
+<td>Get the current behavior id</td>
+</tr>
 </tbody></table>
 <h3 id='MovingIcon'>MovingIcon</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a></p>
@@ -21574,6 +21614,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=size_change_timer">size_change_timer</a></td>
 <td>very short timer before next size change, giving a pulsing effect</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=speed">speed</a></td>
+<td>This is cusome variable, you need to use <code>activate_sparktraps_hack</code> to use it</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance">distance</a></td>
+<td>This is cusome variable, you need to use <code>activate_sparktraps_hack</code> to use it</td>
 </tr>
 </tbody></table>
 <h3 id='Spear'>Spear</h3>
@@ -22348,6 +22398,26 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CONST.ROOM_HEIGHT">ROOM_HEIGHT</a></td>
 <td>8</td>
 <td>Height of a 1x1 room, both in world coordinates and in tiles.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CONST.MAX_TILES_VERT">MAX_TILES_VERT</a></td>
+<td>g_level_max_y</td>
+<td>Maximum number of working floor tiles in vertical axis, 126 (0-125 coordinates)<br/>Floors spawned above or below will not have any collision<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CONST.MAX_TILES_HORIZ">MAX_TILES_HORIZ</a></td>
+<td>g_level_max_x</td>
+<td>Maximum number of working floor tiles in horizontal axis, 86 (0-85 coordinates)<br/>Floors spawned above or below will not have any collision<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CONST.NOF_DRAW_DEPTHS">NOF_DRAW_DEPTHS</a></td>
+<td>53</td>
+<td>Number of draw_depths, 53 (0-52)<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CONST.MAX_PLAYERS">MAX_PLAYERS</a></td>
+<td>4</td>
+<td>Just the max number of players in multiplayer<br/></td>
 </tr>
 </tbody></table>
 <h2 id='COSUBTHEME'>COSUBTHEME</h2>

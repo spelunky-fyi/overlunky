@@ -1308,7 +1308,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "sparktrap_angle_increment"sv,
         // Put a read bp on Spark:rotatnio_angle, the next instruction adds a hardcoded float from constant, we want address of that constant (not the whole instruction)
         PatternCommandBuffer{}
-            .find_after_inst("\xF3\x0F\x10\x89\x58\x01\x00\x00\xF3\x0F\x58\x0D"sv)
+            .find_after_inst("\xF3\x0F\x10\x89\x58\x01\x00\x00"sv)
             .at_exe(),
     },
     {

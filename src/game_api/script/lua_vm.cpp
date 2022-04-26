@@ -808,6 +808,10 @@ end
     /// Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
     /// Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
     lua["modify_sparktraps"] = modify_sparktraps;
+    /// Activate custom variables for speed and distance in the `ITEM_SPARK`
+    /// note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+    /// default game values are: speed = -0.015, distance = 3.0
+    lua["activate_sparktraps_hack"] = activate_sparktraps_hack;
     /// Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
     /// Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
     lua["set_blood_multiplication"] = set_blood_multiplication;
@@ -1702,7 +1706,7 @@ end
     // Covers all of the above.
     */
     /// Some arbitrary constants of the engine
-    lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8);
+    lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8, "MAX_TILES_VERT", g_level_max_y, "MAX_TILES_HORIZ", g_level_max_x, "NOF_DRAW_DEPTHS", 53, "MAX_PLAYERS", 4);
     /* CONST
     // ENGINE_FPS
     // The framerate at which the engine updates, e.g. at which `ON.GAMEFRAME` and similar are called.
@@ -1711,6 +1715,16 @@ end
     // Width of a 1x1 room, both in world coordinates and in tiles.
     // ROOM_HEIGHT
     // Height of a 1x1 room, both in world coordinates and in tiles.
+    // MAX_TILES_VERT
+    // Maximum number of working floor tiles in vertical axis, 126 (0-125 coordinates)
+    // Floors spawned above or below will not have any collision
+    // MAX_TILES_HORIZ
+    // Maximum number of working floor tiles in horizontal axis, 86 (0-85 coordinates)
+    // Floors spawned above or below will not have any collision
+    // NOF_DRAW_DEPTHS
+    // Number of draw_depths, 53 (0-52)
+    // MAX_PLAYERS
+    // Just the max number of players in multiplayer
     */
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.create_named_table(

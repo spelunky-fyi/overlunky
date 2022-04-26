@@ -4592,6 +4592,20 @@ void render_entity_props(int uid, bool detached = false)
         render_state("Current state", entity->state);
         render_state("Last state", entity->last_state);
         render_ai("AI state", entity->move_state);
+        const std::string current_behavior_str = fmt::format("{}", entity->get_behavior());
+        if (ImGui::BeginCombo("Current Behavior##ChangeBehaviorCombo", current_behavior_str.c_str()))
+        {
+            for (auto& item : entity->behaviors_map)
+            {
+                const std::string option_str = fmt::format("{}", item.first);
+                bool isSelected = entity->current_behavior == item.second;
+                if (ImGui::Selectable(option_str.c_str(), isSelected))
+                {
+                    entity->current_behavior = item.second;
+                }
+            }
+            ImGui::EndCombo();
+        }
         if (entity->standing_on_uid != -1)
         {
             ImGui::Text("Standing on:");

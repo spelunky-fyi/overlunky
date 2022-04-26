@@ -99,6 +99,10 @@ Name | Data | Description
 [ENGINE_FPS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.ENGINE_FPS) | 60 | The framerate at which the engine updates, e.g. at which `ON.GAMEFRAME` and similar are called.<br/>Independent of rendering framerate, so it does not correlate with the call rate of `ON.GUIFRAME` and similar.<br/>
 [ROOM_WIDTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.ROOM_WIDTH) | 10 | Width of a 1x1 room, both in world coordinates and in tiles.<br/>
 [ROOM_HEIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.ROOM_HEIGHT) | 8 | Height of a 1x1 room, both in world coordinates and in tiles.<br/>
+[MAX_TILES_VERT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.MAX_TILES_VERT) | g_level_max_y | Maximum number of working floor tiles in vertical axis, 126 (0-125 coordinates)<br/>Floors spawned above or below will not have any collision<br/>
+[MAX_TILES_HORIZ](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.MAX_TILES_HORIZ) | g_level_max_x | Maximum number of working floor tiles in horizontal axis, 86 (0-85 coordinates)<br/>Floors spawned above or below will not have any collision<br/>
+[NOF_DRAW_DEPTHS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.NOF_DRAW_DEPTHS) | 53 | Number of draw_depths, 53 (0-52)<br/>
+[MAX_PLAYERS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.MAX_PLAYERS) | 4 | Just the max number of players in multiplayer<br/>
 
 ## COSUBTHEME
 

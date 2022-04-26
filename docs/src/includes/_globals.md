@@ -412,6 +412,35 @@ properties on the sound. Otherwise you may cause a deadlock. The callback signat
 ## Entity functions
 
 
+### activate_sparktraps_hack
+
+
+```lua
+activate_sparktraps_hack(true);
+
+-- set random speed, direction and distance for the spark
+set_post_entity_spawn(function(ent)
+
+	direction = 1
+	if prng:random_chance(2, PRNG_CLASS.ENTITY_VARIATION) then
+		direction = -1
+	end
+
+	ent.speed = prng:random_float(PRNG_CLASS.ENTITY_VARIATION) * 0.1 * direction
+	ent.distance = prng:random_float(PRNG_CLASS.ENTITY_VARIATION) * 10
+
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SPARK)
+```
+
+
+> Search script examples for [activate_sparktraps_hack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_sparktraps_hack)
+
+#### nil activate_sparktraps_hack(bool activate)
+
+Activate custom variables for speed and distance in the `ITEM_SPARK`
+note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+default game values are: speed = -0.015, distance = 3.0
+
 ### apply_entity_db
 
 
