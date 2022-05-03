@@ -972,8 +972,10 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            if (auto speech_value = handle_function_with_return<std::u16string>(callback.func, lua["cast_entity"](entity), buffer)) {
-                if (!return_value) {
+            if (auto speech_value = handle_function_with_return<std::u16string>(callback.func, lua["cast_entity"](entity), buffer))
+            {
+                if (!return_value)
+                {
                     return_value = speech_value;
                 }
             }
@@ -1002,8 +1004,10 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            if (auto toast_value = handle_function_with_return<std::u16string>(callback.func, buffer)) {
-                if (!return_value) {
+            if (auto toast_value = handle_function_with_return<std::u16string>(callback.func, buffer))
+            {
+                if (!return_value)
+                {
                     return_value = toast_value;
                 }
             }
