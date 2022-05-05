@@ -93,8 +93,8 @@ Entity* Layer::spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y)
 
 Entity* Layer::get_grid_entity_at(float x, float y)
 {
-    const uint32_t ix = static_cast<uint32_t>(x + 0.5f);
-    const uint32_t iy = static_cast<uint32_t>(y + 0.5f);
+    const uint32_t ix = static_cast<uint32_t>(std::round(x));
+    const uint32_t iy = static_cast<uint32_t>(std::round(y));
     if (ix < g_level_max_x && iy < g_level_max_y)
     {
         return grid_entities[iy][ix];
@@ -172,4 +172,32 @@ Entity* Layer::spawn_apep(float x, float y, bool right)
     }
 
     return apep_head;
+}
+
+void Layer::move_grid_entity(Entity* ent, float x, float y, Layer* dest_layer)
+{
+    move_grid_entity(ent, static_cast<uint32_t>(std::round(x)), static_cast<uint32_t>(std::round(y)), dest_layer);
+}
+
+void Layer::move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_layer)
+{
+    if (ent)
+    {
+        const auto pos = ent->position();
+        const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.first));
+        const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.second));
+        if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)
+        {
+            if (grid_entities[current_grid_y][current_grid_x] == ent)
+                grid_entities[current_grid_y][current_grid_x] = nullptr;
+        }
+        if (x < g_level_max_x && y < g_level_max_y)
+        {
+            dest_layer->grid_entities[y][x] = ent;
+        }
+        for (auto item_ent : ent->items.entities())
+        {
+            move_grid_entity(item_ent, x + item_ent->x, y + item_ent->y, dest_layer);
+        }
+    }
 }

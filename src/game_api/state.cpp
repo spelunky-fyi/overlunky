@@ -556,7 +556,7 @@ uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_positio
     else if (layer < LAYER::FRONT)
     {
         auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
+        auto player = state.items()->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
             player_position = player->position();
@@ -577,7 +577,7 @@ uint8_t enum_to_layer(const LAYER layer)
     else if (layer < LAYER::FRONT)
     {
         auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
+        auto player = state.items()->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
             return player->layer;
