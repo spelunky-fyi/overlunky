@@ -190,7 +190,7 @@ end
         return nullptr;
     };
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
-    lua["savegame"] = savedata();
+    lua["savegame"] = State::get().savedata();
 
     /// Standard lua print function, prints directly to the console but not to the game
     lua["lua_print"] = lua["print"];
@@ -589,14 +589,18 @@ end
     /// Set seed and reset run.
     lua["set_seed"] = set_seed;
     /// Enable/disable godmode for players.
-    lua["god"] = godmode;
+    lua["god"] = [](bool g)
+    { State::get().godmode(g); };
     /// Enable/disable godmode for companions.
-    lua["god_companions"] = godmode_companions;
+    lua["god_companions"] = [](bool g)
+    { State::get().godmode_companions(g); };
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
-    lua["force_dark_level"] = darkmode;
+    lua["force_dark_level"] = [](bool g)
+    { State::get().darkmode(g); };
     /// Set the zoom level used in levels and shops. 13.5 is the default.
-    lua["zoom"] = zoom;
+    lua["zoom"] = [](float level)
+    { State::get().zoom(level); };
     /// Enable/disable game engine pause.
     /// This is just short for `state.pause == 32`, but that produces an audio bug
     /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
@@ -737,11 +741,14 @@ end
     /// Get the ENT_TYPE... of the entity by uid
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
-    lua["get_zoom_level"] = get_zoom_level;
+    lua["get_zoom_level"] = []() -> float
+    { return State::get_zoom_level(); };
     /// Get the game coordinates at the screen position (`x`, `y`)
-    lua["game_position"] = click_position;
+    lua["game_position"] = [](float x, float y) -> std::pair<float, float>
+    { return State::click_position(x, y); };
     /// Translate an entity position to screen position to be used in drawing functions
-    lua["screen_position"] = screen_position;
+    lua["screen_position"] = [](float x, float y) -> std::pair<float, float>
+    { return State::screen_position(x, y); };
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity

@@ -143,6 +143,8 @@ void register_usertypes(sol::state& lua)
         &Player::is_female,
         "set_heart_color",
         &Player::set_heart_color,
+        "let_go",
+        &Player::let_go,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable>());
 

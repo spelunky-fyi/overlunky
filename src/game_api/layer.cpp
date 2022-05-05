@@ -127,7 +127,7 @@ Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
     door->as<ExitDoor>()->level = l;
     door->as<ExitDoor>()->theme = t;
     door->as<ExitDoor>()->special_door = true;
-    spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), round(x), round(y - 1.0f), false, 0.0, 0.0, true);
+    spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), round(x), round(y - 1.0f), false, 0.0, 0.0, true); // TODO: not needed if there is a floor below door
     return door;
 }
 
