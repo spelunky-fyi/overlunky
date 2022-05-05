@@ -418,7 +418,10 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos)
 
 TEXTURE Entity::get_texture()
 {
-    return texture->id;
+    if (texture)
+        return texture->id;
+
+    return -1;
 }
 bool Entity::set_texture(TEXTURE texture_id)
 {
