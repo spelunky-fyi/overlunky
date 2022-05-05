@@ -253,6 +253,15 @@ std::vector<DropEntry> drop_entries{
     {"ANUBIS2_SPECIALSHOT_R", "\xBA\xDF\x02\x00\x00\xE8****\x8B"s, VTABLE_OFFSET::NONE, 0, 1},
 
     ///
+    /// Spawn:
+    ///
+
+    {"COOKFIRE_CAVEMAN", "\x48\x89\xD9\xBA\xE1\x00\x00\x00\x0F\x28\xD7"s, VTABLE_OFFSET::NONE, 0, 4, 2},
+    {"BONEBLOCK_SKELETON", "\xBA\xE3\x00\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
+    {"BONEBLOCK_SKULL", "\xBA\xE2\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
+    {"BONEBLOCK_BONES", "\xBA\xE3\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
+
+    ///
     /// Special:
     ///
 
