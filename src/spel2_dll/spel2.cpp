@@ -255,6 +255,7 @@ SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script)
         script->get_path().c_str(),
         script->get_filename().c_str(),
         script->get_unsafe(),
+        script->get_online_safe(),
     };
 }
 

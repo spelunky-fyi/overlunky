@@ -1299,6 +1299,61 @@ end
         }
         return sol::nullopt;
     };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+    /// where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_pre_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_pre_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+                    VanillaRenderContext render_ctx{};
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    auto return_value = backend->handle_function_with_return<bool>(fun, render_ctx, lua["cast_entity"](self)).value_or(false);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+    /// where `render_ctx` is a `VanillaRenderContext`.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_post_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_post_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+                    VanillaRenderContext render_ctx{};
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    backend->handle_function(fun, render_ctx, lua["cast_entity"](self));
+                    backend->clear_current_callback();
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
 
     /// Raise a signal and probably crash the game
     lua["raise"] = std::raise;
@@ -1521,6 +1576,8 @@ end
         ON::RENDER_POST_PAUSE_MENU,
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
+        "RENDER_POST_DRAW_DEPTH",
+        ON::RENDER_POST_DRAW_DEPTH,
         "RENDER_POST_JOURNAL_PAGE",
         ON::RENDER_POST_JOURNAL_PAGE,
         "SPEECH_BUBBLE",
@@ -1583,6 +1640,9 @@ end
     // RENDER_PRE_DRAW_DEPTH
     // Params: `VanillaRenderContext render_ctx, int draw_depth`
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_POST_DRAW_DEPTH
+    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     // RENDER_POST_JOURNAL_PAGE
     // Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`
     // Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx

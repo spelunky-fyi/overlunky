@@ -933,6 +933,7 @@ void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
         }
     }
 }
+
 void LuaBackend::hook_entity_dtor(Entity* entity)
 {
     if (std::count_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity](auto& dtor_hook)

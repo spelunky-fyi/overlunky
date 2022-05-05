@@ -910,6 +910,22 @@ function set_pre_collision1(uid, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_pre_collision2(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+---where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_render(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+---where `render_ctx` is a `VanillaRenderContext`.
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_render(uid, fun) end
 ---Raise a signal and probably crash the game
 ---@return nil
 function raise() end
@@ -4010,9 +4026,11 @@ local function VanillaRenderContext_draw_screen_texture(self, texture_id, source
 ---@param dest Quad
 ---@param color Color
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color, angle: number, px: number, py: number): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color, shader: WORLD_SHADER): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, source: Quad, dest: Quad, color: Color, shader: WORLD_SHADER): nil
 local function VanillaRenderContext_draw_world_texture(self, texture_id, source, dest, color) end
 
 ---@class TextureRenderingInfo
@@ -6605,8 +6623,9 @@ ON = {
   PRE_LOAD_LEVEL_FILES = 109,
   PROLOGUE = 2,
   RECAP = 20,
+  RENDER_POST_DRAW_DEPTH = 122,
   RENDER_POST_HUD = 118,
-  RENDER_POST_JOURNAL_PAGE = 122,
+  RENDER_POST_JOURNAL_PAGE = 123,
   RENDER_POST_PAUSE_MENU = 120,
   RENDER_PRE_DRAW_DEPTH = 121,
   RENDER_PRE_HUD = 117,
@@ -6619,11 +6638,11 @@ ON = {
   SCRIPT_ENABLE = 115,
   SEED_INPUT = 8,
   SPACESHIP = 15,
-  SPEECH_BUBBLE = 123,
+  SPEECH_BUBBLE = 124,
   START = 103,
   TEAM_SELECT = 10,
   TITLE = 3,
-  TOAST = 124,
+  TOAST = 125,
   TRANSITION = 13,
   WIN = 16
 }
@@ -8819,6 +8838,28 @@ WIN_STATE = {
   TIAMAT_WIN = 1
 }
 ---@alias WIN_STATE integer
+WORLD_SHADER = {
+  COLOR = 0,
+  DEFERRED_COLOR_TRANSPARENT = 6,
+  DEFERRED_TEXTURE_COLOR = 7,
+  DEFERRED_TEXTURE_COLOR_CURSED = 9,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE = 16,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW = 22,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW = 23,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION = 24,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW = 18,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS = 20,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY = 19,
+  DEFERRED_TEXTURE_COLOR_POISONED = 8,
+  DEFERRED_TEXTURE_COLOR_POISONED_CURSED = 10,
+  DEFERRED_TEXTURE_COLOR_TRANSPARENT = 11,
+  DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED = 12,
+  TEXTURE = 1,
+  TEXTURE_ALPHA_COLOR = 3,
+  TEXTURE_COLOR = 2,
+  TEXTURE_COLORS_WARP = 5
+}
+---@alias WORLD_SHADER integer
 YANG = {
   ANGRY = -1,
   BOTH_TURKEYS_DELIVERED = 3,

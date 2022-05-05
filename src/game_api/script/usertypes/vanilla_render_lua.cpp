@@ -121,7 +121,7 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
     draw_world_texture(texture_id, row, column, new_quad, color);
 }
 
-void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& quad, Color color)
+void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color, WORLD_SHADER shader)
 {
     auto texture = get_texture(texture_id);
     if (texture == nullptr)
@@ -148,17 +148,27 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
         uv_left,
         uv_top,
     };
-    RenderAPI::get().draw_world_texture(texture, source, quad, color);
+    RenderAPI::get().draw_world_texture(texture, source, dest, color, (WorldShader)shader);
 }
 
-void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)
+void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color)
+{
+    draw_world_texture(texture_id, row, column, dest, color, (WORLD_SHADER)WorldShader::TextureColor);
+}
+
+void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color, WORLD_SHADER shader)
 {
     auto texture = get_texture(texture_id);
     if (texture == nullptr)
     {
         return;
     }
-    RenderAPI::get().draw_world_texture(texture, source, dest, color);
+    RenderAPI::get().draw_world_texture(texture, source, dest, color, (WorldShader)shader);
+}
+
+void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)
+{
+    draw_world_texture(texture_id, source, dest, color, (WORLD_SHADER)WorldShader::TextureColor);
 }
 
 namespace NVanillaRender
@@ -218,7 +228,9 @@ void register_usertypes(sol::state& lua)
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color, float, float, float)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color)>(&VanillaRenderContext::draw_world_texture),
-        static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color)>(&VanillaRenderContext::draw_world_texture));
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color, WORLD_SHADER)>(&VanillaRenderContext::draw_world_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color)>(&VanillaRenderContext::draw_world_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color, WORLD_SHADER)>(&VanillaRenderContext::draw_world_texture));
     lua.new_usertype<VanillaRenderContext>(
         "VanillaRenderContext",
         "draw_text",
@@ -294,5 +306,88 @@ void register_usertypes(sol::state& lua)
         &TextRenderingInfo::height,
         "font",
         &TextRenderingInfo::font);
+
+    lua.create_named_table(
+        "WORLD_SHADER",
+        "COLOR",
+        WorldShader::Colors,
+        "TEXTURE",
+        WorldShader::Texture,
+        "TEXTURE_ALPHA_COLOR",
+        WorldShader::TextureAlphaColor,
+        "TEXTURE_COLOR",
+        WorldShader::TextureColor,
+        "TEXTURE_COLORS_WARP",
+        WorldShader::TextureColorsWarp,
+        "DEFERRED_COLOR_TRANSPARENT",
+        WorldShader::DeferredColorTransparent,
+        "DEFERRED_TEXTURE_COLOR",
+        WorldShader::DeferredTextureColor,
+        "DEFERRED_TEXTURE_COLOR_POISONED",
+        WorldShader::DeferredTextureColor_Poisoned,
+        "DEFERRED_TEXTURE_COLOR_CURSED",
+        WorldShader::DeferredTextureColor_Cursed,
+        "DEFERRED_TEXTURE_COLOR_POISONED_CURSED",
+        WorldShader::DeferredTextureColor_PoisonedCursed,
+        "DEFERRED_TEXTURE_COLOR_TRANSPARENT",
+        WorldShader::DeferredTextureColor_Transparent,
+        "DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED",
+        WorldShader::DeferredTextureColor_TransparentCorrected,
+        "DEFERRED_TEXTURE_COLOR_EMISSIVE",
+        WorldShader::DeferredTextureColor_Emissive,
+        "DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW",
+        WorldShader::DeferredTextureColor_EmissiveGlow,
+        "DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY",
+        WorldShader::DeferredTextureColor_EmissiveGlowHeavy,
+        "DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS",
+        WorldShader::DeferredTextureColor_EmissiveGlowBrightness,
+        "DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW",
+        WorldShader::DeferredTextureColor_EmissiveColorizedGlow,
+        "DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW",
+        WorldShader::DeferredTextureColor_EmissiveColorizedGlow_DynamicGlow,
+        "DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION",
+        WorldShader::DeferredTextureColor_EmissiveColorizedGlow_Saturation);
+    /* WORLD_SHADER
+    // COLOR
+    // Renders a solid color
+    // TEXTURE
+    // Renders a texture without applying the given color
+    // TEXTURE_ALPHA_COLOR
+    // Renders a texture by interpreting its red channel as alpha and applying the given color
+    // TEXTURE_COLOR
+    // The default shader to be used, just renders a texture with transparancy and the given color
+    // TEXTURE_COLORS_WARP
+    // Renders the texture, with "gamma correction" of the color channels and multiplying everything by the input color alpha only
+    // DEFERRED_COLOR_TRANSPARENT
+    // Basically same as COLOR but goes through the deferred pipeline
+    // DEFERRED_TEXTURE_COLOR
+    // Basically same as TEXTURE_COLOR but goes through the deferred pipeline
+    // DEFERRED_TEXTURE_COLOR
+    // Basically same as TEXTURE_COLOR but goes through the deferred pipeline
+    // DEFERRED_TEXTURE_COLOR_POISONED
+    // Same as DEFERRED_TEXTURE_COLOR but applies poison color effect
+    // DEFERRED_TEXTURE_COLOR_CURSED
+    // Same as DEFERRED_TEXTURE_COLOR but applies cursed color effect
+    // DEFERRED_TEXTURE_COLOR_POISONED_CURSED
+    // Same as DEFERRED_TEXTURE_COLOR but applies poisoned and cursed color effect
+    // DEFERRED_TEXTURE_COLOR_TRANSPARENT
+    // Basically same as DEFERRED_TEXTURE_COLOR
+    // DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED
+    // Same as DEFERRED_TEXTURE_COLOR_TRANSPARENT but applies gamma correction to alpha channel
+    // DEFERRED_TEXTURE_COLOR_EMISSIVE
+    // Same as DEFERRED_TEXTURE_COLOR but renders to the emissive channel
+    // DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW
+    // Same as DEFERRED_TEXTURE_COLOR but renders to the emissive channel with glow
+    // DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY
+    // Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW but renders to the emissive channel with heavy glow
+    // DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS
+    // Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY but renders glow on top of the texture
+    // DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW
+    // Same as DEFERRED_TEXTURE_COLOR but renders heavy glow behind the texture
+    // DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW
+    // Basically same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW
+    // DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION
+    // Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW but renders texture as solid color
+    */
 };
 } // namespace NVanillaRender

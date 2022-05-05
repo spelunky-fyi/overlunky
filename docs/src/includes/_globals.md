@@ -280,6 +280,18 @@ Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK
 This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
 The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
 
+### set_post_render
+
+
+> Search script examples for [set_post_render](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_post_render(int uid, function fun)
+
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+where `render_ctx` is a `VanillaRenderContext`.
+Use this only when no other approach works, this call can be expensive if overused.
+
 ### set_post_render_screen
 
 
@@ -338,6 +350,18 @@ Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK
 This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
 In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
 The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
+
+### set_pre_render
+
+
+> Search script examples for [set_pre_render](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_pre_render(int uid, function fun)
+
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
+Use this only when no other approach works, this call can be expensive if overused.
 
 ### set_pre_render_screen
 

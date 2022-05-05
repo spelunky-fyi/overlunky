@@ -20,6 +20,7 @@ using PROCEDURAL_CHANCE = uint32_t;           // NoAlias
 using LEVEL_CONFIG = uint32_t;                // NoAlias
 using TILE_CODE = uint32_t;                   // NoAlias
 using IMAGE = int64_t;                        // NoAlias
+using WORLD_SHADER = uint8_t;                 // NoAlias
 using SHORT_TILE_CODE = uint8_t;
 using STRINGID = uint32_t;
 
