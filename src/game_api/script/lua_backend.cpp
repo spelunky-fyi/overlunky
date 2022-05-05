@@ -961,6 +961,8 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
     auto now = get_frame_count();
     std::lock_guard lock{gil};
 
+    std::optional<std::u16string> return_value = std::nullopt;
+
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -970,12 +972,17 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, lua["cast_entity"](entity), buffer).value_or(std::u16string{no_return_str});
+            if (auto speech_value = handle_function_with_return<std::u16string>(callback.func, lua["cast_entity"](entity), buffer))
+            {
+                if (!return_value)
+                {
+                    return_value = speech_value;
+                }
+            }
             clear_current_callback();
-            return return_value;
         }
     }
-    return std::u16string{no_return_str};
+    return return_value.value_or(std::u16string{no_return_str});
 }
 
 std::u16string LuaBackend::pre_toast(char16_t* buffer)
@@ -986,6 +993,8 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
     auto now = get_frame_count();
     std::lock_guard lock{gil};
 
+    std::optional<std::u16string> return_value = std::nullopt;
+
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -995,12 +1004,17 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, buffer).value_or(std::u16string{no_return_str});
+            if (auto toast_value = handle_function_with_return<std::u16string>(callback.func, buffer))
+            {
+                if (!return_value)
+                {
+                    return_value = toast_value;
+                }
+            }
             clear_current_callback();
-            return return_value;
         }
     }
-    return std::u16string{no_return_str};
+    return return_value.value_or(std::u16string{no_return_str});
 }
 
 void LuaBackend::for_each_backend(std::function<bool(LuaBackend&)> fun)
