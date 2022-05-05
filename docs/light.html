@@ -3483,7 +3483,7 @@ Use empty table as argument to reset to the game default</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=entity_remove_item">entity_remove_item</a></p>
 </blockquote>
-<h4 id='nil-entity_remove_item-int-id-int-item_uid'>nil entity_remove_item(int id, int item_uid)</h4>
+<h4 id='nil-entity_remove_item-int-uid-int-item_uid'>nil entity_remove_item(int uid, int item_uid)</h4>
 <p>Remove item by uid from entity</p>
 <h3 id='filter_entities'>filter_entities</h3>
 <blockquote>
@@ -3792,7 +3792,7 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_flags2">get_entity_flags2</a></p>
 </blockquote>
-<h4 id='int-get_entity_flags2-int-id'>int get_entity_flags2(int id)</h4>
+<h4 id='int-get_entity_flags2-int-uid'>int get_entity_flags2(int uid)</h4>
 <p>Get the <code>more_flags</code> field from entity by uid</p>
 <h3 id='get_level_flags'>get_level_flags</h3>
 <blockquote>
@@ -4853,8 +4853,9 @@ Read the game prng state. Use <a href="#PRNG">prng</a>:get_pair() instead.</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_dark_level">force_dark_level</a></p>
 </blockquote>
-<h4 id='nil-force_dark_level-bool-g'>nil force_dark_level(bool g)</h4>
-<p>Set level flag 18 on post room generation instead, to properly force every level to dark</p>
+
+<p><code>nil force_dark_level(bool g)</code><br/>
+Set level flag 18 on post room generation instead, to properly force every level to dark</p>
 <h3 id='get_entities'>get_entities</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities">get_entities</a></p>
@@ -17841,6 +17842,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_heart_color">set_heart_color(Color hcolor)</a></td>
 <td>Set the heart color the character.</td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=let_go">let_go()</a></td>
+<td>Drops from ladders, ropes and ledge grabs</td>
 </tr>
 </tbody></table>
 <h3 id='PowerupCapable'>PowerupCapable</h3>

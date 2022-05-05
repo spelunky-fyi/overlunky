@@ -4140,6 +4140,7 @@ string | [get_short_name()](https://github.com/spelunky-fyi/overlunky/search?l=L
 [Color](#Color) | [get_heart_color()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_heart_color) | Get the heart color of the character, this will be the modded heart color not only the vanilla heart color.
 bool | [is_female()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_female) | Check whether the character is female, will be `true` if the character was modded to be female as well.
  | [set_heart_color(Color hcolor)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) | Set the heart color the character.
+ | [let_go()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=let_go) | Drops from ladders, ropes and ledge grabs
 
 ### PowerupCapable
 

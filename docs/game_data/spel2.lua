@@ -493,9 +493,9 @@ function get_entity_flags(uid) end
 ---@return nil
 function set_entity_flags(uid, flags) end
 ---Get the `more_flags` field from entity by uid
----@param id integer
+---@param uid integer
 ---@return integer
-function get_entity_flags2(id) end
+function get_entity_flags2(uid) end
 ---Set the `more_flags` field from entity by uid
 ---@param uid integer
 ---@param flags integer
@@ -543,10 +543,10 @@ function get_render_position(uid) end
 ---@return number, number
 function get_velocity(uid) end
 ---Remove item by uid from entity
----@param id integer
+---@param uid integer
 ---@param item_uid integer
 ---@return nil
-function entity_remove_item(id, item_uid) end
+function entity_remove_item(uid, item_uid) end
 ---Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
 ---@param uid integer
 ---@param off_x number
@@ -2013,6 +2013,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field get_heart_color fun(self, ): Color
     ---@field is_female fun(self, ): boolean
     ---@field set_heart_color fun(self, hcolor: Color): nil
+    ---@field let_go fun(self, ): nil
 
 ---@class Floor : Entity
     ---@field deco_top integer

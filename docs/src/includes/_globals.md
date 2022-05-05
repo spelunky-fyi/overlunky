@@ -520,7 +520,7 @@ Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 
 > Search script examples for [entity_remove_item](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
 
-#### nil entity_remove_item(int id, int item_uid)
+#### nil entity_remove_item(int uid, int item_uid)
 
 Remove item by uid from entity
 
@@ -993,7 +993,7 @@ Get the `flags` field from entity by uid
 
 > Search script examples for [get_entity_flags2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags2)
 
-#### int get_entity_flags2(int id)
+#### int get_entity_flags2(int uid)
 
 Get the `more_flags` field from entity by uid
 
@@ -2627,8 +2627,7 @@ end, ON.POST_ROOM_GENERATION)
 
 > Search script examples for [force_dark_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_dark_level)
 
-#### nil force_dark_level(bool g)
-
+`nil force_dark_level(bool g)`<br/>
 Set level flag 18 on post room generation instead, to properly force every level to dark
 
 ### get_entities
