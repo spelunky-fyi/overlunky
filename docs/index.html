@@ -440,6 +440,9 @@
                             <a href="#set_post_entity_spawn" class="toc-h3 toc-link" data-title="set_post_entity_spawn">set_post_entity_spawn</a>
                           </li>
                           <li>
+                            <a href="#set_post_render" class="toc-h3 toc-link" data-title="set_post_render">set_post_render</a>
+                          </li>
+                          <li>
                             <a href="#set_post_render_screen" class="toc-h3 toc-link" data-title="set_post_render_screen">set_post_render_screen</a>
                           </li>
                           <li>
@@ -453,6 +456,9 @@
                           </li>
                           <li>
                             <a href="#set_pre_entity_spawn" class="toc-h3 toc-link" data-title="set_pre_entity_spawn">set_pre_entity_spawn</a>
+                          </li>
+                          <li>
+                            <a href="#set_pre_render" class="toc-h3 toc-link" data-title="set_pre_render">set_pre_render</a>
                           </li>
                           <li>
                             <a href="#set_pre_render_screen" class="toc-h3 toc-link" data-title="set_pre_render_screen">set_pre_render_screen</a>
@@ -2990,6 +2996,9 @@
                     <a href="#WIN_STATE" class="toc-h2 toc-link" data-title="WIN_STATE">WIN_STATE</a>
                   </li>
                   <li>
+                    <a href="#WORLD_SHADER" class="toc-h2 toc-link" data-title="WORLD_SHADER">WORLD_SHADER</a>
+                  </li>
+                  <li>
                     <a href="#YANG" class="toc-h2 toc-link" data-title="YANG">YANG</a>
                   </li>
               </ul>
@@ -3315,6 +3324,15 @@ Use this only when no other approach works, this call can be expensive if overus
 <p>Add a callback for a spawn of specific entity types or mask. Set <code>mask</code> to <code>MASK.ANY</code> to ignore that.
 This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
 The callback signature is <code>nil post_entity_spawn(entity, spawn_flags)</code></p>
+<h3 id='set_post_render'>set_post_render</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_render">set_post_render</a></p>
+</blockquote>
+<h4 id='optional-lt-CallbackId-gt-set_post_render-int-uid-function-fun'>optional&lt;<a href="#Aliases">CallbackId</a>&gt; set_post_render(int uid, function fun)</h4>
+<p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
+Sets a callback that is called right after the entity is rendered. The signature of the callback is <code>nil post_render(render_ctx, entity)</code>
+where <code>render_ctx</code> is a <code>VanillaRenderContext</code>.
+Use this only when no other approach works, this call can be expensive if overused.</p>
 <h3 id='set_post_render_screen'>set_post_render_screen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_render_screen">set_post_render_screen</a></p>
@@ -3359,6 +3377,15 @@ Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-
 This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
 In many cases replacing the intended entity won&#39;t have the indended effect or will even break the game, so use only if you really know what you&#39;re doing.
 The callback signature is <code>optional&lt;int&gt; pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)</code></p>
+<h3 id='set_pre_render'>set_pre_render</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_render">set_pre_render</a></p>
+</blockquote>
+<h4 id='optional-lt-CallbackId-gt-set_pre_render-int-uid-function-fun'>optional&lt;<a href="#Aliases">CallbackId</a>&gt; set_pre_render(int uid, function fun)</h4>
+<p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
+Sets a callback that is called right after the entity is rendered. The signature of the callback is <code>bool pre_render(render_ctx, entity)</code>
+where <code>render_ctx</code> is a <code>VanillaRenderContext</code>. Return <code>true</code> to skip the original rendering function and all later pre_render callbacks.
+Use this only when no other approach works, this call can be expensive if overused.</p>
 <h3 id='set_pre_render_screen'>set_pre_render_screen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_render_screen">set_pre_render_screen</a></p>
@@ -6118,22 +6145,32 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)</a></td>
-<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
+<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
 </tr>
 <tr>
 <td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const AABB&amp; rect, Color color)</a></td>
-<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const AABB&amp; dest, Color color)</a></td>
+<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
 </tr>
 <tr>
 <td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const AABB&amp; rect, Color color, float angle, float px, float py)</a></td>
-<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const AABB&amp; dest, Color color, float angle, float px, float py)</a></td>
+<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const Quad&amp; dest, Color color, WORLD_SHADER shader)</a></td>
+<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>The <code>shader</code> parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color, WORLD_SHADER shader)</a></td>
+<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>The <code>shader</code> parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td></td>
@@ -23855,6 +23892,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Params: <code>VanillaRenderContext render_ctx, int draw_depth</code><br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx<br/></td>
 </tr>
 <tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_DRAW_DEPTH">RENDER_POST_DRAW_DEPTH</a></td>
+<td>ON::RENDER_POST_DRAW_DEPTH</td>
+<td>Params: <code>VanillaRenderContext render_ctx, int draw_depth</code><br/>Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx<br/></td>
+</tr>
+<tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_JOURNAL_PAGE">RENDER_POST_JOURNAL_PAGE</a></td>
 <td>ON::RENDER_POST_JOURNAL_PAGE</td>
 <td>Params: <code>VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page</code><br/>Runs after the journal page is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/>The page_type parameter values can be found in the JOURNAL_PAGE_TYPE ENUM<br/>The JournalPage parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:<br/><code>page:as_journal_page_progress()</code><br/><code>page:as_journal_page_journalmenu()</code><br/><code>page:as_journal_page_places()</code><br/><code>page:as_journal_page_people()</code><br/><code>page:as_journal_page_bestiary()</code><br/><code>page:as_journal_page_items()</code><br/><code>page:as_journal_page_traps()</code><br/><code>page:as_journal_page_story()</code><br/><code>page:as_journal_page_feats()</code><br/><code>page:as_journal_page_deathcause()</code><br/><code>page:as_journal_page_deathmenu()</code><br/><code>page:as_journal_page_recap()</code><br/><code>page:as_journal_page_playerprofile()</code><br/><code>page:as_journal_page_lastgameplayed()</code><br/></td>
@@ -25219,6 +25261,114 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WIN_STATE.COSMIC_OCEAN_WIN">COSMIC_OCEAN_WIN</a></td>
 <td>3</td>
 <td></td>
+</tr>
+</tbody></table>
+<h2 id='WORLD_SHADER'>WORLD_SHADER</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER">WORLD_SHADER</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.COLOR">COLOR</a></td>
+<td>WorldShader::Colors</td>
+<td>Renders a solid color<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.TEXTURE">TEXTURE</a></td>
+<td>WorldShader::Texture</td>
+<td>Renders a texture without applying the given color<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.TEXTURE_ALPHA_COLOR">TEXTURE_ALPHA_COLOR</a></td>
+<td>WorldShader::TextureAlphaColor</td>
+<td>Renders a texture by interpreting its red channel as alpha and applying the given color<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.TEXTURE_COLOR">TEXTURE_COLOR</a></td>
+<td>WorldShader::TextureColor</td>
+<td>The default shader to be used, just renders a texture with transparancy and the given color<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.TEXTURE_COLORS_WARP">TEXTURE_COLORS_WARP</a></td>
+<td>WorldShader::TextureColorsWarp</td>
+<td>Renders the texture, with &quot;gamma correction&quot; of the color channels and multiplying everything by the input color alpha only<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_COLOR_TRANSPARENT">DEFERRED_COLOR_TRANSPARENT</a></td>
+<td>WorldShader::DeferredColorTransparent</td>
+<td>Basically same as COLOR but goes through the deferred pipeline<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR">DEFERRED_TEXTURE_COLOR</a></td>
+<td>WorldShader::DeferredTextureColor</td>
+<td>Basically same as TEXTURE_COLOR but goes through the deferred pipeline<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_POISONED">DEFERRED_TEXTURE_COLOR_POISONED</a></td>
+<td>WorldShader::DeferredTextureColor_Poisoned</td>
+<td>Same as DEFERRED_TEXTURE_COLOR but applies poison color effect<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_CURSED">DEFERRED_TEXTURE_COLOR_CURSED</a></td>
+<td>WorldShader::DeferredTextureColor_Cursed</td>
+<td>Same as DEFERRED_TEXTURE_COLOR but applies cursed color effect<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_POISONED_CURSED">DEFERRED_TEXTURE_COLOR_POISONED_CURSED</a></td>
+<td>WorldShader::DeferredTextureColor_PoisonedCursed</td>
+<td>Same as DEFERRED_TEXTURE_COLOR but applies poisoned and cursed color effect<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_TRANSPARENT">DEFERRED_TEXTURE_COLOR_TRANSPARENT</a></td>
+<td>WorldShader::DeferredTextureColor_Transparent</td>
+<td>Basically same as DEFERRED_TEXTURE_COLOR<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED">DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED</a></td>
+<td>WorldShader::DeferredTextureColor_TransparentCorrected</td>
+<td>Same as DEFERRED_TEXTURE_COLOR_TRANSPARENT but applies gamma correction to alpha channel<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE">DEFERRED_TEXTURE_COLOR_EMISSIVE</a></td>
+<td>WorldShader::DeferredTextureColor_Emissive</td>
+<td>Same as DEFERRED_TEXTURE_COLOR but renders to the emissive channel<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW">DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW</a></td>
+<td>WorldShader::DeferredTextureColor_EmissiveGlow</td>
+<td>Same as DEFERRED_TEXTURE_COLOR but renders to the emissive channel with glow<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY">DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY</a></td>
+<td>WorldShader::DeferredTextureColor_EmissiveGlowHeavy</td>
+<td>Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW but renders to the emissive channel with heavy glow<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS">DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS</a></td>
+<td>WorldShader::DeferredTextureColor_EmissiveGlowBrightness</td>
+<td>Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY but renders glow on top of the texture<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW">DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW</a></td>
+<td>WorldShader::DeferredTextureColor_EmissiveColorizedGlow</td>
+<td>Same as DEFERRED_TEXTURE_COLOR but renders heavy glow behind the texture<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW">DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW</a></td>
+<td>WorldShader::DeferredTextureColor_EmissiveColorizedGlow_DynamicGlow</td>
+<td>Basically same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION">DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION</a></td>
+<td>WorldShader::DeferredTextureColor_EmissiveColorizedGlow_Saturation</td>
+<td>Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW but renders texture as solid color<br/></td>
 </tr>
 </tbody></table>
 <h2 id='YANG'>YANG</h2>
