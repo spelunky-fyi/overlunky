@@ -620,15 +620,15 @@ void LuaBackend::render_options()
 
 bool LuaBackend::is_callback_cleared(int32_t callback_id)
 {
-    return std::count(clear_callbacks.begin(), clear_callbacks.end(), callback_id);
+    return std::find(clear_callbacks.begin(), clear_callbacks.end(), callback_id) != clear_callbacks.end();
 }
 bool LuaBackend::is_entity_callback_cleared(std::pair<int, uint32_t> callback_id)
 {
-    return std::count(clear_entity_hooks.begin(), clear_entity_hooks.end(), callback_id);
+    return std::find(clear_entity_hooks.begin(), clear_entity_hooks.end(), callback_id) != clear_entity_hooks.end();
 }
 bool LuaBackend::is_screen_callback_cleared(std::pair<int, uint32_t> callback_id)
 {
-    return std::count(clear_screen_hooks.begin(), clear_screen_hooks.end(), callback_id);
+    return std::find(clear_screen_hooks.begin(), clear_screen_hooks.end(), callback_id) != clear_screen_hooks.end();
 }
 
 bool LuaBackend::pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
