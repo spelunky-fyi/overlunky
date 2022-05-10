@@ -307,7 +307,7 @@ bool LuaBackend::update()
             int now = get_frame_count();
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
-                if (now >= cb->lastRan + cb->interval)
+                if (now >= cb->lastRan + cb->interval && !is_callback_cleared(it->first))
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     std::optional<bool> keep_going = handle_function_with_return<bool>(cb->func);
@@ -323,7 +323,7 @@ bool LuaBackend::update()
             }
             else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now >= cbt->timeout)
+                if (now >= cbt->timeout && !is_callback_cleared(it->first))
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     handle_function(cbt->func);
@@ -355,6 +355,9 @@ bool LuaBackend::update()
 
         for (auto& [id, callback] : callbacks)
         {
+            if (is_callback_cleared(id))
+                continue;
+
             set_current_callback(-1, id, CallbackType::Normal);
             if ((ON)g_state->screen == callback.screen && g_state->screen != state.screen && g_state->screen_last != (int)ON::OPTIONS) // game screens
             {
@@ -445,12 +448,12 @@ bool LuaBackend::update()
             }
             clear_current_callback();
         }
-        int now_l = g_state->time_level;
+        const int now_l = g_state->time_level;
         for (auto it = level_timers.begin(); it != level_timers.end();)
         {
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
-                if (now_l >= cb->lastRan + cb->interval)
+                if (now_l >= cb->lastRan + cb->interval && !is_callback_cleared(it->first))
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     std::optional<bool> keep_going = handle_function_with_return<bool>(cb->func);
@@ -466,7 +469,7 @@ bool LuaBackend::update()
             }
             else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now_l >= cbt->timeout)
+                if (now_l >= cbt->timeout && !is_callback_cleared(it->first))
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     handle_function(cbt->func);
@@ -533,6 +536,9 @@ void LuaBackend::draw(ImDrawList* dl)
 
         for (auto& [id, callback] : callbacks)
         {
+            if (is_callback_cleared(id))
+                continue;
+
             auto now = get_frame_count();
             if (callback.screen == ON::GUIFRAME)
             {
@@ -885,6 +891,9 @@ void LuaBackend::process_vanilla_render_callbacks(ON event)
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
@@ -905,6 +914,9 @@ void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
     render_ctx.bounding_box = bbox;
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
@@ -924,6 +936,9 @@ void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
