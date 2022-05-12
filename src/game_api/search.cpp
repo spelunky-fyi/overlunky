@@ -1596,8 +1596,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // We're editing the layer offset in mov rcx,[r14+00001308]
         "storage_layer"sv,
         PatternCommandBuffer{}
-            .find_inst("\xe8\x43\x62\xb6\xff\x49\x8b\x8e"sv)
-            .offset(0x8)
+            .find_inst("\xf3\x0f\x10\x55\xe0\xf3\x0f\x10\x5d\xe4"sv)
+            .offset(-0x4)
             .at_exe(),
     },
 };
