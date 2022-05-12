@@ -1598,8 +1598,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_inst("\xe8\x43\x62\xb6\xff\x49\x8b\x8e"sv)
             .offset(0x8)
-            .at_exe()
-    }
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
