@@ -744,6 +744,12 @@ void activate_sparktraps_hack(bool activate)
     }
 }
 
+void set_storage_layer(LAYER layer)
+{
+    if (layer == LAYER::FRONT || layer == LAYER::BACK)
+        write_mem_prot(get_address("storage_layer"), 0x1300 + 8 * (uint8_t)layer, true);
+}
+
 void set_kapala_blood_threshold(uint8_t threshold)
 {
     write_mem_prot(get_address("kapala_blood_threshold"), threshold, true);

@@ -71,6 +71,7 @@ void set_seed(uint32_t seed);
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type);
 void modify_sparktraps(float angle_increment = 0.015, float distance = 3.0);
 void activate_sparktraps_hack(bool activate);
+void set_storage_layer(LAYER layer);
 void set_kapala_blood_threshold(uint8_t threshold);
 void set_kapala_hud_icon(int8_t icon_index);
 void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_multiplier);

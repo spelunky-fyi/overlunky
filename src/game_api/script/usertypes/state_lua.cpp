@@ -455,6 +455,8 @@ void register_usertypes(sol::state& lua)
         &StateMemory::cause_of_death,
         "cause_of_death_entity_type",
         &StateMemory::cause_of_death_entity_type,
+        "storage_uid",
+        &StateMemory::waddler_floor_storage,
         "toast_timer",
         &StateMemory::toast_timer,
         "speechbubble_timer",

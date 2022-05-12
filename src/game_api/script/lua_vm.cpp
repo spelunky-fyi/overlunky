@@ -819,6 +819,8 @@ end
     /// note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
     /// default game values are: speed = -0.015, distance = 3.0
     lua["activate_sparktraps_hack"] = activate_sparktraps_hack;
+    /// Set layer to search for storage items on
+    lua["set_storage_layer"] = set_storage_layer;
     /// Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
     /// Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
     lua["set_blood_multiplication"] = set_blood_multiplication;
