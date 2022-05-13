@@ -148,6 +148,8 @@ void register_usertypes(sol::state& lua)
         &EntityDB::tile_x,
         "tiley",
         &EntityDB::tile_y);
+
+    /// Some information used to render the entity, can not be changed
     lua.new_usertype<RenderInfo>(
         "RenderInfo",
         "x",
@@ -175,7 +177,9 @@ void register_usertypes(sol::state& lua)
         "tileh",
         &RenderInfo::tileh,
         "facing_left",
-        &RenderInfo::flip_horizontal);
+        &RenderInfo::flip_horizontal,
+        "render_inactive",
+        &RenderInfo::render_inactive);
 
     auto get_overlay = [&lua](Entity& entity)
     {

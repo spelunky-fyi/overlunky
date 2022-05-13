@@ -283,7 +283,7 @@ struct Quad
         return *this;
     }
 
-    Quad& flip_horizontal()
+    Quad& flip_horizontally()
     {
         std::swap(top_left_x, top_right_x);
         std::swap(top_left_y, top_right_y);

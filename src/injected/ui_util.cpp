@@ -172,12 +172,12 @@ std::pair<float, float> UI::get_position(Entity* ent, bool render)
     if (!render)
         return ent->position();
 
-    if (ent->rendering_info && !ent->rendering_info->stop_render)
+    if (ent->rendering_info && !ent->rendering_info->render_inactive)
         return {ent->rendering_info->x, ent->rendering_info->y};
 
     for (auto ent_item : ent->items.entities())
     {
-        if (ent_item->rendering_info && ent_item->rendering_info->stop_render == false)
+        if (ent_item->rendering_info && ent_item->rendering_info->render_inactive == false)
         {
             return {ent_item->rendering_info->x - ent_item->x, ent_item->rendering_info->y - ent_item->y};
         }
@@ -186,7 +186,7 @@ std::pair<float, float> UI::get_position(Entity* ent, bool render)
 }
 bool UI::has_active_render(Entity* ent)
 {
-    return (ent->rendering_info && !ent->rendering_info->stop_render);
+    return (ent->rendering_info && !ent->rendering_info->render_inactive);
 }
 
 // Redirect to RPC / Spawn_API etc.:
