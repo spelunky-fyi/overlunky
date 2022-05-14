@@ -79,6 +79,8 @@ void register_usertypes(sol::state& lua)
         &Inventory::kills_total,
         "collected_money_total",
         &Inventory::collected_money_total,
+        "collected_money_count",
+        &Inventory::collected_money_count,
         "collected_money",
         &Inventory::collected_money,
         "collected_money_values",
@@ -100,7 +102,9 @@ void register_usertypes(sol::state& lua)
         "companion_poison_tick_timers",
         &Inventory::companion_poison_tick_timers,
         "is_companion_cursed",
-        &Inventory::is_companion_cursed);
+        &Inventory::is_companion_cursed,
+        "acquired_powerups",
+        &Inventory::acquired_powerups);
 
     lua.new_usertype<Ai>(
         "Ai",

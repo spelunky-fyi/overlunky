@@ -434,7 +434,7 @@ struct Inventory
     /// Used to transfer information to transition/next level. Is not updated during a level
     /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<ENT_TYPE, 30> acquired_powerups;
-    /// Total money collected during previous levels (not the current one)
+    /// Total money collected during previous levels (so excluding the current one)
     uint32_t collected_money_total;
 };
 
