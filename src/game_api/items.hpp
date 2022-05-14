@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity.hpp"
+#include "entities_chars.hpp"
 #include "state_structs.hpp"
 
 class Player;
