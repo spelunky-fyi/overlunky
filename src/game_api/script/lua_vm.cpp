@@ -1756,8 +1756,11 @@ end
         2);
 
     /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+    /// There are more styles, we just didn't name them all
     lua.create_named_table(
         "VANILLA_FONT_STYLE",
+        "NORMAL",
+        0,
         "ITALIC",
         1,
         "BOLD",
