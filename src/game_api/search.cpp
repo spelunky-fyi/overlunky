@@ -1591,6 +1591,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        // Write bp on first waddler storage item in state
+        // We're editing the layer offset in mov rcx,[r14+00001308]
+        "storage_layer"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xf3\x0f\x10\x55\xe0\xf3\x0f\x10\x5d\xe4"sv)
+            .offset(-0x4)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
