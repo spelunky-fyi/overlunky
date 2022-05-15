@@ -1,5 +1,7 @@
 #include "state_lua.hpp"
 
+#include "entity.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "online.hpp" // maybe TODO: move to separete file
 #include "state.hpp"

@@ -1,6 +1,7 @@
 #include "entities_chars_lua.hpp"
 
 #include "entities_chars.hpp"
+#include "items.hpp"
 #include "state_structs.hpp"
 
 #include <sol/sol.hpp>

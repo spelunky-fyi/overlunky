@@ -1,6 +1,7 @@
 #include "state.hpp"
 #include "entities_chars.hpp"
 #include "game_manager.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "memory.hpp"
 #include "savedata.hpp"

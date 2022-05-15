@@ -1,6 +1,5 @@
 #pragma once
 
-#include "items.hpp"
 #include "screen.hpp"
 #include "screen_arena.hpp"
 #include "state_structs.hpp"
@@ -11,6 +10,8 @@ struct SaveData;
 struct Layer;
 struct LevelGenSystem;
 class ThemeInfo;
+struct Items;
+
 void fix_liquid_out_of_bounds();
 
 #pragma pack(push, 1) // disable struct padding

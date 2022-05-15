@@ -6,6 +6,7 @@
 #include "entities_monsters.hpp"
 #include "entity.hpp"
 #include "game_manager.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "online.hpp"
 #include "rpc.hpp"

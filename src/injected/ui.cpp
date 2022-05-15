@@ -35,6 +35,7 @@
 #include "entities_mounts.hpp"
 #include "file_api.hpp"
 #include "flags.hpp"
+#include "items.hpp"
 #include "logger.h"
 #include "savedata.hpp"
 #include "script.hpp"

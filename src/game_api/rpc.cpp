@@ -7,6 +7,7 @@
 #include "entities_liquids.hpp"
 #include "entities_mounts.hpp"
 #include "entity.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "memory.hpp"
 #include "savedata.hpp"
