@@ -1,7 +1,7 @@
 #include "settings_api.hpp"
 
-#include "search.hpp"
 #include "render_api.hpp"
+#include "search.hpp"
 
 union SettingValue
 {
