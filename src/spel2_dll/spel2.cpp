@@ -2,6 +2,7 @@
 
 #include "character_def.hpp"
 #include "console.hpp"
+#include "entity.hpp"
 #include "file_api.hpp"
 #include "memory.hpp"
 #include "script.hpp"

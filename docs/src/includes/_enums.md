@@ -913,10 +913,11 @@ Name | Data | Description
 
 > Search script examples for [VANILLA_FONT_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE)
 
-Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event<br/>There are more styles, we just didn't name them all
 
 Name | Data | Description
 ---- | ---- | -----------
+[NORMAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.NORMAL) | 0 | 
 [ITALIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.ITALIC) | 1 | 
 [BOLD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.BOLD) | 2 | 
 

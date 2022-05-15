@@ -360,7 +360,8 @@ int | [held_item_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 int | [mount_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_metadata) | Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 int | [kills_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) | 
 int | [kills_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) | 
-int | [collected_money_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) | Total money collected during previous levels (not the current one)
+int | [collected_money_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) | Total money collected during previous levels (so excluding the current one)
+int | [collected_money_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_count) | Count/size for the `collected_money` arrays
 array&lt;[ENT_TYPE](#ENT_TYPE), 512&gt; | [collected_money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money) | Types of gold/gems collected during this level, used later to display during the transition
 array&lt;int, 512&gt; | [collected_money_values](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_values) | Values of gold/gems collected during this level, used later to display during the transition
 array&lt;[ENT_TYPE](#ENT_TYPE), 256&gt; | [killed_enemies](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_enemies) | Types of enemies killed during this level, used later to display during the transition
@@ -372,6 +373,7 @@ array&lt;int, 8&gt; | [companion_trust](https://github.com/spelunky-fyi/overlunk
 array&lt;int, 8&gt; | [companion_health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_health) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 array&lt;int, 8&gt; | [companion_poison_tick_timers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_poison_tick_timers) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 array&lt;bool, 8&gt; | [is_companion_cursed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_companion_cursed) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+array&lt;[ENT_TYPE](#ENT_TYPE), 30&gt; | [acquired_powerups](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=acquired_powerups) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 
 ## Generic types
 
