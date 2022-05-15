@@ -1424,6 +1424,9 @@
                             <a href="#Quad" class="toc-h3 toc-link" data-title="Quad">Quad</a>
                           </li>
                           <li>
+                            <a href="#RenderInfo" class="toc-h3 toc-link" data-title="RenderInfo">RenderInfo</a>
+                          </li>
+                          <li>
                             <a href="#ShortTileCodeDef" class="toc-h3 toc-link" data-title="ShortTileCodeDef">ShortTileCodeDef</a>
                           </li>
                           <li>
@@ -6525,7 +6528,12 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=collected_money_total">collected_money_total</a></td>
-<td>Total money collected during previous levels (not the current one)</td>
+<td>Total money collected during previous levels (so excluding the current one)</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=collected_money_count">collected_money_count</a></td>
+<td>Count/size for the <code>collected_money</code> arrays</td>
 </tr>
 <tr>
 <td>array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, 512&gt;</td>
@@ -6580,6 +6588,11 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <tr>
 <td>array&lt;bool, 8&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_companion_cursed">is_companion_cursed</a></td>
+<td>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
+</tr>
+<tr>
+<td>array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, 30&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=acquired_powerups">acquired_powerups</a></td>
 <td>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
 </tr>
 </tbody></table>
@@ -6993,9 +7006,75 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td>Rotates a <a href="#Quad">Quad</a> by an angle, px/py are not offsets, use <code>:get_AABB():center()</code> to get approximated center for simetrical quadrangle</td>
 </tr>
 <tr>
+<td><a href="#Quad">Quad</a>&amp;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flip_horizontally">flip_horizontally()</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Quad">Quad</a>&amp;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flip_vertically">flip_vertically()</a></td>
+<td></td>
+</tr>
+<tr>
 <td>tuple&lt;<a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split()</a></td>
 <td>Returns the corners in order: bottom_left, bottom_right, top_right, top_left</td>
+</tr>
+</tbody></table>
+<h3 id='RenderInfo'>RenderInfo</h3>
+<p>Some information used to render the entity, can not be changed</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=shader">shader</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Quad">Quad</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=source">source</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Quad">Quad</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destination">destination</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tilew">tilew</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tileh">tileh</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=facing_left">facing_left</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=render_inactive">render_inactive</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h3 id='ShortTileCodeDef'>ShortTileCodeDef</h3>
@@ -15145,6 +15224,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offsety">offsety</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#RenderInfo">RenderInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rendering_info">rendering_info</a></td>
 <td></td>
 </tr>
 <tr>
@@ -25091,7 +25175,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=VANILLA_FONT_STYLE">VANILLA_FONT_STYLE</a></p>
 </blockquote>
 
-<p>Used in the <code>render_ctx:draw_text</code> and <code>render_ctx:draw_text_size</code> functions of the ON.RENDER_PRE/POST_xxx event</p>
+<p>Used in the <code>render_ctx:draw_text</code> and <code>render_ctx:draw_text_size</code> functions of the ON.RENDER_PRE/POST_xxx event<br/>There are more styles, we just didn&#39;t name them all</p>
 
 <table><thead>
 <tr>
@@ -25100,6 +25184,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=VANILLA_FONT_STYLE.NORMAL">NORMAL</a></td>
+<td>0</td>
+<td></td>
+</tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=VANILLA_FONT_STYLE.ITALIC">ITALIC</a></td>
 <td>1</td>
