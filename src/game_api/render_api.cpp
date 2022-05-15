@@ -39,13 +39,13 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
     // with a single LUT for now
     if (g_forced_lut_textures[layer])
     {
-        Texture* lut = get_texture(g_forced_lut_textures[layer].value());
-        g_render_layer(lightsources, layer, camera, lut->name, lut->name);
+        if (Texture* lut = get_texture(g_forced_lut_textures[layer].value()))
+        {
+            g_render_layer(lightsources, layer, camera, lut->name, lut->name);
+            return;
+        }
     }
-    else
-    {
-        g_render_layer(lightsources, layer, camera, lut_lhs, lut_rhs);
-    }
+    g_render_layer(lightsources, layer, camera, lut_lhs, lut_rhs);
 }
 
 void RenderAPI::set_lut(TEXTURE texture_id, uint8_t layer)
