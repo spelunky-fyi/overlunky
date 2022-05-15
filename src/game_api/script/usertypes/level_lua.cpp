@@ -1,5 +1,6 @@
 #include "level_lua.hpp"
 
+#include "entity.hpp"
 #include "level_api.hpp"
 #include "savedata.hpp" // maybe TODO: move to separte file
 #include "script/lua_backend.hpp"

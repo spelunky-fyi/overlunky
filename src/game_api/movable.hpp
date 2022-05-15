@@ -3,6 +3,7 @@
 #include "entity.hpp"
 
 #include <functional>
+#include <set>
 
 class Movable : public Entity
 {

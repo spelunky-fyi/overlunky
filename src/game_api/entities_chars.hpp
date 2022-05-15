@@ -5,6 +5,7 @@
 
 struct Illumination;
 struct PlayerInputs;
+struct Inventory;
 
 class Ai
 {

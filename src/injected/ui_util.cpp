@@ -1,6 +1,7 @@
 #include "ui_util.hpp"
 
 #include "entities_chars.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"

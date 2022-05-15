@@ -2001,6 +2001,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field kills_level integer
     ---@field kills_total integer
     ---@field collected_money_total integer
+    ---@field collected_money_count integer
     ---@field collected_money ENT_TYPE[]
     ---@field collected_money_values integer[]
     ---@field killed_enemies ENT_TYPE[]
@@ -2012,6 +2013,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field companion_health integer[]
     ---@field companion_poison_tick_timers integer[]
     ---@field is_companion_cursed boolean[]
+    ---@field acquired_powerups ENT_TYPE[]
 
 ---@class Ai
     ---@field target Entity
@@ -4901,6 +4903,10 @@ CHAR_STATE = {
 ---@alias CHAR_STATE integer
 CONST = {
   ENGINE_FPS = 60,
+  MAX_PLAYERS = 4,
+  MAX_TILES_HORIZ = 86,
+  MAX_TILES_VERT = 126,
+  NOF_DRAW_DEPTHS = 53,
   ROOM_HEIGHT = 8,
   ROOM_WIDTH = 10
 }
@@ -8240,7 +8246,8 @@ VANHORSING = {
 ---@alias VANHORSING integer
 VANILLA_FONT_STYLE = {
   BOLD = 2,
-  ITALIC = 1
+  ITALIC = 1,
+  NORMAL = 0
 }
 ---@alias VANILLA_FONT_STYLE integer
 VANILLA_SOUND = {
