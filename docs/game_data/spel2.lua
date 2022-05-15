@@ -1872,6 +1872,17 @@ local function PRNG_random(self, min, max) end
     ---@field tilex integer
     ---@field tiley integer
 
+---@class RenderInfo
+    ---@field x number
+    ---@field y number
+    ---@field shader integer
+    ---@field source Quad
+    ---@field destination Quad
+    ---@field tilew number
+    ---@field tileh number
+    ---@field facing_left boolean
+    ---@field render_inactive boolean
+
 ---@class Entity
     ---@field type EntityDB
     ---@field overlay Entity
@@ -1895,6 +1906,7 @@ local function PRNG_random(self, min, max) end
     ---@field hitboxy number
     ---@field offsetx number
     ---@field offsety number
+    ---@field rendering_info RenderInfo
     ---@field topmost fun(self, ): Entity
     ---@field topmost_mount fun(self, ): Entity
     ---@field overlaps_with Entity_overlaps_with
@@ -4116,6 +4128,8 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field get_AABB fun(self, ): AABB
     ---@field offset fun(self, off_x: number, off_y: number): Quad
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad
+    ---@field flip_horizontally fun(self, ): Quad
+    ---@field flip_vertically fun(self, ): Quad
     ---@field split fun(self, ): Vec2, Vec2, Vec2, Vec2
 
 ---@class Screen

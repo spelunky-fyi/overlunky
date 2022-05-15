@@ -1,5 +1,6 @@
 #include "settings_api.hpp"
 
+#include "render_api.hpp"
 #include "search.hpp"
 
 union SettingValue
@@ -64,6 +65,12 @@ bool set_setting(GAME_SETTING setting, std::uint32_t value)
 }
 std::optional<std::uint32_t> get_setting(GAME_SETTING setting)
 {
+    if ((setting == GAME_SETTING::FREQUENCY_NUMERATOR || setting == GAME_SETTING::FREQUENCY_DENOMINATOR) && get_setting(GAME_SETTING::WINDOW_MODE) == 1u)
+    {
+        size_t renderer = RenderAPI::get().renderer();
+        return *reinterpret_cast<std::uint32_t*>(renderer + (setting == GAME_SETTING::FREQUENCY_NUMERATOR ? 0x10 : 0x14));
+    }
+
     if (SettingData* data = get_setting_data(setting))
     {
         switch (setting)

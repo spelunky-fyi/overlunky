@@ -96,7 +96,7 @@ struct RenderInfo
     uint8_t unknown_timer2; // for some entities this stops when the entity is not on screen but the above one don't
     bool unknown12c;
     bool unknown12d;
-    bool stop_render; // stops all the rendering stuff, the value is forced thou
+    bool render_inactive; // stops all the rendering stuff, the value is forced thou
     uint8_t unknown13b;
     uint8_t unknown13c;
     uint8_t unknown13d;
