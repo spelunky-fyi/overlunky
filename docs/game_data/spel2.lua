@@ -664,6 +664,10 @@ function modify_sparktraps(angle_increment, distance) end
 ---@param activate boolean
 ---@return nil
 function activate_sparktraps_hack(activate) end
+---Set layer to search for storage items on
+---@param layer LAYER
+---@return nil
+function set_storage_layer(layer) end
 ---Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ---Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
 ---@param default_multiplier integer
@@ -1666,6 +1670,7 @@ function udp_send(host, port, msg) end
     ---@field coffin_contents ENT_TYPE
     ---@field screen_change_counter integer
     ---@field time_startup integer
+    ---@field storage_uid integer
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
 

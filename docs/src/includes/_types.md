@@ -2129,6 +2129,7 @@ int | [time_speedrun](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=t
 [ENT_TYPE](#ENT_TYPE) | [coffin_contents](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffin_contents) | 
 int | [screen_change_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_change_counter) | 
 int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) | 
+int | [storage_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=storage_uid) | 
 [LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | 
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
 

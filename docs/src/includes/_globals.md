@@ -1294,6 +1294,15 @@ Enables or disables the journal
 
 Set seed and reset run.
 
+### set_storage_layer
+
+
+> Search script examples for [set_storage_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_storage_layer)
+
+#### nil set_storage_layer([LAYER](#LAYER) layer)
+
+Set layer to search for storage items on
+
 ### warp
 
 
