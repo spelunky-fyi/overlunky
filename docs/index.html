@@ -4004,7 +4004,47 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_seed-int-seed'>nil set_seed(int seed)</h4>
 <p>Set seed and reset run.</p>
-<h3 id='set_storage_layer'>set_storage_layer</h3>
+<h3 id='set_storage_layer'>set_storage_layer</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Sets the right layer when using the vanilla tile code if waddler is still happy,</span>
+<span class="c1">-- otherwise spawns the floor to the left of this tile.</span>
+<span class="c1">-- Manually spawning FLOOR_STORAGE pre-tilecode doesn't seem to work as expected,</span>
+<span class="c1">-- so we destroy it post-tilecode.</span>
+<span class="n">set_post_tile_code_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">test_flag</span><span class="p">(</span><span class="n">state</span><span class="p">.</span><span class="n">quest_flags</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">then</span>
+        <span class="c1">-- Just set the layer and let the vanilla tilecode handle the floor</span>
+        <span class="n">set_storage_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+    <span class="k">else</span>
+        <span class="kd">local</span> <span class="n">floor</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">get_grid_entity_at</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">floor</span> <span class="k">then</span>
+            <span class="n">floor</span><span class="p">:</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="k">end</span>
+        <span class="k">if</span> <span class="n">get_grid_entity_at</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span> <span class="o">~=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">then</span>
+            <span class="kd">local</span> <span class="n">left</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">get_grid_entity_at</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">))</span>
+            <span class="n">spawn_grid_entity</span><span class="p">(</span><span class="n">left</span><span class="p">.</span><span class="n">type</span><span class="p">.</span><span class="n">id</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
+        <span class="k">end</span>
+    <span class="k">end</span>
+<span class="k">end</span><span class="p">,</span> <span class="s2">"storage_floor"</span><span class="p">)</span>
+
+<span class="c1">-- This fixes a bug in the game that breaks storage on transition.</span>
+<span class="c1">-- The old storage_uid is not cleared after every level for some reason.</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+    <span class="n">state</span><span class="p">.</span><span class="n">storage_uid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">TRANSITION</span><span class="p">)</span>
+
+<span class="c1">-- Having a waddler is completely optional for storage,</span>
+<span class="c1">-- but this makes a nice waddler room if he still likes you.</span>
+<span class="n">define_tile_code</span><span class="p">(</span><span class="s2">"waddler"</span><span class="p">)</span>
+<span class="n">set_pre_tile_code_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">test_flag</span><span class="p">(</span><span class="n">state</span><span class="p">.</span><span class="n">quest_flags</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">then</span>
+        <span class="kd">local</span> <span class="n">uid</span> <span class="o">=</span> <span class="n">spawn_roomowner</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_STORAGEGUY</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">0</span><span class="p">.</span><span class="mi">5</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">,</span> <span class="n">ROOM_TEMPLATE</span><span class="p">.</span><span class="n">WADDLER</span><span class="p">)</span>
+        <span class="n">set_on_kill</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="k">function</span><span class="p">()</span>
+            <span class="c1">-- Disable current level storage if you kill waddler</span>
+            <span class="n">state</span><span class="p">.</span><span class="n">storage_uid</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">end</span><span class="p">)</span>
+    <span class="k">end</span>
+    <span class="k">return</span> <span class="kc">true</span>
+<span class="k">end</span><span class="p">,</span> <span class="s2">"waddler"</span><span class="p">)</span>
+
+</code></pre></div>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_storage_layer">set_storage_layer</a></p>
 </blockquote>
