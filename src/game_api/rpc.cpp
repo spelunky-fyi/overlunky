@@ -1758,3 +1758,16 @@ void change_poison_timer(int16_t frames)
         write_mem_recoverable("change_poison_timer", offset_subsequent, frames, true);
     }
 }
+
+void disable_floor_embeds(bool disable)
+{
+    const static auto address = get_address("spawn_floor_embeds");
+    if (disable)
+    {
+        write_mem_recoverable("disable_floor_embeds", address, "\xC3"sv, true);
+    }
+    else
+    {
+        recover_mem("disable_floor_embeds");
+    }
+}
