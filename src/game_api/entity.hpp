@@ -54,7 +54,7 @@ struct HookWithId
 };
 struct EntityHooksInfo
 {
-    void* entity;
+    std::int32_t entity;
     std::uint32_t cbcount;
     std::vector<HookWithId<void(Entity*)>> on_dtor;
     std::vector<HookWithId<void(Entity*)>> on_destroy;
@@ -66,6 +66,8 @@ struct EntityHooksInfo
     std::vector<HookWithId<void(Container*, Movable*)>> on_open;
     std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision1;
     std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision2;
+    std::vector<HookWithId<bool(Entity*)>> pre_render;
+    std::vector<HookWithId<void(Entity*)>> post_render;
 };
 
 // Creates an instance of this entity
@@ -286,6 +288,9 @@ class Entity
     void set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage);
     void set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1);
     void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
+    void set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render);
+    void set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render);
+
     std::span<uint32_t> get_items();
 
     template <typename T>
@@ -343,94 +348,6 @@ class Entity
 
     /// Applies changes made in `entity.type`
     virtual void apply_db() = 0;
-};
-
-struct Inventory
-{
-    /// Sum of the money collected in current level
-    uint32_t money;
-    uint8_t bombs;
-    uint8_t ropes;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    int16_t poison_tick_timer;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    bool cursed;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    bool elixir_buff;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    uint8_t health;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    uint8_t kapala_blood_amount;
-    /// Is set to state.time_total when player dies in coop (to determinate who should be first to re-spawn from coffin)
-    uint32_t time_of_death;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ENT_TYPE held_item;
-    /// Metadata of the held item (health, is cursed etc.)
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    int16_t held_item_metadata;
-    uint8_t unknown5c; // padding?
-
-    int8_t player_slot;
-    /// Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ENT_TYPE mount_type;
-    /// Metadata of the mount (health, is cursed etc.)
-    /// Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    int16_t mount_metadata;
-    int16_t unknown_mount_ralated; // unsure, can be padding as well
-
-    /// Types of gold/gems collected during this level, used later to display during the transition
-    std::array<ENT_TYPE, 512> collected_money;
-    /// Values of gold/gems collected during this level, used later to display during the transition
-    std::array<uint32_t, 512> collected_money_values;
-    /// Count/size for the `collected_money` arrays
-    uint32_t collected_money_count;
-    /// Types of enemies killed during this level, used later to display during the transition
-    std::array<ENT_TYPE, 256> killed_enemies;
-    uint32_t kills_level;
-    uint32_t kills_total;
-
-    /// Metadata of items held by companions (health, is cursed etc.)
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    std::array<int16_t, 8> companion_held_item_metadatas;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    std::array<int16_t, 8> companion_poison_tick_timers;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    std::array<ENT_TYPE, 8> companions;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    std::array<ENT_TYPE, 8> companion_held_items;
-    /// (0..3) Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    std::array<uint8_t, 8> companion_trust;
-    /// Number of companions, it will determinate how many companions will be transfered to next level
-    /// Increments when player acquires new companion, decrements when one of them dies
-    uint8_t companion_count;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    std::array<uint8_t, 8> companion_health;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    std::array<bool, 8> is_companion_cursed;
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
-    /// Used to transfer information to transition/next level. Is not updated during a level
-    /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    std::array<ENT_TYPE, 30> acquired_powerups;
-    /// Total money collected during previous levels (not the current one)
-    uint32_t collected_money_total;
 };
 
 struct SoundInfo
@@ -503,3 +420,4 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos);
 
 struct EntityFactory* entity_factory();
 Entity* get_entity_ptr(uint32_t uid);
+Entity* get_entity_ptr_local(uint32_t uid);

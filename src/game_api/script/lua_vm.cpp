@@ -6,6 +6,7 @@
 #include "entities_monsters.hpp"
 #include "entity.hpp"
 #include "game_manager.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "online.hpp"
 #include "rpc.hpp"
@@ -190,7 +191,7 @@ end
         return nullptr;
     };
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
-    lua["savegame"] = savedata();
+    lua["savegame"] = State::get().savedata();
 
     /// Standard lua print function, prints directly to the console but not to the game
     lua["lua_print"] = lua["print"];
@@ -589,14 +590,18 @@ end
     /// Set seed and reset run.
     lua["set_seed"] = set_seed;
     /// Enable/disable godmode for players.
-    lua["god"] = godmode;
+    lua["god"] = [](bool g)
+    { State::get().godmode(g); };
     /// Enable/disable godmode for companions.
-    lua["god_companions"] = godmode_companions;
+    lua["god_companions"] = [](bool g)
+    { State::get().godmode_companions(g); };
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
-    lua["force_dark_level"] = darkmode;
+    lua["force_dark_level"] = [](bool g)
+    { State::get().darkmode(g); };
     /// Set the zoom level used in levels and shops. 13.5 is the default.
-    lua["zoom"] = zoom;
+    lua["zoom"] = [](float level)
+    { State::get().zoom(level); };
     /// Enable/disable game engine pause.
     /// This is just short for `state.pause == 32`, but that produces an audio bug
     /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
@@ -737,11 +742,14 @@ end
     /// Get the ENT_TYPE... of the entity by uid
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
-    lua["get_zoom_level"] = get_zoom_level;
+    lua["get_zoom_level"] = []() -> float
+    { return State::get_zoom_level(); };
     /// Get the game coordinates at the screen position (`x`, `y`)
-    lua["game_position"] = click_position;
+    lua["game_position"] = [](float x, float y) -> std::pair<float, float>
+    { return State::click_position(x, y); };
     /// Translate an entity position to screen position to be used in drawing functions
-    lua["screen_position"] = screen_position;
+    lua["screen_position"] = [](float x, float y) -> std::pair<float, float>
+    { return State::screen_position(x, y); };
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
@@ -812,6 +820,8 @@ end
     /// note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
     /// default game values are: speed = -0.015, distance = 3.0
     lua["activate_sparktraps_hack"] = activate_sparktraps_hack;
+    /// Set layer to search for storage items on
+    lua["set_storage_layer"] = set_storage_layer;
     /// Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
     /// Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
     lua["set_blood_multiplication"] = set_blood_multiplication;
@@ -1292,6 +1302,61 @@ end
         }
         return sol::nullopt;
     };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+    /// where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_pre_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_pre_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+                    VanillaRenderContext render_ctx{};
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    auto return_value = backend->handle_function_with_return<bool>(fun, render_ctx, lua["cast_entity"](self)).value_or(false);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+    /// where `render_ctx` is a `VanillaRenderContext`.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_post_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_post_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+                    VanillaRenderContext render_ctx{};
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    backend->handle_function(fun, render_ctx, lua["cast_entity"](self));
+                    backend->clear_current_callback();
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
 
     /// Raise a signal and probably crash the game
     lua["raise"] = std::raise;
@@ -1514,6 +1579,8 @@ end
         ON::RENDER_POST_PAUSE_MENU,
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
+        "RENDER_POST_DRAW_DEPTH",
+        ON::RENDER_POST_DRAW_DEPTH,
         "RENDER_POST_JOURNAL_PAGE",
         ON::RENDER_POST_JOURNAL_PAGE,
         "SPEECH_BUBBLE",
@@ -1576,6 +1643,9 @@ end
     // RENDER_PRE_DRAW_DEPTH
     // Params: `VanillaRenderContext render_ctx, int draw_depth`
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_POST_DRAW_DEPTH
+    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     // RENDER_POST_JOURNAL_PAGE
     // Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`
     // Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
@@ -1689,8 +1759,11 @@ end
         2);
 
     /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+    /// There are more styles, we just didn't name them all
     lua.create_named_table(
         "VANILLA_FONT_STYLE",
+        "NORMAL",
+        0,
         "ITALIC",
         1,
         "BOLD",

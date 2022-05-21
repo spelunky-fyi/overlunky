@@ -1,5 +1,7 @@
 #include "state_lua.hpp"
 
+#include "entity.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "online.hpp" // maybe TODO: move to separete file
 #include "state.hpp"
@@ -507,6 +509,7 @@ void register_usertypes(sol::state& lua)
         &StateMemory::arena,
         /* state got so big that adding stuff here will couse `compiler out of heap space`
         * to solve this, we add stuff in this comment for the autodoc, and then for real below to the `state_usertype`
+        * lol maybe we should remove this house of cards then and add stuff in a way that doesn't break the compiler when you add one little thing. and fix the autodoc.
 
         "speedrun_character",
         &StateMemory::speedrun_character,
@@ -534,6 +537,9 @@ void register_usertypes(sol::state& lua)
         &StateMemory::screen_change_counter,
         "time_startup",
         &StateMemory::time_startup,
+        "storage_uid",
+        &StateMemory::waddler_floor_storage,
+
         */
         "logic",
         &StateMemory::logic,
@@ -553,6 +559,7 @@ void register_usertypes(sol::state& lua)
     state_usertype["coffin_contents"] = &StateMemory::coffin_contents;
     state_usertype["screen_change_counter"] = &StateMemory::screen_change_counter;
     state_usertype["time_startup"] = &StateMemory::time_startup;
+    state_usertype["storage_uid"] = &StateMemory::waddler_floor_storage;
 
     lua.new_usertype<LightParams>(
         "LightParams",

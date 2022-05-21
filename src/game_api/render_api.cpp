@@ -39,13 +39,13 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
     // with a single LUT for now
     if (g_forced_lut_textures[layer])
     {
-        Texture* lut = get_texture(g_forced_lut_textures[layer].value());
-        g_render_layer(lightsources, layer, camera, lut->name, lut->name);
+        if (Texture* lut = get_texture(g_forced_lut_textures[layer].value()))
+        {
+            g_render_layer(lightsources, layer, camera, lut->name, lut->name);
+            return;
+        }
     }
-    else
-    {
-        g_render_layer(lightsources, layer, camera, lut_lhs, lut_rhs);
-    }
+    g_render_layer(lightsources, layer, camera, lut_lhs, lut_rhs);
 }
 
 void RenderAPI::set_lut(TEXTURE texture_id, uint8_t layer)
@@ -82,6 +82,7 @@ void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float 
 {
     trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_PRE_DRAW_DEPTH, draw_depth, {bbox_left, bbox_top, bbox_right, bbox_bottom});
     g_render_draw_depth_trampoline(layer, draw_depth, bbox_left, bbox_bottom, bbox_right, bbox_top);
+    trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_POST_DRAW_DEPTH, draw_depth, {bbox_left, bbox_top, bbox_right, bbox_bottom});
 }
 
 using VanillaRenderJournalPageFun = void(JournalPage*);
@@ -266,12 +267,10 @@ void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Co
     }
 }
 
-void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Color color)
+void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader)
 {
     static size_t func_offset = 0;
     static size_t param_7 = 0;
-    constexpr uint8_t shader = 0x7; // this comes from RenderInfo->shader
-
     if (func_offset == 0)
     {
         func_offset = get_address("draw_world_texture"sv);
@@ -301,7 +300,7 @@ void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Col
             dest.top_left_y,
             unknown};
 
-        typedef void render_func(size_t, uint8_t, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
+        typedef void render_func(size_t, WorldShader, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         auto texture_name = texture->name;
         rf(renderer(), shader, &texture_name, 1, destination, &source, (void*)param_7, &color, nullptr);

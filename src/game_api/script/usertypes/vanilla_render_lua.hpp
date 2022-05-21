@@ -41,19 +41,32 @@ class VanillaRenderContext
 
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
     /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    /// For more control use the version taking a Quad instead
     void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color);
 
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
     /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
-    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color);
+    /// For more control use the version taking a Quad instead
+    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& dest, Color color);
 
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
     /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
-    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle, float px, float py);
+    /// For more control use the version taking a Quad instead
+    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& dest, Color color, float angle, float px, float py);
+
+    /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+    /// The `shader` parameter controls how to render the texture
+    /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color, WORLD_SHADER shader);
 
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
     /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
     void draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color);
+
+    /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen
+    /// The `shader` parameter controls how to render the texture
+    /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    void draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color, WORLD_SHADER shader);
 
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen
     /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event

@@ -364,7 +364,7 @@ std::tuple<float, float, uint8_t> get_render_position(uint32_t uid)
     Entity* ent = get_entity_ptr(uid);
     if (ent)
     {
-        if (ent->rendering_info != nullptr && !ent->rendering_info->stop_render)
+        if (ent->rendering_info != nullptr && !ent->rendering_info->render_inactive)
             return std::make_tuple(ent->rendering_info->x, ent->rendering_info->y, ent->layer);
         else
             return get_position(uid);
@@ -418,7 +418,10 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos)
 
 TEXTURE Entity::get_texture()
 {
-    return texture->id;
+    if (texture)
+        return texture->id;
+
+    return -1;
 }
 bool Entity::set_texture(TEXTURE texture_id)
 {
@@ -433,7 +436,7 @@ bool Entity::set_texture(TEXTURE texture_id)
 void Entity::unhook(std::uint32_t id)
 {
     auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [this](auto& hook)
-                           { return hook.entity == this; });
+                           { return hook.entity == uid; });
     if (it != g_entity_hooks.end())
     {
         std::erase_if(it->on_dtor, [id](auto& hook)
@@ -456,18 +459,22 @@ void Entity::unhook(std::uint32_t id)
                       { return hook.id == id; });
         std::erase_if(it->pre_collision2, [id](auto& hook)
                       { return hook.id == id; });
+        std::erase_if(it->pre_render, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->post_render, [id](auto& hook)
+                      { return hook.id == id; });
     }
 }
 EntityHooksInfo& Entity::get_hooks()
 {
     auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [this](auto& hook)
-                           { return hook.entity == this; });
+                           { return hook.entity == uid; });
     if (it == g_entity_hooks.end())
     {
         hook_dtor(this, [](void* self)
                   {
                       auto _it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
-                                              { return hook.entity == self; });
+                                              { return hook.entity == ((Entity*)self)->uid; });
                       if (_it != g_entity_hooks.end())
                       {
                           for (auto& cb : _it->on_dtor)
@@ -476,7 +483,7 @@ EntityHooksInfo& Entity::get_hooks()
                           }
                           g_entity_hooks.erase(_it);
                       } });
-        g_entity_hooks.push_back({this});
+        g_entity_hooks.push_back({uid});
         return g_entity_hooks.back();
     }
     return *it;
@@ -664,6 +671,53 @@ void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::functio
     hook_info.pre_collision2.push_back({reserved_callback_id, std::move(pre_collision2)});
 }
 
+auto hook_render_callback(Entity* self, RenderInfo* self_rendering_info)
+{
+    hook_vtable<void(RenderInfo*, float*)>(
+        self_rendering_info,
+        [uid = self->uid](RenderInfo* render_info, float* floats, void (*original)(RenderInfo*, float* floats))
+        {
+            Entity* entity = get_entity_ptr_local(uid);
+            EntityHooksInfo& _hook_info = entity->get_hooks();
+            bool skip_original{false};
+            for (auto& [id, pre] : _hook_info.pre_render)
+            {
+                if (pre(entity))
+                {
+                    skip_original = true;
+                    break;
+                }
+            }
+            if (!skip_original)
+            {
+                original(render_info, floats);
+            }
+            for (auto& [id, post] : _hook_info.post_render)
+            {
+                post(entity);
+            }
+        },
+        0x3);
+}
+void Entity::set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_render.empty() || hook_info.pre_render.empty())
+    {
+        hook_render_callback(this, rendering_info);
+    }
+    hook_info.pre_render.push_back({reserved_callback_id, std::move(pre_render)});
+}
+void Entity::set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_render.empty() || hook_info.pre_render.empty())
+    {
+        hook_render_callback(this, rendering_info);
+    }
+    hook_info.post_render.push_back({reserved_callback_id, std::move(post_render)});
+}
+
 std::span<uint32_t> Entity::get_items()
 {
     if (items.size)
@@ -676,6 +730,15 @@ Entity* get_entity_ptr(uint32_t uid)
 {
     auto state = State::get();
     auto p = state.find(uid);
+    if (IsBadWritePtr(p, 0x178))
+        return nullptr;
+    return p;
+}
+
+Entity* get_entity_ptr_local(uint32_t uid)
+{
+    auto state = State::get();
+    auto p = state.find_local(uid);
     if (IsBadWritePtr(p, 0x178))
         return nullptr;
     return p;

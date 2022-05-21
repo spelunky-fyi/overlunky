@@ -125,6 +125,10 @@ void register_usertypes(sol::state& lua)
         &Quad::offset,
         "rotate",
         &Quad::rotate,
+        "flip_horizontally",
+        &Quad::flip_horizontally,
+        "flip_vertically",
+        &Quad::flip_vertically,
         "split",
         &Quad::split);
 }

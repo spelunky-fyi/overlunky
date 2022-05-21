@@ -144,34 +144,6 @@ void spawn_liquid_ex(ENT_TYPE entity_type, float x, float y, float velocityx, fl
     return spawn_liquid(entity_type, x, y, velocityx, velocityy, liquid_flags, amount, INFINITY);
 }
 
-int32_t spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap) // ui only
-{
-    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
-
-    auto state = State::get();
-    Player* player = nullptr;
-
-    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
-    {
-        if (state.items()->player(i) != nullptr)
-        {
-            player = state.items()->player(i); // maybe spawn offset to camera focus uid then the player itself?
-            break;
-        }
-    }
-    if (player == nullptr)
-        return -1;
-
-    std::pair<float, float> offset_position;
-    if (!s)
-        offset_position = player->position();
-
-    DEBUG("Spawning {} on {}, {}", entity_type, x + offset_position.first, y + offset_position.second);
-    return state.layer_local(player->layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, s, vx, vy, snap)->uid;
-}
-
 int32_t spawn_entity_abs(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
@@ -230,24 +202,6 @@ int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, floa
     return state.layer_local(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
 }
 
-int32_t spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t) // ui only
-{
-    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
-
-    auto state = State::get();
-
-    auto player = state.items()->player(0); // do the same stuff as in spawn_entity?
-    if (player == nullptr)
-        return -1;
-    auto [_x, _y] = player->position();
-    DEBUG("Spawning door on {}, {}", x + _x, y + _y);
-    Layer* layer = state.layer_local(player->layer);
-    layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    return layer->spawn_door(x + _x, y + _y, w, l, t)->uid;
-}
-
 int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint8_t t)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
@@ -258,29 +212,6 @@ int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
     return State::get().layer_local(actual_layer)->spawn_door(x + offset_position.first, y + offset_position.second, w, l, t)->uid;
-}
-
-void spawn_backdoor(float x, float y) // ui only
-{
-    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
-
-    auto state = State::get();
-
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
-    auto [_x, _y] = player->position();
-    DEBUG("Spawning backdoor on {}, {}", x + _x, y + _y);
-    Layer* front_layer = state.layer_local(0);
-    Layer* back_layer = state.layer_local(1);
-    front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0f, false, 0.0, 0.0, true);
-    back_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x + _x, y + _y - 1.0f, false, 0.0, 0.0, true);
-    front_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
-    back_layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x + _x, y + _y, false, 0.0, 0.0, true);
 }
 
 void spawn_backdoor_abs(float x, float y)
@@ -332,7 +263,6 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
 
     // Needs some space on top
     if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 1 || static_cast<int>(y) + 2 >= g_level_max_y || height == 1 ||
-        layer_ptr->get_grid_entity_at(x, y - 1.0f) == nullptr ||
         layer_ptr->get_grid_entity_at(x, y) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 1.0f) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 2.0f) != nullptr)
@@ -422,8 +352,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height)
     static const auto deco = to_id("ENT_TYPE_DECORATION_MUSHROOM_HAT");
 
     if (height == 1 || i_y == 0 || i_x >= g_level_max_x || i_y >= g_level_max_y - 2 || // check parameters
-        layer_ptr->grid_entities[i_y - 1][i_x] == nullptr ||                           // check spaces above, below etc.
-        layer_ptr->grid_entities[i_y][i_x] != nullptr ||
+        layer_ptr->grid_entities[i_y][i_x] != nullptr ||                               // check spaces above etc.
         layer_ptr->grid_entities[i_y + 1][i_x] != nullptr ||
         layer_ptr->grid_entities[i_y + 2][i_x] != nullptr)
         return -1;

@@ -493,9 +493,9 @@ function get_entity_flags(uid) end
 ---@return nil
 function set_entity_flags(uid, flags) end
 ---Get the `more_flags` field from entity by uid
----@param id integer
+---@param uid integer
 ---@return integer
-function get_entity_flags2(id) end
+function get_entity_flags2(uid) end
 ---Set the `more_flags` field from entity by uid
 ---@param uid integer
 ---@param flags integer
@@ -543,10 +543,10 @@ function get_render_position(uid) end
 ---@return number, number
 function get_velocity(uid) end
 ---Remove item by uid from entity
----@param id integer
+---@param uid integer
 ---@param item_uid integer
 ---@return nil
-function entity_remove_item(id, item_uid) end
+function entity_remove_item(uid, item_uid) end
 ---Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
 ---@param uid integer
 ---@param off_x number
@@ -664,6 +664,10 @@ function modify_sparktraps(angle_increment, distance) end
 ---@param activate boolean
 ---@return nil
 function activate_sparktraps_hack(activate) end
+---Set layer to search for storage items on
+---@param layer LAYER
+---@return nil
+function set_storage_layer(layer) end
 ---Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ---Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
 ---@param default_multiplier integer
@@ -910,6 +914,22 @@ function set_pre_collision1(uid, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_pre_collision2(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+---where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_render(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+---where `render_ctx` is a `VanillaRenderContext`.
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_render(uid, fun) end
 ---Raise a signal and probably crash the game
 ---@return nil
 function raise() end
@@ -1650,6 +1670,7 @@ function udp_send(host, port, msg) end
     ---@field coffin_contents ENT_TYPE
     ---@field screen_change_counter integer
     ---@field time_startup integer
+    ---@field storage_uid integer
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
 
@@ -1851,6 +1872,17 @@ local function PRNG_random(self, min, max) end
     ---@field tilex integer
     ---@field tiley integer
 
+---@class RenderInfo
+    ---@field x number
+    ---@field y number
+    ---@field shader integer
+    ---@field source Quad
+    ---@field destination Quad
+    ---@field tilew number
+    ---@field tileh number
+    ---@field facing_left boolean
+    ---@field render_inactive boolean
+
 ---@class Entity
     ---@field type EntityDB
     ---@field overlay Entity
@@ -1874,6 +1906,7 @@ local function PRNG_random(self, min, max) end
     ---@field hitboxy number
     ---@field offsetx number
     ---@field offsety number
+    ---@field rendering_info RenderInfo
     ---@field topmost fun(self, ): Entity
     ---@field topmost_mount fun(self, ): Entity
     ---@field overlaps_with Entity_overlaps_with
@@ -1980,6 +2013,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field kills_level integer
     ---@field kills_total integer
     ---@field collected_money_total integer
+    ---@field collected_money_count integer
     ---@field collected_money ENT_TYPE[]
     ---@field collected_money_values integer[]
     ---@field killed_enemies ENT_TYPE[]
@@ -1991,6 +2025,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field companion_health integer[]
     ---@field companion_poison_tick_timers integer[]
     ---@field is_companion_cursed boolean[]
+    ---@field acquired_powerups ENT_TYPE[]
 
 ---@class Ai
     ---@field target Entity
@@ -2013,6 +2048,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field get_heart_color fun(self, ): Color
     ---@field is_female fun(self, ): boolean
     ---@field set_heart_color fun(self, hcolor: Color): nil
+    ---@field let_go fun(self, ): nil
 
 ---@class Floor : Entity
     ---@field deco_top integer
@@ -4009,9 +4045,11 @@ local function VanillaRenderContext_draw_screen_texture(self, texture_id, source
 ---@param dest Quad
 ---@param color Color
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color, angle: number, px: number, py: number): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color, shader: WORLD_SHADER): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, source: Quad, dest: Quad, color: Color, shader: WORLD_SHADER): nil
 local function VanillaRenderContext_draw_world_texture(self, texture_id, source, dest, color) end
 
 ---@class TextureRenderingInfo
@@ -4090,6 +4128,8 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field get_AABB fun(self, ): AABB
     ---@field offset fun(self, off_x: number, off_y: number): Quad
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad
+    ---@field flip_horizontally fun(self, ): Quad
+    ---@field flip_vertically fun(self, ): Quad
     ---@field split fun(self, ): Vec2, Vec2, Vec2, Vec2
 
 ---@class Screen
@@ -4877,6 +4917,10 @@ CHAR_STATE = {
 ---@alias CHAR_STATE integer
 CONST = {
   ENGINE_FPS = 60,
+  MAX_PLAYERS = 4,
+  MAX_TILES_HORIZ = 86,
+  MAX_TILES_VERT = 126,
+  NOF_DRAW_DEPTHS = 53,
   ROOM_HEIGHT = 8,
   ROOM_WIDTH = 10
 }
@@ -6604,8 +6648,9 @@ ON = {
   PRE_LOAD_LEVEL_FILES = 109,
   PROLOGUE = 2,
   RECAP = 20,
+  RENDER_POST_DRAW_DEPTH = 122,
   RENDER_POST_HUD = 118,
-  RENDER_POST_JOURNAL_PAGE = 122,
+  RENDER_POST_JOURNAL_PAGE = 123,
   RENDER_POST_PAUSE_MENU = 120,
   RENDER_PRE_DRAW_DEPTH = 121,
   RENDER_PRE_HUD = 117,
@@ -6618,11 +6663,11 @@ ON = {
   SCRIPT_ENABLE = 115,
   SEED_INPUT = 8,
   SPACESHIP = 15,
-  SPEECH_BUBBLE = 123,
+  SPEECH_BUBBLE = 124,
   START = 103,
   TEAM_SELECT = 10,
   TITLE = 3,
-  TOAST = 124,
+  TOAST = 125,
   TRANSITION = 13,
   WIN = 16
 }
@@ -8215,7 +8260,8 @@ VANHORSING = {
 ---@alias VANHORSING integer
 VANILLA_FONT_STYLE = {
   BOLD = 2,
-  ITALIC = 1
+  ITALIC = 1,
+  NORMAL = 0
 }
 ---@alias VANILLA_FONT_STYLE integer
 VANILLA_SOUND = {
@@ -8818,6 +8864,28 @@ WIN_STATE = {
   TIAMAT_WIN = 1
 }
 ---@alias WIN_STATE integer
+WORLD_SHADER = {
+  COLOR = 0,
+  DEFERRED_COLOR_TRANSPARENT = 6,
+  DEFERRED_TEXTURE_COLOR = 7,
+  DEFERRED_TEXTURE_COLOR_CURSED = 9,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE = 16,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW = 22,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW = 23,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION = 24,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW = 18,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS = 20,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY = 19,
+  DEFERRED_TEXTURE_COLOR_POISONED = 8,
+  DEFERRED_TEXTURE_COLOR_POISONED_CURSED = 10,
+  DEFERRED_TEXTURE_COLOR_TRANSPARENT = 11,
+  DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED = 12,
+  TEXTURE = 1,
+  TEXTURE_ALPHA_COLOR = 3,
+  TEXTURE_COLOR = 2,
+  TEXTURE_COLORS_WARP = 5
+}
+---@alias WORLD_SHADER integer
 YANG = {
   ANGRY = -1,
   BOTH_TURKEYS_DELIVERED = 3,

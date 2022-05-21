@@ -307,7 +307,7 @@ bool LuaBackend::update()
             int now = get_frame_count();
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
-                if (now >= cb->lastRan + cb->interval)
+                if (now >= cb->lastRan + cb->interval && !is_callback_cleared(it->first))
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     std::optional<bool> keep_going = handle_function_with_return<bool>(cb->func);
@@ -323,7 +323,7 @@ bool LuaBackend::update()
             }
             else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now >= cbt->timeout)
+                if (now >= cbt->timeout && !is_callback_cleared(it->first))
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     handle_function(cbt->func);
@@ -355,6 +355,9 @@ bool LuaBackend::update()
 
         for (auto& [id, callback] : callbacks)
         {
+            if (is_callback_cleared(id))
+                continue;
+
             set_current_callback(-1, id, CallbackType::Normal);
             if ((ON)g_state->screen == callback.screen && g_state->screen != state.screen && g_state->screen_last != (int)ON::OPTIONS) // game screens
             {
@@ -445,12 +448,12 @@ bool LuaBackend::update()
             }
             clear_current_callback();
         }
-        int now_l = g_state->time_level;
+        const int now_l = g_state->time_level;
         for (auto it = level_timers.begin(); it != level_timers.end();)
         {
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
-                if (now_l >= cb->lastRan + cb->interval)
+                if (now_l >= cb->lastRan + cb->interval && !is_callback_cleared(it->first))
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     std::optional<bool> keep_going = handle_function_with_return<bool>(cb->func);
@@ -466,7 +469,7 @@ bool LuaBackend::update()
             }
             else if (auto cbt = std::get_if<TimeoutCallback>(&it->second))
             {
-                if (now_l >= cbt->timeout)
+                if (now_l >= cbt->timeout && !is_callback_cleared(it->first))
                 {
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     handle_function(cbt->func);
@@ -533,6 +536,9 @@ void LuaBackend::draw(ImDrawList* dl)
 
         for (auto& [id, callback] : callbacks)
         {
+            if (is_callback_cleared(id))
+                continue;
+
             auto now = get_frame_count();
             if (callback.screen == ON::GUIFRAME)
             {
@@ -620,15 +626,15 @@ void LuaBackend::render_options()
 
 bool LuaBackend::is_callback_cleared(int32_t callback_id)
 {
-    return std::count(clear_callbacks.begin(), clear_callbacks.end(), callback_id);
+    return std::find(clear_callbacks.begin(), clear_callbacks.end(), callback_id) != clear_callbacks.end();
 }
 bool LuaBackend::is_entity_callback_cleared(std::pair<int, uint32_t> callback_id)
 {
-    return std::count(clear_entity_hooks.begin(), clear_entity_hooks.end(), callback_id);
+    return std::find(clear_entity_hooks.begin(), clear_entity_hooks.end(), callback_id) != clear_entity_hooks.end();
 }
 bool LuaBackend::is_screen_callback_cleared(std::pair<int, uint32_t> callback_id)
 {
-    return std::count(clear_screen_hooks.begin(), clear_screen_hooks.end(), callback_id);
+    return std::find(clear_screen_hooks.begin(), clear_screen_hooks.end(), callback_id) != clear_screen_hooks.end();
 }
 
 bool LuaBackend::pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
@@ -885,6 +891,9 @@ void LuaBackend::process_vanilla_render_callbacks(ON event)
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
@@ -905,6 +914,9 @@ void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
     render_ctx.bounding_box = bbox;
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
@@ -924,6 +936,9 @@ void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
+        if (is_callback_cleared(id))
+            continue;
+
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
@@ -933,6 +948,7 @@ void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
         }
     }
 }
+
 void LuaBackend::hook_entity_dtor(Entity* entity)
 {
     if (std::count_if(entity_dtor_hooks.begin(), entity_dtor_hooks.end(), [entity](auto& dtor_hook)
@@ -961,6 +977,8 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
     auto now = get_frame_count();
     std::lock_guard lock{gil};
 
+    std::optional<std::u16string> return_value = std::nullopt;
+
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -970,12 +988,17 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, lua["cast_entity"](entity), buffer).value_or(std::u16string{no_return_str});
+            if (auto speech_value = handle_function_with_return<std::u16string>(callback.func, lua["cast_entity"](entity), buffer))
+            {
+                if (!return_value)
+                {
+                    return_value = speech_value;
+                }
+            }
             clear_current_callback();
-            return return_value;
         }
     }
-    return std::u16string{no_return_str};
+    return return_value.value_or(std::u16string{no_return_str});
 }
 
 std::u16string LuaBackend::pre_toast(char16_t* buffer)
@@ -986,6 +1009,8 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
     auto now = get_frame_count();
     std::lock_guard lock{gil};
 
+    std::optional<std::u16string> return_value = std::nullopt;
+
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -995,12 +1020,17 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            std::u16string return_value = handle_function_with_return<std::u16string>(callback.func, buffer).value_or(std::u16string{no_return_str});
+            if (auto toast_value = handle_function_with_return<std::u16string>(callback.func, buffer))
+            {
+                if (!return_value)
+                {
+                    return_value = toast_value;
+                }
+            }
             clear_current_callback();
-            return return_value;
         }
     }
-    return std::u16string{no_return_str};
+    return return_value.value_or(std::u16string{no_return_str});
 }
 
 void LuaBackend::for_each_backend(std::function<bool(LuaBackend&)> fun)

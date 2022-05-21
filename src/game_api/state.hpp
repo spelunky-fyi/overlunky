@@ -1,6 +1,5 @@
 #pragma once
 
-#include "items.hpp"
 #include "screen.hpp"
 #include "screen_arena.hpp"
 #include "state_structs.hpp"
@@ -11,6 +10,8 @@ struct SaveData;
 struct Layer;
 struct LevelGenSystem;
 class ThemeInfo;
+struct Items;
+
 void fix_liquid_out_of_bounds();
 
 #pragma pack(push, 1) // disable struct padding
@@ -229,12 +230,12 @@ struct State
     void godmode_companions(bool g);
     void darkmode(bool g);
 
-    size_t get_zoom_level_address();
-    float get_zoom_level();
+    static size_t get_zoom_level_address();
+    static float get_zoom_level();
     void zoom(float level);
 
-    std::pair<float, float> click_position(float x, float y);
-    std::pair<float, float> screen_position(float x, float y);
+    static std::pair<float, float> click_position(float x, float y);
+    static std::pair<float, float> screen_position(float x, float y);
 
     uint32_t flags() const
     {
@@ -256,8 +257,9 @@ struct State
     std::vector<int64_t> read_prng() const;
 
     Entity* find(uint32_t uid);
+    Entity* find_local(uint32_t uid);
 
-    std::pair<float, float> get_camera_position();
+    static std::pair<float, float> get_camera_position();
     void set_camera_position(float cx, float cy);
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);

@@ -3,6 +3,7 @@
 #include "color.hpp"
 #include "custom_types.hpp"
 #include "movable.hpp"
+#include "render_api.hpp"
 
 #include <sol/sol.hpp>
 
@@ -148,6 +149,38 @@ void register_usertypes(sol::state& lua)
         "tiley",
         &EntityDB::tile_y);
 
+    /// Some information used to render the entity, can not be changed
+    lua.new_usertype<RenderInfo>(
+        "RenderInfo",
+        "x",
+        &RenderInfo::x,
+        "y",
+        &RenderInfo::y,
+        "shader",
+        &RenderInfo::shader,
+        "source",
+        &RenderInfo::source,
+        "destination",
+        sol::property([](const RenderInfo& ri) -> Quad
+                      { return Quad{
+                            ri.destination_bottom_left_x,
+                            ri.destination_bottom_left_y,
+                            ri.destination_bottom_right_x,
+                            ri.destination_bottom_right_y,
+                            ri.destination_top_right_x,
+                            ri.destination_top_right_y,
+                            ri.destination_top_left_x,
+                            ri.destination_top_left_y,
+                        }; }),
+        "tilew",
+        &RenderInfo::tilew,
+        "tileh",
+        &RenderInfo::tileh,
+        "facing_left",
+        &RenderInfo::flip_horizontal,
+        "render_inactive",
+        &RenderInfo::render_inactive);
+
     auto get_overlay = [&lua](Entity& entity)
     {
         return lua["cast_entity"](entity.overlay);
@@ -215,6 +248,8 @@ void register_usertypes(sol::state& lua)
         &Entity::offsetx,
         "offsety",
         &Entity::offsety,
+        "rendering_info",
+        &Entity::rendering_info,
         "topmost",
         topmost,
         "topmost_mount",

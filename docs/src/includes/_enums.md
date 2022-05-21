@@ -539,6 +539,7 @@ Name | Data | Description
 [RENDER_PRE_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU) | ON::RENDER_PRE_PAUSE_MENU | Params: `VanillaRenderContext render_ctx`<br/>Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
 [RENDER_POST_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_PAUSE_MENU) | ON::RENDER_POST_PAUSE_MENU | Params: `VanillaRenderContext render_ctx`<br/>Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
 [RENDER_PRE_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_DRAW_DEPTH) | ON::RENDER_PRE_DRAW_DEPTH | Params: `VanillaRenderContext render_ctx, int draw_depth`<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx<br/>
+[RENDER_POST_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_DRAW_DEPTH) | ON::RENDER_POST_DRAW_DEPTH | Params: `VanillaRenderContext render_ctx, int draw_depth`<br/>Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx<br/>
 [RENDER_POST_JOURNAL_PAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_JOURNAL_PAGE) | ON::RENDER_POST_JOURNAL_PAGE | Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`<br/>Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>The page_type parameter values can be found in the JOURNAL_PAGE_TYPE ENUM<br/>The JournalPage parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:<br/>`page:as_journal_page_progress()`<br/>`page:as_journal_page_journalmenu()`<br/>`page:as_journal_page_places()`<br/>`page:as_journal_page_people()`<br/>`page:as_journal_page_bestiary()`<br/>`page:as_journal_page_items()`<br/>`page:as_journal_page_traps()`<br/>`page:as_journal_page_story()`<br/>`page:as_journal_page_feats()`<br/>`page:as_journal_page_deathcause()`<br/>`page:as_journal_page_deathmenu()`<br/>`page:as_journal_page_recap()`<br/>`page:as_journal_page_playerprofile()`<br/>`page:as_journal_page_lastgameplayed()`<br/>
 [SPEECH_BUBBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) | ON::SPEECH_BUBBLE | Params: `Entity speaking_entity, string text`<br/>Runs before any speech bubble is created, even the one using `say` function<br/>Return behavior: if you don't return anything it will execute the speech bubble function normally with default message<br/>if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [TOAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TOAST) | ON::TOAST | Params: `string text`<br/>Runs before any toast is created, even the one using `toast` function<br/>Return behavior: if you don't return anything it will execute the toast function normally with default message<br/>if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
@@ -912,10 +913,11 @@ Name | Data | Description
 
 > Search script examples for [VANILLA_FONT_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE)
 
-Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event<br/>There are more styles, we just didn't name them all
 
 Name | Data | Description
 ---- | ---- | -----------
+[NORMAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.NORMAL) | 0 | 
 [ITALIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.ITALIC) | 1 | 
 [BOLD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=VANILLA_FONT_STYLE.BOLD) | 2 | 
 
@@ -985,6 +987,35 @@ Name | Data | Description
 [TIAMAT_WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.TIAMAT_WIN) | 1 | 
 [HUNDUN_WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.HUNDUN_WIN) | 2 | 
 [COSMIC_OCEAN_WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WIN_STATE.COSMIC_OCEAN_WIN) | 3 | 
+
+## WORLD_SHADER
+
+
+> Search script examples for [WORLD_SHADER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[COLOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.COLOR) | WorldShader::Colors | Renders a solid color<br/>
+[TEXTURE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.TEXTURE) | WorldShader::Texture | Renders a texture without applying the given color<br/>
+[TEXTURE_ALPHA_COLOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.TEXTURE_ALPHA_COLOR) | WorldShader::TextureAlphaColor | Renders a texture by interpreting its red channel as alpha and applying the given color<br/>
+[TEXTURE_COLOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.TEXTURE_COLOR) | WorldShader::TextureColor | The default shader to be used, just renders a texture with transparancy and the given color<br/>
+[TEXTURE_COLORS_WARP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.TEXTURE_COLORS_WARP) | WorldShader::TextureColorsWarp | Renders the texture, with "gamma correction" of the color channels and multiplying everything by the input color alpha only<br/>
+[DEFERRED_COLOR_TRANSPARENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_COLOR_TRANSPARENT) | WorldShader::DeferredColorTransparent | Basically same as COLOR but goes through the deferred pipeline<br/>
+[DEFERRED_TEXTURE_COLOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR) | WorldShader::DeferredTextureColor | Basically same as TEXTURE_COLOR but goes through the deferred pipeline<br/>
+[DEFERRED_TEXTURE_COLOR_POISONED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_POISONED) | WorldShader::DeferredTextureColor_Poisoned | Same as DEFERRED_TEXTURE_COLOR but applies poison color effect<br/>
+[DEFERRED_TEXTURE_COLOR_CURSED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_CURSED) | WorldShader::DeferredTextureColor_Cursed | Same as DEFERRED_TEXTURE_COLOR but applies cursed color effect<br/>
+[DEFERRED_TEXTURE_COLOR_POISONED_CURSED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_POISONED_CURSED) | WorldShader::DeferredTextureColor_PoisonedCursed | Same as DEFERRED_TEXTURE_COLOR but applies poisoned and cursed color effect<br/>
+[DEFERRED_TEXTURE_COLOR_TRANSPARENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_TRANSPARENT) | WorldShader::DeferredTextureColor_Transparent | Basically same as DEFERRED_TEXTURE_COLOR<br/>
+[DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED) | WorldShader::DeferredTextureColor_TransparentCorrected | Same as DEFERRED_TEXTURE_COLOR_TRANSPARENT but applies gamma correction to alpha channel<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE) | WorldShader::DeferredTextureColor_Emissive | Same as DEFERRED_TEXTURE_COLOR but renders to the emissive channel<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW) | WorldShader::DeferredTextureColor_EmissiveGlow | Same as DEFERRED_TEXTURE_COLOR but renders to the emissive channel with glow<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY) | WorldShader::DeferredTextureColor_EmissiveGlowHeavy | Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW but renders to the emissive channel with heavy glow<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS) | WorldShader::DeferredTextureColor_EmissiveGlowBrightness | Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY but renders glow on top of the texture<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW) | WorldShader::DeferredTextureColor_EmissiveColorizedGlow | Same as DEFERRED_TEXTURE_COLOR but renders heavy glow behind the texture<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW) | WorldShader::DeferredTextureColor_EmissiveColorizedGlow_DynamicGlow | Basically same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW<br/>
+[DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION) | WorldShader::DeferredTextureColor_EmissiveColorizedGlow_Saturation | Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW but renders texture as solid color<br/>
 
 ## YANG
 

@@ -1,5 +1,6 @@
 add_library(injected SHARED
         ui.cpp ui.hpp
+        ui_util.cpp ui_util.hpp
         decode_audio_file.cpp decode_audio_file.hpp
         main.cpp)
 target_link_libraries(injected PRIVATE
