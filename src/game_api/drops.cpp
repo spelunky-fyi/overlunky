@@ -257,8 +257,8 @@ std::vector<DropEntry> drop_entries{
     ///
 
     /// It set's move_state for them for sleep and wake_up_timer, so i has to be movable and entity + 0x150 can't be something important
-    {"COOKFIRE_CAVEMAN_RIGHT", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC3"s, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
-    {"COOKFIRE_CAVEMAN_LEFT", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC6"s, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
+    {"COOKFIRE_CAVEMAN_1", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC3"s, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
+    {"COOKFIRE_CAVEMAN_2", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC6"s, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
     {"BONEBLOCK_SKELETON", "\xBA\xE3\x00\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
     {"BONEBLOCK_SKULL", "\xBA\xE2\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
     {"BONEBLOCK_BONES", "\xBA\xE3\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
