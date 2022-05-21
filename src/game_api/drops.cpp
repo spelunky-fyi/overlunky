@@ -20,10 +20,8 @@ std::vector<DropEntry> drop_entries{
     /// Has to be ENT_TYPE_CHAR_*
     {"ALTAR_DICE_HIREDHAND", "\x48\x0F\x45\xCE\xC7\x44\x24\x20\xD7\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 8},
     {"ALTAR_IDOL_GOLDEN_MONKEY", "\x20\x00\xBA\x35\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
-    {"ALTAR_KAPALA", "\x20\x00\xBA\x16\x02\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_PRESENT_EGGPLANT", "\x20\x00\xBA\xE7\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_ROCK_WOODENARROW", "\x20\x00\xBA\x73\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
-    {"ALTAR_ROYAL_JELLY", "\x20\x00\xBA\x05\x02\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_USHABTI_CAVEMAN", "\x20\x00\xBA\xE1\x00\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_USHABTI_TURKEY", "\x20\x00\xBA\x83\x03\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
     {"ALTAR_USHABTI_VAMPIRE", "\x20\x00\xBA\xF5\x00\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 3},
@@ -33,6 +31,10 @@ std::vector<DropEntry> drop_entries{
     {"ALTAR_HIREDHAND_SHOTGUN", "\xBA\x41\x02\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1}, // this relies on the fact that this it is the first pattern
     /// Gift from Kali when reaching 8 favor, this is what you get if you have all the powerups
     {"ALTAR_GIFT_BOMBBAG", "\xBA\x01\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_ALTAR, 26, 1},
+    /// Will spawn only if you don't have any backpack
+    {"ALTAR_GIFT_CAPE", "\xBA\x34\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_ALTAR, 26, 1},
+    {"ALTAR_KAPALA", "\xBA\x16\x02\x00\x00"s, VTABLE_OFFSET::FLOOR_ALTAR, 26, 1},
+    {"ALTAR_ROYAL_JELLY", "\xBA\x05\x02\x00\x00\xE8"s, VTABLE_OFFSET::FLOOR_ALTAR, 26, 1},
     /* Kali gifts are potentially possible, but the game checks if player has the powerup
     which is more complicated */
     {"ANUBIS2_JETPACK", "\x37\x02\x00\x00"s, VTABLE_OFFSET::MONS_ANUBIS2, 3},
@@ -264,7 +266,16 @@ std::vector<DropEntry> drop_entries{
     {"BONEBLOCK_BONES", "\xBA\xE3\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
     {"GIANTSPIDER_WEB_LEFT", "\xBA\x6E\x01\x00\x00\xE8****\x8B"s, VTABLE_OFFSET::MONS_GIANTSPIDER, 75, 1},
     {"GIANTSPIDER_WEB_RIGHT", "\xBA\x6E\x01\x00\x00\xE8****\x48"s, VTABLE_OFFSET::MONS_GIANTSPIDER, 75, 1},
+    {"IMP_LAVAPOT", "\xBA\xE5\x01\x00\x00"s, VTABLE_OFFSET::MONS_IMP, 75, 1},
     // {"MECH_JETPACK_MECH", "\xBA\x38\x02\x00\x00"s, VTABLE_OFFSET::MOUNT_MECH, 75, 1}, // hoverpack actually works (lol), but still everything crashes on mech death
+    {"ICE_ALIVE_EMBEDDED_ON_ICE", "\xBA\xCF\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1, 2}, // two of them for soeam reason
+    {"FLOOR_EMERALD", "\xC6\x44\x24\x30\x00\xBA\xF2\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    {"FLOOR_SAPPHIRE", "\xC6\x44\x24\x30\x00\xBA\xF3\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    /// Probably for the FLOOR_EMPRESS_GRAVE
+    {"FLOOR_DIAMOND", "\xC6\x44\x24\x30\x00\xBA\xF1\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    {"FLOOR_RUBY", "\xC6\x44\x24\x30\x00\xBA\xF4\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    {"FLOOR_EMBED_GOLD", "\xC6\x44\x24\x30\x00\xBA\xBE\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    {"FLOOR_EMBED_GOLD_BIG", "\xC6\x44\x24\x30\x00\xBA\xBF\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
 
     ///
     /// Special:
