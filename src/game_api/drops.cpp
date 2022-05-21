@@ -157,7 +157,7 @@ std::vector<DropEntry> drop_entries{
     {"QUILLBACK_BOMBBAG", "\xBA\x01\x02\x00\x00"s, VTABLE_OFFSET::MONS_CAVEMAN_BOSS, 3, 1},
     {"QUILLBACK_COOKEDTURKEY", "\xBA\x06\x02\x00\x00"s, VTABLE_OFFSET::MONS_CAVEMAN_BOSS, 3, 1},
     {"LAVAPOT_MAGMAMAN", "\xBA\xEF\x00\x00\x00"s, VTABLE_OFFSET::ITEM_LAVAPOT, 3, 1},
-    /// Always spawns 5
+    /// Always spawns 5 of them
     {"LAVAMANDER_RUBY", "\xBA\xF4\x01\x00\x00"s, VTABLE_OFFSET::MONS_LAVAMANDER, 3, 1}, // 41 80 FE 05 - 05 ammount
     {"CATMUMMY_DIAMOND", "\xBA\xF1\x01\x00\x00"s, VTABLE_OFFSET::MONS_CATMUMMY, 3, 1},
     /// Has to be ENT_TYPE_CHAR_*
@@ -256,10 +256,15 @@ std::vector<DropEntry> drop_entries{
     /// Spawn:
     ///
 
-    {"COOKFIRE_CAVEMAN", "\x48\x89\xD9\xBA\xE1\x00\x00\x00\x0F\x28\xD7"s, VTABLE_OFFSET::NONE, 0, 4, 2},
+    /// It set's move_state for them for sleep and wake_up_timer, so i has to be movable and entity + 0x150 can't be something important
+    {"COOKFIRE_CAVEMAN_RIGHT", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC3"s, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
+    {"COOKFIRE_CAVEMAN_LEFT", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC6"s, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
     {"BONEBLOCK_SKELETON", "\xBA\xE3\x00\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
     {"BONEBLOCK_SKULL", "\xBA\xE2\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
     {"BONEBLOCK_BONES", "\xBA\xE3\x01\x00\x00"s, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
+    {"GIANTSPIDER_WEB_LEFT", "\xBA\x6E\x01\x00\x00\xE8****\x8B"s, VTABLE_OFFSET::MONS_GIANTSPIDER, 75, 1},
+    {"GIANTSPIDER_WEB_RIGHT", "\xBA\x6E\x01\x00\x00\xE8****\x48"s, VTABLE_OFFSET::MONS_GIANTSPIDER, 75, 1},
+    // {"MECH_JETPACK_MECH", "\xBA\x38\x02\x00\x00"s, VTABLE_OFFSET::MOUNT_MECH, 75, 1}, // hoverpack actually works (lol), but still everything crashes on mech death
 
     ///
     /// Special:
