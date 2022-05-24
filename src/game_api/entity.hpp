@@ -25,6 +25,12 @@ enum class REPEAT_TYPE : uint8_t
     BackAndForth,
 };
 
+enum class SHAPE : uint8_t
+{
+    RECTANGLE = 1,
+    CIRCLE = 2,
+};
+
 struct Animation
 {
     int32_t texture;
@@ -88,7 +94,10 @@ struct EntityDB
     uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc (RVA 0x21F30CC4)
     int16_t field_26;
     Rect rect_collision;
-    uint32_t default_duckmask;
+    uint8_t default_shape;
+    bool default_hitbox_enabled;
+    uint8_t field_3A;
+    uint8_t field_3B;
     int32_t field_3C;
     int32_t field_40;
     int32_t field_44;
@@ -166,7 +175,7 @@ class Entity
     uint32_t more_flags;
     int32_t uid;
     uint16_t animation_frame;
-    /// Don't edit this dirrectly, use `set_draw_depth`
+    /// Don't edit this directly, use `set_draw_depth`
     uint8_t draw_depth;
     uint8_t b3f; // depth related, changed when going thru doors etc.
     float x;
@@ -182,7 +191,10 @@ class Entity
     float offsety;
     float hitboxx;
     float hitboxy;
-    uint32_t duckmask;
+    SHAPE shape;         // 1 = rectangle, 2 = circle
+    bool hitbox_enabled; // probably, off for bg, deco, logical etc
+    uint8_t b82;
+    uint8_t b83;
     float angle;
     RenderInfo* rendering_info;
     Texture* texture;

@@ -203,7 +203,7 @@ float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, 
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
-    g_force_width = 0, g_force_height = 0, g_pause_at = -1;
+    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF;
 unsigned int g_level_width = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0;
@@ -1192,7 +1192,7 @@ void frame_advance()
 {
     if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
     {
-        g_state->pause = 0x20;
+        g_state->pause = 0x2;
         g_pause_at = -1;
     }
 }
@@ -1805,7 +1805,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_pause_at = -1;
         if (g_state->pause == 0)
         {
-            g_state->pause = 0x20;
+            g_state->pause = 0x2;
             paused = true;
         }
         else
@@ -1820,7 +1820,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_state->pause == 0x20)
+        if (g_state->pause == 0x2)
         {
             g_pause_at = UI::get_frame_count() + 1;
             g_state->pause = 0;
@@ -2951,20 +2951,43 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
     }
-    if ((ent->type->search_flags & 0x10) == 0)
-        draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
-    else
+    if (ent->shape == SHAPE::CIRCLE)
         draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
+    else
+        draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
+
+    if ((g_hitbox_mask & 0x8000) == 0)
+        return;
 
     static const auto spark_trap = to_id("ENT_TYPE_FLOOR_SPARK_TRAP");
     static const auto wooden_arrow = to_id("ENT_TYPE_ITEM_WOODEN_ARROW");
     static const auto metal_arrow = to_id("ENT_TYPE_ITEM_METAL_ARROW");
     static const auto light_arrow = to_id("ENT_TYPE_ITEM_LIGHT_ARROW");
+    static const auto bomb = to_id("ENT_TYPE_ITEM_BOMB");
+    static const auto mine = to_id("ENT_TYPE_ITEM_LANDMINE");
+    static const auto keg = to_id("ENT_TYPE_ACTIVEFLOOR_POWDERKEG");
+    static const auto keg2 = to_id("ENT_TYPE_ACTIVEFLOOR_TIMEDPOWDERKEG");
 
     if (type == spark_trap && ent->animation_frame == 7)
     {
         // TODO: get the real distance from game (can be changed thru API)
         auto [radx, rady] = UI::screen_position(render_position.first + 3, render_position.second + 3);
+        auto srad = screenify({radx, rady});
+        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+    }
+    else if (type == bomb)
+    {
+        float rad = 1.6f;
+        if (((Bomb*)ent)->scale_hor > 1.25f)
+            rad = 2.6f;
+        auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
+        auto srad = screenify({radx, rady});
+        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+    }
+    else if (type == mine || type == keg || type == keg2)
+    {
+        float rad = 1.6f;
+        auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
         auto srad = screenify({radx, rady});
         draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
@@ -3164,7 +3187,7 @@ void render_clickhandler()
     if (options["draw_hitboxes"])
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, 0xBF, LAYER::PLAYER))
+        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, LAYER::PLAYER))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -3176,48 +3199,54 @@ void render_clickhandler()
                 continue;
             }
 
-            if (!UI::has_active_render(ent))
+            if (!UI::has_active_render(ent) && (ent->type->search_flags & 0x7000) == 0)
                 continue;
 
             render_hitbox(ent, false, ImColor(0, 255, 255, 150));
         }
-        g_players = UI::get_players();
-        for (auto player : g_players)
+        if ((g_hitbox_mask & 0x1) != 0)
         {
-            render_hitbox(player, false, ImColor(255, 0, 255, 200));
+            g_players = UI::get_players();
+            for (auto player : g_players)
+            {
+                render_hitbox(player, false, ImColor(255, 0, 255, 200));
+            }
         }
 
-        static const auto additional_fixed_entities = {
-            to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
-            to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
-            to_id("ENT_TYPE_ACTIVEFLOOR_EGGSHIPBLOCKER"),
-            to_id("ENT_TYPE_FLOOR_SURFACE_HIDDEN"),
-            to_id("ENT_TYPE_FLOOR_YAMA_PLATFORM"),
-            to_id("ENT_TYPE_FLOOR_ARROW_TRAP"),
-            to_id("ENT_TYPE_FLOOR_POISONED_ARROW_TRAP"),
-            to_id("ENT_TYPE_FLOOR_TOTEM_TRAP"),
-            to_id("ENT_TYPE_FLOOR_JUNGLE_SPEAR_TRAP"),
-            to_id("ENT_TYPE_FLOOR_LION_TRAP"),
-            to_id("ENT_TYPE_FLOOR_LASER_TRAP"),
-            to_id("ENT_TYPE_FLOOR_SPARK_TRAP"),
-            to_id("ENT_TYPE_FLOOR_SPIKEBALL_CEILING"),
-            to_id("ENT_TYPE_FLOOR_SPRING_TRAP"),
-            to_id("ENT_TYPE_FLOOR_BIGSPEAR_TRAP"),
-            to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
-            to_id("ENT_TYPE_FLOOR_DUSTWALL"),
-            to_id("ENT_TYPE_FLOOR_TENTACLE_BOTTOM"),
-            to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
-            to_id("ENT_TYPE_FLOOR_SPIKES"),
-        };
-        for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, LAYER::PLAYER)) // FLOOR | ACTIVEFLOOR
+        if ((g_hitbox_mask & 0x8000) != 0)
         {
-            auto ent = get_entity_ptr(entity);
-            render_hitbox(ent, false, ImColor(0, 255, 255, 150));
-        }
-        for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, LAYER::PLAYER)) // LOGICAL
-        {
-            auto ent = get_entity_ptr(entity);
-            render_hitbox(ent, false, ImColor(255, 0, 0, 150));
+            static const auto additional_fixed_entities = {
+                to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
+                to_id("ENT_TYPE_FLOOR_MOTHER_STATUE"),
+                to_id("ENT_TYPE_ACTIVEFLOOR_EGGSHIPBLOCKER"),
+                to_id("ENT_TYPE_FLOOR_SURFACE_HIDDEN"),
+                to_id("ENT_TYPE_FLOOR_YAMA_PLATFORM"),
+                to_id("ENT_TYPE_FLOOR_ARROW_TRAP"),
+                to_id("ENT_TYPE_FLOOR_POISONED_ARROW_TRAP"),
+                to_id("ENT_TYPE_FLOOR_TOTEM_TRAP"),
+                to_id("ENT_TYPE_FLOOR_JUNGLE_SPEAR_TRAP"),
+                to_id("ENT_TYPE_FLOOR_LION_TRAP"),
+                to_id("ENT_TYPE_FLOOR_LASER_TRAP"),
+                to_id("ENT_TYPE_FLOOR_SPARK_TRAP"),
+                to_id("ENT_TYPE_FLOOR_SPIKEBALL_CEILING"),
+                to_id("ENT_TYPE_FLOOR_SPRING_TRAP"),
+                to_id("ENT_TYPE_FLOOR_BIGSPEAR_TRAP"),
+                to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
+                to_id("ENT_TYPE_FLOOR_DUSTWALL"),
+                to_id("ENT_TYPE_FLOOR_TENTACLE_BOTTOM"),
+                to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
+                to_id("ENT_TYPE_FLOOR_SPIKES"),
+            };
+            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, LAYER::PLAYER)) // FLOOR | ACTIVEFLOOR
+            {
+                auto ent = get_entity_ptr(entity);
+                render_hitbox(ent, false, ImColor(0, 255, 255, 150));
+            }
+            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, LAYER::PLAYER)) // LOGICAL
+            {
+                auto ent = get_entity_ptr(entity);
+                render_hitbox(ent, false, ImColor(255, 0, 0, 150));
+            }
         }
 
         if (ImGui::IsMousePosValid())
@@ -3717,6 +3746,18 @@ void render_options()
     ImGui::SameLine();
     ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
     tooltip("Use interpolated render position for smoother hitboxes on hifps.\nActual game logic is not interpolated like this though.");
+    if (ImGui::CollapsingHeader("Hitbox entity types to draw"))
+    {
+        ImGui::Indent(16.0f);
+        for (int i = 0; i < 16; i++)
+        {
+            if (i % 2)
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+            ImGui::CheckboxFlags(mask_names[i], &g_hitbox_mask, (int)std::pow(2, i));
+        }
+        tooltip("Some cherry-picked entities like traps and invisible walls.");
+        ImGui::Unindent(16.0f);
+    }
     ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
     tooltip("Show outlines of tiles and rooms, with roomtypes.", "toggle_grid");
     ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
@@ -4836,6 +4877,15 @@ void render_entity_props(int uid, bool detached = false)
         ImGui::DragFloat("Height##EntityHeight", &entity->h, 0.5f, 0.0, 10.0, "%.3f");
         ImGui::DragFloat("Box width##EntityBoxWidth", &entity->hitboxx, 0.5f, 0.0, 10.0, "%.3f");
         ImGui::DragFloat("Box height##EntityBoxHeight", &entity->hitboxy, 0.5f, 0.0, 10.0, "%.3f");
+        ImGui::Text("Hitbox shape:");
+        ImGui::SameLine();
+        int shape = static_cast<int>(entity->shape);
+        if (ImGui::CheckboxFlags("Rectangle##EntityBoxRect", &shape, 1) && (shape & 1) != 0)
+            shape = 1;
+        ImGui::SameLine();
+        if (ImGui::CheckboxFlags("Circle##EntityBoxCircle", &shape, 2) && (shape & 2) != 0)
+            shape = 2;
+        entity->shape = static_cast<SHAPE>(shape);
         ImGui::DragFloat("Offset X##EntityOffsetX", &entity->offsetx, 0.5f, -10.0, 10.0, "%.3f");
         ImGui::DragFloat("Offset Y##EntityOffsetY", &entity->offsety, 0.5f, -10.0, 10.0, "%.3f");
         uint8_t draw_depth = entity->draw_depth;
@@ -4998,7 +5048,7 @@ void render_game_props()
         if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
         {
             if (paused)
-                g_state->pause = 0x20;
+                g_state->pause = 0x2;
             else
                 g_state->pause = 0;
         }
