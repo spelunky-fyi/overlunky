@@ -1904,6 +1904,8 @@ local function PRNG_random(self, min, max) end
     ---@field color Color
     ---@field hitboxx number
     ---@field hitboxy number
+    ---@field shape SHAPE
+    ---@field hitbox_enabled boolean
     ---@field offsetx number
     ---@field offsety number
     ---@field rendering_info RenderInfo
