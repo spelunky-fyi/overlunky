@@ -3786,7 +3786,7 @@ void render_options()
         tooltip("Some cherry-picked entities like traps and invisible walls.");
         ImGui::Unindent(16.0f);
     }
-    ImGui::Checkbox("Smooth camera", &options["smooth_camera"]);
+    ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
     tooltip("Smooth camera movement when dragging, unless paused.");
     ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
     tooltip("Faster camera movement when dragging.");
