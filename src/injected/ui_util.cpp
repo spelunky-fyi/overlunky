@@ -301,31 +301,59 @@ void UI::update_floor_at(float x, float y, LAYER l)
     auto floor = ent->as<Floor>();
     floor->on_neighbor_destroyed();
 }
+bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
+{
+    return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
+}
 void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
 {
     if (!ent)
         return;
 
-    // recursively kill items
-    static const auto jelly = to_id("ENT_TYPE_MONS_MEGAJELLYFISH");
-    static const auto jellybg = to_id("ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND");
-    static const auto hundun = to_id("ENT_TYPE_MONS_HUNDUN");
-    static const auto kingu = to_id("ENT_TYPE_MONS_KINGU");
-    static const auto tiamat = to_id("ENT_TYPE_MONS_TIAMAT");
-    static const auto osiris = to_id("ENT_TYPE_MONS_OSIRIS_HEAD");
-    static const auto apep = to_id("ENT_TYPE_MONS_APEP_HEAD");
+    static const auto jelly = {
+        to_id("ENT_TYPE_MONS_MEGAJELLYFISH"),
+        to_id("ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND"),
+    };
 
-    // recursively kill overlay
-    static const auto slidingwallchain = to_id("ENT_TYPE_ITEM_SLIDINGWALL_CHAIN");
-    static const auto apep_body = to_id("ENT_TYPE_MONS_APEP_BODY");
-    static const auto osiris_hand = to_id("ENT_TYPE_MONS_OSIRIS_HAND");
+    static const auto destroy_items = {
+        to_id("ENT_TYPE_MONS_HUNDUN"),
+        to_id("ENT_TYPE_MONS_KINGU"),
+        to_id("ENT_TYPE_MONS_TIAMAT"),
+        to_id("ENT_TYPE_MONS_OSIRIS_HEAD"),
+        to_id("ENT_TYPE_MONS_APEP_HEAD"),
+    };
 
-    // don't try, crashes anyway
-    static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
+    static const auto kill_last_overlay = {
+        to_id("ENT_TYPE_ITEM_SLIDINGWALL_CHAIN"),
+        to_id("ENT_TYPE_ITEM_SLIDINGWALL_CHAIN_LASTPIECE"),
+        to_id("ENT_TYPE_FLOOR_SLIDINGWALL_CEILING"),
+        to_id("ENT_TYPE_ITEM_CHAIN"),
+        to_id("ENT_TYPE_ITEM_CHAIN_LASTPIECE"),
+        to_id("ENT_TYPE_FLOOR_SPIKEBALL_CEILING"),
+        to_id("ENT_TYPE_ITEM_STICKYTRAP_PIECE"),
+        to_id("ENT_TYPE_ITEM_STICKYTRAP_LASTPIECE"),
+        to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
+    };
+
+    static const auto destroy_overlay = {
+        to_id("ENT_TYPE_MONS_APEP_BODY"),
+        to_id("ENT_TYPE_MONS_OSIRIS_HAND"),
+    };
+
+    static const auto just_kill = {
+        to_id("ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL"),
+        to_id("ENT_TYPE_ACTIVEFLOOR_CHAINED_SPIKEBALL"),
+        to_id("ENT_TYPE_ITEM_STICKYTRAP_BALL"),
+    };
+
+    // crashes anyway
+    static const auto ignore = {
+        to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"),
+    };
 
     if (recurse)
     {
-        if (ent->type->id == jelly || ent->type->id == jellybg)
+        if (in_array(ent->type->id, jelly))
         {
             const auto last_item = destroy_entity_items(ent);
             ent->destroy();
@@ -337,23 +365,23 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
             }
             return;
         }
-        else if (ent->type->id == hundun || ent->type->id == kingu || ent->type->id == tiamat || ent->type->id == osiris || ent->type->id == apep)
+        else if (in_array(ent->type->id, destroy_items))
         {
             destroy_entity_items(ent);
             ent->destroy();
             return;
         }
-        else if (ent->type->id == apep_body || ent->type->id == osiris_hand)
+        else if (in_array(ent->type->id, destroy_overlay))
         {
             destroy_entity_overlay(ent);
             return;
         }
-        else if (ent->type->id == slidingwallchain)
+        else if (in_array(ent->type->id, kill_last_overlay))
         {
             kill_entity_overlay(ent);
             return;
         }
-        else if (ent->type->id == olmec)
+        else if (in_array(ent->type->id, ignore))
         {
             return;
         }
@@ -363,7 +391,8 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         const LAYER layer = (LAYER)ent->layer;
         const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
-        set_flag(ent->flags, 29); // set dead before destroy == no mess
+        destroy_entity_items(ent);
+        ent->flags = set_flag(ent->flags, 29); // set dead before destroy == no mess
         ent->destroy();
         if (sf & 0x100)
         {
