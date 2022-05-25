@@ -585,6 +585,16 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
     hook_info.on_damage.push_back({reserved_callback_id, std::move(on_damage)});
 }
 
+bool Entity::is_player()
+{
+    if (type->search_flags & 1)
+    {
+        Player* pl = this->as<Player>();
+        return pl->ai == nullptr;
+    }
+    return false;
+}
+
 bool Entity::is_movable()
 {
     static const ENT_TYPE first_logical = to_id("ENT_TYPE_LOGICAL_CONSTELLATION");

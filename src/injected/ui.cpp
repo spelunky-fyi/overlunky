@@ -3671,18 +3671,7 @@ void render_clickhandler()
             }
             Entity* to_kill = UI::get_entity_at(g_x, g_y, true, 2, mask);
             if (to_kill)
-            {
-                g_held_id = to_kill->uid;
-                // move movables to void because they like to explode and drop stuff, but actually destroy blocks and such
-                if (to_kill->is_movable())
-                {
-                    to_kill->teleport_abs(0, -1000, 0, 0); // TODO: dead flag instead?
-                }
-                else
-                {
-                    to_kill->kill(true, nullptr);
-                }
-            }
+                UI::safe_destroy(to_kill, mask == unsafe_entity_mask);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -4535,6 +4524,11 @@ void render_entity_props(int uid, bool detached = false)
     const auto is_movable = entity->is_movable();
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     render_uid(entity->uid, "EntityGeneral");
+    if (ImGui::Button("Smart destroy##SafeKillEntity"))
+    {
+        UI::safe_destroy(entity, true);
+    }
+    tooltip("Try to get rid of the entity in some\nsmart way that hopefully doesn't crash.\nWorks on most boss heads and jellies.", "mouse_destroy");
     ImGui::SameLine();
     if (ImGui::Button("Void##VoidEntity"))
     {
@@ -4567,7 +4561,7 @@ void render_entity_props(int uid, bool detached = false)
     {
         entity->destroy();
     }
-    tooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.", "mouse_destroy");
+    tooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.");
     if (ImGui::CollapsingHeader("State"))
     {
         auto overlay = entity->overlay;

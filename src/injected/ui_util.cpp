@@ -1,6 +1,7 @@
 #include "ui_util.hpp"
 
 #include "entities_chars.hpp"
+#include "entities_floors.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
 #include "rpc.hpp"
@@ -260,4 +261,121 @@ void UI::steam_achievements(bool on)
         enable_steam_achievements();
     else
         disable_steam_achievements();
+}
+int32_t UI::destroy_entity_items(Entity* ent)
+{
+    auto items = entity_get_items_by(ent->uid, 0, 0);
+    if (items.size() == 0)
+        return -1;
+    std::vector<uint32_t>::reverse_iterator it = items.rbegin();
+    int32_t last_uid = *it;
+    while (it != items.rend())
+    {
+        auto item = get_entity_ptr(*it);
+        UI::destroy_entity_items(item);
+        UI::safe_destroy(item, false, false);
+        it++;
+    }
+    return last_uid;
+}
+void UI::destroy_entity_overlay(Entity* ent)
+{
+    while (ent->overlay)
+        ent = ent->overlay;
+    UI::safe_destroy(ent, false, true);
+}
+void UI::kill_entity_overlay(Entity* ent)
+{
+    while (ent->overlay)
+        ent = ent->overlay;
+    kill_entity(ent->uid);
+}
+void UI::update_floor_at(float x, float y, LAYER l)
+{
+    auto uid = get_grid_entity_at(x, y, l);
+    if (uid == -1)
+        return;
+    auto ent = get_entity_ptr(uid);
+    if ((ent->type->search_flags & 0x100) == 0)
+        return;
+    auto floor = ent->as<Floor>();
+    floor->on_neighbor_destroyed();
+}
+void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
+{
+    if (!ent)
+        return;
+
+    // recursively kill items
+    static const auto jelly = to_id("ENT_TYPE_MONS_MEGAJELLYFISH");
+    static const auto jellybg = to_id("ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND");
+    static const auto hundun = to_id("ENT_TYPE_MONS_HUNDUN");
+    static const auto kingu = to_id("ENT_TYPE_MONS_KINGU");
+    static const auto tiamat = to_id("ENT_TYPE_MONS_TIAMAT");
+    static const auto osiris = to_id("ENT_TYPE_MONS_OSIRIS_HEAD");
+    static const auto apep = to_id("ENT_TYPE_MONS_APEP_HEAD");
+
+    // recursively kill overlay
+    static const auto slidingwallchain = to_id("ENT_TYPE_ITEM_SLIDINGWALL_CHAIN");
+    static const auto apep_body = to_id("ENT_TYPE_MONS_APEP_BODY");
+    static const auto osiris_hand = to_id("ENT_TYPE_MONS_OSIRIS_HAND");
+
+    // don't try, crashes anyway
+    static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
+
+    if (recurse)
+    {
+        if (ent->type->id == jelly || ent->type->id == jellybg)
+        {
+            const auto last_item = destroy_entity_items(ent);
+            ent->destroy();
+            for (int tail_uid = last_item + 8; tail_uid > last_item; --tail_uid)
+            {
+                auto tail = get_entity_ptr(tail_uid);
+                if (tail)
+                    tail->destroy();
+            }
+            return;
+        }
+        else if (ent->type->id == hundun || ent->type->id == kingu || ent->type->id == tiamat || ent->type->id == osiris || ent->type->id == apep)
+        {
+            destroy_entity_items(ent);
+            ent->destroy();
+            return;
+        }
+        else if (ent->type->id == apep_body || ent->type->id == osiris_hand)
+        {
+            destroy_entity_overlay(ent);
+            return;
+        }
+        else if (ent->type->id == slidingwallchain)
+        {
+            kill_entity_overlay(ent);
+            return;
+        }
+        else if (ent->type->id == olmec)
+        {
+            return;
+        }
+    }
+    if (!ent->is_player())
+    {
+        const LAYER layer = (LAYER)ent->layer;
+        const auto [x, y] = UI::get_position(ent);
+        const auto sf = ent->type->search_flags;
+        set_flag(ent->flags, 29); // set dead before destroy == no mess
+        ent->destroy();
+        if (sf & 0x100)
+        {
+            // update neighbors manually when destroying floor
+            update_floor_at(x - 1, y, layer);
+            update_floor_at(x + 1, y, layer);
+            update_floor_at(x, y - 1, layer);
+            update_floor_at(x, y + 1, layer);
+        }
+    }
+    else if (unsafe)
+    {
+        ent->kill(true, nullptr);
+    }
 }

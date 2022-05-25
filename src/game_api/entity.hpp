@@ -289,6 +289,7 @@ class Entity
     void unhook(std::uint32_t id);
     struct EntityHooksInfo& get_hooks();
 
+    bool is_player();
     bool is_movable();
     bool is_liquid();
 
