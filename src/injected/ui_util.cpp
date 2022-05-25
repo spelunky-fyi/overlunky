@@ -346,6 +346,14 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         to_id("ENT_TYPE_ITEM_STICKYTRAP_BALL"),
     };
 
+    static const auto flame = {
+        to_id("ENT_TYPE_ITEM_WALLTORCHFLAME"),
+        to_id("ENT_TYPE_ITEM_LAMPFLAME"),
+        to_id("ENT_TYPE_ITEM_TORCHFLAME"),
+        to_id("ENT_TYPE_ITEM_REDLANTERNFLAME"),
+        to_id("ENT_TYPE_ITEM_PALACE_CANDLE_FLAME"),
+    };
+
     // crashes anyway
     static const auto ignore = {
         to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"),
@@ -379,6 +387,19 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         else if (in_array(ent->type->id, kill_last_overlay))
         {
             kill_entity_overlay(ent);
+            return;
+        }
+        else if (in_array(ent->type->id, just_kill))
+        {
+            kill_entity(ent->uid);
+            return;
+        }
+        else if (in_array(ent->type->id, flame))
+        {
+            if (!ent->overlay)
+                return;
+            const auto torch = ent->overlay->as<Torch>();
+            torch->light_up(false);
             return;
         }
         else if (in_array(ent->type->id, ignore))
