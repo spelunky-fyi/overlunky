@@ -199,7 +199,7 @@ std::map<int, EntityWindow*> entity_windows;
 
 static ImFont *font, *bigfont, *hugefont;
 
-float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f;
+float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f, g_camera_speed = 1.0f;
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
@@ -273,7 +273,8 @@ std::map<std::string, bool> options = {
     {"draw_script_messages", true},
     {"fade_script_messages", true},
     {"draw_hitboxes_interpolated", true},
-    {"show_tooltips", true}};
+    {"show_tooltips", true},
+    {"smooth_camera", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -666,6 +667,7 @@ void save_config(std::string file)
     writeData << "lightness = " << std::fixed << std::setprecision(2) << g_val << " # float, 0.0 - 1.0" << std::endl;
     writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0" << std::endl;
     writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
+    writeData << "camera_speed = " << std::fixed << std::setprecision(2) << g_camera_speed << " # float" << std::endl;
 
     writeData << "kits = [";
     for (unsigned int i = 0; i < saved_entities.size(); i++)
@@ -760,6 +762,7 @@ void load_config(std::string file)
     g_val = toml::find_or<float>(opts, "lightness", 0.66f);
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66f);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0f);
+    g_camera_speed = toml::find_or<float>(opts, "camera_speed", 1.0f);
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
@@ -1879,21 +1882,29 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (g_state->camera->focused_entity_uid == -1)
             g_state->camera->focus_x -= 0.2f;
+        if (g_state->pause != 0 || !options["smooth_camera"])
+            g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
     }
     else if (pressed("camera_right", wParam))
     {
         if (g_state->camera->focused_entity_uid == -1)
             g_state->camera->focus_x += 0.2f;
+        if (g_state->pause != 0 || !options["smooth_camera"])
+            g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
     }
     else if (pressed("camera_up", wParam))
     {
         if (g_state->camera->focused_entity_uid == -1)
             g_state->camera->focus_y += 0.2f;
+        if (g_state->pause != 0 || !options["smooth_camera"])
+            g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
     }
     else if (pressed("camera_down", wParam))
     {
         if (g_state->camera->focused_entity_uid == -1)
             g_state->camera->focus_y -= 0.2f;
+        if (g_state->pause != 0 || !options["smooth_camera"])
+            g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
     }
     else if (pressed("coordinate_left", wParam))
     {
@@ -2792,6 +2803,8 @@ void render_camera()
     tooltip("Click to focus other entities. Hold to move camera around.", "mouse_camera_drag");
     ImGui::InputFloat("Camera Focus X##CameraFocusX", &g_state->camera->focus_x, 0.2f, 1.0f);
     ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2f, 1.0f);
+    ImGui::InputFloat("Camera Real X##CameraRealX", &g_state->camera->adjusted_focus_x, 0.2f, 1.0f);
+    ImGui::InputFloat("Camera Real Y##CameraRealY", &g_state->camera->adjusted_focus_y, 0.2f, 1.0f);
     if (ImGui::CollapsingHeader("Camera Bounds"))
     {
         ImGui::InputFloat("Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2f, 1.0f);
@@ -2984,7 +2997,17 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
         auto srad = screenify({radx, rady});
         draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
-    else if (type == mine || type == keg || type == keg2)
+    else if (type == mine)
+    {
+        auto rpos = UI::screen_position(render_position.first, render_position.second);
+        auto srpos = screenify({rpos.first, rpos.second});
+
+        float rad = 1.6f;
+        auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
+        auto srad = screenify({radx, rady});
+        draw_list->AddCircle(srpos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+    }
+    else if (type == keg || type == keg2)
     {
         float rad = 1.6f;
         auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
@@ -3576,8 +3599,13 @@ void render_clickhandler()
                 std::pair<float, float> oryginal_pos = UI::click_position(startpos.x, startpos.y);
                 std::pair<float, float> current_pos = UI::click_position(mpos.x, mpos.y);
 
-                g_state->camera->focus_x -= current_pos.first - oryginal_pos.first;
-                g_state->camera->focus_y -= current_pos.second - oryginal_pos.second;
+                g_state->camera->focus_x -= (current_pos.first - oryginal_pos.first) * g_camera_speed;
+                g_state->camera->focus_y -= (current_pos.second - oryginal_pos.second) * g_camera_speed;
+                if (g_state->pause != 0 || !options["smooth_camera"])
+                {
+                    g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
+                    g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
+                }
                 startpos = normalize(io.MousePos);
                 set_camera_bounds(false);
             }
@@ -3758,6 +3786,10 @@ void render_options()
         tooltip("Some cherry-picked entities like traps and invisible walls.");
         ImGui::Unindent(16.0f);
     }
+    ImGui::Checkbox("Smooth camera", &options["smooth_camera"]);
+    tooltip("Smooth camera movement when dragging, unless paused.");
+    ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
+    tooltip("Faster camera movement when dragging.");
     ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
     tooltip("Show outlines of tiles and rooms, with roomtypes.", "toggle_grid");
     ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
