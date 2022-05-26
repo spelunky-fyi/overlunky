@@ -37,6 +37,7 @@
 #include "flags.hpp"
 #include "items.hpp"
 #include "logger.h"
+#include "math.hpp"
 #include "savedata.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
@@ -113,6 +114,7 @@ std::map<std::string, int64_t> keys{
     {"spawn_kit_9", OL_KEY_SHIFT | '9'},
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
+    {"destroy_selected", VK_DELETE},
     {"warp", OL_KEY_CTRL | 'W'},
     {"warp_next_level_a", OL_KEY_CTRL | 'A'},
     {"warp_next_level_b", OL_KEY_CTRL | 'B'},
@@ -145,6 +147,7 @@ std::map<std::string, int64_t> keys{
     {"mouse_grab", OL_BUTTON_MOUSE | 0x03},
     {"mouse_grab_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x03},
     {"mouse_grab_throw", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x03},
+    {"mouse_grab_throw_unsafe", OL_BUTTON_MOUSE | OL_KEY_CTRL | OL_KEY_SHIFT | 0x03},
     {"mouse_camera_drag", OL_BUTTON_MOUSE | 0x04},
     {"mouse_blast", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x04},
     {"mouse_boom", 0x0},
@@ -211,10 +214,11 @@ std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Player*> g_players;
+std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, mouse_select = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -246,8 +250,11 @@ std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
 [[maybe_unused]] const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 [[maybe_unused]] const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-inline constexpr unsigned int safe_entity_mask = 0x18f;
+int safe_entity_mask = 0x18f;
 inline constexpr unsigned int unsafe_entity_mask = 0;
+
+inline constexpr int default_entity_mask = 0x18f;
+inline constexpr int default_hitbox_mask = 0x80bf;
 
 std::map<std::string, bool> options = {
     {"mouse_control", true},
@@ -2136,6 +2143,21 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_speedhack_old_multiplier = g_speedhack_multiplier;
         speedhack(0.2f); // TODO: configurable
     }
+    else if (pressed("destroy_selected", wParam))
+    {
+        for (auto selected_uid : g_selected_ids)
+        {
+            auto ent = get_entity_ptr(selected_uid);
+            if (ent)
+                UI::safe_destroy(ent, true);
+        }
+        g_selected_ids.clear();
+        auto selected = get_entity_ptr(g_last_id);
+        if (selected)
+            UI::safe_destroy(selected, true);
+        if (!lock_entity)
+            g_last_id = -1;
+    }
     else
     {
         return false;
@@ -2854,6 +2876,33 @@ void render_cross()
     draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
 }
 
+void render_select()
+{
+    ImVec2 pos = ImGui::GetMousePos();
+    auto* draw_list = ImGui::GetWindowDrawList();
+    draw_list->AddRectFilled(startpos, pos, ImColor(255, 255, 255, 60));
+}
+
+void select_entities()
+{
+    ImVec2 pos = ImGui::GetMousePos();
+    auto mask = safe_entity_mask;
+    if (GetAsyncKeyState(VK_SHIFT)) // TODO: Get the right modifier
+    {
+        mask = unsafe_entity_mask;
+    }
+    auto spos = normalize(startpos);
+    auto spos2 = normalize(pos);
+    auto [ax, ay] = UI::click_position(spos.x, spos.y);
+    auto [bx, by] = UI::click_position(spos2.x, spos2.y);
+    auto rax = std::min(ax, bx);
+    auto ray = std::max(ay, by);
+    auto rbx = std::max(ax, bx);
+    auto rby = std::min(ay, by);
+    auto box = AABB{rax, ray, rbx, rby};
+    g_selected_ids = UI::get_entities_overlapping(mask, box, (LAYER)g_state->camera_layer);
+}
+
 void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 {
     if (g_state == 0 || (g_state->screen != 11 && g_state->screen != 12))
@@ -2943,7 +2992,7 @@ static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
     return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
 }
 
-void render_hitbox(Entity* ent, bool cross, ImColor color)
+void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
 {
     const auto type = ent->type->id;
     if (!type)
@@ -2965,7 +3014,12 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
         draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
     }
     if (ent->shape == SHAPE::CIRCLE)
-        draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
+        if (filled)
+            draw_list->AddCircleFilled(spos, sboxb.x - spos.x, color);
+        else
+            draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
+    else if (filled)
+        draw_list->AddRectFilled(sboxa, sboxb, color);
     else
         draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
 
@@ -3272,6 +3326,13 @@ void render_clickhandler()
             }
         }
 
+        for (auto entity : g_selected_ids)
+        {
+            auto ent = get_entity_ptr(entity);
+            if (ent)
+                render_hitbox(ent, false, ImColor(255, 255, 255, 100), true);
+        }
+
         if (ImGui::IsMousePosValid())
         {
             ImVec2 mpos = normalize(io.MousePos);
@@ -3472,6 +3533,16 @@ void render_clickhandler()
             if (!lock_entity)
                 g_last_id = g_held_id;
         }
+        else if (clicked("mouse_grab_throw") || clicked("mouse_grab_throw_unsafe"))
+        {
+            if (!mouse_select)
+            {
+                startpos = ImGui::GetMousePos();
+                mouse_select = true;
+            }
+            set_pos(startpos);
+            render_select();
+        }
         else if (held("mouse_grab_throw") && g_held_id > 0)
         {
             if (!throw_held)
@@ -3482,6 +3553,16 @@ void render_clickhandler()
             set_pos(startpos);
             UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             render_arrow();
+        }
+        else if ((held("mouse_grab_throw") || held("mouse_grab_throw_unsafe")) && mouse_select)
+        {
+            set_pos(startpos);
+            render_select();
+        }
+        else if ((released("mouse_grab_throw") || released("mouse_grab_throw_unsafe")) && mouse_select)
+        {
+            mouse_select = false;
+            select_entities();
         }
         else if ((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
         {
@@ -3763,18 +3844,6 @@ void render_options()
     ImGui::SameLine();
     ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
     tooltip("Use interpolated render position for smoother hitboxes on hifps.\nActual game logic is not interpolated like this though.");
-    if (ImGui::CollapsingHeader("Hitbox entity types to draw"))
-    {
-        ImGui::Indent(16.0f);
-        for (int i = 0; i < 16; i++)
-        {
-            if (i % 2)
-                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
-            ImGui::CheckboxFlags(mask_names[i], &g_hitbox_mask, (int)std::pow(2, i));
-        }
-        tooltip("Some cherry-picked entities like traps and invisible walls.");
-        ImGui::Unindent(16.0f);
-    }
     ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
     tooltip("Smooth camera movement when dragging, unless paused.");
     ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
@@ -3804,6 +3873,38 @@ void render_options()
     tooltip("Draw all tools tabbed in a single window", "tabbed_interface");
     ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
     tooltip("Am I annoying you already :(");
+
+    if (ImGui::CollapsingHeader("Hitbox entity types to draw"))
+    {
+        ImGui::Indent(16.0f);
+        for (int i = 0; i < 16; i++)
+        {
+            if (i % 2)
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+            ImGui::CheckboxFlags(mask_names[i], &g_hitbox_mask, (int)std::pow(2, i));
+        }
+        tooltip("Some cherry-picked entities like traps and invisible walls.");
+        if (ImGui::Button("Restore defaults##RestoreDefaultHitboxMask"))
+            g_hitbox_mask = default_hitbox_mask;
+        ImGui::Unindent(16.0f);
+    }
+
+    if (ImGui::CollapsingHeader("Entity types to grab by default"))
+    {
+        ImGui::Indent(16.0f);
+        for (int i = 0; i < 15; i++)
+        {
+            if (i % 2)
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+            ImGui::CheckboxFlags(mask_names[i], &safe_entity_mask, (int)std::pow(2, i));
+        }
+        if (ImGui::Button("Any##AnyEntityMask"))
+            safe_entity_mask = 0;
+        ImGui::SameLine();
+        if (ImGui::Button("Defaults##DefaultEntityMask"))
+            safe_entity_mask = default_entity_mask;
+        ImGui::Unindent(16.0f);
+    }
 
     if (ImGui::Button("Edit style"))
     {
@@ -4488,6 +4589,29 @@ void render_entity_props(int uid, bool detached = false)
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     if (!detached)
     {
+        if (g_selected_ids.size() > 0)
+        {
+            ImGui::Text("%d selected entities:", g_selected_ids.size());
+            ImGui::SameLine();
+            if (ImGui::Button("Clear##ClearSelectedEntities"))
+                g_selected_ids.clear();
+            ImGui::SameLine();
+            if (ImGui::Button("Smart destroy##DestroySelectedEntities"))
+            {
+                for (auto selected_uid : g_selected_ids)
+                {
+                    auto ent = get_entity_ptr(selected_uid);
+                    if (ent)
+                        UI::safe_destroy(ent, true);
+                }
+                g_selected_ids.clear();
+            }
+            for (auto selected_uid : g_selected_ids)
+            {
+                render_uid(selected_uid, "Multiselect");
+            }
+            ImGui::Separator();
+        }
         ImGui::Checkbox("Lock to player one", &lock_player);
         tooltip("Automatically switch to player after new level.");
         if (lock_player)
@@ -4557,7 +4681,7 @@ void render_entity_props(int uid, bool detached = false)
     }
     tooltip("Move the entity to limbo layer,\nlike it exists but doesn't do anything.");
     ImGui::SameLine();
-    if (ImGui::Button("Dstr##DestroyEntity"))
+    if (ImGui::Button("Destroy##DestroyEntity"))
     {
         entity->destroy();
     }

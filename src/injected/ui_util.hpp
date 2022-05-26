@@ -2,6 +2,7 @@
 
 #include "aliases.hpp"
 #include "color.hpp"
+#include "math.hpp"
 
 class Player;
 class Entity;
@@ -65,4 +66,5 @@ class UI
     static void kill_entity_overlay(Entity* ent);
     static void update_floor_at(float x, float y, LAYER l);
     static void safe_destroy(Entity* ent, bool unsafe = false, bool recurse = true);
+    static std::vector<uint32_t> get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer);
 };

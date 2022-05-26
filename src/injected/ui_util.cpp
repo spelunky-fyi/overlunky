@@ -413,19 +413,36 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
-        ent->flags = set_flag(ent->flags, 29); // set dead before destroy == no mess
-        ent->destroy();
-        if (sf & 0x100)
+        if (sf & 0x100 && test_flag(ent->flags, 3)) // solid floor
         {
+            kill_entity(ent->uid);
             // update neighbors manually when destroying floor
+            /*
+            TODO: oh crap you actually have to kill floor to update the liquid system
+            this creates ton of particles but oh well
+
             update_floor_at(x - 1, y, layer);
             update_floor_at(x + 1, y, layer);
             update_floor_at(x, y - 1, layer);
             update_floor_at(x, y + 1, layer);
+            */
+        }
+        else if (ent->is_liquid())
+        {
+            kill_entity(ent->uid);
+        }
+        else
+        {
+            ent->flags = set_flag(ent->flags, 29); // set dead before destroy == no mess
+            ent->destroy();
         }
     }
     else if (unsafe)
     {
         ent->kill(true, nullptr);
     }
+}
+std::vector<uint32_t> UI::get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer)
+{
+    return get_entities_overlapping_hitbox(0, mask, hitbox, layer);
 }
