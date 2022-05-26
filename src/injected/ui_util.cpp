@@ -292,14 +292,41 @@ void UI::kill_entity_overlay(Entity* ent)
 }
 void UI::update_floor_at(float x, float y, LAYER l)
 {
+    static const auto destroy_deco = {
+        to_id("ENT_TYPE_DECORATION_HANGING_HIDE"),
+        to_id("ENT_TYPE_DECORATION_CROSS_BEAM"),
+        to_id("ENT_TYPE_DECORATION_HANGING_WIRES"),
+        to_id("ENT_TYPE_DECORATION_MINEWOOD_POLE"),
+        // TODO: more!
+    };
     auto uid = get_grid_entity_at(x, y, l);
     if (uid == -1)
         return;
     auto ent = get_entity_ptr(uid);
-    if ((ent->type->search_flags & 0x100) == 0)
+    if ((ent->type->search_flags & 0x100) == 0 || !test_flag(ent->flags, 3))
         return;
     auto floor = ent->as<Floor>();
-    floor->on_neighbor_destroyed();
+    if (test_flag(floor->type->properties_flags, 1) && floor->get_decoration_entity_type() != -1)
+        for (int i = 0; i < 7; ++i)
+        {
+            floor->remove_decoration((FLOOR_SIDE)i);
+        }
+    for (auto deco : entity_get_items_by(floor->uid, destroy_deco, 0x200))
+    {
+        auto deco_ent = get_entity_ptr(deco);
+        if (deco_ent)
+            deco_ent->destroy();
+    }
+    for (auto deco : get_entities_at(destroy_deco, 0, x, y, l, 1.0f))
+    {
+        auto deco_ent = get_entity_ptr(deco);
+        if (deco_ent)
+            deco_ent->destroy();
+    }
+    if (test_flag(floor->type->properties_flags, 2))
+        floor->decorate_internal();
+    else
+        floor->fix_decorations(true, false);
 }
 bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
 {

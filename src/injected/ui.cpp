@@ -147,6 +147,7 @@ std::map<std::string, int64_t> keys{
     {"mouse_spawn_over", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x01},
     {"mouse_draw", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x01},
     {"mouse_erase", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x05},
+    {"mouse_decorate", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x04},
     {"mouse_teleport", OL_BUTTON_MOUSE | 0x02},
     {"mouse_teleport_throw", OL_BUTTON_MOUSE | 0x02},
     {"mouse_grab", OL_BUTTON_MOUSE | 0x03},
@@ -3190,6 +3191,19 @@ void fix_script_requires(Script auto* script)
     }
 }
 
+void fix_decorations_at(int x, int y, LAYER layer)
+{
+    for (int dx = x - 1; dx <= x + 1; ++dx)
+    {
+        for (int dy = y - 1; dy <= y + 1; ++dy)
+        {
+            auto fx = static_cast<float>(dx);
+            auto fy = static_cast<float>(dy);
+            UI::update_floor_at(fx, fy, layer);
+        }
+    }
+}
+
 void update_script(Script auto* script)
 {
     if (!script->is_enabled())
@@ -3595,6 +3609,24 @@ void render_clickhandler()
         else if (held("mouse_erase") && ImGui::IsWindowFocused())
         {
             erase_entities();
+        }
+        else if (clicked("mouse_decorate") && ImGui::IsWindowFocused())
+        {
+            grid_x = UINT_MAX;
+            grid_y = UINT_MAX;
+        }
+        else if (held("mouse_decorate") && ImGui::IsWindowFocused())
+        {
+            auto [nx, ny] = normalize(ImGui::GetMousePos());
+            auto pos = UI::click_position(nx, ny);
+            const uint32_t new_grid_x = static_cast<uint32_t>(std::round(pos.first));
+            const uint32_t new_grid_y = static_cast<uint32_t>(std::round(pos.second));
+            if (new_grid_x != grid_x || new_grid_y != grid_y)
+            {
+                grid_x = new_grid_x;
+                grid_y = new_grid_y;
+                fix_decorations_at(grid_x, grid_y, (LAYER)g_state->camera_layer);
+            }
         }
         else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused())
         {
