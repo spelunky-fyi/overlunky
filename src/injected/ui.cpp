@@ -117,7 +117,7 @@ std::map<std::string, int64_t> keys{
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
     {"destroy_grabbed", VK_DELETE},
-    {"destroy_selected", OL_KEY_CTRL | VK_DELETE},
+    {"destroy_selected", OL_KEY_ALT | VK_DELETE},
     {"warp", OL_KEY_CTRL | 'W'},
     {"warp_next_level_a", OL_KEY_CTRL | 'A'},
     {"warp_next_level_b", OL_KEY_CTRL | 'B'},
@@ -145,12 +145,16 @@ std::map<std::string, int64_t> keys{
     {"mouse_spawn", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_throw", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_over", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x01},
+    {"mouse_draw", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x01},
+    {"mouse_erase", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x05},
     {"mouse_teleport", OL_BUTTON_MOUSE | 0x02},
     {"mouse_teleport_throw", OL_BUTTON_MOUSE | 0x02},
     {"mouse_grab", OL_BUTTON_MOUSE | 0x03},
     {"mouse_grab_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x03},
     {"mouse_grab_throw", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x03},
     {"mouse_grab_throw_unsafe", OL_BUTTON_MOUSE | OL_KEY_CTRL | OL_KEY_SHIFT | 0x03},
+    {"mouse_select", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x03},
+    {"mouse_select_unsafe", OL_BUTTON_MOUSE | OL_KEY_ALT | OL_KEY_SHIFT | 0x03},
     {"mouse_camera_drag", OL_BUTTON_MOUSE | 0x04},
     {"mouse_blast", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x04},
     {"mouse_boom", 0x0},
@@ -210,7 +214,7 @@ ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF;
-unsigned int g_level_width = 0;
+unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0;
 std::vector<EntityItem> g_items;
@@ -221,13 +225,14 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, mouse_select = false, run_finder = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
 std::map<int, std::string> entity_names;
+std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 
@@ -915,21 +920,33 @@ void spawn_entities(bool s, std::string list = "")
     const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
+        auto to_spawn = g_items[g_filtered_items[g_current_item]];
         if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-            return;
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_CHAR") != std::string::npos)
+        {
+            if (g_entity)
+            {
+                to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
+            }
+            else
+            {
+                return;
+            }
+        }
+        if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
         {
             std::pair<float, float> cpos = UI::click_position(g_x, g_y);
-            int spawned = UI::spawn_companion(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second, LAYER::PLAYER);
+            int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
             if (!lock_entity)
                 g_last_id = spawned;
         }
-        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
+        else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
         {
             bool snap = options["snap_to_grid"];
-            if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_FLOOR") != std::string::npos)
+            if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
             {
                 snap = true;
+                g_vx = 0;
+                g_vy = 0;
 
                 std::pair<float, float> cpos = UI::click_position(g_x, g_y);
                 auto old_block_id = UI::get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
@@ -941,7 +958,7 @@ void spawn_entities(bool s, std::string list = "")
                         old_block->destroy();
                 }
             }
-            int spawned = UI::spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap);
+            int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
             if (options["spawn_floor_decorated"])
             {
                 if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
@@ -958,7 +975,7 @@ void spawn_entities(bool s, std::string list = "")
         else
         {
             std::pair<float, float> cpos = UI::click_position(g_x, g_y);
-            UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second);
+            UI::spawn_liquid(to_spawn.id, cpos.first, cpos.second);
         }
     }
     else
@@ -2949,6 +2966,25 @@ void select_entities()
     g_selected_ids = UI::get_entities_overlapping(mask, box, (LAYER)g_state->camera_layer);
 }
 
+void erase_entities()
+{
+    ImVec2 pos = ImGui::GetMousePos();
+    auto mask = safe_entity_mask;
+    if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier
+    {
+        mask = unsafe_entity_mask;
+    }
+    auto spos = normalize(pos);
+    auto [ax, ay] = UI::click_position(spos.x, spos.y);
+    auto box = AABB{ax, ay, ax, ay};
+    for (auto erase_uid : UI::get_entities_overlapping(mask, box.extrude(0.1f), (LAYER)g_state->camera_layer))
+    {
+        auto erase = get_entity_ptr(erase_uid);
+        if (erase)
+            UI::safe_destroy(erase);
+    }
+}
+
 void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 {
     if (g_state == 0 || (g_state->screen != 11 && g_state->screen != 12))
@@ -3535,6 +3571,31 @@ void render_clickhandler()
             g_vy = 0;
             g_over_id = -1;
         }
+        else if (clicked("mouse_draw") && ImGui::IsWindowFocused())
+        {
+            grid_x = UINT_MAX;
+            grid_y = UINT_MAX;
+        }
+        else if (held("mouse_draw") && ImGui::IsWindowFocused())
+        {
+            auto [nx, ny] = normalize(ImGui::GetMousePos());
+            auto pos = UI::click_position(nx, ny);
+            const uint32_t new_grid_x = static_cast<uint32_t>(std::round(pos.first));
+            const uint32_t new_grid_y = static_cast<uint32_t>(std::round(pos.second));
+            if (new_grid_x != grid_x || new_grid_y != grid_y)
+            {
+                grid_x = new_grid_x;
+                grid_y = new_grid_y;
+                set_pos(ImGui::GetMousePos());
+                g_vx = 0;
+                g_vy = 0;
+                spawn_entities(true);
+            }
+        }
+        else if (held("mouse_erase") && ImGui::IsWindowFocused())
+        {
+            erase_entities();
+        }
         else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused())
         {
             if (g_players.empty())
@@ -3588,13 +3649,9 @@ void render_clickhandler()
             if (!lock_entity)
                 g_last_id = g_held_id;
         }
-        else if (clicked("mouse_grab_throw") || clicked("mouse_grab_throw_unsafe"))
+        else if (clicked("mouse_select") || clicked("mouse_select_unsafe"))
         {
-            if (!mouse_select)
-            {
-                startpos = ImGui::GetMousePos();
-                mouse_select = true;
-            }
+            startpos = ImGui::GetMousePos();
             set_pos(startpos);
             render_select();
         }
@@ -3606,17 +3663,20 @@ void render_clickhandler()
                 throw_held = true;
             }
             set_pos(startpos);
-            UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
-            render_arrow();
+            auto held = get_entity_ptr(g_held_id);
+            if (held && held->is_movable())
+            {
+                UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
+                render_arrow();
+            }
         }
-        else if ((held("mouse_grab_throw") || held("mouse_grab_throw_unsafe")) && mouse_select)
+        else if (held("mouse_select") || held("mouse_select_unsafe"))
         {
             set_pos(startpos);
             render_select();
         }
-        else if ((released("mouse_grab_throw") || released("mouse_grab_throw_unsafe")) && mouse_select)
+        else if (released("mouse_select") || released("mouse_select_unsafe"))
         {
-            mouse_select = false;
             options["draw_hitboxes"] = true;
             select_entities();
         }
@@ -3628,15 +3688,15 @@ void render_clickhandler()
             set_pos(startpos);
             if (ImGui::IsMouseDragging(keys["mouse_grab"] & 0xff - 1) || ImGui::IsMouseDragging(keys["mouse_grab_unsafe"] & 0xff - 1))
             {
-                if (g_held_entity)
+                if (g_held_entity && g_held_entity->is_movable())
                 {
                     if (g_held_entity->is_movable())
                         g_held_entity->as<Movable>()->standing_on_uid = -1;
 
                     g_held_entity->flags |= 1U << 4;
                     g_held_entity->flags |= 1U << 9;
+                    UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
                 }
-                UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             }
         }
         if (released("mouse_grab_throw") && g_held_id > 0 && g_held_entity != 0)
@@ -3647,7 +3707,8 @@ void render_clickhandler()
                 g_held_entity->flags = g_held_flags;
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
-            UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            if (g_held_entity && g_held_entity->is_movable())
+                UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3660,9 +3721,13 @@ void render_clickhandler()
             io.MouseDrawCursor = true;
             if (g_held_entity)
                 g_held_entity->flags = g_held_flags;
-            if (options["snap_to_grid"])
+            if (options["snap_to_grid"] && g_held_entity->is_movable())
             {
                 UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
+            }
+            else if (!g_held_entity->is_movable())
+            {
+
             }
             g_x = 0;
             g_y = 0;
@@ -6463,6 +6528,7 @@ void create_box(std::vector<EntityItem> items)
     {
         new_filtered_items[i] = i;
         entity_names[new_items[i].id] = new_items[i].name.substr(9);
+        entity_full_names[new_items[i].id] = new_items[i].name;
     }
 
     // TODO: add atomic and wrap it as struct
