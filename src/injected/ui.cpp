@@ -19,6 +19,7 @@
 #include <map>
 #include <regex>
 #include <string>
+
 #pragma warning(push, 0)
 #include <toml.hpp>
 #pragma warning(pop)
@@ -96,6 +97,7 @@ std::map<std::string, int64_t> keys{
     {"tool_keys", OL_KEY_CTRL | OL_KEY_SHIFT | 'K'},
     {"tool_script", VK_F8},
     {"tool_save", VK_F6},
+    {"tool_finder", VK_F7},
     {"reset_windows", OL_KEY_CTRL | OL_KEY_SHIFT | 'R'},
     {"reset_windows_vertical", OL_KEY_CTRL | OL_KEY_SHIFT | 'V'},
     {"tabbed_interface", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
@@ -114,7 +116,8 @@ std::map<std::string, int64_t> keys{
     {"spawn_kit_9", OL_KEY_SHIFT | '9'},
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
-    {"destroy_selected", VK_DELETE},
+    {"destroy_grabbed", VK_DELETE},
+    {"destroy_selected", OL_KEY_CTRL | VK_DELETE},
     {"warp", OL_KEY_CTRL | 'W'},
     {"warp_next_level_a", OL_KEY_CTRL | 'A'},
     {"warp_next_level_b", OL_KEY_CTRL | 'B'},
@@ -215,10 +218,10 @@ std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Player*> g_players;
 std::vector<uint32_t> g_selected_ids;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, mouse_select = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, mouse_select = false, run_finder = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -226,7 +229,7 @@ StateMemory* g_state = 0;
 SaveData* g_save = 0;
 std::map<int, std::string> entity_names;
 std::string active_tab = "", activate_tab = "";
-std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
+std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 
 std::string text;
 std::string g_change_key = "";
@@ -1688,6 +1691,13 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         toggle("tool_save");
     }
+    else if (pressed("tool_finder", wParam))
+    {
+        if (toggle("tool_finder"))
+        {
+            set_focus_finder = true;
+        }
+    }
     else if (pressed("tool_keys", wParam))
     {
         toggle("tool_keys");
@@ -1725,6 +1735,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("enter", wParam) && active("tool_entity") && io.WantCaptureKeyboard)
     {
         spawn_entities(false);
+        return true;
+    }
+    else if (pressed("enter", wParam) && active("tool_finder") && io.WantCaptureKeyboard)
+    {
+        run_finder = true;
         return true;
     }
     else if (pressed("move_up", wParam) && active("tool_door") && io.WantCaptureKeyboard)
@@ -2143,20 +2158,23 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_speedhack_old_multiplier = g_speedhack_multiplier;
         speedhack(0.2f); // TODO: configurable
     }
+    else if (pressed("destroy_grabbed", wParam))
+    {
+        auto selected = get_entity_ptr(g_last_id);
+        if (selected)
+            UI::safe_destroy(selected, true);
+        if (!lock_entity)
+            g_last_id = -1;
+    }
     else if (pressed("destroy_selected", wParam))
     {
         for (auto selected_uid : g_selected_ids)
         {
             auto ent = get_entity_ptr(selected_uid);
             if (ent)
-                UI::safe_destroy(ent, true);
+                UI::safe_destroy(ent, false, true, true);
         }
         g_selected_ids.clear();
-        auto selected = get_entity_ptr(g_last_id);
-        if (selected)
-            UI::safe_destroy(selected, true);
-        if (!lock_entity)
-            g_last_id = -1;
     }
     else
     {
@@ -3010,8 +3028,8 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
-        draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
-        draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
+        draw_list->AddLine(ImVec2(sboxa.x, sboxa.y), ImVec2(sboxb.x, sboxb.y), color, 2);
+        draw_list->AddLine(ImVec2(sboxa.x, sboxb.y), ImVec2(sboxb.x, sboxa.y), color, 2);
     }
     if (ent->shape == SHAPE::CIRCLE)
         if (filled)
@@ -3326,11 +3344,19 @@ void render_clickhandler()
             }
         }
 
+        static auto front_col = ImColor(0, 255, 51, 100);
+        static auto back_col = ImColor(255, 160, 31, 100);
+
         for (auto entity : g_selected_ids)
         {
             auto ent = get_entity_ptr(entity);
             if (ent)
-                render_hitbox(ent, false, ImColor(255, 255, 255, 100), true);
+            {
+                if (ent->layer == g_state->camera_layer)
+                    render_hitbox(ent, false, front_col, true);
+                else
+                    render_hitbox(ent, false, back_col, true);
+            }
         }
 
         if (ImGui::IsMousePosValid())
@@ -3527,6 +3553,7 @@ void render_clickhandler()
             g_held_entity = UI::get_entity_at(g_x, g_y, true, 2, mask);
             if (g_held_entity)
             {
+                options["draw_hitboxes"] = true;
                 g_held_id = g_held_entity->uid;
                 g_held_flags = g_held_entity->flags;
             }
@@ -3562,6 +3589,7 @@ void render_clickhandler()
         else if ((released("mouse_grab_throw") || released("mouse_grab_throw_unsafe")) && mouse_select)
         {
             mouse_select = false;
+            options["draw_hitboxes"] = true;
             select_entities();
         }
         else if ((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
@@ -4583,35 +4611,309 @@ void render_screen(const char* label, int state)
     }
 }
 
+void render_entity_finder()
+{
+    static std::string search_entity_name = "";
+    if (set_focus_finder)
+    {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_finder = false;
+    }
+    ImGui::InputText("Text filter##EntitySearchName", &search_entity_name);
+
+    static uint32_t search_entity_type = 0;
+    ImGui::InputScalar("##EntityType", ImGuiDataType_U32, &search_entity_type, &u32_one);
+    ImGui::SameLine();
+    if (search_entity_type > 0)
+    {
+        ImGui::Text("%s", entity_names[search_entity_type].c_str());
+    }
+    else
+    {
+        ImGui::Text("ENT_TYPE");
+    }
+
+    static int search_entity_layer = -128;
+    if (ImGui::RadioButton("Both layers", search_entity_layer == -128))
+        search_entity_layer = -128;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Front", search_entity_layer == 0))
+        search_entity_layer = 0;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Back", search_entity_layer == 1))
+        search_entity_layer = 1;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Current layer", search_entity_layer == -1))
+        search_entity_layer = -1;
+
+    static int search_entity_mask = 0;
+    if (ImGui::CollapsingHeader("Mask##EntitySearchMask"))
+    {
+        ImGui::Indent(16.0f);
+        for (int i = 0; i < 15; i++)
+        {
+            if (i % 2)
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+            ImGui::CheckboxFlags(mask_names[i], &search_entity_mask, (int)std::pow(2, i));
+        }
+        ImGui::Unindent(16.0f);
+    }
+
+    static int search_entity_flags = 0;
+    static int search_entity_not_flags = 0;
+    static int search_entity_more_flags = 0;
+    static int search_entity_not_more_flags = 0;
+    static int search_entity_properties_flags = 0;
+    static int search_entity_not_properties_flags = 0;
+
+    static const ImVec4 green = ImVec4(0.2f, 1.0f, 0.2f, 0.6f);
+    static const ImVec4 red = ImVec4(1.0f, 0.2f, 0.2f, 0.6f);
+
+    if (ImGui::CollapsingHeader("Flags##EntitySearchFlags"))
+    {
+        ImGui::Indent(16.0f);
+        ImGui::PushID("EntitySearchFlags");
+        for (int i = 0; i < 32; i++)
+        {
+            ImGui::PushID(i);
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, red);
+            ImGui::CheckboxFlags("", &search_entity_not_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, green);
+            ImGui::CheckboxFlags(entity_flags[i], &search_entity_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::PopID();
+        }
+        ImGui::PopID();
+        ImGui::Unindent(16.0f);
+    }
+    if (ImGui::CollapsingHeader("More Flags##EntitySearchMoreFlags"))
+    {
+        ImGui::Indent(16.0f);
+        ImGui::PushID("EntitySearchMoreFlags");
+        for (int i = 0; i < 23; i++)
+        {
+            ImGui::PushID(i);
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, red);
+            ImGui::CheckboxFlags("", &search_entity_not_more_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, green);
+            ImGui::CheckboxFlags(more_flags[i], &search_entity_more_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::PopID();
+        }
+        ImGui::PopID();
+        ImGui::Unindent(16.0f);
+    }
+    if (ImGui::CollapsingHeader("Properties Flags##EntitySearchPropertiesFlags"))
+    {
+        ImGui::Indent(16.0f);
+        ImGui::PushID("EntitySearchPropertiesFlags");
+        for (int i = 0; i < 27; i++)
+        {
+            ImGui::PushID(i);
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, red);
+            ImGui::CheckboxFlags("", &search_entity_not_properties_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, green);
+            ImGui::CheckboxFlags(entity_type_properties_flags[i], &search_entity_properties_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::PopID();
+        }
+        ImGui::PopID();
+        ImGui::Unindent(16.0f);
+    }
+    ImGui::Text("");
+    static bool run_filter = false;
+    static bool extra_filter = false;
+    if (ImGui::Button("Search##SearchEntities") || run_finder)
+    {
+        g_selected_ids = UI::get_entities_by({search_entity_type}, search_entity_mask, (LAYER)search_entity_layer);
+        run_filter = true;
+        run_finder = false;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Filter##FilterEntities"))
+    {
+        run_filter = true;
+        extra_filter = true;
+    }
+    if (run_filter)
+    {
+        run_filter = false;
+        if (extra_filter)
+        {
+            if (search_entity_type != 0)
+            {
+                g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                    {
+                                                        auto ent = get_entity_ptr(filter_uid);
+                                                        if (!ent)
+                                                            return true;
+                                                        return ent->type->id != search_entity_type; }),
+                                     g_selected_ids.end());
+            }
+            if (search_entity_mask != 0)
+            {
+                g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                    {
+                                                        auto ent = get_entity_ptr(filter_uid);
+                                                        if (!ent)
+                                                            return true;
+                                                        return (ent->type->search_flags & search_entity_mask) == 0; }),
+                                     g_selected_ids.end());
+            }
+            {
+                g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                    {
+                                                        auto ent = get_entity_ptr(filter_uid);
+                                                        if (!ent)
+                                                            return true;
+                                                        return ent->layer != enum_to_layer((LAYER)search_entity_layer); }),
+                                     g_selected_ids.end());
+            }
+            extra_filter = false;
+        }
+        if (search_entity_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->flags & search_entity_flags) == 0; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_not_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->flags & search_entity_not_flags) != 0; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_more_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->more_flags & search_entity_more_flags) == 0; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_not_more_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->more_flags & search_entity_not_more_flags) != 0; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_properties_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->type->properties_flags & search_entity_properties_flags) == 0; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_not_properties_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->type->properties_flags & search_entity_not_properties_flags) != 0; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_name != "")
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return !StrStrIA(entity_names[ent->type->id].c_str(), search_entity_name.c_str()); }),
+                                 g_selected_ids.end());
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Reset##ResetSearchEntities"))
+    {
+        search_entity_name = "";
+        search_entity_type = 0;
+        search_entity_mask = 0;
+        search_entity_layer = -128;
+        search_entity_flags = 0;
+        search_entity_not_flags = 0;
+        search_entity_more_flags = 0;
+        search_entity_not_more_flags = 0;
+        search_entity_properties_flags = 0;
+        search_entity_not_properties_flags = 0;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Clear##ClearSelectedEntities"))
+        g_selected_ids.clear();
+    if (g_selected_ids.size() > 0)
+    {
+        ImGui::Text("");
+        ImGui::Text("%d entities selected:", g_selected_ids.size());
+        if (ImGui::Button("Smart destroy##SmartDestroySelectedEntities"))
+        {
+            for (auto selected_uid : g_selected_ids)
+            {
+                auto ent = get_entity_ptr(selected_uid);
+                if (ent)
+                    UI::safe_destroy(ent, false, true, true);
+            }
+            g_selected_ids.clear();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Kill##KillSelectedEntities"))
+        {
+            for (auto selected_uid : g_selected_ids)
+            {
+                auto ent = get_entity_ptr(selected_uid);
+                if (ent)
+                    ent->kill(true, nullptr);
+            }
+            g_selected_ids.clear();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Destroy##DestroySelectedEntities"))
+        {
+            for (auto selected_uid : g_selected_ids)
+            {
+                auto ent = get_entity_ptr(selected_uid);
+                if (ent)
+                    ent->destroy();
+            }
+            g_selected_ids.clear();
+        }
+        for (auto selected_uid : g_selected_ids)
+        {
+            render_uid(selected_uid, "Multiselect");
+        }
+    }
+}
+
 void render_entity_props(int uid, bool detached = false)
 {
     auto entity = get_entity_ptr(uid);
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     if (!detached)
     {
-        if (g_selected_ids.size() > 0)
-        {
-            ImGui::Text("%d selected entities:", g_selected_ids.size());
-            ImGui::SameLine();
-            if (ImGui::Button("Clear##ClearSelectedEntities"))
-                g_selected_ids.clear();
-            ImGui::SameLine();
-            if (ImGui::Button("Smart destroy##DestroySelectedEntities"))
-            {
-                for (auto selected_uid : g_selected_ids)
-                {
-                    auto ent = get_entity_ptr(selected_uid);
-                    if (ent)
-                        UI::safe_destroy(ent, true);
-                }
-                g_selected_ids.clear();
-            }
-            for (auto selected_uid : g_selected_ids)
-            {
-                render_uid(selected_uid, "Multiselect");
-            }
-            ImGui::Separator();
-        }
         ImGui::Checkbox("Lock to player one", &lock_player);
         tooltip("Automatically switch to player after new level.");
         if (lock_player)
@@ -5625,6 +5927,7 @@ void render_keyconfig()
     if (g_change_key != "")
     {
         ImGuiIO& io = ImGui::GetIO();
+        io.WantCaptureKeyboard = true;
         ImGui::SetNextWindowSize(io.DisplaySize);
         ImGui::SetNextWindowPos({0, 0});
         ImGui::SetNextWindowBgAlpha(0.75);
@@ -5735,6 +6038,8 @@ void render_tool(std::string tool)
         render_savegame();
     else if (tool == "tool_keys")
         render_keyconfig();
+    else if (tool == "tool_finder")
+        render_entity_finder();
 }
 
 void imgui_init(ImGuiContext*)
@@ -5756,6 +6061,7 @@ void imgui_init(ImGuiContext*)
     windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, true});
     windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", false, false});
     windows["tool_keys"] = new Window({"Keys (" + key_string(keys["tool_keys"]) + ")", false, false});
+    windows["tool_finder"] = new Window({"Finder (" + key_string(keys["tool_finder"]) + ")", false, true});
 
     if (g_ui_scripts.find("dark") == g_ui_scripts.end())
     {

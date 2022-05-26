@@ -288,7 +288,7 @@ void UI::kill_entity_overlay(Entity* ent)
 {
     while (ent->overlay)
         ent = ent->overlay;
-    kill_entity(ent->uid);
+    ent->kill(true, ent);
 }
 void UI::update_floor_at(float x, float y, LAYER l)
 {
@@ -305,7 +305,7 @@ bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
 {
     return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
 }
-void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
+void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
 {
     if (!ent)
         return;
@@ -335,7 +335,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
     };
 
-    static const auto destroy_overlay = {
+    static const auto destroy_last_overlay = {
         to_id("ENT_TYPE_MONS_APEP_BODY"),
         to_id("ENT_TYPE_MONS_OSIRIS_HAND"),
     };
@@ -359,6 +359,15 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"),
     };
 
+    // check if the entity or any overlay is ignored
+    auto check = ent;
+    do
+    {
+        if (check && in_array(check->type->id, ignore))
+            return;
+        check = check->overlay;
+    } while (check);
+
     if (recurse)
     {
         if (in_array(ent->type->id, jelly))
@@ -379,9 +388,10 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
             ent->destroy();
             return;
         }
-        else if (in_array(ent->type->id, destroy_overlay))
+        else if (in_array(ent->type->id, destroy_last_overlay))
         {
-            destroy_entity_overlay(ent);
+            if (!multi)
+                destroy_entity_overlay(ent);
             return;
         }
         else if (in_array(ent->type->id, kill_last_overlay))
@@ -391,7 +401,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         }
         else if (in_array(ent->type->id, just_kill))
         {
-            kill_entity(ent->uid);
+            ent->kill(true, ent);
             return;
         }
         else if (in_array(ent->type->id, flame))
@@ -402,10 +412,6 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
             torch->light_up(false);
             return;
         }
-        else if (in_array(ent->type->id, ignore))
-        {
-            return;
-        }
     }
     if (!ent->is_player())
     {
@@ -413,23 +419,39 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
-        if (sf & 0x100 && test_flag(ent->flags, 3)) // solid floor
+        if (sf & 0x180 && test_flag(ent->flags, 3)) // solid floor
         {
-            kill_entity(ent->uid);
-            // update neighbors manually when destroying floor
-            /*
-            TODO: oh crap you actually have to kill floor to update the liquid system
-            this creates ton of particles but oh well
+            auto [fx, fy] = UI::get_position(ent);
+            const auto goat = UI::get_entity_at(fx, fy, false, 20, 0x4);
+            ent->kill(true, goat); // lol lets just blame the shopkeeper for breaking his own floor so he doesn't get mad
 
+            /*
+            TODO: oh crap you actually have to kill floor to update the liquid floor map
+            this creates ton of particles and pisses everyone off but oh well, wip
+
+            ent->destroy();
             update_floor_at(x - 1, y, layer);
             update_floor_at(x + 1, y, layer);
             update_floor_at(x, y - 1, layer);
             update_floor_at(x, y + 1, layer);
             */
+
+            /* nope doesn't update liquid floor map either
+            auto state = State::get();
+            const auto pos = ent->position();
+            const uint32_t grid_x = static_cast<uint32_t>(std::round(pos.first));
+            const uint32_t grid_y = static_cast<uint32_t>(std::round(pos.second));
+            if (grid_x < 0x56 && grid_y < 0x7e)
+            {
+                if (state.layer(ent->layer)->grid_entities[grid_y][grid_x] == ent)
+                    state.layer(ent->layer)->grid_entities[grid_y][grid_x] = nullptr;
+            }
+            ent->destroy();
+            */
         }
         else if (ent->is_liquid())
         {
-            kill_entity(ent->uid);
+            ent->kill(true, ent);
         }
         else
         {
@@ -439,7 +461,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
     }
     else if (unsafe)
     {
-        ent->kill(true, nullptr);
+        ent->kill(true, ent);
     }
 }
 std::vector<uint32_t> UI::get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer)
