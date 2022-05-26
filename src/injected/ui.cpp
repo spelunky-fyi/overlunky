@@ -4677,29 +4677,28 @@ void render_entity_finder()
     static int search_entity_mask = 0;
     if (ImGui::CollapsingHeader("Mask##EntitySearchMask"))
     {
-        ImGui::Indent(16.0f);
         for (int i = 0; i < 15; i++)
         {
             if (i % 2)
                 ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
             ImGui::CheckboxFlags(mask_names[i], &search_entity_mask, (int)std::pow(2, i));
         }
-        ImGui::Unindent(16.0f);
     }
 
-    static int search_entity_flags = 0;
-    static int search_entity_not_flags = 0;
-    static int search_entity_more_flags = 0;
-    static int search_entity_not_more_flags = 0;
-    static int search_entity_properties_flags = 0;
-    static int search_entity_not_properties_flags = 0;
+    static unsigned int search_entity_flags = 0;
+    static unsigned int search_entity_not_flags = 0;
+    static unsigned int search_entity_more_flags = 0;
+    static unsigned int search_entity_not_more_flags = 0;
+    static unsigned int search_entity_properties_flags = 0;
+    static unsigned int search_entity_not_properties_flags = 0;
 
     static const ImVec4 green = ImVec4(0.2f, 1.0f, 0.2f, 0.6f);
     static const ImVec4 red = ImVec4(1.0f, 0.2f, 0.2f, 0.6f);
+    static const ImVec4 white = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, white);
 
     if (ImGui::CollapsingHeader("Flags##EntitySearchFlags"))
     {
-        ImGui::Indent(16.0f);
         ImGui::PushID("EntitySearchFlags");
         for (int i = 0; i < 32; i++)
         {
@@ -4714,11 +4713,9 @@ void render_entity_finder()
             ImGui::PopID();
         }
         ImGui::PopID();
-        ImGui::Unindent(16.0f);
     }
     if (ImGui::CollapsingHeader("More Flags##EntitySearchMoreFlags"))
     {
-        ImGui::Indent(16.0f);
         ImGui::PushID("EntitySearchMoreFlags");
         for (int i = 0; i < 23; i++)
         {
@@ -4733,11 +4730,9 @@ void render_entity_finder()
             ImGui::PopID();
         }
         ImGui::PopID();
-        ImGui::Unindent(16.0f);
     }
     if (ImGui::CollapsingHeader("Properties Flags##EntitySearchPropertiesFlags"))
     {
-        ImGui::Indent(16.0f);
         ImGui::PushID("EntitySearchPropertiesFlags");
         for (int i = 0; i < 27; i++)
         {
@@ -4752,9 +4747,10 @@ void render_entity_finder()
             ImGui::PopID();
         }
         ImGui::PopID();
-        ImGui::Unindent(16.0f);
     }
+    ImGui::PopStyleColor();
     ImGui::Text("");
+
     static bool run_filter = false;
     static bool extra_filter = false;
     if (ImGui::Button("Search##SearchEntities") || run_finder)
@@ -4812,7 +4808,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->flags & search_entity_flags) == 0; }),
+                                                    return (ent->flags & search_entity_flags) != search_entity_flags; }),
                                  g_selected_ids.end());
         }
         if (search_entity_not_flags != 0)
@@ -4832,7 +4828,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->more_flags & search_entity_more_flags) == 0; }),
+                                                    return (ent->more_flags & search_entity_more_flags) != search_entity_more_flags; }),
                                  g_selected_ids.end());
         }
         if (search_entity_not_more_flags != 0)
@@ -4852,7 +4848,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->type->properties_flags & search_entity_properties_flags) == 0; }),
+                                                    return (ent->type->properties_flags & search_entity_properties_flags) != search_entity_properties_flags; }),
                                  g_selected_ids.end());
         }
         if (search_entity_not_properties_flags != 0)
@@ -6285,6 +6281,13 @@ void imgui_draw()
                 render_savegame();
                 ImGui::End();
             }
+
+            if (windows["tool_finder"]->open)
+            {
+                ImGui::Begin(windows["tool_finder"]->name.c_str(), &windows["tool_finder"]->open);
+                render_entity_finder();
+                ImGui::End();
+            }
         }
         else
         {
@@ -6369,6 +6372,15 @@ void imgui_draw()
                 ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
                 ImGui::Begin(windows["tool_save"]->name.c_str(), &windows["tool_save"]->open);
                 render_savegame();
+                ImGui::End();
+            }
+
+            if (windows["tool_finder"]->open)
+            {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
+                ImGui::Begin(windows["tool_finder"]->name.c_str(), &windows["tool_finder"]->open);
+                render_entity_finder();
                 ImGui::End();
             }
         }
