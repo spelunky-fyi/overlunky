@@ -557,6 +557,10 @@ std::string key_string(int64_t keycode)
     {
         name = "Ctrl+" + name;
     }
+    if (keycode & OL_KEY_ALT)
+    {
+        name = "Alt+" + name;
+    }
     return name;
 }
 
@@ -650,7 +654,7 @@ void save_config(std::string file)
     writeData << "# Overlunky hotkeys" << std::endl
               << "# Syntax:" << std::endl
               << "# function = keycode_in_hex" << std::endl
-              << "# For modifiers, add 0x100 for Ctrl or 0x200 for Shift" << std::endl
+              << "# For modifiers, add 0x100 for Ctrl, 0x200 for Shift and 0x800 for Alt" << std::endl
               << "# For mouse buttons, add 0x400" << std::endl
               << "# For Mouse wheel, 0x11 = down, 0x12 = up" << std::endl
               << "# Set to 0x0 to disable key" << std::endl
@@ -1362,13 +1366,17 @@ bool pressed(std::string keyname, WPARAM wParam)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     return wParam == (unsigned)keycode;
 }
@@ -1381,13 +1389,17 @@ bool clicked(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     if ((keycode & OL_MOUSE_WHEEL) > 0)
     {
@@ -1422,13 +1434,17 @@ bool dblclicked(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -1449,13 +1465,17 @@ bool held(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -1476,13 +1496,17 @@ bool released(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -1503,13 +1527,17 @@ bool dragging(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -1610,7 +1638,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         }
     }
 
-    if (nCode != WM_KEYDOWN)
+    if (nCode != WM_KEYDOWN && nCode != WM_SYSKEYDOWN)
     {
         return false;
     }
@@ -2905,7 +2933,7 @@ void select_entities()
 {
     ImVec2 pos = ImGui::GetMousePos();
     auto mask = safe_entity_mask;
-    if (GetAsyncKeyState(VK_SHIFT)) // TODO: Get the right modifier
+    if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier
     {
         mask = unsafe_entity_mask;
     }
@@ -3371,7 +3399,7 @@ void render_clickhandler()
             dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
             // dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
             unsigned int mask = safe_entity_mask;
-            if (GetAsyncKeyState(VK_SHIFT)) // TODO: Get the right modifier from mouse_destroy_unsafe
+            if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier from mouse_destroy_unsafe
             {
                 mask = unsafe_entity_mask;
             }
@@ -5938,7 +5966,7 @@ void render_keyconfig()
         ImGui::InvisibleButton("KeyCaptureCanvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         ImDrawList* dl = ImGui::GetForegroundDrawList();
         ImGui::PushFont(bigfont);
-        std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl and Shift are available.", g_change_key);
+        std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl, Alt and Shift are available.", g_change_key);
         ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
         dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
         ImGui::PopFont();
@@ -5977,15 +6005,17 @@ void render_keyconfig()
         }
 
         // Keys
-        for (size_t i = 0; i < 512; ++i)
+        for (size_t i = 0; i < VK_LSHIFT; ++i)
         {
-            if (io.KeysDown[i] && i != VK_CONTROL && i != VK_SHIFT)
+            if (ImGui::IsKeyDown((ImGuiKey)i))
             {
                 size_t keycode = i;
-                if (io.KeysDown[VK_CONTROL])
+                if (ImGui::GetIO().KeyCtrl)
                     keycode += 0x100;
-                if (io.KeysDown[VK_SHIFT])
+                if (ImGui::GetIO().KeyShift)
                     keycode += 0x200;
+                if (ImGui::GetIO().KeyAlt)
+                    keycode += 0x800;
                 keys[g_change_key] = keycode;
                 save_config(cfgfile);
                 g_change_key = "";
