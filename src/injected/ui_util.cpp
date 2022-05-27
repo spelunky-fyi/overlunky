@@ -328,14 +328,19 @@ bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
 {
     return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
 }
-void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
+void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, [[maybe_unused]]bool multi)
 {
     if (!ent)
         return;
 
-    static const auto jelly = {
+    static const auto jellys = {
         to_id("ENT_TYPE_MONS_MEGAJELLYFISH"),
         to_id("ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND"),
+    };
+
+    static const auto jelly_tail = {
+        to_id("ENT_TYPE_FX_MEGAJELLYFISH_TAIL"),
+        to_id("ENT_TYPE_FX_MEGAJELLYFISH_TAIL_BG"),
     };
 
     static const auto destroy_items = {
@@ -344,6 +349,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
         to_id("ENT_TYPE_MONS_TIAMAT"),
         to_id("ENT_TYPE_MONS_OSIRIS_HEAD"),
         to_id("ENT_TYPE_MONS_APEP_HEAD"),
+        to_id("ENT_TYPE_MONS_YAMA"),
     };
 
     static const auto kill_last_overlay = {
@@ -356,11 +362,6 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
         to_id("ENT_TYPE_ITEM_STICKYTRAP_PIECE"),
         to_id("ENT_TYPE_ITEM_STICKYTRAP_LASTPIECE"),
         to_id("ENT_TYPE_FLOOR_STICKYTRAP_CEILING"),
-    };
-
-    static const auto destroy_last_overlay = {
-        to_id("ENT_TYPE_MONS_APEP_BODY"),
-        to_id("ENT_TYPE_MONS_OSIRIS_HAND"),
     };
 
     static const auto just_kill = {
@@ -377,11 +378,6 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
         to_id("ENT_TYPE_ITEM_PALACE_CANDLE_FLAME"),
     };
 
-    // crashes anyway
-    /* static const auto ignore = {
-        to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"),
-    }; */
-
     static const auto olmecs = {
         to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"),
     };
@@ -391,6 +387,8 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
         auto check = ent;
         do
         {
+            // TODO: weird hack, but destroying the olmec in 3-1 crashes. some logic is still using it
+            // destroying olmec anywhere else would be fine I think
             if (check && in_array(check->type->id, olmecs))
             {
                 auto olmec = check->as<Olmec>();
@@ -399,10 +397,11 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
                 move_entity_abs(olmec->uid, 10.0f, 1000.0f, 0.0f, 0.0f);
                 return;
             }
-            else if (in_array(check->type->id, jelly))
+            else if (in_array(check->type->id, jellys))
             {
                 const auto last_item = destroy_entity_items(check);
                 check->destroy();
+                // stupid tail is not attached to jelly, but it should always be here
                 for (int tail_uid = last_item + 8; tail_uid > last_item; --tail_uid)
                 {
                     auto tail = get_entity_ptr(tail_uid);
@@ -411,16 +410,29 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
                 }
                 return;
             }
+            // stupid tail is not attached to jelly. if trying to destroy tail, check entities backwards to find jelly
+            else if (in_array(check->type->id, jelly_tail))
+            {
+                int32_t uid = check->uid;
+                Entity* find_jelly;
+                while(true)
+                {
+                    uid--;
+                    find_jelly = get_entity_ptr(uid);
+                    if (find_jelly && in_array(find_jelly->type->id, jellys))
+                    {
+                        safe_destroy(find_jelly);
+                        return;
+                    }
+                    if (uid < check->uid - 32)
+                        break;
+                }
+                return;
+            }
             else if (in_array(check->type->id, destroy_items))
             {
                 destroy_entity_items(check);
                 check->destroy();
-                return;
-            }
-            else if (in_array(check->type->id, destroy_last_overlay))
-            {
-                if (!multi)
-                    destroy_entity_overlay(check);
                 return;
             }
             else if (in_array(check->type->id, kill_last_overlay))
@@ -453,8 +465,10 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
         if (sf & 0x100 && test_flag(ent->flags, 3)) // solid floor
         {
             auto [fx, fy] = UI::get_position(ent);
+            // always blaiming the closest MONS for floor destruction
+            // in case this is shop floor, the shopkeeper doesn't get mad this way
             const auto goat = UI::get_entity_at(fx, fy, false, 20, 0x4);
-            ent->kill(true, goat); // lol lets just blame the shopkeeper for breaking his own floor so he doesn't get mad
+            ent->kill(true, goat);
 
             /*
             TODO: oh crap you actually have to kill floor to update the liquid floor map
