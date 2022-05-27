@@ -863,8 +863,8 @@ bool active(std::string window)
     ImGuiWindow* current = g.NavWindow;
     if (current == NULL)
         return false;
-    while (current->ParentWindow != NULL)
-        current = current->ParentWindow;
+    // while (current->ParentWindow != NULL)
+    //     current = current->ParentWindow;
     if (!options["tabbed_interface"] || detached(window))
     {
         if (windows.find(window) == windows.end())
@@ -873,7 +873,8 @@ bool active(std::string window)
     }
     else
     {
-        return current == ImGui::FindWindowByName("Overlunky") && active_tab == window;
+        const char* test = strstr(current->Name, "Overlunky");
+        return current->Name == test && active_tab == window;
     }
 }
 
@@ -1015,7 +1016,7 @@ void spawn_entities(bool s, std::string list = "")
                 }
             }
             int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
-            if (options["spawn_floor_decorated"])
+            if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
             {
                 if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
                 {
