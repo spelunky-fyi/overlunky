@@ -6,6 +6,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <misc\cpp\imgui_stdlib.h>
+#include <windows.h>
+#include <shellapi.h>
 
 #include <algorithm>
 #include <array>
@@ -6274,10 +6276,10 @@ void imgui_init(ImGuiContext*)
     windows["tool_camera"] = new Window({"Camera (" + key_string(keys["tool_camera"]) + ")", false, true});
     windows["tool_entity_properties"] = new Window({"Entity (" + key_string(keys["tool_entity_properties"]) + ")", false, true});
     windows["tool_game_properties"] = new Window({"Game (" + key_string(keys["tool_game_properties"]) + ")", false, true});
-    windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", false, true});
+    windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", false, false});
     windows["tool_debug"] = new Window({"Debug (" + key_string(keys["tool_debug"]) + ")", false, false});
     windows["tool_style"] = new Window({"Style (" + key_string(keys["tool_style"]) + ")", false, false});
-    windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, true});
+    windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, false});
     windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", false, false});
     windows["tool_keys"] = new Window({"Keys (" + key_string(keys["tool_keys"]) + ")", false, false});
     windows["tool_finder"] = new Window({"Finder (" + key_string(keys["tool_finder"]) + ")", false, true});
@@ -6332,7 +6334,48 @@ void imgui_draw()
         {
             ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
             ImGui::SetNextWindowSize({600, ImGui::GetIO().DisplaySize.y / 2}, ImGuiCond_FirstUseEver);
-            ImGui::Begin("Overlunky", NULL);
+            ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar);
+            if (ImGui::BeginMenuBar())
+            {
+                if (ImGui::BeginMenu("Tools"))
+                {
+                    for (size_t i = 0; i < tab_order.size() - 4; ++i)
+                    {
+                        auto tab = tab_order[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str()))
+                        {
+                            toggle(tab);
+                        }
+                    }
+                    if (ImGui::MenuItem("Detach active tool"))
+                    {
+                        if (options["tabbed_interface"])
+                            detach(active_tab);
+                    }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Settings"))
+                {
+                    for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
+                    {
+                        auto tab = tab_order[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str()))
+                        {
+                            toggle(tab);
+                        }
+                    }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Help"))
+                {
+                    if (ImGui::MenuItem("README"))
+                        ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
+                    if (ImGui::MenuItem("API Documentation"))
+                        ShellExecuteA(NULL, "open", "https://spelunky-fyi.github.io/overlunky/", NULL, NULL, SW_SHOWNORMAL);
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenuBar();
+            }
             if (ImGui::BeginTabBar("##TabBar"))
             {
                 ImGuiTabItemFlags flags = 0;
@@ -6364,8 +6407,8 @@ void imgui_draw()
             }
             if (tabnum == 0)
             {
-                ImGui::TextWrapped("Looks like you closed all your tabs. You can use the F-keys to open closed tabs or click here:");
-                if (ImGui::Button("Restore tabs"))
+                ImGui::TextWrapped("Looks like you closed all your tabs. Good thing we have a menubar now!");
+                if (ImGui::Button("Restore all tabs"))
                 {
                     for (auto window : windows)
                     {
