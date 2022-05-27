@@ -966,7 +966,6 @@ std::string spawned_type()
     {
         return text;
     }
-    return "";
 }
 
 void spawn_entities(bool s, std::string list = "")
