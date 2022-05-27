@@ -4,7 +4,6 @@
 #include "spawn_api.hpp"
 #include "state.hpp"
 
-
 #include <numbers>
 
 void Floor::fix_border_tile_animation()
