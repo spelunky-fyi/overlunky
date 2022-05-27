@@ -1671,6 +1671,8 @@ function udp_send(host, port, msg) end
     ---@field screen_change_counter integer
     ---@field time_startup integer
     ---@field storage_uid integer
+    ---@field waddler_storage ENT_TYPE[]
+    ---@field waddler_metadata integer[]
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
 
