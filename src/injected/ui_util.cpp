@@ -2,6 +2,7 @@
 
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
+#include "entities_activefloors.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
 #include "rpc.hpp"
@@ -44,7 +45,6 @@ void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
     auto player = state.items()->player(0);
     if (player == nullptr)
         return;
-    DEBUG("Teleporting to relative {}, {}, {}", x, y, s);
     player->teleport(x, y, s, vx, vy, snap);
 }
 std::pair<float, float> UI::screen_position(float x, float y)
@@ -136,7 +136,6 @@ int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float v
         y += state->camera->focus_y;
     }
 
-    DEBUG("Spawning {} on {}, {}", entity_type, x, y);
     return state->layers[state->camera_layer]->spawn_entity(entity_type, x, y, s, vx, vy, snap)->uid;
 }
 int32_t UI::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
@@ -145,7 +144,6 @@ int32_t UI::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
     x += state->camera->focus_x;
     y += state->camera->focus_y;
 
-    DEBUG("Spawning door on {}, {}", x, y);
     Layer* layer = state->layers[state->camera_layer];
     layer->spawn_entity(to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"), x, y, false, 0.0, 0.0, true);
     return layer->spawn_door(x, y, w, l, t)->uid;
@@ -156,7 +154,6 @@ void UI::spawn_backdoor(float x, float y)
     x += state->camera->focus_x;
     y += state->camera->focus_y;
 
-    DEBUG("Spawning backdoor on {}, {}", x, y);
     Layer* front_layer = state->layers[0];
     Layer* back_layer = state->layers[1];
     front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
@@ -381,63 +378,71 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
     };
 
     // crashes anyway
-    static const auto ignore = {
+    /* static const auto ignore = {
+        to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"),
+    }; */
+
+    static const auto olmecs = {
         to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC"),
     };
 
-    // check if the entity or any overlay is ignored
-    auto check = ent;
-    do
-    {
-        if (check && in_array(check->type->id, ignore))
-            return;
-        check = check->overlay;
-    } while (check);
-
     if (recurse)
     {
-        if (in_array(ent->type->id, jelly))
+        auto check = ent;
+        do
         {
-            const auto last_item = destroy_entity_items(ent);
-            ent->destroy();
-            for (int tail_uid = last_item + 8; tail_uid > last_item; --tail_uid)
+            if (check && in_array(check->type->id, olmecs))
             {
-                auto tail = get_entity_ptr(tail_uid);
-                if (tail)
-                    tail->destroy();
-            }
-            return;
-        }
-        else if (in_array(ent->type->id, destroy_items))
-        {
-            destroy_entity_items(ent);
-            ent->destroy();
-            return;
-        }
-        else if (in_array(ent->type->id, destroy_last_overlay))
-        {
-            if (!multi)
-                destroy_entity_overlay(ent);
-            return;
-        }
-        else if (in_array(ent->type->id, kill_last_overlay))
-        {
-            kill_entity_overlay(ent);
-            return;
-        }
-        else if (in_array(ent->type->id, just_kill))
-        {
-            ent->kill(true, ent);
-            return;
-        }
-        else if (in_array(ent->type->id, flame))
-        {
-            if (!ent->overlay)
+                auto olmec = check->as<Olmec>();
+                olmec->attack_phase = 3;
+                olmec->flags = 0x50001231;
+                move_entity_abs(olmec->uid, 10.0f, 1000.0f, 0.0f, 0.0f);
                 return;
-            const auto torch = ent->overlay->as<Torch>();
-            torch->light_up(false);
-            return;
-        }
+            }
+            else if (in_array(check->type->id, jelly))
+            {
+                const auto last_item = destroy_entity_items(check);
+                check->destroy();
+                for (int tail_uid = last_item + 8; tail_uid > last_item; --tail_uid)
+                {
+                    auto tail = get_entity_ptr(tail_uid);
+                    if (tail)
+                        tail->destroy();
+                }
+                return;
+            }
+            else if (in_array(check->type->id, destroy_items))
+            {
+                destroy_entity_items(check);
+                check->destroy();
+                return;
+            }
+            else if (in_array(check->type->id, destroy_last_overlay))
+            {
+                if (!multi)
+                    destroy_entity_overlay(check);
+                return;
+            }
+            else if (in_array(check->type->id, kill_last_overlay))
+            {
+                kill_entity_overlay(check);
+                return;
+            }
+            else if (in_array(check->type->id, just_kill))
+            {
+                check->kill(true, check);
+                return;
+            }
+            else if (in_array(check->type->id, flame))
+            {
+                if (!check->overlay)
+                    return;
+                const auto torch = check->overlay->as<Torch>();
+                torch->light_up(false);
+                return;
+            }
+            check = check->overlay;
+        } while (check);
     }
     if (!ent->is_player())
     {

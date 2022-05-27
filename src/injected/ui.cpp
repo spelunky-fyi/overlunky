@@ -925,7 +925,6 @@ bool update_players()
 
 void fix_decorations_at(int x, int y, LAYER layer)
 {
-    DEBUG("{} decorating {} {}", g_state->time_total, x, y);
     for (int dx = x - 1; dx <= x + 1; ++dx)
     {
         for (int dy = y - 1; dy <= y + 1; ++dy)
@@ -997,7 +996,6 @@ void spawn_entities(bool s, std::string list = "")
                                     fix_decorations_at(fx, fy, layer);
                                 }};
                     callbacks.push_back(cb);
-                    DEBUG("{} added callback", g_state->time_total);
                 }
             }
             if (!lock_entity)
@@ -5593,7 +5591,6 @@ void force_time()
     {
         if (g_state->time_total >= it->frame)
         {
-            DEBUG("{} calling callback", g_state->time_total);
             it->func();
             it = callbacks.erase(it);
         }
@@ -5984,7 +5981,6 @@ void load_font()
             else if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &fontdir) == S_OK)
             {
                 std::string localfontpath(cvt.to_bytes(fontdir) + "\\Microsoft\\Windows\\Fonts\\" + fontfile);
-                DEBUG("{}", localfontpath);
                 if (GetFileAttributesA(localfontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
                 {
                     font = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[0]);
