@@ -2,6 +2,7 @@
 
 #include "aliases.hpp"
 #include "color.hpp"
+#include "math.hpp"
 
 class Player;
 class Entity;
@@ -60,4 +61,10 @@ class UI
     static std::string_view get_room_template_name(uint16_t room_template);
     static std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l);
     static void steam_achievements(bool on);
+    static int32_t destroy_entity_items(Entity* ent);
+    static void destroy_entity_overlay(Entity* ent);
+    static void kill_entity_overlay(Entity* ent);
+    static void update_floor_at(float x, float y, LAYER l);
+    static void safe_destroy(Entity* ent, bool unsafe = false, bool recurse = true, bool multi = false);
+    static std::vector<uint32_t> get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer);
 };

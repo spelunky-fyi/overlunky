@@ -6,6 +6,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <misc\cpp\imgui_stdlib.h>
+#include <shellapi.h>
+#include <windows.h>
 
 #include <algorithm>
 #include <array>
@@ -19,6 +21,7 @@
 #include <map>
 #include <regex>
 #include <string>
+
 #pragma warning(push, 0)
 #include <toml.hpp>
 #pragma warning(pop)
@@ -37,6 +40,7 @@
 #include "flags.hpp"
 #include "items.hpp"
 #include "logger.h"
+#include "math.hpp"
 #include "savedata.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
@@ -95,6 +99,7 @@ std::map<std::string, int64_t> keys{
     {"tool_keys", OL_KEY_CTRL | OL_KEY_SHIFT | 'K'},
     {"tool_script", VK_F8},
     {"tool_save", VK_F6},
+    {"tool_finder", VK_F7},
     {"reset_windows", OL_KEY_CTRL | OL_KEY_SHIFT | 'R'},
     {"reset_windows_vertical", OL_KEY_CTRL | OL_KEY_SHIFT | 'V'},
     {"tabbed_interface", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
@@ -113,6 +118,8 @@ std::map<std::string, int64_t> keys{
     {"spawn_kit_9", OL_KEY_SHIFT | '9'},
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
+    {"destroy_grabbed", VK_DELETE},
+    {"destroy_selected", OL_KEY_ALT | VK_DELETE},
     {"warp", OL_KEY_CTRL | 'W'},
     {"warp_next_level_a", OL_KEY_CTRL | 'A'},
     {"warp_next_level_b", OL_KEY_CTRL | 'B'},
@@ -140,11 +147,17 @@ std::map<std::string, int64_t> keys{
     {"mouse_spawn", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_throw", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_over", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x01},
+    {"mouse_draw", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x01},
+    {"mouse_erase", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x05},
+    {"mouse_decorate", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x04},
     {"mouse_teleport", OL_BUTTON_MOUSE | 0x02},
     {"mouse_teleport_throw", OL_BUTTON_MOUSE | 0x02},
     {"mouse_grab", OL_BUTTON_MOUSE | 0x03},
     {"mouse_grab_unsafe", OL_BUTTON_MOUSE | OL_KEY_SHIFT | 0x03},
     {"mouse_grab_throw", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x03},
+    {"mouse_grab_throw_unsafe", OL_BUTTON_MOUSE | OL_KEY_CTRL | OL_KEY_SHIFT | 0x03},
+    {"mouse_select", OL_BUTTON_MOUSE | OL_KEY_ALT | 0x03},
+    {"mouse_select_unsafe", OL_BUTTON_MOUSE | OL_KEY_ALT | OL_KEY_SHIFT | 0x03},
     {"mouse_camera_drag", OL_BUTTON_MOUSE | 0x04},
     {"mouse_blast", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x04},
     {"mouse_boom", 0x0},
@@ -197,32 +210,41 @@ struct EntityWindow
 };
 std::map<int, EntityWindow*> entity_windows;
 
+struct Callback
+{
+    uint32_t frame;
+    std::function<void()> func;
+};
+std::vector<Callback> callbacks;
+
 static ImFont *font, *bigfont, *hugefont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f, g_camera_speed = 1.0f;
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
-    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF;
-unsigned int g_level_width = 0;
+    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1;
+unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
 std::vector<std::string> saved_entities;
 std::vector<Player*> g_players;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
+std::vector<uint32_t> g_selected_ids;
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
 std::map<int, std::string> entity_names;
+std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "";
-std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
+std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 
 std::string text;
 std::string g_change_key = "";
@@ -246,8 +268,11 @@ std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
 [[maybe_unused]] const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 [[maybe_unused]] const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-inline constexpr unsigned int safe_entity_mask = 0x18f;
+int safe_entity_mask = 0x18f;
 inline constexpr unsigned int unsafe_entity_mask = 0;
+
+inline constexpr int default_entity_mask = 0x18f;
+inline constexpr int default_hitbox_mask = 0x80bf;
 
 std::map<std::string, bool> options = {
     {"mouse_control", true},
@@ -547,6 +572,10 @@ std::string key_string(int64_t keycode)
     {
         name = "Ctrl+" + name;
     }
+    if (keycode & OL_KEY_ALT)
+    {
+        name = "Alt+" + name;
+    }
     return name;
 }
 
@@ -640,7 +669,7 @@ void save_config(std::string file)
     writeData << "# Overlunky hotkeys" << std::endl
               << "# Syntax:" << std::endl
               << "# function = keycode_in_hex" << std::endl
-              << "# For modifiers, add 0x100 for Ctrl or 0x200 for Shift" << std::endl
+              << "# For modifiers, add 0x100 for Ctrl, 0x200 for Shift and 0x800 for Alt" << std::endl
               << "# For mouse buttons, add 0x400" << std::endl
               << "# For Mouse wheel, 0x11 = down, 0x12 = up" << std::endl
               << "# Set to 0x0 to disable key" << std::endl
@@ -834,8 +863,8 @@ bool active(std::string window)
     ImGuiWindow* current = g.NavWindow;
     if (current == NULL)
         return false;
-    while (current->ParentWindow != NULL)
-        current = current->ParentWindow;
+    // while (current->ParentWindow != NULL)
+    //     current = current->ParentWindow;
     if (!options["tabbed_interface"] || detached(window))
     {
         if (windows.find(window) == windows.end())
@@ -844,7 +873,8 @@ bool active(std::string window)
     }
     else
     {
-        return current == ImGui::FindWindowByName("Overlunky") && active_tab == window;
+        const char* test = strstr(current->Name, "Overlunky");
+        return current->Name == test && active_tab == window;
     }
 }
 
@@ -896,28 +926,86 @@ bool update_players()
     return true;
 }
 
+void fix_decorations_at(int x, int y, LAYER layer)
+{
+    for (int dx = x - 1; dx <= x + 1; ++dx)
+    {
+        for (int dy = y - 1; dy <= y + 1; ++dy)
+        {
+            auto fx = static_cast<float>(dx);
+            auto fy = static_cast<float>(dy);
+            UI::update_floor_at(fx, fy, layer);
+        }
+    }
+}
+
+std::string spawned_type()
+{
+    const auto pos = text.find_first_of(" ");
+    if (pos == std::string::npos && g_filtered_count > 0)
+    {
+        auto to_spawn = g_items[g_filtered_items[g_current_item]];
+        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
+        {
+            if (g_entity)
+            {
+                return entity_full_names[g_entity->type->id];
+            }
+            else if (g_last_type >= 0)
+            {
+                return entity_full_names[g_last_type];
+            }
+        }
+        else if (g_current_item > 0 && g_filtered_count > 0)
+        {
+            to_spawn = g_items[g_filtered_items[g_current_item]];
+            return to_spawn.name;
+        }
+        return "";
+    }
+    else
+    {
+        return text;
+    }
+}
+
 void spawn_entities(bool s, std::string list = "")
 {
     const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
+        auto to_spawn = g_items[g_filtered_items[g_current_item]];
         if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-            return;
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_CHAR") != std::string::npos)
         {
-            std::pair<float, float> cpos = UI::click_position(g_x, g_y);
-            int spawned = UI::spawn_companion(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second, LAYER::PLAYER);
+            if (g_entity)
+            {
+                to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
+            }
+            else if (g_last_type >= 0)
+            {
+                to_spawn = EntityItem{entity_full_names[g_last_type], (uint32_t)g_last_type};
+            }
+            else
+            {
+                return;
+            }
+        }
+        std::pair<float, float> cpos = UI::click_position(g_x, g_y);
+        if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
+        {
+            int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
             if (!lock_entity)
                 g_last_id = spawned;
         }
-        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
+        else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
         {
             bool snap = options["snap_to_grid"];
-            if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_FLOOR") != std::string::npos)
+            if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
             {
                 snap = true;
+                g_vx = 0;
+                g_vy = 0;
 
-                std::pair<float, float> cpos = UI::click_position(g_x, g_y);
                 auto old_block_id = UI::get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
                 if (old_block_id != -1)
                 {
@@ -927,8 +1015,8 @@ void spawn_entities(bool s, std::string list = "")
                         old_block->destroy();
                 }
             }
-            int spawned = UI::spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, s, g_vx, g_vy, snap);
-            if (options["spawn_floor_decorated"])
+            int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
+            if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
             {
                 if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
                 {
@@ -936,6 +1024,15 @@ void spawn_entities(bool s, std::string list = "")
                     {
                         floor->fix_decorations(true, false);
                     }
+                    auto fpos = floor->position();
+                    auto fx = static_cast<int>(fpos.first);
+                    auto fy = static_cast<int>(fpos.second);
+                    auto layer = (LAYER)floor->layer;
+                    Callback cb = {g_state->time_total + 2, [fx, fy, layer]
+                                   {
+                                       fix_decorations_at(fx, fy, layer);
+                                   }};
+                    callbacks.push_back(cb);
                 }
             }
             if (!lock_entity)
@@ -943,8 +1040,7 @@ void spawn_entities(bool s, std::string list = "")
         }
         else
         {
-            std::pair<float, float> cpos = UI::click_position(g_x, g_y);
-            UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first, cpos.second);
+            UI::spawn_liquid(to_spawn.id, cpos.first, cpos.second);
         }
     }
     else
@@ -1352,13 +1448,17 @@ bool pressed(std::string keyname, WPARAM wParam)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     return wParam == (unsigned)keycode;
 }
@@ -1371,13 +1471,17 @@ bool clicked(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     if ((keycode & OL_MOUSE_WHEEL) > 0)
     {
@@ -1412,13 +1516,17 @@ bool dblclicked(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -1439,13 +1547,17 @@ bool held(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -1466,13 +1578,17 @@ bool released(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -1493,13 +1609,17 @@ bool dragging(std::string keyname)
         return false;
     }
     int64_t keycode = keys[keyname];
-    if (GetAsyncKeyState(VK_CONTROL))
+    if (ImGui::GetIO().KeyCtrl)
     {
         wParam += OL_KEY_CTRL;
     }
-    if (GetAsyncKeyState(VK_SHIFT))
+    if (ImGui::GetIO().KeyShift)
     {
         wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
     }
     for (int i = 0; i < ImGuiMouseButton_COUNT; i++)
     {
@@ -1600,7 +1720,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         }
     }
 
-    if (nCode != WM_KEYDOWN)
+    if (nCode != WM_KEYDOWN && nCode != WM_SYSKEYDOWN)
     {
         return false;
     }
@@ -1681,6 +1801,13 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         toggle("tool_save");
     }
+    else if (pressed("tool_finder", wParam))
+    {
+        if (toggle("tool_finder"))
+        {
+            set_focus_finder = true;
+        }
+    }
     else if (pressed("tool_keys", wParam))
     {
         toggle("tool_keys");
@@ -1718,6 +1845,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("enter", wParam) && active("tool_entity") && io.WantCaptureKeyboard)
     {
         spawn_entities(false);
+        return true;
+    }
+    else if (pressed("enter", wParam) && active("tool_finder") && io.WantCaptureKeyboard)
+    {
+        run_finder = true;
         return true;
     }
     else if (pressed("move_up", wParam) && active("tool_door") && io.WantCaptureKeyboard)
@@ -2135,6 +2267,24 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         g_speedhack_old_multiplier = g_speedhack_multiplier;
         speedhack(0.2f); // TODO: configurable
+    }
+    else if (pressed("destroy_grabbed", wParam))
+    {
+        auto selected = get_entity_ptr(g_last_id);
+        if (selected)
+            UI::safe_destroy(selected, true);
+        if (!lock_entity)
+            g_last_id = -1;
+    }
+    else if (pressed("destroy_selected", wParam))
+    {
+        for (auto selected_uid : g_selected_ids)
+        {
+            auto ent = get_entity_ptr(selected_uid);
+            if (ent)
+                UI::safe_destroy(ent, false, true, true);
+        }
+        g_selected_ids.clear();
     }
     else
     {
@@ -2854,6 +3004,52 @@ void render_cross()
     draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
 }
 
+void render_select()
+{
+    ImVec2 pos = ImGui::GetMousePos();
+    auto* draw_list = ImGui::GetWindowDrawList();
+    draw_list->AddRectFilled(startpos, pos, ImColor(255, 255, 255, 60));
+}
+
+void select_entities()
+{
+    ImVec2 pos = ImGui::GetMousePos();
+    auto mask = safe_entity_mask;
+    if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier
+    {
+        mask = unsafe_entity_mask;
+    }
+    auto spos = normalize(startpos);
+    auto spos2 = normalize(pos);
+    auto [ax, ay] = UI::click_position(spos.x, spos.y);
+    auto [bx, by] = UI::click_position(spos2.x, spos2.y);
+    auto rax = std::min(ax, bx);
+    auto ray = std::max(ay, by);
+    auto rbx = std::max(ax, bx);
+    auto rby = std::min(ay, by);
+    auto box = AABB{rax, ray, rbx, rby};
+    g_selected_ids = UI::get_entities_overlapping(mask, box, (LAYER)g_state->camera_layer);
+}
+
+void erase_entities()
+{
+    ImVec2 pos = ImGui::GetMousePos();
+    auto mask = safe_entity_mask;
+    if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier
+    {
+        mask = unsafe_entity_mask;
+    }
+    auto spos = normalize(pos);
+    auto [ax, ay] = UI::click_position(spos.x, spos.y);
+    auto box = AABB{ax, ay, ax, ay};
+    for (auto erase_uid : UI::get_entities_overlapping(mask, box.extrude(0.1f), (LAYER)g_state->camera_layer))
+    {
+        auto erase = get_entity_ptr(erase_uid);
+        if (erase)
+            UI::safe_destroy(erase);
+    }
+}
+
 void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 {
     if (g_state == 0 || (g_state->screen != 11 && g_state->screen != 12))
@@ -2943,7 +3139,7 @@ static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
     return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
 }
 
-void render_hitbox(Entity* ent, bool cross, ImColor color)
+void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
 {
     const auto type = ent->type->id;
     if (!type)
@@ -2961,11 +3157,16 @@ void render_hitbox(Entity* ent, bool cross, ImColor color)
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
-        draw_list->AddLine(ImVec2(spos.x - 9, spos.y - 9), ImVec2(spos.x + 10, spos.y + 10), ImColor(0, 255, 0, 200), 2);
-        draw_list->AddLine(ImVec2(spos.x - 9, spos.y + 9), ImVec2(spos.x + 10, spos.y - 10), ImColor(0, 255, 0, 200), 2);
+        draw_list->AddLine(ImVec2(sboxa.x, sboxa.y), ImVec2(sboxb.x, sboxb.y), color, 2);
+        draw_list->AddLine(ImVec2(sboxa.x, sboxb.y), ImVec2(sboxb.x, sboxa.y), color, 2);
     }
     if (ent->shape == SHAPE::CIRCLE)
-        draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
+        if (filled)
+            draw_list->AddCircleFilled(spos, sboxb.x - spos.x, color);
+        else
+            draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
+    else if (filled)
+        draw_list->AddRectFilled(sboxa, sboxb, color);
     else
         draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
 
@@ -3272,6 +3473,21 @@ void render_clickhandler()
             }
         }
 
+        static auto front_col = ImColor(0, 255, 51, 100);
+        static auto back_col = ImColor(255, 160, 31, 100);
+
+        for (auto entity : g_selected_ids)
+        {
+            auto ent = get_entity_ptr(entity);
+            if (ent)
+            {
+                if (ent->layer == g_state->camera_layer)
+                    render_hitbox(ent, false, front_col, true);
+                else
+                    render_hitbox(ent, false, back_col, true);
+            }
+        }
+
         if (ImGui::IsMousePosValid())
         {
             ImVec2 mpos = normalize(io.MousePos);
@@ -3284,7 +3500,7 @@ void render_clickhandler()
             dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
             // dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
             unsigned int mask = safe_entity_mask;
-            if (GetAsyncKeyState(VK_SHIFT)) // TODO: Get the right modifier from mouse_destroy_unsafe
+            if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier from mouse_destroy_unsafe
             {
                 mask = unsafe_entity_mask;
             }
@@ -3420,6 +3636,49 @@ void render_clickhandler()
             g_vy = 0;
             g_over_id = -1;
         }
+        else if (clicked("mouse_draw") && ImGui::IsWindowFocused())
+        {
+            grid_x = UINT_MAX;
+            grid_y = UINT_MAX;
+        }
+        else if (held("mouse_draw") && ImGui::IsWindowFocused())
+        {
+            auto [nx, ny] = normalize(ImGui::GetMousePos());
+            auto pos = UI::click_position(nx, ny);
+            const uint32_t new_grid_x = static_cast<uint32_t>(std::round(pos.first));
+            const uint32_t new_grid_y = static_cast<uint32_t>(std::round(pos.second));
+            if (new_grid_x != grid_x || new_grid_y != grid_y)
+            {
+                grid_x = new_grid_x;
+                grid_y = new_grid_y;
+                set_pos(ImGui::GetMousePos());
+                g_vx = 0;
+                g_vy = 0;
+                spawn_entities(true);
+            }
+        }
+        else if (held("mouse_erase"))
+        {
+            erase_entities();
+        }
+        else if (clicked("mouse_decorate"))
+        {
+            grid_x = UINT_MAX;
+            grid_y = UINT_MAX;
+        }
+        else if (held("mouse_decorate"))
+        {
+            auto [nx, ny] = normalize(ImGui::GetMousePos());
+            auto pos = UI::click_position(nx, ny);
+            const uint32_t new_grid_x = static_cast<uint32_t>(std::round(pos.first));
+            const uint32_t new_grid_y = static_cast<uint32_t>(std::round(pos.second));
+            if (new_grid_x != grid_x || new_grid_y != grid_y)
+            {
+                grid_x = new_grid_x;
+                grid_y = new_grid_y;
+                fix_decorations_at(grid_x, grid_y, (LAYER)g_state->camera_layer);
+            }
+        }
         else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused())
         {
             if (g_players.empty())
@@ -3454,6 +3713,28 @@ void render_clickhandler()
             g_vx = 0;
             g_vy = 0;
         }
+        else if (dblclicked("mouse_grab") || dblclicked("mouse_grab_unsafe"))
+        {
+            startpos = ImGui::GetMousePos();
+            set_pos(startpos);
+            unsigned int mask = safe_entity_mask;
+            if (held("mouse_grab_unsafe"))
+            {
+                mask = unsafe_entity_mask;
+            }
+            g_held_entity = UI::get_entity_at(g_x, g_y, true, 2, mask);
+            if (g_held_entity)
+            {
+                options["draw_hitboxes"] = true;
+                g_held_id = g_held_entity->uid;
+                g_held_flags = g_held_entity->flags;
+                g_last_type = g_held_entity->type->id;
+            }
+            if (!lock_entity)
+                g_last_id = g_held_id;
+            g_current_item = 0;
+            update_filter("");
+        }
         else if (clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
         {
             startpos = ImGui::GetMousePos();
@@ -3466,11 +3747,19 @@ void render_clickhandler()
             g_held_entity = UI::get_entity_at(g_x, g_y, true, 2, mask);
             if (g_held_entity)
             {
+                options["draw_hitboxes"] = true;
                 g_held_id = g_held_entity->uid;
                 g_held_flags = g_held_entity->flags;
+                g_last_type = g_held_entity->type->id;
             }
             if (!lock_entity)
                 g_last_id = g_held_id;
+        }
+        else if (clicked("mouse_select") || clicked("mouse_select_unsafe"))
+        {
+            startpos = ImGui::GetMousePos();
+            set_pos(startpos);
+            render_select();
         }
         else if (held("mouse_grab_throw") && g_held_id > 0)
         {
@@ -3480,8 +3769,22 @@ void render_clickhandler()
                 throw_held = true;
             }
             set_pos(startpos);
-            UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
-            render_arrow();
+            auto held = get_entity_ptr(g_held_id);
+            if (held && held->is_movable())
+            {
+                UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
+                render_arrow();
+            }
+        }
+        else if (held("mouse_select") || held("mouse_select_unsafe"))
+        {
+            set_pos(startpos);
+            render_select();
+        }
+        else if (released("mouse_select") || released("mouse_select_unsafe"))
+        {
+            options["draw_hitboxes"] = true;
+            select_entities();
         }
         else if ((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
         {
@@ -3491,15 +3794,15 @@ void render_clickhandler()
             set_pos(startpos);
             if (ImGui::IsMouseDragging(keys["mouse_grab"] & 0xff - 1) || ImGui::IsMouseDragging(keys["mouse_grab_unsafe"] & 0xff - 1))
             {
-                if (g_held_entity)
+                if (g_held_entity && g_held_entity->is_movable())
                 {
                     if (g_held_entity->is_movable())
                         g_held_entity->as<Movable>()->standing_on_uid = -1;
 
                     g_held_entity->flags |= 1U << 4;
                     g_held_entity->flags |= 1U << 9;
+                    UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
                 }
-                UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
             }
         }
         if (released("mouse_grab_throw") && g_held_id > 0 && g_held_entity != 0)
@@ -3510,7 +3813,8 @@ void render_clickhandler()
                 g_held_entity->flags = g_held_flags;
             set_pos(startpos);
             set_vel(ImGui::GetMousePos());
-            UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
+            if (g_held_entity && g_held_entity->is_movable())
+                UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3523,9 +3827,12 @@ void render_clickhandler()
             io.MouseDrawCursor = true;
             if (g_held_entity)
                 g_held_entity->flags = g_held_flags;
-            if (options["snap_to_grid"])
+            if (options["snap_to_grid"] && g_held_entity->is_movable())
             {
                 UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
+            }
+            else if (!g_held_entity->is_movable())
+            {
             }
             g_x = 0;
             g_y = 0;
@@ -3671,18 +3978,7 @@ void render_clickhandler()
             }
             Entity* to_kill = UI::get_entity_at(g_x, g_y, true, 2, mask);
             if (to_kill)
-            {
-                g_held_id = to_kill->uid;
-                // move movables to void because they like to explode and drop stuff, but actually destroy blocks and such
-                if (to_kill->is_movable())
-                {
-                    to_kill->teleport_abs(0, -1000, 0, 0); // TODO: dead flag instead?
-                }
-                else
-                {
-                    to_kill->kill(true, nullptr);
-                }
-            }
+                UI::safe_destroy(to_kill, mask == unsafe_entity_mask);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -3774,19 +4070,7 @@ void render_options()
     ImGui::SameLine();
     ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
     tooltip("Use interpolated render position for smoother hitboxes on hifps.\nActual game logic is not interpolated like this though.");
-    if (ImGui::CollapsingHeader("Hitbox entity types to draw"))
-    {
-        ImGui::Indent(16.0f);
-        for (int i = 0; i < 16; i++)
-        {
-            if (i % 2)
-                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
-            ImGui::CheckboxFlags(mask_names[i], &g_hitbox_mask, (int)std::pow(2, i));
-        }
-        tooltip("Some cherry-picked entities like traps and invisible walls.");
-        ImGui::Unindent(16.0f);
-    }
-    ImGui::Checkbox("Smooth camera", &options["smooth_camera"]);
+    ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
     tooltip("Smooth camera movement when dragging, unless paused.");
     ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
     tooltip("Faster camera movement when dragging.");
@@ -3815,6 +4099,38 @@ void render_options()
     tooltip("Draw all tools tabbed in a single window", "tabbed_interface");
     ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
     tooltip("Am I annoying you already :(");
+
+    if (ImGui::CollapsingHeader("Hitbox entity types to draw"))
+    {
+        ImGui::Indent(16.0f);
+        for (int i = 0; i < 16; i++)
+        {
+            if (i % 2)
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+            ImGui::CheckboxFlags(mask_names[i], &g_hitbox_mask, (int)std::pow(2, i));
+        }
+        tooltip("Some cherry-picked entities like traps and invisible walls.");
+        if (ImGui::Button("Restore defaults##RestoreDefaultHitboxMask"))
+            g_hitbox_mask = default_hitbox_mask;
+        ImGui::Unindent(16.0f);
+    }
+
+    if (ImGui::CollapsingHeader("Entity types to grab by default"))
+    {
+        ImGui::Indent(16.0f);
+        for (int i = 0; i < 15; i++)
+        {
+            if (i % 2)
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+            ImGui::CheckboxFlags(mask_names[i], &safe_entity_mask, (int)std::pow(2, i));
+        }
+        if (ImGui::Button("Any##AnyEntityMask"))
+            safe_entity_mask = 0;
+        ImGui::SameLine();
+        if (ImGui::Button("Defaults##DefaultEntityMask"))
+            safe_entity_mask = default_entity_mask;
+        ImGui::Unindent(16.0f);
+    }
 
     if (ImGui::Button("Edit style"))
     {
@@ -4493,6 +4809,299 @@ void render_screen(const char* label, int state)
     }
 }
 
+void render_entity_finder()
+{
+    static std::string search_entity_name = "";
+    if (set_focus_finder)
+    {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_finder = false;
+    }
+    ImGui::InputText("Text filter##EntitySearchName", &search_entity_name);
+
+    static uint32_t search_entity_type = 0;
+    ImGui::InputScalar("##EntityType", ImGuiDataType_U32, &search_entity_type, &u32_one);
+    ImGui::SameLine();
+    if (search_entity_type > 0)
+    {
+        ImGui::Text("%s", entity_names[search_entity_type].c_str());
+    }
+    else
+    {
+        ImGui::Text("ENT_TYPE");
+    }
+
+    static int search_entity_layer = -128;
+    if (ImGui::RadioButton("Both layers", search_entity_layer == -128))
+        search_entity_layer = -128;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Front", search_entity_layer == 0))
+        search_entity_layer = 0;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Back", search_entity_layer == 1))
+        search_entity_layer = 1;
+    ImGui::SameLine();
+    if (ImGui::RadioButton("Current layer", search_entity_layer == -1))
+        search_entity_layer = -1;
+
+    static int search_entity_mask = 0;
+    if (ImGui::CollapsingHeader("Mask##EntitySearchMask"))
+    {
+        for (int i = 0; i < 15; i++)
+        {
+            if (i % 2)
+                ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+            ImGui::CheckboxFlags(mask_names[i], &search_entity_mask, (int)std::pow(2, i));
+        }
+    }
+
+    static unsigned int search_entity_flags = 0;
+    static unsigned int search_entity_not_flags = 0;
+    static unsigned int search_entity_more_flags = 0;
+    static unsigned int search_entity_not_more_flags = 0;
+    static unsigned int search_entity_properties_flags = 0;
+    static unsigned int search_entity_not_properties_flags = 0;
+
+    static const ImVec4 green = ImVec4(0.2f, 1.0f, 0.2f, 0.6f);
+    static const ImVec4 red = ImVec4(1.0f, 0.2f, 0.2f, 0.6f);
+    static const ImVec4 white = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+    ImGui::PushStyleColor(ImGuiCol_CheckMark, white);
+
+    if (ImGui::CollapsingHeader("Flags##EntitySearchFlags"))
+    {
+        ImGui::PushID("EntitySearchFlags");
+        for (int i = 0; i < 32; i++)
+        {
+            ImGui::PushID(i);
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, red);
+            ImGui::CheckboxFlags("", &search_entity_not_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, green);
+            ImGui::CheckboxFlags(entity_flags[i], &search_entity_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::PopID();
+        }
+        ImGui::PopID();
+    }
+    if (ImGui::CollapsingHeader("More Flags##EntitySearchMoreFlags"))
+    {
+        ImGui::PushID("EntitySearchMoreFlags");
+        for (int i = 0; i < 23; i++)
+        {
+            ImGui::PushID(i);
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, red);
+            ImGui::CheckboxFlags("", &search_entity_not_more_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, green);
+            ImGui::CheckboxFlags(more_flags[i], &search_entity_more_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::PopID();
+        }
+        ImGui::PopID();
+    }
+    if (ImGui::CollapsingHeader("Properties Flags##EntitySearchPropertiesFlags"))
+    {
+        ImGui::PushID("EntitySearchPropertiesFlags");
+        for (int i = 0; i < 27; i++)
+        {
+            ImGui::PushID(i);
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, red);
+            ImGui::CheckboxFlags("", &search_entity_not_properties_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, green);
+            ImGui::CheckboxFlags(entity_type_properties_flags[i], &search_entity_properties_flags, (int)std::pow(2, i));
+            ImGui::PopStyleColor();
+            ImGui::PopID();
+        }
+        ImGui::PopID();
+    }
+    ImGui::PopStyleColor();
+    ImGui::Text("");
+
+    static bool run_filter = false;
+    static bool extra_filter = false;
+    if (ImGui::Button("Search##SearchEntities") || run_finder)
+    {
+        g_selected_ids = UI::get_entities_by({search_entity_type}, search_entity_mask, (LAYER)search_entity_layer);
+        run_filter = true;
+        run_finder = false;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Filter##FilterEntities"))
+    {
+        run_filter = true;
+        extra_filter = true;
+    }
+    if (run_filter)
+    {
+        run_filter = false;
+        if (extra_filter)
+        {
+            if (search_entity_type != 0)
+            {
+                g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                    {
+                                                        auto ent = get_entity_ptr(filter_uid);
+                                                        if (!ent)
+                                                            return true;
+                                                        return ent->type->id != search_entity_type; }),
+                                     g_selected_ids.end());
+            }
+            if (search_entity_mask != 0)
+            {
+                g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                    {
+                                                        auto ent = get_entity_ptr(filter_uid);
+                                                        if (!ent)
+                                                            return true;
+                                                        return (ent->type->search_flags & search_entity_mask) == 0; }),
+                                     g_selected_ids.end());
+            }
+            {
+                g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                    {
+                                                        auto ent = get_entity_ptr(filter_uid);
+                                                        if (!ent)
+                                                            return true;
+                                                        return ent->layer != enum_to_layer((LAYER)search_entity_layer); }),
+                                     g_selected_ids.end());
+            }
+            extra_filter = false;
+        }
+        if (search_entity_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->flags & search_entity_flags) != search_entity_flags; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_not_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->flags & search_entity_not_flags) != 0; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_more_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->more_flags & search_entity_more_flags) != search_entity_more_flags; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_not_more_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->more_flags & search_entity_not_more_flags) != 0; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_properties_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->type->properties_flags & search_entity_properties_flags) != search_entity_properties_flags; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_not_properties_flags != 0)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return (ent->type->properties_flags & search_entity_not_properties_flags) != 0; }),
+                                 g_selected_ids.end());
+        }
+        if (search_entity_name != "")
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return !StrStrIA(entity_names[ent->type->id].c_str(), search_entity_name.c_str()); }),
+                                 g_selected_ids.end());
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Reset##ResetSearchEntities"))
+    {
+        search_entity_name = "";
+        search_entity_type = 0;
+        search_entity_mask = 0;
+        search_entity_layer = -128;
+        search_entity_flags = 0;
+        search_entity_not_flags = 0;
+        search_entity_more_flags = 0;
+        search_entity_not_more_flags = 0;
+        search_entity_properties_flags = 0;
+        search_entity_not_properties_flags = 0;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Clear##ClearSelectedEntities"))
+        g_selected_ids.clear();
+    if (g_selected_ids.size() > 0)
+    {
+        ImGui::Text("");
+        ImGui::Text("%d entities selected:", (int)g_selected_ids.size());
+        if (ImGui::Button("Smart delete##SmartDestroySelectedEntities"))
+        {
+            for (auto selected_uid : g_selected_ids)
+            {
+                auto ent = get_entity_ptr(selected_uid);
+                if (ent)
+                    UI::safe_destroy(ent, false, true, true);
+            }
+            g_selected_ids.clear();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Kill##KillSelectedEntities"))
+        {
+            for (auto selected_uid : g_selected_ids)
+            {
+                auto ent = get_entity_ptr(selected_uid);
+                if (ent)
+                    ent->kill(true, nullptr);
+            }
+            g_selected_ids.clear();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Destroy##DestroySelectedEntities"))
+        {
+            for (auto selected_uid : g_selected_ids)
+            {
+                auto ent = get_entity_ptr(selected_uid);
+                if (ent)
+                    ent->destroy();
+            }
+            g_selected_ids.clear();
+        }
+        for (auto selected_uid : g_selected_ids)
+        {
+            render_uid(selected_uid, "Multiselect");
+        }
+    }
+}
+
 void render_entity_props(int uid, bool detached = false)
 {
     auto entity = get_entity_ptr(uid);
@@ -4535,6 +5144,11 @@ void render_entity_props(int uid, bool detached = false)
     const auto is_movable = entity->is_movable();
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     render_uid(entity->uid, "EntityGeneral");
+    if (ImGui::Button("Smart delete##SafeKillEntity"))
+    {
+        UI::safe_destroy(entity, true);
+    }
+    tooltip("Try to get rid of the entity in some\nsmart way that hopefully doesn't crash.\nWorks on most boss heads and jellies.", "mouse_destroy");
     ImGui::SameLine();
     if (ImGui::Button("Void##VoidEntity"))
     {
@@ -4563,11 +5177,11 @@ void render_entity_props(int uid, bool detached = false)
     }
     tooltip("Move the entity to limbo layer,\nlike it exists but doesn't do anything.");
     ImGui::SameLine();
-    if (ImGui::Button("Dstr##DestroyEntity"))
+    if (ImGui::Button("Destroy##DestroyEntity"))
     {
         entity->destroy();
     }
-    tooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.", "mouse_destroy");
+    tooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.");
     if (ImGui::CollapsingHeader("State"))
     {
         auto overlay = entity->overlay;
@@ -5031,6 +5645,26 @@ void force_time()
         g_state->quests->madame_tusk_state = quest_tusk_state.value();
     if (quest_beg_state.has_value())
         g_state->quests->beg_state = quest_beg_state.value();
+
+    for (auto it = callbacks.begin(); it != callbacks.end();)
+    {
+        if (g_state->time_total >= it->frame)
+        {
+            it->func();
+            it = callbacks.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    if (g_state->loading > 0)
+    {
+        g_selected_ids.clear();
+        g_last_id = -1;
+        g_entity = nullptr;
+    }
 }
 
 void render_timer()
@@ -5413,7 +6047,6 @@ void load_font()
             else if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &fontdir) == S_OK)
             {
                 std::string localfontpath(cvt.to_bytes(fontdir) + "\\Microsoft\\Windows\\Fonts\\" + fontfile);
-                DEBUG("{}", localfontpath);
                 if (GetFileAttributesA(localfontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
                 {
                     font = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[0]);
@@ -5507,6 +6140,7 @@ void render_keyconfig()
     if (g_change_key != "")
     {
         ImGuiIO& io = ImGui::GetIO();
+        io.WantCaptureKeyboard = true;
         ImGui::SetNextWindowSize(io.DisplaySize);
         ImGui::SetNextWindowPos({0, 0});
         ImGui::SetNextWindowBgAlpha(0.75);
@@ -5517,7 +6151,7 @@ void render_keyconfig()
         ImGui::InvisibleButton("KeyCaptureCanvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         ImDrawList* dl = ImGui::GetForegroundDrawList();
         ImGui::PushFont(bigfont);
-        std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl and Shift are available.", g_change_key);
+        std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl, Alt and Shift are available.", g_change_key);
         ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
         dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
         ImGui::PopFont();
@@ -5556,15 +6190,17 @@ void render_keyconfig()
         }
 
         // Keys
-        for (size_t i = 0; i < 512; ++i)
+        for (size_t i = 0; i < VK_LSHIFT; ++i)
         {
-            if (io.KeysDown[i] && i != VK_CONTROL && i != VK_SHIFT)
+            if (ImGui::IsKeyDown((ImGuiKey)i))
             {
                 size_t keycode = i;
-                if (io.KeysDown[VK_CONTROL])
+                if (ImGui::GetIO().KeyCtrl)
                     keycode += 0x100;
-                if (io.KeysDown[VK_SHIFT])
+                if (ImGui::GetIO().KeyShift)
                     keycode += 0x200;
+                if (ImGui::GetIO().KeyAlt)
+                    keycode += 0x800;
                 keys[g_change_key] = keycode;
                 save_config(cfgfile);
                 g_change_key = "";
@@ -5591,6 +6227,11 @@ void render_prohud()
     buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+
+    auto type = spawned_type();
+    buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}", type)));
+    textsize = ImGui::CalcTextSize(buf.c_str());
+    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y * 2 + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 }
 
 void render_tool(std::string tool)
@@ -5617,6 +6258,8 @@ void render_tool(std::string tool)
         render_savegame();
     else if (tool == "tool_keys")
         render_keyconfig();
+    else if (tool == "tool_finder")
+        render_entity_finder();
 }
 
 void imgui_init(ImGuiContext*)
@@ -5632,12 +6275,13 @@ void imgui_init(ImGuiContext*)
     windows["tool_camera"] = new Window({"Camera (" + key_string(keys["tool_camera"]) + ")", false, true});
     windows["tool_entity_properties"] = new Window({"Entity (" + key_string(keys["tool_entity_properties"]) + ")", false, true});
     windows["tool_game_properties"] = new Window({"Game (" + key_string(keys["tool_game_properties"]) + ")", false, true});
-    windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", false, true});
+    windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", false, false});
     windows["tool_debug"] = new Window({"Debug (" + key_string(keys["tool_debug"]) + ")", false, false});
     windows["tool_style"] = new Window({"Style (" + key_string(keys["tool_style"]) + ")", false, false});
-    windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, true});
+    windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, false});
     windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", false, false});
     windows["tool_keys"] = new Window({"Keys (" + key_string(keys["tool_keys"]) + ")", false, false});
+    windows["tool_finder"] = new Window({"Finder (" + key_string(keys["tool_finder"]) + ")", false, true});
 
     if (g_ui_scripts.find("dark") == g_ui_scripts.end())
     {
@@ -5689,7 +6333,48 @@ void imgui_draw()
         {
             ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
             ImGui::SetNextWindowSize({600, ImGui::GetIO().DisplaySize.y / 2}, ImGuiCond_FirstUseEver);
-            ImGui::Begin("Overlunky", NULL);
+            ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar);
+            if (ImGui::BeginMenuBar())
+            {
+                if (ImGui::BeginMenu("Tools"))
+                {
+                    for (size_t i = 0; i < tab_order.size() - 4; ++i)
+                    {
+                        auto tab = tab_order[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str()))
+                        {
+                            toggle(tab);
+                        }
+                    }
+                    if (ImGui::MenuItem("Detach active tool"))
+                    {
+                        if (options["tabbed_interface"])
+                            detach(active_tab);
+                    }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Settings"))
+                {
+                    for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
+                    {
+                        auto tab = tab_order[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str()))
+                        {
+                            toggle(tab);
+                        }
+                    }
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Help"))
+                {
+                    if (ImGui::MenuItem("README"))
+                        ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
+                    if (ImGui::MenuItem("API Documentation"))
+                        ShellExecuteA(NULL, "open", "https://spelunky-fyi.github.io/overlunky/", NULL, NULL, SW_SHOWNORMAL);
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenuBar();
+            }
             if (ImGui::BeginTabBar("##TabBar"))
             {
                 ImGuiTabItemFlags flags = 0;
@@ -5721,8 +6406,8 @@ void imgui_draw()
             }
             if (tabnum == 0)
             {
-                ImGui::TextWrapped("Looks like you closed all your tabs. You can use the F-keys to open closed tabs or click here:");
-                if (ImGui::Button("Restore tabs"))
+                ImGui::TextWrapped("Looks like you closed all your tabs. Good thing we have a menubar now!");
+                if (ImGui::Button("Restore all tabs"))
                 {
                     for (auto window : windows)
                     {
@@ -5831,6 +6516,13 @@ void imgui_draw()
                 render_savegame();
                 ImGui::End();
             }
+
+            if (windows["tool_finder"]->open)
+            {
+                ImGui::Begin(windows["tool_finder"]->name.c_str(), &windows["tool_finder"]->open);
+                render_entity_finder();
+                ImGui::End();
+            }
         }
         else
         {
@@ -5917,6 +6609,15 @@ void imgui_draw()
                 render_savegame();
                 ImGui::End();
             }
+
+            if (windows["tool_finder"]->open)
+            {
+                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
+                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
+                ImGui::Begin(windows["tool_finder"]->name.c_str(), &windows["tool_finder"]->open);
+                render_entity_finder();
+                ImGui::End();
+            }
         }
 
         if (!options["tabbed_interface"])
@@ -5988,7 +6689,7 @@ void post_draw()
 void create_box(std::vector<EntityItem> items)
 {
     std::vector<EntityItem> new_items(items);
-    new_items.emplace(new_items.begin(), "ENT_TYPE_Select entity to spawn:", 0); // :D
+    new_items.emplace(new_items.begin(), "ENT_TYPE_Use entity picker or select entity to spawn:", 0);
 
     std::sort(new_items.begin(), new_items.end());
 
@@ -5997,6 +6698,7 @@ void create_box(std::vector<EntityItem> items)
     {
         new_filtered_items[i] = i;
         entity_names[new_items[i].id] = new_items[i].name.substr(9);
+        entity_full_names[new_items[i].id] = new_items[i].name;
     }
 
     // TODO: add atomic and wrap it as struct
