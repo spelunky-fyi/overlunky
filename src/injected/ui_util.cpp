@@ -297,7 +297,6 @@ void UI::update_floor_at(float x, float y, LAYER l)
         to_id("ENT_TYPE_DECORATION_CROSS_BEAM"),
         to_id("ENT_TYPE_DECORATION_HANGING_WIRES"),
         to_id("ENT_TYPE_DECORATION_MINEWOOD_POLE"),
-        // TODO: more!
     };
     auto uid = get_grid_entity_at(x, y, l);
     if (uid == -1)
@@ -317,7 +316,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
         if (deco_ent)
             deco_ent->destroy();
     }
-    for (auto deco : get_entities_at(destroy_deco, 0, x, y, l, 1.0f))
+    for (auto deco : get_entities_at(destroy_deco, 0, x, y, l, 0.5f))
     {
         auto deco_ent = get_entity_ptr(deco);
         if (deco_ent)
@@ -446,7 +445,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, bool multi)
         const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
-        if (sf & 0x180 && test_flag(ent->flags, 3)) // solid floor
+        if (sf & 0x100 && test_flag(ent->flags, 3)) // solid floor
         {
             auto [fx, fy] = UI::get_position(ent);
             const auto goat = UI::get_entity_at(fx, fy, false, 20, 0x4);

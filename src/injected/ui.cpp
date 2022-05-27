@@ -208,6 +208,13 @@ struct EntityWindow
 };
 std::map<int, EntityWindow*> entity_windows;
 
+struct Callback
+{
+    uint32_t frame;
+    std::function<void()> func;
+};
+std::vector<Callback> callbacks;
+
 static ImFont *font, *bigfont, *hugefont;
 
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f, g_camera_speed = 1.0f;
@@ -916,6 +923,20 @@ bool update_players()
     return true;
 }
 
+void fix_decorations_at(int x, int y, LAYER layer)
+{
+    DEBUG("{} decorating {} {}", g_state->time_total, x, y);
+    for (int dx = x - 1; dx <= x + 1; ++dx)
+    {
+        for (int dy = y - 1; dy <= y + 1; ++dy)
+        {
+            auto fx = static_cast<float>(dx);
+            auto fy = static_cast<float>(dy);
+            UI::update_floor_at(fx, fy, layer);
+        }
+    }
+}
+
 void spawn_entities(bool s, std::string list = "")
 {
     const auto pos = text.find_first_of(" ");
@@ -933,9 +954,9 @@ void spawn_entities(bool s, std::string list = "")
                 return;
             }
         }
+        std::pair<float, float> cpos = UI::click_position(g_x, g_y);
         if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
         {
-            std::pair<float, float> cpos = UI::click_position(g_x, g_y);
             int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
             if (!lock_entity)
                 g_last_id = spawned;
@@ -949,7 +970,6 @@ void spawn_entities(bool s, std::string list = "")
                 g_vx = 0;
                 g_vy = 0;
 
-                std::pair<float, float> cpos = UI::click_position(g_x, g_y);
                 auto old_block_id = UI::get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
                 if (old_block_id != -1)
                 {
@@ -968,6 +988,16 @@ void spawn_entities(bool s, std::string list = "")
                     {
                         floor->fix_decorations(true, false);
                     }
+                    auto fpos = floor->position();
+                    auto fx = static_cast<int>(fpos.first);
+                    auto fy = static_cast<int>(fpos.second);
+                    auto layer = (LAYER)floor->layer;
+                    Callback cb = {g_state->time_total + 2, [fx, fy, layer]
+                                {
+                                    fix_decorations_at(fx, fy, layer);
+                                }};
+                    callbacks.push_back(cb);
+                    DEBUG("{} added callback", g_state->time_total);
                 }
             }
             if (!lock_entity)
@@ -975,7 +1005,6 @@ void spawn_entities(bool s, std::string list = "")
         }
         else
         {
-            std::pair<float, float> cpos = UI::click_position(g_x, g_y);
             UI::spawn_liquid(to_spawn.id, cpos.first, cpos.second);
         }
     }
@@ -3191,19 +3220,6 @@ void fix_script_requires(Script auto* script)
     }
 }
 
-void fix_decorations_at(int x, int y, LAYER layer)
-{
-    for (int dx = x - 1; dx <= x + 1; ++dx)
-    {
-        for (int dy = y - 1; dy <= y + 1; ++dy)
-        {
-            auto fx = static_cast<float>(dx);
-            auto fy = static_cast<float>(dy);
-            UI::update_floor_at(fx, fy, layer);
-        }
-    }
-}
-
 void update_script(Script auto* script)
 {
     if (!script->is_enabled())
@@ -3606,16 +3622,16 @@ void render_clickhandler()
                 spawn_entities(true);
             }
         }
-        else if (held("mouse_erase") && ImGui::IsWindowFocused())
+        else if (held("mouse_erase"))
         {
             erase_entities();
         }
-        else if (clicked("mouse_decorate") && ImGui::IsWindowFocused())
+        else if (clicked("mouse_decorate"))
         {
             grid_x = UINT_MAX;
             grid_y = UINT_MAX;
         }
-        else if (held("mouse_decorate") && ImGui::IsWindowFocused())
+        else if (held("mouse_decorate"))
         {
             auto [nx, ny] = normalize(ImGui::GetMousePos());
             auto pos = UI::click_position(nx, ny);
@@ -5572,6 +5588,20 @@ void force_time()
         g_state->quests->madame_tusk_state = quest_tusk_state.value();
     if (quest_beg_state.has_value())
         g_state->quests->beg_state = quest_beg_state.value();
+
+    for (auto it = callbacks.begin(); it != callbacks.end();)
+    {
+        if (g_state->time_total >= it->frame)
+        {
+            DEBUG("{} calling callback", g_state->time_total);
+            it->func();
+            it = callbacks.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 void render_timer()
