@@ -6,8 +6,8 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <misc\cpp\imgui_stdlib.h>
-#include <windows.h>
 #include <shellapi.h>
+#include <windows.h>
 
 #include <algorithm>
 #include <array>
@@ -1029,9 +1029,9 @@ void spawn_entities(bool s, std::string list = "")
                     auto fy = static_cast<int>(fpos.second);
                     auto layer = (LAYER)floor->layer;
                     Callback cb = {g_state->time_total + 2, [fx, fy, layer]
-                                {
-                                    fix_decorations_at(fx, fy, layer);
-                                }};
+                                   {
+                                       fix_decorations_at(fx, fy, layer);
+                                   }};
                     callbacks.push_back(cb);
                 }
             }
@@ -3833,7 +3833,6 @@ void render_clickhandler()
             }
             else if (!g_held_entity->is_movable())
             {
-
             }
             g_x = 0;
             g_y = 0;

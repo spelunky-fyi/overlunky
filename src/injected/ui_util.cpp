@@ -1,14 +1,15 @@
 #include "ui_util.hpp"
 
+#include "entities_activefloors.hpp"
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
-#include "entities_activefloors.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
 #include "steam_api.hpp"
+
 
 void UI::godmode(bool g)
 {
@@ -329,7 +330,7 @@ bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
 {
     return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
 }
-void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, [[maybe_unused]]bool multi)
+void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, [[maybe_unused]] bool multi)
 {
     if (!ent)
         return;
@@ -416,7 +417,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, [[maybe_unused]]bo
             {
                 int32_t uid = check->uid;
                 Entity* find_jelly;
-                while(true)
+                while (true)
                 {
                     uid--;
                     find_jelly = get_entity_ptr(uid);
