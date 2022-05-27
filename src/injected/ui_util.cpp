@@ -294,6 +294,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
         to_id("ENT_TYPE_DECORATION_CROSS_BEAM"),
         to_id("ENT_TYPE_DECORATION_HANGING_WIRES"),
         to_id("ENT_TYPE_DECORATION_MINEWOOD_POLE"),
+        to_id("ENT_TYPE_DECORATION_PAGODA_POLE"),
     };
     auto uid = get_grid_entity_at(x, y, l);
     if (uid == -1)
@@ -458,8 +459,8 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, [[maybe_unused]]bo
     }
     if (!ent->is_player())
     {
-        const LAYER layer = (LAYER)ent->layer;
-        const auto [x, y] = UI::get_position(ent);
+        // const LAYER layer = (LAYER)ent->layer;
+        // const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
         if (sf & 0x100 && test_flag(ent->flags, 3)) // solid floor

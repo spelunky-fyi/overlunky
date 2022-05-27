@@ -221,7 +221,7 @@ float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, 
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
-    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF;
+    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1;
 unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0;
@@ -936,6 +936,37 @@ void fix_decorations_at(int x, int y, LAYER layer)
     }
 }
 
+std::string spawned_type()
+{
+    const auto pos = text.find_first_of(" ");
+    if (pos == std::string::npos && g_filtered_count > 0)
+    {
+        auto to_spawn = g_items[g_filtered_items[g_current_item]];
+        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
+        {
+            if (g_entity)
+            {
+                return entity_full_names[g_entity->type->id];
+            }
+            else if (g_last_type >= 0)
+            {
+                return entity_full_names[g_last_type];
+            }
+        }
+        else if (g_current_item > 0 && g_filtered_count > 0)
+        {
+            to_spawn = g_items[g_filtered_items[g_current_item]];
+            return to_spawn.name;
+        }
+        return "";
+    }
+    else
+    {
+        return text;
+    }
+    return "";
+}
+
 void spawn_entities(bool s, std::string list = "")
 {
     const auto pos = text.find_first_of(" ");
@@ -947,6 +978,10 @@ void spawn_entities(bool s, std::string list = "")
             if (g_entity)
             {
                 to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
+            }
+            else if (g_last_type >= 0)
+            {
+                to_spawn = EntityItem{entity_full_names[g_last_type], (uint32_t)g_last_type};
             }
             else
             {
@@ -3676,6 +3711,28 @@ void render_clickhandler()
             g_vx = 0;
             g_vy = 0;
         }
+        else if (dblclicked("mouse_grab") || dblclicked("mouse_grab_unsafe"))
+        {
+            startpos = ImGui::GetMousePos();
+            set_pos(startpos);
+            unsigned int mask = safe_entity_mask;
+            if (held("mouse_grab_unsafe"))
+            {
+                mask = unsafe_entity_mask;
+            }
+            g_held_entity = UI::get_entity_at(g_x, g_y, true, 2, mask);
+            if (g_held_entity)
+            {
+                options["draw_hitboxes"] = true;
+                g_held_id = g_held_entity->uid;
+                g_held_flags = g_held_entity->flags;
+                g_last_type = g_held_entity->type->id;
+            }
+            if (!lock_entity)
+                g_last_id = g_held_id;
+            g_current_item = 0;
+            update_filter("");
+        }
         else if (clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
         {
             startpos = ImGui::GetMousePos();
@@ -3691,6 +3748,7 @@ void render_clickhandler()
                 options["draw_hitboxes"] = true;
                 g_held_id = g_held_entity->uid;
                 g_held_flags = g_held_entity->flags;
+                g_last_type = g_held_entity->type->id;
             }
             if (!lock_entity)
                 g_last_id = g_held_id;
@@ -5003,8 +5061,8 @@ void render_entity_finder()
     if (g_selected_ids.size() > 0)
     {
         ImGui::Text("");
-        ImGui::Text("%d entities selected:", g_selected_ids.size());
-        if (ImGui::Button("Smart destroy##SmartDestroySelectedEntities"))
+        ImGui::Text("%d entities selected:", (int)g_selected_ids.size());
+        if (ImGui::Button("Smart delete##SmartDestroySelectedEntities"))
         {
             for (auto selected_uid : g_selected_ids)
             {
@@ -5085,7 +5143,7 @@ void render_entity_props(int uid, bool detached = false)
     const auto is_movable = entity->is_movable();
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     render_uid(entity->uid, "EntityGeneral");
-    if (ImGui::Button("Smart destroy##SafeKillEntity"))
+    if (ImGui::Button("Smart delete##SafeKillEntity"))
     {
         UI::safe_destroy(entity, true);
     }
@@ -5598,6 +5656,13 @@ void force_time()
         {
             ++it;
         }
+    }
+
+    if (g_state->loading > 0)
+    {
+        g_selected_ids.clear();
+        g_last_id = -1;
+        g_entity = nullptr;
     }
 }
 
@@ -6161,6 +6226,11 @@ void render_prohud()
     buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+
+    auto type = spawned_type();
+    buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}", type)));
+    textsize = ImGui::CalcTextSize(buf.c_str());
+    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y * 2 + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 }
 
 void render_tool(std::string tool)
@@ -6577,7 +6647,7 @@ void post_draw()
 void create_box(std::vector<EntityItem> items)
 {
     std::vector<EntityItem> new_items(items);
-    new_items.emplace(new_items.begin(), "ENT_TYPE_Select entity to spawn:", 0); // :D
+    new_items.emplace(new_items.begin(), "ENT_TYPE_Use entity picker or select entity to spawn:", 0);
 
     std::sort(new_items.begin(), new_items.end());
 
