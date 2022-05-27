@@ -10,7 +10,6 @@
 #include "state.hpp"
 #include "steam_api.hpp"
 
-
 void UI::godmode(bool g)
 {
     State::get().godmode(g);
