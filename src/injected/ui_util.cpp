@@ -10,6 +10,8 @@
 #include "state.hpp"
 #include "steam_api.hpp"
 
+#include <unordered_set>
+
 void UI::godmode(bool g)
 {
     State::get().godmode(g);
@@ -334,6 +336,15 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, [[maybe_unused]] b
     if (!ent)
         return;
 
+    static const auto backitems = {
+        to_id("ENT_TYPE_ITEM_JETPACK"),
+        to_id("ENT_TYPE_ITEM_HOVERPACK"),
+        to_id("ENT_TYPE_ITEM_POWERPACK"),
+        to_id("ENT_TYPE_ITEM_TELEPORTER_BACKPACK"),
+        to_id("ENT_TYPE_ITEM_CAPE"),
+        to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
+    };
+
     static const auto jellys = {
         to_id("ENT_TYPE_MONS_MEGAJELLYFISH"),
         to_id("ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND"),
@@ -453,6 +464,22 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, [[maybe_unused]] b
                 const auto torch = check->overlay->as<Torch>();
                 torch->light_up(false);
                 return;
+            }
+            else if (in_array(check->type->id, backitems))
+            {
+                if (check->overlay && (check->overlay->type->search_flags & 0x5) > 0)
+                {
+                    auto wearer = check->overlay->as<PowerupCapable>();
+                    for (const auto& [powerup_type, powerup_entity] : wearer->powerups)
+                    {
+                        if (check == powerup_entity)
+                        {
+                            unequip_backitem(check->overlay->uid);
+                            check->destroy();
+                            return;
+                        }
+                    }
+                }
             }
             check = check->overlay;
         } while (check);
