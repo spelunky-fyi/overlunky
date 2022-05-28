@@ -1,6 +1,5 @@
 #include "entities_floors.hpp"
 
-#include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
 
@@ -194,7 +193,7 @@ void Floor::remove_decoration(FLOOR_SIDE side)
     {
         if (Entity* deco = find_corner_decoration(side))
         {
-            if (entity_has_item_uid(uid, deco->uid))
+            if (items.contains(deco))
                 deco->kill(false, nullptr);
         }
     }
@@ -204,7 +203,7 @@ void Floor::remove_decoration(FLOOR_SIDE side)
         {
             if (Entity* deco = get_entity_ptr(decos[side]))
             {
-                if (entity_has_item_uid(uid, deco->uid))
+                if (items.contains(deco))
                     deco->kill(false, nullptr);
             }
             decos[side] = -1;
