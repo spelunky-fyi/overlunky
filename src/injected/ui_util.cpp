@@ -292,6 +292,7 @@ void UI::kill_entity_overlay(Entity* ent)
 }
 void UI::update_floor_at(float x, float y, LAYER l)
 {
+    static const auto thorn_vine = to_id("ENT_TYPE_FLOOR_THORN_VINE");
     static const auto destroy_deco = {
         to_id("ENT_TYPE_DECORATION_HANGING_HIDE"),
         to_id("ENT_TYPE_DECORATION_CROSS_BEAM"),
@@ -323,7 +324,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
         if (deco_ent)
             deco_ent->destroy();
     }
-    if (test_flag(floor->type->properties_flags, 2))
+    if (test_flag(floor->type->properties_flags, 2) && floor->type->id != thorn_vine)
         floor->decorate_internal();
     else
         floor->fix_decorations(true, false);
@@ -334,23 +335,23 @@ bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
 }
 void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
 {
-    static auto cleanup_ents = {
+    static const auto cleanup_ents = {
         to_id("ENT_TYPE_LOGICAL_REGENERATING_BLOCK"),
         to_id("ENT_TYPE_MIDBG"),
         to_id("ENT_TYPE_MIDBG_STYLEDDECORATION"),
     };
 
-    static auto platform_types = {
+    static const auto platform_types = {
         to_id("ENT_TYPE_FLOOR_PLATFORM"),
         to_id("ENT_TYPE_FLOOR_PAGODA_PLATFORM"),
     };
-    static auto platform_bg = to_id("ENT_TYPE_MIDBG_PLATFORM_STRUCTURE");
+    static const auto platform_bg = to_id("ENT_TYPE_MIDBG_PLATFORM_STRUCTURE");
 
-    static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
-    static auto layer_door = to_id("ENT_TYPE_FLOOR_DOOR_LAYER");
-    static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
-    static auto door_platform = to_id("ENT_TYPE_FLOOR_DOOR_PLATFORM");
-    static auto door_crap = {
+    static const auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
+    static const auto layer_door = to_id("ENT_TYPE_FLOOR_DOOR_LAYER");
+    static const auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
+    static const auto door_platform = to_id("ENT_TYPE_FLOOR_DOOR_PLATFORM");
+    static const auto door_crap = {
         to_id("ENT_TYPE_FLOOR_DOOR_LAYER"),
         to_id("ENT_TYPE_LOGICAL_DOOR"),
         to_id("ENT_TYPE_BG_DOOR"),
