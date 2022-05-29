@@ -4847,6 +4847,7 @@ void render_screen(const char* label, int state)
 
 void render_entity_finder()
 {
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
     static std::string search_entity_name = "";
     if (set_focus_finder)
     {
@@ -4879,6 +4880,22 @@ void render_entity_finder()
     ImGui::SameLine();
     if (ImGui::RadioButton("Current layer", search_entity_layer == -1))
         search_entity_layer = -1;
+
+    static int search_entity_depth[2] = {0, 52};
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.25f);
+    if (ImGui::SliderInt("##EntitySearchDepthMin", &search_entity_depth[0], 0, 52, "%d", ImGuiSliderFlags_AlwaysClamp))
+    {
+        if (search_entity_depth[1] < search_entity_depth[0])
+            search_entity_depth[1] = search_entity_depth[0];
+    }
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.25f);
+    if (ImGui::SliderInt("Draw depth##EntitySearchDepthMax", &search_entity_depth[1], 0, 52, "%d", ImGuiSliderFlags_AlwaysClamp))
+    {
+        if (search_entity_depth[0] > search_entity_depth[1])
+            search_entity_depth[0] = search_entity_depth[1];
+    }
+    ImGui::PopItemWidth();
+    // ImGui::DragIntRange2("Draw depth##EntitySearchDepth", &search_entity_depth[0], &search_entity_depth[1], 1.0f, 0, 52);
 
     static int search_entity_mask = 0;
     if (ImGui::CollapsingHeader("Mask##EntitySearchMask"))
@@ -5077,6 +5094,16 @@ void render_entity_finder()
                                                     return !StrStrIA(entity_names[ent->type->id].c_str(), search_entity_name.c_str()); }),
                                  g_selected_ids.end());
         }
+        if (search_entity_depth[0] > 0 || search_entity_depth[1] < 52)
+        {
+            g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
+                                                {
+                                                    auto ent = get_entity_ptr(filter_uid);
+                                                    if (!ent)
+                                                        return true;
+                                                    return ent->draw_depth < search_entity_depth[0] || ent->draw_depth > search_entity_depth[1]; }),
+                                 g_selected_ids.end());
+        }
     }
     ImGui::SameLine();
     if (ImGui::Button("Reset##ResetSearchEntities"))
@@ -5084,6 +5111,8 @@ void render_entity_finder()
         search_entity_name = "";
         search_entity_type = 0;
         search_entity_mask = 0;
+        search_entity_depth[0] = 0;
+        search_entity_depth[1] = 52;
         search_entity_layer = -128;
         search_entity_flags = 0;
         search_entity_not_flags = 0;
@@ -5136,6 +5165,7 @@ void render_entity_finder()
             render_uid(selected_uid, "Multiselect");
         }
     }
+    ImGui::PopItemWidth();
 }
 
 void render_entity_props(int uid, bool detached = false)
