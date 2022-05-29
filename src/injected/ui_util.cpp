@@ -450,7 +450,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         to_id("ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL"),
         to_id("ENT_TYPE_ACTIVEFLOOR_CHAINED_SPIKEBALL"),
         to_id("ENT_TYPE_ITEM_STICKYTRAP_BALL"),
-        to_id("ENT_TYPE_ACTIVEFLOOR_REGENERATINGGBLOCK"),
+        to_id("ENT_TYPE_ACTIVEFLOOR_REGENERATINGBLOCK"),
     };
 
     static const auto flame = {
