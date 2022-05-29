@@ -334,7 +334,7 @@ class Entity
     virtual bool is_in_liquid() = 0;
     virtual bool check_type_properties_flags_19() = 0; // checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger
     virtual uint32_t get_type_field_60() = 0;
-    virtual void set_invisible(bool) = 0;
+    virtual void set_invisible(bool value) = 0;
     virtual void handle_turning_left(bool apply) = 0; // if disabled, monsters don't turn left and keep walking in the wall (and other right-left issues)
     virtual void set_draw_depth(uint8_t draw_depth) = 0;
     virtual void resume_ai() = 0; // works on entities with ai_func != 0; runs when companions are let go from being held. AI resumes anyway in 1.23.3
