@@ -1040,7 +1040,7 @@ void spawn_entities(bool s, std::string list = "")
                 }
                 else
                 {
-                    auto old_activefloor = UI::get_entity_at(cpos.first, cpos.second, false, 0.5f, 0x80);
+                    auto old_activefloor = UI::get_entity_at(std::round(cpos.first), std::round(cpos.second), false, 0.5f, 0x80);
                     if (old_activefloor)
                         smart_delete(old_activefloor);
                 }
