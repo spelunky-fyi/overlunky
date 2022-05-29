@@ -3,6 +3,7 @@
 #include "entities_activefloors.hpp"
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
+#include "entities_mounts.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
 #include "rpc.hpp"
@@ -596,6 +597,12 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         else if (ent->is_liquid())
         {
             ent->kill(true, ent);
+        }
+        else if (sf & 0x2)
+        {
+            auto mount = ent->as<Mount>();
+            mount->remove_rider();
+            mount->destroy();
         }
         else
         {
