@@ -3070,7 +3070,7 @@ bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlun
 bool | [trigger_action(Entity user)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_action) | Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
  | [get_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) | 
  | [apply_metadata(int metadata)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) | 
- | [set_invisible(bool)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
+ | [set_invisible(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
 span&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
 bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | Returns true if entity is in water/lava
 

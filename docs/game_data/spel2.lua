@@ -1929,7 +1929,7 @@ local function PRNG_random(self, min, max) end
     ---@field trigger_action fun(self, user: Entity): boolean
     ---@field get_metadata any @&Entity::get_metadata
     ---@field apply_metadata fun(self, metadata: integer): nil
-    ---@field set_invisible fun(self, n: boolea): nil
+    ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self, ): span<integer>
     ---@field is_in_liquid fun(self, ): boolean
 
@@ -7299,6 +7299,11 @@ SCREEN = {
   WIN = 16
 }
 ---@alias SCREEN integer
+SHAPE = {
+  RECTANGLE = 1,
+  CIRCLE = 2
+}
+---@alias SHAPE integer
 SHOP_TYPE = {
   CAVEMAN_SHOP = 10,
   CLOTHING_SHOP = 1,
