@@ -519,7 +519,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
                 check->destroy();
                 return;
             }
-            else if (in_array(check->type->id, kill_last_overlay))
+            else if (in_array(check->type->id, kill_last_overlay) || (check->type->search_flags & 0x200 && check->draw_depth <= 11)) // normal floor decorations, missing those and killing floor is not good
             {
                 kill_entity_overlay(check);
                 return;
