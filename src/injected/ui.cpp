@@ -939,6 +939,30 @@ void fix_decorations_at(int x, int y, LAYER layer)
     }
 }
 
+void smart_delete(Entity* ent, bool unsafe = false)
+{
+    static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
+    static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
+    if ((ent->type->id >= first_door && ent->type->id <= first_door + 15) || ent->type->id == logical_door)
+    {
+        auto pos = ent->position();
+        auto layer = (LAYER)ent->layer;
+        UI::cleanup_at(pos.first, pos.second, layer, ent->type->id);
+    }
+    if (ent->type->search_flags & 0x180)
+    {
+        auto pos = ent->position();
+        auto layer = (LAYER)ent->layer;
+        ENT_TYPE type = ent->type->id;
+        Callback cb = {g_state->time_total + 1, [pos, layer, type]
+                       {
+                           UI::cleanup_at(pos.first, pos.second, layer, type);
+                       }};
+        callbacks.push_back(cb);
+    }
+    UI::safe_destroy(ent, unsafe);
+}
+
 std::string spawned_type()
 {
     const auto pos = text.find_first_of(" ");
@@ -1011,8 +1035,14 @@ void spawn_entities(bool s, std::string list = "")
                 {
                     auto old_block = get_entity_ptr(old_block_id);
 
-                    if (old_block) // grid entities can be messed up if you move them with mouse etc.
-                        old_block->destroy();
+                    if (old_block)
+                        smart_delete(old_block);
+                }
+                else
+                {
+                    auto old_activefloor = UI::get_entity_at(cpos.first, cpos.second, false, 0.5f, 0x80);
+                    if (old_activefloor)
+                        smart_delete(old_activefloor);
                 }
             }
             int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
@@ -2272,7 +2302,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         auto selected = get_entity_ptr(g_last_id);
         if (selected)
-            UI::safe_destroy(selected, true);
+            smart_delete(selected, true);
         if (!lock_entity)
             g_last_id = -1;
     }
@@ -2282,7 +2312,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         {
             auto ent = get_entity_ptr(selected_uid);
             if (ent)
-                UI::safe_destroy(ent, false, true, true);
+                smart_delete(ent, false);
         }
         g_selected_ids.clear();
     }
@@ -3046,7 +3076,7 @@ void erase_entities()
     {
         auto erase = get_entity_ptr(erase_uid);
         if (erase)
-            UI::safe_destroy(erase);
+            smart_delete(erase);
     }
 }
 
@@ -3978,7 +4008,7 @@ void render_clickhandler()
             }
             Entity* to_kill = UI::get_entity_at(g_x, g_y, true, 2, mask);
             if (to_kill)
-                UI::safe_destroy(to_kill, mask == unsafe_entity_mask);
+                smart_delete(to_kill, mask == unsafe_entity_mask);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -4102,21 +4132,26 @@ void render_options()
 
     if (ImGui::CollapsingHeader("Hitbox entity types to draw"))
     {
+        ImGui::PushID("HitboxMask");
         ImGui::Indent(16.0f);
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < 15; i++)
         {
             if (i % 2)
                 ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
             ImGui::CheckboxFlags(mask_names[i], &g_hitbox_mask, (int)std::pow(2, i));
         }
+        ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+        ImGui::CheckboxFlags("Traps & Misc", &g_hitbox_mask, (int)std::pow(2, 15));
         tooltip("Some cherry-picked entities like traps and invisible walls.");
-        if (ImGui::Button("Restore defaults##RestoreDefaultHitboxMask"))
+        if (ImGui::Button("Defaults##RestoreDefaultHitboxMask"))
             g_hitbox_mask = default_hitbox_mask;
         ImGui::Unindent(16.0f);
+        ImGui::PopID();
     }
 
     if (ImGui::CollapsingHeader("Entity types to grab by default"))
     {
+        ImGui::PushID("PickerMask");
         ImGui::Indent(16.0f);
         for (int i = 0; i < 15; i++)
         {
@@ -4127,9 +4162,10 @@ void render_options()
         if (ImGui::Button("Any##AnyEntityMask"))
             safe_entity_mask = 0;
         ImGui::SameLine();
-        if (ImGui::Button("Defaults##DefaultEntityMask"))
+        if (ImGui::Button("Defaults##RestoreDefaultEntityMask"))
             safe_entity_mask = default_entity_mask;
         ImGui::Unindent(16.0f);
+        ImGui::PopID();
     }
 
     if (ImGui::Button("Edit style"))
@@ -5069,7 +5105,7 @@ void render_entity_finder()
             {
                 auto ent = get_entity_ptr(selected_uid);
                 if (ent)
-                    UI::safe_destroy(ent, false, true, true);
+                    smart_delete(ent, false);
             }
             g_selected_ids.clear();
         }
@@ -5146,7 +5182,7 @@ void render_entity_props(int uid, bool detached = false)
     render_uid(entity->uid, "EntityGeneral");
     if (ImGui::Button("Smart delete##SafeKillEntity"))
     {
-        UI::safe_destroy(entity, true);
+        smart_delete(entity, true);
     }
     tooltip("Try to get rid of the entity in some\nsmart way that hopefully doesn't crash.\nWorks on most boss heads and jellies.", "mouse_destroy");
     ImGui::SameLine();

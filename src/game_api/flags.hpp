@@ -686,5 +686,4 @@ const char* mask_names[]{
     "Logical",
     "Water",
     "Lava",
-    "Traps & Misc",
 };

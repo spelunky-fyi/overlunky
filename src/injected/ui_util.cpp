@@ -331,7 +331,77 @@ bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
 {
     return std::find(haystack.begin(), haystack.end(), needle) != haystack.end();
 }
-void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, [[maybe_unused]] bool multi)
+void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
+{
+    static auto cleanup_ents = {
+        to_id("ENT_TYPE_LOGICAL_REGENERATING_BLOCK"),
+        to_id("ENT_TYPE_MIDBG"),
+        to_id("ENT_TYPE_MIDBG_STYLEDDECORATION"),
+    };
+
+    static auto platform_types = {
+        to_id("ENT_TYPE_FLOOR_PLATFORM"),
+        to_id("ENT_TYPE_FLOOR_PAGODA_PLATFORM"),
+    };
+    static auto platform_bg = to_id("ENT_TYPE_MIDBG_PLATFORM_STRUCTURE");
+
+    static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
+    static auto layer_door = to_id("ENT_TYPE_FLOOR_DOOR_LAYER");
+    static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
+    static auto door_platform = to_id("ENT_TYPE_FLOOR_DOOR_PLATFORM");
+    static auto door_crap = {
+        to_id("ENT_TYPE_FLOOR_DOOR_LAYER"),
+        to_id("ENT_TYPE_LOGICAL_DOOR"),
+        to_id("ENT_TYPE_BG_DOOR"),
+        to_id("ENT_TYPE_BG_SHOP_BACKDOOR"),
+        to_id("ENT_TYPE_BG_DOOR_BLACK_MARKET"),
+        to_id("ENT_TYPE_BG_DOOR_COG"),
+        to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"),
+        to_id("ENT_TYPE_BG_DOOR_FRONT_LAYER"),
+        to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"),
+    };
+
+    for (auto bg : get_entities_at(cleanup_ents, 0, x, y, l, 0.1f))
+    {
+        auto bg_ent = get_entity_ptr(bg);
+        if (bg_ent)
+            bg_ent->destroy();
+    }
+
+    if (in_array(type, platform_types))
+    {
+        while (true)
+        {
+            y -= 1.0f;
+            auto bgs = get_entities_at(platform_bg, 0x400, x, y, l, 0.1f);
+            if (bgs.size() == 0)
+                return;
+            for (auto bg : bgs)
+            {
+                auto ent = get_entity_ptr(bg);
+                ent->destroy();
+            }
+        }
+    }
+
+    if (type >= first_door && type <= first_door + 14)
+    {
+        if (type == layer_door || type == logical_door)
+            l = LAYER::BOTH;
+        auto door_parts = get_entities_at(door_crap, 0, x, y, l, 0.5f);
+        for (auto part : door_parts)
+        {
+            auto ent = get_entity_ptr(part);
+            ent->destroy();
+        }
+        for (auto uid : get_entities_at(door_platform, 0x100, x, y - 1.0f, l, 0.5f))
+        {
+            auto ent = get_entity_ptr(uid);
+            ent->destroy();
+        }
+    }
+}
+void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
 {
     if (!ent)
         return;
@@ -380,6 +450,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse, [[maybe_unused]] b
         to_id("ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL"),
         to_id("ENT_TYPE_ACTIVEFLOOR_CHAINED_SPIKEBALL"),
         to_id("ENT_TYPE_ITEM_STICKYTRAP_BALL"),
+        to_id("ENT_TYPE_ACTIVEFLOOR_REGENERATINGGBLOCK"),
     };
 
     static const auto flame = {
