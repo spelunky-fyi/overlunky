@@ -1,5 +1,6 @@
 #include "drops.hpp"
 
+#include "entity.hpp"
 #include "memory.hpp"
 
 #include <iostream>
@@ -353,7 +354,8 @@ void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
 
 void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
 {
-    if (drop_id < (int32_t)drop_entries.size())
+    const static auto nof_ent_types = to_id("ENT_TYPE_LIQUID_COARSE_LAVA") + 1;
+    if (drop_id < (int32_t)drop_entries.size() && new_drop_entity_type < nof_ent_types)
     {
         if (drop_id < 0)
         {
