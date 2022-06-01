@@ -269,11 +269,15 @@ std::vector<DropEntry> drop_entries{
     {"GIANTSPIDER_WEB_RIGHT", "\xBA\x6E\x01\x00\x00\xE8****\x48"s, VTABLE_OFFSET::MONS_GIANTSPIDER, 75, 1},
     {"IMP_LAVAPOT", "\xBA\xE5\x01\x00\x00"s, VTABLE_OFFSET::MONS_IMP, 75, 1},
     // {"MECH_JETPACK_MECH", "\xBA\x38\x02\x00\x00"s, VTABLE_OFFSET::MOUNT_MECH, 75, 1}, // hoverpack actually works (lol), but still everything crashes on mech death
-    {"ICE_ALIVE_EMBEDDED_ON_ICE", "\xBA\xCF\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1, 2}, // two of them for soeam reason
+    {"ICE_ALIVE_EMBEDDED_ON_ICE", "\xBA\xCF\x01\x00\x00\xE8"s, VTABLE_OFFSET::NONE, 0, 1, 2}, // two of them for some reason
+    /// Most items that don't normally spawn in floor will be invisible and can have broken physics when the floor is destroyed
     {"FLOOR_EMERALD", "\xC6\x44\x24\x30\x00\xBA\xF2\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    /// Most items that don't normally spawn in floor will be invisible and can have broken physics when the floor is destroyed
     {"FLOOR_SAPPHIRE", "\xC6\x44\x24\x30\x00\xBA\xF3\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     /// Probably for the FLOOR_EMPRESS_GRAVE
+    /// Most items that don't normally spawn in floor will be invisible and can have broken physics when the floor is destroyed
     {"FLOOR_DIAMOND", "\xC6\x44\x24\x30\x00\xBA\xF1\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
+    /// Most items that don't normally spawn in floor will be invisible and can have broken physics when the floor is destroyed
     {"FLOOR_RUBY", "\xC6\x44\x24\x30\x00\xBA\xF4\x01\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"FLOOR_EMBED_GOLD", "\xC6\x44\x24\x30\x00\xBA\xBE\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
     {"FLOOR_EMBED_GOLD_BIG", "\xC6\x44\x24\x30\x00\xBA\xBF\x00\x00\x00"s, VTABLE_OFFSET::NONE, 0, 6},
