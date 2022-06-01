@@ -675,6 +675,18 @@ Name | Data | Description
 [ONLINE_LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SCREEN.ONLINE_LOADING) | 28 | 
 [ONLINE_LOBBY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SCREEN.ONLINE_LOBBY) | 29 | 
 
+## SHAPE
+
+
+> Search script examples for [SHAPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHAPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[RECTANGLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHAPE.RECTANGLE) | SHAPE::RECTANGLE | 
+[CIRCLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHAPE.CIRCLE) | SHAPE::CIRCLE | 
+
 ## SHOP_TYPE
 
 

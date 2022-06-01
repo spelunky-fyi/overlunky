@@ -2,6 +2,7 @@
 
 #include "aliases.hpp"
 #include "color.hpp"
+#include "math.hpp"
 
 class Player;
 class Entity;
@@ -43,7 +44,6 @@ class UI
     static void spawn_backdoor(float x, float y);
     static std::pair<float, float> get_position(Entity* ent, bool render = false);
     static bool has_active_render(Entity* ent);
-
     static void set_time_ghost_enabled(bool enable);
     static void set_time_jelly_enabled(bool enable);
     static ENT_TYPE get_entity_type(int32_t uid);
@@ -60,4 +60,11 @@ class UI
     static std::string_view get_room_template_name(uint16_t room_template);
     static std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l);
     static void steam_achievements(bool on);
+    static int32_t destroy_entity_items(Entity* ent);
+    static void destroy_entity_overlay(Entity* ent);
+    static void kill_entity_overlay(Entity* ent);
+    static void update_floor_at(float x, float y, LAYER l);
+    static void cleanup_at(float x, float y, LAYER l, ENT_TYPE type = 0);
+    static void safe_destroy(Entity* ent, bool unsafe = false, bool recurse = true);
+    static std::vector<uint32_t> get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer);
 };
