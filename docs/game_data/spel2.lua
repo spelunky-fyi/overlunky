@@ -890,6 +890,24 @@ function set_on_player_instagib(uid, fun) end
 ---@return CallbackId?
 function set_on_damage(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
+---The callback signature is `bool pre_update(Entity self)`
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_update(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after a floor is updated (by killed neighbor).
+---The callback signature is `nil post_update(Entity self)`
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_update(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
 ---The callback signature is `nil on_open(Entity entity_self, Entity opener)`
 ---Use this only when no other approach works, this call can be expensive if overused.
