@@ -1222,6 +1222,61 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
+    /// The callback signature is `bool pre_update(Entity self)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    lua["set_pre_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_pre_update(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    auto return_value = backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after a floor is updated (by killed neighbor).
+    /// The callback signature is `nil post_update(Entity self)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    lua["set_post_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_post_update(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    backend->handle_function(fun, lua["cast_entity"](self));
+                    backend->clear_current_callback();
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
     /// The callback signature is `nil on_open(Entity entity_self, Entity opener)`
     /// Use this only when no other approach works, this call can be expensive if overused.
