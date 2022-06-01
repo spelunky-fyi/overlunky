@@ -593,13 +593,13 @@ auto hook_update_callback(Entity* self)
 {
     hook_vtable<void(Entity*)>(
         self,
-        [uid = self->uid](Entity* self, void (*original)(Entity*))
+        [](Entity* entity, void (*original)(Entity*))
         {
-            EntityHooksInfo& _hook_info = self->get_hooks();
+            EntityHooksInfo& _hook_info = entity->get_hooks();
             bool skip_original{false};
             for (auto& [id, pre] : _hook_info.pre_update)
             {
-                if (pre(self))
+                if (pre(entity))
                 {
                     skip_original = true;
                     break;
@@ -607,11 +607,11 @@ auto hook_update_callback(Entity* self)
             }
             if (!skip_original)
             {
-                original(self);
+                original(entity);
             }
             for (auto& [id, post] : _hook_info.post_update)
             {
-                post(self);
+                post(entity);
             }
         },
         0x26);
