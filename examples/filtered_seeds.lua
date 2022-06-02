@@ -39,7 +39,7 @@ local reset_counter = 0
 
 function newseed()
     reset_counter = reset_counter + 1
-    if reset_counter % 10 == 0 then
+    if reset_counter % 25 == 0 then
         print("Reset counter: " .. reset_counter)
     end
     seed = math.random(0xFFFFFFFF)
@@ -48,6 +48,11 @@ function newseed()
 end
 
 function black_screen(draw_ctx)
+    if not in_run then
+        state.fadein = 0
+        state.fadeout = 0
+        state.fadevalue = 0
+    end
     local cam = state.camera
     sx, sy = screen_position(state.camera.bounds_left, state.camera.bounds_top) -- top left
     sx2, sy2 = screen_position(state.camera.bounds_right, state.camera.bounds_bottom) -- bottom right
@@ -58,6 +63,7 @@ set_callback(function()
     if in_run then
         if black_screen_cb ~= nil then
             clear_callback(black_screen_cb)
+            black_screen_cb = nil
         end
         return
     end
@@ -78,7 +84,7 @@ set_callback(function()
     for i, option in pairs(item_type_options) do
         if options[option.name] then table.insert(search_items, option.type) end
     end
-    
+
     local layer = LAYER.FRONT
     if options.fs_backlayer or options.fs07_plasmacannon then
       layer = LAYER.BOTH
