@@ -1758,3 +1758,33 @@ void change_poison_timer(int16_t frames)
         write_mem_recoverable("change_poison_timer", offset_subsequent, frames, true);
     }
 }
+
+void set_adventure_seed(int64_t first, int64_t second)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(0x22dd9d40); // TODO
+    }
+    if (offset != 0)
+    {
+        write_mem_prot(offset, first, true);
+        write_mem_prot(offset + 8, second, true);
+    }
+}
+
+std::pair<int64_t, int64_t> get_adventure_seed()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto memory = Memory::get();
+        offset = memory.at_exe(0x22dd9d40); // TODO
+    }
+    if (offset != 0)
+    {
+        return {read_i64(offset), read_i64(offset + 8)};
+    }
+    return {0, 0};
+}

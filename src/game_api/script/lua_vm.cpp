@@ -1534,6 +1534,11 @@ end
             return spawn_roomowner(owner_type, x, y, layer, room_template);
         });
 
+    /// Get the current adventure seed pair
+    lua["get_adventure_seed"] = get_adventure_seed;
+    /// Set the current adventure seed pair
+    lua["set_adventure_seed"] = set_adventure_seed;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
