@@ -6411,18 +6411,18 @@ void imgui_init(ImGuiContext*)
     refresh_script_files();
     autorun_scripts();
     set_colors();
-    windows["tool_entity"] = new Window({"Spawner (" + key_string(keys["tool_entity"]) + ")", is_tab_detached("tool_entity"), is_tab_open("tool_entity")});
-    windows["tool_door"] = new Window({"Warp (" + key_string(keys["tool_door"]) + ")", is_tab_detached("tool_door"), is_tab_open("tool_door")});
-    windows["tool_camera"] = new Window({"Camera (" + key_string(keys["tool_camera"]) + ")", is_tab_detached("tool_camera"), is_tab_open("tool_camera")});
-    windows["tool_entity_properties"] = new Window({"Entity (" + key_string(keys["tool_entity_properties"]) + ")", is_tab_detached("tool_entity_properties"), is_tab_open("tool_entity_properties")});
-    windows["tool_game_properties"] = new Window({"Game (" + key_string(keys["tool_game_properties"]) + ")", is_tab_detached("tool_game_properties"), is_tab_open("tool_game_properties")});
-    windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", is_tab_detached("tool_options"), is_tab_open("tool_options")});
-    windows["tool_debug"] = new Window({"Debug (" + key_string(keys["tool_debug"]) + ")", is_tab_detached("tool_debug"), is_tab_open("tool_debug")});
-    windows["tool_style"] = new Window({"Style (" + key_string(keys["tool_style"]) + ")", is_tab_detached("tool_style"), is_tab_open("tool_style")});
-    windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", is_tab_detached("tool_script"), is_tab_open("tool_script")});
-    windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", is_tab_detached("tool_save"), is_tab_open("tool_save")});
-    windows["tool_keys"] = new Window({"Keys (" + key_string(keys["tool_keys"]) + ")", is_tab_detached("tool_keys"), is_tab_open("tool_keys")});
-    windows["tool_finder"] = new Window({"Finder (" + key_string(keys["tool_finder"]) + ")", is_tab_detached("tool_finder"), is_tab_open("tool_finder")});
+    windows["tool_entity"] = new Window({"Spawner", is_tab_detached("tool_entity"), is_tab_open("tool_entity")});
+    windows["tool_door"] = new Window({"Warp", is_tab_detached("tool_door"), is_tab_open("tool_door")});
+    windows["tool_camera"] = new Window({"Camera", is_tab_detached("tool_camera"), is_tab_open("tool_camera")});
+    windows["tool_entity_properties"] = new Window({"Entity", is_tab_detached("tool_entity_properties"), is_tab_open("tool_entity_properties")});
+    windows["tool_game_properties"] = new Window({"Game", is_tab_detached("tool_game_properties"), is_tab_open("tool_game_properties")});
+    windows["tool_options"] = new Window({"Options", is_tab_detached("tool_options"), is_tab_open("tool_options")});
+    windows["tool_debug"] = new Window({"Debug", is_tab_detached("tool_debug"), is_tab_open("tool_debug")});
+    windows["tool_style"] = new Window({"Style", is_tab_detached("tool_style"), is_tab_open("tool_style")});
+    windows["tool_script"] = new Window({"Scripts", is_tab_detached("tool_script"), is_tab_open("tool_script")});
+    windows["tool_save"] = new Window({"Savegame", is_tab_detached("tool_save"), is_tab_open("tool_save")});
+    windows["tool_keys"] = new Window({"Keys", is_tab_detached("tool_keys"), is_tab_open("tool_keys")});
+    windows["tool_finder"] = new Window({"Finder", is_tab_detached("tool_finder"), is_tab_open("tool_finder")});
 
     if (g_ui_scripts.find("dark") == g_ui_scripts.end())
     {
@@ -6444,14 +6444,6 @@ void imgui_init(ImGuiContext*)
             false);
         g_ui_scripts["light"] = std::unique_ptr<SpelunkyScript>(script);
     }
-}
-
-std::string short_window_name(std::string tab)
-{
-    auto paren = windows[tab]->name.find_first_of("(");
-    if (paren != std::string::npos)
-        return windows[tab]->name.substr(0, paren - 1);
-    return windows[tab]->name;
 }
 
 void imgui_draw()
@@ -6490,7 +6482,7 @@ void imgui_draw()
                     for (size_t i = 0; i < tab_order.size() - 4; ++i)
                     {
                         auto tab = tab_order[i];
-                        if (ImGui::MenuItem(short_window_name(tab).c_str(), key_string(keys[tab]).c_str()))
+                        if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
                         {
                             toggle(tab);
                         }
@@ -6507,7 +6499,7 @@ void imgui_draw()
                     for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
                     {
                         auto tab = tab_order[i];
-                        if (ImGui::MenuItem(short_window_name(tab).c_str(), key_string(keys[tab]).c_str()))
+                        if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
                         {
                             toggle(tab);
                         }
@@ -6549,12 +6541,12 @@ void imgui_draw()
                         activate_tab = "";
                         active_tab = "";
                     }
-                    if (!detached(tab) && ImGui::BeginTabItem(short_window_name(tab).c_str(), &windows[tab]->open, flags))
+                    if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
                     {
                         if (ImGui::BeginDragDropSource())
                         {
                             ImGui::SetDragDropPayload("TAB", NULL, 0);
-                            ImGui::Text("Drag outside main window\nto detach %s", short_window_name(tab).c_str());
+                            ImGui::Text("Drag outside main window\nto detach %s", windows[tab]->name.c_str());
                             ImGui::EndDragDropSource();
                         }
                         active_tab = tab;
