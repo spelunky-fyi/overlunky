@@ -1144,7 +1144,7 @@ int pick_selected_entity(ImGuiInputTextCallbackData* data)
 
 bool update_entity()
 {
-    if (!visible("tool_entity_properties") && !options["draw_hitboxes"])
+    if (!visible("tool_entity_properties") && !options["draw_hitboxes"] && g_last_id == -1)
         return false;
     if (g_last_id > -1)
     {
@@ -3503,21 +3503,6 @@ void render_clickhandler()
             }
         }
 
-        static auto front_col = ImColor(0, 255, 51, 100);
-        static auto back_col = ImColor(255, 160, 31, 100);
-
-        for (auto entity : g_selected_ids)
-        {
-            auto ent = get_entity_ptr(entity);
-            if (ent)
-            {
-                if (ent->layer == g_state->camera_layer)
-                    render_hitbox(ent, false, front_col, true);
-                else
-                    render_hitbox(ent, false, back_col, true);
-            }
-        }
-
         if (ImGui::IsMousePosValid())
         {
             ImVec2 mpos = normalize(io.MousePos);
@@ -3543,10 +3528,25 @@ void render_clickhandler()
             }
         }
     }
-    if (options["draw_hitboxes"] && update_entity())
+
+    if (update_entity())
     {
         render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
     }
+    static auto front_col = ImColor(0, 255, 51, 100);
+    static auto back_col = ImColor(255, 160, 31, 100);
+    for (auto entity : g_selected_ids)
+    {
+        auto ent = get_entity_ptr(entity);
+        if (ent)
+        {
+            if (ent->layer == g_state->camera_layer)
+                render_hitbox(ent, false, front_col, true);
+            else
+                render_hitbox(ent, false, back_col, true);
+        }
+    }
+
     for (auto& [name, script] : g_scripts)
     {
         fix_script_requires(script.get());
@@ -3755,7 +3755,6 @@ void render_clickhandler()
             g_held_entity = UI::get_entity_at(g_x, g_y, true, 2, mask);
             if (g_held_entity)
             {
-                options["draw_hitboxes"] = true;
                 g_held_id = g_held_entity->uid;
                 g_held_flags = g_held_entity->flags;
                 g_last_type = g_held_entity->type->id;
@@ -3777,7 +3776,6 @@ void render_clickhandler()
             g_held_entity = UI::get_entity_at(g_x, g_y, true, 2, mask);
             if (g_held_entity)
             {
-                options["draw_hitboxes"] = true;
                 g_held_id = g_held_entity->uid;
                 g_held_flags = g_held_entity->flags;
                 g_last_type = g_held_entity->type->id;
@@ -3813,7 +3811,6 @@ void render_clickhandler()
         }
         else if (released("mouse_select") || released("mouse_select_unsafe"))
         {
-            options["draw_hitboxes"] = true;
             select_entities();
         }
         else if ((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
