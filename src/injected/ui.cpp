@@ -6446,6 +6446,14 @@ void imgui_init(ImGuiContext*)
     }
 }
 
+std::string short_window_name(std::string tab)
+{
+    auto paren = windows[tab]->name.find_first_of("(");
+    if (paren != std::string::npos)
+        return windows[tab]->name.substr(0, paren - 1);
+    return windows[tab]->name;
+}
+
 void imgui_draw()
 {
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
@@ -6482,16 +6490,15 @@ void imgui_draw()
                     for (size_t i = 0; i < tab_order.size() - 4; ++i)
                     {
                         auto tab = tab_order[i];
-                        if (ImGui::MenuItem(windows[tab]->name.c_str()))
+                        if (ImGui::MenuItem(short_window_name(tab).c_str(), key_string(keys[tab]).c_str()))
                         {
                             toggle(tab);
                         }
                     }
                     ImGui::Separator();
-                    if (ImGui::MenuItem("Detach active tool"))
+                    if (ImGui::MenuItem("Detach tab", key_string(keys["detach_tab"]).c_str()))
                     {
-                        if (options["tabbed_interface"])
-                            detach(active_tab);
+                        detach(active_tab);
                     }
                     ImGui::EndMenu();
                 }
@@ -6500,18 +6507,18 @@ void imgui_draw()
                     for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
                     {
                         auto tab = tab_order[i];
-                        if (ImGui::MenuItem(windows[tab]->name.c_str()))
+                        if (ImGui::MenuItem(short_window_name(tab).c_str(), key_string(keys[tab]).c_str()))
                         {
                             toggle(tab);
                         }
                     }
                     ImGui::Separator();
-                    if (ImGui::MenuItem("Save options"))
+                    if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
                     {
                         ImGui::SaveIniSettingsToDisk(inifile);
                         save_config(cfgfile);
                     }
-                    if (ImGui::MenuItem("Load options"))
+                    if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
                     {
                         ImGui::LoadIniSettingsFromDisk(inifile);
                         load_config(cfgfile);
@@ -6542,12 +6549,12 @@ void imgui_draw()
                         activate_tab = "";
                         active_tab = "";
                     }
-                    if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
+                    if (!detached(tab) && ImGui::BeginTabItem(short_window_name(tab).c_str(), &windows[tab]->open, flags))
                     {
                         if (ImGui::BeginDragDropSource())
                         {
                             ImGui::SetDragDropPayload("TAB", NULL, 0);
-                            ImGui::Text("Drag outside main window\nto detach %s", windows[tab]->name.c_str());
+                            ImGui::Text("Drag outside main window\nto detach %s", short_window_name(tab).c_str());
                             ImGui::EndDragDropSource();
                         }
                         active_tab = tab;
