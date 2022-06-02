@@ -245,6 +245,8 @@ std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
+std::vector<std::string> tabs_open = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"};
+std::vector<std::string> tabs_detached = {};
 
 std::string text;
 std::string g_change_key = "";
@@ -740,6 +742,47 @@ void save_config(std::string file)
               << "# A relative path is relative to the game directory. Use forward / slashes." << std::endl;
     writeData << "script_dir = \"" << scriptpath << "\"" << std::endl;
 
+    std::vector<std::string> ini_tabs_open;
+    std::vector<std::string> ini_tabs_detached;
+    for (auto [name, window] : windows)
+    {
+        if (window->open)
+            ini_tabs_open.push_back(name);
+        if (window->detached)
+            ini_tabs_detached.push_back(name);
+    }
+    if (windows.size() == 0)
+    {
+        ini_tabs_open = tabs_open;
+        ini_tabs_detached = tabs_detached;
+    }
+
+    writeData << "tabs_open = [";
+    for (unsigned int i = 0; i < ini_tabs_open.size(); i++)
+    {
+        writeData << std::endl
+                  << "  \"" << ini_tabs_open[i] << "\"";
+        if (i < ini_tabs_open.size() - 1)
+            writeData << ",";
+    }
+    if (!ini_tabs_open.empty())
+        writeData << std::endl;
+    writeData << "]" << std::endl;
+
+    writeData << "tabs_detached = [";
+    for (unsigned int i = 0; i < ini_tabs_detached.size(); i++)
+    {
+        writeData << std::endl
+                  << "  \"" << ini_tabs_detached[i] << "\"";
+        if (i < ini_tabs_detached.size() - 1)
+            writeData << ",";
+    }
+    if (!ini_tabs_detached.empty())
+        writeData << std::endl;
+    writeData << "]" << std::endl;
+
+    writeData << "tab_active = \"" << active_tab << "\"" << std::endl;
+
     writeData.close();
 }
 
@@ -799,6 +842,12 @@ void load_config(std::string file)
     auto ini_fontsize = toml::find_or<std::vector<float>>(opts, "font_size", {14.0f, 32.0f, 72.0f});
     if (ini_fontsize.size() >= 3)
         fontsize = ini_fontsize;
+    auto ini_tabs_open = toml::find_or<std::vector<std::string>>(opts, "tabs_open", {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"});
+    tabs_open = ini_tabs_open;
+    auto ini_tabs_detached = toml::find_or<std::vector<std::string>>(opts, "tabs_detached", {});
+    tabs_detached = ini_tabs_detached;
+    active_tab = toml::find_or<std::string>(opts, "tab_active", "tool_entity");
+    activate_tab = active_tab;
     UI::godmode(options["god_mode"]);
     if (options["disable_achievements"])
         UI::steam_achievements(false);
@@ -6333,6 +6382,16 @@ void render_tool(std::string tool)
         render_entity_finder();
 }
 
+bool is_tab_open(std::string name)
+{
+    return std::find(tabs_open.begin(), tabs_open.end(), name) != tabs_open.end();
+}
+
+bool is_tab_detached(std::string name)
+{
+    return std::find(tabs_detached.begin(), tabs_detached.end(), name) != tabs_detached.end();
+}
+
 void imgui_init(ImGuiContext*)
 {
     show_cursor();
@@ -6341,18 +6400,18 @@ void imgui_init(ImGuiContext*)
     refresh_script_files();
     autorun_scripts();
     set_colors();
-    windows["tool_entity"] = new Window({"Spawner (" + key_string(keys["tool_entity"]) + ")", false, true});
-    windows["tool_door"] = new Window({"Warp (" + key_string(keys["tool_door"]) + ")", false, true});
-    windows["tool_camera"] = new Window({"Camera (" + key_string(keys["tool_camera"]) + ")", false, true});
-    windows["tool_entity_properties"] = new Window({"Entity (" + key_string(keys["tool_entity_properties"]) + ")", false, true});
-    windows["tool_game_properties"] = new Window({"Game (" + key_string(keys["tool_game_properties"]) + ")", false, true});
-    windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", false, false});
-    windows["tool_debug"] = new Window({"Debug (" + key_string(keys["tool_debug"]) + ")", false, false});
-    windows["tool_style"] = new Window({"Style (" + key_string(keys["tool_style"]) + ")", false, false});
-    windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", false, false});
-    windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", false, false});
-    windows["tool_keys"] = new Window({"Keys (" + key_string(keys["tool_keys"]) + ")", false, false});
-    windows["tool_finder"] = new Window({"Finder (" + key_string(keys["tool_finder"]) + ")", false, true});
+    windows["tool_entity"] = new Window({"Spawner (" + key_string(keys["tool_entity"]) + ")", is_tab_detached("tool_entity"), is_tab_open("tool_entity")});
+    windows["tool_door"] = new Window({"Warp (" + key_string(keys["tool_door"]) + ")", is_tab_detached("tool_door"), is_tab_open("tool_door")});
+    windows["tool_camera"] = new Window({"Camera (" + key_string(keys["tool_camera"]) + ")", is_tab_detached("tool_camera"), is_tab_open("tool_camera")});
+    windows["tool_entity_properties"] = new Window({"Entity (" + key_string(keys["tool_entity_properties"]) + ")", is_tab_detached("tool_entity_properties"), is_tab_open("tool_entity_properties")});
+    windows["tool_game_properties"] = new Window({"Game (" + key_string(keys["tool_game_properties"]) + ")", is_tab_detached("tool_game_properties"), is_tab_open("tool_game_properties")});
+    windows["tool_options"] = new Window({"Options (" + key_string(keys["tool_options"]) + ")", is_tab_detached("tool_options"), is_tab_open("tool_options")});
+    windows["tool_debug"] = new Window({"Debug (" + key_string(keys["tool_debug"]) + ")", is_tab_detached("tool_debug"), is_tab_open("tool_debug")});
+    windows["tool_style"] = new Window({"Style (" + key_string(keys["tool_style"]) + ")", is_tab_detached("tool_style"), is_tab_open("tool_style")});
+    windows["tool_script"] = new Window({"Scripts (" + key_string(keys["tool_script"]) + ")", is_tab_detached("tool_script"), is_tab_open("tool_script")});
+    windows["tool_save"] = new Window({"Savegame (" + key_string(keys["tool_save"]) + ")", is_tab_detached("tool_save"), is_tab_open("tool_save")});
+    windows["tool_keys"] = new Window({"Keys (" + key_string(keys["tool_keys"]) + ")", is_tab_detached("tool_keys"), is_tab_open("tool_keys")});
+    windows["tool_finder"] = new Window({"Finder (" + key_string(keys["tool_finder"]) + ")", is_tab_detached("tool_finder"), is_tab_open("tool_finder")});
 
     if (g_ui_scripts.find("dark") == g_ui_scripts.end())
     {
