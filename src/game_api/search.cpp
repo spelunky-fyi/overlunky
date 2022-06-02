@@ -1601,12 +1601,19 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "load_screen"sv,
+        "load_screen_call"sv,
         PatternCommandBuffer{}
             .find_inst("\x24\xfd\x88\x46\x32\x48\x89\xf1"sv)
             .offset(0x8)
             .decode_call()
             .at_exe(),
+    },
+    {
+        "load_screen_func"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x8b\x49\x0c\x41\x8b\x47\x10"sv)
+            .at_exe()
+            .function_start(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
