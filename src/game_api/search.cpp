@@ -1600,6 +1600,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(-0x4)
             .at_exe(),
     },
+    {
+        "load_screen"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x24\xfd\x88\x46\x32\x48\x89\xf1"sv)
+            .offset(0x8)
+            .decode_call()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
