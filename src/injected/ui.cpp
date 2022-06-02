@@ -243,7 +243,7 @@ StateMemory* g_state = 0;
 SaveData* g_save = 0;
 std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
-std::string active_tab = "", activate_tab = "";
+std::string active_tab = "", activate_tab = "", detach_tab = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 std::vector<std::string> tabs_open = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"};
 std::vector<std::string> tabs_detached = {};
@@ -3458,6 +3458,7 @@ void render_clickhandler()
         ImGui::SetNextWindowSize(io.DisplaySize);
     }
     ImGui::SetNextWindowPos({0, 0});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
     ImGui::Begin(
         "Clickhandler",
         NULL,
@@ -3655,6 +3656,15 @@ void render_clickhandler()
     if (options["mouse_control"])
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const auto payload = ImGui::AcceptDragDropPayload("TAB", ImGuiDragDropFlags_AcceptNoDrawDefaultRect))
+            {
+                detach(active_tab);
+                detach_tab = active_tab;
+            }
+            ImGui::EndDragDropTarget();
+        }
 
         if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
         {
@@ -4064,6 +4074,7 @@ void render_clickhandler()
     }
 
     ImGui::End();
+    ImGui::PopStyleVar();
 }
 
 void render_options()
@@ -6533,6 +6544,12 @@ void imgui_draw()
                     }
                     if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
                     {
+                        if (ImGui::BeginDragDropSource())
+                        {
+                            ImGui::SetDragDropPayload("TAB", NULL, 0);
+                            ImGui::Text("Drag outside main window\nto detach %s", windows[tab]->name.c_str());
+                            ImGui::EndDragDropSource();
+                        }
                         active_tab = tab;
                         ImGui::BeginChild("ScrollableTool");
                         render_tool(tab);
@@ -6573,6 +6590,21 @@ void imgui_draw()
                      ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
                     ImGuiCond_Once);
                 ImGui::End();
+            }
+            if (detach_tab != "")
+            {
+                auto win = ImGui::FindWindowByName(windows[detach_tab]->name.c_str());
+                if (win)
+                {
+                    auto pos = ImGui::GetMousePos();
+                    win->Pos.x = pos.x - 32.0f;
+                    win->Pos.y = pos.y - 8.0f;
+                    if (win->Pos.x < 0.0f)
+                        win->Pos.x = 0.0f;
+                    if (win->Pos.y < 0.0f)
+                        win->Pos.y = 0.0f;
+                }
+                detach_tab = "";
             }
         }
         else if (options["stack_vertically"])
