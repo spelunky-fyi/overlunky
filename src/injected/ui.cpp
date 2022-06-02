@@ -4177,11 +4177,19 @@ void render_options()
     }
     tooltip("Edit the hotkeys for all the tools.", "tool_keys");
     if (ImGui::Button("Save options"))
+    {
+        ImGui::SaveIniSettingsToDisk(inifile);
         save_config(cfgfile);
+    }
     tooltip("Save current options to overlunky.ini.\nThis is not done automatically!", "save_settings");
     ImGui::SameLine();
     if (ImGui::Button("Load options"))
+    {
+        ImGui::LoadIniSettingsFromDisk(inifile);
         load_config(cfgfile);
+        refresh_script_files();
+        set_colors();
+    }
     tooltip("Load overlunky.ini.", "load_settings");
 }
 
@@ -6409,6 +6417,7 @@ void imgui_draw()
                             toggle(tab);
                         }
                     }
+                    ImGui::Separator();
                     if (ImGui::MenuItem("Detach active tool"))
                     {
                         if (options["tabbed_interface"])
@@ -6425,6 +6434,19 @@ void imgui_draw()
                         {
                             toggle(tab);
                         }
+                    }
+                    ImGui::Separator();
+                    if (ImGui::MenuItem("Save options"))
+                    {
+                        ImGui::SaveIniSettingsToDisk(inifile);
+                        save_config(cfgfile);
+                    }
+                    if (ImGui::MenuItem("Load options"))
+                    {
+                        ImGui::LoadIniSettingsFromDisk(inifile);
+                        load_config(cfgfile);
+                        refresh_script_files();
+                        set_colors();
                     }
                     ImGui::EndMenu();
                 }
