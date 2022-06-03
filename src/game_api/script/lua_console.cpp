@@ -842,7 +842,7 @@ bool LuaConsole::pre_draw()
         {
             std::string buf = fmt::format("{}", i);
             auto linesize = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, buf.c_str(), nullptr, nullptr);
-            drawlist->AddText(ImVec2(indent_size - linesize.x, io.DisplaySize.y - linesize.y * (num - i + 2) + 1.0f), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+            drawlist->AddText(ImVec2(indent_size - linesize.x - 2.0f, io.DisplaySize.y - linesize.y * (num - i + 2) + 4.0f), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
         }
         ImGui::End();
     }
