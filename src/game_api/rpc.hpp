@@ -119,3 +119,4 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer);
 void add_item_to_shop(int32_t item_uid, int32_t shop_owner);
 void change_poison_timer(int16_t frames);
 void disable_floor_embeds(bool disable);
+void disable_ghostjar_ghost_spawn(bool disable);

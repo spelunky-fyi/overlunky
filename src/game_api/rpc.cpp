@@ -1771,3 +1771,16 @@ void disable_floor_embeds(bool disable)
         recover_mem("disable_floor_embeds");
     }
 }
+
+void disable_ghostjar_ghost_spawn(bool disable)
+{
+    const static auto address = get_address("ghost_jar_ghost_spawn");
+    if (disable)
+    {
+        write_mem_recoverable("ghost_jar_ghost_spawn", address, "\x90\x90\x90\x90\x90"sv, true);
+    }
+    else
+    {
+        recover_mem("ghost_jar_ghost_spawn");
+    }
+}
