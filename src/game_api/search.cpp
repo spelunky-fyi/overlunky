@@ -1615,7 +1615,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
-};
+    {
+        "adventure_seed"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x4c\x8d\x80\xa0\x00\x00\x00"sv)
+            .offset(0x7)
+            .decode_pc()
+            .at_exe(),
+    }};
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
 void preload_addresses()
