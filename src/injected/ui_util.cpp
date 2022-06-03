@@ -324,10 +324,14 @@ void UI::update_floor_at(float x, float y, LAYER l)
         if (deco_ent)
             deco_ent->destroy();
     }
-    if (test_flag(floor->type->properties_flags, 2) && floor->type->id != thorn_vine)
-        floor->decorate_internal();
-    else
-        floor->fix_decorations(true, false);
+    floor->on_neighbor_destroyed();
+    if (test_flag(floor->type->properties_flags, 1) || test_flag(floor->type->properties_flags, 2))
+    {
+        if (floor->type->id == thorn_vine || floor->type->id < 4)
+            floor->fix_decorations(true, false);
+        else
+            floor->decorate_internal();
+    }
 }
 bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
 {
@@ -559,41 +563,14 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
     }
     if (!ent->is_player())
     {
-        // const LAYER layer = (LAYER)ent->layer;
-        // const auto [x, y] = UI::get_position(ent);
+        const LAYER layer = (LAYER)ent->layer;
+        const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
         if (sf & 0x100 && test_flag(ent->flags, 3)) // solid floor
         {
-            auto [fx, fy] = UI::get_position(ent);
-            // always blaiming the closest MONS for floor destruction
-            // in case this is shop floor, the shopkeeper doesn't get mad this way
-            const auto goat = UI::get_entity_at(fx, fy, false, 20, 0x4);
-            ent->kill(true, goat);
-
-            /*
-            TODO: oh crap you actually have to kill floor to update the liquid floor map
-            this creates ton of particles and pisses everyone off but oh well, wip
-
             ent->destroy();
-            update_floor_at(x - 1, y, layer);
-            update_floor_at(x + 1, y, layer);
-            update_floor_at(x, y - 1, layer);
-            update_floor_at(x, y + 1, layer);
-            */
-
-            /* nope doesn't update liquid floor map either
-            auto state = State::get();
-            const auto pos = ent->position();
-            const uint32_t grid_x = static_cast<uint32_t>(std::round(pos.first));
-            const uint32_t grid_y = static_cast<uint32_t>(std::round(pos.second));
-            if (grid_x < 0x56 && grid_y < 0x7e)
-            {
-                if (state.layer(ent->layer)->grid_entities[grid_y][grid_x] == ent)
-                    state.layer(ent->layer)->grid_entities[grid_y][grid_x] = nullptr;
-            }
-            ent->destroy();
-            */
+            update_liquid_collision_at(x, y, false);
         }
         else if (ent->is_liquid())
         {
