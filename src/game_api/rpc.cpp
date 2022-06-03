@@ -1758,3 +1758,16 @@ void change_poison_timer(int16_t frames)
         write_mem_recoverable("change_poison_timer", offset_subsequent, frames, true);
     }
 }
+
+void update_liquid_collision_at(float x, float y, bool add)
+{
+    using UpdateLiquidCollision = void(LiquidPhysics*, int32_t, int32_t, bool); // setting last parameter to true just skips the whole function
+    UpdateLiquidCollision* RemoveLiquidCollision_fun = (UpdateLiquidCollision*)get_address("remove_from_liquid_collision_map");
+    UpdateLiquidCollision* AddLiquidCollision_fun = (UpdateLiquidCollision*)get_address("add_from_liquid_collision_map");
+    auto state = get_state_ptr();
+
+    if (add)
+        AddLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
+    else
+        RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
+}

@@ -2393,8 +2393,8 @@ SCREEN = {
   WIN = 16
 }
 SHAPE = {
-  RECTANGLE = 1,
-  CIRCLE = 2
+  CIRCLE = 2,
+  RECTANGLE = 1
 }
 SHOP_TYPE = {
   CAVEMAN_SHOP = 10,
