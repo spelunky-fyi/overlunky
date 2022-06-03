@@ -621,6 +621,20 @@ void register_usertypes(sol::state& lua)
         &ScreenConstellation::animation_timer,
         "constellation_text_opacity",
         &ScreenConstellation::constellation_text_opacity,
+        "constellation_text",
+        sol::property([](ScreenConstellation& s) -> std::u16string_view
+                      {
+                          std::u16string_view str(s.constellation_text);
+                          return str; },
+                      [](ScreenConstellation& s, std::u16string new_str)
+                      {
+                          const char16_t* src = new_str.c_str();
+                          char16_t* temp = s.constellation_text;
+                          unsigned int n = 0;
+                          while ((*temp++ = *src++) != 0)
+                              if (n++ >= 30)
+                                  break;
+                      }),
         sol::base_classes,
         sol::bases<Screen>());
 
