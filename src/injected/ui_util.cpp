@@ -563,7 +563,6 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
     }
     if (!ent->is_player())
     {
-        const LAYER layer = (LAYER)ent->layer;
         const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
