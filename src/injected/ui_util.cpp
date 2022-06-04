@@ -293,12 +293,14 @@ void UI::kill_entity_overlay(Entity* ent)
 void UI::update_floor_at(float x, float y, LAYER l)
 {
     static const auto thorn_vine = to_id("ENT_TYPE_FLOOR_THORN_VINE");
+    static const auto pipe = to_id("ENT_TYPE_FLOOR_PIPE");
     static const auto destroy_deco = {
         to_id("ENT_TYPE_DECORATION_HANGING_HIDE"),
         to_id("ENT_TYPE_DECORATION_CROSS_BEAM"),
         to_id("ENT_TYPE_DECORATION_HANGING_WIRES"),
         to_id("ENT_TYPE_DECORATION_MINEWOOD_POLE"),
         to_id("ENT_TYPE_DECORATION_PAGODA_POLE"),
+        to_id("ENT_TYPE_DECORATION_PIPE"),
     };
     auto uid = get_grid_entity_at(x, y, l);
     if (uid == -1)
@@ -308,10 +310,22 @@ void UI::update_floor_at(float x, float y, LAYER l)
         return;
     auto floor = ent->as<Floor>();
     if (test_flag(floor->type->properties_flags, 1) && floor->get_decoration_entity_type() != -1)
+    {
         for (int i = 0; i < 7; ++i)
         {
             floor->remove_decoration((FLOOR_SIDE)i);
         }
+    }
+    else if (floor->type->id == pipe || floor->type->id == thorn_vine)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            auto deco_ent = get_entity_ptr(floor->decos[i]);
+            if (deco_ent)
+                deco_ent->destroy();
+            floor->decos[i] = -1;
+        }
+    }
     for (auto deco : entity_get_items_by(floor->uid, destroy_deco, 0x200))
     {
         auto deco_ent = get_entity_ptr(deco);
@@ -324,13 +338,21 @@ void UI::update_floor_at(float x, float y, LAYER l)
         if (deco_ent)
             deco_ent->destroy();
     }
-    floor->on_neighbor_destroyed();
     if (test_flag(floor->type->properties_flags, 1) || test_flag(floor->type->properties_flags, 2))
     {
-        if (floor->type->id == thorn_vine || floor->type->id < 4)
+        if (floor->type->id < 4)
+        {
+            floor->on_neighbor_destroyed();
             floor->fix_decorations(true, false);
+        }
         else
+        {
             floor->decorate_internal();
+        }
+    }
+    else
+    {
+        floor->on_neighbor_destroyed();
     }
 }
 bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
