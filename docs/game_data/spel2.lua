@@ -34,13 +34,21 @@ function get_player(slot, or_ghost) end
 ---@param slot integer
 ---@return PlayerGhost
 function get_playerghost(slot) end
----Standard lua print function, prints directly to the console but not to the game
+---Standard lua print function, prints directly to the terminal but not to the game
 ---@return nil
 function lua_print() end
 ---Print a log message on screen.
 ---@param message string
 ---@return nil
 function print(message) end
+---Print a log message to console.
+---@param message string
+---@return nil
+function console_print(message) end
+---Prinspect to console
+---@vararg any
+---@return nil
+function console_prinspect(...) end
 ---Same as `print`
 ---@param message string
 ---@return nil
@@ -1724,6 +1732,7 @@ function udp_send(host, port, msg) end
     ---@field storage_uid integer
     ---@field waddler_storage ENT_TYPE[]
     ---@field waddler_metadata integer[]
+    ---@field theme_info ThemeInfo
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
 

@@ -1569,6 +1569,24 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out
 #### nil cancel_toast()
 
 
+### console_prinspect
+
+
+> Search script examples for [console_prinspect](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=console_prinspect)
+
+#### nil console_prinspect(variadic_args objects)
+
+Prinspect to console
+
+### console_print
+
+
+> Search script examples for [console_print](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=console_print)
+
+#### nil console_print(string message)
+
+Print a log message to console.
+
 ### lua_print
 
 
@@ -1576,7 +1594,7 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out
 
 #### nil lua_print()
 
-Standard lua print function, prints directly to the console but not to the game
+Standard lua print function, prints directly to the terminal but not to the game
 
 ### message
 
