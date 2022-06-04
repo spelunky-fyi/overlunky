@@ -3454,13 +3454,14 @@ void render_clickhandler()
     ImGuiIO& io = ImGui::GetIO();
     if (g_Console->is_toggled())
     {
-        ImGui::SetNextWindowSize({io.DisplaySize.x, io.DisplaySize.y - (4.0f * ImGui::GetStyle().ItemSpacing.y + ImGui::GetTextLineHeight())});
+        ImGui::SetNextWindowSize({io.DisplaySize.x - 16.0f, io.DisplaySize.y - (4.0f * ImGui::GetStyle().ItemSpacing.y + ImGui::GetTextLineHeight())});
+        ImGui::SetNextWindowPos({16.0f, 0});
     }
     else
     {
         ImGui::SetNextWindowSize(io.DisplaySize);
+        ImGui::SetNextWindowPos({0, 0});
     }
-    ImGui::SetNextWindowPos({0, 0});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
     ImGui::Begin(
         "Clickhandler",
