@@ -689,6 +689,9 @@
                             <a href="#create_image" class="toc-h3 toc-link" data-title="create_image">create_image</a>
                           </li>
                           <li>
+                            <a href="#disable_floor_embeds" class="toc-h3 toc-link" data-title="disable_floor_embeds">disable_floor_embeds</a>
+                          </li>
+                          <li>
                             <a href="#get_character_heart_color" class="toc-h3 toc-link" data-title="get_character_heart_color">get_character_heart_color</a>
                           </li>
                           <li>
@@ -1030,6 +1033,9 @@
                           </li>
                           <li>
                             <a href="#define_procedural_spawn" class="toc-h3 toc-link" data-title="define_procedural_spawn">define_procedural_spawn</a>
+                          </li>
+                          <li>
+                            <a href="#disable_ghostjar_ghost_spawn" class="toc-h3 toc-link" data-title="disable_ghostjar_ghost_spawn">disable_ghostjar_ghost_spawn</a>
                           </li>
                           <li>
                             <a href="#door" class="toc-h3 toc-link" data-title="door">door</a>
@@ -3881,6 +3887,12 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='tuple-lt-IMAGE-int-int-gt-create_image-string-path'>tuple&lt;IMAGE, int, int&gt; create_image(string path)</h4>
 <p>Create image from file. Returns a tuple containing id, width and height.</p>
+<h3 id='disable_floor_embeds'>disable_floor_embeds</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=disable_floor_embeds">disable_floor_embeds</a></p>
+</blockquote>
+<h4 id='nil-disable_floor_embeds-bool-disable'>nil disable_floor_embeds(bool disable)</h4>
+<p>Disable all crust item spawns</p>
 <h3 id='get_character_heart_color'>get_character_heart_color</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_character_heart_color">get_character_heart_color</a></p>
@@ -4589,6 +4601,12 @@ The function <code>bool is_valid(x, y, layer)</code> determines whether the spaw
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set <code>is_valid</code> to <code>nil</code> in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.</p>
+<h3 id='disable_ghostjar_ghost_spawn'>disable_ghostjar_ghost_spawn</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=disable_ghostjar_ghost_spawn">disable_ghostjar_ghost_spawn</a></p>
+</blockquote>
+<h4 id='nil-disable_ghostjar_ghost_spawn-bool-disable'>nil disable_ghostjar_ghost_spawn(bool disable)</h4>
+<p>Disable ghost spawn and mist effect when breaking the ghost jar</p>
 <h3 id='door'>door</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door">door</a></p>
