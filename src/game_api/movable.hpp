@@ -5,12 +5,14 @@
 #include <functional>
 #include <set>
 
+struct MovableBehavior;
+
 class Movable : public Entity
 {
   public:
-    std::map<uint32_t, size_t> behaviors_map;
-    std::set<size_t> pb0;
-    size_t current_behavior;
+    std::map<uint32_t, MovableBehavior*> behaviors_map;
+    std::set<MovableBehavior*> behaviors;
+    MovableBehavior* current_behavior;
     int64_t ic8;
     float movex;
     float movey;
