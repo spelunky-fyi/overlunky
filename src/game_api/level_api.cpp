@@ -1305,7 +1305,7 @@ void LevelGenData::init()
         g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data"sv);
         g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes"sv);
 
-        g_load_screen_trampoline = (LoadScreenFun*)get_address("load_screen_call"sv);
+        g_load_screen_trampoline = (LoadScreenFun*)get_address("load_screen_func"sv);
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
@@ -2101,8 +2101,7 @@ bool grow_chain_and_blocks(uint32_t x, uint32_t y)
 
 void do_load_screen()
 {
-    using LoadScreen = void(StateMemory*, size_t, size_t);
-    auto load_screen_fun = (LoadScreen*)get_address("load_screen_func");
+    auto load_screen_fun = (LoadScreenFun*)get_address("load_screen_func");
     const auto state = State::get().ptr();
     pre_load_screen();
     load_screen_fun(state, 0, 0);
