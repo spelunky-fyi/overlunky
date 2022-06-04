@@ -298,6 +298,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
 {
     static const auto thorn_vine = to_id("ENT_TYPE_FLOOR_THORN_VINE");
     static const auto pipe = to_id("ENT_TYPE_FLOOR_PIPE");
+    static const auto quicksand = to_id("ENT_TYPE_FLOOR_QUICKSAND");
     static const auto destroy_deco = {
         to_id("ENT_TYPE_DECORATION_HANGING_HIDE"),
         to_id("ENT_TYPE_DECORATION_CROSS_BEAM"),
@@ -320,7 +321,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
             floor->remove_decoration((FLOOR_SIDE)i);
         }
     }
-    else if (floor->type->id == pipe || floor->type->id == thorn_vine)
+    else if (floor->type->id == pipe || floor->type->id == thorn_vine || floor->type->id == quicksand)
     {
         for (int i = 0; i < 4; ++i)
         {

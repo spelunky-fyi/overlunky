@@ -449,9 +449,9 @@ void Entity::unhook(std::uint32_t id)
                       { return hook.id == id; });
         std::erase_if(it->on_damage, [id](auto& hook)
                       { return hook.id == id; });
-        std::erase_if(it->pre_update, [id](auto& hook)
+        std::erase_if(it->pre_floor_update, [id](auto& hook)
                       { return hook.id == id; });
-        std::erase_if(it->post_update, [id](auto& hook)
+        std::erase_if(it->post_floor_update, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->pre_statemachine, [id](auto& hook)
                       { return hook.id == id; });
@@ -597,7 +597,7 @@ auto hook_update_callback(Entity* self)
         {
             EntityHooksInfo& _hook_info = entity->get_hooks();
             bool skip_original{false};
-            for (auto& [id, pre] : _hook_info.pre_update)
+            for (auto& [id, pre] : _hook_info.pre_floor_update)
             {
                 if (pre(entity))
                 {
@@ -609,30 +609,30 @@ auto hook_update_callback(Entity* self)
             {
                 original(entity);
             }
-            for (auto& [id, post] : _hook_info.post_update)
+            for (auto& [id, post] : _hook_info.post_floor_update)
             {
                 post(entity);
             }
         },
         0x26);
 }
-void Entity::set_pre_update(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_update)
+void Entity::set_pre_floor_update(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_update)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_update.empty() && hook_info.post_update.empty())
+    if (hook_info.pre_floor_update.empty() && hook_info.post_floor_update.empty())
     {
         hook_update_callback(this);
     }
-    hook_info.pre_update.push_back({reserved_callback_id, std::move(pre_update)});
+    hook_info.pre_floor_update.push_back({reserved_callback_id, std::move(pre_update)});
 }
-void Entity::set_post_update(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_update)
+void Entity::set_post_floor_update(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_update)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_update.empty() && hook_info.post_update.empty())
+    if (hook_info.pre_floor_update.empty() && hook_info.post_floor_update.empty())
     {
         hook_update_callback(this);
     }
-    hook_info.post_update.push_back({reserved_callback_id, std::move(post_update)});
+    hook_info.post_floor_update.push_back({reserved_callback_id, std::move(post_update)});
 }
 
 bool Entity::is_player()

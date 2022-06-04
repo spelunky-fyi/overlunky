@@ -1225,16 +1225,16 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
-    /// The callback signature is `bool pre_update(Entity self)`
+    /// The callback signature is `bool pre_floor_update(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    lua["set_pre_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             std::uint32_t id = entity->reserve_callback_id();
-            entity->set_pre_update(
+            entity->set_pre_floor_update(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self)
                 {
@@ -1253,16 +1253,16 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right after a floor is updated (by killed neighbor).
-    /// The callback signature is `nil post_update(Entity self)`
+    /// The callback signature is `nil post_floor_update(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    lua["set_post_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
             LuaBackend* backend = LuaBackend::get_calling_backend();
             std::uint32_t id = entity->reserve_callback_id();
-            entity->set_post_update(
+            entity->set_post_floor_update(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self)
                 {
