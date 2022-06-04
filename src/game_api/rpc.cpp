@@ -1791,3 +1791,29 @@ void update_liquid_collision_at(float x, float y, bool add)
     else
         RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
 }
+
+void disable_floor_embeds(bool disable)
+{
+    const static auto address = get_address("spawn_floor_embeds");
+    if (disable)
+    {
+        write_mem_recoverable("disable_floor_embeds", address, "\xC3"sv, true);
+    }
+    else
+    {
+        recover_mem("disable_floor_embeds");
+    }
+}
+
+void disable_ghostjar_ghost_spawn(bool disable)
+{
+    const static auto address = get_address("ghost_jar_ghost_spawn");
+    if (disable)
+    {
+        write_mem_recoverable("ghost_jar_ghost_spawn", address, "\x90\x90\x90\x90\x90"sv, true);
+    }
+    else
+    {
+        recover_mem("ghost_jar_ghost_spawn");
+    }
+}

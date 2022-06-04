@@ -1640,6 +1640,22 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        // Just set bp in create entity for embeds, find unique pattern somewhere in that function
+        "spawn_floor_embeds"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x08\xD1\x48\x0F\x44\xF8\x83\x7F\x0C\x1A"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Set conditional bp for ghost, break the ghost jar, execute past return, we need address for that whole function call to nop it
+        "ghost_jar_ghost_spawn"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\x83\x78\x18\x00"sv)
+            .offset(0x2)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

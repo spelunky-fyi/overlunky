@@ -1096,6 +1096,15 @@ Change the amount of frames after the damage from poison is applied
 
 Create image from file. Returns a tuple containing id, width and height.
 
+### disable_floor_embeds
+
+
+> Search script examples for [disable_floor_embeds](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disable_floor_embeds)
+
+#### nil disable_floor_embeds(bool disable)
+
+Disable all crust item spawns
+
 ### get_character_heart_color
 
 
@@ -2164,6 +2173,15 @@ The function `bool is_valid(x, y, layer)` determines whether the spawn is legal 
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
+
+### disable_ghostjar_ghost_spawn
+
+
+> Search script examples for [disable_ghostjar_ghost_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disable_ghostjar_ghost_spawn)
+
+#### nil disable_ghostjar_ghost_spawn(bool disable)
+
+Disable ghost spawn and mist effect when breaking the ghost jar
 
 ### door
 
