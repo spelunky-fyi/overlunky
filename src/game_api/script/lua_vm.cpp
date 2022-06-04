@@ -1479,6 +1479,9 @@ end
             return spawn_roomowner(owner_type, x, y, layer, room_template);
         });
 
+    /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+    lua["update_liquid_collision_at"] = update_liquid_collision_at;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
