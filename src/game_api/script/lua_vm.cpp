@@ -11,6 +11,7 @@
 #include "online.hpp"
 #include "rpc.hpp"
 #include "savedata.hpp"
+#include "search.hpp"
 #include "settings_api.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
@@ -1545,6 +1546,15 @@ end
 
     /// Disable all crust item spawns
     lua["disable_floor_embeds"] = disable_floor_embeds;
+
+    /// Get the address for a pattern name
+    lua["get_address"] = get_address;
+
+    /// Get the rva for a pattern name
+    lua["get_rva"] = [](std::string_view address_name) -> size_t
+    {
+        return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe");
+    };
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

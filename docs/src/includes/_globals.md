@@ -280,6 +280,19 @@ Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK
 This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
 The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
 
+### set_post_floor_update
+
+
+> Search script examples for [set_post_floor_update](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_floor_update)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_post_floor_update(int uid, function fun)
+
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right after a floor is updated (by killed neighbor).
+The callback signature is `nil post_floor_update(Entity self)`
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+
 ### set_post_render
 
 
@@ -351,6 +364,19 @@ This is run before the entity is spawned, spawn your own entity and return its u
 In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
 The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
 
+### set_pre_floor_update
+
+
+> Search script examples for [set_pre_floor_update](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_floor_update)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_pre_floor_update(int uid, function fun)
+
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
+The callback signature is `bool pre_floor_update(Entity self)`
+Use this only when no other approach works, this call can be expensive if overused.
+Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+
 ### set_pre_render
 
 
@@ -408,6 +434,36 @@ Sets a callback for a vanilla sound which lets you hook creation or playing even
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
 properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`
+
+## Debug functions
+
+
+### get_address
+
+
+> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
+
+#### size_t get_address(string_view address_name)
+
+Get the address for a pattern name
+
+### get_rva
+
+
+> Search script examples for [get_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rva)
+
+#### size_t get_rva(string_view address_name)
+
+Get the rva for a pattern name
+
+### raise
+
+
+> Search script examples for [raise](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
+
+#### nil raise()
+
+Raise a signal and probably crash the game
 
 ## Entity functions
 
@@ -818,6 +874,15 @@ Due to changes in 1.23.x only the [Vlad](#Vlad)'s cape value you provide will be
 
 Set the contents of [ENT_TYPE](#ENT_TYPE).ITEM_POT, [ENT_TYPE](#ENT_TYPE).ITEM_CRATE or [ENT_TYPE](#ENT_TYPE).ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
 
+### set_cursepot_ghost_enabled
+
+
+> Search script examples for [set_cursepot_ghost_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursepot_ghost_enabled)
+
+#### nil set_cursepot_ghost_enabled(bool enable)
+
+Determines whether the ghost appears when breaking the ghost pot
+
 ### set_door
 
 
@@ -1105,6 +1170,15 @@ Create image from file. Returns a tuple containing id, width and height.
 
 Disable all crust item spawns
 
+### get_adventure_seed
+
+
+> Search script examples for [get_adventure_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_adventure_seed)
+
+#### tuple&lt;int, int&gt; get_adventure_seed()
+
+Get the current adventure seed pair
+
 ### get_character_heart_color
 
 
@@ -1229,6 +1303,15 @@ Load another script by id "author/name" and import its `exports` table
 
 Same as `Player.is_female`
 
+### load_screen
+
+
+> Search script examples for [load_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_screen)
+
+#### nil load_screen()
+
+Immediately load a screen based on state.screen_next and stuff
+
 ### pause
 
 
@@ -1239,15 +1322,6 @@ Same as `Player.is_female`
 Enable/disable game engine pause.
 This is just short for `state.pause == 32`, but that produces an audio bug
 I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
-
-### raise
-
-
-> Search script examples for [raise](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
-
-#### nil raise()
-
-Raise a signal and probably crash the game
 
 ### register_console_command
 
@@ -1275,6 +1349,15 @@ Converts a color to int to be used in drawing functions. Use values from `0..255
 #### nil seed_prng(int seed)
 
 Seed the game prng.
+
+### set_adventure_seed
+
+
+> Search script examples for [set_adventure_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_adventure_seed)
+
+#### nil set_adventure_seed(int first, int second)
+
+Set the current adventure seed pair
 
 ### set_character_heart_color
 
@@ -2173,15 +2256,6 @@ The function `bool is_valid(x, y, layer)` determines whether the spawn is legal 
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
-
-### disable_ghostjar_ghost_spawn
-
-
-> Search script examples for [disable_ghostjar_ghost_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disable_ghostjar_ghost_spawn)
-
-#### nil disable_ghostjar_ghost_spawn(bool disable)
-
-Disable ghost spawn and mist effect when breaking the ghost jar
 
 ### door
 

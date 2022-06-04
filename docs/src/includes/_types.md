@@ -1514,14 +1514,13 @@ int | [flying_thing_countdown](https://github.com/spelunky-fyi/overlunky/search?
 
 ### ScreenConstellation
 
-Derived from [Screen](#Screen)
-
 
 Type | Name | Description
 ---- | ---- | -----------
 int | [sequence_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sequence_state) | 
 int | [animation_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_timer) | 
 float | [constellation_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text_opacity) | 
+float | [constellation_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text) | 
 
 ### ScreenCredits
 

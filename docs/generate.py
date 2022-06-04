@@ -65,6 +65,7 @@ header_files = [
     "../src/imgui/imgui.h",
     "../src/game_api/script/usertypes/level_lua.cpp",
     "../src/game_api/script/usertypes/gui_lua.cpp",
+    "../src/game_api/search.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -903,6 +904,8 @@ for func in funcs:
     cat = "Generic functions"
     if any(subs in func["name"] for subs in ["prinspect", "messpect", "print", "message", "say", "speechbubble", "toast"]):
         cat = "Message functions"
+    elif any(subs in func["name"] for subs in ["get_address", "get_rva", "raise"]):
+        cat = "Debug functions"
     elif any(subs in func["name"] for subs in ["tile_code"]):
         cat = "Tile code functions"
     elif any(subs in func["name"] for subs in ["interval", "timeout", "callback", "set_on", "set_pre", "set_post"]):
