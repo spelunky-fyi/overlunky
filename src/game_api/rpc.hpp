@@ -122,4 +122,4 @@ void set_adventure_seed(int64_t first, int64_t second);
 std::pair<int64_t, int64_t> get_adventure_seed();
 void update_liquid_collision_at(float x, float y, bool add);
 void disable_floor_embeds(bool disable);
-void disable_ghostjar_ghost_spawn(bool disable);
+void set_cursepot_ghost_enabled(bool enable);
