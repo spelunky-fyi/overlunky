@@ -818,6 +818,15 @@ Due to changes in 1.23.x only the [Vlad](#Vlad)'s cape value you provide will be
 
 Set the contents of [ENT_TYPE](#ENT_TYPE).ITEM_POT, [ENT_TYPE](#ENT_TYPE).ITEM_CRATE or [ENT_TYPE](#ENT_TYPE).ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
 
+### set_cursepot_ghost_enabled
+
+
+> Search script examples for [set_cursepot_ghost_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursepot_ghost_enabled)
+
+#### nil set_cursepot_ghost_enabled(bool enable)
+
+Determines whether the ghost appears when breaking the ghost pot
+
 ### set_door
 
 
@@ -2173,15 +2182,6 @@ The function `bool is_valid(x, y, layer)` determines whether the spawn is legal 
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
-
-### disable_ghostjar_ghost_spawn
-
-
-> Search script examples for [disable_ghostjar_ghost_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disable_ghostjar_ghost_spawn)
-
-#### nil disable_ghostjar_ghost_spawn(bool disable)
-
-Disable ghost spawn and mist effect when breaking the ghost jar
 
 ### door
 

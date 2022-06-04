@@ -692,6 +692,10 @@ function force_olmec_phase_0(b) end
 ---@param cursed integer
 ---@return nil
 function set_ghost_spawn_times(normal, cursed) end
+---Determines whether the ghost appears when breaking the ghost pot
+---@param enable boolean
+---@return nil
+function set_cursepot_ghost_enabled(enable) end
 ---Determines whether the time ghost appears, including the showing of the ghost toast
 ---@param b boolean
 ---@return nil
@@ -1074,10 +1078,6 @@ function update_liquid_collision_at(x, y, add) end
 ---@param disable boolean
 ---@return nil
 function disable_floor_embeds(disable) end
----Disable ghost spawn and mist effect when breaking the ghost jar
----@param disable boolean
----@return nil
-function disable_ghostjar_ghost_spawn(disable) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
