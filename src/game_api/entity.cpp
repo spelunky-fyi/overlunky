@@ -91,6 +91,24 @@ ENT_TYPE to_id(std::string_view name)
     return it != map.end() ? it->second : -1;
 }
 
+std::string_view to_name(ENT_TYPE id)
+{
+    const EntityFactory* entity_factory_ptr = entity_factory();
+    if (entity_factory_ptr)
+    {
+        for (const auto& [name, type_id] : entity_factory_ptr->entity_map)
+        {
+            if (type_id == id)
+            {
+                return name;
+            }
+        }
+    }
+ 
+    return {};
+}
+
+
 void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
 {
     if (overlay)

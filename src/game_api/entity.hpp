@@ -156,6 +156,8 @@ EntityDB* get_type(uint32_t id);
 
 ENT_TYPE to_id(std::string_view id);
 
+std::string_view to_name(ENT_TYPE id);
+
 class Entity
 {
   public:
@@ -347,7 +349,7 @@ class Entity
     virtual void liberate_from_shop() = 0;             // can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
 
     /// Applies changes made in `entity.type`
-    virtual void apply_db() = 0;
+    virtual void apply_db() = 0; // This is actually just an initialize call that is happening once after  the entity is created
 };
 
 struct SoundInfo
