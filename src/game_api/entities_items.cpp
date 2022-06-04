@@ -21,7 +21,8 @@ void ParachutePowerup::deploy()
             y = 0.5f;
         offsety = 0.115f;
         hitboxy = 0.285f;
-        duckmask = 2143944961; // hehe funny number
+        shape = SHAPE::RECTANGLE;
+        hitbox_enabled = true;
     }
 }
 

@@ -1923,27 +1923,30 @@ void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
 
     const uint32_t start_x = static_cast<uint32_t>(area.left + 0.5f);
     uint32_t end_x = static_cast<uint32_t>(area.right + 0.5f);
-    const uint32_t start_y = static_cast<uint32_t>(area.bottom + 0.5f);
-    uint32_t end_y = static_cast<uint32_t>(area.top + 0.5f);
+    uint32_t start_y = static_cast<uint32_t>(area.top + 0.5f);
+    uint32_t end_y = static_cast<uint32_t>(area.bottom + 0.5f);
 
-    if (start_x >= g_level_max_x || start_y >= g_level_max_y)
+    if (start_x >= g_level_max_x || end_y >= g_level_max_y)
         return;
 
     if (end_x == 0)
         end_x = state->w * 10 + 6;
 
-    if (end_y == 0)
-        end_y = g_level_max_y - (state->h * 8 + 6);
-
     if (end_x >= g_level_max_x)
         end_x = g_level_max_x - 1;
 
-    if (end_y >= g_level_max_y)
-        end_y = g_level_max_y - 1;
+    if (start_y == 0 || start_y >= g_level_max_y)
+        start_y = g_level_max_y - 1;
+
+    if (end_y == 0)
+        end_y = g_level_max_y - (state->h * 8 + 6);
+
+    if (end_y >= g_level_max_y) // in case of overflow when someone puts wierd state->h value
+        end_y = 0;
 
     for (uint32_t i_x = start_x; i_x <= end_x; ++i_x)
     {
-        for (uint32_t i_y = end_y; i_y >= start_y; --i_y)
+        for (int i_y = start_y; i_y >= static_cast<int>(end_y); --i_y) // go from top to bottom
         {
             auto test_ent = state->layers[actual_layer]->grid_entities[i_y][i_x];
             if (!test_ent || !test_ent->type)
@@ -1964,7 +1967,8 @@ void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
                 }
                 --i_y;
                 int32_t last_uid = -1;
-                for (uint32_t max = i_y - max_lengh; i_y > max && i_y >= 0; --i_y)
+                const int max = (i_y - (int)max_lengh) < 0 ? 0 : i_y - max_lengh;
+                for (; i_y > max && (i_y - 1) >= 0; --i_y)
                 {
                     if (state->layers[actual_layer]->grid_entities[i_y - 1][i_x] != nullptr)
                     {
@@ -2001,7 +2005,7 @@ void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
 
     const uint32_t start_x = static_cast<uint32_t>(area.left + 0.5f);
     uint32_t end_x = static_cast<uint32_t>(area.right + 0.5f);
-    const uint32_t start_y = static_cast<uint32_t>(area.bottom + 0.5f);
+    uint32_t start_y = static_cast<uint32_t>(area.bottom + 0.5f);
     uint32_t end_y = static_cast<uint32_t>(area.top + 0.5f);
 
     if (start_x >= g_level_max_x || start_y >= g_level_max_y)
@@ -2010,14 +2014,17 @@ void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
     if (end_x == 0)
         end_x = state->w * 10 + 6;
 
-    if (end_y == 0)
-        end_y = g_level_max_y - (state->h * 8 + 6);
-
     if (end_x >= g_level_max_x)
         end_x = g_level_max_x - 1;
 
-    if (end_y >= g_level_max_y)
+    if (end_y == 0 || end_y >= g_level_max_y)
         end_y = g_level_max_y - 1;
+
+    if (start_y == 0)
+        start_y = g_level_max_y - (state->h * 8 + 6);
+
+    if (start_y >= g_level_max_y) // in case of overflow when someone puts wierd state->h value
+        start_y = 0;
 
     for (uint32_t i_x = start_x; i_x <= end_x; ++i_x)
     {
@@ -2045,7 +2052,7 @@ void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
 
                 ++i_y;
                 int32_t last_uid = -1;
-                for (uint32_t max = i_y + max_lengh; i_y < max && i_y < g_level_max_y; ++i_y)
+                for (uint32_t max = i_y + max_lengh; i_y < max && (i_y + 1) < g_level_max_y; ++i_y)
                 {
                     if (state->layers[actual_layer]->grid_entities[i_y + 1][i_x] != nullptr)
                     {

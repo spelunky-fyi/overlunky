@@ -1,6 +1,7 @@
 #include "state.hpp"
 #include "entities_chars.hpp"
 #include "game_manager.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "memory.hpp"
 #include "rpc.hpp"
@@ -460,7 +461,7 @@ uint32_t lowbias32(uint32_t x)
     x ^= x >> 16;
     return x;
 }
-Entity* State::find(uint32_t uid)
+Entity* find(StateMemory* state, uint32_t uid)
 {
     // Ported from MauveAlert's python code in the CAT tracker
 
@@ -470,12 +471,12 @@ Entity* State::find(uint32_t uid)
         return nullptr;
     }
 
-    const uint32_t mask = ptr()->uid_to_entity_mask;
+    const uint32_t mask = state->uid_to_entity_mask;
     const uint32_t target_uid_plus_one = lowbias32(uid + 1);
     uint32_t cur_index = target_uid_plus_one & mask;
     while (true)
     {
-        auto entry = ptr()->uid_to_entity_data[cur_index];
+        auto entry = state->uid_to_entity_data[cur_index];
         if (entry.uid_plus_one == target_uid_plus_one)
         {
             return entry.entity;
@@ -493,6 +494,14 @@ Entity* State::find(uint32_t uid)
 
         cur_index = (cur_index + (uint32_t)1) & mask;
     }
+}
+Entity* State::find(uint32_t uid)
+{
+    return ::find(ptr(), uid);
+}
+Entity* State::find_local(uint32_t uid)
+{
+    return ::find(ptr_local(), uid);
 }
 
 LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
@@ -558,7 +567,7 @@ uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_positio
     else if (layer < LAYER::FRONT)
     {
         auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
+        auto player = state.items()->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
             player_position = player->position();
@@ -579,7 +588,7 @@ uint8_t enum_to_layer(const LAYER layer)
     else if (layer < LAYER::FRONT)
     {
         auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(abs((int)layer) - 1));
+        auto player = state.items()->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
             return player->layer;

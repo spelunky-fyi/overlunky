@@ -1,6 +1,7 @@
 #include "entities_items_lua.hpp"
 
 #include "entities_items.hpp"
+#include "items.hpp"
 #include "state_structs.hpp"
 
 #include <sol/sol.hpp>
@@ -359,6 +360,10 @@ void register_usertypes(sol::state& lua)
         &Spark::next_size,
         "size_change_timer",
         &Spark::size_change_timer,
+        "speed",
+        &Spark::speed,
+        "distance",
+        &Spark::distance,
         sol::base_classes,
         sol::bases<Entity, Movable, Flame>());
 

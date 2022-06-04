@@ -141,3 +141,18 @@ void set_character_heart_color(ENT_TYPE type_id, Color color)
 {
     NCharacterDB::set_character_heart_color(NCharacterDB::get_character_index(type_id), color);
 }
+
+void Player::let_go()
+{
+    if (overlay)
+    {
+        overlay->remove_item_ptr(this);
+        // jump_flags_b = 0xFF;
+        // last_state = state;
+        // state = 1, 9, 0xA; ?
+        stand_counter = 0;
+        const auto& anim = behaviors_map.find(2);
+        if (anim != behaviors_map.end())
+            current_behavior = anim->second;
+    }
+}

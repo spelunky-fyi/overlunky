@@ -118,6 +118,7 @@ struct SpelunkyScriptMeta
     const char* path;
     const char* filename;
     bool unsafe;
+    bool online_safe;
 };
 SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script);
 

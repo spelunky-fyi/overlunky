@@ -280,6 +280,18 @@ Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK
 This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
 The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
 
+### set_post_render
+
+
+> Search script examples for [set_post_render](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_post_render(int uid, function fun)
+
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+where `render_ctx` is a `VanillaRenderContext`.
+Use this only when no other approach works, this call can be expensive if overused.
+
 ### set_post_render_screen
 
 
@@ -339,6 +351,18 @@ This is run before the entity is spawned, spawn your own entity and return its u
 In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
 The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
 
+### set_pre_render
+
+
+> Search script examples for [set_pre_render](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_pre_render(int uid, function fun)
+
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
+Use this only when no other approach works, this call can be expensive if overused.
+
 ### set_pre_render_screen
 
 
@@ -387,6 +411,35 @@ properties on the sound. Otherwise you may cause a deadlock. The callback signat
 
 ## Entity functions
 
+
+### activate_sparktraps_hack
+
+
+```lua
+activate_sparktraps_hack(true);
+
+-- set random speed, direction and distance for the spark
+set_post_entity_spawn(function(ent)
+
+	direction = 1
+	if prng:random_chance(2, PRNG_CLASS.ENTITY_VARIATION) then
+		direction = -1
+	end
+
+	ent.speed = prng:random_float(PRNG_CLASS.ENTITY_VARIATION) * 0.1 * direction
+	ent.distance = prng:random_float(PRNG_CLASS.ENTITY_VARIATION) * 10
+
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SPARK)
+```
+
+
+> Search script examples for [activate_sparktraps_hack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_sparktraps_hack)
+
+#### nil activate_sparktraps_hack(bool activate)
+
+Activate custom variables for speed and distance in the `ITEM_SPARK`
+note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+default game values are: speed = -0.015, distance = 3.0
 
 ### apply_entity_db
 
@@ -491,7 +544,7 @@ Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 
 > Search script examples for [entity_remove_item](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
 
-#### nil entity_remove_item(int id, int item_uid)
+#### nil entity_remove_item(int uid, int item_uid)
 
 Remove item by uid from entity
 
@@ -765,6 +818,15 @@ Due to changes in 1.23.x only the [Vlad](#Vlad)'s cape value you provide will be
 
 Set the contents of [ENT_TYPE](#ENT_TYPE).ITEM_POT, [ENT_TYPE](#ENT_TYPE).ITEM_CRATE or [ENT_TYPE](#ENT_TYPE).ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
 
+### set_cursepot_ghost_enabled
+
+
+> Search script examples for [set_cursepot_ghost_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursepot_ghost_enabled)
+
+#### nil set_cursepot_ghost_enabled(bool enable)
+
+Determines whether the ghost appears when breaking the ghost pot
+
 ### set_door
 
 
@@ -964,7 +1026,7 @@ Get the `flags` field from entity by uid
 
 > Search script examples for [get_entity_flags2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags2)
 
-#### int get_entity_flags2(int id)
+#### int get_entity_flags2(int uid)
 
 Get the `more_flags` field from entity by uid
 
@@ -1042,6 +1104,15 @@ Change the amount of frames after the damage from poison is applied
 #### tuple&lt;IMAGE, int, int&gt; create_image(string path)
 
 Create image from file. Returns a tuple containing id, width and height.
+
+### disable_floor_embeds
+
+
+> Search script examples for [disable_floor_embeds](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disable_floor_embeds)
+
+#### nil disable_floor_embeds(bool disable)
+
+Disable all crust item spawns
 
 ### get_character_heart_color
 
@@ -1240,6 +1311,68 @@ Enables or disables the journal
 #### nil set_seed(int seed)
 
 Set seed and reset run.
+
+### set_storage_layer
+
+
+```lua
+-- Sets the right layer when using the vanilla tile code if waddler is still happy,
+-- otherwise spawns the floor to the left of this tile.
+-- Manually spawning FLOOR_STORAGE pre-tilecode doesn't seem to work as expected,
+-- so we destroy it post-tilecode.
+set_post_tile_code_callback(function(x, y, layer)
+    if not test_flag(state.quest_flags, 10) then
+        -- Just set the layer and let the vanilla tilecode handle the floor
+        set_storage_layer(layer)
+    else
+        local floor = get_entity(get_grid_entity_at(x, y, layer))
+        if floor then
+            floor:destroy()
+        end
+        if get_grid_entity_at(x - 1, y, layer) ~= -1 then
+            local left = get_entity(get_grid_entity_at(x - 1, y, layer))
+            spawn_grid_entity(left.type.id, x, y, layer)
+        end
+    end
+end, "storage_floor")
+
+-- This fixes a bug in the game that breaks storage on transition.
+-- The old storage_uid is not cleared after every level for some reason.
+set_callback(function()
+    state.storage_uid = -1
+end, ON.TRANSITION)
+
+-- Having a waddler is completely optional for storage,
+-- but this makes a nice waddler room if he still likes you.
+define_tile_code("waddler")
+set_pre_tile_code_callback(function(x, y, layer)
+    if not test_flag(state.quest_flags, 10) then
+        local uid = spawn_roomowner(ENT_TYPE.MONS_STORAGEGUY, x + 0.5, y, layer, ROOM_TEMPLATE.WADDLER)
+        set_on_kill(uid, function()
+            -- Disable current level storage if you kill waddler
+            state.storage_uid = -1
+        end)
+    end
+    return true
+end, "waddler")
+
+```
+
+
+> Search script examples for [set_storage_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_storage_layer)
+
+#### nil set_storage_layer([LAYER](#LAYER) layer)
+
+Set layer to search for storage items on
+
+### update_liquid_collision_at
+
+
+> Search script examples for [update_liquid_collision_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_liquid_collision_at)
+
+#### nil update_liquid_collision_at(float x, float y, bool add)
+
+Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
 
 ### warp
 
@@ -2284,6 +2417,8 @@ If you want to respawn a player that is a ghost, set in his inventory `health` t
 
 #### nil spawn_tree(float x, float y, [LAYER](#LAYER) layer)
 
+#### nil spawn_tree(float x, float y, [LAYER](#LAYER) layer, int height)
+
 Spawns and grows a tree
 
 ## String functions
@@ -2596,8 +2731,7 @@ end, ON.POST_ROOM_GENERATION)
 
 > Search script examples for [force_dark_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_dark_level)
 
-#### nil force_dark_level(bool g)
-
+`nil force_dark_level(bool g)`<br/>
 Set level flag 18 on post room generation instead, to properly force every level to dark
 
 ### get_entities

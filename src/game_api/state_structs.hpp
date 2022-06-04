@@ -932,16 +932,6 @@ struct Dialogue
     uint32_t unknown18;
 };
 
-struct SelectPlayerSlot
-{
-    bool activated;
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
-    ENT_TYPE character;  // Entity DB ID
-    uint32_t texture_id; // Texture DB ID
-};
-
 struct ShopRestrictedItem
 {
     int32_t item_uid;

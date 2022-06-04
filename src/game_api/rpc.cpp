@@ -7,6 +7,7 @@
 #include "entities_liquids.hpp"
 #include "entities_mounts.hpp"
 #include "entity.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "memory.hpp"
 #include "savedata.hpp"
@@ -34,42 +35,6 @@ bool testflag(uint32_t flags, int bit)
 uint32_t flipflag(uint32_t flags, int bit)
 {
     return (flags ^ (1U << (bit - 1)));
-}
-
-void teleport(float x, float y, bool s, float vx, float vy, bool snap) // ui only
-{
-    auto state = State::get();
-
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return;
-    DEBUG("Teleporting to relative {}, {}, {}", x, y, s);
-    player->teleport(x, y, s, vx, vy, snap);
-}
-
-void godmode(bool g)
-{
-    State::get().godmode(g);
-}
-
-void godmode_companions(bool g)
-{
-    State::get().godmode_companions(g);
-}
-
-void darkmode(bool g)
-{
-    State::get().darkmode(g);
-}
-
-void zoom(float level)
-{
-    State::get().zoom(level);
-}
-
-float get_zoom_level()
-{
-    return State::get().get_zoom_level();
 }
 
 void attach_entity(Entity* overlay, Entity* attachee)
@@ -155,49 +120,6 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, const float (&offset)
     }
 }
 
-int32_t get_entity_at(float x, float y, bool s, float radius, uint32_t mask) // ui only
-{
-    auto state = State::get();
-    if (s)
-    {
-        auto [rx, ry] = state.click_position(x, y);
-        x = rx;
-        y = ry;
-    }
-    // DEBUG("Items at {}:", (x, y));
-    auto player = state.items()->player(0);
-    if (player == nullptr)
-        return -1;
-    std::vector<std::tuple<int32_t, float, Entity*>> found;
-    for (auto& item : state.layer(player->layer)->all_entities.entities())
-    {
-        auto [ix, iy] = item->position();
-        auto flags = item->type->search_flags;
-        float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-        if (((mask & flags) > 0 || mask == 0) && distance < radius)
-        {
-            /*DEBUG(
-                "Item {}, {:x} type, {} position, {} distance, {:x}",
-                item->uid,
-                item->type->search_flags,
-                item->position_self(),
-                distance,
-                item->pointer());*/
-            found.push_back({item->uid, distance, item});
-        }
-    }
-    if (!found.empty())
-    {
-        std::sort(found.begin(), found.end(), [](auto a, auto b) -> bool
-                  { return std::get<1>(a) < std::get<1>(b); });
-        auto picked = found[0];
-        // auto entity = std::get<2>(picked);
-        // DEBUG("{}", (void*)entity);
-        return std::get<0>(picked);
-    }
-    return -1;
-}
-
 int32_t get_grid_entity_at(float x, float y, LAYER layer)
 {
     auto state = State::get();
@@ -207,13 +129,6 @@ int32_t get_grid_entity_at(float x, float y, LAYER layer)
         return ent->uid;
 
     return -1;
-}
-
-void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap) // ui only
-{
-    auto ent = get_entity_ptr(uid);
-    if (ent)
-        ent->teleport(x, y, s, vx, vy, snap);
 }
 
 void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
@@ -327,7 +242,7 @@ ENT_TYPE get_entity_type(uint32_t uid)
     if (entity)
         return entity->type->id;
 
-    return UINT32_MAX;
+    return UINT32_MAX; // TODO: shouldn't this be 0?
 }
 
 std::vector<Player*> get_players()
@@ -343,27 +258,17 @@ std::vector<Player*> get_players()
     return found;
 }
 
-std::pair<float, float> click_position(float x, float y)
-{
-    return State::get().click_position(x, y);
-}
-
-std::pair<float, float> screen_position(float x, float y)
-{
-    return State::get().screen_position(x, y);
-}
-
 std::tuple<float, float, float, float> screen_aabb(float left, float top, float right, float bottom)
 {
-    auto [sx1, sy1] = screen_position(left, top);
-    auto [sx2, sy2] = screen_position(right, bottom);
+    auto [sx1, sy1] = State::screen_position(left, top);
+    auto [sx2, sy2] = State::screen_position(right, bottom);
     return std::tuple{sx1, sy1, sx2, sy2};
 }
 
 float screen_distance(float x)
 {
-    auto a = State::get().screen_position(0, 0);
-    auto b = State::get().screen_position(x, 0);
+    auto a = State::screen_position(0, 0);
+    auto b = State::screen_position(x, 0);
     return b.first - a.first;
 }
 
@@ -807,7 +712,11 @@ void modify_sparktraps(float angle_increment, float distance)
     static float* new_array;
     if (new_array == nullptr)
     {
-        const auto offset = get_address("sparktrap_angle_increment");
+        const auto offset = get_address("sparktrap_angle_increment") + 4;
+
+        if (read_u8(offset - 1) != 0x89) // check if sparktraps_hack is active
+            return;
+
         const int32_t distance_offset = 0xF1;
         new_array = (float*)alloc_mem_rel32(offset + 4, sizeof(float) * 2);
         if (!new_array)
@@ -819,6 +728,28 @@ void modify_sparktraps(float angle_increment, float distance)
     }
     *new_array = angle_increment;
     *(new_array + 1) = distance;
+}
+
+void activate_sparktraps_hack(bool activate)
+{
+    if (activate)
+    {
+        const auto offset = get_address("sparktrap_angle_increment");
+        const int32_t distance_offset = 0xF1;
+
+        write_mem_recoverable("sparktraps_hack", offset, "\xF3\x0F\x58\x89\x6C\x01\x00\x00"sv, true);
+        write_mem_recoverable("sparktraps_hack", offset + distance_offset, "\xF3\x0F\x10\xB9\x70\x01\x00\x00"sv, true);
+    }
+    else
+    {
+        recover_mem("sparktraps_hack");
+    }
+}
+
+void set_storage_layer(LAYER layer)
+{
+    if (layer == LAYER::FRONT || layer == LAYER::BACK)
+        write_mem_prot(get_address("storage_layer"), 0x1300 + 8 * (uint8_t)layer, true);
 }
 
 void set_kapala_blood_threshold(uint8_t threshold)
@@ -862,12 +793,6 @@ void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscap
 {
     // Due to changes in 1.23.x, the default multiplier is automatically vlads - 1.
     write_mem_prot(get_address("blood_multiplication"), vladscape_multiplier, true);
-}
-
-SaveData* savedata()
-{
-    auto state = State::get();
-    return state.savedata();
 }
 
 std::vector<int64_t> read_prng()
@@ -1764,25 +1689,11 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
     if (auto entity = get_entity_ptr(uid))
     {
         auto state = State::get();
-        const auto [c_x, c_y] = entity->position_self();
-        const Entity* ent = state.layer(entity->layer)->get_grid_entity_at(c_x, c_y);
-        if (ent == entity) // check if it's grid entity
-        {
-            const uint32_t grid_x = static_cast<uint32_t>(c_x + 0.5f);
-            const uint32_t grid_y = static_cast<uint32_t>(c_y + 0.5f);
-            std::pair<float, float> offset;
-            const auto actual_layer = enum_to_layer(layer, offset);
-            const uint32_t ix = static_cast<uint32_t>(offset.first + x + 0.5f);
-            const uint32_t iy = static_cast<uint32_t>(offset.second + y + 0.5f);
-
-            if (ix < g_level_max_x && iy < g_level_max_y)
-            {
-                state.layer(entity->layer)->grid_entities[grid_y][grid_x] = nullptr;
-                entity->teleport_abs(static_cast<float>(ix), static_cast<float>(iy), 0, 0);
-                entity->set_layer(layer);
-                state.layer(actual_layer)->grid_entities[iy][ix] = entity;
-            }
-        }
+        std::pair<float, float> offset;
+        const auto actual_layer = enum_to_layer(layer, offset);
+        state.layer(entity->layer)->move_grid_entity(entity, offset.first + x, offset.first + y, state.layer(actual_layer));
+        entity->teleport_abs(offset.first + x, offset.first + y, 0, 0);
+        entity->set_layer(layer);
     }
 }
 
@@ -1849,6 +1760,45 @@ void change_poison_timer(int16_t frames)
     }
 }
 
+void update_liquid_collision_at(float x, float y, bool add)
+{
+    using UpdateLiquidCollision = void(LiquidPhysics*, int32_t, int32_t, bool); // setting last parameter to true just skips the whole function
+    UpdateLiquidCollision* RemoveLiquidCollision_fun = (UpdateLiquidCollision*)get_address("remove_from_liquid_collision_map");
+    UpdateLiquidCollision* AddLiquidCollision_fun = (UpdateLiquidCollision*)get_address("add_from_liquid_collision_map");
+    auto state = get_state_ptr();
+
+    if (add)
+        AddLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
+    else
+        RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
+}
+
+void disable_floor_embeds(bool disable)
+{
+    const static auto address = get_address("spawn_floor_embeds");
+    if (disable)
+    {
+        write_mem_recoverable("disable_floor_embeds", address, "\xC3"sv, true);
+    }
+    else
+    {
+        recover_mem("disable_floor_embeds");
+    }
+}
+
+void set_cursepot_ghost_enabled(bool enable)
+{
+    const static auto address = get_address("ghost_jar_ghost_spawn");
+    if (!enable)
+    {
+        write_mem_recoverable("ghost_jar_ghost_spawn", address, "\x90\x90\x90\x90\x90"sv, true);
+    }
+    else
+    {
+        recover_mem("ghost_jar_ghost_spawn");
+    }
+}
+
 using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
@@ -1867,6 +1817,6 @@ void init_state_update()
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)
     {
-        DEBUG("Failed hooking strings stuff: {}\n", error);
+        DEBUG("Failed hooking state_refresh stuff: {}\n", error);
     }
 }

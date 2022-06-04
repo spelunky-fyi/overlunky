@@ -266,10 +266,12 @@ tuple&lt;float, float&gt; | [draw_text_size(const string& text, float scale_x, f
  | [draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
  | [draw_screen_texture(TEXTURE texture_id, int row, int column, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
  | [draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. `source` - the coordinates in the texture, `dest` - the coordinates on the screen<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
- | [draw_world_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
- | [draw_world_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
- | [draw_world_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
+ | [draw_world_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a [Quad](#Quad) instead
+ | [draw_world_texture(TEXTURE texture_id, int row, int column, const AABB& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a [Quad](#Quad) instead
+ | [draw_world_texture(TEXTURE texture_id, int row, int column, const AABB& dest, Color color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a [Quad](#Quad) instead
+ | [draw_world_texture(TEXTURE texture_id, int row, int column, const Quad& dest, Color color, WORLD_SHADER shader)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>The `shader` parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
  | [draw_world_texture(TEXTURE texture_id, int row, int column, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
+ | [draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color, WORLD_SHADER shader)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen<br/>The `shader` parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
  | [draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 
 ## Entity related types
@@ -358,7 +360,8 @@ int | [held_item_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 int | [mount_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mount_metadata) | Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 int | [kills_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_level) | 
 int | [kills_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_total) | 
-int | [collected_money_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) | Total money collected during previous levels (not the current one)
+int | [collected_money_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_total) | Total money collected during previous levels (so excluding the current one)
+int | [collected_money_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_count) | Count/size for the `collected_money` arrays
 array&lt;[ENT_TYPE](#ENT_TYPE), 512&gt; | [collected_money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money) | Types of gold/gems collected during this level, used later to display during the transition
 array&lt;int, 512&gt; | [collected_money_values](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_money_values) | Values of gold/gems collected during this level, used later to display during the transition
 array&lt;[ENT_TYPE](#ENT_TYPE), 256&gt; | [killed_enemies](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_enemies) | Types of enemies killed during this level, used later to display during the transition
@@ -370,6 +373,7 @@ array&lt;int, 8&gt; | [companion_trust](https://github.com/spelunky-fyi/overlunk
 array&lt;int, 8&gt; | [companion_health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_health) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 array&lt;int, 8&gt; | [companion_poison_tick_timers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=companion_poison_tick_timers) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 array&lt;bool, 8&gt; | [is_companion_cursed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_companion_cursed) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+array&lt;[ENT_TYPE](#ENT_TYPE), 30&gt; | [acquired_powerups](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=acquired_powerups) | Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 
 ## Generic types
 
@@ -490,7 +494,25 @@ float | [top_left_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=to
 [AABB](#AABB) | [get_AABB()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_AABB) | Returns the max/min values of the [Quad](#Quad)
 [Quad](#Quad)& | [offset(float off_x, float off_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | 
 [Quad](#Quad)& | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates a [Quad](#Quad) by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
+[Quad](#Quad)& | [flip_horizontally()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_horizontally) | 
+[Quad](#Quad)& | [flip_vertically()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_vertically) | 
 tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corners in order: bottom_left, bottom_right, top_right, top_left
+
+### RenderInfo
+
+Some information used to render the entity, can not be changed
+
+Type | Name | Description
+---- | ---- | -----------
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+int | [shader](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shader) | 
+[Quad](#Quad) | [source](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=source) | 
+[Quad](#Quad) | [destination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination) | 
+float | [tilew](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilew) | 
+float | [tileh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tileh) | 
+bool | [facing_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=facing_left) | 
+bool | [render_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_inactive) | 
 
 ### ShortTileCodeDef
 
@@ -2127,6 +2149,9 @@ int | [time_speedrun](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=t
 [ENT_TYPE](#ENT_TYPE) | [coffin_contents](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffin_contents) | 
 int | [screen_change_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_change_counter) | 
 int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) | 
+int | [storage_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=storage_uid) | 
+array&lt;[ENT_TYPE](#ENT_TYPE), 99&gt; | [waddler_storage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_storage) | 
+array&lt;int, 99&gt; | [waddler_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_metadata) | 
 [LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | 
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
 
@@ -3006,7 +3031,7 @@ int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) |
 int | [more_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=more_flags) | 
 int | [uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) | 
 int | [animation_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) | 
-int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Don't edit this dirrectly, use `set_draw_depth`
+int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Don't edit this directly, use `set_draw_depth`
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
@@ -3020,8 +3045,11 @@ float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) 
 [Color](#Color) | [color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=color) | 
 float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | 
 float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | 
+[SHAPE](#SHAPE) | [shape](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shape) | 
+bool | [hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitbox_enabled) | 
 float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
 float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
+[RenderInfo](#RenderInfo) | [rendering_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rendering_info) | 
 [Entity](#Entity) | [topmost()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) | 
 [Entity](#Entity) | [topmost_mount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) | 
 bool | [overlaps_with(AABB hitbox)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
@@ -3042,7 +3070,7 @@ bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlun
 bool | [trigger_action(Entity user)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_action) | Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
  | [get_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) | 
  | [apply_metadata(int metadata)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) | 
- | [set_invisible(bool)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
+ | [set_invisible(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
 span&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
 bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | Returns true if entity is in water/lava
 
@@ -4140,6 +4168,7 @@ string | [get_short_name()](https://github.com/spelunky-fyi/overlunky/search?l=L
 [Color](#Color) | [get_heart_color()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_heart_color) | Get the heart color of the character, this will be the modded heart color not only the vanilla heart color.
 bool | [is_female()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_female) | Check whether the character is female, will be `true` if the character was modded to be female as well.
  | [set_heart_color(Color hcolor)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) | Set the heart color the character.
+ | [let_go()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=let_go) | Drops from ladders, ropes and ledge grabs
 
 ### PowerupCapable
 
@@ -5543,6 +5572,9 @@ bool | [can_jump()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can
  | [add_money(int money)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money) | Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
 bool | [is_on_fire()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on_fire) | 
  | [damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) | Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+array&lt;int&gt; | [get_all_behaviors()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_all_behaviors) | Get all avaible behavior ids
+bool | [set_behavior(int behavior_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_behavior) | Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity<br/>Returns false if entity doesn't have this behavior id
+int | [get_behavior()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_behavior) | Get the current behavior id
 
 ### MovingIcon
 
@@ -5811,6 +5843,8 @@ float | [size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) | 
 float | [size_multiply](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size_multiply) | 0.0 when not on screen
 float | [next_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_size) | width and height will be set to this value  size_multiply next frame
 int | [size_change_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size_change_timer) | very short timer before next size change, giving a pulsing effect
+float | [speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) | This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+float | [distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) | This is cusome variable, you need to use `activate_sparktraps_hack` to use it
 
 ### Spear
 

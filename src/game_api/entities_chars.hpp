@@ -5,6 +5,7 @@
 
 struct Illumination;
 struct PlayerInputs;
+struct Inventory;
 
 class Ai
 {
@@ -88,7 +89,10 @@ class Player : public PowerupCapable
     int32_t i168;
     int32_t i16c;
     float y_pos; // not sure why, seams to be the same as abs_y
-    uint32_t jump_flags;
+    uint8_t jump_flags_a;
+    uint8_t jump_flags_b;
+    uint8_t jump_flags_c;
+    uint8_t jump_flags_d;
     uint8_t timer_since_last_jump; // something different happens before or after 6
     uint8_t can_use;               // is compared with bit numbers, so probably flags
 
@@ -109,6 +113,8 @@ class Player : public PowerupCapable
 
     /// Set the heart color the character.
     void set_heart_color(Color hcolor);
+    /// Drops from ladders, ropes and ledge grabs
+    void let_go();
 };
 
 std::u16string get_character_name(ENT_TYPE type_id);

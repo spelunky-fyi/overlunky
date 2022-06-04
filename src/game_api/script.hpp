@@ -31,6 +31,7 @@ struct ScriptMeta
     std::string filename;
     std::string stem;
     bool unsafe;
+    bool online_safe;
 };
 
 struct ScriptMessage
@@ -76,6 +77,7 @@ class SpelunkyScript
     const std::string& get_path() const;
     const std::string& get_version() const;
     bool get_unsafe() const;
+    bool get_online_safe() const;
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
     std::string& get_code() const;

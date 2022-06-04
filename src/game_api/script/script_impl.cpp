@@ -67,11 +67,13 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         sol::optional<std::string> meta_description = lua["meta"]["description"];
         sol::optional<std::string> meta_author = lua["meta"]["author"];
         sol::optional<bool> meta_unsafe = lua["meta"]["unsafe"];
+        sol::optional<bool> meta_online_safe = lua["meta"]["online_safe"];
         meta.name = meta_name.value_or(meta.filename);
         meta.version = meta_version.value_or("");
         meta.description = meta_description.value_or("");
         meta.author = meta_author.value_or("Anonymous");
         meta.unsafe = meta_unsafe.value_or(false);
+        meta.online_safe = meta_online_safe.value_or(false);
         meta.id = script_id();
         lua["__script_id"] = meta.file;
 

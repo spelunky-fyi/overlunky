@@ -2,6 +2,7 @@
 
 #include "character_def.hpp"
 #include "console.hpp"
+#include "entity.hpp"
 #include "file_api.hpp"
 #include "memory.hpp"
 #include "script.hpp"
@@ -255,6 +256,7 @@ SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script)
         script->get_path().c_str(),
         script->get_filename().c_str(),
         script->get_unsafe(),
+        script->get_online_safe(),
     };
 }
 

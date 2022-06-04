@@ -55,6 +55,10 @@ bool SpelunkyScript::get_unsafe() const
 {
     return m_Impl->meta.unsafe;
 }
+bool SpelunkyScript::get_online_safe() const
+{
+    return m_Impl->meta.online_safe;
+}
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
 std::string& SpelunkyScript::get_code() const

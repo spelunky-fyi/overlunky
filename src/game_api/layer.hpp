@@ -103,9 +103,9 @@ struct EntityList
         return uids().contains(uid);
     }
 
-    std::pair<Entity*, uint32_t> operator[](const uint32_t idx) const
+    std::pair<Entity*&, uint32_t&> operator[](const uint32_t idx) const
     {
-        return std::make_pair(ent_list[idx], uid_list[idx]);
+        return {ent_list[idx], uid_list[idx]};
     }
 };
 
@@ -184,4 +184,7 @@ struct Layer
     Entity* spawn_apep(float x, float y, bool right);
 
     Entity* get_grid_entity_at(float x, float y);
+
+    void move_grid_entity(Entity* ent, float x, float y, Layer* dest_layer);
+    void move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_layer);
 };

@@ -624,6 +624,7 @@ set_callback(function(ctx)
 end, ON.PRE_LOAD_LEVEL_FILES)
 
 set_callback(function()
+    if not in_level() then return end
     state.width = prng:random(options.xmin, options.xmax)
     state.height = prng:random(options.ymin, options.ymax)
     state.level_gen.themes[THEME.DWELLING]:spawn_border()
@@ -631,9 +632,7 @@ set_callback(function()
 end, ON.PRE_LEVEL_GENERATION)
 
 set_callback(function()
-    if not in_level() then
-        return
-    end
+    if not in_level() then return end
     if state.level_count == 0 then
         get_player(1).health = 20
         get_player(1).inventory.bombs = 20

@@ -6,6 +6,7 @@
 #include "entities_monsters.hpp"
 #include "entity.hpp"
 #include "game_manager.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "online.hpp"
 #include "rpc.hpp"
@@ -190,7 +191,7 @@ end
         return nullptr;
     };
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
-    lua["savegame"] = savedata();
+    lua["savegame"] = State::get().savedata();
 
     /// Standard lua print function, prints directly to the console but not to the game
     lua["lua_print"] = lua["print"];
@@ -519,12 +520,16 @@ end
     lua["layer_door"] = spawn_backdoor_abs;
     /// Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
     lua["spawn_apep"] = spawn_apep;
+    auto spawn_tree = sol::overload(
+        static_cast<void (*)(float, float, LAYER)>(::spawn_tree),
+        static_cast<void (*)(float, float, LAYER, uint16_t)>(::spawn_tree));
+
     /// Spawns and grows a tree
     lua["spawn_tree"] = spawn_tree;
 
     auto spawn_mushroom = sol::overload(
         static_cast<int32_t (*)(float, float, LAYER)>(::spawn_mushroom),
-        static_cast<int32_t (*)(float x, float y, LAYER, uint16_t)>(::spawn_mushroom));
+        static_cast<int32_t (*)(float, float, LAYER, uint16_t)>(::spawn_mushroom));
     /// Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
     /// Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
     /// Returns uid of the base or -1 if it wasn't able to spawn
@@ -585,14 +590,18 @@ end
     /// Set seed and reset run.
     lua["set_seed"] = set_seed;
     /// Enable/disable godmode for players.
-    lua["god"] = godmode;
+    lua["god"] = [](bool g)
+    { State::get().godmode(g); };
     /// Enable/disable godmode for companions.
-    lua["god_companions"] = godmode_companions;
+    lua["god_companions"] = [](bool g)
+    { State::get().godmode_companions(g); };
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
-    lua["force_dark_level"] = darkmode;
+    lua["force_dark_level"] = [](bool g)
+    { State::get().darkmode(g); };
     /// Set the zoom level used in levels and shops. 13.5 is the default.
-    lua["zoom"] = zoom;
+    lua["zoom"] = [](float level)
+    { State::get().zoom(level); };
     /// Enable/disable game engine pause.
     /// This is just short for `state.pause == 32`, but that produces an audio bug
     /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
@@ -733,11 +742,14 @@ end
     /// Get the ENT_TYPE... of the entity by uid
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
-    lua["get_zoom_level"] = get_zoom_level;
+    lua["get_zoom_level"] = []() -> float
+    { return State::get_zoom_level(); };
     /// Get the game coordinates at the screen position (`x`, `y`)
-    lua["game_position"] = click_position;
+    lua["game_position"] = [](float x, float y) -> std::pair<float, float>
+    { return State::click_position(x, y); };
     /// Translate an entity position to screen position to be used in drawing functions
-    lua["screen_position"] = screen_position;
+    lua["screen_position"] = [](float x, float y) -> std::pair<float, float>
+    { return State::screen_position(x, y); };
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
@@ -804,6 +816,12 @@ end
     /// Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
     /// Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
     lua["modify_sparktraps"] = modify_sparktraps;
+    /// Activate custom variables for speed and distance in the `ITEM_SPARK`
+    /// note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+    /// default game values are: speed = -0.015, distance = 3.0
+    lua["activate_sparktraps_hack"] = activate_sparktraps_hack;
+    /// Set layer to search for storage items on
+    lua["set_storage_layer"] = set_storage_layer;
     /// Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
     /// Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
     lua["set_blood_multiplication"] = set_blood_multiplication;
@@ -815,6 +833,8 @@ end
     lua["force_olmec_phase_0"] = force_olmec_phase_0;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
+    /// Determines whether the ghost appears when breaking the ghost pot
+    lua["set_cursepot_ghost_enabled"] = set_cursepot_ghost_enabled;
     /// Determines whether the time ghost appears, including the showing of the ghost toast
     lua["set_time_ghost_enabled"] = set_time_ghost_enabled;
     /// Determines whether the time jelly appears in cosmic ocean
@@ -1061,6 +1081,7 @@ end
                 });
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
+            return id;
         }
         return sol::nullopt;
     };
@@ -1283,6 +1304,61 @@ end
         }
         return sol::nullopt;
     };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+    /// where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_pre_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_pre_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+                    VanillaRenderContext render_ctx{};
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    auto return_value = backend->handle_function_with_return<bool>(fun, render_ctx, lua["cast_entity"](self)).value_or(false);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+    /// where `render_ctx` is a `VanillaRenderContext`.
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_post_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* e = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = e->reserve_callback_id();
+            e->set_post_render(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+                    VanillaRenderContext render_ctx{};
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    backend->handle_function(fun, render_ctx, lua["cast_entity"](self));
+                    backend->clear_current_callback();
+                });
+            backend->hook_entity_dtor(e);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
 
     /// Raise a signal and probably crash the game
     lua["raise"] = std::raise;
@@ -1405,6 +1481,13 @@ end
             return spawn_roomowner(owner_type, x, y, layer, room_template);
         });
 
+    /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+    lua["update_liquid_collision_at"] = update_liquid_collision_at;
+
+    /// Disable all crust item spawns
+    lua["disable_floor_embeds"] = disable_floor_embeds;
+
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
@@ -1505,6 +1588,8 @@ end
         ON::RENDER_POST_PAUSE_MENU,
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
+        "RENDER_POST_DRAW_DEPTH",
+        ON::RENDER_POST_DRAW_DEPTH,
         "RENDER_POST_JOURNAL_PAGE",
         ON::RENDER_POST_JOURNAL_PAGE,
         "SPEECH_BUBBLE",
@@ -1567,6 +1652,9 @@ end
     // RENDER_PRE_DRAW_DEPTH
     // Params: `VanillaRenderContext render_ctx, int draw_depth`
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_POST_DRAW_DEPTH
+    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     // RENDER_POST_JOURNAL_PAGE
     // Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`
     // Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
@@ -1637,7 +1725,7 @@ end
     // Covers all of the above.
     */
     /// Some arbitrary constants of the engine
-    lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8);
+    lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8, "MAX_TILES_VERT", g_level_max_y, "MAX_TILES_HORIZ", g_level_max_x, "NOF_DRAW_DEPTHS", 53, "MAX_PLAYERS", 4);
     /* CONST
     // ENGINE_FPS
     // The framerate at which the engine updates, e.g. at which `ON.GAMEFRAME` and similar are called.
@@ -1646,6 +1734,16 @@ end
     // Width of a 1x1 room, both in world coordinates and in tiles.
     // ROOM_HEIGHT
     // Height of a 1x1 room, both in world coordinates and in tiles.
+    // MAX_TILES_VERT
+    // Maximum number of working floor tiles in vertical axis, 126 (0-125 coordinates)
+    // Floors spawned above or below will not have any collision
+    // MAX_TILES_HORIZ
+    // Maximum number of working floor tiles in horizontal axis, 86 (0-85 coordinates)
+    // Floors spawned above or below will not have any collision
+    // NOF_DRAW_DEPTHS
+    // Number of draw_depths, 53 (0-52)
+    // MAX_PLAYERS
+    // Just the max number of players in multiplayer
     */
     /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
     lua.create_named_table(
@@ -1670,8 +1768,11 @@ end
         2);
 
     /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+    /// There are more styles, we just didn't name them all
     lua.create_named_table(
         "VANILLA_FONT_STYLE",
+        "NORMAL",
+        0,
         "ITALIC",
         1,
         "BOLD",

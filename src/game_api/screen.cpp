@@ -4,6 +4,7 @@
 #include <functional>
 #include <vector>
 
+#include "entity.hpp"
 #include "game_manager.hpp"
 #include "state.hpp"
 #include "vtable_hook.hpp"

@@ -106,8 +106,8 @@ set_callback(function(render_ctx, draw_depth)
         -- reposition the crown on top of the head, starting from the center point of the player: bit to the left, bit upwards
         x = x - 0.5
         y = y + 1.15
-        rect = AABB:new(x, y, x + 1.0, y - 1.0)
-        render_ctx:draw_world_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, rect, white)
+        rect = Quad:new(AABB:new(x, y, x + 1.0, y - 1.0))
+        render_ctx:draw_world_texture(TEXTURE.DATA_TEXTURES_ITEMS_0, 1, 14, rect, white, WORLD_SHADER.DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW)
     end
 end, ON.RENDER_PRE_DRAW_DEPTH)
 

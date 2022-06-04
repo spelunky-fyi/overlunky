@@ -283,6 +283,26 @@ struct Quad
         return *this;
     }
 
+    Quad& flip_horizontally()
+    {
+        std::swap(top_left_x, top_right_x);
+        std::swap(top_left_y, top_right_y);
+        std::swap(bottom_left_x, bottom_right_x);
+        std::swap(bottom_left_y, bottom_right_y);
+
+        return *this;
+    }
+
+    Quad& flip_vertically()
+    {
+        std::swap(top_left_x, bottom_left_x);
+        std::swap(top_left_y, bottom_left_y);
+        std::swap(top_right_x, bottom_right_x);
+        std::swap(top_right_y, bottom_right_y);
+
+        return *this;
+    }
+
     /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
     std::tuple<Vec2, Vec2, Vec2, Vec2> split()
     {

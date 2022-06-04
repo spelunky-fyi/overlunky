@@ -284,6 +284,13 @@ function spawn_apep(x, y, layer, right) end
 ---@param layer LAYER
 ---@return nil
 function spawn_tree(x, y, layer) end
+---Spawns and grows a tree
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param height integer
+---@return nil
+function spawn_tree(x, y, layer, height) end
 ---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
 ---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
 ---Returns uid of the base or -1 if it wasn't able to spawn
@@ -486,9 +493,9 @@ function get_entity_flags(uid) end
 ---@return nil
 function set_entity_flags(uid, flags) end
 ---Get the `more_flags` field from entity by uid
----@param id integer
+---@param uid integer
 ---@return integer
-function get_entity_flags2(id) end
+function get_entity_flags2(uid) end
 ---Set the `more_flags` field from entity by uid
 ---@param uid integer
 ---@param flags integer
@@ -536,10 +543,10 @@ function get_render_position(uid) end
 ---@return number, number
 function get_velocity(uid) end
 ---Remove item by uid from entity
----@param id integer
+---@param uid integer
 ---@param item_uid integer
 ---@return nil
-function entity_remove_item(id, item_uid) end
+function entity_remove_item(uid, item_uid) end
 ---Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
 ---@param uid integer
 ---@param off_x number
@@ -651,6 +658,16 @@ function set_kapala_hud_icon(icon_index) end
 ---@param distance number
 ---@return nil
 function modify_sparktraps(angle_increment, distance) end
+---Activate custom variables for speed and distance in the `ITEM_SPARK`
+---note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+---default game values are: speed = -0.015, distance = 3.0
+---@param activate boolean
+---@return nil
+function activate_sparktraps_hack(activate) end
+---Set layer to search for storage items on
+---@param layer LAYER
+---@return nil
+function set_storage_layer(layer) end
 ---Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
 ---Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
 ---@param default_multiplier integer
@@ -675,6 +692,10 @@ function force_olmec_phase_0(b) end
 ---@param cursed integer
 ---@return nil
 function set_ghost_spawn_times(normal, cursed) end
+---Determines whether the ghost appears when breaking the ghost pot
+---@param enable boolean
+---@return nil
+function set_cursepot_ghost_enabled(enable) end
 ---Determines whether the time ghost appears, including the showing of the ghost toast
 ---@param b boolean
 ---@return nil
@@ -897,6 +918,22 @@ function set_pre_collision1(uid, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_pre_collision2(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
+---where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_render(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
+---where `render_ctx` is a `VanillaRenderContext`.
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_render(uid, fun) end
 ---Raise a signal and probably crash the game
 ---@return nil
 function raise() end
@@ -1031,6 +1068,16 @@ function spawn_shopkeeper(x, y, layer, room_template) end
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
 function spawn_roomowner(owner_type, x, y, layer, room_template) end
+---Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+---@param x number
+---@param y number
+---@param add boolean
+---@return nil
+function update_liquid_collision_at(x, y, add) end
+---Disable all crust item spawns
+---@param disable boolean
+---@return nil
+function disable_floor_embeds(disable) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1637,6 +1684,9 @@ function udp_send(host, port, msg) end
     ---@field coffin_contents ENT_TYPE
     ---@field screen_change_counter integer
     ---@field time_startup integer
+    ---@field storage_uid integer
+    ---@field waddler_storage ENT_TYPE[]
+    ---@field waddler_metadata integer[]
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
 
@@ -1838,6 +1888,17 @@ local function PRNG_random(self, min, max) end
     ---@field tilex integer
     ---@field tiley integer
 
+---@class RenderInfo
+    ---@field x number
+    ---@field y number
+    ---@field shader integer
+    ---@field source Quad
+    ---@field destination Quad
+    ---@field tilew number
+    ---@field tileh number
+    ---@field facing_left boolean
+    ---@field render_inactive boolean
+
 ---@class Entity
     ---@field type EntityDB
     ---@field overlay Entity
@@ -1859,8 +1920,11 @@ local function PRNG_random(self, min, max) end
     ---@field color Color
     ---@field hitboxx number
     ---@field hitboxy number
+    ---@field shape SHAPE
+    ---@field hitbox_enabled boolean
     ---@field offsetx number
     ---@field offsety number
+    ---@field rendering_info RenderInfo
     ---@field topmost fun(self, ): Entity
     ---@field topmost_mount fun(self, ): Entity
     ---@field overlaps_with Entity_overlaps_with
@@ -1879,7 +1943,7 @@ local function PRNG_random(self, min, max) end
     ---@field trigger_action fun(self, user: Entity): boolean
     ---@field get_metadata any @&Entity::get_metadata
     ---@field apply_metadata fun(self, metadata: integer): nil
-    ---@field set_invisible fun(self, n: boolea): nil
+    ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self, ): span<integer>
     ---@field is_in_liquid fun(self, ): boolean
 
@@ -1937,6 +2001,9 @@ local function Entity_overlaps_with(self, other) end
     ---@field add_money fun(self, money: integer): nil
     ---@field is_on_fire fun(self, ): boolean
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
+    ---@field get_all_behaviors fun(self, ): integer[]
+    ---@field set_behavior fun(self, behavior_id: integer): boolean
+    ---@field get_behavior fun(self, ): integer
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
@@ -1964,6 +2031,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field kills_level integer
     ---@field kills_total integer
     ---@field collected_money_total integer
+    ---@field collected_money_count integer
     ---@field collected_money ENT_TYPE[]
     ---@field collected_money_values integer[]
     ---@field killed_enemies ENT_TYPE[]
@@ -1975,6 +2043,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field companion_health integer[]
     ---@field companion_poison_tick_timers integer[]
     ---@field is_companion_cursed boolean[]
+    ---@field acquired_powerups ENT_TYPE[]
 
 ---@class Ai
     ---@field target Entity
@@ -1997,6 +2066,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field get_heart_color fun(self, ): Color
     ---@field is_female fun(self, ): boolean
     ---@field set_heart_color fun(self, hcolor: Color): nil
+    ---@field let_go fun(self, ): nil
 
 ---@class Floor : Entity
     ---@field deco_top integer
@@ -2893,6 +2963,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field size_multiply number
     ---@field next_size number
     ---@field size_change_timer integer
+    ---@field speed number
+    ---@field distance number
 
 ---@class TiamatShot : LightEmitter
 
@@ -3991,9 +4063,11 @@ local function VanillaRenderContext_draw_screen_texture(self, texture_id, source
 ---@param dest Quad
 ---@param color Color
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color, angle: number, px: number, py: number): nil
+---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color, shader: WORLD_SHADER): nil
 ---@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
+---@overload fun(self, texture_id: TEXTURE, source: Quad, dest: Quad, color: Color, shader: WORLD_SHADER): nil
 local function VanillaRenderContext_draw_world_texture(self, texture_id, source, dest, color) end
 
 ---@class TextureRenderingInfo
@@ -4072,6 +4146,8 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field get_AABB fun(self, ): AABB
     ---@field offset fun(self, off_x: number, off_y: number): Quad
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad
+    ---@field flip_horizontally fun(self, ): Quad
+    ---@field flip_vertically fun(self, ): Quad
     ---@field split fun(self, ): Vec2, Vec2, Vec2, Vec2
 
 ---@class Screen
@@ -4859,6 +4935,10 @@ CHAR_STATE = {
 ---@alias CHAR_STATE integer
 CONST = {
   ENGINE_FPS = 60,
+  MAX_PLAYERS = 4,
+  MAX_TILES_HORIZ = 86,
+  MAX_TILES_VERT = 126,
+  NOF_DRAW_DEPTHS = 53,
   ROOM_HEIGHT = 8,
   ROOM_WIDTH = 10
 }
@@ -4877,9 +4957,9 @@ COSUBTHEME = {
 }
 ---@alias COSUBTHEME integer
 DROP = {
-  ALIENQUEEN_ALIENBLAST = 183,
-  ALIENQUEEN_ALIENBLAST_RE = 185,
-  ALIENQUEEN_ALIENBLAST_RI = 184,
+  ALIENQUEEN_ALIENBLAST = 184,
+  ALIENQUEEN_ALIENBLAST_RE = 186,
+  ALIENQUEEN_ALIENBLAST_RI = 185,
   ALTAR_DICE_CLIMBINGGLOVES = 0,
   ALTAR_DICE_COOKEDTURKEY = 1,
   ALTAR_DICE_DIAMOND = 2,
@@ -4891,186 +4971,202 @@ DROP = {
   ALTAR_DICE_TELEPACK = 7,
   ALTAR_DICE_VAMPIRE = 8,
   ALTAR_DICE_WEBGUN = 9,
-  ALTAR_GIFT_BOMBBAG = 21,
-  ALTAR_HIREDHAND_SHOTGUN = 20,
+  ALTAR_GIFT_BOMBBAG = 19,
+  ALTAR_GIFT_CAPE = 20,
+  ALTAR_HIREDHAND_SHOTGUN = 18,
   ALTAR_IDOL_GOLDEN_MONKEY = 11,
-  ALTAR_KAPALA = 12,
-  ALTAR_PRESENT_EGGPLANT = 13,
-  ALTAR_ROCK_WOODENARROW = 14,
-  ALTAR_ROYAL_JELLY = 15,
-  ALTAR_USHABTI_CAVEMAN = 16,
-  ALTAR_USHABTI_HIREDHAND = 19,
-  ALTAR_USHABTI_TURKEY = 17,
-  ALTAR_USHABTI_VAMPIRE = 18,
-  ANUBIS2_ANUBIS_COFFIN = 158,
-  ANUBIS2_JETPACK = 22,
-  ANUBIS2_SPECIALSHOT_R = 188,
-  ANUBIS_COFFIN_SORCERESS = 110,
-  ANUBIS_COFFIN_VAMPIRE = 109,
-  ANUBIS_COFFIN_WITCHDOCTOR = 111,
-  ANUBIS_SCEPTER = 23,
-  ANUBIS_SPECIALSHOT_R = 187,
-  ARROWTRAP_WOODENARROW = 155,
-  AXOLOTL_BUBBLE = 176,
-  BEG_BOMBBAG = 24,
-  BEG_TELEPACK = 26,
-  BEG_TRUECROWN = 25,
-  BONEPILE_SKELETONKEY = 27,
-  BONEPILE_SKULL = 28,
-  CANDLE_NUGGET = 149,
-  CATMUMMY_CURSINGCLOUD = 186,
-  CATMUMMY_DIAMOND = 121,
-  CHEST_BOMB = 140,
-  CHEST_EMERALD = 135,
-  CHEST_LEPRECHAUN = 139,
-  CHEST_RUBY = 137,
-  CHEST_SAPPHIRE = 136,
-  CHEST_SMALLEMERALD = 134,
-  CHEST_SMALLRUBY = 138,
-  CLONEGUN_SHOT = 168,
-  COBRA_ACIDSPIT = 179,
-  COFFIN_SKULL = 152,
-  COOKEDTURKEY_HEALTH = 190,
-  COOKFIRE_TORCH = 150,
-  CROCMAN_TELEPACK = 29,
-  CROCMAN_TELEPORTER = 30,
-  CRUSHTRAP_NUGGET = 131,
-  CUTSCENE_GOLDCOIN = 147,
-  DUATALTAR_BOMBBAG = 127,
-  DUATALTAR_BOMBBOX = 128,
-  DUATALTAR_COOKEDTURKEY = 129,
-  EGGSAC_GRUB_1 = 114,
-  EGGSAC_GRUB_2 = 115,
-  EGGSAC_GRUB_3 = 116,
-  EMBED_NUGGET = 133,
-  FACTORY_GENERATOR_SCRAP = 93,
-  FIREBUG_FIREBALL = 178,
-  FLOORSTYLEDCOG_NUGGET = 130,
-  FREEZERAY_SHOT = 167,
-  GHIST_GOLDCOIN = 63,
-  GHOSTJAR_DIAMOND = 31,
-  GHOST_DIAMOND = 32,
-  GIANTFOOD_HEALTH = 191,
-  GIANTFROG_FROG = 112,
-  GIANTFROG_TADPOLE = 113,
-  GIANTSPIDER_PASTE = 33,
-  GIANTSPIDER_WEBSHOT = 160,
-  GOLDENMONKEY_NUGGET = 37,
-  GOLDENMONKEY_SMALLEMERALD = 34,
-  GOLDENMONKEY_SMALLRUBY = 36,
-  GOLDENMONKEY_SMALLSAPPHIRE = 35,
-  HANGINGSPIDER_WEBGUN = 38,
-  HERMITCRAB_ACIDBUBBLE = 181,
-  HUMPHEAD_HIREDHAND = 122,
-  HUNDUN_FIREBALL = 177,
-  ICECAVE_BOULDER = 39,
-  JIANGSHIASSASSIN_SPIKESHOES = 40,
-  JIANGSHI_SPRINGSHOES = 41,
-  KAPALA_HEALTH = 193,
-  KINGU_FEMALE_JIANGSHI = 45,
-  KINGU_JIANGSHI = 44,
-  KINGU_OCTOPUS = 43,
-  KINGU_TABLETOFDESTINY = 42,
-  LAMASSU_DIAMOND = 126,
-  LAMASSU_EMERALD = 125,
-  LAMASSU_LASERSHOT = 171,
-  LAMASSU_RUBY = 124,
-  LAMASSU_SAPPHIRE = 123,
-  LASERTRAP_SHOT = 157,
-  LAVAMANDER_RUBY = 120,
-  LAVAPOT_MAGMAMAN = 119,
-  LEPRECHAUN_CLOVER = 46,
-  LOCKEDCHEST_UDJATEYE = 144,
-  MADAME_TUSK_KEY = 108,
-  MATTOCK_BROKENMATTOCK = 47,
-  MOLE_MATTOCK = 48,
-  MOSQUITO_HOVERPACK = 49,
-  MOTHERSTATUE_HEALTH = 189,
-  MUMMY_DIAMOND = 50,
-  MUMMY_FLY = 159,
-  NECROMANCER_RUBY = 51,
-  OCTOPUS_INKSPIT = 180,
-  OLMEC_BOMB = 161,
-  OLMEC_CAVEMAN_1 = 52,
-  OLMEC_CAVEMAN_2 = 53,
-  OLMEC_CAVEMAN_3 = 54,
-  OLMEC_SISTERS_BOMBBOX = 154,
-  OLMEC_SISTERS_ROPEPILE = 153,
-  OLMEC_UFO = 162,
-  OSIRIS_EMERALDS = 55,
-  OSIRIS_PORTAL = 57,
-  OSIRIS_TABLETOFDESTINY = 56,
-  PANGXIE_ACIDBUBBLE = 182,
-  PANGXIE_WOODENSHIELD = 58,
-  PLASMACANNON_SHOT = 166,
-  POISONEDARROWTRAP_WOODENARROW = 156,
-  POTOFGOLD_GOLDCOIN = 146,
-  QILIN_FIREBALL = 175,
-  QUEENBEE_ROYALJELLY = 59,
-  QUILLBACK_BOMBBAG = 117,
-  QUILLBACK_COOKEDTURKEY = 118,
-  REDLANTERN_SMALLNUGGET = 148,
-  ROBOT_METALSHIELD = 60,
-  ROCKDOG_FIREBALL = 174,
-  ROYALJELLY_HEALTH = 192,
-  SACRIFICE_EGGPLANT = 104,
-  SACRIFICE_IDOL = 101,
-  SACRIFICE_PRESENT = 102,
-  SACRIFICE_ROCK = 103,
-  SCEPTER_ANUBISSPECIALSHOT = 164,
-  SCEPTER_PLAYERSHOT = 165,
-  SCRAP_ALIEN = 99,
-  SCRAP_COBRA = 97,
-  SCRAP_SCORPION = 98,
-  SCRAP_SNAKE = 96,
-  SCRAP_SPIDER = 95,
-  SHOPKEEPER_GENERATOR_1 = 94,
-  SHOPKEEPER_GOLDBAR = 62,
-  SHOPKEEPER_GOLDCOIN = 61,
-  SHOTGUN_BULLET = 169,
-  SKELETON_SKELETONKEY = 64,
-  SKELETON_SKULL = 65,
-  SKULLDROPTRAP_SKULL = 151,
-  SLIDINGWALL_NUGGET = 132,
-  SORCERESS_DAGGERSHOT = 172,
-  SORCERESS_RUBY = 66,
-  SPARROW_ROPEPILE = 67,
-  SPARROW_SKELETONKEY = 68,
-  TIAMAT_BAT = 69,
-  TIAMAT_BEE = 70,
-  TIAMAT_CAVEMAN = 71,
-  TIAMAT_COBRA = 72,
-  TIAMAT_HERMITCRAB = 73,
-  TIAMAT_MONKEY = 74,
-  TIAMAT_MOSQUITO = 75,
-  TIAMAT_OCTOPUS = 76,
-  TIAMAT_OLMITE = 77,
-  TIAMAT_SCORPION = 78,
-  TIAMAT_SHOT = 79,
-  TIAMAT_SNAKE = 80,
-  TIAMAT_TIAMATSHOT = 173,
-  TIAMAT_UFO = 81,
-  TIAMAT_YETI = 82,
-  TORCH_SMALLNUGGET = 83,
-  TURKEY_COOKEDTURKEY = 84,
-  UFO_ALIEN = 100,
-  UFO_LASERSHOT = 170,
-  UFO_PARACHUTE = 85,
-  USHABTI_QILIN = 145,
-  VAMPIRE_CAPE = 86,
-  VAN_HORSING_COMPASS = 87,
-  VAN_HORSING_DIAMOND = 88,
-  VAULTCHEST_DIAMOND = 142,
-  VAULTCHEST_EMERALD = 141,
-  VAULTCHEST_RUBY = 143,
-  VLAD_VLADSCAPE = 89,
-  YAMA_EGGPLANTCROWN = 105,
-  YAMA_GIANTFOOD = 106,
-  YANG_KEY = 107,
-  YETIKING_FREEZERAY = 90,
-  YETIKING_ICESPIRE = 163,
-  YETIQUEEN_POWERPACK = 91,
-  YETI_PITCHERSMITT = 92
+  ALTAR_KAPALA = 21,
+  ALTAR_PRESENT_EGGPLANT = 12,
+  ALTAR_ROCK_WOODENARROW = 13,
+  ALTAR_ROYAL_JELLY = 22,
+  ALTAR_USHABTI_CAVEMAN = 14,
+  ALTAR_USHABTI_HIREDHAND = 17,
+  ALTAR_USHABTI_TURKEY = 15,
+  ALTAR_USHABTI_VAMPIRE = 16,
+  ANUBIS2_ANUBIS_COFFIN = 159,
+  ANUBIS2_JETPACK = 23,
+  ANUBIS2_SPECIALSHOT_R = 189,
+  ANUBIS_COFFIN_SORCERESS = 111,
+  ANUBIS_COFFIN_VAMPIRE = 110,
+  ANUBIS_COFFIN_WITCHDOCTOR = 112,
+  ANUBIS_SCEPTER = 24,
+  ANUBIS_SPECIALSHOT_R = 188,
+  ARROWTRAP_WOODENARROW = 156,
+  AXOLOTL_BUBBLE = 177,
+  BEG_BOMBBAG = 25,
+  BEG_TELEPACK = 27,
+  BEG_TRUECROWN = 26,
+  BONEBLOCK_BONES = 194,
+  BONEBLOCK_SKELETON = 192,
+  BONEBLOCK_SKULL = 193,
+  BONEPILE_SKELETONKEY = 28,
+  BONEPILE_SKULL = 29,
+  CANDLE_NUGGET = 150,
+  CATMUMMY_CURSINGCLOUD = 187,
+  CATMUMMY_DIAMOND = 122,
+  CHEST_BOMB = 141,
+  CHEST_EMERALD = 136,
+  CHEST_LEPRECHAUN = 140,
+  CHEST_RUBY = 138,
+  CHEST_SAPPHIRE = 137,
+  CHEST_SMALLEMERALD = 135,
+  CHEST_SMALLRUBY = 139,
+  CLONEGUN_SHOT = 169,
+  COBRA_ACIDSPIT = 180,
+  COFFIN_SKULL = 153,
+  COOKEDTURKEY_HEALTH = 206,
+  COOKFIRE_CAVEMAN_1 = 190,
+  COOKFIRE_CAVEMAN_2 = 191,
+  COOKFIRE_TORCH = 151,
+  CROCMAN_TELEPACK = 30,
+  CROCMAN_TELEPORTER = 31,
+  CRUSHTRAP_NUGGET = 132,
+  CUTSCENE_GOLDCOIN = 148,
+  DUATALTAR_BOMBBAG = 128,
+  DUATALTAR_BOMBBOX = 129,
+  DUATALTAR_COOKEDTURKEY = 130,
+  EGGSAC_GRUB_1 = 115,
+  EGGSAC_GRUB_2 = 116,
+  EGGSAC_GRUB_3 = 117,
+  EMBED_NUGGET = 134,
+  FACTORY_GENERATOR_SCRAP = 94,
+  FIREBUG_FIREBALL = 179,
+  FLOORSTYLEDCOG_NUGGET = 131,
+  FLOOR_DIAMOND = 201,
+  FLOOR_EMBED_GOLD = 203,
+  FLOOR_EMBED_GOLD_BIG = 204,
+  FLOOR_EMERALD = 199,
+  FLOOR_RUBY = 202,
+  FLOOR_SAPPHIRE = 200,
+  FREEZERAY_SHOT = 168,
+  GHIST_GOLDCOIN = 64,
+  GHOSTJAR_DIAMOND = 32,
+  GHOST_DIAMOND = 33,
+  GIANTFOOD_HEALTH = 207,
+  GIANTFROG_FROG = 113,
+  GIANTFROG_TADPOLE = 114,
+  GIANTSPIDER_PASTE = 34,
+  GIANTSPIDER_WEBSHOT = 161,
+  GIANTSPIDER_WEB_LEFT = 195,
+  GIANTSPIDER_WEB_RIGHT = 196,
+  GOLDENMONKEY_NUGGET = 38,
+  GOLDENMONKEY_SMALLEMERALD = 35,
+  GOLDENMONKEY_SMALLRUBY = 37,
+  GOLDENMONKEY_SMALLSAPPHIRE = 36,
+  HANGINGSPIDER_WEBGUN = 39,
+  HERMITCRAB_ACIDBUBBLE = 182,
+  HUMPHEAD_HIREDHAND = 123,
+  HUNDUN_FIREBALL = 178,
+  ICECAVE_BOULDER = 40,
+  ICE_ALIVE_EMBEDDED_ON_ICE = 198,
+  IMP_LAVAPOT = 197,
+  JIANGSHIASSASSIN_SPIKESHOES = 41,
+  JIANGSHI_SPRINGSHOES = 42,
+  KAPALA_HEALTH = 209,
+  KINGU_FEMALE_JIANGSHI = 46,
+  KINGU_JIANGSHI = 45,
+  KINGU_OCTOPUS = 44,
+  KINGU_TABLETOFDESTINY = 43,
+  LAMASSU_DIAMOND = 127,
+  LAMASSU_EMERALD = 126,
+  LAMASSU_LASERSHOT = 172,
+  LAMASSU_RUBY = 125,
+  LAMASSU_SAPPHIRE = 124,
+  LASERTRAP_SHOT = 158,
+  LAVAMANDER_RUBY = 121,
+  LAVAPOT_MAGMAMAN = 120,
+  LEPRECHAUN_CLOVER = 47,
+  LOCKEDCHEST_UDJATEYE = 145,
+  MADAME_TUSK_KEY = 109,
+  MATTOCK_BROKENMATTOCK = 48,
+  MOLE_MATTOCK = 49,
+  MOSQUITO_HOVERPACK = 50,
+  MOTHERSTATUE_HEALTH = 205,
+  MUMMY_DIAMOND = 51,
+  MUMMY_FLY = 160,
+  NECROMANCER_RUBY = 52,
+  OCTOPUS_INKSPIT = 181,
+  OLMEC_BOMB = 162,
+  OLMEC_CAVEMAN_1 = 53,
+  OLMEC_CAVEMAN_2 = 54,
+  OLMEC_CAVEMAN_3 = 55,
+  OLMEC_SISTERS_BOMBBOX = 155,
+  OLMEC_SISTERS_ROPEPILE = 154,
+  OLMEC_UFO = 163,
+  OSIRIS_EMERALDS = 56,
+  OSIRIS_PORTAL = 58,
+  OSIRIS_TABLETOFDESTINY = 57,
+  PANGXIE_ACIDBUBBLE = 183,
+  PANGXIE_WOODENSHIELD = 59,
+  PLASMACANNON_SHOT = 167,
+  POISONEDARROWTRAP_WOODENARROW = 157,
+  POTOFGOLD_GOLDCOIN = 147,
+  QILIN_FIREBALL = 176,
+  QUEENBEE_ROYALJELLY = 60,
+  QUILLBACK_BOMBBAG = 118,
+  QUILLBACK_COOKEDTURKEY = 119,
+  REDLANTERN_SMALLNUGGET = 149,
+  ROBOT_METALSHIELD = 61,
+  ROCKDOG_FIREBALL = 175,
+  ROYALJELLY_HEALTH = 208,
+  SACRIFICE_EGGPLANT = 105,
+  SACRIFICE_IDOL = 102,
+  SACRIFICE_PRESENT = 103,
+  SACRIFICE_ROCK = 104,
+  SCEPTER_ANUBISSPECIALSHOT = 165,
+  SCEPTER_PLAYERSHOT = 166,
+  SCRAP_ALIEN = 100,
+  SCRAP_COBRA = 98,
+  SCRAP_SCORPION = 99,
+  SCRAP_SNAKE = 97,
+  SCRAP_SPIDER = 96,
+  SHOPKEEPER_GENERATOR_1 = 95,
+  SHOPKEEPER_GOLDBAR = 63,
+  SHOPKEEPER_GOLDCOIN = 62,
+  SHOTGUN_BULLET = 170,
+  SKELETON_SKELETONKEY = 65,
+  SKELETON_SKULL = 66,
+  SKULLDROPTRAP_SKULL = 152,
+  SLIDINGWALL_NUGGET = 133,
+  SORCERESS_DAGGERSHOT = 173,
+  SORCERESS_RUBY = 67,
+  SPARROW_ROPEPILE = 68,
+  SPARROW_SKELETONKEY = 69,
+  TIAMAT_BAT = 70,
+  TIAMAT_BEE = 71,
+  TIAMAT_CAVEMAN = 72,
+  TIAMAT_COBRA = 73,
+  TIAMAT_HERMITCRAB = 74,
+  TIAMAT_MONKEY = 75,
+  TIAMAT_MOSQUITO = 76,
+  TIAMAT_OCTOPUS = 77,
+  TIAMAT_OLMITE = 78,
+  TIAMAT_SCORPION = 79,
+  TIAMAT_SHOT = 80,
+  TIAMAT_SNAKE = 81,
+  TIAMAT_TIAMATSHOT = 174,
+  TIAMAT_UFO = 82,
+  TIAMAT_YETI = 83,
+  TORCH_SMALLNUGGET = 84,
+  TURKEY_COOKEDTURKEY = 85,
+  UFO_ALIEN = 101,
+  UFO_LASERSHOT = 171,
+  UFO_PARACHUTE = 86,
+  USHABTI_QILIN = 146,
+  VAMPIRE_CAPE = 87,
+  VAN_HORSING_COMPASS = 88,
+  VAN_HORSING_DIAMOND = 89,
+  VAULTCHEST_DIAMOND = 143,
+  VAULTCHEST_EMERALD = 142,
+  VAULTCHEST_RUBY = 144,
+  VLAD_VLADSCAPE = 90,
+  YAMA_EGGPLANTCROWN = 106,
+  YAMA_GIANTFOOD = 107,
+  YANG_KEY = 108,
+  YETIKING_FREEZERAY = 91,
+  YETIKING_ICESPIRE = 164,
+  YETIQUEEN_POWERPACK = 92,
+  YETI_PITCHERSMITT = 93
 }
 ---@alias DROP integer
 DROPCHANCE = {
@@ -6586,8 +6682,9 @@ ON = {
   PRE_LOAD_LEVEL_FILES = 109,
   PROLOGUE = 2,
   RECAP = 20,
+  RENDER_POST_DRAW_DEPTH = 122,
   RENDER_POST_HUD = 118,
-  RENDER_POST_JOURNAL_PAGE = 122,
+  RENDER_POST_JOURNAL_PAGE = 123,
   RENDER_POST_PAUSE_MENU = 120,
   RENDER_PRE_DRAW_DEPTH = 121,
   RENDER_PRE_HUD = 117,
@@ -6600,11 +6697,11 @@ ON = {
   SCRIPT_ENABLE = 115,
   SEED_INPUT = 8,
   SPACESHIP = 15,
-  SPEECH_BUBBLE = 123,
+  SPEECH_BUBBLE = 124,
   START = 103,
   TEAM_SELECT = 10,
   TITLE = 3,
-  TOAST = 124,
+  TOAST = 125,
   TRANSITION = 13,
   WIN = 16
 }
@@ -7232,6 +7329,11 @@ SCREEN = {
   WIN = 16
 }
 ---@alias SCREEN integer
+SHAPE = {
+  CIRCLE = 2,
+  RECTANGLE = 1
+}
+---@alias SHAPE integer
 SHOP_TYPE = {
   CAVEMAN_SHOP = 10,
   CLOTHING_SHOP = 1,
@@ -8197,7 +8299,8 @@ VANHORSING = {
 ---@alias VANHORSING integer
 VANILLA_FONT_STYLE = {
   BOLD = 2,
-  ITALIC = 1
+  ITALIC = 1,
+  NORMAL = 0
 }
 ---@alias VANILLA_FONT_STYLE integer
 VANILLA_SOUND = {
@@ -8800,6 +8903,28 @@ WIN_STATE = {
   TIAMAT_WIN = 1
 }
 ---@alias WIN_STATE integer
+WORLD_SHADER = {
+  COLOR = 0,
+  DEFERRED_COLOR_TRANSPARENT = 6,
+  DEFERRED_TEXTURE_COLOR = 7,
+  DEFERRED_TEXTURE_COLOR_CURSED = 9,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE = 16,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW = 22,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_DYNAMIC_GLOW = 23,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION = 24,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW = 18,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_BRIGHTNESS = 20,
+  DEFERRED_TEXTURE_COLOR_EMISSIVE_GLOW_HEAVY = 19,
+  DEFERRED_TEXTURE_COLOR_POISONED = 8,
+  DEFERRED_TEXTURE_COLOR_POISONED_CURSED = 10,
+  DEFERRED_TEXTURE_COLOR_TRANSPARENT = 11,
+  DEFERRED_TEXTURE_COLOR_TRANSPARENT_CORRECTED = 12,
+  TEXTURE = 1,
+  TEXTURE_ALPHA_COLOR = 3,
+  TEXTURE_COLOR = 2,
+  TEXTURE_COLORS_WARP = 5
+}
+---@alias WORLD_SHADER integer
 YANG = {
   ANGRY = -1,
   BOTH_TURKEYS_DELIVERED = 3,

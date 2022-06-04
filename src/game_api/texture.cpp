@@ -29,14 +29,22 @@ TextureDefinition get_texture_definition(TEXTURE texture_id)
 
 Texture* get_texture(TEXTURE texture_id)
 {
+    if (texture_id < 0)
+        return nullptr;
+
     auto* textures = get_textures();
     auto& render = RenderAPI::get();
+
     if (texture_id >= static_cast<int64_t>(textures->texture_map.size()))
     {
         std::lock_guard lock{render.custom_textures_lock};
         return &render.custom_textures[texture_id];
     }
-    return textures->texture_map[texture_id];
+    else if (texture_id < 0x192)
+    {
+        return textures->texture_map[texture_id];
+    }
+    return nullptr;
 }
 
 TEXTURE define_texture(TextureDefinition data)

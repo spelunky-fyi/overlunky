@@ -1308,7 +1308,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "sparktrap_angle_increment"sv,
         // Put a read bp on Spark:rotatnio_angle, the next instruction adds a hardcoded float from constant, we want address of that constant (not the whole instruction)
         PatternCommandBuffer{}
-            .find_after_inst("\xF3\x0F\x10\x89\x58\x01\x00\x00\xF3\x0F\x58\x0D"sv)
+            .find_after_inst("\xF3\x0F\x10\x89\x58\x01\x00\x00"sv)
             .at_exe(),
     },
     {
@@ -1590,6 +1590,48 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x31\xC0\x45\x31\xED\x89\x4C\x24\x3C"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        // Write bp on first waddler storage item in state
+        // We're editing the layer offset in mov rcx,[r14+00001308]
+        "storage_layer"sv,
+        PatternCommandBuffer{}
+            .find_inst("\xf3\x0f\x10\x55\xe0\xf3\x0f\x10\x5d\xe4"sv)
+            .offset(-0x4)
+            .at_exe(),
+    },
+    {
+        // Go to the kill virtual function for floor, scroll down until you see getting address for LiquidPhysics, it should call that function after that
+        "remove_from_liquid_collision_map"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x31\xD2\x44\x39\x41\x20\x0F\x92\xC2"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Go to the spawn function when spawning floor, there should be something like call r8, go into that function, inside there would be couple calls to virtuals (not entity virtuals)
+        // one of them is the one that calls this function (can be recognize by the getting address for the LiquidPhysics)
+        "add_from_liquid_collision_map"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x31\xF6\x39\x6B\x20\x40\x0F\x92\xC6"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Just set bp in create entity for embeds, find unique pattern somewhere in that function
+        "spawn_floor_embeds"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x08\xD1\x48\x0F\x44\xF8\x83\x7F\x0C\x1A"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Set conditional bp for ghost, break the ghost jar, execute past return, we need address for that whole function call to nop it
+        "ghost_jar_ghost_spawn"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\x83\x78\x18\x00"sv)
+            .offset(0x2)
+            .at_exe(),
     },
     {
         // Put write bp on state.time_level

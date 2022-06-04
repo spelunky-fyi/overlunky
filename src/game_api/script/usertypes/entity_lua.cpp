@@ -3,6 +3,7 @@
 #include "color.hpp"
 #include "custom_types.hpp"
 #include "movable.hpp"
+#include "render_api.hpp"
 
 #include <sol/sol.hpp>
 
@@ -148,6 +149,38 @@ void register_usertypes(sol::state& lua)
         "tiley",
         &EntityDB::tile_y);
 
+    /// Some information used to render the entity, can not be changed
+    lua.new_usertype<RenderInfo>(
+        "RenderInfo",
+        "x",
+        &RenderInfo::x,
+        "y",
+        &RenderInfo::y,
+        "shader",
+        &RenderInfo::shader,
+        "source",
+        &RenderInfo::source,
+        "destination",
+        sol::property([](const RenderInfo& ri) -> Quad
+                      { return Quad{
+                            ri.destination_bottom_left_x,
+                            ri.destination_bottom_left_y,
+                            ri.destination_bottom_right_x,
+                            ri.destination_bottom_right_y,
+                            ri.destination_top_right_x,
+                            ri.destination_top_right_y,
+                            ri.destination_top_left_x,
+                            ri.destination_top_left_y,
+                        }; }),
+        "tilew",
+        &RenderInfo::tilew,
+        "tileh",
+        &RenderInfo::tileh,
+        "facing_left",
+        &RenderInfo::flip_horizontal,
+        "render_inactive",
+        &RenderInfo::render_inactive);
+
     auto get_overlay = [&lua](Entity& entity)
     {
         return lua["cast_entity"](entity.overlay);
@@ -211,10 +244,16 @@ void register_usertypes(sol::state& lua)
         &Entity::hitboxx,
         "hitboxy",
         &Entity::hitboxy,
+        "shape",
+        &Entity::shape,
+        "hitbox_enabled",
+        &Entity::hitbox_enabled,
         "offsetx",
         &Entity::offsetx,
         "offsety",
         &Entity::offsety,
+        "rendering_info",
+        &Entity::rendering_info,
         "topmost",
         topmost,
         "topmost_mount",
@@ -360,6 +399,12 @@ void register_usertypes(sol::state& lua)
         &Movable::is_on_fire,
         "damage",
         damage,
+        "get_all_behaviors",
+        &Movable::get_all_behaviors,
+        "set_behavior",
+        &Movable::set_behavior,
+        "get_behavior",
+        &Movable::get_behavior,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -382,6 +427,7 @@ void register_usertypes(sol::state& lua)
     }
 
     lua.create_named_table("REPEAT_TYPE", "NO_REPEAT", REPEAT_TYPE::NoRepeat, "LINEAR", REPEAT_TYPE::Linear, "BACK_AND_FORTH", REPEAT_TYPE::BackAndForth);
+    lua.create_named_table("SHAPE", "RECTANGLE", SHAPE::RECTANGLE, "CIRCLE", SHAPE::CIRCLE);
     lua.create_named_table("BUTTON", "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32);
     lua.create_named_table(
         "MASK",
