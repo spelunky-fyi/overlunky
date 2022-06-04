@@ -1479,6 +1479,9 @@ end
             return spawn_roomowner(owner_type, x, y, layer, room_template);
         });
 
+    /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+    lua["update_liquid_collision_at"] = update_liquid_collision_at;
+
     /// Disable all crust item spawns
     lua["disable_floor_embeds"] = disable_floor_embeds;
 

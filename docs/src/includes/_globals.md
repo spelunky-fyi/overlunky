@@ -1356,6 +1356,15 @@ end, "waddler")
 
 Set layer to search for storage items on
 
+### update_liquid_collision_at
+
+
+> Search script examples for [update_liquid_collision_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_liquid_collision_at)
+
+#### nil update_liquid_collision_at(float x, float y, bool add)
+
+Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+
 ### warp
 
 

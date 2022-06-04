@@ -1601,6 +1601,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        // Go to the kill virtual function for floor, scroll down until you see getting address for LiquidPhysics, it should call that function after that
+        "remove_from_liquid_collision_map"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x31\xD2\x44\x39\x41\x20\x0F\x92\xC2"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Go to the spawn function when spawning floor, there should be something like call r8, go into that function, inside there would be couple calls to virtuals (not entity virtuals)
+        // one of them is the one that calls this function (can be recognize by the getting address for the LiquidPhysics)
+        "add_from_liquid_collision_map"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x31\xF6\x39\x6B\x20\x40\x0F\x92\xC6"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         // Just set bp in create entity for embeds, find unique pattern somewhere in that function
         "spawn_floor_embeds"sv,
         PatternCommandBuffer{}
@@ -1609,7 +1626,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        // Set conditional bp for ghost, break the ghost jar, execute past return, we need address for that call to nop it
+        // Set conditional bp for ghost, break the ghost jar, execute past return, we need address for that whole function call to nop it
         "ghost_jar_ghost_spawn"sv,
         PatternCommandBuffer{}
             .find_after_inst("\x48\x83\x78\x18\x00"sv)
