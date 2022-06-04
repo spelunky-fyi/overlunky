@@ -301,7 +301,7 @@ def print_af(lf, af):
     typed_params, params = cpp_params_to_emmy_lua(af["param"])
     typed_params.strip()
     typed_params = replace_all(typed_params, replace)
-    print_comment(lf)
+    print_comment(lf if lf["comment"] else af)
     print_func(name, params, ret, typed_params)
 
 
@@ -326,7 +326,8 @@ for file in header_files:
                         "comment": comment,
                     }
                 )
-        else:
+                comment = []
+        elif not c:
             comment = []
 
 for file in header_files:

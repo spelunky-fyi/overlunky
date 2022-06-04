@@ -16,6 +16,12 @@ def print_collecting_info(data):
     print(f"Collecting {data} data...")
 
 
+def print_console(*args, **kwargs):
+    sys.stdout, stdout = sys.__stdout__, sys.stdout
+    print(args, kwargs)
+    sys.stdout = stdout
+
+
 if not os.path.exists("src/includes"):
     os.makedirs("src/includes")
 
@@ -231,23 +237,36 @@ def format_af(lf, af):
     fun = f"{ret} {name}({param})".strip()
     return fun
 
+
 def print_af(lf, af):
-    if lf["comment"] and lf["comment"][0] == "NoDoc":
-        return
-    if lf["name"] in printed_funcs:
+    fun = format_af(lf, af)
+    print(f"#### {fun}\n")
+    comments = af["comment"]
+    if comments:
+        comment = " ".join(comments)
+        comment = link_custom_type(comment)
+        print(comment)
+        print()
+
+
+def print_lf(lf):
+    comments = lf["comment"]
+    if comments and comments[0] == "NoDoc":
         return
     name = lf["name"]
+    if name in printed_funcs:
+        return
     search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
     print(f"\n### {name}\n")
     include_example(name)
     print(f"\n> Search script examples for [{name}]({search_link})\n")
-    for ol in rpcfunc(lf["cpp"]):
-        fun = format_af(lf, ol)
-        print(f"#### {fun}\n")
-    for com in lf["comment"]:
+    for af in rpcfunc(lf["cpp"]):
+        print_af(lf, af)
+    for com in comments:
         com = link_custom_type(com)
         print(com)
     printed_funcs.append(lf["name"])
+
 
 print_collecting_info("rpc")
 for file in header_files:
@@ -271,7 +290,8 @@ for file in header_files:
                         "comment": comment,
                     }
                 )
-        else:
+                comment = []
+        elif not c:
             comment = []
 
 print_collecting_info("class")
@@ -917,6 +937,8 @@ for func in funcs:
         cat = "Spawn functions"
     elif any(subs in func["name"] for subs in ["entity", "entities", "set_door", "get_door", "contents", "attach", "pick_up", "drop", "backitem", "carry", "door_at", "get_type", "kapala", "sparktrap", "explosion", "rope", "door", "blood", "olmec", "ghost", "jelly", "ankh", "player"]):
         cat = "Entity functions"
+    elif any(subs in func["name"] for subs in ["movable", "behavior"]):
+        cat = "Movable Behavior functions"
     elif any(subs in func["name"] for subs in ["theme"]):
         cat = "Theme functions"
     elif any(subs in func["name"] for subs in ["_lut", "_texture"]):
@@ -945,8 +967,7 @@ for cat in sorted(func_cats):
     print("\n## " + cat + "\n")
     for lf in sorted(func_cats[cat], key=lambda x: x["name"]):
         if len(rpcfunc(lf["cpp"])):
-            for af in rpcfunc(lf["cpp"]):
-                print_af(lf, af)
+            print_lf(lf)
         elif not (lf["name"].startswith("on_") or lf["name"] in not_functions):
             if lf["comment"] and lf["comment"][0] == "NoDoc":
                 continue
@@ -989,8 +1010,7 @@ for lf in events:
 for lf in deprecated_funcs:
     lf["comment"].pop(0)
     if len(rpcfunc(lf["cpp"])):
-        for af in rpcfunc(lf["cpp"]):
-            print_af(lf, af)
+        print_lf(lf)
     elif not (lf["name"].startswith("on_") or lf["name"] in not_functions):
         if lf["comment"] and lf["comment"][0] == "NoDoc":
             continue
