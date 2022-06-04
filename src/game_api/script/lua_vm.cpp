@@ -194,7 +194,7 @@ end
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
     lua["savegame"] = State::get().savedata();
 
-    /// Standard lua print function, prints directly to the console but not to the game
+    /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
     /// Print a log message on screen.
     lua["print"] = [](std::string message) -> void
@@ -204,6 +204,34 @@ end
         if (backend->messages.size() > 20)
             backend->messages.pop_front();
         backend->lua["lua_print"](message);
+    };
+
+    /// Print a log message to console.
+    lua["console_print"] = [](std::string message) -> void
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->console->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
+        if (backend->console->messages.size() > 20)
+            backend->console->messages.pop_front();
+        backend->lua["lua_print"](message);
+    };
+
+    /// Prinspect to console
+    lua["console_prinspect"] = [&lua](sol::variadic_args objects) -> void
+    {
+        if (objects.size() > 0)
+        {
+            std::string message;
+            for (const auto& obj : objects)
+            {
+                message += lua["inspect"](obj);
+                message += ", ";
+            }
+            message.pop_back();
+            message.pop_back();
+
+            lua["console_print"](std::move(message));
+        }
     };
 
     /// Same as `print`

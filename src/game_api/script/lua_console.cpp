@@ -690,6 +690,7 @@ bool LuaConsole::pre_draw()
 
                 ImGui::PushStyleColor(ImGuiCol_Button, trans);
                 ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+                ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0, 0));
                 ImGui::PushID((int)i);
                 ImGui::PushID(results.message.c_str());
                 if (ImGui::Button("< ##CopyToClipboard", {16.0f, ImGui::GetTextLineHeight() * num}))
@@ -698,6 +699,7 @@ bool LuaConsole::pre_draw()
                     ImGui::SetTooltip("Copy result to clipboard!");
                 ImGui::PopID();
                 ImGui::PopID();
+                ImGui::PopStyleVar();
                 ImGui::PopStyleVar();
                 ImGui::PopStyleColor();
                 ImGui::SameLine();
