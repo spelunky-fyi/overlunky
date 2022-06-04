@@ -855,6 +855,7 @@ void load_config(std::string file)
         hook_savegame();
     UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
     UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
+    UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
     save_config(file);
 }
 
@@ -2065,6 +2066,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         options["disable_ghost_timer"] = !options["disable_ghost_timer"];
         UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
         UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
+        UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -4112,10 +4114,11 @@ void render_options()
         g_ui_scripts["light"]->set_enabled(test_flag(g_dark_mode, 2));
     }
     tooltip("Forces every level to be lit af.");
-    if (ImGui::Checkbox("Disable ghost timer", &options["disable_ghost_timer"]))
+    if (ImGui::Checkbox("Disable ghosts and time jelly", &options["disable_ghost_timer"]))
     {
         UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
         UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
+        UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
     }
     tooltip("Disables the timed ghost and jelly.", "toggle_ghost");
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))

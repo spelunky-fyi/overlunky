@@ -201,6 +201,10 @@ void UI::set_time_jelly_enabled(bool enable)
 {
     ::set_time_jelly_enabled(enable);
 }
+void UI::set_cursepot_ghost_enabled(bool enable)
+{
+    ::set_cursepot_ghost_enabled(enable);
+}
 ENT_TYPE UI::get_entity_type(int32_t uid)
 {
     return ::get_entity_type(uid);
