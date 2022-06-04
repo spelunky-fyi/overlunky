@@ -833,6 +833,8 @@ end
     lua["force_olmec_phase_0"] = force_olmec_phase_0;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
+    /// Determines whether the ghost appears when breaking the ghost pot
+    lua["set_cursepot_ghost_enabled"] = set_cursepot_ghost_enabled;
     /// Determines whether the time ghost appears, including the showing of the ghost toast
     lua["set_time_ghost_enabled"] = set_time_ghost_enabled;
     /// Determines whether the time jelly appears in cosmic ocean
@@ -1485,8 +1487,6 @@ end
     /// Disable all crust item spawns
     lua["disable_floor_embeds"] = disable_floor_embeds;
 
-    /// Disable ghost spawn and mist effect when breaking the ghost jar
-    lua["disable_ghostjar_ghost_spawn"] = disable_ghostjar_ghost_spawn;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
