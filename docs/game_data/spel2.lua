@@ -1082,6 +1082,12 @@ function spawn_shopkeeper(x, y, layer, room_template) end
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
 function spawn_roomowner(owner_type, x, y, layer, room_template) end
+---Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+---@param x number
+---@param y number
+---@param add boolean
+---@return nil
+function update_liquid_collision_at(x, y, add) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -7318,8 +7324,8 @@ SCREEN = {
 }
 ---@alias SCREEN integer
 SHAPE = {
-  RECTANGLE = 1,
-  CIRCLE = 2
+  CIRCLE = 2,
+  RECTANGLE = 1
 }
 ---@alias SHAPE integer
 SHOP_TYPE = {

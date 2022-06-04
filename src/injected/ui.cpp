@@ -975,11 +975,13 @@ bool update_players()
     return true;
 }
 
-void fix_decorations_at(int x, int y, LAYER layer)
+void fix_decorations_at(float x, float y, LAYER layer)
 {
-    for (int dx = x - 1; dx <= x + 1; ++dx)
+    int gx = static_cast<uint32_t>(std::round(x));
+    int gy = static_cast<uint32_t>(std::round(y));
+    for (int dx = gx - 1; dx <= gx + 1; ++dx)
     {
-        for (int dy = y - 1; dy <= y + 1; ++dy)
+        for (int dy = gy - 1; dy <= gy + 1; ++dy)
         {
             auto fx = static_cast<float>(dx);
             auto fy = static_cast<float>(dy);
@@ -1005,7 +1007,8 @@ void smart_delete(Entity* ent, bool unsafe = false)
         ENT_TYPE type = ent->type->id;
         Callback cb = {g_state->time_total + 1, [pos, layer, type]
                        {
-                           UI::cleanup_at(pos.first, pos.second, layer, type);
+                           fix_decorations_at(std::round(pos.first), std::round(pos.second), layer);
+                           UI::cleanup_at(std::round(pos.first), std::round(pos.second), layer, type);
                        }};
         callbacks.push_back(cb);
     }
@@ -1104,12 +1107,10 @@ void spawn_entities(bool s, std::string list = "")
                         floor->fix_decorations(true, false);
                     }
                     auto fpos = floor->position();
-                    auto fx = static_cast<int>(fpos.first);
-                    auto fy = static_cast<int>(fpos.second);
                     auto layer = (LAYER)floor->layer;
-                    Callback cb = {g_state->time_total + 2, [fx, fy, layer]
+                    Callback cb = {g_state->time_total + 2, [fpos, layer]
                                    {
-                                       fix_decorations_at(fx, fy, layer);
+                                       fix_decorations_at(fpos.first, fpos.second, layer);
                                    }};
                     callbacks.push_back(cb);
                 }
@@ -3765,7 +3766,7 @@ void render_clickhandler()
             {
                 grid_x = new_grid_x;
                 grid_y = new_grid_y;
-                fix_decorations_at(grid_x, grid_y, (LAYER)g_state->camera_layer);
+                fix_decorations_at(std::round(pos.first), std::round(pos.second), (LAYER)g_state->camera_layer);
             }
         }
         else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused())
