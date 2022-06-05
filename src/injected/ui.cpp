@@ -292,6 +292,7 @@ std::map<std::string, bool> options = {
     {"tabbed_interface", true},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
+    {"warp_transition", false},
     {"lights", false},
     {"disable_achievements", true},
     {"disable_savegame", true},
@@ -1407,13 +1408,27 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
 {
-    if (options["warp_increments_level_count"])
+    if (options["warp_increments_level_count"] && g_state->screen == 12)
+    {
         g_state->level_count += 1;
-    UI::warp(w, l, t);
+    }
+    if (options["warp_transition"])
+    {
+        UI::transition(w, l, t);
+    }
+    else
+    {
+        UI::warp(w, l, t);
+    }
 }
 
 void warp_next_level(size_t num)
 {
+    if (g_state->screen == 13)
+    {
+        UI::warp(g_state->world_next, g_state->level_next, g_state->theme_next);
+        return;
+    }
     std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> targets; // tuple = world, level, theme
     uint8_t target_world = 0;
     uint8_t target_level = 0;
@@ -2712,123 +2727,138 @@ void render_narnia()
     tooltip("Spawn a door to back layer.\nTip: You can instantly switch layers with (Shift+Tab).", "spawn_layer_door");
     ImGui::Checkbox("Increment level count on warp", &options["warp_increments_level_count"]);
     tooltip("Simulate natural level progression when warping.");
+    ImGui::Checkbox("Warp to transition instead", &options["warp_transition"]);
+    tooltip("Simulate natural level progression even more.");
     ImGui::Text("Next level");
     ImGui::SameLine(100.0f);
-    int n = 0;
 
-    uint8_t target_world = 0;
-    uint8_t target_level = 0;
-    uint8_t target_theme = 0;
-    int tnum = g_state->world * 100 + g_state->level;
-    switch (tnum)
+    if (g_state->screen != 13)
     {
-    case 104:
-    case 301:
-        break;
-    case 501:
-        target_world = 6;
-        target_level = 1;
-        target_theme = 8;
-        break;
-    case 204:
-        target_world = 3;
-        target_level = 1;
-        target_theme = 4;
-        break;
-    case 403:
-        if (g_state->theme == 6 || g_state->theme == 11)
+        int n = 0;
+
+        uint8_t target_world = 0;
+        uint8_t target_level = 0;
+        uint8_t target_theme = 0;
+        int tnum = g_state->world * 100 + g_state->level;
+        switch (tnum)
+        {
+        case 104:
+        case 301:
+            break;
+        case 501:
+            target_world = 6;
+            target_level = 1;
+            target_theme = 8;
+            break;
+        case 204:
+            target_world = 3;
+            target_level = 1;
+            target_theme = 4;
+            break;
+        case 403:
+            if (g_state->theme == 6 || g_state->theme == 11)
+            {
+                target_world = 4;
+                target_level = 4;
+                target_theme = 6;
+            }
+            else
+            {
+                target_world = 4;
+                target_level = 4;
+                target_theme = 5;
+            }
+            break;
+        case 404:
+            target_world = 5;
+            target_level = 1;
+            target_theme = 7;
+            break;
+        case 603:
+            target_world = 6;
+            target_level = 4;
+            target_theme = 14;
+            break;
+        case 604:
+            target_world = 7;
+            target_level = 1;
+            target_theme = 9;
+            break;
+        case 702:
+            target_world = 7;
+            target_level = 3;
+            target_theme = 9;
+            break;
+        case 703:
+            target_world = 7;
+            target_level = 4;
+            target_theme = 16;
+            break;
+        case 704:
+            target_world = 8;
+            target_level = 5;
+            target_theme = 10;
+            break;
+        default:
+            target_world = g_state->world;
+            target_level = g_state->level + 1;
+            target_theme = g_state->theme;
+            break;
+        }
+        if (g_state->theme == 17)
+        {
+            target_world = 1;
+            target_level = 1;
+            target_theme = 1;
+        }
+        if (target_world > 0)
+        {
+            std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
+            if (ImGui::Button(buf.c_str()))
+            {
+                warp_inc(target_world, target_level, target_theme);
+            }
+            n++;
+        }
+
+        for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
+        {
+            ExitDoor* target = get_entity_ptr(doorid)->as<ExitDoor>();
+            if (!target->special_door)
+                continue;
+            std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+            if (n > 0)
+                ImGui::SameLine();
+            if (ImGui::Button(buf.c_str()))
+            {
+                warp_inc(target->world, target->level, target->theme);
+            }
+            n++;
+        }
+
+        if (g_state->theme == 11)
         {
             target_world = 4;
             target_level = 4;
-            target_theme = 6;
-        }
-        else
-        {
-            target_world = 4;
-            target_level = 4;
-            target_theme = 5;
-        }
-        break;
-    case 404:
-        target_world = 5;
-        target_level = 1;
-        target_theme = 7;
-        break;
-    case 603:
-        target_world = 6;
-        target_level = 4;
-        target_theme = 14;
-        break;
-    case 604:
-        target_world = 7;
-        target_level = 1;
-        target_theme = 9;
-        break;
-    case 702:
-        target_world = 7;
-        target_level = 3;
-        target_theme = 9;
-        break;
-    case 703:
-        target_world = 7;
-        target_level = 4;
-        target_theme = 16;
-        break;
-    case 704:
-        target_world = 8;
-        target_level = 5;
-        target_theme = 10;
-        break;
-    default:
-        target_world = g_state->world;
-        target_level = g_state->level + 1;
-        target_theme = g_state->theme;
-        break;
-    }
-    if (g_state->theme == 17)
-    {
-        target_world = 1;
-        target_level = 1;
-        target_theme = 1;
-    }
-    if (target_world > 0)
-    {
-        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
-        if (ImGui::Button(buf.c_str()))
-        {
-            warp_inc(target_world, target_level, target_theme);
-        }
-        n++;
-    }
+            target_theme = 12;
 
-    for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
-    {
-        ExitDoor* target = get_entity_ptr(doorid)->as<ExitDoor>();
-        if (!target->special_door)
-            continue;
-        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
-        if (n > 0)
+            std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
             ImGui::SameLine();
-        if (ImGui::Button(buf.c_str()))
-        {
-            warp_inc(target->world, target->level, target->theme);
+            if (ImGui::Button(buf.c_str()))
+            {
+                warp_inc(target_world, target_level, target_theme);
+            }
+            n++;
         }
-        n++;
     }
-
-    if (g_state->theme == 11)
+    else
     {
-        target_world = 4;
-        target_level = 4;
-        target_theme = 12;
-
-        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
-        ImGui::SameLine();
+        std::string buf = fmt::format("{}-{} {}", g_state->world_next, g_state->level_next, theme_name(g_state->theme_next));
+        ImGui::SameLine(100.0f);
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(target_world, target_level, target_theme);
+            warp_inc(g_state->world_next, g_state->level_next, g_state->theme_next);
         }
-        n++;
     }
 
     ImGui::Text("Dwelling");

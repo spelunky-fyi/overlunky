@@ -33,6 +33,7 @@ class UI
     static void zoom(float level);
     static uint32_t get_frame_count();
     static void warp(uint8_t world, uint8_t level, uint8_t theme);
+    static void transition(uint8_t world, uint8_t level, uint8_t theme);
     static float get_zoom_level();
     static void teleport(float x, float y, bool s, float vx, float vy, bool snap);
     static std::pair<float, float> screen_position(float x, float y);

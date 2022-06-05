@@ -37,6 +37,23 @@ void UI::warp(uint8_t world, uint8_t level, uint8_t theme)
 {
     State::get().warp(world, level, theme);
 }
+void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
+{
+    auto state = State::get().ptr();
+    if (state->screen != 12)
+    {
+        State::get().warp(world, level, theme);
+        return;
+    }
+    state->world_next = world;
+    state->level_next = level;
+    state->theme_next = theme;
+    state->screen_next = 13;
+    state->fadeout = 5;
+    state->fadein = 5;
+    state->win_state = 0;
+    state->loading = 1;
+}
 float UI::get_zoom_level()
 {
     return State::get_zoom_level();
