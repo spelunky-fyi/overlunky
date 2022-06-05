@@ -8,6 +8,7 @@ class Player;
 class Entity;
 struct SaveData;
 struct Illumination;
+struct GameManager;
 
 constexpr uint32_t set_flag(uint32_t& flags, int bit)
 {
@@ -69,4 +70,5 @@ class UI
     static void cleanup_at(float x, float y, LAYER l, ENT_TYPE type = 0);
     static void safe_destroy(Entity* ent, bool unsafe = false, bool recurse = true);
     static std::vector<uint32_t> get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer);
+    static bool get_focus();
 };

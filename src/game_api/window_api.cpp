@@ -119,6 +119,9 @@ void init_imgui()
     io.MouseDrawCursor = true;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+    io.ConfigViewportsNoTaskBarIcon = true;
+
     ImGui_ImplWin32_Init(g_Window);
     ImGui_ImplDX11_Init(g_Device, g_Context);
 

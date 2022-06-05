@@ -10,6 +10,7 @@
 #include "spawn_api.hpp"
 #include "state.hpp"
 #include "steam_api.hpp"
+#include "game_manager.hpp"
 
 #include <unordered_set>
 
@@ -648,4 +649,9 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
 std::vector<uint32_t> UI::get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer)
 {
     return get_entities_overlapping_hitbox(0, mask, hitbox, layer);
+}
+
+bool UI::get_focus()
+{
+    return ::get_game_manager()->game_props->game_has_focus;
 }

@@ -302,7 +302,8 @@ std::map<std::string, bool> options = {
     {"fade_script_messages", true},
     {"draw_hitboxes_interpolated", true},
     {"show_tooltips", true},
-    {"smooth_camera", true}};
+    {"smooth_camera", true},
+    {"multi_viewports", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -857,6 +858,10 @@ void load_config(std::string file)
     UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
     UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
     UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
+    if (options["multi_viewports"])
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    else
+        ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     save_config(file);
 }
 
@@ -1017,6 +1022,27 @@ void smart_delete(Entity* ent, bool unsafe = false)
     UI::safe_destroy(ent, unsafe);
 }
 
+static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+
+static inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x - rhs.x, lhs.y - rhs.y);
+}
+
+ImVec2 fix_pos(ImVec2 orig)
+{
+    return ImGui::GetMainViewport()->Pos + orig;
+}
+
+ImVec2 mouse_pos()
+{
+    auto base = ImGui::GetMainViewport();
+    return ImGui::GetMousePos() - base->Pos;
+}
+
 std::string spawned_type()
 {
     const auto pos = text.find_first_of(" ");
@@ -1157,7 +1183,7 @@ void spawn_entity_over()
         else
         {
             auto cpos = UI::click_position(g_x, g_y);
-            auto mpos = normalize(ImGui::GetMousePos());
+            auto mpos = normalize(mouse_pos());
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
             UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
@@ -1802,6 +1828,8 @@ float held_duration_last(std::string keyname)
 
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
+    ImGuiContext& g = *GImGui;
+
     if (nCode == WM_KEYUP)
     {
         if (pressed("speedhack_turbo", wParam))
@@ -1823,7 +1851,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 
     int repeat = (lParam >> 30) & 1U;
     auto& io = ImGui::GetIO();
-    ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
 
     if (current != nullptr && current == ImGui::FindWindowByName("KeyCapture"))
@@ -3090,7 +3117,8 @@ void render_camera()
 
 void render_arrow()
 {
-    ImVec2 pos = ImGui::GetMousePos();
+    auto base = ImGui::GetMainViewport();
+    ImVec2 pos = mouse_pos();
     ImVec2 line = ImVec2(pos.x - startpos.x, pos.y - startpos.y);
     float length = (float)std::sqrt(std::pow(line.x, 2) + std::pow(line.y, 2));
     float theta = 0.7f;
@@ -3102,30 +3130,32 @@ void render_arrow()
     ImVec2 leftpoint = ImVec2(point.x + tnormal * normal.y, point.y + tnormal * normal.x);
     ImVec2 rightpoint = ImVec2(point.x + (-tnormal * normal.y), point.y + (-tnormal * normal.x));
     auto* draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y - 9), ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
-    draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
-    draw_list->AddLine(startpos, pos, ImColor(255, 0, 0, 200), 2);
-    draw_list->AddLine(leftpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
-    draw_list->AddLine(rightpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
+    draw_list->AddLine(base->Pos + ImVec2(startpos.x - 9, startpos.y - 9), base->Pos + ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(base->Pos + ImVec2(startpos.x - 9, startpos.y + 9), base->Pos + ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(base->Pos + startpos, base->Pos + pos, ImColor(255, 0, 0, 200), 2);
+    draw_list->AddLine(base->Pos + leftpoint, base->Pos + ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
+    draw_list->AddLine(base->Pos + rightpoint, base->Pos + ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
 }
 
 void render_cross()
 {
+    auto base = ImGui::GetMainViewport();
     auto* draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y - 9), ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
-    draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(base->Pos + ImVec2(startpos.x - 9, startpos.y - 9), base->Pos + ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(base->Pos + ImVec2(startpos.x - 9, startpos.y + 9), base->Pos + ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
 }
 
 void render_select()
 {
-    ImVec2 pos = ImGui::GetMousePos();
+    auto base = ImGui::GetMainViewport();
+    ImVec2 pos = mouse_pos();
     auto* draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddRectFilled(startpos, pos, ImColor(255, 255, 255, 60));
+    draw_list->AddRectFilled(base->Pos + startpos, base->Pos + pos, ImColor(255, 255, 255, 60));
 }
 
 void select_entities()
 {
-    ImVec2 pos = ImGui::GetMousePos();
+    ImVec2 pos = mouse_pos();
     auto mask = safe_entity_mask;
     if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier
     {
@@ -3145,7 +3175,7 @@ void select_entities()
 
 void erase_entities()
 {
-    ImVec2 pos = ImGui::GetMousePos();
+    ImVec2 pos = mouse_pos();
     auto mask = safe_entity_mask;
     if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier
     {
@@ -3166,8 +3196,9 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 {
     if (g_state == 0 || (g_state->screen != 11 && g_state->screen != 12))
         return;
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
+    // ImGuiIO& io = ImGui::GetIO();
+    auto base = ImGui::GetMainViewport();
+    ImVec2 res = base->Size;
     auto* draw_list = ImGui::GetWindowDrawList();
     for (int x = -1; x < 96; x++)
     {
@@ -3187,7 +3218,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                 width = 2;
                 color = ImColor(gridcolor.Value.x, gridcolor.Value.y, gridcolor.Value.z, 0.2f);
             }
-            draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), color, static_cast<float>(width));
+            draw_list->AddLine(fix_pos(ImVec2(grids.x, 0)), fix_pos(ImVec2(grids.x, res.y)), color, static_cast<float>(width));
         }
     }
     for (int y = -1; y < 128; y++)
@@ -3208,7 +3239,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                 width = 2;
                 color = ImColor(color.Value.x, color.Value.y, color.Value.z, 0.2f);
             }
-            draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, static_cast<float>(width));
+            draw_list->AddLine(fix_pos(ImVec2(0, grids.y)), fix_pos(ImVec2(res.x, grids.y)), color, static_cast<float>(width));
         }
     }
     g_players = UI::get_players();
@@ -3217,16 +3248,16 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
         auto p_pos = UI::get_position(player);
         std::pair<float, float> gridline = UI::screen_position(std::round(p_pos.first - 0.5f) + 0.5f, std::round(p_pos.second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
-        draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(255, 0, 255, 200), 2);
-        draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(255, 0, 255, 200), 2);
+        draw_list->AddLine(fix_pos(ImVec2(0, grids.y)), fix_pos(ImVec2(res.x, grids.y)), ImColor(255, 0, 255, 200), 2);
+        draw_list->AddLine(fix_pos(ImVec2(grids.x, 0)), fix_pos(ImVec2(grids.x, res.y)), ImColor(255, 0, 255, 200), 2);
     }
     if (update_entity())
     {
         auto e_pos = UI::get_position(g_entity);
         std::pair<float, float> gridline = UI::screen_position(std::round(e_pos.first - 0.5f) + 0.5f, std::round(e_pos.second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
-        draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
-        draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
+        draw_list->AddLine(fix_pos(ImVec2(0, grids.y)), fix_pos(ImVec2(res.x, grids.y)), ImColor(0, 255, 0, 200), 2);
+        draw_list->AddLine(fix_pos(ImVec2(grids.x, 0)), fix_pos(ImVec2(grids.x, res.y)), ImColor(0, 255, 0, 200), 2);
     }
     for (unsigned int x = 0; x < g_state->w; ++x)
     {
@@ -3240,15 +3271,10 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                 auto pos = UI::screen_position(room_pos.first, room_pos.second);
                 ImVec2 spos = screenify({pos.first, pos.second});
                 std::string room_text = fmt::format("{:d},{:d} {:s} ({:d})", x, y, room_name, room_temp.value());
-                draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
+                draw_list->AddText(fix_pos(ImVec2(spos.x + 5.0f, spos.y + 5.0f)), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
             }
         }
     }
-}
-
-static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
-{
-    return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
 }
 
 void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
@@ -3269,18 +3295,18 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
-        draw_list->AddLine(ImVec2(sboxa.x, sboxa.y), ImVec2(sboxb.x, sboxb.y), color, 2);
-        draw_list->AddLine(ImVec2(sboxa.x, sboxb.y), ImVec2(sboxb.x, sboxa.y), color, 2);
+        draw_list->AddLine(fix_pos(sboxa), fix_pos(sboxb), color, 2);
+        draw_list->AddLine(fix_pos(ImVec2(sboxa.x, sboxb.y)), fix_pos(ImVec2(sboxb.x, sboxa.y)), color, 2);
     }
     if (ent->shape == SHAPE::CIRCLE)
         if (filled)
-            draw_list->AddCircleFilled(spos, sboxb.x - spos.x, color);
+            draw_list->AddCircleFilled(fix_pos(spos), sboxb.x - spos.x, color);
         else
-            draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
+            draw_list->AddCircle(fix_pos(spos), sboxb.x - spos.x, color, 0, 2.0f);
     else if (filled)
-        draw_list->AddRectFilled(sboxa, sboxb, color);
+        draw_list->AddRectFilled(fix_pos(sboxa), fix_pos(sboxb), color);
     else
-        draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
+        draw_list->AddRect(fix_pos(sboxa), fix_pos(sboxb), color, 0.0f, 0, 2.0f);
 
     if ((g_hitbox_mask & 0x8000) == 0)
         return;
@@ -3299,7 +3325,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         // TODO: get the real distance from game (can be changed thru API)
         auto [radx, rady] = UI::screen_position(render_position.first + 3, render_position.second + 3);
         auto srad = screenify({radx, rady});
-        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+        draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
     else if (type == bomb)
     {
@@ -3308,7 +3334,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
             rad = 2.6f;
         auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
         auto srad = screenify({radx, rady});
-        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+        draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
     else if (type == mine)
     {
@@ -3318,14 +3344,14 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         float rad = 1.6f;
         auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
         auto srad = screenify({radx, rady});
-        draw_list->AddCircle(srpos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+        draw_list->AddCircle(fix_pos(srpos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
     else if (type == keg || type == keg2)
     {
         float rad = 1.6f;
         auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
         auto srad = screenify({radx, rady});
-        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+        draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
     else if (type == wooden_arrow || type == metal_arrow || type == light_arrow)
     {
@@ -3344,7 +3370,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         auto [pbx, pby] = UI::screen_position(pb.x, pb.y);
         auto [pcx, pcy] = UI::screen_position(pc.x, pc.y);
         auto [pdx, pdy] = UI::screen_position(pd.x, pd.y);
-        const ImVec2 points[] = {screenify({pax, pay}), screenify({pbx, pby}), screenify({pcx, pcy}), screenify({pdx, pdy}), screenify({pax, pay})};
+        const ImVec2 points[] = {fix_pos(screenify({pax, pay})), fix_pos(screenify({pbx, pby})), fix_pos(screenify({pcx, pcy})), fix_pos(screenify({pdx, pdy})), fix_pos(screenify({pax, pay}))};
         draw_list->AddPolyline(points, 5, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
 }
@@ -3444,7 +3470,8 @@ void render_messages()
               { return std::get<2>(a) < std::get<2>(b); });
 
     ImGui::SetNextWindowSize({-1, -1});
-    ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+    auto base = ImGui::GetMainViewport();
+    ImGui::SetNextWindowViewport(base->ID);
     ImGui::Begin(
         "Messages",
         NULL,
@@ -3464,7 +3491,7 @@ void render_messages()
         queue = newqueue;
     }
 
-    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * font_size - 40});
+    ImGui::SetWindowPos({base->Pos.x + 30.0f + 0.128f * base->Size.x * io.FontGlobalScale, base->Pos.y + base->Size.y - queue.size() * font_size - 40});
     for (auto message : queue)
     {
         float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 12000.0f;
@@ -3483,18 +3510,19 @@ void render_messages()
 void render_clickhandler()
 {
     ImGuiIO& io = ImGui::GetIO();
+    auto base = ImGui::GetMainViewport();
     if (g_Console->is_toggled())
     {
-        ImGui::SetNextWindowSize({io.DisplaySize.x - 16.0f, io.DisplaySize.y - (4.0f * ImGui::GetStyle().ItemSpacing.y + ImGui::GetTextLineHeight())});
-        ImGui::SetNextWindowPos({16.0f, 0});
+        ImGui::SetNextWindowSize({base->Size.x - 16.0f, base->Size.y - (4.0f * ImGui::GetStyle().ItemSpacing.y + ImGui::GetTextLineHeight())});
+        ImGui::SetNextWindowPos({base->Pos.x + 16.0f, base->Pos.y});
     }
     else
     {
-        ImGui::SetNextWindowSize(io.DisplaySize);
-        ImGui::SetNextWindowPos({0, 0});
+        ImGui::SetNextWindowSize(base->Size);
+        ImGui::SetNextWindowPos(base->Pos);
     }
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
-    ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+    ImGui::SetNextWindowViewport(base->ID);
     ImGui::Begin(
         "Clickhandler",
         NULL,
@@ -3591,7 +3619,7 @@ void render_clickhandler()
 
         if (ImGui::IsMousePosValid())
         {
-            ImVec2 mpos = normalize(io.MousePos);
+            ImVec2 mpos = normalize(mouse_pos());
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
             // std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
@@ -3689,7 +3717,7 @@ void render_clickhandler()
             ImColor(1.0f, 1.0f, 1.0f, 0.8f),
             subtext);
     }
-    if (options["mouse_control"])
+    if (options["mouse_control"] && UI::get_focus())
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         if (ImGui::BeginDragDropTarget())
@@ -3705,17 +3733,17 @@ void render_clickhandler()
         if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
         {
             io.MouseDrawCursor = false;
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
         }
         else if ((clicked("mouse_spawn") || clicked("mouse_teleport")) && ImGui::IsWindowFocused())
         {
             io.MouseDrawCursor = false;
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
         }
         else if (clicked("mouse_spawn_over") && ImGui::IsWindowFocused())
         {
             io.MouseDrawCursor = false;
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             set_pos(startpos);
             auto ent = UI::get_entity_at(g_x, g_y, true, 2, safe_entity_mask);
             g_over_id = ent ? ent->uid : -1;
@@ -3726,13 +3754,13 @@ void render_clickhandler()
         }
         else if ((held("mouse_spawn") || held("mouse_teleport") || held("mouse_spawn_over")) && ImGui::IsWindowFocused())
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             render_cross();
         }
         else if (released("mouse_spawn_throw") && ImGui::IsWindowFocused())
         {
             set_pos(startpos);
-            set_vel(ImGui::GetMousePos());
+            set_vel(mouse_pos());
             spawn_entities(true);
             g_x = 0;
             g_y = 0;
@@ -3751,7 +3779,7 @@ void render_clickhandler()
         else if (released("mouse_spawn_over") && ImGui::IsWindowFocused())
         {
             set_pos(startpos);
-            set_vel(ImGui::GetMousePos());
+            set_vel(mouse_pos());
             spawn_entity_over();
             g_x = 0;
             g_y = 0;
@@ -3768,7 +3796,7 @@ void render_clickhandler()
         }
         else if (held("mouse_draw") && ImGui::IsWindowFocused())
         {
-            auto [nx, ny] = normalize(ImGui::GetMousePos());
+            auto [nx, ny] = normalize(mouse_pos());
             auto pos = UI::click_position(nx, ny);
             const uint32_t new_grid_x = static_cast<uint32_t>(std::round(pos.first));
             const uint32_t new_grid_y = static_cast<uint32_t>(std::round(pos.second));
@@ -3776,7 +3804,7 @@ void render_clickhandler()
             {
                 grid_x = new_grid_x;
                 grid_y = new_grid_y;
-                set_pos(ImGui::GetMousePos());
+                set_pos(mouse_pos());
                 g_vx = 0;
                 g_vy = 0;
                 spawn_entities(true);
@@ -3793,7 +3821,7 @@ void render_clickhandler()
         }
         else if (held("mouse_decorate"))
         {
-            auto [nx, ny] = normalize(ImGui::GetMousePos());
+            auto [nx, ny] = normalize(mouse_pos());
             auto pos = UI::click_position(nx, ny);
             const uint32_t new_grid_x = static_cast<uint32_t>(std::round(pos.first));
             const uint32_t new_grid_y = static_cast<uint32_t>(std::round(pos.second));
@@ -3809,7 +3837,7 @@ void render_clickhandler()
             if (g_players.empty())
                 return;
             set_pos(startpos);
-            set_vel(ImGui::GetMousePos());
+            set_vel(mouse_pos());
             ImVec2 mpos = normalize(startpos);
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
             if (g_state->theme == 10)
@@ -3840,7 +3868,7 @@ void render_clickhandler()
         }
         else if (dblclicked("mouse_grab") || dblclicked("mouse_grab_unsafe"))
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             set_pos(startpos);
             unsigned int mask = safe_entity_mask;
             if (held("mouse_grab_unsafe"))
@@ -3861,7 +3889,7 @@ void render_clickhandler()
         }
         else if (clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             set_pos(startpos);
             unsigned int mask = safe_entity_mask;
             if (held("mouse_grab_unsafe"))
@@ -3880,7 +3908,7 @@ void render_clickhandler()
         }
         else if (clicked("mouse_select") || clicked("mouse_select_unsafe"))
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             set_pos(startpos);
             render_select();
         }
@@ -3888,7 +3916,7 @@ void render_clickhandler()
         {
             if (!throw_held)
             {
-                startpos = ImGui::GetMousePos();
+                startpos = mouse_pos();
                 throw_held = true;
             }
             set_pos(startpos);
@@ -3910,7 +3938,7 @@ void render_clickhandler()
         }
         else if ((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             throw_held = false;
             io.MouseDrawCursor = false;
             set_pos(startpos);
@@ -3934,7 +3962,7 @@ void render_clickhandler()
             if (g_held_entity)
                 g_held_entity->flags = g_held_flags;
             set_pos(startpos);
-            set_vel(ImGui::GetMousePos());
+            set_vel(mouse_pos());
             if (g_held_entity && g_held_entity->is_movable())
                 UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
@@ -3964,7 +3992,7 @@ void render_clickhandler()
         }
         else if (released("mouse_clone"))
         {
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             UI::spawn_entity(to_id("ENT_TYPE_ITEM_CLONEGUNSHOT"), g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -3974,8 +4002,8 @@ void render_clickhandler()
         else if (held("mouse_zap") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
-            set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y + 200));
+            set_pos(mouse_pos());
+            set_vel(ImVec2(mouse_pos().x, mouse_pos().y + 200));
             UI::spawn_entity(to_id("ENT_TYPE_ITEM_LAMASSU_LASER_SHOT"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -4043,7 +4071,7 @@ void render_clickhandler()
         else if (held("mouse_blast") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 10)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             UI::spawn_entity(to_id("ENT_TYPE_FX_ALIENBLAST"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -4053,7 +4081,7 @@ void render_clickhandler()
         else if (held("mouse_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             UI::spawn_entity(to_id("ENT_TYPE_FX_EXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -4063,7 +4091,7 @@ void render_clickhandler()
         else if (held("mouse_big_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -4073,7 +4101,7 @@ void render_clickhandler()
         else if (held("mouse_nuke") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             static const auto powered_explosion = to_id("ENT_TYPE_FX_POWEREDEXPLOSION");
             UI::spawn_entity(powered_explosion, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             UI::spawn_entity(powered_explosion, g_x - 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
@@ -4091,7 +4119,7 @@ void render_clickhandler()
         }
         else if (released("mouse_destroy") || released("mouse_destroy_unsafe"))
         {
-            ImVec2 pos = ImGui::GetMousePos();
+            ImVec2 pos = mouse_pos();
             set_pos(pos);
             unsigned int mask = safe_entity_mask;
             if (released("mouse_destroy_unsafe"))
@@ -4221,6 +4249,14 @@ void render_options()
         options["stack_vertically"] = false;
     }
     tooltip("Draw all tools tabbed in a single window", "tabbed_interface");
+    if (ImGui::Checkbox("Drag windows outside the game window", &options["multi_viewports"]))
+    {
+        if (options["multi_viewports"])
+            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        else
+            ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+    }
+    tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
     ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
     tooltip("Am I annoying you already :(");
 
@@ -6309,8 +6345,10 @@ void render_keyconfig()
     {
         ImGuiIO& io = ImGui::GetIO();
         io.WantCaptureKeyboard = true;
-        ImGui::SetNextWindowSize(io.DisplaySize);
-        ImGui::SetNextWindowPos({0, 0});
+        auto base = ImGui::GetMainViewport();
+        ImGui::SetNextWindowSize(base->Size);
+        ImGui::SetNextWindowPos(base->Pos);
+        ImGui::SetNextWindowViewport(base->ID);
         ImGui::SetNextWindowBgAlpha(0.75);
         ImGui::Begin(
             "KeyCapture",
@@ -6321,7 +6359,7 @@ void render_keyconfig()
         ImGui::PushFont(bigfont);
         std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl, Alt and Shift are available.", g_change_key);
         ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-        dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
+        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + base->Size.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
         ImGui::PopFont();
 
         // Buttons
@@ -6387,19 +6425,21 @@ void render_spawner()
 
 void render_prohud()
 {
+    auto io = ImGui::GetIO();
+    auto base = ImGui::GetMainViewport();
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause);
+    std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, 2}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
     buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
     auto type = spawned_type();
     buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}", type)));
     textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y * 2 + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 }
 
 void render_tool(std::string tool)
@@ -6485,10 +6525,20 @@ void imgui_init(ImGuiContext*)
 
 void imgui_draw()
 {
+    auto base = ImGui::GetMainViewport();
+    ImGuiContext& g = *GImGui;
+
+    for (int i = 1; i < g.PlatformIO.Viewports.Size; i++)
+    {
+        ImGuiViewport* viewport = g.PlatformIO.Viewports[i];
+        viewport->Flags |= ImGuiViewportFlags_NoFocusOnClick | ImGuiViewportFlags_NoFocusOnAppearing | ImGuiViewportFlags_OwnedByApp;
+    }
+
     ImDrawList* dl = ImGui::GetBackgroundDrawList();
     std::string buf = fmt::format("Overlunky {}", get_version());
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
+
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + base->Size.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
     if (options["draw_hud"])
         render_prohud();
@@ -6509,9 +6559,9 @@ void imgui_draw()
     {
         if (options["tabbed_interface"])
         {
-            ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowSize({600, ImGui::GetIO().DisplaySize.y / 2}, ImGuiCond_FirstUseEver);
-            ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar);
+            ImGui::SetNextWindowPos(base->Pos, ImGuiCond_FirstUseEver);
+            ImGui::SetNextWindowSize({600, base->Size.y / 2}, ImGuiCond_FirstUseEver);
+            ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiViewportFlags_NoTaskBarIcon | ImGuiViewportFlags_NoDecoration);
             if (ImGui::BeginMenuBar())
             {
                 if (ImGui::BeginMenu("Tools"))
@@ -6619,7 +6669,7 @@ void imgui_draw()
                 if (!tab.second->detached)
                     continue;
                 ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
-                ImGui::Begin(tab.second->name.c_str(), &tab.second->detached);
+                ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, ImGuiViewportFlags_NoTaskBarIcon);
                 render_tool(tab.first);
                 ImGui::SetWindowPos(
                     {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2,
@@ -6632,7 +6682,7 @@ void imgui_draw()
                 auto win = ImGui::FindWindowByName(windows[detach_tab]->name.c_str());
                 if (win)
                 {
-                    auto pos = ImGui::GetMousePos();
+                    auto pos = mouse_pos();
                     win->Pos.x = pos.x - 32.0f;
                     win->Pos.y = pos.y - 8.0f;
                     if (win->Pos.x < 0.0f)

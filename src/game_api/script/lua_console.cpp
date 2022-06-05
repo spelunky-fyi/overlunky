@@ -636,10 +636,11 @@ bool LuaConsole::pre_draw()
     {
         auto& io = ImGui::GetIO();
         auto& style = ImGui::GetStyle();
+        auto base = ImGui::GetMainViewport();
 
-        const float window_height = io.DisplaySize.y - style.ItemSpacing.y * 2.0f;
-        ImGui::SetNextWindowSize({io.DisplaySize.x, window_height});
-        ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+        ImGui::SetNextWindowSize(base->Size);
+        ImGui::SetNextWindowPos(base->Pos);
+        ImGui::SetNextWindowViewport(base->ID);
         ImGui::Begin(
             "Console Overlay",
             NULL,
@@ -872,7 +873,7 @@ bool LuaConsole::pre_draw()
         ImGui::Unindent(indent_size);
         ImGui::PopItemWidth();
 
-        ImGui::SetWindowPos({io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y / 2 - window_height / 2}, ImGuiCond_Always);
+        ImGui::SetWindowPos({base->Pos.x + base->Size.x / 2 - ImGui::GetWindowWidth() / 2, base->Pos.y + base->Size.y / 2 - base->Size.y / 2}, ImGuiCond_Always);
         auto drawlist = ImGui::GetWindowDrawList();
         int num = 1;
         const char* str;
@@ -882,7 +883,7 @@ bool LuaConsole::pre_draw()
         {
             std::string buf = fmt::format("{}", i);
             auto linesize = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, buf.c_str(), nullptr, nullptr);
-            drawlist->AddText(ImVec2(indent_size - linesize.x - 2.0f, io.DisplaySize.y - linesize.y * (num - i + 2) + 4.0f), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+            drawlist->AddText(ImVec2(base->Pos.x + indent_size - linesize.x - 2.0f, base->Pos.y + base->Size.y - linesize.y * (num - i + 2) + 9.0f), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
         }
         ImGui::End();
     }
