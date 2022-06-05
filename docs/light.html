@@ -3374,7 +3374,35 @@ Use this only when no other approach works, this call can be expensive if overus
 <p>Add a callback for a spawn of specific entity types or mask. Set <code>mask</code> to <code>MASK.ANY</code> to ignore that.
 This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
 The callback signature is <code>nil post_entity_spawn(entity, spawn_flags)</code></p>
-<h3 id='set_post_floor_update'>set_post_floor_update</h3>
+<h3 id='set_post_floor_update'>set_post_floor_update</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Use FLOOR_GENERIC from different themes in your level,</span>
+<span class="c1">-- with textures that update correctly when destroyed</span>
+
+<span class="n">define_tile_code</span><span class="p">(</span><span class="s2">"floor_generic_tidepool"</span><span class="p">)</span>
+<span class="n">set_pre_tile_code_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
+    <span class="kd">local</span> <span class="n">uid</span> <span class="o">=</span> <span class="n">spawn_grid_entity</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">FLOOR_GENERIC</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
+    <span class="n">set_post_update</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">:</span><span class="n">set_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_FLOOR_TIDEPOOL_0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="k">in</span> <span class="nb">ipairs</span><span class="p">(</span><span class="n">entity_get_items_by</span><span class="p">(</span><span class="n">me</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">DECORATION_GENERIC</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">DECORATION</span><span class="p">))</span> <span class="k">do</span>
+            <span class="kd">local</span> <span class="n">deco</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">deco</span><span class="p">:</span><span class="n">set_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_FLOOR_TIDEPOOL_0</span><span class="p">)</span>
+        <span class="k">end</span>
+    <span class="k">end</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">true</span>
+<span class="k">end</span><span class="p">,</span> <span class="s2">"floor_generic_tidepool"</span><span class="p">)</span>
+
+
+<span class="c1">-- Fix quicksand decorations when not in temple</span>
+<span class="n">set_post_entity_spawn</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span>
+    <span class="n">set_post_floor_update</span><span class="p">(</span><span class="n">ent</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+        <span class="n">me</span><span class="p">:</span><span class="n">set_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_FLOOR_TEMPLE_0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="k">in</span> <span class="nb">ipairs</span><span class="p">(</span><span class="n">entity_get_items_by</span><span class="p">(</span><span class="n">me</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">DECORATION_GENERIC</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">DECORATION</span><span class="p">))</span> <span class="k">do</span>
+            <span class="kd">local</span> <span class="n">deco</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">deco</span><span class="p">:</span><span class="n">set_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_FLOOR_TEMPLE_0</span><span class="p">)</span>
+        <span class="k">end</span>
+    <span class="k">end</span><span class="p">)</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">SPAWN_TYPE</span><span class="p">.</span><span class="n">ANY</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">FLOOR</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">FLOOR_QUICKSAND</span><span class="p">)</span>
+
+</code></pre></div>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_floor_update">set_post_floor_update</a></p>
 </blockquote>
@@ -3382,8 +3410,7 @@ The callback signature is <code>nil post_entity_spawn(entity, spawn_flags)</code
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
 Sets a callback that is called right after a floor is updated (by killed neighbor).
 The callback signature is <code>nil post_floor_update(Entity self)</code>
-Use this only when no other approach works, this call can be expensive if overused.
-Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.</p>
+Use this only when no other approach works, this call can be expensive if overused.</p>
 <h3 id='set_post_render'>set_post_render</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_render">set_post_render</a></p>
@@ -3445,8 +3472,7 @@ The callback signature is <code>optional&lt;int&gt; pre_entity_spawn(entity_type
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
 Sets a callback that is called right before a floor is updated (by killed neighbor), return <code>true</code> to skip the game&#39;s neighbor update handling.
 The callback signature is <code>bool pre_floor_update(Entity self)</code>
-Use this only when no other approach works, this call can be expensive if overused.
-Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.</p>
+Use this only when no other approach works, this call can be expensive if overused.</p>
 <h3 id='set_pre_render'>set_pre_render</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_render">set_pre_render</a></p>
@@ -24099,7 +24125,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.LOADING">LOADING</a></td>
 <td>ON::LOADING</td>
-<td></td>
+<td>Runs whenever state.loading changes and is &gt; 0. Prefer PRE/POST_LOAD_SCREEN instead though.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RESET">RESET</a></td>
@@ -24129,7 +24155,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LOAD_SCREEN">PRE_LOAD_SCREEN</a></td>
 <td>ON::PRE_LOAD_SCREEN</td>
-<td></td>
+<td>Runs right before loading a new screen based on screen_next<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_ROOM_GENERATION">POST_ROOM_GENERATION</a></td>
@@ -24139,12 +24165,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_GENERATION">POST_LEVEL_GENERATION</a></td>
 <td>ON::POST_LEVEL_GENERATION</td>
-<td>Runs right level generation is done, before any entities are updated<br/></td>
+<td>Runs right after level generation is done, before any entities are updated<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_SCREEN">POST_LOAD_SCREEN</a></td>
 <td>ON::POST_LOAD_SCREEN</td>
-<td></td>
+<td>Runs right after a screen is loaded, before rendering anything<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_GET_RANDOM_ROOM">PRE_GET_RANDOM_ROOM</a></td>

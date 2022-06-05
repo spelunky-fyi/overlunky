@@ -283,6 +283,38 @@ The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
 ### set_post_floor_update
 
 
+```lua
+-- Use FLOOR_GENERIC from different themes in your level,
+-- with textures that update correctly when destroyed
+
+define_tile_code("floor_generic_tidepool")
+set_pre_tile_code_callback(function(x, y, layer)
+    local uid = spawn_grid_entity(ENT_TYPE.FLOOR_GENERIC, x, y, layer)
+    set_post_update(uid, function(me)
+        me:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TIDEPOOL_0)
+        for i,v in ipairs(entity_get_items_by(me.uid, ENT_TYPE.DECORATION_GENERIC, MASK.DECORATION)) do
+            local deco = get_entity(v)
+            deco:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TIDEPOOL_0)
+        end
+    end)
+    return true
+end, "floor_generic_tidepool")
+
+
+-- Fix quicksand decorations when not in temple
+set_post_entity_spawn(function(ent)
+    set_post_floor_update(ent.uid, function(me)
+        me:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0)
+        for i,v in ipairs(entity_get_items_by(me.uid, ENT_TYPE.DECORATION_GENERIC, MASK.DECORATION)) do
+            local deco = get_entity(v)
+            deco:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0)
+        end
+    end)
+end, SPAWN_TYPE.ANY, MASK.FLOOR, ENT_TYPE.FLOOR_QUICKSAND)
+
+```
+
+
 > Search script examples for [set_post_floor_update](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_floor_update)
 
 #### optional&lt;[CallbackId](#Aliases)&gt; set_post_floor_update(int uid, function fun)
@@ -291,7 +323,6 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right after a floor is updated (by killed neighbor).
 The callback signature is `nil post_floor_update(Entity self)`
 Use this only when no other approach works, this call can be expensive if overused.
-Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 
 ### set_post_render
 
@@ -375,7 +406,6 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
 The callback signature is `bool pre_floor_update(Entity self)`
 Use this only when no other approach works, this call can be expensive if overused.
-Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 
 ### set_pre_render
 
