@@ -440,6 +440,9 @@
                             <a href="#set_post_entity_spawn" class="toc-h3 toc-link" data-title="set_post_entity_spawn">set_post_entity_spawn</a>
                           </li>
                           <li>
+                            <a href="#set_post_floor_update" class="toc-h3 toc-link" data-title="set_post_floor_update">set_post_floor_update</a>
+                          </li>
+                          <li>
                             <a href="#set_post_render" class="toc-h3 toc-link" data-title="set_post_render">set_post_render</a>
                           </li>
                           <li>
@@ -458,6 +461,9 @@
                             <a href="#set_pre_entity_spawn" class="toc-h3 toc-link" data-title="set_pre_entity_spawn">set_pre_entity_spawn</a>
                           </li>
                           <li>
+                            <a href="#set_pre_floor_update" class="toc-h3 toc-link" data-title="set_pre_floor_update">set_pre_floor_update</a>
+                          </li>
+                          <li>
                             <a href="#set_pre_render" class="toc-h3 toc-link" data-title="set_pre_render">set_pre_render</a>
                           </li>
                           <li>
@@ -471,6 +477,20 @@
                           </li>
                           <li>
                             <a href="#set_vanilla_sound_callback" class="toc-h3 toc-link" data-title="set_vanilla_sound_callback">set_vanilla_sound_callback</a>
+                          </li>
+                      </ul>
+                  </li>
+                  <li>
+                    <a href="#Debug-functions" class="toc-h2 toc-link" data-title="Debug functions">Debug functions</a>
+                      <ul class="toc-list-h3">
+                          <li>
+                            <a href="#get_address" class="toc-h3 toc-link" data-title="get_address">get_address</a>
+                          </li>
+                          <li>
+                            <a href="#get_rva" class="toc-h3 toc-link" data-title="get_rva">get_rva</a>
+                          </li>
+                          <li>
+                            <a href="#raise" class="toc-h3 toc-link" data-title="raise">raise</a>
                           </li>
                       </ul>
                   </li>
@@ -695,6 +715,9 @@
                             <a href="#disable_floor_embeds" class="toc-h3 toc-link" data-title="disable_floor_embeds">disable_floor_embeds</a>
                           </li>
                           <li>
+                            <a href="#get_adventure_seed" class="toc-h3 toc-link" data-title="get_adventure_seed">get_adventure_seed</a>
+                          </li>
+                          <li>
                             <a href="#get_character_heart_color" class="toc-h3 toc-link" data-title="get_character_heart_color">get_character_heart_color</a>
                           </li>
                           <li>
@@ -734,10 +757,10 @@
                             <a href="#is_character_female" class="toc-h3 toc-link" data-title="is_character_female">is_character_female</a>
                           </li>
                           <li>
-                            <a href="#pause" class="toc-h3 toc-link" data-title="pause">pause</a>
+                            <a href="#load_screen" class="toc-h3 toc-link" data-title="load_screen">load_screen</a>
                           </li>
                           <li>
-                            <a href="#raise" class="toc-h3 toc-link" data-title="raise">raise</a>
+                            <a href="#pause" class="toc-h3 toc-link" data-title="pause">pause</a>
                           </li>
                           <li>
                             <a href="#register_console_command" class="toc-h3 toc-link" data-title="register_console_command">register_console_command</a>
@@ -747,6 +770,9 @@
                           </li>
                           <li>
                             <a href="#seed_prng" class="toc-h3 toc-link" data-title="seed_prng">seed_prng</a>
+                          </li>
+                          <li>
+                            <a href="#set_adventure_seed" class="toc-h3 toc-link" data-title="set_adventure_seed">set_adventure_seed</a>
                           </li>
                           <li>
                             <a href="#set_character_heart_color" class="toc-h3 toc-link" data-title="set_character_heart_color">set_character_heart_color</a>
@@ -813,6 +839,12 @@
                           </li>
                           <li>
                             <a href="#cancel_toast" class="toc-h3 toc-link" data-title="cancel_toast">cancel_toast</a>
+                          </li>
+                          <li>
+                            <a href="#console_prinspect" class="toc-h3 toc-link" data-title="console_prinspect">console_prinspect</a>
+                          </li>
+                          <li>
+                            <a href="#console_print" class="toc-h3 toc-link" data-title="console_print">console_print</a>
                           </li>
                           <li>
                             <a href="#lua_print" class="toc-h3 toc-link" data-title="lua_print">lua_print</a>
@@ -3342,6 +3374,16 @@ Use this only when no other approach works, this call can be expensive if overus
 <p>Add a callback for a spawn of specific entity types or mask. Set <code>mask</code> to <code>MASK.ANY</code> to ignore that.
 This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
 The callback signature is <code>nil post_entity_spawn(entity, spawn_flags)</code></p>
+<h3 id='set_post_floor_update'>set_post_floor_update</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_floor_update">set_post_floor_update</a></p>
+</blockquote>
+<h4 id='optional-lt-CallbackId-gt-set_post_floor_update-int-uid-function-fun'>optional&lt;<a href="#Aliases">CallbackId</a>&gt; set_post_floor_update(int uid, function fun)</h4>
+<p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
+Sets a callback that is called right after a floor is updated (by killed neighbor).
+The callback signature is <code>nil post_floor_update(Entity self)</code>
+Use this only when no other approach works, this call can be expensive if overused.
+Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.</p>
 <h3 id='set_post_render'>set_post_render</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_render">set_post_render</a></p>
@@ -3395,6 +3437,16 @@ Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-
 This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
 In many cases replacing the intended entity won&#39;t have the indended effect or will even break the game, so use only if you really know what you&#39;re doing.
 The callback signature is <code>optional&lt;int&gt; pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)</code></p>
+<h3 id='set_pre_floor_update'>set_pre_floor_update</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_floor_update">set_pre_floor_update</a></p>
+</blockquote>
+<h4 id='optional-lt-CallbackId-gt-set_pre_floor_update-int-uid-function-fun'>optional&lt;<a href="#Aliases">CallbackId</a>&gt; set_pre_floor_update(int uid, function fun)</h4>
+<p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
+Sets a callback that is called right before a floor is updated (by killed neighbor), return <code>true</code> to skip the game&#39;s neighbor update handling.
+The callback signature is <code>bool pre_floor_update(Entity self)</code>
+Use this only when no other approach works, this call can be expensive if overused.
+Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.</p>
 <h3 id='set_pre_render'>set_pre_render</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_render">set_pre_render</a></p>
@@ -3438,6 +3490,24 @@ Sets a callback for a vanilla sound which lets you hook creation or playing even
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
 properties on the sound. Otherwise you may cause a deadlock. The callback signature is <code>nil on_vanilla_sound(PlayingSound sound)</code></p>
+<h2 id='Debug-functions'>Debug functions</h2><h3 id='get_address'>get_address</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_address">get_address</a></p>
+</blockquote>
+<h4 id='size_t-get_address-string_view-address_name'>size_t get_address(string_view address_name)</h4>
+<p>Get the address for a pattern name</p>
+<h3 id='get_rva'>get_rva</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_rva">get_rva</a></p>
+</blockquote>
+<h4 id='size_t-get_rva-string_view-address_name'>size_t get_rva(string_view address_name)</h4>
+<p>Get the rva for a pattern name</p>
+<h3 id='raise'>raise</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=raise">raise</a></p>
+</blockquote>
+<h4 id='nil-raise'>nil raise()</h4>
+<p>Raise a signal and probably crash the game</p>
 <h2 id='Entity-functions'>Entity functions</h2><h3 id='activate_sparktraps_hack'>activate_sparktraps_hack</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">activate_sparktraps_hack</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
 
 <span class="c1">-- set random speed, direction and distance for the spark</span>
@@ -3899,6 +3969,12 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='nil-disable_floor_embeds-bool-disable'>nil disable_floor_embeds(bool disable)</h4>
 <p>Disable all crust item spawns</p>
+<h3 id='get_adventure_seed'>get_adventure_seed</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_adventure_seed">get_adventure_seed</a></p>
+</blockquote>
+<h4 id='tuple-lt-int-int-gt-get_adventure_seed'>tuple&lt;int, int&gt; get_adventure_seed()</h4>
+<p>Get the current adventure seed pair</p>
 <h3 id='get_character_heart_color'>get_character_heart_color</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_character_heart_color">get_character_heart_color</a></p>
@@ -3978,6 +4054,12 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 </blockquote>
 <h4 id='bool-is_character_female-ENT_TYPE-type_id'>bool is_character_female(<a href="#ENT_TYPE">ENT_TYPE</a> type_id)</h4>
 <p>Same as <code>Player.is_female</code></p>
+<h3 id='load_screen'>load_screen</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_screen">load_screen</a></p>
+</blockquote>
+<h4 id='nil-load_screen'>nil load_screen()</h4>
+<p>Immediately load a screen based on state.screen_next and stuff</p>
 <h3 id='pause'>pause</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></p>
@@ -3986,12 +4068,6 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 <p>Enable/disable game engine pause.
 This is just short for <code>state.pause == 32</code>, but that produces an audio bug
 I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <code>state.pause == 16</code> will do the same but <code>set_global_interval</code> will still work</p>
-<h3 id='raise'>raise</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=raise">raise</a></p>
-</blockquote>
-<h4 id='nil-raise'>nil raise()</h4>
-<p>Raise a signal and probably crash the game</p>
 <h3 id='register_console_command'>register_console_command</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=register_console_command">register_console_command</a></p>
@@ -4010,6 +4086,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-seed_prng-int-seed'>nil seed_prng(int seed)</h4>
 <p>Seed the game prng.</p>
+<h3 id='set_adventure_seed'>set_adventure_seed</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_adventure_seed">set_adventure_seed</a></p>
+</blockquote>
+<h4 id='nil-set_adventure_seed-int-first-int-second'>nil set_adventure_seed(int first, int second)</h4>
+<p>Set the current adventure seed pair</p>
 <h3 id='set_character_heart_color'>set_character_heart_color</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_character_heart_color">set_character_heart_color</a></p>
@@ -4152,12 +4234,24 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=cancel_toast">cancel_toast</a></p>
 </blockquote>
-<h4 id='nil-cancel_toast'>nil cancel_toast()</h4><h3 id='lua_print'>lua_print</h3>
+<h4 id='nil-cancel_toast'>nil cancel_toast()</h4><h3 id='console_prinspect'>console_prinspect</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=console_prinspect">console_prinspect</a></p>
+</blockquote>
+<h4 id='nil-console_prinspect-variadic_args-objects'>nil console_prinspect(variadic_args objects)</h4>
+<p>Prinspect to console</p>
+<h3 id='console_print'>console_print</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=console_print">console_print</a></p>
+</blockquote>
+<h4 id='nil-console_print-string-message'>nil console_print(string message)</h4>
+<p>Print a log message to console.</p>
+<h3 id='lua_print'>lua_print</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lua_print">lua_print</a></p>
 </blockquote>
 <h4 id='nil-lua_print'>nil lua_print()</h4>
-<p>Standard lua print function, prints directly to the console but not to the game</p>
+<p>Standard lua print function, prints directly to the terminal but not to the game</p>
 <h3 id='message'>message</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=message">message</a></p>
@@ -10583,8 +10677,6 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='ScreenConstellation'>ScreenConstellation</h3>
-<p>Derived from <a href="#Screen">Screen</a></p>
-
 <table><thead>
 <tr>
 <th>Type</th>
@@ -10605,6 +10697,11 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=constellation_text_opacity">constellation_text_opacity</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=constellation_text">constellation_text</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -12908,6 +13005,11 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>array&lt;int, 99&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=waddler_metadata">waddler_metadata</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#ThemeInfo">ThemeInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=theme_info">theme_info</a></td>
 <td></td>
 </tr>
 <tr>
@@ -24025,6 +24127,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Runs before any level generation, no entities should exist at this point<br/></td>
 </tr>
 <tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LOAD_SCREEN">PRE_LOAD_SCREEN</a></td>
+<td>ON::PRE_LOAD_SCREEN</td>
+<td></td>
+</tr>
+<tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_ROOM_GENERATION">POST_ROOM_GENERATION</a></td>
 <td>ON::POST_ROOM_GENERATION</td>
 <td>Params: <code>PostRoomGenerationContext room_gen_ctx</code><br/>Runs right after all rooms are generated before entities are spawned<br/></td>
@@ -24033,6 +24140,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_GENERATION">POST_LEVEL_GENERATION</a></td>
 <td>ON::POST_LEVEL_GENERATION</td>
 <td>Runs right level generation is done, before any entities are updated<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_SCREEN">POST_LOAD_SCREEN</a></td>
+<td>ON::POST_LOAD_SCREEN</td>
+<td></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_GET_RANDOM_ROOM">PRE_GET_RANDOM_ROOM</a></td>
