@@ -10702,7 +10702,27 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 </tbody></table>
-<h3 id='ScreenConstellation'>ScreenConstellation</h3>
+<h3 id='ScreenConstellation'>ScreenConstellation</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- forces any level transition to immediately go to constellation ending with custom text</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">screen_next</span> <span class="o">==</span> <span class="n">SCREEN</span><span class="p">.</span><span class="n">TRANSITION</span> <span class="k">then</span>
+      <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">level_count</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">then</span> <span class="n">state</span><span class="p">.</span><span class="n">level_count</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">end</span> <span class="c1">-- no /0</span>
+      <span class="n">state</span><span class="p">.</span><span class="n">win_state</span> <span class="o">=</span> <span class="n">WIN_STATE</span><span class="p">.</span><span class="n">COSMIC_OCEAN_WIN</span>
+      <span class="n">state</span><span class="p">.</span><span class="n">screen_next</span> <span class="o">=</span> <span class="n">SCREEN</span><span class="p">.</span><span class="n">CONSTELLATION</span>
+      <span class="n">state</span><span class="p">.</span><span class="n">world_next</span> <span class="o">=</span> <span class="mi">8</span>
+      <span class="n">state</span><span class="p">.</span><span class="n">level_next</span> <span class="o">=</span> <span class="mi">99</span>
+      <span class="n">state</span><span class="p">.</span><span class="n">theme_next</span> <span class="o">=</span> <span class="n">THEME</span><span class="p">.</span><span class="n">COSMIC_OCEAN</span>
+      <span class="n">state</span><span class="p">.</span><span class="n">level_gen</span><span class="p">.</span><span class="n">themes</span><span class="p">[</span><span class="n">THEME</span><span class="p">.</span><span class="n">COSMIC_OCEAN</span><span class="p">].</span><span class="n">sub_theme</span> <span class="o">=</span> <span class="n">state</span><span class="p">.</span><span class="n">level_gen</span><span class="p">.</span><span class="n">themes</span><span class="p">[</span><span class="n">state</span><span class="p">.</span><span class="n">theme</span><span class="p">]</span>
+      <span class="n">state</span><span class="p">:</span><span class="n">force_current_theme</span><span class="p">(</span><span class="n">THEME</span><span class="p">.</span><span class="n">COSMIC_OCEAN</span><span class="p">)</span>
+      <span class="n">set_global_interval</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">screen_constellation</span><span class="p">.</span><span class="n">sequence_state</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">then</span>
+          <span class="n">state</span><span class="p">.</span><span class="n">screen_constellation</span><span class="p">.</span><span class="n">constellation_text</span> <span class="o">=</span> <span class="s2">"Lol u stars now"</span>
+          <span class="n">clear_callback</span><span class="p">()</span>
+        <span class="k">end</span>
+      <span class="k">end</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">end</span>
+  <span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">PRE_LOAD_SCREEN</span><span class="p">)</span>
+
+</code></pre></div>
 <table><thead>
 <tr>
 <th>Type</th>
