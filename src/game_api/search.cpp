@@ -446,6 +446,20 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "custom_malloc"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8d\x42\x17\x48\x83\xe0\xf0\x48\x83\xfa\x17"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "custom_free"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x49\x89\xcd\x49\x83\xe5\xf8\x4e\x8d\x0c\x2f"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "read_encrypted_file"sv,
         PatternCommandBuffer{}
             .find_inst("\x41\xb8\x50\x46\x00\x00"sv)

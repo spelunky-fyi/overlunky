@@ -1,8 +1,9 @@
 #include "strings.hpp"
 
+#include "containers/game_allocator.hpp"
+
 #include "entity.hpp"
 #include "fix_entity_descriptions.hpp"
-#include "game_allocator.hpp"
 #include "memory.hpp"
 #include "script/events.hpp"
 #include "virtual_table.hpp"
