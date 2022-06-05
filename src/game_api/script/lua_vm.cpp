@@ -1256,7 +1256,6 @@ end
     /// Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
     /// The callback signature is `bool pre_floor_update(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1284,7 +1283,6 @@ end
     /// Sets a callback that is called right after a floor is updated (by killed neighbor).
     /// The callback signature is `nil post_floor_update(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_post_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1719,7 +1717,13 @@ end
     // Params: `PostRoomGenerationContext room_gen_ctx`
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
-    // Runs right level generation is done, before any entities are updated
+    // Runs right after level generation is done, before any entities are updated
+    // LOADING
+    // Runs whenever state.loading changes and is > 0. Prefer PRE/POST_LOAD_SCREEN instead though.
+    // PRE_LOAD_SCREEN
+    // Runs right before loading a new screen based on screen_next
+    // POST_LOAD_SCREEN
+    // Runs right after a screen is loaded, before rendering anything
     // PRE_GET_RANDOM_ROOM
     // Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`
     // Return: `string room_data`

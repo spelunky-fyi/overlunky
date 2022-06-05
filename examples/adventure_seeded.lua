@@ -2,7 +2,10 @@ meta.name = 'Adventure Seeded'
 meta.version = '1.0'
 meta.description = [[Reset the adventure, using the same seed that was used to start it, replicating it perfectly.
 
-The example seed should have a teleporter in 1-1 right in front of you in the crust.]]
+The example seed should have a teleporter in 1-1 right in front of you in the crust.
+
+You have to enable this script before you start the run to save the seed on the first level! Also enable warping through transitions if you want to use warps with this, cause loading transitions affects the levelgen.
+]]
 meta.author = 'Dregu'
 
 -- The seed pair is initialized on game start, and the first value is added to the second value on every level or transtion
