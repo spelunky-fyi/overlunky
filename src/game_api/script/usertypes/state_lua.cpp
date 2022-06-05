@@ -543,6 +543,8 @@ void register_usertypes(sol::state& lua)
         &StateMemory::waddler_storage,
         "waddler_metadata",
         &StateMemory::waddler_storage_meta,
+        "theme_info",
+        &StateMemory::current_theme,
 
         */
         "logic",
@@ -566,6 +568,7 @@ void register_usertypes(sol::state& lua)
     state_usertype["storage_uid"] = &StateMemory::waddler_floor_storage;
     state_usertype["waddler_storage"] = &StateMemory::waddler_storage;
     state_usertype["waddler_metadata"] = &StateMemory::waddler_storage_meta;
+    state_usertype["theme_info"] = &StateMemory::current_theme;
 
     lua.new_usertype<LightParams>(
         "LightParams",

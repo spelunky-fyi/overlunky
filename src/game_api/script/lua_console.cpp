@@ -655,6 +655,8 @@ bool LuaConsole::pre_draw()
         ImGui::BeginChild("Results Region", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
 
+        static const ImVec4 trans{0.0f, 0.0f, 0.0f, 0.0f};
+
         for (size_t i = 0; i < history.size(); i++)
         {
             auto& item = history[i];
@@ -679,9 +681,28 @@ bool LuaConsole::pre_draw()
                 last_force_scroll = set_scroll_to_history_item;
                 set_scroll_to_history_item = std::nullopt;
             }
-
             for (const auto& results : item.messages)
             {
+                int num = 1;
+                const char* str;
+                for (str = results.message.c_str(); *str; ++str)
+                    num += *str == '\n';
+
+                ImGui::PushStyleColor(ImGuiCol_Button, trans);
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+                ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0, 0));
+                ImGui::PushID((int)i);
+                ImGui::PushID(results.message.c_str());
+                if (ImGui::Button("< ##CopyToClipboard", {16.0f, ImGui::GetTextLineHeight() * num}))
+                    ImGui::SetClipboardText(results.message.c_str());
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Copy result to clipboard!");
+                ImGui::PopID();
+                ImGui::PopID();
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
                 ImGui::PushStyleColor(ImGuiCol_Text, results.color);
                 ImGui::TextWrapped("%s", results.message.c_str());
                 ImGui::PopStyleColor();

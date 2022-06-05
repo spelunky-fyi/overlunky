@@ -1601,6 +1601,21 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "load_screen_func"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x8b\x49\x0c\x41\x8b\x47\x10"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "adventure_seed"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x4c\x8d\x80\xa0\x00\x00\x00"sv)
+            .offset(0x7)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
         // Go to the kill virtual function for floor, scroll down until you see getting address for LiquidPhysics, it should call that function after that
         "remove_from_liquid_collision_map"sv,
         PatternCommandBuffer{}

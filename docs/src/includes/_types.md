@@ -1514,14 +1514,13 @@ int | [flying_thing_countdown](https://github.com/spelunky-fyi/overlunky/search?
 
 ### ScreenConstellation
 
-Derived from [Screen](#Screen)
-
 
 Type | Name | Description
 ---- | ---- | -----------
 int | [sequence_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sequence_state) | 
 int | [animation_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_timer) | 
 float | [constellation_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text_opacity) | 
+float | [constellation_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text) | 
 
 ### ScreenCredits
 
@@ -2152,6 +2151,7 @@ int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ti
 int | [storage_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=storage_uid) | 
 array&lt;[ENT_TYPE](#ENT_TYPE), 99&gt; | [waddler_storage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_storage) | 
 array&lt;int, 99&gt; | [waddler_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_metadata) | 
+[ThemeInfo](#ThemeInfo) | [theme_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_info) | 
 [LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | 
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
 

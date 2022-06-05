@@ -34,13 +34,21 @@ function get_player(slot, or_ghost) end
 ---@param slot integer
 ---@return PlayerGhost
 function get_playerghost(slot) end
----Standard lua print function, prints directly to the console but not to the game
+---Standard lua print function, prints directly to the terminal but not to the game
 ---@return nil
 function lua_print() end
 ---Print a log message on screen.
 ---@param message string
 ---@return nil
 function print(message) end
+---Print a log message to console.
+---@param message string
+---@return nil
+function console_print(message) end
+---Prinspect to console
+---@vararg any
+---@return nil
+function console_prinspect(...) end
 ---Same as `print`
 ---@param message string
 ---@return nil
@@ -894,6 +902,24 @@ function set_on_player_instagib(uid, fun) end
 ---@return CallbackId?
 function set_on_damage(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
+---The callback signature is `bool pre_floor_update(Entity self)`
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_floor_update(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after a floor is updated (by killed neighbor).
+---The callback signature is `nil post_floor_update(Entity self)`
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_floor_update(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
 ---The callback signature is `nil on_open(Entity entity_self, Entity opener)`
 ---Use this only when no other approach works, this call can be expensive if overused.
@@ -1068,6 +1094,14 @@ function spawn_shopkeeper(x, y, layer, room_template) end
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
 function spawn_roomowner(owner_type, x, y, layer, room_template) end
+---Get the current adventure seed pair
+---@return integer, integer
+function get_adventure_seed() end
+---Set the current adventure seed pair
+---@param first integer
+---@param second integer
+---@return nil
+function set_adventure_seed(first, second) end
 ---Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
 ---@param x number
 ---@param y number
@@ -1078,6 +1112,14 @@ function update_liquid_collision_at(x, y, add) end
 ---@param disable boolean
 ---@return nil
 function disable_floor_embeds(disable) end
+---Get the address for a pattern name
+---@param address_name string
+---@return size_t
+function get_address(address_name) end
+---Get the rva for a pattern name
+---@param address_name string
+---@return size_t
+function get_rva(address_name) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1298,6 +1340,9 @@ function grow_chainandblocks() end
 ---@param y integer
 ---@return boolean
 function grow_chainandblocks(x, y) end
+---Immediately load a screen based on state.screen_next and stuff
+---@return nil
+function load_screen() end
 ---Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Check ThemeInfo for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
 ---Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
@@ -1687,6 +1732,7 @@ function udp_send(host, port, msg) end
     ---@field storage_uid integer
     ---@field waddler_storage ENT_TYPE[]
     ---@field waddler_metadata integer[]
+    ---@field theme_info ThemeInfo
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
 
@@ -4427,10 +4473,11 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field animation_timer integer
     ---@field woodpanel_slidedown_timer number
 
----@class ScreenConstellation : Screen
+---@class ScreenConstellation
     ---@field sequence_state integer
     ---@field animation_timer integer
     ---@field constellation_text_opacity number
+    ---@field constellation_text number
 
 ---@class ScreenRecap : Screen
 

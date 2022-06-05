@@ -1759,6 +1759,26 @@ void change_poison_timer(int16_t frames)
     }
 }
 
+void set_adventure_seed(int64_t first, int64_t second)
+{
+    const static size_t offset = get_address("adventure_seed");
+    if (offset != 0)
+    {
+        write_mem_prot(offset, first, true);
+        write_mem_prot(offset + 8, second, true);
+    }
+}
+
+std::pair<int64_t, int64_t> get_adventure_seed()
+{
+    const static size_t offset = get_address("adventure_seed");
+    if (offset != 0)
+    {
+        return {read_i64(offset), read_i64(offset + 8)};
+    }
+    return {0, 0};
+}
+
 void update_liquid_collision_at(float x, float y, bool add)
 {
     using UpdateLiquidCollision = void(LiquidPhysics*, int32_t, int32_t, bool); // setting last parameter to true just skips the whole function

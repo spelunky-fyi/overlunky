@@ -46,6 +46,7 @@ class UI
     static bool has_active_render(Entity* ent);
     static void set_time_ghost_enabled(bool enable);
     static void set_time_jelly_enabled(bool enable);
+    static void set_cursepot_ghost_enabled(bool enable);
     static ENT_TYPE get_entity_type(int32_t uid);
     static std::vector<Player*> get_players();
     static int32_t get_grid_entity_at(float, float, LAYER);
