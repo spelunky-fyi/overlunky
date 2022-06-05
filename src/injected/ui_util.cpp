@@ -314,6 +314,15 @@ void UI::update_floor_at(float x, float y, LAYER l)
     if ((ent->type->search_flags & 0x100) == 0 || !test_flag(ent->flags, 3))
         return;
     auto floor = ent->as<Floor>();
+    auto state = State::get().ptr();
+    if (test_flag(state->special_visibility_flags, 1))
+    {
+        for (auto item : entity_get_items_by(floor->uid, 0, 0x8))
+        {
+            auto embed = get_entity_ptr(item);
+            clr_flag(embed->flags, 1);
+        }
+    }
     if (test_flag(floor->type->properties_flags, 1) && floor->get_decoration_entity_type() != -1)
     {
         for (int i = 0; i < 7; ++i)
