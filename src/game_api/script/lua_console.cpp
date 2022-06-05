@@ -639,6 +639,7 @@ bool LuaConsole::pre_draw()
 
         const float window_height = io.DisplaySize.y - style.ItemSpacing.y * 2.0f;
         ImGui::SetNextWindowSize({io.DisplaySize.x, window_height});
+        ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
         ImGui::Begin(
             "Console Overlay",
             NULL,

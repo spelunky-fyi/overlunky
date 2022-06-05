@@ -3444,6 +3444,7 @@ void render_messages()
               { return std::get<2>(a) < std::get<2>(b); });
 
     ImGui::SetNextWindowSize({-1, -1});
+    ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
     ImGui::Begin(
         "Messages",
         NULL,
@@ -3493,6 +3494,7 @@ void render_clickhandler()
         ImGui::SetNextWindowPos({0, 0});
     }
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
+    ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
     ImGui::Begin(
         "Clickhandler",
         NULL,

@@ -118,6 +118,7 @@ void init_imgui()
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = true;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     ImGui_ImplWin32_Init(g_Window);
     ImGui_ImplDX11_Init(g_Device, g_Context);
 
@@ -184,8 +185,12 @@ void cleanup_render_target()
     }
 }
 
+static bool skip_hkPresent = false;
 HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
+    if (skip_hkPresent)
+        return g_OrigSwapChainPresent(pSwapChain, SyncInterval, Flags);
+
     static bool init = false;
     if (!init)
     {
@@ -221,8 +226,17 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
     }
 
     ImGui::Render();
+
     g_Context->OMSetRenderTargets(1, &g_MainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        skip_hkPresent = true;
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        skip_hkPresent = false;
+    }
 
     {
         if (ImGui::GetIO().WantCaptureKeyboard)
