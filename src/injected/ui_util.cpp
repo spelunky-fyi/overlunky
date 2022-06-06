@@ -4,13 +4,13 @@
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
 #include "entities_mounts.hpp"
+#include "game_manager.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
 #include "rpc.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
 #include "steam_api.hpp"
-#include "game_manager.hpp"
 
 #include <unordered_set>
 

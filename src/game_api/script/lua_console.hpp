@@ -67,4 +67,5 @@ class LuaConsole : public LuaBackend
     void push_history(std::string history_item, std::vector<ScriptMessage> result_item);
 
     std::string dump_api();
+    unsigned int get_input_lines();
 };

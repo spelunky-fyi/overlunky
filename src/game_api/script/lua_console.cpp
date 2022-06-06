@@ -819,7 +819,7 @@ bool LuaConsole::pre_draw()
             return 0;
         };
 
-        const float indent_size = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, "000", nullptr, nullptr).x + 8.0f;
+        const float indent_size = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, "00", nullptr, nullptr).x + 2.0f;
         ImGui::PushItemWidth(ImGui::GetWindowWidth() - indent_size);
         ImGui::Indent(indent_size);
         ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine;
@@ -1066,4 +1066,13 @@ std::string LuaConsole::dump_api()
     api = std::regex_replace(api, reg, "\"$1\"");
 
     return api;
+}
+
+unsigned int LuaConsole::get_input_lines()
+{
+    int num = 1;
+    const char* str;
+    for (str = console_input; *str; ++str)
+        num += *str == '\n';
+    return num;
 }

@@ -2694,7 +2694,7 @@ void render_input()
     }
     ImVec2 region = ImGui::GetContentRegionMax();
     ImGui::PushItemWidth(region.x - 110);
-    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion, pick_selected_entity))
+    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
     {
         update_filter(text);
     }
@@ -3513,7 +3513,7 @@ void render_clickhandler()
     auto base = ImGui::GetMainViewport();
     if (g_Console->is_toggled())
     {
-        ImGui::SetNextWindowSize({base->Size.x - 16.0f, base->Size.y - (4.0f * ImGui::GetStyle().ItemSpacing.y + ImGui::GetTextLineHeight())});
+        ImGui::SetNextWindowSize({base->Size.x - 32.0f, base->Size.y - (2.0f * ImGui::GetStyle().ItemSpacing.y + g_Console.get()->get_input_lines() * ImGui::GetTextLineHeight())});
         ImGui::SetNextWindowPos({base->Pos.x + 16.0f, base->Pos.y});
     }
     else
@@ -4992,7 +4992,7 @@ void render_entity_finder()
         ImGui::SetKeyboardFocusHere();
         set_focus_finder = false;
     }
-    ImGui::InputText("Text filter##EntitySearchName", &search_entity_name);
+    ImGui::InputText("Text filter##EntitySearchName", &search_entity_name, ImGuiInputTextFlags_AutoSelectAll);
 
     static uint32_t search_entity_type = 0;
     ImGui::InputScalar("##EntityType", ImGuiDataType_U32, &search_entity_type, &u32_one);
