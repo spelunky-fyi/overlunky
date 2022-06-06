@@ -301,6 +301,8 @@ void register_usertypes(sol::state& lua)
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
     lua.new_usertype<Movable>(
         "Movable",
+        "move",
+        &Movable::move,
         "movex",
         &Movable::movex,
         "movey",

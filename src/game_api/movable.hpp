@@ -14,8 +14,15 @@ class Movable : public Entity
     std::set<MovableBehavior*> behaviors;
     MovableBehavior* current_behavior;
     int64_t ic8;
-    float movex;
-    float movey;
+    union
+    {
+        Vec2 move;
+        struct
+        {
+            float movex;
+            float movey;
+        };
+    };
     BUTTON buttons;
     BUTTON buttons_previous;
     int16_t unknown_padding; // garbage?
