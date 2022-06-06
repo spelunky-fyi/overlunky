@@ -1097,6 +1097,108 @@ function is_character_female(type_id) end
 ---@param color Color
 ---@return nil
 function set_character_heart_color(type_id, color) end
+---Make a `CustomMovableBehavior`, if `base_behavior` is `nil` you will have to set all of the
+---behavior functions. If a behavior with `behavior_name` already exists for your script it will
+---be returned instead. 
+---@param behavior_name string
+---@param state_id integer
+---@param base_behavior VanillaMovableBehavior
+---@return CustomMovableBehavior
+function make_custom_behavior(behavior_name, state_id, base_behavior) end
+---Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's
+---`get_next_state_id` to enter this state, given that the behavior is added to the movable.
+---@param behavior MovableBehavior
+---@return integer
+function get_behavior_state_id(behavior) end
+---Set the `force_state` function of a `CustomMovableBehavior`, this will be called every frame when
+---the movable is updated. If an `force_state` is already set it will be overridden. The signature
+---of the function is `bool force_state(movable, base_fun)`, when the function returns `true` the movable will
+---enter this behavior. If no base behavior is set `base_fun` will be `nil`.
+---@param behavior CustomMovableBehavior
+---@param force_state fun(): any
+---@return nil
+function set_custom_behavior_force_state(behavior, force_state) end
+---Set the `on_enter` function of a `CustomMovableBehavior`, this will be called when the movable
+---enters the state. If an `on_enter` is already set it will be overridden. The signature of the
+---function is `nil on_enter(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
+---@param behavior CustomMovableBehavior
+---@param on_enter fun(): any
+---@return nil
+function set_custom_behavior_on_enter(behavior, on_enter) end
+---Set the `on_exit` function of a `CustomMovableBehavior`, this will be called when the movable
+---leaves the state. If an `on_exit` is already set it will be overridden. The signature of the
+---function is `nil on_exit(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
+---@param behavior CustomMovableBehavior
+---@param on_exit fun(): any
+---@return nil
+function set_custom_behavior_on_exit(behavior, on_exit) end
+---Set the `update_render` function of a `CustomMovableBehavior`, this will be called every frame when
+---the movable is updated. If an `update_render` is already set it will be overridden. The signature
+---of the function is `nil update_render(movable, base_fun))`, use it to change the color, texture,
+---animation frame, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
+---@param behavior CustomMovableBehavior
+---@param update_render fun(): any
+---@return nil
+function set_custom_behavior_update_render(behavior, update_render) end
+---Set the `update_physics` function of a `CustomMovableBehavior`, this will be called every frame when
+---the movable is updated. If an `update_physics` is already set it will be overridden. The signature
+---of the function is `nil update_physics(movable, base_fun))`, use this to update the movex, movey, velocityx,
+---velocityy, etc. of the movable, then call `update_movable` to update the movable. If no base behavior is set
+---`base_fun` will be `nil`.
+---@param behavior CustomMovableBehavior
+---@param update_physics fun(): any
+---@return nil
+function set_custom_behavior_update_physics(behavior, update_physics) end
+---Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when
+---the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature
+---of the function is `int get_next_state_id(movable, base_fun))`, use this to move to another state, return `nil`.
+---or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
+---@param behavior CustomMovableBehavior
+---@param get_next_state_id fun(): any
+---@return nil
+function set_custom_behavior_get_next_state_id(behavior, get_next_state_id) end
+---Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`
+---but the returned values are still valid after a call to `clear_behaviors`
+---@param movable Movable
+---@param state_id integer
+---@return VanillaMovableBehavior
+function get_base_behavior(movable, state_id) end
+---Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a
+---`CustomMovableBehavior`
+---@param movable Movable
+---@param behavior MovableBehavior
+---@return nil
+function add_behavior(movable, behavior) end
+---Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a
+---`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to
+---run this movables statemachine without crashing, so add a new one if you are not sure
+---@param movable Movable
+---@param behavior MovableBehavior
+---@return nil
+function clear_behavior(movable, behavior) end
+---Clears all behaviors of this movable, need to call `add_behavior` to avoid crashing
+---@param movable Movable
+---@return nil
+function clear_behaviors(movable) end
+---Move a movable according to its velocity, update physics, gravity, etc.
+---@param movable Movable
+---@return nil
+function update_movable(movable) end
+---Move a movable according to its velocity, can disable gravity
+---@param movable Movable
+---@param disable_gravity boolean
+---@return nil
+function update_movable(movable, disable_gravity) end
+---Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is
+---held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal
+---movement via `on_rope`. Use this for example to update a custom enemy type.
+---@param movable Movable
+---@param move Vec2
+---@param sprint_factor number
+---@param disable_gravity boolean
+---@param on_rope boolean
+---@return nil
+function update_movable(movable, move, sprint_factor, disable_gravity, on_rope) end
 ---Get the [ParticleDB](#ParticleDB) details of the specified ID
 ---@param id integer
 ---@return ParticleDB
@@ -1936,6 +2038,7 @@ local function PRNG_random(self, min, max) end
 local function Entity_overlaps_with(self, other) end
 
 ---@class Movable : Entity
+    ---@field move Vec2
     ---@field movex number
     ---@field movey number
     ---@field buttons BUTTON
@@ -3573,6 +3676,10 @@ local function Entity_overlaps_with(self, other) end
     ---@field timer integer
 
 ---@class DMAlienBlast : Entity
+
+---@class VanillaMovableBehavior : MovableBehavior
+
+---@class CustomMovableBehavior : MovableBehavior
 
 ---@class ParticleDB
     ---@field id integer

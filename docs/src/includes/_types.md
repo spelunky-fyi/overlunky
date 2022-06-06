@@ -4799,6 +4799,15 @@ Type | Name | Description
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [smoke](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=smoke) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [smoke2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=smoke2) | 
 
+### CustomMovableBehavior
+
+Opaque handle to a custom movable behavior from a script mod
+Derived from [MovableBehavior](#MovableBehavior)
+
+
+Type | Name | Description
+---- | ---- | -----------
+
 ### Drill
 
 Derived from [Entity](#Entity) [Movable](#Movable)
@@ -5522,6 +5531,7 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
+[Vec2](#Vec2) | [move](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move) | 
 float | [movex](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) | 
 float | [movey](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movey) | 
 [BUTTON](#BUTTON) | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
@@ -6053,6 +6063,15 @@ Type | Name | Description
 ---- | ---- | -----------
 int | [wiggle_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wiggle_timer) | 
 int | [shine_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shine_timer) | 
+
+### VanillaMovableBehavior
+
+Opaque handle to a movable behavior from the vanilla game
+Derived from [MovableBehavior](#MovableBehavior)
+
+
+Type | Name | Description
+---- | ---- | -----------
 
 ### VladsCape
 

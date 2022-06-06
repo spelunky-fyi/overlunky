@@ -1514,6 +1514,159 @@ Show a message that looks like a level feeling.
 #### bool toast_visible()
 
 
+## Movable Behavior functions
+
+
+### add_behavior
+
+
+> Search script examples for [add_behavior](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_behavior)
+
+#### nil add_behavior([Movable](#Movable) movable, MovableBehavior behavior)
+
+Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a `CustomMovableBehavior`
+
+
+### clear_behavior
+
+
+> Search script examples for [clear_behavior](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_behavior)
+
+#### nil clear_behavior([Movable](#Movable) movable, MovableBehavior behavior)
+
+Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a `CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to run this movables statemachine without crashing, so add a new one if you are not sure
+
+
+### clear_behaviors
+
+
+> Search script examples for [clear_behaviors](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_behaviors)
+
+#### nil clear_behaviors([Movable](#Movable) movable)
+
+Clears all behaviors of this movable, need to call `add_behavior` to avoid crashing
+
+
+### get_base_behavior
+
+
+> Search script examples for [get_base_behavior](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_behavior)
+
+#### [VanillaMovableBehavior](#VanillaMovableBehavior) get_base_behavior([Movable](#Movable) movable, int state_id)
+
+Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors` but the returned values are still valid after a call to `clear_behaviors`
+
+
+### get_behavior_state_id
+
+
+> Search script examples for [get_behavior_state_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_behavior_state_id)
+
+#### int get_behavior_state_id(MovableBehavior behavior)
+
+Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's
+`get_next_state_id` to enter this state, given that the behavior is added to the movable.
+
+### make_custom_behavior
+
+
+> Search script examples for [make_custom_behavior](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=make_custom_behavior)
+
+#### [CustomMovableBehavior](#CustomMovableBehavior) make_custom_behavior(string_view behavior_name, int state_id, [VanillaMovableBehavior](#VanillaMovableBehavior) base_behavior)
+
+Make a `CustomMovableBehavior`, if `base_behavior` is `nil` you will have to set all of the
+behavior functions. If a behavior with `behavior_name` already exists for your script it will
+be returned instead.
+
+### set_custom_behavior_force_state
+
+
+> Search script examples for [set_custom_behavior_force_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_custom_behavior_force_state)
+
+#### nil set_custom_behavior_force_state([CustomMovableBehavior](#CustomMovableBehavior) behavior, function force_state)
+
+Set the `force_state` function of a `CustomMovableBehavior`, this will be called every frame when
+the movable is updated. If an `force_state` is already set it will be overridden. The signature
+of the function is `bool force_state(movable, base_fun)`, when the function returns `true` the movable will
+enter this behavior. If no base behavior is set `base_fun` will be `nil`.
+
+### set_custom_behavior_get_next_state_id
+
+
+> Search script examples for [set_custom_behavior_get_next_state_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_custom_behavior_get_next_state_id)
+
+#### nil set_custom_behavior_get_next_state_id([CustomMovableBehavior](#CustomMovableBehavior) behavior, function get_next_state_id)
+
+Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when
+the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature
+of the function is `int get_next_state_id(movable, base_fun))`, use this to move to another state, return `nil`.
+or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
+
+### set_custom_behavior_on_enter
+
+
+> Search script examples for [set_custom_behavior_on_enter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_custom_behavior_on_enter)
+
+#### nil set_custom_behavior_on_enter([CustomMovableBehavior](#CustomMovableBehavior) behavior, function on_enter)
+
+Set the `on_enter` function of a `CustomMovableBehavior`, this will be called when the movable
+enters the state. If an `on_enter` is already set it will be overridden. The signature of the
+function is `nil on_enter(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
+
+### set_custom_behavior_on_exit
+
+
+> Search script examples for [set_custom_behavior_on_exit](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_custom_behavior_on_exit)
+
+#### nil set_custom_behavior_on_exit([CustomMovableBehavior](#CustomMovableBehavior) behavior, function on_exit)
+
+Set the `on_exit` function of a `CustomMovableBehavior`, this will be called when the movable
+leaves the state. If an `on_exit` is already set it will be overridden. The signature of the
+function is `nil on_exit(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
+
+### set_custom_behavior_update_physics
+
+
+> Search script examples for [set_custom_behavior_update_physics](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_custom_behavior_update_physics)
+
+#### nil set_custom_behavior_update_physics([CustomMovableBehavior](#CustomMovableBehavior) behavior, function update_physics)
+
+Set the `update_physics` function of a `CustomMovableBehavior`, this will be called every frame when
+the movable is updated. If an `update_physics` is already set it will be overridden. The signature
+of the function is `nil update_physics(movable, base_fun))`, use this to update the movex, movey, velocityx,
+velocityy, etc. of the movable, then call `update_movable` to update the movable. If no base behavior is set
+`base_fun` will be `nil`.
+
+### set_custom_behavior_update_render
+
+
+> Search script examples for [set_custom_behavior_update_render](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_custom_behavior_update_render)
+
+#### nil set_custom_behavior_update_render([CustomMovableBehavior](#CustomMovableBehavior) behavior, function update_render)
+
+Set the `update_render` function of a `CustomMovableBehavior`, this will be called every frame when
+the movable is updated. If an `update_render` is already set it will be overridden. The signature
+of the function is `nil update_render(movable, base_fun))`, use it to change the color, texture,
+animation frame, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
+
+### update_movable
+
+
+> Search script examples for [update_movable](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_movable)
+
+#### nil update_movable([Movable](#Movable) movable)
+
+Move a movable according to its velocity, update physics, gravity, etc.
+
+#### nil update_movable([Movable](#Movable) movable, bool disable_gravity)
+
+Move a movable according to its velocity, can disable gravity
+
+#### nil update_movable([Movable](#Movable) movable, [Vec2](#Vec2) move, float sprint_factor, bool disable_gravity, bool on_rope)
+
+Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal movement via `on_rope`. Use this for example to update a custom enemy type.
+
+
 ## Network functions
 
 
