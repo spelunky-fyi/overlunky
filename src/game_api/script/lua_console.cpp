@@ -638,8 +638,8 @@ bool LuaConsole::pre_draw()
         auto& style = ImGui::GetStyle();
         auto base = ImGui::GetMainViewport();
 
-        ImGui::SetNextWindowSize(base->Size);
-        ImGui::SetNextWindowPos(base->Pos);
+        ImGui::SetNextWindowSize(size.x != 0 ? size : base->Size);
+        ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowViewport(base->ID);
         ImGui::Begin(
             "Console Overlay",
@@ -883,7 +883,9 @@ bool LuaConsole::pre_draw()
         {
             std::string buf = fmt::format("{}", i);
             auto linesize = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, buf.c_str(), nullptr, nullptr);
-            drawlist->AddText(ImVec2(base->Pos.x + indent_size - linesize.x - 2.0f, base->Pos.y + base->Size.y - linesize.y * (num - i + 2) + 9.0f), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+            float numx = pos.x != 0 ? pos.x + indent_size - linesize.x - 2.0f : base->Pos.x + indent_size - linesize.x - 2.0f;
+            float numy = pos.y != 0 ? pos.y + size.y - linesize.y * (num - i + 2) + 9.0f : base->Pos.y + base->Size.y - linesize.y * (num - i + 2) + 9.0f;
+            drawlist->AddText(ImVec2(numx, numy), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
         }
         ImGui::End();
     }
@@ -1075,4 +1077,10 @@ unsigned int LuaConsole::get_input_lines()
     for (str = console_input; *str; ++str)
         num += *str == '\n';
     return num;
+}
+
+void LuaConsole::set_geometry(float x, float y, float w, float h)
+{
+    pos = ImVec2(x, y);
+    size = ImVec2(w, h);
 }

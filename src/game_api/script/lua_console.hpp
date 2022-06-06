@@ -38,6 +38,9 @@ class LuaConsole : public LuaBackend
     std::string completion_options;
     std::string completion_error;
 
+    ImVec2 pos{0, 0};
+    ImVec2 size{0, 0};
+
     void on_history_request(struct ImGuiInputTextCallbackData* data);
     bool on_completion(struct ImGuiInputTextCallbackData* data);
 
@@ -68,4 +71,5 @@ class LuaConsole : public LuaBackend
 
     std::string dump_api();
     unsigned int get_input_lines();
+    void set_geometry(float x, float y, float w, float h);
 };

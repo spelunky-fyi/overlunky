@@ -485,6 +485,7 @@ void set_colors()
     style.Colors[ImGuiCol_TabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.80f);
     style.Colors[ImGuiCol_TabUnfocused] = ImVec4(col_area.x, col_area.y, col_area.z, 0.60f);
     style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(col_area.x, col_area.y, col_area.z, 0.80f);
+    style.Colors[ImGuiCol_DockingPreview] = ImVec4(col_area.x, col_area.y, col_area.z, 0.6f);
     style.WindowPadding = ImVec2(4, 4);
     style.WindowRounding = 0;
     style.FrameRounding = 0;
@@ -3511,15 +3512,20 @@ void render_clickhandler()
 {
     ImGuiIO& io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
+    ImGui::SetNextWindowBgAlpha(0.0f);
+    auto main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
+    auto space = ImGui::DockBuilderGetCentralNode(main_dock);
+    g_Console.get()->set_geometry(space->Pos.x, space->Pos.y, space->Size.x, space->Size.y);
     if (g_Console->is_toggled())
     {
-        ImGui::SetNextWindowSize({base->Size.x - 32.0f, base->Size.y - (2.0f * ImGui::GetStyle().ItemSpacing.y + g_Console.get()->get_input_lines() * ImGui::GetTextLineHeight())});
-        ImGui::SetNextWindowPos({base->Pos.x + 16.0f, base->Pos.y});
+        auto console_height = (2.0f * ImGui::GetStyle().ItemSpacing.y + g_Console.get()->get_input_lines() * ImGui::GetTextLineHeight());
+        ImGui::SetNextWindowSize({space->Size.x - 32.0f, base->Size.y - console_height});
+        ImGui::SetNextWindowPos({space->Pos.x + 16.0f, space->Pos.y});
     }
     else
     {
-        ImGui::SetNextWindowSize(base->Size);
-        ImGui::SetNextWindowPos(base->Pos);
+        ImGui::SetNextWindowSize(space->Size);
+        ImGui::SetNextWindowPos(space->Pos);
     }
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
     ImGui::SetNextWindowViewport(base->ID);

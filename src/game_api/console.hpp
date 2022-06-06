@@ -41,6 +41,7 @@ class SpelunkyConsole
 
     void set_selected_uid(uint32_t uid);
     unsigned int get_input_lines();
+    void set_geometry(float x, float y, float w, float h);
 
   private:
     std::unique_ptr<class LuaConsole> m_Impl;

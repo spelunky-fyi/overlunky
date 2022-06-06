@@ -117,3 +117,8 @@ unsigned int SpelunkyConsole::get_input_lines()
 {
     return m_Impl->get_input_lines();
 }
+
+void SpelunkyConsole::set_geometry(float x, float y, float w, float h)
+{
+    m_Impl->set_geometry(x, y, w, h);
+}
