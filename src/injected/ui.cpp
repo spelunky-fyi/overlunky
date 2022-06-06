@@ -3855,7 +3855,7 @@ void render_clickhandler()
             if (g_players.empty())
                 return;
             set_pos(startpos);
-            ImVec2 mpos = normalize(io.MousePos);
+            ImVec2 mpos = normalize(mouse_pos());
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
@@ -4043,7 +4043,7 @@ void render_clickhandler()
         {
             if (ImGui::IsMousePosValid())
             {
-                startpos = normalize(io.MousePos);
+                startpos = normalize(mouse_pos());
             }
         }
 
@@ -4052,7 +4052,7 @@ void render_clickhandler()
             if (ImGui::IsMousePosValid())
             {
                 g_state->camera->focused_entity_uid = -1;
-                ImVec2 mpos = normalize(io.MousePos);
+                ImVec2 mpos = normalize(mouse_pos());
                 std::pair<float, float> oryginal_pos = UI::click_position(startpos.x, startpos.y);
                 std::pair<float, float> current_pos = UI::click_position(mpos.x, mpos.y);
 
@@ -4063,7 +4063,7 @@ void render_clickhandler()
                     g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
                     g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
                 }
-                startpos = normalize(io.MousePos);
+                startpos = normalize(mouse_pos());
                 set_camera_bounds(false);
             }
         }
