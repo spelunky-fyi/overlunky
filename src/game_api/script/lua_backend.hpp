@@ -170,6 +170,16 @@ struct CurrentCallback
     CallbackType type;
 };
 
+struct VanillaMovableBehavior;
+struct CustomMovableBehavior;
+struct CustomMovableBehaviorStorage
+{
+    std::string name;
+    // Stored as std::shared_ptr<void> since MovableBehavior has no virtual dtor but
+    // std::shared_ptr<void> takes care of the type erasure to correctly destroy it
+    std::shared_ptr<void> behavior;
+};
+
 struct ScriptState
 {
     Player* player;
@@ -222,6 +232,7 @@ class LuaBackend
     std::vector<std::pair<int, std::uint32_t>> entity_dtor_hooks;
     std::vector<std::pair<int, std::uint32_t>> screen_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
+    std::vector<CustomMovableBehaviorStorage> custom_movable_behaviors;
     std::vector<std::string> required_scripts;
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
@@ -267,6 +278,9 @@ class LuaBackend
     virtual const char* get_path() const = 0;
     virtual const char* get_root() const = 0;
     virtual const std::filesystem::path& get_root_path() const = 0;
+
+    CustomMovableBehavior* get_custom_movable_behavior(std::string_view name);
+    CustomMovableBehavior* make_custom_movable_behavior(std::string_view name, uint8_t state_id, VanillaMovableBehavior* base_behavior);
 
     bool update();
     void draw(ImDrawList* dl);

@@ -21,6 +21,7 @@
 #include "lua_require.hpp"
 #include "script_util.hpp"
 
+#include "usertypes/behavior_lua.hpp"
 #include "usertypes/char_state_lua.hpp"
 #include "usertypes/drops_lua.hpp"
 #include "usertypes/entities_activefloors_lua.hpp"
@@ -136,6 +137,7 @@ end
     NCharacterState::register_usertypes(lua);
     NEntityFlags::register_usertypes(lua);
     NEntityCasting::register_usertypes(lua);
+    NBehavior::register_usertypes(lua);
 
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
     lua["state"] = get_state_ptr();

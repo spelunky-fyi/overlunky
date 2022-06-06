@@ -1,17 +1,19 @@
 #pragma once
 
+#include "containers/custom_map.hpp"
+#include "containers/custom_set.hpp"
+#include "movable_behavior.hpp"
 #include "entity.hpp"
 
 #include <functional>
-#include <set>
 
 struct MovableBehavior;
 
 class Movable : public Entity
 {
   public:
-    std::map<uint32_t, MovableBehavior*> behaviors_map;
-    std::set<MovableBehavior*> behaviors;
+    custom_map<uint32_t, MovableBehavior*> behaviors_map;
+    custom_set<MovableBehavior*, SortMovableBehavior> behaviors;
     MovableBehavior* current_behavior;
     int64_t ic8;
     union

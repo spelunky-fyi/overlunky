@@ -1614,6 +1614,26 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(-0x4)
             .at_exe(),
     },
+    {
+        // Follow the definition of a movable (e.g. ENT_TYPE_MONS_SNAKE) to its
+        // create function, to its vtable, to its virtual apply_db/init to the first
+        // call in there, the call that takes the movable, uint and vtable is add_behavior
+        "add_behavior"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x80\x79\x19\x00\x75\x4f\x48\x39\xc1\x74\x4a"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Check the 6th virtual of a vtable passed to `add_behavior` which should be
+        // calling `update_movable` at the bottom as
+        // `update_movable(this, &this->movex, this->sprint_factor, 1, 0, 0, 0);`
+        "update_movable"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x03\x50\x14\x83\xfa\x11\x77\x15"sv)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
