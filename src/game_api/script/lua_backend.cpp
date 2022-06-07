@@ -1,6 +1,7 @@
 #include "lua_backend.hpp"
 
 #include "aliases.hpp"
+#include "constants.hpp"
 #include "entities_chars.hpp"
 #include "level_api.hpp"
 #include "lua_console.hpp"

@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "aliases.hpp"
+#include "string_aliases.hpp"
 #include "audio_buffer.hpp"
 #include "fmod.hpp"
 
