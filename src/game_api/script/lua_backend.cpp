@@ -158,9 +158,8 @@ bool LuaBackend::reset()
 
 CustomMovableBehavior* LuaBackend::get_custom_movable_behavior(std::string_view name)
 {
-    auto it = std::find_if(custom_movable_behaviors.begin(), custom_movable_behaviors.end(), [name](const CustomMovableBehaviorStorage& beh) {
-        return beh.name == name;
-    });
+    auto it = std::find_if(custom_movable_behaviors.begin(), custom_movable_behaviors.end(), [name](const CustomMovableBehaviorStorage& beh)
+                           { return beh.name == name; });
     if (it != custom_movable_behaviors.end())
     {
         return static_cast<CustomMovableBehavior*>(it->behavior.get());
@@ -173,7 +172,7 @@ CustomMovableBehavior* LuaBackend::make_custom_movable_behavior(std::string_view
     auto custom_behavior = std::make_shared<CustomMovableBehavior>();
     custom_behavior->state_id = state_id;
     custom_behavior->base_behavior = base_behavior;
-    custom_movable_behaviors.push_back(CustomMovableBehaviorStorage{ std::string{ name }, custom_behavior });
+    custom_movable_behaviors.push_back(CustomMovableBehaviorStorage{std::string{name}, custom_behavior});
     return custom_behavior.get();
 }
 

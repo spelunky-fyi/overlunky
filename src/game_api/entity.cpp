@@ -104,10 +104,9 @@ std::string_view to_name(ENT_TYPE id)
             }
         }
     }
- 
+
     return {};
 }
-
 
 void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
 {

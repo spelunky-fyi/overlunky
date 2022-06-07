@@ -2,8 +2,8 @@
 
 #include "containers/custom_map.hpp"
 #include "containers/custom_set.hpp"
-#include "movable_behavior.hpp"
 #include "entity.hpp"
+#include "movable_behavior.hpp"
 
 #include <functional>
 

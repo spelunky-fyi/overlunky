@@ -3,14 +3,13 @@
 #include "movable.hpp"
 #include "search.hpp"
 
-
 bool SortMovableBehavior::operator()(const MovableBehavior* lhs, const MovableBehavior* rhs) const
 {
     const auto lhs_id = lhs->get_state_id();
     const auto rhs_id = rhs->get_state_id();
     return lhs_id == rhs_id
-        ? lhs->secondary_sort_id() > rhs->secondary_sort_id()
-        : lhs_id > rhs_id;
+               ? lhs->secondary_sort_id() > rhs->secondary_sort_id()
+               : lhs_id > rhs_id;
 }
 
 CustomMovableBehavior::~CustomMovableBehavior()
@@ -24,16 +23,15 @@ CustomMovableBehavior::~CustomMovableBehavior()
     }
 }
 
-template<auto OriginalFun>
+template <auto OriginalFun>
 void call_custom_or_original(const auto& custom, VanillaMovableBehavior* base, Movable* movable)
 {
     if (custom)
     {
         if (base)
         {
-            custom(movable, [=](Movable* movable) {
-                (base->*OriginalFun)(movable);
-            });
+            custom(movable, [=](Movable* movable)
+                   { (base->*OriginalFun)(movable); });
         }
         else
         {
@@ -46,16 +44,15 @@ void call_custom_or_original(const auto& custom, VanillaMovableBehavior* base, M
     }
 }
 
-template<auto OriginalFun, class T>
+template <auto OriginalFun, class T>
 T call_custom_or_original(const auto& custom, VanillaMovableBehavior* base, T fallback_return, Movable* movable)
 {
     if (custom)
     {
         if (base)
         {
-            return custom(movable, [=](Movable* movable) {
-                return (base->*OriginalFun)(movable);
-            });
+            return custom(movable, [=](Movable* movable)
+                          { return (base->*OriginalFun)(movable); });
         }
         else
         {
@@ -70,37 +67,44 @@ T call_custom_or_original(const auto& custom, VanillaMovableBehavior* base, T fa
     return fallback_return;
 }
 
-uint8_t CustomMovableBehavior::get_state_id() const {
+uint8_t CustomMovableBehavior::get_state_id() const
+{
     return state_id;
 }
-uint8_t CustomMovableBehavior::secondary_sort_id() const {
+uint8_t CustomMovableBehavior::secondary_sort_id() const
+{
     return 255;
 }
-bool CustomMovableBehavior::force_state(Movable* movable) {
+bool CustomMovableBehavior::force_state(Movable* movable)
+{
     return call_custom_or_original<&VanillaMovableBehavior::force_state>(custom_force_state, base_behavior, false, movable);
 }
-void CustomMovableBehavior::on_enter(Movable* movable) {
+void CustomMovableBehavior::on_enter(Movable* movable)
+{
     call_custom_or_original<&VanillaMovableBehavior::on_enter>(custom_on_enter, base_behavior, movable);
 }
-void CustomMovableBehavior::on_exit(Movable* movable) {
+void CustomMovableBehavior::on_exit(Movable* movable)
+{
     call_custom_or_original<&VanillaMovableBehavior::on_exit>(custom_on_exit, base_behavior, movable);
 }
-void CustomMovableBehavior::update_render(Movable* movable) {
+void CustomMovableBehavior::update_render(Movable* movable)
+{
     call_custom_or_original<&VanillaMovableBehavior::update_render>(custom_update_render, base_behavior, movable);
 }
-void CustomMovableBehavior::update_physics(Movable* movable) {
+void CustomMovableBehavior::update_physics(Movable* movable)
+{
     call_custom_or_original<&VanillaMovableBehavior::update_physics>(custom_update_physics, base_behavior, movable);
 }
-uint8_t CustomMovableBehavior::get_next_state_id(Movable* movable) {
+uint8_t CustomMovableBehavior::get_next_state_id(Movable* movable)
+{
     return call_custom_or_original<&VanillaMovableBehavior::get_next_state_id>(custom_get_next_state_id, base_behavior, state_id, movable);
 }
 
 void CustomMovableBehavior::hook_movable(Movable* movable)
 {
     using_movables.push_back(movable);
-    movable->set_on_dtor([=](Entity*) {
-        std::erase(using_movables, movable);
-    });
+    movable->set_on_dtor([=](Entity*)
+                         { std::erase(using_movables, movable); });
 }
 
 VanillaMovableBehavior* get_base_behavior(Movable* movable, uint32_t state_id)
@@ -183,7 +187,7 @@ void update_movable(Movable* movable, Vec2 move, float sprint_factor, bool disab
 UpdateMovable* g_update_movable_trampoline{nullptr};
 void update_movable(Movable& movable, const Vec2& move_xy, float sprint_factor, bool apply_move, bool disable_gravity, bool on_ladder, bool param_7)
 {
-	g_update_movable_trampoline(movable, move_xy, sprint_factor, apply_move, disable_gravity, on_ladder, param_7);
+    g_update_movable_trampoline(movable, move_xy, sprint_factor, apply_move, disable_gravity, on_ladder, param_7);
 }
 
 #include <detours.h>
@@ -205,5 +209,7 @@ void init_behavior_hooks()
     }
 }
 #else
-void init_behavior_hooks() {}
+void init_behavior_hooks()
+{
+}
 #endif

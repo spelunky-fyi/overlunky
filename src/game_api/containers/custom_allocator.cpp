@@ -4,7 +4,7 @@
 #include "thread_utils.hpp"
 
 using MallocFun = void*(void*, std::size_t);
-using FreeFun = void* (void*, void*);
+using FreeFun = void*(void*, void*);
 
 void* custom_malloc(std::size_t size)
 {
