@@ -745,6 +745,29 @@ void LuaBackend::pre_level_generation()
         }
     }
 }
+void LuaBackend::pre_load_screen()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LOAD_SCREEN)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function(callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
 void LuaBackend::post_room_generation()
 {
     if (!get_enabled())
@@ -784,6 +807,29 @@ void LuaBackend::post_level_generation()
             continue;
 
         if (callback.screen == ON::POST_LEVEL_GENERATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function(callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+void LuaBackend::post_load_screen()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LOAD_SCREEN)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function(callback.func);

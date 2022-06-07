@@ -11,6 +11,7 @@
 #include "online.hpp"
 #include "rpc.hpp"
 #include "savedata.hpp"
+#include "search.hpp"
 #include "settings_api.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
@@ -195,7 +196,7 @@ end
     /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
     lua["savegame"] = State::get().savedata();
 
-    /// Standard lua print function, prints directly to the console but not to the game
+    /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
     /// Print a log message on screen.
     lua["print"] = [](std::string message) -> void
@@ -205,6 +206,34 @@ end
         if (backend->messages.size() > 20)
             backend->messages.pop_front();
         backend->lua["lua_print"](message);
+    };
+
+    /// Print a log message to console.
+    lua["console_print"] = [](std::string message) -> void
+    {
+        LuaBackend* backend = LuaBackend::get_calling_backend();
+        backend->console->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
+        if (backend->console->messages.size() > 20)
+            backend->console->messages.pop_front();
+        backend->lua["lua_print"](message);
+    };
+
+    /// Prinspect to console
+    lua["console_prinspect"] = [&lua](sol::variadic_args objects) -> void
+    {
+        if (objects.size() > 0)
+        {
+            std::string message;
+            for (const auto& obj : objects)
+            {
+                message += lua["inspect"](obj);
+                message += ", ";
+            }
+            message.pop_back();
+            message.pop_back();
+
+            lua["console_print"](std::move(message));
+        }
     };
 
     /// Same as `print`
@@ -835,6 +864,8 @@ end
     lua["force_olmec_phase_0"] = force_olmec_phase_0;
     /// Determines when the ghost appears, either when the player is cursed or not
     lua["set_ghost_spawn_times"] = set_ghost_spawn_times;
+    /// Determines whether the ghost appears when breaking the ghost pot
+    lua["set_cursepot_ghost_enabled"] = set_cursepot_ghost_enabled;
     /// Determines whether the time ghost appears, including the showing of the ghost toast
     lua["set_time_ghost_enabled"] = set_time_ghost_enabled;
     /// Determines whether the time jelly appears in cosmic ocean
@@ -1224,6 +1255,59 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
+    /// The callback signature is `bool pre_floor_update(Entity self)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_pre_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_pre_floor_update(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return false;
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    auto return_value = backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after a floor is updated (by killed neighbor).
+    /// The callback signature is `nil post_floor_update(Entity self)`
+    /// Use this only when no other approach works, this call can be expensive if overused.
+    lua["set_post_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_post_floor_update(
+                id,
+                [=, &lua, fun = std::move(fun)](Entity* self)
+                {
+                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
+                        return;
+                    backend->set_current_callback(uid, id, CallbackType::Entity);
+                    backend->handle_function(fun, lua["cast_entity"](self));
+                    backend->clear_current_callback();
+                });
+            backend->hook_entity_dtor(entity);
+            backend->entity_hooks.push_back({uid, id});
+            return id;
+        }
+        return sol::nullopt;
+    };
+    /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
     /// The callback signature is `nil on_open(Entity entity_self, Entity opener)`
     /// Use this only when no other approach works, this call can be expensive if overused.
@@ -1481,6 +1565,25 @@ end
             return spawn_roomowner(owner_type, x, y, layer, room_template);
         });
 
+    /// Get the current adventure seed pair
+    lua["get_adventure_seed"] = get_adventure_seed;
+    /// Set the current adventure seed pair
+    lua["set_adventure_seed"] = set_adventure_seed;
+    /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+    lua["update_liquid_collision_at"] = update_liquid_collision_at;
+
+    /// Disable all crust item spawns
+    lua["disable_floor_embeds"] = disable_floor_embeds;
+
+    /// Get the address for a pattern name
+    lua["get_address"] = get_address;
+
+    /// Get the rva for a pattern name
+    lua["get_rva"] = [](std::string_view address_name) -> size_t
+    {
+        return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe");
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
@@ -1559,10 +1662,14 @@ end
         ON::PRE_LOAD_LEVEL_FILES,
         "PRE_LEVEL_GENERATION",
         ON::PRE_LEVEL_GENERATION,
+        "PRE_LOAD_SCREEN",
+        ON::PRE_LOAD_SCREEN,
         "POST_ROOM_GENERATION",
         ON::POST_ROOM_GENERATION,
         "POST_LEVEL_GENERATION",
         ON::POST_LEVEL_GENERATION,
+        "POST_LOAD_SCREEN",
+        ON::POST_LOAD_SCREEN,
         "PRE_GET_RANDOM_ROOM",
         ON::PRE_GET_RANDOM_ROOM,
         "PRE_HANDLE_ROOM_TILES",
@@ -1612,7 +1719,13 @@ end
     // Params: `PostRoomGenerationContext room_gen_ctx`
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
-    // Runs right level generation is done, before any entities are updated
+    // Runs right after level generation is done, before any entities are updated
+    // LOADING
+    // Runs whenever state.loading changes and is > 0. Prefer PRE/POST_LOAD_SCREEN instead though.
+    // PRE_LOAD_SCREEN
+    // Runs right before loading a new screen based on screen_next
+    // POST_LOAD_SCREEN
+    // Runs right after a screen is loaded, before rendering anything
     // PRE_GET_RANDOM_ROOM
     // Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`
     // Return: `string room_data`

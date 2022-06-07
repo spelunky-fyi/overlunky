@@ -79,6 +79,8 @@ enum class ON
     RENDER_POST_JOURNAL_PAGE,
     SPEECH_BUBBLE,
     TOAST,
+    PRE_LOAD_SCREEN,
+    POST_LOAD_SCREEN,
 };
 
 struct IntOption
@@ -295,8 +297,10 @@ class LuaBackend
 
     void pre_load_level_files();
     void pre_level_generation();
+    void pre_load_screen();
     void post_room_generation();
     void post_level_generation();
+    void post_load_screen();
 
     std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template);
     struct PreHandleRoomTilesResult

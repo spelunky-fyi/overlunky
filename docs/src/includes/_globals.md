@@ -280,6 +280,50 @@ Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK
 This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
 The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
 
+### set_post_floor_update
+
+
+```lua
+-- Use FLOOR_GENERIC from different themes in your level,
+-- with textures that update correctly when destroyed
+
+define_tile_code("floor_generic_tidepool")
+set_pre_tile_code_callback(function(x, y, layer)
+    local uid = spawn_grid_entity(ENT_TYPE.FLOOR_GENERIC, x, y, layer)
+    set_post_update(uid, function(me)
+        me:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TIDEPOOL_0)
+        for i,v in ipairs(entity_get_items_by(me.uid, ENT_TYPE.DECORATION_GENERIC, MASK.DECORATION)) do
+            local deco = get_entity(v)
+            deco:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TIDEPOOL_0)
+        end
+    end)
+    return true
+end, "floor_generic_tidepool")
+
+
+-- Fix quicksand decorations when not in temple
+set_post_entity_spawn(function(ent)
+    set_post_floor_update(ent.uid, function(me)
+        me:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0)
+        for i,v in ipairs(entity_get_items_by(me.uid, ENT_TYPE.DECORATION_GENERIC, MASK.DECORATION)) do
+            local deco = get_entity(v)
+            deco:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0)
+        end
+    end)
+end, SPAWN_TYPE.ANY, MASK.FLOOR, ENT_TYPE.FLOOR_QUICKSAND)
+
+```
+
+
+> Search script examples for [set_post_floor_update](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_floor_update)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_post_floor_update(int uid, function fun)
+
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right after a floor is updated (by killed neighbor).
+The callback signature is `nil post_floor_update(Entity self)`
+Use this only when no other approach works, this call can be expensive if overused.
+
 ### set_post_render
 
 
@@ -351,6 +395,18 @@ This is run before the entity is spawned, spawn your own entity and return its u
 In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
 The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
 
+### set_pre_floor_update
+
+
+> Search script examples for [set_pre_floor_update](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_floor_update)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_pre_floor_update(int uid, function fun)
+
+Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
+The callback signature is `bool pre_floor_update(Entity self)`
+Use this only when no other approach works, this call can be expensive if overused.
+
 ### set_pre_render
 
 
@@ -408,6 +464,36 @@ Sets a callback for a vanilla sound which lets you hook creation or playing even
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
 properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`
+
+## Debug functions
+
+
+### get_address
+
+
+> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
+
+#### size_t get_address(string_view address_name)
+
+Get the address for a pattern name
+
+### get_rva
+
+
+> Search script examples for [get_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rva)
+
+#### size_t get_rva(string_view address_name)
+
+Get the rva for a pattern name
+
+### raise
+
+
+> Search script examples for [raise](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
+
+#### nil raise()
+
+Raise a signal and probably crash the game
 
 ## Entity functions
 
@@ -818,6 +904,15 @@ Due to changes in 1.23.x only the [Vlad](#Vlad)'s cape value you provide will be
 
 Set the contents of [ENT_TYPE](#ENT_TYPE).ITEM_POT, [ENT_TYPE](#ENT_TYPE).ITEM_CRATE or [ENT_TYPE](#ENT_TYPE).ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
 
+### set_cursepot_ghost_enabled
+
+
+> Search script examples for [set_cursepot_ghost_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursepot_ghost_enabled)
+
+#### nil set_cursepot_ghost_enabled(bool enable)
+
+Determines whether the ghost appears when breaking the ghost pot
+
 ### set_door
 
 
@@ -1096,6 +1191,24 @@ Change the amount of frames after the damage from poison is applied
 
 Create image from file. Returns a tuple containing id, width and height.
 
+### disable_floor_embeds
+
+
+> Search script examples for [disable_floor_embeds](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disable_floor_embeds)
+
+#### nil disable_floor_embeds(bool disable)
+
+Disable all crust item spawns
+
+### get_adventure_seed
+
+
+> Search script examples for [get_adventure_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_adventure_seed)
+
+#### tuple&lt;int, int&gt; get_adventure_seed()
+
+Get the current adventure seed pair
+
 ### get_character_heart_color
 
 
@@ -1220,6 +1333,15 @@ Load another script by id "author/name" and import its `exports` table
 
 Same as `Player.is_female`
 
+### load_screen
+
+
+> Search script examples for [load_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_screen)
+
+#### nil load_screen()
+
+Immediately load a screen based on state.screen_next and stuff
+
 ### pause
 
 
@@ -1230,15 +1352,6 @@ Same as `Player.is_female`
 Enable/disable game engine pause.
 This is just short for `state.pause == 32`, but that produces an audio bug
 I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
-
-### raise
-
-
-> Search script examples for [raise](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=raise)
-
-#### nil raise()
-
-Raise a signal and probably crash the game
 
 ### register_console_command
 
@@ -1266,6 +1379,15 @@ Converts a color to int to be used in drawing functions. Use values from `0..255
 #### nil seed_prng(int seed)
 
 Seed the game prng.
+
+### set_adventure_seed
+
+
+> Search script examples for [set_adventure_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_adventure_seed)
+
+#### nil set_adventure_seed(int first, int second)
+
+Set the current adventure seed pair
 
 ### set_character_heart_color
 
@@ -1297,11 +1419,64 @@ Set seed and reset run.
 ### set_storage_layer
 
 
+```lua
+-- Sets the right layer when using the vanilla tile code if waddler is still happy,
+-- otherwise spawns the floor to the left of this tile.
+-- Manually spawning FLOOR_STORAGE pre-tilecode doesn't seem to work as expected,
+-- so we destroy it post-tilecode.
+set_post_tile_code_callback(function(x, y, layer)
+    if not test_flag(state.quest_flags, 10) then
+        -- Just set the layer and let the vanilla tilecode handle the floor
+        set_storage_layer(layer)
+    else
+        local floor = get_entity(get_grid_entity_at(x, y, layer))
+        if floor then
+            floor:destroy()
+        end
+        if get_grid_entity_at(x - 1, y, layer) ~= -1 then
+            local left = get_entity(get_grid_entity_at(x - 1, y, layer))
+            spawn_grid_entity(left.type.id, x, y, layer)
+        end
+    end
+end, "storage_floor")
+
+-- This fixes a bug in the game that breaks storage on transition.
+-- The old storage_uid is not cleared after every level for some reason.
+set_callback(function()
+    state.storage_uid = -1
+end, ON.TRANSITION)
+
+-- Having a waddler is completely optional for storage,
+-- but this makes a nice waddler room if he still likes you.
+define_tile_code("waddler")
+set_pre_tile_code_callback(function(x, y, layer)
+    if not test_flag(state.quest_flags, 10) then
+        local uid = spawn_roomowner(ENT_TYPE.MONS_STORAGEGUY, x + 0.5, y, layer, ROOM_TEMPLATE.WADDLER)
+        set_on_kill(uid, function()
+            -- Disable current level storage if you kill waddler
+            state.storage_uid = -1
+        end)
+    end
+    return true
+end, "waddler")
+
+```
+
+
 > Search script examples for [set_storage_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_storage_layer)
 
 #### nil set_storage_layer([LAYER](#LAYER) layer)
 
 Set layer to search for storage items on
+
+### update_liquid_collision_at
+
+
+> Search script examples for [update_liquid_collision_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_liquid_collision_at)
+
+#### nil update_liquid_collision_at(float x, float y, bool add)
+
+Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
 
 ### warp
 
@@ -1424,6 +1599,24 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out
 #### nil cancel_toast()
 
 
+### console_prinspect
+
+
+> Search script examples for [console_prinspect](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=console_prinspect)
+
+#### nil console_prinspect(variadic_args objects)
+
+Prinspect to console
+
+### console_print
+
+
+> Search script examples for [console_print](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=console_print)
+
+#### nil console_print(string message)
+
+Print a log message to console.
+
 ### lua_print
 
 
@@ -1431,7 +1624,7 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out
 
 #### nil lua_print()
 
-Standard lua print function, prints directly to the console but not to the game
+Standard lua print function, prints directly to the terminal but not to the game
 
 ### message
 

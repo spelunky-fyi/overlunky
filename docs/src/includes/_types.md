@@ -1514,7 +1514,29 @@ int | [flying_thing_countdown](https://github.com/spelunky-fyi/overlunky/search?
 
 ### ScreenConstellation
 
-Derived from [Screen](#Screen)
+
+```lua
+-- forces any level transition to immediately go to constellation ending with custom text
+set_callback(function()
+    if state.screen_next == SCREEN.TRANSITION then
+      if state.level_count == 0 then state.level_count = 1 end -- no /0
+      state.win_state = WIN_STATE.COSMIC_OCEAN_WIN
+      state.screen_next = SCREEN.CONSTELLATION
+      state.world_next = 8
+      state.level_next = 99
+      state.theme_next = THEME.COSMIC_OCEAN
+      state.level_gen.themes[THEME.COSMIC_OCEAN].sub_theme = state.level_gen.themes[state.theme]
+      state:force_current_theme(THEME.COSMIC_OCEAN)
+      set_global_interval(function()
+        if state.screen_constellation.sequence_state == 2 then
+          state.screen_constellation.constellation_text = "Lol u stars now"
+          clear_callback()
+        end
+      end, 1)
+    end
+  end, ON.PRE_LOAD_SCREEN)
+
+```
 
 
 Type | Name | Description
@@ -1522,6 +1544,7 @@ Type | Name | Description
 int | [sequence_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sequence_state) | 
 int | [animation_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_timer) | 
 float | [constellation_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text_opacity) | 
+float | [constellation_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text) | 
 
 ### ScreenCredits
 
@@ -2150,6 +2173,9 @@ int | [time_speedrun](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=t
 int | [screen_change_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_change_counter) | 
 int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) | 
 int | [storage_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=storage_uid) | 
+array&lt;[ENT_TYPE](#ENT_TYPE), 99&gt; | [waddler_storage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_storage) | 
+array&lt;int, 99&gt; | [waddler_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_metadata) | 
+[ThemeInfo](#ThemeInfo) | [theme_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_info) | 
 [LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | 
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
 
@@ -3029,7 +3055,7 @@ int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) |
 int | [more_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=more_flags) | 
 int | [uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) | 
 int | [animation_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) | 
-int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Don't edit this dirrectly, use `set_draw_depth`
+int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Don't edit this directly, use `set_draw_depth`
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
@@ -3043,6 +3069,8 @@ float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) 
 [Color](#Color) | [color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=color) | 
 float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | 
 float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | 
+[SHAPE](#SHAPE) | [shape](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shape) | 
+bool | [hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitbox_enabled) | 
 float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
 float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
 [RenderInfo](#RenderInfo) | [rendering_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rendering_info) | 
@@ -3066,7 +3094,7 @@ bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlun
 bool | [trigger_action(Entity user)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_action) | Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
  | [get_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) | 
  | [apply_metadata(int metadata)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) | 
- | [set_invisible(bool)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
+ | [set_invisible(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
 span&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
 bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | Returns true if entity is in water/lava
 

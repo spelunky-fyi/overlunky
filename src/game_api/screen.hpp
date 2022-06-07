@@ -623,7 +623,7 @@ class ScreenConstellation : public Screen // ID: 19
     uint16_t sequence_state;
     uint16_t animation_timer;
     float constellation_text_opacity;
-    uint16_t constellation_text[32]; // UTF16 string
+    char16_t constellation_text[32]; // UTF16 string
     float* credits_progression;
     size_t unknown37;
     size_t bg_music_info; /* unsure */

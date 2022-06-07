@@ -1625,6 +1625,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        "load_screen_func"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x8b\x49\x0c\x41\x8b\x47\x10"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         // Check the 6th virtual of a vtable passed to `add_behavior` which should be
         // calling `update_movable` at the bottom as
         // `update_movable(this, &this->movex, this->sprint_factor, 1, 0, 0, 0);`
@@ -1633,6 +1640,47 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x03\x50\x14\x83\xfa\x11\x77\x15"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "adventure_seed"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x4c\x8d\x80\xa0\x00\x00\x00"sv)
+            .offset(0x7)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        // Go to the kill virtual function for floor, scroll down until you see getting address for LiquidPhysics, it should call that function after that
+        "remove_from_liquid_collision_map"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x31\xD2\x44\x39\x41\x20\x0F\x92\xC2"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Go to the spawn function when spawning floor, there should be something like call r8, go into that function, inside there would be couple calls to virtuals (not entity virtuals)
+        // one of them is the one that calls this function (can be recognize by the getting address for the LiquidPhysics)
+        "add_from_liquid_collision_map"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x31\xF6\x39\x6B\x20\x40\x0F\x92\xC6"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Just set bp in create entity for embeds, find unique pattern somewhere in that function
+        "spawn_floor_embeds"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x08\xD1\x48\x0F\x44\xF8\x83\x7F\x0C\x1A"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Set conditional bp for ghost, break the ghost jar, execute past return, we need address for that whole function call to nop it
+        "ghost_jar_ghost_spawn"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("\x48\x83\x78\x18\x00"sv)
+            .offset(0x2)
+            .at_exe(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

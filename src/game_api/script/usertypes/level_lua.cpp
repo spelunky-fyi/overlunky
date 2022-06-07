@@ -1143,6 +1143,9 @@ void register_usertypes(sol::state& lua)
     /// To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
     lua["grow_chainandblocks"] = grow_chain_and_blocks;
 
+    /// Immediately load a screen based on state.screen_next and stuff
+    lua["load_screen"] = do_load_screen;
+
     lua.new_usertype<ThemeInfo>(
         "ThemeInfo",
         "sub_theme",

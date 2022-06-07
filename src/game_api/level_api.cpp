@@ -684,6 +684,15 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
     g_levels_to_load.clear();
 }
 
+using LoadScreenFun = void(StateMemory*, size_t, size_t);
+LoadScreenFun* g_load_screen_trampoline{nullptr};
+void load_screen(StateMemory* state, size_t param_2, size_t param_3)
+{
+    pre_load_screen();
+    g_load_screen_trampoline(state, param_2, param_3);
+    post_load_screen();
+}
+
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
 void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16_t room_template, float x, float y, std::uint8_t layer)
@@ -1295,6 +1304,8 @@ void LevelGenData::init()
         g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data"sv);
         g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes"sv);
 
+        g_load_screen_trampoline = (LoadScreenFun*)get_address("load_screen_func"sv);
+
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 
@@ -1307,6 +1318,8 @@ void LevelGenData::init()
         DetourAttach((void**)&g_gather_room_data_trampoline, gather_room_data);
         DetourAttach((void**)&g_get_random_room_data_trampoline, get_random_room_data);
         DetourAttach((void**)&g_spawn_room_from_tile_codes_trampoline, spawn_room_from_tile_codes);
+
+        DetourAttach((void**)&g_load_screen_trampoline, load_screen);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)
@@ -2083,4 +2096,13 @@ bool grow_chain_and_blocks(uint32_t x, uint32_t y)
     using GrowChainAndBlocks = bool(uint32_t, uint32_t);
     auto grow_fun = (GrowChainAndBlocks*)get_address("grow_chain_and_blocks");
     return grow_fun(x, y);
+}
+
+void do_load_screen()
+{
+    auto load_screen_fun = (LoadScreenFun*)get_address("load_screen_func");
+    const auto state = State::get().ptr();
+    pre_load_screen();
+    load_screen_fun(state, 0, 0);
+    post_load_screen();
 }

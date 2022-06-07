@@ -522,14 +522,16 @@ Name | Data | Description
 [GAMEFRAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GAMEFRAME) | ON::GAMEFRAME | Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen<br/>
 [SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCREEN) | ON::SCREEN | Runs whenever state.screen changes<br/>
 [START](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.START) | ON::START | Runs on the first [ON](#ON).[SCREEN](#SCREEN) of a run<br/>
-[LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOADING) | ON::LOADING | 
+[LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOADING) | ON::LOADING | Runs whenever state.loading changes and is > 0. Prefer PRE/POST_LOAD_SCREEN instead though.<br/>
 [RESET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RESET) | ON::RESET | Runs when resetting a run<br/>
 [SAVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SAVE) | ON::SAVE | Params: `SaveContext save_ctx`<br/>Runs at the same times as ON.SCREEN, but receives the save_ctx<br/>
 [LOAD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOAD) | ON::LOAD | Params: `LoadContext load_ctx`<br/>Runs as soon as your script is loaded, including reloads, then never again<br/>
 [PRE_LOAD_LEVEL_FILES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_LEVEL_FILES) | ON::PRE_LOAD_LEVEL_FILES | Params: `PreLoadLevelFilesContext load_level_ctx`<br/>Runs right before level files would be loaded<br/>
 [PRE_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_GENERATION) | ON::PRE_LEVEL_GENERATION | Runs before any level generation, no entities should exist at this point<br/>
+[PRE_LOAD_SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_SCREEN) | ON::PRE_LOAD_SCREEN | Runs right before loading a new screen based on screen_next<br/>
 [POST_ROOM_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_ROOM_GENERATION) | ON::POST_ROOM_GENERATION | Params: `PostRoomGenerationContext room_gen_ctx`<br/>Runs right after all rooms are generated before entities are spawned<br/>
-[POST_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_GENERATION) | ON::POST_LEVEL_GENERATION | Runs right level generation is done, before any entities are updated<br/>
+[POST_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_GENERATION) | ON::POST_LEVEL_GENERATION | Runs right after level generation is done, before any entities are updated<br/>
+[POST_LOAD_SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_SCREEN) | ON::POST_LOAD_SCREEN | Runs right after a screen is loaded, before rendering anything<br/>
 [PRE_GET_RANDOM_ROOM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GET_RANDOM_ROOM) | ON::PRE_GET_RANDOM_ROOM | Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`<br/>Return: `string room_data`<br/>Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.<br/>If the size of the string returned does not match with the room templates expected size the room is discarded.<br/>White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.<br/>
 [PRE_HANDLE_ROOM_TILES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_HANDLE_ROOM_TILES) | ON::PRE_HANDLE_ROOM_TILES | Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`<br/>Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this<br/>Runs after a random room was selected and right before it would spawn entities for each tile code<br/>Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant<br/>
 [SCRIPT_ENABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) | ON::SCRIPT_ENABLE | 
@@ -674,6 +676,18 @@ Name | Data | Description
 [ARENA_SCORE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SCREEN.ARENA_SCORE) | 27 | 
 [ONLINE_LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SCREEN.ONLINE_LOADING) | 28 | 
 [ONLINE_LOBBY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SCREEN.ONLINE_LOBBY) | 29 | 
+
+## SHAPE
+
+
+> Search script examples for [SHAPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHAPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[RECTANGLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHAPE.RECTANGLE) | SHAPE::RECTANGLE | 
+[CIRCLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SHAPE.CIRCLE) | SHAPE::CIRCLE | 
 
 ## SHOP_TYPE
 

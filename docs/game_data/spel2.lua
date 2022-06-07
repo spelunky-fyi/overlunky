@@ -34,13 +34,21 @@ function get_player(slot, or_ghost) end
 ---@param slot integer
 ---@return PlayerGhost
 function get_playerghost(slot) end
----Standard lua print function, prints directly to the console but not to the game
+---Standard lua print function, prints directly to the terminal but not to the game
 ---@return nil
 function lua_print() end
 ---Print a log message on screen.
 ---@param message string
 ---@return nil
 function print(message) end
+---Print a log message to console.
+---@param message string
+---@return nil
+function console_print(message) end
+---Prinspect to console
+---@vararg any
+---@return nil
+function console_prinspect(...) end
 ---Same as `print`
 ---@param message string
 ---@return nil
@@ -692,6 +700,10 @@ function force_olmec_phase_0(b) end
 ---@param cursed integer
 ---@return nil
 function set_ghost_spawn_times(normal, cursed) end
+---Determines whether the ghost appears when breaking the ghost pot
+---@param enable boolean
+---@return nil
+function set_cursepot_ghost_enabled(enable) end
 ---Determines whether the time ghost appears, including the showing of the ghost toast
 ---@param b boolean
 ---@return nil
@@ -890,6 +902,22 @@ function set_on_player_instagib(uid, fun) end
 ---@return CallbackId?
 function set_on_damage(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
+---The callback signature is `bool pre_floor_update(Entity self)`
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_floor_update(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after a floor is updated (by killed neighbor).
+---The callback signature is `nil post_floor_update(Entity self)`
+---Use this only when no other approach works, this call can be expensive if overused.
+---@param uid integer
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_floor_update(uid, fun) end
+---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
 ---The callback signature is `nil on_open(Entity entity_self, Entity opener)`
 ---Use this only when no other approach works, this call can be expensive if overused.
@@ -1064,6 +1092,32 @@ function spawn_shopkeeper(x, y, layer, room_template) end
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
 function spawn_roomowner(owner_type, x, y, layer, room_template) end
+---Get the current adventure seed pair
+---@return integer, integer
+function get_adventure_seed() end
+---Set the current adventure seed pair
+---@param first integer
+---@param second integer
+---@return nil
+function set_adventure_seed(first, second) end
+---Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+---@param x number
+---@param y number
+---@param add boolean
+---@return nil
+function update_liquid_collision_at(x, y, add) end
+---Disable all crust item spawns
+---@param disable boolean
+---@return nil
+function disable_floor_embeds(disable) end
+---Get the address for a pattern name
+---@param address_name string
+---@return size_t
+function get_address(address_name) end
+---Get the rva for a pattern name
+---@param address_name string
+---@return size_t
+function get_rva(address_name) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1386,6 +1440,9 @@ function grow_chainandblocks() end
 ---@param y integer
 ---@return boolean
 function grow_chainandblocks(x, y) end
+---Immediately load a screen based on state.screen_next and stuff
+---@return nil
+function load_screen() end
 ---Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Check ThemeInfo for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
 ---Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
@@ -1773,6 +1830,9 @@ function udp_send(host, port, msg) end
     ---@field screen_change_counter integer
     ---@field time_startup integer
     ---@field storage_uid integer
+    ---@field waddler_storage ENT_TYPE[]
+    ---@field waddler_metadata integer[]
+    ---@field theme_info ThemeInfo
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
 
@@ -2006,6 +2066,8 @@ local function PRNG_random(self, min, max) end
     ---@field color Color
     ---@field hitboxx number
     ---@field hitboxy number
+    ---@field shape SHAPE
+    ---@field hitbox_enabled boolean
     ---@field offsetx number
     ---@field offsety number
     ---@field rendering_info RenderInfo
@@ -2027,7 +2089,7 @@ local function PRNG_random(self, min, max) end
     ---@field trigger_action fun(self, user: Entity): boolean
     ---@field get_metadata any @&Entity::get_metadata
     ---@field apply_metadata fun(self, metadata: integer): nil
-    ---@field set_invisible fun(self, n: boolea): nil
+    ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self, ): span<integer>
     ---@field is_in_liquid fun(self, ): boolean
 
@@ -4516,10 +4578,11 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field animation_timer integer
     ---@field woodpanel_slidedown_timer number
 
----@class ScreenConstellation : Screen
+---@class ScreenConstellation
     ---@field sequence_state integer
     ---@field animation_timer integer
     ---@field constellation_text_opacity number
+    ---@field constellation_text number
 
 ---@class ScreenRecap : Screen
 
@@ -5046,9 +5109,9 @@ COSUBTHEME = {
 }
 ---@alias COSUBTHEME integer
 DROP = {
-  ALIENQUEEN_ALIENBLAST = 183,
-  ALIENQUEEN_ALIENBLAST_RE = 185,
-  ALIENQUEEN_ALIENBLAST_RI = 184,
+  ALIENQUEEN_ALIENBLAST = 184,
+  ALIENQUEEN_ALIENBLAST_RE = 186,
+  ALIENQUEEN_ALIENBLAST_RI = 185,
   ALTAR_DICE_CLIMBINGGLOVES = 0,
   ALTAR_DICE_COOKEDTURKEY = 1,
   ALTAR_DICE_DIAMOND = 2,
@@ -5060,186 +5123,202 @@ DROP = {
   ALTAR_DICE_TELEPACK = 7,
   ALTAR_DICE_VAMPIRE = 8,
   ALTAR_DICE_WEBGUN = 9,
-  ALTAR_GIFT_BOMBBAG = 21,
-  ALTAR_HIREDHAND_SHOTGUN = 20,
+  ALTAR_GIFT_BOMBBAG = 19,
+  ALTAR_GIFT_CAPE = 20,
+  ALTAR_HIREDHAND_SHOTGUN = 18,
   ALTAR_IDOL_GOLDEN_MONKEY = 11,
-  ALTAR_KAPALA = 12,
-  ALTAR_PRESENT_EGGPLANT = 13,
-  ALTAR_ROCK_WOODENARROW = 14,
-  ALTAR_ROYAL_JELLY = 15,
-  ALTAR_USHABTI_CAVEMAN = 16,
-  ALTAR_USHABTI_HIREDHAND = 19,
-  ALTAR_USHABTI_TURKEY = 17,
-  ALTAR_USHABTI_VAMPIRE = 18,
-  ANUBIS2_ANUBIS_COFFIN = 158,
-  ANUBIS2_JETPACK = 22,
-  ANUBIS2_SPECIALSHOT_R = 188,
-  ANUBIS_COFFIN_SORCERESS = 110,
-  ANUBIS_COFFIN_VAMPIRE = 109,
-  ANUBIS_COFFIN_WITCHDOCTOR = 111,
-  ANUBIS_SCEPTER = 23,
-  ANUBIS_SPECIALSHOT_R = 187,
-  ARROWTRAP_WOODENARROW = 155,
-  AXOLOTL_BUBBLE = 176,
-  BEG_BOMBBAG = 24,
-  BEG_TELEPACK = 26,
-  BEG_TRUECROWN = 25,
-  BONEPILE_SKELETONKEY = 27,
-  BONEPILE_SKULL = 28,
-  CANDLE_NUGGET = 149,
-  CATMUMMY_CURSINGCLOUD = 186,
-  CATMUMMY_DIAMOND = 121,
-  CHEST_BOMB = 140,
-  CHEST_EMERALD = 135,
-  CHEST_LEPRECHAUN = 139,
-  CHEST_RUBY = 137,
-  CHEST_SAPPHIRE = 136,
-  CHEST_SMALLEMERALD = 134,
-  CHEST_SMALLRUBY = 138,
-  CLONEGUN_SHOT = 168,
-  COBRA_ACIDSPIT = 179,
-  COFFIN_SKULL = 152,
-  COOKEDTURKEY_HEALTH = 190,
-  COOKFIRE_TORCH = 150,
-  CROCMAN_TELEPACK = 29,
-  CROCMAN_TELEPORTER = 30,
-  CRUSHTRAP_NUGGET = 131,
-  CUTSCENE_GOLDCOIN = 147,
-  DUATALTAR_BOMBBAG = 127,
-  DUATALTAR_BOMBBOX = 128,
-  DUATALTAR_COOKEDTURKEY = 129,
-  EGGSAC_GRUB_1 = 114,
-  EGGSAC_GRUB_2 = 115,
-  EGGSAC_GRUB_3 = 116,
-  EMBED_NUGGET = 133,
-  FACTORY_GENERATOR_SCRAP = 93,
-  FIREBUG_FIREBALL = 178,
-  FLOORSTYLEDCOG_NUGGET = 130,
-  FREEZERAY_SHOT = 167,
-  GHIST_GOLDCOIN = 63,
-  GHOSTJAR_DIAMOND = 31,
-  GHOST_DIAMOND = 32,
-  GIANTFOOD_HEALTH = 191,
-  GIANTFROG_FROG = 112,
-  GIANTFROG_TADPOLE = 113,
-  GIANTSPIDER_PASTE = 33,
-  GIANTSPIDER_WEBSHOT = 160,
-  GOLDENMONKEY_NUGGET = 37,
-  GOLDENMONKEY_SMALLEMERALD = 34,
-  GOLDENMONKEY_SMALLRUBY = 36,
-  GOLDENMONKEY_SMALLSAPPHIRE = 35,
-  HANGINGSPIDER_WEBGUN = 38,
-  HERMITCRAB_ACIDBUBBLE = 181,
-  HUMPHEAD_HIREDHAND = 122,
-  HUNDUN_FIREBALL = 177,
-  ICECAVE_BOULDER = 39,
-  JIANGSHIASSASSIN_SPIKESHOES = 40,
-  JIANGSHI_SPRINGSHOES = 41,
-  KAPALA_HEALTH = 193,
-  KINGU_FEMALE_JIANGSHI = 45,
-  KINGU_JIANGSHI = 44,
-  KINGU_OCTOPUS = 43,
-  KINGU_TABLETOFDESTINY = 42,
-  LAMASSU_DIAMOND = 126,
-  LAMASSU_EMERALD = 125,
-  LAMASSU_LASERSHOT = 171,
-  LAMASSU_RUBY = 124,
-  LAMASSU_SAPPHIRE = 123,
-  LASERTRAP_SHOT = 157,
-  LAVAMANDER_RUBY = 120,
-  LAVAPOT_MAGMAMAN = 119,
-  LEPRECHAUN_CLOVER = 46,
-  LOCKEDCHEST_UDJATEYE = 144,
-  MADAME_TUSK_KEY = 108,
-  MATTOCK_BROKENMATTOCK = 47,
-  MOLE_MATTOCK = 48,
-  MOSQUITO_HOVERPACK = 49,
-  MOTHERSTATUE_HEALTH = 189,
-  MUMMY_DIAMOND = 50,
-  MUMMY_FLY = 159,
-  NECROMANCER_RUBY = 51,
-  OCTOPUS_INKSPIT = 180,
-  OLMEC_BOMB = 161,
-  OLMEC_CAVEMAN_1 = 52,
-  OLMEC_CAVEMAN_2 = 53,
-  OLMEC_CAVEMAN_3 = 54,
-  OLMEC_SISTERS_BOMBBOX = 154,
-  OLMEC_SISTERS_ROPEPILE = 153,
-  OLMEC_UFO = 162,
-  OSIRIS_EMERALDS = 55,
-  OSIRIS_PORTAL = 57,
-  OSIRIS_TABLETOFDESTINY = 56,
-  PANGXIE_ACIDBUBBLE = 182,
-  PANGXIE_WOODENSHIELD = 58,
-  PLASMACANNON_SHOT = 166,
-  POISONEDARROWTRAP_WOODENARROW = 156,
-  POTOFGOLD_GOLDCOIN = 146,
-  QILIN_FIREBALL = 175,
-  QUEENBEE_ROYALJELLY = 59,
-  QUILLBACK_BOMBBAG = 117,
-  QUILLBACK_COOKEDTURKEY = 118,
-  REDLANTERN_SMALLNUGGET = 148,
-  ROBOT_METALSHIELD = 60,
-  ROCKDOG_FIREBALL = 174,
-  ROYALJELLY_HEALTH = 192,
-  SACRIFICE_EGGPLANT = 104,
-  SACRIFICE_IDOL = 101,
-  SACRIFICE_PRESENT = 102,
-  SACRIFICE_ROCK = 103,
-  SCEPTER_ANUBISSPECIALSHOT = 164,
-  SCEPTER_PLAYERSHOT = 165,
-  SCRAP_ALIEN = 99,
-  SCRAP_COBRA = 97,
-  SCRAP_SCORPION = 98,
-  SCRAP_SNAKE = 96,
-  SCRAP_SPIDER = 95,
-  SHOPKEEPER_GENERATOR_1 = 94,
-  SHOPKEEPER_GOLDBAR = 62,
-  SHOPKEEPER_GOLDCOIN = 61,
-  SHOTGUN_BULLET = 169,
-  SKELETON_SKELETONKEY = 64,
-  SKELETON_SKULL = 65,
-  SKULLDROPTRAP_SKULL = 151,
-  SLIDINGWALL_NUGGET = 132,
-  SORCERESS_DAGGERSHOT = 172,
-  SORCERESS_RUBY = 66,
-  SPARROW_ROPEPILE = 67,
-  SPARROW_SKELETONKEY = 68,
-  TIAMAT_BAT = 69,
-  TIAMAT_BEE = 70,
-  TIAMAT_CAVEMAN = 71,
-  TIAMAT_COBRA = 72,
-  TIAMAT_HERMITCRAB = 73,
-  TIAMAT_MONKEY = 74,
-  TIAMAT_MOSQUITO = 75,
-  TIAMAT_OCTOPUS = 76,
-  TIAMAT_OLMITE = 77,
-  TIAMAT_SCORPION = 78,
-  TIAMAT_SHOT = 79,
-  TIAMAT_SNAKE = 80,
-  TIAMAT_TIAMATSHOT = 173,
-  TIAMAT_UFO = 81,
-  TIAMAT_YETI = 82,
-  TORCH_SMALLNUGGET = 83,
-  TURKEY_COOKEDTURKEY = 84,
-  UFO_ALIEN = 100,
-  UFO_LASERSHOT = 170,
-  UFO_PARACHUTE = 85,
-  USHABTI_QILIN = 145,
-  VAMPIRE_CAPE = 86,
-  VAN_HORSING_COMPASS = 87,
-  VAN_HORSING_DIAMOND = 88,
-  VAULTCHEST_DIAMOND = 142,
-  VAULTCHEST_EMERALD = 141,
-  VAULTCHEST_RUBY = 143,
-  VLAD_VLADSCAPE = 89,
-  YAMA_EGGPLANTCROWN = 105,
-  YAMA_GIANTFOOD = 106,
-  YANG_KEY = 107,
-  YETIKING_FREEZERAY = 90,
-  YETIKING_ICESPIRE = 163,
-  YETIQUEEN_POWERPACK = 91,
-  YETI_PITCHERSMITT = 92
+  ALTAR_KAPALA = 21,
+  ALTAR_PRESENT_EGGPLANT = 12,
+  ALTAR_ROCK_WOODENARROW = 13,
+  ALTAR_ROYAL_JELLY = 22,
+  ALTAR_USHABTI_CAVEMAN = 14,
+  ALTAR_USHABTI_HIREDHAND = 17,
+  ALTAR_USHABTI_TURKEY = 15,
+  ALTAR_USHABTI_VAMPIRE = 16,
+  ANUBIS2_ANUBIS_COFFIN = 159,
+  ANUBIS2_JETPACK = 23,
+  ANUBIS2_SPECIALSHOT_R = 189,
+  ANUBIS_COFFIN_SORCERESS = 111,
+  ANUBIS_COFFIN_VAMPIRE = 110,
+  ANUBIS_COFFIN_WITCHDOCTOR = 112,
+  ANUBIS_SCEPTER = 24,
+  ANUBIS_SPECIALSHOT_R = 188,
+  ARROWTRAP_WOODENARROW = 156,
+  AXOLOTL_BUBBLE = 177,
+  BEG_BOMBBAG = 25,
+  BEG_TELEPACK = 27,
+  BEG_TRUECROWN = 26,
+  BONEBLOCK_BONES = 194,
+  BONEBLOCK_SKELETON = 192,
+  BONEBLOCK_SKULL = 193,
+  BONEPILE_SKELETONKEY = 28,
+  BONEPILE_SKULL = 29,
+  CANDLE_NUGGET = 150,
+  CATMUMMY_CURSINGCLOUD = 187,
+  CATMUMMY_DIAMOND = 122,
+  CHEST_BOMB = 141,
+  CHEST_EMERALD = 136,
+  CHEST_LEPRECHAUN = 140,
+  CHEST_RUBY = 138,
+  CHEST_SAPPHIRE = 137,
+  CHEST_SMALLEMERALD = 135,
+  CHEST_SMALLRUBY = 139,
+  CLONEGUN_SHOT = 169,
+  COBRA_ACIDSPIT = 180,
+  COFFIN_SKULL = 153,
+  COOKEDTURKEY_HEALTH = 206,
+  COOKFIRE_CAVEMAN_1 = 190,
+  COOKFIRE_CAVEMAN_2 = 191,
+  COOKFIRE_TORCH = 151,
+  CROCMAN_TELEPACK = 30,
+  CROCMAN_TELEPORTER = 31,
+  CRUSHTRAP_NUGGET = 132,
+  CUTSCENE_GOLDCOIN = 148,
+  DUATALTAR_BOMBBAG = 128,
+  DUATALTAR_BOMBBOX = 129,
+  DUATALTAR_COOKEDTURKEY = 130,
+  EGGSAC_GRUB_1 = 115,
+  EGGSAC_GRUB_2 = 116,
+  EGGSAC_GRUB_3 = 117,
+  EMBED_NUGGET = 134,
+  FACTORY_GENERATOR_SCRAP = 94,
+  FIREBUG_FIREBALL = 179,
+  FLOORSTYLEDCOG_NUGGET = 131,
+  FLOOR_DIAMOND = 201,
+  FLOOR_EMBED_GOLD = 203,
+  FLOOR_EMBED_GOLD_BIG = 204,
+  FLOOR_EMERALD = 199,
+  FLOOR_RUBY = 202,
+  FLOOR_SAPPHIRE = 200,
+  FREEZERAY_SHOT = 168,
+  GHIST_GOLDCOIN = 64,
+  GHOSTJAR_DIAMOND = 32,
+  GHOST_DIAMOND = 33,
+  GIANTFOOD_HEALTH = 207,
+  GIANTFROG_FROG = 113,
+  GIANTFROG_TADPOLE = 114,
+  GIANTSPIDER_PASTE = 34,
+  GIANTSPIDER_WEBSHOT = 161,
+  GIANTSPIDER_WEB_LEFT = 195,
+  GIANTSPIDER_WEB_RIGHT = 196,
+  GOLDENMONKEY_NUGGET = 38,
+  GOLDENMONKEY_SMALLEMERALD = 35,
+  GOLDENMONKEY_SMALLRUBY = 37,
+  GOLDENMONKEY_SMALLSAPPHIRE = 36,
+  HANGINGSPIDER_WEBGUN = 39,
+  HERMITCRAB_ACIDBUBBLE = 182,
+  HUMPHEAD_HIREDHAND = 123,
+  HUNDUN_FIREBALL = 178,
+  ICECAVE_BOULDER = 40,
+  ICE_ALIVE_EMBEDDED_ON_ICE = 198,
+  IMP_LAVAPOT = 197,
+  JIANGSHIASSASSIN_SPIKESHOES = 41,
+  JIANGSHI_SPRINGSHOES = 42,
+  KAPALA_HEALTH = 209,
+  KINGU_FEMALE_JIANGSHI = 46,
+  KINGU_JIANGSHI = 45,
+  KINGU_OCTOPUS = 44,
+  KINGU_TABLETOFDESTINY = 43,
+  LAMASSU_DIAMOND = 127,
+  LAMASSU_EMERALD = 126,
+  LAMASSU_LASERSHOT = 172,
+  LAMASSU_RUBY = 125,
+  LAMASSU_SAPPHIRE = 124,
+  LASERTRAP_SHOT = 158,
+  LAVAMANDER_RUBY = 121,
+  LAVAPOT_MAGMAMAN = 120,
+  LEPRECHAUN_CLOVER = 47,
+  LOCKEDCHEST_UDJATEYE = 145,
+  MADAME_TUSK_KEY = 109,
+  MATTOCK_BROKENMATTOCK = 48,
+  MOLE_MATTOCK = 49,
+  MOSQUITO_HOVERPACK = 50,
+  MOTHERSTATUE_HEALTH = 205,
+  MUMMY_DIAMOND = 51,
+  MUMMY_FLY = 160,
+  NECROMANCER_RUBY = 52,
+  OCTOPUS_INKSPIT = 181,
+  OLMEC_BOMB = 162,
+  OLMEC_CAVEMAN_1 = 53,
+  OLMEC_CAVEMAN_2 = 54,
+  OLMEC_CAVEMAN_3 = 55,
+  OLMEC_SISTERS_BOMBBOX = 155,
+  OLMEC_SISTERS_ROPEPILE = 154,
+  OLMEC_UFO = 163,
+  OSIRIS_EMERALDS = 56,
+  OSIRIS_PORTAL = 58,
+  OSIRIS_TABLETOFDESTINY = 57,
+  PANGXIE_ACIDBUBBLE = 183,
+  PANGXIE_WOODENSHIELD = 59,
+  PLASMACANNON_SHOT = 167,
+  POISONEDARROWTRAP_WOODENARROW = 157,
+  POTOFGOLD_GOLDCOIN = 147,
+  QILIN_FIREBALL = 176,
+  QUEENBEE_ROYALJELLY = 60,
+  QUILLBACK_BOMBBAG = 118,
+  QUILLBACK_COOKEDTURKEY = 119,
+  REDLANTERN_SMALLNUGGET = 149,
+  ROBOT_METALSHIELD = 61,
+  ROCKDOG_FIREBALL = 175,
+  ROYALJELLY_HEALTH = 208,
+  SACRIFICE_EGGPLANT = 105,
+  SACRIFICE_IDOL = 102,
+  SACRIFICE_PRESENT = 103,
+  SACRIFICE_ROCK = 104,
+  SCEPTER_ANUBISSPECIALSHOT = 165,
+  SCEPTER_PLAYERSHOT = 166,
+  SCRAP_ALIEN = 100,
+  SCRAP_COBRA = 98,
+  SCRAP_SCORPION = 99,
+  SCRAP_SNAKE = 97,
+  SCRAP_SPIDER = 96,
+  SHOPKEEPER_GENERATOR_1 = 95,
+  SHOPKEEPER_GOLDBAR = 63,
+  SHOPKEEPER_GOLDCOIN = 62,
+  SHOTGUN_BULLET = 170,
+  SKELETON_SKELETONKEY = 65,
+  SKELETON_SKULL = 66,
+  SKULLDROPTRAP_SKULL = 152,
+  SLIDINGWALL_NUGGET = 133,
+  SORCERESS_DAGGERSHOT = 173,
+  SORCERESS_RUBY = 67,
+  SPARROW_ROPEPILE = 68,
+  SPARROW_SKELETONKEY = 69,
+  TIAMAT_BAT = 70,
+  TIAMAT_BEE = 71,
+  TIAMAT_CAVEMAN = 72,
+  TIAMAT_COBRA = 73,
+  TIAMAT_HERMITCRAB = 74,
+  TIAMAT_MONKEY = 75,
+  TIAMAT_MOSQUITO = 76,
+  TIAMAT_OCTOPUS = 77,
+  TIAMAT_OLMITE = 78,
+  TIAMAT_SCORPION = 79,
+  TIAMAT_SHOT = 80,
+  TIAMAT_SNAKE = 81,
+  TIAMAT_TIAMATSHOT = 174,
+  TIAMAT_UFO = 82,
+  TIAMAT_YETI = 83,
+  TORCH_SMALLNUGGET = 84,
+  TURKEY_COOKEDTURKEY = 85,
+  UFO_ALIEN = 101,
+  UFO_LASERSHOT = 171,
+  UFO_PARACHUTE = 86,
+  USHABTI_QILIN = 146,
+  VAMPIRE_CAPE = 87,
+  VAN_HORSING_COMPASS = 88,
+  VAN_HORSING_DIAMOND = 89,
+  VAULTCHEST_DIAMOND = 143,
+  VAULTCHEST_EMERALD = 142,
+  VAULTCHEST_RUBY = 144,
+  VLAD_VLADSCAPE = 90,
+  YAMA_EGGPLANTCROWN = 106,
+  YAMA_GIANTFOOD = 107,
+  YANG_KEY = 108,
+  YETIKING_FREEZERAY = 91,
+  YETIKING_ICESPIRE = 164,
+  YETIQUEEN_POWERPACK = 92,
+  YETI_PITCHERSMITT = 93
 }
 ---@alias DROP integer
 DROPCHANCE = {
@@ -7402,6 +7481,11 @@ SCREEN = {
   WIN = 16
 }
 ---@alias SCREEN integer
+SHAPE = {
+  CIRCLE = 2,
+  RECTANGLE = 1
+}
+---@alias SHAPE integer
 SHOP_TYPE = {
   CAVEMAN_SHOP = 10,
   CLOTHING_SHOP = 1,

@@ -528,6 +528,8 @@ void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken);
 bool grow_chain_and_blocks();
 bool grow_chain_and_blocks(uint32_t x, uint32_t y);
 
+void do_load_screen();
+
 enum class DYNAMIC_TEXTURE : int32_t
 {
     INVISIBLE = -2,

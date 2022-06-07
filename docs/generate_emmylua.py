@@ -52,6 +52,7 @@ header_files = [
     "../src/imgui/imgui.h",
     "../src/game_api/script/usertypes/level_lua.cpp",
     "../src/game_api/script/usertypes/gui_lua.cpp",
+    "../src/game_api/search.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
