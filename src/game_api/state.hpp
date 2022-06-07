@@ -26,16 +26,19 @@ struct StateMemory
     float fadevalue; // 0.0 = all visible; 1.0 = all black
     uint32_t fadeout;
     uint32_t fadein;
-    uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in
-                                         // credits, ...)
+    uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
+
+    /// True when you have control over your character
     uint8_t ingame;
+    /// True whenever you in an active game (basically everything except the main menu, character select etc.)
     uint8_t playing;
     /// `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
     uint8_t pause;
     uint8_t b33;
     int32_t i34;
     uint32_t quest_flags;
-    uint8_t correct_ushabti; // correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
+    /// correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
+    uint8_t correct_ushabti;
     uint8_t i3cb;
     uint8_t i3cc;
     uint8_t i3cd;
@@ -52,8 +55,9 @@ struct StateMemory
     int8_t kali_altars_destroyed;
     /// 0 - none, 1 - item, 3 - kapala
     int8_t kali_gifts;
-    int32_t i50;              // kali related?
-    int32_t money_shop_total; // total $ spent at shops, persists between levels, number will be negative
+    int32_t i50; // kali related?
+    /// total $ spent at shops, persists between levels, number will be negative
+    int32_t money_shop_total;
     uint8_t world_start;
     uint8_t level_start;
     uint8_t theme_start;
