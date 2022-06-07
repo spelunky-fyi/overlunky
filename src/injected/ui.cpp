@@ -101,8 +101,6 @@ std::map<std::string, int64_t> keys{
     {"tool_save", VK_F6},
     {"tool_finder", VK_F7},
     {"reset_windows", OL_KEY_CTRL | OL_KEY_SHIFT | 'R'},
-    {"reset_windows_vertical", OL_KEY_CTRL | OL_KEY_SHIFT | 'V'},
-    {"tabbed_interface", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
     {"detach_tab", OL_KEY_CTRL | OL_KEY_SHIFT | 'D'},
     {"save_settings", OL_KEY_CTRL | OL_KEY_SHIFT | 'S'},
     {"load_settings", OL_KEY_CTRL | OL_KEY_SHIFT | 'L'},
@@ -284,12 +282,9 @@ std::map<std::string, bool> options = {
     {"noclip", false},
     {"snap_to_grid", false},
     {"spawn_floor_decorated", true},
-    {"stack_horizontally", false},
-    {"stack_vertically", false},
     {"disable_pause", false},
     {"draw_grid", false},
     {"draw_hitboxes", false},
-    {"tabbed_interface", true},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
     {"warp_transition", false},
@@ -875,7 +870,7 @@ bool detached(std::string window)
 
 bool toggle(std::string tool)
 {
-    if (!options["tabbed_interface"] || detached(tool))
+    if (detached(tool))
     {
         windows[tool]->open = true;
         const char* name = windows[tool]->name.c_str();
@@ -922,7 +917,7 @@ bool active(std::string window)
         return false;
     // while (current->ParentWindow != NULL)
     //     current = current->ParentWindow;
-    if (!options["tabbed_interface"] || detached(window))
+    if (detached(window))
     {
         if (windows.find(window) == windows.end())
             return false;
@@ -953,7 +948,7 @@ bool visible(std::string window)
 {
     if (windows.find(window) == windows.end())
         return false;
-    if (!options["tabbed_interface"] || detached(window))
+    if (detached(window))
     {
         ImGuiWindow* win = ImGui::FindWindowByName(windows[window]->name.c_str());
         if (win != NULL)
@@ -1021,6 +1016,15 @@ void smart_delete(Entity* ent, bool unsafe = false)
         callbacks.push_back(cb);
     }
     UI::safe_destroy(ent, unsafe);
+}
+
+void reset_windows()
+{
+    for (auto [name, window] : windows)
+    {
+        window->detached = false;
+        window->open = true;
+    }
 }
 
 static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
@@ -2248,35 +2252,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("reset_windows", wParam))
     {
-        options["stack_horizontally"] = !options["stack_horizontally"];
-        if (options["stack_horizontally"])
-        {
-            options["stack_vertically"] = false;
-            options["tabbed_interface"] = false;
-        }
-    }
-    else if (pressed("reset_windows_vertical", wParam))
-    {
-        options["stack_vertically"] = !options["stack_vertically"];
-        if (options["stack_vertically"])
-        {
-            options["stack_horizontally"] = false;
-            options["tabbed_interface"] = false;
-        }
-    }
-    else if (pressed("tabbed_interface", wParam))
-    {
-        options["tabbed_interface"] = !options["tabbed_interface"];
-        if (options["tabbed_interface"])
-        {
-            options["stack_horizontally"] = false;
-            options["stack_vertically"] = false;
-        }
+        reset_windows();
     }
     else if (pressed("detach_tab", wParam))
     {
-        if (options["tabbed_interface"])
-            detach(active_tab);
+        detach(active_tab);
     }
     else if (pressed("save_settings", wParam))
     {
@@ -2724,39 +2704,6 @@ const char* theme_name(int theme)
 
 void render_narnia()
 {
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    if (set_focus_world)
-    {
-        ImGui::SetKeyboardFocusHere();
-        set_focus_world = false;
-    }
-    if (ImGui::DragScalar("World##WarpWorld", ImGuiDataType_U8, &g_world, 0.1f, &u8_one, &u8_seven)) {}
-    if (ImGui::DragScalar("Level##WarpLevel", ImGuiDataType_U8, &g_level, 0.1f, &u8_one, &u8_four)) {}
-    render_themes();
-    ImGui::PopItemWidth();
-    if (ImGui::Button("Instant warp##InstantWarp"))
-    {
-        warp_inc(g_world, g_level, g_to + 1);
-    }
-    tooltip("Warp to selected level, skipping transition.", "warp");
-    ImGui::SameLine();
-    if (ImGui::Button("Warp door##SpawnWarpDoor"))
-    {
-        int spawned = UI::spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
-        if (!lock_entity)
-            g_last_id = spawned;
-    }
-    tooltip("Spawn an exit door to selected level.", "spawn_warp_door");
-    ImGui::SameLine();
-    if (ImGui::Button("Layer door##SpawnLayerDoor"))
-    {
-        UI::spawn_backdoor(g_x, g_y);
-    }
-    tooltip("Spawn a door to back layer.\nTip: You can instantly switch layers with (Shift+Tab).", "spawn_layer_door");
-    ImGui::Checkbox("Increment level count on warp", &options["warp_increments_level_count"]);
-    tooltip("Simulate natural level progression when warping.");
-    ImGui::Checkbox("Warp to transition instead", &options["warp_transition"]);
-    tooltip("Simulate natural level progression even more.");
     ImGui::Text("Next level");
     ImGui::SameLine(100.0f);
 
@@ -3021,6 +2968,40 @@ void render_narnia()
     ImGui::SameLine(100.0f);
     if (ImGui::Button("Camp##WarpCamp"))
         warp_inc(1, 1, 17);
+
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    if (set_focus_world)
+    {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_world = false;
+    }
+    if (ImGui::DragScalar("World##WarpWorld", ImGuiDataType_U8, &g_world, 0.1f, &u8_one, &u8_seven)) {}
+    if (ImGui::DragScalar("Level##WarpLevel", ImGuiDataType_U8, &g_level, 0.1f, &u8_one, &u8_four)) {}
+    render_themes();
+    ImGui::PopItemWidth();
+    if (ImGui::Button("Instant warp##InstantWarp"))
+    {
+        warp_inc(g_world, g_level, g_to + 1);
+    }
+    tooltip("Warp to selected level, skipping transition.", "warp");
+    ImGui::SameLine();
+    if (ImGui::Button("Warp door##SpawnWarpDoor"))
+    {
+        int spawned = UI::spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
+        if (!lock_entity)
+            g_last_id = spawned;
+    }
+    tooltip("Spawn an exit door to selected level.", "spawn_warp_door");
+    ImGui::SameLine();
+    if (ImGui::Button("Layer door##SpawnLayerDoor"))
+    {
+        UI::spawn_backdoor(g_x, g_y);
+    }
+    tooltip("Spawn a door to back layer.\nTip: You can instantly switch layers with (Shift+Tab).", "spawn_layer_door");
+    ImGui::Checkbox("Increment level count on warp", &options["warp_increments_level_count"]);
+    tooltip("Simulate natural level progression when warping.");
+    ImGui::Checkbox("Warp to transition instead", &options["warp_transition"]);
+    tooltip("Simulate natural level progression even more.");
 }
 
 void render_camera()
@@ -4237,24 +4218,6 @@ void render_options()
     ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
     tooltip("Show enabled cheats and random\ninteresting state variables on screen.", "toggle_hud");
 
-    if (ImGui::Checkbox("Stack windows horizontally", &options["stack_horizontally"]))
-    {
-        options["stack_vertically"] = false;
-        options["tabbed_interface"] = false;
-    }
-    tooltip("Draw all tools separately side by side at the top of the screen.", "reset_windows");
-    if (ImGui::Checkbox("Stack windows vertically", &options["stack_vertically"]))
-    {
-        options["stack_horizontally"] = false;
-        options["tabbed_interface"] = false;
-    }
-    tooltip("Draw all tools separately at the sides of the screen.", "reset_windows_vertical");
-    if (ImGui::Checkbox("Single tabbed window", &options["tabbed_interface"]))
-    {
-        options["stack_horizontally"] = false;
-        options["stack_vertically"] = false;
-    }
-    tooltip("Draw all tools tabbed in a single window", "tabbed_interface");
     if (ImGui::Checkbox("Drag windows outside the game window", &options["multi_viewports"]))
     {
         if (options["multi_viewports"])
@@ -6553,371 +6516,141 @@ void imgui_draw()
         render_messages();
     render_clickhandler();
 
-    int win_condition = ImGuiCond_FirstUseEver;
-    if (options["stack_horizontally"] || options["stack_vertically"])
-    {
-        win_condition = ImGuiCond_Always;
-    }
-    float lastwidth = 0;
-    float lastheight = 0;
     float toolwidth = 0.12f * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
     {
-        if (options["tabbed_interface"])
+        ImGui::SetNextWindowPos(base->Pos, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({600, base->Size.y / 2}, ImGuiCond_FirstUseEver);
+        ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiViewportFlags_NoTaskBarIcon | ImGuiViewportFlags_NoDecoration);
+        if (ImGui::BeginMenuBar())
         {
-            ImGui::SetNextWindowPos(base->Pos, ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowSize({600, base->Size.y / 2}, ImGuiCond_FirstUseEver);
-            ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiViewportFlags_NoTaskBarIcon | ImGuiViewportFlags_NoDecoration);
-            if (ImGui::BeginMenuBar())
+            if (ImGui::BeginMenu("Tools"))
             {
-                if (ImGui::BeginMenu("Tools"))
+                for (size_t i = 0; i < tab_order.size() - 4; ++i)
                 {
-                    for (size_t i = 0; i < tab_order.size() - 4; ++i)
+                    auto tab = tab_order[i];
+                    if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
                     {
-                        auto tab = tab_order[i];
-                        if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
-                        {
-                            toggle(tab);
-                        }
+                        toggle(tab);
                     }
-                    ImGui::Separator();
-                    if (ImGui::MenuItem("Detach tab", key_string(keys["detach_tab"]).c_str()))
-                    {
-                        detach(active_tab);
-                    }
-                    ImGui::EndMenu();
                 }
-                if (ImGui::BeginMenu("Settings"))
+                ImGui::Separator();
+                if (ImGui::MenuItem("Detach tab", key_string(keys["detach_tab"]).c_str()))
                 {
-                    for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
-                    {
-                        auto tab = tab_order[i];
-                        if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
-                        {
-                            toggle(tab);
-                        }
-                    }
-                    ImGui::Separator();
-                    if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
-                    {
-                        ImGui::SaveIniSettingsToDisk(inifile);
-                        save_config(cfgfile);
-                    }
-                    if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
-                    {
-                        ImGui::LoadIniSettingsFromDisk(inifile);
-                        load_config(cfgfile);
-                        refresh_script_files();
-                        set_colors();
-                    }
-                    ImGui::EndMenu();
+                    detach(active_tab);
                 }
-                if (ImGui::BeginMenu("Help"))
-                {
-                    if (ImGui::MenuItem("README"))
-                        ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
-                    if (ImGui::MenuItem("API Documentation"))
-                        ShellExecuteA(NULL, "open", "https://spelunky-fyi.github.io/overlunky/", NULL, NULL, SW_SHOWNORMAL);
-                    ImGui::EndMenu();
-                }
-                ImGui::EndMenuBar();
+                ImGui::EndMenu();
             }
-            if (ImGui::BeginTabBar("##TabBar"))
+            if (ImGui::BeginMenu("Settings"))
             {
-                ImGuiTabItemFlags flags = 0;
-                for (auto tab : tab_order)
+                for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
                 {
-                    flags = 0;
-                    if (activate_tab == tab)
+                    auto tab = tab_order[i];
+                    if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
                     {
-                        flags = ImGuiTabItemFlags_SetSelected;
-                        activate_tab = "";
-                        active_tab = "";
-                    }
-                    if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
-                    {
-                        if (ImGui::BeginDragDropSource())
-                        {
-                            ImGui::SetDragDropPayload("TAB", NULL, 0);
-                            ImGui::Text("Drag outside main window\nto detach %s", windows[tab]->name.c_str());
-                            ImGui::EndDragDropSource();
-                        }
-                        active_tab = tab;
-                        ImGui::BeginChild("ScrollableTool");
-                        render_tool(tab);
-                        ImGui::EndChild();
-                        ImGui::EndTabItem();
+                        toggle(tab);
                     }
                 }
-                ImGui::EndTabBar();
-            }
-            int tabnum = 0;
-            for (auto window : windows)
-            {
-                if (window.second->open && !window.second->detached)
-                    ++tabnum;
-            }
-            if (tabnum == 0)
-            {
-                ImGui::TextWrapped("Looks like you closed all your tabs. Good thing we have a menubar now!");
-                if (ImGui::Button("Restore all tabs"))
+                ImGui::Separator();
+                if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
                 {
-                    for (auto window : windows)
+                    ImGui::SaveIniSettingsToDisk(inifile);
+                    save_config(cfgfile);
+                }
+                if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
+                {
+                    ImGui::LoadIniSettingsFromDisk(inifile);
+                    load_config(cfgfile);
+                    refresh_script_files();
+                    set_colors();
+                }
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Help"))
+            {
+                if (ImGui::MenuItem("README"))
+                    ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
+                if (ImGui::MenuItem("API Documentation"))
+                    ShellExecuteA(NULL, "open", "https://spelunky-fyi.github.io/overlunky/", NULL, NULL, SW_SHOWNORMAL);
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+        if (ImGui::BeginTabBar("##TabBar"))
+        {
+            ImGuiTabItemFlags flags = 0;
+            for (auto tab : tab_order)
+            {
+                flags = 0;
+                if (activate_tab == tab)
+                {
+                    flags = ImGuiTabItemFlags_SetSelected;
+                    activate_tab = "";
+                    active_tab = "";
+                }
+                if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
+                {
+                    if (ImGui::BeginDragDropSource())
                     {
-                        window.second->open = true;
+                        ImGui::SetDragDropPayload("TAB", NULL, 0);
+                        ImGui::Text("Drag outside main window\nto detach %s", windows[tab]->name.c_str());
+                        ImGui::EndDragDropSource();
                     }
+                    active_tab = tab;
+                    ImGui::BeginChild("ScrollableTool");
+                    render_tool(tab);
+                    ImGui::EndChild();
+                    ImGui::EndTabItem();
                 }
             }
+            ImGui::EndTabBar();
+        }
+        int tabnum = 0;
+        for (auto window : windows)
+        {
+            if (window.second->open && !window.second->detached)
+                ++tabnum;
+        }
+        if (tabnum == 0)
+        {
+            ImGui::TextWrapped("Looks like you closed all your tabs. Good thing we have a menubar now!");
+            if (ImGui::Button("Restore all tabs"))
+            {
+                for (auto window : windows)
+                {
+                    window.second->open = true;
+                }
+            }
+        }
+        ImGui::End();
+
+        for (auto tab : windows)
+        {
+            if (!tab.second->detached)
+                continue;
+            ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
+            ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, ImGuiViewportFlags_NoTaskBarIcon);
+            render_tool(tab.first);
+            ImGui::SetWindowPos(
+                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2,
+                 ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
+                ImGuiCond_Once);
             ImGui::End();
-
-            for (auto tab : windows)
-            {
-                if (!tab.second->detached)
-                    continue;
-                ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
-                ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, ImGuiViewportFlags_NoTaskBarIcon);
-                render_tool(tab.first);
-                ImGui::SetWindowPos(
-                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2,
-                     ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
-                    ImGuiCond_Once);
-                ImGui::End();
-            }
-            if (detach_tab != "")
-            {
-                auto win = ImGui::FindWindowByName(windows[detach_tab]->name.c_str());
-                if (win)
-                {
-                    auto pos = mouse_pos();
-                    win->Pos.x = pos.x - 32.0f;
-                    win->Pos.y = pos.y - 8.0f;
-                    if (win->Pos.x < 0.0f)
-                        win->Pos.x = 0.0f;
-                    if (win->Pos.y < 0.0f)
-                        win->Pos.y = 0.0f;
-                }
-                detach_tab = "";
-            }
         }
-        else if (options["stack_vertically"])
+        if (detach_tab != "")
         {
-            if (windows["tool_options"]->open)
+            auto win = ImGui::FindWindowByName(windows[detach_tab]->name.c_str());
+            if (win)
             {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::Begin(windows["tool_options"]->name.c_str(), &windows["tool_options"]->open);
-                render_options();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-                ImGui::End();
+                auto pos = mouse_pos();
+                win->Pos.x = pos.x - 32.0f;
+                win->Pos.y = pos.y - 8.0f;
+                if (win->Pos.x < 0.0f)
+                    win->Pos.x = 0.0f;
+                if (win->Pos.y < 0.0f)
+                    win->Pos.y = 0.0f;
             }
-
-            if (windows["tool_camera"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::Begin(windows["tool_camera"]->name.c_str(), &windows["tool_camera"]->open);
-                render_camera();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_door"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::Begin(windows["tool_door"]->name.c_str(), &windows["tool_door"]->open);
-                render_narnia();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_entity"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-                ImGui::Begin(windows["tool_entity"]->name.c_str(), &windows["tool_entity"]->open);
-                render_spawner();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({0, 0}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_entity_properties"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
-                render_entity_props(g_last_id);
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_game_properties"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::Begin(windows["tool_game_properties"]->name.c_str(), &windows["tool_game_properties"]->open);
-                render_game_props();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_script"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::Begin(windows["tool_script"]->name.c_str(), &windows["tool_script"]->open);
-                render_scripts();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 2 * ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_save"]->open)
-            {
-                ImGui::Begin(windows["tool_save"]->name.c_str(), &windows["tool_save"]->open);
-                render_savegame();
-                ImGui::End();
-            }
-
-            if (windows["tool_finder"]->open)
-            {
-                ImGui::Begin(windows["tool_finder"]->name.c_str(), &windows["tool_finder"]->open);
-                render_entity_finder();
-                ImGui::End();
-            }
-        }
-        else
-        {
-            if (windows["tool_entity"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, toolwidth}, win_condition);
-                ImGui::SetNextWindowPos({0, 0}, win_condition);
-                ImGui::Begin(windows["tool_entity"]->name.c_str(), &windows["tool_entity"]->open);
-                render_spawner();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_door"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_door"]->name.c_str(), &windows["tool_door"]->open);
-                render_narnia();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_camera"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_camera"]->name.c_str(), &windows["tool_camera"]->open);
-                render_camera();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_entity_properties"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
-                render_entity_props(g_last_id);
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_game_properties"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_game_properties"]->name.c_str(), &windows["tool_game_properties"]->open);
-                render_game_props();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_options"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_options"]->name.c_str(), &windows["tool_options"]->open);
-                render_options();
-                lastwidth = ImGui::GetWindowWidth();
-                lastheight = ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_script"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
-                ImGui::Begin(windows["tool_script"]->name.c_str(), &windows["tool_script"]->open);
-                render_scripts();
-                ImGui::End();
-            }
-
-            if (windows["tool_save"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
-                ImGui::Begin(windows["tool_save"]->name.c_str(), &windows["tool_save"]->open);
-                render_savegame();
-                ImGui::End();
-            }
-
-            if (windows["tool_finder"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
-                ImGui::Begin(windows["tool_finder"]->name.c_str(), &windows["tool_finder"]->open);
-                render_entity_finder();
-                ImGui::End();
-            }
-        }
-
-        if (!options["tabbed_interface"])
-        {
-            if (windows["tool_debug"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 4, 0}, win_condition);
-                ImGui::Begin(windows["tool_debug"]->name.c_str(), &windows["tool_debug"]->open);
-                render_debug();
-                ImGui::End();
-            }
-
-            if (windows["tool_style"]->open)
-            {
-                ImGui::Begin(windows["tool_style"]->name.c_str(), &windows["tool_style"]->open);
-                ImGui::SetWindowSize({-1, -1}, win_condition);
-                render_style_editor();
-                ImGui::SetWindowPos(
-                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_keys"]->open)
-            {
-                ImGui::Begin(windows["tool_keys"]->name.c_str(), &windows["tool_keys"]->open);
-                ImGui::SetWindowSize({-1, -1}, win_condition);
-                render_keyconfig();
-                ImGui::SetWindowPos(
-                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, win_condition);
-                ImGui::End();
-            }
+            detach_tab = "";
         }
     }
 
