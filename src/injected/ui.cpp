@@ -2562,7 +2562,7 @@ void render_list()
 {
     // ImGui::ListBox with filter
     ImVec2 boxsize = {-1, -1};
-    if (options["menu_ui"])
+    if (options["menu_ui"] && !detached("tool_entity"))
         boxsize = {400.0f, 400.0f};
     if (!ImGui::ListBoxHeader("##Entities", boxsize))
         return;
@@ -4150,6 +4150,16 @@ void render_clickhandler()
 
 void render_options()
 {
+    if (options["menu_ui"] && !detached("tool_options"))
+    {
+        if (ImGui::MenuItem("Switch to windowed UI"))
+            options["menu_ui"] = false;
+        if (ImGui::MenuItem("Save options"))
+            save_config(cfgfile);
+        if (ImGui::MenuItem("Load options"))
+            load_config(cfgfile);
+        ImGui::Separator();
+    }
     ImGui::Text("Game cheats");
     if (ImGui::Checkbox("God mode (players)##Godmode", &options["god_mode"]))
     {
@@ -4247,8 +4257,8 @@ void render_options()
     }
     tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
 
-    ImGui::Checkbox("Main menu instead of main window", &options["menu_ui"]);
-    tooltip("Puts everything in a main menu instead of a floating window.");
+    ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
+    tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.");
 
     ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
     tooltip("Am I annoying you already :(");
@@ -4291,6 +4301,8 @@ void render_options()
         ImGui::PopID();
     }
 
+    if (options["menu_ui"])
+        return;
     if (ImGui::Button("Edit style"))
     {
         toggle("tool_style");
@@ -4415,10 +4427,6 @@ void render_script_files()
 void render_scripts()
 {
     ImGui::PushTextWrapPos(0.0f);
-    ImGui::TextColored(
-        ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
-        "Note: The Lua API is unstable, not ready and it WILL change, probably a lot. You can play around with it, but don't be surprised if none of "
-        "your scripts work next week.");
     ImGui::PopTextWrapPos();
     ImGui::Checkbox("Draw script messages##DrawScriptMessages", &options["draw_script_messages"]);
     ImGui::Checkbox("Fade script messages##FadeScriptMessages", &options["fade_script_messages"]);
@@ -6267,6 +6275,17 @@ void render_style_editor()
 {
     ImGuiStyle& style = ImGui::GetStyle();
     ImGuiIO& io = ImGui::GetIO();
+    if (options["menu_ui"])
+    {
+        if (ImGui::MenuItem("Randomize"))
+        {
+            g_hue = (float)rand() / RAND_MAX;
+            g_sat = (float)rand() / RAND_MAX;
+            g_val = (float)rand() / RAND_MAX;
+            style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
+        }
+        ImGui::Separator();
+    }
     ImGui::TextWrapped("Leave empty to use embedded font 'Hack'. You must save and restart for font changes to take effect.");
     ImGui::InputText("Font file##FontFile", &fontfile);
     tooltip("Just the filename, e.g. comic.ttf");
@@ -6279,23 +6298,26 @@ void render_style_editor()
     ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Alpha##StyleAlpha", &style.Alpha, 0.01f, 0.2f, 1.0f);
     ImGui::DragFloat("Scale##StyleScale", &io.FontGlobalScale, 0.01f, 0.2f, 2.0f);
-    if (ImGui::Button("Randomize##StyleRandomize"))
+    if (!options["menu_ui"])
     {
-        g_hue = (float)rand() / RAND_MAX;
-        g_sat = (float)rand() / RAND_MAX;
-        g_val = (float)rand() / RAND_MAX;
-        style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Save options##StyleSave"))
-    {
-        save_config(cfgfile);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Load options##StyleLoad"))
-    {
-        load_config(cfgfile);
-        refresh_script_files();
+        if (ImGui::Button("Randomize##StyleRandomize"))
+        {
+            g_hue = (float)rand() / RAND_MAX;
+            g_sat = (float)rand() / RAND_MAX;
+            g_val = (float)rand() / RAND_MAX;
+            style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Save options##StyleSave"))
+        {
+            save_config(cfgfile);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Load options##StyleLoad"))
+        {
+            load_config(cfgfile);
+            refresh_script_files();
+        }
     }
     set_colors();
 }
@@ -6560,9 +6582,9 @@ void imgui_draw()
                     if (windows[tab]->detached)
                         continue;
                     ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {600.0f, base->Size.y - 50.0f});
-                    ImGui::SetNextItemOpen(true);
                     if (ImGui::BeginMenu(windows[tab]->name.c_str(), true))
                     {
+                        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
                         active_tab = tab;
                         if (ImGui::BeginDragDropSource())
                         {
@@ -6572,6 +6594,7 @@ void imgui_draw()
                         }
                         ImGui::GetIO().WantCaptureKeyboard = true;
                         render_tool(tab);
+                        ImGui::PopStyleVar();
                         ImGui::EndMenu();
                     }
                 }
@@ -6602,6 +6625,9 @@ void imgui_draw()
                 }
                 if (ImGui::BeginMenu("Settings"))
                 {
+                    if (ImGui::MenuItem("Switch to menu UI"))
+                        options["menu_ui"] = true;
+                    ImGui::Separator();
                     for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
                     {
                         auto tab = tab_order[i];

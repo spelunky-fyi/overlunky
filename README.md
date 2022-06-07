@@ -124,7 +124,6 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + While we try to keep all the modding tools compatible, some things may break sometimes.
     + Check the [open issues](https://github.com/spelunky-fyi/overlunky/issues) for known compatibility problems with other tools.
   - If you're **missing** some overlay **windows** or tabs:
-    + Try resetting window positions. (See hotkeys above.)
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
     + Maybe the overlay is just really tiny or collapsed? You can resize it. Just try your magic with the mouse.
   - If you mess up your **keyboard shortcuts** or UI:
