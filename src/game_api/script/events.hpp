@@ -30,4 +30,4 @@ void trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType pag
 std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
 std::u16string pre_toast(char16_t* buffer);
 
-void update_backends();
+void update_backends(StateMemory* s);

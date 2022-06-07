@@ -1804,7 +1804,7 @@ OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
     g_state_update_trampoline(s);
-    update_backends();
+    update_backends(s);
 }
 
 void init_state_update()
