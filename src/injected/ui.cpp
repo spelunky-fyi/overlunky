@@ -298,7 +298,8 @@ std::map<std::string, bool> options = {
     {"draw_hitboxes_interpolated", true},
     {"show_tooltips", true},
     {"smooth_camera", true},
-    {"multi_viewports", true}};
+    {"multi_viewports", true},
+    {"menu_ui", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -487,9 +488,11 @@ void set_colors()
     style.PopupRounding = 0;
     style.GrabRounding = 0;
     style.TabRounding = 0;
+    style.ScrollbarRounding = 0;
     style.WindowBorderSize = 0;
     style.FrameBorderSize = 0;
     style.PopupBorderSize = 0;
+    style.DisplaySafeAreaPadding = {0, 0};
 }
 
 void load_script(std::string file, bool enable = true)
@@ -893,10 +896,16 @@ bool toggle(std::string tool)
         }
         return false;
     }
+    else if (options["menu_ui"])
+    {
+        activate_tab = tool;
+        return true;
+    }
     else
     {
         ImGuiWindow* win = ImGui::FindWindowByName("Overlunky");
-        win->Collapsed = false;
+        if (win)
+            win->Collapsed = false;
         for (auto window : windows)
         {
             if (window.first == tool)
@@ -922,6 +931,10 @@ bool active(std::string window)
         if (windows.find(window) == windows.end())
             return false;
         return current == ImGui::FindWindowByName(windows[window]->name.c_str());
+    }
+    else if (options["menu_ui"])
+    {
+        return window == active_tab;
     }
     else
     {
@@ -954,6 +967,10 @@ bool visible(std::string window)
         if (win != NULL)
             return !win->Collapsed;
         return false;
+    }
+    else if (options["menu_ui"])
+    {
+        return window == active_tab;
     }
     else
     {
@@ -2544,7 +2561,10 @@ void render_liquid_pool(int i)
 void render_list()
 {
     // ImGui::ListBox with filter
-    if (!ImGui::ListBoxHeader("##Entities", {-1, -1}))
+    ImVec2 boxsize = {-1, -1};
+    if (options["menu_ui"])
+        boxsize = {400.0f, 400.0f};
+    if (!ImGui::ListBoxHeader("##Entities", boxsize))
         return;
     bool value_changed = false;
     ImGuiListClipper clipper;
@@ -4226,6 +4246,10 @@ void render_options()
             ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     }
     tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
+
+    ImGui::Checkbox("Main menu instead of main window", &options["menu_ui"]);
+    tooltip("Puts everything in a main menu instead of a floating window.");
+
     ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
     tooltip("Am I annoying you already :(");
 
@@ -6387,7 +6411,6 @@ void render_keyconfig()
 
 void render_spawner()
 {
-    // ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
     render_input();
     render_list();
 }
@@ -6396,19 +6419,22 @@ void render_prohud()
 {
     auto io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
-    ImDrawList* dl = ImGui::GetBackgroundDrawList();
+    ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
+    auto topmargin = 0.0f;
+    if (options["menu_ui"])
+        topmargin = ImGui::GetTextLineHeight();
     std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
     buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
     auto type = spawned_type();
     buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}", type)));
     textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 }
 
 void render_tool(std::string tool)
@@ -6503,7 +6529,7 @@ void imgui_draw()
         viewport->Flags |= ImGuiViewportFlags_NoFocusOnClick | ImGuiViewportFlags_NoFocusOnAppearing | ImGuiViewportFlags_OwnedByApp;
     }
 
-    ImDrawList* dl = ImGui::GetBackgroundDrawList();
+    ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
     std::string buf = fmt::format("Overlunky {}", get_version());
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
 
@@ -6521,109 +6547,143 @@ void imgui_draw()
     {
         ImGui::SetNextWindowPos(base->Pos, ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowSize({600, base->Size.y / 2}, ImGuiCond_FirstUseEver);
-        ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiViewportFlags_NoTaskBarIcon | ImGuiViewportFlags_NoDecoration);
-        if (ImGui::BeginMenuBar())
+        if (options["menu_ui"])
         {
-            if (ImGui::BeginMenu("Tools"))
+            ImGui::PushID("MainMenu");
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0, 0});
+            if (ImGui::BeginMainMenuBar())
             {
-                for (size_t i = 0; i < tab_order.size() - 4; ++i)
+                ImGui::PopStyleVar();
+                for (size_t i = 0; i < tab_order.size(); ++i)
                 {
                     auto tab = tab_order[i];
-                    if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
+                    if (windows[tab]->detached)
+                        continue;
+                    ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {600.0f, base->Size.y - 50.0f});
+                    ImGui::SetNextItemOpen(true);
+                    if (ImGui::BeginMenu(windows[tab]->name.c_str(), true))
                     {
-                        toggle(tab);
+                        active_tab = tab;
+                        if (ImGui::BeginDragDropSource())
+                        {
+                            ImGui::SetDragDropPayload("TAB", NULL, 0);
+                            ImGui::Text("Drag outside the menu\nto detach %s", windows[tab]->name.c_str());
+                            ImGui::EndDragDropSource();
+                        }
+                        ImGui::GetIO().WantCaptureKeyboard = true;
+                        render_tool(tab);
+                        ImGui::EndMenu();
                     }
                 }
-                ImGui::Separator();
-                if (ImGui::MenuItem("Detach tab", key_string(keys["detach_tab"]).c_str()))
-                {
-                    detach(active_tab);
-                }
-                ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("Settings"))
+            ImGui::PopID();
+        }
+        else
+        {
+            ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiViewportFlags_NoTaskBarIcon | ImGuiViewportFlags_NoDecoration);
+            if (ImGui::BeginMenuBar())
             {
-                for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
+                if (ImGui::BeginMenu("Tools"))
                 {
-                    auto tab = tab_order[i];
-                    if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
+                    for (size_t i = 0; i < tab_order.size() - 4; ++i)
                     {
-                        toggle(tab);
+                        auto tab = tab_order[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
+                        {
+                            toggle(tab);
+                        }
                     }
-                }
-                ImGui::Separator();
-                if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
-                {
-                    ImGui::SaveIniSettingsToDisk(inifile);
-                    save_config(cfgfile);
-                }
-                if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
-                {
-                    ImGui::LoadIniSettingsFromDisk(inifile);
-                    load_config(cfgfile);
-                    refresh_script_files();
-                    set_colors();
-                }
-                ImGui::EndMenu();
-            }
-            if (ImGui::BeginMenu("Help"))
-            {
-                if (ImGui::MenuItem("README"))
-                    ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
-                if (ImGui::MenuItem("API Documentation"))
-                    ShellExecuteA(NULL, "open", "https://spelunky-fyi.github.io/overlunky/", NULL, NULL, SW_SHOWNORMAL);
-                ImGui::EndMenu();
-            }
-            ImGui::EndMenuBar();
-        }
-        if (ImGui::BeginTabBar("##TabBar"))
-        {
-            ImGuiTabItemFlags flags = 0;
-            for (auto tab : tab_order)
-            {
-                flags = 0;
-                if (activate_tab == tab)
-                {
-                    flags = ImGuiTabItemFlags_SetSelected;
-                    activate_tab = "";
-                    active_tab = "";
-                }
-                if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
-                {
-                    if (ImGui::BeginDragDropSource())
+                    ImGui::Separator();
+                    if (ImGui::MenuItem("Detach tab", key_string(keys["detach_tab"]).c_str()))
                     {
-                        ImGui::SetDragDropPayload("TAB", NULL, 0);
-                        ImGui::Text("Drag outside main window\nto detach %s", windows[tab]->name.c_str());
-                        ImGui::EndDragDropSource();
+                        detach(active_tab);
                     }
-                    active_tab = tab;
-                    ImGui::BeginChild("ScrollableTool");
-                    render_tool(tab);
-                    ImGui::EndChild();
-                    ImGui::EndTabItem();
+                    ImGui::EndMenu();
                 }
-            }
-            ImGui::EndTabBar();
-        }
-        int tabnum = 0;
-        for (auto window : windows)
-        {
-            if (window.second->open && !window.second->detached)
-                ++tabnum;
-        }
-        if (tabnum == 0)
-        {
-            ImGui::TextWrapped("Looks like you closed all your tabs. Good thing we have a menubar now!");
-            if (ImGui::Button("Restore all tabs"))
-            {
-                for (auto window : windows)
+                if (ImGui::BeginMenu("Settings"))
                 {
-                    window.second->open = true;
+                    for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
+                    {
+                        auto tab = tab_order[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
+                        {
+                            toggle(tab);
+                        }
+                    }
+                    ImGui::Separator();
+                    if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
+                    {
+                        ImGui::SaveIniSettingsToDisk(inifile);
+                        save_config(cfgfile);
+                    }
+                    if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
+                    {
+                        ImGui::LoadIniSettingsFromDisk(inifile);
+                        load_config(cfgfile);
+                        refresh_script_files();
+                        set_colors();
+                    }
+                    ImGui::EndMenu();
                 }
+                if (ImGui::BeginMenu("Help"))
+                {
+                    if (ImGui::MenuItem("README"))
+                        ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
+                    if (ImGui::MenuItem("API Documentation"))
+                        ShellExecuteA(NULL, "open", "https://spelunky-fyi.github.io/overlunky/", NULL, NULL, SW_SHOWNORMAL);
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenuBar();
             }
-        }
-        ImGui::End();
 
+            if (ImGui::BeginTabBar("##TabBar"))
+            {
+                ImGuiTabItemFlags flags = 0;
+                for (auto tab : tab_order)
+                {
+                    flags = 0;
+                    if (activate_tab == tab)
+                    {
+                        flags = ImGuiTabItemFlags_SetSelected;
+                        activate_tab = "";
+                        active_tab = "";
+                    }
+                    if (!detached(tab) && ImGui::BeginTabItem(windows[tab]->name.c_str(), &windows[tab]->open, flags))
+                    {
+                        if (ImGui::BeginDragDropSource())
+                        {
+                            ImGui::SetDragDropPayload("TAB", NULL, 0);
+                            ImGui::Text("Drag outside main window\nto detach %s", windows[tab]->name.c_str());
+                            ImGui::EndDragDropSource();
+                        }
+                        active_tab = tab;
+                        ImGui::BeginChild("ScrollableTool");
+                        render_tool(tab);
+                        ImGui::EndChild();
+                        ImGui::EndTabItem();
+                    }
+                }
+                ImGui::EndTabBar();
+            }
+            int tabnum = 0;
+            for (auto window : windows)
+            {
+                if (window.second->open && !window.second->detached)
+                    ++tabnum;
+            }
+            if (tabnum == 0)
+            {
+                ImGui::TextWrapped("Looks like you closed all your tabs. Good thing we have a menubar now!");
+                if (ImGui::Button("Restore all tabs"))
+                {
+                    for (auto window : windows)
+                    {
+                        window.second->open = true;
+                    }
+                }
+            }
+            ImGui::End();
+        }
         for (auto tab : windows)
         {
             if (!tab.second->detached)
@@ -6631,9 +6691,9 @@ void imgui_draw()
             ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
             ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, ImGuiViewportFlags_NoTaskBarIcon);
             render_tool(tab.first);
-            ImGui::SetWindowPos(
-                {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2,
-                 ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
+            ImGui::SetNextWindowPos(
+                {base->Size.x / 2 - ImGui::GetWindowWidth() / 2,
+                 base->Size.y / 2 - ImGui::GetWindowHeight() / 2},
                 ImGuiCond_Once);
             ImGui::End();
         }
@@ -6642,7 +6702,7 @@ void imgui_draw()
             auto win = ImGui::FindWindowByName(windows[detach_tab]->name.c_str());
             if (win)
             {
-                auto pos = mouse_pos();
+                auto pos = ImGui::GetIO().MousePos;
                 win->Pos.x = pos.x - 32.0f;
                 win->Pos.y = pos.y - 8.0f;
                 if (win->Pos.x < 0.0f)
