@@ -6497,6 +6497,15 @@ bool is_tab_detached(std::string name)
     return std::find(tabs_detached.begin(), tabs_detached.end(), name) != tabs_detached.end();
 }
 
+void imgui_pre_init(ImGuiContext*)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDrawCursor = true;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigViewportsNoTaskBarIcon = true;
+}
+
 void imgui_init(ImGuiContext*)
 {
     show_cursor();
@@ -6817,6 +6826,7 @@ void init_ui()
     g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);
+    register_imgui_pre_init(&imgui_pre_init);
     register_imgui_init(&imgui_init);
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);
