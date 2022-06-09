@@ -4,6 +4,7 @@
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
 #include "entities_mounts.hpp"
+#include "game_manager.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
 #include "rpc.hpp"
@@ -648,4 +649,9 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
 std::vector<uint32_t> UI::get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer)
 {
     return get_entities_overlapping_hitbox(0, mask, hitbox, layer);
+}
+
+bool UI::get_focus()
+{
+    return ::get_game_manager()->game_props->game_has_focus;
 }
