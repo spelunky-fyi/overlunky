@@ -188,24 +188,38 @@ def replace_all(text, dic):
         text = text.replace(i, j)
     return text
 
+
 def is_custom_type(name):
     for type in types:
         if type["name"] == name:
             return True
     return False
 
+
 def link_custom_type(ret):
     parts = re.findall(r"[\w_]+|[^\w_]+", ret)
     ret = ""
-    for i,part in enumerate(parts):
+    for i, part in enumerate(parts):
         for type in types:
-            if part == type["name"] and (len(parts) <= i+1 or not parts[i+1][0] in ")]") and not "`" in ret:
+            if (
+                part == type["name"]
+                and (len(parts) <= i + 1 or not parts[i + 1][0] in ")]")
+                and not "`" in ret
+            ):
                 part = f"[{part}](#{part})"
         for enum in enums:
-            if part == enum["name"] and (len(parts) <= i+1 or not parts[i+1][0] in ")]") and not "`" in ret:
+            if (
+                part == enum["name"]
+                and (len(parts) <= i + 1 or not parts[i + 1][0] in ")]")
+                and not "`" in ret
+            ):
                 part = f"[{part}](#{part})"
         for alias in aliases:
-            if part == alias["name"] and (len(parts) <= i+1 or not parts[i+1][0] in ")]") and not "`" in ret:
+            if (
+                part == alias["name"]
+                and (len(parts) <= i + 1 or not parts[i + 1][0] in ")]")
+                and not "`" in ret
+            ):
                 part = f"[{part}](#Aliases)"
         ret += part
     return ret
@@ -228,7 +242,9 @@ def include_example(name):
         file.close()
         print("\n```lua\n" + data + "\n```\n")
 
+
 printed_funcs = []
+
 
 def format_af(lf, af):
     ret = replace_all(af["return"], replace) or "nil"
@@ -374,15 +390,21 @@ for file in header_files:
                         r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line
                     )
                     if m:
-                        if m[1].endswith(",") and not (m[2].endswith(">") or m[2].endswith(")")): #Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
+                        if m[1].endswith(",") and not (
+                            m[2].endswith(">") or m[2].endswith(")")
+                        ):  # Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
                             types_and_vars = m[1]
                             vars_match = re.search(r"(?: *\w*,)*$", types_and_vars)
-                            vars_except_last = vars_match.group() #Last var is m[2]
+                            vars_except_last = vars_match.group()  # Last var is m[2]
                             start, end = vars_match.span()
                             vars_type = types_and_vars[:start]
                             for m_var in re.findall(r"(\w*),", vars_except_last):
                                 member_vars.append(
-                                    {"type": vars_type, "name": m_var, "comment": comment}
+                                    {
+                                        "type": vars_type,
+                                        "name": m_var,
+                                        "comment": comment,
+                                    }
                                 )
                             member_vars.append(
                                 {"type": vars_type, "name": m[2], "comment": comment}
@@ -465,10 +487,14 @@ for file in api_files:
         )
         if "member_funs" not in underlying_cpp_type:
             if cpp_type in cpp_type_exceptions:
-                underlying_cpp_type = {"name": cpp_type, "member_funs": {}, "member_vars": {}}
+                underlying_cpp_type = {
+                    "name": cpp_type,
+                    "member_funs": {},
+                    "member_vars": {},
+                }
             else:
                 raise RuntimeError(
-                    f"No member_funs found in \"{cpp_type}\" while looking for usertypes in file \"{file}\". Did you forget to include a header file at the top of the generate script? (if it isn't the problem then add it to cpp_type_exceptions list)"
+                    f'No member_funs found in "{cpp_type}" while looking for usertypes in file "{file}". Did you forget to include a header file at the top of the generate script? (if it isn\'t the problem then add it to cpp_type_exceptions list)'
                 )
 
         skip = False
@@ -497,10 +523,14 @@ for file in api_files:
             cpp = var[1]
 
             if var[1].startswith("sol::property"):
-                param_match = re.match(fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)", cpp)
+                param_match = re.match(
+                    fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)", cpp
+                )
                 if param_match:
                     type_var_name = param_match[1]
-                    m_var_return = re.search(fr"return[^;]*{type_var_name}\.([\w.]+)", cpp)
+                    m_var_return = re.search(
+                        fr"return[^;]*{type_var_name}\.([\w.]+)", cpp
+                    )
                     if m_var_return:
                         cpp_name = m_var_return[1]
                         cpp_name = cpp_name.replace(".", "::")
@@ -540,7 +570,11 @@ for file in api_files:
                     (
                         item
                         for item in underlying_cpp_type["member_vars"]
-                        if item["name"] == cpp_name or (item["name"].endswith("]") and f"{cpp_name}[" in item["name"])
+                        if item["name"] == cpp_name
+                        or (
+                            item["name"].endswith("]")
+                            and f"{cpp_name}[" in item["name"]
+                        )
                     ),
                     dict(),
                 )
@@ -551,7 +585,9 @@ for file in api_files:
                         if type == "char":
                             sig = f"string {var_name}"
                         else:
-                            sig += underlying_cpp_var["name"][underlying_cpp_var["name"].find("["):]
+                            sig += underlying_cpp_var["name"][
+                                underlying_cpp_var["name"].find("[") :
+                            ]
                     vars.append(
                         {
                             "name": var_name,
@@ -561,7 +597,9 @@ for file in api_files:
                         }
                     )
                 else:
-                    m_return_type = re.search(r"->(\w+){", var[1]) #Use var[1] instead of cpp because it could be replaced on the sol::property stuff
+                    m_return_type = re.search(
+                        r"->(\w+){", var[1]
+                    )  # Use var[1] instead of cpp because it could be replaced on the sol::property stuff
                     if m_return_type:
                         sig = f"{m_return_type[1]} {var_name}"
                         vars.append({"name": var_name, "type": cpp, "signature": sig})
@@ -859,11 +897,13 @@ Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples 
 )
 
 print("\n# Aliases\n")
-print("""
+print(
+    """
 We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
 
 Name | Type
----- | ----""")
+---- | ----"""
+)
 
 for alias in aliases:
     name = alias["name"]
@@ -874,14 +914,14 @@ for alias in aliases:
 setup_stdout("_globals")
 
 global_types = {
-  "meta": "array<string>",
-  "state": "StateMemory",
-  "game_manager": "GameManager",
-  "online": "Online",
-  "players": "array<Player>",
-  "savegame": "SaveData",
-  "options": "array<mixed>",
-  "prng": "PRNG"
+    "meta": "array<string>",
+    "state": "StateMemory",
+    "game_manager": "GameManager",
+    "online": "Online",
+    "players": "array<Player>",
+    "savegame": "SaveData",
+    "options": "array<mixed>",
+    "prng": "PRNG",
 }
 
 print("# Global variables")
@@ -924,13 +964,27 @@ func_cats = dict()
 
 for func in funcs:
     cat = "Generic functions"
-    if any(subs in func["name"] for subs in ["prinspect", "messpect", "print", "message", "say", "speechbubble", "toast"]):
+    if any(
+        subs in func["name"]
+        for subs in [
+            "prinspect",
+            "messpect",
+            "print",
+            "message",
+            "say",
+            "speechbubble",
+            "toast",
+        ]
+    ):
         cat = "Message functions"
     elif any(subs in func["name"] for subs in ["get_address", "get_rva", "raise"]):
         cat = "Debug functions"
     elif any(subs in func["name"] for subs in ["tile_code"]):
         cat = "Tile code functions"
-    elif any(subs in func["name"] for subs in ["interval", "timeout", "callback", "set_on", "set_pre", "set_post"]):
+    elif any(
+        subs in func["name"]
+        for subs in ["interval", "timeout", "callback", "set_on", "set_pre", "set_post"]
+    ):
         cat = "Callback functions"
     elif any(subs in func["name"] for subs in ["flag"]):
         cat = "Flag functions"
@@ -938,9 +992,39 @@ for func in funcs:
         cat = "Shop functions"
     elif any(subs in func["name"] for subs in ["_room"]):
         cat = "Room functions"
-    elif any(subs in func["name"] for subs in ["spawn"]) or func["name"] in ["door", "layer_door"]:
+    elif any(subs in func["name"] for subs in ["spawn"]) or func["name"] in [
+        "door",
+        "layer_door",
+    ]:
         cat = "Spawn functions"
-    elif any(subs in func["name"] for subs in ["entity", "entities", "set_door", "get_door", "contents", "attach", "pick_up", "drop", "backitem", "carry", "door_at", "get_type", "kapala", "sparktrap", "explosion", "rope", "door", "blood", "olmec", "ghost", "jelly", "ankh", "player"]):
+    elif any(
+        subs in func["name"]
+        for subs in [
+            "entity",
+            "entities",
+            "set_door",
+            "get_door",
+            "contents",
+            "attach",
+            "pick_up",
+            "drop",
+            "backitem",
+            "carry",
+            "door_at",
+            "get_type",
+            "kapala",
+            "sparktrap",
+            "explosion",
+            "rope",
+            "door",
+            "blood",
+            "olmec",
+            "ghost",
+            "jelly",
+            "ankh",
+            "player",
+        ]
+    ):
         cat = "Entity functions"
     elif any(subs in func["name"] for subs in ["movable", "behavior"]):
         cat = "Movable Behavior functions"
@@ -952,7 +1036,20 @@ for func in funcs:
         cat = "Option functions"
     elif any(subs in func["name"] for subs in ["_input", "_io", "mouse_"]):
         cat = "Input functions"
-    elif any(subs in func["name"] for subs in ["bounds", "move", "position", "velocity", "distance", "size", "hitbox", "aabb", "zoom"]):
+    elif any(
+        subs in func["name"]
+        for subs in [
+            "bounds",
+            "move",
+            "position",
+            "velocity",
+            "distance",
+            "size",
+            "hitbox",
+            "aabb",
+            "zoom",
+        ]
+    ):
         cat = "Position functions"
     elif any(subs in func["name"] for subs in ["particle"]):
         cat = "Particle functions"
@@ -990,7 +1087,9 @@ for cat in sorted(func_cats):
             ret = ret.replace("<", "&lt;").replace(">", "&gt;")
             param = link_custom_type(param)
             fun = f"{ret} {name}({param})".strip()
-            search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
+            search_link = (
+                "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
+            )
             print(f"\n### {name}\n")
             include_example(name)
             print(f"\n> Search script examples for [{name}]({search_link})\n")
@@ -1006,7 +1105,7 @@ print(
 
 for lf in events:
     if lf["name"].startswith("on_"):
-        print("\n### "+ lf["name"] + "\n")
+        print("\n### " + lf["name"] + "\n")
         include_example(lf["name"])
         for com in lf["comment"]:
             com = link_custom_type(com)
@@ -1070,8 +1169,14 @@ for type in types:
         cat = "Generic entities"
         type_cat = "Entity types"
 
-
-    elif "Screen" in type["base"] or type["name"] == "Screen" or any(subs in type["name"] for subs in ["Screen", "UI", "FlyingThing", "SaveRelated"]):
+    elif (
+        "Screen" in type["base"]
+        or type["name"] == "Screen"
+        or any(
+            subs in type["name"]
+            for subs in ["Screen", "UI", "FlyingThing", "SaveRelated"]
+        )
+    ):
         cat = "Screen types"
     elif "JournalPage" in type["base"] or type["name"] == "JournalPage":
         cat = "Journal types"
@@ -1091,9 +1196,22 @@ for type in types:
         cat = "Logic types"
     elif any(subs in type["name"] for subs in ["Light", "Illumination"]):
         cat = "Lighting types"
-    elif any(subs in type["name"] for subs in ["Animation", "EntityDB", "Inventory", "Ai"]):
+    elif any(
+        subs in type["name"] for subs in ["Animation", "EntityDB", "Inventory", "Ai"]
+    ):
         cat = "Entity related types"
-    elif any(subs in type["name"] for subs in ["StateMemory", "Items", "GameManager", "GameProps", "Camera", "QuestsInfo", "PlayerSlot"]):
+    elif any(
+        subs in type["name"]
+        for subs in [
+            "StateMemory",
+            "Items",
+            "GameManager",
+            "GameProps",
+            "Camera",
+            "QuestsInfo",
+            "PlayerSlot",
+        ]
+    ):
         cat = "State types"
     elif any(subs in type["name"] for subs in ["Gamepad", "ImGuiIO", "Input"]):
         cat = "Input types"
@@ -1108,7 +1226,7 @@ for type in types:
     if not type_cat in type_cats:
         type_cats[type_cat] = dict()
     if not cat in type_cats[type_cat]:
-        type_cats[type_cat][cat] = [];
+        type_cats[type_cat][cat] = []
     type_cats[type_cat][cat].append(type)
 
 for type_cat in type_cats:
@@ -1128,19 +1246,24 @@ for type_cat in type_cats:
                 for base in bases:
                     print(" [" + base + "](#" + base + ")", end="")
                 print("\n")
-            print("""
+            print(
+                """
 Type | Name | Description
----- | ---- | -----------""")
+---- | ---- | -----------"""
+            )
             for var in type["vars"]:
                 if "comment" in var and "NoDoc" in var["comment"]:
                     continue
                 search_link = (
-                    "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + var["name"]
+                    "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q="
+                    + var["name"]
                 )
                 if "signature" in var:
                     signature = var["signature"]
                     n = re.search(r"^\s*([^\( ]*)(\(([^\)]*))", var["signature"])
-                    m = re.search(r"\s*([^\(]*)\s+([^\( ]*)(\(([^\)]*))?", var["signature"])
+                    m = re.search(
+                        r"\s*([^\(]*)\s+([^\( ]*)(\(([^\)]*))?", var["signature"]
+                    )
                     ret = ""
                     name = ""
                     param = ""
@@ -1177,7 +1300,8 @@ Type | Name | Description
 
 setup_stdout("_casting")
 
-print("""
+print(
+    """
 # Automatic casting of entities
 
 When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
@@ -1186,7 +1310,8 @@ To figure out what type of entity you get back, consult the [entity hierarchy li
 
 You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks
 
-For reference, the available `as_<typename>` functions are listed below:\n""")
+For reference, the available `as_<typename>` functions are listed below:\n"""
+)
 
 for known_cast in known_casts:
     print("- " + known_cast)
@@ -1194,7 +1319,8 @@ for known_cast in known_casts:
 setup_stdout("_enums")
 
 print("\n# Enums\n")
-print("""Enums are like numbers but in text that's easier to remember.
+print(
+    """Enums are like numbers but in text that's easier to remember.
 
 ```lua
 set_callback(function()
@@ -1213,9 +1339,11 @@ for type in sorted(enums, key=lambda x: x["name"]):
     print(f"\n> Search script examples for [{type['name']}]({search_link})\n")
     if "comment" in type:
         print(link_custom_type("<br/>".join(type["comment"])))
-    print("""
+    print(
+        """
 Name | Data | Description
----- | ---- | -----------""")
+---- | ---- | -----------"""
+    )
     for var in type["vars"]:
         if var["name"]:
             print(
@@ -1226,8 +1354,10 @@ Name | Data | Description
                 + "."
                 + var["name"]
                 + ") | "
-                + var["type"] + " | "
-            , end="")
+                + var["type"]
+                + " | ",
+                end="",
+            )
         else:
             print(var["type"] + " |  | ", end="")
         if "docs" in var:
