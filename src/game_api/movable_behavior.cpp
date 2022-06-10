@@ -30,8 +30,8 @@ void call_custom_or_original(const auto& custom, VanillaMovableBehavior* base, M
     {
         if (base)
         {
-            custom(movable, [=](Movable* movable)
-                   { (base->*OriginalFun)(movable); });
+            custom(movable, [=](Movable* _movable)
+                   { (base->*OriginalFun)(_movable); });
         }
         else
         {
@@ -51,8 +51,8 @@ T call_custom_or_original(const auto& custom, VanillaMovableBehavior* base, T fa
     {
         if (base)
         {
-            return custom(movable, [=](Movable* movable)
-                          { return (base->*OriginalFun)(movable); });
+            return custom(movable, [=](Movable* _movable)
+                          { return (base->*OriginalFun)(_movable); });
         }
         else
         {
