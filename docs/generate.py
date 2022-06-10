@@ -119,6 +119,7 @@ rpc = []
 classes = []
 events = []
 funcs = []
+pre_gathered_vars = {}
 types = []
 known_casts = []
 aliases = []
@@ -453,13 +454,69 @@ for file in api_files:
         line = line.strip()
         if line == "":
             comment = []
-        m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', line)
-        if m and not m.group(1).startswith("__"):
-            if not getfunc(m.group(1)):
-                funcs.append(
-                    {"name": m.group(1), "cpp": m.group(2), "comment": comment}
+
+        m = re.search(
+            r'lua\[[\'"]([^\'"]*)[\'"]\]\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)',
+            line,
+        )
+        if m:
+            name = m.group(2)
+            if not name.startswith("as_"):  # don't include the casting functions
+                cpp_type = m.group(1)
+                underlying_cpp_type = next(
+                    (item for item in classes if item["name"] == cpp_type), dict()
                 )
-            comment = []
+
+                if name not in underlying_cpp_type["member_funs"]:
+                    underlying_cpp_type["member_funs"][name] = []
+
+                cpp = m.group(3)
+                if len(rpcfunc(cpp)):
+                    for af in rpcfunc(cpp):
+                        underlying_cpp_type["member_funs"][name].append(
+                            {
+                                "return": af["return"],
+                                "name": name,
+                                "param": ", ".join(
+                                    [p.strip() for p in af["param"].split(",")[1:]]
+                                ),
+                                "comment": af["comment"],
+                            }
+                        )
+                else:
+                    m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", cpp)
+                    m2 = re.search(r"\(([^\{]*)\)", cpp)
+                    ret = "nil"
+                    param = ""
+                    if m:
+                        ret = replace_all(m.group(2), replace).strip() or "nil"
+                    if m or m2:
+                        param = (m or m2).group(1)
+                        param = replace_all(param, replace).strip()
+                        param = ", ".join([p.strip() for p in param.split(",")[1:]])
+                    underlying_cpp_type["member_funs"][name].append(
+                        {
+                            "return": ret,
+                            "name": name,
+                            "param": param,
+                            "comment": comment,
+                        }
+                    )
+                if cpp_type not in pre_gathered_vars:
+                    pre_gathered_vars[cpp_type] = []
+                pre_gathered_vars[cpp_type].append(
+                    f"{name}, {cpp_type}::{name}".format(name=name, cpp_type=cpp_type)
+                )
+                comment = []
+        else:
+            m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', line)
+            if m and not m.group(1).startswith("__"):
+                if not getfunc(m.group(1)):
+                    funcs.append(
+                        {"name": m.group(1), "cpp": m.group(2), "comment": comment}
+                    )
+                comment = []
+
         c = re.search(r"/// ?(.*)$", line)
         if c:
             comment.append(c.group(1))
@@ -496,6 +553,9 @@ for file in api_files:
                 raise RuntimeError(
                     f'No member_funs found in "{cpp_type}" while looking for usertypes in file "{file}". Did you forget to include a header file at the top of the generate script? (if it isn\'t the problem then add it to cpp_type_exceptions list)'
                 )
+
+        if cpp_type in pre_gathered_vars:
+            attr += pre_gathered_vars[cpp_type]
 
         skip = False
         for var in attr:
@@ -607,7 +667,7 @@ for file in api_files:
                         vars.append({"name": var_name, "type": cpp})
         types.append({"name": name, "vars": vars, "base": base})
 
-print_collecting_info("entitys")
+print_collecting_info("entities")
 for file in api_files:
     with open(file) as fp:
         line = fp.readline()

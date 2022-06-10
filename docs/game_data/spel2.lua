@@ -1153,106 +1153,12 @@ function is_character_female(type_id) end
 function set_character_heart_color(type_id, color) end
 ---Make a `CustomMovableBehavior`, if `base_behavior` is `nil` you will have to set all of the
 ---behavior functions. If a behavior with `behavior_name` already exists for your script it will
----be returned instead. 
+---be returned instead.
 ---@param behavior_name string
 ---@param state_id integer
 ---@param base_behavior VanillaMovableBehavior
 ---@return CustomMovableBehavior
 function make_custom_behavior(behavior_name, state_id, base_behavior) end
----Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's
----`get_next_state_id` to enter this state, given that the behavior is added to the movable.
----@param behavior MovableBehavior
----@return integer
-function get_behavior_state_id(behavior) end
----Set the `force_state` function of a `CustomMovableBehavior`, this will be called every frame when
----the movable is updated. If an `force_state` is already set it will be overridden. The signature
----of the function is `bool force_state(movable, base_fun)`, when the function returns `true` the movable will
----enter this behavior. If no base behavior is set `base_fun` will be `nil`.
----@param behavior CustomMovableBehavior
----@param force_state fun(): any
----@return nil
-function set_custom_behavior_force_state(behavior, force_state) end
----Set the `on_enter` function of a `CustomMovableBehavior`, this will be called when the movable
----enters the state. If an `on_enter` is already set it will be overridden. The signature of the
----function is `nil on_enter(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
----@param behavior CustomMovableBehavior
----@param on_enter fun(): any
----@return nil
-function set_custom_behavior_on_enter(behavior, on_enter) end
----Set the `on_exit` function of a `CustomMovableBehavior`, this will be called when the movable
----leaves the state. If an `on_exit` is already set it will be overridden. The signature of the
----function is `nil on_exit(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
----@param behavior CustomMovableBehavior
----@param on_exit fun(): any
----@return nil
-function set_custom_behavior_on_exit(behavior, on_exit) end
----Set the `update_render` function of a `CustomMovableBehavior`, this will be called every frame when
----the movable is updated. If an `update_render` is already set it will be overridden. The signature
----of the function is `nil update_render(movable, base_fun))`, use it to change the color, texture,
----animation frame, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
----@param behavior CustomMovableBehavior
----@param update_render fun(): any
----@return nil
-function set_custom_behavior_update_render(behavior, update_render) end
----Set the `update_physics` function of a `CustomMovableBehavior`, this will be called every frame when
----the movable is updated. If an `update_physics` is already set it will be overridden. The signature
----of the function is `nil update_physics(movable, base_fun))`, use this to update the movex, movey, velocityx,
----velocityy, etc. of the movable, then call `update_movable` to update the movable. If no base behavior is set
----`base_fun` will be `nil`.
----@param behavior CustomMovableBehavior
----@param update_physics fun(): any
----@return nil
-function set_custom_behavior_update_physics(behavior, update_physics) end
----Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when
----the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature
----of the function is `int get_next_state_id(movable, base_fun))`, use this to move to another state, return `nil`.
----or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
----@param behavior CustomMovableBehavior
----@param get_next_state_id fun(): any
----@return nil
-function set_custom_behavior_get_next_state_id(behavior, get_next_state_id) end
----Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`
----but the returned values are still valid after a call to `clear_behaviors`
----@param movable Movable
----@param state_id integer
----@return VanillaMovableBehavior
-function get_base_behavior(movable, state_id) end
----Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a
----`CustomMovableBehavior`
----@param movable Movable
----@param behavior MovableBehavior
----@return nil
-function add_behavior(movable, behavior) end
----Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a
----`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to
----run this movables statemachine without crashing, so add a new one if you are not sure
----@param movable Movable
----@param behavior MovableBehavior
----@return nil
-function clear_behavior(movable, behavior) end
----Clears all behaviors of this movable, need to call `add_behavior` to avoid crashing
----@param movable Movable
----@return nil
-function clear_behaviors(movable) end
----Move a movable according to its velocity, update physics, gravity, etc.
----@param movable Movable
----@return nil
-function update_movable(movable) end
----Move a movable according to its velocity, can disable gravity
----@param movable Movable
----@param disable_gravity boolean
----@return nil
-function update_movable(movable, disable_gravity) end
----Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is
----held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal
----movement via `on_rope`. Use this for example to update a custom enemy type.
----@param movable Movable
----@param move Vec2
----@param sprint_factor number
----@param disable_gravity boolean
----@param on_rope boolean
----@return nil
-function update_movable(movable, move, sprint_factor, disable_gravity, on_rope) end
 ---Get the [ParticleDB](#ParticleDB) details of the specified ID
 ---@param id integer
 ---@return ParticleDB
@@ -1280,16 +1186,6 @@ function render_screen_particles(particle_emitter) end
 ---@param particle_emitter ParticleEmitterInfo
 ---@return nil
 function extinguish_particles(particle_emitter) end
----Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
----Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
----Base THEME to load enabled functions from, when no other theme is specified.
----Add TEXTUREs here to override different dynamic textures.
----Set a callback to be called before this theme function.
----Set a callback to be called after this theme function, to fix some changes it did for example.
----Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
----Create a new theme with defaults.
----Create a new theme with base dwelling and id 100.
----Add TEXTUREs to `textures` to override different dynamic textures easily.
 ---Default function in spawn definitions to check whether a spawn is valid or not
 ---@param x number
 ---@param y number
@@ -1443,8 +1339,6 @@ function grow_chainandblocks(x, y) end
 ---Immediately load a screen based on state.screen_next and stuff
 ---@return nil
 function load_screen() end
----Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Check ThemeInfo for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
----Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
 ---@return nil
 function force_custom_theme() end
@@ -2151,6 +2045,20 @@ local function Entity_overlaps_with(self, other) end
     ---@field get_all_behaviors fun(self, ): integer[]
     ---@field set_behavior fun(self, behavior_id: integer): boolean
     ---@field get_behavior fun(self, ): integer
+    ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior
+    ---@field add_behavior fun(self, behavior: MovableBehavior): nil
+    ---@field clear_behavior fun(self, behavior: MovableBehavior): nil
+    ---@field clear_behaviors fun(self, ): nil
+    ---@field update_physics Movable_update_physics
+
+---@class Movable_update_physics
+---@param move Vec2
+---@param sprint_factor float
+---@param disable_gravity bool
+---@param on_rope bool
+---@overload fun(self): nil
+---@overload fun(self, disable_gravity: boolean): nil
+local function Movable_update_physics(self, move, sprint_factor, disable_gravity, on_rope) end
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
@@ -3742,6 +3650,12 @@ local function Entity_overlaps_with(self, other) end
 ---@class VanillaMovableBehavior : MovableBehavior
 
 ---@class CustomMovableBehavior : MovableBehavior
+    ---@field fun fun(self, ): nil set_force_state(any force_state:
+    ---@field fun fun(self, ): nil set_on_enter(any on_enter:
+    ---@field fun fun(self, ): nil set_on_exit(any on_exit:
+    ---@field fun fun(self, ): nil set_update_render(any update_render:
+    ---@field fun fun(self, ): nil set_update_physics(any update_physics:
+    ---@field fun fun(self, ): nil set_get_next_state_id(any get_next_state_id:
 
 ---@class ParticleDB
     ---@field id integer
