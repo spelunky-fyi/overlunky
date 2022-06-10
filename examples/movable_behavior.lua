@@ -70,21 +70,22 @@ local custom_state_flee = {
 
 ---@param rock Movable
 set_post_entity_spawn(function(rock)
+    local vanilla_state_idle = rock:get_base_behavior(1)
+
     if custom_state_idle.handle == nil then
-        local vanilla_state_idle = get_base_behavior(rock, 1)
         custom_state_idle.handle = make_custom_behavior("cool_rock_idle", 1, vanilla_state_idle)
-        set_custom_behavior_get_next_state_id(custom_state_idle.handle, custom_state_idle.get_next_state_id)
+        custom_state_idle.handle:set_get_next_state_id(custom_state_idle.get_next_state_id)
 
         custom_state_flee.handle = make_custom_behavior("cool_rock_flee", 2, vanilla_state_idle)
-        set_custom_behavior_force_state(custom_state_flee.handle, custom_state_flee.force_state)
-        set_custom_behavior_on_enter(custom_state_flee.handle, custom_state_flee.on_enter)
-        set_custom_behavior_on_exit(custom_state_flee.handle, custom_state_flee.on_exit)
-        set_custom_behavior_update_render(custom_state_flee.handle, custom_state_flee.update_render)
-        set_custom_behavior_update_physics(custom_state_flee.handle, custom_state_flee.update_physics)
-        set_custom_behavior_get_next_state_id(custom_state_flee.handle, custom_state_flee.get_next_state_id)
+        custom_state_flee.handle:set_force_state(custom_state_flee.force_state)
+        custom_state_flee.handle:set_on_enter(custom_state_flee.on_enter)
+        custom_state_flee.handle:set_on_exit(custom_state_flee.on_exit)
+        custom_state_flee.handle:set_update_render(custom_state_flee.update_render)
+        custom_state_flee.handle:set_update_physics(custom_state_flee.update_physics)
+        custom_state_flee.handle:set_get_next_state_id(custom_state_flee.get_next_state_id)
     end
 
-    clear_behavior(rock, get_base_behavior(rock, 1))
-    add_behavior(rock, custom_state_idle.handle)
-    add_behavior(rock, custom_state_flee.handle)
+    rock:clear_behavior(vanilla_state_idle)
+    rock:add_behavior(custom_state_idle.handle)
+    rock:add_behavior(custom_state_flee.handle)
 end, SPAWN_TYPE.ANY, MASK.ANY, ENT_TYPE.ITEM_ROCK)
