@@ -29,7 +29,7 @@ struct VanillaMovableBehavior : MovableBehavior
 {
 };
 
-struct CustomMovableBehavior : MovableBehavior
+struct CustomMovableBehavior final : MovableBehavior
 {
     uint8_t state_id{};
     std::function<bool(Movable*, std::function<bool(Movable*)>)> custom_force_state;
