@@ -112,3 +112,13 @@ void SpelunkyConsole::set_selected_uid(uint32_t uid)
     m_Impl->lua["E"] = m_Impl->lua["get_entity"](uid);
     m_Impl->lua["P"] = m_Impl->lua["players"];
 }
+
+unsigned int SpelunkyConsole::get_input_lines()
+{
+    return m_Impl->get_input_lines();
+}
+
+void SpelunkyConsole::set_geometry(float x, float y, float w, float h)
+{
+    m_Impl->set_geometry(x, y, w, h);
+}

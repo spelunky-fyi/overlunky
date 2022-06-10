@@ -48,6 +48,27 @@ ImVec2 screenify(ImVec2 pos)
     return screened;
 }
 
+ImVec2 screenify_fix(ImVec2 pos)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    auto base = ImGui::GetMainViewport();
+
+    ImVec2 res = io.DisplaySize;
+    ImVec2 bar = {0.0, 0.0};
+    if (res.x / res.y > 1.78)
+    {
+        bar.x = (res.x - res.y / 9 * 16) / 2;
+        res.x = res.y / 9 * 16;
+    }
+    else if (res.x / res.y < 1.77)
+    {
+        bar.y = (res.y - res.x / 16 * 9) / 2;
+        res.y = res.x / 16 * 9;
+    }
+    ImVec2 screened = ImVec2(pos.x / (1.0f / (res.x / 2)) + res.x / 2 + bar.x + base->Pos.x, res.y - (res.y / 2 * pos.y) - res.y / 2 + bar.y + base->Pos.y);
+    return screened;
+}
+
 ImVec2 normalize(ImVec2 pos)
 {
     ImGuiIO& io = ImGui::GetIO();

@@ -48,8 +48,8 @@ GuiDrawContext::GuiDrawContext(LuaBackend* _backend, ImDrawList* _draw_list)
 
 void GuiDrawContext::draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)
 {
-    ImVec2 a = screenify({x1, y1});
-    ImVec2 b = screenify({x2, y2});
+    ImVec2 a = screenify_fix({x1, y1});
+    ImVec2 b = screenify_fix({x2, y2});
     backend->draw_list->AddLine(a, b, color, thickness);
 };
 void GuiDrawContext::draw_rect(float left, float top, float right, float bottom, float thickness, float rounding, uColor color)
@@ -62,8 +62,8 @@ void GuiDrawContext::draw_rect(float left, float top, float right, float bottom,
 #endif
         return;
     }
-    ImVec2 a = screenify({left, top});
-    ImVec2 b = screenify({right, bottom});
+    ImVec2 a = screenify_fix({left, top});
+    ImVec2 b = screenify_fix({right, bottom});
     backend->draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
 };
 void GuiDrawContext::draw_rect(AABB rect, float thickness, float rounding, uColor color)
@@ -79,8 +79,8 @@ void GuiDrawContext::draw_rect_filled(float left, float top, float right, float 
 #endif
         return;
     }
-    ImVec2 a = screenify({left, top});
-    ImVec2 b = screenify({right, bottom});
+    ImVec2 a = screenify_fix({left, top});
+    ImVec2 b = screenify_fix({right, bottom});
     // check for nan in the vectors because this will cause a crash in ImGui
     backend->draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
 };
@@ -93,7 +93,7 @@ void GuiDrawContext::draw_poly(std::vector<Vec2> points, float thickness, uColor
     backend->draw_list->PathClear();
     for (auto point : points)
     {
-        ImVec2 a = screenify({point.x, point.y});
+        ImVec2 a = screenify_fix({point.x, point.y});
         backend->draw_list->PathLineToMergeDuplicate(a);
     }
     backend->draw_list->PathStroke(color, 0, thickness);
@@ -103,43 +103,43 @@ void GuiDrawContext::draw_poly_filled(std::vector<Vec2> points, uColor color)
     backend->draw_list->PathClear();
     for (auto point : points)
     {
-        ImVec2 a = screenify({point.x, point.y});
+        ImVec2 a = screenify_fix({point.x, point.y});
         backend->draw_list->PathLineToMergeDuplicate(a);
     }
     backend->draw_list->PathFillConvex(color);
 }
 void GuiDrawContext::draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float thickness, uColor color)
 {
-    ImVec2 a = screenify({p1.x, p1.y});
-    ImVec2 b = screenify({p2.x, p2.y});
-    ImVec2 c = screenify({p3.x, p3.y});
-    ImVec2 d = screenify({p4.x, p4.y});
+    ImVec2 a = screenify_fix({p1.x, p1.y});
+    ImVec2 b = screenify_fix({p2.x, p2.y});
+    ImVec2 c = screenify_fix({p3.x, p3.y});
+    ImVec2 d = screenify_fix({p4.x, p4.y});
     backend->draw_list->AddBezierCubic(a, b, c, d, color, thickness);
 }
 void GuiDrawContext::draw_bezier_quadratic(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
 {
-    ImVec2 a = screenify({p1.x, p1.y});
-    ImVec2 b = screenify({p2.x, p2.y});
-    ImVec2 c = screenify({p3.x, p3.y});
+    ImVec2 a = screenify_fix({p1.x, p1.y});
+    ImVec2 b = screenify_fix({p2.x, p2.y});
+    ImVec2 c = screenify_fix({p3.x, p3.y});
     backend->draw_list->AddBezierQuadratic(a, b, c, color, thickness);
 }
 void GuiDrawContext::draw_triangle(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
 {
-    ImVec2 a = screenify({p1.x, p1.y});
-    ImVec2 b = screenify({p2.x, p2.y});
-    ImVec2 c = screenify({p3.x, p3.y});
+    ImVec2 a = screenify_fix({p1.x, p1.y});
+    ImVec2 b = screenify_fix({p2.x, p2.y});
+    ImVec2 c = screenify_fix({p3.x, p3.y});
     backend->draw_list->AddTriangle(a, b, c, color, thickness);
 }
 void GuiDrawContext::draw_triangle_filled(Vec2 p1, Vec2 p2, Vec2 p3, uColor color)
 {
-    ImVec2 a = screenify({p1.x, p1.y});
-    ImVec2 b = screenify({p2.x, p2.y});
-    ImVec2 c = screenify({p3.x, p3.y});
+    ImVec2 a = screenify_fix({p1.x, p1.y});
+    ImVec2 b = screenify_fix({p2.x, p2.y});
+    ImVec2 c = screenify_fix({p3.x, p3.y});
     backend->draw_list->AddTriangleFilled(a, b, c, color);
 }
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
 {
-    ImVec2 a = screenify({x, y});
+    ImVec2 a = screenify_fix({x, y});
     float r = screenify(radius);
     // check for nan in the vectors and radius because this will cause a crash in ImGui
     if (isnan(a.x) || isnan(a.y) || isnan(r))
@@ -153,13 +153,13 @@ void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness
 };
 void GuiDrawContext::draw_circle_filled(float x, float y, float radius, uColor color)
 {
-    ImVec2 a = screenify({x, y});
+    ImVec2 a = screenify_fix({x, y});
     float r = screenify(radius);
     backend->draw_list->AddCircleFilled(a, r, color, 0);
 };
 void GuiDrawContext::draw_text(float x, float y, float size, std::string text, uColor color)
 {
-    ImVec2 a = screenify({x, y});
+    ImVec2 a = screenify_fix({x, y});
     ImGuiIO& io = ImGui::GetIO();
     ImFont* font = io.Fonts->Fonts.back();
     for (auto pickfont : io.Fonts->Fonts)
@@ -176,8 +176,8 @@ void GuiDrawContext::draw_image(IMAGE image, float left, float top, float right,
 {
     if (!backend->images.contains(image))
         return;
-    ImVec2 a = screenify({left, top});
-    ImVec2 b = screenify({right, bottom});
+    ImVec2 a = screenify_fix({left, top});
+    ImVec2 b = screenify_fix({right, bottom});
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     backend->draw_list->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
@@ -190,8 +190,8 @@ void GuiDrawContext::draw_image_rotated(IMAGE image, float left, float top, floa
 {
     if (!backend->images.contains(image))
         return;
-    ImVec2 a = screenify({left, top});
-    ImVec2 b = screenify({right, bottom});
+    ImVec2 a = screenify_fix({left, top});
+    ImVec2 b = screenify_fix({right, bottom});
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     ImVec2 pivot = {screenify(px), screenify(py)};
@@ -218,9 +218,9 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     }
     else
     {
-        ImVec2 spos = screenify(ImVec2(x, y));
-        ImVec2 ssa = screenify(ImVec2(w, h));
-        ImVec2 ssb = screenify(ImVec2(0, 0));
+        ImVec2 spos = screenify_fix(ImVec2(x, y));
+        ImVec2 ssa = screenify_fix(ImVec2(w, h));
+        ImVec2 ssb = screenify_fix(ImVec2(0, 0));
         ImVec2 ssize = ImVec2(ssa.x - ssb.x, ssb.y - ssa.y);
         ImGui::SetNextWindowPos(spos, cond);
         ImGui::SetNextWindowSize(ssize, cond);

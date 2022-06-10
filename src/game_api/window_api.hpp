@@ -20,6 +20,7 @@ enum WndProcResult : LRESULT
     RunAllWindowProc = RunImguiWindowProc | RunGameWindowProc,
 };
 void register_on_input(OnInputCallback on_input);
+void register_imgui_pre_init(ImguiInitCallback imgui_init);
 void register_imgui_init(ImguiInitCallback imgui_init);
 void register_imgui_draw(ImguiDrawCallback imgui_draw);
 void register_pre_draw(PreDrawCallback pre_draw);
