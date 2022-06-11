@@ -28,14 +28,34 @@ struct MovableBehavior
 // Note: Implementing stuff only to shut up clang
 struct VanillaMovableBehavior final : MovableBehavior
 {
-    virtual uint8_t get_state_id() const override { return 0xff; }
-    virtual uint8_t secondary_sort_id() const override { return 0xff; }
-    virtual bool force_state(Movable*) override { return false; }
-    virtual void on_enter(Movable*) override {}
-    virtual void on_exit(Movable*) override {}
-    virtual void update_render(Movable*) override {}
-    virtual void update_physics(Movable*) override {}
-    virtual uint8_t get_next_state_id(Movable*) override { return 0xff; }
+    virtual uint8_t get_state_id() const override
+    {
+        return 0xff;
+    }
+    virtual uint8_t secondary_sort_id() const override
+    {
+        return 0xff;
+    }
+    virtual bool force_state(Movable*) override
+    {
+        return false;
+    }
+    virtual void on_enter(Movable*) override
+    {
+    }
+    virtual void on_exit(Movable*) override
+    {
+    }
+    virtual void update_render(Movable*) override
+    {
+    }
+    virtual void update_physics(Movable*) override
+    {
+    }
+    virtual uint8_t get_next_state_id(Movable*) override
+    {
+        return 0xff;
+    }
 };
 
 struct CustomMovableBehavior final : MovableBehavior
