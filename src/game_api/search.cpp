@@ -820,6 +820,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .set_optional(true)
             .get_address("fetch_texture_begin"sv)
             .find_next_inst_in_range("\x66\x89\x46\x3c"sv, 0x250)
+            .offset(0x4)
             .at_exe(),
     },
     {
