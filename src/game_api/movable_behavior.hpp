@@ -23,39 +23,13 @@ struct MovableBehavior
     virtual void update_render(Movable* movable) = 0;
     virtual void update_physics(Movable* movable) = 0;
     virtual uint8_t get_next_state_id(Movable* movable) = 0;
+
+    // To shut up clang
+    virtual ~MovableBehavior(){};
 };
 
-// Note: Implementing stuff only to shut up clang
-struct VanillaMovableBehavior final : MovableBehavior
+struct VanillaMovableBehavior : MovableBehavior
 {
-    virtual uint8_t get_state_id() const override
-    {
-        return 0xff;
-    }
-    virtual uint8_t secondary_sort_id() const override
-    {
-        return 0xff;
-    }
-    virtual bool force_state(Movable*) override
-    {
-        return false;
-    }
-    virtual void on_enter(Movable*) override
-    {
-    }
-    virtual void on_exit(Movable*) override
-    {
-    }
-    virtual void update_render(Movable*) override
-    {
-    }
-    virtual void update_physics(Movable*) override
-    {
-    }
-    virtual uint8_t get_next_state_id(Movable*) override
-    {
-        return 0xff;
-    }
 };
 
 struct CustomMovableBehavior final : MovableBehavior

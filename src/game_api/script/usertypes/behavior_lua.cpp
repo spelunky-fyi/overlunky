@@ -36,15 +36,19 @@ void register_usertypes(sol::state& lua)
 
     /// Opaque handle to a movable behavior
     lua.new_usertype<MovableBehavior>(
-        "MovableBehavior");
+        "MovableBehavior",
+        sol::no_constructor);
     /// Opaque handle to a movable behavior from the vanilla game
     lua.new_usertype<VanillaMovableBehavior>(
         "VanillaMovableBehavior",
+        sol::no_constructor,
         sol::base_classes,
         sol::bases<MovableBehavior>());
+
     /// Opaque handle to a custom movable behavior from a script mod
     lua.new_usertype<CustomMovableBehavior>(
         "CustomMovableBehavior",
+        sol::no_constructor,
         sol::base_classes,
         sol::bases<MovableBehavior>());
 
