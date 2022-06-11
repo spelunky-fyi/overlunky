@@ -332,7 +332,10 @@ void fetch_texture(Entity* entity, int32_t texture_id)
             texture_id = State::get().ptr_local()->current_theme->get_dynamic_texture(texture_id);
         }
         entity->texture = get_textures()->texture_map[texture_id];
+    }
 
+    if (entity->texture != nullptr)
+    {
         entity->animation_frame = static_cast<uint16_t>(entity->type->tile_y * entity->texture->num_tiles_width + entity->type->tile_x);
     }
     else
