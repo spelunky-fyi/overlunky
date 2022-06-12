@@ -233,7 +233,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -3102,6 +3102,11 @@ void render_camera()
         ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
         ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
         ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
+        if (ImGui::Checkbox("Enable default camera bounds##CameraBoundsLevel", &enable_camera_bounds))
+        {
+            set_camera_bounds(enable_camera_bounds);
+        }
+        tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.");
         if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
         {
             UI::set_camp_camera_bounds_enabled(enable_camp_camera);
@@ -4041,7 +4046,8 @@ void render_clickhandler()
             {
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
             }
-            set_camera_bounds(true);
+            enable_camera_bounds = true;
+            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.5f)
@@ -4050,7 +4056,8 @@ void render_clickhandler()
             {
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
             }
-            set_camera_bounds(true);
+            enable_camera_bounds = true;
+            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (released("mouse_camera_drag") && !dblclicked("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 3.0f && held_duration_last("mouse_camera_drag") < 0.2f)
@@ -4060,7 +4067,8 @@ void render_clickhandler()
                 auto ent = UI::get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
                 g_state->camera->focused_entity_uid = ent ? ent->uid : -1;
             }
-            set_camera_bounds(true);
+            enable_camera_bounds = true;
+            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (clicked("mouse_camera_drag"))
@@ -4088,7 +4096,8 @@ void render_clickhandler()
                     g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
                 }
                 startpos = normalize(mouse_pos());
-                set_camera_bounds(false);
+                enable_camera_bounds = false;
+                set_camera_bounds(enable_camera_bounds);
             }
         }
 
