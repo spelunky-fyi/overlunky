@@ -162,9 +162,10 @@ def run_parse():
 
     global rpc, classes, events, funcs, deprecated_funcs, pre_gathered_vars, types, known_casts, aliases, lualibs, enums, constructors
 
-    if ENABLE_CACHING and not needs_update(header_files + api_files):
+    cache_file = os.path.join(".db", CACHE_FILE)
+    if ENABLE_CACHING and not needs_update(header_files + api_files, cache_file):
         print_console("Files are unchanged, trying to use pickled parse data...")
-        unpickled = do_unpickle(os.path.join(".db", CACHE_FILE))
+        unpickled = do_unpickle(cache_file)
         if unpickled != None:
             rpc = unpickled["rpc"]
             classes = unpickled["classes"]

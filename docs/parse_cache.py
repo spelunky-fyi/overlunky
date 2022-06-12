@@ -4,7 +4,7 @@ import inspect
 import pickle
 
 
-def needs_update(files):
+def needs_update(files, pickle_file):
 
     BLOCK_SIZE = 65536
 
@@ -21,11 +21,11 @@ def needs_update(files):
     file_hash = hash_files(files)
     db_hash = ""
 
-    if os.path.exists(".db/hash.db"):
-        with open(".db/hash.db", "r") as hash_file:
+    if os.path.exists(f"{pickle_file}.db"):
+        with open(f"{pickle_file}.db", "r") as hash_file:
             db_hash = hash_file.read()
 
-    with open(".db/hash.db", "w") as hash_file:
+    with open(f"{pickle_file}.db", "w") as hash_file:
         hash_file.write(file_hash)
 
     return db_hash != file_hash
