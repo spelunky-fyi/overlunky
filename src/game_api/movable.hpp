@@ -33,7 +33,7 @@ class Movable : public Entity
     int32_t price;
     int32_t owner_uid;
     int32_t last_owner_uid;
-    size_t animation_func;
+    Animation* current_animation;
     uint32_t idle_counter;
     int32_t standing_on_uid;
     float velocityx;
