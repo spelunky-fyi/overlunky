@@ -866,3 +866,8 @@ void Movable::set_gravity(float gravity)
         },
         0x53);
 }
+
+void Movable::reset_gravity()
+{
+    unregister_hook_function((void***)this, 0x53);
+}

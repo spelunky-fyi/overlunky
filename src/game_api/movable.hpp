@@ -89,7 +89,11 @@ class Movable : public Entity
     void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
     void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);
 
+    /// Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
     void set_gravity(float gravity);
+
+    /// Remove the gravity hook and reset to defaults
+    void reset_gravity();
 
     // don't use this, it's only to not break backwards compatibility
     void light_on_fire_broken()

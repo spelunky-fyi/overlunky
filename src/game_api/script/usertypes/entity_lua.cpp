@@ -411,6 +411,8 @@ void register_usertypes(sol::state& lua)
         &Movable::get_behavior,
         "set_gravity",
         &Movable::set_gravity,
+        "reset_gravity",
+        &Movable::reset_gravity,
         sol::base_classes,
         sol::bases<Entity>());
 
