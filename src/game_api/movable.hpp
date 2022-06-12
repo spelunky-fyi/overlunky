@@ -91,6 +91,8 @@ class Movable : public Entity
     /// Get the current behavior id
     uint32_t get_behavior();
 
+    void set_gravity(float gravity);
+
     virtual bool can_jump() = 0;
     virtual void v38() = 0;
     virtual float sprint_factor() = 0;
