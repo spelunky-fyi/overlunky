@@ -453,6 +453,15 @@ Type | Name | Description
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 
+### MovableBehavior
+
+Opaque handle to a movable behavior
+
+Type | Name | Description
+---- | ---- | -----------
+int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state_id) | 
+int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state_id) | Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's<br/>`get_next_state_id` to enter this state, given that the behavior is added to the movable.
+
 ### PRNG
 
 [PRNG](#PRNG) (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
@@ -4838,8 +4847,8 @@ Type | Name | Description
 nil | [set_force_state(function force_state)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_force_state) | Set the `force_state` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `force_state` is already set it will be overridden. The signature<br/>of the function is `bool force_state(movable, base_fun)`, when the function returns `true` the movable will<br/>enter this behavior. If no base behavior is set `base_fun` will be `nil`.
 nil | [set_on_enter(function on_enter)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_enter) | Set the `on_enter` function of a `CustomMovableBehavior`, this will be called when the movable<br/>enters the state. If an `on_enter` is already set it will be overridden. The signature of the<br/>function is `nil on_enter(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
 nil | [set_on_exit(function on_exit)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_exit) | Set the `on_exit` function of a `CustomMovableBehavior`, this will be called when the movable<br/>leaves the state. If an `on_exit` is already set it will be overridden. The signature of the<br/>function is `nil on_exit(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
-nil | [set_update_render(function update_render)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_update_render) | Set the `update_render` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_render` is already set it will be overridden. The signature<br/>of the function is `nil update_render(movable, base_fun))`, use it to change the color, texture,<br/>animation frame, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
-nil | [set_update_physics(function update_physics)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_update_physics) | Set the `update_physics` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_physics` is already set it will be overridden. The signature<br/>of the function is `nil update_physics(movable, base_fun))`, use this to update the movex, movey, velocityx,<br/>velocityy, etc. of the movable, then call `update_movable` to update the movable. If no base behavior is set<br/>`base_fun` will be `nil`.
+nil | [set_update_logic(function update_logic)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_update_logic) | Set the `update_logic` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_logic` is already set it will be overridden. The signature<br/>of the function is `nil update_logic(movable, base_fun))`, use it to change the color, texture,<br/>some timers, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
+nil | [set_update_world(function update_world)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_update_world) | Set the `update_world` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_world` is already set it will be overridden. The signature<br/>of the function is `nil update_world(movable, base_fun))`, use this to update the move, velocity,<br/>current_animation, etc. of the movable, then call `mov:generic_update_world` to update the movable. If no<br/>base behavior is set `base_fun` will be `nil`.
 nil | [set_get_next_state_id(function get_next_state_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_get_next_state_id) | Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature<br/>of the function is `int get_next_state_id(movable, base_fun))`, use this to move to another state, return `nil`.<br/>or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
 
 ### Drill
@@ -5574,6 +5583,7 @@ int | [stand_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=s
 float | [jump_height_multiplier](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_height_multiplier) | 
 int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
 int | [last_owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_owner_uid) | 
+[Animation](#Animation) | [current_animation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_animation) | 
 int | [idle_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=idle_counter) | 
 int | [standing_on_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=standing_on_uid) | 
 float | [velocityx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocityx) | 
@@ -5619,9 +5629,9 @@ int | [get_behavior()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 nil | [add_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_behavior) | Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
 nil | [clear_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_behavior) | Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
 nil | [clear_behaviors()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_behaviors) | Clears all behaviors of this movable, need to call `add_behavior` to avoid crashing
-nil | [update_physics()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_physics) | Move a movable according to its velocity, update physics, gravity, etc.
-nil | [update_physics(bool disable_gravity)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_physics) | Move a movable according to its velocity, can disable gravity
-nil | [update_physics(Vec2 move, float sprint_factor, bool disable_gravity, bool on_rope)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_physics) | Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is<br/>held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal<br/>movement via `on_rope`. Use this for example to update a custom enemy type.
+nil | [generic_update_world()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generic_update_world) | Move a movable according to its velocity, update physics, gravity, etc.<br/>Will also update `movable.animation_frame` and various timers and counters
+nil | [generic_update_world(bool disable_gravity)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generic_update_world) | Move a movable according to its velocity, can disable gravity<br/>Will also update `movable.animation_frame` and various timers and counters
+nil | [generic_update_world(Vec2 move, float sprint_factor, bool disable_gravity, bool on_rope)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generic_update_world) | Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is<br/>held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal<br/>movement via `on_rope`. Use this for example to update a custom enemy type.<br/>Will also update `movable.animation_frame` and various timers and counters
 
 ### MovingIcon
 

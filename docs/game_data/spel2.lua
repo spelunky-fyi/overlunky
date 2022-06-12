@@ -2003,6 +2003,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field jump_height_multiplier number
     ---@field owner_uid integer
     ---@field last_owner_uid integer
+    ---@field current_animation Animation
     ---@field idle_counter integer
     ---@field standing_on_uid integer
     ---@field velocityx number
@@ -2049,16 +2050,16 @@ local function Entity_overlaps_with(self, other) end
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil
     ---@field clear_behaviors fun(self): nil
-    ---@field update_physics Movable_update_physics
+    ---@field generic_update_world Movable_generic_update_world
 
----@class Movable_update_physics
+---@class Movable_generic_update_world
 ---@param move Vec2
 ---@param sprint_factor number
 ---@param disable_gravity boolean
 ---@param on_rope boolean
 ---@overload fun(self): nil
 ---@overload fun(self, disable_gravity: boolean): nil
-local function Movable_update_physics(self, move, sprint_factor, disable_gravity, on_rope) end
+local function Movable_generic_update_world(self, move, sprint_factor, disable_gravity, on_rope) end
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
@@ -3647,14 +3648,22 @@ local function Movable_update_physics(self, move, sprint_factor, disable_gravity
 
 ---@class DMAlienBlast : Entity
 
+---@class MovableBehavior
+    ---@field get_state_id MovableBehavior_get_state_id
+
+---@class MovableBehavior_get_state_id
+
+---@overload fun(self): integer
+local function MovableBehavior_get_state_id(self) end
+
 ---@class VanillaMovableBehavior : MovableBehavior
 
 ---@class CustomMovableBehavior : MovableBehavior
     ---@field set_force_state fun(self, force_state: fun(): any): nil
     ---@field set_on_enter fun(self, on_enter: fun(): any): nil
     ---@field set_on_exit fun(self, on_exit: fun(): any): nil
-    ---@field set_update_render fun(self, update_render: fun(): any): nil
-    ---@field set_update_physics fun(self, update_physics: fun(): any): nil
+    ---@field set_update_logic fun(self, update_logic: fun(): any): nil
+    ---@field set_update_world fun(self, update_world: fun(): any): nil
     ---@field set_get_next_state_id fun(self, get_next_state_id: fun(): any): nil
 
 ---@class ParticleDB
