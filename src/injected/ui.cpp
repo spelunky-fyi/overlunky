@@ -3224,13 +3224,12 @@ void erase_entities()
 
 void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 {
-    if (g_state == 0 || (g_state->screen != 11 && g_state->screen != 12))
+    if (g_state == 0 || (g_state->screen < 11 || g_state->screen > 13))
         return;
-    // ImGuiIO& io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
     ImVec2 res = base->Size;
     auto* draw_list = ImGui::GetWindowDrawList();
-    for (int x = -1; x < 96; x++)
+    for (int x = -1; x < 86; x++)
     {
         std::pair<float, float> gridline = UI::screen_position(x + 0.5f, 0);
         if (std::abs(gridline.first) <= 1.0)
@@ -3251,7 +3250,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
             draw_list->AddLine(fix_pos(ImVec2(grids.x, 0)), fix_pos(ImVec2(grids.x, res.y)), color, static_cast<float>(width));
         }
     }
-    for (int y = -1; y < 128; y++)
+    for (int y = -1; y < 126; y++)
     {
         std::pair<float, float> gridline = UI::screen_position(0, y + 0.5f);
         if (std::abs(gridline.second) <= 1.0)
@@ -3592,10 +3591,10 @@ void render_clickhandler()
     {
         render_grid();
     }
-    if (options["draw_hitboxes"])
+    if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, LAYER::PLAYER))
+        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)g_state->camera_layer))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -3758,7 +3757,7 @@ void render_clickhandler()
             hugefont,
             144.0,
             ImVec2(io.DisplaySize.x / 2 - warningsize.x / 2, io.DisplaySize.y / 2 - warningsize.y / 2),
-            ImColor(1.0f, 1.0f, 1.0f, 0.8f),
+            ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             warningtext);
         const char* subtext = "Probably... Some things might, but don't just expect a random script to work.";
         ImVec2 subsize = font->CalcTextSizeA(18.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, subtext);
@@ -3766,7 +3765,7 @@ void render_clickhandler()
             font,
             18.0,
             ImVec2(io.DisplaySize.x / 2 - subsize.x / 2, io.DisplaySize.y / 2 + warningsize.y / 2 + 20),
-            ImColor(1.0f, 1.0f, 1.0f, 0.8f),
+            ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             subtext);
     }
     if (options["mouse_control"] && UI::get_focus())
