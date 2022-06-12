@@ -21507,6 +21507,16 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td>Get the current behavior id</td>
 </tr>
 <tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_gravity">set_gravity(float gravity)</a></td>
+<td>Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=reset_gravity">reset_gravity()</a></td>
+<td>Remove the gravity hook and reset to defaults</td>
+</tr>
+<tr>
 <td><a href="#VanillaMovableBehavior">VanillaMovableBehavior</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_base_behavior">get_base_behavior(int state_id)</a></td>
 <td>Gets a vanilla behavior from this movable, needs to be called before <code>clear_behaviors</code><br/>but the returned values are still valid after a call to <code>clear_behaviors</code></td>

@@ -2046,6 +2046,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field get_all_behaviors fun(self): integer[]
     ---@field set_behavior fun(self, behavior_id: integer): boolean
     ---@field get_behavior fun(self): integer
+    ---@field set_gravity fun(self, gravity: number): nil
+    ---@field reset_gravity fun(self): nil
     ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil
