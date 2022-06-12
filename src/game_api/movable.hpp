@@ -1,19 +1,30 @@
 #pragma once
 
+#include "containers/custom_map.hpp"
+#include "containers/custom_set.hpp"
 #include "entity.hpp"
+#include "movable_behavior.hpp"
 
 #include <functional>
-#include <set>
+
+struct MovableBehavior;
 
 class Movable : public Entity
 {
   public:
-    std::map<uint32_t, size_t> behaviors_map;
-    std::set<size_t> pb0;
-    size_t current_behavior;
+    custom_map<uint32_t, MovableBehavior*> behaviors_map;
+    custom_set<MovableBehavior*, SortMovableBehavior> behaviors;
+    MovableBehavior* current_behavior;
     int64_t ic8;
-    float movex;
-    float movey;
+    union
+    {
+        Vec2 move;
+        struct
+        {
+            float movex;
+            float movey;
+        };
+    };
     BUTTON buttons;
     BUTTON buttons_previous;
     int16_t unknown_padding; // garbage?
@@ -22,7 +33,7 @@ class Movable : public Entity
     int32_t price;
     int32_t owner_uid;
     int32_t last_owner_uid;
-    size_t animation_func;
+    Animation* current_animation;
     uint32_t idle_counter;
     int32_t standing_on_uid;
     float velocityx;
@@ -78,6 +89,8 @@ class Movable : public Entity
     void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
     void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);
 
+    void set_gravity(float gravity);
+
     // don't use this, it's only to not break backwards compatibility
     void light_on_fire_broken()
     {
@@ -90,8 +103,6 @@ class Movable : public Entity
     bool set_behavior(uint32_t behavior_id);
     /// Get the current behavior id
     uint32_t get_behavior();
-
-    void set_gravity(float gravity);
 
     virtual bool can_jump() = 0;
     virtual void v38() = 0;

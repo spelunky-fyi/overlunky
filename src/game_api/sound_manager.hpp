@@ -12,6 +12,7 @@
 #include "aliases.hpp"
 #include "audio_buffer.hpp"
 #include "fmod.hpp"
+#include "string_aliases.hpp"
 
 class SoundManager;
 class PlayingSound;

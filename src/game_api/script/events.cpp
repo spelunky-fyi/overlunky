@@ -1,5 +1,7 @@
 #include "events.hpp"
 
+#include "constants.hpp"
+
 void pre_load_level_files()
 {
     LuaBackend::for_each_backend(

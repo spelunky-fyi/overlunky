@@ -1707,6 +1707,20 @@ Show a message that looks like a level feeling.
 #### bool toast_visible()
 
 
+## Movable Behavior functions
+
+
+### make_custom_behavior
+
+
+> Search script examples for [make_custom_behavior](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=make_custom_behavior)
+
+#### [CustomMovableBehavior](#CustomMovableBehavior) make_custom_behavior(string_view behavior_name, int state_id, [VanillaMovableBehavior](#VanillaMovableBehavior) base_behavior)
+
+Make a `CustomMovableBehavior`, if `base_behavior` is `nil` you will have to set all of the
+behavior functions. If a behavior with `behavior_name` already exists for your script it will
+be returned instead.
+
 ## Network functions
 
 

@@ -1151,6 +1151,14 @@ function is_character_female(type_id) end
 ---@param color Color
 ---@return nil
 function set_character_heart_color(type_id, color) end
+---Make a `CustomMovableBehavior`, if `base_behavior` is `nil` you will have to set all of the
+---behavior functions. If a behavior with `behavior_name` already exists for your script it will
+---be returned instead.
+---@param behavior_name string
+---@param state_id integer
+---@param base_behavior VanillaMovableBehavior
+---@return CustomMovableBehavior
+function make_custom_behavior(behavior_name, state_id, base_behavior) end
 ---Get the [ParticleDB](#ParticleDB) details of the specified ID
 ---@param id integer
 ---@return ParticleDB
@@ -1178,16 +1186,6 @@ function render_screen_particles(particle_emitter) end
 ---@param particle_emitter ParticleEmitterInfo
 ---@return nil
 function extinguish_particles(particle_emitter) end
----Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
----Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
----Base THEME to load enabled functions from, when no other theme is specified.
----Add TEXTUREs here to override different dynamic textures.
----Set a callback to be called before this theme function.
----Set a callback to be called after this theme function, to fix some changes it did for example.
----Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
----Create a new theme with defaults.
----Create a new theme with base dwelling and id 100.
----Add TEXTUREs to `textures` to override different dynamic textures easily.
 ---Default function in spawn definitions to check whether a spawn is valid or not
 ---@param x number
 ---@param y number
@@ -1341,8 +1339,6 @@ function grow_chainandblocks(x, y) end
 ---Immediately load a screen based on state.screen_next and stuff
 ---@return nil
 function load_screen() end
----Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Check ThemeInfo for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
----Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
 ---@return nil
 function force_custom_theme() end
@@ -1471,7 +1467,7 @@ function udp_send(host, port, msg) end
     ---@field save fun(self, data: string): boolean
 
 ---@class LoadContext
-    ---@field load fun(self, ): string
+    ---@field load fun(self): string
 
 ---@class ArenaConfigArenas
     ---@field dwelling_1 boolean
@@ -1711,7 +1707,7 @@ function udp_send(host, port, msg) end
     ---@field screen_arena_score ScreenArenaScore
     ---@field screen_arena_menu ScreenArenaMenu
     ---@field screen_arena_items ScreenArenaItems
-    ---@field get_correct_ushabti fun(self, ): integer
+    ---@field get_correct_ushabti fun(self): integer
     ---@field set_correct_ushabti fun(self, animation_frame: integer): nil
     ---@field arena ArenaState
     ---@field speedrun_character ENT_TYPE
@@ -1792,7 +1788,7 @@ function udp_send(host, port, msg) end
 
 ---@class OnlineLobby
     ---@field code integer
-    ---@field get_code fun(self, ): string
+    ---@field get_code fun(self): string
 
 ---@class LogicList
     ---@field olmec_cutscene LogicOlmecCutscene
@@ -1885,9 +1881,9 @@ local function PRNG_random(self, min, max) end
     ---@field g number
     ---@field b number
     ---@field a number
-    ---@field get_rgba fun(self, ): integer, integer, integer, integer
+    ---@field get_rgba fun(self): integer, integer, integer, integer
     ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color
-    ---@field get_ucolor fun(self, ): uColor
+    ---@field get_ucolor fun(self): uColor
     ---@field set_ucolor fun(self, color: uColor): Color
 
 ---@class Animation
@@ -1969,27 +1965,27 @@ local function PRNG_random(self, min, max) end
     ---@field offsetx number
     ---@field offsety number
     ---@field rendering_info RenderInfo
-    ---@field topmost fun(self, ): Entity
-    ---@field topmost_mount fun(self, ): Entity
+    ---@field topmost fun(self): Entity
+    ---@field topmost_mount fun(self): Entity
     ---@field overlaps_with Entity_overlaps_with
-    ---@field get_texture fun(self, ): TEXTURE
+    ---@field get_texture fun(self): TEXTURE
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean
     ---@field set_draw_depth fun(self, draw_depth: integer): nil
     ---@field liberate_from_shop any @&Entity::liberate_from_shop
-    ---@field get_held_entity fun(self, ): Entity
+    ---@field get_held_entity fun(self): Entity
     ---@field set_layer fun(self, layer: LAYER): nil
-    ---@field remove fun(self, ): nil
+    ---@field remove fun(self): nil
     ---@field respawn fun(self, layer: LAYER): nil
     ---@field kill fun(self, destroy_corpse: boolean, responsible: Entity): nil
-    ---@field destroy fun(self, ): nil
+    ---@field destroy fun(self): nil
     ---@field activate fun(self, activator: Entity): nil
     ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil
     ---@field trigger_action fun(self, user: Entity): boolean
     ---@field get_metadata any @&Entity::get_metadata
     ---@field apply_metadata fun(self, metadata: integer): nil
     ---@field set_invisible fun(self, value: boolean): nil
-    ---@field get_items fun(self, ): span<integer>
-    ---@field is_in_liquid fun(self, ): boolean
+    ---@field get_items fun(self): integer[]
+    ---@field is_in_liquid fun(self): boolean
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -1998,6 +1994,7 @@ local function PRNG_random(self, min, max) end
 local function Entity_overlaps_with(self, other) end
 
 ---@class Movable : Entity
+    ---@field move Vec2
     ---@field movex number
     ---@field movey number
     ---@field buttons BUTTON
@@ -2006,6 +2003,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field jump_height_multiplier number
     ---@field owner_uid integer
     ---@field last_owner_uid integer
+    ---@field current_animation Animation
     ---@field idle_counter integer
     ---@field standing_on_uid integer
     ---@field velocityx number
@@ -2023,7 +2021,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field poison_tick_timer integer
     ---@field airtime integer
     ---@field falling_timer integer
-    ---@field is_poisoned fun(self, ): boolean
+    ---@field is_poisoned fun(self): boolean
     ---@field poison fun(self, frames: integer): nil
     ---@field dark_shadow_timer integer
     ---@field onfire_effect_timer integer
@@ -2040,22 +2038,36 @@ local function Entity_overlaps_with(self, other) end
     ---@field set_cursed fun(self, b: boolean): nil
     ---@field drop fun(self, entity_to_drop: Entity): nil
     ---@field pick_up fun(self, entity_to_pick_up: Entity): nil
-    ---@field can_jump fun(self, ): boolean
-    ---@field standing_on fun(self, ): Entity
+    ---@field can_jump fun(self): boolean
+    ---@field standing_on fun(self): Entity
     ---@field add_money fun(self, money: integer): nil
-    ---@field is_on_fire fun(self, ): boolean
+    ---@field is_on_fire fun(self): boolean
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
-    ---@field get_all_behaviors fun(self, ): integer[]
+    ---@field get_all_behaviors fun(self): integer[]
     ---@field set_behavior fun(self, behavior_id: integer): boolean
-    ---@field get_behavior fun(self, ): integer
+    ---@field get_behavior fun(self): integer
+    ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior
+    ---@field add_behavior fun(self, behavior: MovableBehavior): nil
+    ---@field clear_behavior fun(self, behavior: MovableBehavior): nil
+    ---@field clear_behaviors fun(self): nil
+    ---@field generic_update_world Movable_generic_update_world
+
+---@class Movable_generic_update_world
+---@param move Vec2
+---@param sprint_factor number
+---@param disable_gravity boolean
+---@param on_rope boolean
+---@overload fun(self): nil
+---@overload fun(self, disable_gravity: boolean): nil
+local function Movable_generic_update_world(self, move, sprint_factor, disable_gravity, on_rope) end
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
     ---@field give_powerup fun(self, powerup_type: ENT_TYPE): nil
     ---@field has_powerup fun(self, powerup_type: ENT_TYPE): boolean
-    ---@field get_powerups fun(self, ): ENT_TYPE[]
-    ---@field unequip_backitem fun(self, ): nil
-    ---@field worn_backitem fun(self, ): integer
+    ---@field get_powerups fun(self): ENT_TYPE[]
+    ---@field unequip_backitem fun(self): nil
+    ---@field worn_backitem fun(self): integer
 
 ---@class Inventory
     ---@field money integer
@@ -2104,31 +2116,31 @@ local function Entity_overlaps_with(self, other) end
     ---@field linked_companion_child integer
     ---@field ai Ai
     ---@field set_jetpack_fuel fun(self, fuel: integer): nil
-    ---@field kapala_blood_amount fun(self, ): integer
-    ---@field get_name fun(self, ): string
-    ---@field get_short_name fun(self, ): string
-    ---@field get_heart_color fun(self, ): Color
-    ---@field is_female fun(self, ): boolean
+    ---@field kapala_blood_amount fun(self): integer
+    ---@field get_name fun(self): string
+    ---@field get_short_name fun(self): string
+    ---@field get_heart_color fun(self): Color
+    ---@field is_female fun(self): boolean
     ---@field set_heart_color fun(self, hcolor: Color): nil
-    ---@field let_go fun(self, ): nil
+    ---@field let_go fun(self): nil
 
 ---@class Floor : Entity
     ---@field deco_top integer
     ---@field deco_bottom integer
     ---@field deco_left integer
     ---@field deco_right integer
-    ---@field fix_border_tile_animation fun(self, ): nil
+    ---@field fix_border_tile_animation fun(self): nil
     ---@field fix_decorations fun(self, fix_also_neighbors: boolean, fix_styled_floor: boolean): nil
     ---@field add_decoration fun(self, side: FLOOR_SIDE): nil
     ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil
-    ---@field decorate_internal fun(self, ): nil
-    ---@field get_floor_type fun(self, ): ENT_TYPE
+    ---@field decorate_internal fun(self): nil
+    ---@field get_floor_type fun(self): ENT_TYPE
 
 ---@class Door : Floor
     ---@field counter integer
     ---@field fx_button Entity
     ---@field enter fun(self, who: Entity): integer
-    ---@field is_unlocked fun(self, ): boolean
+    ---@field is_unlocked fun(self): boolean
     ---@field unlock fun(self, unlock: boolean): nil
 
 ---@class ExitDoor : Door
@@ -2158,7 +2170,7 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class Arrowtrap : Floor
     ---@field arrow_shot boolean
-    ---@field rearm fun(self, ): nil
+    ---@field rearm fun(self): nil
     ---@field trigger fun(self, who_uid: integer): nil
 
 ---@class TotemTrap : Floor
@@ -2286,7 +2298,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field jump_timer integer
     ---@field phase1_amount_of_bomb_salvos integer
     ---@field unknown_attack_state integer
-    ---@field broken_floaters fun(self, ): integer
+    ---@field broken_floaters fun(self): integer
 
 ---@class WoodenlogTrap : Movable
     ---@field ceiling_1_uid integer
@@ -2318,7 +2330,7 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class Drill : Movable
     ---@field top_chain_piece Entity
-    ---@field trigger fun(self, ): nil
+    ---@field trigger fun(self): nil
 
 ---@class ThinIce : Movable
     ---@field strength integer
@@ -2349,8 +2361,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field tamed boolean
     ---@field walk_pause_timer integer
     ---@field taming_timer integer
-    ---@field used_double_jump fun(self, ): boolean
-    ---@field remove_rider fun(self, ): nil
+    ---@field used_double_jump fun(self): boolean
+    ---@field remove_rider fun(self): nil
 
 ---@class Rockdog : Mount
     ---@field attack_cooldown integer
@@ -3071,7 +3083,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field flame_uid integer
     ---@field is_lit boolean
     ---@field light_up fun(self, lit: boolean): nil
-    ---@field get_flame_type fun(self, ): ENT_TYPE
+    ---@field get_flame_type fun(self): ENT_TYPE
 
 ---@class WallTorch : Torch
     ---@field dropped_gold boolean
@@ -3240,7 +3252,7 @@ local function Entity_overlaps_with(self, other) end
 ---@class ParachutePowerup : Powerup
     ---@field falltime_deploy integer
     ---@field deployed boolean
-    ---@field deploy fun(self, ): nil
+    ---@field deploy fun(self): nil
 
 ---@class TrueCrownPowerup : Powerup
     ---@field timer integer
@@ -3439,7 +3451,7 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class Liquid : Entity
     ---@field fx_surface Entity
-    ---@field get_liquid_flags fun(self, ): integer
+    ---@field get_liquid_flags fun(self): integer
     ---@field set_liquid_flags fun(self, flags: integer): nil
 
 ---@class Lava : Liquid
@@ -3636,6 +3648,24 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class DMAlienBlast : Entity
 
+---@class MovableBehavior
+    ---@field get_state_id MovableBehavior_get_state_id
+
+---@class MovableBehavior_get_state_id
+
+---@overload fun(self): integer
+local function MovableBehavior_get_state_id(self) end
+
+---@class VanillaMovableBehavior : MovableBehavior
+
+---@class CustomMovableBehavior : MovableBehavior
+    ---@field set_force_state fun(self, force_state: fun(): any): nil
+    ---@field set_on_enter fun(self, on_enter: fun(): any): nil
+    ---@field set_on_exit fun(self, on_exit: fun(): any): nil
+    ---@field set_update_logic fun(self, update_logic: fun(): any): nil
+    ---@field set_update_world fun(self, update_world: fun(): any): nil
+    ---@field set_get_next_state_id fun(self, get_next_state_id: fun(): any): nil
+
 ---@class ParticleDB
     ---@field id integer
     ---@field spawn_count_min integer
@@ -3665,7 +3695,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field blue integer
     ---@field permanent boolean
     ---@field invisible boolean
-    ---@field get_texture fun(self, ): integer
+    ---@field get_texture fun(self): integer
     ---@field set_texture fun(self, texture_id: integer): boolean
 
 ---@class ParticleEmitterInfo
@@ -3679,57 +3709,57 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class ThemeInfo
     ---@field sub_theme ThemeInfo
-    ---@field get_unknown1 fun(self, ): boolean
-    ---@field init_flags fun(self, ): nil
-    ---@field init_level fun(self, ): nil
-    ---@field unknown_v4 fun(self, ): nil
-    ---@field unknown_v5 fun(self, ): nil
-    ---@field add_special_rooms fun(self, ): nil
-    ---@field unknown_v7 fun(self, ): nil
-    ---@field unknown_v8 fun(self, ): nil
-    ---@field add_vault fun(self, ): nil
-    ---@field add_coffin fun(self, ): nil
-    ---@field add_special_feeling fun(self, ): nil
-    ---@field unknown_v12 fun(self, ): boolean
-    ---@field spawn_level fun(self, ): nil
-    ---@field spawn_border fun(self, ): nil
-    ---@field post_process_level fun(self, ): nil
-    ---@field spawn_traps fun(self, ): nil
-    ---@field post_process_entities fun(self, ): nil
-    ---@field spawn_procedural fun(self, ): nil
-    ---@field spawn_background fun(self, ): nil
-    ---@field spawn_lights fun(self, ): nil
-    ---@field spawn_transition fun(self, ): nil
-    ---@field post_transition fun(self, ): nil
-    ---@field spawn_players fun(self, ): nil
-    ---@field spawn_effects fun(self, ): nil
-    ---@field get_level_file fun(self, ): string
-    ---@field get_theme_id fun(self, ): integer
-    ---@field get_base_id fun(self, ): integer
-    ---@field get_floor_spreading_type fun(self, ): integer
-    ---@field get_floor_spreading_type2 fun(self, ): integer
-    ---@field unknown_v30 fun(self, ): boolean
-    ---@field get_transition_block_modifier fun(self, ): integer
-    ---@field unknown_v32 fun(self, ): integer
-    ---@field get_backwall_type fun(self, ): integer
-    ---@field get_border_type fun(self, ): integer
-    ---@field get_critter_type fun(self, ): integer
-    ---@field get_liquid_gravity fun(self, ): number
-    ---@field get_player_damage fun(self, ): boolean
-    ---@field unknown_v38 fun(self, ): boolean
-    ---@field get_backlayer_lut fun(self, ): integer
-    ---@field get_backlayer_light_level fun(self, ): number
-    ---@field get_loop fun(self, ): boolean
-    ---@field get_vault_level fun(self, ): integer
+    ---@field get_unknown1 fun(self): boolean
+    ---@field init_flags fun(self): nil
+    ---@field init_level fun(self): nil
+    ---@field unknown_v4 fun(self): nil
+    ---@field unknown_v5 fun(self): nil
+    ---@field add_special_rooms fun(self): nil
+    ---@field unknown_v7 fun(self): nil
+    ---@field unknown_v8 fun(self): nil
+    ---@field add_vault fun(self): nil
+    ---@field add_coffin fun(self): nil
+    ---@field add_special_feeling fun(self): nil
+    ---@field unknown_v12 fun(self): boolean
+    ---@field spawn_level fun(self): nil
+    ---@field spawn_border fun(self): nil
+    ---@field post_process_level fun(self): nil
+    ---@field spawn_traps fun(self): nil
+    ---@field post_process_entities fun(self): nil
+    ---@field spawn_procedural fun(self): nil
+    ---@field spawn_background fun(self): nil
+    ---@field spawn_lights fun(self): nil
+    ---@field spawn_transition fun(self): nil
+    ---@field post_transition fun(self): nil
+    ---@field spawn_players fun(self): nil
+    ---@field spawn_effects fun(self): nil
+    ---@field get_level_file fun(self): string
+    ---@field get_theme_id fun(self): integer
+    ---@field get_base_id fun(self): integer
+    ---@field get_floor_spreading_type fun(self): integer
+    ---@field get_floor_spreading_type2 fun(self): integer
+    ---@field unknown_v30 fun(self): boolean
+    ---@field get_transition_block_modifier fun(self): integer
+    ---@field unknown_v32 fun(self): integer
+    ---@field get_backwall_type fun(self): integer
+    ---@field get_border_type fun(self): integer
+    ---@field get_critter_type fun(self): integer
+    ---@field get_liquid_gravity fun(self): number
+    ---@field get_player_damage fun(self): boolean
+    ---@field unknown_v38 fun(self): boolean
+    ---@field get_backlayer_lut fun(self): integer
+    ---@field get_backlayer_light_level fun(self): number
+    ---@field get_loop fun(self): boolean
+    ---@field get_vault_level fun(self): integer
     ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
     ---@field get_dynamic_texture fun(self, texture_id: integer): integer
-    ---@field pre_transition fun(self, ): nil
-    ---@field get_level_height fun(self, ): integer
-    ---@field unknown_v47 fun(self, ): integer
-    ---@field spawn_decoration fun(self, ): nil
-    ---@field spawn_decoration2 fun(self, ): nil
-    ---@field spawn_extra fun(self, ): nil
-    ---@field unknown_v51 fun(self, ): nil
+    ---@field pre_transition fun(self): nil
+    ---@field get_level_height fun(self): integer
+    ---@field unknown_v47 fun(self): integer
+    ---@field spawn_decoration fun(self): nil
+    ---@field spawn_decoration2 fun(self): nil
+    ---@field spawn_extra fun(self): nil
+    ---@field unknown_v51 fun(self): nil
 
 ---@class CustomTheme
     ---@field level_file string
@@ -3744,57 +3774,57 @@ local function Entity_overlaps_with(self, other) end
     ---@field unknown2 any @&CustomTheme::unknown2
     ---@field unknown3 any @&CustomTheme::unknown3
     ---@field unknown4 any @&CustomTheme::unknown4
-    ---@field get_unknown1 fun(self, ): boolean
-    ---@field init_flags fun(self, ): nil
-    ---@field init_level fun(self, ): nil
-    ---@field unknown_v4 fun(self, ): nil
-    ---@field unknown_v5 fun(self, ): nil
-    ---@field add_special_rooms fun(self, ): nil
-    ---@field unknown_v7 fun(self, ): nil
-    ---@field unknown_v8 fun(self, ): nil
-    ---@field add_vault fun(self, ): nil
-    ---@field add_coffin fun(self, ): nil
-    ---@field add_special_feeling fun(self, ): nil
-    ---@field unknown_v12 fun(self, ): boolean
-    ---@field spawn_level fun(self, ): nil
-    ---@field spawn_border fun(self, ): nil
-    ---@field post_process_level fun(self, ): nil
-    ---@field spawn_traps fun(self, ): nil
-    ---@field post_process_entities fun(self, ): nil
-    ---@field spawn_procedural fun(self, ): nil
-    ---@field spawn_background fun(self, ): nil
-    ---@field spawn_lights fun(self, ): nil
-    ---@field spawn_transition fun(self, ): nil
-    ---@field post_transition fun(self, ): nil
-    ---@field spawn_players fun(self, ): nil
-    ---@field spawn_effects fun(self, ): nil
-    ---@field get_level_file fun(self, ): string
-    ---@field get_theme_id fun(self, ): integer
-    ---@field get_base_id fun(self, ): integer
-    ---@field get_floor_spreading_type fun(self, ): integer
-    ---@field get_floor_spreading_type2 fun(self, ): integer
-    ---@field unknown_v30 fun(self, ): boolean
-    ---@field get_transition_block_modifier fun(self, ): integer
-    ---@field unknown_v32 fun(self, ): integer
-    ---@field get_backwall_type fun(self, ): integer
-    ---@field get_border_type fun(self, ): integer
-    ---@field get_critter_type fun(self, ): integer
-    ---@field get_liquid_gravity fun(self, ): number
-    ---@field get_player_damage fun(self, ): boolean
-    ---@field unknown_v38 fun(self, ): boolean
-    ---@field get_backlayer_lut fun(self, ): integer
-    ---@field get_backlayer_light_level fun(self, ): number
-    ---@field get_loop fun(self, ): boolean
-    ---@field get_vault_level fun(self, ): integer
+    ---@field get_unknown1 fun(self): boolean
+    ---@field init_flags fun(self): nil
+    ---@field init_level fun(self): nil
+    ---@field unknown_v4 fun(self): nil
+    ---@field unknown_v5 fun(self): nil
+    ---@field add_special_rooms fun(self): nil
+    ---@field unknown_v7 fun(self): nil
+    ---@field unknown_v8 fun(self): nil
+    ---@field add_vault fun(self): nil
+    ---@field add_coffin fun(self): nil
+    ---@field add_special_feeling fun(self): nil
+    ---@field unknown_v12 fun(self): boolean
+    ---@field spawn_level fun(self): nil
+    ---@field spawn_border fun(self): nil
+    ---@field post_process_level fun(self): nil
+    ---@field spawn_traps fun(self): nil
+    ---@field post_process_entities fun(self): nil
+    ---@field spawn_procedural fun(self): nil
+    ---@field spawn_background fun(self): nil
+    ---@field spawn_lights fun(self): nil
+    ---@field spawn_transition fun(self): nil
+    ---@field post_transition fun(self): nil
+    ---@field spawn_players fun(self): nil
+    ---@field spawn_effects fun(self): nil
+    ---@field get_level_file fun(self): string
+    ---@field get_theme_id fun(self): integer
+    ---@field get_base_id fun(self): integer
+    ---@field get_floor_spreading_type fun(self): integer
+    ---@field get_floor_spreading_type2 fun(self): integer
+    ---@field unknown_v30 fun(self): boolean
+    ---@field get_transition_block_modifier fun(self): integer
+    ---@field unknown_v32 fun(self): integer
+    ---@field get_backwall_type fun(self): integer
+    ---@field get_border_type fun(self): integer
+    ---@field get_critter_type fun(self): integer
+    ---@field get_liquid_gravity fun(self): number
+    ---@field get_player_damage fun(self): boolean
+    ---@field unknown_v38 fun(self): boolean
+    ---@field get_backlayer_lut fun(self): integer
+    ---@field get_backlayer_light_level fun(self): number
+    ---@field get_loop fun(self): boolean
+    ---@field get_vault_level fun(self): integer
     ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
     ---@field get_dynamic_texture fun(self, texture_id: integer): integer
-    ---@field pre_transition fun(self, ): nil
-    ---@field get_level_height fun(self, ): integer
-    ---@field unknown_v47 fun(self, ): integer
-    ---@field spawn_decoration fun(self, ): nil
-    ---@field spawn_decoration2 fun(self, ): nil
-    ---@field spawn_extra fun(self, ): nil
-    ---@field unknown_v51 fun(self, ): nil
+    ---@field pre_transition fun(self): nil
+    ---@field get_level_height fun(self): integer
+    ---@field unknown_v47 fun(self): integer
+    ---@field spawn_decoration fun(self): nil
+    ---@field spawn_decoration2 fun(self): nil
+    ---@field spawn_extra fun(self): nil
+    ---@field unknown_v51 fun(self): nil
 
 ---@class PreLoadLevelFilesContext
     ---@field override_level_files fun(self, levels: string[]): nil
@@ -3833,9 +3863,9 @@ local function Entity_overlaps_with(self, other) end
     ---@field set_short_tile_code fun(self, tx: integer, ty: integer, layer: LAYER, short_tile_code: SHORT_TILE_CODE): boolean
     ---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): integer[][]
     ---@field replace_short_tile_code fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE, replacement_short_tile_code: SHORT_TILE_CODE): boolean
-    ---@field has_back_layer fun(self, ): boolean
-    ---@field add_empty_back_layer fun(self, ): nil
-    ---@field add_copied_back_layer fun(self, ): nil
+    ---@field has_back_layer fun(self): boolean
+    ---@field add_empty_back_layer fun(self): nil
+    ---@field add_copied_back_layer fun(self): nil
 
 ---@class ShortTileCodeDef
     ---@field tile_code TILE_CODE
@@ -3920,7 +3950,7 @@ local function Entity_overlaps_with(self, other) end
 
 ---@class CustomSound
     ---@field play CustomSound_play
-    ---@field get_parameters fun(self, ): table<VANILLA_SOUND_PARAM, string>
+    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
 
 ---@class CustomSound_play
 ---@param paused boolean
@@ -3930,8 +3960,8 @@ local function Entity_overlaps_with(self, other) end
 local function CustomSound_play(self, paused, sound_type) end
 
 ---@class PlayingSound
-    ---@field is_playing fun(self, ): boolean
-    ---@field stop fun(self, ): boolean
+    ---@field is_playing fun(self): boolean
+    ---@field stop fun(self): boolean
     ---@field set_pause fun(self, pause: boolean): boolean
     ---@field set_mute fun(self, mute: boolean): boolean
     ---@field set_pitch fun(self, pitch: number): boolean
@@ -3939,7 +3969,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field set_volume fun(self, volume: number): boolean
     ---@field set_looping fun(self, loop_mode: SOUND_LOOP_MODE): boolean
     ---@field set_callback fun(self, callback: SoundCallbackFunction): boolean
-    ---@field get_parameters fun(self, ): table<VANILLA_SOUND_PARAM, string>
+    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
     ---@field get_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM): number?
     ---@field set_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM, value: number): boolean
 
@@ -3999,8 +4029,8 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_image_rotated GuiDrawContext_draw_image_rotated
     ---@field window any @&GuiDrawContext::window
     ---@field win_text fun(self, text: string): nil
-    ---@field win_separator fun(self, ): nil
-    ---@field win_inline fun(self, ): nil
+    ---@field win_separator fun(self): nil
+    ---@field win_inline fun(self): nil
     ---@field win_sameline fun(self, offset: number, spacing: number): nil
     ---@field win_button fun(self, text: string): boolean
     ---@field win_input_text fun(self, label: string, value: string): string
@@ -4013,7 +4043,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field win_check fun(self, label: string, value: boolean): boolean
     ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer
     ---@field win_pushid fun(self, id: integer): nil
-    ---@field win_popid fun(self, ): nil
+    ---@field win_popid fun(self): nil
     ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil
 
 ---@class GuiDrawContext_draw_rect
@@ -4126,7 +4156,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field destination_top_right_x number
     ---@field destination_top_right_y number
     ---@field set_destination fun(self, bbox: AABB): nil
-    ---@field dest_get_quad fun(self, ): Quad
+    ---@field dest_get_quad fun(self): Quad
     ---@field dest_set_quad fun(self, quad: Quad): nil
     ---@field source_bottom_left_x number
     ---@field source_bottom_left_y number
@@ -4136,7 +4166,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field source_top_left_y number
     ---@field source_top_right_x number
     ---@field source_top_right_y number
-    ---@field source_get_quad fun(self, ): Quad
+    ---@field source_get_quad fun(self): Quad
     ---@field source_set_quad fun(self, quad: Quad): nil
 
 ---@class TextRenderingInfo
@@ -4170,13 +4200,13 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field right number
     ---@field top number
     ---@field overlaps_with fun(self, other: AABB): boolean
-    ---@field abs fun(self, ): AABB
+    ---@field abs fun(self): AABB
     ---@field extrude fun(self, amount: number): AABB
     ---@field offset fun(self, off_x: number, off_y: number): AABB
-    ---@field area fun(self, ): number
-    ---@field center fun(self, ): number, number
-    ---@field width fun(self, ): number
-    ---@field height fun(self, ): number
+    ---@field area fun(self): number
+    ---@field center fun(self): number, number
+    ---@field width fun(self): number
+    ---@field height fun(self): number
 
 ---@class Quad
     ---@field bottom_left_x number
@@ -4187,12 +4217,12 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field top_right_y number
     ---@field top_left_x number
     ---@field top_left_y number
-    ---@field get_AABB fun(self, ): AABB
+    ---@field get_AABB fun(self): AABB
     ---@field offset fun(self, off_x: number, off_y: number): Quad
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad
-    ---@field flip_horizontally fun(self, ): Quad
-    ---@field flip_vertically fun(self, ): Quad
-    ---@field split fun(self, ): Vec2, Vec2, Vec2, Vec2
+    ---@field flip_horizontally fun(self): Quad
+    ---@field flip_vertically fun(self): Quad
+    ---@field split fun(self): Vec2, Vec2, Vec2, Vec2
 
 ---@class Screen
     ---@field render_timer number
@@ -4854,9 +4884,12 @@ Color = nil
 ---Create a new color - defaults to black
 ---@return Color
 function Color.new(self) end
----@param Color Color
+---@param color Color
 ---@return Color
-function Color.new(self, Color) end
+function Color.new(self, color) end
+---@param color Color
+---@return Color
+function Color.new(self, color) end
 ---Create a new color by specifying its values
 ---@param r_ number
 ---@param g_ number
@@ -4884,9 +4917,9 @@ function CustomTheme.new(self) end
 Vec2 = nil
 ---@return Vec2
 function Vec2.new(self) end
----@param Vec2 Vec2
+---@param vec2 Vec2
 ---@return Vec2
-function Vec2.new(self, Vec2) end
+function Vec2.new(self, vec2) end
 ---@param x_ number
 ---@param y_ number
 ---@return Vec2
@@ -4900,9 +4933,9 @@ AABB = nil
 ---@return AABB
 function AABB.new(self) end
 ---Copy an axis aligned bounding box
----@param AABB AABB
+---@param aabb AABB
 ---@return AABB
-function AABB.new(self, AABB) end
+function AABB.new(self, aabb) end
 ---Create a new axis aligned bounding box by specifying its values
 ---@param left_ number
 ---@param top_ number
@@ -4914,9 +4947,9 @@ function AABB.new(self, left_, top_, right_, bottom_) end
 Quad = nil
 ---@return Quad
 function Quad.new(self) end
----@param Quad Quad
+---@param quad Quad
 ---@return Quad
-function Quad.new(self, Quad) end
+function Quad.new(self, quad) end
 ---@param bottom_left_ Vec2
 ---@param bottom_right_ Vec2
 ---@param top_right_ Vec2
@@ -4933,9 +4966,9 @@ function Quad.new(self, bottom_left_, bottom_right_, top_right_, top_left_) end
 ---@param _top_left_y number
 ---@return Quad
 function Quad.new(self, _bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right_y, _top_right_x, _top_right_y, _top_left_x, _top_left_y) end
----@param AABB AABB
+---@param aabb AABB
 ---@return Quad
-function Quad.new(self, AABB) end
+function Quad.new(self, aabb) end
 
 --## Enums
 

@@ -6,7 +6,8 @@
 #include <d3d11.h>
 #include <detours.h>
 
-#include "game_allocator.hpp"
+#include "containers/game_allocator.hpp"
+
 #include "memory.hpp"
 #include "util.hpp"
 #include "window_api.hpp"
