@@ -3287,18 +3287,23 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
 
     std::pair<float, float> render_position = UI::get_position(ent, options["draw_hitboxes_interpolated"]);
 
+    auto [originx, originy] =
+        UI::screen_position(render_position.first, render_position.second);
     auto [boxa_x, boxa_y] =
         UI::screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
     auto [boxb_x, boxb_y] =
         UI::screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
+    ImVec2 sorigin = screenify({originx, originy});
     ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
     ImVec2 sboxa = screenify({boxa_x, boxa_y});
     ImVec2 sboxb = screenify({boxb_x, boxb_y});
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
-        draw_list->AddLine(fix_pos(sboxa), fix_pos(sboxb), color, 2);
-        draw_list->AddLine(fix_pos(ImVec2(sboxa.x, sboxb.y)), fix_pos(ImVec2(sboxb.x, sboxa.y)), color, 2);
+        draw_list->AddLine(fix_pos(sboxa), fix_pos(sorigin), color, 2);
+        draw_list->AddLine(fix_pos(sboxb), fix_pos(sorigin), color, 2);
+        draw_list->AddLine(fix_pos(ImVec2(sboxa.x, sboxb.y)), fix_pos(sorigin), color, 2);
+        draw_list->AddLine(fix_pos(ImVec2(sboxb.x, sboxa.y)), fix_pos(sorigin), color, 2);
     }
     if (ent->shape == SHAPE::CIRCLE)
         if (filled)
@@ -3622,6 +3627,18 @@ void render_clickhandler()
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 0, 0, 150));
             }
+
+            // OOB kill bounds
+            auto* draw_list = ImGui::GetBackgroundDrawList();
+            std::pair<float, float> gridline = UI::screen_position(-0.5f, 0);
+            ImVec2 grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(fix_pos(ImVec2(grids.x, base->Pos.y)), fix_pos(ImVec2(grids.x, base->Pos.y + base->Size.y)), ImColor(255, 0, 0, 150), 2.0f);
+            gridline = UI::screen_position(static_cast<float>(10 * g_state->w) + 5.5f, 0);
+            grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(fix_pos(ImVec2(grids.x, base->Pos.y)), fix_pos(ImVec2(grids.x, base->Pos.y + base->Size.y)), ImColor(255, 0, 0, 150), 2.0f);
+            gridline = UI::screen_position(0, static_cast<float>(120 - 8 * g_state->h) - 4.0f);
+            grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(fix_pos(ImVec2(base->Pos.x, grids.y)), fix_pos(ImVec2(base->Pos.x + base->Size.x, grids.y)), ImColor(255, 0, 0, 150), 2.0f);
         }
 
         if (ImGui::IsMousePosValid())
