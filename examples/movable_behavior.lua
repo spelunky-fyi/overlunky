@@ -37,11 +37,11 @@ local custom_state_flee = {
         rock.wet_effect_timer = 0;
     end,
     ---@param rock Movable
-    update_render = function(rock, base_fun)
+    update_logic = function(rock, base_fun)
         return base_fun(rock)
     end,
     ---@param rock Movable
-    update_physics = function(rock, base_fun)
+    update_world = function(rock, base_fun)
         if rock.velocityx == 0 then
             local x, y, l = get_position(rock.uid)
             local close_players = get_entities_at(0, MASK.PLAYER, x, y, l, 0.6);
@@ -80,8 +80,8 @@ set_post_entity_spawn(function(rock)
         custom_state_flee.handle:set_force_state(custom_state_flee.force_state)
         custom_state_flee.handle:set_on_enter(custom_state_flee.on_enter)
         custom_state_flee.handle:set_on_exit(custom_state_flee.on_exit)
-        custom_state_flee.handle:set_update_render(custom_state_flee.update_render)
-        custom_state_flee.handle:set_update_physics(custom_state_flee.update_physics)
+        custom_state_flee.handle:set_update_logic(custom_state_flee.update_logic)
+        custom_state_flee.handle:set_update_world(custom_state_flee.update_world)
         custom_state_flee.handle:set_get_next_state_id(custom_state_flee.get_next_state_id)
     end
 

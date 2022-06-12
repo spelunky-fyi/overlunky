@@ -20,8 +20,8 @@ struct MovableBehavior
     virtual bool force_state(Movable* movable) = 0;
     virtual void on_enter(Movable* movable) = 0;
     virtual void on_exit(Movable* movable) = 0;
-    virtual void update_render(Movable* movable) = 0;
-    virtual void update_physics(Movable* movable) = 0;
+    virtual void update_logic(Movable* movable) = 0;
+    virtual void update_world(Movable* movable) = 0;
     virtual uint8_t get_next_state_id(Movable* movable) = 0;
 
     // To shut up clang
@@ -38,8 +38,8 @@ struct CustomMovableBehavior final : MovableBehavior
     std::function<bool(Movable*, std::function<bool(Movable*)>)> custom_force_state;
     std::function<void(Movable*, std::function<void(Movable*)>)> custom_on_enter;
     std::function<void(Movable*, std::function<void(Movable*)>)> custom_on_exit;
-    std::function<void(Movable*, std::function<void(Movable*)>)> custom_update_render;
-    std::function<void(Movable*, std::function<void(Movable*)>)> custom_update_physics;
+    std::function<void(Movable*, std::function<void(Movable*)>)> custom_update_logic;
+    std::function<void(Movable*, std::function<void(Movable*)>)> custom_update_world;
     std::function<uint8_t(Movable*, std::function<uint8_t(Movable*)>)> custom_get_next_state_id;
     VanillaMovableBehavior* base_behavior;
 
@@ -52,8 +52,8 @@ struct CustomMovableBehavior final : MovableBehavior
     virtual bool force_state(Movable* movable) override;
     virtual void on_enter(Movable* movable) override;
     virtual void on_exit(Movable* movable) override;
-    virtual void update_render(Movable* movable) override;
-    virtual void update_physics(Movable* movable) override;
+    virtual void update_logic(Movable* movable) override;
+    virtual void update_world(Movable* movable) override;
     virtual uint8_t get_next_state_id(Movable* movable) override;
 
     void hook_movable(Movable* movable);
@@ -73,12 +73,15 @@ void clear_behavior(Movable* movable, MovableBehavior* behavior);
 void clear_behaviors(Movable* movable);
 
 /// Move a movable according to its velocity, update physics, gravity, etc.
+/// Will also update `movable.animation_frame` and various timers and counters
 void update_movable(Movable* movable);
 /// Move a movable according to its velocity, can disable gravity
+/// Will also update `movable.animation_frame` and various timers and counters
 void update_movable(Movable* movable, bool disable_gravity);
 /// Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is
 /// held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal
 /// movement via `on_rope`. Use this for example to update a custom enemy type.
+/// Will also update `movable.animation_frame` and various timers and counters
 void update_movable(Movable* movable, Vec2 move, float sprint_factor, bool disable_gravity, bool on_rope);
 
 void init_behavior_hooks();

@@ -87,13 +87,13 @@ void CustomMovableBehavior::on_exit(Movable* movable)
 {
     call_custom_or_original<&VanillaMovableBehavior::on_exit>(custom_on_exit, base_behavior, movable);
 }
-void CustomMovableBehavior::update_render(Movable* movable)
+void CustomMovableBehavior::update_logic(Movable* movable)
 {
-    call_custom_or_original<&VanillaMovableBehavior::update_render>(custom_update_render, base_behavior, movable);
+    call_custom_or_original<&VanillaMovableBehavior::update_logic>(custom_update_logic, base_behavior, movable);
 }
-void CustomMovableBehavior::update_physics(Movable* movable)
+void CustomMovableBehavior::update_world(Movable* movable)
 {
-    call_custom_or_original<&VanillaMovableBehavior::update_physics>(custom_update_physics, base_behavior, movable);
+    call_custom_or_original<&VanillaMovableBehavior::update_world>(custom_update_world, base_behavior, movable);
 }
 uint8_t CustomMovableBehavior::get_next_state_id(Movable* movable)
 {

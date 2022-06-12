@@ -32,7 +32,7 @@ void register_usertypes(sol::state& lua)
         static_cast<void (*)(Movable*)>(::update_movable),
         static_cast<void (*)(Movable*, bool)>(::update_movable),
         static_cast<void (*)(Movable*, Vec2, float, bool, bool)>(::update_movable));
-    lua["Movable"]["update_physics"] = update_movable;
+    lua["Movable"]["generic_update_world"] = update_movable;
 
     /// Opaque handle to a movable behavior
     lua.new_usertype<MovableBehavior>(
@@ -93,29 +93,29 @@ void register_usertypes(sol::state& lua)
             backend->handle_function(on_exit, movable, std::move(base_fun));
         };
     };
-    /// Set the `update_render` function of a `CustomMovableBehavior`, this will be called every frame when
-    /// the movable is updated. If an `update_render` is already set it will be overridden. The signature
-    /// of the function is `nil update_render(movable, base_fun))`, use it to change the color, texture,
-    /// animation frame, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
-    lua["CustomMovableBehavior"]["set_update_render"] = [](CustomMovableBehavior* behavior, sol::function update_render) -> void
+    /// Set the `update_logic` function of a `CustomMovableBehavior`, this will be called every frame when
+    /// the movable is updated. If an `update_logic` is already set it will be overridden. The signature
+    /// of the function is `nil update_logic(movable, base_fun))`, use it to change the color, texture,
+    /// some timers, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
+    lua["CustomMovableBehavior"]["set_update_logic"] = [](CustomMovableBehavior* behavior, sol::function update_logic) -> void
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        behavior->custom_update_render = [=, update_render = std::move(update_render)](Movable* movable, std::function<void(Movable*)> base_fun)
+        behavior->custom_update_logic = [=, update_logic = std::move(update_logic)](Movable* movable, std::function<void(Movable*)> base_fun)
         {
-            backend->handle_function(update_render, movable, std::move(base_fun));
+            backend->handle_function(update_logic, movable, std::move(base_fun));
         };
     };
-    /// Set the `update_physics` function of a `CustomMovableBehavior`, this will be called every frame when
-    /// the movable is updated. If an `update_physics` is already set it will be overridden. The signature
-    /// of the function is `nil update_physics(movable, base_fun))`, use this to update the movex, movey, velocityx,
-    /// velocityy, etc. of the movable, then call `update_movable` to update the movable. If no base behavior is set
-    /// `base_fun` will be `nil`.
-    lua["CustomMovableBehavior"]["set_update_physics"] = [](CustomMovableBehavior* behavior, sol::function update_physics) -> void
+    /// Set the `update_world` function of a `CustomMovableBehavior`, this will be called every frame when
+    /// the movable is updated. If an `update_world` is already set it will be overridden. The signature
+    /// of the function is `nil update_world(movable, base_fun))`, use this to update the move, velocity,
+    /// current_animation, etc. of the movable, then call `mov:generic_update_world` to update the movable. If no
+    /// base behavior is set `base_fun` will be `nil`.
+    lua["CustomMovableBehavior"]["set_update_world"] = [](CustomMovableBehavior* behavior, sol::function update_world) -> void
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        behavior->custom_update_physics = [=, update_physics = std::move(update_physics)](Movable* movable, std::function<void(Movable*)> base_fun)
+        behavior->custom_update_world = [=, update_world = std::move(update_world)](Movable* movable, std::function<void(Movable*)> base_fun)
         {
-            backend->handle_function(update_physics, movable, std::move(base_fun));
+            backend->handle_function(update_world, movable, std::move(base_fun));
         };
     };
     /// Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when
