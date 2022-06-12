@@ -76,7 +76,6 @@ struct EntityHooksInfo
     std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision2;
     std::vector<HookWithId<bool(Entity*)>> pre_render;
     std::vector<HookWithId<void(Entity*)>> post_render;
-    std::vector<HookWithId<float(Movable*)>> on_gravity;
 };
 
 // Creates an instance of this entity

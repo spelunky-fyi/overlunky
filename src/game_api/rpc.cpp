@@ -1210,36 +1210,6 @@ void set_journal_enabled(bool b)
     g_journal_enabled = b;
 }
 
-static float g_gravity = 1.0f;
-using ApplyGravityFun = void(void*, float, Movable*);
-ApplyGravityFun* g_apply_gravity_trampoline{nullptr};
-void apply_gravity(void* state, [[maybe_unused]] float gravity, Movable* ent)
-{
-    g_apply_gravity_trampoline(state, g_gravity, ent);
-}
-void set_gravity(float gravity)
-{
-    g_gravity = gravity;
-    static bool function_hooked = false;
-    if (!function_hooked)
-    {
-        g_apply_gravity_trampoline = (ApplyGravityFun*)get_address("apply_gravity");
-
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-
-        DetourAttach((void**)&g_apply_gravity_trampoline, &apply_gravity);
-
-        const LONG error = DetourTransactionCommit();
-        if (error != NO_ERROR)
-        {
-            DEBUG("Failed hooking apply_gravity: {}\n", error);
-        }
-
-        function_hooked = true;
-    }
-}
-
 void set_camp_camera_bounds_enabled(bool b)
 {
     static size_t offset = 0;
