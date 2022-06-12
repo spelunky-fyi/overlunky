@@ -4,6 +4,7 @@
 #include "items.hpp"
 #include "level_api.hpp"
 #include "memory.hpp"
+#include "movable_behavior.hpp"
 #include "savedata.hpp"
 #include "spawn_api.hpp"
 #include "strings.hpp"
@@ -95,6 +96,7 @@ State& State::get()
         STATE = State{addr_location};
         STATE.ptr()->level_gen->init();
         init_spawn_hooks();
+        init_behavior_hooks();
         init_render_api_hooks();
         get_is_init() = true;
         strings_init();

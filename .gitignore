@@ -9,3 +9,6 @@ out
 /CMakePresets.json
 *.aps
 docs/slate
+docs/.db
+*.pyc
+

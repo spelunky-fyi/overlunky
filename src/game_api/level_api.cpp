@@ -2,7 +2,6 @@
 
 #include "entities_monsters.hpp"
 #include "entity.hpp"
-#include "game_allocator.hpp"
 #include "memory.hpp"
 #include "prng.hpp"
 #include "rpc.hpp"

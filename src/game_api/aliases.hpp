@@ -1,13 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
 
 using CallbackId = uint32_t;
 using Flags = uint32_t;
 using uColor = uint32_t;
 using SPAWN_TYPE = uint32_t;                  // NoAlias
-using VANILLA_SOUND = std::string;            // NoAlias
 using VANILLA_SOUND_PARAM = uint32_t;         // NoAlias
 using VANILLA_SOUND_CALLBACK_TYPE = uint32_t; // NoAlias
 using TEXTURE = int64_t;                      // NoAlias
@@ -25,7 +23,6 @@ using SHORT_TILE_CODE = uint8_t;
 using STRINGID = uint32_t;
 
 inline constexpr uint8_t MAX_PLAYERS = 4;
-const std::u16string no_return_str = u"~[:NO_RETURN:]#";
 
 enum class LAYER : int32_t
 {
