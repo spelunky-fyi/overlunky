@@ -1582,8 +1582,6 @@ end
         return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe");
     };
 
-    lua["set_gravity"] = set_gravity;
-
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
