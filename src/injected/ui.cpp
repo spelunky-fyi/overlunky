@@ -1258,20 +1258,46 @@ bool update_entity()
     return false;
 }
 
-void fix_co_coordinates(std::pair<float, float>& cpos)
+bool fix_co_coordinates(std::pair<float, float>& cpos)
 {
+    bool fixed = false;
     float maxx = g_state->w * 10.0f + 2.5f;
     float minx = 2.5f;
     float maxy = 122.5f;
     float miny = 122.5f - g_state->h * 8.0f;
-    if (cpos.first > maxx)
+    while (cpos.first > maxx)
+    {
+        g_state->camera->focus_x -= g_state->w * 10.0f;
+        g_state->camera->adjusted_focus_x -= g_state->w * 10.0f;
+        g_state->camera->calculated_focus_x -= g_state->w * 10.0f;
         cpos.first -= g_state->w * 10.0f;
-    else if (cpos.first < minx)
+        fixed = true;
+    }
+    while (cpos.first < minx)
+    {
+        g_state->camera->focus_x += g_state->w * 10.0f;
+        g_state->camera->adjusted_focus_x += g_state->w * 10.0f;
+        g_state->camera->calculated_focus_x += g_state->w * 10.0f;
         cpos.first += g_state->w * 10.0f;
-    if (cpos.second > maxy)
+        fixed = true;
+    }
+    while (cpos.second > maxy)
+    {
+        g_state->camera->focus_y -= g_state->h * 8.0f;
+        g_state->camera->adjusted_focus_y -= g_state->h * 8.0f;
+        g_state->camera->calculated_focus_y -= g_state->h * 8.0f;
         cpos.second -= g_state->h * 8.0f;
-    else if (cpos.second < miny)
+        fixed = true;
+    }
+    while (cpos.second < miny)
+    {
+        g_state->camera->focus_y += g_state->h * 8.0f;
+        g_state->camera->adjusted_focus_y += g_state->h * 8.0f;
+        g_state->camera->calculated_focus_y += g_state->h * 8.0f;
         cpos.second += g_state->h * 8.0f;
+        fixed = true;
+    }
+    return fixed;
 }
 
 void set_zoom()
@@ -1405,12 +1431,9 @@ void force_noclip()
             if (g_state->theme == 10)
             {
                 auto cpos = UI::get_position(player);
-                fix_co_coordinates(cpos);
-                if (cpos.first != UI::get_position(player).first || cpos.second != UI::get_position(player).second)
+                if (fix_co_coordinates(cpos))
                 {
                     player->teleport_abs(cpos.first, cpos.second, player->velocityx, player->velocityy);
-                    // this just glitches the shaders, doesn't work
-                    // set_camera_position(cpos.first, cpos.second);
                 }
             }
         }
@@ -3873,7 +3896,6 @@ void render_clickhandler()
                 fix_co_coordinates(cpos);
             auto player = (Movable*)g_players.at(0)->topmost_mount();
             player->teleport_abs(cpos.first, cpos.second, g_vx, g_vy);
-            // set_camera_position(cpos.first, cpos.second);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
