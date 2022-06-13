@@ -1,6 +1,9 @@
 #include "events.hpp"
 
 #include "constants.hpp"
+#include "rpc.hpp"
+#include "state.hpp"
+#include <fmt/format.h>
 
 void pre_load_level_files()
 {
@@ -20,8 +23,17 @@ void pre_level_generation()
             return true;
         });
 }
+static int64_t prev_seed = 0;
 void pre_load_screen()
 {
+    auto state = State::get().ptr();
+    if (state->screen_next == 12 && (state->quest_flags & 1) != 0)
+    {
+        auto seed = get_adventure_seed();
+        if (seed.second != prev_seed)
+            game_log(fmt::format("{}Seed: {:X} {:X}", ((state->quest_flags & (1U << 7)) > 0 && state->screen == 28) ? "Daily " : "", seed.first, seed.second));
+        prev_seed = seed.second;
+    }
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
