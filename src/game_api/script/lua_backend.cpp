@@ -45,6 +45,8 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     state.reset = (g_state->quest_flags & 1);
     state.quest_flags = g_state->quest_flags;
 
+    auto& global_vm = *vm;
+    global_vm["_entity_userdata"] = global_vm.create_named_table("_entity_userdata");
     populate_lua_env(lua);
 
     std::lock_guard lock{g_all_backends_mutex};
@@ -219,6 +221,8 @@ bool LuaBackend::update()
             level_timers.clear();
             script_input.clear();
             clear_custom_shopitem_names();
+            auto& global_vm = *vm;
+            global_vm["_entity_userdata"] = global_vm.create_named_table("_entity_userdata");
         }
         if (g_state->screen != state.screen)
         {

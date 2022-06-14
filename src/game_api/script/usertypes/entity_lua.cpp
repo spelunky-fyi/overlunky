@@ -4,6 +4,7 @@
 #include "custom_types.hpp"
 #include "movable.hpp"
 #include "render_api.hpp"
+#include "script/lua_backend.hpp"
 
 #include <sol/sol.hpp>
 
@@ -295,7 +296,14 @@ void register_usertypes(sol::state& lua)
         "get_items",
         &Entity::get_items,
         "is_in_liquid",
-        &Entity::is_in_liquid);
+        &Entity::is_in_liquid,
+        "userdata",
+        sol::property([&lua](Entity& e)
+                      {
+                        auto& global_vm = *LuaBackend::get_calling_backend()->vm;
+                        if (global_vm["_entity_userdata"][e.uid] == sol::nil)
+                            global_vm["_entity_userdata"][e.uid] = global_vm.create_table();
+                        return global_vm["_entity_userdata"][e.uid]; }));
 
     auto damage = sol::overload(
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
