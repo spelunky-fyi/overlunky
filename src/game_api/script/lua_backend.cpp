@@ -3,6 +3,7 @@
 #include "aliases.hpp"
 #include "constants.hpp"
 #include "entities_chars.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "lua_console.hpp"
 #include "lua_vm.hpp"
@@ -177,7 +178,7 @@ CustomMovableBehavior* LuaBackend::make_custom_movable_behavior(std::string_view
     return custom_behavior.get();
 }
 
-sol::table LuaBackend::get_user_data(Entity& entity)
+sol::object LuaBackend::get_user_data(Entity& entity)
 {
     if (user_datas.contains(entity.uid))
     {
@@ -185,18 +186,41 @@ sol::table LuaBackend::get_user_data(Entity& entity)
     }
     return sol::nil;
 }
-void LuaBackend::set_user_data(Entity& entity, sol::table user_data)
+sol::object LuaBackend::get_user_data(uint32_t uid)
+{
+    if (user_datas.contains(uid))
+    {
+        return user_datas[uid];
+    }
+    return sol::nil;
+}
+void LuaBackend::set_user_data(Entity& entity, sol::object user_data)
 {
     if (!user_datas.contains(entity.uid))
     {
         entity.set_on_dtor(
-            [this, uid = entity.uid](Entity*)
+            [this, &entity](Entity*)
             {
-                // TODO: fix for transitions???
-                user_datas.erase(uid);
+                /*auto state = State::get().ptr_local();
+                if ((entity.type->search_flags & 1) > 0 && state->loading == 2)
+                {
+                    auto player = entity.as<Player>();
+                    DEBUG("{} holding {}", entity.uid, player->holding_uid);
+                    SavedUserData saved;
+                    saved.self = this->get_user_data(entity);
+                    if (player->holding_uid != -1)
+                        saved.held = this->get_user_data(player->holding_uid);
+                    this->saved_user_datas[player->inventory_ptr] = saved;
+                }*/
+                user_datas.erase(entity.uid);
             });
     }
     user_datas[entity.uid] = user_data;
+}
+void LuaBackend::set_user_data(uint32_t uid, sol::object user_data)
+{
+    auto ent = get_entity_ptr(uid);
+    set_user_data(*ent, user_data);
 }
 
 bool LuaBackend::update()
@@ -776,6 +800,48 @@ void LuaBackend::pre_load_screen()
 
     std::lock_guard lock{gil};
 
+    auto state_ptr = State::get().ptr();
+    if ((ON)state_ptr->screen == ON::LEVEL)
+    {
+        int companion_slot = 10;
+        for (auto uid : get_entities_by_mask(1))
+        {
+            auto ent = get_entity_ptr(uid)->as<Player>();
+            if (ent->inventory_ptr->health == 0)
+                continue;
+            int slot = ent->inventory_ptr->player_slot;
+            if (slot == -1)
+                slot = companion_slot++;
+            bool should_save = false;
+            SavedUserData saved;
+            if (user_datas.contains(uid))
+            {
+                saved.self = get_user_data(uid);
+                should_save = true;
+            }
+            if (ent->holding_uid != -1 and user_datas.contains(ent->holding_uid))
+            {
+                saved.held = get_user_data(ent->holding_uid);
+                should_save = true;
+            }
+            if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && user_datas.contains(ent->overlay->uid))
+            {
+                saved.mount = get_user_data(ent->overlay->uid);
+                should_save = true;
+            }
+            for (auto [type, powerup] : ent->powerups)
+            {
+                if (user_datas.contains(powerup->uid))
+                {
+                    saved.powerups[type] = get_user_data(powerup->uid);
+                    should_save = true;
+                }
+            }
+            if (should_save)
+                saved_user_datas[slot] = saved;
+        }
+    }
+
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -822,6 +888,35 @@ void LuaBackend::post_level_generation()
     std::lock_guard lock{gil};
 
     lua["players"] = std::vector<Player*>(get_players());
+
+    auto state_ptr = State::get().ptr();
+    if ((ON)state_ptr->screen == ON::LEVEL)
+    {
+        int companion_slot = 10;
+        for (auto uid : get_entities_by_mask(1))
+        {
+            auto ent = get_entity_ptr(uid)->as<Player>();
+            if (ent->inventory_ptr->health == 0)
+                continue;
+            int slot = ent->inventory_ptr->player_slot;
+            if (slot == -1)
+                slot = companion_slot++;
+            if (saved_user_datas.contains(slot))
+            {
+                set_user_data(*ent, saved_user_datas[slot].self.value_or(sol::nil));
+                if (ent->holding_uid != -1)
+                    set_user_data(ent->holding_uid, saved_user_datas[slot].held.value_or(sol::nil));
+                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0)
+                    set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value_or(sol::nil));
+                for (auto [type, powerup] : ent->powerups)
+                {
+                    if (saved_user_datas[slot].powerups.contains(type))
+                        set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
+                }
+            }
+        }
+        saved_user_datas.clear();
+    }
 
     for (auto& [id, callback] : callbacks)
     {

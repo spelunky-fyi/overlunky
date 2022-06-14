@@ -130,23 +130,5 @@ void register_usertypes(sol::state& lua)
             return backend->handle_function_with_return<uint8_t>(get_next_state_id, movable, std::move(base_fun)).value_or(behavior->state_id);
         };
     };
-
-    auto get_user_data = [](Entity& entity) -> sol::table
-    {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        if (sol::table user_data = backend->get_user_data(entity))
-        {
-            return user_data;
-        }
-        return sol::nil;
-    };
-    auto set_user_data = [](Entity& entity, sol::table user_data) -> sol::table
-    {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->set_user_data(entity, user_data);
-    };
-    auto user_data = sol::property(get_user_data, set_user_data);
-    /// Table containing arbitrary data, `nil` by default and will be cleared when the entity is destroyed
-    lua["Entity"]["user_data"] = user_data;
 }
 }; // namespace NBehavior
