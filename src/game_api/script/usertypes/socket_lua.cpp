@@ -2,7 +2,9 @@
 
 #include "script/lua_backend.hpp"
 
+#include <detours.h>
 #include <sol/sol.hpp>
+#include <winsock.h>
 
 void udp_data(sockpp::udp_socket socket, UdpServer* server)
 {
@@ -25,6 +27,23 @@ UdpServer::UdpServer(std::string host_, in_port_t port_, sol::function cb_)
     thr.detach();
 }
 
+using NetFun = int(SOCKET, char*, int, int, sockaddr*, int*);
+NetFun* g_sendto_trampoline{nullptr};
+NetFun* g_recvfrom_trampoline{nullptr};
+int mySendto(SOCKET s, char* buf, int len, int flags, struct sockaddr* to, int* tolen)
+{
+    auto ret = g_sendto_trampoline(s, buf, len, flags, to, tolen);
+    DEBUG("SEND: {}", (ByteStr)buf);
+    return ret;
+}
+
+int myRecvfrom(SOCKET s, char* buf, int len, int flags, struct sockaddr* from, int* fromlen)
+{
+    auto ret = g_recvfrom_trampoline(s, buf, len, flags, from, fromlen);
+    DEBUG("RECV: {}", (ByteStr)buf);
+    return ret;
+}
+
 namespace NSocket
 {
 void register_usertypes(sol::state& lua)
@@ -42,6 +61,21 @@ void register_usertypes(sol::state& lua)
         sockpp::udp_socket sock;
         sockpp::inet_address addr(host, port);
         sock.send_to(msg, addr);
+    };
+
+    lua["dump_network"] = []()
+    {
+        g_sendto_trampoline = (NetFun*)GetProcAddress(GetModuleHandleA("ws2_32.dll"), "sendto");
+        g_recvfrom_trampoline = (NetFun*)GetProcAddress(GetModuleHandleA("ws2_32.dll"), "recvfrom");
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+        DetourAttach((void**)&g_sendto_trampoline, mySendto);
+        DetourAttach((void**)&g_recvfrom_trampoline, myRecvfrom);
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking network: {}\n", error);
+        }
     };
 }
 }; // namespace NSocket
