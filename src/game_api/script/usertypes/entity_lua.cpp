@@ -200,31 +200,10 @@ void register_usertypes(sol::state& lua)
         return lua["cast_entity"](entity.topmost_mount());
     };
 
-    auto get_user_data = [](Entity& entity) -> sol::table
-    {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        if (sol::table user_data = backend->get_user_data(entity))
-        {
-            return user_data;
-        }
-        return sol::nil;
-    };
-    auto set_user_data = [](Entity& entity, sol::table user_data) -> void
-    {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        backend->set_user_data(entity, user_data);
-    };
-    auto user_data = sol::property(get_user_data, set_user_data);
-
-    auto overlaps_with = sol::overload(
-        static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
-        static_cast<bool (Entity::*)(AABB)>(&Entity::overlaps_with),
-        static_cast<bool (Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
-
     auto get_user_data = [](Entity& entity) -> sol::object
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        if (sol::object user_data = backend->get_user_data(entity))
+        if (sol::table user_data = backend->get_user_data(entity))
         {
             return user_data;
         }
@@ -236,6 +215,11 @@ void register_usertypes(sol::state& lua)
         backend->set_user_data(entity, user_data);
     };
     auto user_data = sol::property(get_user_data, set_user_data);
+
+    auto overlaps_with = sol::overload(
+        static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(AABB)>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
 
     lua.new_usertype<Entity>(
         "Entity",
@@ -332,9 +316,7 @@ void register_usertypes(sol::state& lua)
         "get_items",
         &Entity::get_items,
         "is_in_liquid",
-        &Entity::is_in_liquid,
-        "user_data",
-        std::move(user_data));
+        &Entity::is_in_liquid);
 
     auto damage = sol::overload(
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
