@@ -3106,6 +3106,7 @@ nil | [apply_metadata(int metadata)](https://github.com/spelunky-fyi/overlunky/s
 nil | [set_invisible(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
 array&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
 bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | Returns true if entity is in water/lava
+nil | [user_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | Table containing arbitrary data, `nil` by default and will be cleared when the entity is destroyed
 
 ### IceSlidingSound
 

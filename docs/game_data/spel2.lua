@@ -1986,6 +1986,7 @@ local function PRNG_random(self, min, max) end
     ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self): integer[]
     ---@field is_in_liquid fun(self): boolean
+    ---@field user_data table?
 
 ---@class Entity_overlaps_with
 ---@param other Entity

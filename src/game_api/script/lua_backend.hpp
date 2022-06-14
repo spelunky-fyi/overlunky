@@ -235,6 +235,7 @@ class LuaBackend
     std::vector<std::pair<int, std::uint32_t>> screen_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<CustomMovableBehaviorStorage> custom_movable_behaviors;
+    std::unordered_map<std::uint32_t, sol::table> user_datas;
     std::vector<std::string> required_scripts;
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
@@ -283,6 +284,9 @@ class LuaBackend
 
     CustomMovableBehavior* get_custom_movable_behavior(std::string_view name);
     CustomMovableBehavior* make_custom_movable_behavior(std::string_view name, uint8_t state_id, VanillaMovableBehavior* base_behavior);
+
+    sol::table get_user_data(Entity& entity);
+    void set_user_data(Entity& entity, sol::table user_data);
 
     bool update();
     void draw(ImDrawList* dl);

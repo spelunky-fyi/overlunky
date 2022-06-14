@@ -177,6 +177,28 @@ CustomMovableBehavior* LuaBackend::make_custom_movable_behavior(std::string_view
     return custom_behavior.get();
 }
 
+sol::table LuaBackend::get_user_data(Entity& entity)
+{
+    if (user_datas.contains(entity.uid))
+    {
+        return user_datas[entity.uid];
+    }
+    return sol::nil;
+}
+void LuaBackend::set_user_data(Entity& entity, sol::table user_data)
+{
+    if (!user_datas.contains(entity.uid))
+    {
+        entity.set_on_dtor(
+            [this, uid = entity.uid](Entity*)
+            {
+                // TODO: fix for transitions???
+                user_datas.erase(uid);
+            });
+    }
+    user_datas[entity.uid] = user_data;
+}
+
 bool LuaBackend::update()
 {
     if (!get_enabled())
