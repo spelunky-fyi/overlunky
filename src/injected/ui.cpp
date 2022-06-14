@@ -233,7 +233,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -1258,20 +1258,46 @@ bool update_entity()
     return false;
 }
 
-void fix_co_coordinates(std::pair<float, float>& cpos)
+bool fix_co_coordinates(std::pair<float, float>& cpos)
 {
+    bool fixed = false;
     float maxx = g_state->w * 10.0f + 2.5f;
     float minx = 2.5f;
     float maxy = 122.5f;
     float miny = 122.5f - g_state->h * 8.0f;
-    if (cpos.first > maxx)
+    while (cpos.first > maxx)
+    {
+        g_state->camera->focus_x -= g_state->w * 10.0f;
+        g_state->camera->adjusted_focus_x -= g_state->w * 10.0f;
+        g_state->camera->calculated_focus_x -= g_state->w * 10.0f;
         cpos.first -= g_state->w * 10.0f;
-    else if (cpos.first < minx)
+        fixed = true;
+    }
+    while (cpos.first < minx)
+    {
+        g_state->camera->focus_x += g_state->w * 10.0f;
+        g_state->camera->adjusted_focus_x += g_state->w * 10.0f;
+        g_state->camera->calculated_focus_x += g_state->w * 10.0f;
         cpos.first += g_state->w * 10.0f;
-    if (cpos.second > maxy)
+        fixed = true;
+    }
+    while (cpos.second > maxy)
+    {
+        g_state->camera->focus_y -= g_state->h * 8.0f;
+        g_state->camera->adjusted_focus_y -= g_state->h * 8.0f;
+        g_state->camera->calculated_focus_y -= g_state->h * 8.0f;
         cpos.second -= g_state->h * 8.0f;
-    else if (cpos.second < miny)
+        fixed = true;
+    }
+    while (cpos.second < miny)
+    {
+        g_state->camera->focus_y += g_state->h * 8.0f;
+        g_state->camera->adjusted_focus_y += g_state->h * 8.0f;
+        g_state->camera->calculated_focus_y += g_state->h * 8.0f;
         cpos.second += g_state->h * 8.0f;
+        fixed = true;
+    }
+    return fixed;
 }
 
 void set_zoom()
@@ -1405,12 +1431,9 @@ void force_noclip()
             if (g_state->theme == 10)
             {
                 auto cpos = UI::get_position(player);
-                fix_co_coordinates(cpos);
-                if (cpos.first != UI::get_position(player).first || cpos.second != UI::get_position(player).second)
+                if (fix_co_coordinates(cpos))
                 {
                     player->teleport_abs(cpos.first, cpos.second, player->velocityx, player->velocityy);
-                    // this just glitches the shaders, doesn't work
-                    // set_camera_position(cpos.first, cpos.second);
                 }
             }
         }
@@ -3102,6 +3125,11 @@ void render_camera()
         ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
         ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
         ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
+        if (ImGui::Checkbox("Enable default camera bounds##CameraBoundsLevel", &enable_camera_bounds))
+        {
+            set_camera_bounds(enable_camera_bounds);
+        }
+        tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.");
         if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
         {
             UI::set_camp_camera_bounds_enabled(enable_camp_camera);
@@ -3196,13 +3224,12 @@ void erase_entities()
 
 void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 {
-    if (g_state == 0 || (g_state->screen != 11 && g_state->screen != 12))
+    if (g_state == 0 || (g_state->screen < 11 || g_state->screen > 13))
         return;
-    // ImGuiIO& io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
     ImVec2 res = base->Size;
     auto* draw_list = ImGui::GetWindowDrawList();
-    for (int x = -1; x < 96; x++)
+    for (int x = -1; x < 86; x++)
     {
         std::pair<float, float> gridline = UI::screen_position(x + 0.5f, 0);
         if (std::abs(gridline.first) <= 1.0)
@@ -3223,7 +3250,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
             draw_list->AddLine(fix_pos(ImVec2(grids.x, 0)), fix_pos(ImVec2(grids.x, res.y)), color, static_cast<float>(width));
         }
     }
-    for (int y = -1; y < 128; y++)
+    for (int y = -1; y < 126; y++)
     {
         std::pair<float, float> gridline = UI::screen_position(0, y + 0.5f);
         if (std::abs(gridline.second) <= 1.0)
@@ -3287,18 +3314,23 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
 
     std::pair<float, float> render_position = UI::get_position(ent, options["draw_hitboxes_interpolated"]);
 
+    auto [originx, originy] =
+        UI::screen_position(render_position.first, render_position.second);
     auto [boxa_x, boxa_y] =
         UI::screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
     auto [boxb_x, boxb_y] =
         UI::screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
+    ImVec2 sorigin = screenify({originx, originy});
     ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
     ImVec2 sboxa = screenify({boxa_x, boxa_y});
     ImVec2 sboxb = screenify({boxb_x, boxb_y});
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
-        draw_list->AddLine(fix_pos(sboxa), fix_pos(sboxb), color, 2);
-        draw_list->AddLine(fix_pos(ImVec2(sboxa.x, sboxb.y)), fix_pos(ImVec2(sboxb.x, sboxa.y)), color, 2);
+        draw_list->AddLine(fix_pos(sboxa), fix_pos(sorigin), color, 2);
+        draw_list->AddLine(fix_pos(sboxb), fix_pos(sorigin), color, 2);
+        draw_list->AddLine(fix_pos(ImVec2(sboxa.x, sboxb.y)), fix_pos(sorigin), color, 2);
+        draw_list->AddLine(fix_pos(ImVec2(sboxb.x, sboxa.y)), fix_pos(sorigin), color, 2);
     }
     if (ent->shape == SHAPE::CIRCLE)
         if (filled)
@@ -3559,10 +3591,10 @@ void render_clickhandler()
     {
         render_grid();
     }
-    if (options["draw_hitboxes"])
+    if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, LAYER::PLAYER))
+        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)g_state->camera_layer))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -3622,6 +3654,18 @@ void render_clickhandler()
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 0, 0, 150));
             }
+
+            // OOB kill bounds
+            auto* draw_list = ImGui::GetBackgroundDrawList();
+            std::pair<float, float> gridline = UI::screen_position(-0.5f, 0);
+            ImVec2 grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(fix_pos(ImVec2(grids.x, base->Pos.y)), fix_pos(ImVec2(grids.x, base->Pos.y + base->Size.y)), ImColor(255, 0, 0, 150), 2.0f);
+            gridline = UI::screen_position(static_cast<float>(10 * g_state->w) + 5.5f, 0);
+            grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(fix_pos(ImVec2(grids.x, base->Pos.y)), fix_pos(ImVec2(grids.x, base->Pos.y + base->Size.y)), ImColor(255, 0, 0, 150), 2.0f);
+            gridline = UI::screen_position(0, static_cast<float>(120 - 8 * g_state->h) - 4.0f);
+            grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(fix_pos(ImVec2(base->Pos.x, grids.y)), fix_pos(ImVec2(base->Pos.x + base->Size.x, grids.y)), ImColor(255, 0, 0, 150), 2.0f);
         }
 
         if (ImGui::IsMousePosValid())
@@ -3713,7 +3757,7 @@ void render_clickhandler()
             hugefont,
             144.0,
             ImVec2(io.DisplaySize.x / 2 - warningsize.x / 2, io.DisplaySize.y / 2 - warningsize.y / 2),
-            ImColor(1.0f, 1.0f, 1.0f, 0.8f),
+            ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             warningtext);
         const char* subtext = "Probably... Some things might, but don't just expect a random script to work.";
         ImVec2 subsize = font->CalcTextSizeA(18.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, subtext);
@@ -3721,7 +3765,7 @@ void render_clickhandler()
             font,
             18.0,
             ImVec2(io.DisplaySize.x / 2 - subsize.x / 2, io.DisplaySize.y / 2 + warningsize.y / 2 + 20),
-            ImColor(1.0f, 1.0f, 1.0f, 0.8f),
+            ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             subtext);
     }
     if (options["mouse_control"] && UI::get_focus())
@@ -3851,7 +3895,6 @@ void render_clickhandler()
                 fix_co_coordinates(cpos);
             auto player = (Movable*)g_players.at(0)->topmost_mount();
             player->teleport_abs(cpos.first, cpos.second, g_vx, g_vy);
-            // set_camera_position(cpos.first, cpos.second);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -4024,7 +4067,8 @@ void render_clickhandler()
             {
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
             }
-            set_camera_bounds(true);
+            enable_camera_bounds = true;
+            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.5f)
@@ -4033,7 +4077,8 @@ void render_clickhandler()
             {
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
             }
-            set_camera_bounds(true);
+            enable_camera_bounds = true;
+            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (released("mouse_camera_drag") && !dblclicked("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 3.0f && held_duration_last("mouse_camera_drag") < 0.2f)
@@ -4043,7 +4088,8 @@ void render_clickhandler()
                 auto ent = UI::get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
                 g_state->camera->focused_entity_uid = ent ? ent->uid : -1;
             }
-            set_camera_bounds(true);
+            enable_camera_bounds = true;
+            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (clicked("mouse_camera_drag"))
@@ -4071,7 +4117,8 @@ void render_clickhandler()
                     g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
                 }
                 startpos = normalize(mouse_pos());
-                set_camera_bounds(false);
+                enable_camera_bounds = false;
+                set_camera_bounds(enable_camera_bounds);
             }
         }
 

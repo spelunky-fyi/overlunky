@@ -876,6 +876,14 @@
                       </ul>
                   </li>
                   <li>
+                    <a href="#Movable-Behavior-functions" class="toc-h2 toc-link" data-title="Movable Behavior functions">Movable Behavior functions</a>
+                      <ul class="toc-list-h3">
+                          <li>
+                            <a href="#make_custom_behavior" class="toc-h3 toc-link" data-title="make_custom_behavior">make_custom_behavior</a>
+                          </li>
+                      </ul>
+                  </li>
+                  <li>
                     <a href="#Network-functions" class="toc-h2 toc-link" data-title="Network functions">Network functions</a>
                       <ul class="toc-list-h3">
                           <li>
@@ -1457,6 +1465,9 @@
                           </li>
                           <li>
                             <a href="#ImVec2" class="toc-h3 toc-link" data-title="ImVec2">ImVec2</a>
+                          </li>
+                          <li>
+                            <a href="#MovableBehavior" class="toc-h3 toc-link" data-title="MovableBehavior">MovableBehavior</a>
                           </li>
                           <li>
                             <a href="#PRNG" class="toc-h3 toc-link" data-title="PRNG">PRNG</a>
@@ -2499,6 +2510,9 @@
                             <a href="#CursedPot" class="toc-h3 toc-link" data-title="CursedPot">CursedPot</a>
                           </li>
                           <li>
+                            <a href="#CustomMovableBehavior" class="toc-h3 toc-link" data-title="CustomMovableBehavior">CustomMovableBehavior</a>
+                          </li>
+                          <li>
                             <a href="#Drill" class="toc-h3 toc-link" data-title="Drill">Drill</a>
                           </li>
                           <li>
@@ -2866,6 +2880,9 @@
                           </li>
                           <li>
                             <a href="#Ushabti" class="toc-h3 toc-link" data-title="Ushabti">Ushabti</a>
+                          </li>
+                          <li>
+                            <a href="#VanillaMovableBehavior" class="toc-h3 toc-link" data-title="VanillaMovableBehavior">VanillaMovableBehavior</a>
                           </li>
                           <li>
                             <a href="#VladsCape" class="toc-h3 toc-link" data-title="VladsCape">VladsCape</a>
@@ -4329,7 +4346,15 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=toast_visible">toast_visible</a></p>
 </blockquote>
-<h4 id='bool-toast_visible'>bool toast_visible()</h4><h2 id='Network-functions'>Network functions</h2><h3 id='udp_listen'>udp_listen</h3>
+<h4 id='bool-toast_visible'>bool toast_visible()</h4><h2 id='Movable-Behavior-functions'>Movable Behavior functions</h2><h3 id='make_custom_behavior'>make_custom_behavior</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=make_custom_behavior">make_custom_behavior</a></p>
+</blockquote>
+<h4 id='CustomMovableBehavior-make_custom_behavior-string_view-behavior_name-int-state_id-VanillaMovableBehavior-base_behavior'><a href="#CustomMovableBehavior">CustomMovableBehavior</a> make_custom_behavior(string_view behavior_name, int state_id, <a href="#VanillaMovableBehavior">VanillaMovableBehavior</a> base_behavior)</h4>
+<p>Make a <code>CustomMovableBehavior</code>, if <code>base_behavior</code> is <code>nil</code> you will have to set all of the
+behavior functions. If a behavior with <code>behavior_name</code> already exists for your script it will
+be returned instead.</p>
+<h2 id='Network-functions'>Network functions</h2><h3 id='udp_listen'>udp_listen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udp_listen">udp_listen</a></p>
 </blockquote>
@@ -5976,92 +6001,92 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </thead><tbody>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_line">draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)</a></td>
 <td>Draws a line on screen</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_rect">draw_rect(float left, float top, float right, float bottom, float thickness, float rounding, uColor color)</a></td>
 <td>Draws a rectangle on screen from top-left to bottom-right.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_rect">draw_rect(AABB rect, float thickness, float rounding, uColor color)</a></td>
 <td>Draws a rectangle on screen from top-left to bottom-right.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_rect_filled">draw_rect_filled(float left, float top, float right, float bottom, float rounding, uColor color)</a></td>
 <td>Draws a filled rectangle on screen from top-left to bottom-right.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_rect_filled">draw_rect_filled(AABB rect, float rounding, uColor color)</a></td>
 <td>Draws a filled rectangle on screen from top-left to bottom-right.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_triangle">draw_triangle(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)</a></td>
 <td>Draws a triangle on screen.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_triangle_filled">draw_triangle_filled(Vec2 p1, Vec2 p2, Vec2 p3, uColor color)</a></td>
 <td>Draws a filled triangle on screen.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_poly">draw_poly(array<Vec2> points, float thickness, uColor color)</a></td>
 <td>Draws a polyline on screen.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_poly_filled">draw_poly_filled(array<Vec2> points, uColor color)</a></td>
 <td>Draws a filled convex polyline on screen.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_bezier_cubic">draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float thickness, uColor color)</a></td>
 <td>Draws a cubic bezier curve on screen.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_bezier_quadratic">draw_bezier_quadratic(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)</a></td>
 <td>Draws a quadratic bezier curve on screen.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_circle">draw_circle(float x, float y, float radius, float thickness, uColor color)</a></td>
 <td>Draws a circle on screen</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_circle_filled">draw_circle_filled(float x, float y, float radius, uColor color)</a></td>
 <td>Draws a filled circle on screen</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text(float x, float y, float size, string text, uColor color)</a></td>
 <td>Draws text in screen coordinates <code>x</code>, <code>y</code>, anchored top-left. Text size 0 uses the default 18.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_image">draw_image(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)</a></td>
 <td>Draws an image on screen from top-left to bottom-right. Use UV coordinates <code>0, 0, 1, 1</code> to just draw the whole image.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_image">draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)</a></td>
 <td>Draws an image on screen from top-left to bottom-right. Use UV coordinates <code>0, 0, 1, 1</code> to just draw the whole image.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_image_rotated">draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)</a></td>
 <td>Same as <code>draw_image</code> but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning <code>px=py=0</code> rotates around the center)</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_image_rotated">draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)</a></td>
 <td>Same as <code>draw_image</code> but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning <code>px=py=0</code> rotates around the center)</td>
 </tr>
@@ -6071,22 +6096,22 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td>Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/><a href="https://github.com/ocornut/imgui/">ImGui</a> widgets, so read more about them there. Use screen position and distance, or <code>0, 0, 0, 0</code> to<br/>autosize in center. Use just a <code>##Label</code> as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add <code>##SomeUniqueLabel</code> after the text, or use pushid to<br/>give things unique ids. ImGui doesn&#39;t know what you clicked if all your buttons have the same text... The window api is probably evolving<br/>still, this is just the first draft. Felt cute, might delete later!<br/>Returns false if the window was closed from the X.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_text">win_text(string text)</a></td>
 <td>Add some text to window, automatically wrapped</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_separator">win_separator()</a></td>
 <td>Add a separator line to window</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_inline">win_inline()</a></td>
 <td>Add next thing on the same line. This is same as <code>win_sameline(0, -1)</code></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_sameline">win_sameline(float offset, float spacing)</a></td>
 <td>Add next thing on the same line, with an offset</td>
 </tr>
@@ -6141,17 +6166,17 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td>Add a combo box</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_pushid">win_pushid(int id)</a></td>
 <td>Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_popid">win_popid()</a></td>
 <td>Pop unique identifier from the stack. Put after the input.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_image">win_image(IMAGE image, int width, int height)</a></td>
 <td>Draw image to window.</td>
 </tr>
@@ -6209,7 +6234,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td>Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.<br/>Note that the actual chance to spawn is <code>1/inverse_chance</code> and that is also slightly skewed because of technical reasons.<br/>Returns <code>false</code> if the given chance is not defined.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_num_extra_spawns">set_num_extra_spawns(int extra_spawn_id, int num_spawns_front_layer, int num_spawns_back_layer)</a></td>
 <td>Change the amount of extra spawns for the given <code>extra_spawn_id</code>.</td>
 </tr>
@@ -6219,7 +6244,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td>Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match<br/>Returns <code>nil</code> if all possible short tile codes are already in use</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_short_tile_code">change_short_tile_code(SHORT_TILE_CODE short_tile_code, ShortTileCodeDef short_tile_code_def)</a></td>
 <td>Overrides a specific short tile code, this means it will change for the whole level</td>
 </tr>
@@ -6258,12 +6283,12 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td>Check whether the room has a back layer</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_empty_back_layer">add_empty_back_layer()</a></td>
 <td>Add a back layer filled with all <code>0</code> if there is no back layer yet<br/>Does nothing if there already is a backlayer</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_copied_back_layer">add_copied_back_layer()</a></td>
 <td>Add a back layer that is a copy of the front layer<br/>Does nothing if there already is a backlayer</td>
 </tr>
@@ -6277,12 +6302,12 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </thead><tbody>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=override_level_files">override_level_files(array<string> levels)</a></td>
 <td>Block all loading <code>.lvl</code> files and instead load the specified <code>.lvl</code> files. This includes <code>generic.lvl</code> so if you need it specify it here.<br/>All <code>.lvl</code> files are loaded relative to <code>Data/Levels</code>, but they can be completely custom <code>.lvl</code> files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_level_files">add_level_files(array<string> levels)</a></td>
 <td>Load additional levels files other than the ones that would usually be loaded. Stacks with <code>override_level_files</code> if that was called first.<br/>All <code>.lvl</code> files are loaded relative to <code>Data/Levels</code>, but they can be completely custom <code>.lvl</code> files that ship with your mod so long as they are in said folder.</td>
 </tr>
@@ -6310,7 +6335,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </thead><tbody>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text(const string&amp; text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)</a></td>
 <td>Draw text using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.</td>
 </tr>
@@ -6320,62 +6345,62 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td>Measure the provided text using the built-in renderer</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB&amp; rect, Color color)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB&amp; rect, Color color, float angle, float px, float py)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const AABB&amp; dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const AABB&amp; dest, Color color, float angle, float px, float py)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const Quad&amp; dest, Color color, WORLD_SHADER shader)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>The <code>shader</code> parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color, WORLD_SHADER shader)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>The <code>shader</code> parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
@@ -6803,7 +6828,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 <tr>
 <td><a href="#AABB">AABB</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=AABB">new(const AABB&amp;)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=AABB">new(AABB)</a></td>
 <td>Copy an axis aligned bounding box</td>
 </tr>
 <tr>
@@ -6895,7 +6920,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 <tr>
 <td><a href="#Color">Color</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Color">new(const Color&amp;)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Color">new(Color)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -7043,6 +7068,27 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td></td>
 </tr>
 </tbody></table>
+<h3 id='MovableBehavior'>MovableBehavior</h3>
+<p>Opaque handle to a movable behavior</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_state_id">get_state_id()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_state_id">get_state_id()</a></td>
+<td>Get the <code>state_id</code> of a behavior, this is the id that needs to be returned from a behavior&#39;s<br/><code>get_next_state_id</code> to enter this state, given that the behavior is added to the movable.</td>
+</tr>
+</tbody></table>
 <h3 id='PRNG'>PRNG</h3>
 <p><a href="#PRNG">PRNG</a> (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
@@ -7057,7 +7103,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </thead><tbody>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seed">seed(int seed)</a></td>
 <td>Same as <code>seed_prng</code></td>
 </tr>
@@ -7102,7 +7148,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pair">set_pair(size_t index, int first, int second)</a></td>
 <td></td>
 </tr>
@@ -7122,7 +7168,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 <tr>
 <td><a href="#Quad">Quad</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Quad">new(const Quad&amp;)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Quad">new(Quad)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -7137,7 +7183,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 <tr>
 <td><a href="#Quad">Quad</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Quad">new(const AABB&amp; aabb)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Quad">new(AABB aabb)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -7306,7 +7352,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 <tr>
 <td><a href="#Vec2">Vec2</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Vec2">new(const Vec2&amp;)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Vec2">new(Vec2)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -11275,7 +11321,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_code">set_code(const string&amp; code)</a></td>
 <td></td>
 </tr>
@@ -12694,7 +12740,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_current_theme">force_current_theme(int t)</a></td>
 <td>This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!</td>
 </tr>
@@ -12964,7 +13010,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>Returns animation_frame of the correct ushabti</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_correct_ushabti">set_correct_ushabti(int animation_frame)</a></td>
 <td></td>
 </tr>
@@ -13227,7 +13273,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_destination">set_destination(const AABB&amp; bbox)</a></td>
 <td></td>
 </tr>
@@ -13237,7 +13283,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dest_set_quad">dest_set_quad(const Quad&amp; quad)</a></td>
 <td></td>
 </tr>
@@ -13287,7 +13333,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=source_set_quad">source_set_quad(const Quad&amp; quad)</a></td>
 <td></td>
 </tr>
@@ -13379,12 +13425,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><code>override(THEME_OVERRIDE override, bool enabled)</code> To disable or enable theme functions using the base_theme.<br/><code>override(THEME_OVERRIDE override, THEME theme)</code> To override a theme function with another theme.<br/><code>override(THEME_OVERRIDE override, function func)</code> To override a theme function with a lua function.<br/></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pre">pre(THEME_OVERRIDE index, function func_)</a></td>
 <td>Set a callback to be called before this theme function.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post">post(THEME_OVERRIDE index, function func_)</a></td>
 <td>Set a callback to be called after this theme function, to fix some changes it did for example.</td>
 </tr>
@@ -13414,52 +13460,52 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_flags">init_flags()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_level">init_level()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v4">unknown_v4()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v5">unknown_v5()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_rooms">add_special_rooms()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v7">unknown_v7()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v8">unknown_v8()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_vault">add_vault()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_coffin">add_coffin()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_feeling">add_special_feeling()</a></td>
 <td></td>
 </tr>
@@ -13469,62 +13515,62 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_level">spawn_level()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_border">spawn_border()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_level">post_process_level()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_traps">spawn_traps()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_entities">post_process_entities()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_procedural">spawn_procedural()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_background">spawn_background()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_lights">spawn_lights()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_transition">spawn_transition()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_transition">post_transition()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_players">spawn_players()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_effects">spawn_effects()</a></td>
 <td></td>
 </tr>
@@ -13629,7 +13675,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Add TEXTUREs to <code>textures</code> to override different dynamic textures easily.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pre_transition">pre_transition()</a></td>
 <td></td>
 </tr>
@@ -13644,22 +13690,22 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration">spawn_decoration()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration2">spawn_decoration2()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_extra">spawn_extra()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v51">unknown_v51()</a></td>
 <td></td>
 </tr>
@@ -13683,52 +13729,52 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_flags">init_flags()</a></td>
 <td>dwelling,tidepool: unset levelgen.flags.flag12<br/>jungle,volcana.olmec,icecaves,neobab,cog,duat,abzu,tiamat,eggplant,hundun,basecamp,arena: nop<br/>temple: unset levelgen.flags.flag10 + calculate chance of grasshopper critter spawn<br/>sunken: unset levelgen.flags.flag9, 10, 17, 18 + if state.level == 1 -&gt; unset flag 11<br/>cosmic: calls same virtual on its sub_theme</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_level">init_level()</a></td>
 <td>does random calculations and calls function to determine the start room in most themes</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v4">unknown_v4()</a></td>
 <td>most themes call the same function, some check whether they are in CO</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v5">unknown_v5()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_rooms">add_special_rooms()</a></td>
 <td>dwelling: does stuff when level == 4 or udjat present<br/>jungle: when black market present<br/>volcana: when drill present<br/>touches the rooms and sometimes the meta info about the rooms</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v7">unknown_v7()</a></td>
 <td>can&#39;t trigger, dwelling (quillback) and abzu do something special (arena just returns)</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v8">unknown_v8()</a></td>
 <td>does something depending on levelgen.data.unknown7</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_vault">add_vault()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_coffin">add_coffin()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_feeling">add_special_feeling()</a></td>
 <td>metal clanking and air of oppression</td>
 </tr>
@@ -13738,62 +13784,62 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_level">spawn_level()</a></td>
 <td>spawns all floor etc tiles based on the room layout<br/>disable this and only the player is spawned in the level</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_border">spawn_border()</a></td>
 <td>spawns CO: teleportingborder / Duat: dust / theme specific border tiles around the level</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_level">post_process_level()</a></td>
 <td>volcana: checks if state.coffin_contents = cocovondiamonds -&gt; chooses one of the four coffins in vlad&#39;s castle at random to put her in<br/>tidepool: spawns impostor lake, some door and a litwalltorch, ...<br/>neobab: assigns the correct animation_frame to all the ushabtis<br/>co, arena: forwards to the same virtual of the sub_theme<br/>abzu, tiamat: spawns impostor lake</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_traps">spawn_traps()</a></td>
 <td>adds theme specific random traps and pushblocks</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_process_entities">post_process_entities()</a></td>
 <td>pleasure palace: applies correct texture to ladders and ladder platforms<br/>sunken city: randomly adds ENT_TYPE_DECORATION_SUNKEN_BRIDGE between entities (the slimy bridges)<br/>hundun: calls sunken city virtual, so has slimy bridges</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_procedural">spawn_procedural()</a></td>
 <td>adds legs under platforms, random pots, goldbars, procedural spawns, compass indicator...</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_background">spawn_background()</a></td>
 <td>adds a background, e.g. CO stars / Duat moon / Plain backwall for other themes</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_lights">spawn_lights()</a></td>
 <td>adds extra light where needed, e.g. in the udjat chest room, or the top layer of the black market: spawns ENT_TYPE_LOGICAL_ROOM_LIGHT</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_transition">spawn_transition()</a></td>
 <td>spawns a transition tunnel to the level</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_transition">post_transition()</a></td>
 <td>unsets flag 1 (Reset) of state.quest_flags<br/>sets the correct state.screen (0xC)<br/>sets state.ingame to true, adjust fade values and starts loading</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_players">spawn_players()</a></td>
 <td>spawns the player(s) in the world, along with what they were holding</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_effects">spawn_effects()</a></td>
 <td>when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail<br/>this actually also sets the camera bounds and various theme specific special effects<br/>also spawns / sets the conditions for osiris, jelly, orbs...<br/>also makes curse pots spawn the ghost</td>
 </tr>
@@ -13898,7 +13944,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number<br/>that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pre_transition">pre_transition()</a></td>
 <td>manipulates state.level_next, world_next and theme_next; triggers when exiting a level<br/>for dwelling, it just increments level_next because the world/theme choice is made by which door you pick<br/>for jungle/volcana, it checks whether it&#39;s on the fourth level, if so, sets theme_next (4), world_next (3) and level_next (1) correctly for olmec<br/>for CO it checks whether the next level is 99, and set state.win_state to 3 to finish the game</td>
 </tr>
@@ -13913,22 +13959,22 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>returns a value that appears to affect room generation and is based on current world,level</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration">spawn_decoration()</a></td>
 <td>used e.g. in <a href="#Vlad">Vlad</a>&#39;s castle to insert the big banner in the center with the two demon statues<br/>also implemented for neobab (i think in the zoos)<br/>might do other things as well</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_decoration2">spawn_decoration2()</a></td>
 <td>dwelling: adds the decal above the udjat chest<br/>jungle: adds the colorful jungle flowers on top of the blocks<br/>does lots of other things as well, not sure about difference between this and spawn_decoration</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_extra">spawn_extra()</a></td>
 <td>dwelling udjat level: adds the key in random place<br/>vlad&#39;s castle: adds decorative banners<br/>tidepool: adds hanging seaweed, red lanterns, ...<br/>temple: adds temple sand deco, ...<br/>neobab: adds neon signs, hanging wires, ...</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown_v51">unknown_v51()</a></td>
 <td></td>
 </tr>
@@ -14373,12 +14419,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rearm">rearm()</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger">trigger(int who_uid)</a></td>
 <td>The uid must be movable entity for ownership transfers</td>
 </tr>
@@ -14404,7 +14450,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>setting the left part to 0 or right part to 1 destroys the trap</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger">trigger(int who_uid, bool left)</a></td>
 <td>The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,</td>
 </tr>
@@ -14488,7 +14534,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Will alwyas return <code>true</code> for exits, layers and others that the game never locks, even if you lock it with <code>unlock</code> function</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unlock">unlock(bool unlock)</a></td>
 <td>Lock/Unlock doors</td>
 </tr>
@@ -14597,27 +14643,27 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fix_border_tile_animation">fix_border_tile_animation()</a></td>
 <td>Sets <code>animation_frame</code> of the floor for types <code>FLOOR_BORDERTILE</code>, <code>FLOOR_BORDERTILE_METAL</code> and <code>FLOOR_BORDERTILE_OCTOPUS</code>.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fix_decorations">fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)</a></td>
 <td>Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set <code>fix_also_neighbours</code> to <code>true</code> to fix the neighbouring floor tile decorations on the border of the two tiles.<br/>Set <code>fix_styled_floor</code> to <code>true</code> to fix decorations on <code>FLOORSTYLED_</code> entities, those usually only have decorations when broken.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_decoration">add_decoration(FLOOR_SIDE side)</a></td>
 <td>Explicitly add a decoration on the given side. Corner decorations only exist for <code>FLOOR_BORDERTILE</code> and <code>FLOOR_BORDERTILE_OCTOPUS</code>.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=remove_decoration">remove_decoration(FLOOR_SIDE side)</a></td>
 <td>Explicitly remove a decoration on the given side. Corner decorations only exist for <code>FLOOR_BORDERTILE</code> and <code>FLOOR_BORDERTILE_OCTOPUS</code>.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=decorate_internal">decorate_internal()</a></td>
 <td></td>
 </tr>
@@ -14658,7 +14704,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=activate_laserbeam">activate_laserbeam(bool turn_on)</a></td>
 <td></td>
 </tr>
@@ -14741,7 +14787,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger">trigger(int who_uid, int direction)</a></td>
 <td>The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right, 3 = up, 4 = down</td>
 </tr>
@@ -14772,7 +14818,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger">trigger(int who_uid)</a></td>
 <td>The uid must be movable entity for ownership transfers</td>
 </tr>
@@ -15146,7 +15192,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger">trigger(int who_uid, bool left)</a></td>
 <td>The uid must be movable entity for ownership transfers</td>
 </tr>
@@ -15505,12 +15551,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Changes the entity texture, check the <a href="game_data/textures.txt">textures.txt</a> for available vanilla textures or use <a href="#define_texture">define_texture</a> to make custom one</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_draw_depth">set_draw_depth(int draw_depth)</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=liberate_from_shop">liberate_from_shop()</a></td>
 <td></td>
 </tr>
@@ -15520,37 +15566,37 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_layer">set_layer(LAYER layer)</a></td>
 <td>Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=remove">remove()</a></td>
 <td>Moves the entity to the limbo-layer where it can later be retrieved from again via <code>respawn</code></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=respawn">respawn(LAYER layer)</a></td>
 <td>Moves the entity from the limbo-layer (where it was previously put by <code>remove</code>) to <code>layer</code></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kill">kill(bool destroy_corpse, Entity responsible)</a></td>
 <td>Kills the entity, you can set responsible to <code>nil</code> to ignore it</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy">destroy()</a></td>
 <td>Completely removes the entity from existence</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=activate">activate(Entity activator)</a></td>
 <td>Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... <code>get_entity(&lt;udjat socket uid&gt;):activate(players[1])</code> (make sure player 1 has the udjat eye though)</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=perform_teleport">perform_teleport(int delta_x, int delta_y)</a></td>
 <td>Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.</td>
 </tr>
@@ -15565,17 +15611,17 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=apply_metadata">apply_metadata(int metadata)</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_invisible">set_invisible(bool value)</a></td>
 <td></td>
 </tr>
 <tr>
-<td>span&lt;int&gt;</td>
+<td>array&lt;int&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_items">get_items()</a></td>
 <td></td>
 </tr>
@@ -15665,7 +15711,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_liquid_flags">set_liquid_flags(int flags)</a></td>
 <td></td>
 </tr>
@@ -17883,12 +17929,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=carry">carry(Movable rider)</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tame">tame(bool value)</a></td>
 <td></td>
 </tr>
@@ -17923,7 +17969,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=remove_rider">remove_rider()</a></td>
 <td></td>
 </tr>
@@ -18182,7 +18228,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_jetpack_fuel">set_jetpack_fuel(int fuel)</a></td>
 <td></td>
 </tr>
@@ -18212,12 +18258,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Check whether the character is female, will be <code>true</code> if the character was modded to be female as well.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_heart_color">set_heart_color(Color hcolor)</a></td>
 <td>Set the heart color the character.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=let_go">let_go()</a></td>
 <td>Drops from ladders, ropes and ledge grabs</td>
 </tr>
@@ -18233,12 +18279,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=remove_powerup">remove_powerup(ENT_TYPE powerup_type)</a></td>
 <td>Removes a currently applied powerup. Specify <code>ENT_TYPE.ITEM_POWERUP_xxx</code>, not <code>ENT_TYPE.ITEM_PICKUP_xxx</code>! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=give_powerup">give_powerup(ENT_TYPE powerup_type)</a></td>
 <td>Gives the player/monster the specified powerup. Specify <code>ENT_TYPE.ITEM_POWERUP_xxx</code>, not <code>ENT_TYPE.ITEM_PICKUP_xxx</code>! Giving true crown to a monster crashes the game.</td>
 </tr>
@@ -18253,7 +18299,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Return all powerups that the entity has</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unequip_backitem">unequip_backitem()</a></td>
 <td>Unequips the currently worn backitem</td>
 </tr>
@@ -19114,12 +19160,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=poison_arrow">poison_arrow(bool poisoned)</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=light_up">light_up(bool lit)</a></td>
 <td></td>
 </tr>
@@ -19719,6 +19765,48 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 </tbody></table>
+<h3 id='CustomMovableBehavior'>CustomMovableBehavior</h3>
+<p>Opaque handle to a custom movable behavior from a script mod
+Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_force_state">set_force_state(function force_state)</a></td>
+<td>Set the <code>force_state</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>force_state</code> is already set it will be overridden. The signature<br/>of the function is <code>bool force_state(movable, base_fun)</code>, when the function returns <code>true</code> the movable will<br/>enter this behavior. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_enter">set_on_enter(function on_enter)</a></td>
+<td>Set the <code>on_enter</code> function of a <code>CustomMovableBehavior</code>, this will be called when the movable<br/>enters the state. If an <code>on_enter</code> is already set it will be overridden. The signature of the<br/>function is <code>nil on_enter(movable, base_fun))</code>. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_exit">set_on_exit(function on_exit)</a></td>
+<td>Set the <code>on_exit</code> function of a <code>CustomMovableBehavior</code>, this will be called when the movable<br/>leaves the state. If an <code>on_exit</code> is already set it will be overridden. The signature of the<br/>function is <code>nil on_exit(movable, base_fun))</code>. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_update_logic">set_update_logic(function update_logic)</a></td>
+<td>Set the <code>update_logic</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>update_logic</code> is already set it will be overridden. The signature<br/>of the function is <code>nil update_logic(movable, base_fun))</code>, use it to change the color, texture,<br/>some timers, etc. of the movable. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_update_world">set_update_world(function update_world)</a></td>
+<td>Set the <code>update_world</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>update_world</code> is already set it will be overridden. The signature<br/>of the function is <code>nil update_world(movable, base_fun))</code>, use this to update the move, velocity,<br/>current_animation, etc. of the movable, then call <code>mov:generic_update_world</code> to update the movable. If no<br/>base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_get_next_state_id">set_get_next_state_id(function get_next_state_id)</a></td>
+<td>Set the <code>get_next_state_id</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>get_next_state_id</code> is already set it will be overridden. The signature<br/>of the function is <code>int get_next_state_id(movable, base_fun))</code>, use this to move to another state, return <code>nil</code>.<br/>or this behaviors <code>state_id</code> to remain in this behavior. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+</tr>
+</tbody></table>
 <h3 id='Drill'>Drill</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a></p>
 
@@ -19735,7 +19823,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger">trigger()</a></td>
 <td></td>
 </tr>
@@ -21164,6 +21252,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move">move</a></td>
+<td></td>
+</tr>
+<tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=movex">movex</a></td>
 <td></td>
@@ -21201,6 +21294,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=last_owner_uid">last_owner_uid</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Animation">Animation</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=current_animation">current_animation</a></td>
 <td></td>
 </tr>
 <tr>
@@ -21339,32 +21437,32 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=stun">stun(int framecount)</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=freeze">freeze(int framecount)</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=light_on_fire">light_on_fire(int time)</a></td>
 <td>Does not damage entity</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_cursed">set_cursed(bool b)</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=drop">drop(Entity entity_to_drop)</a></td>
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pick_up">pick_up(Entity entity_to_pick_up)</a></td>
 <td></td>
 </tr>
@@ -21379,7 +21477,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_money">add_money(int money)</a></td>
 <td>Adds or subtracts the specified amount of money to the movable&#39;s (player&#39;s) inventory. Shows the calculation animation in the HUD.</td>
 </tr>
@@ -21389,7 +21487,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=damage">damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</a></td>
 <td>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities</td>
 </tr>
@@ -21407,6 +21505,41 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_behavior">get_behavior()</a></td>
 <td>Get the current behavior id</td>
+</tr>
+<tr>
+<td><a href="#VanillaMovableBehavior">VanillaMovableBehavior</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_base_behavior">get_base_behavior(int state_id)</a></td>
+<td>Gets a vanilla behavior from this movable, needs to be called before <code>clear_behaviors</code><br/>but the returned values are still valid after a call to <code>clear_behaviors</code></td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_behavior">add_behavior(MovableBehavior behavior)</a></td>
+<td>Add a behavior to this movable, can be either a <code>VanillaMovableBehavior</code> or a<br/><code>CustomMovableBehavior</code></td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clear_behavior">clear_behavior(MovableBehavior behavior)</a></td>
+<td>Clear a specific behavior of this movable, can be either a <code>VanillaMovableBehavior</code> or a<br/><code>CustomMovableBehavior</code>, a behavior with this behaviors <code>state_id</code> may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clear_behaviors">clear_behaviors()</a></td>
+<td>Clears all behaviors of this movable, need to call <code>add_behavior</code> to avoid crashing</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=generic_update_world">generic_update_world()</a></td>
+<td>Move a movable according to its velocity, update physics, gravity, etc.<br/>Will also update <code>movable.animation_frame</code> and various timers and counters</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=generic_update_world">generic_update_world(bool disable_gravity)</a></td>
+<td>Move a movable according to its velocity, can disable gravity<br/>Will also update <code>movable.animation_frame</code> and various timers and counters</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=generic_update_world">generic_update_world(Vec2 move, float sprint_factor, bool disable_gravity, bool on_rope)</a></td>
+<td>Move a movable according to its velocity and <code>move</code>, if the movables <code>BUTTON.RUN</code> is<br/>held apply <code>sprint_factor</code> on <code>move.x</code>, can disable gravity or lock its horizontal<br/>movement via <code>on_rope</code>. Use this for example to update a custom enemy type.<br/>Will also update <code>movable.animation_frame</code> and various timers and counters</td>
 </tr>
 </tbody></table>
 <h3 id='MovingIcon'>MovingIcon</h3>
@@ -21560,7 +21693,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=deploy">deploy()</a></td>
 <td></td>
 </tr>
@@ -22274,7 +22407,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>It&#39;s used just to check, to light/extinguish use <code>light_up</code> function</td>
 </tr>
 <tr>
-<td></td>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=light_up">light_up(bool lit)</a></td>
 <td></td>
 </tr>
@@ -22426,6 +22559,18 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=shine_timer">shine_timer</a></td>
 <td></td>
 </tr>
+</tbody></table>
+<h3 id='VanillaMovableBehavior'>VanillaMovableBehavior</h3>
+<p>Opaque handle to a movable behavior from the vanilla game
+Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
 </tbody></table>
 <h3 id='VladsCape'>VladsCape</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#Backpack">Backpack</a> <a href="#Cape">Cape</a></p>

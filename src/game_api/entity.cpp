@@ -863,3 +863,19 @@ uint32_t Movable::get_behavior()
     }
     return 0; // there is no id 0, but i can be wrong
 }
+
+void Movable::set_gravity(float gravity)
+{
+    hook_vtable<void(Movable*, float)>(
+        this,
+        [gravity](Movable* ent, [[maybe_unused]] float _gravity, void (*original)(Movable*, float))
+        {
+            original(ent, gravity);
+        },
+        0x53);
+}
+
+void Movable::reset_gravity()
+{
+    unregister_hook_function((void***)this, 0x53);
+}
