@@ -803,20 +803,33 @@ void LuaBackend::pre_load_screen()
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::LEVEL)
     {
-        int companion_slot = 10;
         for (auto uid : get_entities_by_mask(1))
         {
             auto ent = get_entity_ptr(uid)->as<Player>();
-            if (ent->inventory_ptr->health == 0)
-                continue;
             int slot = ent->inventory_ptr->player_slot;
-            if (slot == -1)
-                slot = companion_slot++;
+            if (slot == -1 && ent->linked_companion_parent == -1)
+                continue;
+            if (slot == -1 && ent->linked_companion_parent != -1)
+            {
+                Player* parent = ent;
+                while (true)
+                {
+                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                    slot++;
+                    if (parent->linked_companion_parent == -1)
+                    {
+                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        break;
+                    }
+                }
+            }
+            if (slot < 0)
+                continue;
             bool should_save = false;
             SavedUserData saved;
-            if (user_datas.contains(uid))
+            if (user_datas.contains(ent->uid))
             {
-                saved.self = get_user_data(uid);
+                saved.self = get_user_data(ent->uid);
                 should_save = true;
             }
             if (ent->holding_uid != -1 and user_datas.contains(ent->holding_uid))
@@ -892,15 +905,28 @@ void LuaBackend::post_level_generation()
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::LEVEL)
     {
-        int companion_slot = 10;
         for (auto uid : get_entities_by_mask(1))
         {
             auto ent = get_entity_ptr(uid)->as<Player>();
-            if (ent->inventory_ptr->health == 0)
-                continue;
             int slot = ent->inventory_ptr->player_slot;
-            if (slot == -1)
-                slot = companion_slot++;
+            if (slot == -1 && ent->linked_companion_parent == -1)
+                continue;
+            if (slot == -1 && ent->linked_companion_parent != -1)
+            {
+                Player* parent = ent;
+                while (true)
+                {
+                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                    slot++;
+                    if (parent->linked_companion_parent == -1)
+                    {
+                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        break;
+                    }
+                }
+            }
+            if (slot < 0)
+                continue;
             if (saved_user_datas.contains(slot))
             {
                 set_user_data(*ent, saved_user_datas[slot].self.value_or(sol::nil));
