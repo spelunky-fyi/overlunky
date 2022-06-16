@@ -195,6 +195,12 @@ struct ScriptState
     uint32_t quest_flags;
 };
 
+struct UserData
+{
+    sol::object data;
+    std::uint32_t hook_id;
+};
+
 struct SavedUserData
 {
     sol::optional<sol::object> self;
@@ -243,7 +249,7 @@ class LuaBackend
     std::vector<std::pair<int, std::uint32_t>> screen_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<CustomMovableBehaviorStorage> custom_movable_behaviors;
-    std::unordered_map<std::uint32_t, sol::object> user_datas;
+    std::unordered_map<std::uint32_t, UserData> user_datas;
     std::unordered_map<int, SavedUserData> saved_user_datas;
     std::vector<std::string> required_scripts;
     std::unordered_map<int, ScriptInput*> script_input;

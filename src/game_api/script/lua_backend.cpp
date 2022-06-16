@@ -139,6 +139,13 @@ void LuaBackend::clear_all_callbacks()
     screen_hooks.clear();
     clear_screen_hooks.clear();
     options.clear();
+    for (auto& [uid, user_data] : user_datas)
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            entity->unhook(user_data.second);
+        }
+    }
     required_scripts.clear();
     console_commands.clear();
     lua["on_guiframe"] = sol::lua_nil;
@@ -182,7 +189,7 @@ sol::object LuaBackend::get_user_data(Entity& entity)
 {
     if (user_datas.contains(entity.uid))
     {
-        return user_datas[entity.uid];
+        return user_datas[entity.uid].data;
     }
     return sol::nil;
 }
@@ -198,8 +205,8 @@ void LuaBackend::set_user_data(Entity& entity, sol::object user_data)
 {
     if (!user_datas.contains(entity.uid))
     {
-        entity.set_on_dtor(
-            [this, &entity](Entity*)
+        uint32_t hook_id = entity.set_on_dtor(
+            [this, uid = entity.uid](Entity*)
             {
                 /*auto state = State::get().ptr_local();
                 if ((entity.type->search_flags & 1) > 0 && state->loading == 2)
@@ -214,8 +221,9 @@ void LuaBackend::set_user_data(Entity& entity, sol::object user_data)
                 }*/
                 user_datas.erase(entity.uid);
             });
+        user_datas[entity.uid].hook_id = hook_id;
     }
-    user_datas[entity.uid] = user_data;
+    user_datas[entity.uid].data = user_data;
 }
 void LuaBackend::set_user_data(uint32_t uid, sol::object user_data)
 {

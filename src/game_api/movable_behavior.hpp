@@ -43,7 +43,7 @@ struct CustomMovableBehavior final : MovableBehavior
     std::function<uint8_t(Movable*, std::function<uint8_t(Movable*)>)> custom_get_next_state_id;
     VanillaMovableBehavior* base_behavior;
 
-    std::vector<Movable*> using_movables;
+    std::unordered_map<Movable*, uint32_t> using_movables;
 
     ~CustomMovableBehavior();
 
