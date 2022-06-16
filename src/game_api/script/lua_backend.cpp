@@ -208,17 +208,6 @@ void LuaBackend::set_user_data(Entity& entity, sol::object user_data)
         uint32_t hook_id = entity.set_on_dtor(
             [this, uid = entity.uid](Entity*)
             {
-                /*auto state = State::get().ptr_local();
-                if ((entity.type->search_flags & 1) > 0 && state->loading == 2)
-                {
-                    auto player = entity.as<Player>();
-                    DEBUG("{} holding {}", entity.uid, player->holding_uid);
-                    SavedUserData saved;
-                    saved.self = this->get_user_data(entity);
-                    if (player->holding_uid != -1)
-                        saved.held = this->get_user_data(player->holding_uid);
-                    this->saved_user_datas[player->inventory_ptr] = saved;
-                }*/
                 user_datas.erase(uid);
             });
         user_datas[entity.uid].hook_id = hook_id;
@@ -809,7 +798,7 @@ void LuaBackend::pre_load_screen()
     std::lock_guard lock{gil};
 
     auto state_ptr = State::get().ptr();
-    if ((ON)state_ptr->screen == ON::LEVEL)
+    if ((ON)state_ptr->screen == ON::LEVEL && (state_ptr->quest_flags & 1) == 0)
     {
         for (auto uid : get_entities_by_mask(1))
         {
