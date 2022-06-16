@@ -20,14 +20,16 @@ void pre_level_generation()
             return true;
         });
 }
-void pre_load_screen()
+bool pre_load_screen()
 {
+    bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
-            backend.pre_load_screen();
-            return true;
+            block = backend.pre_load_screen();
+            return !block;
         });
+    return block;
 }
 void post_room_generation()
 {

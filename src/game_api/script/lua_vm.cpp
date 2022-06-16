@@ -1723,7 +1723,7 @@ end
     // LOADING
     // Runs whenever state.loading changes and is > 0. Prefer PRE/POST_LOAD_SCREEN instead though.
     // PRE_LOAD_SCREEN
-    // Runs right before loading a new screen based on screen_next
+    // Runs right before loading a new screen based on screen_next. Return true from callback to block the screen from loading.
     // POST_LOAD_SCREEN
     // Runs right after a screen is loaded, before rendering anything
     // PRE_GET_RANDOM_ROOM

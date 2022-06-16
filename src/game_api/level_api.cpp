@@ -688,7 +688,8 @@ using LoadScreenFun = void(StateMemory*, size_t, size_t);
 LoadScreenFun* g_load_screen_trampoline{nullptr};
 void load_screen(StateMemory* state, size_t param_2, size_t param_3)
 {
-    pre_load_screen();
+    if (pre_load_screen())
+        return;
     g_load_screen_trampoline(state, param_2, param_3);
     post_load_screen();
 }
@@ -2102,7 +2103,8 @@ void do_load_screen()
 {
     auto load_screen_fun = (LoadScreenFun*)get_address("load_screen_func");
     const auto state = State::get().ptr();
-    pre_load_screen();
+    if (pre_load_screen())
+        return;
     load_screen_fun(state, 0, 0);
     post_load_screen();
 }

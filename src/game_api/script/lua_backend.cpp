@@ -788,10 +788,10 @@ void LuaBackend::pre_level_generation()
         }
     }
 }
-void LuaBackend::pre_load_screen()
+bool LuaBackend::pre_load_screen()
 {
     if (!get_enabled())
-        return;
+        return false;
 
     auto now = get_frame_count();
 
@@ -805,9 +805,11 @@ void LuaBackend::pre_load_screen()
         if (callback.screen == ON::PRE_LOAD_SCREEN)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function(callback.func);
+            auto return_value = handle_function_with_return<bool>(callback.func).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
+            if (return_value)
+                return return_value;
         }
     }
 
@@ -865,6 +867,7 @@ void LuaBackend::pre_load_screen()
                 saved_user_datas[slot] = saved;
         }
     }
+    return false;
 }
 void LuaBackend::post_room_generation()
 {
