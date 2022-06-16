@@ -3083,6 +3083,7 @@ bool | [hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
 float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
 [RenderInfo](#RenderInfo) | [rendering_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rendering_info) | 
+ | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | 
 [Entity](#Entity) | [topmost()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) | 
 [Entity](#Entity) | [topmost_mount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) | 
 bool | [overlaps_with(AABB hitbox)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
@@ -3106,7 +3107,6 @@ nil | [apply_metadata(int metadata)](https://github.com/spelunky-fyi/overlunky/s
 nil | [set_invisible(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
 array&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
 bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | Returns true if entity is in water/lava
-nil | [user_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | Table containing arbitrary data, `nil` by default and will be cleared when the entity is destroyed
 
 ### IceSlidingSound
 
@@ -5626,6 +5626,8 @@ nil | [damage(int damage_dealer_uid, int damage_amount, int stun_time, float vel
 array&lt;int&gt; | [get_all_behaviors()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_all_behaviors) | Get all avaible behavior ids
 bool | [set_behavior(int behavior_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_behavior) | Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity<br/>Returns false if entity doesn't have this behavior id
 int | [get_behavior()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_behavior) | Get the current behavior id
+nil | [set_gravity(float gravity)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_gravity) | Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
+nil | [reset_gravity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_gravity) | Remove the gravity hook and reset to defaults
 [VanillaMovableBehavior](#VanillaMovableBehavior) | [get_base_behavior(int state_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_behavior) | Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
 nil | [add_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_behavior) | Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
 nil | [clear_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_behavior) | Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
