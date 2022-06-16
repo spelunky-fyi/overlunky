@@ -143,7 +143,7 @@ void LuaBackend::clear_all_callbacks()
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            entity->unhook(user_data.second);
+            entity->unhook(user_data.hook_id);
         }
     }
     required_scripts.clear();
@@ -197,7 +197,7 @@ sol::object LuaBackend::get_user_data(uint32_t uid)
 {
     if (user_datas.contains(uid))
     {
-        return user_datas[uid];
+        return user_datas[uid].data;
     }
     return sol::nil;
 }
@@ -219,7 +219,7 @@ void LuaBackend::set_user_data(Entity& entity, sol::object user_data)
                         saved.held = this->get_user_data(player->holding_uid);
                     this->saved_user_datas[player->inventory_ptr] = saved;
                 }*/
-                user_datas.erase(entity.uid);
+                user_datas.erase(uid);
             });
         user_datas[entity.uid].hook_id = hook_id;
     }
