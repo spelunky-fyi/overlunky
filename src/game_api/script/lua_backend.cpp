@@ -797,6 +797,20 @@ void LuaBackend::pre_load_screen()
 
     std::lock_guard lock{gil};
 
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LOAD_SCREEN)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function(callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::LEVEL && (state_ptr->quest_flags & 1) == 0)
     {
@@ -849,20 +863,6 @@ void LuaBackend::pre_load_screen()
             }
             if (should_save)
                 saved_user_datas[slot] = saved;
-        }
-    }
-
-    for (auto& [id, callback] : callbacks)
-    {
-        if (is_callback_cleared(id))
-            continue;
-
-        if (callback.screen == ON::PRE_LOAD_SCREEN)
-        {
-            set_current_callback(-1, id, CallbackType::Normal);
-            handle_function(callback.func);
-            clear_current_callback();
-            callback.lastRan = now;
         }
     }
 }
