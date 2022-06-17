@@ -4,6 +4,7 @@
 #include "entities_chars.hpp"
 #include "entities_floors.hpp"
 #include "entities_mounts.hpp"
+#include "game_manager.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
 #include "rpc.hpp"
@@ -36,6 +37,23 @@ uint32_t UI::get_frame_count()
 void UI::warp(uint8_t world, uint8_t level, uint8_t theme)
 {
     State::get().warp(world, level, theme);
+}
+void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
+{
+    auto state = State::get().ptr();
+    if (state->screen != 12)
+    {
+        State::get().warp(world, level, theme);
+        return;
+    }
+    state->world_next = world;
+    state->level_next = level;
+    state->theme_next = theme;
+    state->screen_next = 13;
+    state->fadeout = 5;
+    state->fadein = 5;
+    state->win_state = 0;
+    state->loading = 1;
 }
 float UI::get_zoom_level()
 {
@@ -201,6 +219,10 @@ void UI::set_time_jelly_enabled(bool enable)
 {
     ::set_time_jelly_enabled(enable);
 }
+void UI::set_cursepot_ghost_enabled(bool enable)
+{
+    ::set_cursepot_ghost_enabled(enable);
+}
 ENT_TYPE UI::get_entity_type(int32_t uid)
 {
     return ::get_entity_type(uid);
@@ -293,12 +315,15 @@ void UI::kill_entity_overlay(Entity* ent)
 void UI::update_floor_at(float x, float y, LAYER l)
 {
     static const auto thorn_vine = to_id("ENT_TYPE_FLOOR_THORN_VINE");
+    static const auto pipe = to_id("ENT_TYPE_FLOOR_PIPE");
+    static const auto quicksand = to_id("ENT_TYPE_FLOOR_QUICKSAND");
     static const auto destroy_deco = {
         to_id("ENT_TYPE_DECORATION_HANGING_HIDE"),
         to_id("ENT_TYPE_DECORATION_CROSS_BEAM"),
         to_id("ENT_TYPE_DECORATION_HANGING_WIRES"),
         to_id("ENT_TYPE_DECORATION_MINEWOOD_POLE"),
         to_id("ENT_TYPE_DECORATION_PAGODA_POLE"),
+        to_id("ENT_TYPE_DECORATION_PIPE"),
     };
     auto uid = get_grid_entity_at(x, y, l);
     if (uid == -1)
@@ -307,11 +332,32 @@ void UI::update_floor_at(float x, float y, LAYER l)
     if ((ent->type->search_flags & 0x100) == 0 || !test_flag(ent->flags, 3))
         return;
     auto floor = ent->as<Floor>();
+    auto state = State::get().ptr();
+    if (test_flag(state->special_visibility_flags, 1))
+    {
+        for (auto item : entity_get_items_by(floor->uid, 0, 0x8))
+        {
+            auto embed = get_entity_ptr(item);
+            clr_flag(embed->flags, 1);
+        }
+    }
     if (test_flag(floor->type->properties_flags, 1) && floor->get_decoration_entity_type() != -1)
+    {
         for (int i = 0; i < 7; ++i)
         {
             floor->remove_decoration((FLOOR_SIDE)i);
         }
+    }
+    else if (floor->type->id == pipe || floor->type->id == thorn_vine || floor->type->id == quicksand)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            auto deco_ent = get_entity_ptr(floor->decos[i]);
+            if (deco_ent)
+                deco_ent->destroy();
+            floor->decos[i] = -1;
+        }
+    }
     for (auto deco : entity_get_items_by(floor->uid, destroy_deco, 0x200))
     {
         auto deco_ent = get_entity_ptr(deco);
@@ -324,13 +370,21 @@ void UI::update_floor_at(float x, float y, LAYER l)
         if (deco_ent)
             deco_ent->destroy();
     }
-    floor->on_neighbor_destroyed();
     if (test_flag(floor->type->properties_flags, 1) || test_flag(floor->type->properties_flags, 2))
     {
-        if (floor->type->id == thorn_vine || floor->type->id < 4)
+        if (floor->type->id < 4)
+        {
+            floor->on_neighbor_destroyed();
             floor->fix_decorations(true, false);
+        }
         else
+        {
             floor->decorate_internal();
+        }
+    }
+    else
+    {
+        floor->on_neighbor_destroyed();
     }
 }
 bool in_array(uint32_t needle, std::vector<uint32_t> haystack)
@@ -595,4 +649,9 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
 std::vector<uint32_t> UI::get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer)
 {
     return get_entities_overlapping_hitbox(0, mask, hitbox, layer);
+}
+
+bool UI::get_focus()
+{
+    return ::get_game_manager()->game_props->game_has_focus;
 }

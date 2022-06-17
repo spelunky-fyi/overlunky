@@ -34,16 +34,18 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Tab**: Add selected item id to list when making a kit
       + **Mouse left**: Spawn entity at mouse cursor (drag to set velocity)
       + **Ctrl+Mouse left**: Spawn overlay on hovered entity (drag to offset position) / Spawn or throw single liquid blob
+      + **Alt+Mouse left**: Hold to draw floors or other entities on grid
       + **Mouse right**: Teleport to mouse cursor (drag to set velocity)
       + **Mouse middle**: Select or drag safe entities around
+      + **Alt+Mouse middle**: Select multiple entities in the finder
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
-      + **(Ctrl/Shift+)Mouse 4**: Boom / Big Boom / Nuke!
       + **Mouse 5**: Destroy safe entities
+      * **Alt+Mouse 5**: Erase multiple entities safely
       + **Shift+Mouse 5**: Destroy any entity (really unsafe :)
-      + **Ctrl+Mouse 5**: Clone entity
       + **Shift+123...**: Spawn saved kit number
       + **Shift+Tab**: Change P1 layer
+      + **Delete**: Delete selected entity safely
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
       + Dragged entities have noclip on, so you can drag yourself through walls etc
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can `Save` for later use with a single click.
@@ -75,6 +77,8 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
   - **F6**: Save editor
       + Edit your save data.
       + Note: Doesn't automatically save to file, you need to let the game trigger a save for that.
+  - **F7**: Entity finder
+      + **Alt+Delete**: Delete all selected entities
   - **F8**: Scripts
       + You can load, edit and set options for Lua scripts here
       + **Ctrl+F5**: Reload enabled scripts
@@ -88,6 +92,9 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
     - **"clear/clr/cls"**: Clear history
     - **"reset/reload"**: Clear all callbacks made in the console
     - **"quit"**: Ragequit
+    - **"P"**: Short for get_player(1)
+    - **"E"**: Short for the selected Entity
+    - **"U"**: Short for the selected uid
   - **Ctrl+Shift+K**: Edit keybindings
   - **Ctrl+Shift+S**: Save options, hotkeys and UI colors
   - **Ctrl+Shift+L**: Load options, hotkeys and UI colors
@@ -117,7 +124,6 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + While we try to keep all the modding tools compatible, some things may break sometimes.
     + Check the [open issues](https://github.com/spelunky-fyi/overlunky/issues) for known compatibility problems with other tools.
   - If you're **missing** some overlay **windows** or tabs:
-    + Try resetting window positions. (See hotkeys above.)
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
     + Maybe the overlay is just really tiny or collapsed? You can resize it. Just try your magic with the mouse.
   - If you mess up your **keyboard shortcuts** or UI:

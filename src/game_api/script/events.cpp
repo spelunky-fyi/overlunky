@@ -1,5 +1,7 @@
 #include "events.hpp"
 
+#include "constants.hpp"
+
 void pre_load_level_files()
 {
     LuaBackend::for_each_backend(
@@ -18,6 +20,15 @@ void pre_level_generation()
             return true;
         });
 }
+void pre_load_screen()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.pre_load_screen();
+            return true;
+        });
+}
 void post_room_generation()
 {
     LuaBackend::for_each_backend(
@@ -33,6 +44,15 @@ void post_level_generation()
         [&](LuaBackend& backend)
         {
             backend.post_level_generation();
+            return true;
+        });
+}
+void post_load_screen()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.post_load_screen();
             return true;
         });
 }

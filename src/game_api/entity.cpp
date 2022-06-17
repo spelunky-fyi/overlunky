@@ -91,6 +91,23 @@ ENT_TYPE to_id(std::string_view name)
     return it != map.end() ? it->second : -1;
 }
 
+std::string_view to_name(ENT_TYPE id)
+{
+    const EntityFactory* entity_factory_ptr = entity_factory();
+    if (entity_factory_ptr)
+    {
+        for (const auto& [name, type_id] : entity_factory_ptr->entity_map)
+        {
+            if (type_id == id)
+            {
+                return name;
+            }
+        }
+    }
+
+    return {};
+}
+
 void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
 {
     if (overlay)
@@ -449,6 +466,10 @@ void Entity::unhook(std::uint32_t id)
                       { return hook.id == id; });
         std::erase_if(it->on_damage, [id](auto& hook)
                       { return hook.id == id; });
+        std::erase_if(it->pre_floor_update, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->post_floor_update, [id](auto& hook)
+                      { return hook.id == id; });
         std::erase_if(it->pre_statemachine, [id](auto& hook)
                       { return hook.id == id; });
         std::erase_if(it->post_statemachine, [id](auto& hook)
@@ -585,6 +606,52 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
     hook_info.on_damage.push_back({reserved_callback_id, std::move(on_damage)});
 }
 
+auto hook_update_callback(Entity* self)
+{
+    hook_vtable<void(Entity*)>(
+        self,
+        [](Entity* entity, void (*original)(Entity*))
+        {
+            EntityHooksInfo& _hook_info = entity->get_hooks();
+            bool skip_original{false};
+            for (auto& [id, pre] : _hook_info.pre_floor_update)
+            {
+                if (pre(entity))
+                {
+                    skip_original = true;
+                    break;
+                }
+            }
+            if (!skip_original)
+            {
+                original(entity);
+            }
+            for (auto& [id, post] : _hook_info.post_floor_update)
+            {
+                post(entity);
+            }
+        },
+        0x26);
+}
+void Entity::set_pre_floor_update(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_update)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_floor_update.empty() && hook_info.post_floor_update.empty())
+    {
+        hook_update_callback(this);
+    }
+    hook_info.pre_floor_update.push_back({reserved_callback_id, std::move(pre_update)});
+}
+void Entity::set_post_floor_update(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_update)
+{
+    EntityHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_floor_update.empty() && hook_info.post_floor_update.empty())
+    {
+        hook_update_callback(this);
+    }
+    hook_info.post_floor_update.push_back({reserved_callback_id, std::move(post_update)});
+}
+
 bool Entity::is_player()
 {
     if (type->search_flags & 1)
@@ -712,7 +779,7 @@ auto hook_render_callback(Entity* self, RenderInfo* self_rendering_info)
 void Entity::set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_render.empty() || hook_info.pre_render.empty())
+    if (hook_info.pre_render.empty() && hook_info.post_render.empty())
     {
         hook_render_callback(this, rendering_info);
     }
@@ -721,7 +788,7 @@ void Entity::set_pre_render(std::uint32_t reserved_callback_id, std::function<bo
 void Entity::set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render)
 {
     EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_render.empty() || hook_info.pre_render.empty())
+    if (hook_info.pre_render.empty() && hook_info.post_render.empty())
     {
         hook_render_callback(this, rendering_info);
     }
@@ -787,4 +854,20 @@ uint32_t Movable::get_behavior()
         }
     }
     return 0; // there is no id 0, but i can be wrong
+}
+
+void Movable::set_gravity(float gravity)
+{
+    hook_vtable<void(Movable*, float)>(
+        this,
+        [gravity](Movable* ent, [[maybe_unused]] float _gravity, void (*original)(Movable*, float))
+        {
+            original(ent, gravity);
+        },
+        0x53);
+}
+
+void Movable::reset_gravity()
+{
+    unregister_hook_function((void***)this, 0x53);
 }

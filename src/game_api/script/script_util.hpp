@@ -15,6 +15,7 @@ size_t get_say_context();
 float screenify(float dis);
 
 ImVec2 screenify(ImVec2 pos);
+ImVec2 screenify_fix(ImVec2 pos);
 
 ImVec2 normalize(ImVec2 pos);
 

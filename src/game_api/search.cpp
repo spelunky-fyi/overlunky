@@ -446,6 +446,20 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "custom_malloc"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8d\x42\x17\x48\x83\xe0\xf0\x48\x83\xfa\x17"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "custom_free"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x49\x89\xcd\x49\x83\xe5\xf8\x4e\x8d\x0c\x2f"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "read_encrypted_file"sv,
         PatternCommandBuffer{}
             .find_inst("\x41\xb8\x50\x46\x00\x00"sv)
@@ -820,6 +834,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .set_optional(true)
             .get_address("fetch_texture_begin"sv)
             .find_next_inst_in_range("\x66\x89\x46\x3c"sv, 0x250)
+            .offset(0x4)
             .at_exe(),
     },
     {
@@ -1598,6 +1613,41 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_inst("\xf3\x0f\x10\x55\xe0\xf3\x0f\x10\x5d\xe4"sv)
             .offset(-0x4)
+            .at_exe(),
+    },
+    {
+        // Follow the definition of a movable (e.g. ENT_TYPE_MONS_SNAKE) to its
+        // create function, to its vtable, to its virtual apply_db/init to the first
+        // call in there, the call that takes the movable, uint and vtable is add_behavior
+        "add_behavior"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x80\x79\x19\x00\x75\x4f\x48\x39\xc1\x74\x4a"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "load_screen_func"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x8b\x49\x0c\x41\x8b\x47\x10"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Check the 6th virtual of a vtable passed to `add_behavior` which should be
+        // calling `update_movable` at the bottom as
+        // `update_movable(this, &this->movex, this->sprint_factor, 1, 0, 0, 0);`
+        "update_movable"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x03\x50\x14\x83\xfa\x11\x77\x15"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "adventure_seed"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x4c\x8d\x80\xa0\x00\x00\x00"sv)
+            .offset(0x7)
+            .decode_pc()
             .at_exe(),
     },
     {

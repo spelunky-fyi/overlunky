@@ -305,6 +305,8 @@ void register_usertypes(sol::state& lua)
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
     lua.new_usertype<Movable>(
         "Movable",
+        "move",
+        &Movable::move,
         "movex",
         &Movable::movex,
         "movey",
@@ -321,6 +323,8 @@ void register_usertypes(sol::state& lua)
         &Movable::owner_uid,
         "last_owner_uid",
         &Movable::last_owner_uid,
+        "current_animation",
+        &Movable::current_animation,
         "idle_counter",
         &Movable::idle_counter,
         "standing_on_uid",
@@ -405,6 +409,10 @@ void register_usertypes(sol::state& lua)
         &Movable::set_behavior,
         "get_behavior",
         &Movable::get_behavior,
+        "set_gravity",
+        &Movable::set_gravity,
+        "reset_gravity",
+        &Movable::reset_gravity,
         sol::base_classes,
         sol::bases<Entity>());
 

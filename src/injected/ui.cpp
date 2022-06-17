@@ -38,6 +38,7 @@
 #include "entities_mounts.hpp"
 #include "file_api.hpp"
 #include "flags.hpp"
+#include "game_manager.hpp"
 #include "items.hpp"
 #include "logger.h"
 #include "math.hpp"
@@ -101,8 +102,6 @@ std::map<std::string, int64_t> keys{
     {"tool_save", VK_F6},
     {"tool_finder", VK_F7},
     {"reset_windows", OL_KEY_CTRL | OL_KEY_SHIFT | 'R'},
-    {"reset_windows_vertical", OL_KEY_CTRL | OL_KEY_SHIFT | 'V'},
-    {"tabbed_interface", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
     {"detach_tab", OL_KEY_CTRL | OL_KEY_SHIFT | 'D'},
     {"save_settings", OL_KEY_CTRL | OL_KEY_SHIFT | 'S'},
     {"load_settings", OL_KEY_CTRL | OL_KEY_SHIFT | 'L'},
@@ -235,12 +234,13 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
+GameManager* g_game_manager = 0;
 std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "", detach_tab = "";
@@ -284,14 +284,12 @@ std::map<std::string, bool> options = {
     {"noclip", false},
     {"snap_to_grid", false},
     {"spawn_floor_decorated", true},
-    {"stack_horizontally", false},
-    {"stack_vertically", false},
     {"disable_pause", false},
     {"draw_grid", false},
     {"draw_hitboxes", false},
-    {"tabbed_interface", true},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
+    {"warp_transition", false},
     {"lights", false},
     {"disable_achievements", true},
     {"disable_savegame", true},
@@ -301,7 +299,9 @@ std::map<std::string, bool> options = {
     {"fade_script_messages", true},
     {"draw_hitboxes_interpolated", true},
     {"show_tooltips", true},
-    {"smooth_camera", true}};
+    {"smooth_camera", true},
+    {"multi_viewports", true},
+    {"menu_ui", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -483,15 +483,18 @@ void set_colors()
     style.Colors[ImGuiCol_TabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.80f);
     style.Colors[ImGuiCol_TabUnfocused] = ImVec4(col_area.x, col_area.y, col_area.z, 0.60f);
     style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(col_area.x, col_area.y, col_area.z, 0.80f);
+    style.Colors[ImGuiCol_DockingPreview] = ImVec4(col_area.x, col_area.y, col_area.z, 0.6f);
     style.WindowPadding = ImVec2(4, 4);
     style.WindowRounding = 0;
     style.FrameRounding = 0;
     style.PopupRounding = 0;
     style.GrabRounding = 0;
     style.TabRounding = 0;
+    style.ScrollbarRounding = 0;
     style.WindowBorderSize = 0;
     style.FrameBorderSize = 0;
     style.PopupBorderSize = 0;
+    style.DisplaySafeAreaPadding = {0, 0};
 }
 
 void load_script(std::string file, bool enable = true)
@@ -855,6 +858,11 @@ void load_config(std::string file)
         hook_savegame();
     UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
     UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
+    UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
+    if (options["multi_viewports"])
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    else
+        ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     save_config(file);
 }
 
@@ -867,7 +875,7 @@ bool detached(std::string window)
 
 bool toggle(std::string tool)
 {
-    if (!options["tabbed_interface"] || detached(tool))
+    if (detached(tool))
     {
         windows[tool]->open = true;
         const char* name = windows[tool]->name.c_str();
@@ -890,10 +898,16 @@ bool toggle(std::string tool)
         }
         return false;
     }
+    else if (options["menu_ui"])
+    {
+        activate_tab = tool;
+        return true;
+    }
     else
     {
         ImGuiWindow* win = ImGui::FindWindowByName("Overlunky");
-        win->Collapsed = false;
+        if (win)
+            win->Collapsed = false;
         for (auto window : windows)
         {
             if (window.first == tool)
@@ -914,11 +928,15 @@ bool active(std::string window)
         return false;
     // while (current->ParentWindow != NULL)
     //     current = current->ParentWindow;
-    if (!options["tabbed_interface"] || detached(window))
+    if (detached(window))
     {
         if (windows.find(window) == windows.end())
             return false;
         return current == ImGui::FindWindowByName(windows[window]->name.c_str());
+    }
+    else if (options["menu_ui"])
+    {
+        return window == active_tab;
     }
     else
     {
@@ -945,12 +963,16 @@ bool visible(std::string window)
 {
     if (windows.find(window) == windows.end())
         return false;
-    if (!options["tabbed_interface"] || detached(window))
+    if (detached(window))
     {
         ImGuiWindow* win = ImGui::FindWindowByName(windows[window]->name.c_str());
         if (win != NULL)
             return !win->Collapsed;
         return false;
+    }
+    else if (options["menu_ui"])
+    {
+        return window == active_tab;
     }
     else
     {
@@ -1015,6 +1037,36 @@ void smart_delete(Entity* ent, bool unsafe = false)
     UI::safe_destroy(ent, unsafe);
 }
 
+void reset_windows()
+{
+    for (auto [name, window] : windows)
+    {
+        window->detached = false;
+        window->open = true;
+    }
+}
+
+static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+
+static inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x - rhs.x, lhs.y - rhs.y);
+}
+
+ImVec2 fix_pos(ImVec2 orig)
+{
+    return ImGui::GetMainViewport()->Pos + orig;
+}
+
+ImVec2 mouse_pos()
+{
+    auto base = ImGui::GetMainViewport();
+    return ImGui::GetMousePos() - base->Pos;
+}
+
 std::string spawned_type()
 {
     const auto pos = text.find_first_of(" ");
@@ -1047,6 +1099,9 @@ std::string spawned_type()
 
 void spawn_entities(bool s, std::string list = "")
 {
+    if (g_game_manager->pause_ui->visibility > 0)
+        return;
+
     const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
@@ -1155,7 +1210,7 @@ void spawn_entity_over()
         else
         {
             auto cpos = UI::click_position(g_x, g_y);
-            auto mpos = normalize(ImGui::GetMousePos());
+            auto mpos = normalize(mouse_pos());
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
             UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
@@ -1208,20 +1263,46 @@ bool update_entity()
     return false;
 }
 
-void fix_co_coordinates(std::pair<float, float>& cpos)
+bool fix_co_coordinates(std::pair<float, float>& cpos)
 {
+    bool fixed = false;
     float maxx = g_state->w * 10.0f + 2.5f;
     float minx = 2.5f;
     float maxy = 122.5f;
     float miny = 122.5f - g_state->h * 8.0f;
-    if (cpos.first > maxx)
+    while (cpos.first > maxx)
+    {
+        g_state->camera->focus_x -= g_state->w * 10.0f;
+        g_state->camera->adjusted_focus_x -= g_state->w * 10.0f;
+        g_state->camera->calculated_focus_x -= g_state->w * 10.0f;
         cpos.first -= g_state->w * 10.0f;
-    else if (cpos.first < minx)
+        fixed = true;
+    }
+    while (cpos.first < minx)
+    {
+        g_state->camera->focus_x += g_state->w * 10.0f;
+        g_state->camera->adjusted_focus_x += g_state->w * 10.0f;
+        g_state->camera->calculated_focus_x += g_state->w * 10.0f;
         cpos.first += g_state->w * 10.0f;
-    if (cpos.second > maxy)
+        fixed = true;
+    }
+    while (cpos.second > maxy)
+    {
+        g_state->camera->focus_y -= g_state->h * 8.0f;
+        g_state->camera->adjusted_focus_y -= g_state->h * 8.0f;
+        g_state->camera->calculated_focus_y -= g_state->h * 8.0f;
         cpos.second -= g_state->h * 8.0f;
-    else if (cpos.second < miny)
+        fixed = true;
+    }
+    while (cpos.second < miny)
+    {
+        g_state->camera->focus_y += g_state->h * 8.0f;
+        g_state->camera->adjusted_focus_y += g_state->h * 8.0f;
+        g_state->camera->calculated_focus_y += g_state->h * 8.0f;
         cpos.second += g_state->h * 8.0f;
+        fixed = true;
+    }
+    return fixed;
 }
 
 void set_zoom()
@@ -1355,12 +1436,9 @@ void force_noclip()
             if (g_state->theme == 10)
             {
                 auto cpos = UI::get_position(player);
-                fix_co_coordinates(cpos);
-                if (cpos.first != UI::get_position(player).first || cpos.second != UI::get_position(player).second)
+                if (fix_co_coordinates(cpos))
                 {
                     player->teleport_abs(cpos.first, cpos.second, player->velocityx, player->velocityy);
-                    // this just glitches the shaders, doesn't work
-                    // set_camera_position(cpos.first, cpos.second);
                 }
             }
         }
@@ -1406,13 +1484,27 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
 {
-    if (options["warp_increments_level_count"])
+    if (options["warp_increments_level_count"] && g_state->screen == 12)
+    {
         g_state->level_count += 1;
-    UI::warp(w, l, t);
+    }
+    if (options["warp_transition"])
+    {
+        UI::transition(w, l, t);
+    }
+    else
+    {
+        UI::warp(w, l, t);
+    }
 }
 
 void warp_next_level(size_t num)
 {
+    if (g_state->screen == 13)
+    {
+        UI::warp(g_state->world_next, g_state->level_next, g_state->theme_next);
+        return;
+    }
     std::vector<std::tuple<uint8_t, uint8_t, uint8_t>> targets; // tuple = world, level, theme
     uint8_t target_world = 0;
     uint8_t target_level = 0;
@@ -1786,6 +1878,8 @@ float held_duration_last(std::string keyname)
 
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
+    ImGuiContext& g = *GImGui;
+
     if (nCode == WM_KEYUP)
     {
         if (pressed("speedhack_turbo", wParam))
@@ -1807,7 +1901,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 
     int repeat = (lParam >> 30) & 1U;
     auto& io = ImGui::GetIO();
-    ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
 
     if (current != nullptr && current == ImGui::FindWindowByName("KeyCapture"))
@@ -2065,6 +2158,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         options["disable_ghost_timer"] = !options["disable_ghost_timer"];
         UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
         UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
+        UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
     }
     else if (pressed("teleport_left", wParam))
     {
@@ -2203,35 +2297,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("reset_windows", wParam))
     {
-        options["stack_horizontally"] = !options["stack_horizontally"];
-        if (options["stack_horizontally"])
-        {
-            options["stack_vertically"] = false;
-            options["tabbed_interface"] = false;
-        }
-    }
-    else if (pressed("reset_windows_vertical", wParam))
-    {
-        options["stack_vertically"] = !options["stack_vertically"];
-        if (options["stack_vertically"])
-        {
-            options["stack_horizontally"] = false;
-            options["tabbed_interface"] = false;
-        }
-    }
-    else if (pressed("tabbed_interface", wParam))
-    {
-        options["tabbed_interface"] = !options["tabbed_interface"];
-        if (options["tabbed_interface"])
-        {
-            options["stack_horizontally"] = false;
-            options["stack_vertically"] = false;
-        }
+        reset_windows();
     }
     else if (pressed("detach_tab", wParam))
     {
-        if (options["tabbed_interface"])
-            detach(active_tab);
+        detach(active_tab);
     }
     else if (pressed("save_settings", wParam))
     {
@@ -2519,7 +2589,10 @@ void render_liquid_pool(int i)
 void render_list()
 {
     // ImGui::ListBox with filter
-    if (!ImGui::ListBoxHeader("##Entities", {-1, -1}))
+    ImVec2 boxsize = {-1, -1};
+    if (options["menu_ui"] && !detached("tool_entity"))
+        boxsize = {400.0f, 400.0f};
+    if (!ImGui::ListBoxHeader("##Entities", boxsize))
         return;
     bool value_changed = false;
     ImGuiListClipper clipper;
@@ -2650,7 +2723,7 @@ void render_input()
     }
     ImVec2 region = ImGui::GetContentRegionMax();
     ImGui::PushItemWidth(region.x - 110);
-    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion, pick_selected_entity))
+    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
     {
         update_filter(text);
     }
@@ -2679,154 +2752,136 @@ const char* theme_name(int theme)
 
 void render_narnia()
 {
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    if (set_focus_world)
-    {
-        ImGui::SetKeyboardFocusHere();
-        set_focus_world = false;
-    }
-    if (ImGui::DragScalar("World##WarpWorld", ImGuiDataType_U8, &g_world, 0.1f, &u8_one, &u8_seven)) {}
-    if (ImGui::DragScalar("Level##WarpLevel", ImGuiDataType_U8, &g_level, 0.1f, &u8_one, &u8_four)) {}
-    render_themes();
-    ImGui::PopItemWidth();
-    if (ImGui::Button("Instant warp##InstantWarp"))
-    {
-        warp_inc(g_world, g_level, g_to + 1);
-    }
-    tooltip("Warp to selected level, skipping transition.", "warp");
-    ImGui::SameLine();
-    if (ImGui::Button("Warp door##SpawnWarpDoor"))
-    {
-        int spawned = UI::spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
-        if (!lock_entity)
-            g_last_id = spawned;
-    }
-    tooltip("Spawn an exit door to selected level.", "spawn_warp_door");
-    ImGui::SameLine();
-    if (ImGui::Button("Layer door##SpawnLayerDoor"))
-    {
-        UI::spawn_backdoor(g_x, g_y);
-    }
-    tooltip("Spawn a door to back layer.\nTip: You can instantly switch layers with (Shift+Tab).", "spawn_layer_door");
-    ImGui::Checkbox("Increment level count on warp", &options["warp_increments_level_count"]);
-    tooltip("Simulate natural level progression when warping.");
     ImGui::Text("Next level");
     ImGui::SameLine(100.0f);
-    int n = 0;
 
-    uint8_t target_world = 0;
-    uint8_t target_level = 0;
-    uint8_t target_theme = 0;
-    int tnum = g_state->world * 100 + g_state->level;
-    switch (tnum)
+    if (g_state->screen != 13)
     {
-    case 104:
-    case 301:
-        break;
-    case 501:
-        target_world = 6;
-        target_level = 1;
-        target_theme = 8;
-        break;
-    case 204:
-        target_world = 3;
-        target_level = 1;
-        target_theme = 4;
-        break;
-    case 403:
-        if (g_state->theme == 6 || g_state->theme == 11)
+        int n = 0;
+
+        uint8_t target_world = 0;
+        uint8_t target_level = 0;
+        uint8_t target_theme = 0;
+        int tnum = g_state->world * 100 + g_state->level;
+        switch (tnum)
+        {
+        case 104:
+        case 301:
+            break;
+        case 501:
+            target_world = 6;
+            target_level = 1;
+            target_theme = 8;
+            break;
+        case 204:
+            target_world = 3;
+            target_level = 1;
+            target_theme = 4;
+            break;
+        case 403:
+            if (g_state->theme == 6 || g_state->theme == 11)
+            {
+                target_world = 4;
+                target_level = 4;
+                target_theme = 6;
+            }
+            else
+            {
+                target_world = 4;
+                target_level = 4;
+                target_theme = 5;
+            }
+            break;
+        case 404:
+            target_world = 5;
+            target_level = 1;
+            target_theme = 7;
+            break;
+        case 603:
+            target_world = 6;
+            target_level = 4;
+            target_theme = 14;
+            break;
+        case 604:
+            target_world = 7;
+            target_level = 1;
+            target_theme = 9;
+            break;
+        case 702:
+            target_world = 7;
+            target_level = 3;
+            target_theme = 9;
+            break;
+        case 703:
+            target_world = 7;
+            target_level = 4;
+            target_theme = 16;
+            break;
+        case 704:
+            target_world = 8;
+            target_level = 5;
+            target_theme = 10;
+            break;
+        default:
+            target_world = g_state->world;
+            target_level = g_state->level + 1;
+            target_theme = g_state->theme;
+            break;
+        }
+        if (g_state->theme == 17)
+        {
+            target_world = 1;
+            target_level = 1;
+            target_theme = 1;
+        }
+        if (target_world > 0)
+        {
+            std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
+            if (ImGui::Button(buf.c_str()))
+            {
+                warp_inc(target_world, target_level, target_theme);
+            }
+            n++;
+        }
+
+        for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
+        {
+            ExitDoor* target = get_entity_ptr(doorid)->as<ExitDoor>();
+            if (!target->special_door)
+                continue;
+            std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
+            if (n > 0)
+                ImGui::SameLine();
+            if (ImGui::Button(buf.c_str()))
+            {
+                warp_inc(target->world, target->level, target->theme);
+            }
+            n++;
+        }
+
+        if (g_state->theme == 11)
         {
             target_world = 4;
             target_level = 4;
-            target_theme = 6;
-        }
-        else
-        {
-            target_world = 4;
-            target_level = 4;
-            target_theme = 5;
-        }
-        break;
-    case 404:
-        target_world = 5;
-        target_level = 1;
-        target_theme = 7;
-        break;
-    case 603:
-        target_world = 6;
-        target_level = 4;
-        target_theme = 14;
-        break;
-    case 604:
-        target_world = 7;
-        target_level = 1;
-        target_theme = 9;
-        break;
-    case 702:
-        target_world = 7;
-        target_level = 3;
-        target_theme = 9;
-        break;
-    case 703:
-        target_world = 7;
-        target_level = 4;
-        target_theme = 16;
-        break;
-    case 704:
-        target_world = 8;
-        target_level = 5;
-        target_theme = 10;
-        break;
-    default:
-        target_world = g_state->world;
-        target_level = g_state->level + 1;
-        target_theme = g_state->theme;
-        break;
-    }
-    if (g_state->theme == 17)
-    {
-        target_world = 1;
-        target_level = 1;
-        target_theme = 1;
-    }
-    if (target_world > 0)
-    {
-        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
-        if (ImGui::Button(buf.c_str()))
-        {
-            warp_inc(target_world, target_level, target_theme);
-        }
-        n++;
-    }
+            target_theme = 12;
 
-    for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
-    {
-        ExitDoor* target = get_entity_ptr(doorid)->as<ExitDoor>();
-        if (!target->special_door)
-            continue;
-        std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
-        if (n > 0)
+            std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
             ImGui::SameLine();
-        if (ImGui::Button(buf.c_str()))
-        {
-            warp_inc(target->world, target->level, target->theme);
+            if (ImGui::Button(buf.c_str()))
+            {
+                warp_inc(target_world, target_level, target_theme);
+            }
+            n++;
         }
-        n++;
     }
-
-    if (g_state->theme == 11)
+    else
     {
-        target_world = 4;
-        target_level = 4;
-        target_theme = 12;
-
-        std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
-        ImGui::SameLine();
+        std::string buf = fmt::format("{}-{} {}", g_state->world_next, g_state->level_next, theme_name(g_state->theme_next));
+        ImGui::SameLine(100.0f);
         if (ImGui::Button(buf.c_str()))
         {
-            warp_inc(target_world, target_level, target_theme);
+            warp_inc(g_state->world_next, g_state->level_next, g_state->theme_next);
         }
-        n++;
     }
 
     ImGui::Text("Dwelling");
@@ -2961,6 +3016,40 @@ void render_narnia()
     ImGui::SameLine(100.0f);
     if (ImGui::Button("Camp##WarpCamp"))
         warp_inc(1, 1, 17);
+
+    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    if (set_focus_world)
+    {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_world = false;
+    }
+    if (ImGui::DragScalar("World##WarpWorld", ImGuiDataType_U8, &g_world, 0.1f, &u8_one, &u8_seven)) {}
+    if (ImGui::DragScalar("Level##WarpLevel", ImGuiDataType_U8, &g_level, 0.1f, &u8_one, &u8_four)) {}
+    render_themes();
+    ImGui::PopItemWidth();
+    if (ImGui::Button("Instant warp##InstantWarp"))
+    {
+        warp_inc(g_world, g_level, g_to + 1);
+    }
+    tooltip("Warp to selected level, skipping transition.", "warp");
+    ImGui::SameLine();
+    if (ImGui::Button("Warp door##SpawnWarpDoor"))
+    {
+        int spawned = UI::spawn_door(g_x, g_y, g_world, g_level, g_to + 1);
+        if (!lock_entity)
+            g_last_id = spawned;
+    }
+    tooltip("Spawn an exit door to selected level.", "spawn_warp_door");
+    ImGui::SameLine();
+    if (ImGui::Button("Layer door##SpawnLayerDoor"))
+    {
+        UI::spawn_backdoor(g_x, g_y);
+    }
+    tooltip("Spawn a door to back layer.\nTip: You can instantly switch layers with (Shift+Tab).", "spawn_layer_door");
+    ImGui::Checkbox("Increment level count on warp", &options["warp_increments_level_count"]);
+    tooltip("Simulate natural level progression when warping.");
+    ImGui::Checkbox("Warp to transition instead", &options["warp_transition"]);
+    tooltip("Simulate natural level progression even more.");
 }
 
 void render_camera()
@@ -3041,6 +3130,11 @@ void render_camera()
         ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
         ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
         ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
+        if (ImGui::Checkbox("Enable default camera bounds##CameraBoundsLevel", &enable_camera_bounds))
+        {
+            set_camera_bounds(enable_camera_bounds);
+        }
+        tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.");
         if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
         {
             UI::set_camp_camera_bounds_enabled(enable_camp_camera);
@@ -3058,7 +3152,9 @@ void render_camera()
 
 void render_arrow()
 {
-    ImVec2 pos = ImGui::GetMousePos();
+    ImGui::GetIO().MouseDrawCursor = false;
+    auto base = ImGui::GetMainViewport();
+    ImVec2 pos = mouse_pos();
     ImVec2 line = ImVec2(pos.x - startpos.x, pos.y - startpos.y);
     float length = (float)std::sqrt(std::pow(line.x, 2) + std::pow(line.y, 2));
     float theta = 0.7f;
@@ -3070,30 +3166,35 @@ void render_arrow()
     ImVec2 leftpoint = ImVec2(point.x + tnormal * normal.y, point.y + tnormal * normal.x);
     ImVec2 rightpoint = ImVec2(point.x + (-tnormal * normal.y), point.y + (-tnormal * normal.x));
     auto* draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y - 9), ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
-    draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
-    draw_list->AddLine(startpos, pos, ImColor(255, 0, 0, 200), 2);
-    draw_list->AddLine(leftpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
-    draw_list->AddLine(rightpoint, ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
+    draw_list->AddLine(base->Pos + ImVec2(startpos.x - 9, startpos.y - 9), base->Pos + ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(base->Pos + ImVec2(startpos.x - 9, startpos.y + 9), base->Pos + ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(base->Pos + startpos, base->Pos + pos, ImColor(255, 0, 0, 200), 2);
+    draw_list->AddLine(base->Pos + leftpoint, base->Pos + ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
+    draw_list->AddLine(base->Pos + rightpoint, base->Pos + ImVec2(pos.x, pos.y), ImColor(255, 0, 0, 200), 2);
 }
 
 void render_cross()
 {
+    ImGui::GetIO().MouseDrawCursor = false;
+    auto base = ImGui::GetMainViewport();
     auto* draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y - 9), ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
-    draw_list->AddLine(ImVec2(startpos.x - 9, startpos.y + 9), ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(base->Pos + ImVec2(startpos.x - 9, startpos.y - 9), base->Pos + ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
+    draw_list->AddLine(base->Pos + ImVec2(startpos.x - 9, startpos.y + 9), base->Pos + ImVec2(startpos.x + 10, startpos.y - 10), ImColor(255, 255, 255, 200), 2);
 }
 
 void render_select()
 {
-    ImVec2 pos = ImGui::GetMousePos();
+    ImGui::GetIO().MouseDrawCursor = false;
+    auto base = ImGui::GetMainViewport();
+    ImVec2 pos = mouse_pos();
     auto* draw_list = ImGui::GetWindowDrawList();
-    draw_list->AddRectFilled(startpos, pos, ImColor(255, 255, 255, 60));
+    draw_list->AddRectFilled(base->Pos + startpos, base->Pos + pos, ImColor(255, 255, 255, 60));
 }
 
 void select_entities()
 {
-    ImVec2 pos = ImGui::GetMousePos();
+    ImGui::GetIO().MouseDrawCursor = true;
+    ImVec2 pos = mouse_pos();
     auto mask = safe_entity_mask;
     if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier
     {
@@ -3113,7 +3214,7 @@ void select_entities()
 
 void erase_entities()
 {
-    ImVec2 pos = ImGui::GetMousePos();
+    ImVec2 pos = mouse_pos();
     auto mask = safe_entity_mask;
     if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier
     {
@@ -3132,12 +3233,12 @@ void erase_entities()
 
 void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
 {
-    if (g_state == 0 || (g_state->screen != 11 && g_state->screen != 12))
+    if (g_state == 0 || (g_state->screen < 11 || g_state->screen > 13))
         return;
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 res = io.DisplaySize;
+    auto base = ImGui::GetMainViewport();
+    ImVec2 res = base->Size;
     auto* draw_list = ImGui::GetWindowDrawList();
-    for (int x = -1; x < 96; x++)
+    for (int x = -1; x < 86; x++)
     {
         std::pair<float, float> gridline = UI::screen_position(x + 0.5f, 0);
         if (std::abs(gridline.first) <= 1.0)
@@ -3155,10 +3256,10 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                 width = 2;
                 color = ImColor(gridcolor.Value.x, gridcolor.Value.y, gridcolor.Value.z, 0.2f);
             }
-            draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), color, static_cast<float>(width));
+            draw_list->AddLine(fix_pos(ImVec2(grids.x, 0)), fix_pos(ImVec2(grids.x, res.y)), color, static_cast<float>(width));
         }
     }
-    for (int y = -1; y < 128; y++)
+    for (int y = -1; y < 126; y++)
     {
         std::pair<float, float> gridline = UI::screen_position(0, y + 0.5f);
         if (std::abs(gridline.second) <= 1.0)
@@ -3176,7 +3277,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                 width = 2;
                 color = ImColor(color.Value.x, color.Value.y, color.Value.z, 0.2f);
             }
-            draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), color, static_cast<float>(width));
+            draw_list->AddLine(fix_pos(ImVec2(0, grids.y)), fix_pos(ImVec2(res.x, grids.y)), color, static_cast<float>(width));
         }
     }
     g_players = UI::get_players();
@@ -3185,16 +3286,16 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
         auto p_pos = UI::get_position(player);
         std::pair<float, float> gridline = UI::screen_position(std::round(p_pos.first - 0.5f) + 0.5f, std::round(p_pos.second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
-        draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(255, 0, 255, 200), 2);
-        draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(255, 0, 255, 200), 2);
+        draw_list->AddLine(fix_pos(ImVec2(0, grids.y)), fix_pos(ImVec2(res.x, grids.y)), ImColor(255, 0, 255, 200), 2);
+        draw_list->AddLine(fix_pos(ImVec2(grids.x, 0)), fix_pos(ImVec2(grids.x, res.y)), ImColor(255, 0, 255, 200), 2);
     }
     if (update_entity())
     {
         auto e_pos = UI::get_position(g_entity);
         std::pair<float, float> gridline = UI::screen_position(std::round(e_pos.first - 0.5f) + 0.5f, std::round(e_pos.second) - 0.5f);
         ImVec2 grids = screenify({gridline.first, gridline.second});
-        draw_list->AddLine(ImVec2(0, grids.y), ImVec2(res.x, grids.y), ImColor(0, 255, 0, 200), 2);
-        draw_list->AddLine(ImVec2(grids.x, 0), ImVec2(grids.x, res.y), ImColor(0, 255, 0, 200), 2);
+        draw_list->AddLine(fix_pos(ImVec2(0, grids.y)), fix_pos(ImVec2(res.x, grids.y)), ImColor(0, 255, 0, 200), 2);
+        draw_list->AddLine(fix_pos(ImVec2(grids.x, 0)), fix_pos(ImVec2(grids.x, res.y)), ImColor(0, 255, 0, 200), 2);
     }
     for (unsigned int x = 0; x < g_state->w; ++x)
     {
@@ -3208,15 +3309,10 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
                 auto pos = UI::screen_position(room_pos.first, room_pos.second);
                 ImVec2 spos = screenify({pos.first, pos.second});
                 std::string room_text = fmt::format("{:d},{:d} {:s} ({:d})", x, y, room_name, room_temp.value());
-                draw_list->AddText(ImVec2(spos.x + 5.0f, spos.y + 5.0f), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
+                draw_list->AddText(fix_pos(ImVec2(spos.x + 5.0f, spos.y + 5.0f)), ImColor(1.0f, 1.0f, 1.0f, 1.0f), room_text.c_str());
             }
         }
     }
-}
-
-static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
-{
-    return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
 }
 
 void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
@@ -3227,28 +3323,33 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
 
     std::pair<float, float> render_position = UI::get_position(ent, options["draw_hitboxes_interpolated"]);
 
+    auto [originx, originy] =
+        UI::screen_position(render_position.first, render_position.second);
     auto [boxa_x, boxa_y] =
         UI::screen_position(render_position.first - ent->hitboxx + ent->offsetx, render_position.second - ent->hitboxy + ent->offsety);
     auto [boxb_x, boxb_y] =
         UI::screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
+    ImVec2 sorigin = screenify({originx, originy});
     ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
     ImVec2 sboxa = screenify({boxa_x, boxa_y});
     ImVec2 sboxb = screenify({boxb_x, boxb_y});
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
-        draw_list->AddLine(ImVec2(sboxa.x, sboxa.y), ImVec2(sboxb.x, sboxb.y), color, 2);
-        draw_list->AddLine(ImVec2(sboxa.x, sboxb.y), ImVec2(sboxb.x, sboxa.y), color, 2);
+        draw_list->AddLine(fix_pos(sboxa), fix_pos(sorigin), color, 2);
+        draw_list->AddLine(fix_pos(sboxb), fix_pos(sorigin), color, 2);
+        draw_list->AddLine(fix_pos(ImVec2(sboxa.x, sboxb.y)), fix_pos(sorigin), color, 2);
+        draw_list->AddLine(fix_pos(ImVec2(sboxb.x, sboxa.y)), fix_pos(sorigin), color, 2);
     }
     if (ent->shape == SHAPE::CIRCLE)
         if (filled)
-            draw_list->AddCircleFilled(spos, sboxb.x - spos.x, color);
+            draw_list->AddCircleFilled(fix_pos(spos), sboxb.x - spos.x, color);
         else
-            draw_list->AddCircle(spos, sboxb.x - spos.x, color, 0, 2.0f);
+            draw_list->AddCircle(fix_pos(spos), sboxb.x - spos.x, color, 0, 2.0f);
     else if (filled)
-        draw_list->AddRectFilled(sboxa, sboxb, color);
+        draw_list->AddRectFilled(fix_pos(sboxa), fix_pos(sboxb), color);
     else
-        draw_list->AddRect(sboxa, sboxb, color, 0.0f, 0, 2.0f);
+        draw_list->AddRect(fix_pos(sboxa), fix_pos(sboxb), color, 0.0f, 0, 2.0f);
 
     if ((g_hitbox_mask & 0x8000) == 0)
         return;
@@ -3267,7 +3368,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         // TODO: get the real distance from game (can be changed thru API)
         auto [radx, rady] = UI::screen_position(render_position.first + 3, render_position.second + 3);
         auto srad = screenify({radx, rady});
-        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+        draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
     else if (type == bomb)
     {
@@ -3276,7 +3377,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
             rad = 2.6f;
         auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
         auto srad = screenify({radx, rady});
-        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+        draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
     else if (type == mine)
     {
@@ -3286,14 +3387,14 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         float rad = 1.6f;
         auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
         auto srad = screenify({radx, rady});
-        draw_list->AddCircle(srpos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+        draw_list->AddCircle(fix_pos(srpos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
     else if (type == keg || type == keg2)
     {
         float rad = 1.6f;
         auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
         auto srad = screenify({radx, rady});
-        draw_list->AddCircle(spos, srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+        draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
     else if (type == wooden_arrow || type == metal_arrow || type == light_arrow)
     {
@@ -3312,7 +3413,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         auto [pbx, pby] = UI::screen_position(pb.x, pb.y);
         auto [pcx, pcy] = UI::screen_position(pc.x, pc.y);
         auto [pdx, pdy] = UI::screen_position(pd.x, pd.y);
-        const ImVec2 points[] = {screenify({pax, pay}), screenify({pbx, pby}), screenify({pcx, pcy}), screenify({pdx, pdy}), screenify({pax, pay})};
+        const ImVec2 points[] = {fix_pos(screenify({pax, pay})), fix_pos(screenify({pbx, pby})), fix_pos(screenify({pcx, pcy})), fix_pos(screenify({pdx, pdy})), fix_pos(screenify({pax, pay}))};
         draw_list->AddPolyline(points, 5, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
 }
@@ -3412,6 +3513,8 @@ void render_messages()
               { return std::get<2>(a) < std::get<2>(b); });
 
     ImGui::SetNextWindowSize({-1, -1});
+    auto base = ImGui::GetMainViewport();
+    ImGui::SetNextWindowViewport(base->ID);
     ImGui::Begin(
         "Messages",
         NULL,
@@ -3431,7 +3534,7 @@ void render_messages()
         queue = newqueue;
     }
 
-    ImGui::SetWindowPos({30.0f + 0.128f * io.DisplaySize.x * io.FontGlobalScale, io.DisplaySize.y - queue.size() * font_size - 40});
+    ImGui::SetWindowPos({base->Pos.x + 30.0f + 0.128f * base->Size.x * io.FontGlobalScale, base->Pos.y + base->Size.y - queue.size() * font_size - 40});
     for (auto message : queue)
     {
         float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 12000.0f;
@@ -3450,16 +3553,26 @@ void render_messages()
 void render_clickhandler()
 {
     ImGuiIO& io = ImGui::GetIO();
+    auto base = ImGui::GetMainViewport();
+    ImGui::SetNextWindowBgAlpha(0.0f);
+    auto main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
+    auto space = ImGui::DockBuilderGetCentralNode(main_dock);
+    g_Console.get()->set_geometry(space->Pos.x, space->Pos.y, space->Size.x, space->Size.y);
     if (g_Console->is_toggled())
     {
-        ImGui::SetNextWindowSize({io.DisplaySize.x, io.DisplaySize.y - (4.0f * ImGui::GetStyle().ItemSpacing.y + ImGui::GetTextLineHeight())});
+        auto console_height = (2.0f * ImGui::GetStyle().ItemSpacing.y + g_Console.get()->get_input_lines() * ImGui::GetTextLineHeight());
+        if (options["menu_ui"])
+            console_height += ImGui::GetTextLineHeight();
+        ImGui::SetNextWindowSize({space->Size.x - 32.0f, space->Size.y - console_height});
+        ImGui::SetNextWindowPos({space->Pos.x + 16.0f, space->Pos.y});
     }
     else
     {
-        ImGui::SetNextWindowSize(io.DisplaySize);
+        ImGui::SetNextWindowSize(space->Size);
+        ImGui::SetNextWindowPos(space->Pos);
     }
-    ImGui::SetNextWindowPos({0, 0});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
+    ImGui::SetNextWindowViewport(base->ID);
     ImGui::Begin(
         "Clickhandler",
         NULL,
@@ -3489,10 +3602,10 @@ void render_clickhandler()
     {
         render_grid();
     }
-    if (options["draw_hitboxes"])
+    if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, LAYER::PLAYER))
+        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)g_state->camera_layer))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -3552,11 +3665,23 @@ void render_clickhandler()
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 0, 0, 150));
             }
+
+            // OOB kill bounds
+            auto* draw_list = ImGui::GetBackgroundDrawList();
+            std::pair<float, float> gridline = UI::screen_position(-0.5f, 0);
+            ImVec2 grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(fix_pos(ImVec2(grids.x, base->Pos.y)), fix_pos(ImVec2(grids.x, base->Pos.y + base->Size.y)), ImColor(255, 0, 0, 150), 2.0f);
+            gridline = UI::screen_position(static_cast<float>(10 * g_state->w) + 5.5f, 0);
+            grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(fix_pos(ImVec2(grids.x, base->Pos.y)), fix_pos(ImVec2(grids.x, base->Pos.y + base->Size.y)), ImColor(255, 0, 0, 150), 2.0f);
+            gridline = UI::screen_position(0, static_cast<float>(120 - 8 * g_state->h) - 4.0f);
+            grids = screenify({gridline.first, gridline.second});
+            draw_list->AddLine(fix_pos(ImVec2(base->Pos.x, grids.y)), fix_pos(ImVec2(base->Pos.x + base->Size.x, grids.y)), ImColor(255, 0, 0, 150), 2.0f);
         }
 
         if (ImGui::IsMousePosValid())
         {
-            ImVec2 mpos = normalize(io.MousePos);
+            ImVec2 mpos = normalize(mouse_pos());
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
             // std::pair<float, float> campos = get_camera_position();
             ImDrawList* dl = ImGui::GetBackgroundDrawList();
@@ -3643,7 +3768,7 @@ void render_clickhandler()
             hugefont,
             144.0,
             ImVec2(io.DisplaySize.x / 2 - warningsize.x / 2, io.DisplaySize.y / 2 - warningsize.y / 2),
-            ImColor(1.0f, 1.0f, 1.0f, 0.8f),
+            ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             warningtext);
         const char* subtext = "Probably... Some things might, but don't just expect a random script to work.";
         ImVec2 subsize = font->CalcTextSizeA(18.0, io.DisplaySize.x - 200, io.DisplaySize.x - 200, subtext);
@@ -3651,10 +3776,10 @@ void render_clickhandler()
             font,
             18.0,
             ImVec2(io.DisplaySize.x / 2 - subsize.x / 2, io.DisplaySize.y / 2 + warningsize.y / 2 + 20),
-            ImColor(1.0f, 1.0f, 1.0f, 0.8f),
+            ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             subtext);
     }
-    if (options["mouse_control"])
+    if (options["mouse_control"] && UI::get_focus())
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         if (ImGui::BeginDragDropTarget())
@@ -3667,20 +3792,18 @@ void render_clickhandler()
             ImGui::EndDragDropTarget();
         }
 
-        if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
+        if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")))
         {
-            io.MouseDrawCursor = false;
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
         }
-        else if ((clicked("mouse_spawn") || clicked("mouse_teleport")) && ImGui::IsWindowFocused())
+        else if ((clicked("mouse_spawn") || clicked("mouse_teleport")))
         {
-            io.MouseDrawCursor = false;
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
         }
-        else if (clicked("mouse_spawn_over") && ImGui::IsWindowFocused())
+        else if (clicked("mouse_spawn_over"))
         {
             io.MouseDrawCursor = false;
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             set_pos(startpos);
             auto ent = UI::get_entity_at(g_x, g_y, true, 2, safe_entity_mask);
             g_over_id = ent ? ent->uid : -1;
@@ -3691,13 +3814,13 @@ void render_clickhandler()
         }
         else if ((held("mouse_spawn") || held("mouse_teleport") || held("mouse_spawn_over")) && ImGui::IsWindowFocused())
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             render_cross();
         }
         else if (released("mouse_spawn_throw") && ImGui::IsWindowFocused())
         {
             set_pos(startpos);
-            set_vel(ImGui::GetMousePos());
+            set_vel(mouse_pos());
             spawn_entities(true);
             g_x = 0;
             g_y = 0;
@@ -3716,7 +3839,7 @@ void render_clickhandler()
         else if (released("mouse_spawn_over") && ImGui::IsWindowFocused())
         {
             set_pos(startpos);
-            set_vel(ImGui::GetMousePos());
+            set_vel(mouse_pos());
             spawn_entity_over();
             g_x = 0;
             g_y = 0;
@@ -3733,7 +3856,7 @@ void render_clickhandler()
         }
         else if (held("mouse_draw") && ImGui::IsWindowFocused())
         {
-            auto [nx, ny] = normalize(ImGui::GetMousePos());
+            auto [nx, ny] = normalize(mouse_pos());
             auto pos = UI::click_position(nx, ny);
             const uint32_t new_grid_x = static_cast<uint32_t>(std::round(pos.first));
             const uint32_t new_grid_y = static_cast<uint32_t>(std::round(pos.second));
@@ -3741,7 +3864,7 @@ void render_clickhandler()
             {
                 grid_x = new_grid_x;
                 grid_y = new_grid_y;
-                set_pos(ImGui::GetMousePos());
+                set_pos(mouse_pos());
                 g_vx = 0;
                 g_vy = 0;
                 spawn_entities(true);
@@ -3758,7 +3881,7 @@ void render_clickhandler()
         }
         else if (held("mouse_decorate"))
         {
-            auto [nx, ny] = normalize(ImGui::GetMousePos());
+            auto [nx, ny] = normalize(mouse_pos());
             auto pos = UI::click_position(nx, ny);
             const uint32_t new_grid_x = static_cast<uint32_t>(std::round(pos.first));
             const uint32_t new_grid_y = static_cast<uint32_t>(std::round(pos.second));
@@ -3769,30 +3892,25 @@ void render_clickhandler()
                 fix_decorations_at(std::round(pos.first), std::round(pos.second), (LAYER)g_state->camera_layer);
             }
         }
-        else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused())
+        else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused() && !g_players.empty() && g_game_manager->pause_ui->visibility == 0)
         {
-            if (g_players.empty())
-                return;
             set_pos(startpos);
-            set_vel(ImGui::GetMousePos());
+            set_vel(mouse_pos());
             ImVec2 mpos = normalize(startpos);
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
             auto player = (Movable*)g_players.at(0)->topmost_mount();
             player->teleport_abs(cpos.first, cpos.second, g_vx, g_vy);
-            // set_camera_position(cpos.first, cpos.second);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
             g_vy = 0;
         }
-        else if (released("mouse_teleport") && ImGui::IsWindowFocused())
+        else if (released("mouse_teleport") && ImGui::IsWindowFocused() && !g_players.empty() && g_game_manager->pause_ui->visibility == 0)
         {
-            if (g_players.empty())
-                return;
             set_pos(startpos);
-            ImVec2 mpos = normalize(io.MousePos);
+            ImVec2 mpos = normalize(mouse_pos());
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
@@ -3805,7 +3923,7 @@ void render_clickhandler()
         }
         else if (dblclicked("mouse_grab") || dblclicked("mouse_grab_unsafe"))
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             set_pos(startpos);
             unsigned int mask = safe_entity_mask;
             if (held("mouse_grab_unsafe"))
@@ -3826,7 +3944,7 @@ void render_clickhandler()
         }
         else if (clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             set_pos(startpos);
             unsigned int mask = safe_entity_mask;
             if (held("mouse_grab_unsafe"))
@@ -3845,7 +3963,7 @@ void render_clickhandler()
         }
         else if (clicked("mouse_select") || clicked("mouse_select_unsafe"))
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             set_pos(startpos);
             render_select();
         }
@@ -3853,7 +3971,7 @@ void render_clickhandler()
         {
             if (!throw_held)
             {
-                startpos = ImGui::GetMousePos();
+                startpos = mouse_pos();
                 throw_held = true;
             }
             set_pos(startpos);
@@ -3875,7 +3993,7 @@ void render_clickhandler()
         }
         else if ((held("mouse_grab") || held("mouse_grab_unsafe")) && g_held_id > 0 && g_held_entity != 0)
         {
-            startpos = ImGui::GetMousePos();
+            startpos = mouse_pos();
             throw_held = false;
             io.MouseDrawCursor = false;
             set_pos(startpos);
@@ -3899,7 +4017,7 @@ void render_clickhandler()
             if (g_held_entity)
                 g_held_entity->flags = g_held_flags;
             set_pos(startpos);
-            set_vel(ImGui::GetMousePos());
+            set_vel(mouse_pos());
             if (g_held_entity && g_held_entity->is_movable())
                 UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
@@ -3929,7 +4047,7 @@ void render_clickhandler()
         }
         else if (released("mouse_clone"))
         {
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             UI::spawn_entity(to_id("ENT_TYPE_ITEM_CLONEGUNSHOT"), g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -3939,8 +4057,8 @@ void render_clickhandler()
         else if (held("mouse_zap") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
-            set_vel(ImVec2(ImGui::GetMousePos().x, ImGui::GetMousePos().y + 200));
+            set_pos(mouse_pos());
+            set_vel(ImVec2(mouse_pos().x, mouse_pos().y + 200));
             UI::spawn_entity(to_id("ENT_TYPE_ITEM_LAMASSU_LASER_SHOT"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -3954,7 +4072,8 @@ void render_clickhandler()
             {
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
             }
-            set_camera_bounds(true);
+            enable_camera_bounds = true;
+            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.5f)
@@ -3963,7 +4082,8 @@ void render_clickhandler()
             {
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
             }
-            set_camera_bounds(true);
+            enable_camera_bounds = true;
+            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (released("mouse_camera_drag") && !dblclicked("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 3.0f && held_duration_last("mouse_camera_drag") < 0.2f)
@@ -3973,14 +4093,15 @@ void render_clickhandler()
                 auto ent = UI::get_entity_at(startpos.x, startpos.y, true, 2, safe_entity_mask);
                 g_state->camera->focused_entity_uid = ent ? ent->uid : -1;
             }
-            set_camera_bounds(true);
+            enable_camera_bounds = true;
+            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (clicked("mouse_camera_drag"))
         {
             if (ImGui::IsMousePosValid())
             {
-                startpos = normalize(io.MousePos);
+                startpos = normalize(mouse_pos());
             }
         }
 
@@ -3989,7 +4110,7 @@ void render_clickhandler()
             if (ImGui::IsMousePosValid())
             {
                 g_state->camera->focused_entity_uid = -1;
-                ImVec2 mpos = normalize(io.MousePos);
+                ImVec2 mpos = normalize(mouse_pos());
                 std::pair<float, float> oryginal_pos = UI::click_position(startpos.x, startpos.y);
                 std::pair<float, float> current_pos = UI::click_position(mpos.x, mpos.y);
 
@@ -4000,15 +4121,16 @@ void render_clickhandler()
                     g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
                     g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
                 }
-                startpos = normalize(io.MousePos);
-                set_camera_bounds(false);
+                startpos = normalize(mouse_pos());
+                enable_camera_bounds = false;
+                set_camera_bounds(enable_camera_bounds);
             }
         }
 
         else if (held("mouse_blast") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 10)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             UI::spawn_entity(to_id("ENT_TYPE_FX_ALIENBLAST"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -4018,7 +4140,7 @@ void render_clickhandler()
         else if (held("mouse_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             UI::spawn_entity(to_id("ENT_TYPE_FX_EXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -4028,7 +4150,7 @@ void render_clickhandler()
         else if (held("mouse_big_boom") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             UI::spawn_entity(to_id("ENT_TYPE_FX_POWEREDEXPLOSION"), g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -4038,7 +4160,7 @@ void render_clickhandler()
         else if (held("mouse_nuke") && ImGui::GetFrameCount() > g_last_gun + ImGui::GetIO().Framerate / 5)
         {
             g_last_gun = ImGui::GetFrameCount();
-            set_pos(ImGui::GetMousePos());
+            set_pos(mouse_pos());
             static const auto powered_explosion = to_id("ENT_TYPE_FX_POWEREDEXPLOSION");
             UI::spawn_entity(powered_explosion, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             UI::spawn_entity(powered_explosion, g_x - 0.2f, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
@@ -4056,7 +4178,7 @@ void render_clickhandler()
         }
         else if (released("mouse_destroy") || released("mouse_destroy_unsafe"))
         {
-            ImVec2 pos = ImGui::GetMousePos();
+            ImVec2 pos = mouse_pos();
             set_pos(pos);
             unsigned int mask = safe_entity_mask;
             if (released("mouse_destroy_unsafe"))
@@ -4080,6 +4202,16 @@ void render_clickhandler()
 
 void render_options()
 {
+    if (options["menu_ui"] && !detached("tool_options"))
+    {
+        if (ImGui::MenuItem("Switch to windowed UI"))
+            options["menu_ui"] = false;
+        if (ImGui::MenuItem("Save options"))
+            save_config(cfgfile);
+        if (ImGui::MenuItem("Load options"))
+            load_config(cfgfile);
+        ImGui::Separator();
+    }
     ImGui::Text("Game cheats");
     if (ImGui::Checkbox("God mode (players)##Godmode", &options["god_mode"]))
     {
@@ -4112,10 +4244,11 @@ void render_options()
         g_ui_scripts["light"]->set_enabled(test_flag(g_dark_mode, 2));
     }
     tooltip("Forces every level to be lit af.");
-    if (ImGui::Checkbox("Disable ghost timer", &options["disable_ghost_timer"]))
+    if (ImGui::Checkbox("Disable ghosts and time jelly", &options["disable_ghost_timer"]))
     {
         UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
         UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
+        UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
     }
     tooltip("Disables the timed ghost and jelly.", "toggle_ghost");
     if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
@@ -4167,24 +4300,18 @@ void render_options()
     ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
     tooltip("Show enabled cheats and random\ninteresting state variables on screen.", "toggle_hud");
 
-    if (ImGui::Checkbox("Stack windows horizontally", &options["stack_horizontally"]))
+    if (ImGui::Checkbox("Drag windows outside the game window", &options["multi_viewports"]))
     {
-        options["stack_vertically"] = false;
-        options["tabbed_interface"] = false;
+        if (options["multi_viewports"])
+            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+        else
+            ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     }
-    tooltip("Draw all tools separately side by side at the top of the screen.", "reset_windows");
-    if (ImGui::Checkbox("Stack windows vertically", &options["stack_vertically"]))
-    {
-        options["stack_horizontally"] = false;
-        options["tabbed_interface"] = false;
-    }
-    tooltip("Draw all tools separately at the sides of the screen.", "reset_windows_vertical");
-    if (ImGui::Checkbox("Single tabbed window", &options["tabbed_interface"]))
-    {
-        options["stack_horizontally"] = false;
-        options["stack_vertically"] = false;
-    }
-    tooltip("Draw all tools tabbed in a single window", "tabbed_interface");
+    tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
+
+    ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
+    tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.");
+
     ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
     tooltip("Am I annoying you already :(");
 
@@ -4226,6 +4353,8 @@ void render_options()
         ImGui::PopID();
     }
 
+    if (options["menu_ui"])
+        return;
     if (ImGui::Button("Edit style"))
     {
         toggle("tool_style");
@@ -4350,10 +4479,6 @@ void render_script_files()
 void render_scripts()
 {
     ImGui::PushTextWrapPos(0.0f);
-    ImGui::TextColored(
-        ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
-        "Note: The Lua API is unstable, not ready and it WILL change, probably a lot. You can play around with it, but don't be surprised if none of "
-        "your scripts work next week.");
     ImGui::PopTextWrapPos();
     ImGui::Checkbox("Draw script messages##DrawScriptMessages", &options["draw_script_messages"]);
     ImGui::Checkbox("Fade script messages##FadeScriptMessages", &options["fade_script_messages"]);
@@ -4920,7 +5045,7 @@ void render_entity_finder()
         ImGui::SetKeyboardFocusHere();
         set_focus_finder = false;
     }
-    ImGui::InputText("Text filter##EntitySearchName", &search_entity_name);
+    ImGui::InputText("Text filter##EntitySearchName", &search_entity_name, ImGuiInputTextFlags_AutoSelectAll);
 
     static uint32_t search_entity_type = 0;
     ImGui::InputScalar("##EntityType", ImGuiDataType_U32, &search_entity_type, &u32_one);
@@ -6202,6 +6327,17 @@ void render_style_editor()
 {
     ImGuiStyle& style = ImGui::GetStyle();
     ImGuiIO& io = ImGui::GetIO();
+    if (options["menu_ui"])
+    {
+        if (ImGui::MenuItem("Randomize"))
+        {
+            g_hue = (float)rand() / RAND_MAX;
+            g_sat = (float)rand() / RAND_MAX;
+            g_val = (float)rand() / RAND_MAX;
+            style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
+        }
+        ImGui::Separator();
+    }
     ImGui::TextWrapped("Leave empty to use embedded font 'Hack'. You must save and restart for font changes to take effect.");
     ImGui::InputText("Font file##FontFile", &fontfile);
     tooltip("Just the filename, e.g. comic.ttf");
@@ -6214,23 +6350,26 @@ void render_style_editor()
     ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Alpha##StyleAlpha", &style.Alpha, 0.01f, 0.2f, 1.0f);
     ImGui::DragFloat("Scale##StyleScale", &io.FontGlobalScale, 0.01f, 0.2f, 2.0f);
-    if (ImGui::Button("Randomize##StyleRandomize"))
+    if (!options["menu_ui"])
     {
-        g_hue = (float)rand() / RAND_MAX;
-        g_sat = (float)rand() / RAND_MAX;
-        g_val = (float)rand() / RAND_MAX;
-        style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Save options##StyleSave"))
-    {
-        save_config(cfgfile);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Load options##StyleLoad"))
-    {
-        load_config(cfgfile);
-        refresh_script_files();
+        if (ImGui::Button("Randomize##StyleRandomize"))
+        {
+            g_hue = (float)rand() / RAND_MAX;
+            g_sat = (float)rand() / RAND_MAX;
+            g_val = (float)rand() / RAND_MAX;
+            style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Save options##StyleSave"))
+        {
+            save_config(cfgfile);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Load options##StyleLoad"))
+        {
+            load_config(cfgfile);
+            refresh_script_files();
+        }
     }
     set_colors();
 }
@@ -6273,8 +6412,10 @@ void render_keyconfig()
     {
         ImGuiIO& io = ImGui::GetIO();
         io.WantCaptureKeyboard = true;
-        ImGui::SetNextWindowSize(io.DisplaySize);
-        ImGui::SetNextWindowPos({0, 0});
+        auto base = ImGui::GetMainViewport();
+        ImGui::SetNextWindowSize(base->Size);
+        ImGui::SetNextWindowPos(base->Pos);
+        ImGui::SetNextWindowViewport(base->ID);
         ImGui::SetNextWindowBgAlpha(0.75);
         ImGui::Begin(
             "KeyCapture",
@@ -6285,7 +6426,7 @@ void render_keyconfig()
         ImGui::PushFont(bigfont);
         std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl, Alt and Shift are available.", g_change_key);
         ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-        dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
+        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + base->Size.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
         ImGui::PopFont();
 
         // Buttons
@@ -6344,26 +6485,30 @@ void render_keyconfig()
 
 void render_spawner()
 {
-    // ImGui::Text("Spawning at x: %+.2f, y: %+.2f", g_x, g_y);
     render_input();
     render_list();
 }
 
 void render_prohud()
 {
-    ImDrawList* dl = ImGui::GetBackgroundDrawList();
-    std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause);
+    auto io = ImGui::GetIO();
+    auto base = ImGui::GetMainViewport();
+    ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
+    auto topmargin = 0.0f;
+    if (options["menu_ui"])
+        topmargin = ImGui::GetTextLineHeight();
+    std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, 2}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
     buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
     auto type = spawned_type();
     buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}", type)));
     textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, textsize.y * 2 + 4}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 }
 
 void render_tool(std::string tool)
@@ -6402,6 +6547,15 @@ bool is_tab_open(std::string name)
 bool is_tab_detached(std::string name)
 {
     return std::find(tabs_detached.begin(), tabs_detached.end(), name) != tabs_detached.end();
+}
+
+void imgui_pre_init(ImGuiContext*)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    io.MouseDrawCursor = true;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigViewportsNoTaskBarIcon = true;
 }
 
 void imgui_init(ImGuiContext*)
@@ -6449,10 +6603,20 @@ void imgui_init(ImGuiContext*)
 
 void imgui_draw()
 {
-    ImDrawList* dl = ImGui::GetBackgroundDrawList();
+    auto base = ImGui::GetMainViewport();
+    ImGuiContext& g = *GImGui;
+
+    for (int i = 1; i < g.PlatformIO.Viewports.Size; i++)
+    {
+        ImGuiViewport* viewport = g.PlatformIO.Viewports[i];
+        viewport->Flags |= ImGuiViewportFlags_NoFocusOnClick | ImGuiViewportFlags_NoFocusOnAppearing | ImGuiViewportFlags_OwnedByApp;
+    }
+
+    ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
     std::string buf = fmt::format("Overlunky {}", get_version());
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-    dl->AddText({ImGui::GetIO().DisplaySize.x / 2 - textsize.x / 2, ImGui::GetIO().DisplaySize.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
+
+    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + base->Size.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
     if (options["draw_hud"])
         render_prohud();
@@ -6461,21 +6625,46 @@ void imgui_draw()
         render_messages();
     render_clickhandler();
 
-    int win_condition = ImGuiCond_FirstUseEver;
-    if (options["stack_horizontally"] || options["stack_vertically"])
-    {
-        win_condition = ImGuiCond_Always;
-    }
-    float lastwidth = 0;
-    float lastheight = 0;
     float toolwidth = 0.12f * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
     {
-        if (options["tabbed_interface"])
+        ImGui::SetNextWindowPos(base->Pos, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({600, base->Size.y / 2}, ImGuiCond_FirstUseEver);
+        if (options["menu_ui"])
         {
-            ImGui::SetNextWindowPos({0, 0}, ImGuiCond_FirstUseEver);
-            ImGui::SetNextWindowSize({600, ImGui::GetIO().DisplaySize.y / 2}, ImGuiCond_FirstUseEver);
-            ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar);
+            ImGui::PushID("MainMenu");
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0, 0});
+            if (ImGui::BeginMainMenuBar())
+            {
+                ImGui::PopStyleVar();
+                for (size_t i = 0; i < tab_order.size(); ++i)
+                {
+                    auto tab = tab_order[i];
+                    if (windows[tab]->detached)
+                        continue;
+                    ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {600.0f, base->Size.y - 50.0f});
+                    if (ImGui::BeginMenu(windows[tab]->name.c_str(), true))
+                    {
+                        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
+                        active_tab = tab;
+                        if (ImGui::BeginDragDropSource())
+                        {
+                            ImGui::SetDragDropPayload("TAB", NULL, 0);
+                            ImGui::Text("Drag outside the menu\nto detach %s", windows[tab]->name.c_str());
+                            ImGui::EndDragDropSource();
+                        }
+                        ImGui::GetIO().WantCaptureKeyboard = true;
+                        render_tool(tab);
+                        ImGui::PopStyleVar();
+                        ImGui::EndMenu();
+                    }
+                }
+            }
+            ImGui::PopID();
+        }
+        else
+        {
+            ImGui::Begin("Overlunky", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiViewportFlags_NoTaskBarIcon | ImGuiViewportFlags_NoDecoration);
             if (ImGui::BeginMenuBar())
             {
                 if (ImGui::BeginMenu("Tools"))
@@ -6497,6 +6686,9 @@ void imgui_draw()
                 }
                 if (ImGui::BeginMenu("Settings"))
                 {
+                    if (ImGui::MenuItem("Switch to menu UI"))
+                        options["menu_ui"] = true;
+                    ImGui::Separator();
                     for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
                     {
                         auto tab = tab_order[i];
@@ -6530,6 +6722,7 @@ void imgui_draw()
                 }
                 ImGui::EndMenuBar();
             }
+
             if (ImGui::BeginTabBar("##TabBar"))
             {
                 ImGuiTabItemFlags flags = 0;
@@ -6577,255 +6770,34 @@ void imgui_draw()
                 }
             }
             ImGui::End();
-
-            for (auto tab : windows)
-            {
-                if (!tab.second->detached)
-                    continue;
-                ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
-                ImGui::Begin(tab.second->name.c_str(), &tab.second->detached);
-                render_tool(tab.first);
-                ImGui::SetWindowPos(
-                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2,
-                     ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
-                    ImGuiCond_Once);
-                ImGui::End();
-            }
-            if (detach_tab != "")
-            {
-                auto win = ImGui::FindWindowByName(windows[detach_tab]->name.c_str());
-                if (win)
-                {
-                    auto pos = ImGui::GetMousePos();
-                    win->Pos.x = pos.x - 32.0f;
-                    win->Pos.y = pos.y - 8.0f;
-                    if (win->Pos.x < 0.0f)
-                        win->Pos.x = 0.0f;
-                    if (win->Pos.y < 0.0f)
-                        win->Pos.y = 0.0f;
-                }
-                detach_tab = "";
-            }
         }
-        else if (options["stack_vertically"])
+        for (auto tab : windows)
         {
-            if (windows["tool_options"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::Begin(windows["tool_options"]->name.c_str(), &windows["tool_options"]->open);
-                render_options();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_camera"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::Begin(windows["tool_camera"]->name.c_str(), &windows["tool_camera"]->open);
-                render_camera();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_door"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::Begin(windows["tool_door"]->name.c_str(), &windows["tool_door"]->open);
-                render_narnia();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({0, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_entity"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y - lastheight}, win_condition);
-                ImGui::Begin(windows["tool_entity"]->name.c_str(), &windows["tool_entity"]->open);
-                render_spawner();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({0, 0}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_entity_properties"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
-                render_entity_props(g_last_id);
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_game_properties"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::Begin(windows["tool_game_properties"]->name.c_str(), &windows["tool_game_properties"]->open);
-                render_game_props();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_script"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::Begin(windows["tool_script"]->name.c_str(), &windows["tool_script"]->open);
-                render_scripts();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::SetWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 2 * ImGui::GetIO().DisplaySize.y / 3}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_save"]->open)
-            {
-                ImGui::Begin(windows["tool_save"]->name.c_str(), &windows["tool_save"]->open);
-                render_savegame();
-                ImGui::End();
-            }
-
-            if (windows["tool_finder"]->open)
-            {
-                ImGui::Begin(windows["tool_finder"]->name.c_str(), &windows["tool_finder"]->open);
-                render_entity_finder();
-                ImGui::End();
-            }
+            if (!tab.second->detached)
+                continue;
+            ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
+            ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, ImGuiViewportFlags_NoTaskBarIcon);
+            render_tool(tab.first);
+            ImGui::SetNextWindowPos(
+                {base->Size.x / 2 - ImGui::GetWindowWidth() / 2,
+                 base->Size.y / 2 - ImGui::GetWindowHeight() / 2},
+                ImGuiCond_Once);
+            ImGui::End();
         }
-        else
+        if (detach_tab != "")
         {
-            if (windows["tool_entity"]->open)
+            auto win = ImGui::FindWindowByName(windows[detach_tab]->name.c_str());
+            if (win)
             {
-                ImGui::SetNextWindowSize({toolwidth, toolwidth}, win_condition);
-                ImGui::SetNextWindowPos({0, 0}, win_condition);
-                ImGui::Begin(windows["tool_entity"]->name.c_str(), &windows["tool_entity"]->open);
-                render_spawner();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
+                auto pos = ImGui::GetIO().MousePos;
+                win->Pos.x = pos.x - 32.0f;
+                win->Pos.y = pos.y - 8.0f;
+                if (win->Pos.x < 0.0f)
+                    win->Pos.x = 0.0f;
+                if (win->Pos.y < 0.0f)
+                    win->Pos.y = 0.0f;
             }
-
-            if (windows["tool_door"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_door"]->name.c_str(), &windows["tool_door"]->open);
-                render_narnia();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_camera"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_camera"]->name.c_str(), &windows["tool_camera"]->open);
-                render_camera();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_entity_properties"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_entity_properties"]->name.c_str(), &windows["tool_entity_properties"]->open);
-                render_entity_props(g_last_id);
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_game_properties"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({lastwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_game_properties"]->name.c_str(), &windows["tool_game_properties"]->open);
-                render_game_props();
-                lastwidth += ImGui::GetWindowWidth();
-                lastheight += ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_options"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth, 0}, win_condition);
-                ImGui::Begin(windows["tool_options"]->name.c_str(), &windows["tool_options"]->open);
-                render_options();
-                lastwidth = ImGui::GetWindowWidth();
-                lastheight = ImGui::GetWindowHeight();
-                ImGui::End();
-            }
-
-            if (windows["tool_script"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 2, 0}, win_condition);
-                ImGui::Begin(windows["tool_script"]->name.c_str(), &windows["tool_script"]->open);
-                render_scripts();
-                ImGui::End();
-            }
-
-            if (windows["tool_save"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
-                ImGui::Begin(windows["tool_save"]->name.c_str(), &windows["tool_save"]->open);
-                render_savegame();
-                ImGui::End();
-            }
-
-            if (windows["tool_finder"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 3, 0}, win_condition);
-                ImGui::Begin(windows["tool_finder"]->name.c_str(), &windows["tool_finder"]->open);
-                render_entity_finder();
-                ImGui::End();
-            }
-        }
-
-        if (!options["tabbed_interface"])
-        {
-            if (windows["tool_debug"]->open)
-            {
-                ImGui::SetNextWindowSize({toolwidth, -1}, win_condition);
-                ImGui::SetNextWindowPos({ImGui::GetIO().DisplaySize.x - toolwidth * 4, 0}, win_condition);
-                ImGui::Begin(windows["tool_debug"]->name.c_str(), &windows["tool_debug"]->open);
-                render_debug();
-                ImGui::End();
-            }
-
-            if (windows["tool_style"]->open)
-            {
-                ImGui::Begin(windows["tool_style"]->name.c_str(), &windows["tool_style"]->open);
-                ImGui::SetWindowSize({-1, -1}, win_condition);
-                render_style_editor();
-                ImGui::SetWindowPos(
-                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, win_condition);
-                ImGui::End();
-            }
-
-            if (windows["tool_keys"]->open)
-            {
-                ImGui::Begin(windows["tool_keys"]->name.c_str(), &windows["tool_keys"]->open);
-                ImGui::SetWindowSize({-1, -1}, win_condition);
-                render_keyconfig();
-                ImGui::SetWindowPos(
-                    {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2}, win_condition);
-                ImGui::End();
-            }
+            detach_tab = "";
         }
     }
 
@@ -6901,11 +6873,13 @@ void init_ui()
 
     g_state = get_state_ptr();
     g_save = UI::savedata();
+    g_game_manager = get_game_manager();
 
     g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
     g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);
+    register_imgui_pre_init(&imgui_pre_init);
     register_imgui_init(&imgui_init);
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);

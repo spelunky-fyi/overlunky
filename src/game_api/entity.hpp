@@ -65,6 +65,8 @@ struct EntityHooksInfo
     std::vector<HookWithId<void(Entity*)>> on_dtor;
     std::vector<HookWithId<void(Entity*)>> on_destroy;
     std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
+    std::vector<HookWithId<bool(Entity*)>> pre_floor_update;
+    std::vector<HookWithId<void(Entity*)>> post_floor_update;
     std::vector<HookWithId<bool(Entity*)>> on_player_instagib;
     std::vector<HookWithId<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)>> on_damage;
     std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
@@ -164,6 +166,8 @@ struct EntityItem
 EntityDB* get_type(uint32_t id);
 
 ENT_TYPE to_id(std::string_view id);
+
+std::string_view to_name(ENT_TYPE id);
 
 class Entity
 {
@@ -299,6 +303,8 @@ class Entity
     void set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill);
     void set_on_player_instagib(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> on_instagib);
     void set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage);
+    void set_pre_floor_update(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> pre_update);
+    void set_post_floor_update(std::uint32_t reserved_callback_id, std::function<void(Entity*)> post_update);
     void set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1);
     void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
     void set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render);
@@ -360,7 +366,7 @@ class Entity
     virtual void liberate_from_shop() = 0;             // can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
 
     /// Applies changes made in `entity.type`
-    virtual void apply_db() = 0;
+    virtual void apply_db() = 0; // This is actually just an initialize call that is happening once after  the entity is created
 };
 
 struct SoundInfo

@@ -4,6 +4,7 @@
 #include <detours.h>
 #include <string>
 
+#include "entity.hpp"
 #include "level_api.hpp"
 #include "memory.hpp"
 #include "script/events.hpp"
@@ -307,26 +308,40 @@ void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Col
     }
 }
 
-const Texture* fetch_texture(int32_t texture_id)
+void fetch_texture(Entity* entity, int32_t texture_id)
 {
+    entity->texture = nullptr;
+
     auto* textures = get_textures();
     if (texture_id >= static_cast<int64_t>(textures->texture_map.size()))
     {
-        const auto& render_api = RenderAPI::get();
+        auto& render_api = RenderAPI::get();
         std::lock_guard lock{render_api.custom_textures_lock};
-        const auto& custom_textures = render_api.custom_textures;
+        auto& custom_textures = render_api.custom_textures;
         auto it = custom_textures.find(texture_id);
         if (it != custom_textures.end())
         {
-            return &it->second;
+            entity->texture = &it->second;
         }
     }
 
-    if (texture_id < -3)
+    if (entity->texture == nullptr)
     {
-        texture_id = State::get().ptr_local()->current_theme->get_dynamic_texture(texture_id);
+        if (texture_id < -3)
+        {
+            texture_id = State::get().ptr_local()->current_theme->get_dynamic_texture(texture_id);
+        }
+        entity->texture = get_textures()->texture_map[texture_id];
     }
-    return get_textures()->texture_map[texture_id];
+
+    if (entity->texture != nullptr)
+    {
+        entity->animation_frame = static_cast<uint16_t>(entity->type->tile_y * entity->texture->num_tiles_width + entity->type->tile_x);
+    }
+    else
+    {
+        entity->animation_frame = 0;
+    }
 }
 
 void init_render_api_hooks()
@@ -340,17 +355,11 @@ void init_render_api_hooks()
 
         // Manually assembled code, let's hope it won't have to change ever
         std::string code = fmt::format(
-            "\x48\x89\xc1"                         // mov    rcx, rax
-            "\x48\xba{}"                           // mov    rdx, 0x0
-            "\xff\xd2"                             // call   rdx
-            "\x48\x89\x86\x90\x00\x00\x00"         // mov    QWORD PTR[rsi + 0x90], rax
-            "\x48\x85\xc0"                         // test   rax, rax
-            "\x74\x17"                             // jz     0x17
-            "\x48\x0f\xb7\x40\x18"                 // movzx  rax, WORD PTR[rax + 0x18]
-            "\x66\x0f\xaf\x84\x1f\x90\x00\x00\x00" // imul   ax, WORD PTR[rdi + rbx * 1 + 0x90]
-            "\x66\x03\x84\x1f\x8c\x00\x00\x00"     // add    ax, WORD PTR[rdi + rbx * 1 + 0x8c]
-            "\xeb\x02"                             // jmp    0x2
-            "\x31\xc0"sv,                          // xor    rax, rax
+            "\x48\x89\xf1"    // mov    rcx, rax
+            "\x48\x89\xc2"    // mov    rdx, rsi
+            "\x48\xb8{}"      // mov    rax, 0x0
+            "\xff\xd0"        // call   rax
+            "\x48\x31\xc0"sv, // xor    rax, rax
             to_le_bytes(fetch_texture_addr));
 
         // Fill with nop, code is not performance-critical either way

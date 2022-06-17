@@ -636,9 +636,11 @@ bool LuaConsole::pre_draw()
     {
         auto& io = ImGui::GetIO();
         auto& style = ImGui::GetStyle();
+        auto base = ImGui::GetMainViewport();
 
-        const float window_height = io.DisplaySize.y - style.ItemSpacing.y * 2.0f;
-        ImGui::SetNextWindowSize({io.DisplaySize.x, window_height});
+        ImGui::SetNextWindowSize(size.x != 0 ? size : base->Size);
+        ImGui::SetNextWindowPos(pos);
+        ImGui::SetNextWindowViewport(base->ID);
         ImGui::Begin(
             "Console Overlay",
             NULL,
@@ -655,6 +657,8 @@ bool LuaConsole::pre_draw()
         ImGui::BeginChild("Results Region", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
 
+        static const ImVec4 trans{0.0f, 0.0f, 0.0f, 0.0f};
+
         for (size_t i = 0; i < history.size(); i++)
         {
             auto& item = history[i];
@@ -666,7 +670,25 @@ bool LuaConsole::pre_draw()
                     color = ImVec4{0.4f, 0.8f, 0.4f, 1.0f};
                 }
 
-                ImGui::TextUnformatted("> ");
+                int num = 1;
+                const char* str;
+                for (str = item.command.c_str(); *str; ++str)
+                    num += *str == '\n';
+
+                ImGui::PushStyleColor(ImGuiCol_Button, trans);
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+                ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0, 0));
+                ImGui::PushID((int)i);
+                ImGui::PushID(item.command.c_str());
+                if (ImGui::Button("> ##CopyCommandToClipboard", {16.0f, ImGui::GetTextLineHeight() * num}))
+                    ImGui::SetClipboardText(item.command.c_str());
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Copy command to clipboard!");
+                ImGui::PopID();
+                ImGui::PopID();
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
+                ImGui::PopStyleColor();
                 ImGui::SameLine();
                 ImGui::PushStyleColor(ImGuiCol_Text, color);
                 ImGui::TextWrapped("%s", item.command.c_str());
@@ -679,9 +701,28 @@ bool LuaConsole::pre_draw()
                 last_force_scroll = set_scroll_to_history_item;
                 set_scroll_to_history_item = std::nullopt;
             }
-
             for (const auto& results : item.messages)
             {
+                int num = 1;
+                const char* str;
+                for (str = results.message.c_str(); *str; ++str)
+                    num += *str == '\n';
+
+                ImGui::PushStyleColor(ImGuiCol_Button, trans);
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+                ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0, 0));
+                ImGui::PushID((int)i);
+                ImGui::PushID(results.message.c_str());
+                if (ImGui::Button("< ##CopyResultToClipboard", {16.0f, ImGui::GetTextLineHeight() * num}))
+                    ImGui::SetClipboardText(results.message.c_str());
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Copy result to clipboard!");
+                ImGui::PopID();
+                ImGui::PopID();
+                ImGui::PopStyleVar();
+                ImGui::PopStyleVar();
+                ImGui::PopStyleColor();
+                ImGui::SameLine();
                 ImGui::PushStyleColor(ImGuiCol_Text, results.color);
                 ImGui::TextWrapped("%s", results.message.c_str());
                 ImGui::PopStyleColor();
@@ -778,7 +819,7 @@ bool LuaConsole::pre_draw()
             return 0;
         };
 
-        const float indent_size = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, "000", nullptr, nullptr).x + 8.0f;
+        const float indent_size = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, "00", nullptr, nullptr).x + 2.0f;
         ImGui::PushItemWidth(ImGui::GetWindowWidth() - indent_size);
         ImGui::Indent(indent_size);
         ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine;
@@ -832,7 +873,7 @@ bool LuaConsole::pre_draw()
         ImGui::Unindent(indent_size);
         ImGui::PopItemWidth();
 
-        ImGui::SetWindowPos({io.DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, io.DisplaySize.y / 2 - window_height / 2}, ImGuiCond_Always);
+        ImGui::SetWindowPos({base->Pos.x + base->Size.x / 2 - ImGui::GetWindowWidth() / 2, base->Pos.y + base->Size.y / 2 - base->Size.y / 2}, ImGuiCond_Always);
         auto drawlist = ImGui::GetWindowDrawList();
         int num = 1;
         const char* str;
@@ -842,7 +883,9 @@ bool LuaConsole::pre_draw()
         {
             std::string buf = fmt::format("{}", i);
             auto linesize = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, buf.c_str(), nullptr, nullptr);
-            drawlist->AddText(ImVec2(indent_size - linesize.x - 2.0f, io.DisplaySize.y - linesize.y * (num - i + 2) + 4.0f), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+            float numx = pos.x != 0 ? pos.x + indent_size - linesize.x - 2.0f : base->Pos.x + indent_size - linesize.x - 2.0f;
+            float numy = pos.y != 0 ? pos.y + size.y - linesize.y * (num - i + 2) + 9.0f : base->Pos.y + base->Size.y - linesize.y * (num - i + 2) + 9.0f;
+            drawlist->AddText(ImVec2(numx, numy), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
         }
         ImGui::End();
     }
@@ -1025,4 +1068,19 @@ std::string LuaConsole::dump_api()
     api = std::regex_replace(api, reg, "\"$1\"");
 
     return api;
+}
+
+unsigned int LuaConsole::get_input_lines()
+{
+    int num = 1;
+    const char* str;
+    for (str = console_input; *str; ++str)
+        num += *str == '\n';
+    return num;
+}
+
+void LuaConsole::set_geometry(float x, float y, float w, float h)
+{
+    pos = ImVec2(x, y);
+    size = ImVec2(w, h);
 }

@@ -29,6 +29,7 @@ using ResizeBuffersPtr = HRESULT(STDMETHODCALLTYPE*)(IDXGISwapChain*, UINT, UINT
 ResizeBuffersPtr g_OrigSwapChainResizeBuffers{nullptr};
 
 OnInputCallback g_OnInputCallback{nullptr};
+ImguiInitCallback g_ImguiPreInitCallback{nullptr};
 ImguiInitCallback g_ImguiInitCallback{nullptr};
 ImguiDrawCallback g_ImguiDrawCallback{nullptr};
 PreDrawCallback g_PreDrawCallback{nullptr};
@@ -115,9 +116,11 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
 void init_imgui()
 {
     ImGuiContext* imgui_context = ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.MouseDrawCursor = true;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    if (g_ImguiPreInitCallback)
+    {
+        g_ImguiPreInitCallback(imgui_context);
+    }
+
     ImGui_ImplWin32_Init(g_Window);
     ImGui_ImplDX11_Init(g_Device, g_Context);
 
@@ -184,8 +187,12 @@ void cleanup_render_target()
     }
 }
 
+static bool skip_hkPresent = false;
 HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
+    if (skip_hkPresent)
+        return g_OrigSwapChainPresent(pSwapChain, SyncInterval, Flags);
+
     static bool init = false;
     if (!init)
     {
@@ -221,8 +228,17 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
     }
 
     ImGui::Render();
+
     g_Context->OMSetRenderTargets(1, &g_MainRenderTargetView, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        skip_hkPresent = true;
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+        skip_hkPresent = false;
+    }
 
     {
         if (ImGui::GetIO().WantCaptureKeyboard)
@@ -321,6 +337,10 @@ bool init_hooks(void* swap_chain_ptr)
 void register_on_input(OnInputCallback on_input)
 {
     g_OnInputCallback = on_input;
+}
+void register_imgui_pre_init(ImguiInitCallback imgui_init)
+{
+    g_ImguiPreInitCallback = imgui_init;
 }
 void register_imgui_init(ImguiInitCallback imgui_init)
 {

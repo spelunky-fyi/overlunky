@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cmath>
+#include <tuple>
+
 struct Vec2
 {
     Vec2() = default;

@@ -1,10 +1,12 @@
 #include "lua_backend.hpp"
 
 #include "aliases.hpp"
+#include "constants.hpp"
 #include "entities_chars.hpp"
 #include "level_api.hpp"
 #include "lua_console.hpp"
 #include "lua_vm.hpp"
+#include "movable_behavior.hpp"
 #include "overloaded.hpp"
 #include "rpc.hpp"
 #include "script_util.hpp"
@@ -148,6 +150,26 @@ bool LuaBackend::reset()
 {
     clear();
     return true;
+}
+
+CustomMovableBehavior* LuaBackend::get_custom_movable_behavior(std::string_view name)
+{
+    auto it = std::find_if(custom_movable_behaviors.begin(), custom_movable_behaviors.end(), [name](const CustomMovableBehaviorStorage& beh)
+                           { return beh.name == name; });
+    if (it != custom_movable_behaviors.end())
+    {
+        return static_cast<CustomMovableBehavior*>(it->behavior.get());
+    }
+    return nullptr;
+}
+CustomMovableBehavior* LuaBackend::make_custom_movable_behavior(std::string_view name, uint8_t state_id, VanillaMovableBehavior* base_behavior)
+{
+    assert(get_custom_movable_behavior(name) == nullptr);
+    auto custom_behavior = std::make_shared<CustomMovableBehavior>();
+    custom_behavior->state_id = state_id;
+    custom_behavior->base_behavior = base_behavior;
+    custom_movable_behaviors.push_back(CustomMovableBehaviorStorage{std::string{name}, custom_behavior});
+    return custom_behavior.get();
 }
 
 bool LuaBackend::update()
@@ -728,6 +750,29 @@ void LuaBackend::pre_level_generation()
         }
     }
 }
+void LuaBackend::pre_load_screen()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LOAD_SCREEN)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function(callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
 void LuaBackend::post_room_generation()
 {
     if (!get_enabled())
@@ -767,6 +812,29 @@ void LuaBackend::post_level_generation()
             continue;
 
         if (callback.screen == ON::POST_LEVEL_GENERATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function(callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+void LuaBackend::post_load_screen()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LOAD_SCREEN)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function(callback.func);
