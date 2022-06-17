@@ -38,6 +38,7 @@
 #include "entities_mounts.hpp"
 #include "file_api.hpp"
 #include "flags.hpp"
+#include "game_manager.hpp"
 #include "items.hpp"
 #include "logger.h"
 #include "math.hpp"
@@ -239,6 +240,7 @@ Entity* g_entity = 0;
 Entity* g_held_entity = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
+GameManager* g_game_manager = 0;
 std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "", detach_tab = "";
@@ -1097,6 +1099,9 @@ std::string spawned_type()
 
 void spawn_entities(bool s, std::string list = "")
 {
+    if (g_game_manager->pause_ui->visibility > 0)
+        return;
+
     const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
@@ -3147,6 +3152,7 @@ void render_camera()
 
 void render_arrow()
 {
+    ImGui::GetIO().MouseDrawCursor = false;
     auto base = ImGui::GetMainViewport();
     ImVec2 pos = mouse_pos();
     ImVec2 line = ImVec2(pos.x - startpos.x, pos.y - startpos.y);
@@ -3169,6 +3175,7 @@ void render_arrow()
 
 void render_cross()
 {
+    ImGui::GetIO().MouseDrawCursor = false;
     auto base = ImGui::GetMainViewport();
     auto* draw_list = ImGui::GetWindowDrawList();
     draw_list->AddLine(base->Pos + ImVec2(startpos.x - 9, startpos.y - 9), base->Pos + ImVec2(startpos.x + 10, startpos.y + 10), ImColor(255, 255, 255, 200), 2);
@@ -3177,6 +3184,7 @@ void render_cross()
 
 void render_select()
 {
+    ImGui::GetIO().MouseDrawCursor = false;
     auto base = ImGui::GetMainViewport();
     ImVec2 pos = mouse_pos();
     auto* draw_list = ImGui::GetWindowDrawList();
@@ -3185,6 +3193,7 @@ void render_select()
 
 void select_entities()
 {
+    ImGui::GetIO().MouseDrawCursor = true;
     ImVec2 pos = mouse_pos();
     auto mask = safe_entity_mask;
     if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier
@@ -3552,7 +3561,9 @@ void render_clickhandler()
     if (g_Console->is_toggled())
     {
         auto console_height = (2.0f * ImGui::GetStyle().ItemSpacing.y + g_Console.get()->get_input_lines() * ImGui::GetTextLineHeight());
-        ImGui::SetNextWindowSize({space->Size.x - 32.0f, base->Size.y - console_height});
+        if (options["menu_ui"])
+            console_height += ImGui::GetTextLineHeight();
+        ImGui::SetNextWindowSize({space->Size.x - 32.0f, space->Size.y - console_height});
         ImGui::SetNextWindowPos({space->Pos.x + 16.0f, space->Pos.y});
     }
     else
@@ -3781,17 +3792,15 @@ void render_clickhandler()
             ImGui::EndDragDropTarget();
         }
 
-        if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")) && ImGui::IsWindowFocused())
+        if ((clicked("mouse_spawn_throw") || clicked("mouse_teleport_throw")))
         {
-            io.MouseDrawCursor = false;
             startpos = mouse_pos();
         }
-        else if ((clicked("mouse_spawn") || clicked("mouse_teleport")) && ImGui::IsWindowFocused())
+        else if ((clicked("mouse_spawn") || clicked("mouse_teleport")))
         {
-            io.MouseDrawCursor = false;
             startpos = mouse_pos();
         }
-        else if (clicked("mouse_spawn_over") && ImGui::IsWindowFocused())
+        else if (clicked("mouse_spawn_over"))
         {
             io.MouseDrawCursor = false;
             startpos = mouse_pos();
@@ -3883,10 +3892,8 @@ void render_clickhandler()
                 fix_decorations_at(std::round(pos.first), std::round(pos.second), (LAYER)g_state->camera_layer);
             }
         }
-        else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused())
+        else if (released("mouse_teleport_throw") && ImGui::IsWindowFocused() && !g_players.empty() && g_game_manager->pause_ui->visibility == 0)
         {
-            if (g_players.empty())
-                return;
             set_pos(startpos);
             set_vel(mouse_pos());
             ImVec2 mpos = normalize(startpos);
@@ -3900,10 +3907,8 @@ void render_clickhandler()
             g_vx = 0;
             g_vy = 0;
         }
-        else if (released("mouse_teleport") && ImGui::IsWindowFocused())
+        else if (released("mouse_teleport") && ImGui::IsWindowFocused() && !g_players.empty() && g_game_manager->pause_ui->visibility == 0)
         {
-            if (g_players.empty())
-                return;
             set_pos(startpos);
             ImVec2 mpos = normalize(mouse_pos());
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
@@ -6868,6 +6873,7 @@ void init_ui()
 
     g_state = get_state_ptr();
     g_save = UI::savedata();
+    g_game_manager = get_game_manager();
 
     g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
     g_Console->load_history("console_history.txt");
