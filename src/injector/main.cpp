@@ -6,6 +6,14 @@
 #include "injector.h"
 #include "logger.h"
 #include "version.hpp"
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <strsafe.h>
+#include <wininet.h>
+
+#pragma comment(lib, "wininet.lib")
 
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
@@ -18,8 +26,135 @@ fs::path get_dll_path(const char* rel_path)
     return path.parent_path().concat(rel_path);
 }
 
+bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeader = NULL)
+{
+    const int BUFFER_SIZE = 32768;
+    const int iInterval = 250;
+    DWORD iFlags;
+    const char* sAgent = "Overlunky Updater";
+    HINTERNET hInternet;
+    HINTERNET hConnect;
+    char acBuffer[BUFFER_SIZE];
+    DWORD iReadBytes;
+    FILE* pFile = NULL;
+    DWORD iBytesToRead = 0;
+    DWORD iReadBytesOfRq = 4;
+    DWORD response_headers_size = 4096;
+    char response_headers[4096];
+    std::string old_version = "";
+    std::string new_version = "";
+
+    // Get connection state
+    InternetGetConnectedState(&iFlags, 0);
+    if (iFlags & INTERNET_CONNECTION_OFFLINE)
+    {
+        return false;
+    }
+
+    // Open internet session
+    if (!(iFlags & INTERNET_CONNECTION_PROXY))
+    {
+        hInternet = InternetOpenA(sAgent, INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY, NULL, NULL, 0);
+    }
+    else
+    {
+        hInternet = InternetOpenA(sAgent, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+    }
+    if (hInternet)
+    {
+        if (sHeader == NULL)
+        {
+            sHeader = "Accept: */*\r\n\r\n";
+        }
+
+        // Get URL
+        hConnect = InternetOpenUrlA(hInternet, sURL, sHeader, lstrlenA(sHeader), INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, 0);
+        if (!hConnect)
+        {
+            InternetCloseHandle(hInternet);
+            return false;
+        }
+
+        // Get current version
+        std::ifstream vStream("overlunky.version");
+        if (!vStream.fail())
+        {
+            std::stringstream buffer;
+            buffer << vStream.rdbuf();
+            old_version = buffer.str();
+        }
+
+        // Get headers
+        if (!HttpQueryInfo(hConnect, HTTP_QUERY_RAW_HEADERS_CRLF, (LPVOID)response_headers, &response_headers_size, NULL))
+        {
+            return false;
+        }
+        std::stringstream buffer(response_headers);
+        std::string line;
+        while (std::getline(buffer, line))
+        {
+            if (line.find("Last-Modified:") != std::string::npos)
+                new_version = line;
+        }
+        if (old_version == new_version)
+        {
+            INFO("AutoUpdate: Running latest version.");
+            return true;
+        }
+        INFO("AutoUpdate: Updating...");
+
+        // Open file to write
+        if (!fopen_s(&pFile, sSaveFilename, "wb"))
+        {
+            InternetCloseHandle(hInternet);
+            return false;
+        }
+
+        // Get content size
+        if (!HttpQueryInfo(hConnect, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&iBytesToRead, &iReadBytesOfRq, NULL))
+        {
+            iBytesToRead = 0;
+        }
+
+        do
+        {
+            if (!InternetReadFile(hConnect, acBuffer, BUFFER_SIZE, &iReadBytes))
+            {
+                fclose(pFile);
+                InternetCloseHandle(hInternet);
+                return false;
+            }
+            if (iReadBytes > 0)
+            {
+                fwrite(acBuffer, sizeof(char), iReadBytes, pFile);
+            }
+            if (iReadBytes <= 0)
+            {
+                break;
+            }
+        } while (TRUE);
+        fflush(pFile);
+        fclose(pFile);
+        InternetCloseHandle(hInternet);
+    }
+    else
+    {
+        return false;
+    }
+
+    std::ofstream vStream("overlunky.version");
+    if (!vStream.fail())
+    {
+        vStream << new_version;
+        vStream.close();
+    }
+    return true;
+}
+
 int main(int argc, char** argv)
 {
+    auto_update("https://github.com/Dregu/overlunky/releases/download/whip/injected.dll", "injected.dll");
+
     CmdLineParser cmd_line_parser(argc, argv);
 
     bool info_dump = GetCmdLineParam<bool>(cmd_line_parser, "info_dump", false);
