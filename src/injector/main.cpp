@@ -14,6 +14,7 @@
 #include <wininet.h>
 
 #pragma comment(lib, "wininet.lib")
+#pragma warning(disable : 4706 4996)
 
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
@@ -48,6 +49,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
     InternetGetConnectedState(&iFlags, 0);
     if (iFlags & INTERNET_CONNECTION_OFFLINE)
     {
+        INFO("AutoUpdate: Can't connect to the internet");
         return false;
     }
 
@@ -72,6 +74,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
         if (!hConnect)
         {
             InternetCloseHandle(hInternet);
+            INFO("AutoUpdate: Can't get release information from github");
             return false;
         }
 
@@ -87,6 +90,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
         // Get headers
         if (!HttpQueryInfo(hConnect, HTTP_QUERY_RAW_HEADERS_CRLF, (LPVOID)response_headers, &response_headers_size, NULL))
         {
+            INFO("AutoUpdate: Can't get version information from github");
             return false;
         }
         std::stringstream buffer(response_headers);
@@ -98,15 +102,16 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
         }
         if (old_version == new_version)
         {
-            INFO("AutoUpdate: Running latest version.");
+            INFO("AutoUpdate: Running latest version!");
             return true;
         }
-        INFO("AutoUpdate: Updating...");
+        INFO("AutoUpdate: New version found! Updating...");
 
         // Open file to write
-        if (!fopen_s(&pFile, sSaveFilename, "wb"))
+        if (!(pFile = fopen(sSaveFilename, "wb")))
         {
             InternetCloseHandle(hInternet);
+            INFO("AutoUpdate: Can't write new dll file");
             return false;
         }
 
@@ -122,6 +127,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
             {
                 fclose(pFile);
                 InternetCloseHandle(hInternet);
+                INFO("AutoUpdate: Can't read file from github");
                 return false;
             }
             if (iReadBytes > 0)
@@ -139,6 +145,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
     }
     else
     {
+        INFO("AutoUpdate: Can't connect to github");
         return false;
     }
 
@@ -165,7 +172,7 @@ int main(int argc, char** argv)
         PANIC("DLL not found! {}", overlunky_path.string().data());
     }
 
-    INFO("Overlunky version: {}", get_version());
+    INFO("Overlunky launcher version: {}", get_version());
 
     Process game_proc = [&cmd_line_parser]()
     {
