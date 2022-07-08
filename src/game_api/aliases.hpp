@@ -53,3 +53,11 @@ enum class JournalPageType
     PlayerProfile,
     LastGamePlayed,
 };
+
+enum class LogLevel
+{
+    Info = 0,
+    InfoScreen = 3,
+    Fatal = 1,
+    Error = 2
+};

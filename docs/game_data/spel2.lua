@@ -1118,6 +1118,10 @@ function get_address(address_name) end
 ---@param address_name string
 ---@return size_t
 function get_rva(address_name) end
+---Log to spelunky.log
+---@param message string
+---@return nil
+function log_print(message) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1460,6 +1464,9 @@ function udp_listen(host, port, cb) end
 ---@param msg string
 ---@return nil
 function udp_send(host, port, msg) end
+---Hook the sendto and recvfrom functions and start dumping network data to terminal
+---@return nil
+function dump_network() end
 
 --## Types
 
@@ -2047,6 +2054,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field get_all_behaviors fun(self): integer[]
     ---@field set_behavior fun(self, behavior_id: integer): boolean
     ---@field get_behavior fun(self): integer
+    ---@field set_gravity fun(self, gravity: number): nil
+    ---@field reset_gravity fun(self): nil
     ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil
