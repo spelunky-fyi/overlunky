@@ -35,7 +35,7 @@ int mySendto(SOCKET s, char* buf, int len, int flags, sockaddr_in* addr, int* to
     auto ret = g_sendto_trampoline(s, buf, len, flags, addr, tolen);
     char ip[16] = "";
     inet_ntop(addr->sin_family, &addr->sin_addr, ip, sizeof(ip));
-    DEBUG("SEND: {}:{} | {}", ip, addr->sin_port, (ByteStr)buf);
+    DEBUG("SEND: {}:{} | {}", ip, addr->sin_port, ByteStr{buf});
     return ret;
 }
 
@@ -44,7 +44,7 @@ int myRecvfrom(SOCKET s, char* buf, int len, int flags, sockaddr_in* addr, int* 
     auto ret = g_recvfrom_trampoline(s, buf, len, flags, addr, fromlen);
     char ip[16] = "";
     inet_ntop(addr->sin_family, &addr->sin_addr, ip, sizeof(ip));
-    DEBUG("RECV: {}:{} | {}", ip, addr->sin_port, (ByteStr)buf);
+    DEBUG("RECV: {}:{} | {}", ip, addr->sin_port, ByteStr{buf});
     return ret;
 }
 
@@ -67,6 +67,7 @@ void register_usertypes(sol::state& lua)
         sock.send_to(msg, addr);
     };
 
+    /// Hook the sendto and recvfrom functions and start dumping network data to terminal
     lua["dump_network"] = []()
     {
         g_sendto_trampoline = (NetFun*)GetProcAddress(GetModuleHandleA("ws2_32.dll"), "sendto");
