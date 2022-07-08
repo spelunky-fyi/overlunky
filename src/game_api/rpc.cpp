@@ -1817,3 +1817,11 @@ void set_cursepot_ghost_enabled(bool enable)
         recover_mem("ghost_jar_ghost_spawn");
     }
 }
+
+void game_log(std::string message)
+{
+    using GameLogFun = void(std::ofstream*, const char*, void*, LogLevel);
+    const static auto game_log_fun = (GameLogFun*)get_address("game_log_function");
+    const static auto log_stream = (std::ofstream*)read_i64(get_address("game_log_stream"));
+    game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
+}

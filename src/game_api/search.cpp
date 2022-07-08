@@ -1683,6 +1683,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x2)
             .at_exe(),
     },
+    {
+        // Borrowed from Playlunky logger.cpp
+        "game_log_function"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x83\x80\x90\x01\x00\x00\x01\x48\x83\xbf\x88\x00\x00\x00\x00"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Just picked some random call to ^, before that it reads the location of the stream
+        "game_log_stream"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8d\x55\xa0\x45\x31\xc0")
+            .offset(-0x7)
+            .decode_pc()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
