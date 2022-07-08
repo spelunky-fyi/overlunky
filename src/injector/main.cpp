@@ -191,7 +191,7 @@ int main(int argc, char** argv)
     INFO("Overlunky launcher version: {}", version);
 
     if (version.find(".") == std::string::npos)
-        auto_update("https://github.com/Dregu/overlunky/releases/download/whip/injected.dll", "injected.dll");
+        auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/injected.dll", "injected.dll");
     else
         INFO("AutoUpdate: Disabled on stable releases. Get the WHIP build to get automatic updates.");
 
