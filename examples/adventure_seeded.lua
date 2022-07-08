@@ -16,6 +16,8 @@ function init()
     a, b = get_adventure_seed()
     ainput = string.format("%X", a)
     binput = string.format("%X", b)
+    seeded = false
+    daily = false
 end
 set_callback(init, ON.CAMP)
 init()
@@ -34,16 +36,24 @@ set_callback(function(ctx)
             state.level_next = state.level_start
             state.theme_next = state.theme_start
             state.screen_next = SCREEN.LEVEL
+            if daily then
+                state.quest_flags = set_flag(state.quest_flags, 8)
+                state.level_flags = set_flag(state.level_flags, 26)
+            else
+                state.quest_flags = clr_flag(state.quest_flags, 8)
+                state.level_flags = clr_flag(state.level_flags, 26)
+            end
             state.loading = 1
         end
+        daily = ctx:win_check("Daily mode", daily)
     end)
 end, ON.GUIFRAME)
 
 -- Save the initial seed pair on reset so we can recall it later to restart the same adventure
 set_callback(function()
-    if state.loading == 2 and (test_flag(state.quest_flags, 1) or state.screen < SCREEN.LEVEL) then
+    if test_flag(state.quest_flags, 1) and state.screen_next == SCREEN.LEVEL then
         a, b = get_adventure_seed()
         ainput = string.format("%X", a)
         binput = string.format("%X", b)
     end
-end, ON.LOADING)
+end, ON.PRE_LOAD_SCREEN)

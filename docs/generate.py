@@ -344,7 +344,10 @@ for func in ps.funcs:
         ]
     ):
         cat = "Message functions"
-    elif any(subs in func["name"] for subs in ["get_address", "get_rva", "raise"]):
+    elif any(
+        subs in func["name"]
+        for subs in ["get_address", "get_rva", "raise", "dump_network"]
+    ):
         cat = "Debug functions"
     elif any(subs in func["name"] for subs in ["tile_code"]):
         cat = "Tile code functions"
