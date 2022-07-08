@@ -1972,6 +1972,7 @@ local function PRNG_random(self, min, max) end
     ---@field offsetx number
     ---@field offsety number
     ---@field rendering_info RenderInfo
+    ---@field user_data any @user_data
     ---@field topmost fun(self): Entity
     ---@field topmost_mount fun(self): Entity
     ---@field overlaps_with Entity_overlaps_with
@@ -1993,7 +1994,6 @@ local function PRNG_random(self, min, max) end
     ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self): integer[]
     ---@field is_in_liquid fun(self): boolean
-    ---@field user_data table?
 
 ---@class Entity_overlaps_with
 ---@param other Entity
