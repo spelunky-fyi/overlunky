@@ -120,7 +120,11 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
             if (line.find("Last-Modified:") != std::string::npos)
                 new_version = line;
         }
-        if (old_version == new_version)
+        if (!fs::exists(sSaveFilename))
+        {
+            INFO("AutoUpdate: {} is missing, updating!", sSaveFilename);
+        }
+        else if (old_version == new_version)
         {
             INFO("AutoUpdate: Running latest version!");
             return true;
@@ -128,17 +132,19 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
         else if (old_version == "")
             INFO("AutoUpdate: No old version information found, updating just in case!");
         else
-            INFO("AutoUpdate: New version found!");
+            INFO("AutoUpdate: New version found, updating!");
         answer = MessageBoxA(NULL, "New Overlunky WHIP version available!\nDo you want to update?", "Overlunky Update", MB_ICONASTERISK | MB_YESNO);
         if (answer == IDNO)
             return true;
+
+        INFO("AutoUpdate: Downloading {}...", sSaveFilename);
 
         // Open file to write
         errno_t err;
         if ((err = fopen_s(&pFile, sSaveFilename, "wb")) != 0)
         {
             InternetCloseHandle(hInternet);
-            INFO("AutoUpdate: Can't write new dll file");
+            INFO("AutoUpdate: Can't write new file");
             return false;
         }
 
@@ -191,9 +197,13 @@ int main(int argc, char** argv)
     INFO("Overlunky launcher version: {}", version);
 
     if (version.find(".") == std::string::npos)
+    {
         auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/injected.dll", "injected.dll");
+    }
     else
+    {
         INFO("AutoUpdate: Disabled on stable releases. Get the WHIP build to get automatic updates.");
+    }
 
     CmdLineParser cmd_line_parser(argc, argv);
 
