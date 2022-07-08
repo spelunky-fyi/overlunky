@@ -30,7 +30,6 @@ fs::path get_dll_path(const char* rel_path)
 bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeader = NULL)
 {
     const int BUFFER_SIZE = 32768;
-    const int iInterval = 250;
     DWORD iFlags;
     const char* sAgent = "Overlunky Updater";
     HINTERNET hInternet;
@@ -44,6 +43,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
     char response_headers[4096];
     std::string old_version = "";
     std::string new_version = "";
+    int answer;
 
     // Get connection state
     InternetGetConnectedState(&iFlags, 0);
@@ -79,12 +79,32 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
         }
 
         // Get current version
-        std::ifstream vStream("overlunky.version");
-        if (!vStream.fail())
+        std::ifstream viStream("overlunky.version");
+        if (!viStream.fail())
         {
             std::stringstream buffer;
-            buffer << vStream.rdbuf();
+            buffer << viStream.rdbuf();
             old_version = buffer.str();
+            if (old_version.find("disabled") != std::string::npos)
+            {
+                INFO("AutoUpdate: Disabled, delete overlunky.version to enable again.");
+                return true;
+            }
+        }
+        else
+        {
+            answer = MessageBoxA(NULL, "Overlunky WHIP can update automatically!\nDo you want to enable automatic updates?", "Overlunky Update", MB_ICONASTERISK | MB_YESNO);
+            if (answer == IDNO)
+            {
+                std::ofstream voStream("overlunky.version");
+                if (!voStream.fail())
+                {
+                    voStream << "disabled" << std::endl;
+                    voStream.close();
+                }
+                INFO("AutoUpdate: Disabled, delete overlunky.version to enable again.");
+                return true;
+            }
         }
 
         // Get headers
@@ -105,10 +125,17 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
             INFO("AutoUpdate: Running latest version!");
             return true;
         }
-        INFO("AutoUpdate: New version found! Updating...");
+        else if (old_version == "")
+            INFO("AutoUpdate: No old version information found, updating just in case!");
+        else
+            INFO("AutoUpdate: New version found!");
+        answer = MessageBoxA(NULL, "New Overlunky WHIP version available!\nDo you want to update?", "Overlunky Update", MB_ICONASTERISK | MB_YESNO);
+        if (answer == IDNO)
+            return true;
 
         // Open file to write
-        if (!(pFile = fopen(sSaveFilename, "wb")))
+        errno_t err;
+        if ((err = fopen_s(&pFile, sSaveFilename, "wb")) != 0)
         {
             InternetCloseHandle(hInternet);
             INFO("AutoUpdate: Can't write new dll file");
@@ -160,7 +187,13 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
 
 int main(int argc, char** argv)
 {
-    auto_update("https://github.com/Dregu/overlunky/releases/download/whip/injected.dll", "injected.dll");
+    std::string version(get_version());
+    INFO("Overlunky launcher version: {}", version);
+
+    if (version.find(".") == std::string::npos)
+        auto_update("https://github.com/Dregu/overlunky/releases/download/whip/injected.dll", "injected.dll");
+    else
+        INFO("AutoUpdate: Disabled on stable releases. Get the WHIP build to get automatic updates.");
 
     CmdLineParser cmd_line_parser(argc, argv);
 
@@ -171,8 +204,6 @@ int main(int argc, char** argv)
     {
         PANIC("DLL not found! {}", overlunky_path.string().data());
     }
-
-    INFO("Overlunky launcher version: {}", get_version());
 
     Process game_proc = [&cmd_line_parser]()
     {
