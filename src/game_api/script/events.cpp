@@ -23,7 +23,7 @@ void pre_level_generation()
             return true;
         });
 }
-void pre_load_screen()
+bool pre_load_screen()
 {
     static int64_t prev_seed = 0;
     auto state = State::get().ptr();
@@ -44,12 +44,15 @@ void pre_load_screen()
             prev_seed = seed.second;
         }
     }
+
+    bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
-            backend.pre_load_screen();
-            return true;
+            block = backend.pre_load_screen();
+            return !block;
         });
+    return block;
 }
 void post_room_generation()
 {

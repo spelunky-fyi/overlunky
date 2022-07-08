@@ -3,6 +3,7 @@
 #include "aliases.hpp"
 #include "constants.hpp"
 #include "entities_chars.hpp"
+#include "items.hpp"
 #include "level_api.hpp"
 #include "lua_console.hpp"
 #include "lua_vm.hpp"
@@ -138,6 +139,13 @@ void LuaBackend::clear_all_callbacks()
     screen_hooks.clear();
     clear_screen_hooks.clear();
     options.clear();
+    for (auto& [uid, user_data] : user_datas)
+    {
+        if (Entity* entity = get_entity_ptr(uid))
+        {
+            entity->unhook(user_data.hook_id);
+        }
+    }
     required_scripts.clear();
     console_commands.clear();
     lua["on_guiframe"] = sol::lua_nil;
@@ -177,6 +185,41 @@ CustomMovableBehavior* LuaBackend::make_custom_movable_behavior(std::string_view
     return custom_behavior.get();
 }
 
+sol::object LuaBackend::get_user_data(Entity& entity)
+{
+    if (user_datas.contains(entity.uid))
+    {
+        return user_datas[entity.uid].data;
+    }
+    return sol::nil;
+}
+sol::object LuaBackend::get_user_data(uint32_t uid)
+{
+    if (user_datas.contains(uid))
+    {
+        return user_datas[uid].data;
+    }
+    return sol::nil;
+}
+void LuaBackend::set_user_data(Entity& entity, sol::object user_data)
+{
+    if (!user_datas.contains(entity.uid))
+    {
+        uint32_t hook_id = entity.set_on_dtor(
+            [this, uid = entity.uid](Entity*)
+            {
+                user_datas.erase(uid);
+            });
+        user_datas[entity.uid].hook_id = hook_id;
+    }
+    user_datas[entity.uid].data = user_data;
+}
+void LuaBackend::set_user_data(uint32_t uid, sol::object user_data)
+{
+    auto ent = get_entity_ptr(uid);
+    set_user_data(*ent, user_data);
+}
+
 bool LuaBackend::update()
 {
     if (!get_enabled())
@@ -214,12 +257,13 @@ bool LuaBackend::update()
         std::vector<Player*> players = get_players();
         lua["players"] = std::vector<Player*>(players);
 
+        /*moved to pre_load_screen
         if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen_next != (int)ON::OPTIONS && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
         {
             level_timers.clear();
             script_input.clear();
             clear_custom_shopitem_names();
-        }
+        }*/
         if (g_state->screen != state.screen)
         {
             if (on_screen)
@@ -229,12 +273,12 @@ bool LuaBackend::update()
         {
             on_frame.value()();
         }
-        if (g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3)
+        if (g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3 && g_state->time_level == 1)
         {
             if (on_camp)
                 on_camp.value()();
         }
-        if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3)
+        if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3 && g_state->time_level == 1)
         {
             if (g_state->level_count == 0)
             {
@@ -386,12 +430,12 @@ bool LuaBackend::update()
                 handle_function(callback.func);
                 callback.lastRan = now;
             }
-            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3)
+            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3 && g_state->time_level == 1)
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
             }
-            else if (callback.screen == ON::CAMP && g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3)
+            else if (callback.screen == ON::CAMP && g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3 && g_state->time_level == 1)
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
@@ -430,7 +474,7 @@ bool LuaBackend::update()
                 }
                 case ON::START:
                 {
-                    if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->level_count == 0 && g_state->loading != state.loading && g_state->loading == 3)
+                    if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->level_count == 0 && g_state->loading != state.loading && g_state->loading == 3 && g_state->time_level == 1)
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
@@ -745,10 +789,10 @@ void LuaBackend::pre_level_generation()
         }
     }
 }
-void LuaBackend::pre_load_screen()
+bool LuaBackend::pre_load_screen()
 {
     if (!get_enabled())
-        return;
+        return false;
 
     auto now = get_frame_count();
 
@@ -762,11 +806,74 @@ void LuaBackend::pre_load_screen()
         if (callback.screen == ON::PRE_LOAD_SCREEN)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function(callback.func);
+            auto return_value = handle_function_with_return<bool>(callback.func).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
+            if (return_value)
+                return return_value;
         }
     }
+
+    auto state_ptr = State::get().ptr();
+    if ((ON)state_ptr->screen == ON::LEVEL && (ON)state_ptr->screen_next != ON::DEATH && (state_ptr->quest_flags & 1) == 0)
+    {
+        for (auto uid : get_entities_by_mask(1))
+        {
+            auto ent = get_entity_ptr(uid)->as<Player>();
+            int slot = ent->inventory_ptr->player_slot;
+            if (slot == -1 && ent->linked_companion_parent == -1)
+                continue;
+            if (slot == -1 && ent->linked_companion_parent != -1)
+            {
+                Player* parent = ent;
+                while (true)
+                {
+                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                    slot++;
+                    if (parent->linked_companion_parent == -1)
+                    {
+                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        break;
+                    }
+                }
+            }
+            if (slot < 0)
+                continue;
+            bool should_save = false;
+            SavedUserData saved;
+            if (user_datas.contains(ent->uid))
+            {
+                saved.self = get_user_data(ent->uid);
+                should_save = true;
+            }
+            if (ent->holding_uid != -1 and user_datas.contains(ent->holding_uid))
+            {
+                saved.held = get_user_data(ent->holding_uid);
+                should_save = true;
+            }
+            if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && user_datas.contains(ent->overlay->uid))
+            {
+                saved.mount = get_user_data(ent->overlay->uid);
+                should_save = true;
+            }
+            for (auto [type, powerup] : ent->powerups)
+            {
+                if (user_datas.contains(powerup->uid))
+                {
+                    saved.powerups[type] = get_user_data(powerup->uid);
+                    should_save = true;
+                }
+            }
+            if (should_save)
+                saved_user_datas[slot] = saved;
+        }
+    }
+
+    level_timers.clear();
+    script_input.clear();
+    clear_custom_shopitem_names();
+
+    return false;
 }
 void LuaBackend::post_room_generation()
 {
@@ -800,6 +907,48 @@ void LuaBackend::post_level_generation()
     std::lock_guard lock{gil};
 
     lua["players"] = std::vector<Player*>(get_players());
+
+    auto state_ptr = State::get().ptr();
+    if ((ON)state_ptr->screen == ON::LEVEL)
+    {
+        for (auto uid : get_entities_by_mask(1))
+        {
+            auto ent = get_entity_ptr(uid)->as<Player>();
+            int slot = ent->inventory_ptr->player_slot;
+            if (slot == -1 && ent->linked_companion_parent == -1)
+                continue;
+            if (slot == -1 && ent->linked_companion_parent != -1)
+            {
+                Player* parent = ent;
+                while (true)
+                {
+                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                    slot++;
+                    if (parent->linked_companion_parent == -1)
+                    {
+                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        break;
+                    }
+                }
+            }
+            if (slot < 0)
+                continue;
+            if (saved_user_datas.contains(slot))
+            {
+                set_user_data(*ent, saved_user_datas[slot].self.value_or(sol::nil));
+                if (ent->holding_uid != -1)
+                    set_user_data(ent->holding_uid, saved_user_datas[slot].held.value_or(sol::nil));
+                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0)
+                    set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value_or(sol::nil));
+                for (auto [type, powerup] : ent->powerups)
+                {
+                    if (saved_user_datas[slot].powerups.contains(type))
+                        set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
+                }
+            }
+        }
+        saved_user_datas.clear();
+    }
 
     for (auto& [id, callback] : callbacks)
     {

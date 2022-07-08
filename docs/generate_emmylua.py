@@ -377,6 +377,7 @@ final_replace_stuff = {
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
     ---@field keyreleased fun(key: number | string): boolean""",
     "---@field gamepad any @sol::property([](){g_WantUpdateHasGamepad=true;returnget_gamepad()/**/;})": "---@field gamepad Gamepad",
+    "---@field user_data fun(self): nil": "---@field user_data table?",
 }
 
 with open("./game_data/spel2.lua", "r") as file:

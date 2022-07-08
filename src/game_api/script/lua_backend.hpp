@@ -195,6 +195,20 @@ struct ScriptState
     uint32_t quest_flags;
 };
 
+struct UserData
+{
+    sol::object data;
+    std::uint32_t hook_id;
+};
+
+struct SavedUserData
+{
+    sol::optional<sol::object> self;
+    sol::optional<sol::object> held;
+    sol::optional<sol::object> mount;
+    std::unordered_map<uint32_t, sol::object> powerups;
+};
+
 struct SaveData;
 struct StateMemory;
 class SoundManager;
@@ -235,6 +249,8 @@ class LuaBackend
     std::vector<std::pair<int, std::uint32_t>> screen_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<CustomMovableBehaviorStorage> custom_movable_behaviors;
+    std::unordered_map<std::uint32_t, UserData> user_datas;
+    std::unordered_map<int, SavedUserData> saved_user_datas;
     std::vector<std::string> required_scripts;
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
@@ -284,6 +300,11 @@ class LuaBackend
     CustomMovableBehavior* get_custom_movable_behavior(std::string_view name);
     CustomMovableBehavior* make_custom_movable_behavior(std::string_view name, uint8_t state_id, VanillaMovableBehavior* base_behavior);
 
+    sol::object get_user_data(uint32_t uid);
+    sol::object get_user_data(Entity& entity);
+    void set_user_data(uint32_t uid, sol::object user_data);
+    void set_user_data(Entity& entity, sol::object user_data);
+
     bool update();
     void draw(ImDrawList* dl);
     void render_options();
@@ -297,7 +318,7 @@ class LuaBackend
 
     void pre_load_level_files();
     void pre_level_generation();
-    void pre_load_screen();
+    bool pre_load_screen();
     void post_room_generation();
     void post_level_generation();
     void post_load_screen();

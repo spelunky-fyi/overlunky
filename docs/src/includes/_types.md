@@ -3083,6 +3083,7 @@ bool | [hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
 float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
 [RenderInfo](#RenderInfo) | [rendering_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rendering_info) | 
+ | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | 
 [Entity](#Entity) | [topmost()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) | 
 [Entity](#Entity) | [topmost_mount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) | 
 bool | [overlaps_with(AABB hitbox)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 

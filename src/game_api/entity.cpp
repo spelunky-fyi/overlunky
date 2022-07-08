@@ -838,7 +838,15 @@ bool Movable::set_behavior(uint32_t an)
     const auto& it = behaviors_map.find(an);
     if (it != behaviors_map.end())
     {
+        if (current_behavior != nullptr)
+        {
+            current_behavior->on_exit(this);
+        }
         current_behavior = it->second;
+        if (current_behavior != nullptr)
+        {
+            current_behavior->on_enter(this);
+        }
         return true;
     }
     return false;

@@ -14,12 +14,13 @@ bool SortMovableBehavior::operator()(const MovableBehavior* lhs, const MovableBe
 
 CustomMovableBehavior::~CustomMovableBehavior()
 {
-    for (Movable* movable : using_movables)
+    for (auto& [movable, hook] : using_movables)
     {
         // Reset to default behaviors, as soon as one custom behavior is removed this
         // whole state machine can not possibly be valid anymore
         clear_behaviors(movable);
         movable->apply_db();
+        movable->unhook(hook);
     }
 }
 
@@ -102,9 +103,9 @@ uint8_t CustomMovableBehavior::get_next_state_id(Movable* movable)
 
 void CustomMovableBehavior::hook_movable(Movable* movable)
 {
-    using_movables.push_back(movable);
-    movable->set_on_dtor([=](Entity*)
-                         { std::erase(using_movables, movable); });
+    using_movables[movable] =
+        movable->set_on_dtor([=](Entity*)
+                             { using_movables.erase(movable); });
 }
 
 VanillaMovableBehavior* get_base_behavior(Movable* movable, uint32_t state_id)
