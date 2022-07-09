@@ -52,7 +52,12 @@ set_property(
         SOURCE detours/src/uimports.cpp
         APPEND PROPERTY HEADER_FILE_ONLY true)
 
-target_compile_options(lib_detours_overlunky PRIVATE /w /Zi /MT /Gy /Gm- /Zl /Od)
+if(MSVC)
+        target_compile_options(lib_detours_overlunky PRIVATE /w /Zi /MT /Gy /Gm- /Zl /Od)
+else()
+        target_compile_options(lib_detours_overlunky PRIVATE -w)
+endif()
+
 target_include_directories(lib_detours_overlunky PUBLIC detours/src)
 
 # --------------------------------------------------
@@ -62,15 +67,17 @@ add_subdirectory(version)
 # --------------------------------------------------
 # warnings interface target
 add_library(overlunky_warnings INTERFACE)
+
 if(MSVC)
         target_compile_options(overlunky_warnings INTERFACE /W4 /WX)
-        target_compile_options(overlunky_warnings INTERFACE /wd4201) #nonstandard extension used : nameless struct/union
+        target_compile_options(overlunky_warnings INTERFACE /wd4201) # nonstandard extension used : nameless struct/union
+
         if(CLANG)
-                target_compile_options(overlunky_warnings INTERFACE -Wshadow-all -Wno-missing-field-initializers -Wno-microsoft-cast)
+                target_compile_options(overlunky_warnings INTERFACE -Wshadow-all -Wno-missing-field-initializers -Wno-microsoft-cast -Wno-gnu-anonymous-struct -Wno-nested-anon-types -Wno-gnu-zero-variadic-macro-arguments -Wno-microsoft-enum-value -Wno-deprecated-declarations -Wno-language-extension-token -Wno-sign-compare)
         endif()
 else()
         target_compile_options(overlunky_warnings INTERFACE -Wall -Wextra -pedantic -Werror)
-        target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast)
+        target_compile_options(overlunky_warnings INTERFACE -Wno-missing-field-initializers -Wno-microsoft-cast -Wno-gnu-anonymous-struct -Wno-nested-anon-types -Wno-gnu-zero-variadic-macro-arguments -Wno-microsoft-enum-value -Wno-deprecated-declarations -Wno-language-extension-token -Wno-sign-compare)
 endif()
 
 # --------------------------------------------------
@@ -78,7 +85,7 @@ endif()
 add_subdirectory(shared)
 add_subdirectory(game_api)
 
-if (BUILD_INFO_DUMP)
+if(BUILD_INFO_DUMP)
         # --------------------------------------------------
         # json
         set(JSON_BuildTests OFF CACHE INTERNAL "")
@@ -97,6 +104,30 @@ if(BUILD_OVERLUNKY)
         option(BUILD_EXAMPLE "Build example application" OFF)
         add_subdirectory(libnyquist)
 
+        # Remove the vectorization instructions since those cause a crash for some users
+        function(remove_arch_avx target)
+                get_target_property(target_compile_options ${target} COMPILE_OPTIONS)
+                list(REMOVE_ITEM target_compile_options /arch:AVX)
+                set_target_properties(${target} PROPERTIES COMPILE_OPTIONS "${target_compile_options}")
+        endfunction()
+
+        remove_arch_avx(libwavpack)
+        remove_arch_avx(libnyquist)
+
+        if(WIN32)
+                if(NOT MSVC)
+                        # Remove other instructions that is added on Windows even if not MSVC
+                        function(remove_zi target)
+                                get_target_property(target_compile_options ${target} COMPILE_OPTIONS)
+                                list(REMOVE_ITEM target_compile_options /Zi)
+                                set_target_properties(${target} PROPERTIES COMPILE_OPTIONS "${target_compile_options}")
+                        endfunction()
+
+                        remove_zi(libwavpack)
+                        remove_zi(libnyquist)
+                endif()
+        endif()
+
         # --------------------------------------------------
         # toml11
         option(toml11_BUILD_TEST OFF)
@@ -108,17 +139,22 @@ if(BUILD_OVERLUNKY)
                 if(NOT EXISTS ${SPELUNKY_INSTALL_DIR}/Spel2.exe)
                         get_filename_component(STEAM_INSTALL_DIR "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Valve\\Steam;InstallPath]" ABSOLUTE)
                         set(SPELUNKY_INSTALL_DIR "${STEAM_INSTALL_DIR}/SteamApps/common/Spelunky 2")
+
                         if(NOT EXISTS ${SPELUNKY_INSTALL_DIR}/Spel2.exe)
                                 set(STEAM_LIBRARY_FOLDERS_CONFIG "${STEAM_INSTALL_DIR}/SteamApps/libraryfolders.vdf")
+
                                 if(EXISTS ${STEAM_LIBRARY_FOLDERS_CONFIG})
                                         FILE(READ "${STEAM_LIBRARY_FOLDERS_CONFIG}" STEAM_LIBRARY_FOLDERS_CONFIG_CONTENT)
                                         STRING(REGEX MATCHALL "\"[A-Z]\:[^\"]*\"" POTENTIAL_STEAM_LIBRARY_FOLDERS ${STEAM_LIBRARY_FOLDERS_CONFIG_CONTENT})
+
                                         foreach(STEAM_LIBRARY_FOLDER ${POTENTIAL_STEAM_LIBRARY_FOLDERS})
                                                 string(REGEX REPLACE "\^\"" "" STEAM_LIBRARY_FOLDER ${STEAM_LIBRARY_FOLDER})
                                                 string(REGEX REPLACE "\"$" "" STEAM_LIBRARY_FOLDER ${STEAM_LIBRARY_FOLDER})
                                                 string(REGEX REPLACE "\\\\\\\\" "/" STEAM_LIBRARY_FOLDER ${STEAM_LIBRARY_FOLDER}) # double slash, escaped for cmake string then escaped for regex, requires a total of 8 backslashes
+
                                                 if(EXISTS ${STEAM_LIBRARY_FOLDER})
                                                         set(SPELUNKY_INSTALL_DIR "${STEAM_LIBRARY_FOLDER}/SteamApps/common/Spelunky 2")
+
                                                         if(EXISTS ${SPELUNKY_INSTALL_DIR}/Spel2.exe)
                                                                 break()
                                                         endif()
@@ -143,6 +179,7 @@ if(BUILD_OVERLUNKY)
         if(MSVC)
                 if(BUILD_INFO_DUMP AND EXISTS ${SPELUNKY_INSTALL_DIR})
                         find_package(Python3 COMPONENTS Interpreter)
+
                         if(Python3_FOUND)
                                 add_custom_target(update_docs_overlunky
                                         COMMAND ${CMAKE_COMMAND} -E rm -Rf ${SPELUNKY_INSTALL_DIR}/game_data
@@ -169,6 +206,21 @@ endif()
 add_subdirectory(sockpp)
 target_include_directories(spel2_api PUBLIC sockpp/include)
 target_link_libraries(spel2_api PUBLIC sockpp-static)
-if(CLANG)
-        target_compile_options(sockpp-static INTERFACE -Wno-sign-compare)
+
+# --------------------------------------------------
+# disable all warnings on 3rd-party
+if(MSVC)
+        target_compile_options(imgui PRIVATE "/w")
+        target_compile_options(lib_detours_overlunky PRIVATE "/w")
+        target_compile_options(libwavpack PRIVATE "/w")
+        target_compile_options(libnyquist PRIVATE "/w")
+        target_compile_options(sockpp-objs PRIVATE "/w")
+        target_compile_options(sockpp-static PRIVATE "/w")
+else()
+        target_compile_options(imgui PRIVATE "--no-warnings")
+        target_compile_options(lib_detours_overlunky PRIVATE "--no-warnings")
+        target_compile_options(libwavpack PRIVATE "--no-warnings")
+        target_compile_options(libnyquist PRIVATE "--no-warnings")
+        target_compile_options(sockpp-objs PRIVATE "--no-warnings")
+        target_compile_options(sockpp-static PRIVATE "--no-warnings")
 endif()
