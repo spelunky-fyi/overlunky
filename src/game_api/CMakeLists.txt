@@ -5,10 +5,11 @@ add_library(spel2_api STATIC
         ${spel2_sources}
         ${spel2_headers})
 target_include_directories(spel2_api PUBLIC .)
-target_link_libraries(spel2_api PUBLIC
+target_link_libraries_system(spel2_api PUBLIC
         imgui)
 target_link_libraries(spel2_api PRIVATE
-        shared
+        shared)
+target_link_libraries_system(spel2_api PRIVATE
         sol2::sol2
         ${LUA_LIBRARIES}
         lib_detours_overlunky)

@@ -8,6 +8,8 @@ setup_format_target(format_overlunky)
 
 include(cmake/include-what-you-use.cmake)
 
+include(cmake/link_sys_library.cmake)
+
 string(COMPARE EQUAL "Clang" "${CMAKE_CXX_COMPILER_ID}" CLANG)
 
 if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)

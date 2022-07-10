@@ -6,7 +6,7 @@ add_library(injected SHARED
 target_link_libraries(injected PRIVATE
         shared
         spel2_api)
-target_link_libraries(injected PUBLIC
+target_link_libraries_system(injected PUBLIC
         imgui
         toml11::toml11
         libnyquist
