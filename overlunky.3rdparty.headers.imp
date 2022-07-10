@@ -1,0 +1,13 @@
+[
+  { ref: "stl.c.headers.imp" },
+  { ref: "stl.cpp.msvc.headers.imp" },
+  { ref: "win32.headers.imp" },
+
+  { include: [ "<libnyquist/Common.h>", private, "<libnyquist/Decoders.h>", public ] },
+
+  { include: [ "<fmt/core.h>", private, "<fmt/format.h>", public ] },
+  
+  { include: [ "<misc/cpp/imgui_stdlib.h>", private, "<imgui.h>", public ] },
+
+  { include: [ "<luaxlib.h>", private, "<lua.h>", public ] },
+]
