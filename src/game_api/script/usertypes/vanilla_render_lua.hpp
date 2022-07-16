@@ -1,13 +1,17 @@
 #pragma once
 
-#include "aliases.hpp"
-#include "color.hpp"
-#include "math.hpp"
+#include <cstdint> // for uint8_t, uint32_t
+#include <string>  // for string
+#include <utility> // for pair
 
-#include <sol/forward.hpp>
-#include <string>
+#include "aliases.hpp" // for TEXTURE, WORLD_SHADER
+#include "color.hpp"   // for Color
+#include "math.hpp"    // for Quad, AABB
 
-class ScriptImpl;
+namespace sol
+{
+class state;
+} // namespace sol
 
 class VanillaRenderContext
 {

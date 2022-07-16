@@ -1,14 +1,16 @@
 #pragma once
 
-#include <sol/forward.hpp>
+#include <sol/forward.hpp> // for function
+#include <string>          // for string
+#include <vector>          // for vector
 
-#include <string>
-#include <vector>
+#include "aliases.hpp" // for uColor, IMAGE
+#include "math.hpp"    // for Vec2, AABB (ptr only)
 
-#include "aliases.hpp"
-#include "math.hpp"
-
-class ScriptImpl;
+namespace sol
+{
+class state;
+} // namespace sol
 
 class GuiDrawContext
 {

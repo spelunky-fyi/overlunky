@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cstdint>
-#include <optional>
-#include <string_view>
-#include <tuple>
-#include <vector>
+#include <cstdint>     // for uint32_t
+#include <optional>    // for optional
+#include <string_view> // for string_view
+#include <utility>     // for pair
+#include <vector>      // for vector
 
 enum class GAME_SETTING
 {

@@ -1,9 +1,21 @@
 #pragma once
 
-#include "entities_chars.hpp"
-#include "movable.hpp"
-#include "particles.hpp"
-#include <cstdint>
+#include <array>      // for array
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint8_t, int32_t, uint16_t, int8_t, uint32_t
+#include <functional> // for function
+#include <utility>    // for pair
+
+#include "aliases.hpp" // for ENT_TYPE
+#include "movable.hpp" // for Movable
+
+class Entity;
+class PowerupCapable;
+struct Illumination;
+struct Inventory;
+struct ParticleEmitterInfo;
+struct PlayerInputs;
+struct SoundPosition;
 
 class Backpack : public Movable
 {

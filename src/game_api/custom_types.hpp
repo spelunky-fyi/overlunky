@@ -1,9 +1,11 @@
 #pragma once
 
-#include "aliases.hpp"
-#include <span>
-#include <string_view>
-#include <vector>
+#include <cstdint>     // for uint32_t
+#include <map>         // for map
+#include <span>        // for span
+#include <string_view> // for string_view
+
+#include "aliases.hpp" // for ENT_TYPE
 
 enum class CUSTOM_TYPE : uint32_t
 {

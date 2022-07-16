@@ -1,9 +1,19 @@
 #include "entities_monsters_lua.hpp"
 
-#include "entities_monsters.hpp"
-#include "state_structs.hpp"
+#include <algorithm>   // for max
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for state, data_t, proxy_key_t, basic_t...
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max, end, swap, find_if
 
-#include <sol/sol.hpp>
+#include "entities_monsters.hpp" // for CritterSlime, Hundun, Tiamat, Critt...
+#include "entity.hpp"            // for Entity
+#include "state_structs.hpp"     // IWYU pragma: keep
+
+class Movable;
+class PowerupCapable;
 
 namespace NEntitiesMonsters
 {

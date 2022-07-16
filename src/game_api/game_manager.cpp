@@ -1,6 +1,8 @@
 #include "game_manager.hpp"
 
-#include "memory.hpp"
+#include <string> // for operator""sv
+
+#include "search.hpp" // for get_address
 
 GameManager* get_game_manager()
 {

@@ -1,8 +1,16 @@
 #include "socket_lua.hpp"
 
-#include "script/lua_backend.hpp"
-
-#include <sol/sol.hpp>
+#include <algorithm>             // for max
+#include <exception>             // for exception
+#include <new>                   // for operator new
+#include <sockpp/inet_address.h> // for inet_address
+#include <sockpp/udp_socket.h>   // for udp_socket
+#include <sol/sol.hpp>           // for global_table, proxy_key_t, function
+#include <sys/types.h>           // for ssize_t
+#include <thread>                // for thread
+#include <tuple>                 // for get
+#include <type_traits>           // for move
+#include <utility>               // for max, min
 
 void udp_data(sockpp::udp_socket socket, UdpServer* server)
 {

@@ -1,10 +1,13 @@
 #pragma once
-#include "aliases.hpp"
 
-#include <string>
-#include <string_view>
+#include <cstdint>     // for uint32_t
+#include <map>         // for map
+#include <string>      // for u16string, allocator
+#include <string_view> // for u16string_view
 
-extern const std::map<uint32_t, STRINGID> string_hashes;
+#include "aliases.hpp" // for STRINGID
+
+const std::map<uint32_t, STRINGID>& get_string_hashes();
 
 void strings_init();
 const char16_t** get_strings_table();

@@ -1,14 +1,30 @@
 #include "gui_lua.hpp"
 
-#include "file_api.hpp"
-#include "script/lua_backend.hpp"
-#include "script/script_util.hpp"
-#include "window_api.hpp"
+#include <Windows.h>     // for GetProcAddress, DWORD, LoadLibraryA
+#include <algorithm>     // for max
+#include <chrono>        // for system_clock
+#include <cmath>         // for isnan, floor
+#include <cstddef>       // for NULL
+#include <deque>         // for deque
+#include <exception>     // for exception
+#include <filesystem>    // for operator/, path
+#include <fmt/format.h>  // for check_format_string, format, vformat
+#include <imgui.h>       // for ImVec2, ImGuiIO, ImDrawList, GetIO
+#include <map>           // for map
+#include <new>           // for operator new
+#include <sol/sol.hpp>   // for proxy_key_t, data_t, state, property
+#include <tuple>         // for get, tuple, make_tuple
+#include <type_traits>   // for move, declval, reference_wrapper, ref
+#include <unordered_set> // for unordered_set
+#include <utility>       // for max, min, pair, get, make_pair
+#include <xinput.h>      // for XINPUT_STATE, XINPUT_CAPABILITIES
 
-#include <imgui.h>
-#include <sol/sol.hpp>
+#include "file_api.hpp"           // for create_d3d11_texture_from_file
+#include "script.hpp"             // for ScriptMessage, ScriptImage
+#include "script/lua_backend.hpp" // for LuaBackend
+#include "script/script_util.hpp" // for screenify_fix, screenify, normalize
+#include "window_api.hpp"         // for hide_cursor, show_cursor
 
-#include <xinput.h>
 typedef DWORD(WINAPI* PFN_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*);
 typedef DWORD(WINAPI* PFN_XInputGetState)(DWORD, XINPUT_STATE*);
 static bool g_HasGamepad = false;

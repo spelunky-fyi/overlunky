@@ -1,13 +1,17 @@
 #pragma once
 
-#include "lua_backend.hpp"
-#include "math.hpp"
+#include <cstdint>     // for uint16_t, uint8_t, uint32_t
+#include <optional>    // for optional
+#include <string>      // for u16string, string
+#include <string_view> // for string_view
 
-#include <cstdint>
-#include <optional>
-#include <string_view>
+#include "aliases.hpp"     // for JournalPageType
+#include "lua_backend.hpp" // for ON
 
 class Entity;
+class JournalPage;
+struct AABB;
+struct LevelGenRoomData;
 
 void pre_load_level_files();
 void pre_level_generation();

@@ -1,12 +1,24 @@
 #include "entity_lua.hpp"
 
-#include "color.hpp"
-#include "custom_types.hpp"
-#include "movable.hpp"
-#include "render_api.hpp"
-#include "script/lua_backend.hpp"
+#include <algorithm>   // for max
+#include <cstdint>     // for uint16_t, int8_t, uint32_t, uint8_t
+#include <exception>   // for exception
+#include <map>         // for map, _Tree_const_iterator
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for proxy_key_t, data_t, state, property
+#include <string>      // for operator==, allocator, string
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max, swap, pair
+#include <vector>      // for _Vector_iterator, vector, _Vector_...
 
-#include <sol/sol.hpp>
+#include "color.hpp"              // for Color, Color::a, Color::b, Color::g
+#include "custom_types.hpp"       // for get_custom_types_map
+#include "entity.hpp"             // for Entity, EntityDB, Animation, Rect
+#include "math.hpp"               // for Quad, AABB
+#include "movable.hpp"            // for Movable, Movable::falling_timer
+#include "render_api.hpp"         // for RenderInfo, RenderInfo::flip_horiz...
+#include "script/lua_backend.hpp" // for LuaBackend
 
 namespace NEntity
 {

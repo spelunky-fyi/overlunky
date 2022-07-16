@@ -1,7 +1,18 @@
 #include "texture.hpp"
 
+#include <cstring>
+#include <functional>
+#include <list>
+#include <mutex>
+#include <new>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+
+#include "D:/zollk/Documents/Projects/llvm-project/build/Release/lib/clang/13.0.1/include/stddef.h"
 #include "memory.hpp"
 #include "render_api.hpp"
+#include "search.hpp"
 
 Textures* get_textures()
 {
@@ -250,6 +261,7 @@ void reload_texture(const char* texture_name)
 void reload_texture(const char** texture_name)
 {
     class Renderer;
+
     using LoadTextureFunT = void(Renderer*, const char**);
 
     auto& render = RenderAPI::get();

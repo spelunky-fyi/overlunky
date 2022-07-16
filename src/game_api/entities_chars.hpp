@@ -1,11 +1,20 @@
 #pragma once
 
-#include "movable.hpp"
-#include <cstdint>
+#include <cstddef>    // for size_t
+#include <cstdint>    // for int32_t, uint8_t, int8_t, int16_t, uint32_t
+#include <functional> // for less
+#include <map>        // for map
+#include <string>     // for u16string, allocator
+#include <vector>     // for vector
+
+#include "aliases.hpp" // for ENT_TYPE
+#include "color.hpp"   // for Color
+#include "movable.hpp" // for Movable
 
 struct Illumination;
 struct PlayerInputs;
 struct Inventory;
+class Entity;
 
 class Ai
 {

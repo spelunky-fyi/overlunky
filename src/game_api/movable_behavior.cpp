@@ -1,7 +1,16 @@
 #include "movable_behavior.hpp"
 
-#include "movable.hpp"
-#include "search.hpp"
+#include <list>    // for _List_iterator, _List_const_ite...
+#include <map>     // for _Tree_iterator, _Tree_const_ite...
+#include <string>  // for operator""sv
+#include <utility> // for min, max, pair
+
+#include "containers/custom_map.hpp" // for custom_map
+#include "containers/custom_set.hpp" // for custom_set
+#include "movable.hpp"               // for Movable
+#include "search.hpp"                // for get_address
+
+class Entity;
 
 bool SortMovableBehavior::operator()(const MovableBehavior* lhs, const MovableBehavior* rhs) const
 {

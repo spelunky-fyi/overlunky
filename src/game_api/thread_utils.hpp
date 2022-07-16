@@ -1,9 +1,8 @@
 #pragma once
 
-#include <Windows.h>
-#include <winternl.h>
-
-#include <cstdint>
+#include <Windows.h> // for ResumeThread, SuspendThread, HANDLE
+#include <cstddef>   // for size_t
+#include <cstdint>   // for int64_t
 
 HANDLE get_main_thread();
 size_t heap_base();

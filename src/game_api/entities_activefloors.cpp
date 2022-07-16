@@ -1,6 +1,9 @@
 #include "entities_activefloors.hpp"
 
-#include "memory.hpp"
+#include "entity.hpp" // for Entity, to_id, EntityDB, SoundPosition (ptr only)
+#include "items.hpp"  // IWYU pragma: keep
+#include "layer.hpp"  // for EntityList::Range, EntityList, EntityList::Ent...
+#include "search.hpp" // for get_address
 
 uint8_t Olmec::broken_floaters()
 {

@@ -1,5 +1,7 @@
 #include "virtual_table.hpp"
-#include "memory.hpp"
+
+#include "memory.hpp" // for Memory
+#include "search.hpp" // for get_address
 
 size_t get_virtual_function_address(VTABLE_OFFSET table_entry, uint32_t function_index)
 {

@@ -1,11 +1,22 @@
-#include <chrono>
-#include <filesystem>
-#include <thread>
+#include <Windows.h>   // for PROCESS_INFORMATION, CloseHandle, GetEnvironm...
+#include <chrono>      // for operator<=>, operator-, operator+, operator""s
+#include <compare>     // for operator<, operator<=, operator>
+#include <cstdint>     // for uint64_t
+#include <filesystem>  // for exists, path
+#include <fstream>     // for filesystem
+#include <new>         // for operator new
+#include <optional>    // for optional
+#include <stdio.h>     // for NULL, sprintf_s
+#include <string.h>    // for strlen
+#include <string>      // for string, basic_string
+#include <string_view> // for string_view
+#include <thread>      // for sleep_for
+#include <utility>     // for max, min
 
-#include "cmd_line.h"
-#include "injector.h"
-#include "logger.h"
-#include "version.hpp"
+#include "cmd_line.h"  // for GetCmdLineParam, CmdLineParser
+#include "injector.h"  // for Process, ProcessInfo, call, find_function
+#include "logger.h"    // for INFO, PANIC
+#include "version.hpp" // for get_version
 
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;

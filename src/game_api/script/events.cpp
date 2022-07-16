@@ -1,6 +1,16 @@
 #include "events.hpp"
 
-#include "constants.hpp"
+#include <functional>  // for _Func_impl_no_alloc<>::_Mybase
+#include <new>         // for operator new
+#include <type_traits> // for move
+#include <utility>     // for max, min
+
+#include "constants.hpp"          // for no_return_str
+#include "level_api_types.hpp"    // for LevelGenRoomData
+#include "script/lua_backend.hpp" // for LuaBackend, ON, LuaBackend::PreHan...
+
+class JournalPage;
+struct AABB;
 
 void pre_load_level_files()
 {

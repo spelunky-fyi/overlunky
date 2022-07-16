@@ -1,6 +1,16 @@
 #include "console.hpp"
 
-#include "script/lua_console.hpp"
+#include <exception>   // for exception
+#include <fstream>     // for basic_ostream, basic_ios, basic_if...
+#include <locale>      // for num_put, num_get
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for table_proxy, protected_function_re...
+#include <tuple>       // for get
+#include <type_traits> // for move, _Identity_t
+#include <utility>     // for max, min
+
+#include "script.hpp"             // for ScriptMessage
+#include "script/lua_console.hpp" // for LuaConsole, ConsoleHistoryItem
 
 SpelunkyConsole::SpelunkyConsole(SoundManager* sound_manager)
     : m_Impl{new LuaConsole(sound_manager)}

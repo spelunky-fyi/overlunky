@@ -1,11 +1,20 @@
 #include "screen_lua.hpp"
 
-#include "entity.hpp"
-#include "particles.hpp"
-#include "screen.hpp"
-#include "screen_arena.hpp"
+#include <algorithm>   // for max
+#include <array>       // for operator==
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for proxy_key_t, state, data_t, table_proxy
+#include <string>      // for operator==, allocator, u16string
+#include <string_view> // for u16string_view
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
 
-#include <sol/sol.hpp>
+#include "aliases.hpp"      // for JournalPageType, JournalPageType::Bestiary
+#include "entity.hpp"       // IWYU pragma: keep
+#include "particles.hpp"    // IWYU pragma: keep
+#include "screen.hpp"       // for ScreenCharacterSelect, ScreenOnlineLobby
+#include "screen_arena.hpp" // for ScreenArenaStagesSelect, ScreenArenaIntro
 
 namespace NScreen
 {

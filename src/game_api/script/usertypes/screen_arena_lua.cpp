@@ -1,9 +1,15 @@
 #include "screen_arena_lua.hpp"
 
-#include "screen.hpp"
-#include "screen_arena.hpp"
+#include <algorithm>   // for max
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for data_t, basic_table_core::new_usertype
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
 
-#include <sol/sol.hpp>
+#include "screen.hpp"       // for ScreenZoomAnimation, Screen (ptr only)
+#include "screen_arena.hpp" // for ScreenArenaMenu, ScreenArenaStagesSelect
 
 namespace NScreenArena
 {

@@ -1,6 +1,12 @@
 #pragma once
 
-#include "entity.hpp"
+#include <cstdint> // for uint8_t, int32_t, uint16_t, uint32_t
+#include <list>    // for list, list<>::const_iterator
+#include <memory>  // for allocator
+
+#include "entity.hpp" // for Entity
+
+struct Illumination;
 
 class Liquid : public Entity
 {

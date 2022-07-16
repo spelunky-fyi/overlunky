@@ -1,6 +1,8 @@
 #include "prng.hpp"
 
-#include "state.hpp"
+#include <limits> // for numeric_limits
+
+#include "state.hpp" // for State
 
 PRNG& PRNG::get()
 {

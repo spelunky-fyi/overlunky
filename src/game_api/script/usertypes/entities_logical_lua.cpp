@@ -1,9 +1,16 @@
 #include "entities_logical_lua.hpp"
 
-#include "entities_logical.hpp"
-#include "state_structs.hpp"
+#include <algorithm>   // for max
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for proxy_key_t, state, basic_table_core...
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
 
-#include <sol/sol.hpp>
+#include "entities_logical.hpp" // for Portal, DMSpawning, LogicalDoor, Our...
+#include "entity.hpp"           // for Entity
+#include "state_structs.hpp"    // IWYU pragma: keep
 
 namespace NEntitiesLogical
 {

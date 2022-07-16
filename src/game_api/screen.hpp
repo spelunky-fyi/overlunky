@@ -1,7 +1,15 @@
 #pragma once
 
-#include "render_api.hpp"
-#include <cstdint>
+#include <array>      // for array
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint32_t, uint8_t, uint16_t, int32_t, int8_t
+#include <functional> // for function
+#include <string>     // for allocator, string
+#include <vector>     // for vector
+
+#include "aliases.hpp"    // for STRINGID, MAX_PLAYERS
+#include "color.hpp"      // for Color
+#include "render_api.hpp" // for TextureRenderingInfo, TextRenderingInfo (p...
 
 struct ParticleEmitterInfo;
 struct SoundPosition;

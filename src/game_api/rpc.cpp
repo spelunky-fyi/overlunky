@@ -1,23 +1,43 @@
 #include "rpc.hpp"
 
-#include "custom_types.hpp"
-#include "drops.hpp"
-#include "entities_floors.hpp"
-#include "entities_items.hpp"
-#include "entities_liquids.hpp"
-#include "entities_mounts.hpp"
-#include "entity.hpp"
-#include "items.hpp"
-#include "level_api.hpp"
-#include "memory.hpp"
-#include "savedata.hpp"
-#include "state.hpp"
-#include "thread_utils.hpp"
+#include <Windows.h>        // for VirtualFree, MEM_RELEASE, GetCurrent...
+#include <array>            // for array
+#include <cmath>            // for round, pow, sqrt
+#include <cstring>          // for size_t, memcpy
+#include <detours.h>        // for DetourAttach, DetourTransactionBegin
+#include <fmt/format.h>     // for check_format_string, format, vformat
+#include <initializer_list> // for initializer_list
+#include <list>             // for _List_const_iterator
+#include <map>              // for map, _Tree_iterator, _Tree_const_ite...
+#include <memory>           // for remove
+#include <new>              // for operator new
+#include <set>              // for set, set<>::iterator
+#include <span>             // for span
+#include <string>           // for operator""sv, string, operator""s
+#include <string_view>      // for string_view
+#include <type_traits>      // for move, hash
+#include <unordered_set>    // for _Uset_traits<>::allocator_type, _Use...
+#include <utility>          // for min, max, pair, find
 
-#include <cstdarg>
-#include <detours.h>
-#include <unordered_set>
-#include <utility>
+#include "custom_types.hpp"     // for get_custom_entity_types, CUSTOM_TYPE
+#include "entities_chars.hpp"   // for Player (ptr only), PowerupCapable
+#include "entities_floors.hpp"  // for ExitDoor, Door
+#include "entities_items.hpp"   // for StretchChain, PunishBall, Container
+#include "entities_liquids.hpp" // for Liquid
+#include "entities_mounts.hpp"  // for Mount
+#include "entity.hpp"           // for get_entity_ptr, to_id, Entity, EntityDB
+#include "items.hpp"            // for Items
+#include "layer.hpp"            // for EntityList, EntityList::Range, Layer
+#include "logger.h"             // for DEBUG
+#include "math.hpp"             // for AABB
+#include "memory.hpp"           // for write_mem_prot, write_mem_recoverable
+#include "movable.hpp"          // for Movable
+#include "particles.hpp"        // for ParticleEmitterInfo
+#include "search.hpp"           // for get_address, find_inst
+#include "state.hpp"            // for State, get_state_ptr, enum_to_layer
+#include "state_structs.hpp"    // for ShopRestrictedItem, Illumination
+#include "thread_utils.hpp"     // for OnHeapPointer
+#include "virtual_table.hpp"    // for get_virtual_function_address, VIRT_FUNC
 
 uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
 {

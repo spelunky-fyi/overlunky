@@ -1,8 +1,21 @@
 #pragma once
 
-#include "lua_backend.hpp"
+#include <cstddef>         // for size_t
+#include <filesystem>      // for path
+#include <functional>      // for equal_to
+#include <imgui.h>         // for ImVec2
+#include <optional>        // for optional
+#include <sol/forward.hpp> // for function
+#include <string>          // for string, allocator, hash, basic_string
+#include <string_view>     // for string_view
+#include <type_traits>     // for move, declval
+#include <unordered_map>   // for _Umap_traits<>::allocator_type, unordered...
+#include <vector>          // for vector
 
-#include <optional>
+#include "lua_backend.hpp" // for LuaBackend
+#include "script.hpp"      // for ScriptMessage
+
+class SoundManager;
 
 struct ConsoleHistoryItem
 {

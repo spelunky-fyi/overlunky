@@ -1,9 +1,8 @@
 #pragma once
 
-#include <imgui.h>
-#include <misc/cpp/imgui_stdlib.h>
-
-#include <string>
+#include <cstddef> // for size_t
+#include <imgui.h> // for ImVec2, ImGuiInputTextCallback, ImDrawList (ptr ...
+#include <string>  // for string
 
 class Entity;
 

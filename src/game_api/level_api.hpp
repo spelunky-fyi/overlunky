@@ -1,15 +1,23 @@
 #pragma once
 
-#include "containers/game_string.hpp"
-#include "containers/game_unordered_map.hpp"
-#include "containers/game_vector.hpp"
-#include "level_api_types.hpp"
-#include "math.hpp"
+#include <array>       // for array
+#include <cstddef>     // for byte
+#include <cstdint>     // for uint32_t, uint8_t, uint...
+#include <functional>  // for function
+#include <new>         // for operator new
+#include <optional>    // for optional
+#include <string>      // for string, allocator
+#include <string_view> // for string_view
+#include <type_traits> // for move
+#include <utility>     // for pair
+#include <vector>      // for vector
 
-#include <cstdint>
-#include <optional>
-#include <string>
-#include <unordered_map>
+#include "aliases.hpp"                       // for LAYER
+#include "containers/game_string.hpp"        // for game_string
+#include "containers/game_unordered_map.hpp" // for game_unordered_map
+#include "containers/game_vector.hpp"        // for game_vector
+#include "level_api_types.hpp"               // for ShortTileCodeDef
+#include "math.hpp"                          // for AABB (ptr only), Vec2
 
 struct TileCodeDef
 {

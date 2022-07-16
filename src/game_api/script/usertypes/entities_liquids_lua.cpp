@@ -1,9 +1,16 @@
 #include "entities_liquids_lua.hpp"
 
-#include "entities_liquids.hpp"
-#include "state_structs.hpp"
+#include <algorithm>   // for max
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for proxy_key_t, state, basic_table_core...
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
 
-#include <sol/sol.hpp>
+#include "entities_liquids.hpp" // for Liquid, Lava, Lava::emitted_light
+#include "entity.hpp"           // for Entity
+#include "state_structs.hpp"    // IWYU pragma: keep
 
 namespace NEntitiesLiquids
 {

@@ -1,8 +1,17 @@
 #include "vanilla_render_lua.hpp"
 
-#include "render_api.hpp"
-#include "script/lua_backend.hpp"
-#include "state.hpp" // for enum_to_layer
+#include <algorithm>   // for max
+#include <cstdlib>     // for abs
+#include <locale>      // for num_put
+#include <new>         // for operator new
+#include <optional>    // for nullopt
+#include <sol/sol.hpp> // for global_table, proxy_key_t, optional, state
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+
+#include "render_api.hpp" // for TextureRenderingInfo, WorldShader, TextRen...
+#include "state.hpp"      // for enum_to_layer
+#include "texture.hpp"    // for Texture, get_texture
 
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {

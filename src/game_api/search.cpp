@@ -1,14 +1,27 @@
 #include "search.hpp"
 
 // clang-format off
-#include <Windows.h>
-#include <Psapi.h>
+#include <Windows.h>          // for IMAGE_SECTION_HEADER, GetModuleHandleA
+#include <fmt/format.h>       // for check_format_string, format_to, vformat_to
+#include <cstring>            // for memcmp
+#include <exception>          // for terminate
+#include <functional>         // for _Func_impl_no_alloc<>::_Mybase, equal_to
+#include <list>               // for _List_iterator, _List_const_iterator
+#include <locale>             // for num_put
+#include <new>                // for operator new
+#include <span>               // for span
+#include <sstream>            // for basic_ostream, basic_streambuf, basic_s...
+#include <stdexcept>          // for logic_error
+#include <tuple>              // for get, apply, tuple
+#include <type_traits>        // for move
+#include <unordered_map>      // for unordered_map, _Umap_traits<>::allocato...
+#include <utility>            // for min, max, pair, tuple_element<>::type
+#include <vector>             // for vector, _Vector_const_iterator, _Vector...
 // clang-format on
 
-#include <algorithm>
-
-#include "memory.hpp"
-#include "virtual_table.hpp"
+#include "logger.h"          // for ByteStr, DEBUG
+#include "memory.hpp"        // for Memory, function_start
+#include "virtual_table.hpp" // for VIRT_FUNC, VTABLE_OFFSET, VIRT_FUNC::LO...
 
 // Decodes the program counter inside an instruction
 // The default simple variant is 3 bytes instruction, 4 bytes rel. address, 0 bytes suffix:

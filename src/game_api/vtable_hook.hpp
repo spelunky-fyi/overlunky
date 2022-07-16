@@ -1,9 +1,12 @@
 #pragma once
 
-#include <any>
-#include <functional>
-#include <optional>
-#include <unordered_map>
+#include <cstddef>       // for size_t
+#include <functional>    // for equal_to, function, _Func_class
+#include <new>           // for operator new
+#include <type_traits>   // for hash, forward
+#include <unordered_map> // for unordered_map, _Umap_traits<>::allocator_type
+#include <utility>       // for min, max
+#include <vector>        // for vector, _Vector_iterator, allocator, _Vecto...
 
 void* register_hook_function(void*** vtable, size_t index, void* hook_function);
 void unregister_hook_function(void*** vtable, size_t index);
@@ -33,6 +36,7 @@ struct VDestructorDetour
 
 template <class VFunT>
 requires std::is_function_v<VFunT> struct VTableDetour;
+
 template <class RetT, class ClassT, class... ArgsT>
 struct VTableDetour<RetT(ClassT*, ArgsT...)>
 {

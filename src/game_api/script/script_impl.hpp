@@ -1,6 +1,13 @@
 #pragma once
 
-#include "lua_backend.hpp"
+#include <filesystem> // for path
+#include <string>     // for string
+
+#include "lua_backend.hpp" // for LuaBackend
+#include "script.hpp"      // for ScriptMeta
+
+class LuaConsole;
+class SoundManager;
 
 class ScriptImpl : public LuaBackend
 {

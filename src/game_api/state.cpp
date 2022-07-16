@@ -1,16 +1,30 @@
 #include "state.hpp"
-#include "entities_chars.hpp"
-#include "game_manager.hpp"
-#include "items.hpp"
-#include "level_api.hpp"
-#include "memory.hpp"
-#include "movable_behavior.hpp"
-#include "savedata.hpp"
-#include "spawn_api.hpp"
-#include "strings.hpp"
-#include "virtual_table.hpp"
 
-#include <detours.h>
+#include <Windows.h>   // for GetCurrentThread, LONG, NO_ERROR
+#include <cmath>       // for abs
+#include <cstdlib>     // for size_t, abs
+#include <detours.h>   // for DetourAttach, DetourTransactionBegin
+#include <functional>  // for _Func_class, function
+#include <new>         // for operator new
+#include <string>      // for allocator, operator""sv, operator""s
+#include <type_traits> // for move
+
+#include "entities_chars.hpp"   // for Player
+#include "entity.hpp"           // for to_id, Entity, HookWithId, EntityDB
+#include "game_manager.hpp"     // for get_game_manager, GameManager, SaveR...
+#include "items.hpp"            // for Items, SelectPlayerSlot
+#include "level_api.hpp"        // for LevelGenSystem, LevelGenSystem::(ano...
+#include "logger.h"             // for DEBUG
+#include "memory.hpp"           // for write_mem_prot, read_u64, read_u8
+#include "movable.hpp"          // for Movable
+#include "movable_behavior.hpp" // for init_behavior_hooks
+#include "render_api.hpp"       // for init_render_api_hooks
+#include "savedata.hpp"         // for SaveData
+#include "search.hpp"           // for get_address
+#include "spawn_api.hpp"        // for init_spawn_hooks
+#include "strings.hpp"          // for strings_init
+#include "thread_utils.hpp"     // for OnHeapPointer
+#include "virtual_table.hpp"    // for get_virtual_function_address, VTABLE...
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {

@@ -1,3 +1,10 @@
+#include <cstdint>    // for uint32_t
+#include <functional> // for less
+#include <map>        // for allocator, map
+#include <new>        // for operator new
+#include <utility>    // for min
+
+#include "aliases.hpp" // for STRINGID
 #include "strings.hpp"
 
 const std::map<uint32_t, STRINGID> string_hashes = {
@@ -1963,3 +1970,8 @@ const std::map<uint32_t, STRINGID> string_hashes = {
     {0x13aced89, 1959},
     {0x796b612f, 1960},
 };
+
+const std::map<uint32_t, STRINGID>& get_string_hashes()
+{
+    return string_hashes;
+}

@@ -1,6 +1,8 @@
 #include "game_allocator.hpp"
 
-#include "memory.hpp"
+#include <string> // for operator""sv
+
+#include "search.hpp" // for get_address
 
 using GameMallocFun = decltype(game_malloc);
 using GameFreeFun = decltype(game_free);

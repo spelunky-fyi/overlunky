@@ -1,10 +1,24 @@
 #include "texture_lua.hpp"
 
-#include "file_api.hpp"
-#include "script/lua_backend.hpp"
-#include "texture.hpp"
+#include <algorithm>     // for max, replace, transform
+#include <array>         // for _Array_iterator, array, _Array_con...
+#include <cctype>        // for toupper
+#include <cstddef>       // for size_t
+#include <cstdint>       // for uint32_t
+#include <functional>    // for equal_to
+#include <new>           // for operator new
+#include <optional>      // for optional
+#include <sol/sol.hpp>   // for global_table, proxy_key_t, data_t
+#include <string>        // for string, allocator, hash, operator==
+#include <tuple>         // for get
+#include <type_traits>   // for move, declval
+#include <unordered_map> // for _Umap_traits<>::allocator_type
+#include <utility>       // for min, max
 
-#include <sol/sol.hpp>
+#include "aliases.hpp"            // for TEXTURE
+#include "file_api.hpp"           // for get_image_file_path
+#include "script/lua_backend.hpp" // for LuaBackend
+#include "texture.hpp"            // for TextureDefinition, get_texture
 
 namespace NTexture
 {

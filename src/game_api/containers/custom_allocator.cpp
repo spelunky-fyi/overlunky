@@ -1,7 +1,10 @@
 #include "custom_allocator.hpp"
 
-#include "memory.hpp"
-#include "thread_utils.hpp"
+#include <string> // for operator""sv
+
+#include "memory.hpp"       // for read_u64, Memory
+#include "search.hpp"       // for get_address
+#include "thread_utils.hpp" // for OnHeapPointer
 
 using CustomMallocFun = void*(void*, std::size_t);
 using CustomFreeFun = void*(void*, void*);

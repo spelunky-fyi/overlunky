@@ -1,9 +1,12 @@
 #pragma once
 
-#include <string>
-#include <string_view>
+#include <string>      // for string
+#include <string_view> // for string_view
 
-#include <sol/forward.hpp>
+namespace sol
+{
+class state;
+} // namespace sol
 
 class SaveContext
 {

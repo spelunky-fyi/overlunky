@@ -1,8 +1,18 @@
 #include "player_lua.hpp"
 
-#include "state_structs.hpp"
+#include <algorithm>   // for max
+#include <array>       // for array
+#include <cstdint>     // for uint8_t
+#include <locale>      // for num_put
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for readonly, state
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
 
-#include <sol/sol.hpp>
+#include "aliases.hpp"       // for INPUTS
+#include "state_structs.hpp" // for InputMapping, PlayerSlot, PlayerInputs
 
 namespace NPlayer
 {

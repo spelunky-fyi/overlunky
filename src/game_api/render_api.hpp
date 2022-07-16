@@ -1,11 +1,19 @@
 #pragma once
 
-#include "aliases.hpp"
-#include "color.hpp"
-#include "math.hpp"
-#include "texture.hpp"
+#include <cstddef>       // for size_t
+#include <cstdint>       // for uint32_t, uint8_t, uint16_t, int32_t
+#include <functional>    // for equal_to
+#include <mutex>         // for mutex
+#include <new>           // for operator new
+#include <string>        // for allocator, string
+#include <type_traits>   // for hash
+#include <unordered_map> // for _Umap_traits<>::allocator_type, unordered_map
+#include <utility>       // for pair
 
-#include <mutex>
+#include "aliases.hpp" // for TEXTURE
+#include "color.hpp"   // for Color
+#include "math.hpp"    // for Quad, AABB (ptr only)
+#include "texture.hpp" // for Texture
 
 enum JOURNAL_VFTABLE
 {

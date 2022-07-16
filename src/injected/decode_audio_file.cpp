@@ -1,6 +1,10 @@
 #include "decode_audio_file.hpp"
 
-#include <memory>
+#include <cstddef>     // for byte
+#include <cstring>     // for memcpy
+#include <memory>      // for make_unique, unique_ptr
+#include <type_traits> // for move
+#include <vector>      // for vector
 
 #if defined(__clang__)
 #pragma clang diagnostic push
@@ -11,7 +15,8 @@
 #pragma warning(push, 0)
 #endif
 
-#include <libnyquist/Decoders.h>
+#include <cstdint>               // for uint8_t
+#include <libnyquist/Decoders.h> // for AudioData, ConvertFromFloat32, GetF...
 
 #if defined(__clang__)
 #pragma clang diagnostic pop

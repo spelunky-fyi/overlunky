@@ -1,6 +1,12 @@
 #include "entities_items.hpp"
 
-#include "vtable_hook.hpp"
+#include <new>         // for operator new
+#include <type_traits> // for move
+#include <vector>      // for vector, _Vector_iterator, _Vector_cons...
+
+#include "entities_chars.hpp" // for PowerupCapable
+#include "entity.hpp"         // for HookWithId, EntityHooksInfo, to_id, SHAPE
+#include "vtable_hook.hpp"    // for hook_vtable
 
 void ParachutePowerup::deploy()
 {
