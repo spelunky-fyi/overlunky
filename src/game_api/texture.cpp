@@ -1,5 +1,6 @@
 #include "texture.hpp"
 
+#include <cstddef> // IWYU pragma: keep
 #include <cstring>
 #include <functional>
 #include <list>
@@ -9,7 +10,6 @@
 #include <unordered_map>
 #include <utility>
 
-#include "D:/zollk/Documents/Projects/llvm-project/build/Release/lib/clang/13.0.1/include/stddef.h"
 #include "memory.hpp"
 #include "render_api.hpp"
 #include "search.hpp"

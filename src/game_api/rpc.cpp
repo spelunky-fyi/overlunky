@@ -6,8 +6,8 @@
 #include <cstring>          // for size_t, memcpy
 #include <detours.h>        // for DetourAttach, DetourTransactionBegin
 #include <fmt/format.h>     // for check_format_string, format, vformat
-#include <fstream>          // for ofstream
 #include <initializer_list> // for initializer_list
+#include <iosfwd>           // for ofstream
 #include <list>             // for _List_const_iterator
 #include <map>              // for map, _Tree_iterator, _Tree_const_ite...
 #include <memory>           // for remove

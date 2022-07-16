@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
+#include <cstddef> // IWYU pragma: keep
 #include <cstdint>
 #include <functional>
 #include <list>
@@ -15,7 +15,6 @@
 #include <variant>
 #include <vector>
 
-#include "D:/zollk/Documents/Projects/llvm-project/build/Release/lib/clang/13.0.1/include/stddef.h"
 #include "aliases.hpp"
 #include "audio_buffer.hpp"
 #include "fmod.hpp"

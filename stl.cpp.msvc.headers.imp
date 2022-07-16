@@ -28,7 +28,6 @@
   { include: [ "<xiosbase>", private, "<iostream>", public ] },
   { include: [ "<xlocale>", private, "<locale>", public ] },
   { include: [ "<xlocnum>", private, "<locale>", public ] },
-  { include: [ "<iosfwd>", private, "<fstream>", public ] },
   { include: [ "<xmemory>", private, "<memory>", public ] },
   { include: [ "<xmemory0>", private, "<memory>", public ] },
   { include: [ "<xmemory0>", private, "<string>", public ] },
