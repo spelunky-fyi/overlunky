@@ -108,6 +108,8 @@ def main():
         args.fix_includes,
         "--comments",
         "--update_comments",
+        "--nosafe_headers",
+        "--noreorder",
     ]
     with open(iwyu_out, "r") as fix_includes_in_file:
         subprocess.call(fix_includes_args, stdin=fix_includes_in_file)

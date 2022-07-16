@@ -51,6 +51,16 @@
   { symbol: [ "memmove", private, "<cstring>", public ] },
   { symbol: [ "memset", private, "<cstring>", public ] },
 
-  { symbol: [ "std::terminate", private, "<exception>", public ] },
-  { symbol: [ "terminate", private, "<exception>", public ] },
+  { symbol: [ "std::terminate", public, "<exception>", public ] },
+  { symbol: [ "terminate", public, "<exception>", public ] },
+  { symbol: [ "std::string", public, "<string>", public ] },
+  { symbol: [ "string", public, "<string>", public ] },
+  { symbol: [ "std::u16string", public, "<string>", public ] },
+  { symbol: [ "u16string", public, "<string>", public ] },
+  { symbol: [ "std::string_view", public, "<string_view>", public ] },
+  { symbol: [ "string_view", public, "<string_view>", public ] },
+  { symbol: [ "std::u16string_view", public, "<string_view>", public ] },
+  { symbol: [ "u16string_view", public, "<string_view>", public ] },
+  { symbol: [ "std::byte", public, "<cstddef>", public ] },
+  { symbol: [ "byte", public, "<cstddef>", public ] },
 ]
