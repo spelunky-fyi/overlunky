@@ -19,6 +19,17 @@ endif()
 option(BUILD_OVERLUNKY CACHE ON)
 option(BUILD_INFO_DUMP CACHE ON)
 option(BUILD_SPEL2_DLL CACHE OFF)
+OPTION(OVERLUNKY_UNITY_BUILD OFF)
+
+function(setup_ol_target TARGET_NAME)
+  setup_iwyu(${TARGET_NAME})
+
+  if(OVERLUNKY_UNITY_BUILD)
+    set_property(
+      TARGET ${TARGET_NAME}
+      PROPERTY UNITY_BUILD ON)
+  endif()
+endfunction()
 
 add_compile_definitions(_ITERATOR_DEBUG_LEVEL=0)
 add_compile_definitions(NOMINMAX)

@@ -593,7 +593,7 @@ void LuaBackend::draw(ImDrawList* dl)
         /// Use `set_callback(function, ON.GUIFRAME)` instead
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
 
-        GuiDrawContext draw_ctx(this, dl);
+        GuiDrawContext draw_ctx(this);
 
         if (on_guiframe)
         {

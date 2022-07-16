@@ -1,4 +1,4 @@
-//#include "ui.hpp"
+#pragma once
 
 #include "aliases.hpp"
 #include "color.hpp"

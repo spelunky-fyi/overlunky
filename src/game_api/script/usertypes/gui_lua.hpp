@@ -13,7 +13,7 @@ class ScriptImpl;
 class GuiDrawContext
 {
   public:
-    GuiDrawContext(class LuaBackend* script, struct ImDrawList* draw_list);
+    GuiDrawContext(class LuaBackend* script);
 
     /// Draws a line on screen
     void draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color);
@@ -97,7 +97,6 @@ class GuiDrawContext
 
   private:
     class LuaBackend* backend;
-    struct ImDrawList* draw_list;
 };
 
 namespace NGui

@@ -85,7 +85,7 @@ endif()
 add_subdirectory(shared)
 add_subdirectory(game_api)
 
-setup_iwyu(spel2_api)
+setup_ol_target(spel2_api)
 
 if(BUILD_INFO_DUMP)
         # --------------------------------------------------
@@ -94,12 +94,12 @@ if(BUILD_INFO_DUMP)
         add_subdirectory(json)
 
         add_subdirectory(info_dump)
-        setup_iwyu(info_dump)
+        setup_ol_target(info_dump)
 endif()
 
 if(BUILD_SPEL2_DLL)
         add_subdirectory(spel2_dll)
-        setup_iwyu(spel2_dll)
+        setup_ol_target(spel2_dll)
 endif()
 
 if(BUILD_OVERLUNKY)
@@ -180,8 +180,8 @@ if(BUILD_OVERLUNKY)
         add_subdirectory(injected)
         add_subdirectory(injector)
 
-        setup_iwyu(injected)
-        setup_iwyu(injector)
+        setup_ol_target(injected)
+        setup_ol_target(injector)
 
         if(MSVC)
                 if(BUILD_INFO_DUMP AND EXISTS ${SPELUNKY_INSTALL_DIR})
