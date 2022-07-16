@@ -1,3 +1,7 @@
+
+// THIS FILE IS AUTO-GENERATED
+// If you need to make changes it please change strings_get_hashes.py
+
 #include <cstdint>    // for uint32_t
 #include <functional> // for less
 #include <map>        // for allocator, map
