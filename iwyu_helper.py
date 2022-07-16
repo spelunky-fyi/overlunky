@@ -4,21 +4,25 @@ import sys
 import json
 import shutil
 import os
+import pathlib
 
 
-def does_file_have_local_changes(file_path: str):
+def does_src_file_have_local_changes(source_file_path: str):
+    header_file_path = str(pathlib.Path(source_file_path).with_suffix(".hpp"))
     git_diff_command = [
         "git",
         "diff",
         "--exit-code",
-        file_path,
+        source_file_path,
+        header_file_path,
     ]
     git_diff_staged_command = [
         "git",
         "diff",
         "--cached",
         "--exit-code",
-        file_path,
+        source_file_path,
+        header_file_path,
     ]
     with open(os.devnull, "w") as nul:
         return (
@@ -108,7 +112,7 @@ def main():
                 compile_commands = [
                     compile_command
                     for compile_command in compile_commands
-                    if does_file_have_local_changes(compile_command["file"])
+                    if does_src_file_have_local_changes(compile_command["file"])
                 ]
             # Append extra agrs
             if args.extra_args:
