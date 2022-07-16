@@ -47,3 +47,5 @@ jobs:
           title: "WHIP Build"
           files: |
             Overlunky_WHIP.zip
+            Overlunky/Overlunky.exe
+            Overlunky/injected.dll

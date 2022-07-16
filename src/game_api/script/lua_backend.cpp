@@ -822,7 +822,7 @@ bool LuaBackend::pre_load_screen()
     }
 
     auto state_ptr = State::get().ptr();
-    if ((ON)state_ptr->screen == ON::LEVEL && (state_ptr->quest_flags & 1) == 0)
+    if ((ON)state_ptr->screen == ON::LEVEL && (ON)state_ptr->screen_next != ON::DEATH && (state_ptr->quest_flags & 1) == 0)
     {
         for (auto uid : get_entities_by_mask(1))
         {

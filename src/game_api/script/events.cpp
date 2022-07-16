@@ -32,6 +32,26 @@ void pre_level_generation()
 }
 bool pre_load_screen()
 {
+    static int64_t prev_seed = 0;
+    auto state = State::get().ptr();
+    if (state->screen_next == 12 && (state->quest_flags & 1) != 0)
+    {
+        if ((state->quest_flags & (1U << 6)) > 0)
+        {
+            auto seed = state->seed;
+            if (seed != prev_seed)
+                game_log(fmt::format("Seeded Seed: {:X}", seed));
+            prev_seed = seed;
+        }
+        else
+        {
+            auto seed = get_adventure_seed();
+            if (seed.second != prev_seed)
+                game_log(fmt::format("{} Seed: {:X} {:X}", ((state->quest_flags & (1U << 7)) > 0 && state->screen == 28) ? "Daily" : "Adventure", (uint64_t)seed.first, (uint64_t)seed.second));
+            prev_seed = seed.second;
+        }
+    }
+
     bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)

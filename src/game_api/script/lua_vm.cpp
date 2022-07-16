@@ -109,11 +109,15 @@ void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
     auto infinite_loop = [](lua_State* argst, [[maybe_unused]] lua_Debug* argdb)
     {
-        luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
+        static uint32_t last_frame = 0;
+        auto state = State::get().ptr();
+        if (last_frame == state->time_startup)
+            luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
+        last_frame = state->time_startup;
     };
 
     lua_sethook(lua.lua_state(), NULL, 0, 0);
-    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 1000000000);
+    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 500000000);
 
     lua.safe_script(R"(
 -- This function walks up the stack until it finds an _ENV that is not _G
@@ -1616,6 +1620,9 @@ end
     {
         return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe");
     };
+
+    /// Log to spelunky.log
+    lua["log_print"] = game_log;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

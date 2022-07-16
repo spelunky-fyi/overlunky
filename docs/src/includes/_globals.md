@@ -468,6 +468,15 @@ properties on the sound. Otherwise you may cause a deadlock. The callback signat
 ## Debug functions
 
 
+### dump_network
+
+
+> Search script examples for [dump_network](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dump_network)
+
+#### nil dump_network()
+
+Hook the sendto and recvfrom functions and start dumping network data to terminal
+
 ### get_address
 
 
@@ -1616,6 +1625,15 @@ Prinspect to console
 #### nil console_print(string message)
 
 Print a log message to console.
+
+### log_print
+
+
+> Search script examples for [log_print](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=log_print)
+
+#### nil log_print(string message)
+
+Log to spelunky.log
 
 ### lua_print
 

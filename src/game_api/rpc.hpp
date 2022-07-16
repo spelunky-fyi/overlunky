@@ -3,6 +3,7 @@
 #include <cstdint>    // for uint32_t, uint8_t, int32_t, int64_t, int16_t
 #include <functional> // for function
 #include <optional>   // for optional, nullopt
+#include <string>     // for string
 #include <tuple>      // for tuple
 #include <utility>    // for pair
 #include <vector>     // for vector
@@ -129,3 +130,4 @@ std::pair<int64_t, int64_t> get_adventure_seed();
 void update_liquid_collision_at(float x, float y, bool add);
 void disable_floor_embeds(bool disable);
 void set_cursepot_ghost_enabled(bool enable);
+void game_log(std::string message);

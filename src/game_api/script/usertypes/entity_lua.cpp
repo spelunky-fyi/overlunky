@@ -329,6 +329,10 @@ void register_usertypes(sol::state& lua)
         &Entity::get_items,
         "is_in_liquid",
         &Entity::is_in_liquid);
+    /* Entity
+    // user_data
+    // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LEVEL_GENERATION.
+    */
 
     auto damage = sol::overload(
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),

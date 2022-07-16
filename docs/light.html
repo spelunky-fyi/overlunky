@@ -484,6 +484,9 @@
                     <a href="#Debug-functions" class="toc-h2 toc-link" data-title="Debug functions">Debug functions</a>
                       <ul class="toc-list-h3">
                           <li>
+                            <a href="#dump_network" class="toc-h3 toc-link" data-title="dump_network">dump_network</a>
+                          </li>
+                          <li>
                             <a href="#get_address" class="toc-h3 toc-link" data-title="get_address">get_address</a>
                           </li>
                           <li>
@@ -845,6 +848,9 @@
                           </li>
                           <li>
                             <a href="#console_print" class="toc-h3 toc-link" data-title="console_print">console_print</a>
+                          </li>
+                          <li>
+                            <a href="#log_print" class="toc-h3 toc-link" data-title="log_print">log_print</a>
                           </li>
                           <li>
                             <a href="#lua_print" class="toc-h3 toc-link" data-title="lua_print">lua_print</a>
@@ -3533,7 +3539,13 @@ Sets a callback for a vanilla sound which lets you hook creation or playing even
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
 properties on the sound. Otherwise you may cause a deadlock. The callback signature is <code>nil on_vanilla_sound(PlayingSound sound)</code></p>
-<h2 id='Debug-functions'>Debug functions</h2><h3 id='get_address'>get_address</h3>
+<h2 id='Debug-functions'>Debug functions</h2><h3 id='dump_network'>dump_network</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dump_network">dump_network</a></p>
+</blockquote>
+<h4 id='nil-dump_network'>nil dump_network()</h4>
+<p>Hook the sendto and recvfrom functions and start dumping network data to terminal</p>
+<h3 id='get_address'>get_address</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_address">get_address</a></p>
 </blockquote>
@@ -4289,6 +4301,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-console_print-string-message'>nil console_print(string message)</h4>
 <p>Print a log message to console.</p>
+<h3 id='log_print'>log_print</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=log_print">log_print</a></p>
+</blockquote>
+<h4 id='nil-log_print-string-message'>nil log_print(string message)</h4>
+<p>Log to spelunky.log</p>
 <h3 id='lua_print'>lua_print</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lua_print">lua_print</a></p>
@@ -15516,6 +15534,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=user_data">user_data</a></td>
+<td>You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before <a href="#ON">ON</a>.PRE_LOAD_SCREEN from a level and loaded right before <a href="#ON">ON</a>.POST_LEVEL_GENERATION.<br/></td>
+</tr>
+<tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=topmost">topmost()</a></td>
 <td></td>
@@ -21507,6 +21530,16 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td>Get the current behavior id</td>
 </tr>
 <tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_gravity">set_gravity(float gravity)</a></td>
+<td>Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=reset_gravity">reset_gravity()</a></td>
+<td>Remove the gravity hook and reset to defaults</td>
+</tr>
+<tr>
 <td><a href="#VanillaMovableBehavior">VanillaMovableBehavior</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_base_behavior">get_base_behavior(int state_id)</a></td>
 <td>Gets a vanilla behavior from this movable, needs to be called before <code>clear_behaviors</code><br/>but the returned values are still valid after a call to <code>clear_behaviors</code></td>
@@ -24320,7 +24353,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LOAD_SCREEN">PRE_LOAD_SCREEN</a></td>
 <td>ON::PRE_LOAD_SCREEN</td>
-<td>Runs right before loading a new screen based on screen_next<br/></td>
+<td>Runs right before loading a new screen based on screen_next. Return true from callback to block the screen from loading.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_ROOM_GENERATION">POST_ROOM_GENERATION</a></td>

@@ -6,6 +6,7 @@
 #include <cstring>          // for size_t, memcpy
 #include <detours.h>        // for DetourAttach, DetourTransactionBegin
 #include <fmt/format.h>     // for check_format_string, format, vformat
+#include <fstream>          // for ofstream
 #include <initializer_list> // for initializer_list
 #include <list>             // for _List_const_iterator
 #include <map>              // for map, _Tree_iterator, _Tree_const_ite...
@@ -1836,4 +1837,12 @@ void set_cursepot_ghost_enabled(bool enable)
     {
         recover_mem("ghost_jar_ghost_spawn");
     }
+}
+
+void game_log(std::string message)
+{
+    using GameLogFun = void(std::ofstream*, const char*, void*, LogLevel);
+    const static auto game_log_fun = (GameLogFun*)get_address("game_log_function");
+    const static auto log_stream = (std::ofstream*)read_i64(get_address("game_log_stream"));
+    game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
 }
