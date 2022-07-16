@@ -31,6 +31,12 @@ if(DEFINED IWYU AND CMAKE_GENERATOR STREQUAL "Ninja")
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         USES_TERMINAL
     )
+    add_custom_target(
+        apply_iwyu_fixes_changes
+        ${Python_EXECUTABLE} ${IWYU_HELPER_FILE} -i="${IWYU}" -t="${IWYU_TOOL_FILE}" -c="${COMPILE_COMMANDS_FILE}" -f="${FIX_INCLUDES_FILE}" -s -e=--no-warnings -e=-Xiwyu -e=--mapping_file="${CMAKE_SOURCE_DIR}/overlunky.3rdparty.headers.imp"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        USES_TERMINAL
+    )
 
     set(IWYU_PATH_AND_OPTIONS
         ${IWYU}

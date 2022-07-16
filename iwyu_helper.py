@@ -6,6 +6,27 @@ import shutil
 import os
 
 
+def does_file_have_local_changes(file_path: str):
+    git_diff_command = [
+        "git",
+        "diff",
+        "--exit-code",
+        file_path,
+    ]
+    git_diff_staged_command = [
+        "git",
+        "diff",
+        "--cached",
+        "--exit-code",
+        file_path,
+    ]
+    with open(os.devnull, "w") as nul:
+        return (
+            subprocess.call(git_diff_command, stdout=nul, stderr=nul) != 0
+            or subprocess.call(git_diff_staged_command, stdout=nul, stderr=nul) != 0
+        )
+
+
 def main():
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="IWYU helper script, calls iwyu_tool.py and passes output to fix_includes.py"
@@ -48,6 +69,13 @@ def main():
         required=True,
         help="Path to fix_includes.py to execute.",
     )
+    parser.add_argument(
+        "--skip_unchanged",
+        "-s",
+        default=None,
+        action="store_true",
+        help="Only touch changed files, including staged files.",
+    )
 
     args = parser.parse_args()
 
@@ -75,6 +103,13 @@ def main():
                 for compile_command in compile_commands
                 if not compile_command["command"].endswith("cmake_pch.hxx.cxx")
             ]
+            if args.skip_unchanged:
+                # Strip unchanged files
+                compile_commands = [
+                    compile_command
+                    for compile_command in compile_commands
+                    if does_file_have_local_changes(compile_command["file"])
+                ]
             # Append extra agrs
             if args.extra_args:
                 for compile_command in compile_commands:
