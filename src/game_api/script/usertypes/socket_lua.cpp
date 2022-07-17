@@ -1,6 +1,8 @@
 #include "socket_lua.hpp"
 
+#include <Windows.h>             // for GetModuleHandleA, GetProcAddress
 #include <algorithm>             // for max
+#include <detours.h>             // for DetourAttach, DetourTransactionBegin
 #include <exception>             // for exception
 #include <new>                   // for operator new
 #include <sockpp/inet_address.h> // for inet_address
@@ -11,7 +13,10 @@
 #include <tuple>                 // for get
 #include <type_traits>           // for move
 #include <utility>               // for max, min
-#include <winsock.h>
+#include <winsock2.h>            // for sockaddr_in, SOCKET
+#include <ws2tcpip.h>            // for inet_ntop
+
+#include "logger.h" // for DEBUG, ByteStr
 
 void udp_data(sockpp::udp_socket socket, UdpServer* server)
 {

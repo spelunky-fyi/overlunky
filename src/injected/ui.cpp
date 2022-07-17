@@ -43,6 +43,7 @@
 #include "logger.h"
 #include "math.hpp"
 #include "savedata.hpp"
+#include "screen.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"

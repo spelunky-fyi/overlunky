@@ -15,7 +15,7 @@
 #include <utility>      // for min, max
 
 #include "math.hpp"               // for Vec2
-#include "movable.hpp"            // for Movable (ptr only)
+#include "movable.hpp"            // IWYU pragma: keep
 #include "movable_behavior.hpp"   // for CustomMovableBehavior, update_movable
 #include "script/lua_backend.hpp" // for LuaBackend
 

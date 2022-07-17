@@ -73,7 +73,7 @@ if(DEFINED IWYU AND CMAKE_GENERATOR STREQUAL "Ninja")
         ${IWYU}
         --no-warnings
         -Xiwyu
-        --mapping_file="${IWYU_MAPPING_FILE}")
+        --mapping_file=${IWYU_MAPPING_FILE})
 
     function(setup_iwyu TARGET_NAME)
         message("Adding include-what-you-use to target ${TARGET_NAME}...")
