@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 include(cmake/clang-format.cmake)
 setup_format_target(format_overlunky)
 
+set(IWYU_MAPPING_FILE ${CMAKE_SOURCE_DIR}/overlunky.3rdparty.headers.imp)
 set(POST_IWYU_FORMATTING_TARGET format_overlunky_changes)
 include(cmake/include-what-you-use.cmake)
 

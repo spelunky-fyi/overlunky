@@ -2,6 +2,10 @@
 if(DEFINED IWYU AND CMAKE_GENERATOR STREQUAL "Ninja")
     message("Configuring include-what-you-use...")
 
+    if(NOT DEFINED IWYU_MAPPING_FILE)
+        message(FATAL_ERROR "Please specify a mapping file for IWYU via the variable IWYU_MAPPING_FILE...")
+    endif()
+
     set(IWYU_HELPER_FILE "${CMAKE_SOURCE_DIR}/iwyu_helper.py")
     set(IWYU_TOOL_FILE "${CMAKE_BINARY_DIR}/iwyu_tool.py")
     set(FIX_INCLUDES_FILE "${CMAKE_BINARY_DIR}/fix_includes.py")
@@ -33,7 +37,7 @@ if(DEFINED IWYU AND CMAKE_GENERATOR STREQUAL "Ninja")
         -f="${FIX_INCLUDES_FILE}"
         -e=--no-warnings
         -e=-Xiwyu
-        -e=--mapping_file="${CMAKE_SOURCE_DIR}/overlunky.3rdparty.headers.imp")
+        -e=--mapping_file="${IWYU_MAPPING_FILE}")
 
     if(DEFINED POST_IWYU_FORMATTING_TARGET)
         add_custom_target(
@@ -69,7 +73,7 @@ if(DEFINED IWYU AND CMAKE_GENERATOR STREQUAL "Ninja")
         ${IWYU}
         --no-warnings
         -Xiwyu
-        --mapping_file=${CMAKE_SOURCE_DIR}/overlunky.3rdparty.headers.imp)
+        --mapping_file="${IWYU_MAPPING_FILE}")
 
     function(setup_iwyu TARGET_NAME)
         message("Adding include-what-you-use to target ${TARGET_NAME}...")
