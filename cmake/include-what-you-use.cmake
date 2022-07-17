@@ -23,22 +23,47 @@ if(DEFINED IWYU AND CMAKE_GENERATOR STREQUAL "Ninja")
 
     find_package(Python)
 
-    # ${Python_EXECUTABLE} ${IWYU_TOOL_FILE} -p . -v
     message("Adding target apply_iwyu_fixes...")
-    add_custom_target(
-        apply_iwyu_fixes
-        COMMAND ${Python_EXECUTABLE} ${IWYU_HELPER_FILE} -i="${IWYU}" -t="${IWYU_TOOL_FILE}" -c="${COMPILE_COMMANDS_FILE}" -f="${FIX_INCLUDES_FILE}" -e=--no-warnings -e=-Xiwyu -e=--mapping_file="${CMAKE_SOURCE_DIR}/overlunky.3rdparty.headers.imp"
-        COMMAND cmake --build . --target format_overlunky_changes
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        USES_TERMINAL
-    )
-    add_custom_target(
-        apply_iwyu_fixes_changes
-        COMMAND ${Python_EXECUTABLE} ${IWYU_HELPER_FILE} -i="${IWYU}" -t="${IWYU_TOOL_FILE}" -c="${COMPILE_COMMANDS_FILE}" -f="${FIX_INCLUDES_FILE}" -s -e=--no-warnings -e=-Xiwyu -e=--mapping_file="${CMAKE_SOURCE_DIR}/overlunky.3rdparty.headers.imp"
-        COMMAND cmake --build . --target format_overlunky_changes
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        USES_TERMINAL
-    )
+    set(IWYU_COMMAND
+        ${Python_EXECUTABLE}
+        ${IWYU_HELPER_FILE}
+        -i="${IWYU}"
+        -t="${IWYU_TOOL_FILE}"
+        -c="${COMPILE_COMMANDS_FILE}"
+        -f="${FIX_INCLUDES_FILE}"
+        -e=--no-warnings
+        -e=-Xiwyu
+        -e=--mapping_file="${CMAKE_SOURCE_DIR}/overlunky.3rdparty.headers.imp")
+
+    if(DEFINED POST_IWYU_FORMATTING_TARGET)
+        add_custom_target(
+            apply_iwyu_fixes
+            COMMAND ${IWYU_COMMAND}
+            COMMAND cmake --build . --target ${POST_IWYU_FORMATTING_TARGET}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            USES_TERMINAL
+        )
+        add_custom_target(
+            apply_iwyu_fixes_changes
+            COMMAND ${IWYU_COMMAND} -s
+            COMMAND cmake --build . --target ${POST_IWYU_FORMATTING_TARGET}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            USES_TERMINAL
+        )
+    else()
+        add_custom_target(
+            apply_iwyu_fixes
+            ${IWYU_COMMAND}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            USES_TERMINAL
+        )
+        add_custom_target(
+            apply_iwyu_fixes_changes
+            ${IWYU_COMMAND} -s
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            USES_TERMINAL
+        )
+    endif()
 
     set(IWYU_PATH_AND_OPTIONS
         ${IWYU}
