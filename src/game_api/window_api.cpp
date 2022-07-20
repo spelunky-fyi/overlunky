@@ -303,6 +303,46 @@ void hook_virtual_function(FunT hook_fun, FunT& orig_fun, int vtable_index)
     }
 };
 
+void hook_steam_overlay()
+{
+    BYTE* steam_overlay = (BYTE*)GetModuleHandleA("gameoverlayrenderer64.dll");
+    // TODO: Yeah I could've probably figured these out from the vtable or made patterns
+    // but I don't think they change a lot anyway
+    const size_t present_offset = 0x88D80;
+    const size_t resize_offset = 0x89040;
+    if (steam_overlay == nullptr)
+    {
+        // Steam overlay is not loaded, so we're probably running on steam emu
+        // Just do the old vtable hook and call it a day
+        DEBUG("No Steam Overlay detected, hooking D3D...");
+
+        // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L249
+        hook_virtual_function(&hkPresent, g_OrigSwapChainPresent, 8);
+        // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L254
+        hook_virtual_function(&hkResizeBuffers, g_OrigSwapChainResizeBuffers, 13);
+        return;
+    }
+
+    // Steam overlay is loaded and it would crash if we hook the vtable
+    // Lets detour the steam overlay instead!
+    DEBUG("Steam detected, hooking Steam Overlay...");
+
+    g_OrigSwapChainPresent = (PresentPtr)(steam_overlay + present_offset);
+    g_OrigSwapChainResizeBuffers = (ResizeBuffersPtr)(steam_overlay + resize_offset);
+
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+
+    DetourAttach((void**)&g_OrigSwapChainPresent, hkPresent);
+    DetourAttach((void**)&g_OrigSwapChainResizeBuffers, hkResizeBuffers);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        PANIC("Failed hooking Steam Overlay: {}\n", error);
+    }
+}
+
 bool init_hooks(void* swap_chain_ptr)
 {
     g_SwapChain = reinterpret_cast<IDXGISwapChain*>(swap_chain_ptr);
@@ -311,10 +351,7 @@ bool init_hooks(void* swap_chain_ptr)
         g_Device->GetImmediateContext(&g_Context);
     }
 
-    // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L249
-    hook_virtual_function(&hkPresent, g_OrigSwapChainPresent, 8);
-    // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L254
-    hook_virtual_function(&hkResizeBuffers, g_OrigSwapChainResizeBuffers, 13);
+    hook_steam_overlay();
 
     {
         g_destroy_game_manager_trampoline = (DestroyGameManager*)get_address("destroy_game_manager"sv);
