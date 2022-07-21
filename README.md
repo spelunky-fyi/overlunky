@@ -165,7 +165,7 @@ cd build
 cmake ..
 cmake --build . --config Release --target ALL_BUILD
 ```
-The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode. Set `OL_DEBUG=1` in the *game environment* to enable logging to console.
+The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode. Set `OL_DEBUG=1` in the *game environment* to enable logging to console. (Run `setx OL_DEBUG 1` to do this system-wide.)
 
 ## Command line switches
   - `--launch_game <path_to_game_directory>` will launch Spel2.exe from that directory and hook to the game process, rather than trying to find it.
