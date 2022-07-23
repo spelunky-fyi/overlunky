@@ -6657,6 +6657,7 @@ void imgui_draw()
                         ImGui::EndMenu();
                     }
                 }
+                ImGui::EndMainMenuBar();
             }
             ImGui::PopID();
         }
