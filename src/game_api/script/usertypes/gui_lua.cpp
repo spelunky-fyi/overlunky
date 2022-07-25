@@ -41,6 +41,16 @@ Gamepad get_gamepad()
 
 const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
 
+static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+
+static inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x - rhs.x, lhs.y - rhs.y);
+}
+
 GuiDrawContext::GuiDrawContext(LuaBackend* _backend, ImDrawList* _draw_list)
     : backend(_backend), draw_list{_draw_list}
 {
@@ -496,7 +506,8 @@ void register_usertypes(sol::state& lua)
     /// Current mouse cursor position in screen coordinates.
     lua["mouse_position"] = []() -> std::pair<float, float>
     {
-        auto pos = normalize(ImGui::GetMousePos());
+        auto base = ImGui::GetMainViewport();
+        auto pos = normalize(ImGui::GetMousePos() - base->Pos);
         return std::make_pair(pos.x, pos.y);
     };
 
