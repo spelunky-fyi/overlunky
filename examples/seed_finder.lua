@@ -1,41 +1,48 @@
 meta.name = "Seed Finder"
-meta.version = "1.0"
-meta.description = "Script your own success condition and find some seeds, in adventure or seeded mode!\n\nREAD THE SOURCE FOR MORE INFORMATION OR ENJOY FINDING CAVEMAN SHOPS FOREVER!"
+meta.version = "WIP"
+meta.description = "Script your own success condition and find some seeds, in adventure or seeded mode!\n\nLOAD THE SEED FINDER EXAMPLES, READ THE SOURCE FOR MORE INFORMATION OR ENJOY FINDING CAVEMAN SHOPS FOREVER!"
 meta.author = "Dregu"
-
 
 --[[
 By default, this script just finds caveman shops.
 To script it, you need to import it to your own script,
-or the Overlunky console and change the success condition:
+or the Overlunky console and change the success condition.
+All these examples are found in the Seed Finder Examples script.
 
 -- Find shop jetpack in the front layer:
 finder = import("dregu/seedfinder")
+finder.goal = "Shop Jetpack"
 finder.success = function()
     return get_entities_by(ENT_TYPE.ITEM_PURCHASABLE_JETPACK, MASK.ITEM, LAYER.FRONT)[1] ~= nil
 end
 
--- You can also set the position or uid of the found thing, and you will be pointed to it
+-- You can also add multiple finder scripts to a list,
+-- set the position or uid of the found thing, and you will be pointed to it
 -- Find crust jetpack:
 finder = import("dregu/seedfinder")
-finder.success = function()
-    for i,v in ipairs(get_entities_by(ENT_TYPE.ITEM_JETPACK, MASK.ITEM, LAYER.FRONT)) do
-        --finder.x, finder.y, _ = get_position(v)
-        finder.uid = v
-        return true
-    end
-end
-
--- Find crust teleporter close to entrance
-finder = import("dregu/seedfinder")
-finder.success = function()
-    for i,v in ipairs(get_entities_by(ENT_TYPE.ITEM_TELEPORTER, MASK.ITEM, LAYER.FRONT)) do
-        if distance(players[1].uid, v) < 10 then
+finder.add({
+    goal = "Crust Jetpack",
+    success = function()
+        for i,v in ipairs(get_entities_by(ENT_TYPE.ITEM_JETPACK, MASK.ITEM, LAYER.FRONT)) do
+            --finder.x, finder.y, _ = get_position(v)
             finder.uid = v
             return true
         end
     end
-end
+})
+finder.add({
+    goal = "Crust teleporter near the entrance",
+    deepest_world = 1,
+    deepest_level = 1,
+    success = function()
+        for i,v in ipairs(get_entities_by(ENT_TYPE.ITEM_TELEPORTER, MASK.ITEM, LAYER.FRONT)) do
+            if distance(players[1].uid, v) < 10 then
+                finder.uid = v
+                return true
+            end
+        end
+    end
+})
 
 ]]
 
@@ -45,6 +52,7 @@ exports = {
     x = 0,
     y = 0,
     uid = -1,
+    goal = "Caveman Shop, please read the instructions and add your own success condition!",
     world = -1,
     level = -1,
     theme = -1,
@@ -70,12 +78,18 @@ exports = {
 
     seeded = true,
     find = false,
-    msg = "",
+    found = false,
+    msg = "\n\n\n\n\n",
     a = 0,
     b = 0,
     start = 0,
     seeds = 1,
     levels = 1,
+    list = {},
+
+    add = function(f)
+        exports.list[#exports.list+1] = f
+    end,
 
     next = function(w, l, t)
         local nw, nl, nt = 0, 0, 0
@@ -215,8 +229,10 @@ exports = {
     end
 }
 
+finder = exports
+
 function stats()
-    return F"\n{(get_ms()-exports.start)/1000} seconds\n{exports.seeds} seeds ({string.format('%.2f',exports.seeds/(get_ms()-exports.start)*1000)} sps)\n{exports.levels} levels ({string.format('%.2f',exports.levels/(get_ms()-exports.start)*1000)} lps)"
+    return F"\n{(get_ms()-exports.start)/1000} seconds\n{exports.seeds} seeds ({string.format('%.2f',exports.seeds/(get_ms()-exports.start)*1000)}/s)\n{exports.levels} levels ({string.format('%.2f',exports.levels/(get_ms()-exports.start)*1000)}/s)"
 end
 
 set_callback(function()
@@ -226,15 +242,17 @@ set_callback(function()
     state.loading_black_screen_timer = 0
 
     if not exports.find then return end
+    if state.loading ~= 3 or state.screen ~= SCREEN.LEVEL then return end
 
     local next = exports.next(state.world, state.level, state.theme)
 
     if exports.success() then -- found the thing, lets celebrate
-        exports.msg = F"Found thing in {state.world}-{state.level}" .. stats()
+        exports.msg = F"Found \"{exports.goal}\" in {state.world}-{state.level}" .. stats()
         exports.world = state.world
         exports.level = state.level
         exports.theme = state.theme
         exports.find = false
+        exports.found = true
     elseif exports.reset() or not next then -- reached deepest level or can't figure out next level, lets reset
         if test_flag(state.quest_flags, 7) then
             state.seed = math.random(0, 0xFFFFFFFF)
@@ -245,7 +263,7 @@ set_callback(function()
         state.theme_next = state.theme_start
         exports.seeds = exports.seeds + 1
         exports.levels = exports.levels + 1
-        exports.msg = F"Finding your thing" .. stats()
+        exports.msg = F"Finding \"{exports.goal}\"" .. stats()
         state.loading = 1
     else -- load next level
         state.world_next = next.world
@@ -257,10 +275,10 @@ set_callback(function()
             state.screen_next = SCREEN.LEVEL
         end
         exports.levels = exports.levels + 1
-        exports.msg = F"Finding your thing" .. stats()
+        exports.msg = F"Finding \"{exports.goal}\"" .. stats()
         state.loading = 1
     end
-end, ON.LEVEL)
+end, ON.LOADING)
 
 set_callback(function()
     state.screen_next = SCREEN.LEVEL
@@ -282,6 +300,9 @@ set_callback(function(ctx)
     state.fadein = 0
     state.fadevalue = 0
     state.loading_black_screen_timer = 0
+    if not exports.find and not exports.found then
+        exports.msg = F"Goal: \"{exports.goal}\"\n\n\n\n"
+    end
     ctx:window("Scriptable Seed Finder", 0, 0, 0, 0, true, function()
         exports.seeded = ctx:win_check("Seeded mode", exports.seeded)
         if exports.seeded then
@@ -295,6 +316,7 @@ set_callback(function(ctx)
 
         if not exports.find and ctx:win_button("Find") then
             exports.find = true
+            exports.found = false
             exports.start = get_ms()
             exports.seeds = 1
             exports.levels = 1
@@ -312,11 +334,11 @@ set_callback(function(ctx)
             state.level_next = state.level_start
             state.theme_next = state.theme_start
             state.loading = 1
-            exports.msg = "Finding your thing" .. stats()
+            exports.msg = F"Finding \"{exports.goal}\"" .. stats()
         end
         if exports.find and ctx:win_button("Stop") then
             exports.find = false
-            exports.msg = F"Stopped" .. stats()
+            exports.msg = F"Stopped finding \"{exports.goal}\"" .. stats()
         end
 
         ctx:win_inline()
@@ -334,6 +356,9 @@ set_callback(function(ctx)
         end
 
         ctx:win_separator()
+        ctx:win_text(exports.msg)
+
+        ctx:win_separator()
         ctx:win_text("Route (defaults to first exit/ending)")
         exports.volcana = ctx:win_check("Volcana", exports.volcana)
         exports.temple = ctx:win_check("Temple", exports.temple)
@@ -349,8 +374,18 @@ set_callback(function(ctx)
         exports.deepest_level = ctx:win_input_int("Level", exports.deepest_level)
 
         ctx:win_separator()
-        ctx:win_text(exports.msg)
-        ctx:win_text("")
+        ctx:win_text("Finder scripts")
+        for _,f in ipairs(exports.list) do
+            if ctx:win_button(f.goal) then
+                for k,v in pairs(f) do
+                    exports[k] = v
+                end
+                exports.found = false
+                exports.find = false
+                exports.levels = 0
+                exports.seeds = 0
+            end
+        end
     end)
 
     if exports.uid > -1 then
