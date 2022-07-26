@@ -1,10 +1,10 @@
 meta.name = "Seed Finder"
 meta.version = "WIP"
-meta.description = "Script your own success condition and find some seeds, in adventure or seeded mode!\n\nLOAD THE SEED FINDER EXAMPLES, READ THE SOURCE FOR MORE INFORMATION OR ENJOY FINDING CAVEMAN SHOPS FOREVER!"
+meta.description = "Script your own success condition and find some seeds, in adventure or seeded mode!\n\nLOAD THE SEED FINDER EXAMPLES, READ THE SOURCE FOR MORE INFORMATION OR ENJOY FINDING YOURSELF!"
 meta.author = "Dregu"
 
 --[[
-By default, this script just finds caveman shops.
+By default, this script just finds the player.
 To script it, you need to import it to your own script,
 or the Overlunky console and change the success condition.
 
