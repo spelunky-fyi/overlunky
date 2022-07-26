@@ -41,12 +41,12 @@ Gamepad get_gamepad()
 
 const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
 
-static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
+[[maybe_unused]] static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
 {
     return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
 }
 
-static inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs)
+[[maybe_unused]] static inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs)
 {
     return ImVec2(lhs.x - rhs.x, lhs.y - rhs.y);
 }
