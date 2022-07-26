@@ -1,6 +1,6 @@
 meta.name = "Seed Finder"
-meta.version = "0.1"
-meta.description = "Script your own success condition and find some seeds, in adventure or seeded mode!"
+meta.version = "1.0"
+meta.description = "Script your own success condition and find some seeds, in adventure or seeded mode!\n\nREAD THE SOURCE FOR MORE INFORMATION OR ENJOY FINDING CAVEMAN SHOPS FOREVER!"
 meta.author = "Dregu"
 
 
@@ -26,6 +26,17 @@ finder.success = function()
     end
 end
 
+-- Find crust teleporter close to entrance
+finder = import("dregu/seedfinder")
+finder.success = function()
+    for i,v in ipairs(get_entities_by(ENT_TYPE.ITEM_TELEPORTER, MASK.ITEM, LAYER.FRONT)) do
+        if distance(players[1].uid, v) < 10 then
+            finder.uid = v
+            return true
+        end
+    end
+end
+
 ]]
 
 exports = {
@@ -34,6 +45,9 @@ exports = {
     x = 0,
     y = 0,
     uid = -1,
+    world = -1,
+    level = -1,
+    theme = -1,
 
     success = function()
         for i,v in ipairs(get_entities_by_type(ENT_TYPE.MONS_CAVEMAN_SHOPKEEPER)) do
@@ -217,6 +231,9 @@ set_callback(function()
 
     if exports.success() then -- found the thing, lets celebrate
         exports.msg = F"Found thing in {state.world}-{state.level}" .. stats()
+        exports.world = state.world
+        exports.level = state.level
+        exports.theme = state.theme
         exports.find = false
     elseif exports.reset() or not next then -- reached deepest level or can't figure out next level, lets reset
         if test_flag(state.quest_flags, 7) then
@@ -283,6 +300,9 @@ set_callback(function(ctx)
             exports.levels = 1
             exports.x, exports.y = 0, 0
             exports.uid = -1
+            exports.world = -1
+            exports.level = -1
+            exports.theme = -1
             state.quest_flags = 0x1
             if exports.seeded then
                 state.quest_flags = set_flag(state.quest_flags, 7)
@@ -340,7 +360,7 @@ set_callback(function(ctx)
         end
     end
 
-    if not exports.find and exports.x ~= 0 and exports.y ~= 0 then
+    if not exports.find and exports.x ~= 0 and exports.y ~= 0 and exports.world == state.world and exports.level == state.level and exports.theme == state.theme then
         local sx, sy = screen_position(exports.x, exports.y)
         local rad = screen_distance(0.66)
         ctx:draw_circle(sx, sy, rad, 4, 0xFFFFFFFF)
