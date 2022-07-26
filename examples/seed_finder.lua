@@ -7,7 +7,8 @@ meta.author = "Dregu"
 By default, this script just finds caveman shops.
 To script it, you need to import it to your own script,
 or the Overlunky console and change the success condition.
-All these examples are found in the Seed Finder Examples script.
+
+These and more advanced examples with custom options can be loaded from the "Seed Finder Examples" script.
 
 -- Find shop jetpack in the front layer:
 finder = import("dregu/seedfinder")
@@ -24,8 +25,7 @@ finder.add({
     goal = "Crust Jetpack",
     success = function()
         for i,v in ipairs(get_entities_by(ENT_TYPE.ITEM_JETPACK, MASK.ITEM, LAYER.FRONT)) do
-            --finder.x, finder.y, _ = get_position(v)
-            finder.uid = v
+            finder.x, finder.y, _ = get_position(v)
             return true
         end
     end
@@ -46,52 +46,25 @@ finder.add({
 
 ]]
 
-exports = {
-    deepest_world = 8,
-    deepest_level = 98,
+defaults = {
     x = 0,
     y = 0,
     uid = -1,
-    goal = "Caveman Shop, please read the instructions and add your own success condition!",
     world = -1,
     level = -1,
     theme = -1,
-
-    success = function()
-        for i,v in ipairs(get_entities_by_type(ENT_TYPE.MONS_CAVEMAN_SHOPKEEPER)) do
-            exports.x, exports.y, _ = get_position(v)
-            return true
-        end
-    end,
-
-    reset = function()
-        return state.world >= exports.deepest_world and state.level >= exports.deepest_level
-    end,
-
-    volcana = false,
-    temple = false,
-    cog = false,
-    abzuduat = false,
-    sunken = false,
-    eggplant = false,
-    cosmic = false,
-
-    seeded = true,
     find = false,
     found = false,
-    msg = "\n\n\n\n\n",
-    a = 0,
-    b = 0,
-    start = 0,
     seeds = 1,
     levels = 1,
-    list = {},
-
     add = function(f)
         exports.list[#exports.list+1] = f
     end,
-
-    next = function(w, l, t)
+    reset = function(opt)
+        return state.world >= exports.deepest_world and state.level >= exports.deepest_level
+    end,
+    options = false,
+    next = function(w, l, t, opt)
         local nw, nl, nt = 0, 0, 0
         if w == 1 then
             if l < 4 then
@@ -229,6 +202,34 @@ exports = {
     end
 }
 
+exports = {
+    deepest_world = 8,
+    deepest_level = 98,
+    goal = "Please read the instructions or load the Seed Finder Examples script and select a goal!",
+    success = function(opt)
+        for i,v in ipairs(get_entities_by_mask(MASK.PLAYER)) do
+            exports.uid = v
+            return true
+        end
+    end,
+    volcana = false,
+    temple = false,
+    cog = false,
+    abzuduat = false,
+    sunken = false,
+    eggplant = false,
+    cosmic = false,
+    seeded = true,
+    msg = "\n\n\n\n\n",
+    a = 0,
+    b = 0,
+    start = 0,
+    list = {},
+}
+
+for k,v in pairs(defaults) do
+    exports[k] = v
+end
 finder = exports
 
 function stats()
@@ -244,16 +245,16 @@ set_callback(function()
     if not exports.find then return end
     if state.loading ~= 3 or state.screen ~= SCREEN.LEVEL then return end
 
-    local next = exports.next(state.world, state.level, state.theme)
+    local next = exports.next(state.world, state.level, state.theme, exports.opt)
 
-    if exports.success() then -- found the thing, lets celebrate
+    if exports.success(exports.opt) then -- found the thing, lets celebrate
         exports.msg = F"Found \"{exports.goal}\" in {state.world}-{state.level}" .. stats()
         exports.world = state.world
         exports.level = state.level
         exports.theme = state.theme
         exports.find = false
         exports.found = true
-    elseif exports.reset() or not next then -- reached deepest level or can't figure out next level, lets reset
+    elseif exports.reset(exports.opt) or not next then -- reached deepest level or can't figure out next level, lets reset
         if test_flag(state.quest_flags, 7) then
             state.seed = math.random(0, 0xFFFFFFFF)
         end
@@ -373,17 +374,26 @@ set_callback(function(ctx)
         exports.deepest_world = ctx:win_input_int("World", exports.deepest_world)
         exports.deepest_level = ctx:win_input_int("Level", exports.deepest_level)
 
-        ctx:win_separator()
-        ctx:win_text("Finder scripts")
-        for _,f in ipairs(exports.list) do
-            if ctx:win_button(f.goal) then
-                for k,v in pairs(f) do
-                    exports[k] = v
+
+        if type(exports.options) == "function" then
+            ctx:win_separator()
+            ctx:win_text("Custom options")
+            exports.options(ctx, exports.opt)
+        end
+
+        if #exports.list > 0 then
+            ctx:win_separator()
+            ctx:win_text("Goal scripts")
+            for _,f in ipairs(exports.list) do
+                if ctx:win_button(f.goal) then
+                    for k,v in pairs(defaults) do
+                        exports[k] = v
+                    end
+                    exports.opt = {}
+                    for k,v in pairs(f) do
+                        exports[k] = v
+                    end
                 end
-                exports.found = false
-                exports.find = false
-                exports.levels = 0
-                exports.seeds = 0
             end
         end
     end)
