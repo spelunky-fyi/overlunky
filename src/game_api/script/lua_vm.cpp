@@ -364,7 +364,7 @@ end
     /// - `nil` if the script was found but has no exports
     /// - `false` if the script was not found but optional is set to true
     /// - an error if the script was not found and the optional argument was not set
-    // lua["import"] = [](string id, optional<string> version, optional<bool> optional) -> table
+    // lua["import"] = [](string id, string version = "", bool optional = false) -> table
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {
@@ -438,7 +438,7 @@ end
         });
 
     /// Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
-    // lua["script_enabled"] = [](string id, optional<string> version) -> bool
+    // lua["script_enabled"] = [](string id, string version = "") -> bool
     lua["script_enabled"] = sol::overload(
         [](std::string id)
         {
