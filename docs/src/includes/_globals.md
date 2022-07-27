@@ -1329,7 +1329,7 @@ Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` 
 
 > Search script examples for [import](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=import)
 
-#### table import(string id, optional<string> version, optional<bool> optional)
+#### table import(string id, string version = "", bool optional = false)
 
 Load another script by id "author/name" and import its `exports` table. Returns:
 
@@ -1390,7 +1390,7 @@ Converts a color to int to be used in drawing functions. Use values from `0..255
 
 > Search script examples for [script_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=script_enabled)
 
-#### bool script_enabled(string id, optional<string> version)
+#### bool script_enabled(string id, string version = "")
 
 Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
 

@@ -4104,7 +4104,7 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
 </blockquote>
-<h4 id='table-import-string-id-optional-version-optional-optional'>table import(string id, optional<string> version, optional<bool> optional)</h4>
+<h4 id='table-import-string-id-string-version-quot-quot-bool-optional-false'>table import(string id, string version = &quot;&quot;, bool optional = false)</h4>
 <p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table. Returns:</p>
 
 <ul>
@@ -4149,7 +4149,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=script_enabled">script_enabled</a></p>
 </blockquote>
-<h4 id='bool-script_enabled-string-id-optional-version'>bool script_enabled(string id, optional<string> version)</h4>
+<h4 id='bool-script_enabled-string-id-string-version-quot-quot'>bool script_enabled(string id, string version = &quot;&quot;)</h4>
 <p>Check if another script is enabled by id &quot;author/name&quot;. You should probably check this after all the other scripts have had a chance to load.</p>
 <h3 id='seed_prng'>seed_prng</h3>
 <blockquote>
