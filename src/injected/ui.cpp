@@ -6647,12 +6647,11 @@ void imgui_draw()
 
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + base->Size.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
+    render_clickhandler();
     if (options["draw_hud"])
         render_prohud();
-
     if (options["draw_script_messages"])
         render_messages();
-    render_clickhandler();
 
     float toolwidth = 0.12f * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
@@ -6807,11 +6806,11 @@ void imgui_draw()
                 continue;
             ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
             ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, ImGuiViewportFlags_NoTaskBarIcon);
+            ImGui::PushID(tab.second->name.c_str());
+            ImGui::BeginChild("ScrollableTool");
             render_tool(tab.first);
-            ImGui::SetNextWindowPos(
-                {base->Size.x / 2 - ImGui::GetWindowWidth() / 2,
-                 base->Size.y / 2 - ImGui::GetWindowHeight() / 2},
-                ImGuiCond_Once);
+            ImGui::EndChild();
+            ImGui::PopID();
             ImGui::End();
         }
         if (detach_tab != "")
