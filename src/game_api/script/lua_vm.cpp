@@ -437,6 +437,24 @@ end
             return sol::make_object(lua, import_backend->lua["exports"]);
         });
 
+    /// Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
+    // lua["script_enabled"] = [](string id, optional<string> version) -> bool
+    lua["script_enabled"] = sol::overload(
+        [](std::string id)
+        {
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)));
+            if (!import_backend)
+                return false;
+            return import_backend->get_enabled();
+        },
+        [](std::string id, std::string version)
+        {
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)), std::string_view(version));
+            if (!import_backend)
+                return false;
+            return import_backend->get_enabled();
+        });
+
     /// Deprecated
     /// Same as import().
     lua["load_script"] = lua["import"];
