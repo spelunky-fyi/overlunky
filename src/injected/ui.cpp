@@ -3343,6 +3343,13 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         draw_list->AddLine(fix_pos(ImVec2(sboxa.x, sboxb.y)), fix_pos(sorigin), color, 2);
         draw_list->AddLine(fix_pos(ImVec2(sboxb.x, sboxa.y)), fix_pos(sorigin), color, 2);
     }
+    static const auto spark = to_id("ENT_TYPE_ITEM_SPARK");
+    if (type == spark)
+    {
+        auto ent_spark = ent->as<Spark>();
+        if (ent_spark->size >= 1.0)
+            color = ImColor(255, 0, 0, 150);
+    }
     if (ent->shape == SHAPE::CIRCLE)
         if (filled)
             draw_list->AddCircleFilled(fix_pos(spos), sboxb.x - spos.x, color);
