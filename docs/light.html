@@ -772,6 +772,9 @@
                             <a href="#rgba" class="toc-h3 toc-link" data-title="rgba">rgba</a>
                           </li>
                           <li>
+                            <a href="#script_enabled" class="toc-h3 toc-link" data-title="script_enabled">script_enabled</a>
+                          </li>
+                          <li>
                             <a href="#seed_prng" class="toc-h3 toc-link" data-title="seed_prng">seed_prng</a>
                           </li>
                           <li>
@@ -4101,8 +4104,15 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
 </blockquote>
-<h4 id='table-import-string-id-optional-version'>table import(string id, optional<string> version)</h4>
-<p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table</p>
+<h4 id='table-import-string-id-optional-version-optional-optional'>table import(string id, optional<string> version, optional<bool> optional)</h4>
+<p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table. Returns:</p>
+
+<ul>
+<li><code>table</code> if the script has exports</li>
+<li><code>nil</code> if the script was found but has no exports</li>
+<li><code>false</code> if the script was not found but optional is set to true</li>
+<li>an error if the script was not found and the optional argument was not set</li>
+</ul>
 <h3 id='is_character_female'>is_character_female</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_character_female">is_character_female</a></p>
@@ -4135,6 +4145,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='uColor-rgba-int-r-int-g-int-b-int-a'><a href="#Aliases">uColor</a> rgba(int r, int g, int b, int a)</h4>
 <p>Converts a color to int to be used in drawing functions. Use values from <code>0..255</code>.</p>
+<h3 id='script_enabled'>script_enabled</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=script_enabled">script_enabled</a></p>
+</blockquote>
+<h4 id='bool-script_enabled-string-id-optional-version'>bool script_enabled(string id, optional<string> version)</h4>
+<p>Check if another script is enabled by id &quot;author/name&quot;. You should probably check this after all the other scripts have had a chance to load.</p>
 <h3 id='seed_prng'>seed_prng</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seed_prng">seed_prng</a></p>
