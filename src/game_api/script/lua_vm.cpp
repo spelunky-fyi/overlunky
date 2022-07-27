@@ -358,8 +358,13 @@ end
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
 
-    /// Load another script by id "author/name" and import its `exports` table
-    // lua["import"] = [](string id, optional<string> version) -> table
+    /// Load another script by id "author/name" and import its `exports` table. Returns:
+    ///
+    /// - `table` if the script has exports
+    /// - `nil` if the script was found but has no exports
+    /// - `false` if the script was not found but optional is set to true
+    /// - an error if the script was not found and the optional argument was not set
+    // lua["import"] = [](string id, optional<string> version, optional<bool> optional) -> table
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {
@@ -387,6 +392,42 @@ end
             {
                 luaL_error(lua, "Imported script not found");
                 return sol::make_object(lua, sol::lua_nil);
+            }
+            if (!import_backend->get_enabled())
+            {
+                import_backend->set_enabled(true);
+                import_backend->update();
+            }
+            return sol::make_object(lua, import_backend->lua["exports"]);
+        },
+        [&lua](std::string id, std::string version, bool optional)
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            backend->required_scripts.push_back(sanitize(id));
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)), std::string_view(version));
+            if (!import_backend)
+            {
+                if (!optional)
+                    luaL_error(lua, "Imported script not found");
+                return sol::make_object(lua, false);
+            }
+            if (!import_backend->get_enabled())
+            {
+                import_backend->set_enabled(true);
+                import_backend->update();
+            }
+            return sol::make_object(lua, import_backend->lua["exports"]);
+        },
+        [&lua](std::string id, bool optional)
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            backend->required_scripts.push_back(sanitize(id));
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)));
+            if (!import_backend)
+            {
+                if (!optional)
+                    luaL_error(lua, "Imported script not found");
+                return sol::make_object(lua, false);
             }
             if (!import_backend->get_enabled())
             {
