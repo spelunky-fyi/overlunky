@@ -269,3 +269,6 @@ struct State
 
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
 uint8_t enum_to_layer(const LAYER layer);
+
+uint32_t lowbias32(uint32_t x);
+uint32_t lowbias32_r(uint32_t x);

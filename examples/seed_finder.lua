@@ -55,6 +55,7 @@ defaults = {
     theme = -1,
     find = false,
     found = false,
+    gaveup = false,
     seeds = 1,
     levels = 1,
     add = function(f)
@@ -62,6 +63,9 @@ defaults = {
     end,
     reset = function(opt)
         return state.world >= exports.deepest_world and state.level >= exports.deepest_level
+    end,
+    giveup = function(opt)
+        return exports.max_seeds > 0 and exports.seeds >= exports.max_seeds
     end,
     options = false,
     next = function(w, l, t, opt)
@@ -220,11 +224,14 @@ exports = {
     eggplant = false,
     cosmic = false,
     seeded = true,
+    sequential = false,
+    first = 0,
     msg = "\n\n\n\n\n",
     a = 0,
     b = 0,
     start = 0,
     list = {},
+    max_seeds = 0
 }
 
 for k,v in pairs(defaults) do
@@ -255,8 +262,11 @@ set_callback(function()
         exports.find = false
         exports.found = true
     elseif exports.reset(exports.opt) or not next then -- reached deepest level or can't figure out next level, lets reset
-        if test_flag(state.quest_flags, 7) then
-            state.seed = math.random(0, 0xFFFFFFFF)
+        if exports.giveup(exports.opt) then -- some limit reached
+            exports.msg = F"Gave up finding \"{exports.goal}\"" .. stats()
+            exports.find = false
+            exports.gaveup = true
+            return
         end
         state.quest_flags = state.quest_flags | 1
         state.world_next = state.world_start
@@ -264,6 +274,13 @@ set_callback(function()
         state.theme_next = state.theme_start
         exports.seeds = exports.seeds + 1
         exports.levels = exports.levels + 1
+        if test_flag(state.quest_flags, 7) then
+            if exports.sequential then
+                state.seed = state.seed + 1
+            else
+                state.seed = lowbias32(exports.first + exports.seeds)
+            end
+        end
         exports.msg = F"Finding \"{exports.goal}\"" .. stats()
         state.loading = 1
     else -- load next level
@@ -301,12 +318,13 @@ set_callback(function(ctx)
     state.fadein = 0
     state.fadevalue = 0
     state.loading_black_screen_timer = 0
-    if not exports.find and not exports.found then
+    if not exports.find and not exports.found and not exports.gaveup then
         exports.msg = F"Goal: \"{exports.goal}\"\n\n\n\n"
     end
     ctx:window("Scriptable Seed Finder", 0, 0, 0, 0, true, function()
         exports.seeded = ctx:win_check("Seeded mode", exports.seeded)
         if exports.seeded then
+            exports.sequential = ctx:win_check("Sequential seeds", exports.sequential)
             state.seed = tonumber(ctx:win_input_text("Seed", string.format("%08X", state.seed)), 16)
             state.quest_flags = set_flag(state.quest_flags, 7)
         else
@@ -314,10 +332,12 @@ set_callback(function(ctx)
             exports.b = tonumber(ctx:win_input_text("Second", string.format("%016X", exports.b)), 16)
             state.quest_flags = clr_flag(state.quest_flags, 7)
         end
+        exports.max_seeds = ctx:win_input_int("Max seeds to try", exports.max_seeds)
 
         if not exports.find and ctx:win_button("Find") then
             exports.find = true
             exports.found = false
+            exports.gaveup = false
             exports.start = get_ms()
             exports.seeds = 1
             exports.levels = 1
@@ -329,8 +349,11 @@ set_callback(function(ctx)
             state.quest_flags = 0x1
             if exports.seeded then
                 state.quest_flags = set_flag(state.quest_flags, 7)
+                if not exports.sequential then
+                    exports.first = math.random(0, 0xFFFFFFFF)
+                    state.seed = exports.first
+                end
             end
-            state.seed = math.random(0, 0xFFFFFFFF)
             state.world_next = state.world_start
             state.level_next = state.level_start
             state.theme_next = state.theme_start
@@ -373,7 +396,6 @@ set_callback(function(ctx)
         ctx:win_text("Deepest level (resets if thing is not found here)")
         exports.deepest_world = ctx:win_input_int("World", exports.deepest_world)
         exports.deepest_level = ctx:win_input_int("Level", exports.deepest_level)
-
 
         if type(exports.options) == "function" then
             ctx:win_separator()

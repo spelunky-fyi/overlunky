@@ -437,6 +437,10 @@ end
             return sol::make_object(lua, import_backend->lua["exports"]);
         });
 
+    /// Deprecated
+    /// Same as import().
+    lua["load_script"] = lua["import"];
+
     /// Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
     // lua["script_enabled"] = [](string id, string version = "") -> bool
     lua["script_enabled"] = sol::overload(
@@ -455,9 +459,11 @@ end
             return import_backend->get_enabled();
         });
 
-    /// Deprecated
-    /// Same as import().
-    lua["load_script"] = lua["import"];
+    /// Some random hash function
+    lua["lowbias32"] = lowbias32;
+
+    /// Reverse of some random hash function
+    lua["lowbias32_r"] = lowbias32_r;
 
     /// Get your sanitized script id to be used in import.
     lua["get_id"] = []() -> std::string

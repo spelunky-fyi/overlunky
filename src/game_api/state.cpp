@@ -462,6 +462,15 @@ uint32_t lowbias32(uint32_t x)
     x ^= x >> 16;
     return x;
 }
+uint32_t lowbias32_r(uint32_t x)
+{
+    x ^= x >> 16;
+    x *= 0x43021123U;
+    x ^= x >> 15 ^ x >> 30;
+    x *= 0x1d69e2a5U;
+    x ^= x >> 16;
+    return x;
+}
 Entity* find(StateMemory* state, uint32_t uid)
 {
     // Ported from MauveAlert's python code in the CAT tracker
