@@ -995,6 +995,7 @@ void LuaConsole::push_history(std::string history_item, std::vector<ScriptMessag
     if (!history_item.empty())
     {
         has_new_history = true;
+        scroll_to_bottom = true;
         history.push_back(ConsoleHistoryItem{
             std::move(history_item),
             std::move(result_item)});

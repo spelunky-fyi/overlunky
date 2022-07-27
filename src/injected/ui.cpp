@@ -25,6 +25,7 @@
 #pragma warning(push, 0)
 #include <toml.hpp>
 #pragma warning(pop)
+#include <fmt/chrono.h>
 #include <fmt/core.h>
 
 #include "olfont.h"
@@ -297,6 +298,7 @@ std::map<std::string, bool> options = {
     {"draw_hud", true},
     {"draw_script_messages", true},
     {"fade_script_messages", true},
+    {"console_script_messages", false},
     {"draw_hitboxes_interpolated", true},
     {"show_tooltips", true},
     {"smooth_camera", true},
@@ -3471,8 +3473,32 @@ void set_vel(ImVec2 pos)
 void render_messages()
 {
     using namespace std::chrono_literals;
-    using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     auto now = std::chrono::system_clock::now();
+
+    if (options["console_script_messages"])
+    {
+        auto in_time_t = std::chrono::system_clock::to_time_t(now);
+        std::tm time_buf;
+        localtime_s(&time_buf, &in_time_t);
+        std::vector<ScriptMessage> messages;
+        for (auto& [name, script] : g_scripts)
+        {
+            for (auto&& message : script->consume_messages())
+                messages.push_back(message);
+            if (messages.size() > 0)
+                g_Console->push_history(fmt::format("--- [{}] at {:%Y-%m-%d %X}", script->get_name(), time_buf), std::move(messages));
+        }
+        messages.clear();
+        {
+            for (auto&& message : g_Console->consume_messages())
+                messages.push_back(message);
+            if (messages.size() > 0)
+                g_Console->push_history(fmt::format("--- [Console] at {:%Y-%m-%d %X}", time_buf), std::move(messages));
+        }
+        return;
+    }
+
+    using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     std::vector<Message> queue;
     for (auto& [name, script] : g_scripts)
     {
@@ -4481,6 +4507,8 @@ void render_scripts()
     ImGui::PushTextWrapPos(0.0f);
     ImGui::PopTextWrapPos();
     ImGui::Checkbox("Draw script messages##DrawScriptMessages", &options["draw_script_messages"]);
+    ImGui::SameLine();
+    ImGui::Checkbox("to console##ConsoleScriptMessages", &options["console_script_messages"]);
     ImGui::Checkbox("Fade script messages##FadeScriptMessages", &options["fade_script_messages"]);
     if (ImGui::Checkbox("Load scripts from default directory##LoadScriptsDefault", &load_script_dir))
         refresh_script_files();
@@ -6878,6 +6906,7 @@ void init_ui()
     g_game_manager = get_game_manager();
 
     g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
+    g_Console->set_max_history_size(1000);
     g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);

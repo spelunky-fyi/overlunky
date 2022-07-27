@@ -31,6 +31,7 @@ class SpelunkyConsole
     void set_max_history_size(size_t max_history);
     void save_history(std::string_view path);
     void load_history(std::string_view path);
+    void push_history(std::string history_item, std::vector<ScriptMessage> result_item);
 
     std::string dump_api();
 
