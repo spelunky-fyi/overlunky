@@ -1356,6 +1356,24 @@ Same as `Player.is_female`
 
 Immediately load a screen based on state.screen_next and stuff
 
+### lowbias32
+
+
+> Search script examples for [lowbias32](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lowbias32)
+
+#### int lowbias32(int x)
+
+Some random hash function
+
+### lowbias32_r
+
+
+> Search script examples for [lowbias32_r](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lowbias32_r)
+
+#### int lowbias32_r(int x)
+
+Reverse of some random hash function
+
 ### pause
 
 
