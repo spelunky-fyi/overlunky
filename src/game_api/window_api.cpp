@@ -305,12 +305,12 @@ void hook_virtual_function(FunT hook_fun, FunT& orig_fun, int vtable_index)
 
 void hook_steam_overlay()
 {
-    BYTE* steam_overlay = (BYTE*)GetModuleHandleA("gameoverlayrenderer64.dll");
+    char* steam_overlay = (char*)GetModuleHandleA("gameoverlayrenderer64.dll");
     // TODO: Yeah I could've probably figured these out from the vtable or made patterns
     // but I don't think they change a lot anyway
     // Update 2 days later: They immediately changed for the first time in years
-    const size_t present_offset = 0x88E30;
-    const size_t resize_offset = 0x890F0;
+    // const size_t present_offset = 0x88E30;
+    // const size_t resize_offset = 0x890F0;
     if (steam_overlay == nullptr)
     {
         // Steam overlay is not loaded, so we're probably running on steam emu
@@ -328,8 +328,22 @@ void hook_steam_overlay()
     // Lets detour the steam overlay instead!
     DEBUG("Steam detected, hooking Steam Overlay...");
 
-    g_OrigSwapChainPresent = (PresentPtr)(steam_overlay + present_offset);
-    g_OrigSwapChainResizeBuffers = (ResizeBuffersPtr)(steam_overlay + resize_offset);
+    size_t present_offset = find_inst(steam_overlay, "\x48\x89\x74\x24\x20\x41\x56\x48\x83\xEC\x20\x41\x8B\xE8\x8B\xF2"sv, 0, 0x99999, "steam_overlay_present"sv);
+    size_t resize_offset = find_inst(steam_overlay, "\x48\x89\x6C\x24\x10\x48\x89\x74\x24\x18\x57\x41\x56\x41\x57\x48\x83\xEC\x30\x44\x8B\xFA\x48\x8B\xF1\x48\x8B\xD1\x41\x8B\xE9"sv, 0, 0x99999, "steam_overlay_resize"sv);
+
+    if (present_offset == 0 || resize_offset == 0)
+    {
+        DEBUG("Couldn't find steam overlay functions... Hooking D3D directly, but it will probably crash.");
+
+        // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L249
+        hook_virtual_function(&hkPresent, g_OrigSwapChainPresent, 8);
+        // https://github.com/Rebzzel/kiero/blob/master/METHODSTABLE.txt#L254
+        hook_virtual_function(&hkResizeBuffers, g_OrigSwapChainResizeBuffers, 13);
+        return;
+    }
+
+    g_OrigSwapChainPresent = (PresentPtr)(steam_overlay + present_offset - 5);
+    g_OrigSwapChainResizeBuffers = (ResizeBuffersPtr)(steam_overlay + resize_offset - 5);
 
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
@@ -352,10 +366,15 @@ bool init_hooks(void* swap_chain_ptr)
         g_Device->GetImmediateContext(&g_Context);
     }
 
-    hook_steam_overlay();
     // void* present_ptr = (void*)vtable_find<void*>(g_SwapChain, 8);
     // size_t present_fun = *(size_t*)present_ptr;
-    // DEBUG("present {} {}", present_ptr, (void*)present_fun);
+    // DEBUG("present vtable {} {}", present_ptr, (void*)present_fun);
+
+    // void* resize_ptr = (void*)vtable_find<void*>(g_SwapChain, 13);
+    // size_t resize_fun = *(size_t*)resize_ptr;
+    // DEBUG("resize vtable {} {}", resize_ptr, (void*)resize_fun);
+
+    hook_steam_overlay();
     // hook_virtual_function(&hkPresent, g_OrigSwapChainPresent, 8);
     // hook_virtual_function(&hkResizeBuffers, g_OrigSwapChainResizeBuffers, 13);
 
