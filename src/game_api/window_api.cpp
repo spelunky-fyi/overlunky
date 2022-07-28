@@ -308,8 +308,9 @@ void hook_steam_overlay()
     BYTE* steam_overlay = (BYTE*)GetModuleHandleA("gameoverlayrenderer64.dll");
     // TODO: Yeah I could've probably figured these out from the vtable or made patterns
     // but I don't think they change a lot anyway
-    const size_t present_offset = 0x88D80;
-    const size_t resize_offset = 0x89040;
+    // Update 2 days later: They immediately changed for the first time in years
+    const size_t present_offset = 0x88E30;
+    const size_t resize_offset = 0x890F0;
     if (steam_overlay == nullptr)
     {
         // Steam overlay is not loaded, so we're probably running on steam emu
@@ -351,9 +352,12 @@ bool init_hooks(void* swap_chain_ptr)
         g_Device->GetImmediateContext(&g_Context);
     }
 
-    // hook_steam_overlay(); // TODO: lol this broke immediately
-    hook_virtual_function(&hkPresent, g_OrigSwapChainPresent, 8);
-    hook_virtual_function(&hkResizeBuffers, g_OrigSwapChainResizeBuffers, 13);
+    hook_steam_overlay();
+    // void* present_ptr = (void*)vtable_find<void*>(g_SwapChain, 8);
+    // size_t present_fun = *(size_t*)present_ptr;
+    // DEBUG("present {} {}", present_ptr, (void*)present_fun);
+    // hook_virtual_function(&hkPresent, g_OrigSwapChainPresent, 8);
+    // hook_virtual_function(&hkResizeBuffers, g_OrigSwapChainResizeBuffers, 13);
 
     {
         g_destroy_game_manager_trampoline = (DestroyGameManager*)get_address("destroy_game_manager"sv);
