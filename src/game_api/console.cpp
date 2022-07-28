@@ -75,7 +75,8 @@ void SpelunkyConsole::save_history(std::string_view path)
         std::string line;
         for (const auto& history_item : m_Impl->history)
         {
-            history_file << "> " + history_item.command << '\n';
+            if (history_item.command.find("---") != 0)
+                history_file << "> " + history_item.command << '\n';
         }
     }
 }
@@ -104,6 +105,10 @@ void SpelunkyConsole::load_history(std::string_view path)
             m_Impl->push_history(std::move(history_item), {});
         }
     }
+}
+void SpelunkyConsole::push_history(std::string history_item, std::vector<ScriptMessage> result_item)
+{
+    m_Impl->push_history(std::move(history_item), std::move(result_item));
 }
 
 void SpelunkyConsole::toggle()

@@ -97,6 +97,129 @@ void State::set_write_load_opt(bool write_load_opt)
     }
 }
 
+static bool g_godmode_player_active = false;
+static bool g_godmode_companions_active = false;
+
+bool is_active_player(Entity* e)
+{
+    auto state = State::get();
+    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
+    {
+        auto player = state.items()->player(i);
+        if (player && player == e)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t);
+OnDamageFun* g_on_damage_trampoline{nullptr};
+void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint16_t stun_amount, uint8_t iframes)
+{
+    if (g_godmode_player_active && is_active_player(victim))
+    {
+        return;
+    }
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    {
+        return;
+    }
+
+    // because Player::on_damage is always hooked here, we have to check whether a script has hooked this function as well
+    EntityHooksInfo& _hook_info = victim->get_hooks();
+    bool skip_orig = false;
+    for (auto& [id, backend_on_damage] : _hook_info.on_damage)
+    {
+        if (backend_on_damage(victim, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
+        {
+            skip_orig = true;
+        }
+    }
+
+    if (!skip_orig)
+    {
+        g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
+    }
+}
+
+using OnInstaGibFun = void(Entity*, size_t);
+OnInstaGibFun* g_on_instagib_trampoline{nullptr};
+void on_instagib(Entity* victim, size_t unknown)
+{
+    if (g_godmode_player_active && is_active_player(victim))
+    {
+        return;
+    }
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    {
+        return;
+    }
+
+    // because on_instagib is only hooked here, we have to check whether a script has hooked this function as well
+    EntityHooksInfo& _hook_info = victim->get_hooks();
+    bool skip_orig = false;
+    for (auto& [id, backend_on_player_instagib] : _hook_info.on_player_instagib)
+    {
+        if (backend_on_player_instagib(victim))
+        {
+            skip_orig = true;
+        }
+    }
+
+    // The instagib function needs to be called when the entity is dead, otherwise the death screen will never be opened
+    if (victim->as<Movable>()->health == 0)
+    {
+        skip_orig = false;
+    }
+
+    if (!skip_orig)
+    {
+        g_on_instagib_trampoline(victim, unknown);
+    }
+}
+
+void hook_godmode_functions()
+{
+    static bool functions_hooked = false;
+    if (!functions_hooked)
+    {
+        auto memory = Memory::get();
+        auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
+        auto addr_insta = get_address("insta_gib");
+
+        g_on_damage_trampoline = (OnDamageFun*)addr_damage;
+        g_on_instagib_trampoline = (OnInstaGibFun*)addr_insta;
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+
+        DetourAttach((void**)&g_on_damage_trampoline, &on_damage);
+        DetourAttach((void**)&g_on_instagib_trampoline, &on_instagib);
+
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking on_damage/instagib: {}\n", error);
+        }
+
+        functions_hooked = true;
+    }
+}
+
+void State::godmode(bool g)
+{
+    // hook_godmode_functions();
+    g_godmode_player_active = g;
+}
+
+void State::godmode_companions(bool g)
+{
+    // hook_godmode_functions();
+    g_godmode_companions_active = g;
+}
+
 State& State::get()
 {
     static State STATE;
@@ -112,6 +235,7 @@ State& State::get()
         init_spawn_hooks();
         init_behavior_hooks();
         init_render_api_hooks();
+        hook_godmode_functions();
         get_is_init() = true;
         strings_init();
     }
@@ -242,129 +366,6 @@ void StateMemory::force_current_theme(uint32_t t)
             state->level_gen->theme_cosmicocean->sub_theme = state->level_gen->theme_dwelling; // just set it to something, can't edit this atm
         state->current_theme = state->level_gen->themes[t - 1];
     }
-}
-
-static bool g_godmode_player_active = false;
-static bool g_godmode_companions_active = false;
-
-bool is_active_player(Entity* e)
-{
-    auto state = State::get();
-    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
-    {
-        auto player = state.items()->player(i);
-        if (player && player == e)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t);
-OnDamageFun* g_on_damage_trampoline{nullptr};
-void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint16_t stun_amount, uint8_t iframes)
-{
-    if (g_godmode_player_active && is_active_player(victim))
-    {
-        return;
-    }
-    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
-    {
-        return;
-    }
-
-    // because Player::on_damage is always hooked here, we have to check whether a script has hooked this function as well
-    EntityHooksInfo& _hook_info = victim->get_hooks();
-    bool skip_orig = false;
-    for (auto& [id, backend_on_damage] : _hook_info.on_damage)
-    {
-        if (backend_on_damage(victim, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
-        {
-            skip_orig = true;
-        }
-    }
-
-    if (!skip_orig)
-    {
-        g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
-    }
-}
-
-using OnInstaGibFun = void(Entity*, size_t);
-OnInstaGibFun* g_on_instagib_trampoline{nullptr};
-void on_instagib(Entity* victim, size_t unknown)
-{
-    if (g_godmode_player_active && is_active_player(victim))
-    {
-        return;
-    }
-    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
-    {
-        return;
-    }
-
-    // because on_instagib is only hooked here, we have to check whether a script has hooked this function as well
-    EntityHooksInfo& _hook_info = victim->get_hooks();
-    bool skip_orig = false;
-    for (auto& [id, backend_on_player_instagib] : _hook_info.on_player_instagib)
-    {
-        if (backend_on_player_instagib(victim))
-        {
-            skip_orig = true;
-        }
-    }
-
-    // The instagib function needs to be called when the entity is dead, otherwise the death screen will never be opened
-    if (victim->as<Movable>()->health == 0)
-    {
-        skip_orig = false;
-    }
-
-    if (!skip_orig)
-    {
-        g_on_instagib_trampoline(victim, unknown);
-    }
-}
-
-void hook_godmode_functions()
-{
-    static bool functions_hooked = false;
-    if (!functions_hooked)
-    {
-        auto memory = Memory::get();
-        auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
-        auto addr_insta = get_address("insta_gib");
-
-        g_on_damage_trampoline = (OnDamageFun*)addr_damage;
-        g_on_instagib_trampoline = (OnInstaGibFun*)addr_insta;
-
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-
-        DetourAttach((void**)&g_on_damage_trampoline, &on_damage);
-        DetourAttach((void**)&g_on_instagib_trampoline, &on_instagib);
-
-        const LONG error = DetourTransactionCommit();
-        if (error != NO_ERROR)
-        {
-            DEBUG("Failed hooking on_damage/instagib: {}\n", error);
-        }
-
-        functions_hooked = true;
-    }
-}
-
-void State::godmode(bool g)
-{
-    hook_godmode_functions();
-    g_godmode_player_active = g;
-}
-
-void State::godmode_companions(bool g)
-{
-    hook_godmode_functions();
-    g_godmode_companions_active = g;
 }
 
 void State::darkmode(bool g)

@@ -62,6 +62,7 @@ class SpelunkyScript
     ~SpelunkyScript();
 
     std::deque<ScriptMessage>& get_messages();
+    std::deque<ScriptMessage> consume_messages();
     std::vector<std::string> consume_requires();
 
     const std::string& get_id() const;

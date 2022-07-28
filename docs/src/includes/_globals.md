@@ -1329,9 +1329,14 @@ Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` 
 
 > Search script examples for [import](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=import)
 
-#### table import(string id, optional<string> version)
+#### table import(string id, string version = "", bool optional = false)
 
-Load another script by id "author/name" and import its `exports` table
+Load another script by id "author/name" and import its `exports` table. Returns:
+
+- `table` if the script has exports
+- `nil` if the script was found but has no exports
+- `false` if the script was not found but optional is set to true
+- an error if the script was not found and the optional argument was not set
 
 ### is_character_female
 
@@ -1379,6 +1384,15 @@ Adds a command that can be used in the console.
 #### [uColor](#Aliases) rgba(int r, int g, int b, int a)
 
 Converts a color to int to be used in drawing functions. Use values from `0..255`.
+
+### script_enabled
+
+
+> Search script examples for [script_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=script_enabled)
+
+#### bool script_enabled(string id, string version = "")
+
+Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
 
 ### seed_prng
 

@@ -100,11 +100,22 @@ function set_callback(cb, screen) end
 ---@param id CallbackId?
 ---@return nil
 function clear_callback(id) end
----Load another script by id "author/name" and import its `exports` table
+---Load another script by id "author/name" and import its `exports` table. Returns:
+---
+---- `table` if the script has exports
+---- `nil` if the script was found but has no exports
+---- `false` if the script was not found but optional is set to true
+---- an error if the script was not found and the optional argument was not set
 ---@param id string
----@param version string?
+---@param version string
+---@param optional boolean
 ---@return table
-function import(id, version) end
+function import(id, version, optional) end
+---Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
+---@param id string
+---@param version string
+---@return boolean
+function script_enabled(id, version) end
 ---Get your sanitized script id to be used in import.
 ---@return string
 function get_id() end

@@ -15,6 +15,10 @@ std::deque<ScriptMessage>& SpelunkyScript::get_messages()
 {
     return m_Impl->messages;
 }
+std::deque<ScriptMessage> SpelunkyScript::consume_messages()
+{
+    return std::move(m_Impl->messages);
+}
 std::vector<std::string> SpelunkyScript::consume_requires()
 {
     return std::move(m_Impl->required_scripts);
