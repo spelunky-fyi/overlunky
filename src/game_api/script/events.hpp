@@ -15,6 +15,7 @@ bool pre_load_screen();
 void post_room_generation();
 void post_level_generation();
 void post_load_screen();
+void on_draw_string(STRINGID stringid);
 
 std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template);
 std::optional<LevelGenRoomData> pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template);

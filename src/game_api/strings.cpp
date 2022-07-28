@@ -151,6 +151,17 @@ const char16_t* get_string(STRINGID string_id)
     return strings_table[string_id];
 }
 
+STRINGID pointer_to_stringid(size_t ptr)
+{
+    auto strings_table = get_strings_table();
+    for (STRINGID i = 0; i < g_original_string_ids_end; ++i)
+    {
+        if ((size_t)strings_table[i] == ptr)
+            return i;
+    }
+    return g_original_string_ids_end;
+}
+
 void change_string(STRINGID string_id, std::u16string_view str)
 {
     if (string_id == g_original_string_ids_end)

@@ -15,3 +15,4 @@ STRINGID add_string(std::u16string str);
 void clear_custom_shopitem_names();
 void add_custom_name(uint32_t uid, std::u16string name);
 void clear_custom_name(uint32_t uid);
+STRINGID pointer_to_stringid(size_t ptr);

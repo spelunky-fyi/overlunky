@@ -1767,7 +1767,9 @@ end
         "SPEECH_BUBBLE",
         ON::SPEECH_BUBBLE,
         "TOAST",
-        ON::TOAST);
+        ON::TOAST,
+        "RENDER_PREPARE_TEXT",
+        ON::RENDER_PREPARE_TEXT);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`

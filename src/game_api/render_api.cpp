@@ -9,6 +9,7 @@
 #include "memory.hpp"
 #include "script/events.hpp"
 #include "state.hpp"
+#include "strings.hpp"
 #include "texture.hpp"
 
 RenderAPI& RenderAPI::get()
@@ -344,6 +345,16 @@ void fetch_texture(Entity* entity, int32_t texture_id)
     }
 }
 
+#pragma warning(disable : 4244)
+using PrepareTextFun = void(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11);
+PrepareTextFun* g_prepare_text_trampoline{nullptr};
+void prepare_text(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11)
+{
+    STRINGID id = pointer_to_stringid((size_t)text);
+    on_draw_string(id);
+    g_prepare_text_trampoline(fontstyle, text, a3, x, y, a6, scale_x, scale_y, alignment, unknown_baseline_shift, a11);
+}
+
 void init_render_api_hooks()
 {
     // Fix the texture fetching in spawn_entity
@@ -406,6 +417,8 @@ void init_render_api_hooks()
     render_virt = (size_t*)(journal_vftable + JOURNAL_VFTABLE::LAST_GAME_PLAYED + fourth_virt);
     g_render_journal_page_last_game_played_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
 
+    g_prepare_text_trampoline = (PrepareTextFun*)get_address("prepare_text_for_rendering");
+
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
@@ -427,6 +440,8 @@ void init_render_api_hooks()
     DetourAttach((void**)&g_render_journal_page_recap_trampoline, &render_journal_page_recap);
     DetourAttach((void**)&g_render_journal_page_player_profile_trampoline, &render_journal_page_player_profile);
     DetourAttach((void**)&g_render_journal_page_last_game_played_trampoline, &render_journal_page_last_game_played);
+
+    DetourAttach((void**)&g_prepare_text_trampoline, prepare_text);
 
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)
