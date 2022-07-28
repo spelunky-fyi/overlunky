@@ -8,22 +8,22 @@ import pathlib
 
 
 def does_src_file_have_local_changes(source_file_path: str):
-    header_file_path = str(pathlib.Path(source_file_path).with_suffix(".hpp"))
+    additional_file_types = [".hpp", ".h", ".inl"]
+    files = [source_file_path] + [
+        str(pathlib.Path(source_file_path).with_suffix(ext))
+        for ext in additional_file_types
+    ]
     git_diff_command = [
         "git",
         "diff",
         "--exit-code",
-        source_file_path,
-        header_file_path,
-    ]
+    ] + files
     git_diff_staged_command = [
         "git",
         "diff",
         "--cached",
         "--exit-code",
-        source_file_path,
-        header_file_path,
-    ]
+    ] + files
     with open(os.devnull, "w") as nul:
         return (
             subprocess.call(git_diff_command, stdout=nul, stderr=nul) != 0
