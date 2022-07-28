@@ -116,6 +116,14 @@ function import(id, version, optional) end
 ---@param version string
 ---@return boolean
 function script_enabled(id, version) end
+---Some random hash function
+---@param x integer
+---@return integer
+function lowbias32(x) end
+---Reverse of some random hash function
+---@param x integer
+---@return integer
+function lowbias32_r(x) end
 ---Get your sanitized script id to be used in import.
 ---@return string
 function get_id() end
