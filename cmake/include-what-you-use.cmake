@@ -1,9 +1,35 @@
 
-if(DEFINED IWYU AND CMAKE_GENERATOR STREQUAL "Ninja")
-    message("Configuring include-what-you-use...")
+option(IWYU "Find include-what-you-use and setup targets for applying fixes." OFF)
 
-    if(NOT DEFINED IWYU_MAPPING_FILE)
-        message(FATAL_ERROR "Please specify a mapping file for IWYU via the variable IWYU_MAPPING_FILE...")
+if(IWYU AND
+    (CMAKE_GENERATOR STREQUAL "Ninja" OR CMAKE_GENERATOR STREQUAL "Unix Makefiles"))
+    message(STATUS "Configuring include-what-you-use...")
+
+    if(NOT DEFINED IWYU_BINARY_PATH)
+        if(NOT WIN32)
+            message(STATUS "IWYU_BINARY_PATH not specified, using installed binary...")
+            find_program(IWYU_BINARY_PATH NAMES include-what-you-use iwyu REQUIRED)
+        else()
+            # We have to fetch our own binaries because IWYU is not officially supported on Windows
+            set(IWYU_BINARY_PATH "${CMAKE_BINARY_DIR}/include-what-you-use.exe")
+
+            if(NOT EXISTS ${IWYU_BINARY_PATH})
+                message(STATUS "IWYU_BINARY_PATH not specified, downloading include-what-you-use binary...")
+
+                set(IWYU_EXE_URL "https://github.com/Malacath-92/include-what-you-use/releases/download/${CMAKE_CXX_COMPILER_VERSION}/include-what-you-use.exe")
+
+                message("Downloading binary from \"${IWYU_EXE_URL}\"...")
+                file(DOWNLOAD "${IWYU_EXE_URL}" ${IWYU_BINARY_PATH} SHOW_PROGRESS STATUS IWYU_BINARY_DOWNLOAD_STATUS)
+                list(GET IWYU_BINARY_DOWNLOAD_STATUS 0 IWYU_BINARY_DOWNLOAD_STATUS_CODE)
+
+                if(NOT IWYU_BINARY_DOWNLOAD_STATUS_CODE EQUAL 0)
+                    list(GET IWYU_BINARY_DOWNLOAD_STATUS 1 IWYU_BINARY_DOWNLOAD_STATUS_ERROR)
+                    message(FATAL_ERROR "Failed downloading include-what-you-use.exe for compiler version ${CMAKE_CXX_COMPILER_VERSION}: \"${IWYU_BINARY_DOWNLOAD_STATUS_ERROR}\". Either open an issue, make a PR or manually specify binary path in IWYU_BINARY_PATH...")
+                endif()
+            else()
+                message(STATUS "IWYU_BINARY_PATH not specified, using cached binary...")
+            endif()
+        endif()
     endif()
 
     set(IWYU_HELPER_FILE "${CMAKE_SOURCE_DIR}/iwyu_helper.py")
@@ -27,17 +53,19 @@ if(DEFINED IWYU AND CMAKE_GENERATOR STREQUAL "Ninja")
 
     find_package(Python)
 
-    message("Adding target apply_iwyu_fixes...")
+    message(STATUS "Adding target apply_iwyu_fixes...")
     set(IWYU_COMMAND
         ${Python_EXECUTABLE}
         ${IWYU_HELPER_FILE}
-        -i="${IWYU}"
+        -i="${IWYU_BINARY_PATH}"
         -t="${IWYU_TOOL_FILE}"
         -c="${COMPILE_COMMANDS_FILE}"
         -f="${FIX_INCLUDES_FILE}"
-        -e=--no-warnings
-        -e=-Xiwyu
-        -e=--mapping_file="${IWYU_MAPPING_FILE}")
+        -e=--no-warnings)
+
+    if(DEFINED IWYU_MAPPING_FILE)
+        list(APPEND IWYU_COMMAND -e=-Xiwyu -e=--mapping_file="${IWYU_MAPPING_FILE}")
+    endif()
 
     if(DEFINED POST_IWYU_FORMATTING_TARGET)
         add_custom_target(
@@ -70,13 +98,15 @@ if(DEFINED IWYU AND CMAKE_GENERATOR STREQUAL "Ninja")
     endif()
 
     set(IWYU_PATH_AND_OPTIONS
-        ${IWYU}
-        --no-warnings
-        -Xiwyu
-        --mapping_file=${IWYU_MAPPING_FILE})
+        ${IWYU_BINARY_PATH}
+        --no-warnings)
+
+    if(DEFINED IWYU_MAPPING_FILE)
+        list(APPEND IWYU_PATH_AND_OPTIONS -Xiwyu --mapping_file=${IWYU_MAPPING_FILE})
+    endif()
 
     function(setup_iwyu TARGET_NAME)
-        message("Adding include-what-you-use to target ${TARGET_NAME}...")
+        message(STATUS "Adding include-what-you-use to target ${TARGET_NAME}...")
 
         set_property(
             TARGET ${TARGET_NAME}
