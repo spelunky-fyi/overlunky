@@ -351,7 +351,9 @@ bool init_hooks(void* swap_chain_ptr)
         g_Device->GetImmediateContext(&g_Context);
     }
 
-    hook_steam_overlay();
+    // hook_steam_overlay(); // TODO: lol this broke immediately
+    hook_virtual_function(&hkPresent, g_OrigSwapChainPresent, 8);
+    hook_virtual_function(&hkResizeBuffers, g_OrigSwapChainResizeBuffers, 13);
 
     {
         g_destroy_game_manager_trampoline = (DestroyGameManager*)get_address("destroy_game_manager"sv);
