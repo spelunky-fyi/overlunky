@@ -1,8 +1,14 @@
 #include "drops_lua.hpp"
 
-#include "drops.hpp"
+#include <cstddef>     // for size_t
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for proxy_key_t, global_table, state, table_proxy
+#include <tuple>       // for get
+#include <type_traits> // for move
+#include <utility>     // for max, min
+#include <vector>      // for vector
 
-#include <sol/sol.hpp>
+#include "drops.hpp" // for drop_entries, dropchance_entries, replace_drop
 
 namespace NDrops
 {

@@ -1,8 +1,33 @@
 #pragma once
 
-#include "screen.hpp"
-#include "screen_arena.hpp"
-#include "state_structs.hpp"
+#include <array>   // for array
+#include <cstddef> // for size_t
+#include <cstdint> // for uint8_t, uint32_t, int32_t, int8_t, uin...
+#include <utility> // for pair
+#include <vector>  // for vector
+
+#include "aliases.hpp"       // for ENT_TYPE, LAYER
+#include "state_structs.hpp" // for JournalProgressionSlot, Illumination (p...
+
+class Entity;
+class ScreenArenaIntro;
+class ScreenArenaItems;
+class ScreenArenaLevel;
+class ScreenArenaMenu;
+class ScreenArenaScore;
+class ScreenArenaStagesSelect;
+class ScreenCamp;
+class ScreenCharacterSelect;
+class ScreenConstellation;
+class ScreenCredits;
+class ScreenDeath;
+class ScreenLevel;
+class ScreenRecap;
+class ScreenScores;
+class ScreenTeamSelect;
+class ScreenTransition;
+class ScreenWin;
+struct ParticleEmitterInfo;
 
 const float ZF = 0.737f;
 

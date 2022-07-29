@@ -1,10 +1,31 @@
 #include "script_impl.hpp"
 
-#include "lua_vm.hpp"
-#include "script_util.hpp"
-#include "state.hpp"
+#include <chrono>        // for system_clock
+#include <cstring>       // for memchr
+#include <deque>         // for deque
+#include <exception>     // for exception
+#include <fmt/format.h>  // for format_error
+#include <imgui.h>       // for ImVec4
+#include <list>          // for _List_iterator, _List_const_iterator
+#include <locale>        // for num_get, num_put
+#include <mutex>         // for lock_guard
+#include <new>           // for operator new
+#include <regex>         // for regex_search, regex
+#include <sol/sol.hpp>   // for table_proxy, optional, basic_envir...
+#include <sstream>       // for basic_istringstream, istringstream
+#include <tuple>         // for get
+#include <type_traits>   // for move, conditional_t
+#include <unordered_map> // for unordered_map
+#include <utility>       // for max, min
 
-#include <sol/sol.hpp>
+#include "logger.h"               // for DEBUG
+#include "lua_vm.hpp"             // for execute_lua, get_lua_vm
+#include "script/lua_backend.hpp" // for LuaBackend, ON, ON::SCRIPT_DISABLE
+#include "script_util.hpp"        // for sanitize
+#include "state.hpp"              // for State
+
+class LuaConsole;
+class SoundManager;
 
 ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, LuaConsole* con, bool enable)
     : LuaBackend(sound_mgr, con)

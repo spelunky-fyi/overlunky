@@ -1,10 +1,18 @@
 #pragma once
 
-#include "entities_items.hpp" // for UnknownPointerGroup
-#include "entity.hpp"
+#include <array>         // for array
+#include <cstdint>       // for int32_t, uint8_t, uint32_t, uint16_t
+#include <functional>    // for equal_to
+#include <memory>        // for allocator
+#include <new>           // for operator new
+#include <type_traits>   // for hash
+#include <unordered_map> // for _Umap_traits<>::allocator_type, unorde...
 
-#include <array>
-#include <cstdint>
+#include "aliases.hpp"        // for ENT_TYPE
+#include "entities_items.hpp" // for UnknownPointerGroup
+#include "entity.hpp"         // for SoundPosition (ptr only), Entity
+
+struct Illumination;
 
 enum FLOOR_SIDE
 {

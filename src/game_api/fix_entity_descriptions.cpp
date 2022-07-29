@@ -1,10 +1,11 @@
 #include "fix_entity_descriptions.hpp"
-#include "entity.hpp"
 
-#include <iostream>
-#include <regex>
-#include <sstream>
-#include <string>
+#include <cstdint> // for uint32_t
+#include <new>     // for operator new
+#include <utility> // for pair, min
+#include <vector>  // for allocator, vector, _Vector_const_iterator
+
+#include "entity.hpp" // for get_type, EntityDB
 
 // To update the description mapping, uncomment the #define below, and paste in the contents
 // of the asset doc spreadsheet, run OL and it will dump the vector to stdout. Paste that over

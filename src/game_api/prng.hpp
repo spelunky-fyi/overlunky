@@ -1,7 +1,9 @@
 #pragma once
 
-#include <cstdint>
-#include <optional>
+#include <cstddef>  // for size_t
+#include <cstdint>  // for int64_t, uint64_t
+#include <optional> // for optional
+#include <utility>  // for pair
 
 struct PRNG
 {

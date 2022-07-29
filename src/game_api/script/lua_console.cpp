@@ -1,10 +1,28 @@
 #include "lua_console.hpp"
 
-#include "lua_vm.hpp"
+#include <array>        // for array, _Array_const_iterator
+#include <compare>      // for operator<
+#include <cstdlib>      // for exit, free
+#include <cstring>      // for memchr, memset
+#include <ctype.h>      // for isalnum
+#include <deque>        // for _Deque_iterator, deque, deque<>::i...
+#include <exception>    // for exception
+#include <fmt/format.h> // for check_format_string, format, vformat
+#include <iterator>     // for back_insert_iterator, back_inserter
+#include <limits>       // for numeric_limits
+#include <map>          // for map, _Tree_iterator, _Tree_const_i...
+#include <new>          // for operator new
+#include <regex>        // for regex, regex_replace, regex_search
+#include <set>          // for set
+#include <sol/sol.hpp>  // for basic_userdata, basic_table_core
+#include <tuple>        // for get
+#include <utility>      // for min, max, tuple_element<>::type
 
-#include "lua_libs/lua_libs.hpp"
+#include "lua_libs/lua_libs.hpp"  // for require_serpent_lua
+#include "lua_vm.hpp"             // for execute_lua, expose_unsafe_libraries
+#include "script/lua_backend.hpp" // for LuaBackend
 
-#include <sol/sol.hpp>
+class SoundManager;
 
 LuaConsole::LuaConsole(SoundManager* soundmanager)
     : LuaBackend(soundmanager, this)
@@ -819,7 +837,7 @@ bool LuaConsole::pre_draw()
             return 0;
         };
 
-        const float indent_size = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, "00", nullptr, nullptr).x + 2.0f;
+        const float indent_size = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), std::numeric_limits<float>::max(), -1.0f, "00", nullptr, nullptr).x + 2.0f;
         ImGui::PushItemWidth(ImGui::GetWindowWidth() - indent_size);
         ImGui::Indent(indent_size);
         ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine;
@@ -882,7 +900,7 @@ bool LuaConsole::pre_draw()
         for (int i = 1; i <= num; ++i)
         {
             std::string buf = fmt::format("{}", i);
-            auto linesize = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), FLT_MAX, -1.0f, buf.c_str(), nullptr, nullptr);
+            auto linesize = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), std::numeric_limits<float>::max(), -1.0f, buf.c_str(), nullptr, nullptr);
             float numx = pos.x != 0 ? pos.x + indent_size - linesize.x - 2.0f : base->Pos.x + indent_size - linesize.x - 2.0f;
             float numy = pos.y != 0 ? pos.y + size.y - linesize.y * (num - i + 2) + 9.0f : base->Pos.y + base->Size.y - linesize.y * (num - i + 2) + 9.0f;
             drawlist->AddText(ImVec2(numx, numy), ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());

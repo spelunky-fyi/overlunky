@@ -1,6 +1,12 @@
 #pragma once
 
-#include "entities_chars.hpp"
+#include <cstdint> // for uint8_t, uint32_t, int32_t, uint16_t
+#include <utility> // for pair
+
+#include "entities_chars.hpp" // for PowerupCapable
+
+class Movable;
+struct SoundPosition;
 
 class Mount : public PowerupCapable
 {

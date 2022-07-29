@@ -1,11 +1,15 @@
 #include "character_def.hpp"
 
-#include "memory.hpp"
-#include "strings.hpp"
+#include <algorithm> // for clamp
+#include <array>     // for array
+#include <cassert>   // for assert
+#include <cstring>   // for memcmp, size_t
+#include <span>      // for span
 
-#include <array>
-#include <cassert>
-#include <span>
+#include "aliases.hpp" // for STRINGID
+#include "memory.hpp"  // for write_mem_prot
+#include "search.hpp"  // for get_address
+#include "strings.hpp" // for change_string, get_string
 
 enum class CharGender
 {

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-#include <optional>
-#include <string_view>
+#include <cstddef>     // for size_t
+#include <cstdint>     // for uint8_t
+#include <optional>    // for optional, nullopt
+#include <string>      // for string
+#include <string_view> // for operator""sv, string_view, string_view_literals
 
 using namespace std::string_view_literals;
 

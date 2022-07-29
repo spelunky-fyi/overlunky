@@ -1,23 +1,45 @@
-#include <Windows.h>
+#include <Windows.h>         // for DWORD, MB_OK, MessageBox
+#include <algorithm>         // for transform, replace, sort
+#include <array>             // for array, _Array_iterator
+#include <cctype>            // for toupper
+#include <chrono>            // for operator<=>, operator-
+#include <cmath>             // for round, abs
+#include <compare>           // for operator<, operator<=
+#include <cstdint>           // for uint32_t, int64_t, uint...
+#include <cstdlib>           // for abs, size_t, exit, NULL
+#include <filesystem>        // for create_directories
+#include <fmt/format.h>      // for check_format_string
+#include <fstream>           // for char_traits, operator<<
+#include <functional>        // for equal_to, less
+#include <initializer_list>  // for initializer_list
+#include <list>              // for _List_iterator, _List_c...
+#include <locale>            // for num_put
+#include <map>               // for multimap, _Tree_iterator
+#include <new>               // for operator new
+#include <nlohmann/json.hpp> // for basic_json<>::object_t
+#include <set>               // for set
+#include <stdexcept>         // for out_of_range
+#include <string>            // for string, operator+, oper...
+#include <thread>            // for sleep_for
+#include <type_traits>       // for move, remove_reference_t
+#include <unordered_map>     // for unordered_map, unordere...
+#include <utility>           // for max, min, tuple_element...
+#include <vector>            // for vector, _Vector_iterator
 
-#include <chrono>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <thread>
-
-#include <nlohmann/json.hpp>
-
-#include "console.hpp"
-#include "entity.hpp"
-#include "level_api.hpp"
-#include "memory.hpp"
-#include "particles.hpp"
-#include "settings_api.hpp"
-#include "sound_manager.hpp"
-#include "state.hpp"
-#include "texture.hpp"
-#include "virtual_table.hpp"
+#include "color.hpp"                         // for Color
+#include "console.hpp"                       // for SpelunkyConsole
+#include "containers/game_unordered_map.hpp" // for game_unordered_map
+#include "entity.hpp"                        // for EntityDB, EntityItem
+#include "level_api.hpp"                     // for LevelGenData, LevelGenS...
+#include "logger.h"                          // for DEBUG
+#include "memory.hpp"                        // for Memory
+#include "particles.hpp"                     // for list_particles, Particl...
+#include "search.hpp"                        // for get_address
+#include "settings_api.hpp"                  // for get_settings_names_and_...
+#include "sound_manager.hpp"                 // for SoundManager, SoundMana...
+#include "state.hpp"                         // for StateMemory, State
+#include "texture.hpp"                       // for Texture, get_textures
+#include "virtual_table.hpp"                 // for VTABLE_OFFSET, VTABLE_O...
 
 using float_json = nlohmann::basic_json<std::map, std::vector, std::string, bool, std::int64_t, std::uint64_t, float>;
 #define FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Type, ...)                             \

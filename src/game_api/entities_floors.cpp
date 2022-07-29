@@ -1,9 +1,14 @@
 #include "entities_floors.hpp"
 
-#include "spawn_api.hpp"
-#include "state.hpp"
+#include <assert.h> // for assert
+#include <cmath>    // for floor, abs
+#include <cstdlib>  // for rand, abs, size_t
 
-#include <numbers>
+#include "layer.hpp"     // for EntityList, EntityList::Range, Layer, Entit...
+#include "movable.hpp"   // for Movable
+#include "spawn_api.hpp" // for spawn_entity_over
+#include "state.hpp"     // for State
+#include "texture.hpp"   // for Texture
 
 void Floor::fix_border_tile_animation()
 {

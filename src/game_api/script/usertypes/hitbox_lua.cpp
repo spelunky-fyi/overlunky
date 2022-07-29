@@ -1,8 +1,17 @@
 #include "hitbox_lua.hpp"
 
-#include "rpc.hpp"
+#include <algorithm>   // for max
+#include <cstdint>     // for uint32_t
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for optional, global_table, proxy_key_t, data_t
+#include <string>      // for allocator, operator==
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max, get, pair
 
-#include <sol/sol.hpp>
+#include "entity.hpp" // for get_hitbox
+#include "math.hpp"   // for AABB, Vec2, Quad, AABB::bottom, AABB::left
+#include "rpc.hpp"    // for screen_aabb
 
 namespace NHitbox
 {

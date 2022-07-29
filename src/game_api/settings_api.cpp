@@ -1,7 +1,15 @@
 #include "settings_api.hpp"
 
-#include "render_api.hpp"
-#include "search.hpp"
+#include <assert.h>      // for assert
+#include <cstring>       // for strstr, size_t
+#include <functional>    // for equal_to
+#include <map>           // for map, _Tree_iterator, _Tree_const_iterator
+#include <new>           // for operator new
+#include <type_traits>   // for hash, move, conditional_t
+#include <unordered_set> // for unordered_set, _Uset_traits<>::allocator_type
+
+#include "render_api.hpp" // for RenderAPI
+#include "search.hpp"     // for get_address
 
 union SettingValue
 {

@@ -1,9 +1,12 @@
 #include "drops.hpp"
 
-#include "entity.hpp"
-#include "memory.hpp"
+#include <new>      // for operator new
+#include <optional> // for nullopt
+#include <utility>  // for min, max
 
-#include <iostream>
+#include "entity.hpp" // for to_id
+#include "memory.hpp" // for Memory, recover_mem, write_mem_recoverable
+#include "search.hpp" // for find_inst
 
 using namespace std::string_literals;
 

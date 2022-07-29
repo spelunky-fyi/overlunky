@@ -1,6 +1,14 @@
 #pragma once
 
-#include "aliases.hpp"
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint32_t, int32_t, uint64_t, uint8_t
+#include <functional> // for less
+#include <map>        // for map
+#include <new>        // for operator new
+#include <utility>    // for find, pair
+#include <vector>     // for allocator, vector
+
+#include "aliases.hpp" // for ENT_TYPE
 
 class Entity;
 

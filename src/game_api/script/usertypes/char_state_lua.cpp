@@ -1,6 +1,7 @@
 #include "char_state_lua.hpp"
 
-#include <sol/sol.hpp>
+#include <sol/sol.hpp> // for state
+#include <tuple>       // for get
 
 namespace NCharacterState
 {

@@ -1,13 +1,7 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
-
-#include <map>
-#include <set>
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include <cstddef> // for size_t, ptrdiff_t
+#include <new>     // for operator new
 
 void* game_malloc(std::size_t size);
 void game_free(void* mem);

@@ -1,14 +1,20 @@
-//#include "ui.hpp"
+#pragma once
 
-#include "aliases.hpp"
-#include "color.hpp"
-#include "math.hpp"
+#include <cmath>       // for INFINITY
+#include <cstdint>     // for uint32_t, uint8_t, int32_t, uint16_t
+#include <optional>    // for optional
+#include <string_view> // for string_view
+#include <utility>     // for pair
+#include <vector>      // for vector
+
+#include "aliases.hpp" // for ENT_TYPE, LAYER
+#include "color.hpp"   // for Color
 
 class Player;
 class Entity;
 struct SaveData;
 struct Illumination;
-struct GameManager;
+struct AABB;
 
 constexpr uint32_t set_flag(uint32_t& flags, int bit)
 {

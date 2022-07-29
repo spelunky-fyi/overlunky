@@ -1,6 +1,9 @@
 #pragma once
 
-#include "aliases.hpp"
+#include <array>   // for array
+#include <cstdint> // for uint8_t, int16_t, uint32_t, int8_t
+
+#include "aliases.hpp" // for ENT_TYPE, MAX_PLAYERS
 
 class Player;
 

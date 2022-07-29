@@ -1,6 +1,9 @@
 #include "entities_mounts.hpp"
 
-#include "memory.hpp"
+#include "movable.hpp" // for Movable
+#include "search.hpp"  // for get_address
+
+class Entity;
 
 void Mount::carry(Movable* rider)
 {

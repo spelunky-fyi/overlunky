@@ -1,10 +1,16 @@
 #include "save_context.hpp"
 
-#include "file_api.hpp"
+#include <algorithm>   // for max
+#include <fstream>     // for basic_streambuf, basic_ifstream, basic_ios
+#include <iterator>    // for istreambuf_iterator, operator==
+#include <locale>      // for num_put, num_get
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for state, no_constructor
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max, swap
 
-#include <sol/sol.hpp>
-
-#include <fstream>
+#include "file_api.hpp" // for MakeSavePathCallback
 
 extern MakeSavePathCallback g_MakeSavePathCallback;
 

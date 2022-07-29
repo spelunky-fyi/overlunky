@@ -1,9 +1,16 @@
 #include "particles_lua.hpp"
 
-#include "particles.hpp"
-#include "rpc.hpp"
+#include <algorithm>   // for max
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for global_table, proxy_key_t, data_t, state
+#include <string>      // for allocator, operator==, string
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
+#include <vector>      // for _Vector_const_iterator, vector
 
-#include <sol/sol.hpp>
+#include "particles.hpp" // for ParticleDB, ParticleEmitterInfo, ParticleEm...
+#include "rpc.hpp"       // for generate_world_particles, advance_screen_pa...
 
 namespace NParticles
 {

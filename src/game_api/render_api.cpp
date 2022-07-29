@@ -1,15 +1,30 @@
 #include "render_api.hpp"
 
-#include <cstddef>
-#include <detours.h>
-#include <string>
+#include <Windows.h>    // for MultiByteToWideChar, GetCurrentThread
+#include <array>        // for array
+#include <cstddef>      // for size_t
+#include <detours.h>    // for DetourAttach, DetourTransactionBegin
+#include <fmt/format.h> // for check_format_string, format, vformat
+#include <list>         // for _List_iterator, _List_const_iterator
+#include <optional>     // for optional, nullopt
+#include <string>       // for operator""sv, string, wstring, all...
+#include <string_view>  // for string_view
+#include <vector>       // for vector
 
-#include "entity.hpp"
-#include "level_api.hpp"
-#include "memory.hpp"
-#include "script/events.hpp"
-#include "state.hpp"
-#include "texture.hpp"
+#include "entity.hpp"             // for Entity, EntityDB
+#include "level_api.hpp"          // for ThemeInfo
+#include "logger.h"               // for DEBUG
+#include "memory.hpp"             // for read_u64, to_le_bytes, write_mem_prot
+#include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
+#include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
+#include "search.hpp"             // for get_address
+#include "state.hpp"              // for State, StateMemory
+#include "texture.hpp"            // for Texture, get_textures, get_texture
+
+class JournalPage;
+struct Camera;
+struct Illumination;
+struct Layer;
 
 RenderAPI& RenderAPI::get()
 {

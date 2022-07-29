@@ -1,11 +1,12 @@
 #pragma once
 
-#include "aliases.hpp"
-#include "virtual_table.hpp"
+#include <cstddef> // for size_t
+#include <cstdint> // for uint32_t, uint8_t, int32_t
+#include <string>  // for string, allocator
+#include <vector>  // for vector
 
-#include <cstdint>
-#include <string>
-#include <vector>
+#include "aliases.hpp"       // for ENT_TYPE
+#include "virtual_table.hpp" // for VTABLE_OFFSET
 
 struct DropEntry
 {

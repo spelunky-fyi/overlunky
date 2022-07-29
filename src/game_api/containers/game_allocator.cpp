@@ -1,17 +1,19 @@
 #include "game_allocator.hpp"
 
-#include "memory.hpp"
+#include <string> // for operator""sv
 
-using MallocFun = decltype(game_malloc);
-using FreeFun = decltype(game_free);
+#include "search.hpp" // for get_address
+
+using GameMallocFun = decltype(game_malloc);
+using GameFreeFun = decltype(game_free);
 
 void* game_malloc(std::size_t size)
 {
-    static MallocFun* _malloc = *(MallocFun**)get_address("game_malloc"sv);
+    static GameMallocFun* _malloc = *(GameMallocFun**)get_address("game_malloc"sv);
     return _malloc(size);
 }
 void game_free(void* mem)
 {
-    static FreeFun* _free = *(FreeFun**)get_address("game_free"sv);
+    static GameFreeFun* _free = *(GameFreeFun**)get_address("game_free"sv);
     _free(mem);
 }

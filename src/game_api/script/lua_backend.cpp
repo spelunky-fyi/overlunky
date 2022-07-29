@@ -1,28 +1,35 @@
 #include "lua_backend.hpp"
 
-#include "aliases.hpp"
-#include "constants.hpp"
-#include "entities_chars.hpp"
-#include "items.hpp"
-#include "level_api.hpp"
-#include "lua_console.hpp"
-#include "lua_vm.hpp"
-#include "movable_behavior.hpp"
-#include "overloaded.hpp"
-#include "rpc.hpp"
-#include "script_util.hpp"
-#include "sound_manager.hpp"
-#include "state.hpp"
-#include "strings.hpp"
+#include <assert.h>     // for assert
+#include <cstddef>      // for size_t
+#include <exception>    // for exception
+#include <fmt/format.h> // for format_error
+#include <list>         // for _List_iterator, _List_co...
+#include <sol/sol.hpp>  // for table_proxy, optional
+#include <tuple>        // for get
 
-#include "usertypes/gui_lua.hpp"
-#include "usertypes/level_lua.hpp"
-#include "usertypes/save_context.hpp"
-#include "usertypes/vanilla_render_lua.hpp"
-
-#include "lua_libs/lua_libs.hpp"
-
-#include <sol/sol.hpp>
+#include "aliases.hpp"                      // for IMAGE, JournalPageType
+#include "constants.hpp"                    // for no_return_str
+#include "entities_chars.hpp"               // for Player
+#include "entity.hpp"                       // for Entity, get_entity_ptr
+#include "items.hpp"                        // for Inventory
+#include "level_api.hpp"                    // for LevelGenData, LevelGenSy...
+#include "level_api_types.hpp"              // for LevelGenRoomData
+#include "lua_console.hpp"                  // for LuaConsole
+#include "lua_vm.hpp"                       // for acquire_lua_vm, get_lua_vm
+#include "math.hpp"                         // for AABB
+#include "movable_behavior.hpp"             // for CustomMovableBehavior
+#include "overloaded.hpp"                   // for overloaded
+#include "rpc.hpp"                          // for get_frame_count, get_pla...
+#include "screen.hpp"                       // for get_screen_ptr, Screen
+#include "script_util.hpp"                  // for InputString
+#include "sound_manager.hpp"                // for SoundManager
+#include "state.hpp"                        // for StateMemory, State, get_...
+#include "strings.hpp"                      // for clear_custom_shopitem_names
+#include "usertypes/gui_lua.hpp"            // for GuiDrawContext
+#include "usertypes/level_lua.hpp"          // for PreHandleRoomTilesContext
+#include "usertypes/save_context.hpp"       // for LoadContext, SaveContext
+#include "usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
 
 std::recursive_mutex g_all_backends_mutex;
 std::vector<LuaBackend*> g_all_backends;
@@ -593,7 +600,7 @@ void LuaBackend::draw(ImDrawList* dl)
         /// Use `set_callback(function, ON.GUIFRAME)` instead
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
 
-        GuiDrawContext draw_ctx(this, dl);
+        GuiDrawContext draw_ctx(this);
 
         if (on_guiframe)
         {

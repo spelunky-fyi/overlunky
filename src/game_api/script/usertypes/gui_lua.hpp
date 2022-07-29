@@ -1,19 +1,21 @@
 #pragma once
 
-#include <sol/forward.hpp>
+#include <sol/forward.hpp> // for function
+#include <string>          // for string
+#include <vector>          // for vector
 
-#include <string>
-#include <vector>
+#include "aliases.hpp" // for uColor, IMAGE
+#include "math.hpp"    // for Vec2, AABB (ptr only)
 
-#include "aliases.hpp"
-#include "math.hpp"
-
-class ScriptImpl;
+namespace sol
+{
+class state;
+} // namespace sol
 
 class GuiDrawContext
 {
   public:
-    GuiDrawContext(class LuaBackend* script, struct ImDrawList* draw_list);
+    GuiDrawContext(class LuaBackend* script);
 
     /// Draws a line on screen
     void draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color);
@@ -97,7 +99,6 @@ class GuiDrawContext
 
   private:
     class LuaBackend* backend;
-    struct ImDrawList* draw_list;
 };
 
 namespace NGui

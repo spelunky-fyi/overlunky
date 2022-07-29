@@ -1,5 +1,8 @@
 #include "online.hpp"
-#include "memory.hpp"
+
+#include <fmt/format.h> // for check_format_string, format, vformat
+
+#include "search.hpp" // for get_address
 
 Online* get_online()
 {

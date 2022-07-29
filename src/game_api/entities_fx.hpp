@@ -3,6 +3,8 @@
 #include "movable.hpp"
 #include "particles.hpp"
 
+struct Illumination;
+
 class OlmecFloater : public Movable
 {
   public:

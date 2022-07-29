@@ -1,9 +1,33 @@
 #include "sound_lua.hpp"
 
-#include "script/lua_backend.hpp"
-#include "sound_manager.hpp"
+#include <algorithm>     // for max, transform, replace
+#include <assert.h>      // for assert
+#include <cctype>        // for toupper
+#include <cstdint>       // for uint32_t
+#include <exception>     // for exception
+#include <filesystem>    // for operator/, path
+#include <fmt/format.h>  // for format_error
+#include <functional>    // for _Func_impl_no_alloc<>::_Mybase
+#include <locale>        // for num_put
+#include <memory>        // for allocator, make_unique
+#include <mutex>         // for lock_guard
+#include <new>           // for operator new
+#include <optional>      // for nullopt
+#include <ostream>       // for basic_streambuf, basic_ios
+#include <sol/sol.hpp>   // for global_table, proxy_key_t, state
+#include <string>        // for string, basic_string, operator==
+#include <tuple>         // for get
+#include <type_traits>   // for move, remove_reference_t, declval
+#include <unordered_map> // for unordered_map
+#include <utility>       // for min, max, swap, find
+#include <vector>        // for vector, _Vector_iterator, _Vector_...
 
-#include <sol/sol.hpp>
+#include "aliases.hpp"            // for CallbackId, VANILLA_SOUND_CALLBACK...
+#include "fmod.hpp"               // for EventCallbackType, Created, Destroyed
+#include "logger.h"               // for DEBUG
+#include "script/lua_backend.hpp" // for LuaBackend
+#include "sound_manager.hpp"      // for CustomSound, PlayingSound, SoundMa...
+#include "string_aliases.hpp"     // for VANILLA_SOUND
 
 namespace NSound
 {

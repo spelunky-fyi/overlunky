@@ -1,10 +1,13 @@
 #pragma once
 
-#include <unordered_map>
+#include <Windows.h>   // for GetModuleHandleA, LPVOID
+#include <cstddef>     // for size_t, byte, NULL
+#include <cstdint>     // for int32_t, int64_t, uint32_t, uint64_t, uint8_t
+#include <memory>      // for unique_ptr
+#include <string>      // for string, string_literals
+#include <string_view> // for string_view
 
-#include <Windows.h>
-
-#include "search.hpp"
+#include "search.hpp" // for find_after_bundle
 
 using namespace std::string_literals;
 

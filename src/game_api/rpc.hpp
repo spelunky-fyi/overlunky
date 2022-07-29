@@ -1,15 +1,22 @@
 #pragma once
 
-#include "entity.hpp"
+#include <cstdint>    // for uint32_t, uint8_t, int32_t, int64_t, int16_t
+#include <functional> // for function
+#include <optional>   // for optional, nullopt
+#include <string>     // for string
+#include <tuple>      // for tuple
+#include <utility>    // for pair
+#include <vector>     // for vector
+
+#include "aliases.hpp" // for ENT_TYPE, LAYER
+#include "color.hpp"   // for Color
 
 class Player;
-struct SaveData;
 struct ParticleEmitterInfo;
 struct Illumination;
-
-#include <cstdint>
-#include <functional>
-#include <vector>
+class Entity;
+struct AABB;
+struct Layer;
 
 void attach_entity(Entity* overlay, Entity* attachee);
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid);

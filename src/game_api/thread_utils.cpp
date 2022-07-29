@@ -1,9 +1,12 @@
 #include "thread_utils.hpp"
 
-#include <TlHelp32.h>
-#include <Windows.h>
+#include <TlHelp32.h>   // for CreateToolhelp32Snapshot, THREADENTRY32, Thr...
+#include <Windows.h>    // for HANDLE, GetCurrentProcessId, GetCurrentThread
+#include <winternl.h>   // for KPRIORITY, NTSTATUS, CLIENT_ID, THREADINFOCLASS
+#include <wtypesbase.h> // for ULONG
 
-#include "memory.hpp"
+#include "logger.h"   // for DEBUG
+#include "memory.hpp" // for read_u64
 
 HANDLE get_main_thread()
 {
