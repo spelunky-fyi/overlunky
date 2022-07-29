@@ -1,17 +1,28 @@
-#include <chrono>
-#include <filesystem>
-#include <thread>
+#include <Windows.h>   // for PROCESS_INFORMATION, CloseHandle, GetEnvironm...
+#include <chrono>      // for operator<=>, operator-, operator+, operator""s
+#include <compare>     // for operator<, operator<=, operator>
+#include <ctime>       // for errno_t
+#include <filesystem>  // for exists, path
+#include <fstream>     // for basic_ostream, basic_ofstream, ofstream, basi...
+#include <locale>      // for num_put, num_get
+#include <new>         // for operator new
+#include <optional>    // for optional
+#include <sstream>     // for basic_stringstream
+#include <stdint.h>    // for uint64_t
+#include <stdio.h>     // for NULL, fclose, sprintf_s, fflush, fopen_s, fwrite
+#include <string.h>    // for strlen
+#include <string>      // for char_traits, string, basic_string, operator==
+#include <string_view> // for string_view
+#include <strsafe.h>   // for DWORD
+#include <thread>      // for sleep_for
+#include <type_traits> // for move
+#include <utility>     // for max, min
+#include <wininet.h>   // for InternetCloseHandle, InternetOpenA, InternetG...
 
-#include "cmd_line.h"
-#include "injector.h"
-#include "logger.h"
-#include "version.hpp"
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <strsafe.h>
-#include <wininet.h>
+#include "cmd_line.h"  // for GetCmdLineParam, CmdLineParser
+#include "injector.h"  // for Process, ProcessInfo, call, find_function
+#include "logger.h"    // for INFO, PANIC
+#include "version.hpp" // for get_version
 
 #pragma comment(lib, "wininet.lib")
 #pragma warning(disable : 4706 4996)

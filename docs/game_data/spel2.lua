@@ -107,15 +107,23 @@ function clear_callback(id) end
 ---- `false` if the script was not found but optional is set to true
 ---- an error if the script was not found and the optional argument was not set
 ---@param id string
----@param version string?
----@param optional boolean?
+---@param version string
+---@param optional boolean
 ---@return table
 function import(id, version, optional) end
 ---Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
 ---@param id string
----@param version string?
+---@param version string
 ---@return boolean
 function script_enabled(id, version) end
+---Some random hash function
+---@param x integer
+---@return integer
+function lowbias32(x) end
+---Reverse of some random hash function
+---@param x integer
+---@return integer
+function lowbias32_r(x) end
 ---Get your sanitized script id to be used in import.
 ---@return string
 function get_id() end

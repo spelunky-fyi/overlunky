@@ -763,6 +763,12 @@
                             <a href="#load_screen" class="toc-h3 toc-link" data-title="load_screen">load_screen</a>
                           </li>
                           <li>
+                            <a href="#lowbias32" class="toc-h3 toc-link" data-title="lowbias32">lowbias32</a>
+                          </li>
+                          <li>
+                            <a href="#lowbias32_r" class="toc-h3 toc-link" data-title="lowbias32_r">lowbias32_r</a>
+                          </li>
+                          <li>
                             <a href="#pause" class="toc-h3 toc-link" data-title="pause">pause</a>
                           </li>
                           <li>
@@ -4104,7 +4110,7 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
 </blockquote>
-<h4 id='table-import-string-id-optional-version-optional-optional'>table import(string id, optional<string> version, optional<bool> optional)</h4>
+<h4 id='table-import-string-id-string-version-quot-quot-bool-optional-false'>table import(string id, string version = &quot;&quot;, bool optional = false)</h4>
 <p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table. Returns:</p>
 
 <ul>
@@ -4125,6 +4131,18 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 </blockquote>
 <h4 id='nil-load_screen'>nil load_screen()</h4>
 <p>Immediately load a screen based on state.screen_next and stuff</p>
+<h3 id='lowbias32'>lowbias32</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lowbias32">lowbias32</a></p>
+</blockquote>
+<h4 id='int-lowbias32-int-x'>int lowbias32(int x)</h4>
+<p>Some random hash function</p>
+<h3 id='lowbias32_r'>lowbias32_r</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lowbias32_r">lowbias32_r</a></p>
+</blockquote>
+<h4 id='int-lowbias32_r-int-x'>int lowbias32_r(int x)</h4>
+<p>Reverse of some random hash function</p>
 <h3 id='pause'>pause</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></p>
@@ -4149,7 +4167,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=script_enabled">script_enabled</a></p>
 </blockquote>
-<h4 id='bool-script_enabled-string-id-optional-version'>bool script_enabled(string id, optional<string> version)</h4>
+<h4 id='bool-script_enabled-string-id-string-version-quot-quot'>bool script_enabled(string id, string version = &quot;&quot;)</h4>
 <p>Check if another script is enabled by id &quot;author/name&quot;. You should probably check this after all the other scripts have had a chance to load.</p>
 <h3 id='seed_prng'>seed_prng</h3>
 <blockquote>

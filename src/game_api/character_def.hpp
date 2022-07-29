@@ -1,9 +1,9 @@
 #pragma once
 
-#include "color.hpp"
+#include <cstdint>     // for uint32_t
+#include <string_view> // for u16string_view
 
-#include <cstdint>
-#include <string_view>
+#include "color.hpp" // for Color
 
 namespace NCharacterDB
 {

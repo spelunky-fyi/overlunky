@@ -1,6 +1,8 @@
 #include "lua_libs.hpp"
 
-#include <sol/sol.hpp>
+#include <sol/sol.hpp> // for global_table, state, state_view, table_proxy
+#include <tuple>       // for get
+#include <type_traits> // for move
 
 void require_json_lua(sol::state& lua)
 {

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <sol/forward.hpp>
-
-class ScriptImpl;
+namespace sol
+{
+class state;
+} // namespace sol
 
 namespace NEntityFlags
 {

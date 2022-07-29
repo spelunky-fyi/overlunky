@@ -1,8 +1,9 @@
 #pragma once
 
-#include "aliases.hpp"
-
-#include <sol/forward.hpp>
+namespace sol
+{
+class state;
+} // namespace sol
 
 namespace NBehavior
 {

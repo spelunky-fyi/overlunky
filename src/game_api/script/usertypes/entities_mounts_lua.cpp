@@ -1,9 +1,18 @@
 #include "entities_mounts_lua.hpp"
 
-#include "entities_chars.hpp"
-#include "entities_mounts.hpp"
+#include <algorithm>   // for max
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for proxy_key_t, state, basic_table_core:...
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
 
-#include <sol/sol.hpp>
+#include "entities_mounts.hpp" // for Mount, Mech, Axolotl, Qilin, Rockdog
+#include "entity.hpp"          // for Entity
+
+class Movable;
+class PowerupCapable;
 
 namespace NEntitiesMounts
 {

@@ -1,6 +1,9 @@
 #pragma once
 
-#include <sol/forward.hpp>
+namespace sol
+{
+class state;
+} // namespace sol
 
 namespace NEntitiesFloors
 {

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "sockpp/udp_socket.h"
+#include <sockpp/platform.h> // for in_port_t
+#include <sol/sol.hpp>       // for function, basic_protected_function
+#include <string>            // for string
 
-#include <sol/forward.hpp>
-#include <string>
+#include "sockpp/udp_socket.h" // for udp_socket
 
 class UdpServer
 {

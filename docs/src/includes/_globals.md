@@ -1329,7 +1329,7 @@ Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` 
 
 > Search script examples for [import](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=import)
 
-#### table import(string id, optional<string> version, optional<bool> optional)
+#### table import(string id, string version = "", bool optional = false)
 
 Load another script by id "author/name" and import its `exports` table. Returns:
 
@@ -1355,6 +1355,24 @@ Same as `Player.is_female`
 #### nil load_screen()
 
 Immediately load a screen based on state.screen_next and stuff
+
+### lowbias32
+
+
+> Search script examples for [lowbias32](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lowbias32)
+
+#### int lowbias32(int x)
+
+Some random hash function
+
+### lowbias32_r
+
+
+> Search script examples for [lowbias32_r](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lowbias32_r)
+
+#### int lowbias32_r(int x)
+
+Reverse of some random hash function
 
 ### pause
 
@@ -1390,7 +1408,7 @@ Converts a color to int to be used in drawing functions. Use values from `0..255
 
 > Search script examples for [script_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=script_enabled)
 
-#### bool script_enabled(string id, optional<string> version)
+#### bool script_enabled(string id, string version = "")
 
 Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
 

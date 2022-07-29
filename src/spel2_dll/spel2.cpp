@@ -10,6 +10,7 @@
 #include "spawn_api.hpp"
 #include "state.hpp"
 #include "steam_api.hpp"
+#include "texture.hpp"
 #include "window_api.hpp"
 
 SoundManager* g_SoundManager{nullptr};

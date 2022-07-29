@@ -1,8 +1,17 @@
 #include "script_util.hpp"
-#include "memory.hpp"
-#include "prng.hpp"
 
-#include <regex>
+#include <algorithm>               // for transform
+#include <cctype>                  // for tolower
+#include <cmath>                   // for cos, sin
+#include <cstdlib>                 // for free
+#include <cstring>                 // for memchr
+#include <misc/cpp/imgui_stdlib.h> // IWYU pragma: keep
+#include <new>                     // for operator new
+#include <regex>                   // for regex_replace, optimize, regex
+#include <type_traits>             // for move
+#include <utility>                 // for min, max, _Adl_verify_range
+
+#include "search.hpp" // for get_address
 
 Toast get_toast()
 {

@@ -1,8 +1,10 @@
 #pragma once
 
-#include <sol/forward.hpp>
-
 class SoundManager;
+namespace sol
+{
+class state;
+} // namespace sol
 
 namespace NSound
 {

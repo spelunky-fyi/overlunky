@@ -1,61 +1,94 @@
 #include "lua_vm.hpp"
 
-#include <csignal>
+#include <Windows.h>     // for IsBadReadPtr, Get...
+#include <algorithm>     // for max, transform
+#include <cctype>        // for toupper
+#include <chrono>        // for milliseconds, sys...
+#include <cmath>         // for pow, sqrt
+#include <compare>       // for operator<
+#include <csignal>       // for raise
+#include <cstddef>       // for size_t, NULL
+#include <cstdint>       // for uint32_t, int8_t
+#include <deque>         // for deque
+#include <exception>     // for exception
+#include <fmt/format.h>  // for format_error
+#include <functional>    // for _Func_impl_no_all...
+#include <imgui.h>       // for GetIO, ImVec4
+#include <lauxlib.h>     // for luaL_error
+#include <list>          // for _List_const_iterator
+#include <lua.h>         // for lua_Debug, lua_State
+#include <map>           // for map, map<>::mappe...
+#include <new>           // for operator new
+#include <optional>      // for nullopt, optional
+#include <sol/sol.hpp>   // for global_table, pro...
+#include <string>        // for string, char_traits
+#include <tuple>         // for get, tuple, make_...
+#include <type_traits>   // for move, declval
+#include <unordered_map> // for unordered_map
+#include <unordered_set> // for unordered_set
+#include <utility>       // for min, max, pair, get
+#include <vector>        // for vector, _Vector_i...
 
-#include "entities_items.hpp"
-#include "entities_monsters.hpp"
-#include "entity.hpp"
-#include "game_manager.hpp"
-#include "items.hpp"
-#include "level_api.hpp"
-#include "online.hpp"
-#include "rpc.hpp"
-#include "savedata.hpp"
-#include "search.hpp"
-#include "settings_api.hpp"
-#include "spawn_api.hpp"
-#include "state.hpp"
-#include "strings.hpp"
+#include "aliases.hpp"                             // for CallbackId, ENT_TYPE
+#include "color.hpp"                               // for Color
+#include "entities_chars.hpp"                      // for Player
+#include "entities_items.hpp"                      // for Container, Player...
+#include "entity.hpp"                              // for get_entity_ptr
+#include "game_manager.hpp"                        // for get_game_manager
+#include "items.hpp"                               // for Inventory
+#include "layer.hpp"                               // for g_level_max_x
+#include "lua_backend.hpp"                         // for LuaBackend, ON
+#include "lua_console.hpp"                         // for LuaConsole
+#include "lua_libs/lua_libs.hpp"                   // for require_format_lua
+#include "lua_require.hpp"                         // for register_custom_r...
+#include "math.hpp"                                // for AABB
+#include "movable.hpp"                             // for Movable
+#include "online.hpp"                              // for get_online
+#include "rpc.hpp"                                 // for get_entities_by
+#include "savedata.hpp"                            // IWYU pragma: keep
+#include "screen.hpp"                              // for get_screen_ptr
+#include "script.hpp"                              // for ScriptMessage
+#include "script_util.hpp"                         // for sanitize, get_say
+#include "search.hpp"                              // for get_address
+#include "settings_api.hpp"                        // for get_settings_name...
+#include "spawn_api.hpp"                           // for spawn_roomowner
+#include "state.hpp"                               // for State, StateMemory
+#include "strings.hpp"                             // for change_string
+#include "usertypes/behavior_lua.hpp"              // for register_usertypes
+#include "usertypes/char_state_lua.hpp"            // for register_usertypes
+#include "usertypes/drops_lua.hpp"                 // for register_usertypes
+#include "usertypes/entities_activefloors_lua.hpp" // for register_usertypes
+#include "usertypes/entities_backgrounds_lua.hpp"  // for register_usertypes
+#include "usertypes/entities_chars_lua.hpp"        // for register_usertypes
+#include "usertypes/entities_decorations_lua.hpp"  // for register_usertypes
+#include "usertypes/entities_floors_lua.hpp"       // for register_usertypes
+#include "usertypes/entities_fx_lua.hpp"           // for register_usertypes
+#include "usertypes/entities_items_lua.hpp"        // for register_usertypes
+#include "usertypes/entities_liquids_lua.hpp"      // for register_usertypes
+#include "usertypes/entities_logical_lua.hpp"      // for register_usertypes
+#include "usertypes/entities_monsters_lua.hpp"     // for register_usertypes
+#include "usertypes/entities_mounts_lua.hpp"       // for register_usertypes
+#include "usertypes/entity_casting_lua.hpp"        // for register_usertypes
+#include "usertypes/entity_lua.hpp"                // for register_usertypes
+#include "usertypes/flags_lua.hpp"                 // for register_usertypes
+#include "usertypes/game_manager_lua.hpp"          // for register_usertypes
+#include "usertypes/gui_lua.hpp"                   // for register_usertypes
+#include "usertypes/hitbox_lua.hpp"                // for register_usertypes
+#include "usertypes/level_lua.hpp"                 // for register_usertypes
+#include "usertypes/particles_lua.hpp"             // for register_usertypes
+#include "usertypes/player_lua.hpp"                // for register_usertypes
+#include "usertypes/prng_lua.hpp"                  // for register_usertypes
+#include "usertypes/save_context.hpp"              // for register_usertypes
+#include "usertypes/screen_arena_lua.hpp"          // for register_usertypes
+#include "usertypes/screen_lua.hpp"                // for register_usertypes
+#include "usertypes/socket_lua.hpp"                // for register_usertypes
+#include "usertypes/sound_lua.hpp"                 // for register_usertypes
+#include "usertypes/state_lua.hpp"                 // for register_usertypes
+#include "usertypes/texture_lua.hpp"               // for register_usertypes
+#include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 
-#include "lua_backend.hpp"
-#include "lua_console.hpp"
-#include "lua_require.hpp"
-#include "script_util.hpp"
-
-#include "usertypes/behavior_lua.hpp"
-#include "usertypes/char_state_lua.hpp"
-#include "usertypes/drops_lua.hpp"
-#include "usertypes/entities_activefloors_lua.hpp"
-#include "usertypes/entities_backgrounds_lua.hpp"
-#include "usertypes/entities_chars_lua.hpp"
-#include "usertypes/entities_decorations_lua.hpp"
-#include "usertypes/entities_floors_lua.hpp"
-#include "usertypes/entities_fx_lua.hpp"
-#include "usertypes/entities_items_lua.hpp"
-#include "usertypes/entities_liquids_lua.hpp"
-#include "usertypes/entities_logical_lua.hpp"
-#include "usertypes/entities_monsters_lua.hpp"
-#include "usertypes/entities_mounts_lua.hpp"
-#include "usertypes/entity_casting_lua.hpp"
-#include "usertypes/entity_lua.hpp"
-#include "usertypes/flags_lua.hpp"
-#include "usertypes/game_manager_lua.hpp"
-#include "usertypes/gui_lua.hpp"
-#include "usertypes/hitbox_lua.hpp"
-#include "usertypes/level_lua.hpp"
-#include "usertypes/particles_lua.hpp"
-#include "usertypes/player_lua.hpp"
-#include "usertypes/prng_lua.hpp"
-#include "usertypes/save_context.hpp"
-#include "usertypes/screen_arena_lua.hpp"
-#include "usertypes/screen_lua.hpp"
-#include "usertypes/socket_lua.hpp"
-#include "usertypes/sound_lua.hpp"
-#include "usertypes/state_lua.hpp"
-#include "usertypes/texture_lua.hpp"
-#include "usertypes/vanilla_render_lua.hpp"
-
-#include "lua_libs/lua_libs.hpp"
+struct Illumination;
+struct PlayerInputs;
 
 void load_libraries(sol::state& lua)
 {
@@ -1768,8 +1801,8 @@ end
         ON::SPEECH_BUBBLE,
         "TOAST",
         ON::TOAST,
-        "RENDER_PREPARE_TEXT",
-        ON::RENDER_PREPARE_TEXT);
+        "DEATH_MESSAGE",
+        ON::DEATH_MESSAGE);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`

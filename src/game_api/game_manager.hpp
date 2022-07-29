@@ -1,8 +1,26 @@
-#include "render_api.hpp"
-#include "screen.hpp"
-#include "thread_utils.hpp"
+#include <cstddef> // for size_t
+#include <cstdint> // for uint32_t, uint8_t, int8_t
+
+#include "aliases.hpp"      // for MAX_PLAYERS
+#include "render_api.hpp"   // for TextureRenderingInfo
+#include "thread_utils.hpp" // for OnHeapPointer
 
 struct SaveData;
+class ScreenCamp;
+class ScreenIntro;
+class ScreenLeaderboards;
+class ScreenLevel;
+class ScreenLogo;
+class ScreenMenu;
+class ScreenOnlineLoading;
+class ScreenOnlineLobby;
+class ScreenOptions;
+class ScreenPlayerProfile;
+class ScreenPrologue;
+class ScreenSeedInput;
+class ScreenTitle;
+struct JournalUI;
+struct PauseUI;
 
 struct JournalPopupUI
 {

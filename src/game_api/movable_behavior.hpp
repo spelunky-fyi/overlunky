@@ -1,9 +1,13 @@
 #pragma once
 
-#include <cstddef>
-#include <functional>
+#include <cstdint>       // for uint32_t, uint8_t
+#include <functional>    // for equal_to, function
+#include <memory>        // for allocator
+#include <new>           // for operator new
+#include <type_traits>   // for hash
+#include <unordered_map> // for _Umap_traits<>::allocator_type, unordered_map
 
-#include "math.hpp"
+#include "math.hpp" // for Vec2
 
 class Movable;
 struct MovableBehavior;

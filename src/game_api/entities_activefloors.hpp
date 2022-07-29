@@ -1,7 +1,16 @@
 #pragma once
 
-#include "entities_items.hpp"
-#include "movable.hpp"
+#include <cstddef> // for size_t
+#include <cstdint> // for uint8_t, int32_t, uint32_t, int8_t
+
+#include "aliases.hpp"        // for ENT_TYPE
+#include "entities_items.hpp" // for UnknownPointerGroup
+#include "movable.hpp"        // for Movable
+
+class Entity;
+struct Illumination;
+struct ParticleEmitterInfo;
+struct SoundPosition;
 
 // Seams like all activefloors have one virtual function, but it just `return` so no reason to add it
 

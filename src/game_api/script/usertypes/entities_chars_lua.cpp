@@ -1,10 +1,20 @@
 #include "entities_chars_lua.hpp"
 
-#include "entities_chars.hpp"
-#include "items.hpp"
-#include "state_structs.hpp"
+#include <algorithm>   // for max
+#include <cstdint>     // for int8_t
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for global_table, proxy_key_t, data_t, state
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
 
-#include <sol/sol.hpp>
+#include "entities_chars.hpp" // for Ai, Player, PowerupCapable, get_charac...
+#include "entity.hpp"         // for Entity
+#include "items.hpp"          // for Inventory, Inventory::acquired_powerups
+#include "state_structs.hpp"  // IWYU pragma: keep
+
+class Movable;
 
 namespace NEntitiesChars
 {

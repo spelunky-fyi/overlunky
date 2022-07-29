@@ -1,10 +1,23 @@
 #include "behavior_lua.hpp"
 
-#include "movable.hpp"
-#include "movable_behavior.hpp"
-#include "script/lua_backend.hpp"
+#include <algorithm>    // for max
+#include <cstdint>      // for uint8_t
+#include <exception>    // for exception
+#include <fmt/format.h> // for format_error
+#include <functional>   // for function, _Func_impl_no_alloc<>::_...
+#include <new>          // for operator new
+#include <optional>     // for optional
+#include <sol/sol.hpp>  // for proxy_key_t, function, basic_prote...
+#include <string>       // for allocator, operator==, string
+#include <string_view>  // for string_view
+#include <tuple>        // for get
+#include <type_traits>  // for move, declval, forward
+#include <utility>      // for min, max
 
-#include <sol/sol.hpp>
+#include "math.hpp"               // for Vec2
+#include "movable.hpp"            // IWYU pragma: keep
+#include "movable_behavior.hpp"   // for CustomMovableBehavior, update_movable
+#include "script/lua_backend.hpp" // for LuaBackend
 
 namespace NBehavior
 {

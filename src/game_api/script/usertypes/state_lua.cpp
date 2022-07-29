@@ -1,12 +1,25 @@
 #include "state_lua.hpp"
 
-#include "entity.hpp"
-#include "items.hpp"
-#include "level_api.hpp"
-#include "online.hpp" // maybe TODO: move to separete file
-#include "state.hpp"
+#include <algorithm>              // for max
+#include <cstdint>                // for uint8_t
+#include <locale>                 // for num_put
+#include <new>                    // for operator new
+#include <sol/sol.hpp>            // for data_t, global_table, state, proxy...
+#include <sol/usertype.hpp>       // for basic_usertype
+#include <sol/usertype_proxy.hpp> // for usertype_proxy
+#include <string>                 // for operator==, allocator
+#include <tuple>                  // for get
+#include <type_traits>            // for move, declval, decay_t, reference_...
+#include <utility>                // for min, max
 
-#include <sol/sol.hpp>
+#include "entity.hpp"        // IWYU pragma: keep
+#include "items.hpp"         // for Items, SelectPlayerSlot, Items::is...
+#include "level_api.hpp"     // IWYU pragma: keep
+#include "online.hpp"        // for OnlinePlayer, OnlineLobby, Online
+#include "screen.hpp"        // IWYU pragma: keep
+#include "screen_arena.hpp"  // IWYU pragma: keep
+#include "state.hpp"         // for StateMemory, State, StateMemory::a...
+#include "state_structs.hpp" // for ArenaConfigArenas, ArenaConfigItems
 
 namespace NState
 {

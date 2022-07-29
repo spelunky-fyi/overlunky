@@ -1,16 +1,31 @@
 #include "render_api.hpp"
 
-#include <cstddef>
-#include <detours.h>
-#include <string>
+#include <Windows.h>    // for MultiByteToWideChar, GetCurrentThread
+#include <array>        // for array
+#include <cstddef>      // for size_t
+#include <detours.h>    // for DetourAttach, DetourTransactionBegin
+#include <fmt/format.h> // for check_format_string, format, vformat
+#include <list>         // for _List_iterator, _List_const_iterator
+#include <optional>     // for optional, nullopt
+#include <string>       // for operator""sv, string, wstring, all...
+#include <string_view>  // for string_view
+#include <vector>       // for vector
 
-#include "entity.hpp"
-#include "level_api.hpp"
-#include "memory.hpp"
-#include "script/events.hpp"
-#include "state.hpp"
+#include "entity.hpp"             // for Entity, EntityDB
+#include "level_api.hpp"          // for ThemeInfo
+#include "logger.h"               // for DEBUG
+#include "memory.hpp"             // for read_u64, to_le_bytes, write_mem_prot
+#include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
+#include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
+#include "search.hpp"             // for get_address
+#include "state.hpp"              // for State, StateMemory
 #include "strings.hpp"
-#include "texture.hpp"
+#include "texture.hpp" // for Texture, get_textures, get_texture
+
+class JournalPage;
+struct Camera;
+struct Illumination;
+struct Layer;
 
 RenderAPI& RenderAPI::get()
 {
@@ -345,13 +360,20 @@ void fetch_texture(Entity* entity, int32_t texture_id)
     }
 }
 
-#pragma warning(disable : 4244)
 using PrepareTextFun = void(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11);
 PrepareTextFun* g_prepare_text_trampoline{nullptr};
 void prepare_text(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11)
 {
-    STRINGID id = pointer_to_stringid((size_t)text);
-    on_draw_string(id);
+    static const STRINGID first_death = hash_to_stringid(0x5a52a061);
+    static const STRINGID last_death = hash_to_stringid(0x5c9b2332);
+    if (fontstyle == 1)
+    {
+        STRINGID id = pointer_to_stringid((size_t)text);
+        if (id >= first_death && id <= last_death)
+        {
+            on_death_message(id);
+        }
+    }
     g_prepare_text_trampoline(fontstyle, text, a3, x, y, a6, scale_x, scale_y, alignment, unknown_baseline_shift, a11);
 }
 

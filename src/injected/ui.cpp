@@ -5,7 +5,7 @@
 #include <Shlwapi.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <misc\cpp\imgui_stdlib.h>
+#include <misc/cpp/imgui_stdlib.h>
 #include <shellapi.h>
 #include <windows.h>
 
@@ -44,6 +44,7 @@
 #include "logger.h"
 #include "math.hpp"
 #include "savedata.hpp"
+#include "screen.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"
@@ -2596,7 +2597,6 @@ void render_list()
         boxsize = {400.0f, 400.0f};
     if (!ImGui::ListBoxHeader("##Entities", boxsize))
         return;
-    bool value_changed = false;
     ImGuiListClipper clipper;
     clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
     if (scroll_top)
@@ -2619,7 +2619,6 @@ void render_list()
             if (ImGui::Selectable(item_text, item_selected))
             {
                 g_current_item = i;
-                value_changed = true;
             }
             if (item_selected)
             {
@@ -2641,7 +2640,6 @@ void render_themes()
     // ImGui::ListBox with filter
     if (!ImGui::BeginCombo("Theme##Theme", themes[g_to]))
         return;
-    bool value_changed = false;
     for (uint8_t i = 0; i < 17; i++)
     {
         const bool item_selected = (i == g_to);
@@ -2651,7 +2649,6 @@ void render_themes()
         if (ImGui::Selectable(item_text, item_selected))
         {
             g_to = i;
-            value_changed = true;
         }
         if (item_selected)
             ImGui::SetItemDefaultFocus();

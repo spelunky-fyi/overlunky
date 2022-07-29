@@ -1,6 +1,15 @@
 #include "particles.hpp"
-#include "memory.hpp"
-#include "texture.hpp"
+
+#include <algorithm>     // for sort
+#include <functional>    // for equal_to
+#include <list>          // for _List_iterator, _List_const_iterator
+#include <new>           // for operator new
+#include <type_traits>   // for move, hash
+#include <unordered_map> // for unordered_map, _Umap_traits<>::allocator_type
+#include <utility>       // for min, max
+
+#include "search.hpp"  // for get_address
+#include "texture.hpp" // for get_texture, Texture
 
 ParticleDB* particle_db_ptr()
 {

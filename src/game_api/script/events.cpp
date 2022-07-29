@@ -1,9 +1,19 @@
 #include "events.hpp"
 
-#include "constants.hpp"
-#include "rpc.hpp"
-#include "state.hpp"
-#include <fmt/format.h>
+#include <fmt/format.h> // for check_format_string, format, vformat
+#include <functional>   // for _Func_impl_no_alloc<>::_Mybase
+#include <new>          // for operator new
+#include <type_traits>  // for move
+#include <utility>      // for max, pair, min
+
+#include "constants.hpp"          // for no_return_str
+#include "level_api_types.hpp"    // for LevelGenRoomData
+#include "rpc.hpp"                // for game_log, get_adventure_seed
+#include "script/lua_backend.hpp" // for LuaBackend, ON, LuaBackend::PreHan...
+#include "state.hpp"              // for StateMemory, State
+
+class JournalPage;
+struct AABB;
 
 void pre_load_level_files()
 {
@@ -81,12 +91,12 @@ void post_load_screen()
             return true;
         });
 }
-void on_draw_string(STRINGID stringid)
+void on_death_message(STRINGID stringid)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
-            backend.on_draw_string(stringid);
+            backend.on_death_message(stringid);
             return true;
         });
 }

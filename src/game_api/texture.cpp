@@ -1,7 +1,18 @@
 #include "texture.hpp"
 
+#include <cstddef> // IWYU pragma: keep
+#include <cstring>
+#include <functional>
+#include <list>
+#include <mutex>
+#include <new>
+#include <type_traits>
+#include <unordered_map>
+#include <utility>
+
 #include "memory.hpp"
 #include "render_api.hpp"
+#include "search.hpp"
 
 Textures* get_textures()
 {
@@ -250,6 +261,7 @@ void reload_texture(const char* texture_name)
 void reload_texture(const char** texture_name)
 {
     class Renderer;
+
     using LoadTextureFunT = void(Renderer*, const char**);
 
     auto& render = RenderAPI::get();

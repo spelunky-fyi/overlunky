@@ -1,18 +1,23 @@
 #pragma once
 
 #include <array>
+#include <cstddef> // IWYU pragma: keep
+#include <cstdint>
 #include <functional>
+#include <list>
+#include <new>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <unordered_map>
+#include <utility>
 #include <variant>
 #include <vector>
 
 #include "aliases.hpp"
 #include "audio_buffer.hpp"
 #include "fmod.hpp"
-#include "string_aliases.hpp"
 
 class SoundManager;
 class PlayingSound;
@@ -242,5 +247,6 @@ class SoundManager
     SoundData m_SoundData;
 
     struct Sound;
+
     std::vector<Sound> m_SoundStorage;
 };

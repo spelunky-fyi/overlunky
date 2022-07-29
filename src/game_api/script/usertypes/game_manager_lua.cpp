@@ -1,6 +1,15 @@
 #include "game_manager_lua.hpp"
 
-#include "game_manager.hpp"
+#include <algorithm>   // for max
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for data_t, basic_table_core::new_usertype
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
+
+#include "game_manager.hpp" // for GameManager, JournalPopupUI, GameProps
+#include "screen.hpp"       // IWYU pragma: keep
 
 namespace NGM
 {

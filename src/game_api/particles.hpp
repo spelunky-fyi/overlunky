@@ -1,10 +1,11 @@
 #pragma once
 
-struct Texture;
+#include <cstddef> // for size_t
+#include <cstdint> // for uint32_t, uint8_t, int32_t, uint64_t
+#include <string>  // for string, basic_string
+#include <vector>  // for vector
 
-#include <cstdint>
-#include <string>
-#include <vector>
+struct Texture;
 
 struct ParticleDB
 {

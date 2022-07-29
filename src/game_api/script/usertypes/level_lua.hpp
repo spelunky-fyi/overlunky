@@ -1,12 +1,18 @@
 #pragma once
 
-#include "aliases.hpp"
-#include "level_api_types.hpp"
+#include <cstdint>  // for uint32_t, int32_t
+#include <optional> // for optional
+#include <string>   // for string
+#include <tuple>    // for tuple
+#include <vector>   // for vector
 
-#include <string>
-#include <vector>
+#include "aliases.hpp"         // for LAYER, SHORT_TILE_CODE, PROCEDURAL_CH...
+#include "level_api_types.hpp" // for ShortTileCodeDef (ptr only), LevelGen...
 
-#include <sol/forward.hpp>
+namespace sol
+{
+class state;
+} // namespace sol
 
 struct PreLoadLevelFilesContext
 {

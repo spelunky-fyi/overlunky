@@ -1,10 +1,19 @@
 #include "layer.hpp"
 
-#include "entities_floors.hpp"
-#include "entity.hpp"
-#include "memory.hpp"
-#include "rpc.hpp"
-#include "state.hpp"
+#include <cmath>   // for round, roundf
+#include <cstdint> // for uint32_t, uint8_t
+#include <cstdlib> // for abs
+#include <tuple>   // for tie, tuple
+
+#include "entities_floors.hpp" // for ExitDoor
+#include "entity.hpp"          // for Entity, to_id, EntityDB, entity_factory
+#include "logger.h"            // for DEBUG
+#include "movable.hpp"         // for Movable
+#include "rpc.hpp"             // for entity_get_items_by
+#include "search.hpp"          // for get_address
+#include "state.hpp"           // for State, StateMemory
+
+struct EntityFactory;
 
 Entity* Layer::spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx, float vy, bool snap)
 {
