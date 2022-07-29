@@ -19,7 +19,8 @@
 #include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
 #include "search.hpp"             // for get_address
 #include "state.hpp"              // for State, StateMemory
-#include "texture.hpp"            // for Texture, get_textures, get_texture
+#include "strings.hpp"
+#include "texture.hpp" // for Texture, get_textures, get_texture
 
 class JournalPage;
 struct Camera;
@@ -359,6 +360,23 @@ void fetch_texture(Entity* entity, int32_t texture_id)
     }
 }
 
+using PrepareTextFun = void(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11);
+PrepareTextFun* g_prepare_text_trampoline{nullptr};
+void prepare_text(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11)
+{
+    static const STRINGID first_death = hash_to_stringid(0x5a52a061);
+    static const STRINGID last_death = hash_to_stringid(0x5c9b2332);
+    if (fontstyle == 1)
+    {
+        STRINGID id = pointer_to_stringid((size_t)text);
+        if (id >= first_death && id <= last_death)
+        {
+            on_death_message(id);
+        }
+    }
+    g_prepare_text_trampoline(fontstyle, text, a3, x, y, a6, scale_x, scale_y, alignment, unknown_baseline_shift, a11);
+}
+
 void init_render_api_hooks()
 {
     // Fix the texture fetching in spawn_entity
@@ -421,6 +439,8 @@ void init_render_api_hooks()
     render_virt = (size_t*)(journal_vftable + JOURNAL_VFTABLE::LAST_GAME_PLAYED + fourth_virt);
     g_render_journal_page_last_game_played_trampoline = (VanillaRenderJournalPageFun*)(*render_virt);
 
+    g_prepare_text_trampoline = (PrepareTextFun*)get_address("prepare_text_for_rendering");
+
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
@@ -442,6 +462,8 @@ void init_render_api_hooks()
     DetourAttach((void**)&g_render_journal_page_recap_trampoline, &render_journal_page_recap);
     DetourAttach((void**)&g_render_journal_page_player_profile_trampoline, &render_journal_page_player_profile);
     DetourAttach((void**)&g_render_journal_page_last_game_played_trampoline, &render_journal_page_last_game_played);
+
+    DetourAttach((void**)&g_prepare_text_trampoline, prepare_text);
 
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)

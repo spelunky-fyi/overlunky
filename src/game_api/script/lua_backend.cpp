@@ -994,6 +994,29 @@ void LuaBackend::post_load_screen()
         }
     }
 }
+void LuaBackend::on_death_message(STRINGID stringid)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    std::lock_guard lock{gil};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::DEATH_MESSAGE)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function(callback.func, stringid);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
 
 std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template)
 {

@@ -91,6 +91,15 @@ void post_load_screen()
             return true;
         });
 }
+void on_death_message(STRINGID stringid)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.on_death_message(stringid);
+            return true;
+        });
+}
 
 std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template)
 {
