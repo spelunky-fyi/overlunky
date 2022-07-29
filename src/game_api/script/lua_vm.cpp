@@ -1899,6 +1899,9 @@ end
     // Return behavior: if you don't return anything it will execute the toast function normally with default message
     // if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
     // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
+    // DEATH_MESSAGE
+    // Params: `STRINGID id`
+    // Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.
     */
 
     lua.create_named_table(
