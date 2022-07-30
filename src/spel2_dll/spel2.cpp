@@ -5,6 +5,7 @@
 #include "entity.hpp"
 #include "file_api.hpp"
 #include "memory.hpp"
+#include "screen.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
@@ -434,6 +435,25 @@ uint16_t SpelunkyEntity_GetTextureTile(Entity* entity)
 void SpelunkyEntity_SetTextureTile(Entity* entity, uint16_t texture_tile)
 {
     entity->animation_frame = texture_tile;
+}
+
+void Spelunky_SetPostRenderGame(Spelunky_PostRenderGameFunc post_render_game)
+{
+    RenderAPI::get().set_post_render_game(post_render_game);
+}
+Spelunky_TextSize Spelunky_DrawTextSize(const char* text, float scale_x, float scale_y, uint32_t fontstyle)
+{
+    const auto [w, h] = RenderAPI::get().draw_text_size(text, scale_x, scale_y, fontstyle);
+    return {w, h};
+}
+void Spelunky_DrawText(const char* text, float x, float y, float scale_x, float scale_y, const float (&color)[4], uint32_t alignment, uint32_t fontstyle)
+{
+    RenderAPI::get().draw_text(text, x, y, scale_x, scale_y, Color{color}, alignment, fontstyle);
+}
+
+void Spelunky_EnabledAdvancedHud()
+{
+    RenderAPI::get().set_advanced_hud();
 }
 
 void Spelunky_UpdateLiquidOutOfBoundsBugfix()

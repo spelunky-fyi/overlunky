@@ -32,6 +32,8 @@ using PreDrawFunc = void (*)();
 using PostDrawFunc = void (*)();
 using OnQuitFunc = void (*)();
 
+using Spelunky_PostRenderGameFunc = void (*)();
+
 using Spelunky_MakeSavePathFunc = bool (*)(
     const char* script_path, size_t script_path_size, const char* script_name, size_t script_name_size, char* out_buffer, size_t out_buffer_size);
 
@@ -199,5 +201,16 @@ int64_t SpelunkyEntity_GetTexture(Entity* entity);
 void SpelunkyEntity_SetTexture(Entity* entity, int64_t texture);
 uint16_t SpelunkyEntity_GetTextureTile(Entity* entity);
 void SpelunkyEntity_SetTextureTile(Entity* entity, uint16_t texture_tile);
+
+struct Spelunky_TextSize
+{
+    float width;
+    float height;
+};
+void Spelunky_SetPostRenderGame(Spelunky_PostRenderGameFunc post_render_game);
+Spelunky_TextSize Spelunky_DrawTextSize(const char* text, float scale_x, float scale_y, uint32_t fontstyle);
+void Spelunky_DrawText(const char* text, float x, float y, float scale_x, float scale_y, const float (&color)[4], uint32_t alignment, uint32_t fontstyle);
+
+void Spelunky_EnabledAdvancedHud();
 
 void Spelunky_UpdateLiquidOutOfBoundsBugfix();
