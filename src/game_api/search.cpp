@@ -872,6 +872,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "render_loading"sv,
+        // This function uses the string "Loading indicator"
+        PatternCommandBuffer{}
+            .find_inst("\x64\x0b\x00\x00\xf3\x0f\x10\x86"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "render_hud"sv,
         // Locate in memory 2B 00 24 00 25 00 64 00 "+$%d" (UTF16 str of the money gained text)
         // Find reference to this memory, it's only used in the HUD
