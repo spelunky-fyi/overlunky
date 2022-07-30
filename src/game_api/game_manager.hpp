@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstddef> // for size_t
 #include <cstdint> // for uint32_t, uint8_t, int8_t
 
