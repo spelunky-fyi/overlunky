@@ -1,6 +1,9 @@
 #include "cmd_line.h"
 
-#include <algorithm>
+#include <algorithm>   // for count_if
+#include <string>      // for char_traits
+#include <type_traits> // for move
+#include <utility>     // for min, find_if
 
 CmdLineParser::CmdLineParser(int argc, char** argv)
     : m_CmdLine(argv, argv + argc)

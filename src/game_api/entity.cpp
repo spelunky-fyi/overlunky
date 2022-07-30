@@ -1,15 +1,32 @@
 #include "entity.hpp"
-#include "movable.hpp"
 
-#include <cstdio>
-#include <string>
-#include <vector>
+#include <Windows.h> // for IsBadWritePtr
+#include <chrono>    // for operator<=>, operator-, operator+
+#include <cmath>     // for round
+#include <compare>   // for operator<, operator<=, operator>
+#include <cstdint>   // for uint32_t, uint16_t, uint8_t
+#include <cstdlib>   // for abs, NULL, size_t
+#include <list>      // for _List_const_iterator
+#include <map>       // for _Tree_iterator, map, _Tree_cons...
+#include <new>       // for operator new
+#include <string>    // for allocator, string, operator""sv
+#include <thread>    // for sleep_for
+#include <vector>    // for vector, _Vector_iterator, erase_if
 
-#include "entities_chars.hpp"
-#include "memory.hpp"
-#include "state.hpp"
-#include "thread_utils.hpp"
-#include "vtable_hook.hpp"
+#include "containers/custom_map.hpp" // for custom_map
+#include "entities_chars.hpp"        // for Player
+#include "memory.hpp"                // for write_mem_prot
+#include "movable.hpp"               // for Movable
+#include "movable_behavior.hpp"      // for MovableBehavior
+#include "render_api.hpp"            // for RenderInfo
+#include "search.hpp"                // for get_address
+#include "state.hpp"                 // for State, StateMemory, enum_to_layer
+#include "state_structs.hpp"         // for LiquidPhysicsEngine
+#include "texture.hpp"               // for get_texture, Texture
+#include "vtable_hook.hpp"           // for hook_vtable, hook_dtor, unregis...
+
+template <typename T>
+class OnHeapPointer;
 
 using namespace std::chrono_literals;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
@@ -838,7 +855,15 @@ bool Movable::set_behavior(uint32_t an)
     const auto& it = behaviors_map.find(an);
     if (it != behaviors_map.end())
     {
+        if (current_behavior != nullptr)
+        {
+            current_behavior->on_exit(this);
+        }
         current_behavior = it->second;
+        if (current_behavior != nullptr)
+        {
+            current_behavior->on_enter(this);
+        }
         return true;
     }
     return false;

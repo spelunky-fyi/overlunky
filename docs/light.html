@@ -484,6 +484,9 @@
                     <a href="#Debug-functions" class="toc-h2 toc-link" data-title="Debug functions">Debug functions</a>
                       <ul class="toc-list-h3">
                           <li>
+                            <a href="#dump_network" class="toc-h3 toc-link" data-title="dump_network">dump_network</a>
+                          </li>
+                          <li>
                             <a href="#get_address" class="toc-h3 toc-link" data-title="get_address">get_address</a>
                           </li>
                           <li>
@@ -760,6 +763,12 @@
                             <a href="#load_screen" class="toc-h3 toc-link" data-title="load_screen">load_screen</a>
                           </li>
                           <li>
+                            <a href="#lowbias32" class="toc-h3 toc-link" data-title="lowbias32">lowbias32</a>
+                          </li>
+                          <li>
+                            <a href="#lowbias32_r" class="toc-h3 toc-link" data-title="lowbias32_r">lowbias32_r</a>
+                          </li>
+                          <li>
                             <a href="#pause" class="toc-h3 toc-link" data-title="pause">pause</a>
                           </li>
                           <li>
@@ -767,6 +776,9 @@
                           </li>
                           <li>
                             <a href="#rgba" class="toc-h3 toc-link" data-title="rgba">rgba</a>
+                          </li>
+                          <li>
+                            <a href="#script_enabled" class="toc-h3 toc-link" data-title="script_enabled">script_enabled</a>
                           </li>
                           <li>
                             <a href="#seed_prng" class="toc-h3 toc-link" data-title="seed_prng">seed_prng</a>
@@ -845,6 +857,9 @@
                           </li>
                           <li>
                             <a href="#console_print" class="toc-h3 toc-link" data-title="console_print">console_print</a>
+                          </li>
+                          <li>
+                            <a href="#log_print" class="toc-h3 toc-link" data-title="log_print">log_print</a>
                           </li>
                           <li>
                             <a href="#lua_print" class="toc-h3 toc-link" data-title="lua_print">lua_print</a>
@@ -3533,7 +3548,13 @@ Sets a callback for a vanilla sound which lets you hook creation or playing even
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
 properties on the sound. Otherwise you may cause a deadlock. The callback signature is <code>nil on_vanilla_sound(PlayingSound sound)</code></p>
-<h2 id='Debug-functions'>Debug functions</h2><h3 id='get_address'>get_address</h3>
+<h2 id='Debug-functions'>Debug functions</h2><h3 id='dump_network'>dump_network</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dump_network">dump_network</a></p>
+</blockquote>
+<h4 id='nil-dump_network'>nil dump_network()</h4>
+<p>Hook the sendto and recvfrom functions and start dumping network data to terminal</p>
+<h3 id='get_address'>get_address</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_address">get_address</a></p>
 </blockquote>
@@ -4089,8 +4110,15 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
 </blockquote>
-<h4 id='table-import-string-id-optional-version'>table import(string id, optional<string> version)</h4>
-<p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table</p>
+<h4 id='table-import-string-id-string-version-quot-quot-bool-optional-false'>table import(string id, string version = &quot;&quot;, bool optional = false)</h4>
+<p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table. Returns:</p>
+
+<ul>
+<li><code>table</code> if the script has exports</li>
+<li><code>nil</code> if the script was found but has no exports</li>
+<li><code>false</code> if the script was not found but optional is set to true</li>
+<li>an error if the script was not found and the optional argument was not set</li>
+</ul>
 <h3 id='is_character_female'>is_character_female</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_character_female">is_character_female</a></p>
@@ -4103,6 +4131,18 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 </blockquote>
 <h4 id='nil-load_screen'>nil load_screen()</h4>
 <p>Immediately load a screen based on state.screen_next and stuff</p>
+<h3 id='lowbias32'>lowbias32</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lowbias32">lowbias32</a></p>
+</blockquote>
+<h4 id='int-lowbias32-int-x'>int lowbias32(int x)</h4>
+<p>Some random hash function</p>
+<h3 id='lowbias32_r'>lowbias32_r</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lowbias32_r">lowbias32_r</a></p>
+</blockquote>
+<h4 id='int-lowbias32_r-int-x'>int lowbias32_r(int x)</h4>
+<p>Reverse of some random hash function</p>
 <h3 id='pause'>pause</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></p>
@@ -4123,6 +4163,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='uColor-rgba-int-r-int-g-int-b-int-a'><a href="#Aliases">uColor</a> rgba(int r, int g, int b, int a)</h4>
 <p>Converts a color to int to be used in drawing functions. Use values from <code>0..255</code>.</p>
+<h3 id='script_enabled'>script_enabled</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=script_enabled">script_enabled</a></p>
+</blockquote>
+<h4 id='bool-script_enabled-string-id-string-version-quot-quot'>bool script_enabled(string id, string version = &quot;&quot;)</h4>
+<p>Check if another script is enabled by id &quot;author/name&quot;. You should probably check this after all the other scripts have had a chance to load.</p>
 <h3 id='seed_prng'>seed_prng</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seed_prng">seed_prng</a></p>
@@ -4289,6 +4335,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-console_print-string-message'>nil console_print(string message)</h4>
 <p>Print a log message to console.</p>
+<h3 id='log_print'>log_print</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=log_print">log_print</a></p>
+</blockquote>
+<h4 id='nil-log_print-string-message'>nil log_print(string message)</h4>
+<p>Log to spelunky.log</p>
 <h3 id='lua_print'>lua_print</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lua_print">lua_print</a></p>
@@ -15516,6 +15568,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=user_data">user_data</a></td>
+<td>You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before <a href="#ON">ON</a>.PRE_LOAD_SCREEN from a level and loaded right before <a href="#ON">ON</a>.POST_LEVEL_GENERATION.<br/></td>
+</tr>
+<tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=topmost">topmost()</a></td>
 <td></td>
@@ -24330,7 +24387,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LOAD_SCREEN">PRE_LOAD_SCREEN</a></td>
 <td>ON::PRE_LOAD_SCREEN</td>
-<td>Runs right before loading a new screen based on screen_next<br/></td>
+<td>Runs right before loading a new screen based on screen_next. Return true from callback to block the screen from loading.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_ROOM_GENERATION">POST_ROOM_GENERATION</a></td>

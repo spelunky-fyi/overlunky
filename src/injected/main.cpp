@@ -1,15 +1,25 @@
-#include <Windows.h>
+#include <Windows.h>    // for AttachConsole, DWORD, FreeConsole, SetCons...
+#include <chrono>       // for operator<=>, operator-, operator+, operato...
+#include <compare>      // for operator<, operator<=, operator>
+#include <cstdio>       // for freopen_s, fclose, fopen_s, fputs, FILE, NULL
+#include <cstdlib>      // for getenv_s
+#include <fmt/format.h> // for check_format_string, format, vformat
+#include <iostream>     // for basic_istream, istream, cin, basic_streambuf
+#include <locale>       // for num_get, num_put
+#include <new>          // for operator new
+#include <string>       // for allocator, getline, string
+#include <thread>       // for sleep_for
+#include <type_traits>  // for move
+#include <utility>      // for max, min
+#include <vector>       // for vector
 
-#include <chrono>
-#include <iostream>
-#include <thread>
-
-#include "entity.hpp"
-#include "render_api.hpp"
-#include "search.hpp"
-#include "ui.hpp"
-#include "version.hpp"
-#include "window_api.hpp"
+#include "entity.hpp"     // for EntityItem, list_entities
+#include "logger.h"       // for DEBUG
+#include "render_api.hpp" // for RenderAPI
+#include "search.hpp"     // for preload_addresses, register_application_ve...
+#include "ui.hpp"         // for create_box, init_ui
+#include "version.hpp"    // for get_version
+#include "window_api.hpp" // for init_hooks
 
 using namespace std::chrono_literals;
 

@@ -11,8 +11,6 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 
 **Overlunky (or any other modding tool for that matter) does not support the GamePass/Xbox version**, but it might be considered in the future.
 
-[WHIP builds](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) are whipped together automatically from the latest changes and are not tested or documented at all. They are mainly to keep up with the ever changing scripting api and usually contain bugfixes for that. Use at your own discretion, but if you want the latest scripts, get this. ![WHIP commits](https://img.shields.io/github/commits-since/spelunky-fyi/overlunky/latest)
-
 ## Disclaimer
 You are strongly discouraged from using any modding tools in your actual online Steam installation as to prevent unlocking achievements, ruining or corrupting your savefile and cheating while using online features. You should make a copy of your game somewhere else and install [Mr. Goldbergs Steam Emulator](https://mr_goldberg.gitlab.io/goldberg_emulator/) in the game directory. (Just replace steam_api64.dll with the one in the zip and that copy of the game can't talk to Steam no more!) If you break anything using this tool you get to keep both pieces. Do not report modding related bugs to BlitWorks.
 
@@ -21,14 +19,30 @@ You are strongly discouraged from using any modding tools in your actual online 
 ## Installation and usage
 **[YouTube tutorial](https://youtu.be/Zzba4cV9f2c) for kids who can't read good and who wanna learn to do other stuff good too.**
 
-**[Download the latest release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract to your game folder. Run the program, leave it running and then start your game, or the other way around! Check the [keyboard shortcuts](#features) and [troubleshooting](#troubleshooting) before asking dumb questions. Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
+**[Download the latest stable release](https://github.com/spelunky-fyi/overlunky/releases/latest)** (or a [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) for more experimental stuff) and extract to your game folder, keeping the folder structure. Run the program, leave it running and then start your game, or the other way around! Check the [keyboard shortcuts](#features) and [troubleshooting](#troubleshooting) before asking dumb questions. Overlunky doesn't do any permanent changes to your game, it only exists when you run it.
 
 **Overlunky does NOT work online!** I thought the disclaimer was clear on this... Now I'm not going to stop you from trying, but you'll just find yourself in a world of desync and crashes.
 
 Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut keys and check [entities.txt](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.txt) for a list of numerical entity IDs.
 
+## WHIP build and automatic updates
+
+[WHIP builds](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) are whipped together automatically from the latest changes and are not tested or documented at all. They are mainly to keep up with the ever changing scripting api and usually contain bugfixes for that. Use at your own discretion, but if you want to use the latest scripting features, get this.
+
+**WHIP also has an auto-update system to check for a new version on every launch. This only updates the DLL though, NOT the bundled example scripts or the launcher!** So:
+
+  - If you just want Overlunky for the tools, get the EXE and it will download the DLL and keep it updated for you
+  - If you want the bundled scripts or need to update the launcher, get the ZIP or use Modlunky2 to update everything
+
+![WHIP commits](https://img.shields.io/github/commits-since/spelunky-fyi/overlunky/latest)
+
 ## Features
-Current features and their *default* keyboard shortcuts. Note: There's a LOT of useful keys that are not listed here because this list is getting pretty long, check your `overlunky.ini` for cool beans. The default keys are also changed from time to time to make room for better features, so check the key config for your current keys, or delete the ini (section) to revert to default keys.
+
+Current features and their *default* keyboard shortcuts.
+
+  - There's a LOT of useful keys that are not listed here because this list is getting pretty long, check settings or `overlunky.ini` for cool beans.
+  - *The F-keys don't work in the (default) Menu UI* at the moment.
+  - The default keys are also changed from time to time to make room for better features, so check the key config for your current keys, or delete the ini (section) to revert to default keys.
   - **F1**: Search and spawn entities where you're standing
       + **Ctrl+Enter**: Spawn entity
       + **Tab**: Add selected item id to list when making a kit
@@ -41,7 +55,7 @@ Current features and their *default* keyboard shortcuts. Note: There's a LOT of 
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
       + **Mouse 5**: Destroy safe entities
-      * **Alt+Mouse 5**: Erase multiple entities safely
+      + **Alt+Mouse 5**: Erase multiple entities safely
       + **Shift+Mouse 5**: Destroy any entity (really unsafe :)
       + **Shift+123...**: Spawn saved kit number
       + **Shift+Tab**: Change P1 layer
@@ -132,6 +146,7 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + You're on your own here. We don't test on or make this for ancient software/hardware.
   - If you have problems with **OBS**
     + Use *Game Capture* and disable *Allow Transparency* if Overlunky looks weird/black.
+    + Try toggling the *Capture third-party overlays* option in *Game Capture*. It's possible to hide OL if running the game through Steam.
     + If you have lag or crashes, check previous question.
   - If you're running **Linux**
     + The game and OL should run fine with Wine 7 if you install DXVK.
@@ -150,7 +165,7 @@ cd build
 cmake ..
 cmake --build . --config Release --target ALL_BUILD
 ```
-The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode. Set `OL_DEBUG=1` in the *game environment* to enable logging to console.
+The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode. Set `OL_DEBUG=1` in the *game environment* to enable logging to console. (Run `setx OL_DEBUG 1` to do this system-wide.)
 
 ## Command line switches
   - `--launch_game <path_to_game_directory>` will launch Spel2.exe from that directory and hook to the game process, rather than trying to find it.

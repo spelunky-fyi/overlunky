@@ -1,9 +1,23 @@
 #include "lua_require.hpp"
 
-#include "lua_backend.hpp"
-#include "lua_vm.hpp"
+#include <algorithm>     // for replace, mismatch
+#include <exception>     // for exception
+#include <filesystem>    // for path, operator==, exists, operator/, _Pat...
+#include <fmt/format.h>  // for check_format_string, format, vformat
+#include <fstream>       // for filesystem
+#include <lauxlib.h>     // for luaL_loadfilex
+#include <lua.h>         // for lua_setupvalue, lua_State, LUA_OK
+#include <new>           // for operator new
+#include <optional>      // for optional, nullopt
+#include <sol/sol.hpp>   // for proxy_key_t, table_proxy, state, protecte...
+#include <string_view>   // for string_view
+#include <tuple>         // for get
+#include <type_traits>   // for move, declval, conditional_t, forward
+#include <unordered_set> // for unordered_set
+#include <utility>       // for min, max, pair, tuple_element<>::type
 
-#include <sol/sol.hpp>
+#include "lua_backend.hpp" // for LuaBackend
+#include "lua_vm.hpp"      // for get_lua_vm
 
 void register_custom_require(sol::state& lua)
 {

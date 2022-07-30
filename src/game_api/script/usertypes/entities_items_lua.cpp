@@ -1,10 +1,21 @@
 #include "entities_items_lua.hpp"
 
-#include "entities_items.hpp"
-#include "items.hpp"
-#include "state_structs.hpp"
+#include <algorithm>   // for max
+#include <locale>      // for num_put
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for state, proxy_key_t, table_proxy, data_t
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
 
-#include <sol/sol.hpp>
+#include "entities_items.hpp" // for Spark, Boombox, AnkhPowerup, Arrow
+#include "entity.hpp"         // for Entity
+#include "items.hpp"          // IWYU pragma: keep
+#include "particles.hpp"      // IWYU pragma: keep
+#include "state_structs.hpp"  // IWYU pragma: keep
+
+class Movable;
 
 namespace NEntitiesItems
 {

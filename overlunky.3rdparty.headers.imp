@@ -1,0 +1,42 @@
+[
+  { ref: "stl.c.headers.imp" },
+  { ref: "stl.cpp.msvc.headers.imp" },
+  { ref: "win32.headers.imp" },
+
+  { include: [ "<libnyquist/Common.h>", private, "<libnyquist/Decoders.h>", public ] },
+
+  { include: [ "<fmt/core.h>", private, "<fmt/format.h>", public ] },
+  
+  { include: [ "<misc/cpp/imgui_stdlib.h>", private, "<imgui.h>", public ] },
+
+  { include: [ "<luaxlib.h>", private, "<lua.h>", public ] },
+
+  { include: [ "<sol/forward.hpp>", public, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/stack.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/inheritance.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/proxy_base.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/state.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/state_view.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/table.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/table_core.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/table_proxy.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/protected_function.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/protected_function_result.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/stack_core.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/environment.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/function_types_core.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/raii.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/object.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/optional_implementation.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/overload.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/resolve.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/stack_iterator.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/state_handling.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/table_iterator.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/types.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/variadic_args.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/property.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/userdata.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/error.hpp>", private, "<sol/sol.hpp>", public ] },
+  { include: [ "<sol/call.hpp>", private, "<sol/sol.hpp>", public ] },
+]

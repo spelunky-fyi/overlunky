@@ -1,23 +1,34 @@
 #include "spawn_api.hpp"
 
-#include "entities_chars.hpp"
-#include "entities_liquids.hpp"
-#include "entities_monsters.hpp"
-#include "entity.hpp"
-#include "level_api.hpp"
-#include "memory.hpp"
-#include "prng.hpp"
-#include "state.hpp"
-#include "util.hpp"
+#include <Windows.h>   // for GetCurrentThread, LONG, NO_ERROR
+#include <array>       // for array
+#include <cmath>       // for roundf, INFINITY
+#include <cstddef>     // for size_t
+#include <detours.h>   // for DetourAttach, DetourTransactionBegin
+#include <functional>  // for function, _Func_impl_no_alloc<>::_M...
+#include <new>         // for operator new
+#include <optional>    // for optional
+#include <type_traits> // for move
+#include <utility>     // for pair, identity, min, _Find_fn, find
+#include <vector>      // for vector, allocator, _Vector_iterator
 
-#include "script/events.hpp"
+#include "entities_chars.hpp"    // for Player
+#include "entities_liquids.hpp"  // for Lava
+#include "entities_monsters.hpp" // for Shopkeeper, RoomOwner
+#include "entity.hpp"            // for to_id, Entity, get_entity_ptr, Enti...
+#include "layer.hpp"             // for Layer, g_level_max_y, g_level_max_x
+#include "level_api.hpp"         // for LevelGenSystem, ThemeInfo
+#include "logger.h"              // for DEBUG
+#include "math.hpp"              // for AABB
+#include "memory.hpp"            // for write_mem_prot, read_u8
+#include "prng.hpp"              // for PRNG, PRNG::PRNG_CLASS, PRNG::ENTIT...
+#include "script/events.hpp"     // for post_entity_spawn, pre_entity_spawn
+#include "search.hpp"            // for get_address
+#include "state.hpp"             // for enum_to_layer, State, StateMemory
+#include "state_structs.hpp"     // for LiquidTileSpawnData, LiquidPhysics
+#include "util.hpp"              // for OnScopeExit
 
-#include <Windows.h>
-#include <detours.h>
-
-#include <array>
-#include <functional>
-#include <ranges>
+struct Items;
 
 std::uint32_t g_SpawnNonReplacable;
 SpawnType g_SpawnTypeFlags;
@@ -474,6 +485,7 @@ void pop_spawn_type_flags(SPAWN_TYPE flags)
 }
 
 struct EntityFactory;
+
 using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool, Entity*, bool);
 SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
 Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)

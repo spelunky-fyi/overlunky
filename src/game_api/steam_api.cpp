@@ -1,7 +1,12 @@
 #include "steam_api.hpp"
 
-#include "memory.hpp"
-#include "vtable_hook.hpp"
+#include <array> // for array, _Array_const_iterator
+
+#include "memory.hpp"      // for vtable_find
+#include "search.hpp"      // for get_address
+#include "vtable_hook.hpp" // for get_hook_function, register_hook_function
+
+class ISteamUserStats;
 
 class ISteamUserStats* get_steam_user_stats()
 {

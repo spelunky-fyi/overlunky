@@ -1,10 +1,9 @@
 #pragma once
 
-#include <Windows.h>
-
-#include <optional>
-#include <string>
-#include <vector>
+#include <Windows.h> // for LPTHREAD_START_ROUTINE, DWORD, HANDLE, LPVOID
+#include <optional>  // for optional
+#include <stddef.h>  // for size_t
+#include <string>    // for string
 
 struct MemoryMap
 {

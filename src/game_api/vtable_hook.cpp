@@ -1,9 +1,11 @@
 #include "vtable_hook.hpp"
 
-#include "memory.hpp"
+#include <Windows.h> // for GetLastError, VirtualProtect, DWORD, LPVOID
+#include <cstdint>   // for uintptr_t
+#include <vector>    // for vector, _Vector_iterator, allocator, _Vector_c...
 
-#include <algorithm>
-#include <vector>
+#include "logger.h"   // for DEBUG, PANIC
+#include "memory.hpp" // for vtable_find
 
 struct VFunctionHook
 {

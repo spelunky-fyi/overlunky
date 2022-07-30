@@ -1,9 +1,12 @@
 #pragma once
 
-#include "aliases.hpp"
-#include <array>
-#include <cstdint>
-#include <optional>
+#include <array>       // for array
+#include <cstdint>     // for uint32_t
+#include <optional>    // for optional
+#include <string>      // for string
+#include <string_view> // for string_view
+
+#include "aliases.hpp" // for TEXTURE
 
 struct Texture
 {

@@ -1,8 +1,16 @@
 #include "prng_lua.hpp"
 
-#include "prng.hpp"
+#include <algorithm>   // for max
+#include <cstdint>     // for int64_t
+#include <new>         // for operator new
+#include <optional>    // for optional
+#include <sol/sol.hpp> // for global_table, proxy_key_t, state, overload, call
+#include <string>      // for allocator, operator==
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max, get
 
-#include <sol/sol.hpp>
+#include "prng.hpp" // for PRNG, PRNG::ENTITY_VARIATION, PRNG::EXTRA_SPAWNS
 
 namespace NPRNG
 {

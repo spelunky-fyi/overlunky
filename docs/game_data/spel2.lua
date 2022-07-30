@@ -100,11 +100,30 @@ function set_callback(cb, screen) end
 ---@param id CallbackId?
 ---@return nil
 function clear_callback(id) end
----Load another script by id "author/name" and import its `exports` table
+---Load another script by id "author/name" and import its `exports` table. Returns:
+---
+---- `table` if the script has exports
+---- `nil` if the script was found but has no exports
+---- `false` if the script was not found but optional is set to true
+---- an error if the script was not found and the optional argument was not set
 ---@param id string
----@param version string?
+---@param version string
+---@param optional boolean
 ---@return table
-function import(id, version) end
+function import(id, version, optional) end
+---Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
+---@param id string
+---@param version string
+---@return boolean
+function script_enabled(id, version) end
+---Some random hash function
+---@param x integer
+---@return integer
+function lowbias32(x) end
+---Reverse of some random hash function
+---@param x integer
+---@return integer
+function lowbias32_r(x) end
 ---Get your sanitized script id to be used in import.
 ---@return string
 function get_id() end
@@ -1118,6 +1137,10 @@ function get_address(address_name) end
 ---@param address_name string
 ---@return size_t
 function get_rva(address_name) end
+---Log to spelunky.log
+---@param message string
+---@return nil
+function log_print(message) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1460,6 +1483,9 @@ function udp_listen(host, port, cb) end
 ---@param msg string
 ---@return nil
 function udp_send(host, port, msg) end
+---Hook the sendto and recvfrom functions and start dumping network data to terminal
+---@return nil
+function dump_network() end
 
 --## Types
 
@@ -1965,6 +1991,7 @@ local function PRNG_random(self, min, max) end
     ---@field offsetx number
     ---@field offsety number
     ---@field rendering_info RenderInfo
+    ---@field user_data any @user_data
     ---@field topmost fun(self): Entity
     ---@field topmost_mount fun(self): Entity
     ---@field overlaps_with Entity_overlaps_with

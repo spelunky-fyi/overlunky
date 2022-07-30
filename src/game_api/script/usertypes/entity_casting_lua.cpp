@@ -1,5 +1,9 @@
 #include "entity_casting_lua.hpp"
 
+#include <sol/sol.hpp> // for table_proxy, proxy_key_t, state, state_view
+#include <tuple>       // for get
+#include <type_traits> // for move
+
 namespace NEntityCasting
 {
 void register_usertypes(sol::state& lua)

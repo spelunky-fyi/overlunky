@@ -1,9 +1,17 @@
 #include "entities_floors_lua.hpp"
 
-#include "entities_floors.hpp"
-#include "state_structs.hpp"
+#include <algorithm>   // for max
+#include <locale>      // for num_put
+#include <new>         // for operator new
+#include <sol/sol.hpp> // for proxy_key_t, state, table_proxy, data_t
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max, swap
 
-#include <sol/sol.hpp>
+#include "entities_floors.hpp" // for MotherStatue, Floor, ExitDoor, Door
+#include "entity.hpp"          // for Entity
+#include "state_structs.hpp"   // IWYU pragma: keep
 
 namespace NEntitiesFloors
 {

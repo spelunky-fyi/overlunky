@@ -1,6 +1,13 @@
 #include "custom_types.hpp"
 
-#include "entity.hpp"
+#include <array>       // for array, _Array_const_iterator
+#include <functional>  // for less
+#include <new>         // for operator new
+#include <type_traits> // for move
+#include <utility>     // for min, find
+#include <vector>      // for vector, allocator, vector<>::iterator
+
+#include "entity.hpp" // for to_id
 
 const std::map<CUSTOM_TYPE, std::string_view> custom_type_names = {
     {CUSTOM_TYPE::ACIDBUBBLE, "ACIDBUBBLE"},

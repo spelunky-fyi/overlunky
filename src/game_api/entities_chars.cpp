@@ -1,9 +1,16 @@
 #include "entities_chars.hpp"
 
-#include "character_def.hpp"
-#include "entities_items.hpp"
-#include "memory.hpp"
-#include "rpc.hpp"
+#include <new>         // for operator new
+#include <type_traits> // for move
+#include <utility>     // for min, pair
+
+#include "character_def.hpp"         // for get_character_index, get_charac...
+#include "containers/custom_map.hpp" // for custom_map
+#include "entities_items.hpp"        // for Jetpack, KapalaPowerup
+#include "entity.hpp"                // for EntityDB, to_id, Entity
+#include "layer.hpp"                 // for EntityList::Range, EntityList
+#include "rpc.hpp"                   // for unequip_backitem, worn_backitem
+#include "search.hpp"                // for get_address
 
 void PowerupCapable::remove_powerup(ENT_TYPE powerup_type)
 {

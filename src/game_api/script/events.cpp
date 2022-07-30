@@ -1,6 +1,19 @@
 #include "events.hpp"
 
-#include "constants.hpp"
+#include <fmt/format.h> // for check_format_string, format, vformat
+#include <functional>   // for _Func_impl_no_alloc<>::_Mybase
+#include <new>          // for operator new
+#include <type_traits>  // for move
+#include <utility>      // for max, pair, min
+
+#include "constants.hpp"          // for no_return_str
+#include "level_api_types.hpp"    // for LevelGenRoomData
+#include "rpc.hpp"                // for game_log, get_adventure_seed
+#include "script/lua_backend.hpp" // for LuaBackend, ON, LuaBackend::PreHan...
+#include "state.hpp"              // for StateMemory, State
+
+class JournalPage;
+struct AABB;
 
 void pre_load_level_files()
 {
@@ -20,14 +33,36 @@ void pre_level_generation()
             return true;
         });
 }
-void pre_load_screen()
+bool pre_load_screen()
 {
+    static int64_t prev_seed = 0;
+    auto state = State::get().ptr();
+    if (state->screen_next == 12 && (state->quest_flags & 1) != 0)
+    {
+        if ((state->quest_flags & (1U << 6)) > 0)
+        {
+            auto seed = state->seed;
+            if (seed != prev_seed)
+                game_log(fmt::format("Seeded Seed: {:X}", seed));
+            prev_seed = seed;
+        }
+        else
+        {
+            auto seed = get_adventure_seed();
+            if (seed.second != prev_seed)
+                game_log(fmt::format("{} Seed: {:X} {:X}", ((state->quest_flags & (1U << 7)) > 0 && state->screen == 28) ? "Daily" : "Adventure", (uint64_t)seed.first, (uint64_t)seed.second));
+            prev_seed = seed.second;
+        }
+    }
+
+    bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend& backend)
         {
-            backend.pre_load_screen();
-            return true;
+            block = backend.pre_load_screen();
+            return !block;
         });
+    return block;
 }
 void post_room_generation()
 {
@@ -53,6 +88,15 @@ void post_load_screen()
         [&](LuaBackend& backend)
         {
             backend.post_load_screen();
+            return true;
+        });
+}
+void on_death_message(STRINGID stringid)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend& backend)
+        {
+            backend.on_death_message(stringid);
             return true;
         });
 }

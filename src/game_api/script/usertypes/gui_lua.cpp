@@ -1,14 +1,30 @@
 #include "gui_lua.hpp"
 
-#include "file_api.hpp"
-#include "script/lua_backend.hpp"
-#include "script/script_util.hpp"
-#include "window_api.hpp"
+#include <Windows.h>     // for GetProcAddress, DWORD, LoadLibraryA
+#include <algorithm>     // for max
+#include <chrono>        // for system_clock
+#include <cmath>         // for isnan, floor
+#include <cstddef>       // for NULL
+#include <deque>         // for deque
+#include <exception>     // for exception
+#include <filesystem>    // for operator/, path
+#include <fmt/format.h>  // for check_format_string, format, vformat
+#include <imgui.h>       // for ImVec2, ImGuiIO, ImDrawList, GetIO
+#include <map>           // for map
+#include <new>           // for operator new
+#include <sol/sol.hpp>   // for proxy_key_t, data_t, state, property
+#include <tuple>         // for get, tuple, make_tuple
+#include <type_traits>   // for move, declval, reference_wrapper, ref
+#include <unordered_set> // for unordered_set
+#include <utility>       // for max, min, pair, get, make_pair
+#include <xinput.h>      // for XINPUT_STATE, XINPUT_CAPABILITIES
 
-#include <imgui.h>
-#include <sol/sol.hpp>
+#include "file_api.hpp"           // for create_d3d11_texture_from_file
+#include "script.hpp"             // for ScriptMessage, ScriptImage
+#include "script/lua_backend.hpp" // for LuaBackend
+#include "script/script_util.hpp" // for screenify_fix, screenify, normalize
+#include "window_api.hpp"         // for hide_cursor, show_cursor
 
-#include <xinput.h>
 typedef DWORD(WINAPI* PFN_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*);
 typedef DWORD(WINAPI* PFN_XInputGetState)(DWORD, XINPUT_STATE*);
 static bool g_HasGamepad = false;
@@ -41,8 +57,18 @@ Gamepad get_gamepad()
 
 const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
 
-GuiDrawContext::GuiDrawContext(LuaBackend* _backend, ImDrawList* _draw_list)
-    : backend(_backend), draw_list{_draw_list}
+[[maybe_unused]] static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+
+[[maybe_unused]] static inline ImVec2 operator-(const ImVec2& lhs, const ImVec2& rhs)
+{
+    return ImVec2(lhs.x - rhs.x, lhs.y - rhs.y);
+}
+
+GuiDrawContext::GuiDrawContext(LuaBackend* _backend)
+    : backend(_backend)
 {
 }
 
@@ -496,7 +522,8 @@ void register_usertypes(sol::state& lua)
     /// Current mouse cursor position in screen coordinates.
     lua["mouse_position"] = []() -> std::pair<float, float>
     {
-        auto pos = normalize(ImGui::GetMousePos());
+        auto base = ImGui::GetMainViewport();
+        auto pos = normalize(ImGui::GetMousePos() - base->Pos);
         return std::make_pair(pos.x, pos.y);
     };
 
@@ -625,56 +652,56 @@ void register_usertypes(sol::state& lua)
     lua["draw_line"] = [](float x1, float y1, float x2, float y2, float thickness, uColor color)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).draw_line(x1, y1, x2, y2, thickness, color);
+        GuiDrawContext(backend).draw_line(x1, y1, x2, y2, thickness, color);
     };
     /// Deprecated
     /// Use `GuiDrawContext.draw_rect` instead
     lua["draw_rect"] = [](float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).draw_rect(x1, y1, x2, y2, thickness, rounding, color);
+        GuiDrawContext(backend).draw_rect(x1, y1, x2, y2, thickness, rounding, color);
     };
     /// Deprecated
     /// Use `GuiDrawContext.draw_rect_filled` instead
     lua["draw_rect_filled"] = [](float x1, float y1, float x2, float y2, float rounding, uColor color)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).draw_rect_filled(x1, y1, x2, y2, rounding, color);
+        GuiDrawContext(backend).draw_rect_filled(x1, y1, x2, y2, rounding, color);
     };
     /// Deprecated
     /// Use `GuiDrawContext.draw_circle` instead
     lua["draw_circle"] = [](float x, float y, float radius, float thickness, uColor color)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).draw_circle(x, y, radius, thickness, color);
+        GuiDrawContext(backend).draw_circle(x, y, radius, thickness, color);
     };
     /// Deprecated
     /// Use `GuiDrawContext.draw_circle_filled` instead
     lua["draw_circle_filled"] = [](float x, float y, float radius, uColor color)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).draw_circle_filled(x, y, radius, color);
+        GuiDrawContext(backend).draw_circle_filled(x, y, radius, color);
     };
     /// Deprecated
     /// Use `GuiDrawContext.draw_text` instead
     lua["draw_text"] = [](float x, float y, float size, std::string text, uColor color)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).draw_text(x, y, size, std::move(text), color);
+        GuiDrawContext(backend).draw_text(x, y, size, std::move(text), color);
     };
     /// Deprecated
     /// Use `GuiDrawContext.draw_image` instead
     lua["draw_image"] = [](IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).draw_image(image, x1, y1, x2, y2, uvx1, uvy1, uvx2, uvy2, color);
+        GuiDrawContext(backend).draw_image(image, x1, y1, x2, y2, uvx1, uvy1, uvx2, uvy2, color);
     };
     /// Deprecated
     /// Use `GuiDrawContext.draw_image_rotated` instead
     lua["draw_image_rotated"] = [](IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).draw_image_rotated(image, x1, y1, x2, y2, uvx1, uvy1, uvx2, uvy2, color, angle, px, py);
+        GuiDrawContext(backend).draw_image_rotated(image, x1, y1, x2, y2, uvx1, uvy1, uvx2, uvy2, color, angle, px, py);
     };
 
     /// Deprecated
@@ -682,126 +709,126 @@ void register_usertypes(sol::state& lua)
     lua["window"] = [](std::string title, float x, float y, float w, float h, bool movable, sol::function callback)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).window(std::move(title), x, y, w, h, movable, std::move(callback));
+        GuiDrawContext(backend).window(std::move(title), x, y, w, h, movable, std::move(callback));
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_text` instead
     lua["win_text"] = [](std::string text)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).win_text(std::move(text));
+        GuiDrawContext(backend).win_text(std::move(text));
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_separator` instead
     lua["win_separator"] = []()
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).win_separator();
+        GuiDrawContext(backend).win_separator();
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_inline` instead
     lua["win_inline"] = []()
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).win_inline();
+        GuiDrawContext(backend).win_inline();
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_sameline` instead
     lua["win_sameline"] = [](float offset, float spacing)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).win_sameline(offset, spacing);
+        GuiDrawContext(backend).win_sameline(offset, spacing);
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_button` instead
     lua["win_button"] = [](std::string text) -> bool
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_button(std::move(text));
+        return GuiDrawContext(backend).win_button(std::move(text));
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_input_text` instead
     lua["win_input_text"] = [](std::string label, std::string value) -> std::string
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_input_text(std::move(label), std::move(value));
+        return GuiDrawContext(backend).win_input_text(std::move(label), std::move(value));
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_input_int` instead
     lua["win_input_int"] = [](std::string label, int value) -> int
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_input_int(std::move(label), value);
+        return GuiDrawContext(backend).win_input_int(std::move(label), value);
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_input_float` instead
     lua["win_input_float"] = [](std::string label, float value) -> float
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_input_float(std::move(label), value);
+        return GuiDrawContext(backend).win_input_float(std::move(label), value);
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_slider_int` instead
     lua["win_slider_int"] = [](std::string label, int value, int min, int max) -> int
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_slider_int(std::move(label), value, min, max);
+        return GuiDrawContext(backend).win_slider_int(std::move(label), value, min, max);
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_drag_int` instead
     lua["win_drag_int"] = [](std::string label, int value, int min, int max) -> int
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_drag_int(std::move(label), value, min, max);
+        return GuiDrawContext(backend).win_drag_int(std::move(label), value, min, max);
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_slider_float` instead
     lua["win_slider_float"] = [](std::string label, float value, float min, float max) -> float
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_slider_float(std::move(label), value, min, max);
+        return GuiDrawContext(backend).win_slider_float(std::move(label), value, min, max);
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_drag_float` instead
     lua["win_drag_float"] = [](std::string label, float value, float min, float max) -> float
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_drag_float(std::move(label), value, min, max);
+        return GuiDrawContext(backend).win_drag_float(std::move(label), value, min, max);
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_check` instead
     lua["win_check"] = [](std::string label, bool value) -> bool
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_check(std::move(label), value);
+        return GuiDrawContext(backend).win_check(std::move(label), value);
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_combo` instead
     lua["win_combo"] = [](std::string label, int selected, std::string opts) -> int
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        return GuiDrawContext(backend, backend->draw_list).win_combo(std::move(label), selected, std::move(opts));
+        return GuiDrawContext(backend).win_combo(std::move(label), selected, std::move(opts));
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_pushid` instead
     lua["win_pushid"] = [](int id)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).win_pushid(id);
+        GuiDrawContext(backend).win_pushid(id);
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_popid` instead
     lua["win_popid"] = []()
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).win_popid();
+        GuiDrawContext(backend).win_popid();
     };
     /// Deprecated
     /// Use `GuiDrawContext.win_image` instead
     lua["win_image"] = [](IMAGE image, int width, int height)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        GuiDrawContext(backend, backend->draw_list).win_image(image, width, height);
+        GuiDrawContext(backend).win_image(image, width, height);
     };
 }
 }; // namespace NGui

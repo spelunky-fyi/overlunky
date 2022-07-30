@@ -1,15 +1,24 @@
 #include "strings.hpp"
 
-#include "containers/game_allocator.hpp"
+#include <Windows.h>     // for GetCurrentThread, LONG, NO_...
+#include <cstdio>        // for swprintf_s, NULL, size_t
+#include <cstring>       // for memcpy
+#include <functional>    // for equal_to
+#include <limits>        // for numeric_limits
+#include <list>          // for _List_iterator, _List_const...
+#include <new>           // for operator new
+#include <type_traits>   // for hash, move
+#include <unordered_map> // for unordered_map, _Umap_traits...
+#include <utility>       // for max, min, pair
 
-#include "entity.hpp"
-#include "fix_entity_descriptions.hpp"
-#include "memory.hpp"
-#include "script/events.hpp"
-#include "virtual_table.hpp"
-
-#include "detours.h"
-#include <cassert>
+#include "containers/game_allocator.hpp" // for game_free, game_malloc
+#include "detours.h"                     // for DetourAttach, DetourTransac...
+#include "entity.hpp"                    // for get_type, Entity, EntityDB
+#include "logger.h"                      // for DEBUG
+#include "memory.hpp"                    // for Memory
+#include "script/events.hpp"             // for pre_speach_bubble, pre_toast
+#include "search.hpp"                    // for get_address
+#include "virtual_table.hpp"             // for get_virtual_function_address
 
 static STRINGID g_original_string_ids_end{std::numeric_limits<STRINGID>::max()};
 std::unordered_map<STRINGID, std::u16string> g_custom_strings;
@@ -121,6 +130,7 @@ const char16_t** get_strings_table()
 
 STRINGID hash_to_stringid(uint32_t hash)
 {
+    const auto& string_hashes{get_string_hashes()};
     auto it = string_hashes.find(hash);
     if (it != string_hashes.end())
     {
@@ -149,6 +159,17 @@ const char16_t* get_string(STRINGID string_id)
     }
     auto strings_table = get_strings_table();
     return strings_table[string_id];
+}
+
+STRINGID pointer_to_stringid(size_t ptr)
+{
+    auto strings_table = get_strings_table();
+    for (STRINGID i = 0; i < g_original_string_ids_end; ++i)
+    {
+        if ((size_t)strings_table[i] == ptr)
+            return i;
+    }
+    return g_original_string_ids_end;
 }
 
 void change_string(STRINGID string_id, std::u16string_view str)

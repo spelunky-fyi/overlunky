@@ -1,5 +1,13 @@
 #include "memory.hpp"
 
+#include <cstdlib>       // for exit
+#include <cstring>       // for memcpy
+#include <functional>    // for equal_to
+#include <new>           // for operator new
+#include <unordered_map> // for unordered_map, _Umap_traits<>::allocator_type
+#include <utility>       // for min, max
+#include <vector>        // for vector, _Vector_iterator, _Vector_const_ite...
+
 ExecutableMemory::ExecutableMemory(std::string_view raw_code)
 {
     SYSTEM_INFO system_info;

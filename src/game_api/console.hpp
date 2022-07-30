@@ -1,10 +1,14 @@
 #pragma once
 
-#include <deque>
-#include <memory>
-#include <string>
-#include <string_view>
-#include <vector>
+#include <cstddef>     // for size_t
+#include <cstdint>     // for uint32_t
+#include <deque>       // for deque
+#include <memory>      // for unique_ptr
+#include <string>      // for string
+#include <string_view> // for string_view
+#include <vector>      // for vector
+
+struct ScriptMessage;
 
 class SpelunkyConsole
 {
@@ -13,7 +17,7 @@ class SpelunkyConsole
     ~SpelunkyConsole();
 
     std::vector<std::string> consume_requires();
-    std::deque<struct ScriptMessage> consume_messages();
+    std::deque<ScriptMessage> consume_messages();
     const std::deque<ScriptMessage>& get_messages() const;
 
     bool is_enabled();
@@ -31,6 +35,7 @@ class SpelunkyConsole
     void set_max_history_size(size_t max_history);
     void save_history(std::string_view path);
     void load_history(std::string_view path);
+    void push_history(std::string history_item, std::vector<ScriptMessage> result_item);
 
     std::string dump_api();
 

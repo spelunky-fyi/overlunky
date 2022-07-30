@@ -1,18 +1,29 @@
 #include "ui_util.hpp"
 
-#include "entities_activefloors.hpp"
-#include "entities_chars.hpp"
-#include "entities_floors.hpp"
-#include "entities_mounts.hpp"
-#include "game_manager.hpp"
-#include "items.hpp"
-#include "level_api.hpp"
-#include "rpc.hpp"
-#include "spawn_api.hpp"
-#include "state.hpp"
-#include "steam_api.hpp"
+#include <array>            // for array
+#include <cstdint>          // for uint32_t, int32_t, uint8_t, uin...
+#include <initializer_list> // for initializer_list
+#include <map>              // for map, _Tree_iterator, _Tree_cons...
+#include <new>              // for operator new
+#include <tuple>            // for tie, tuple
 
-#include <unordered_set>
+#include "entities_activefloors.hpp" // for Olmec
+#include "entities_chars.hpp"        // for Player, PowerupCapable
+#include "entities_floors.hpp"       // for Floor, Floor::(anonymous), FLOO...
+#include "entities_items.hpp"        // for Torch
+#include "entities_mounts.hpp"       // for Mount
+#include "entity.hpp"                // for to_id, Entity, get_entity_ptr
+#include "game_manager.hpp"          // for get_game_manager, GameManager
+#include "items.hpp"                 // for Items
+#include "layer.hpp"                 // for Layer, EntityList::Range, Entit...
+#include "level_api.hpp"             // for LevelGenSystem
+#include "math.hpp"                  // for AABB
+#include "render_api.hpp"            // for RenderInfo
+#include "rpc.hpp"                   // for get_entities_at, entity_get_ite...
+#include "spawn_api.hpp"             // for spawn_liquid, spawn_companion
+#include "state.hpp"                 // for State, StateMemory
+#include "state_structs.hpp"         // for Camera, Illumination (ptr only)
+#include "steam_api.hpp"             // for disable_steam_achievements, ena...
 
 void UI::godmode(bool g)
 {

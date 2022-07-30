@@ -5,7 +5,7 @@
 #include <Shlwapi.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <misc\cpp\imgui_stdlib.h>
+#include <misc/cpp/imgui_stdlib.h>
 #include <shellapi.h>
 #include <windows.h>
 
@@ -25,6 +25,7 @@
 #pragma warning(push, 0)
 #include <toml.hpp>
 #pragma warning(pop)
+#include <fmt/chrono.h>
 #include <fmt/core.h>
 
 #include "olfont.h"
@@ -43,6 +44,7 @@
 #include "logger.h"
 #include "math.hpp"
 #include "savedata.hpp"
+#include "screen.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"
@@ -297,6 +299,7 @@ std::map<std::string, bool> options = {
     {"draw_hud", true},
     {"draw_script_messages", true},
     {"fade_script_messages", true},
+    {"console_script_messages", false},
     {"draw_hitboxes_interpolated", true},
     {"show_tooltips", true},
     {"smooth_camera", true},
@@ -2594,7 +2597,6 @@ void render_list()
         boxsize = {400.0f, 400.0f};
     if (!ImGui::ListBoxHeader("##Entities", boxsize))
         return;
-    bool value_changed = false;
     ImGuiListClipper clipper;
     clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
     if (scroll_top)
@@ -2617,7 +2619,6 @@ void render_list()
             if (ImGui::Selectable(item_text, item_selected))
             {
                 g_current_item = i;
-                value_changed = true;
             }
             if (item_selected)
             {
@@ -2639,7 +2640,6 @@ void render_themes()
     // ImGui::ListBox with filter
     if (!ImGui::BeginCombo("Theme##Theme", themes[g_to]))
         return;
-    bool value_changed = false;
     for (uint8_t i = 0; i < 17; i++)
     {
         const bool item_selected = (i == g_to);
@@ -2649,7 +2649,6 @@ void render_themes()
         if (ImGui::Selectable(item_text, item_selected))
         {
             g_to = i;
-            value_changed = true;
         }
         if (item_selected)
             ImGui::SetItemDefaultFocus();
@@ -3341,6 +3340,13 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         draw_list->AddLine(fix_pos(ImVec2(sboxa.x, sboxb.y)), fix_pos(sorigin), color, 2);
         draw_list->AddLine(fix_pos(ImVec2(sboxb.x, sboxa.y)), fix_pos(sorigin), color, 2);
     }
+    static const auto spark = to_id("ENT_TYPE_ITEM_SPARK");
+    if (type == spark)
+    {
+        auto ent_spark = ent->as<Spark>();
+        if (ent_spark->size >= 1.0)
+            color = ImColor(255, 0, 0, 150);
+    }
     if (ent->shape == SHAPE::CIRCLE)
         if (filled)
             draw_list->AddCircleFilled(fix_pos(spos), sboxb.x - spos.x, color);
@@ -3471,8 +3477,32 @@ void set_vel(ImVec2 pos)
 void render_messages()
 {
     using namespace std::chrono_literals;
-    using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     auto now = std::chrono::system_clock::now();
+
+    if (options["console_script_messages"])
+    {
+        auto in_time_t = std::chrono::system_clock::to_time_t(now);
+        std::tm time_buf;
+        localtime_s(&time_buf, &in_time_t);
+        std::vector<ScriptMessage> messages;
+        for (auto& [name, script] : g_scripts)
+        {
+            for (auto&& message : script->consume_messages())
+                messages.push_back(message);
+            if (messages.size() > 0)
+                g_Console->push_history(fmt::format("--- [{}] at {:%Y-%m-%d %X}", script->get_name(), time_buf), std::move(messages));
+        }
+        messages.clear();
+        {
+            for (auto&& message : g_Console->consume_messages())
+                messages.push_back(message);
+            if (messages.size() > 0)
+                g_Console->push_history(fmt::format("--- [Console] at {:%Y-%m-%d %X}", time_buf), std::move(messages));
+        }
+        return;
+    }
+
+    using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     std::vector<Message> queue;
     for (auto& [name, script] : g_scripts)
     {
@@ -4481,6 +4511,8 @@ void render_scripts()
     ImGui::PushTextWrapPos(0.0f);
     ImGui::PopTextWrapPos();
     ImGui::Checkbox("Draw script messages##DrawScriptMessages", &options["draw_script_messages"]);
+    ImGui::SameLine();
+    ImGui::Checkbox("to console##ConsoleScriptMessages", &options["console_script_messages"]);
     ImGui::Checkbox("Fade script messages##FadeScriptMessages", &options["fade_script_messages"]);
     if (ImGui::Checkbox("Load scripts from default directory##LoadScriptsDefault", &load_script_dir))
         refresh_script_files();
@@ -4854,6 +4886,7 @@ void render_savegame()
         ImGui::SliderScalar("Rescued dogs", ImGuiDataType_U8, &g_save->pets_rescued[0], &u8_min, &u8_max);
         ImGui::SliderScalar("Rescued cats", ImGuiDataType_U8, &g_save->pets_rescued[1], &u8_min, &u8_max);
         ImGui::SliderScalar("Rescued hamsters", ImGuiDataType_U8, &g_save->pets_rescued[2], &u8_min, &u8_max);
+        ImGui::InputText("Last daily", g_save->last_daily, sizeof(g_save->last_daily) + 1, 0);
     }
     ImGui::PopID();
 
@@ -6618,12 +6651,11 @@ void imgui_draw()
 
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + base->Size.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
 
+    render_clickhandler();
     if (options["draw_hud"])
         render_prohud();
-
     if (options["draw_script_messages"])
         render_messages();
-    render_clickhandler();
 
     float toolwidth = 0.12f * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
@@ -6659,6 +6691,7 @@ void imgui_draw()
                         ImGui::EndMenu();
                     }
                 }
+                ImGui::EndMainMenuBar();
             }
             ImGui::PopID();
         }
@@ -6777,11 +6810,11 @@ void imgui_draw()
                 continue;
             ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
             ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, ImGuiViewportFlags_NoTaskBarIcon);
+            ImGui::PushID(tab.second->name.c_str());
+            ImGui::BeginChild("ScrollableTool");
             render_tool(tab.first);
-            ImGui::SetNextWindowPos(
-                {base->Size.x / 2 - ImGui::GetWindowWidth() / 2,
-                 base->Size.y / 2 - ImGui::GetWindowHeight() / 2},
-                ImGuiCond_Once);
+            ImGui::EndChild();
+            ImGui::PopID();
             ImGui::End();
         }
         if (detach_tab != "")
@@ -6876,6 +6909,7 @@ void init_ui()
     g_game_manager = get_game_manager();
 
     g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
+    g_Console->set_max_history_size(1000);
     g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);

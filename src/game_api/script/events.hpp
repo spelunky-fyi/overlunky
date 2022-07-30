@@ -1,20 +1,25 @@
 #pragma once
 
-#include "lua_backend.hpp"
-#include "math.hpp"
+#include <cstdint>     // for uint16_t, uint8_t, uint32_t
+#include <optional>    // for optional
+#include <string>      // for u16string, string
+#include <string_view> // for string_view
 
-#include <cstdint>
-#include <optional>
-#include <string_view>
+#include "aliases.hpp"     // for JournalPageType
+#include "lua_backend.hpp" // for ON
 
 class Entity;
+class JournalPage;
+struct AABB;
+struct LevelGenRoomData;
 
 void pre_load_level_files();
 void pre_level_generation();
-void pre_load_screen();
+bool pre_load_screen();
 void post_room_generation();
 void post_level_generation();
 void post_load_screen();
+void on_death_message(STRINGID stringid);
 
 std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template);
 std::optional<LevelGenRoomData> pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template);

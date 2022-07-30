@@ -1,16 +1,13 @@
 #pragma once
 
-#include <chrono>
-#include <deque>
-#include <filesystem>
-#include <memory>
-#include <string>
-#include <string_view>
-#include <type_traits>
-#include <variant>
-#include <vector>
-
-#include <imgui.h>
+#include <chrono>  // for system_clock, time_point
+#include <cstddef> // for size_t
+#include <cstdint> // for uint16_t
+#include <deque>   // for deque
+#include <imgui.h> // for ImVec2, ImDrawList (ptr only), ImVec4
+#include <memory>  // for unique_ptr
+#include <string>  // for string
+#include <vector>  // for vector
 
 struct PlayerInputs;
 class Ai;
@@ -56,7 +53,6 @@ struct ScriptImage
     int height;
 };
 
-class Entity;
 class ScriptImpl;
 
 class SpelunkyScript
@@ -66,6 +62,7 @@ class SpelunkyScript
     ~SpelunkyScript();
 
     std::deque<ScriptMessage>& get_messages();
+    std::deque<ScriptMessage> consume_messages();
     std::vector<std::string> consume_requires();
 
     const std::string& get_id() const;

@@ -1,15 +1,18 @@
 #include "sound_manager.hpp"
 
-#include "memory.hpp"
-#include "overloaded.hpp"
+#include <Windows.h> // for GetProcAddress, GetModuleHandle, HMODULE
+#include <algorithm> // for clamp
+#include <cstdint>   // for uint32_t
+#include <exception> // for exception
+#include <memory>    // for remove_if, unique_ptr
+#include <mutex>     // for lock_guard, mutex
+#include <string>    // for allocator, string, hash, operator==, char_...
 
-#include <mutex>
-#include <string>
-
-#include <Windows.h>
+#include "logger.h"       // for DEBUG
+#include "overloaded.hpp" // for overloaded
+#include "search.hpp"     // for get_address
 
 #define SOL_ALL_SAFETIES_ON 1
-#include <sol/function.hpp>
 
 FMOD::FMOD_MODE operator|(FMOD::FMOD_MODE lhs, FMOD::FMOD_MODE rhs)
 {

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "aliases.hpp"
-#include "math.hpp"
+#include <cstdint> // for int32_t, uint32_t, uint8_t, uint16_t, int16_t
 
-#include <cstdint>
+#include "aliases.hpp" // for LAYER, ENT_TYPE, SPAWN_TYPE, ROOM_TEMPLATE
 
 class Entity;
+struct AABB;
 
 enum SpawnType : SPAWN_TYPE
 {

@@ -1,7 +1,16 @@
 #include "movable_behavior.hpp"
 
-#include "movable.hpp"
-#include "search.hpp"
+#include <list>    // for _List_iterator, _List_const_ite...
+#include <map>     // for _Tree_iterator, _Tree_const_ite...
+#include <string>  // for operator""sv
+#include <utility> // for min, max, pair
+
+#include "containers/custom_map.hpp" // for custom_map
+#include "containers/custom_set.hpp" // for custom_set
+#include "movable.hpp"               // for Movable
+#include "search.hpp"                // for get_address
+
+class Entity;
 
 bool SortMovableBehavior::operator()(const MovableBehavior* lhs, const MovableBehavior* rhs) const
 {
@@ -14,12 +23,13 @@ bool SortMovableBehavior::operator()(const MovableBehavior* lhs, const MovableBe
 
 CustomMovableBehavior::~CustomMovableBehavior()
 {
-    for (Movable* movable : using_movables)
+    for (auto& [movable, hook] : using_movables)
     {
         // Reset to default behaviors, as soon as one custom behavior is removed this
         // whole state machine can not possibly be valid anymore
         clear_behaviors(movable);
         movable->apply_db();
+        movable->unhook(hook);
     }
 }
 
@@ -102,9 +112,9 @@ uint8_t CustomMovableBehavior::get_next_state_id(Movable* movable)
 
 void CustomMovableBehavior::hook_movable(Movable* movable)
 {
-    using_movables.push_back(movable);
-    movable->set_on_dtor([=](Entity*)
-                         { std::erase(using_movables, movable); });
+    using_movables[movable] =
+        movable->set_on_dtor([=](Entity*)
+                             { using_movables.erase(movable); });
 }
 
 VanillaMovableBehavior* get_base_behavior(Movable* movable, uint32_t state_id)

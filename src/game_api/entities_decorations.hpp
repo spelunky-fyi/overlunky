@@ -2,6 +2,8 @@
 
 #include "entity.hpp"
 
+struct Illumination;
+
 class CrossBeam : public Entity
 {
   public:

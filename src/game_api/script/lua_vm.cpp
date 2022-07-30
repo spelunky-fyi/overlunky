@@ -1,61 +1,94 @@
 #include "lua_vm.hpp"
 
-#include <csignal>
+#include <Windows.h>     // for IsBadReadPtr, Get...
+#include <algorithm>     // for max, transform
+#include <cctype>        // for toupper
+#include <chrono>        // for milliseconds, sys...
+#include <cmath>         // for pow, sqrt
+#include <compare>       // for operator<
+#include <csignal>       // for raise
+#include <cstddef>       // for size_t, NULL
+#include <cstdint>       // for uint32_t, int8_t
+#include <deque>         // for deque
+#include <exception>     // for exception
+#include <fmt/format.h>  // for format_error
+#include <functional>    // for _Func_impl_no_all...
+#include <imgui.h>       // for GetIO, ImVec4
+#include <lauxlib.h>     // for luaL_error
+#include <list>          // for _List_const_iterator
+#include <lua.h>         // for lua_Debug, lua_State
+#include <map>           // for map, map<>::mappe...
+#include <new>           // for operator new
+#include <optional>      // for nullopt, optional
+#include <sol/sol.hpp>   // for global_table, pro...
+#include <string>        // for string, char_traits
+#include <tuple>         // for get, tuple, make_...
+#include <type_traits>   // for move, declval
+#include <unordered_map> // for unordered_map
+#include <unordered_set> // for unordered_set
+#include <utility>       // for min, max, pair, get
+#include <vector>        // for vector, _Vector_i...
 
-#include "entities_items.hpp"
-#include "entities_monsters.hpp"
-#include "entity.hpp"
-#include "game_manager.hpp"
-#include "items.hpp"
-#include "level_api.hpp"
-#include "online.hpp"
-#include "rpc.hpp"
-#include "savedata.hpp"
-#include "search.hpp"
-#include "settings_api.hpp"
-#include "spawn_api.hpp"
-#include "state.hpp"
-#include "strings.hpp"
+#include "aliases.hpp"                             // for CallbackId, ENT_TYPE
+#include "color.hpp"                               // for Color
+#include "entities_chars.hpp"                      // for Player
+#include "entities_items.hpp"                      // for Container, Player...
+#include "entity.hpp"                              // for get_entity_ptr
+#include "game_manager.hpp"                        // for get_game_manager
+#include "items.hpp"                               // for Inventory
+#include "layer.hpp"                               // for g_level_max_x
+#include "lua_backend.hpp"                         // for LuaBackend, ON
+#include "lua_console.hpp"                         // for LuaConsole
+#include "lua_libs/lua_libs.hpp"                   // for require_format_lua
+#include "lua_require.hpp"                         // for register_custom_r...
+#include "math.hpp"                                // for AABB
+#include "movable.hpp"                             // for Movable
+#include "online.hpp"                              // for get_online
+#include "rpc.hpp"                                 // for get_entities_by
+#include "savedata.hpp"                            // IWYU pragma: keep
+#include "screen.hpp"                              // for get_screen_ptr
+#include "script.hpp"                              // for ScriptMessage
+#include "script_util.hpp"                         // for sanitize, get_say
+#include "search.hpp"                              // for get_address
+#include "settings_api.hpp"                        // for get_settings_name...
+#include "spawn_api.hpp"                           // for spawn_roomowner
+#include "state.hpp"                               // for State, StateMemory
+#include "strings.hpp"                             // for change_string
+#include "usertypes/behavior_lua.hpp"              // for register_usertypes
+#include "usertypes/char_state_lua.hpp"            // for register_usertypes
+#include "usertypes/drops_lua.hpp"                 // for register_usertypes
+#include "usertypes/entities_activefloors_lua.hpp" // for register_usertypes
+#include "usertypes/entities_backgrounds_lua.hpp"  // for register_usertypes
+#include "usertypes/entities_chars_lua.hpp"        // for register_usertypes
+#include "usertypes/entities_decorations_lua.hpp"  // for register_usertypes
+#include "usertypes/entities_floors_lua.hpp"       // for register_usertypes
+#include "usertypes/entities_fx_lua.hpp"           // for register_usertypes
+#include "usertypes/entities_items_lua.hpp"        // for register_usertypes
+#include "usertypes/entities_liquids_lua.hpp"      // for register_usertypes
+#include "usertypes/entities_logical_lua.hpp"      // for register_usertypes
+#include "usertypes/entities_monsters_lua.hpp"     // for register_usertypes
+#include "usertypes/entities_mounts_lua.hpp"       // for register_usertypes
+#include "usertypes/entity_casting_lua.hpp"        // for register_usertypes
+#include "usertypes/entity_lua.hpp"                // for register_usertypes
+#include "usertypes/flags_lua.hpp"                 // for register_usertypes
+#include "usertypes/game_manager_lua.hpp"          // for register_usertypes
+#include "usertypes/gui_lua.hpp"                   // for register_usertypes
+#include "usertypes/hitbox_lua.hpp"                // for register_usertypes
+#include "usertypes/level_lua.hpp"                 // for register_usertypes
+#include "usertypes/particles_lua.hpp"             // for register_usertypes
+#include "usertypes/player_lua.hpp"                // for register_usertypes
+#include "usertypes/prng_lua.hpp"                  // for register_usertypes
+#include "usertypes/save_context.hpp"              // for register_usertypes
+#include "usertypes/screen_arena_lua.hpp"          // for register_usertypes
+#include "usertypes/screen_lua.hpp"                // for register_usertypes
+#include "usertypes/socket_lua.hpp"                // for register_usertypes
+#include "usertypes/sound_lua.hpp"                 // for register_usertypes
+#include "usertypes/state_lua.hpp"                 // for register_usertypes
+#include "usertypes/texture_lua.hpp"               // for register_usertypes
+#include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 
-#include "lua_backend.hpp"
-#include "lua_console.hpp"
-#include "lua_require.hpp"
-#include "script_util.hpp"
-
-#include "usertypes/behavior_lua.hpp"
-#include "usertypes/char_state_lua.hpp"
-#include "usertypes/drops_lua.hpp"
-#include "usertypes/entities_activefloors_lua.hpp"
-#include "usertypes/entities_backgrounds_lua.hpp"
-#include "usertypes/entities_chars_lua.hpp"
-#include "usertypes/entities_decorations_lua.hpp"
-#include "usertypes/entities_floors_lua.hpp"
-#include "usertypes/entities_fx_lua.hpp"
-#include "usertypes/entities_items_lua.hpp"
-#include "usertypes/entities_liquids_lua.hpp"
-#include "usertypes/entities_logical_lua.hpp"
-#include "usertypes/entities_monsters_lua.hpp"
-#include "usertypes/entities_mounts_lua.hpp"
-#include "usertypes/entity_casting_lua.hpp"
-#include "usertypes/entity_lua.hpp"
-#include "usertypes/flags_lua.hpp"
-#include "usertypes/game_manager_lua.hpp"
-#include "usertypes/gui_lua.hpp"
-#include "usertypes/hitbox_lua.hpp"
-#include "usertypes/level_lua.hpp"
-#include "usertypes/particles_lua.hpp"
-#include "usertypes/player_lua.hpp"
-#include "usertypes/prng_lua.hpp"
-#include "usertypes/save_context.hpp"
-#include "usertypes/screen_arena_lua.hpp"
-#include "usertypes/screen_lua.hpp"
-#include "usertypes/socket_lua.hpp"
-#include "usertypes/sound_lua.hpp"
-#include "usertypes/state_lua.hpp"
-#include "usertypes/texture_lua.hpp"
-#include "usertypes/vanilla_render_lua.hpp"
-
-#include "lua_libs/lua_libs.hpp"
+struct Illumination;
+struct PlayerInputs;
 
 void load_libraries(sol::state& lua)
 {
@@ -76,11 +109,15 @@ void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
     auto infinite_loop = [](lua_State* argst, [[maybe_unused]] lua_Debug* argdb)
     {
-        luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
+        static uint32_t last_frame = 0;
+        auto state = State::get().ptr();
+        if (last_frame == state->time_startup)
+            luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
+        last_frame = state->time_startup;
     };
 
     lua_sethook(lua.lua_state(), NULL, 0, 0);
-    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 1000000000);
+    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 500000000);
 
     lua.safe_script(R"(
 -- This function walks up the stack until it finds an _ENV that is not _G
@@ -354,8 +391,13 @@ end
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     lua["options"] = lua.create_named_table("options");
 
-    /// Load another script by id "author/name" and import its `exports` table
-    // lua["import"] = [](string id, optional<string> version) -> table
+    /// Load another script by id "author/name" and import its `exports` table. Returns:
+    ///
+    /// - `table` if the script has exports
+    /// - `nil` if the script was found but has no exports
+    /// - `false` if the script was not found but optional is set to true
+    /// - an error if the script was not found and the optional argument was not set
+    // lua["import"] = [](string id, string version = "", bool optional = false) -> table
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {
@@ -390,11 +432,71 @@ end
                 import_backend->update();
             }
             return sol::make_object(lua, import_backend->lua["exports"]);
+        },
+        [&lua](std::string id, std::string version, bool optional)
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            backend->required_scripts.push_back(sanitize(id));
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)), std::string_view(version));
+            if (!import_backend)
+            {
+                if (!optional)
+                    luaL_error(lua, "Imported script not found");
+                return sol::make_object(lua, false);
+            }
+            if (!import_backend->get_enabled())
+            {
+                import_backend->set_enabled(true);
+                import_backend->update();
+            }
+            return sol::make_object(lua, import_backend->lua["exports"]);
+        },
+        [&lua](std::string id, bool optional)
+        {
+            LuaBackend* backend = LuaBackend::get_calling_backend();
+            backend->required_scripts.push_back(sanitize(id));
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)));
+            if (!import_backend)
+            {
+                if (!optional)
+                    luaL_error(lua, "Imported script not found");
+                return sol::make_object(lua, false);
+            }
+            if (!import_backend->get_enabled())
+            {
+                import_backend->set_enabled(true);
+                import_backend->update();
+            }
+            return sol::make_object(lua, import_backend->lua["exports"]);
         });
 
     /// Deprecated
     /// Same as import().
     lua["load_script"] = lua["import"];
+
+    /// Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
+    // lua["script_enabled"] = [](string id, string version = "") -> bool
+    lua["script_enabled"] = sol::overload(
+        [](std::string id)
+        {
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)));
+            if (!import_backend)
+                return false;
+            return import_backend->get_enabled();
+        },
+        [](std::string id, std::string version)
+        {
+            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)), std::string_view(version));
+            if (!import_backend)
+                return false;
+            return import_backend->get_enabled();
+        });
+
+    /// Some random hash function
+    lua["lowbias32"] = lowbias32;
+
+    /// Reverse of some random hash function
+    lua["lowbias32_r"] = lowbias32_r;
 
     /// Get your sanitized script id to be used in import.
     lua["get_id"] = []() -> std::string
@@ -1584,6 +1686,9 @@ end
         return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe");
     };
 
+    /// Log to spelunky.log
+    lua["log_print"] = game_log;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
@@ -1695,7 +1800,9 @@ end
         "SPEECH_BUBBLE",
         ON::SPEECH_BUBBLE,
         "TOAST",
-        ON::TOAST);
+        ON::TOAST,
+        "DEATH_MESSAGE",
+        ON::DEATH_MESSAGE);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -1723,7 +1830,7 @@ end
     // LOADING
     // Runs whenever state.loading changes and is > 0. Prefer PRE/POST_LOAD_SCREEN instead though.
     // PRE_LOAD_SCREEN
-    // Runs right before loading a new screen based on screen_next
+    // Runs right before loading a new screen based on screen_next. Return true from callback to block the screen from loading.
     // POST_LOAD_SCREEN
     // Runs right after a screen is loaded, before rendering anything
     // PRE_GET_RANDOM_ROOM
@@ -1792,6 +1899,9 @@ end
     // Return behavior: if you don't return anything it will execute the toast function normally with default message
     // if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
     // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
+    // DEATH_MESSAGE
+    // Params: `STRINGID id`
+    // Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.
     */
 
     lua.create_named_table(

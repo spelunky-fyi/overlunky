@@ -1,12 +1,34 @@
 #include "level_lua.hpp"
 
-#include "entity.hpp"
-#include "level_api.hpp"
-#include "savedata.hpp" // maybe TODO: move to separte file
-#include "script/lua_backend.hpp"
-#include "state.hpp"
+#include <algorithm>        // for max, replace, transform
+#include <array>            // for array
+#include <cctype>           // for toupper
+#include <cstdint>          // for uint32_t, uint8_t, uint...
+#include <cstring>          // for size_t, memcpy, memset
+#include <exception>        // for exception
+#include <fmt/format.h>     // for format_error
+#include <functional>       // for _Func_impl_no_alloc<>::...
+#include <initializer_list> // for initializer_list
+#include <list>             // for _List_iterator, _List_c...
+#include <locale>           // for num_put
+#include <map>              // for map, _Tree<>::iterator
+#include <memory>           // for unique_ptr
+#include <mutex>            // for lock_guard
+#include <new>              // for operator new
+#include <sol/sol.hpp>      // for global_table, proxy_key_t
+#include <string_view>      // for string_view
+#include <type_traits>      // for move, remove_reference_t
+#include <unordered_map>    // for unordered_map, unordere...
+#include <utility>          // for min, max, monostate, get
 
-#include <sol/sol.hpp>
+#include "containers/game_unordered_map.hpp" // for game_unordered_map
+#include "entity.hpp"                        // for to_id
+#include "level_api.hpp"                     // for THEME_OVERRIDE, ThemeInfo
+#include "math.hpp"                          // for AABB
+#include "savedata.hpp"                      // for SaveData, Constellation...
+#include "script/lua_backend.hpp"            // for LuaBackend, LevelGenCal...
+#include "state.hpp"                         // for State, StateMemory, enu...
+#include "state_structs.hpp"                 // for QuestsInfo, Camera, Que...
 
 void PreLoadLevelFilesContext::override_level_files(std::vector<std::string> levels)
 {

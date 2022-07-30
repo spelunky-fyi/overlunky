@@ -468,6 +468,15 @@ properties on the sound. Otherwise you may cause a deadlock. The callback signat
 ## Debug functions
 
 
+### dump_network
+
+
+> Search script examples for [dump_network](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dump_network)
+
+#### nil dump_network()
+
+Hook the sendto and recvfrom functions and start dumping network data to terminal
+
 ### get_address
 
 
@@ -1320,9 +1329,14 @@ Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` 
 
 > Search script examples for [import](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=import)
 
-#### table import(string id, optional<string> version)
+#### table import(string id, string version = "", bool optional = false)
 
-Load another script by id "author/name" and import its `exports` table
+Load another script by id "author/name" and import its `exports` table. Returns:
+
+- `table` if the script has exports
+- `nil` if the script was found but has no exports
+- `false` if the script was not found but optional is set to true
+- an error if the script was not found and the optional argument was not set
 
 ### is_character_female
 
@@ -1341,6 +1355,24 @@ Same as `Player.is_female`
 #### nil load_screen()
 
 Immediately load a screen based on state.screen_next and stuff
+
+### lowbias32
+
+
+> Search script examples for [lowbias32](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lowbias32)
+
+#### int lowbias32(int x)
+
+Some random hash function
+
+### lowbias32_r
+
+
+> Search script examples for [lowbias32_r](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lowbias32_r)
+
+#### int lowbias32_r(int x)
+
+Reverse of some random hash function
 
 ### pause
 
@@ -1370,6 +1402,15 @@ Adds a command that can be used in the console.
 #### [uColor](#Aliases) rgba(int r, int g, int b, int a)
 
 Converts a color to int to be used in drawing functions. Use values from `0..255`.
+
+### script_enabled
+
+
+> Search script examples for [script_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=script_enabled)
+
+#### bool script_enabled(string id, string version = "")
+
+Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
 
 ### seed_prng
 
@@ -1616,6 +1657,15 @@ Prinspect to console
 #### nil console_print(string message)
 
 Print a log message to console.
+
+### log_print
+
+
+> Search script examples for [log_print](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=log_print)
+
+#### nil log_print(string message)
+
+Log to spelunky.log
 
 ### lua_print
 

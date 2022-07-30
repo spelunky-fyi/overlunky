@@ -1,8 +1,9 @@
 #include "script.hpp"
 
-#include "console.hpp"
+#include <type_traits> // for move
 
-#include "script/script_impl.hpp"
+#include "console.hpp"            // for SpelunkyConsole
+#include "script/script_impl.hpp" // for ScriptImpl
 
 SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManager* sound_manager, class SpelunkyConsole* console, bool enable)
     : m_Impl{new ScriptImpl(std::move(script), std::move(file), sound_manager, console ? console->get_impl() : nullptr, enable)}
@@ -13,6 +14,10 @@ SpelunkyScript::~SpelunkyScript() = default;
 std::deque<ScriptMessage>& SpelunkyScript::get_messages()
 {
     return m_Impl->messages;
+}
+std::deque<ScriptMessage> SpelunkyScript::consume_messages()
+{
+    return std::move(m_Impl->messages);
 }
 std::vector<std::string> SpelunkyScript::consume_requires()
 {

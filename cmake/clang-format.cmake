@@ -1,5 +1,6 @@
 function(setup_format_target FORMAT_TARGET_NAME)
     set(CLANG_FORMAT_UTIL_FILE "${CMAKE_BINARY_DIR}/git-clang-format.py")
+
     if(NOT EXISTS ${CLANG_FORMAT_UTIL_FILE})
         message(STATUS "Downloading formatting utility from github.com/TheLartians/Format.cmake")
 
@@ -15,6 +16,7 @@ function(setup_format_target FORMAT_TARGET_NAME)
 
     set(CLANG_FORMAT_COMMAND ${Python_EXECUTABLE} ${CLANG_FORMAT_UTIL_FILE}
         --binary=${CLANG_FORMAT_PROGRAM}
+        --extensions=c,h,cc,cp,cpp,c++,cxx,hh,hpp,hxx,inl
     )
     set(GIT_EMPTY_TREE_HASH 4b825dc642cb6eb9a060e54bf8d69288fbee4904)
 

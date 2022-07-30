@@ -1,8 +1,22 @@
 #include "socket_lua.hpp"
 
-#include "script/lua_backend.hpp"
+#include <Windows.h>             // for GetModuleHandleA, GetProcAddress
+#include <algorithm>             // for max
+#include <detours.h>             // for DetourAttach, DetourTransactionBegin
+#include <exception>             // for exception
+#include <new>                   // for operator new
+#include <sockpp/inet_address.h> // for inet_address
+#include <sockpp/udp_socket.h>   // for udp_socket
+#include <sol/sol.hpp>           // for global_table, proxy_key_t, function
+#include <sys/types.h>           // for ssize_t
+#include <thread>                // for thread
+#include <tuple>                 // for get
+#include <type_traits>           // for move
+#include <utility>               // for max, min
+#include <winsock2.h>            // for sockaddr_in, SOCKET
+#include <ws2tcpip.h>            // for inet_ntop
 
-#include <sol/sol.hpp>
+#include "logger.h" // for DEBUG, ByteStr
 
 void udp_data(sockpp::udp_socket socket, UdpServer* server)
 {
@@ -25,6 +39,27 @@ UdpServer::UdpServer(std::string host_, in_port_t port_, sol::function cb_)
     thr.detach();
 }
 
+using NetFun = int(SOCKET, char*, int, int, sockaddr_in*, int*);
+NetFun* g_sendto_trampoline{nullptr};
+NetFun* g_recvfrom_trampoline{nullptr};
+int mySendto(SOCKET s, char* buf, int len, int flags, sockaddr_in* addr, int* tolen)
+{
+    auto ret = g_sendto_trampoline(s, buf, len, flags, addr, tolen);
+    char ip[16] = "";
+    inet_ntop(addr->sin_family, &addr->sin_addr, ip, sizeof(ip));
+    DEBUG("SEND: {}:{} | {}", ip, addr->sin_port, ByteStr{buf});
+    return ret;
+}
+
+int myRecvfrom(SOCKET s, char* buf, int len, int flags, sockaddr_in* addr, int* fromlen)
+{
+    auto ret = g_recvfrom_trampoline(s, buf, len, flags, addr, fromlen);
+    char ip[16] = "";
+    inet_ntop(addr->sin_family, &addr->sin_addr, ip, sizeof(ip));
+    DEBUG("RECV: {}:{} | {}", ip, addr->sin_port, ByteStr{buf});
+    return ret;
+}
+
 namespace NSocket
 {
 void register_usertypes(sol::state& lua)
@@ -42,6 +77,22 @@ void register_usertypes(sol::state& lua)
         sockpp::udp_socket sock;
         sockpp::inet_address addr(host, port);
         sock.send_to(msg, addr);
+    };
+
+    /// Hook the sendto and recvfrom functions and start dumping network data to terminal
+    lua["dump_network"] = []()
+    {
+        g_sendto_trampoline = (NetFun*)GetProcAddress(GetModuleHandleA("ws2_32.dll"), "sendto");
+        g_recvfrom_trampoline = (NetFun*)GetProcAddress(GetModuleHandleA("ws2_32.dll"), "recvfrom");
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
+        DetourAttach((void**)&g_sendto_trampoline, mySendto);
+        DetourAttach((void**)&g_recvfrom_trampoline, myRecvfrom);
+        const LONG error = DetourTransactionCommit();
+        if (error != NO_ERROR)
+        {
+            DEBUG("Failed hooking network: {}\n", error);
+        }
     };
 }
 }; // namespace NSocket

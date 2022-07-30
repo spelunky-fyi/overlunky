@@ -1,7 +1,8 @@
 #pragma once
 
-#include <array>
-#include <cstdint>
+#include <array>   // for array
+#include <cstdint> // for uint32_t, uint8_t, int8_t, int32_t
+#include <string>  // for string
 
 struct OnlinePlayer
 {

@@ -1,9 +1,13 @@
 #pragma once
 
-#include <cstddef>
-#include <functional>
+#include <cstdint>       // for uint32_t, uint8_t
+#include <functional>    // for equal_to, function
+#include <memory>        // for allocator
+#include <new>           // for operator new
+#include <type_traits>   // for hash
+#include <unordered_map> // for _Umap_traits<>::allocator_type, unordered_map
 
-#include "math.hpp"
+#include "math.hpp" // for Vec2
 
 class Movable;
 struct MovableBehavior;
@@ -43,7 +47,7 @@ struct CustomMovableBehavior final : MovableBehavior
     std::function<uint8_t(Movable*, std::function<uint8_t(Movable*)>)> custom_get_next_state_id;
     VanillaMovableBehavior* base_behavior;
 
-    std::vector<Movable*> using_movables;
+    std::unordered_map<Movable*, uint32_t> using_movables;
 
     ~CustomMovableBehavior();
 

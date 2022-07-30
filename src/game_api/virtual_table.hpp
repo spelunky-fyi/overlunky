@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cstdint>
+#include <cstddef> // for size_t
+#include <cstdint> // for uint32_t
 
 // The numbers below represent the index in the memory block containing the virtual tables of all the objects
 // This table can be found by following the pattern in the get_virtual_function_address function, which looks

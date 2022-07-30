@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
-
-#include <sol/forward.hpp>
+#include <memory>      // for shared_ptr
+#include <sol/sol.hpp> // for environment, protected_function_result
+#include <string_view> // for string_view
 
 std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager = nullptr);
 sol::state& get_lua_vm(class SoundManager* sound_manager = nullptr);

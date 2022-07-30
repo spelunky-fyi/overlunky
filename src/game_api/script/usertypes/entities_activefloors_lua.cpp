@@ -1,9 +1,19 @@
 #include "entities_activefloors_lua.hpp"
 
-#include "entities_activefloors.hpp"
-#include "state_structs.hpp"
-
+#include <algorithm> // for max
+#include <new>       // for operator new
 #include <sol/sol.hpp>
+#include <string>      // for operator==, allocator
+#include <tuple>       // for get
+#include <type_traits> // for move, declval
+#include <utility>     // for min, max
+
+#include "entities_activefloors.hpp" // for Olmec, ClamBase, Crushtrap, Ele...
+#include "entity.hpp"                // for Entity
+#include "particles.hpp"             // IWYU pragma: keep
+#include "state_structs.hpp"         // IWYU pragma: keep
+
+class Movable;
 
 namespace NEntitiesActiveFloors
 {

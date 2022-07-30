@@ -1,22 +1,24 @@
 #pragma once
 
-#include <array>
-#include <functional>
-#include <map>
-#include <span>
-#include <string>
-#include <string_view>
-#include <unordered_map>
-#include <vector>
+#include <cstddef>       // for size_t
+#include <cstdint>       // for uint8_t, uint32_t, int32_t, uint16_t, int64_t
+#include <functional>    // for function, equal_to
+#include <span>          // for span
+#include <string>        // for allocator, string
+#include <string_view>   // for string_view
+#include <tuple>         // for tuple
+#include <type_traits>   // for move
+#include <unordered_map> // for _Umap_traits<>::allocator_type, unordered_map
+#include <utility>       // for pair
+#include <vector>        // for vector
 
-#include "aliases.hpp"
-#include "color.hpp"
-#include "layer.hpp"
-#include "math.hpp"
+#include "aliases.hpp" // for ENT_TYPE, LAYER, TEXTURE, STRINGID
+#include "color.hpp"   // for Color
+#include "layer.hpp"   // for EntityList
+#include "math.hpp"    // for AABB
 
 struct RenderInfo;
 struct Texture;
-struct Illumination;
 
 enum class REPEAT_TYPE : uint8_t
 {

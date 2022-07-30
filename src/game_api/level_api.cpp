@@ -1,24 +1,37 @@
 #include "level_api.hpp"
 
-#include "entities_monsters.hpp"
-#include "entity.hpp"
-#include "memory.hpp"
-#include "prng.hpp"
-#include "rpc.hpp"
-#include "spawn_api.hpp"
-#include "state.hpp"
-#include "util.hpp"
-#include "vtable_hook.hpp"
+#include <Windows.h>     // for memchr, GetCurrentThread, LONG, NO_...
+#include <array>         // for array, _Array_iterator, _Array_cons...
+#include <assert.h>      // for assert
+#include <cmath>         // for ceil, abs
+#include <cstddef>       // for byte
+#include <cstdlib>       // for size_t, abs
+#include <cstring>       // for memcpy, memchr
+#include <detours.h>     // for DetourAttach, DetourTransactionBegin
+#include <fmt/format.h>  // for check_format_string, format, vformat
+#include <iterator>      // for back_insert_iterator, back_inserter
+#include <list>          // for _List_iterator, _List_const_iterator
+#include <memory>        // for unique_ptr, make_unique
+#include <mutex>         // for lock_guard, mutex
+#include <numbers>       // for pi_v
+#include <string_view>   // for string_view
+#include <tuple>         // for tie, tuple
+#include <unordered_map> // for unordered_map, _Umap_traits<>::allo...
 
-#include "script/events.hpp"
-
-#include <array>
-#include <numbers>
-#include <string_view>
-#include <tuple>
-
-#include <Windows.h>
-#include <detours.h>
+#include "entities_monsters.hpp" // for GHOST_BEHAVIOR, GHOST_BEHAVIOR::MED...
+#include "entity.hpp"            // for to_id, Entity, get_entity_ptr, Enti...
+#include "layer.hpp"             // for Layer, g_level_max_y, g_level_max_x
+#include "logger.h"              // for DEBUG
+#include "memory.hpp"            // for to_le_bytes, write_mem_prot, Execut...
+#include "movable.hpp"           // for Movable
+#include "prng.hpp"              // for PRNG, PRNG::EXTRA_SPAWNS
+#include "rpc.hpp"               // for attach_entity, get_entities_overlap...
+#include "script/events.hpp"     // for post_load_screen, pre_load_screen
+#include "search.hpp"            // for get_address
+#include "spawn_api.hpp"         // for pop_spawn_type_flags, push_spawn_ty...
+#include "state.hpp"             // for StateMemory, State, enum_to_layer
+#include "util.hpp"              // for OnScopeExit, trim
+#include "vtable_hook.hpp"       // for hook_vtable
 
 std::uint32_t g_last_tile_code_id;
 std::uint32_t g_last_community_tile_code_id;
@@ -61,6 +74,7 @@ struct PendingEntitySpawn
 std::vector<PendingEntitySpawn> g_attachee_requiring_entities;
 
 struct CommunityTileCode;
+
 using TileCodeFunc = void(const CommunityTileCode& self, float x, float y, Layer* layer);
 
 bool is_room_flipped(float x, float y)
@@ -481,6 +495,7 @@ std::array g_community_tile_codes{
 };
 
 struct CommunityChance;
+
 using ChanceFunc = void(const CommunityChance& self, float x, float y, Layer* layer);
 using ChanceValidPlacementFunc = bool(const CommunityChance& self, float x, float y, Layer* layer);
 
@@ -688,7 +703,8 @@ using LoadScreenFun = void(StateMemory*, size_t, size_t);
 LoadScreenFun* g_load_screen_trampoline{nullptr};
 void load_screen(StateMemory* state, size_t param_2, size_t param_3)
 {
-    pre_load_screen();
+    if (pre_load_screen())
+        return;
     g_load_screen_trampoline(state, param_2, param_3);
     post_load_screen();
 }
@@ -2102,7 +2118,8 @@ void do_load_screen()
 {
     auto load_screen_fun = (LoadScreenFun*)get_address("load_screen_func");
     const auto state = State::get().ptr();
-    pre_load_screen();
+    if (pre_load_screen())
+        return;
     load_screen_fun(state, 0, 0);
     post_load_screen();
 }

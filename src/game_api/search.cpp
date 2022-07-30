@@ -1,14 +1,27 @@
 #include "search.hpp"
 
 // clang-format off
-#include <Windows.h>
-#include <Psapi.h>
+#include <Windows.h>          // for IMAGE_SECTION_HEADER, GetModuleHandleA
+#include <fmt/format.h>       // for check_format_string, format_to, vformat_to
+#include <cstring>            // for memcmp
+#include <exception>          // for terminate
+#include <functional>         // for _Func_impl_no_alloc<>::_Mybase, equal_to
+#include <list>               // for _List_iterator, _List_const_iterator
+#include <locale>             // for num_put
+#include <new>                // for operator new
+#include <span>               // for span
+#include <sstream>            // for basic_ostream, basic_streambuf, basic_s...
+#include <stdexcept>          // for logic_error
+#include <tuple>              // for get, apply, tuple
+#include <type_traits>        // for move
+#include <unordered_map>      // for unordered_map, _Umap_traits<>::allocato...
+#include <utility>            // for min, max, pair, tuple_element<>::type
+#include <vector>             // for vector, _Vector_const_iterator, _Vector...
 // clang-format on
 
-#include <algorithm>
-
-#include "memory.hpp"
-#include "virtual_table.hpp"
+#include "logger.h"          // for ByteStr, DEBUG
+#include "memory.hpp"        // for Memory, function_start
+#include "virtual_table.hpp" // for VIRT_FUNC, VTABLE_OFFSET, VIRT_FUNC::LO...
 
 // Decodes the program counter inside an instruction
 // The default simple variant is 3 bytes instruction, 4 bytes rel. address, 0 bytes suffix:
@@ -1690,6 +1703,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x44\x0F\x29\xBD\x20\x02\x00\x00"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        // Borrowed from Playlunky logger.cpp
+        "game_log_function"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x83\x80\x90\x01\x00\x00\x01\x48\x83\xbf\x88\x00\x00\x00\x00"sv)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // Just picked some random call to ^, before that it reads the location of the stream
+        "game_log_stream"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x48\x8d\x55\xa0\x45\x31\xc0"sv)
+            .offset(-0x7)
+            .decode_pc()
+            .at_exe(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
