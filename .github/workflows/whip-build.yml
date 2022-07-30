@@ -11,7 +11,7 @@ jobs:
 
     runs-on: windows-2019
     steps:
-      - uses: ashutoshvarma/setup-ninja@v1.1
+      - uses: llvm/actions/install-ninja@main
 
       - uses: actions/checkout@v2
         with:
