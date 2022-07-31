@@ -6925,9 +6925,9 @@ void init_ui()
             const float color[4]{1.0f, 1.0f, 1.0f, 0.3f};
             const float scale{0.00035f};
 
-            auto& render_api = RenderAPI::get();
-            const auto [w, h] = render_api.draw_text_size(version_string, scale, scale, 0);
-            render_api.draw_text(version_string, 0.0f, -1.0f + std::abs(h) / 2.0f, scale, scale, color, 1, 0);
+            auto& render_api_l = RenderAPI::get();
+            const auto [w, h] = render_api_l.draw_text_size(version_string, scale, scale, 0);
+            render_api_l.draw_text(version_string, 0.0f, -1.0f + std::abs(h) / 2.0f, scale, scale, color, 1, 0);
         });
 }
 
