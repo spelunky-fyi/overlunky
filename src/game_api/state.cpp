@@ -19,12 +19,13 @@
 #include "movable.hpp"          // for Movable
 #include "movable_behavior.hpp" // for init_behavior_hooks
 #include "render_api.hpp"       // for init_render_api_hooks
-#include "savedata.hpp"         // for SaveData
-#include "search.hpp"           // for get_address
-#include "spawn_api.hpp"        // for init_spawn_hooks
-#include "strings.hpp"          // for strings_init
-#include "thread_utils.hpp"     // for OnHeapPointer
-#include "virtual_table.hpp"    // for get_virtual_function_address, VTABLE...
+#include "rpc.hpp"
+#include "savedata.hpp"      // for SaveData
+#include "search.hpp"        // for get_address
+#include "spawn_api.hpp"     // for init_spawn_hooks
+#include "strings.hpp"       // for strings_init
+#include "thread_utils.hpp"  // for OnHeapPointer
+#include "virtual_table.hpp" // for get_virtual_function_address, VTABLE...
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -243,16 +244,29 @@ State& State::get()
     return STATE;
 }
 
+StateMemory* g_state_ptr{nullptr};
+
 StateMemory* State::ptr() const
 {
+    if (g_state_ptr)
+        return g_state_ptr;
+
     OnHeapPointer<StateMemory> p(read_u64(location));
     return p.decode();
 }
 
 StateMemory* State::ptr_local() const
 {
+    if (g_state_ptr)
+        return g_state_ptr;
+
     OnHeapPointer<StateMemory> p(read_u64(location));
     return p.decode_local();
+}
+
+void State::set_state_ptr(StateMemory* given_ptr)
+{
+    g_state_ptr = given_ptr;
 }
 
 std::pair<float, float> State::click_position(float x, float y)

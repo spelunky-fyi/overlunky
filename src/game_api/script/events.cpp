@@ -252,7 +252,7 @@ void update_backends(StateMemory* s)
     LuaBackend::for_each_backend(
         [=](LuaBackend& backend)
         {
-            backend.update2(s);
+            backend.frame_update(s);
             return true;
         });
 }

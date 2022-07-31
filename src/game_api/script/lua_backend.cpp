@@ -224,17 +224,10 @@ void LuaBackend::set_user_data(uint32_t uid, sol::object user_data)
 
 bool LuaBackend::update()
 {
-    if (!get_enabled())
-        return true;
-
-    if (!pre_update())
-    {
-        return false;
-    }
-
     return true;
 }
-bool LuaBackend::update2(StateMemory* state_mem)
+
+bool LuaBackend::frame_update(StateMemory* state_mem)
 {
     if (!get_enabled())
         return true;
@@ -272,6 +265,8 @@ bool LuaBackend::update2(StateMemory* state_mem)
         // ==========
 
         lua["players"] = get_players();
+        lua["state"] = state_mem;
+        State::set_state_ptr(state_mem);
 
         /*moved to pre_load_screen
         if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen_next != (int)ON::OPTIONS && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
@@ -490,7 +485,7 @@ bool LuaBackend::update2(StateMemory* state_mem)
                 }
                 case ON::START:
                 {
-                    if (state_mem->screen == (int)ON::LEVEL && state_mem->screen_last != (int)ON::OPTIONS && state_mem->level_count == 0 && state_mem->loading != state.loading && g_state->loading == 3 && state_mem->time_level <= 1)
+                    if (state_mem->screen == (int)ON::LEVEL && state_mem->screen_last != (int)ON::OPTIONS && state_mem->level_count == 0 && state_mem->loading != state.loading && state_mem->loading == 3 && state_mem->time_level <= 1)
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;

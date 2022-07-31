@@ -34,25 +34,26 @@
 #include "memory.hpp"           // for write_mem_prot, write_mem_recoverable
 #include "movable.hpp"          // for Movable
 #include "particles.hpp"        // for ParticleEmitterInfo
-#include "search.hpp"           // for get_address, find_inst
-#include "state.hpp"            // for State, get_state_ptr, enum_to_layer
-#include "state_structs.hpp"    // for ShopRestrictedItem, Illumination
-#include "thread_utils.hpp"     // for OnHeapPointer
-#include "virtual_table.hpp"    // for get_virtual_function_address, VIRT_FUNC
+#include "script/events.hpp"
+#include "search.hpp"        // for get_address, find_inst
+#include "state.hpp"         // for State, get_state_ptr, enum_to_layer
+#include "state_structs.hpp" // for ShopRestrictedItem, Illumination
+#include "thread_utils.hpp"  // for OnHeapPointer
+#include "virtual_table.hpp" // for get_virtual_function_address, VIRT_FUNC
 
-uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
+inline uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
 {
     return flags | (1U << (bit - 1));
 }
-uint32_t clrflag(uint32_t flags, int bit)
+inline uint32_t clrflag(uint32_t flags, int bit)
 {
     return flags & ~(1U << (bit - 1));
 }
-bool testflag(uint32_t flags, int bit)
+inline bool testflag(uint32_t flags, int bit)
 {
     return (flags & (1U << (bit - 1))) > 0;
 }
-uint32_t flipflag(uint32_t flags, int bit)
+inline uint32_t flipflag(uint32_t flags, int bit)
 {
     return (flags ^ (1U << (bit - 1)));
 }
@@ -495,7 +496,8 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> 
                          {
                              found.push_back(item->uid);
                          }
-                     } });
+                     }
+                 });
 
     return found;
 }
