@@ -1,4 +1,4 @@
-name: Whip Build
+name: Builds
 
 on:
   push:
@@ -11,8 +11,6 @@ jobs:
 
     runs-on: windows-2019
     steps:
-      - uses: llvm/actions/install-ninja@main
-
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
@@ -26,7 +24,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -GNinja
+          cmake .. -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=OFF
           cmake --build . --config Release
 
       - name: Create artifacts
