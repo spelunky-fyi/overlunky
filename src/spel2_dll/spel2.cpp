@@ -13,6 +13,7 @@
 #include "steam_api.hpp"
 #include "texture.hpp"
 #include "window_api.hpp"
+#include "render_api.hpp"
 
 SoundManager* g_SoundManager{nullptr};
 SpelunkyConsole* g_Console{nullptr};
@@ -459,4 +460,9 @@ void Spelunky_EnabledAdvancedHud()
 void Spelunky_UpdateLiquidOutOfBoundsBugfix()
 {
     fix_liquid_out_of_bounds();
+}
+
+void Spelunky_ReloadShaders()
+{
+    RenderAPI::get().reload_shaders();
 }

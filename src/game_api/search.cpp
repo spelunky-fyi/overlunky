@@ -1721,6 +1721,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },
+    {
+        "reload_shaders"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x41\x89\xd9\xff\x90\x78\x01\x00\x00")
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
