@@ -5,6 +5,7 @@
 #include "entity.hpp"
 #include "file_api.hpp"
 #include "memory.hpp"
+#include "render_api.hpp"
 #include "screen.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
@@ -13,7 +14,6 @@
 #include "steam_api.hpp"
 #include "texture.hpp"
 #include "window_api.hpp"
-#include "render_api.hpp"
 
 SoundManager* g_SoundManager{nullptr};
 SpelunkyConsole* g_Console{nullptr};
