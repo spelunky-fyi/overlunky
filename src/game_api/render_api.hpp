@@ -79,6 +79,9 @@ struct RenderAPI
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
     void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color);
     void draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader);
+
+    void set_post_render_game(void (*post_render_game)());
+    void set_advanced_hud();
 };
 
 // straight out of the x64dbg plugin

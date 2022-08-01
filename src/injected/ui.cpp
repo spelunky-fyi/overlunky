@@ -6645,12 +6645,6 @@ void imgui_draw()
         viewport->Flags |= ImGuiViewportFlags_NoFocusOnClick | ImGuiViewportFlags_NoFocusOnAppearing | ImGuiViewportFlags_OwnedByApp;
     }
 
-    ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
-    std::string buf = fmt::format("Overlunky {}", get_version());
-    ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-
-    dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + base->Size.y - textsize.y - 2}, ImColor(1.0f, 1.0f, 1.0f, .3f), buf.c_str());
-
     render_clickhandler();
     if (options["draw_hud"])
         render_prohud();
@@ -6921,6 +6915,20 @@ void init_ui()
     register_make_save_path(&make_save_path);
 
     register_on_load_file(&load_file_as_dds_if_image);
+
+    auto& render_api = RenderAPI::get();
+    render_api.set_advanced_hud();
+    render_api.set_post_render_game(
+        []()
+        {
+            const std::string version_string = fmt::format("Overlunky {}", get_version());
+            const float color[4]{1.0f, 1.0f, 1.0f, 0.3f};
+            const float scale{0.00035f};
+
+            auto& render_api_l = RenderAPI::get();
+            const auto [w, h] = render_api_l.draw_text_size(version_string, scale, scale, 0);
+            render_api_l.draw_text(version_string, 0.0f, -1.0f + std::abs(h) / 2.0f, scale, scale, color, 1, 0);
+        });
 }
 
 void reload_enabled_scripts()

@@ -46,10 +46,25 @@ size_t RenderAPI::swap_chain() const
     return read_u64(renderer() + swap_chain_off);
 }
 
+void (*g_post_render_game)(){nullptr};
+
+using VanillaRenderLoadingFun = void(size_t);
+VanillaRenderLoadingFun* g_render_loading_trampoline{nullptr};
+void render_loading(size_t param_1)
+{
+    g_render_loading_trampoline(param_1);
+
+    // Piggy-backing off the last draw call
+    if (g_post_render_game)
+    {
+        g_post_render_game();
+    }
+}
+
 std::optional<TEXTURE> g_forced_lut_textures[2]{};
 
 using RenderLayer = void(const std::vector<Illumination*>&, uint8_t, const Camera&, const char**, const char**);
-RenderLayer* g_render_layer = nullptr;
+RenderLayer* g_render_layer_trampoline{nullptr};
 void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer, const Camera& camera, const char** lut_lhs, const char** lut_rhs)
 {
     // The lhs and rhs LUTs are blended in the shader, but we don't know where that value is CPU side so we can only override
@@ -58,11 +73,11 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
     {
         if (Texture* lut = get_texture(g_forced_lut_textures[layer].value()))
         {
-            g_render_layer(lightsources, layer, camera, lut->name, lut->name);
+            g_render_layer_trampoline(lightsources, layer, camera, lut->name, lut->name);
             return;
         }
     }
-    g_render_layer(lightsources, layer, camera, lut_lhs, lut_rhs);
+    g_render_layer_trampoline(lightsources, layer, camera, lut_lhs, lut_rhs);
 }
 
 void RenderAPI::set_lut(TEXTURE texture_id, uint8_t layer)
@@ -74,13 +89,15 @@ void RenderAPI::reset_lut(uint8_t layer)
     g_forced_lut_textures[layer] = std::nullopt;
 }
 
+bool g_advanced_hud{false};
+
 using VanillaRenderHudFun = void(size_t, float, float, size_t);
 VanillaRenderHudFun* g_render_hud_trampoline{nullptr};
 void render_hud(size_t hud_data, float y, float opacity, size_t hud_data2)
 {
     // hud_data and hud_data2 are the same pointer, but the second one is actually used (displays garbage if not passed)
     trigger_vanilla_render_callbacks(ON::RENDER_PRE_HUD);
-    g_render_hud_trampoline(hud_data, y, opacity, hud_data2);
+    g_render_hud_trampoline(hud_data, y - g_advanced_hud * 0.004f, opacity, hud_data2);
     trigger_vanilla_render_callbacks(ON::RENDER_POST_HUD);
 }
 
@@ -324,6 +341,15 @@ void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Col
     }
 }
 
+void RenderAPI::set_post_render_game(void (*post_render_game)())
+{
+    g_post_render_game = post_render_game;
+}
+void RenderAPI::set_advanced_hud()
+{
+    g_advanced_hud = true;
+}
+
 void fetch_texture(Entity* entity, int32_t texture_id)
 {
     entity->texture = nullptr;
@@ -402,7 +428,8 @@ void init_render_api_hooks()
         write_mem_prot(fetch_texture_begin, code, true);
     }
 
-    g_render_layer = (RenderLayer*)get_address("render_layer"sv);
+    g_render_loading_trampoline = (VanillaRenderLoadingFun*)get_address("render_loading"sv);
+    g_render_layer_trampoline = (RenderLayer*)get_address("render_layer"sv);
     g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud"sv);
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
     g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth"sv);
@@ -444,7 +471,8 @@ void init_render_api_hooks()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
-    DetourAttach((void**)&g_render_layer, render_layer);
+    DetourAttach((void**)&g_render_loading_trampoline, render_loading);
+    DetourAttach((void**)&g_render_layer_trampoline, render_layer);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
     DetourAttach((void**)&g_render_draw_depth_trampoline, &render_draw_depth);

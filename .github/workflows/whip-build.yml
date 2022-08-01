@@ -1,4 +1,4 @@
-name: Builds
+name: Whip Build
 
 on:
   push:
@@ -11,6 +11,8 @@ jobs:
 
     runs-on: windows-2019
     steps:
+      - uses: llvm/actions/install-ninja@main
+
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
@@ -24,14 +26,14 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=OFF
+          cmake .. -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -GNinja
           cmake --build . --config Release
 
       - name: Create artifacts
         run: |
           mkdir Overlunky
-          move build\bin\Release\injected.dll Overlunky\injected.dll
-          move build\bin\Release\injector.exe Overlunky\Overlunky.exe
+          move build\bin\injected.dll Overlunky\injected.dll
+          move build\bin\injector.exe Overlunky\Overlunky.exe
           move README.md Overlunky\README.txt
           move examples Overlunky\Scripts
           7z a Overlunky_WHIP.zip Overlunky\

@@ -99,7 +99,7 @@ endif()
 
 if(BUILD_SPEL2_DLL)
         add_subdirectory(spel2_dll)
-        setup_ol_target(spel2_dll)
+        setup_ol_target(spel2)
 endif()
 
 if(BUILD_OVERLUNKY)

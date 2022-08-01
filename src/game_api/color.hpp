@@ -32,7 +32,7 @@ struct Color
     }
 
     /// Create a color from an array of 4 floats
-    constexpr Color(float (&c)[4])
+    constexpr Color(const float (&c)[4])
         : r(c[0]), g(c[1]), b(c[2]), a(c[3])
     {
     }
