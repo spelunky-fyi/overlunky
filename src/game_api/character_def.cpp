@@ -137,5 +137,11 @@ void set_character_gender(std::uint32_t character_index, bool female)
 {
     auto& char_def = get_character_definition(character_index);
     write_mem_prot(&char_def.gender, female ? CharGender::Female : CharGender::Male, true);
+    auto* gender_mask = (uint32_t*)get_address("character_gender_mask");
+    auto gender_bit = 0x1u << character_index;
+    auto new_gender_mask = female
+                               ? *gender_mask & ~gender_bit
+                               : *gender_mask | gender_bit;
+    write_mem_prot((size_t)gender_mask, new_gender_mask, true);
 }
 } // namespace NCharacterDB

@@ -1447,6 +1447,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "character_gender_mask"sv,
+        // Search for the scalar 0xea61c, that is the one you want here
+        // Don't include the value in the pattern as that might be changed
+        PatternCommandBuffer{}
+            .find_inst("\x31\xc9\x4c\x0f\xa3\xf8"sv)
+            .offset(-0x4)
+            .at_exe(),
+    },
+    {
         "string_table"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x8D\x15****\x4C\x8B\x0C\xCA"sv)
