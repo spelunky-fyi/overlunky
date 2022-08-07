@@ -82,6 +82,8 @@ struct RenderAPI
 
     void set_post_render_game(void (*post_render_game)());
     void set_advanced_hud();
+
+    void reload_shaders();
 };
 
 // straight out of the x64dbg plugin

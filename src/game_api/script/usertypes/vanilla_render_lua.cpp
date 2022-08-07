@@ -226,6 +226,12 @@ void register_usertypes(sol::state& lua)
         set_lut(sol::nullopt, layer);
     };
 
+    // NoDoc: Dev-tool only
+    lua["reload_shaders"] = []()
+    {
+        RenderAPI::get().reload_shaders();
+    };
+
     auto draw_screen_texture = sol::overload(
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, float, float, float, float, Color)>(&VanillaRenderContext::draw_screen_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_screen_texture),

@@ -350,6 +350,13 @@ void RenderAPI::set_advanced_hud()
     g_advanced_hud = true;
 }
 
+void RenderAPI::reload_shaders()
+{
+    using ReloadShadersFun = void(size_t);
+    ReloadShadersFun* reload_shaders_impl = (ReloadShadersFun*)get_address("reload_shaders"sv);
+    reload_shaders_impl(renderer());
+}
+
 void fetch_texture(Entity* entity, int32_t texture_id)
 {
     entity->texture = nullptr;

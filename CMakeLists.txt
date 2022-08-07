@@ -31,6 +31,12 @@ function(setup_ol_target TARGET_NAME)
       TARGET ${TARGET_NAME}
       PROPERTY UNITY_BUILD ON)
   endif()
+
+  if(OVERLUNKY_LINK_TIME_OPT)
+    set_property(
+      TARGET ${TARGET_NAME}
+      PROPERTY INTERPROCEDURAL_OPTIMIZATION ON)
+  endif()
 endfunction()
 
 add_compile_definitions(_ITERATOR_DEBUG_LEVEL=0)
