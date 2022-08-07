@@ -25,3 +25,6 @@
 [submodule "docs/slate"]
 	path = docs/slate
 	url = https://github.com/spelunky-fyi/slate
+[submodule "src/neo"]
+	path = src/neo
+	url = https://github.com/vector-of-bool/neo-fun.git

@@ -1130,13 +1130,13 @@ void extinguish_particles(ParticleEmitterInfo* particle_emitter)
         static free_particleemitter_func* fpf = (free_particleemitter_func*)(offset);
         if (particle_emitter != nullptr)
         {
-            if (particle_emitter->unknown26 != 0)
+            if (particle_emitter->emitted_particles2.unknown4 != 0)
             {
-                fpf((ParticleEmitterInfo*)particle_emitter->unknown26);
+                fpf((ParticleEmitterInfo*)particle_emitter->emitted_particles2.unknown4);
             }
-            if (particle_emitter->unknown4 != 0)
+            if (particle_emitter->emitted_particles.unknown4 != 0)
             {
-                fpf((ParticleEmitterInfo*)particle_emitter->unknown4);
+                fpf((ParticleEmitterInfo*)particle_emitter->emitted_particles.unknown4);
             }
             fpf(particle_emitter);
         }

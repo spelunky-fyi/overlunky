@@ -5,6 +5,13 @@
 #include <string>  // for string, basic_string
 #include <vector>  // for vector
 
+#pragma warning(push)
+#pragma warning(disable : 4003)
+#include <neo/iterator_facade.hpp> // for neo::iterator_facade
+#pragma warning(pop)
+
+#include "aliases.hpp" // for uColor
+
 struct Texture;
 
 struct ParticleDB
@@ -39,7 +46,7 @@ struct ParticleDB
     uint8_t red;
     uint8_t green;
     uint8_t blue;
-    uint8_t unknown28;
+    uint8_t alpha;
     Texture* texture;
     size_t unknown29; // code pointer
     size_t unknown30; // code pointer
@@ -74,55 +81,106 @@ struct ParticleEmitter
     }
 };
 
-struct ParticleEmitterInfo
+struct Particle
 {
-    ParticleDB* particle_type;
-    ParticleDB* particle_type2;
-    uint32_t particle_count;
-    uint32_t unknown2;
-    size_t unknown3;
+    uint16_t* max_lifetime;
+    uint16_t* lifetime;
+    float* x;
+    float* y;
+    float* unknown_x_related;
+    float* unknown_y_related;
+    uColor* color;
+    float* width;
+    float* height;
+    float* velocityx;
+    float* velocityy;
+};
+
+struct EmittedParticlesInfo
+{
+    struct ParticleEmitterInfo* particle_emitter;
     size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
+    uint16_t* max_lifetimes;
+    uint16_t* lifetimes;
     size_t unknown7;
     size_t unknown8;
-    size_t unknown9;
-    size_t unknown10;
-    size_t unknown11;
-    size_t unknown12;
-    size_t unknown13;
-    size_t unknown14;
-    size_t unknown15;
-    size_t unknown16;
-    size_t unknown17;
+    float* x_positions;
+    float* y_positions;
+    float* unknown_x_positions;
+    float* unknown_y_positions;
+    uColor* colors;
+    float* widths;
+    float* heights;
+    float* x_velocities;
+    float* y_velocities;
     size_t unknown18;
     size_t unknown19;
     size_t unknown20;
     size_t unknown21;
     size_t unknown22;
     size_t unknown23;
+
+    template <class T>
+    class IteratorImpl : neo::iterator_facade<IteratorImpl<T>>
+    {
+      public:
+        IteratorImpl(T* const src, uint32_t i)
+            : source{src}, index{i}
+        {
+        }
+
+        Particle dereference() const noexcept
+        {
+            return source->operator[](index);
+        }
+
+        void advance(int off) noexcept
+        {
+            index += off;
+        }
+        int distance_to(IteratorImpl rhs) const noexcept
+        {
+            return rhs.index - index;
+        }
+        bool operator==(IteratorImpl rhs) const noexcept
+        {
+            return rhs.source == source && rhs.index == index;
+        }
+
+      private:
+        T* const source;
+        uint32_t index;
+    };
+    using Iterator = IteratorImpl<EmittedParticlesInfo>;
+    using ConstIterator = IteratorImpl<const EmittedParticlesInfo>;
+
+    Iterator begin();
+    Iterator end();
+    ConstIterator begin() const;
+    ConstIterator end() const;
+    ConstIterator cbegin() const;
+    ConstIterator cend() const;
+
+    Particle front();
+    Particle back();
+    const Particle front() const;
+    const Particle back() const;
+
+    bool empty();
+
+    Particle operator[](const uint32_t idx);
+    const Particle operator[](const uint32_t idx) const;
+};
+
+struct ParticleEmitterInfo
+{
+    ParticleDB* particle_type;
+    ParticleDB* particle_type2;
+    uint32_t particle_count;
+    uint32_t unknown2;
+    EmittedParticlesInfo emitted_particles;
     size_t unknown24;
-    size_t unknown25;
-    size_t unknown26;
-    size_t unknown27;
-    size_t unknown28;
-    size_t unknown29;
-    size_t unknown30;
-    size_t unknown31;
-    size_t unknown32;
-    size_t unknown33;
-    size_t unknown34;
-    size_t unknown35;
-    size_t unknown36;
-    size_t unknown37;
-    size_t unknown38;
-    size_t unknown39;
-    size_t unknown40;
-    size_t unknown41;
-    size_t unknown42;
-    size_t unknown43;
-    size_t unknown44;
-    size_t unknown45;
+    EmittedParticlesInfo emitted_particles2;
 
     int32_t entity_uid; // set to -1 to decouple emitter position from entity position (and move it around freely)
 
