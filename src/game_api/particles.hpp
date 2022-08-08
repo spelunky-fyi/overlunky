@@ -121,7 +121,7 @@ struct EmittedParticlesInfo
     size_t unknown23;
 
     template <class T>
-    class IteratorImpl : neo::iterator_facade<IteratorImpl<T>>
+    class IteratorImpl : public neo::iterator_facade<IteratorImpl<T>>
     {
       public:
         IteratorImpl(T* const src, uint32_t i)
@@ -131,7 +131,7 @@ struct EmittedParticlesInfo
 
         Particle dereference() const noexcept
         {
-            return source->operator[](index);
+            return (*source)[index];
         }
 
         void advance(int off) noexcept
@@ -153,6 +153,11 @@ struct EmittedParticlesInfo
     };
     using Iterator = IteratorImpl<EmittedParticlesInfo>;
     using ConstIterator = IteratorImpl<const EmittedParticlesInfo>;
+
+    using size_type = size_t;
+    using value_type = Particle;
+    using iterator = Iterator;
+    using const_iterator = ConstIterator;
 
     Iterator begin();
     Iterator end();
