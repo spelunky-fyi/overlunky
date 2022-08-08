@@ -46,7 +46,7 @@ struct ParticleDB
     uint8_t red;
     uint8_t green;
     uint8_t blue;
-    uint8_t alpha;
+    uint8_t unkown28;
     Texture* texture;
     size_t unknown29; // code pointer
     size_t unknown30; // code pointer
