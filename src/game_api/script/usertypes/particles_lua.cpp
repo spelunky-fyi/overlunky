@@ -97,8 +97,6 @@ void register_usertypes(sol::state& lua)
         &ParticleDB::green,
         "blue",
         &ParticleDB::blue,
-        "alpha",
-        &ParticleDB::alpha,
         "permanent",
         &ParticleDB::permanent,
         "invisible",
