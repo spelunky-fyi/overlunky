@@ -172,6 +172,7 @@ struct EmittedParticlesInfo
     const Particle back() const;
 
     bool empty();
+    size_type size();
 
     Particle operator[](const uint32_t idx);
     const Particle operator[](const uint32_t idx) const;

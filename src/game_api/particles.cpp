@@ -77,6 +77,10 @@ bool EmittedParticlesInfo::empty()
 {
     return particle_emitter->particle_count == 0;
 }
+EmittedParticlesInfo::size_type EmittedParticlesInfo::size()
+{
+    return particle_emitter->particle_count;
+}
 
 Particle EmittedParticlesInfo::operator[](const uint32_t idx)
 {
