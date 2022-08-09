@@ -474,6 +474,12 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                     }
                     break;
                 }
+                case ON::EVERYFRAME:
+                {
+                    handle_function(callback.func);
+                    callback.lastRan = now;
+                    break;
+                }
                 case ON::SCREEN:
                 {
                     if (state_mem->screen != state.screen)

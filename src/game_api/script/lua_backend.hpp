@@ -94,6 +94,7 @@ enum class ON
     PRE_LOAD_SCREEN,
     POST_LOAD_SCREEN,
     DEATH_MESSAGE,
+    EVERYFRAME,
 };
 
 struct IntOption
