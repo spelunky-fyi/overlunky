@@ -1118,28 +1118,14 @@ void extinguish_particles(ParticleEmitterInfo* particle_emitter)
     auto state = get_state_ptr();
     std::erase(*state->particle_emitters, particle_emitter);
 
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("free_particleemitterinfo");
-    }
+    using generic_free_func = void(void*);
+    static generic_free_func* generic_free = (generic_free_func*)get_address("generic_free");
 
-    if (offset != 0)
+    if (particle_emitter != nullptr)
     {
-        typedef void free_particleemitter_func(ParticleEmitterInfo*);
-        static free_particleemitter_func* fpf = (free_particleemitter_func*)(offset);
-        if (particle_emitter != nullptr)
-        {
-            if (particle_emitter->emitted_particles2.unknown4 != 0)
-            {
-                fpf((ParticleEmitterInfo*)particle_emitter->emitted_particles2.unknown4);
-            }
-            if (particle_emitter->emitted_particles.unknown4 != 0)
-            {
-                fpf((ParticleEmitterInfo*)particle_emitter->emitted_particles.unknown4);
-            }
-            fpf(particle_emitter);
-        }
+        generic_free(particle_emitter->emitted_particles.memory);
+        generic_free(particle_emitter->emitted_particles2.memory);
+        generic_free(particle_emitter);
     }
 }
 

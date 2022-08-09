@@ -99,7 +99,7 @@ struct Particle
 struct EmittedParticlesInfo
 {
     struct ParticleEmitterInfo* particle_emitter;
-    size_t unknown4;
+    void* memory;
     uint16_t* max_lifetimes;
     uint16_t* lifetimes;
     size_t unknown7;

@@ -1204,7 +1204,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "free_particleemitterinfo"sv,
+        "generic_free"sv,
         // See `generate_screen_particles`, above that, the pointers to the particleemitters are checked, as well as fields inside
         // the particleemitter, and the same function is called if they are not null
         PatternCommandBuffer{}
