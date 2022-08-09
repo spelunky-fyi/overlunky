@@ -70,7 +70,7 @@ void SpelunkyConsole::set_max_history_size(size_t max_history)
 }
 void SpelunkyConsole::save_history(std::string_view path)
 {
-    if (std::ofstream history_file = std::ofstream(path))
+    if (std::ofstream history_file = std::ofstream(std::string{ path }))
     {
         std::string line;
         for (const auto& history_item : m_Impl->history)
@@ -82,7 +82,7 @@ void SpelunkyConsole::save_history(std::string_view path)
 }
 void SpelunkyConsole::load_history(std::string_view path)
 {
-    if (std::ifstream history_file = std::ifstream(path))
+    if (std::ifstream history_file = std::ifstream(std::string{ path }))
     {
         std::string line;
         std::string history_item;
