@@ -1416,10 +1416,13 @@ function mouse_position() end
 ---- Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ---@return ImGuiIO
 function get_io() end
+---Force the LUT texture for the given layer (or both) until it is reset
+---Pass `nil` in the first parameter to reset
 ---@param texture_id TEXTURE?
 ---@param layer LAYER
 ---@return nil
 function set_lut(texture_id, layer) end
+---Same as `set_lut(nil, layer)`
 ---@param layer LAYER
 ---@return nil
 function reset_lut(layer) end
@@ -3735,6 +3738,18 @@ local function MovableBehavior_get_state_id(self) end
     ---@field y number
     ---@field offset_x number
     ---@field offset_y number
+    ---@field emitted_particles Particle[]
+
+---@class Particle
+    ---@field x number
+    ---@field y number
+    ---@field velocityx number
+    ---@field velocityy number
+    ---@field color uColor
+    ---@field width number
+    ---@field height number
+    ---@field lifetime integer
+    ---@field max_lifetime integer
 
 ---@class ThemeInfo
     ---@field sub_theme ThemeInfo
@@ -4230,12 +4245,18 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field top number
     ---@field overlaps_with fun(self, other: AABB): boolean
     ---@field abs fun(self): AABB
-    ---@field extrude fun(self, amount: number): AABB
+    ---@field extrude AABB_extrude
     ---@field offset fun(self, off_x: number, off_y: number): AABB
     ---@field area fun(self): number
     ---@field center fun(self): number, number
     ---@field width fun(self): number
     ---@field height fun(self): number
+
+---@class AABB_extrude
+---@param amount_x number
+---@param amount_y number
+---@overload fun(self, amount: number): AABB
+local function AABB_extrude(self, amount_x, amount_y) end
 
 ---@class Quad
     ---@field bottom_left_x number
