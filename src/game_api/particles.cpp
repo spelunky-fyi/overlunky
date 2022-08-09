@@ -33,11 +33,11 @@ bool ParticleDB::set_texture(std::uint32_t texture_id)
 
 EmittedParticlesInfo::Iterator EmittedParticlesInfo::begin()
 {
-    return Iterator{ this, 0 };
+    return Iterator{this, 0};
 }
 EmittedParticlesInfo::Iterator EmittedParticlesInfo::end()
 {
-    return Iterator{ this, particle_emitter->particle_count };
+    return Iterator{this, particle_emitter->particle_count};
 }
 EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::begin() const
 {
@@ -49,11 +49,11 @@ EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::end() const
 }
 EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::cbegin() const
 {
-    return ConstIterator{ this, 0 };
+    return ConstIterator{this, 0};
 }
 EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::cend() const
 {
-    return ConstIterator{ this, particle_emitter->particle_count };
+    return ConstIterator{this, particle_emitter->particle_count};
 }
 
 Particle EmittedParticlesInfo::front()
