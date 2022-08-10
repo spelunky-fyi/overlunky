@@ -82,11 +82,11 @@ EmittedParticlesInfo::size_type EmittedParticlesInfo::size()
     return particle_emitter->particle_count;
 }
 
-Particle EmittedParticlesInfo::operator[](const uint32_t idx)
+Particle EmittedParticlesInfo::operator[](const size_type idx)
 {
     return static_cast<const EmittedParticlesInfo&>(*this)[idx];
 }
-const Particle EmittedParticlesInfo::operator[](const uint32_t idx) const
+const Particle EmittedParticlesInfo::operator[](const size_type idx) const
 {
     return {
         max_lifetimes + idx,

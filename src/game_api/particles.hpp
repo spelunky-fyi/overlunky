@@ -131,7 +131,7 @@ struct EmittedParticlesInfo
 
         Particle dereference() const noexcept
         {
-            return (*source)[index];
+            return (*source)[static_cast<size_type>(index)];
         }
 
         void advance(int off) noexcept
@@ -174,8 +174,8 @@ struct EmittedParticlesInfo
     bool empty();
     size_type size();
 
-    Particle operator[](const uint32_t idx);
-    const Particle operator[](const uint32_t idx) const;
+    Particle operator[](const size_type idx);
+    const Particle operator[](const size_type idx) const;
 };
 
 struct ParticleEmitterInfo
