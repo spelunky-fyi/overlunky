@@ -66,10 +66,12 @@ void write_mem(size_t addr, std::string payload)
     write_mem_prot(addr, payload, false);
 }
 
-size_t function_start(size_t off)
+// Looks for padding between functions, which sometimes does not exist, in that case
+// you might be able to specify a different distinct byte
+size_t function_start(size_t off, uint8_t outside_byte)
 {
     off &= ~0xf;
-    while (read_u8(off - 1) != 0xcc)
+    while (read_u8(off - 1) != outside_byte)
     {
         off -= 0x10;
     }

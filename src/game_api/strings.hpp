@@ -19,3 +19,4 @@ void clear_custom_shopitem_names();
 void add_custom_name(uint32_t uid, std::u16string name);
 void clear_custom_name(uint32_t uid);
 STRINGID pointer_to_stringid(size_t ptr);
+std::u16string get_entity_name(ENT_TYPE id, bool fallback_strategy);
