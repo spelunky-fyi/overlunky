@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstddef> // for size_t
+#include <cstddef> // for size_t, ptrdiff_t
 #include <cstdint> // for uint32_t, uint8_t, int32_t, uint64_t
 #include <string>  // for string, basic_string
 #include <vector>  // for vector
@@ -134,13 +134,13 @@ struct EmittedParticlesInfo
             return (*source)[static_cast<size_type>(index)];
         }
 
-        void advance(int off) noexcept
+        void advance(ptrdiff_t off) noexcept
         {
-            index += off;
+            index = static_cast<uint32_t>(index + off);
         }
-        int distance_to(IteratorImpl rhs) const noexcept
+        ptrdiff_t distance_to(IteratorImpl rhs) const noexcept
         {
-            return rhs.index - index;
+            return static_cast<ptrdiff_t>(rhs.index) - static_cast<ptrdiff_t>(index);
         }
         bool operator==(IteratorImpl rhs) const noexcept
         {
@@ -156,6 +156,7 @@ struct EmittedParticlesInfo
 
     using size_type = size_t;
     using value_type = Particle;
+    using difference_type = ptrdiff_t;
     using iterator = Iterator;
     using const_iterator = ConstIterator;
 
