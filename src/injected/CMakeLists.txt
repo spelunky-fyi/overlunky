@@ -19,3 +19,5 @@ if(MSVC)
         target_compile_options(injected PRIVATE /Zc:__cplusplus)
         target_compile_definitions(injected PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
 endif()
+
+target_compile_definitions(imgui PUBLIC IMGUI_USE_WCHAR32)
