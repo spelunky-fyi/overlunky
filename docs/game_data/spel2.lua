@@ -1001,6 +1001,12 @@ function change_string(id, str) end
 ---@param str string
 ---@return STRINGID
 function add_string(str) end
+---Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.` enum name
+---if the entity has no localized name
+---@param type ENT_TYPE
+---@param fallback_strategy boolean?
+---@return nil
+function get_entity_name(type, fallback_strategy) end
 ---Adds custom name to the item by uid used in the shops
 ---This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
 ---@param uid integer

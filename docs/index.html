@@ -564,6 +564,9 @@
                             <a href="#get_entity" class="toc-h3 toc-link" data-title="get_entity">get_entity</a>
                           </li>
                           <li>
+                            <a href="#get_entity_name" class="toc-h3 toc-link" data-title="get_entity_name">get_entity_name</a>
+                          </li>
+                          <li>
                             <a href="#get_entity_type" class="toc-h3 toc-link" data-title="get_entity_type">get_entity_type</a>
                           </li>
                           <li>
@@ -1644,6 +1647,9 @@
                   <li>
                     <a href="#Particle-types" class="toc-h2 toc-link" data-title="Particle types">Particle types</a>
                       <ul class="toc-list-h3">
+                          <li>
+                            <a href="#Particle" class="toc-h3 toc-link" data-title="Particle">Particle</a>
+                          </li>
                           <li>
                             <a href="#ParticleDB" class="toc-h3 toc-link" data-title="ParticleDB">ParticleDB</a>
                           </li>
@@ -3734,6 +3740,13 @@ You can even pass a table!</p>
 </blockquote>
 <h4 id='Entity-get_entity-int-uid'><a href="#Entity">Entity</a> get_entity(int uid)</h4>
 <p>Get the <a href="#Entity">Entity</a> behind an uid, converted to the correct type. To see what type you will get, consult the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md">entity hierarchy list</a></p>
+<h3 id='get_entity_name'>get_entity_name</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_name">get_entity_name</a></p>
+</blockquote>
+<h4 id='nil-get_entity_name-ENT_TYPE-type-optional-fallback_strategy'>nil get_entity_name(<a href="#ENT_TYPE">ENT_TYPE</a> type, optional<bool> fallback_strategy)</h4>
+<p>Get localized name of an entity, pass <code>fallback_strategy</code> as <code>true</code> to fall back to the <code>ENT_TYPE.</code> enum name
+if the entity has no localized name</p>
 <h3 id='get_entity_type'>get_entity_type</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_type">get_entity_type</a></p>
@@ -5051,11 +5064,16 @@ Note that <code>define_texture</code> will also reload the texture if it already
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=reset_lut">reset_lut</a></p>
 </blockquote>
-<h4 id='nil-reset_lut-LAYER-layer'>nil reset_lut(<a href="#LAYER">LAYER</a> layer)</h4><h3 id='set_lut'>set_lut</h3>
+<h4 id='nil-reset_lut-LAYER-layer'>nil reset_lut(<a href="#LAYER">LAYER</a> layer)</h4>
+<p>Same as <code>set_lut(nil, layer)</code></p>
+<h3 id='set_lut'>set_lut</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_lut">set_lut</a></p>
 </blockquote>
-<h4 id='nil-set_lut-optional-lt-TEXTURE-gt-texture_id-LAYER-layer'>nil set_lut(optional&lt;<a href="#TEXTURE">TEXTURE</a>&gt; texture_id, <a href="#LAYER">LAYER</a> layer)</h4><h2 id='Theme-functions'>Theme functions</h2><h3 id='force_co_subtheme'>force_co_subtheme</h3>
+<h4 id='nil-set_lut-optional-lt-TEXTURE-gt-texture_id-LAYER-layer'>nil set_lut(optional&lt;<a href="#TEXTURE">TEXTURE</a>&gt; texture_id, <a href="#LAYER">LAYER</a> layer)</h4>
+<p>Force the LUT texture for the given layer (or both) until it is reset
+Pass <code>nil</code> in the first parameter to reset</p>
+<h2 id='Theme-functions'>Theme functions</h2><h3 id='force_co_subtheme'>force_co_subtheme</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_co_subtheme">force_co_subtheme</a></p>
 </blockquote>
@@ -6925,6 +6943,11 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 <tr>
 <td><a href="#AABB">AABB</a>&amp;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=extrude">extrude(float amount_x, float amount_y)</a></td>
+<td>Grows or shrinks the <a href="#AABB">AABB</a> by the given amount in each direction.<br/>If <code>amount_x/y &lt; 0</code> and <code>abs(amount_x/y) &gt; right/top - left/bottom</code> the respective dimension of the AABB will become <code>0</code>.</td>
+</tr>
+<tr>
+<td><a href="#AABB">AABB</a>&amp;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(float off_x, float off_y)</a></td>
 <td>Offsets the <a href="#AABB">AABB</a> by the given offset.</td>
 </tr>
@@ -8769,7 +8792,61 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 </tbody></table>
-<h2 id='Particle-types'>Particle types</h2><h3 id='ParticleDB'>ParticleDB</h3>
+<h2 id='Particle-types'>Particle types</h2><h3 id='Particle'>Particle</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=velocityx">velocityx</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=velocityy">velocityy</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Aliases">uColor</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=color">color</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=width">width</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=height">height</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lifetime">lifetime</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=max_lifetime">max_lifetime</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='ParticleDB'>ParticleDB</h3>
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8969,6 +9046,11 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset_y">offset_y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;<a href="#Particle">Particle</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_particles">emitted_particles</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -24468,6 +24550,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.TOAST">TOAST</a></td>
 <td>ON::TOAST</td>
 <td>Params: <code>string text</code><br/>Runs before any toast is created, even the one using <code>toast</code> function<br/>Return behavior: if you don&#39;t return anything it will execute the toast function normally with default message<br/>if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won&#39;t matter<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.DEATH_MESSAGE">DEATH_MESSAGE</a></td>
+<td>ON::DEATH_MESSAGE</td>
+<td>Params: <code>STRINGID id</code><br/>Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.<br/></td>
 </tr>
 </tbody></table>
 <h2 id='PARTICLEEMITTER'>PARTICLEEMITTER</h2>

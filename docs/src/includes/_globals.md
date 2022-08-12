@@ -754,6 +754,16 @@ Get uids of matching entities overlapping with the given hitbox. Set `entity_typ
 
 Get the [Entity](#Entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
 
+### get_entity_name
+
+
+> Search script examples for [get_entity_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_name)
+
+#### nil get_entity_name([ENT_TYPE](#ENT_TYPE) type, optional<bool> fallback_strategy)
+
+Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.` enum name
+if the entity has no localized name
+
 ### get_entity_type
 
 
