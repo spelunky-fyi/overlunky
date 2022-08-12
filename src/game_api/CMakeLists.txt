@@ -25,4 +25,5 @@ if(MSVC)
         target_compile_options(spel2_api PRIVATE
                 /Zm80
                 /bigobj)
+        target_compile_definitions(spel2_api PRIVATE _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
 endif()

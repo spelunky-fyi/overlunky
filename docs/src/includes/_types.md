@@ -394,6 +394,7 @@ float | [top](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top) |
 bool | [overlaps_with(const AABB& other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
 [AABB](#AABB)& | [abs()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs) | Fixes the [AABB](#AABB) if any of the sides have negative length
 [AABB](#AABB)& | [extrude(float amount)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=extrude) | Grows or shrinks the [AABB](#AABB) by the given amount in all directions.<br/>If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
+[AABB](#AABB)& | [extrude(float amount_x, float amount_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=extrude) | Grows or shrinks the [AABB](#AABB) by the given amount in each direction.<br/>If `amount_x/y < 0` and `abs(amount_x/y) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
 [AABB](#AABB)& | [offset(float off_x, float off_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | Offsets the [AABB](#AABB) by the given offset.
 float | [area()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) | Compute area of the [AABB](#AABB), can be zero if one dimension is zero or negative if one dimension is inverted.
 tuple&lt;float, float&gt; | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
@@ -1012,6 +1013,21 @@ string | [player_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 ## Particle types
 
 
+### Particle
+
+
+Type | Name | Description
+---- | ---- | -----------
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [velocityx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocityx) | 
+float | [velocityy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocityy) | 
+[uColor](#Aliases) | [color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=color) | 
+float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
+float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
+int | [lifetime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lifetime) | 
+int | [max_lifetime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_lifetime) | 
+
 ### ParticleDB
 
 
@@ -1060,6 +1076,7 @@ float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) |
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 float | [offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_x) | 
 float | [offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) | 
+array&lt;[Particle](#Particle)&gt; | [emitted_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_particles) | 
 
 ## Savegame types
 

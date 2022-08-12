@@ -138,16 +138,22 @@ struct AABB
     /// If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
     AABB& extrude(float amount)
     {
-        left -= amount;
-        right += amount;
+        return extrude(amount, amount);
+    }
+    /// Grows or shrinks the AABB by the given amount in each direction.
+    /// If `amount_x/y < 0` and `abs(amount_x/y) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
+    AABB& extrude(float amount_x, float amount_y)
+    {
+        left -= amount_x;
+        right += amount_x;
         if (left > right)
         {
             left = (left + right) / 2.0f;
             right = left;
         }
 
-        bottom -= amount;
-        top += amount;
+        bottom -= amount_y;
+        top += amount_y;
         if (bottom > top)
         {
             bottom = (bottom + top) / 2.0f;

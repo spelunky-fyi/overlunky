@@ -1,5 +1,5 @@
 add_library(shared INTERFACE)
-target_include_directories(shared INTERFACE .)
+target_include_directories(shared INTERFACE . ../neo/src)
 target_link_libraries(shared INTERFACE
         overlunky_version)
 target_link_libraries_system(shared INTERFACE

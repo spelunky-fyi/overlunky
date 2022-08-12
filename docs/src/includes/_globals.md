@@ -2744,6 +2744,7 @@ Note that `define_texture` will also reload the texture if it already exists
 
 #### nil reset_lut([LAYER](#LAYER) layer)
 
+Same as `set_lut(nil, layer)`
 
 ### set_lut
 
@@ -2752,6 +2753,8 @@ Note that `define_texture` will also reload the texture if it already exists
 
 #### nil set_lut(optional<[TEXTURE](#TEXTURE)> texture_id, [LAYER](#LAYER) layer)
 
+Force the LUT texture for the given layer (or both) until it is reset
+Pass `nil` in the first parameter to reset
 
 ## Theme functions
 

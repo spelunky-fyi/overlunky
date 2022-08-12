@@ -96,7 +96,7 @@ LPVOID alloc_mem_rel32(size_t addr, size_t size);
 void write_mem_prot(size_t addr, std::string_view payload, bool prot);
 void write_mem_prot(size_t addr, std::string payload, bool prot);
 void write_mem(size_t addr, std::string payload);
-size_t function_start(size_t off);
+size_t function_start(size_t off, uint8_t outside_byte = '\xcc');
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot);
 void recover_mem(std::string name, size_t addr = NULL);
 

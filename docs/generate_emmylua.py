@@ -36,6 +36,7 @@ replace_table = {
     "&": "",
     "const ": "",
     "ShopType": "SHOP_TYPE",
+    "EmittedParticlesInfo": "Array<Particle>",
 }
 
 reFloat = re.compile(r"\bfloat\b")
@@ -150,7 +151,7 @@ def print_comment(lf):
 
 
 def print_af(lf, af):
-    if lf["comment"] and lf["comment"][0] == "NoDoc":
+    if lf["comment"] and "NoDoc" in lf["comment"][0]:
         return
     ret = replace_all(af["return"]) or "nil"
     name = lf["name"]
@@ -197,7 +198,7 @@ for lf in ps.funcs:
         for af in ps.rpcfunc(lf["cpp"]):
             print_af(lf, af)
     elif not (lf["name"].startswith("on_") or lf["name"] in ps.not_functions):
-        if lf["comment"] and lf["comment"][0] == "NoDoc":
+        if lf["comment"] and "NoDoc" in lf["comment"][0]:
             continue
         m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
         m2 = re.search(r"\(([^\{]*)\)", lf["cpp"])

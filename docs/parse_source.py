@@ -230,7 +230,7 @@ def run_parse():
             line = line.replace("*", "")
             if not class_name and ("struct" in line or "class" in line):
                 m = re.match(r"(struct|class)\s+(\S+)", line)
-                if m:
+                if m and not line.endswith(";"):
                     class_name = m[2]
             elif class_name:
                 prev_brackets_depth = brackets_depth
@@ -423,10 +423,11 @@ def run_parse():
                             "cpp": m.group(2),
                             "comment": comment,
                         }
-                        if comment and comment[0] == "Deprecated":
-                            deprecated_funcs.append(func)
-                        else:
-                            funcs.append(func)
+                        if not comment or "NoDoc" not in comment[0]:
+                            if comment and comment[0] == "Deprecated":
+                                deprecated_funcs.append(func)
+                            else:
+                                funcs.append(func)
                     comment = []
 
             c = re.search(r"/// ?(.*)$", line)
@@ -438,6 +439,8 @@ def run_parse():
         data = open(file, "r").read()
         data = data.replace("\n", "")
         data = re.sub(r" ", "", data)
+        reParticleHelper = re.compile(r"MakeParticleMemberAccess<(.+?)>\(\)")
+        data = reParticleHelper.sub(r"\1", data)
         m = re.findall(r'new_usertype\<([^\>]*?)\>\s*\(\s*"([^"]*)",(.*?)\);', data)
         for type in m:
             cpp_type = type[0]
