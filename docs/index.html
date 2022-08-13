@@ -1036,6 +1036,9 @@
                             <a href="#get_room_template_name" class="toc-h3 toc-link" data-title="get_room_template_name">get_room_template_name</a>
                           </li>
                           <li>
+                            <a href="#is_machine_room_origin" class="toc-h3 toc-link" data-title="is_machine_room_origin">is_machine_room_origin</a>
+                          </li>
+                          <li>
                             <a href="#is_room_flipped" class="toc-h3 toc-link" data-title="is_room_flipped">is_room_flipped</a>
                           </li>
                           <li>
@@ -4044,8 +4047,8 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=disable_floor_embeds">disable_floor_embeds</a></p>
 </blockquote>
-<h4 id='nil-disable_floor_embeds-bool-disable'>nil disable_floor_embeds(bool disable)</h4>
-<p>Disable all crust item spawns</p>
+<h4 id='bool-disable_floor_embeds-bool-disable'>bool disable_floor_embeds(bool disable)</h4>
+<p>Disable all crust item spawns, returns whether they were already disabled before the call</p>
 <h3 id='get_adventure_seed'>get_adventure_seed</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_adventure_seed">get_adventure_seed</a></p>
@@ -4670,6 +4673,12 @@ you&#39;re standing on, not real level coordinates.</p>
 </blockquote>
 <h4 id='string_view-get_room_template_name-int-room_template'>string_view get_room_template_name(int room_template)</h4>
 <p>For debugging only, get the name of a room template, returns <code>&#39;invalid&#39;</code> if room template is not defined</p>
+<h3 id='is_machine_room_origin'>is_machine_room_origin</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_machine_room_origin">is_machine_room_origin</a></p>
+</blockquote>
+<h4 id='bool-is_machine_room_origin-int-x-int-y'>bool is_machine_room_origin(int x, int y)</h4>
+<p>Get whether a room is the origin of a machine room</p>
 <h3 id='is_room_flipped'>is_room_flipped</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_room_flipped">is_room_flipped</a></p>
