@@ -1215,9 +1215,9 @@ Create image from file. Returns a tuple containing id, width and height.
 
 > Search script examples for [disable_floor_embeds](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disable_floor_embeds)
 
-#### nil disable_floor_embeds(bool disable)
+#### bool disable_floor_embeds(bool disable)
 
-Disable all crust item spawns
+Disable all crust item spawns, returns whether they were already disabled before the call
 
 ### get_adventure_seed
 
@@ -2169,6 +2169,15 @@ Get the room template given a certain index, returns `nil` if coordinates are ou
 #### string_view get_room_template_name(int room_template)
 
 For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
+
+### is_machine_room_origin
+
+
+> Search script examples for [is_machine_room_origin](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_machine_room_origin)
+
+#### bool is_machine_room_origin(int x, int y)
+
+Get whether a room is the origin of a machine room
 
 ### is_room_flipped
 

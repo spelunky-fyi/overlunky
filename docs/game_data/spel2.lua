@@ -25,6 +25,7 @@ prng = nil
 
 -- Functions
 
+
 ---Formatting function, use e.g. as f "my_var = {my_var}"
 ---@param f_string string
 ---@return string
@@ -1140,9 +1141,9 @@ function set_adventure_seed(first, second) end
 ---@param add boolean
 ---@return nil
 function update_liquid_collision_at(x, y, add) end
----Disable all crust item spawns
+---Disable all crust item spawns, returns whether they were already disabled before the call
 ---@param disable boolean
----@return nil
+---@return boolean
 function disable_floor_embeds(disable) end
 ---Get the address for a pattern name
 ---@param address_name string
@@ -1309,6 +1310,11 @@ function get_room_template(x, y, layer) end
 ---@param y integer
 ---@return boolean
 function is_room_flipped(x, y) end
+---Get whether a room is the origin of a machine room
+---@param x integer
+---@param y integer
+---@return boolean
+function is_machine_room_origin(x, y) end
 ---For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
 ---@param room_template integer
 ---@return string
