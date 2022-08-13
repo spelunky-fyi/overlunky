@@ -1108,6 +1108,11 @@ void register_usertypes(sol::state& lua)
     {
         return State::get().ptr_local()->level_gen->is_room_flipped(x, y);
     };
+    /// Get whether a room is the origin of a machine room
+    lua["is_machine_room_origin"] = [](int x, int y) -> bool
+    {
+        return State::get().ptr_local()->level_gen->is_machine_room_origin(x, y);
+    };
     /// For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
     lua["get_room_template_name"] = [](int16_t room_template) -> std::string_view
     {
