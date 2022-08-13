@@ -25,6 +25,15 @@ prng = nil
 
 -- Functions
 
+---Formatting function, use e.g. as f "my_var = {my_var}"
+---@param f_string string
+---@return string
+function f(f_string) end
+---Formatting function, use e.g. as f "my_var = {my_var}"
+---@param f_string string
+---@return string
+function F(f_string) end
+
 ---Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
 ---@param slot integer
 ---@param or_ghost boolean

@@ -192,6 +192,18 @@ prng = nil"""
 )
 
 print("\n-- Functions\n")
+print(
+    """
+---Formatting function, use e.g. as f "my_var = {my_var}"
+---@param f_string string
+---@return string
+function f(f_string) end
+---Formatting function, use e.g. as f "my_var = {my_var}"
+---@param f_string string
+---@return string
+function F(f_string) end
+"""
+)
 
 for lf in ps.funcs:
     if len(ps.rpcfunc(lf["cpp"])):
