@@ -1799,9 +1799,10 @@ void update_liquid_collision_at(float x, float y, bool add)
         RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
 }
 
-void disable_floor_embeds(bool disable)
+bool disable_floor_embeds(bool disable)
 {
     const static auto address = get_address("spawn_floor_embeds");
+    const bool current_value = read_u8(address) == '\xC3';
     if (disable)
     {
         write_mem_recoverable("disable_floor_embeds", address, "\xC3"sv, true);
@@ -1810,6 +1811,7 @@ void disable_floor_embeds(bool disable)
     {
         recover_mem("disable_floor_embeds");
     }
+    return current_value;
 }
 
 void set_cursepot_ghost_enabled(bool enable)

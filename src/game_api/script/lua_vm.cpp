@@ -1681,7 +1681,7 @@ end
     /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
     lua["update_liquid_collision_at"] = update_liquid_collision_at;
 
-    /// Disable all crust item spawns
+    /// Disable all crust item spawns, returns whether they were already disabled before the call
     lua["disable_floor_embeds"] = disable_floor_embeds;
 
     /// Get the address for a pattern name
