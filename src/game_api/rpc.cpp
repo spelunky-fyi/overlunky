@@ -1807,7 +1807,7 @@ void update_liquid_collision_at(float x, float y, bool add)
 bool disable_floor_embeds(bool disable)
 {
     const static auto address = get_address("spawn_floor_embeds");
-    const bool current_value = read_u8(address) == '\xC3';
+    const bool current_value = read_u8(address) == 0xc3;
     if (disable)
     {
         write_mem_recoverable("disable_floor_embeds", address, "\xC3"sv, true);
