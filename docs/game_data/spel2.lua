@@ -319,14 +319,14 @@ function spawn_apep(x, y, layer, right) end
 ---@param x number
 ---@param y number
 ---@param layer LAYER
----@return nil
+---@return integer
 function spawn_tree(x, y, layer) end
 ---Spawns and grows a tree
 ---@param x number
 ---@param y number
 ---@param layer LAYER
 ---@param height integer
----@return nil
+---@return integer
 function spawn_tree(x, y, layer, height) end
 ---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
 ---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
@@ -345,6 +345,21 @@ function spawn_mushroom(x, y, l) end
 ---@param height integer
 ---@return integer
 function spawn_mushroom(x, y, l, height) end
+---Spawns an already unrolled rope as if created by player
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param texture TEXTURE
+---@return integer
+function spawn_unrolled_player_rope(x, y, layer, texture) end
+---Spawns an already unrolled rope as if created by player
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param texture TEXTURE
+---@param max_length integer
+---@return integer
+function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
 ---Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 ---If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 ---@param player_slot integer

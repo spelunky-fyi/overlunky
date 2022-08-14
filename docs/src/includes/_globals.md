@@ -2620,11 +2620,22 @@ If you want to respawn a player that is a ghost, set in his inventory `health` t
 
 > Search script examples for [spawn_tree](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
 
-#### nil spawn_tree(float x, float y, [LAYER](#LAYER) layer)
+#### int spawn_tree(float x, float y, [LAYER](#LAYER) layer)
 
-#### nil spawn_tree(float x, float y, [LAYER](#LAYER) layer, int height)
+#### int spawn_tree(float x, float y, [LAYER](#LAYER) layer, int height)
 
 Spawns and grows a tree
+
+### spawn_unrolled_player_rope
+
+
+> Search script examples for [spawn_unrolled_player_rope](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_unrolled_player_rope)
+
+#### int spawn_unrolled_player_rope(float x, float y, [LAYER](#LAYER) layer, [TEXTURE](#TEXTURE) texture)
+
+#### int spawn_unrolled_player_rope(float x, float y, [LAYER](#LAYER) layer, [TEXTURE](#TEXTURE) texture, int max_length)
+
+Spawns an already unrolled rope as if created by player
 
 ## String functions
 
