@@ -612,6 +612,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "layer_get_entity_at"sv,
+        // Set a bp on spawning entity ENT_TYPE_ITEM_CLIMBABLE_ROPE, then throw a rope, skip first bp
+        // On second bp go back to the caller of load_entity, somewhere upwards this function is called as
+        // layer_get_entity_at(layer, x, y, 0x180, 4, 8, ???)
+        PatternCommandBuffer{}
+            .find_inst("f3 0f 10 5f 7c 0f 28 e2"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "virtual_functions_table"sv,
         // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that

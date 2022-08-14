@@ -428,16 +428,28 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
     const float g_x = static_cast<float>(i_x);
     const float g_y = static_cast<float>(i_y);
 
-    auto has_solid_grid_ent = [=](float x, float y) -> bool
+    auto has_solid_ent = [=](float gx, float gy) -> bool
     {
-        Entity* ent = layer_ptr->get_grid_entity_at(x, y);
-        if (ent)
         {
-            return (ent->flags & 0x1c) == 0x4; // see 0x2299cd7c
+            Movable* ent = static_cast<Movable*>(layer_ptr->get_entity_at(gx, gy, 0x180, 0x4, 0x8, 0));
+            if (ent)
+            {
+                return ent->type->search_flags == 0x100 || (ent->velocityx == 0.0 && ent->velocityy == 0.0); // see 0x2299c90f
+            }
         }
+
+        {
+            Entity* grid_ent = layer_ptr->get_grid_entity_at(gx, gy);
+            if (grid_ent)
+            {
+                return (grid_ent->flags & 0x1c) == 0x4; // see 0x2299cd7c
+            }
+        }
+
         return false;
     };
-    if (has_solid_grid_ent(g_x, g_y))
+
+    if (has_solid_ent(g_x, g_y))
     {
         return -1;
     }
@@ -457,9 +469,9 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
     setup_top_rope_rendering_info_two(top_part->rendering_info, 7, 2);
 
     ClimbableRope* above_part = top_part;
-    for (size_t i = 1; i < max_length; i++)
+    for (size_t i = 1; i <= max_length; i++)
     {
-        if (has_solid_grid_ent(g_x, g_y - static_cast<float>(i)))
+        if (has_solid_ent(g_x, g_y - static_cast<float>(i)))
         {
             break;
         }
