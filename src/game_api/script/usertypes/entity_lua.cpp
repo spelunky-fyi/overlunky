@@ -98,17 +98,13 @@ void register_usertypes(sol::state& lua)
         "height",
         &EntityDB::height,
         "offsetx",
-        sol::property([](EntityDB& e) -> float
-                      { return e.rect_collision.offsetx; }),
+        &EntityDB::default_offsetx,
         "offsety",
-        sol::property([](EntityDB& e) -> float
-                      { return e.rect_collision.offsety; }),
+        &EntityDB::default_offsety,
         "hitboxx",
-        sol::property([](EntityDB& e) -> float
-                      { return e.rect_collision.hitboxx; }),
+        &EntityDB::default_hitboxx,
         "hitboxy",
-        sol::property([](EntityDB& e) -> float
-                      { return e.rect_collision.hitboxy; }),
+        &EntityDB::default_hitboxy,
         "draw_depth",
         &EntityDB::draw_depth,
         "friction",

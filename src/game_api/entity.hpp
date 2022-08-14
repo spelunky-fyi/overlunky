@@ -49,6 +49,14 @@ struct Rect
     float hitboxx;
     float hitboxy;
 };
+struct CollisionInfo
+{
+    Rect rect;
+    SHAPE shape;
+    bool hitbox_enabled;
+    uint8_t field_3A;
+    uint8_t field_3B;
+};
 
 class Entity;
 class Movable;
@@ -97,11 +105,21 @@ struct EntityDB
     uint8_t draw_depth;
     uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc (RVA 0x21F30CC4)
     int16_t field_26;
-    Rect rect_collision;
-    uint8_t default_shape;
-    bool default_hitbox_enabled;
-    uint8_t field_3A;
-    uint8_t field_3B;
+    union
+    {
+        struct
+        {
+            float default_offsetx;
+            float default_offsety;
+            float default_hitboxx;
+            float default_hitboxy;
+            SHAPE default_shape;
+            bool default_hitbox_enabled;
+            uint8_t default_b82;
+            uint8_t default_b83;
+        };
+        CollisionInfo default_collision_info;
+    };
     int32_t field_3C;
     int32_t field_40;
     int32_t field_44;
@@ -193,14 +211,21 @@ class Entity
     float special_offsetx;
     float special_offsety;
     Color color;
-    float offsetx;
-    float offsety;
-    float hitboxx;
-    float hitboxy;
-    SHAPE shape;         // 1 = rectangle, 2 = circle
-    bool hitbox_enabled; // probably, off for bg, deco, logical etc
-    uint8_t b82;
-    uint8_t b83;
+    union
+    {
+        struct
+        {
+            float offsetx;
+            float offsety;
+            float hitboxx;
+            float hitboxy;
+            SHAPE shape;         // 1 = rectangle, 2 = circle
+            bool hitbox_enabled; // probably, off for bg, deco, logical etc
+            uint8_t b82;
+            uint8_t b83;
+        };
+        CollisionInfo collision_info;
+    };
     float angle;
     RenderInfo* rendering_info;
     Texture* texture;
