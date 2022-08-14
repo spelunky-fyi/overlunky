@@ -472,7 +472,7 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
         next_part->segment_nr_inverse = max_length - static_cast<uint32_t>(i);
         next_part->above_part = above_part;
         setup_top_rope_rendering_info_one(next_part->rendering_info);
-        
+
         above_part->below_part = next_part;
         if (i == 1)
         {

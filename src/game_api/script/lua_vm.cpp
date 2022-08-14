@@ -669,8 +669,8 @@ end
     lua["spawn_mushroom"] = spawn_mushroom;
 
     auto spawn_unrolled_player_rope = sol::overload(
-        static_cast<int32_t(*)(float, float, LAYER, TEXTURE)>(::spawn_unrolled_player_rope),
-        static_cast<int32_t(*)(float, float, LAYER, TEXTURE, uint16_t)>(::spawn_unrolled_player_rope));
+        static_cast<int32_t (*)(float, float, LAYER, TEXTURE)>(::spawn_unrolled_player_rope),
+        static_cast<int32_t (*)(float, float, LAYER, TEXTURE, uint16_t)>(::spawn_unrolled_player_rope));
 
     /// Spawns an already unrolled rope as if created by player
     lua["spawn_unrolled_player_rope"] = spawn_unrolled_player_rope;
