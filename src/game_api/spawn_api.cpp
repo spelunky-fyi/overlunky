@@ -13,6 +13,7 @@
 #include <vector>      // for vector, allocator, _Vector_iterator
 
 #include "entities_chars.hpp"    // for Player
+#include "entities_items.hpp"    // for ClimbableRope
 #include "entities_liquids.hpp"  // for Lava
 #include "entities_monsters.hpp" // for Shopkeeper, RoomOwner
 #include "entity.hpp"            // for to_id, Entity, get_entity_ptr, Enti...
@@ -401,6 +402,90 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
     layer_ptr->spawn_entity_over(deco, platform_right, 0, 1)->animation_frame += 1;
     platform_right->animation_frame = 119;
     return base_uid;
+}
+
+int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture)
+{
+    return spawn_unrolled_player_rope(x, y, layer, texture, static_cast<uint16_t>(read_u32(get_address("attach_thrown_rope_to_background"))));
+}
+int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture, uint16_t max_length)
+{
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
+    using setup_top_rope_rendering_info_one_fun = void(RenderInfo*);
+    using setup_top_rope_rendering_info_two_fun = void(RenderInfo*, int32_t, int32_t);
+    static const auto setup_top_rope_rendering_info_one = (setup_top_rope_rendering_info_one_fun*)get_address("setup_top_rope_rendering_info_one"sv);
+    static const auto setup_top_rope_rendering_info_two = (setup_top_rope_rendering_info_two_fun*)get_address("setup_top_rope_rendering_info_two"sv);
+    static const auto rope_ent = to_id("ENT_TYPE_ITEM_CLIMBABLE_ROPE");
+
+    std::pair<float, float> offset(0.0f, 0.0f);
+    const auto actual_layer = enum_to_layer(layer, offset);
+    const auto layer_ptr = State::get().layer_local(actual_layer);
+    const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
+    const uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
+    const float g_x = static_cast<float>(i_x);
+    const float g_y = static_cast<float>(i_y);
+
+    auto has_solid_grid_ent = [=](float x, float y) -> bool
+    {
+        Entity* ent = layer_ptr->get_grid_entity_at(x, y);
+        if (ent)
+        {
+            return (ent->flags & 0x1c) == 0x4; // see 0x2299cd7c
+        }
+        return false;
+    };
+    if (has_solid_grid_ent(g_x, g_y))
+    {
+        return -1;
+    }
+
+    constexpr uint16_t anim_frame_top = 157;
+    constexpr uint16_t anim_frame_single = 158;
+    constexpr uint16_t anim_frame_middle = 192;
+    constexpr uint16_t anim_frame_bottom = 197;
+
+    ClimbableRope* top_part = static_cast<ClimbableRope*>(layer_ptr->spawn_entity(rope_ent, g_x, g_y, false, 0, 0, true));
+    top_part->set_texture(texture);
+    top_part->animation_frame = anim_frame_single;
+    top_part->idle_counter = 5;
+    top_part->segment_nr = 0;
+    top_part->segment_nr_inverse = max_length;
+    setup_top_rope_rendering_info_one(top_part->rendering_info);
+    setup_top_rope_rendering_info_two(top_part->rendering_info, 7, 2);
+
+    ClimbableRope* above_part = top_part;
+    for (size_t i = 1; i < max_length; i++)
+    {
+        if (has_solid_grid_ent(g_x, g_y - static_cast<float>(i)))
+        {
+            break;
+        }
+
+        ClimbableRope* next_part = static_cast<ClimbableRope*>(layer_ptr->spawn_entity_over(rope_ent, above_part, 0, -1));
+        next_part->set_texture(texture);
+        next_part->animation_frame = anim_frame_bottom;
+        next_part->idle_counter = 5;
+        next_part->segment_nr = static_cast<uint32_t>(i);
+        next_part->segment_nr_inverse = max_length - static_cast<uint32_t>(i);
+        next_part->above_part = above_part;
+        setup_top_rope_rendering_info_one(next_part->rendering_info);
+        
+        above_part->below_part = next_part;
+        if (i == 1)
+        {
+            above_part->animation_frame = anim_frame_top;
+        }
+        else
+        {
+            above_part->animation_frame = anim_frame_middle;
+        }
+        above_part = next_part;
+    }
+
+    return top_part->uid;
 }
 
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, float top_threshold)

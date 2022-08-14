@@ -19,9 +19,10 @@
 #include <vector>             // for vector, _Vector_const_iterator, _Vector...
 // clang-format on
 
-#include "logger.h"          // for ByteStr, DEBUG
-#include "memory.hpp"        // for Memory, function_start
-#include "virtual_table.hpp" // for VIRT_FUNC, VTABLE_OFFSET, VIRT_FUNC::LO...
+#include "ghidra_byte_string.hpp" // for operator""_gh
+#include "logger.h"               // for ByteStr, DEBUG
+#include "memory.hpp"             // for Memory, function_start
+#include "virtual_table.hpp"      // for VIRT_FUNC, VTABLE_OFFSET, VIRT_FUNC::LO...
 
 // Decodes the program counter inside an instruction
 // The default simple variant is 3 bytes instruction, 4 bytes rel. address, 0 bytes suffix:
@@ -1115,6 +1116,25 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .get_address("process_ropes_two"sv)
             .find_next_inst("\x83\xF8*\x0F\x87****\x41"sv)
             .offset(0x02)
+            .at_exe(),
+    },
+    {
+        "setup_top_rope_rendering_info_one"sv,
+        // After creating the top rope entity (see attach_thrown_rope_to_background)
+        // two functions are called on the rope->rendering_info
+        PatternCommandBuffer{}
+            .get_address("attach_thrown_rope_to_background"sv)
+            .find_after_inst("48 8b 8b 88 00 00 00"_gh)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "setup_top_rope_rendering_info_two"sv,
+        // See setup_top_rope_rendering_info_one
+        PatternCommandBuffer{}
+            .get_address("attach_thrown_rope_to_background"sv)
+            .find_after_inst("41 b8 02 00 00 00"_gh)
+            .decode_call()
             .at_exe(),
     },
     {

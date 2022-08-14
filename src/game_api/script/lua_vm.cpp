@@ -667,6 +667,14 @@ end
     /// Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
     /// Returns uid of the base or -1 if it wasn't able to spawn
     lua["spawn_mushroom"] = spawn_mushroom;
+
+    auto spawn_unrolled_player_rope = sol::overload(
+        static_cast<int32_t(*)(float, float, LAYER, TEXTURE)>(::spawn_unrolled_player_rope),
+        static_cast<int32_t(*)(float, float, LAYER, TEXTURE, uint16_t)>(::spawn_unrolled_player_rope));
+
+    /// Spawns an already unrolled rope as if created by player
+    lua["spawn_unrolled_player_rope"] = spawn_unrolled_player_rope;
+
     /// NoDoc
     /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
     /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level

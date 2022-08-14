@@ -37,6 +37,8 @@ int32_t spawn_tree(float x, float y, LAYER layer);
 int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height);
 int32_t spawn_mushroom(float x, float y, LAYER l);
 int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height);
+int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture);
+int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture, uint16_t max_length);
 
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, float top_threshold);
 void setup_impostor_lake(Entity* lake_imposter, AABB aabb, float top_threshold);
