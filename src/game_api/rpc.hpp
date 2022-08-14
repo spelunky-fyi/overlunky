@@ -105,6 +105,7 @@ void set_journal_enabled(bool b);
 void set_camp_camera_bounds_enabled(bool b);
 void set_explosion_mask(uint32_t mask);
 void set_max_rope_length(uint8_t length);
+uint8_t get_max_rope_length();
 bool is_inside_active_shop_room(float x, float y, LAYER layer);
 bool is_inside_shop_zone(float x, float y, LAYER layer);
 uint8_t waddler_count_entity(ENT_TYPE entity_type);

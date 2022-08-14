@@ -1268,6 +1268,11 @@ void set_max_rope_length(uint8_t length)
     write_mem_prot(get_address("process_ropes_three"), length_minus_one_8, true);
 }
 
+uint8_t get_max_rope_length()
+{
+    return static_cast<uint8_t>(read_u32(get_address("attach_thrown_rope_to_background")));
+}
+
 uint8_t waddler_count_entity(ENT_TYPE entity_type)
 {
     auto state = get_state_ptr();
