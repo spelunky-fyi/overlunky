@@ -653,10 +653,10 @@ end
     lua["layer_door"] = spawn_backdoor_abs;
     /// Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
     lua["spawn_apep"] = spawn_apep;
-    auto spawn_tree = sol::overload(
-        static_cast<void (*)(float, float, LAYER)>(::spawn_tree),
-        static_cast<void (*)(float, float, LAYER, uint16_t)>(::spawn_tree));
 
+    auto spawn_tree = sol::overload(
+        static_cast<int32_t (*)(float, float, LAYER)>(::spawn_tree),
+        static_cast<int32_t (*)(float, float, LAYER, uint16_t)>(::spawn_tree));
     /// Spawns and grows a tree
     lua["spawn_tree"] = spawn_tree;
 

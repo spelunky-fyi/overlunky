@@ -253,12 +253,11 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     return State::get().layer_local(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
 }
 
-void spawn_tree(float x, float y, LAYER layer)
+int32_t spawn_tree(float x, float y, LAYER layer)
 {
-    spawn_tree(x, y, layer, 0);
+    return spawn_tree(x, y, layer, 0);
 }
-
-void spawn_tree(float x, float y, LAYER layer, uint16_t height)
+int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -277,7 +276,7 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
         layer_ptr->get_grid_entity_at(x, y) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 1.0f) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 2.0f) != nullptr)
-        return;
+        return -1;
 
     static const auto tree_base = to_id("ENT_TYPE_FLOOR_TREE_BASE");
     static const auto tree_trunk = to_id("ENT_TYPE_FLOOR_TREE_TRUNK");
@@ -288,7 +287,8 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
     PRNG& prng = PRNG::get_local();
 
     // spawn the base
-    Entity* current_pice = layer_ptr->spawn_entity(tree_base, x, y, false, 0.0f, 0.0f, true);
+    Entity* current_piece = layer_ptr->spawn_entity(tree_base, x, y, false, 0.0f, 0.0f, true);
+    Entity* base_piece = current_piece;
 
     // spawn segments
     if (layer_ptr->get_grid_entity_at(x, y + 3.0f) == nullptr)
@@ -301,7 +301,7 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
             {
                 break;
             }
-            current_pice = layer_ptr->spawn_entity_over(tree_trunk, current_pice, 0.0f, 1.0f);
+            current_piece = layer_ptr->spawn_entity_over(tree_trunk, current_piece, 0.0f, 1.0f);
             if (height == 0 && prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
             {
                 break;
@@ -309,7 +309,7 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
         }
     }
     // spawn the top
-    current_pice = layer_ptr->spawn_entity_over(tree_top, current_pice, 0.0f, 1.0f);
+    current_piece = layer_ptr->spawn_entity_over(tree_top, current_piece, 0.0f, 1.0f);
 
     do // spawn branches
     {
@@ -320,32 +320,32 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
             if (left)
                 deco->flags |= 1U << 16; // flag 17: facing left
         };
-        auto test_pos = current_pice->position();
+        auto test_pos = current_piece->position();
 
         if (static_cast<int>(test_pos.first) + 1 < g_level_max_x && layer_ptr->get_grid_entity_at(test_pos.first + 1, test_pos.second) == nullptr &&
             prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
-            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_pice, 1.02f, 0.0f);
+            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, 1.02f, 0.0f);
             spawn_deco(branch, false);
         }
         if (static_cast<int>(test_pos.first) - 1 > 0 && layer_ptr->get_grid_entity_at(test_pos.first - 1, test_pos.second) == nullptr &&
             prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
-            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_pice, -1.02f, 0.0f);
+            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, -1.02f, 0.0f);
             branch->flags |= 1U << 16; // flag 17: facing left
             spawn_deco(branch, true);
         }
-        current_pice = current_pice->overlay;
-    } while (current_pice->overlay);
+        current_piece = current_piece->overlay;
+    } while (current_piece->overlay);
+
+    return base_piece->uid;
 }
 
 int32_t spawn_mushroom(float x, float y, LAYER l)
 {
     return spawn_mushroom(x, y, l, 0);
 }
-
-// height relates to trunk
-int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height)
+int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height relates to trunk
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]

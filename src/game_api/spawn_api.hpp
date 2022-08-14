@@ -33,8 +33,8 @@ void spawn_backdoor_abs(float x, float y);
 
 int32_t spawn_apep(float x, float y, LAYER layer, bool right);
 
-void spawn_tree(float x, float y, LAYER layer);
-void spawn_tree(float x, float y, LAYER layer, uint16_t height);
+int32_t spawn_tree(float x, float y, LAYER layer);
+int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height);
 int32_t spawn_mushroom(float x, float y, LAYER l);
 int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height);
 
