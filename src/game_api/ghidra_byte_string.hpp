@@ -74,4 +74,6 @@ constexpr auto operator"" _gh()
     return std::string_view{Str.cpp_byte_string, Str.size()};
 }
 
-static_assert("0F 0f af 12 22 .. .. 12 .."_gh == "\x0F\x0f\xaf\x12\x22**\x12*");
+#ifndef _MSC_VER
+static_assert("0F 0f af 00 12 22 .. .. 12 .."_gh == "\x0F\x0f\xaf\x00\x12\x22**\x12*"sv);
+#endif
