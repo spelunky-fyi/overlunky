@@ -69,6 +69,23 @@ inline bool& get_is_init()
     return is_init;
 }
 
+inline bool& get_do_hooks()
+{
+    static bool do_hooks{true};
+    return do_hooks;
+}
+void State::set_do_hooks(bool do_hooks)
+{
+    if (get_is_init())
+    {
+        DEBUG("Too late to disable hooks...");
+    }
+    else
+    {
+        get_do_hooks() = do_hooks;
+    }
+}
+
 void do_write_load_opt()
 {
     write_mem_prot(get_address("write_load_opt"), "\x90\x90"sv, true);
@@ -231,13 +248,19 @@ State& State::get()
         }
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
-        STATE.ptr()->level_gen->init();
-        init_spawn_hooks();
-        init_behavior_hooks();
-        init_render_api_hooks();
-        hook_godmode_functions();
+
+        const bool do_hooks = get_do_hooks();
+        if (do_hooks)
+        {
+            STATE.ptr()->level_gen->init();
+            init_spawn_hooks();
+            init_behavior_hooks();
+            init_render_api_hooks();
+            hook_godmode_functions();
+            strings_init();
+        }
+
         get_is_init() = true;
-        strings_init();
     }
     return STATE;
 }
