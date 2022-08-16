@@ -61,6 +61,7 @@ struct SpawnLogicProvider
 
 enum class RoomTemplateType
 {
+    VanillaMachineRoom = -1,
     None = 0,
     Entrance = 1,
     Exit = 2,
