@@ -440,7 +440,7 @@ void setup_impostor_lake(Entity* lake_impostor, AABB aabb, float top_threshold)
 void fix_impostor_lake_positions()
 {
     auto state = get_state_ptr();
-    for (LiquidLake* lake = state->liquid_physics->start_lakes; lake < state->liquid_physics->end_lakes; lake++)
+    for (LiquidLake* lake : state->liquid_physics->impostor_lakes)
     {
         Entity* impostor_lake = lake->impostor_lake;
         auto [x_pos, y_pos] = impostor_lake->position();

@@ -826,9 +826,16 @@ struct LiquidPhysics
     };
     size_t unknown2;
     size_t unknown3;
-    LiquidLake* start_lakes;
-    LiquidLake* end_lakes;
-    size_t unknown6;
+    std::vector<LiquidLake*> impostor_lakes;
+    uint32_t total_liquid_spawned; // Total number of spawned liquid entities, all types.
+    uint32_t unknown8;
+    size_t unknown9;
+    uint32_t total_liquid_spawned2; // Same as total_liquid_spawned?
+    bool unknown12;
+    uint8_t padding12a;
+    uint8_t padding12b;
+    uint8_t padding12c;
+    uint32_t unknown13;
 };
 
 struct AITarget
