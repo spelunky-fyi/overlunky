@@ -790,6 +790,15 @@ struct LiquidPool
     LiquidTileSpawnData tile_spawn_data;
 };
 
+struct LiquidLake
+{
+    uint32_t position1;
+    uint32_t position2;
+    uint32_t position3;
+    uint32_t lake_type;
+    Entity* impostor_lake;
+};
+
 struct LiquidPhysics
 {
     size_t unknown1; // MysteryLiquidPointer1 in plugin
@@ -815,6 +824,11 @@ struct LiquidPhysics
             LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
+    size_t unknown2;
+    size_t unknown3;
+    LiquidLake* start_lakes;
+    LiquidLake* end_lakes;
+    size_t unknown6;
 };
 
 struct AITarget

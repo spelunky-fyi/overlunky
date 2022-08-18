@@ -40,6 +40,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height);
 
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, float top_threshold);
 void setup_impostor_lake(Entity* lake_imposter, AABB aabb, float top_threshold);
+void fix_impostor_lake_positions();
 
 void push_spawn_type_flags(SPAWN_TYPE flags);
 void pop_spawn_type_flags(SPAWN_TYPE flags);
