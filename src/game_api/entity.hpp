@@ -337,6 +337,9 @@ class Entity
     void set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render);
     void set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render);
 
+    // Makes this entity climbable as if the player had climbing gloves
+    void set_climbable(bool climbable);
+
     std::span<uint32_t> get_items();
 
     template <typename T>

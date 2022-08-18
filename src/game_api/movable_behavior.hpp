@@ -88,4 +88,6 @@ void update_movable(Movable* movable, bool disable_gravity);
 /// Will also update `movable.animation_frame` and various timers and counters
 void update_movable(Movable* movable, Vec2 move, float sprint_factor, bool disable_gravity, bool on_rope);
 
+void set_entity_climbable(class Entity* entity, bool climbable);
+
 void init_behavior_hooks();

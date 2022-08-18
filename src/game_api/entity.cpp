@@ -812,6 +812,11 @@ void Entity::set_post_render(std::uint32_t reserved_callback_id, std::function<v
     hook_info.post_render.push_back({reserved_callback_id, std::move(post_render)});
 }
 
+void Entity::set_climbable(bool climbable)
+{
+    set_entity_climbable(this, climbable);
+}
+
 std::span<uint32_t> Entity::get_items()
 {
     if (items.size)

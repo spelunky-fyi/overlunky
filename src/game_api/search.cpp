@@ -622,6 +622,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        "layer_get_entity_close_to"sv,
+        PatternCommandBuffer{}
+            .from_exe_base(0x22883570),
+    },
+    {
         "virtual_functions_table"sv,
         // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
@@ -1172,6 +1177,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x48\x81\xCA\x00\x00\x00\x10\x49\x89\x54\x24\x30"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "player_ledge_hang_behavior_vtable"sv,
+        PatternCommandBuffer{}
+            .from_exe_base(0x22da7f30),
     },
     {
         "teleport"sv,
