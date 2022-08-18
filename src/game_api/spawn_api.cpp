@@ -442,15 +442,17 @@ void fix_impostor_lake_positions()
     auto state = get_state_ptr();
     for (LiquidLake* lake = state->liquid_physics->start_lakes; lake < state->liquid_physics->end_lakes; lake++) {
         Entity* impostor_lake = lake->impostor_lake;
-        float y_pos = impostor_lake->y + impostor_lake->offsety;
-        float x_pos = impostor_lake->x + impostor_lake->offsetx;
+        auto [x_pos, y_pos] = impostor_lake->position();
+        x_pos += impostor_lake->offsetx;
+        y_pos += impostor_lake->offsety;
         float hitboxx = impostor_lake->hitboxx;
         float hitboxy = impostor_lake->hitboxy;
-        int32_t x1 = (int32_t)(y_pos - hitboxy + .5) * 3 * 0x102;
-        int32_t x2 = (int32_t)(x_pos - hitboxx + .5) * 3 + x1;
-        int32_t x3 = (int32_t)(x_pos + hitboxx + .5) * 3;
+        // Match the calculations that the game does when initializing these impostor objects.
+        int32_t x1 = (int32_t)((y_pos - hitboxy + .5) * 3) * 0x102;
+        int32_t x2 = (int32_t)((x_pos - hitboxx + .5) * 3) + x1;
+        int32_t x3 = (int32_t)((x_pos + hitboxx + .5) * 3);
         x1 += x3;
-        x3 = (int32_t)(y_pos + hitboxy + .5) * 3 * 0x102 + x3;
+        x3 = (int32_t)((y_pos + hitboxy + .5) * 3) * 0x102 + x3;
         lake->position1 = x2;
         lake->position2 = x1;
         lake->position3 = x3;
