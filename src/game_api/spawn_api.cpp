@@ -440,9 +440,9 @@ void setup_impostor_lake(Entity* lake_impostor, AABB aabb, float top_threshold)
 void fix_impostor_lake_positions()
 {
     auto state = get_state_ptr();
-    for (LiquidLake* lake : state->liquid_physics->impostor_lakes)
+    for (auto& lake : state->liquid_physics->impostor_lakes)
     {
-        Entity* impostor_lake = lake->impostor_lake;
+        Entity* impostor_lake = lake.impostor_lake;
         auto [x_pos, y_pos] = impostor_lake->position();
         x_pos += impostor_lake->offsetx;
         y_pos += impostor_lake->offsety;
@@ -454,9 +454,9 @@ void fix_impostor_lake_positions()
         int32_t x3 = (int32_t)((x_pos + hitboxx + .5) * 3);
         x1 += x3;
         x3 = (int32_t)((y_pos + hitboxy + .5) * 3) * 0x102 + x3;
-        lake->position1 = x2;
-        lake->position2 = x1;
-        lake->position3 = x3;
+        lake.position1 = x2;
+        lake.position2 = x1;
+        lake.position3 = x3;
     }
 }
 
