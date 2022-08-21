@@ -194,7 +194,7 @@ void update_movable(Movable* movable, bool disable_gravity)
 void update_movable(Movable* movable, Vec2 move, float sprint_factor, bool disable_gravity, bool on_rope)
 {
     static UpdateMovable* update_movable_impl = (UpdateMovable*)get_address("update_movable"sv);
-    update_movable_impl(*movable, move, sprint_factor, true, disable_gravity, on_rope, false);
+    update_movable_impl(*movable, move, sprint_factor, false, disable_gravity, on_rope, false);
 }
 
 struct ClimbableEntityInfo
