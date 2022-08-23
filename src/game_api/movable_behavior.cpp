@@ -206,8 +206,8 @@ struct ClimbableEntityInfo
 std::vector<ClimbableEntityInfo> g_climbable_entities;
 void set_entity_climbable(Entity* entity, bool climbable)
 {
-    auto find_entity_pred = [=](const ClimbableEntityInfo& climbable)
-    { return climbable.entity == entity; };
+    auto find_entity_pred = [=](const ClimbableEntityInfo& climbable_info)
+    { return climbable_info.entity == entity; };
 
     auto it = std::find_if(g_climbable_entities.begin(), g_climbable_entities.end(), find_entity_pred);
     bool climbable_before = (entity->type->properties_flags & 0x20) == 0x20;
@@ -241,8 +241,9 @@ struct TurningEntityInfo
 std::vector<TurningEntityInfo> g_entities_disabled_turning{};
 void set_entity_turning(class Entity* entity, bool enabled)
 {
-    auto find_entity_pred = [=](const TurningEntityInfo& turning)
-    { return turning.entity == entity; };
+    auto find_entity_pred = [=](const TurningEntityInfo& turning_info)
+    { return turning_info.entity == entity; };
+
     if (!enabled)
     {
         g_entities_disabled_turning.push_back({
@@ -280,8 +281,9 @@ Entity* get_entity_close_to(Layer& layer, float x, float y, size_t search_flags,
         if (!std::count_if(g_temporary_climbable_entities.begin(), g_temporary_climbable_entities.end(), [=](const ClimbableEntityRecoveryInfo& ent_info)
                            { return ent_info.entity == entity; }))
         {
-            auto it = std::find_if(g_climbable_entities.begin(), g_climbable_entities.end(), [=](const ClimbableEntityInfo& climbable)
-                                   { return climbable.entity == entity; });
+            auto find_entity_pred = [=](const ClimbableEntityInfo& _info)
+            { return _info.entity == entity; };
+            auto it = std::find_if(g_climbable_entities.begin(), g_climbable_entities.end(), find_entity_pred);
             if (it != g_climbable_entities.end())
             {
                 return it->climbable;
@@ -355,8 +357,9 @@ using EntityTurn = void(Entity*, bool);
 EntityTurn* g_entity_turn_trampoline{nullptr};
 void entity_turn(Entity* self, bool apply)
 {
-    auto find_entity_pred = [=](const TurningEntityInfo& turning)
-    { return turning.entity == self; };
+    auto find_entity_pred = [=](const TurningEntityInfo& turning_info)
+    { return turning_info.entity == self; };
+
     if (std::find_if(g_entities_disabled_turning.begin(), g_entities_disabled_turning.end(), find_entity_pred) == g_entities_disabled_turning.end())
     {
         g_entity_turn_trampoline(self, apply);
