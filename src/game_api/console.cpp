@@ -41,11 +41,6 @@ bool SpelunkyConsole::is_toggled()
     return m_Impl->enabled;
 }
 
-bool SpelunkyConsole::run()
-{
-    m_Impl->lua["P"] = m_Impl->lua["get_player"](1);
-    return m_Impl->update();
-}
 void SpelunkyConsole::draw(ImDrawList* dl)
 {
     m_Impl->draw(dl);
@@ -125,7 +120,7 @@ void SpelunkyConsole::set_selected_uid(uint32_t uid)
 {
     m_Impl->lua["U"] = uid;
     m_Impl->lua["E"] = m_Impl->lua["get_entity"](uid);
-    m_Impl->lua["P"] = m_Impl->lua["players"];
+    m_Impl->lua["P"] = m_Impl->lua["get_player"](1);
 }
 
 unsigned int SpelunkyConsole::get_input_lines()

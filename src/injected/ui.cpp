@@ -3442,13 +3442,6 @@ void fix_script_requires(Script auto* script)
     }
 }
 
-void update_script(Script auto* script)
-{
-    if (!script->is_enabled())
-        return;
-    script->run();
-}
-
 void render_script(Script auto* script, ImDrawList* draw_list)
 {
     if (!script->is_enabled())
@@ -3759,13 +3752,8 @@ void render_clickhandler()
     }
     fix_script_requires(g_Console.get());
     auto* draw_list = ImGui::GetBackgroundDrawList();
-    for (auto& [name, script] : g_scripts)
-    {
-        update_script(script.get());
-    }
     if (g_last_id > -1)
         g_Console.get()->set_selected_uid(g_last_id);
-    update_script(g_Console.get());
     for (auto& [name, script] : g_scripts)
     {
         render_script(script.get(), draw_list);
@@ -3775,10 +3763,6 @@ void render_clickhandler()
     for (auto& [name, script] : g_ui_scripts)
     {
         fix_script_requires(script.get());
-    }
-    for (auto& [name, script] : g_ui_scripts)
-    {
-        update_script(script.get());
     }
     for (auto& [name, script] : g_ui_scripts)
     {

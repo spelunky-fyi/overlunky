@@ -1853,6 +1853,7 @@ OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
     g_state_update_trampoline(s);
+    State::set_state_ptr(s);
     update_backends(s);
 }
 

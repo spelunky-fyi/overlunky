@@ -23,7 +23,6 @@ class SpelunkyConsole
     bool is_enabled();
     bool is_toggled();
 
-    bool run();
     void draw(struct ImDrawList* dl);
     void render_options();
 

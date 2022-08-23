@@ -320,7 +320,6 @@ class LuaBackend
     void set_user_data(uint32_t uid, sol::object user_data);
     void set_user_data(Entity& entity, sol::object user_data);
 
-    bool update();
     void draw(ImDrawList* dl);
     void render_options();
 

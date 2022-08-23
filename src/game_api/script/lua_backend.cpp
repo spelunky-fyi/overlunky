@@ -222,11 +222,6 @@ void LuaBackend::set_user_data(uint32_t uid, sol::object user_data)
     set_user_data(*ent, user_data);
 }
 
-bool LuaBackend::update()
-{
-    return true;
-}
-
 bool LuaBackend::frame_update(StateMemory* state_mem)
 {
     if (!get_enabled())
@@ -264,9 +259,13 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
 
         // ==========
 
-        lua["players"] = get_players();
         lua["state"] = state_mem;
-        State::set_state_ptr(state_mem);
+        lua["players"] = get_players();
+
+        if (LuaConsole* is_console = dynamic_cast<LuaConsole*>(this))
+        {
+            lua["P"] = lua["get_player"](1);
+        }
 
         /*moved to pre_load_screen
         if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen_next != (int)ON::OPTIONS && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
