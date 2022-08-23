@@ -33,7 +33,7 @@
 //      e.g.  mov word ptr[XXXXXXXX], 1 = 66:C705 XXXXXXXX 0100 (opcode_suffix_offset = 2)
 size_t decode_pc(const char* exe, size_t offset, uint8_t opcode_offset, uint8_t opcode_suffix_offset, uint8_t opcode_addr_size)
 {
-    off_t rel;
+    ptrdiff_t rel;
     switch (opcode_addr_size)
     {
     case 1:
@@ -46,13 +46,27 @@ size_t decode_pc(const char* exe, size_t offset, uint8_t opcode_offset, uint8_t 
     default:
         rel = *(int32_t*)(&exe[offset + opcode_offset]);
         break;
+    case 8:
+        rel = *(int64_t*)(&exe[offset + opcode_offset]);
+        break;
     }
     return offset + rel + opcode_offset + opcode_addr_size + opcode_suffix_offset;
 }
 
-size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset)
+size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset, uint8_t value_size)
 {
-    return *(uint32_t*)(&exe[offset + opcode_offset]);
+    switch (value_size)
+    {
+    case 1:
+        return *(uint8_t*)(&exe[offset + opcode_offset]);
+    case 2:
+        return *(uint16_t*)(&exe[offset + opcode_offset]);
+    case 4:
+    default:
+        return *(uint32_t*)(&exe[offset + opcode_offset]);
+    case 8:
+        return *(uint64_t*)(&exe[offset + opcode_offset]);
+    }
 }
 
 PIMAGE_NT_HEADERS RtlImageNtHeader(_In_ PVOID Base)
@@ -268,9 +282,9 @@ class PatternCommandBuffer
         commands.push_back({CommandType::DecodePC, {.decode_pc_args = {opcode_prefix, opcode_suffix, opcode_addr}}});
         return *this;
     }
-    PatternCommandBuffer& decode_imm(uint8_t opcode_prefix = 3)
+    PatternCommandBuffer& decode_imm(uint8_t opcode_prefix = 3, uint8_t value_size = 4)
     {
-        commands.push_back({CommandType::DecodeIMM, {.decode_imm_prefix = opcode_prefix}});
+        commands.push_back({CommandType::DecodeIMM, {.decode_imm_args = {opcode_prefix, value_size}}});
         return *this;
     }
     PatternCommandBuffer& decode_call()
@@ -281,6 +295,11 @@ class PatternCommandBuffer
     PatternCommandBuffer& at_exe()
     {
         commands.push_back({CommandType::AtExe});
+        return *this;
+    }
+    PatternCommandBuffer& from_exe()
+    {
+        commands.push_back({CommandType::FromExe});
         return *this;
     }
     PatternCommandBuffer& function_start(uint8_t outside_byte = 0xcc)
@@ -360,13 +379,18 @@ class PatternCommandBuffer
                                     data.decode_pc_args.as_tuple());
                 break;
             case CommandType::DecodeIMM:
-                offset = ::decode_imm(exe, offset, data.decode_imm_prefix);
+                offset = std::apply([=](auto... args)
+                                    { return ::decode_imm(exe, offset, args...); },
+                                    data.decode_imm_args.as_tuple());
                 break;
             case CommandType::DecodeCall:
                 offset = mem.decode_call(offset);
                 break;
             case CommandType::AtExe:
                 offset = mem.at_exe(offset);
+                break;
+            case CommandType::FromExe:
+                offset = offset - mem.exe_ptr;
                 break;
             case CommandType::FunctionStart:
                 offset = ::function_start(offset, data.outside_byte);
@@ -395,6 +419,16 @@ class PatternCommandBuffer
             return {opcode_offset, opcode_suffix_offset, opcode_addr_size};
         }
     };
+    struct DecodeImmArgs
+    {
+        uint8_t opcode_offset;
+        uint8_t value_size;
+
+        std::tuple<uint8_t, uint8_t> as_tuple() const
+        {
+            return {opcode_offset, value_size};
+        }
+    };
     struct FindInstArgs
     {
         std::string_view pattern;
@@ -417,6 +451,7 @@ class PatternCommandBuffer
         DecodeIMM,
         DecodeCall,
         AtExe,
+        FromExe,
         FunctionStart,
         FromExeBase,
     };
@@ -427,7 +462,7 @@ class PatternCommandBuffer
         FindInstArgs find_inst_args;
         int64_t offset;
         DecodePcArgs decode_pc_args;
-        uint8_t decode_imm_prefix;
+        DecodeImmArgs decode_imm_args;
         GetVirtualFunctionAddressArgs get_vfunc_addr_args;
         uint64_t base_offset;
         uint8_t outside_byte;
@@ -624,7 +659,10 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "layer_get_entity_close_to"sv,
         PatternCommandBuffer{}
-            .from_exe_base(0x22883570),
+            .find_after_inst("41 0f 28 cc 41 0f 28 d2"_gh)
+            .offset(0x6)
+            .decode_call()
+            .at_exe(),
     },
     {
         "virtual_functions_table"sv,
@@ -1180,13 +1218,28 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "player_ledge_hang_behavior_vtable"sv,
+        // set write-bp on player->state, with the condition that it is 4
+        // whatever is being assigned to the player->current_behavior next is this vtable
         PatternCommandBuffer{}
-            .from_exe_base(0x22da7f30),
+            .find_inst("0f 57 c0 0f 11 81 58 01 00 00"_gh) // Player::Player
+            .offset(-0xa)                                  // assigning Player::vtable
+            .decode_pc()                                   // Player::vtable
+            .offset(0x4b * 8)                              // 75th virtual in Player
+            .decode_imm(0, 8)                              // deref ptr to virtual
+            .from_exe()                                    // get back to relative offset, ptr was absolute
+            .find_inst("b2 04"_gh)                         // get rdx = 0x4, which is the behavior id
+            .offset(-0xa)                                  // get r8 = ledge_hang_behavior
+            .decode_pc()
+            .at_exe(),
     },
     {
         "entity_turn"sv,
+        // spawn snake, set write-bp on snake->flags, with the condition that the facing_left bit is set
+        // the function where it breaks is the right one
         PatternCommandBuffer{}
-            .from_exe_base(0x228d8710),
+            .find_inst("8b 4a 14 8d a9 3f ff ff ff"_gh)
+            .at_exe()
+            .function_start(),
     },
     {
         "teleport"sv,
