@@ -204,7 +204,6 @@ struct ClimbableEntityInfo
     bool climbable;
 };
 std::vector<ClimbableEntityInfo> g_climbable_entities;
-
 void set_entity_climbable(Entity* entity, bool climbable)
 {
     auto find_entity_pred = [=](const ClimbableEntityInfo& climbable)
@@ -231,6 +230,35 @@ void set_entity_climbable(Entity* entity, bool climbable)
                                 { std::erase_if(g_climbable_entities, find_entity_pred); }),
             climbable,
         });
+    }
+}
+
+struct TurningEntityInfo
+{
+    Entity* entity;
+    uint32_t dtor_hook;
+};
+std::vector<TurningEntityInfo> g_entities_disabled_turning{};
+void set_entity_turning(class Entity* entity, bool enabled)
+{
+    auto find_entity_pred = [=](const TurningEntityInfo& turning)
+    { return turning.entity == entity; };
+    if (!enabled)
+    {
+        g_entities_disabled_turning.push_back({
+            entity,
+            entity->set_on_dtor([=](Entity*)
+                                { std::erase_if(g_entities_disabled_turning, find_entity_pred); }),
+        });
+    }
+    else
+    {
+        auto it = std::find_if(g_entities_disabled_turning.begin(), g_entities_disabled_turning.end(), find_entity_pred);
+        if (it == g_entities_disabled_turning.end())
+        {
+            entity->unhook(it->dtor_hook);
+            g_entities_disabled_turning.erase(it);
+        }
     }
 }
 
@@ -323,6 +351,18 @@ uint8_t ledge_grab_get_next_state_id(MovableBehavior* behavior, Movable* player)
     return g_original_ledge_grab_get_next_state_id(behavior, player);
 }
 
+using EntityTurn = void(Entity*, bool);
+EntityTurn* g_entity_turn_trampoline{nullptr};
+void entity_turn(Entity* self, bool apply)
+{
+    auto find_entity_pred = [=](const TurningEntityInfo& turning)
+    { return turning.entity == self; };
+    if (std::find_if(g_entities_disabled_turning.begin(), g_entities_disabled_turning.end(), find_entity_pred) == g_entities_disabled_turning.end())
+    {
+        g_entity_turn_trampoline(self, apply);
+    }
+}
+
 #define HOOK_MOVE_ENTITY
 #ifdef HOOK_MOVE_ENTITY
 UpdateMovable* g_update_movable_trampoline{nullptr};
@@ -341,6 +381,9 @@ void init_behavior_hooks()
 
     g_get_entity_close_to_trampoline = (GetEntityCloseTo*)get_address("layer_get_entity_close_to"sv);
     DetourAttach((void**)&g_get_entity_close_to_trampoline, (GetEntityCloseTo*)get_entity_close_to);
+
+    g_entity_turn_trampoline = (EntityTurn*)get_address("entity_turn"sv);
+    DetourAttach((void**)&g_entity_turn_trampoline, (GetEntityCloseTo*)entity_turn);
 
 #ifdef HOOK_MOVE_ENTITY
     g_update_movable_trampoline = (UpdateMovable*)memory.at_exe(0x228e3580);

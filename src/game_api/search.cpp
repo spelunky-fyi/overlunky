@@ -1184,6 +1184,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .from_exe_base(0x22da7f30),
     },
     {
+        "entity_turn"sv,
+        PatternCommandBuffer{}
+            .from_exe_base(0x228d8710),
+    },
+    {
         "teleport"sv,
         // Put a bp on `load_item` for ENT_TYPE_FX_TELEPORTSHADOW, do a teleport, the calling function is the one
         PatternCommandBuffer{}

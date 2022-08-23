@@ -89,5 +89,6 @@ void update_movable(Movable* movable, bool disable_gravity);
 void update_movable(Movable* movable, Vec2 move, float sprint_factor, bool disable_gravity, bool on_rope);
 
 void set_entity_climbable(class Entity* entity, bool climbable);
+void set_entity_turning(class Entity* entity, bool enabled);
 
 void init_behavior_hooks();

@@ -174,6 +174,7 @@ class Entity
     void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
     void set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render);
     void set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render);
+    void set_enable_turning(bool enabled);
 
     // Makes this entity climbable as if the player had climbing gloves
     void set_climbable(bool climbable);

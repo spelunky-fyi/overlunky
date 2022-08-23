@@ -716,6 +716,10 @@ void Entity::set_post_render(std::uint32_t reserved_callback_id, std::function<v
     }
     hook_info.post_render.push_back({reserved_callback_id, std::move(post_render)});
 }
+void Entity::set_enable_turning(bool enabled)
+{
+    set_entity_turning(this, enabled);
+}
 
 void Entity::set_climbable(bool climbable)
 {

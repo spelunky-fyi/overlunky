@@ -79,6 +79,8 @@ void register_usertypes(sol::state& lua)
         &Color::set_ucolor);
     lua.new_usertype<Animation>(
         "Animation",
+        "id",
+        &Animation::key,
         "first_tile",
         &Animation::texture,
         "num_tiles",
@@ -297,6 +299,8 @@ void register_usertypes(sol::state& lua)
         &Entity::set_draw_depth,
         "set_climbable",
         &Entity::set_climbable,
+        "set_enable_turning",
+        &Entity::set_enable_turning,
         "liberate_from_shop",
         &Entity::liberate_from_shop,
         "get_held_entity",
