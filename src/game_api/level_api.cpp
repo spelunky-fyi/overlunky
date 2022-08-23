@@ -1644,8 +1644,7 @@ void LevelGenSystem::init()
                     }
                 }
 
-                original(self, param_2, param_3, param_4);
-            },
+                original(self, param_2, param_3, param_4); },
             0xd);
         using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
         hook_vtable<DoProceduralSpawnFun>(
@@ -1659,8 +1658,7 @@ void LevelGenSystem::init()
                 {
                     return;
                 }
-                original(self, spawn_info);
-            },
+                original(self, spawn_info); },
             0x33);
     }
 }
