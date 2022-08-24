@@ -34,12 +34,11 @@
 #include "memory.hpp"           // for write_mem_prot, write_mem_recoverable
 #include "movable.hpp"          // for Movable
 #include "particles.hpp"        // for ParticleEmitterInfo
-#include "script/events.hpp"
-#include "search.hpp"        // for get_address, find_inst
-#include "state.hpp"         // for State, get_state_ptr, enum_to_layer
-#include "state_structs.hpp" // for ShopRestrictedItem, Illumination
-#include "thread_utils.hpp"  // for OnHeapPointer
-#include "virtual_table.hpp" // for get_virtual_function_address, VIRT_FUNC
+#include "search.hpp"           // for get_address, find_inst
+#include "state.hpp"            // for State, get_state_ptr, enum_to_layer
+#include "state_structs.hpp"    // for ShopRestrictedItem, Illumination
+#include "thread_utils.hpp"     // for OnHeapPointer
+#include "virtual_table.hpp"    // for get_virtual_function_address, VIRT_FUNC
 
 inline uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
 {
@@ -1846,27 +1845,4 @@ void game_log(std::string message)
     const static auto game_log_fun = (GameLogFun*)get_address("game_log_function");
     const static auto log_stream = (std::ofstream*)read_i64(get_address("game_log_stream"));
     game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
-}
-
-using OnStateUpdate = void(StateMemory*);
-OnStateUpdate* g_state_update_trampoline{nullptr};
-void StateUpdate(StateMemory* s)
-{
-    g_state_update_trampoline(s);
-    State::set_state_ptr(s);
-    update_backends(s);
-}
-
-void init_state_update()
-{
-    g_state_update_trampoline = (OnStateUpdate*)get_address("state_refresh");
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
-    DetourAttach((void**)&g_state_update_trampoline, &StateUpdate);
-
-    const LONG error = DetourTransactionCommit();
-    if (error != NO_ERROR)
-    {
-        DEBUG("Failed hooking state_refresh stuff: {}\n", error);
-    }
 }

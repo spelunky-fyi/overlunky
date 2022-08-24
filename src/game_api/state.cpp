@@ -19,13 +19,13 @@
 #include "movable.hpp"          // for Movable
 #include "movable_behavior.hpp" // for init_behavior_hooks
 #include "render_api.hpp"       // for init_render_api_hooks
-#include "rpc.hpp"
-#include "savedata.hpp"      // for SaveData
-#include "search.hpp"        // for get_address
-#include "spawn_api.hpp"     // for init_spawn_hooks
-#include "strings.hpp"       // for strings_init
-#include "thread_utils.hpp"  // for OnHeapPointer
-#include "virtual_table.hpp" // for get_virtual_function_address, VTABLE...
+#include "savedata.hpp"         // for SaveData
+#include "script/events.hpp"    //
+#include "search.hpp"           // for get_address
+#include "spawn_api.hpp"        // for init_spawn_hooks
+#include "strings.hpp"          // for strings_init
+#include "thread_utils.hpp"     // for OnHeapPointer
+#include "virtual_table.hpp"    // for get_virtual_function_address, VTABLE...
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -587,6 +587,29 @@ std::vector<int64_t> State::read_prng() const
         prng.push_back(read_i64((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
     }
     return prng;
+}
+
+using OnStateUpdate = void(StateMemory*);
+OnStateUpdate* g_state_update_trampoline{nullptr};
+void StateUpdate(StateMemory* s)
+{
+    g_state_update_trampoline(s);
+    State::set_state_ptr(s);
+    update_backends(s);
+}
+
+void init_state_update()
+{
+    g_state_update_trampoline = (OnStateUpdate*)get_address("state_refresh");
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach((void**)&g_state_update_trampoline, &StateUpdate);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        DEBUG("Failed hooking state_refresh stuff: {}\n", error);
+    }
 }
 
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position)

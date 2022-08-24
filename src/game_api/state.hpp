@@ -298,6 +298,8 @@ struct State
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
 };
 
+void init_state_update();
+
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
 uint8_t enum_to_layer(const LAYER layer);
 
