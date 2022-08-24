@@ -1,6 +1,7 @@
 #pragma once
 
 #include "aliases.hpp"
+#include "containers/custom_vector.hpp"
 #include <array>
 #include <cstdint>
 #include <set>
@@ -826,7 +827,7 @@ struct LiquidPhysics
     };
     size_t unknown2;
     size_t unknown3;
-    std::vector<LiquidLake> impostor_lakes;
+    custom_vector<LiquidLake> impostor_lakes;
     uint32_t total_liquid_spawned; // Total number of spawned liquid entities, all types.
     uint32_t unknown8;
     size_t unknown9;
