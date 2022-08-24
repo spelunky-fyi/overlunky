@@ -62,7 +62,7 @@ Particle EmittedParticlesInfo::front()
 }
 Particle EmittedParticlesInfo::back()
 {
-    return (*this)[particle_emitter->particle_count - 1];
+    return (*this)[particle_count - 1];
 }
 const Particle EmittedParticlesInfo::front() const
 {
@@ -70,16 +70,16 @@ const Particle EmittedParticlesInfo::front() const
 }
 const Particle EmittedParticlesInfo::back() const
 {
-    return (*this)[particle_emitter->particle_count - 1];
+    return (*this)[particle_count - 1];
 }
 
 bool EmittedParticlesInfo::empty()
 {
-    return particle_emitter->particle_count == 0;
+    return particle_count == 0;
 }
 EmittedParticlesInfo::size_type EmittedParticlesInfo::size()
 {
-    return particle_emitter->particle_count;
+    return particle_count;
 }
 
 Particle EmittedParticlesInfo::operator[](const size_type idx)
