@@ -94,7 +94,8 @@ enum class ON
     PRE_LOAD_SCREEN,
     POST_LOAD_SCREEN,
     DEATH_MESSAGE,
-    EVERYFRAME,
+    PRE_UPDATE,
+    UPDATE,
 };
 
 struct IntOption
@@ -367,6 +368,8 @@ class LuaBackend
     CurrentCallback get_current_callback();
     void set_current_callback(int uid, int id, CallbackType type);
     void clear_current_callback();
+
+    bool on_pre_state_update();
 };
 
 template <class... Args>

@@ -1798,7 +1798,11 @@ end
         "TOAST",
         ON::TOAST,
         "DEATH_MESSAGE",
-        ON::DEATH_MESSAGE);
+        ON::DEATH_MESSAGE,
+        "PRE_UPDATE",
+        ON::PRE_UPDATE,
+        "UPDATE",
+        ON::UPDATE);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -1898,6 +1902,11 @@ end
     // DEATH_MESSAGE
     // Params: `STRINGID id`
     // Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.
+    // PRE_UPDATE
+    // Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, thypically 60FPS
+    // Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
+    // UPDATE
+    // Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, thypically 60FPS
     */
 
     lua.create_named_table(

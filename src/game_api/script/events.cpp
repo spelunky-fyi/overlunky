@@ -256,3 +256,19 @@ void update_backends(StateMemory* s)
             return true;
         });
 }
+
+bool pre_state_update()
+{
+    bool return_val = false;
+    LuaBackend::for_each_backend(
+        [=, &return_val](LuaBackend& backend)
+        {
+            if (backend.on_pre_state_update())
+            {
+                return_val = true;
+                return false;
+            }
+            return true;
+        });
+    return return_val;
+}

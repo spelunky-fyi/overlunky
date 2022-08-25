@@ -239,7 +239,7 @@ State& State::get()
         hook_godmode_functions();
         get_is_init() = true;
         strings_init();
-        init_state_update();
+        init_state_update_hook();
     }
     return STATE;
 }
@@ -593,12 +593,16 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
-    g_state_update_trampoline(s);
     State::set_state_ptr(s);
+
+    if (!pre_state_update())
+    {
+        g_state_update_trampoline(s);
+    }
     update_backends(s);
 }
 
-void init_state_update()
+void init_state_update_hook()
 {
     g_state_update_trampoline = (OnStateUpdate*)get_address("state_refresh");
     DetourTransactionBegin();

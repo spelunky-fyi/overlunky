@@ -38,3 +38,4 @@ std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
 std::u16string pre_toast(char16_t* buffer);
 
 void update_backends(StateMemory* s);
+bool pre_state_update();

@@ -473,7 +473,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                     }
                     break;
                 }
-                case ON::EVERYFRAME:
+                case ON::UPDATE:
                 {
                     handle_function(callback.func);
                     callback.lastRan = now;
@@ -1352,4 +1352,32 @@ void LuaBackend::clear_current_callback()
     current_cb.uid = -1;
     current_cb.id = -1;
     current_cb.type = CallbackType::None;
+}
+
+bool LuaBackend::on_pre_state_update()
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+    std::lock_guard lock{gil};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_UPDATE)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            if (handle_function_with_return<bool>(callback.func).value_or(false))
+            {
+                clear_current_callback();
+                return true;
+            }
+            clear_current_callback();
+        }
+    }
+    return false;
 }
