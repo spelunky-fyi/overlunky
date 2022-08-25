@@ -282,9 +282,9 @@ class PatternCommandBuffer
         commands.push_back({CommandType::AtExe});
         return *this;
     }
-    PatternCommandBuffer& function_start()
+    PatternCommandBuffer& function_start(uint8_t outside_byte = 0xcc)
     {
-        commands.push_back({CommandType::FunctionStart});
+        commands.push_back({CommandType::FunctionStart, {.outside_byte = outside_byte}});
         return *this;
     }
 
@@ -368,7 +368,7 @@ class PatternCommandBuffer
                 offset = mem.at_exe(offset);
                 break;
             case CommandType::FunctionStart:
-                offset = ::function_start(offset);
+                offset = ::function_start(offset, data.outside_byte);
                 break;
             case CommandType::FromExeBase:
                 offset = data.base_offset;
@@ -429,6 +429,7 @@ class PatternCommandBuffer
         uint8_t decode_imm_prefix;
         GetVirtualFunctionAddressArgs get_vfunc_addr_args;
         uint64_t base_offset;
+        uint8_t outside_byte;
     };
     struct Command
     {
@@ -1204,7 +1205,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "free_particleemitterinfo"sv,
+        "generic_free"sv,
         // See `generate_screen_particles`, above that, the pointers to the particleemitters are checked, as well as fields inside
         // the particleemitter, and the same function is called if they are not null
         PatternCommandBuffer{}
@@ -1447,11 +1448,27 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "character_gender_mask"sv,
+        // Search for the scalar 0xea61c, that is the one you want here
+        // Don't include the value in the pattern as that might be changed
+        PatternCommandBuffer{}
+            .find_inst("\x31\xc9\x4c\x0f\xa3\xf8"sv)
+            .offset(-0x4)
+            .at_exe(),
+    },
+    {
         "string_table"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x8D\x15****\x4C\x8B\x0C\xCA"sv)
             .decode_pc()
             .at_exe(),
+    },
+    {
+        "get_entity_name"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x44\x21\xe2\x4c\x8b\x91\x78\x02\x00\x00"sv)
+            .at_exe()
+            .function_start(0xff),
     },
     {
         "construct_soundposition_ptr"sv,
@@ -1728,6 +1745,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(-0x7)
             .decode_pc()
             .at_exe(),
+    },
+    {
+        "reload_shaders"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x41\x89\xd9\xff\x90\x78\x01\x00\x00")
+            .at_exe()
+            .function_start(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

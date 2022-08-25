@@ -506,6 +506,7 @@ struct LevelGenSystem
     bool set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template);
 
     bool is_room_flipped(uint32_t x, uint32_t y);
+    bool is_machine_room_origin(uint32_t x, uint32_t y);
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t l);
     bool mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is_set_room);
 

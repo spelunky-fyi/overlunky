@@ -80,6 +80,10 @@ void register_usertypes(sol::state& lua)
         "split",
         &Vec2::operator std::pair<float, float>);
 
+    const auto extrude = sol::overload(
+        static_cast<AABB& (AABB::*)(float)>(&AABB::extrude),
+        static_cast<AABB& (AABB::*)(float, float)>(&AABB::extrude));
+
     /// Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
     lua.new_usertype<AABB>(
         "AABB",
@@ -97,7 +101,7 @@ void register_usertypes(sol::state& lua)
         "abs",
         &AABB::abs,
         "extrude",
-        &AABB::extrude,
+        extrude,
         "offset",
         &AABB::offset,
         "area",

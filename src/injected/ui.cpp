@@ -6304,40 +6304,100 @@ void load_font()
     ImGuiIO& io = ImGui::GetIO();
     io.FontAllowUserScaling = false;
     PWSTR fontdir;
+
+    ImFontConfig font_config;
+    font_config.MergeMode = true;
+    font_config.EllipsisChar = u'\u2026';
+    static const ImWchar emoji_range[] = {0x1, 0x1FFFF, 0};
+    static const ImWchar ellipsis_range[] = {0x2026, 0x2026, 0}; // one of the asian fonts has a stupid huge ellipsis, we get it explicitly from segoe
+
+    std::string font_default;
+    std::string font_jp;
+    std::string font_ko;
+    std::string font_ru;
+    std::string font_zhcn;
+    std::string font_zhtw;
+    std::string font_emoji;
+
     if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
     {
+        using cvt_type = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<cvt_type, wchar_t> cvt;
+
+        std::string fontpath_jp(cvt.to_bytes(fontdir) + "\\YuGothB.ttc");
+        if (GetFileAttributesA(fontpath_jp.c_str()) != INVALID_FILE_ATTRIBUTES)
+            font_jp = fontpath_jp;
+
+        std::string fontpath_jp2(cvt.to_bytes(fontdir) + "\\Meiryo.ttc");
+        if (font_jp == "" && GetFileAttributesA(fontpath_jp2.c_str()) != INVALID_FILE_ATTRIBUTES)
+            font_jp = fontpath_jp2;
+
+        std::string fontpath_ko(cvt.to_bytes(fontdir) + "\\malgunbd.ttf");
+        if (GetFileAttributesA(fontpath_ko.c_str()) != INVALID_FILE_ATTRIBUTES)
+            font_ko = fontpath_ko;
+
+        std::string fontpath_ko2(cvt.to_bytes(fontdir) + "\\Gulim.ttc");
+        if (font_ko == "" && GetFileAttributesA(fontpath_ko2.c_str()) != INVALID_FILE_ATTRIBUTES)
+            font_ko = fontpath_ko2;
+
+        std::string fontpath_ru(cvt.to_bytes(fontdir) + "\\segoeuib.ttf");
+        if (GetFileAttributesA(fontpath_ru.c_str()) != INVALID_FILE_ATTRIBUTES)
+            font_ru = fontpath_ru;
+
+        std::string fontpath_zhcn(cvt.to_bytes(fontdir) + "\\simsun.ttc");
+        if (GetFileAttributesA(fontpath_zhcn.c_str()) != INVALID_FILE_ATTRIBUTES)
+            font_zhcn = fontpath_zhcn;
+
+        std::string fontpath_zhtw(cvt.to_bytes(fontdir) + "\\msjh.ttc");
+        if (GetFileAttributesA(fontpath_zhtw.c_str()) != INVALID_FILE_ATTRIBUTES)
+            font_zhtw = fontpath_zhtw;
+
+        std::string fontpath_emoji(cvt.to_bytes(fontdir) + "\\seguiemj.ttf");
+        if (GetFileAttributesA(fontpath_emoji.c_str()) != INVALID_FILE_ATTRIBUTES)
+            font_emoji = fontpath_emoji;
+
         if (fontfile != "")
         {
-            using cvt_type = std::codecvt_utf8<wchar_t>;
-            std::wstring_convert<cvt_type, wchar_t> cvt;
-
             std::string fontpath(cvt.to_bytes(fontdir) + "\\" + fontfile);
             if (GetFileAttributesA(fontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
             {
-                font = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[0]);
-                bigfont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[1]);
-                hugefont = io.Fonts->AddFontFromFileTTF(fontpath.c_str(), fontsize[2]);
+                font_default = fontpath;
             }
             else if (SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, NULL, &fontdir) == S_OK)
             {
                 std::string localfontpath(cvt.to_bytes(fontdir) + "\\Microsoft\\Windows\\Fonts\\" + fontfile);
                 if (GetFileAttributesA(localfontpath.c_str()) != INVALID_FILE_ATTRIBUTES)
                 {
-                    font = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[0]);
-                    bigfont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[1]);
-                    hugefont = io.Fonts->AddFontFromFileTTF(localfontpath.c_str(), fontsize[2]);
+                    font_default = localfontpath;
                 }
             }
         }
         CoTaskMemFree(fontdir);
     }
 
-    if (!font || !bigfont || !hugefont)
-    {
+    if (font_default != "")
+        font = io.Fonts->AddFontFromFileTTF(font_default.c_str(), fontsize[0]);
+    else
         font = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[0]);
-        bigfont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[1]);
-        hugefont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[2]);
+
+    if (font_ru != "")
+    {
+        io.Fonts->AddFontFromFileTTF(font_ru.c_str(), fontsize[0], &font_config, io.Fonts->GetGlyphRangesCyrillic());
+        io.Fonts->AddFontFromFileTTF(font_ru.c_str(), fontsize[0], &font_config, ellipsis_range);
     }
+    if (font_jp != "")
+        io.Fonts->AddFontFromFileTTF(font_jp.c_str(), fontsize[0], &font_config, io.Fonts->GetGlyphRangesJapanese());
+    if (font_ko != "")
+        io.Fonts->AddFontFromFileTTF(font_ko.c_str(), fontsize[0], &font_config, io.Fonts->GetGlyphRangesKorean());
+    if (font_zhcn != "")
+        io.Fonts->AddFontFromFileTTF(font_zhcn.c_str(), fontsize[0], &font_config, io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+    if (font_zhtw != "")
+        io.Fonts->AddFontFromFileTTF(font_zhtw.c_str(), fontsize[0], &font_config, io.Fonts->GetGlyphRangesChineseFull());
+    if (font_emoji != "")
+        io.Fonts->AddFontFromFileTTF(font_emoji.c_str(), fontsize[0], &font_config, emoji_range);
+
+    bigfont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[1]);
+    hugefont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[2]);
 }
 
 void render_style_editor()

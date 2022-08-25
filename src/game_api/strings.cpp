@@ -1,6 +1,7 @@
 #include "strings.hpp"
 
 #include <Windows.h>     // for GetCurrentThread, LONG, NO_...
+#include <codecvt>       // for codecvt_utf16
 #include <cstdio>        // for swprintf_s, NULL, size_t
 #include <cstring>       // for memcpy
 #include <functional>    // for equal_to
@@ -233,4 +234,31 @@ void clear_custom_shopitem_names()
     }
 
     g_custom_shopitem_names.clear();
+}
+
+std::u16string get_entity_name(ENT_TYPE id, bool fallback_strategy)
+{
+    using get_entity_name_func = void(ENT_TYPE, char16_t*, size_t, bool);
+    static get_entity_name_func* get_entity_name_impl = (get_entity_name_func*)get_address("get_entity_name");
+
+    std::array<char16_t, 256> out_buffer{};
+    get_entity_name_impl(id, out_buffer.data(), out_buffer.size(), true);
+    std::u16string return_string{out_buffer.data()};
+    if (fallback_strategy && return_string.empty())
+    {
+        std::string enum_name{to_name(id).substr(sizeof("ENT_TYPE_") - 1)};
+        std::replace(enum_name.begin(), enum_name.end(), '_', ' ');
+        for (size_t i = 1; i < enum_name.size(); i++)
+        {
+            if (enum_name[i - 1] != ' ' && enum_name[i] != ' ')
+            {
+                enum_name[i] = (char)std::tolower((int)enum_name[i]);
+            }
+        }
+
+        using cvt_type = std::codecvt_utf8_utf16<char16_t>;
+        std::wstring_convert<cvt_type, char16_t> cvt;
+        return_string = cvt.from_bytes(enum_name);
+    }
+    return return_string;
 }

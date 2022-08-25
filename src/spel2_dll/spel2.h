@@ -212,3 +212,5 @@ void Spelunky_DrawText(const char* text, float x, float y, float scale_x, float 
 void Spelunky_EnabledAdvancedHud();
 
 void Spelunky_UpdateLiquidOutOfBoundsBugfix();
+
+void Spelunky_ReloadShaders();

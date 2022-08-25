@@ -214,16 +214,22 @@ void register_usertypes(sol::state& lua)
         }
     };
 
-    // Force the LUT texture for the given layer (or both) until it is reset
-    // Pass `nil` in the first parameter to reset
+    /// Force the LUT texture for the given layer (or both) until it is reset
+    /// Pass `nil` in the first parameter to reset
     lua["set_lut"] = [](sol::optional<TEXTURE> texture_id, LAYER layer)
     {
         set_lut(texture_id, layer);
     };
-    // Same as `set_lut(nil, layer)`
+    /// Same as `set_lut(nil, layer)`
     lua["reset_lut"] = [](LAYER layer)
     {
         set_lut(sol::nullopt, layer);
+    };
+
+    /// NoDoc: Dev-tool only
+    lua["reload_shaders"] = []()
+    {
+        RenderAPI::get().reload_shaders();
     };
 
     auto draw_screen_texture = sol::overload(

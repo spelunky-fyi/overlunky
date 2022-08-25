@@ -1118,28 +1118,14 @@ void extinguish_particles(ParticleEmitterInfo* particle_emitter)
     auto state = get_state_ptr();
     std::erase(*state->particle_emitters, particle_emitter);
 
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("free_particleemitterinfo");
-    }
+    using generic_free_func = void(void*);
+    static generic_free_func* generic_free = (generic_free_func*)get_address("generic_free");
 
-    if (offset != 0)
+    if (particle_emitter != nullptr)
     {
-        typedef void free_particleemitter_func(ParticleEmitterInfo*);
-        static free_particleemitter_func* fpf = (free_particleemitter_func*)(offset);
-        if (particle_emitter != nullptr)
-        {
-            if (particle_emitter->unknown26 != 0)
-            {
-                fpf((ParticleEmitterInfo*)particle_emitter->unknown26);
-            }
-            if (particle_emitter->unknown4 != 0)
-            {
-                fpf((ParticleEmitterInfo*)particle_emitter->unknown4);
-            }
-            fpf(particle_emitter);
-        }
+        generic_free(particle_emitter->emitted_particles.memory);
+        generic_free(particle_emitter->emitted_particles2.memory);
+        generic_free(particle_emitter);
     }
 }
 
@@ -1813,9 +1799,10 @@ void update_liquid_collision_at(float x, float y, bool add)
         RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
 }
 
-void disable_floor_embeds(bool disable)
+bool disable_floor_embeds(bool disable)
 {
     const static auto address = get_address("spawn_floor_embeds");
+    const bool current_value = read_u8(address) == 0xc3;
     if (disable)
     {
         write_mem_recoverable("disable_floor_embeds", address, "\xC3"sv, true);
@@ -1824,6 +1811,7 @@ void disable_floor_embeds(bool disable)
     {
         recover_mem("disable_floor_embeds");
     }
+    return current_value;
 }
 
 void set_cursepot_ghost_enabled(bool enable)

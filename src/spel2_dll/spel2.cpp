@@ -5,6 +5,7 @@
 #include "entity.hpp"
 #include "file_api.hpp"
 #include "memory.hpp"
+#include "render_api.hpp"
 #include "screen.hpp"
 #include "script.hpp"
 #include "sound_manager.hpp"
@@ -451,4 +452,9 @@ void Spelunky_EnabledAdvancedHud()
 void Spelunky_UpdateLiquidOutOfBoundsBugfix()
 {
     fix_liquid_out_of_bounds();
+}
+
+void Spelunky_ReloadShaders()
+{
+    RenderAPI::get().reload_shaders();
 }

@@ -1157,6 +1157,15 @@ void LevelGenData::init()
         assert(get_room_template("coffin_frog") == to_uint(RoomTemplate::CoffinFrog));
     }
 
+    {
+        g_room_template_types.push_back({to_uint(RoomTemplate::MachineBigroomPath), RoomTemplateType::MachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::FeelingTomb), RoomTemplateType::MachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::MachineWideroomPath), RoomTemplateType::MachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::MachineWideroomSide), RoomTemplateType::MachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::MachineTallroomPath), RoomTemplateType::MachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::CoffinFrog), RoomTemplateType::MachineRoom});
+    }
+
     // Scan tile codes to know what id to start at
     {
         // Getting the last id like this in case the game decides to skip some ids so that last_id != tile_codes.size()
@@ -1711,6 +1720,15 @@ bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y)
         return false;
 
     return flipped_rooms->rooms[x + y * 8];
+}
+bool LevelGenSystem::is_machine_room_origin(uint32_t x, uint32_t y)
+{
+    auto* state_ptr = State::get().ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
+        return false;
+
+    return machine_room_origin->rooms[x + y * 8];
 }
 bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t /*l*/)
 {

@@ -34,6 +34,7 @@ replace_table = {
     "constexpr": "",
     "static": "",
     "variadic_args va": "int, int...",
+    "EmittedParticlesInfo": "array<Particle>",
 }
 
 
@@ -133,7 +134,7 @@ def print_af(lf, af):
 
 def print_lf(lf):
     comments = lf["comment"]
-    if comments and comments[0] == "NoDoc":
+    if comments and "NoDoc" in comments[0]:
         return
     name = lf["name"]
     if name in printed_funcs:
@@ -441,7 +442,7 @@ for cat in sorted(func_cats):
         if len(ps.rpcfunc(lf["cpp"])):
             print_lf(lf)
         elif not (lf["name"].startswith("on_") or lf["name"] in ps.not_functions):
-            if lf["comment"] and lf["comment"][0] == "NoDoc":
+            if lf["comment"] and "NoDoc" in lf["comment"][0]:
                 continue
             m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
             m2 = re.search(r"\(([^\{]*)\)", lf["cpp"])
@@ -486,7 +487,7 @@ for lf in ps.deprecated_funcs:
     if len(ps.rpcfunc(lf["cpp"])):
         print_lf(lf)
     elif not (lf["name"].startswith("on_") or lf["name"] in ps.not_functions):
-        if lf["comment"] and lf["comment"][0] == "NoDoc":
+        if lf["comment"] and "NoDoc" in lf["comment"][0]:
             continue
         m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
         m2 = re.search(r"\(([^\{]*)\)", lf["cpp"])

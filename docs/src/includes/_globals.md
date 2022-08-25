@@ -754,6 +754,16 @@ Get uids of matching entities overlapping with the given hitbox. Set `entity_typ
 
 Get the [Entity](#Entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
 
+### get_entity_name
+
+
+> Search script examples for [get_entity_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_name)
+
+#### nil get_entity_name([ENT_TYPE](#ENT_TYPE) type, optional<bool> fallback_strategy)
+
+Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.` enum name
+if the entity has no localized name
+
 ### get_entity_type
 
 
@@ -1205,9 +1215,9 @@ Create image from file. Returns a tuple containing id, width and height.
 
 > Search script examples for [disable_floor_embeds](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=disable_floor_embeds)
 
-#### nil disable_floor_embeds(bool disable)
+#### bool disable_floor_embeds(bool disable)
 
-Disable all crust item spawns
+Disable all crust item spawns, returns whether they were already disabled before the call
 
 ### get_adventure_seed
 
@@ -2160,6 +2170,15 @@ Get the room template given a certain index, returns `nil` if coordinates are ou
 
 For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
 
+### is_machine_room_origin
+
+
+> Search script examples for [is_machine_room_origin](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_machine_room_origin)
+
+#### bool is_machine_room_origin(int x, int y)
+
+Get whether a room is the origin of a machine room
+
 ### is_room_flipped
 
 
@@ -2744,6 +2763,7 @@ Note that `define_texture` will also reload the texture if it already exists
 
 #### nil reset_lut([LAYER](#LAYER) layer)
 
+Same as `set_lut(nil, layer)`
 
 ### set_lut
 
@@ -2752,6 +2772,8 @@ Note that `define_texture` will also reload the texture if it already exists
 
 #### nil set_lut(optional<[TEXTURE](#TEXTURE)> texture_id, [LAYER](#LAYER) layer)
 
+Force the LUT texture for the given layer (or both) until it is reset
+Pass `nil` in the first parameter to reset
 
 ## Theme functions
 

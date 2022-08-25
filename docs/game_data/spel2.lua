@@ -25,6 +25,16 @@ prng = nil
 
 -- Functions
 
+
+---Formatting function, use e.g. as f "my_var = {my_var}"
+---@param f_string string
+---@return string
+function f(f_string) end
+---Formatting function, use e.g. as f "my_var = {my_var}"
+---@param f_string string
+---@return string
+function F(f_string) end
+
 ---Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
 ---@param slot integer
 ---@param or_ghost boolean
@@ -1001,6 +1011,12 @@ function change_string(id, str) end
 ---@param str string
 ---@return STRINGID
 function add_string(str) end
+---Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.` enum name
+---if the entity has no localized name
+---@param type ENT_TYPE
+---@param fallback_strategy boolean?
+---@return nil
+function get_entity_name(type, fallback_strategy) end
 ---Adds custom name to the item by uid used in the shops
 ---This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
 ---@param uid integer
@@ -1125,9 +1141,9 @@ function set_adventure_seed(first, second) end
 ---@param add boolean
 ---@return nil
 function update_liquid_collision_at(x, y, add) end
----Disable all crust item spawns
+---Disable all crust item spawns, returns whether they were already disabled before the call
 ---@param disable boolean
----@return nil
+---@return boolean
 function disable_floor_embeds(disable) end
 ---Get the address for a pattern name
 ---@param address_name string
@@ -1294,6 +1310,11 @@ function get_room_template(x, y, layer) end
 ---@param y integer
 ---@return boolean
 function is_room_flipped(x, y) end
+---Get whether a room is the origin of a machine room
+---@param x integer
+---@param y integer
+---@return boolean
+function is_machine_room_origin(x, y) end
 ---For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
 ---@param room_template integer
 ---@return string
@@ -1416,10 +1437,13 @@ function mouse_position() end
 ---- Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ---@return ImGuiIO
 function get_io() end
+---Force the LUT texture for the given layer (or both) until it is reset
+---Pass `nil` in the first parameter to reset
 ---@param texture_id TEXTURE?
 ---@param layer LAYER
 ---@return nil
 function set_lut(texture_id, layer) end
+---Same as `set_lut(nil, layer)`
 ---@param layer LAYER
 ---@return nil
 function reset_lut(layer) end
@@ -3735,6 +3759,18 @@ local function MovableBehavior_get_state_id(self) end
     ---@field y number
     ---@field offset_x number
     ---@field offset_y number
+    ---@field emitted_particles Particle[]
+
+---@class Particle
+    ---@field x number
+    ---@field y number
+    ---@field velocityx number
+    ---@field velocityy number
+    ---@field color uColor
+    ---@field width number
+    ---@field height number
+    ---@field lifetime integer
+    ---@field max_lifetime integer
 
 ---@class ThemeInfo
     ---@field sub_theme ThemeInfo
@@ -4230,12 +4266,18 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field top number
     ---@field overlaps_with fun(self, other: AABB): boolean
     ---@field abs fun(self): AABB
-    ---@field extrude fun(self, amount: number): AABB
+    ---@field extrude AABB_extrude
     ---@field offset fun(self, off_x: number, off_y: number): AABB
     ---@field area fun(self): number
     ---@field center fun(self): number, number
     ---@field width fun(self): number
     ---@field height fun(self): number
+
+---@class AABB_extrude
+---@param amount_x number
+---@param amount_y number
+---@overload fun(self, amount: number): AABB
+local function AABB_extrude(self, amount_x, amount_y) end
 
 ---@class Quad
     ---@field bottom_left_x number

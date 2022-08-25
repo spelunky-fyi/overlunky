@@ -12,6 +12,16 @@
 #include "particles.hpp" // for ParticleDB, ParticleEmitterInfo, ParticleEm...
 #include "rpc.hpp"       // for generate_world_particles, advance_screen_pa...
 
+template <auto MemberT>
+auto MakeParticleMemberAccess()
+{
+    return sol::property(
+        [](const Particle& p)
+        { return *(p.*MemberT); },
+        [](Particle& p, std::remove_pointer_t<std::decay_t<decltype(std::declval<Particle>().*MemberT)>> v)
+        { *(p.*MemberT) = v; });
+};
+
 namespace NParticles
 {
 void register_usertypes(sol::state& lua)
@@ -111,7 +121,30 @@ void register_usertypes(sol::state& lua)
         "offset_x",
         &ParticleEmitterInfo::offset_x,
         "offset_y",
-        &ParticleEmitterInfo::offset_y);
+        &ParticleEmitterInfo::offset_y,
+        "emitted_particles",
+        &ParticleEmitterInfo::emitted_particles);
+
+    lua.new_usertype<Particle>(
+        "Particle",
+        "x",
+        MakeParticleMemberAccess<&Particle::x>(),
+        "y",
+        MakeParticleMemberAccess<&Particle::y>(),
+        "velocityx",
+        MakeParticleMemberAccess<&Particle::velocityx>(),
+        "velocityy",
+        MakeParticleMemberAccess<&Particle::velocityy>(),
+        "color",
+        MakeParticleMemberAccess<&Particle::color>(),
+        "width",
+        MakeParticleMemberAccess<&Particle::width>(),
+        "height",
+        MakeParticleMemberAccess<&Particle::height>(),
+        "lifetime",
+        MakeParticleMemberAccess<&Particle::lifetime>(),
+        "max_lifetime",
+        MakeParticleMemberAccess<&Particle::max_lifetime>());
 
     lua.create_named_table("PARTICLEEMITTER"
                            //, "TITLE_TORCHFLAME_SMOKE", 1

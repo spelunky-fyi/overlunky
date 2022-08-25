@@ -667,6 +667,9 @@ end
     /// Spawns an impostor lake, `top_threshold` determines how much space on top is rendered as liquid but does not have liquid physics, fill that space with real liquid
     /// There needs to be other liquid in the level for the impostor lake to be visible, there can only be one impostor lake in the level
     lua["spawn_impostor_lake"] = spawn_impostor_lake;
+    /// NoDoc
+    /// Fixes the bounds of impostor lakes in the liquid physics engine to match the bounds of the impostor lake entities.
+    lua["fix_impostor_lake_positions"] = fix_impostor_lake_positions;
     /// Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
     /// If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
     lua["spawn_player"] = spawn_player;
@@ -1564,6 +1567,13 @@ end
     /// Returns STRINGID of the new string
     lua["add_string"] = add_string;
 
+    /// Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
+    /// if the entity has no localized name
+    lua["get_entity_name"] = [](ENT_TYPE type, sol::optional<bool> fallback_strategy)
+    {
+        return get_entity_name(type, fallback_strategy.value_or(false));
+    };
+
     /// Adds custom name to the item by uid used in the shops
     /// This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
     lua["add_custom_name"] = add_custom_name;
@@ -1670,7 +1680,7 @@ end
     /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
     lua["update_liquid_collision_at"] = update_liquid_collision_at;
 
-    /// Disable all crust item spawns
+    /// Disable all crust item spawns, returns whether they were already disabled before the call
     lua["disable_floor_embeds"] = disable_floor_embeds;
 
     /// Get the address for a pattern name
