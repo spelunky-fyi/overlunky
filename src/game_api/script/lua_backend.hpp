@@ -95,7 +95,7 @@ enum class ON
     POST_LOAD_SCREEN,
     DEATH_MESSAGE,
     PRE_UPDATE,
-    UPDATE,
+    POST_UPDATE,
 };
 
 struct IntOption

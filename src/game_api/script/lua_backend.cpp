@@ -474,7 +474,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                     }
                     break;
                 }
-                case ON::UPDATE:
+                case ON::POST_UPDATE:
                 {
                     handle_function(callback.func);
                     callback.lastRan = now;
