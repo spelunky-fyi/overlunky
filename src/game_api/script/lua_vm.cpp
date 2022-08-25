@@ -1811,7 +1811,7 @@ end
         ON::DEATH_MESSAGE,
         "PRE_UPDATE",
         ON::PRE_UPDATE,
-        "UPDATE",
+        "POST_UPDATE",
         ON::POST_UPDATE);
     /* ON
     // GUIFRAME
