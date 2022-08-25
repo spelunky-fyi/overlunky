@@ -40,19 +40,19 @@
 #include "thread_utils.hpp"     // for OnHeapPointer
 #include "virtual_table.hpp"    // for get_virtual_function_address, VIRT_FUNC
 
-inline uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
+uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
 {
     return flags | (1U << (bit - 1));
 }
-inline uint32_t clrflag(uint32_t flags, int bit)
+uint32_t clrflag(uint32_t flags, int bit)
 {
     return flags & ~(1U << (bit - 1));
 }
-inline bool testflag(uint32_t flags, int bit)
+bool testflag(uint32_t flags, int bit)
 {
     return (flags & (1U << (bit - 1))) > 0;
 }
-inline uint32_t flipflag(uint32_t flags, int bit)
+uint32_t flipflag(uint32_t flags, int bit)
 {
     return (flags ^ (1U << (bit - 1)));
 }

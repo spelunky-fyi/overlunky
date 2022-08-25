@@ -55,7 +55,7 @@ struct StateMemory
 
     /// True when you have control over your character
     uint8_t ingame;
-    /// True whenever you in an active game (basically everything except the main menu, character select etc.)
+    /// True whenever you are in an active game (basically everything except the main menu, character select etc.)
     uint8_t playing;
     /// `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
     uint8_t pause;

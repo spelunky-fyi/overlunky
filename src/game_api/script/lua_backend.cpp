@@ -264,6 +264,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
 
         if (LuaConsole* is_console = dynamic_cast<LuaConsole*>(this))
         {
+            /// NoDoc
             lua["P"] = lua["get_player"](1);
         }
 

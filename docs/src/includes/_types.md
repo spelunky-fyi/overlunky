@@ -2109,8 +2109,8 @@ Type | Name | Description
 int | [screen_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) | 
 int | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) | 
 int | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | 
-int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | 
-int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | 
+int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | True when you have control over your character
+int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | True whenever you in an active game (basically everything except the main menu, character select etc.)
 int | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
 int | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 int | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
@@ -2153,7 +2153,7 @@ int | [saved_hamsters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [win_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_state) | 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
 [Illumination](#Illumination) | [illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) | 
 int | [money_last_levels](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_last_levels) | 
-int | [money_shop_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) | 
+int | [money_shop_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) | total $ spent at shops, persists between levels, number will be negative
 [PlayerInputs](#PlayerInputs) | [player_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) | 
 [QuestsInfo](#QuestsInfo) | [quests](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quests) | 
 [Camera](#Camera) | [camera](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera) | 
@@ -2164,7 +2164,7 @@ int | [toast_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toa
 int | [speechbubble_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_timer) | 
 int | [speechbubble_owner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_owner) | 
 [LevelGenSystem](#LevelGenSystem) | [level_gen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gen) | 
-int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | 
+int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | correct_ushabti = anim_frame - (2  floor(anim_frame/12))
 [Items](#Items) | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | 
 int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | 
 [ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
