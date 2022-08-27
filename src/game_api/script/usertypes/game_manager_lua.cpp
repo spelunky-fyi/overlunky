@@ -17,6 +17,7 @@ void register_usertypes(sol::state& lua)
 {
     lua.new_usertype<MusicTrack>(
         "MusicTrack",
+        sol::no_constructor,
         "start_over",
         &MusicTrack::start_over,
         "music_on",
