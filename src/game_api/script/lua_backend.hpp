@@ -428,10 +428,10 @@ std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, A
     }
 }
 
-template<class Inheriting>
+template <class Inheriting>
 class LockableLuaBackend : public LuaBackend
 {
-public:
+  public:
     using LuaBackend::LuaBackend;
 
     using LockableInherited = ProtectedBackend::LockedResource<Inheriting>;

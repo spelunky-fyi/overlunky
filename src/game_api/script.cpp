@@ -75,7 +75,6 @@ void SpelunkyScript::get_meta(std::function<void(const ScriptMeta& meta)> meta_f
     meta_fun(impl->meta);
 }
 
-
 #ifdef SPEL2_EDITABLE_SCRIPTS
 std::string& SpelunkyScript::get_code() const
 {

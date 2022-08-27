@@ -411,8 +411,7 @@ void hook_savegame()
                                   {
                                       if (strcmp(file, "savegame.sav") == 0 and options["disable_savegame"])
                                           return;
-                                      original(backup_file, file, data, data_size);
-                                  });
+                                      original(backup_file, file, data, data_size); });
         savegame_hooked = true;
     }
 }
@@ -5227,8 +5226,7 @@ void render_entity_finder()
                                                         auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
-                                                        return ent->type->id != search_entity_type;
-                                                    }),
+                                                        return ent->type->id != search_entity_type; }),
                                      g_selected_ids.end());
             }
             if (search_entity_mask != 0)
@@ -5238,8 +5236,7 @@ void render_entity_finder()
                                                         auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
-                                                        return (ent->type->search_flags & search_entity_mask) == 0;
-                                                    }),
+                                                        return (ent->type->search_flags & search_entity_mask) == 0; }),
                                      g_selected_ids.end());
             }
             {
@@ -5248,8 +5245,7 @@ void render_entity_finder()
                                                         auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
-                                                        return ent->layer != enum_to_layer((LAYER)search_entity_layer);
-                                                    }),
+                                                        return ent->layer != enum_to_layer((LAYER)search_entity_layer); }),
                                      g_selected_ids.end());
             }
             extra_filter = false;
@@ -5261,8 +5257,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->flags & search_entity_flags) != search_entity_flags;
-                                                }),
+                                                    return (ent->flags & search_entity_flags) != search_entity_flags; }),
                                  g_selected_ids.end());
         }
         if (search_entity_not_flags != 0)
@@ -5272,8 +5267,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->flags & search_entity_not_flags) != 0;
-                                                }),
+                                                    return (ent->flags & search_entity_not_flags) != 0; }),
                                  g_selected_ids.end());
         }
         if (search_entity_more_flags != 0)
@@ -5283,8 +5277,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->more_flags & search_entity_more_flags) != search_entity_more_flags;
-                                                }),
+                                                    return (ent->more_flags & search_entity_more_flags) != search_entity_more_flags; }),
                                  g_selected_ids.end());
         }
         if (search_entity_not_more_flags != 0)
@@ -5294,8 +5287,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->more_flags & search_entity_not_more_flags) != 0;
-                                                }),
+                                                    return (ent->more_flags & search_entity_not_more_flags) != 0; }),
                                  g_selected_ids.end());
         }
         if (search_entity_properties_flags != 0)
@@ -5305,8 +5297,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->type->properties_flags & search_entity_properties_flags) != search_entity_properties_flags;
-                                                }),
+                                                    return (ent->type->properties_flags & search_entity_properties_flags) != search_entity_properties_flags; }),
                                  g_selected_ids.end());
         }
         if (search_entity_not_properties_flags != 0)
@@ -5316,8 +5307,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->type->properties_flags & search_entity_not_properties_flags) != 0;
-                                                }),
+                                                    return (ent->type->properties_flags & search_entity_not_properties_flags) != 0; }),
                                  g_selected_ids.end());
         }
         if (search_entity_name != "")
@@ -5327,8 +5317,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return !StrStrIA(entity_names[ent->type->id].c_str(), search_entity_name.c_str());
-                                                }),
+                                                    return !StrStrIA(entity_names[ent->type->id].c_str(), search_entity_name.c_str()); }),
                                  g_selected_ids.end());
         }
         if (search_entity_depth[0] > 0 || search_entity_depth[1] < 52)
@@ -5338,8 +5327,7 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return ent->draw_depth < search_entity_depth[0] || ent->draw_depth > search_entity_depth[1];
-                                                }),
+                                                    return ent->draw_depth < search_entity_depth[0] || ent->draw_depth > search_entity_depth[1]; }),
                                  g_selected_ids.end());
         }
     }
