@@ -42,6 +42,89 @@ struct SaveRelated
     JournalPopupUI journal_popup_ui;
 };
 
+struct AudioChannelParams
+{
+    uint64_t unknown1;
+    uint64_t unknown2;
+    uint64_t unknown3;
+    uint64_t unknown4;
+    float unknown5;
+    float unknown6; // triggers on ghost (music distortion)
+    float unknown7a;
+    float unknown7b;
+    uint64_t unknown8;
+    uint64_t unknown9;
+    uint64_t unknown10;
+    uint64_t unknown11;
+    float unknown12;
+    float unknown13;
+    float unknown14;
+    float unknown15;
+    float unknown16;
+    uint32_t unknown17;
+    uint64_t unknown18;
+    uint64_t unknown19;
+    uint64_t unknown20;
+    uint64_t unknown21;
+    float unknown22;
+    float unknown23;
+    float unknown24;
+    uint32_t unknown25;
+};
+
+struct MusicTrack
+{
+    uint32_t unknown1;
+    uint32_t unknown2;
+    size_t music_track;  // unsure?
+    uint64_t fmod_param; // param to FMOD::Studio::EventInstance::setParameterByID
+    AudioChannelParams left_channel;
+    AudioChannelParams right_channel;
+    /// when false, current track starts from the beginning, is immediately set back to true
+    bool start_over;
+    uint8_t unknown49;
+    /// set to false to turn off
+    bool music_on;
+    uint8_t unknown51;
+    uint32_t garbage1;
+    bool fadeout_music_and_crash; // probably need to call destroy after or something
+
+    virtual void start() = 0;
+    virtual void fade_out(uint8_t) = 0;                      // unsure
+    virtual void get_name(size_t buttor, uint32_t size) = 0; // unsure?
+    virtual void destroy() = 0;                              // unsure?
+    virtual void update() = 0;                               // disabling this function does not progresses the track, does not stop it at the end level etc.
+                                                             // like if you start a level you have one loop and the after you move it porgresses to another one
+    virtual bool unknown() = 0;
+};
+
+struct BackgroundMusic
+{
+    MusicTrack* game_startup;
+    MusicTrack* main_backgroundtrack;
+    MusicTrack* basecamp;
+    MusicTrack* win_scene;
+    MusicTrack* arena;
+    MusicTrack* arena_intro_and_win;
+    MusicTrack* level_gameplay;
+    MusicTrack* dark_level;
+    MusicTrack* level_transition;
+    MusicTrack* backlayer;
+    MusicTrack* shop;
+    MusicTrack* angered_shopkeeper;
+    MusicTrack* inside_sunken_city_pipe;
+    MusicTrack* pause_menu;
+    size_t unknown15;
+    MusicTrack* sunken_city_duat_transition;
+    uint8_t unknown17;
+    uint8_t unknown18;
+    uint8_t unknown19;
+    uint8_t unknown20;
+    int8_t skip[2400]; // 600 floats, mostly seem to be 1.0
+    float idle_counter;
+    uint32_t unknown22;
+};
+
 struct GameProps
 {
     uint32_t buttons;
@@ -62,7 +145,7 @@ struct GameProps
 
 struct GameManager
 {
-    void* backgroundmusic;
+    BackgroundMusic* backgroundmusic;
     SaveRelated* save_related;
     uint8_t buttons_controls[MAX_PLAYERS];
     uint8_t buttons_movement[MAX_PLAYERS];
