@@ -242,10 +242,14 @@ State& State::get()
     return STATE;
 }
 
+StateMemory* State::ptr_main() const
+{
+    return ptr_local();
+}
+
 StateMemory* State::ptr() const
 {
-    OnHeapPointer<StateMemory> p(read_u64(location));
-    return p.decode();
+    return ptr_local();
 }
 
 StateMemory* State::ptr_local() const

@@ -11,113 +11,125 @@ SpelunkyScript::SpelunkyScript(std::string script, std::string file, SoundManage
 }
 SpelunkyScript::~SpelunkyScript() = default;
 
-std::deque<ScriptMessage>& SpelunkyScript::get_messages()
+void SpelunkyScript::loop_messages(std::function<void(const ScriptMessage&)> message_fun) const
 {
-    return m_Impl->messages;
+    auto impl = m_Impl->Lock();
+    for (const ScriptMessage& message : impl->messages)
+    {
+        message_fun(message);
+    }
 }
 std::deque<ScriptMessage> SpelunkyScript::consume_messages()
 {
-    return std::move(m_Impl->messages);
+    return std::move(m_Impl->Lock()->messages);
 }
 std::vector<std::string> SpelunkyScript::consume_requires()
 {
-    return std::move(m_Impl->required_scripts);
+    return std::move(m_Impl->Lock()->required_scripts);
 }
 
-const std::string& SpelunkyScript::get_id() const
+std::string SpelunkyScript::get_id() const
 {
-    return m_Impl->meta.id;
+    return m_Impl->Lock()->meta.id;
 }
-const std::string& SpelunkyScript::get_name() const
+std::string SpelunkyScript::get_name() const
 {
-    return m_Impl->meta.name;
+    return m_Impl->Lock()->meta.name;
 }
-const std::string& SpelunkyScript::get_description() const
+std::string SpelunkyScript::get_description() const
 {
-    return m_Impl->meta.description;
+    return m_Impl->Lock()->meta.description;
 }
-const std::string& SpelunkyScript::get_author() const
+std::string SpelunkyScript::get_author() const
 {
-    return m_Impl->meta.author;
+    return m_Impl->Lock()->meta.author;
 }
-const std::string& SpelunkyScript::get_file() const
+std::string SpelunkyScript::get_file() const
 {
-    return m_Impl->meta.file;
+    return m_Impl->Lock()->meta.file;
 }
-const std::string& SpelunkyScript::get_filename() const
+std::string SpelunkyScript::get_filename() const
 {
-    return m_Impl->meta.filename;
+    return m_Impl->Lock()->meta.filename;
 }
-const std::string& SpelunkyScript::get_version() const
+std::string SpelunkyScript::get_version() const
 {
-    return m_Impl->meta.version;
+    return m_Impl->Lock()->meta.version;
 }
-const std::string& SpelunkyScript::get_path() const
+std::string SpelunkyScript::get_path() const
 {
-    return m_Impl->meta.path;
+    return m_Impl->Lock()->meta.path;
 }
 bool SpelunkyScript::get_unsafe() const
 {
-    return m_Impl->meta.unsafe;
+    return m_Impl->Lock()->meta.unsafe;
 }
 bool SpelunkyScript::get_online_safe() const
 {
-    return m_Impl->meta.online_safe;
+    return m_Impl->Lock()->meta.online_safe;
 }
+
+void SpelunkyScript::get_meta(std::function<void(const ScriptMeta& meta)> meta_fun)
+{
+    auto impl = m_Impl->Lock();
+    meta_fun(impl->meta);
+}
+
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
 std::string& SpelunkyScript::get_code() const
 {
-    return m_Impl->code;
+    return m_Impl->Lock()->code;
 }
 std::size_t SpelunkyScript::get_code_size() const
 {
-    return m_Impl->code.size();
+    return m_Impl->Lock()->code.size();
 }
 #endif
 
 void SpelunkyScript::update_code(std::string code)
 {
+    auto impl = m_Impl->Lock();
 #ifdef SPEL2_EDITABLE_SCRIPTS
-    m_Impl->code = code;
+    impl->code = code;
 #else
-    m_Impl->code = std::move(code);
+    impl->code = std::move(code);
 #endif
-    m_Impl->changed = true;
+    impl->changed = true;
 }
 
-std::string& SpelunkyScript::get_result()
+std::string SpelunkyScript::get_result()
 {
-    return m_Impl->result;
+    return m_Impl->Lock()->result;
 }
 
 bool SpelunkyScript::is_enabled() const
 {
-    return m_Impl->enabled;
+    return m_Impl->Lock()->enabled;
 }
 void SpelunkyScript::set_enabled(bool enabled)
 {
-    m_Impl->set_enabled(enabled);
+    m_Impl->Lock()->set_enabled(enabled);
 }
 
 bool SpelunkyScript::is_changed() const
 {
-    return m_Impl->changed;
+    return m_Impl->Lock()->changed;
 }
 void SpelunkyScript::set_changed(bool changed)
 {
-    m_Impl->changed = changed;
+    m_Impl->Lock()->changed = changed;
 }
 
 bool SpelunkyScript::run()
 {
-    return m_Impl->update();
+    return m_Impl->Lock()->update();
 }
 void SpelunkyScript::draw(ImDrawList* dl)
 {
-    m_Impl->draw(dl);
+    m_Impl->Lock()->draw(dl);
 }
 void SpelunkyScript::render_options()
 {
-    m_Impl->render_options();
+    m_Impl->Lock()->render_options();
 }

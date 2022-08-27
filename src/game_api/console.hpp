@@ -3,6 +3,7 @@
 #include <cstddef>     // for size_t
 #include <cstdint>     // for uint32_t
 #include <deque>       // for deque
+#include <functional>  // for function
 #include <memory>      // for unique_ptr
 #include <string>      // for string
 #include <string_view> // for string_view
@@ -16,9 +17,9 @@ class SpelunkyConsole
     SpelunkyConsole(class SoundManager* sound_manager);
     ~SpelunkyConsole();
 
-    std::vector<std::string> consume_requires();
+    void loop_messages(std::function<void(const ScriptMessage&)> message_fun) const;
     std::deque<ScriptMessage> consume_messages();
-    const std::deque<ScriptMessage>& get_messages() const;
+    std::vector<std::string> consume_requires();
 
     bool is_enabled();
     bool is_toggled();

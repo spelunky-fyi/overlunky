@@ -28,7 +28,7 @@ void register_usertypes(sol::state& lua)
     /// be returned instead.
     lua["make_custom_behavior"] = [](std::string_view behavior_name, uint8_t state_id, VanillaMovableBehavior* base_behavior) -> CustomMovableBehavior*
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         if (CustomMovableBehavior* existing_behavior = backend->get_custom_movable_behavior(behavior_name))
         {
             return existing_behavior;
@@ -78,9 +78,10 @@ void register_usertypes(sol::state& lua)
     /// enter this behavior. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_force_state"] = [](CustomMovableBehavior* behavior, sol::function force_state) -> void
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend_id = LuaBackend::get_calling_backend_id();
         behavior->custom_force_state = [=, force_state = std::move(force_state)](Movable* movable, std::function<bool(Movable*)> base_fun)
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<bool>(force_state, movable, std::move(base_fun)).value_or(false);
         };
     };
@@ -89,9 +90,10 @@ void register_usertypes(sol::state& lua)
     /// function is `nil on_enter(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_on_enter"] = [](CustomMovableBehavior* behavior, sol::function on_enter) -> void
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend_id = LuaBackend::get_calling_backend_id();
         behavior->custom_on_enter = [=, on_enter = std::move(on_enter)](Movable* movable, std::function<void(Movable*)> base_fun)
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->handle_function(on_enter, movable, std::move(base_fun));
         };
     };
@@ -100,9 +102,10 @@ void register_usertypes(sol::state& lua)
     /// function is `nil on_exit(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_on_exit"] = [](CustomMovableBehavior* behavior, sol::function on_exit) -> void
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend_id = LuaBackend::get_calling_backend_id();
         behavior->custom_on_exit = [=, on_exit = std::move(on_exit)](Movable* movable, std::function<void(Movable*)> base_fun)
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->handle_function(on_exit, movable, std::move(base_fun));
         };
     };
@@ -112,9 +115,10 @@ void register_usertypes(sol::state& lua)
     /// some timers, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_update_logic"] = [](CustomMovableBehavior* behavior, sol::function update_logic) -> void
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend_id = LuaBackend::get_calling_backend_id();
         behavior->custom_update_logic = [=, update_logic = std::move(update_logic)](Movable* movable, std::function<void(Movable*)> base_fun)
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->handle_function(update_logic, movable, std::move(base_fun));
         };
     };
@@ -125,9 +129,10 @@ void register_usertypes(sol::state& lua)
     /// base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_update_world"] = [](CustomMovableBehavior* behavior, sol::function update_world) -> void
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend_id = LuaBackend::get_calling_backend_id();
         behavior->custom_update_world = [=, update_world = std::move(update_world)](Movable* movable, std::function<void(Movable*)> base_fun)
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->handle_function(update_world, movable, std::move(base_fun));
         };
     };
@@ -137,9 +142,10 @@ void register_usertypes(sol::state& lua)
     /// or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_get_next_state_id"] = [](CustomMovableBehavior* behavior, sol::function get_next_state_id) -> void
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend_id = LuaBackend::get_calling_backend_id();
         behavior->custom_get_next_state_id = [=, get_next_state_id = std::move(get_next_state_id)](Movable* movable, std::function<uint8_t(Movable*)> base_fun)
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<uint8_t>(get_next_state_id, movable, std::move(base_fun)).value_or(behavior->state_id);
         };
     };

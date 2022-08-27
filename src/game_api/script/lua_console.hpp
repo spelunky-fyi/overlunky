@@ -23,7 +23,7 @@ struct ConsoleHistoryItem
     std::vector<ScriptMessage> messages;
 };
 
-class LuaConsole : public LuaBackend
+class LuaConsole : public LockableLuaBackend<LuaConsole>
 {
   public:
     LuaConsole(SoundManager* sound_manager);

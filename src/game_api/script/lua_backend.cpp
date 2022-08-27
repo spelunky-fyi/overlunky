@@ -32,7 +32,7 @@
 #include "usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
 
 std::recursive_mutex g_all_backends_mutex;
-std::vector<LuaBackend*> g_all_backends;
+std::vector<std::unique_ptr<LuaBackend::ProtectedBackend>> g_all_backends;
 
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     : lua{get_lua_vm(sound_mgr), sol::create}, vm{acquire_lua_vm(sound_mgr)}, sound_manager{sound_mgr}, console{con}
@@ -56,31 +56,33 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     populate_lua_env(lua);
 
     std::lock_guard lock{g_all_backends_mutex};
-    g_all_backends.push_back(this);
+    g_all_backends.emplace_back(new ProtectedBackend{this});
+    self = g_all_backends.back().get();
 }
 LuaBackend::~LuaBackend()
 {
     {
-        std::lock_guard lock{g_all_backends_mutex};
-        std::erase(g_all_backends, this);
-    }
+        auto self_lock = self->Lock();
 
-    {
         auto& global_vm = *vm;
         for (const std::string& module : loaded_modules)
         {
             global_vm["package"]["loaded"][module] = sol::nil;
             global_vm["_G"][module] = sol::nil;
         }
+
+        clear_all_callbacks();
     }
 
-    clear_all_callbacks();
+    {
+        std::lock_guard lock{g_all_backends_mutex};
+        std::erase_if(g_all_backends, [=](const std::unique_ptr<ProtectedBackend>& protected_backend)
+                      { return protected_backend.get() == self; });
+    }
 }
 
 void LuaBackend::clear()
 {
-    std::lock_guard gil_guard{gil};
-
     clear_all_callbacks();
 
     (get_unsafe()
@@ -89,8 +91,6 @@ void LuaBackend::clear()
 }
 void LuaBackend::clear_all_callbacks()
 {
-    std::lock_guard gil_guard{gil};
-
     // Clear all callbacks on script reload to avoid running them
     // multiple times.
     level_timers.clear();
@@ -239,7 +239,6 @@ bool LuaBackend::update()
 
     try
     {
-        std::lock_guard gil_guard{gil};
         // Deprecated =======
 
         /// Use `set_callback(function, ON.FRAME)` instead
@@ -589,8 +588,6 @@ void LuaBackend::draw(ImDrawList* dl)
     draw_list = dl;
     try
     {
-        std::lock_guard gil_guard{gil};
-
         if (!pre_draw())
         {
             return;
@@ -756,7 +753,6 @@ void LuaBackend::pre_load_level_files()
 
     auto now = get_frame_count();
 
-    std::lock_guard lock{gil};
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -777,8 +773,6 @@ void LuaBackend::pre_level_generation()
         return;
 
     auto now = get_frame_count();
-
-    std::lock_guard lock{gil};
 
     lua["players"] = std::vector<Player*>(get_players());
 
@@ -802,8 +796,6 @@ bool LuaBackend::pre_load_screen()
         return false;
 
     auto now = get_frame_count();
-
-    std::lock_guard lock{gil};
 
     for (auto& [id, callback] : callbacks)
     {
@@ -889,7 +881,6 @@ void LuaBackend::post_room_generation()
 
     auto now = get_frame_count();
 
-    std::lock_guard lock{gil};
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -910,8 +901,6 @@ void LuaBackend::post_level_generation()
         return;
 
     auto now = get_frame_count();
-
-    std::lock_guard lock{gil};
 
     lua["players"] = std::vector<Player*>(get_players());
 
@@ -978,8 +967,6 @@ void LuaBackend::post_load_screen()
 
     auto now = get_frame_count();
 
-    std::lock_guard lock{gil};
-
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1000,8 +987,6 @@ void LuaBackend::on_death_message(STRINGID stringid)
         return;
 
     auto now = get_frame_count();
-
-    std::lock_guard lock{gil};
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1025,7 +1010,6 @@ std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_
 
     auto now = get_frame_count();
 
-    std::lock_guard lock{gil};
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1054,7 +1038,6 @@ LuaBackend::PreHandleRoomTilesResult LuaBackend::pre_handle_room_tiles(LevelGenR
 
     PreHandleRoomTilesContext ctx{room_data};
 
-    std::lock_guard lock{gil};
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1222,7 +1205,6 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         return std::u16string{no_return_str};
 
     auto now = get_frame_count();
-    std::lock_guard lock{gil};
 
     std::optional<std::u16string> return_value = std::nullopt;
 
@@ -1254,7 +1236,6 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
         return std::u16string{no_return_str};
 
     auto now = get_frame_count();
-    std::lock_guard lock{gil};
 
     std::optional<std::u16string> return_value = std::nullopt;
 
@@ -1280,56 +1261,6 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
     return return_value.value_or(std::u16string{no_return_str});
 }
 
-void LuaBackend::for_each_backend(std::function<bool(LuaBackend&)> fun)
-{
-    std::lock_guard lock{g_all_backends_mutex};
-    for (auto* backend : g_all_backends)
-    {
-        if (!fun(*backend))
-        {
-            break;
-        }
-    }
-}
-LuaBackend* LuaBackend::get_backend(std::string_view id)
-{
-    std::lock_guard lock{g_all_backends_mutex};
-    for (auto* backend : g_all_backends)
-    {
-        if (backend->get_path() == id)
-        {
-            return backend;
-        }
-    }
-    return nullptr;
-}
-LuaBackend* LuaBackend::get_backend_by_id(std::string_view id, std::string_view ver)
-{
-    std::lock_guard lock{g_all_backends_mutex};
-    for (auto* backend : g_all_backends)
-    {
-        if (backend->get_id() == id && (ver == "" || ver == backend->get_version()))
-        {
-            return backend;
-        }
-    }
-    return nullptr;
-}
-LuaBackend* LuaBackend::get_calling_backend()
-{
-    static const sol::state& lua = get_lua_vm();
-    auto get_script_id = lua["get_script_id"];
-    if (get_script_id.get_type() == sol::type::function)
-    {
-        auto script_id = get_script_id();
-        if (script_id.get_type() == sol::type::string)
-        {
-            return LuaBackend::get_backend(script_id.get<std::string_view>());
-        }
-    }
-    return nullptr;
-}
-
 CurrentCallback LuaBackend::get_current_callback()
 {
     return current_cb;
@@ -1348,3 +1279,74 @@ void LuaBackend::clear_current_callback()
     current_cb.id = -1;
     current_cb.type = CallbackType::None;
 }
+
+/**
+ * static functions begin
+ */
+void LuaBackend::for_each_backend(std::function<bool(LockedBackend)> fun)
+{
+    std::lock_guard lock{g_all_backends_mutex};
+    for (std::unique_ptr<ProtectedBackend>& backend : g_all_backends)
+    {
+        if (!fun(backend->Lock()))
+        {
+            break;
+        }
+    }
+}
+LuaBackend::LockedBackend LuaBackend::get_backend(std::string_view id)
+{
+    return get_backend_safe(id).value();
+}
+std::optional<LuaBackend::LockedBackend> LuaBackend::get_backend_safe(std::string_view id)
+{
+    std::lock_guard lock{g_all_backends_mutex};
+    for (std::unique_ptr<ProtectedBackend>& backend : g_all_backends)
+    {
+        LockedBackend locked = backend->Lock();
+        if (locked->get_path() == id)
+        {
+            return locked;
+        }
+    }
+    return std::nullopt;
+}
+LuaBackend::LockedBackend LuaBackend::get_backend_by_id(std::string_view id, std::string_view ver)
+{
+    return get_backend_by_id_safe(id, ver).value();
+}
+std::optional<LuaBackend::LockedBackend> LuaBackend::get_backend_by_id_safe(std::string_view id, std::string_view ver)
+{
+    std::lock_guard lock{g_all_backends_mutex};
+    for (std::unique_ptr<ProtectedBackend>& backend : g_all_backends)
+    {
+        LockedBackend locked = backend->Lock();
+        if (locked->get_id() == id && (ver == "" || ver == locked->get_version()))
+        {
+            return locked;
+        }
+    }
+    return std::nullopt;
+}
+LuaBackend::LockedBackend LuaBackend::get_calling_backend()
+{
+    return LuaBackend::get_backend(get_calling_backend_id());
+}
+std::string_view LuaBackend::get_calling_backend_id()
+{
+    std::lock_guard global_lock{global_lua_lock};
+    static const sol::state& lua = get_lua_vm();
+    auto get_script_id = lua["get_script_id"];
+    if (get_script_id.get_type() == sol::type::function)
+    {
+        auto script_id = get_script_id();
+        if (script_id.get_type() == sol::type::string)
+        {
+            return script_id.get<std::string_view>();
+        }
+    }
+    throw std::exception{"Trying to get calling backend but Lua state does not seem to be setup..."};
+}
+/**
+ * static functions end
+ */

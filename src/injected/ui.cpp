@@ -411,7 +411,8 @@ void hook_savegame()
                                   {
                                       if (strcmp(file, "savegame.sav") == 0 and options["disable_savegame"])
                                           return;
-                                      original(backup_file, file, data, data_size); });
+                                      original(backup_file, file, data, data_size);
+                                  });
         savegame_hooked = true;
     }
 }
@@ -3506,18 +3507,19 @@ void render_messages()
     std::vector<Message> queue;
     for (auto& [name, script] : g_scripts)
     {
-        for (auto message : script->get_messages())
-        {
-            if (options["fade_script_messages"] && now - 12s > message.time)
-                continue;
-            std::istringstream messages(message.message);
-            while (!messages.eof())
+        script->loop_messages(
+            [&](const ScriptMessage& message)
             {
-                std::string mline;
-                getline(messages, mline);
-                queue.push_back(std::make_tuple(script->get_name(), mline, message.time, message.color));
-            }
-        }
+                if (options["fade_script_messages"] && now - 12s > message.time)
+                    return;
+                std::istringstream messages(message.message);
+                while (!messages.eof())
+                {
+                    std::string mline;
+                    getline(messages, mline);
+                    queue.push_back(std::make_tuple(script->get_name(), mline, message.time, message.color));
+                }
+            });
     }
     for (auto&& message : g_Console->consume_messages())
     {
@@ -4596,7 +4598,8 @@ void render_scripts()
                     {
                         script->set_changed(true);
                     }
-                    ImGui::InputText("##LuaResult", &script->get_result(), ImGuiInputTextFlags_ReadOnly);
+                    std::string result = script->get_result();
+                    ImGui::InputText("##LuaResult", &result, ImGuiInputTextFlags_ReadOnly);
                 }
             }
             else
@@ -5224,7 +5227,8 @@ void render_entity_finder()
                                                         auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
-                                                        return ent->type->id != search_entity_type; }),
+                                                        return ent->type->id != search_entity_type;
+                                                    }),
                                      g_selected_ids.end());
             }
             if (search_entity_mask != 0)
@@ -5234,7 +5238,8 @@ void render_entity_finder()
                                                         auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
-                                                        return (ent->type->search_flags & search_entity_mask) == 0; }),
+                                                        return (ent->type->search_flags & search_entity_mask) == 0;
+                                                    }),
                                      g_selected_ids.end());
             }
             {
@@ -5243,7 +5248,8 @@ void render_entity_finder()
                                                         auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
-                                                        return ent->layer != enum_to_layer((LAYER)search_entity_layer); }),
+                                                        return ent->layer != enum_to_layer((LAYER)search_entity_layer);
+                                                    }),
                                      g_selected_ids.end());
             }
             extra_filter = false;
@@ -5255,7 +5261,8 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->flags & search_entity_flags) != search_entity_flags; }),
+                                                    return (ent->flags & search_entity_flags) != search_entity_flags;
+                                                }),
                                  g_selected_ids.end());
         }
         if (search_entity_not_flags != 0)
@@ -5265,7 +5272,8 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->flags & search_entity_not_flags) != 0; }),
+                                                    return (ent->flags & search_entity_not_flags) != 0;
+                                                }),
                                  g_selected_ids.end());
         }
         if (search_entity_more_flags != 0)
@@ -5275,7 +5283,8 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->more_flags & search_entity_more_flags) != search_entity_more_flags; }),
+                                                    return (ent->more_flags & search_entity_more_flags) != search_entity_more_flags;
+                                                }),
                                  g_selected_ids.end());
         }
         if (search_entity_not_more_flags != 0)
@@ -5285,7 +5294,8 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->more_flags & search_entity_not_more_flags) != 0; }),
+                                                    return (ent->more_flags & search_entity_not_more_flags) != 0;
+                                                }),
                                  g_selected_ids.end());
         }
         if (search_entity_properties_flags != 0)
@@ -5295,7 +5305,8 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->type->properties_flags & search_entity_properties_flags) != search_entity_properties_flags; }),
+                                                    return (ent->type->properties_flags & search_entity_properties_flags) != search_entity_properties_flags;
+                                                }),
                                  g_selected_ids.end());
         }
         if (search_entity_not_properties_flags != 0)
@@ -5305,7 +5316,8 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return (ent->type->properties_flags & search_entity_not_properties_flags) != 0; }),
+                                                    return (ent->type->properties_flags & search_entity_not_properties_flags) != 0;
+                                                }),
                                  g_selected_ids.end());
         }
         if (search_entity_name != "")
@@ -5315,7 +5327,8 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return !StrStrIA(entity_names[ent->type->id].c_str(), search_entity_name.c_str()); }),
+                                                    return !StrStrIA(entity_names[ent->type->id].c_str(), search_entity_name.c_str());
+                                                }),
                                  g_selected_ids.end());
         }
         if (search_entity_depth[0] > 0 || search_entity_depth[1] < 52)
@@ -5325,7 +5338,8 @@ void render_entity_finder()
                                                     auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
-                                                    return ent->draw_depth < search_entity_depth[0] || ent->draw_depth > search_entity_depth[1]; }),
+                                                    return ent->draw_depth < search_entity_depth[0] || ent->draw_depth > search_entity_depth[1];
+                                                }),
                                  g_selected_ids.end());
         }
     }

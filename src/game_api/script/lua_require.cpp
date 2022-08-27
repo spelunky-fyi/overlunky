@@ -44,7 +44,7 @@ sol::object custom_require(std::string path)
     static sol::state& lua = get_lua_vm();
 
     // Could be preloaded by some unsafe script, which can only be fetched by unsafe scripts
-    LuaBackend* backend = LuaBackend::get_calling_backend();
+    auto backend = LuaBackend::get_calling_backend();
     const bool unsafe = backend->get_unsafe();
     if (unsafe)
     {
@@ -109,7 +109,7 @@ return info.short_src, info.source
 
     const fs::path& backend_root = backend->get_root_path();
 
-    auto require = [=](std::string _path)
+    auto require = [&](std::string _path)
     {
         if (_path.ends_with(".lua") || _path.ends_with(".dll"))
         {
@@ -179,9 +179,9 @@ int custom_loader(lua_State* L)
     std::string path = sol::stack::get<std::string>(L, 1);
     std::replace(path.begin(), path.end(), '.', '/');
     std::replace(path.begin(), path.end(), ':', '.');
-    LuaBackend* backend = LuaBackend::get_calling_backend();
+    auto backend = LuaBackend::get_calling_backend();
 
-    auto try_load = [=](std::string& _path, std::string_view ext)
+    auto try_load = [&](std::string& _path, std::string_view ext)
     {
         _path += ext;
         const auto res = luaL_loadfilex(L, _path.c_str(), "bt");

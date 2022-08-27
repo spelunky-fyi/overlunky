@@ -232,8 +232,9 @@ struct State
     static State& get();
 
     // Returns the main-thread version of StateMemory*
-    StateMemory* ptr() const;
+    StateMemory* ptr_main() const;
     // Returns the local-thread version of StateMemory*
+    StateMemory* ptr() const;
     StateMemory* ptr_local() const;
 
     Layer* layer(uint8_t index) const

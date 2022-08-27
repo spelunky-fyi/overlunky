@@ -28,7 +28,7 @@ class LuaConsole;
 class SoundManager;
 
 ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, LuaConsole* con, bool enable)
-    : LuaBackend(sound_mgr, con)
+    : LockableLuaBackend<ScriptImpl>(sound_mgr, con)
 {
 #ifdef SPEL2_EDITABLE_SCRIPTS
     code = script;
@@ -131,7 +131,6 @@ bool ScriptImpl::reset()
     // Compile & Evaluate the script if the script is changed
     try
     {
-        std::lock_guard gil_guard{gil};
         auto lua_result = execute_lua(lua, code);
 
         sol::optional<std::string> meta_name = lua["meta"]["name"];

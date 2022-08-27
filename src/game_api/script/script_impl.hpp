@@ -9,7 +9,7 @@
 class LuaConsole;
 class SoundManager;
 
-class ScriptImpl : public LuaBackend
+class ScriptImpl : public  LockableLuaBackend<ScriptImpl>
 {
   public:
 #ifdef SPEL2_EDITABLE_SCRIPTS

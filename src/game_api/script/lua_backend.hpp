@@ -28,6 +28,9 @@
 #include "level_api.hpp" // IWYU pragma: keep
 #include "logger.h"      // for DEBUG
 #include "script.hpp"    // for ScriptMessage, ScriptImage (ptr only), Scri...
+#include "util.hpp"      // for GlobalMutexProtectedResource
+
+extern std::recursive_mutex global_lua_lock;
 
 class Player;
 class JournalPage;
@@ -230,6 +233,11 @@ class LuaConsole;
 class LuaBackend
 {
   public:
+    using ProtectedBackend = GlobalMutexProtectedResource<LuaBackend*, &global_lua_lock>;
+    using LockedBackend = ProtectedBackend::LockedResource<LuaBackend>;
+
+    ProtectedBackend* self;
+
     sol::environment lua;
     std::shared_ptr<sol::state> vm;
     std::unordered_set<std::string> loaded_modules;
@@ -239,8 +247,6 @@ class LuaBackend
 
     int cbcount = 0;
     CurrentCallback current_cb = {-1, 0, CallbackType::None};
-
-    std::recursive_mutex gil;
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
@@ -358,14 +364,17 @@ class LuaBackend
     std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
     std::u16string pre_toast(char16_t* buffer);
 
-    static void for_each_backend(std::function<bool(LuaBackend&)> fun);
-    static LuaBackend* get_backend(std::string_view id);
-    static LuaBackend* get_backend_by_id(std::string_view id, std::string_view ver = "");
-    static LuaBackend* get_calling_backend();
-
     CurrentCallback get_current_callback();
     void set_current_callback(int uid, int id, CallbackType type);
     void clear_current_callback();
+
+    static void for_each_backend(std::function<bool(LockedBackend)> fun);
+    static LockedBackend get_backend(std::string_view id);
+    static std::optional<LockedBackend> get_backend_safe(std::string_view id);
+    static LockedBackend get_backend_by_id(std::string_view id, std::string_view ver = "");
+    static std::optional<LockedBackend> get_backend_by_id_safe(std::string_view id, std::string_view ver = "");
+    static LockedBackend get_calling_backend();
+    static std::string_view get_calling_backend_id();
 };
 
 template <class... Args>
@@ -418,3 +427,16 @@ std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, A
         }
     }
 }
+
+template<class Inheriting>
+class LockableLuaBackend : public LuaBackend
+{
+public:
+    using LuaBackend::LuaBackend;
+
+    using LockableInherited = ProtectedBackend::LockedResource<Inheriting>;
+    LockableInherited Lock()
+    {
+        return self->LockAs<Inheriting>();
+    }
+};

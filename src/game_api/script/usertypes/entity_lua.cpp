@@ -214,7 +214,7 @@ void register_usertypes(sol::state& lua)
 
     auto get_user_data = [](Entity& entity) -> sol::object
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         if (sol::object user_data = backend->get_user_data(entity))
         {
             return user_data;
@@ -223,7 +223,7 @@ void register_usertypes(sol::state& lua)
     };
     auto set_user_data = [](Entity& entity, sol::object user_data) -> void
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->set_user_data(entity, user_data);
     };
     auto user_data = sol::property(get_user_data, set_user_data);

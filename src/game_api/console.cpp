@@ -18,17 +18,21 @@ SpelunkyConsole::SpelunkyConsole(SoundManager* sound_manager)
 }
 SpelunkyConsole::~SpelunkyConsole() = default;
 
+void SpelunkyConsole::loop_messages(std::function<void(const ScriptMessage&)> message_fun) const
+{
+    auto impl = m_Impl->Lock();
+    for (const ScriptMessage& message : impl->messages)
+    {
+        message_fun(message);
+    }
+}
 std::vector<std::string> SpelunkyConsole::consume_requires()
 {
-    return std::move(m_Impl->required_scripts);
+    return std::move(m_Impl->Lock()->required_scripts);
 }
 std::deque<ScriptMessage> SpelunkyConsole::consume_messages()
 {
-    return std::move(m_Impl->messages);
-}
-const std::deque<ScriptMessage>& SpelunkyConsole::get_messages() const
-{
-    return m_Impl->messages;
+    return std::move(m_Impl->Lock()->messages);
 }
 
 bool SpelunkyConsole::is_enabled()
@@ -38,42 +42,44 @@ bool SpelunkyConsole::is_enabled()
 }
 bool SpelunkyConsole::is_toggled()
 {
-    return m_Impl->enabled;
+    return m_Impl->Lock()->get_enabled();
 }
 
 bool SpelunkyConsole::run()
 {
-    m_Impl->lua["P"] = m_Impl->lua["get_player"](1);
-    return m_Impl->update();
+    auto impl = m_Impl->Lock();
+    impl->lua["P"] = impl->lua["get_player"](1);
+    return impl->update();
 }
 void SpelunkyConsole::draw(ImDrawList* dl)
 {
-    m_Impl->draw(dl);
+    m_Impl->Lock()->draw(dl);
 }
 void SpelunkyConsole::render_options()
 {
-    m_Impl->render_options();
+    m_Impl->Lock()->render_options();
 }
 
 std::string SpelunkyConsole::execute(std::string code)
 {
-    return m_Impl->execute(std::move(code));
+    return m_Impl->Lock()->execute(std::move(code));
 }
 
 bool SpelunkyConsole::has_new_history() const
 {
-    return m_Impl->has_new_history;
+    return m_Impl->Lock()->has_new_history;
 }
 void SpelunkyConsole::set_max_history_size(size_t max_history)
 {
-    m_Impl->max_history = max_history;
+    m_Impl->Lock()->max_history = max_history;
 }
 void SpelunkyConsole::save_history(std::string_view path)
 {
     if (std::ofstream history_file = std::ofstream(std::string{path}))
     {
         std::string line;
-        for (const auto& history_item : m_Impl->history)
+        auto impl = m_Impl->Lock();
+        for (const auto& history_item : impl->history)
         {
             if (history_item.command.find("---") != 0)
                 history_file << "> " + history_item.command << '\n';
@@ -86,13 +92,15 @@ void SpelunkyConsole::load_history(std::string_view path)
     {
         std::string line;
         std::string history_item;
+
+        auto impl = m_Impl->Lock();
         while (std::getline(history_file, line))
         {
             if (line.starts_with("> "))
             {
                 if (!history_item.empty())
                 {
-                    m_Impl->push_history(std::move(history_item), {});
+                    impl->push_history(std::move(history_item), {});
                 }
                 line = line.substr(2);
             }
@@ -102,38 +110,39 @@ void SpelunkyConsole::load_history(std::string_view path)
 
         if (!history_item.empty())
         {
-            m_Impl->push_history(std::move(history_item), {});
+            impl->push_history(std::move(history_item), {});
         }
     }
 }
 void SpelunkyConsole::push_history(std::string history_item, std::vector<ScriptMessage> result_item)
 {
-    m_Impl->push_history(std::move(history_item), std::move(result_item));
+    m_Impl->Lock()->push_history(std::move(history_item), std::move(result_item));
 }
 
 void SpelunkyConsole::toggle()
 {
-    m_Impl->toggle();
+    m_Impl->Lock()->toggle();
 }
 
 std::string SpelunkyConsole::dump_api()
 {
-    return m_Impl->dump_api();
+    return m_Impl->Lock()->dump_api();
 }
 
 void SpelunkyConsole::set_selected_uid(uint32_t uid)
 {
-    m_Impl->lua["U"] = uid;
-    m_Impl->lua["E"] = m_Impl->lua["get_entity"](uid);
-    m_Impl->lua["P"] = m_Impl->lua["players"];
+    auto impl = m_Impl->Lock();
+    impl->lua["U"] = uid;
+    impl->lua["E"] = impl->lua["get_entity"](uid);
+    impl->lua["P"] = impl->lua["players"];
 }
 
 unsigned int SpelunkyConsole::get_input_lines()
 {
-    return m_Impl->get_input_lines();
+    return m_Impl->Lock()->get_input_lines();
 }
 
 void SpelunkyConsole::set_geometry(float x, float y, float w, float h)
 {
-    m_Impl->set_geometry(x, y, w, h);
+    m_Impl->Lock()->set_geometry(x, y, w, h);
 }
