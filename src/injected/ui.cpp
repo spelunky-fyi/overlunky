@@ -4847,7 +4847,7 @@ void render_savegame()
         for (int i = 0; i < 9; ++i)
         {
             ImGui::PushID(i);
-            ImGui::InputInt("Sticker", &g_save->stickers[i]);
+            ImGui::InputInt("Sticker", (int32_t*)&g_save->stickers[i]);
             ImGui::PopID();
         }
     }
