@@ -186,7 +186,7 @@ struct ParticleEmitterInfo
     uint32_t particle_count;
     uint32_t unknown2;
     EmittedParticlesInfo emitted_particles;
-    size_t unknown24;
+    size_t unknown24; // particle_count2?
     EmittedParticlesInfo emitted_particles2;
 
     int32_t entity_uid; // set to -1 to decouple emitter position from entity position (and move it around freely)
@@ -201,15 +201,15 @@ struct ParticleEmitterInfo
     float offset_x;
     float offset_y;
 
-    uint8_t unknown54a;
+    uint8_t unknown54a; // layer?
     uint8_t unknown54b;
     uint8_t unknown54c;
     uint8_t unknown54d;
     float unknown55;
     uint32_t unknown56;
-    uint32_t unknown57;
+    uint32_t unknown57; // total_particles?
     uint32_t unknown58;
-    uint32_t unknown59;
+    uint32_t unknown59; // max_particles?
     uint32_t unknown60;
 };
 

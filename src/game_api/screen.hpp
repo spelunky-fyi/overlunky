@@ -303,7 +303,7 @@ class ScreenSeedInput : public Screen // ID: 8
 struct FlyingThing
 {
     TextureRenderingInfo texture_info;
-    uint32_t entity_type;
+    ENT_TYPE entity_type;
     bool unknown1;
     uint8_t padding1;
     uint8_t padding2;

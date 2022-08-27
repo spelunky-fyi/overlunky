@@ -2,6 +2,7 @@
 
 #include "aliases.hpp"
 #include "containers/custom_vector.hpp"
+#include "render_api.hpp"
 #include <array>
 #include <cstdint>
 #include <set>
@@ -49,7 +50,7 @@ struct Illumination
     uint32_t timer;
     union
     {
-        /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+        /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
         uint32_t flags;
         struct
         {
@@ -346,17 +347,17 @@ struct ArenaState
     std::array<uint8_t, 4> player_totalwins;
     int8_t unknown9;
     std::array<bool, 4> player_won;
-    uint8_t unknown14a;
-    uint8_t unknown14b;
-    uint8_t unknown14c;
-    uint8_t unknown14d;
+    uint8_t unknown14a; // player1_bot_ai
+    uint8_t unknown14b; // player2_bot_ai
+    uint8_t unknown14c; // player3_bot_ai
+    uint8_t unknown14d; // player4_bot_ai
     uint8_t unknown14e;
     /// The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 10 minutes and 20 == infinite. Can go higher, although this will glitch the menu text. Actual time (seconds) = (state.arena.timer + 1) x 30
     uint8_t timer;
     uint8_t timer_ending;
     uint8_t wins;
     uint8_t lives;
-    uint8_t unknown15;
+    uint8_t unknown15; // time_to_win
     uint8_t unknown16;
     std::array<uint16_t, 4> player_idolheld_countdown;
     uint8_t health;
@@ -735,7 +736,7 @@ struct LiquidPhysicsEngine
 
 struct LiquidPhysicsParams
 {
-    int32_t shader_type; // can also be flags, as for water, any value with bit one is fine
+    int32_t shader_type; // ? can also be flags, as for water, any value with bit one is fine
     uint8_t unknown2;    // shader related, shader id maybe?
     uint8_t padding1;
     uint8_t padding2;
@@ -982,7 +983,7 @@ struct ShopsInfo
 struct OnScreenMessage
 {
     uint32_t* timer;
-    uint32_t* layout;
+    TextRenderingInfo** layout;
     size_t unknown3;
     size_t unknown4;
     uint32_t unknown5;

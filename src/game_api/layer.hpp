@@ -139,10 +139,10 @@ struct Layer
 
     EntityList unknown_entities2;
     EntityList entities_by_draw_depth[53];
-    EntityList unknown_entities3; // debris, explosions, laserbeams etc. ?
-    EntityList unknown_entities4; // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
-    std::vector<Entity*> unknown; // add_to_layer uses this
-    size_t unknown6;
+    EntityList unknown_entities3;        // debris, explosions, laserbeams etc. ?
+    EntityList unknown_entities4;        // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
+    std::vector<Entity*> unknown_vector; // add_to_layer uses this
+    size_t unknown6;                     // MysteryLayerPointer1 in plugin
     // List of items that were destroyed and are waiting to have the dtor called
     // and then be returned to the entity pool
     EntityList expired_entities;

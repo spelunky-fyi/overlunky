@@ -86,7 +86,6 @@ struct RenderAPI
     void reload_shaders();
 };
 
-// straight out of the x64dbg plugin
 struct RenderInfo
 {
     size_t __vftable;
@@ -187,13 +186,21 @@ struct TextRenderingInfo
     float height;
     uint32_t unknown3;
     size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
+    size_t letter_textures;  // a bunch of float representing the matrix transformations (?) of the individual letters of the text
+    size_t alphabet_mapping; /* unsure */
     uint16_t unknown7;
     uint16_t unknown8;
     int32_t unknown9;
     size_t unknown10;
     Texture* font;
+    float unknown13;
+    uint16_t unknown14;
+    uint16_t unknown15;
+    float unknown16;
+    float unknown17;
+    uint32_t unknown18;
+    float unknown19;
+    float unknown20;
 };
 
 struct TextureRenderingInfo

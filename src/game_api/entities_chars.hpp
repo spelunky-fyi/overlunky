@@ -19,11 +19,12 @@ class Entity;
 class Ai
 {
   public:
-    uint32_t unknown1a; // flags?
-    uint32_t unknown1b; // flags?
-    int32_t unknown2;
-    int32_t unknown3; // garbage?
-    size_t unknown4;
+    uint32_t unknown1a;     // flags?
+    uint32_t unknown1b;     // flags?
+    int16_t unknown2a;      // unknown
+    int16_t unknown2b;      // garbage/padding?
+    int32_t unknown3;       // garbage/padding?
+    size_t unknown4;        // array of targets? (uids)
     size_t button_sequence; /*unsure*/
     Entity* self_pointer;
     size_t unknown7;
@@ -35,14 +36,14 @@ class Ai
     int32_t timer;
     /// AI state (patrol, sleep, attack, aggro...)
     int8_t state; // 8 = HH agro
-    int8_t unknown12;
+    int8_t last_state;
     /// Levels completed with, 0..3
     uint8_t trust;
     /// How many times master has violated us
     uint8_t whipped;
     int8_t unknown15;
     int8_t unknown16;
-    int16_t unknown17;
+    int16_t walk_pause_timer; // positive: walking, negative: wating/idle
     int16_t unknown19;
     int16_t unknown20; // distance to target?
     int32_t target_uid;
