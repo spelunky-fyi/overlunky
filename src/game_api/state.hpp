@@ -51,25 +51,25 @@ struct StateMemory
     float fadevalue; // 0.0 = all visible; 1.0 = all black
     uint32_t fadeout;
     uint32_t fadein;
-    uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in
-                                         // credits, ...)
-    uint8_t ingame;
-    uint8_t playing;
+    uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
+    /// True when you have control over your character
+    bool ingame;
+    /// True whenever you are in an active game (basically everything except the main menu, character select etc.)
+    bool playing;
     /// `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
     uint8_t pause;
-    uint8_t b33;
-    int32_t i34;
+    uint8_t pause_related1;
+    uint8_t pause_related2;
+    uint8_t padding1[3];
     uint32_t quest_flags;
     uint8_t correct_ushabti; // correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
-    uint8_t i3cb;
-    uint8_t i3cc;
-    uint8_t i3cd;
-    ENT_TYPE speedrun_character;         // who administers the speedrun in base camp
-    uint8_t speedrun_activation_trigger; // must transition from true to false to activate it
-    uint8_t padding4;
-    uint8_t padding5;
-    uint8_t padding6;
+    uint8_t padding2[3];
+    ENT_TYPE speedrun_character;      // who administers the speedrun in base camp
+    bool speedrun_activation_trigger; // must transition from true to false to activate it
+    uint8_t padding3[3];
+    /// level width in rooms (number of rooms horizontally)
     uint32_t w;
+    /// level height in rooms (number of rooms vertically)
     uint32_t h;
     int8_t kali_favor;
     int8_t kali_status;
@@ -94,7 +94,7 @@ struct StateMemory
     uint8_t theme_next;
     /// 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     uint8_t win_state;
-    uint8_t b73;
+    uint8_t b73; // padding probably
     /// Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
     ENT_TYPE end_spaceship_character;
     uint8_t shoppie_aggro;
@@ -118,7 +118,7 @@ struct StateMemory
     std::array<int16_t, 99> waddler_storage_meta; // to store mattock durability for example
     uint16_t journal_progression_count;
     std::array<JournalProgressionSlot, 40> journal_progression_slots;
-    uint8_t skip2[844];
+    uint8_t skip2[844]; // TODO
     ThemeProgression theme_progression;
     uint8_t unknown3;
     uint8_t unknown4;
@@ -146,8 +146,8 @@ struct StateMemory
     uint8_t padding12;
     ENT_TYPE cause_of_death_entity_type;
     int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
-    size_t toast;
-    size_t speechbubble;
+    OnScreenMessage* toast;
+    OnScreenMessage* speechbubble;
     uint32_t speechbubble_timer;
     uint32_t toast_timer;
     int32_t speechbubble_owner;
@@ -191,7 +191,7 @@ struct StateMemory
     LiquidPhysics* liquid_physics;
     std::vector<ParticleEmitterInfo*>* particle_emitters;
     std::vector<Illumination*>* lightsources;
-    size_t unknown27;
+    size_t unknown27; // lookup entity struct
 
     // This is a Robin Hood Table
     uint32_t uid_to_entity_mask;
@@ -204,13 +204,19 @@ struct StateMemory
     size_t unknown30;
     uint32_t layer_transition_effect_timer;
     uint8_t camera_layer;
-    uint8_t unknown31a;
+    uint8_t unknown31a; // padding probably
     uint8_t unknown31b;
     uint8_t unknown31c;
     ShopsInfo shops;
     uint32_t time_startup;
     uint32_t special_visibility_flags;
     Camera* camera;
+    uint8_t unknown40;
+    int8_t unknown41; // other character related (hired hand, basecamp characters)
+    uint8_t unknown42;
+    uint8_t unknown43;
+    uint32_t unknown44;
+    uint64_t unknown45;
 
     /// This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
     void force_current_theme(uint32_t t);

@@ -478,8 +478,8 @@ struct LevelGenSystem
         };
     };
     uint8_t flags;
-    uint8_t unknown39;
-    uint8_t unknown40;
+    uint8_t unknown39; // also flags?
+    uint8_t unknown40; // also flags?
     union
     {
         ShopType shop_types[2];

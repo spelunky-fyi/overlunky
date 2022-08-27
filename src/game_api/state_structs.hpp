@@ -802,7 +802,7 @@ struct LiquidLake
 
 struct LiquidPhysics
 {
-    size_t unknown1; // MysteryLiquidPointer1 in plugin
+    size_t unknown1; // MysteryLiquidPointer1 in plugin, collision with floors/activefloors related
     union
     {
         LiquidPool pools[5];
@@ -825,12 +825,14 @@ struct LiquidPhysics
             LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
-    size_t unknown2;
-    size_t unknown3;
-    custom_vector<LiquidLake> impostor_lakes;
-    uint32_t total_liquid_spawned; // Total number of spawned liquid entities, all types.
-    uint32_t unknown8;
-    size_t unknown9;
+    std::list<uint32_t>* floors;              // pointer to map/list that contains all floor uids that the liquid interact with
+    std::list<uint32_t>* push_blocks;         // pointer to map/list that contains all activefloor uids that the liquid interact with
+    custom_vector<LiquidLake> impostor_lakes; //
+    uint32_t total_liquid_spawned;            // Total number of spawned liquid entities, all types.
+    uint32_t unknown8;                        // padding probably
+    uint8_t* unknown9;                        // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
+                                              // always allocates after the LiquidPhysics
+
     uint32_t total_liquid_spawned2; // Same as total_liquid_spawned?
     bool unknown12;
     uint8_t padding12a;
@@ -975,4 +977,16 @@ struct ShopsInfo
 {
     std::set<ShopRestrictedItem> items; // could also be a map
     std::vector<ShopOwnerDetails> shop_owners;
+};
+
+struct OnScreenMessage
+{
+    uint32_t* timer;
+    uint32_t* layout;
+    size_t unknown3;
+    size_t unknown4;
+    uint32_t unknown5;
+    float unknown6;
+    uint32_t unknown7;
+    uint32_t unknown8;
 };
