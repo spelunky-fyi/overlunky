@@ -127,10 +127,14 @@ void register_usertypes(sol::state& lua)
         &Ai::timer,
         "state",
         &Ai::state,
+        "last_state",
+        &Ai::last_state,
         "trust",
         &Ai::trust,
         "whipped",
-        &Ai::whipped);
+        &Ai::whipped,
+        "walk_pause_timer",
+        &Ai::walk_pause_timer);
 
     lua.new_usertype<Player>(
         "Player",

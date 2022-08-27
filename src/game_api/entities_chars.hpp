@@ -43,7 +43,8 @@ class Ai
     uint8_t whipped;
     int8_t unknown15;
     int8_t unknown16;
-    int16_t walk_pause_timer; // positive: walking, negative: wating/idle
+    /// positive: walking, negative: wating/idle
+    int16_t walk_pause_timer;
     int16_t unknown19;
     int16_t unknown20; // distance to target?
     int32_t target_uid;
