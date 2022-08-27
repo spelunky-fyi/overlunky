@@ -123,3 +123,8 @@ std::string_view to_name(ENT_TYPE id)
 
     return {};
 }
+
+EntityDB::EntityDB(const ENT_TYPE other)
+    : EntityDB(*get_type(other))
+{
+}

@@ -91,6 +91,7 @@ void register_usertypes(sol::state& lua)
         &Animation::repeat);
     lua.new_usertype<EntityDB>(
         "EntityDB",
+        sol::constructors<EntityDB(EntityDB&), EntityDB(ENT_TYPE)>{},
         "id",
         &EntityDB::id,
         "search_flags",
