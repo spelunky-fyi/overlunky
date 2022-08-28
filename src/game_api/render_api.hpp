@@ -184,14 +184,16 @@ struct TextRenderingInfo
     uint32_t text_length;
     float width;
     float height;
-    uint32_t unknown3;
-    size_t unknown4;
-    size_t letter_textures;  // a bunch of float representing the matrix transformations (?) of the individual letters of the text
-    size_t alphabet_mapping; /* unsure */
+    uint32_t unknown3;      // padding probably
+    size_t unknown4;        // unknown4 + letter_textures + unknown5 is most likely a vector
+    size_t letter_textures; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
+    size_t unknown5;
     uint16_t unknown7;
-    uint16_t unknown8;
+    uint16_t unknown8; // padding probably
     int32_t unknown9;
-    size_t unknown10;
+    uint8_t shader;
+    uint8_t padding1[3];
+    uint32_t padding2;
     Texture* font;
     float unknown13;
     uint16_t unknown14;

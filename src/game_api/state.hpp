@@ -198,10 +198,7 @@ struct StateMemory
     uint32_t padding13;
     RobinHoodTableEntry* uid_to_entity_data;
 
-    size_t backlayer_player_related1;
-    size_t backlayer_player_related2;
-
-    size_t unknown30;
+    custom_vector<std::pair<Entity*, uint8_t>> backlayer_player_related1; // inside vector: player and destination layer?
     uint32_t layer_transition_effect_timer;
     uint8_t camera_layer;
     uint8_t unknown31a; // padding probably

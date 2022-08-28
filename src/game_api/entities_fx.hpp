@@ -2,6 +2,7 @@
 
 #include "movable.hpp"
 #include "particles.hpp"
+#include "sound_manager.hpp"
 
 struct Illumination;
 

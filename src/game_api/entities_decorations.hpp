@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity.hpp"
+#include "sound_manager.hpp"
 
 struct Illumination;
 

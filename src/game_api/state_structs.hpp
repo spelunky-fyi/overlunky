@@ -982,12 +982,8 @@ struct ShopsInfo
 
 struct OnScreenMessage
 {
-    uint32_t* timer;
-    TextRenderingInfo** layout;
-    size_t unknown3;
-    size_t unknown4;
-    uint32_t unknown5;
-    float unknown6;
-    uint32_t unknown7;
-    uint32_t unknown8;
+    uint32_t* timer;                       // it's some struct, game increments this value and one at +0x40, touching just one freezes the game
+    std::vector<TextRenderingInfo*> lines; // each line is separete TextRenderingInfo
+    float x;
+    float z;
 };
