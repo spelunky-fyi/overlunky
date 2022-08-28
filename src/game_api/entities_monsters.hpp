@@ -703,7 +703,7 @@ class Lahamu : public Monster
 {
   public:
     SoundPosition* sound_pos;
-    PlayerTracker* eyeball_positioner;
+    Entity* eyeball;
     uint16_t attack_cooldown_timer;
     bool unknown_proximity_related; // gets set to true when you get close to Lahamu
 };

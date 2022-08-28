@@ -785,6 +785,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Lahamu>(
         "Lahamu",
+        "eyeball",
+        &Lahamu::eyeball,
         "attack_cooldown_timer",
         &Lahamu::attack_cooldown_timer,
         sol::base_classes,

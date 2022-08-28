@@ -88,7 +88,6 @@ struct RenderAPI
 
 struct RenderInfo
 {
-    size_t __vftable;
     float x;
     float y;
     uint32_t unknown3;
@@ -175,6 +174,12 @@ struct RenderInfo
     uint32_t unknown56;
     uint32_t unknown57;
     uint32_t unknown58; // end, next RenderInfo below
+
+    virtual ~RenderInfo() = 0;
+    virtual void unknown_v2() = 0;
+    virtual void update() = 0;
+    virtual void draw(size_t) = 0;
+    virtual bool unknown_3() = 0; // init? sets darkness to 1.0 at the start, then does some other stuff
 };
 
 struct TextRenderingInfo
