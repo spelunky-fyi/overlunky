@@ -649,6 +649,11 @@ void unlock_door_at(float x, float y)
     }
 }
 
+uint32_t get_frame_count_main()
+{
+    auto state = State::get();
+    return state.get_frame_count_main();
+}
 uint32_t get_frame_count()
 {
     auto state = State::get();

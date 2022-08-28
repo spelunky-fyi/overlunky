@@ -272,6 +272,7 @@ struct State
         ptr()->pause = p;
     }
 
+    uint32_t get_frame_count_main() const;
     uint32_t get_frame_count() const;
 
     std::vector<int64_t> read_prng() const;

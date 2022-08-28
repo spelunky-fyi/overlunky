@@ -564,6 +564,10 @@ LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
     return nullptr;
 }
 
+uint32_t State::get_frame_count_main() const
+{
+    return read_u32((size_t)ptr_main() - 0xd0);
+}
 uint32_t State::get_frame_count() const
 {
     return read_u32((size_t)ptr() - 0xd0);

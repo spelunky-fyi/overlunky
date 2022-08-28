@@ -37,7 +37,7 @@ std::vector<std::unique_ptr<LuaBackend::ProtectedBackend>> g_all_backends;
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     : lua{get_lua_vm(sound_mgr), sol::create}, vm{acquire_lua_vm(sound_mgr)}, sound_manager{sound_mgr}, console{con}
 {
-    g_state = get_state_ptr();
+    g_state = State::get().ptr_main();
 
     auto players = get_players(g_state);
     if (!players.empty())
@@ -47,8 +47,8 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     state.screen = g_state->screen;
     state.time_level = g_state->time_level;
     state.time_total = g_state->time_total;
-    state.time_global = get_frame_count();
-    state.frame = get_frame_count();
+    state.time_global = get_frame_count_main();
+    state.frame = state.frame;
     state.loading = g_state->loading;
     state.reset = (g_state->quest_flags & 1);
     state.quest_flags = g_state->quest_flags;

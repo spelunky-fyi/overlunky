@@ -66,6 +66,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
 std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask);
 void lock_door_at(float x, float y);
 void unlock_door_at(float x, float y);
+uint32_t get_frame_count_main();
 uint32_t get_frame_count();
 void carry(uint32_t mount_uid, uint32_t rider_uid);
 void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse = std::nullopt);
