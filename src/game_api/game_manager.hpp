@@ -89,13 +89,17 @@ struct MusicTrack
     uint32_t garbage1;
     bool fadeout_music_and_crash; // probably need to call destroy after or something
 
-    virtual void start() = 0;
+    virtual void start() = 0;                                // just sets music_on to true
     virtual void fade_out(uint8_t) = 0;                      // unsure
     virtual void get_name(size_t buttor, uint32_t size) = 0; // unsure?
     virtual void destroy() = 0;                              // unsure?
     virtual void update() = 0;                               // disabling this function does not progresses the track, does not stop it at the end level etc.
                                                              // like if you start a level you have one loop and the after you move it porgresses to another one
     virtual bool unknown() = 0;
+
+    ~MusicTrack()
+    {
+    }
 };
 
 struct BackgroundMusic
