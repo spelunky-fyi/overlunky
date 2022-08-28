@@ -39,7 +39,7 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
 {
     g_state = get_state_ptr();
 
-    auto players = get_players();
+    auto players = get_players(g_state);
     if (!players.empty())
         state.player = players.at(0);
     else
@@ -260,8 +260,8 @@ bool LuaBackend::update()
 
         // ==========
 
-        std::vector<Player*> players = get_players();
-        lua["players"] = std::vector<Player*>(players);
+        std::vector<Player*> players = get_players(g_state);
+        lua["players"] = players;
 
         /*moved to pre_load_screen
         if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen_next != (int)ON::OPTIONS && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
@@ -774,7 +774,7 @@ void LuaBackend::pre_level_generation()
 
     auto now = get_frame_count();
 
-    lua["players"] = std::vector<Player*>(get_players());
+    lua["players"] = get_players(g_state);
 
     for (auto& [id, callback] : callbacks)
     {
@@ -902,7 +902,7 @@ void LuaBackend::post_level_generation()
 
     auto now = get_frame_count();
 
-    lua["players"] = std::vector<Player*>(get_players());
+    lua["players"] = get_players(g_state);
 
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::LEVEL)

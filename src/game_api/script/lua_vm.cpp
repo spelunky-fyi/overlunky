@@ -177,19 +177,22 @@ end
     NEntityCasting::register_usertypes(lua);
     NBehavior::register_usertypes(lua);
 
+    StateMemory* main_state = State::get().ptr_main();
+    std::vector<Player*> players = get_players(main_state);
+
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
-    lua["state"] = get_state_ptr();
+    lua["state"] = main_state;
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
     lua["online"] = get_online();
     /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See get_player().
-    lua["players"] = std::vector<Player*>(get_players());
+    lua["players"] = players;
 
     auto get_player = sol::overload(
         [&lua](int8_t slot) -> sol::object // -> Player
         {
-            for (auto player : get_players())
+            for (auto player : get_players(State::get().ptr()))
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);
@@ -198,7 +201,7 @@ end
         },
         [&lua](int8_t slot, bool or_ghost) -> sol::object
         {
-            for (auto player : get_players())
+            for (auto player : get_players(State::get().ptr()))
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);

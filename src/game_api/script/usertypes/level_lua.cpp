@@ -1860,11 +1860,13 @@ void register_usertypes(sol::state& lua)
         "FLAGGED_LIQUID_ROOMS",
         16);
 
+    StateMemory* main_state = State::get().ptr_main();
+
     lua.create_named_table("TILE_CODE"
                            //, "EMPTY", 0
                            //, "", ...check__[tile_codes.txt]\[game_data/tile_codes.txt\]...
     );
-    for (const auto& [tile_code_name, tile_code] : State::get().ptr()->level_gen->data->tile_codes)
+    for (const auto& [tile_code_name, tile_code] : main_state->level_gen->data->tile_codes)
     {
         std::string clean_tile_code_name = tile_code_name.c_str();
         std::transform(
@@ -1879,7 +1881,7 @@ void register_usertypes(sol::state& lua)
                            //, "", ...check__[room_templates.txt]\[game_data/room_templates.txt\]...
     );
 
-    auto room_templates = State::get().ptr()->level_gen->data->room_templates;
+    auto room_templates = main_state->level_gen->data->room_templates;
     room_templates["empty_backlayer"] = {9};
     room_templates["boss_arena"] = {22};
     room_templates["shop_jail_backlayer"] = {44};
@@ -1902,8 +1904,7 @@ void register_usertypes(sol::state& lua)
                            //, "ARROWTRAP_CHANCE", 0
                            //, "", ...check__[spawn_chances.txt]\[game_data/spawn_chances.txt\]...
     );
-    auto* state = State::get().ptr();
-    for (auto* chances : {&state->level_gen->data->monster_chances, &state->level_gen->data->trap_chances})
+    for (auto* chances : {&main_state->level_gen->data->monster_chances, &main_state->level_gen->data->trap_chances})
     {
         for (const auto& [chance_name, chance] : *chances)
         {

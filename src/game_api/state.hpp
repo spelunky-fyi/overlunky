@@ -246,12 +246,6 @@ struct State
         return ptr_local()->layers[index];
     }
 
-    Items* items() const
-    {
-        auto pointer = ptr()->items;
-        return pointer;
-    }
-
     void godmode(bool g);
     void godmode_companions(bool g);
     void darkmode(bool g);

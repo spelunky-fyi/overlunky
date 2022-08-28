@@ -102,10 +102,10 @@ static bool g_godmode_companions_active = false;
 
 bool is_active_player(Entity* e)
 {
-    auto state = State::get();
+    auto state = State::get().ptr();
     for (uint8_t i = 0; i < MAX_PLAYERS; i++)
     {
-        auto player = state.items()->player(i);
+        auto player = state->items->player(i);
         if (player && player == e)
         {
             return true;
@@ -231,7 +231,7 @@ State& State::get()
         }
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
-        STATE.ptr()->level_gen->init();
+        STATE.ptr_main()->level_gen->init();
         init_spawn_hooks();
         init_behavior_hooks();
         init_render_api_hooks();
@@ -244,7 +244,8 @@ State& State::get()
 
 StateMemory* State::ptr_main() const
 {
-    return ptr_local();
+    OnHeapPointer<StateMemory> p(read_u64(location));
+    return p.decode();
 }
 
 StateMemory* State::ptr() const
@@ -594,8 +595,8 @@ uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_positio
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
+        auto state = State::get().ptr();
+        auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
             player_position = player->position();
@@ -615,8 +616,8 @@ uint8_t enum_to_layer(const LAYER layer)
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
+        auto state = State::get().ptr();
+        auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
             return player->layer;

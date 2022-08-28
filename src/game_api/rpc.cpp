@@ -265,13 +265,16 @@ ENT_TYPE get_entity_type(uint32_t uid)
     return UINT32_MAX; // TODO: shouldn't this be 0?
 }
 
-std::vector<Player*> get_players()
+std::vector<Player*> get_players(StateMemory* state)
 {
-    auto state = State::get();
+    state = state != nullptr
+                ? state
+                : State::get().ptr();
+
     std::vector<Player*> found;
     for (uint8_t i = 0; i < MAX_PLAYERS; i++)
     {
-        auto player = state.items()->player(i);
+        auto player = state->items->player(i);
         if (player)
             found.push_back((Player*)player);
     }
