@@ -255,14 +255,14 @@ struct SoundInfo
 {
     int64_t unknown1;
     uint32_t sound_id;
-    int32_t unknown2;
+    int32_t unknown2; // padding probably
     const char* sound_name;
     int64_t unknown3;
     int64_t unknown4;
     int64_t unknown5;
 };
 
-struct SoundPosition
+struct SoundMeta
 {
     float x;
     float y;
@@ -275,20 +275,20 @@ struct SoundPosition
     bool start_over;
     uint8_t unknown8; // fade out?
     /// set to false to turn off
-    bool music_on;
+    bool playing;
     uint8_t padding1;
     uint32_t padding2;
 
     virtual void start() = 0;                               // just sets music_on to true
     virtual void fade_out(uint8_t) = 0;                     // unsure, parameter sets the unknown8
     virtual void get_name(void* buttor, uint32_t size) = 0; // unsure?
-    virtual ~SoundPosition() = 0;                           //
+    virtual ~SoundMeta() = 0;                               //
     virtual void update() = 0;                              // disabling this function does not progresses the track, does not stop it at the end level etc.
                                                             // like if you start a level you have one loop and the after you move it porgresses to another one
     virtual bool unknown() = 0;
 };
 
-struct BackGroundSound : public SoundPosition
+struct BackGroundSound : public SoundMeta
 {
-    bool special_fadeout; // crashes, probably need to call destroy after or something
+    bool special_fadeout; // fades out the music then calls destruct (which will crash the game if used on someting in GameManager->BackgroundMusic)
 };

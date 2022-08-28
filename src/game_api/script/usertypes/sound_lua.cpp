@@ -164,20 +164,20 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "set_parameter",
         &PlayingSound::set_parameter);
 
-    lua.new_usertype<SoundPosition>(
-        "SoundPosition",
+    lua.new_usertype<SoundMeta>(
+        "SoundMeta",
         "x",
-        &SoundPosition::x,
+        &SoundMeta::x,
         "y",
-        &SoundPosition::y,
+        &SoundMeta::y,
         "left_channel",
-        &SoundPosition::left_channel,
+        &SoundMeta::left_channel,
         "right_channel",
-        &SoundPosition::right_channel,
+        &SoundMeta::right_channel,
         "start_over",
-        &SoundPosition::start_over,
+        &SoundMeta::start_over,
         "music_on",
-        &SoundPosition::music_on);
+        &SoundMeta::playing);
 
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
     lua.create_named_table("SOUND_TYPE", "SFX", 0, "MUSIC", 1);

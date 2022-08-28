@@ -138,7 +138,7 @@ class Ghost : public Monster
     uint8_t unknown10;
     Illumination* emitted_light;
     Entity* linked_ghost;
-    SoundPosition* sound_info;
+    SoundMeta* sound;
 };
 
 class Bat : public Monster
@@ -162,7 +162,7 @@ class Jiangshi : public Monster
 class Monkey : public Monster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint8_t jump_timer;
     bool on_vine;
 };
@@ -179,8 +179,8 @@ class GoldMonkey : public Monster
 class Mole : public Monster
 {
   public:
-    SoundPosition* burrowing_sound_pos;
-    SoundPosition* nonburrowing_sound_pos;
+    SoundMeta* burrowing_sound;
+    SoundMeta* nonburrowing_sound;
     ParticleEmitterInfo* burrowing_particle;
     float burrow_dir_x;
     float burrow_dir_y;
@@ -321,7 +321,7 @@ class HornedLizard : public Monster
     uint8_t attack_cooldown_timer;
     uint8_t blood_squirt_timer;
     uint8_t unknown3;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     ParticleEmitterInfo* particle;
 };
 
@@ -332,7 +332,7 @@ class Mosquito : public Monster
     float direction_y;
     float stuck_rel_pos_x; // position relative to the block the mosquito is stuck in
     float stuck_rel_pos_y;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint32_t timer;
 };
 
@@ -355,7 +355,7 @@ class Skeleton : public Monster
 class Scarab : public Monster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     Illumination* emitted_light; // set color in sat_vign_0, be sure to make the aperture large enough
     /// how long to stay in current position
     uint16_t timer;
@@ -386,7 +386,7 @@ class Lavamander : public Monster
 class Firebug : public Monster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint16_t fire_timer; // when it reaches zero, it shoots fire
     bool going_up;
     bool detached_from_chain;
@@ -395,7 +395,7 @@ class Firebug : public Monster
 class FirebugUnchained : public Monster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     float max_flight_height; // increments when flying up, until it reaches 1.0, then bug flies down
     uint32_t ai_timer;       // when reaches zero, decides whether to walk or fly or pause; doesn't reset when flying
     uint32_t walking_timer;  // counts down only when walking; can't start flying unless this is at zero
@@ -404,14 +404,14 @@ class FirebugUnchained : public Monster
 class Robot : public WalkingMonster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     Illumination* emitted_light_explosion;
 };
 
 class Quillback : public WalkingMonster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     ParticleEmitterInfo* particle;
     int16_t unknown_state; // accessed as byte and word, so, flags?, changed mostly when breaking floors
     uint8_t unknown_timer;
@@ -421,7 +421,7 @@ class Quillback : public WalkingMonster
 class Leprechaun : public WalkingMonster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint8_t hump_timer;
     uint8_t target_in_sight_timer;
     /// amount of gold he picked up, will be drooped on death
@@ -452,7 +452,7 @@ class VanHorsing : public NPC
 class WitchDoctor : public WalkingMonster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint16_t skull_regen_timer; // when zero, regenerates a new floating skull
 };
 
@@ -462,7 +462,7 @@ class WitchDoctorSkull : public Monster
     int32_t witch_doctor_uid;
     uint32_t unknown1;
     Illumination* emitted_light;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     float rotation_angle;
 };
 
@@ -523,7 +523,7 @@ class Fish : public Monster
 class GiantFish : public Monster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     /// when bouncing into a wall
     uint16_t change_direction_timer;
     /// delay in-between attacks
@@ -550,9 +550,11 @@ class Crabman : public Monster
 class Kingu : public Monster
 {
   public:
-    SoundPosition* sound_info1; // initialized when breaking the shell (sliding down sound maybe?)
-    SoundPosition* sound_info2; // Turning into stone sound
-    float climb_direction_x;    // distance too?
+    /// initialized when breaking the shell (sliding down sound maybe?)
+    SoundMeta* sound1;
+    /// Turning into stone sound
+    SoundMeta* sound2;
+    float climb_direction_x; // distance too?
     float climb_direction_y;
     uint16_t climb_pause_timer;
     uint8_t shell_invincibility_timer;
@@ -601,7 +603,7 @@ class Sorceress : public WalkingMonster
     float in_air_timer;               // why float?
     Illumination* halo_emitted_light; // not the shot but the halo, try putting a color at 10
     Entity* fx_entity;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint8_t hover_timer;
 };
 
@@ -609,7 +611,7 @@ class MagmaMan : public Monster
 {
   public:
     Illumination* emitted_light;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     ParticleEmitterInfo* particle;
     uint32_t jump_timer;  // when 0 it jumps
     uint32_t alive_timer; // when 0, the magmaman disappears
@@ -622,7 +624,7 @@ class Bee : public Monster
     uint8_t padding1;
     uint16_t padding2;
     uint32_t padding3;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint16_t fly_hang_timer; // alternates between hanging/sitting on the wall and flying every time it reaches zero
     uint8_t ai_state;
     uint8_t targeting_timer; // counts when bee takes off and hasn't spotted a target yet
@@ -657,8 +659,8 @@ class ApepPart : public Monster
 class ApepHead : public ApepPart
 {
   public:
-    SoundPosition* sound_pos1;
-    SoundPosition* sound_pos2;
+    SoundMeta* sound1;
+    SoundMeta* sound2;
     float distance_traveled;
     uint32_t tail_uid;
     uint32_t fx_mouthpiece1_uid;
@@ -693,7 +695,7 @@ class Alien : public Monster
 class UFO : public Monster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     int16_t patrol_distance; // pos = right, neg = left
     uint8_t attack_cooldown_timer;
     bool is_falling; // read only, manually setting this true has no effect
@@ -702,7 +704,7 @@ class UFO : public Monster
 class Lahamu : public Monster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     Entity* eyeball;
     uint16_t attack_cooldown_timer;
     bool unknown_proximity_related; // gets set to true when you get close to Lahamu
@@ -743,7 +745,7 @@ class YetiKing : public Monster
 class Lamassu : public Monster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     Entity* attack_effect_entity;
     ParticleEmitterInfo* particle;
     Illumination* emitted_light;
@@ -773,7 +775,8 @@ class Olmite : public WalkingMonster
 class Tiamat : public Monster
 {
   public:
-    SoundPosition* sound_pos; // Turning into stone sound
+    /// Turning into stone sound
+    SoundMeta* sound;
     int32_t fx_tiamat_head_uid;
     int32_t fx_tiamat_arm_right1_uid;
     int32_t fx_tiamat_arm_right2_uid;
@@ -816,7 +819,7 @@ class Frog : public Monster
 class FireFrog : public Frog
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class Grub : public Monster
@@ -833,7 +836,7 @@ class Grub : public Monster
     int16_t turn_into_fly_timer;
     uint16_t padding2;
     ParticleEmitterInfo* particle;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class Tadpole : public Monster
@@ -847,7 +850,7 @@ class GiantFly : public Monster
 {
   public:
     Entity* head_entity;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     ParticleEmitterInfo* particle;
     float sine_amplitude;
     float sine_frequency;
@@ -864,7 +867,7 @@ class Ghist : public Monster
     uint8_t idle_timer; // will not chase after you while the timer is running
     uint8_t padding1;
     uint16_t padding2;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint8_t movement_related_timer_1;
     uint8_t movement_related_timer_2;
     uint8_t transparency;
@@ -884,7 +887,7 @@ class JumpDog : public Monster
 class EggplantMinister : public Monster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint8_t unknown1;         // checks flag 0x2F of 64-bit{flags, more_flags}, maybe prevent from squishing when stomped while falling?
     uint8_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     uint16_t squish_timer;
@@ -930,7 +933,7 @@ class MegaJellyfish : public Monster
   public:
     Entity* flipper1;
     Entity* flipper2;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     /// the closest orb, does not gets updated
     int32_t orb_uid;
     int32_t tail_bg_uid;
@@ -965,7 +968,7 @@ class Hermitcrab : public Monster
 class Necromancer : public WalkingMonster
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     float red_skeleton_spawn_x;
     float red_skeleton_spawn_y;
     int32_t resurrection_uid;
@@ -1043,7 +1046,7 @@ class CritterButterfly : public Critter
 class CritterLocust : public Critter
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint8_t jump_timer; // when 0 it jumps
     uint8_t unknown1;
 };
@@ -1095,7 +1098,7 @@ class CritterDrone : public Critter
 {
   public:
     Illumination* emitted_light;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     float applied_hor_momentum;
     float applied_ver_momentum;
     bool unknown1;

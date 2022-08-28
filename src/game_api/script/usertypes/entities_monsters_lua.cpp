@@ -185,6 +185,8 @@ void register_usertypes(sol::state& lua)
         &Ghost::emitted_light,
         "linked_ghost",
         &Ghost::linked_ghost,
+        "sound",
+        &Ghost::sound,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -210,6 +212,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Monkey>(
         "Monkey",
+        "sound",
+        &Monkey::sound,
         "jump_timer",
         &Monkey::jump_timer,
         "on_vine",
@@ -230,6 +234,10 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Mole>(
         "Mole",
+        "burrowing_sound",
+        &Mole::burrowing_sound,
+        "nonburrowing_sound",
+        &Mole::nonburrowing_sound,
         "burrowing_particle",
         &Mole::burrowing_particle,
         "burrow_dir_x",
@@ -363,6 +371,8 @@ void register_usertypes(sol::state& lua)
         &HornedLizard::attack_cooldown_timer,
         "blood_squirt_timer",
         &HornedLizard::blood_squirt_timer,
+        "sound",
+        &HornedLizard::sound,
         "particle",
         &HornedLizard::particle,
         sol::base_classes,
@@ -378,6 +388,8 @@ void register_usertypes(sol::state& lua)
         &Mosquito::stuck_rel_pos_x,
         "stuck_rel_pos_y",
         &Mosquito::stuck_rel_pos_y,
+        "sound",
+        &Mosquito::sound,
         "timer",
         &Mosquito::timer,
         sol::base_classes,
@@ -401,6 +413,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Scarab>(
         "Scarab",
+        "sound",
+        &Scarab::sound,
         "emitted_light",
         &Scarab::emitted_light,
         "timer",
@@ -436,6 +450,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Firebug>(
         "Firebug",
+        "sound",
+        &Firebug::sound,
         "fire_timer",
         &Firebug::fire_timer,
         "going_up",
@@ -447,6 +463,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<FirebugUnchained>(
         "FirebugUnchained",
+        "sound",
+        &FirebugUnchained::sound,
         "max_flight_height",
         &FirebugUnchained::max_flight_height,
         "ai_timer",
@@ -458,6 +476,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Robot>(
         "Robot",
+        "sound",
+        &Robot::sound,
         "emitted_light_explosion",
         &Robot::emitted_light_explosion,
         sol::base_classes,
@@ -465,6 +485,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Quillback>(
         "Quillback",
+        "sound",
+        &Quillback::sound,
         "particle",
         &Quillback::particle,
         "seen_player",
@@ -474,6 +496,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Leprechaun>(
         "Leprechaun",
+        "sound",
+        &Leprechaun::sound,
         "hump_timer",
         &Leprechaun::hump_timer,
         "target_in_sight_timer",
@@ -508,6 +532,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<WitchDoctor>(
         "WitchDoctor",
+        "sound",
+        &WitchDoctor::sound,
         "skull_regen_timer",
         &WitchDoctor::skull_regen_timer,
         sol::base_classes,
@@ -519,6 +545,8 @@ void register_usertypes(sol::state& lua)
         &WitchDoctorSkull::witch_doctor_uid,
         "emitted_light",
         &WitchDoctorSkull::emitted_light,
+        "sound",
+        &WitchDoctorSkull::sound,
         "rotation_angle",
         &WitchDoctorSkull::rotation_angle,
         sol::base_classes,
@@ -589,6 +617,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<GiantFish>(
         "GiantFish",
+        "sound",
+        &GiantFish::sound,
         "change_direction_timer",
         &GiantFish::change_direction_timer,
         "lose_interest_timer",
@@ -613,6 +643,10 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Kingu>(
         "Kingu",
+        "sound1",
+        &Kingu::sound1,
+        "sound2",
+        &Kingu::sound2,
         "climb_direction_x",
         &Kingu::climb_direction_x,
         "climb_direction_y",
@@ -677,6 +711,8 @@ void register_usertypes(sol::state& lua)
         &Sorceress::halo_emitted_light,
         "fx_entity",
         &Sorceress::fx_entity,
+        "sound",
+        &Sorceress::sound,
         "hover_timer",
         &Sorceress::hover_timer,
         sol::base_classes,
@@ -686,6 +722,8 @@ void register_usertypes(sol::state& lua)
         "MagmaMan",
         "emitted_light",
         &MagmaMan::emitted_light,
+        "sound",
+        &MagmaMan::sound,
         "particle",
         &MagmaMan::particle,
         "jump_timer",
@@ -699,6 +737,8 @@ void register_usertypes(sol::state& lua)
         "Bee",
         "can_rest",
         &Bee::can_rest,
+        "sound",
+        &Bee::sound,
         "fly_hang_timer",
         &Bee::fly_hang_timer,
         "targeting_timer",
@@ -732,6 +772,10 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<ApepHead>(
         "ApepHead",
+        "sound1",
+        &ApepHead::sound1,
+        "sound2",
+        &ApepHead::sound2,
         "distance_traveled",
         &ApepHead::distance_traveled,
         "tail_uid",
@@ -774,6 +818,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<UFO>(
         "UFO",
+        "sound",
+        &UFO::sound,
         "patrol_distance",
         &UFO::patrol_distance,
         "attack_cooldown_timer",
@@ -785,6 +831,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Lahamu>(
         "Lahamu",
+        "sound",
+        &Lahamu::sound,
         "eyeball",
         &Lahamu::eyeball,
         "attack_cooldown_timer",
@@ -816,6 +864,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Lamassu>(
         "Lamassu",
+        "sound",
+        &Lamassu::sound,
         "attack_effect_entity",
         &Lamassu::attack_effect_entity,
         "particle",
@@ -852,6 +902,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Tiamat>(
         "Tiamat",
+        "sound",
+        &Tiamat::sound,
         "fx_tiamat_head",
         &Tiamat::fx_tiamat_head_uid,
         "fx_tiamat_arm_right1",
@@ -909,6 +961,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<FireFrog>(
         "FireFrog",
+        "sound",
+        &FireFrog::sound,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, Frog>());
 
@@ -926,6 +980,8 @@ void register_usertypes(sol::state& lua)
         &Grub::turn_into_fly_timer,
         "particle",
         &Grub::particle,
+        "sound",
+        &Grub::sound,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -942,6 +998,8 @@ void register_usertypes(sol::state& lua)
         "GiantFly",
         "head_entity",
         &GiantFly::head_entity,
+        "sound",
+        &GiantFly::sound,
         "particle",
         &GiantFly::particle,
         "sine_amplitude",
@@ -961,6 +1019,8 @@ void register_usertypes(sol::state& lua)
         &Ghist::body_uid,
         "idle_timer",
         &Ghist::idle_timer,
+        "sound",
+        &Ghist::sound,
         "transparency",
         &Ghist::transparency,
         "fadeout",
@@ -979,6 +1039,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<EggplantMinister>(
         "EggplantMinister",
+        "sound",
+        &EggplantMinister::sound,
         "walk_pause_timer",
         &EggplantMinister::walk_pause_timer,
         "squish_timer",
@@ -1043,6 +1105,8 @@ void register_usertypes(sol::state& lua)
         &MegaJellyfish::flipper1,
         "flipper2",
         &MegaJellyfish::flipper2,
+        "sound",
+        &MegaJellyfish::sound,
         "orb_uid",
         &MegaJellyfish::orb_uid,
         "tail_bg_uid",
@@ -1086,6 +1150,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Necromancer>(
         "Necromancer",
+        "sound",
+        &Necromancer::sound,
         "red_skeleton_spawn_x",
         &Necromancer::red_skeleton_spawn_x,
         "red_skeleton_spawn_y",
@@ -1164,6 +1230,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<CritterLocust>(
         "CritterLocust",
+        "sound",
+        &CritterLocust::sound,
         "jump_timer",
         &CritterLocust::jump_timer,
         sol::base_classes,
@@ -1229,6 +1297,8 @@ void register_usertypes(sol::state& lua)
         "CritterDrone",
         "emitted_light",
         &CritterDrone::emitted_light,
+        "sound",
+        &CritterDrone::sound,
         "applied_hor_momentum",
         &CritterDrone::applied_hor_momentum,
         "applied_ver_momentum",

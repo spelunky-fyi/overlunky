@@ -15,7 +15,8 @@ class CrossBeam : public Entity
 class PalaceSign : public Entity
 {
   public:
-    SoundPosition* sound_pos;
+    /// The neon buzz sound
+    SoundMeta* sound;
     Illumination* illumination; // illumination1/2 used only in dark level, no pointer in normal level
     Illumination* arrow_illumination;
     uint8_t arrow_change_timer;

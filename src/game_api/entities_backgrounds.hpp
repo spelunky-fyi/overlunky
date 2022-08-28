@@ -38,7 +38,7 @@ class BGSurfaceLayer : public BGRelativeElement
 class BGEggshipRoom : public Entity
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     Entity* fx_shell;
     Entity* fx_door;
     Entity* platform_left;
