@@ -244,29 +244,16 @@ State& State::get()
     return STATE;
 }
 
-StateMemory* g_state_ptr{nullptr};
-
 StateMemory* State::ptr() const
 {
-    if (g_state_ptr)
-        return g_state_ptr;
-
     OnHeapPointer<StateMemory> p(read_u64(location));
     return p.decode();
 }
 
 StateMemory* State::ptr_local() const
 {
-    if (g_state_ptr)
-        return g_state_ptr;
-
     OnHeapPointer<StateMemory> p(read_u64(location));
     return p.decode_local();
-}
-
-void State::set_state_ptr(StateMemory* given_ptr)
-{
-    g_state_ptr = given_ptr;
 }
 
 std::pair<float, float> State::click_position(float x, float y)
@@ -593,13 +580,11 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
-    State::set_state_ptr(s);
-
     if (!pre_state_update())
     {
         g_state_update_trampoline(s);
     }
-    update_backends(s);
+    update_backends();
 }
 
 void init_state_update_hook()

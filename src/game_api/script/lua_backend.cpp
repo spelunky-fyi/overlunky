@@ -222,7 +222,7 @@ void LuaBackend::set_user_data(uint32_t uid, sol::object user_data)
     set_user_data(*ent, user_data);
 }
 
-bool LuaBackend::frame_update(StateMemory* state_mem)
+bool LuaBackend::update()
 {
     if (!get_enabled())
         return true;
@@ -234,9 +234,6 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
 
     try
     {
-        if (!state_mem)
-            state_mem = g_state;
-
         std::lock_guard gil_guard{gil};
         // Deprecated =======
 
@@ -259,7 +256,9 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
 
         // ==========
 
-        lua["state"] = state_mem;
+        g_state = State::get().ptr_local();
+
+        lua["state"] = g_state;
         lua["players"] = get_players();
 
         if (LuaConsole* is_console = dynamic_cast<LuaConsole*>(this))
@@ -275,23 +274,23 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
             script_input.clear();
             clear_custom_shopitem_names();
         }*/
-        if (state_mem->screen != state.screen)
+        if (g_state->screen != state.screen)
         {
             if (on_screen)
                 on_screen.value()();
         }
-        if (on_frame && state_mem->time_level != state.time_level && state_mem->screen == (int)ON::LEVEL)
+        if (on_frame && g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
         {
             on_frame.value()();
         }
-        if (state_mem->screen == (int)ON::CAMP && state_mem->screen_last != (int)ON::OPTIONS && state_mem->loading != state.loading && state_mem->loading == 3 && state_mem->time_level == 1)
+        if (g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3 && g_state->time_level == 1)
         {
             if (on_camp)
                 on_camp.value()();
         }
-        if (state_mem->screen == (int)ON::LEVEL && state_mem->screen_last != (int)ON::OPTIONS && state_mem->loading != state.loading && state_mem->loading == 3 && state_mem->time_level == 1)
+        if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3 && g_state->time_level == 1)
         {
-            if (state_mem->level_count == 0)
+            if (g_state->level_count == 0)
             {
                 if (on_start)
                     on_start.value()();
@@ -299,17 +298,17 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
             if (on_level)
                 on_level.value()();
         }
-        if (state_mem->screen == (int)ON::TRANSITION && state.screen != (int)ON::TRANSITION)
+        if (g_state->screen == (int)ON::TRANSITION && state.screen != (int)ON::TRANSITION)
         {
             if (on_transition)
                 on_transition.value()();
         }
-        if (state_mem->screen == (int)ON::DEATH && state.screen != (int)ON::DEATH)
+        if (g_state->screen == (int)ON::DEATH && state.screen != (int)ON::DEATH)
         {
             if (on_death)
                 on_death.value()();
         }
-        if ((state_mem->screen == (int)ON::WIN && state.screen != (int)ON::WIN) || (state_mem->screen == (int)ON::CONSTELLATION && state.screen != (int)ON::CONSTELLATION))
+        if ((g_state->screen == (int)ON::WIN && state.screen != (int)ON::WIN) || (g_state->screen == (int)ON::CONSTELLATION && state.screen != (int)ON::CONSTELLATION))
         {
             if (on_win)
                 on_win.value()();
@@ -436,17 +435,17 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                 continue;
 
             set_current_callback(-1, id, CallbackType::Normal);
-            if ((ON)state_mem->screen == callback.screen && state_mem->screen != state.screen && state_mem->screen_last != (int)ON::OPTIONS) // game screens
+            if ((ON)g_state->screen == callback.screen && g_state->screen != state.screen && g_state->screen_last != (int)ON::OPTIONS) // game screens
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
             }
-            else if (callback.screen == ON::LEVEL && state_mem->screen == (int)ON::LEVEL && state_mem->screen_last != (int)ON::OPTIONS && state.loading != state_mem->loading && state_mem->loading == 3 && state_mem->time_level <= 1)
+            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3 && g_state->time_level <= 1)
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
             }
-            else if (callback.screen == ON::CAMP && state_mem->screen == (int)ON::CAMP && state_mem->screen_last != (int)ON::OPTIONS && state.loading != state_mem->loading && state_mem->loading == 3 && state_mem->time_level == 1)
+            else if (callback.screen == ON::CAMP && g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3 && g_state->time_level == 1)
             {
                 handle_function(callback.func);
                 callback.lastRan = now;
@@ -457,7 +456,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                 {
                 case ON::FRAME:
                 {
-                    if (state_mem->time_level != state.time_level && state_mem->screen == (int)ON::LEVEL)
+                    if (g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
@@ -466,8 +465,8 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                 }
                 case ON::GAMEFRAME:
                 {
-                    if (!state_mem->pause && get_frame_count() != state.time_global &&
-                        ((state_mem->screen >= (int)ON::CAMP && state_mem->screen <= (int)ON::DEATH) || state_mem->screen == (int)ON::ARENA_MATCH))
+                    if (!g_state->pause && get_frame_count() != state.time_global &&
+                        ((g_state->screen >= (int)ON::CAMP && g_state->screen <= (int)ON::DEATH) || g_state->screen == (int)ON::ARENA_MATCH))
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
@@ -482,7 +481,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                 }
                 case ON::SCREEN:
                 {
-                    if (state_mem->screen != state.screen)
+                    if (g_state->screen != state.screen)
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
@@ -491,7 +490,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                 }
                 case ON::START:
                 {
-                    if (state_mem->screen == (int)ON::LEVEL && state_mem->screen_last != (int)ON::OPTIONS && state_mem->level_count == 0 && state_mem->loading != state.loading && state_mem->loading == 3 && state_mem->time_level <= 1)
+                    if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->level_count == 0 && g_state->loading != state.loading && g_state->loading == 3 && g_state->time_level <= 1)
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
@@ -500,7 +499,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                 }
                 case ON::LOADING:
                 {
-                    if (state_mem->loading > 0 && state_mem->loading != state.loading)
+                    if (g_state->loading > 0 && g_state->loading != state.loading)
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
@@ -509,7 +508,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                 }
                 case ON::RESET:
                 {
-                    if ((state_mem->quest_flags & 1) > 0 && (state_mem->quest_flags & 1) != state.reset)
+                    if ((g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset)
                     {
                         handle_function(callback.func);
                         callback.lastRan = now;
@@ -518,7 +517,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
                 }
                 case ON::SAVE:
                 {
-                    if (state_mem->loading != state.loading && state_mem->loading == 1)
+                    if (g_state->loading != state.loading && g_state->loading == 1)
                     {
                         handle_function(callback.func, SaveContext{get_root(), get_name()});
                         callback.lastRan = now;
@@ -531,7 +530,7 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
             }
             clear_current_callback();
         }
-        const int now_l = state_mem->time_level;
+        const int now_l = g_state->time_level;
         for (auto it = level_timers.begin(); it != level_timers.end();)
         {
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
@@ -570,14 +569,14 @@ bool LuaBackend::frame_update(StateMemory* state_mem)
             }
         }
 
-        state.screen = state_mem->screen;
-        state.time_level = state_mem->time_level;
-        state.time_total = state_mem->time_total;
+        state.screen = g_state->screen;
+        state.time_level = g_state->time_level;
+        state.time_total = g_state->time_total;
         state.time_global = get_frame_count();
         state.frame = get_frame_count();
-        state.loading = state_mem->loading;
-        state.reset = (state_mem->quest_flags & 1);
-        state.quest_flags = state_mem->quest_flags;
+        state.loading = g_state->loading;
+        state.reset = (g_state->quest_flags & 1);
+        state.quest_flags = g_state->quest_flags;
     }
     catch (const sol::error& e)
     {

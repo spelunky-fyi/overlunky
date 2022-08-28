@@ -247,12 +247,12 @@ std::u16string pre_toast(char16_t* buffer)
     return return_empty_str ? u"" : new_string;
 }
 
-void update_backends(StateMemory* s)
+void update_backends()
 {
     LuaBackend::for_each_backend(
         [=](LuaBackend& backend)
         {
-            backend.frame_update(s);
+            backend.update();
             return true;
         });
 }

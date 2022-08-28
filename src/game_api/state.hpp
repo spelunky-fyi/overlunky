@@ -240,8 +240,6 @@ struct State
     // Returns the local-thread version of StateMemory*
     StateMemory* ptr_local() const;
 
-    static void set_state_ptr(StateMemory* given_ptr);
-
     Layer* layer(uint8_t index) const
     {
         return ptr()->layers[index];

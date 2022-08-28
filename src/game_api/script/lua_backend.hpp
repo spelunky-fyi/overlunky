@@ -290,7 +290,7 @@ class LuaBackend
 
     void clear();
     void clear_all_callbacks();
-    bool frame_update(StateMemory* state_mem);
+    bool update();
 
     virtual bool reset();
     virtual bool pre_draw()

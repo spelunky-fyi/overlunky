@@ -412,6 +412,7 @@ end
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
+                import_backend->update();
             }
             return sol::make_object(lua, import_backend->lua["exports"]);
         },
@@ -428,6 +429,7 @@ end
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
+                import_backend->update();
             }
             return sol::make_object(lua, import_backend->lua["exports"]);
         },
@@ -445,6 +447,7 @@ end
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
+                import_backend->update();
             }
             return sol::make_object(lua, import_backend->lua["exports"]);
         },
@@ -462,6 +465,7 @@ end
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
+                import_backend->update();
             }
             return sol::make_object(lua, import_backend->lua["exports"]);
         });
