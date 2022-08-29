@@ -1746,6 +1746,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        // Go into jetpack 99 virtual function (play_warning_sound), there are two calls for virtuls and one call to static function, that's the one
         "play_sound"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x83\xC1\x18\x41\xB8\x38\x01\x00\x00"sv)
