@@ -8,6 +8,7 @@
 #include <mutex>     // for lock_guard, mutex
 #include <string>    // for allocator, string, hash, operator==, char_...
 
+#include "entity.hpp"
 #include "logger.h"       // for DEBUG
 #include "overloaded.hpp" // for overloaded
 #include "search.hpp"     // for get_address
@@ -867,4 +868,16 @@ bool SoundManager::set_parameter(PlayingSound playing_sound, VANILLA_SOUND_PARAM
                    [](std::monostate)
                    { return false; }},
         playing_sound.m_FmodHandle);
+}
+
+SoundMeta* play_sound(uint32_t sound_id, uint32_t target_uid)
+{
+    using play_sound = SoundMeta*(uint32_t);
+    static auto play_sound_func = (play_sound*)get_address("play_sound");
+    auto sound_info = play_sound_func(sound_id);
+    if (Entity* target = get_entity_ptr(target_uid))
+    {
+        target->set_as_sound_source(sound_info);
+    }
+    return sound_info;
 }

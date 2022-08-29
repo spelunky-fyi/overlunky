@@ -292,3 +292,5 @@ struct BackGroundSound : public SoundMeta
 {
     bool special_fadeout; // fades out the music then calls destruct (which will crash the game if used on someting in GameManager->BackgroundMusic)
 };
+
+SoundMeta* play_sound(uint32_t sound_id, uint32_t target_uid);

@@ -176,8 +176,10 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         &SoundMeta::right_channel,
         "start_over",
         &SoundMeta::start_over,
-        "music_on",
+        "playing",
         &SoundMeta::playing);
+
+    lua["play_sound"] = play_sound;
 
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
     lua.create_named_table("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
