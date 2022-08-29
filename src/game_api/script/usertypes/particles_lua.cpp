@@ -111,6 +111,11 @@ void register_usertypes(sol::state& lua)
         "particle_type",
         &ParticleEmitterInfo::particle_type,
         "particle_count",
+        sol::property([](ParticleEmitterInfo& e) -> uint32_t
+                      { return e.emitted_particles.particle_count; }),
+        "particle_count_back_layer",
+        sol::property([](ParticleEmitterInfo& e) -> uint32_t
+                      { return e.emitted_particles_back_layer.particle_count; }),
         &ParticleEmitterInfo::total_particles,
         "entity_uid",
         &ParticleEmitterInfo::entity_uid,
