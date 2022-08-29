@@ -37,7 +37,7 @@ EmittedParticlesInfo::Iterator EmittedParticlesInfo::begin()
 }
 EmittedParticlesInfo::Iterator EmittedParticlesInfo::end()
 {
-    return Iterator{this, particle_emitter->particle_count};
+    return Iterator{this, particle_count};
 }
 EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::begin() const
 {
@@ -53,7 +53,7 @@ EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::cbegin() const
 }
 EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::cend() const
 {
-    return ConstIterator{this, particle_emitter->particle_count};
+    return ConstIterator{this, particle_count};
 }
 
 Particle EmittedParticlesInfo::front()

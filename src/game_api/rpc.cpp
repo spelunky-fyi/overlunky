@@ -1124,7 +1124,7 @@ void extinguish_particles(ParticleEmitterInfo* particle_emitter)
     if (particle_emitter != nullptr)
     {
         generic_free(particle_emitter->emitted_particles.memory);
-        generic_free(particle_emitter->emitted_particles2.memory);
+        generic_free(particle_emitter->emitted_particles_back_layer.memory);
         generic_free(particle_emitter);
     }
 }
