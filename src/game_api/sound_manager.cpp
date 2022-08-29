@@ -870,14 +870,19 @@ bool SoundManager::set_parameter(PlayingSound playing_sound, VANILLA_SOUND_PARAM
         playing_sound.m_FmodHandle);
 }
 
-SoundMeta* play_sound(uint32_t sound_id, uint32_t target_uid)
+SoundMeta* play_sound(uint32_t sound_id, uint32_t source_uid)
 {
     using play_sound = SoundMeta*(uint32_t);
     static auto play_sound_func = (play_sound*)get_address("play_sound");
-    auto sound_info = play_sound_func(sound_id);
-    if (Entity* target = get_entity_ptr(target_uid))
+
+    Entity* source = get_entity_ptr(source_uid);
+    SoundMeta* sound_info{nullptr};
+
+    if (source_uid == ~0 || source != nullptr)
     {
-        target->set_as_sound_source(sound_info);
+        sound_info = play_sound_func(sound_id);
+        if (source != nullptr)
+            source->set_as_sound_source(sound_info);
     }
     return sound_info;
 }
