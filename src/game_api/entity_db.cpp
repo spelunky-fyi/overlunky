@@ -29,6 +29,12 @@
 template <typename T>
 class OnHeapPointer;
 
+EntityDB::EntityDB(const EntityDB& other) = default;
+EntityDB::EntityDB(const ENT_TYPE other)
+    : EntityDB(*get_type(other))
+{
+}
+
 using namespace std::chrono_literals;
 using EntityMap = std::unordered_map<std::string, uint16_t>;
 
@@ -122,9 +128,4 @@ std::string_view to_name(ENT_TYPE id)
     }
 
     return {};
-}
-
-EntityDB::EntityDB(const ENT_TYPE other)
-    : EntityDB(*get_type(other))
-{
 }

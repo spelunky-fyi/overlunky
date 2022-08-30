@@ -12,11 +12,13 @@
 #include <utility>       // for pair
 #include <vector>        // for vector
 
-#include "aliases.hpp"        // for ENT_TYPE, LAYER, TEXTURE, STRINGID
-#include "color.hpp"          // for Color
-#include "entity_structs.hpp" // for CollisionInfo
-#include "layer.hpp"          // for EntityList
-#include "math.hpp"           // for AABB
+#include "aliases.hpp"                       // for ENT_TYPE, LAYER, TEXTURE, STRINGID
+#include "color.hpp"                         // for Color
+#include "containers/game_unordered_map.hpp" // for game_unordered_map
+#include "containers/identity_hasher.hpp"    // for identity_hasher
+#include "entity_structs.hpp"                // for CollisionInfo
+#include "layer.hpp"                         // for EntityList
+#include "math.hpp"                          // for AABB
 
 struct RenderInfo;
 struct Texture;
@@ -95,12 +97,12 @@ struct EntityDB
     int32_t sound_killed_by_other;
     float field_a8;
     int32_t field_AC;
-    std::unordered_map<uint8_t, Animation> animations;
+    game_unordered_map<uint8_t, Animation, identity_hasher<>> animations;
     float default_special_offsetx;
     float default_special_offsety;
     uint8_t init;
 
-    EntityDB(const EntityDB& other) = default;
+    EntityDB(const EntityDB& other);
     EntityDB(const ENT_TYPE other);
 };
 
