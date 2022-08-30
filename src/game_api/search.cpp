@@ -657,14 +657,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        "layer_get_entity_close_to"sv,
-        PatternCommandBuffer{}
-            .find_after_inst("41 0f 28 cc 41 0f 28 d2"_gh)
-            .offset(0x6)
-            .decode_call()
-            .at_exe(),
-    },
-    {
         "virtual_functions_table"sv,
         // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
@@ -1213,31 +1205,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // then place yourself in Quillback's path
         PatternCommandBuffer{}
             .find_inst("\x48\x81\xCA\x00\x00\x00\x10\x49\x89\x54\x24\x30"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        "player_ledge_hang_behavior_vtable"sv,
-        // set write-bp on player->state, with the condition that it is 4
-        // whatever is being assigned to the player->current_behavior next is this vtable
-        PatternCommandBuffer{}
-            .find_inst("0f 57 c0 0f 11 81 58 01 00 00"_gh) // Player::Player
-            .offset(-0xa)                                  // assigning Player::vtable
-            .decode_pc()                                   // Player::vtable
-            .offset(0x4b * 8)                              // 75th virtual in Player
-            .decode_imm(0, 8)                              // deref ptr to virtual
-            .from_exe()                                    // get back to relative offset, ptr was absolute
-            .find_inst("b2 04"_gh)                         // get rdx = 0x4, which is the behavior id
-            .offset(-0xa)                                  // get r8 = ledge_hang_behavior
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "entity_turn"sv,
-        // spawn snake, set write-bp on snake->flags, with the condition that the facing_left bit is set
-        // the function where it breaks is the right one
-        PatternCommandBuffer{}
-            .find_inst("8b 4a 14 8d a9 3f ff ff ff"_gh)
             .at_exe()
             .function_start(),
     },

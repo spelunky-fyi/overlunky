@@ -176,9 +176,6 @@ class Entity
     void set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render);
     void set_enable_turning(bool enabled);
 
-    // Makes this entity climbable as if the player had climbing gloves
-    void set_climbable(bool climbable);
-
     std::span<uint32_t> get_items();
 
     template <typename T>

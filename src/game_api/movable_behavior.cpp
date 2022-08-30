@@ -12,6 +12,7 @@
 #include "movable.hpp"               // for Movable
 #include "search.hpp"                // for get_address
 #include "util.hpp"                  // for OnScopeExit
+#include "virtual_table.hpp"         // for get_virtual_function_address, ...
 #include "vtable_hook.hpp"           // for register_hook_function
 
 class Entity;
@@ -197,42 +198,6 @@ void update_movable(Movable* movable, Vec2 move, float sprint_factor, bool disab
     update_movable_impl(*movable, move, sprint_factor, false, disable_gravity, on_rope, false);
 }
 
-struct ClimbableEntityInfo
-{
-    Entity* entity;
-    uint32_t dtor_hook;
-    bool climbable;
-};
-std::vector<ClimbableEntityInfo> g_climbable_entities;
-void set_entity_climbable(Entity* entity, bool climbable)
-{
-    auto find_entity_pred = [=](const ClimbableEntityInfo& climbable_info)
-    { return climbable_info.entity == entity; };
-
-    auto it = std::find_if(g_climbable_entities.begin(), g_climbable_entities.end(), find_entity_pred);
-    bool climbable_before = (entity->type->properties_flags & 0x20) == 0x20;
-    if (it != g_climbable_entities.end())
-    {
-        if (climbable_before != climbable)
-        {
-            it->climbable = climbable;
-        }
-        else
-        {
-            g_climbable_entities.erase(it);
-        }
-    }
-    else if (climbable_before != climbable)
-    {
-        g_climbable_entities.push_back({
-            entity,
-            entity->set_on_dtor([=](Entity*)
-                                { std::erase_if(g_climbable_entities, find_entity_pred); }),
-            climbable,
-        });
-    }
-}
-
 struct TurningEntityInfo
 {
     Entity* entity;
@@ -263,96 +228,6 @@ void set_entity_turning(class Entity* entity, bool enabled)
     }
 }
 
-bool g_expecting_ledge_hang_test{false};
-
-struct ClimbableEntityRecoveryInfo
-{
-    Entity* entity;
-    bool climbable;
-};
-std::vector<ClimbableEntityRecoveryInfo> g_temporary_climbable_entities;
-
-using GetEntityCloseTo = Entity*(Layer&, float, float, size_t, size_t, size_t);
-GetEntityCloseTo* g_get_entity_close_to_trampoline{nullptr};
-Entity* get_entity_close_to(Layer& layer, float x, float y, size_t search_flags, size_t include_flags, size_t exclude_flags)
-{
-    auto test_ent = [](Entity* entity) -> std::optional<bool>
-    {
-        if (!std::count_if(g_temporary_climbable_entities.begin(), g_temporary_climbable_entities.end(), [=](const ClimbableEntityRecoveryInfo& ent_info)
-                           { return ent_info.entity == entity; }))
-        {
-            auto find_entity_pred = [=](const ClimbableEntityInfo& _info)
-            { return _info.entity == entity; };
-            auto it = std::find_if(g_climbable_entities.begin(), g_climbable_entities.end(), find_entity_pred);
-            if (it != g_climbable_entities.end())
-            {
-                return it->climbable;
-            }
-        }
-        return std::nullopt;
-    };
-
-    Entity* close_ent = g_get_entity_close_to_trampoline(layer, x, y, search_flags, include_flags, exclude_flags);
-    const std::optional<bool> climbable = test_ent(close_ent);
-    if (g_expecting_ledge_hang_test && close_ent && climbable.has_value())
-    {
-        bool climbable_before = (close_ent->type->properties_flags & 0x20) == 0x20;
-        if (climbable_before != climbable.value())
-        {
-            if (climbable.value())
-            {
-                close_ent->type->properties_flags |= 0x20;
-            }
-            else
-            {
-                close_ent->type->properties_flags &= ~0x20;
-            }
-            g_temporary_climbable_entities.push_back({close_ent, climbable_before});
-        }
-    }
-    return close_ent;
-}
-void reset_clingy_ents()
-{
-    for (const ClimbableEntityRecoveryInfo& recovery_info : g_temporary_climbable_entities)
-    {
-        if (recovery_info.climbable)
-        {
-            recovery_info.entity->type->properties_flags |= 0x20;
-        }
-        else
-        {
-            recovery_info.entity->type->properties_flags &= ~0x20;
-        }
-    }
-    g_temporary_climbable_entities.clear();
-}
-
-using LedgeGrabForceState = bool(MovableBehavior*, Movable*);
-LedgeGrabForceState* g_original_ledge_grab_force_state{nullptr};
-bool ledge_grab_force_state(MovableBehavior* behavior, Movable* player)
-{
-    g_expecting_ledge_hang_test = true;
-    ON_SCOPE_EXIT(g_expecting_ledge_hang_test = false; reset_clingy_ents());
-    return g_original_ledge_grab_force_state(behavior, player);
-}
-using LedgeGrabOnEnter = bool(MovableBehavior*, Movable*);
-LedgeGrabOnEnter* g_original_ledge_grab_on_enter{nullptr};
-void ledge_grab_on_enter(MovableBehavior* behavior, Movable* player)
-{
-    g_expecting_ledge_hang_test = true;
-    ON_SCOPE_EXIT(g_expecting_ledge_hang_test = false; reset_clingy_ents());
-    g_original_ledge_grab_on_enter(behavior, player);
-}
-using LedgeGrabGetNextStateId = uint8_t(MovableBehavior*, Movable*);
-LedgeGrabGetNextStateId* g_original_ledge_grab_get_next_state_id{nullptr};
-uint8_t ledge_grab_get_next_state_id(MovableBehavior* behavior, Movable* player)
-{
-    g_expecting_ledge_hang_test = true;
-    ON_SCOPE_EXIT(g_expecting_ledge_hang_test = false; reset_clingy_ents());
-    return g_original_ledge_grab_get_next_state_id(behavior, player);
-}
-
 using EntityTurn = void(Entity*, bool);
 EntityTurn* g_entity_turn_trampoline{nullptr};
 void entity_turn(Entity* self, bool apply)
@@ -366,7 +241,6 @@ void entity_turn(Entity* self, bool apply)
     }
 }
 
-#define HOOK_MOVE_ENTITY
 #ifdef HOOK_MOVE_ENTITY
 UpdateMovable* g_update_movable_trampoline{nullptr};
 void update_movable(Movable& movable, const Vec2& move_xy, float sprint_factor, bool apply_move, bool disable_gravity, bool on_ladder, bool param_7)
@@ -382,15 +256,12 @@ void init_behavior_hooks()
 
     auto memory = Memory::get();
 
-    g_get_entity_close_to_trampoline = (GetEntityCloseTo*)get_address("layer_get_entity_close_to"sv);
-    DetourAttach((void**)&g_get_entity_close_to_trampoline, (GetEntityCloseTo*)get_entity_close_to);
-
-    g_entity_turn_trampoline = (EntityTurn*)get_address("entity_turn"sv);
-    DetourAttach((void**)&g_entity_turn_trampoline, (GetEntityCloseTo*)entity_turn);
+    g_entity_turn_trampoline = (EntityTurn*)memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::MONS_SNAKE, 0x10));
+    DetourAttach((void**)&g_entity_turn_trampoline, &entity_turn);
 
 #ifdef HOOK_MOVE_ENTITY
     g_update_movable_trampoline = (UpdateMovable*)memory.at_exe(0x228e3580);
-    DetourAttach((void**)&g_update_movable_trampoline, (UpdateMovable*)update_movable);
+    DetourAttach((void**)&g_update_movable_trampoline, &update_movable);
 #endif
 
     const LONG error = DetourTransactionCommit();
@@ -398,9 +269,4 @@ void init_behavior_hooks()
     {
         DEBUG("Failed hooking behavior hooks: {}\n", error);
     }
-
-    void*** ledge_grab_behavior_vtable = (void***)get_address("player_ledge_hang_behavior_vtable"sv);
-    g_original_ledge_grab_force_state = (LedgeGrabForceState*)register_hook_function(ledge_grab_behavior_vtable, 0x2, &ledge_grab_force_state);
-    g_original_ledge_grab_on_enter = (LedgeGrabOnEnter*)register_hook_function(ledge_grab_behavior_vtable, 0x3, &ledge_grab_on_enter);
-    g_original_ledge_grab_get_next_state_id = (LedgeGrabGetNextStateId*)register_hook_function(ledge_grab_behavior_vtable, 0x7, &ledge_grab_get_next_state_id);
 }

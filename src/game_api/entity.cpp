@@ -721,11 +721,6 @@ void Entity::set_enable_turning(bool enabled)
     set_entity_turning(this, enabled);
 }
 
-void Entity::set_climbable(bool climbable)
-{
-    set_entity_climbable(this, climbable);
-}
-
 std::span<uint32_t> Entity::get_items()
 {
     if (items.size)

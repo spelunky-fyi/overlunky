@@ -298,8 +298,6 @@ void register_usertypes(sol::state& lua)
         &Entity::set_texture,
         "set_draw_depth",
         &Entity::set_draw_depth,
-        "set_climbable",
-        &Entity::set_climbable,
         "set_enable_turning",
         &Entity::set_enable_turning,
         "liberate_from_shop",
