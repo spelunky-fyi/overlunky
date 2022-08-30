@@ -55,18 +55,15 @@ struct game_allocator
         game_free(p);
     }
 
-    void construct(pointer p, const T& val)
+    template <class U, class... Args>
+    void construct(U* const p, Args&&... args)
     {
-        new (static_cast<void*>(p)) T(val);
+        new (static_cast<void*>(p)) U(std::forward<Args>(args)...);
     }
 
-    void construct(pointer p)
+    template <class U>
+    void destroy(U* const p)
     {
-        new (static_cast<void*>(p)) T();
-    }
-
-    void destroy(pointer p)
-    {
-        p->~T();
+        p->~U();
     }
 };
