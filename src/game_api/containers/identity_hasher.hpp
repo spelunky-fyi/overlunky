@@ -1,7 +1,7 @@
 #pragma once
 
-#include <type_traits>
 #include <cstddef>
+#include <type_traits>
 
 template <class T = void>
 struct identity_hasher
