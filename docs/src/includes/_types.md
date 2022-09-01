@@ -2110,7 +2110,7 @@ int | [screen_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scr
 int | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) | 
 int | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | 
 int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | True when you have control over your character
-int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | True whenever you in an active game (basically everything except the main menu, character select etc.)
+int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | True whenever you are in an active game (basically everything except the main menu, character select etc.)
 int | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
 int | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 int | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
