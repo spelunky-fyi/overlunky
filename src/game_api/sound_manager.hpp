@@ -256,7 +256,7 @@ struct SoundInfo
     int64_t unknown1;
     uint32_t sound_id;
     int32_t unknown2; // padding probably
-    const char* sound_name;
+    const char* sound_name; // sometimes pointer, sometimes static array?
     int64_t unknown3;
     int64_t unknown4;
     int64_t unknown5;
@@ -284,7 +284,7 @@ struct SoundMeta
     virtual void get_name(void* buttor, uint32_t size) = 0; // unsure?
     virtual ~SoundMeta() = 0;                               //
     virtual void update() = 0;                              // disabling this function does not progresses the track, does not stop it at the end level etc.
-                                                            // like if you start a level you have one loop and the after you move it porgresses to another one
+                                                            // like if you start a level you have one loop and then after you move, it porgresses to another one
     virtual bool unknown() = 0;
 };
 
