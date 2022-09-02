@@ -362,7 +362,7 @@ class LuaBackend
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);
     static LuaBackend* get_backend_by_id(std::string_view id, std::string_view ver = "");
-    
+
     static LuaBackend* get_calling_backend();
     static void push_calling_backend(LuaBackend*);
     static void pop_calling_backend(LuaBackend*);

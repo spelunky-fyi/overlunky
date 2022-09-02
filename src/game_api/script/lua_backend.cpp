@@ -1346,7 +1346,7 @@ void LuaBackend::push_calling_backend(LuaBackend* calling_backend)
     assert(g_CallingBackend == nullptr);
     g_CallingBackend = calling_backend;
 }
-void LuaBackend::pop_calling_backend(LuaBackend* calling_backend)
+void LuaBackend::pop_calling_backend([[maybe_unused]] LuaBackend* calling_backend)
 {
     assert(g_CallingBackend == calling_backend);
     g_CallingBackend = nullptr;
