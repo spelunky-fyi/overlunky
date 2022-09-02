@@ -1091,9 +1091,9 @@ function poison_entity(entity_uid) end
 function modify_ankh_health_gain(max_health, beat_add_health) end
 ---Adds entity as shop item, has to be movable (haven't tested many)
 ---@param item_uid integer
----@param shop_owner integer
+---@param shop_owner_uid integer
 ---@return nil
-function add_item_to_shop(item_uid, shop_owner) end
+function add_item_to_shop(item_uid, shop_owner_uid) end
 ---Change the amount of frames after the damage from poison is applied
 ---@param frames integer
 ---@return nil
@@ -1952,6 +1952,7 @@ local function PRNG_random(self, min, max) end
     ---@field set_ucolor fun(self, color: uColor): Color
 
 ---@class Animation
+    ---@field id integer
     ---@field first_tile integer
     ---@field num_tiles integer
     ---@field interval integer
@@ -2037,6 +2038,7 @@ local function PRNG_random(self, min, max) end
     ---@field get_texture fun(self): TEXTURE
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean
     ---@field set_draw_depth fun(self, draw_depth: integer): nil
+    ---@field set_enable_turning fun(self, enabled: boolean): nil
     ---@field liberate_from_shop any @&Entity::liberate_from_shop
     ---@field get_held_entity fun(self): Entity
     ---@field set_layer fun(self, layer: LAYER): nil
@@ -3727,6 +3729,7 @@ local function MovableBehavior_get_state_id(self) end
 ---@class VanillaMovableBehavior : MovableBehavior
 
 ---@class CustomMovableBehavior : MovableBehavior
+    ---@field base_behavior VanillaMovableBehavior
     ---@field set_force_state fun(self, force_state: fun(): any): nil
     ---@field set_on_enter fun(self, on_enter: fun(): any): nil
     ---@field set_on_exit fun(self, on_exit: fun(): any): nil
@@ -4983,6 +4986,14 @@ function Color.new(self, color) end
 ---@param a_ number
 ---@return Color
 function Color.new(self, r_, g_, b_, a_) end
+
+EntityDB = nil
+---@param other EntityDB
+---@return EntityDB
+function EntityDB.new(self, other) end
+---@param other ENT_TYPE
+---@return EntityDB
+function EntityDB.new(self, other) end
 
 CustomTheme = nil
 ---Create a new theme with an id and base theme, overriding defaults. Check [theme fun(): anys that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).

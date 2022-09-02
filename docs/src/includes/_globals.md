@@ -2237,7 +2237,7 @@ Spawn a [RoomOwner](#RoomOwner) (or a few other like CavemanShopkeeper) in the c
 
 > Search script examples for [add_item_to_shop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_item_to_shop)
 
-#### nil add_item_to_shop(int item_uid, int shop_owner)
+#### nil add_item_to_shop(int item_uid, int shop_owner_uid)
 
 Adds entity as shop item, has to be movable (haven't tested many)
 

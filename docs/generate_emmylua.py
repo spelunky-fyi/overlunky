@@ -17,6 +17,8 @@ replace_table = {
     "vector": "Array",
     "array": "Array",
     "unordered_map": "table",
+    "game_table": "table",
+    ", identity_hasher<>": "",
     "const char*": "string",
     "wstring": "string",
     "u16string": "string",
