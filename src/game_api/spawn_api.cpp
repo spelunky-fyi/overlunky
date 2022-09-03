@@ -534,6 +534,29 @@ void setup_impostor_lake(Entity* lake_impostor, AABB aabb, float top_threshold)
     setup_lake_impostor(lake_impostor, aabb.width() / 2.0f, aabb.height() / 2.0f, top_threshold);
 }
 
+void fix_impostor_lake_positions()
+{
+    auto state = get_state_ptr();
+    for (auto& lake : state->liquid_physics->impostor_lakes)
+    {
+        Entity* impostor_lake = lake.impostor_lake;
+        auto [x_pos, y_pos] = impostor_lake->position();
+        x_pos += impostor_lake->offsetx;
+        y_pos += impostor_lake->offsety;
+        float hitboxx = impostor_lake->hitboxx;
+        float hitboxy = impostor_lake->hitboxy;
+        // Match the calculations that the game does when initializing these impostor objects.
+        int32_t x1 = (int32_t)((y_pos - hitboxy + .5) * 3) * 0x102;
+        int32_t x2 = (int32_t)((x_pos - hitboxx + .5) * 3) + x1;
+        int32_t x3 = (int32_t)((x_pos + hitboxx + .5) * 3);
+        x1 += x3;
+        x3 = (int32_t)((y_pos + hitboxy + .5) * 3) * 0x102 + x3;
+        lake.position1 = x2;
+        lake.position2 = x1;
+        lake.position3 = x3;
+    }
+}
+
 void update_spawn_type_flags()
 {
     SPAWN_TYPE flags = 0;
