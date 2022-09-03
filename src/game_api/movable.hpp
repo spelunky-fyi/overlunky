@@ -109,7 +109,7 @@ class Movable : public Entity
     uint32_t get_behavior();
 
     virtual bool can_jump() = 0;
-    virtual void v38() = 0;
+    virtual void get_collision_info(CollisionInfo*) = 0;
     virtual float sprint_factor() = 0;
     virtual void calculate_jump_height() = 0; // when disabled, jump height is very high
     virtual std::unordered_map<uint8_t, Animation>& get_animation_map() = 0;

@@ -1328,25 +1328,52 @@ std::optional<LuaBackend::LockedBackend> LuaBackend::get_backend_by_id_safe(std:
     }
     return std::nullopt;
 }
+
+LuaBackend* g_CallingBackend{nullptr};
 LuaBackend::LockedBackend LuaBackend::get_calling_backend()
 {
     return LuaBackend::get_backend(get_calling_backend_id());
 }
-std::string_view LuaBackend::get_calling_backend_id()
+std::string LuaBackend::get_calling_backend_id()
 {
     std::lock_guard global_lock{global_lua_lock};
+
+    if (g_CallingBackend)
+    {
+        return g_CallingBackend->get_path();
+    }
+
     static const sol::state& lua = get_lua_vm();
     auto get_script_id = lua["get_script_id"];
     if (get_script_id.get_type() == sol::type::function)
     {
         auto script_id = get_script_id();
-        if (script_id.get_type() == sol::type::string)
+        if (script_id.get_type() == sol::type::string && script_id.valid())
         {
-            return script_id.get<std::string_view>();
+            return script_id.get<std::string>();
+        }
+        else
+        {
+            sol::error e = script_id;
+            throw std::runtime_error{e.what()};
         }
     }
-    throw std::exception{"Trying to get calling backend but Lua state does not seem to be setup..."};
+
+    throw std::runtime_error{"Trying to get calling backend but Lua state does not seem to be setup..."};
 }
+void LuaBackend::push_calling_backend(LuaBackend* calling_backend)
+{
+    std::lock_guard global_lock{global_lua_lock};
+    assert(g_CallingBackend == nullptr);
+    g_CallingBackend = calling_backend;
+}
+void LuaBackend::pop_calling_backend([[maybe_unused]] LuaBackend* calling_backend)
+{
+    std::lock_guard global_lock{global_lua_lock};
+    assert(g_CallingBackend == calling_backend);
+    g_CallingBackend = nullptr;
+}
+
 /**
  * static functions end
  */

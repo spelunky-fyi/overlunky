@@ -1158,12 +1158,12 @@ void LevelGenData::init()
     }
 
     {
-        g_room_template_types.push_back({to_uint(RoomTemplate::MachineBigroomPath), RoomTemplateType::MachineRoom});
-        g_room_template_types.push_back({to_uint(RoomTemplate::FeelingTomb), RoomTemplateType::MachineRoom});
-        g_room_template_types.push_back({to_uint(RoomTemplate::MachineWideroomPath), RoomTemplateType::MachineRoom});
-        g_room_template_types.push_back({to_uint(RoomTemplate::MachineWideroomSide), RoomTemplateType::MachineRoom});
-        g_room_template_types.push_back({to_uint(RoomTemplate::MachineTallroomPath), RoomTemplateType::MachineRoom});
-        g_room_template_types.push_back({to_uint(RoomTemplate::CoffinFrog), RoomTemplateType::MachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::MachineBigroomPath), RoomTemplateType::VanillaMachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::FeelingTomb), RoomTemplateType::VanillaMachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::MachineWideroomPath), RoomTemplateType::VanillaMachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::MachineWideroomSide), RoomTemplateType::VanillaMachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::MachineTallroomPath), RoomTemplateType::VanillaMachineRoom});
+        g_room_template_types.push_back({to_uint(RoomTemplate::CoffinFrog), RoomTemplateType::VanillaMachineRoom});
     }
 
     // Scan tile codes to know what id to start at
@@ -1704,7 +1704,8 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t r
     level_rooms->rooms[x + y * 8] = room_template;
 
     // Unset machine room origin flag if it is a machine room so there's no accidental origins left within the machine room
-    if (data->get_room_template_type(room_template) == RoomTemplateType::MachineRoom)
+    const RoomTemplateType type = data->get_room_template_type(room_template);
+    if (type == RoomTemplateType::MachineRoom || type == RoomTemplateType::VanillaMachineRoom)
     {
         machine_room_origin->rooms[x + y * 8] = false;
     }

@@ -13,6 +13,7 @@
 #include <vector>      // for vector, allocator, _Vector_iterator
 
 #include "entities_chars.hpp"    // for Player
+#include "entities_items.hpp"    // for ClimbableRope
 #include "entities_liquids.hpp"  // for Lava
 #include "entities_monsters.hpp" // for Shopkeeper, RoomOwner
 #include "entity.hpp"            // for to_id, Entity, get_entity_ptr, Enti...
@@ -253,12 +254,11 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     return State::get().layer_local(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
 }
 
-void spawn_tree(float x, float y, LAYER layer)
+int32_t spawn_tree(float x, float y, LAYER layer)
 {
-    spawn_tree(x, y, layer, 0);
+    return spawn_tree(x, y, layer, 0);
 }
-
-void spawn_tree(float x, float y, LAYER layer, uint16_t height)
+int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -277,7 +277,7 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
         layer_ptr->get_grid_entity_at(x, y) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 1.0f) != nullptr ||
         layer_ptr->get_grid_entity_at(x, y + 2.0f) != nullptr)
-        return;
+        return -1;
 
     static const auto tree_base = to_id("ENT_TYPE_FLOOR_TREE_BASE");
     static const auto tree_trunk = to_id("ENT_TYPE_FLOOR_TREE_TRUNK");
@@ -288,7 +288,8 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
     PRNG& prng = PRNG::get_local();
 
     // spawn the base
-    Entity* current_pice = layer_ptr->spawn_entity(tree_base, x, y, false, 0.0f, 0.0f, true);
+    Entity* current_piece = layer_ptr->spawn_entity(tree_base, x, y, false, 0.0f, 0.0f, true);
+    Entity* base_piece = current_piece;
 
     // spawn segments
     if (layer_ptr->get_grid_entity_at(x, y + 3.0f) == nullptr)
@@ -301,7 +302,7 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
             {
                 break;
             }
-            current_pice = layer_ptr->spawn_entity_over(tree_trunk, current_pice, 0.0f, 1.0f);
+            current_piece = layer_ptr->spawn_entity_over(tree_trunk, current_piece, 0.0f, 1.0f);
             if (height == 0 && prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
             {
                 break;
@@ -309,7 +310,7 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
         }
     }
     // spawn the top
-    current_pice = layer_ptr->spawn_entity_over(tree_top, current_pice, 0.0f, 1.0f);
+    current_piece = layer_ptr->spawn_entity_over(tree_top, current_piece, 0.0f, 1.0f);
 
     do // spawn branches
     {
@@ -320,32 +321,32 @@ void spawn_tree(float x, float y, LAYER layer, uint16_t height)
             if (left)
                 deco->flags |= 1U << 16; // flag 17: facing left
         };
-        auto test_pos = current_pice->position();
+        auto test_pos = current_piece->position();
 
         if (static_cast<int>(test_pos.first) + 1 < g_level_max_x && layer_ptr->get_grid_entity_at(test_pos.first + 1, test_pos.second) == nullptr &&
             prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
-            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_pice, 1.02f, 0.0f);
+            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, 1.02f, 0.0f);
             spawn_deco(branch, false);
         }
         if (static_cast<int>(test_pos.first) - 1 > 0 && layer_ptr->get_grid_entity_at(test_pos.first - 1, test_pos.second) == nullptr &&
             prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
-            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_pice, -1.02f, 0.0f);
+            Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, -1.02f, 0.0f);
             branch->flags |= 1U << 16; // flag 17: facing left
             spawn_deco(branch, true);
         }
-        current_pice = current_pice->overlay;
-    } while (current_pice->overlay);
+        current_piece = current_piece->overlay;
+    } while (current_piece->overlay);
+
+    return base_piece->uid;
 }
 
 int32_t spawn_mushroom(float x, float y, LAYER l)
 {
     return spawn_mushroom(x, y, l, 0);
 }
-
-// height relates to trunk
-int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height)
+int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height relates to trunk
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
@@ -401,6 +402,102 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height)
     layer_ptr->spawn_entity_over(deco, platform_right, 0, 1)->animation_frame += 1;
     platform_right->animation_frame = 119;
     return base_uid;
+}
+
+int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture)
+{
+    return spawn_unrolled_player_rope(x, y, layer, texture, static_cast<uint16_t>(read_u32(get_address("attach_thrown_rope_to_background"))));
+}
+int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture, uint16_t max_length)
+{
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
+    using setup_top_rope_rendering_info_one_fun = void(RenderInfo*);
+    using setup_top_rope_rendering_info_two_fun = void(RenderInfo*, int32_t, int32_t);
+    static const auto setup_top_rope_rendering_info_one = (setup_top_rope_rendering_info_one_fun*)get_address("setup_top_rope_rendering_info_one"sv);
+    static const auto setup_top_rope_rendering_info_two = (setup_top_rope_rendering_info_two_fun*)get_address("setup_top_rope_rendering_info_two"sv);
+    static const auto rope_ent = to_id("ENT_TYPE_ITEM_CLIMBABLE_ROPE");
+
+    std::pair<float, float> offset(0.0f, 0.0f);
+    const auto actual_layer = enum_to_layer(layer, offset);
+    const auto layer_ptr = State::get().layer_local(actual_layer);
+    const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
+    const uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
+    const float g_x = static_cast<float>(i_x);
+    const float g_y = static_cast<float>(i_y);
+
+    auto has_solid_ent = [=](float gx, float gy) -> bool
+    {
+        {
+            Movable* ent = static_cast<Movable*>(layer_ptr->get_entity_at(gx, gy, 0x180, 0x4, 0x8, 0));
+            if (ent)
+            {
+                return ent->type->search_flags == 0x100 || (ent->velocityx == 0.0 && ent->velocityy == 0.0); // see 0x2299c90f
+            }
+        }
+
+        {
+            Entity* grid_ent = layer_ptr->get_grid_entity_at(gx, gy);
+            if (grid_ent)
+            {
+                return (grid_ent->flags & 0x1c) == 0x4; // see 0x2299cd7c
+            }
+        }
+
+        return false;
+    };
+
+    if (has_solid_ent(g_x, g_y))
+    {
+        return -1;
+    }
+
+    constexpr uint16_t anim_frame_top = 157;
+    constexpr uint16_t anim_frame_single = 158;
+    constexpr uint16_t anim_frame_middle = 192;
+    constexpr uint16_t anim_frame_bottom = 197;
+
+    ClimbableRope* top_part = static_cast<ClimbableRope*>(layer_ptr->spawn_entity(rope_ent, g_x, g_y, false, 0, 0, true));
+    top_part->set_texture(texture);
+    top_part->animation_frame = anim_frame_single;
+    top_part->idle_counter = 5;
+    top_part->segment_nr = 0;
+    top_part->segment_nr_inverse = max_length;
+    setup_top_rope_rendering_info_one(top_part->rendering_info);
+    setup_top_rope_rendering_info_two(top_part->rendering_info, 7, 2);
+
+    ClimbableRope* above_part = top_part;
+    for (size_t i = 1; i <= max_length; i++)
+    {
+        if (has_solid_ent(g_x, g_y - static_cast<float>(i)))
+        {
+            break;
+        }
+
+        ClimbableRope* next_part = static_cast<ClimbableRope*>(layer_ptr->spawn_entity_over(rope_ent, above_part, 0, -1));
+        next_part->set_texture(texture);
+        next_part->animation_frame = anim_frame_bottom;
+        next_part->idle_counter = 5;
+        next_part->segment_nr = static_cast<uint32_t>(i);
+        next_part->segment_nr_inverse = max_length - static_cast<uint32_t>(i);
+        next_part->above_part = above_part;
+        setup_top_rope_rendering_info_one(next_part->rendering_info);
+
+        above_part->below_part = next_part;
+        if (i == 1)
+        {
+            above_part->animation_frame = anim_frame_top;
+        }
+        else
+        {
+            above_part->animation_frame = anim_frame_middle;
+        }
+        above_part = next_part;
+    }
+
+    return top_part->uid;
 }
 
 Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, float top_threshold)

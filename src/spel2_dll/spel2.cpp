@@ -19,6 +19,10 @@
 SoundManager* g_SoundManager{nullptr};
 SpelunkyConsole* g_Console{nullptr};
 
+void Spelunky_SetDoHooks(bool do_hooks)
+{
+    State::set_do_hooks(do_hooks);
+}
 void Spelunky_SetWriteLoadOptimization(bool write_load_opt)
 {
     State::set_write_load_opt(write_load_opt);

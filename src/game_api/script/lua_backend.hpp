@@ -28,7 +28,7 @@
 #include "level_api.hpp" // IWYU pragma: keep
 #include "logger.h"      // for DEBUG
 #include "script.hpp"    // for ScriptMessage, ScriptImage (ptr only), Scri...
-#include "util.hpp"      // for GlobalMutexProtectedResource
+#include "util.hpp"      // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
 
 extern std::recursive_mutex global_lua_lock;
 
@@ -373,8 +373,11 @@ class LuaBackend
     static std::optional<LockedBackend> get_backend_safe(std::string_view id);
     static LockedBackend get_backend_by_id(std::string_view id, std::string_view ver = "");
     static std::optional<LockedBackend> get_backend_by_id_safe(std::string_view id, std::string_view ver = "");
+
     static LockedBackend get_calling_backend();
-    static std::string_view get_calling_backend_id();
+    static std::string get_calling_backend_id();
+    static void push_calling_backend(LuaBackend*);
+    static void pop_calling_backend(LuaBackend*);
 };
 
 template <class... Args>
@@ -385,6 +388,9 @@ bool LuaBackend::handle_function(sol::function func, Args&&... args)
 template <class Ret, class... Args>
 std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, Args&&... args)
 {
+    LuaBackend::push_calling_backend(this);
+    ON_SCOPE_EXIT(LuaBackend::pop_calling_backend(this));
+
     auto lua_result = func(std::forward<Args>(args)...);
     if (!lua_result.valid())
     {

@@ -56,6 +56,7 @@ using Spelunky_GetImageFilePathFunc = bool (*)(const char* root_path, const char
 class SpelunkyScript;
 class SpelunkyConsole;
 
+void Spelunky_SetDoHooks(bool do_hooks);
 void Spelunky_SetWriteLoadOptimization(bool write_load_opt);
 
 void Spelunky_RegisterApplicationVersion(const char* version);
