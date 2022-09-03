@@ -1071,12 +1071,14 @@ Type | Name | Description
 ---- | ---- | -----------
 [ParticleDB](#ParticleDB) | [particle_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_type) | 
 int | [particle_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count) | 
+int | [particle_count_back_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count_back_layer) | 
 int | [entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) | 
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 float | [offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_x) | 
 float | [offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) | 
 array&lt;[Particle](#Particle)&gt; | [emitted_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_particles) | 
+array&lt;[Particle](#Particle)&gt; | [emitted_particles_back_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_particles_back_layer) | 
 
 ## Savegame types
 

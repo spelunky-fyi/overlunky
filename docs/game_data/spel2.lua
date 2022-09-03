@@ -3754,12 +3754,14 @@ local function MovableBehavior_get_state_id(self) end
 ---@class ParticleEmitterInfo
     ---@field particle_type ParticleDB
     ---@field particle_count integer
+    ---@field particle_count_back_layer integer
     ---@field entity_uid integer
     ---@field x number
     ---@field y number
     ---@field offset_x number
     ---@field offset_y number
     ---@field emitted_particles Particle[]
+    ---@field emitted_particles_back_layer Particle[]
 
 ---@class Particle
     ---@field x number
