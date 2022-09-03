@@ -1,14 +1,19 @@
 #include "movable_behavior.hpp"
 
-#include <list>    // for _List_iterator, _List_const_ite...
-#include <map>     // for _Tree_iterator, _Tree_const_ite...
-#include <string>  // for operator""sv
-#include <utility> // for min, max, pair
+#include <detours.h> // for DetourTransactionBegin, DetourUpdateThread, ...
+#include <list>      // for _List_iterator, _List_const_ite...
+#include <map>       // for _Tree_iterator, _Tree_const_ite...
+#include <string>    // for operator""sv
+#include <utility>   // for min, max, pair
 
 #include "containers/custom_map.hpp" // for custom_map
 #include "containers/custom_set.hpp" // for custom_set
+#include "memory.hpp"                // for Memory
 #include "movable.hpp"               // for Movable
 #include "search.hpp"                // for get_address
+#include "util.hpp"                  // for OnScopeExit
+#include "virtual_table.hpp"         // for get_virtual_function_address, ...
+#include "vtable_hook.hpp"           // for register_hook_function
 
 class Entity;
 
@@ -190,7 +195,50 @@ void update_movable(Movable* movable, bool disable_gravity)
 void update_movable(Movable* movable, Vec2 move, float sprint_factor, bool disable_gravity, bool on_rope)
 {
     static UpdateMovable* update_movable_impl = (UpdateMovable*)get_address("update_movable"sv);
-    update_movable_impl(*movable, move, sprint_factor, true, disable_gravity, on_rope, false);
+    update_movable_impl(*movable, move, sprint_factor, false, disable_gravity, on_rope, false);
+}
+
+struct TurningEntityInfo
+{
+    Entity* entity;
+    uint32_t dtor_hook;
+};
+std::vector<TurningEntityInfo> g_entities_disabled_turning{};
+void set_entity_turning(class Entity* entity, bool enabled)
+{
+    auto find_entity_pred = [=](const TurningEntityInfo& turning_info)
+    { return turning_info.entity == entity; };
+
+    if (!enabled)
+    {
+        g_entities_disabled_turning.push_back({
+            entity,
+            entity->set_on_dtor([=](Entity*)
+                                { std::erase_if(g_entities_disabled_turning, find_entity_pred); }),
+        });
+    }
+    else
+    {
+        auto it = std::find_if(g_entities_disabled_turning.begin(), g_entities_disabled_turning.end(), find_entity_pred);
+        if (it == g_entities_disabled_turning.end())
+        {
+            entity->unhook(it->dtor_hook);
+            g_entities_disabled_turning.erase(it);
+        }
+    }
+}
+
+using EntityTurn = void(Entity*, bool);
+EntityTurn* g_entity_turn_trampoline{nullptr};
+void entity_turn(Entity* self, bool apply)
+{
+    auto find_entity_pred = [=](const TurningEntityInfo& turning_info)
+    { return turning_info.entity == self; };
+
+    if (std::find_if(g_entities_disabled_turning.begin(), g_entities_disabled_turning.end(), find_entity_pred) == g_entities_disabled_turning.end())
+    {
+        g_entity_turn_trampoline(self, apply);
+    }
 }
 
 #ifdef HOOK_MOVE_ENTITY
@@ -199,8 +247,7 @@ void update_movable(Movable& movable, const Vec2& move_xy, float sprint_factor, 
 {
     g_update_movable_trampoline(movable, move_xy, sprint_factor, apply_move, disable_gravity, on_ladder, param_7);
 }
-
-#include <detours.h>
+#endif
 
 void init_behavior_hooks()
 {
@@ -208,18 +255,18 @@ void init_behavior_hooks()
     DetourUpdateThread(GetCurrentThread());
 
     auto memory = Memory::get();
-    g_update_movable_trampoline = (UpdateMovable*)memory.at_exe(0x228e3580);
 
-    DetourAttach((void**)&g_update_movable_trampoline, (UpdateMovable*)update_movable);
+    g_entity_turn_trampoline = (EntityTurn*)memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::MONS_SNAKE, 0x10));
+    DetourAttach((void**)&g_entity_turn_trampoline, &entity_turn);
+
+#ifdef HOOK_MOVE_ENTITY
+    g_update_movable_trampoline = (UpdateMovable*)memory.at_exe(0x228e3580);
+    DetourAttach((void**)&g_update_movable_trampoline, &update_movable);
+#endif
 
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)
     {
-        DEBUG("Failed hooking MoveEntity: {}\n", error);
+        DEBUG("Failed hooking behavior hooks: {}\n", error);
     }
 }
-#else
-void init_behavior_hooks()
-{
-}
-#endif

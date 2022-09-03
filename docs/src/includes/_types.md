@@ -287,13 +287,14 @@ int | [target_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=targ
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | AI state (patrol, sleep, attack, aggro...)
 int | [trust](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trust) | Levels completed with, 0..3
-int | [whipped](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=whipped) | How many times master has violated us
+int | [whipped](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=whipped) | Number of times whipped by player
 
 ### Animation
 
 
 Type | Name | Description
 ---- | ---- | -----------
+int | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
 int | [first_tile](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_tile) | 
 int | [num_tiles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=num_tiles) | 
 int | [interval](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=interval) | 
@@ -302,8 +303,72 @@ int | [interval](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=interv
 ### EntityDB
 
 
+Used to store static common data for an ENT_TYPE. You can also clone entity types with the copy constructor to create new custom entities with different common properties. [This tool](https://dregu.github.io/Spelunky2ls/animation.html) can be helpful when messing with the animations. The default values are also listed in [entities.json](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json).
+
+> When cloning an entity type, remember to save it in the script for as long as you need it. Otherwise the memory will be freed immediately, which eventually leads to a crash when used or overwritten by other stuff:
+
+```lua
+-- Create a special fast snake type with weird animation
+special_snake = EntityDB:new(ENT_TYPE.MONS_SNAKE)
+special_snake.max_speed = 1
+special_snake.acceleration = 2
+special_snake.animations[2].num_tiles = 1
+
+set_post_entity_spawn(function(snake)
+    -- 50% chance to make snakes special
+    if prng:random_chance(2, PRNG_CLASS.PROCEDURAL_SPAWNS) then
+        -- Assign custom type
+        snake.type = special_snake
+        -- This is only really needed if types are changed during the level
+        snake.current_animation = special_snake.animations[2]
+    end
+end, SPAWN_TYPE.ANY, MASK.MONSTER, ENT_TYPE.MONS_SNAKE)
+```
+
+> You can also use Entity.user_data to store the custom type:
+
+```lua
+-- Custom player who is buffed a bit every level
+set_callback(function()
+    -- Doing this to include HH
+    for i,v in ipairs(get_entities_by_mask(MASK.PLAYER)) do
+        local player = get_entity(v)
+
+        -- Create new custom type on the first level, based on the original type
+        if not player.user_data then
+            player.user_data = {}
+            player.user_data.type = EntityDB:new(player.type.id)
+        end
+
+        -- Set the player entity type to the custom type every level
+        player.type = player.user_data.type
+
+        -- Buff the player every subsequent level
+        if state.level_count > 0 then
+            player.type.max_speed = player.type.max_speed * 1.1
+            player.type.acceleration = player.type.acceleration * 1.1
+            player.type.jump = player.type.jump * 1.1
+        end
+    end
+end, ON.POST_LEVEL_GENERATION)
+```
+
+> Illegal bad example, don't do this:
+
+```lua
+set_callback(function()
+    -- Nobody owns the new type and the memory is freed immediately, eventually leading to a crash
+    players[1].type = EntityDB:new(players[1].type)
+    players[1].type.max_speed = 2
+end, ON.POST_LEVEL_GENERATION)
+```
+
+
+
 Type | Name | Description
 ---- | ---- | -----------
+[EntityDB](#EntityDB) | [new(EntityDB other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
+[EntityDB](#EntityDB) | [new(ENT_TYPE)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
 [ENT_TYPE](#ENT_TYPE) | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
 int | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) | [MASK](#MASK)
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
@@ -3111,6 +3176,7 @@ bool | [overlaps_with(Entity other)](https://github.com/spelunky-fyi/overlunky/s
 [TEXTURE](#TEXTURE) | [get_texture()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) | 
 bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) | Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
 nil | [set_draw_depth(int draw_depth)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) | 
+nil | [set_enable_turning(bool enabled)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_enable_turning) | 
 nil | [liberate_from_shop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | 
 [Entity](#Entity) | [get_held_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) | 
 nil | [set_layer(LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_layer) | Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
@@ -4864,6 +4930,7 @@ Derived from [MovableBehavior](#MovableBehavior)
 
 Type | Name | Description
 ---- | ---- | -----------
+[VanillaMovableBehavior](#VanillaMovableBehavior) | [base_behavior](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=base_behavior) | 
 nil | [set_force_state(function force_state)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_force_state) | Set the `force_state` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `force_state` is already set it will be overridden. The signature<br/>of the function is `bool force_state(movable, base_fun)`, when the function returns `true` the movable will<br/>enter this behavior. If no base behavior is set `base_fun` will be `nil`.
 nil | [set_on_enter(function on_enter)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_enter) | Set the `on_enter` function of a `CustomMovableBehavior`, this will be called when the movable<br/>enters the state. If an `on_enter` is already set it will be overridden. The signature of the<br/>function is `nil on_enter(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
 nil | [set_on_exit(function on_exit)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_exit) | Set the `on_exit` function of a `CustomMovableBehavior`, this will be called when the movable<br/>leaves the state. If an `on_exit` is already set it will be overridden. The signature of the<br/>function is `nil on_exit(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.

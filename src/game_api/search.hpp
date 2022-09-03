@@ -9,7 +9,7 @@
 using namespace std::string_view_literals;
 
 size_t decode_pc(const char* exe, size_t offset, uint8_t opcode_offset = 3, uint8_t opcode_suffix_offset = 0, uint8_t opcode_addr_size = 4);
-size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset = 3);
+size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset = 3, uint8_t value_size = 4);
 
 // Find the location of the instruction (needle) with wildcard (* or \x2a) support
 // Optional pattern_name for better error messages

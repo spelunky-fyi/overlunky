@@ -175,7 +175,10 @@ struct RenderInfo
     float darkness; // 0.0 = completely black ; 1.0 = normal (dark effect like when on fire)
     uint32_t unknown56;
     uint32_t unknown57;
-    uint32_t unknown58; // end, next RenderInfo below
+    uint32_t unknown58;
+    float* unknown59;
+    uint32_t unknown60;
+    uint32_t unknown61; // end, next RenderInfo below
 };
 
 struct TextRenderingInfo
