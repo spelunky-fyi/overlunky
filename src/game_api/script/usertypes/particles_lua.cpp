@@ -111,7 +111,11 @@ void register_usertypes(sol::state& lua)
         "particle_type",
         &ParticleEmitterInfo::particle_type,
         "particle_count",
-        &ParticleEmitterInfo::particle_count,
+        sol::property([](ParticleEmitterInfo& e) -> uint32_t
+                      { return e.emitted_particles.particle_count; }),
+        "particle_count_back_layer",
+        sol::property([](ParticleEmitterInfo& e) -> uint32_t
+                      { return e.emitted_particles_back_layer.particle_count; }),
         "entity_uid",
         &ParticleEmitterInfo::entity_uid,
         "x",
@@ -123,7 +127,9 @@ void register_usertypes(sol::state& lua)
         "offset_y",
         &ParticleEmitterInfo::offset_y,
         "emitted_particles",
-        &ParticleEmitterInfo::emitted_particles);
+        &ParticleEmitterInfo::emitted_particles,
+        "emitted_particles_back_layer",
+        &ParticleEmitterInfo::emitted_particles_back_layer);
 
     lua.new_usertype<Particle>(
         "Particle",

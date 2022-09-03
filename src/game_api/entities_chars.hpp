@@ -38,7 +38,7 @@ class Ai
     int8_t unknown12;
     /// Levels completed with, 0..3
     uint8_t trust;
-    /// How many times master has violated us
+    /// Number of times whipped by player
     uint8_t whipped;
     int8_t unknown15;
     int8_t unknown16;

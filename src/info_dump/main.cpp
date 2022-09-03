@@ -1035,7 +1035,7 @@ void to_json(float_json& j, const EntityDB& ent)
         {"search_flags", ent.search_flags},
         {"width", ent.width},
         {"height", ent.height},
-        {"rect_collision", ent.rect_collision},
+        {"rect_collision", ent.default_collision_info.rect},
         {"friction", ent.friction},
         {"elasticity", ent.elasticity},
         {"weight", ent.weight},

@@ -59,13 +59,15 @@ struct custom_allocator
         new (static_cast<void*>(p)) T(val);
     }
 
-    void construct(pointer p)
+    template <class U, class... Args>
+    void construct(U* const p, Args&&... args)
     {
-        new (static_cast<void*>(p)) T();
+        new (static_cast<void*>(p)) U(std::forward<Args>(args)...);
     }
 
-    void destroy(pointer p)
+    template <class U>
+    void destroy(U* const p)
     {
-        p->~T();
+        p->~U();
     }
 };

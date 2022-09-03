@@ -319,14 +319,14 @@ function spawn_apep(x, y, layer, right) end
 ---@param x number
 ---@param y number
 ---@param layer LAYER
----@return nil
+---@return integer
 function spawn_tree(x, y, layer) end
 ---Spawns and grows a tree
 ---@param x number
 ---@param y number
 ---@param layer LAYER
 ---@param height integer
----@return nil
+---@return integer
 function spawn_tree(x, y, layer, height) end
 ---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
 ---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
@@ -345,6 +345,21 @@ function spawn_mushroom(x, y, l) end
 ---@param height integer
 ---@return integer
 function spawn_mushroom(x, y, l, height) end
+---Spawns an already unrolled rope as if created by player
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param texture TEXTURE
+---@return integer
+function spawn_unrolled_player_rope(x, y, layer, texture) end
+---Spawns an already unrolled rope as if created by player
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param texture TEXTURE
+---@param max_length integer
+---@return integer
+function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
 ---Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 ---If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 ---@param player_slot integer
@@ -1076,9 +1091,9 @@ function poison_entity(entity_uid) end
 function modify_ankh_health_gain(max_health, beat_add_health) end
 ---Adds entity as shop item, has to be movable (haven't tested many)
 ---@param item_uid integer
----@param shop_owner integer
+---@param shop_owner_uid integer
 ---@return nil
-function add_item_to_shop(item_uid, shop_owner) end
+function add_item_to_shop(item_uid, shop_owner_uid) end
 ---Change the amount of frames after the damage from poison is applied
 ---@param frames integer
 ---@return nil
@@ -1937,6 +1952,7 @@ local function PRNG_random(self, min, max) end
     ---@field set_ucolor fun(self, color: uColor): Color
 
 ---@class Animation
+    ---@field id integer
     ---@field first_tile integer
     ---@field num_tiles integer
     ---@field interval integer
@@ -2022,6 +2038,7 @@ local function PRNG_random(self, min, max) end
     ---@field get_texture fun(self): TEXTURE
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean
     ---@field set_draw_depth fun(self, draw_depth: integer): nil
+    ---@field set_enable_turning fun(self, enabled: boolean): nil
     ---@field liberate_from_shop any @&Entity::liberate_from_shop
     ---@field get_held_entity fun(self): Entity
     ---@field set_layer fun(self, layer: LAYER): nil
@@ -3712,6 +3729,7 @@ local function MovableBehavior_get_state_id(self) end
 ---@class VanillaMovableBehavior : MovableBehavior
 
 ---@class CustomMovableBehavior : MovableBehavior
+    ---@field base_behavior VanillaMovableBehavior
     ---@field set_force_state fun(self, force_state: fun(): any): nil
     ---@field set_on_enter fun(self, on_enter: fun(): any): nil
     ---@field set_on_exit fun(self, on_exit: fun(): any): nil
@@ -3754,12 +3772,14 @@ local function MovableBehavior_get_state_id(self) end
 ---@class ParticleEmitterInfo
     ---@field particle_type ParticleDB
     ---@field particle_count integer
+    ---@field particle_count_back_layer integer
     ---@field entity_uid integer
     ---@field x number
     ---@field y number
     ---@field offset_x number
     ---@field offset_y number
     ---@field emitted_particles Particle[]
+    ---@field emitted_particles_back_layer Particle[]
 
 ---@class Particle
     ---@field x number
@@ -4968,6 +4988,14 @@ function Color.new(self, color) end
 ---@param a_ number
 ---@return Color
 function Color.new(self, r_, g_, b_, a_) end
+
+EntityDB = nil
+---@param other EntityDB
+---@return EntityDB
+function EntityDB.new(self, other) end
+---@param other ENT_TYPE
+---@return EntityDB
+function EntityDB.new(self, other) end
 
 CustomTheme = nil
 ---Create a new theme with an id and base theme, overriding defaults. Check [theme fun(): anys that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).

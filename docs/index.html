@@ -1164,6 +1164,9 @@
                           <li>
                             <a href="#spawn_tree" class="toc-h3 toc-link" data-title="spawn_tree">spawn_tree</a>
                           </li>
+                          <li>
+                            <a href="#spawn_unrolled_player_rope" class="toc-h3 toc-link" data-title="spawn_unrolled_player_rope">spawn_unrolled_player_rope</a>
+                          </li>
                       </ul>
                   </li>
                   <li>
@@ -4720,7 +4723,7 @@ you&#39;re standing on, not real level coordinates.</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_item_to_shop">add_item_to_shop</a></p>
 </blockquote>
-<h4 id='nil-add_item_to_shop-int-item_uid-int-shop_owner'>nil add_item_to_shop(int item_uid, int shop_owner)</h4>
+<h4 id='nil-add_item_to_shop-int-item_uid-int-shop_owner_uid'>nil add_item_to_shop(int item_uid, int shop_owner_uid)</h4>
 <p>Adds entity as shop item, has to be movable (haven&#39;t tested many)</p>
 <h3 id='change_diceshop_prizes'>change_diceshop_prizes</h3>
 <blockquote>
@@ -4982,8 +4985,14 @@ If you want to respawn a player that is a ghost, set in his inventory <code>heal
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_tree">spawn_tree</a></p>
 </blockquote>
-<h4 id='nil-spawn_tree-float-x-float-y-LAYER-layer'>nil spawn_tree(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='nil-spawn_tree-float-x-float-y-LAYER-layer-int-height'>nil spawn_tree(float x, float y, <a href="#LAYER">LAYER</a> layer, int height)</h4>
+<h4 id='int-spawn_tree-float-x-float-y-LAYER-layer'>int spawn_tree(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='int-spawn_tree-float-x-float-y-LAYER-layer-int-height'>int spawn_tree(float x, float y, <a href="#LAYER">LAYER</a> layer, int height)</h4>
 <p>Spawns and grows a tree</p>
+<h3 id='spawn_unrolled_player_rope'>spawn_unrolled_player_rope</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_unrolled_player_rope">spawn_unrolled_player_rope</a></p>
+</blockquote>
+<h4 id='int-spawn_unrolled_player_rope-float-x-float-y-LAYER-layer-TEXTURE-texture'>int spawn_unrolled_player_rope(float x, float y, <a href="#LAYER">LAYER</a> layer, <a href="#TEXTURE">TEXTURE</a> texture)</h4><h4 id='int-spawn_unrolled_player_rope-float-x-float-y-LAYER-layer-TEXTURE-texture-int-max_length'>int spawn_unrolled_player_rope(float x, float y, <a href="#LAYER">LAYER</a> layer, <a href="#TEXTURE">TEXTURE</a> texture, int max_length)</h4>
+<p>Spawns an already unrolled rope as if created by player</p>
 <h2 id='String-functions'>String functions</h2><h3 id='add_custom_name'>add_custom_name</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_custom_name">add_custom_name</a></p>
@@ -6520,7 +6529,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=whipped">whipped</a></td>
-<td>How many times master has violated us</td>
+<td>Number of times whipped by player</td>
 </tr>
 </tbody></table>
 <h3 id='Animation'>Animation</h3>
@@ -6531,6 +6540,11 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=id">id</a></td>
+<td></td>
+</tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=first_tile">first_tile</a></td>
@@ -6553,6 +6567,63 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='EntityDB'>EntityDB</h3>
+<p>Used to store static common data for an ENT_TYPE. You can also clone entity types with the copy constructor to create new custom entities with different common properties. <a href="https://dregu.github.io/Spelunky2ls/animation.html">This tool</a> can be helpful when messing with the animations. The default values are also listed in <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json">entities.json</a>.</p>
+
+<blockquote>
+<p>When cloning an entity type, remember to save it in the script for as long as you need it. Otherwise the memory will be freed immediately, which eventually leads to a crash when used or overwritten by other stuff:</p>
+</blockquote>
+<div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Create a special fast snake type with weird animation</span>
+<span class="n">special_snake</span> <span class="o">=</span> <span class="n">EntityDB</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_SNAKE</span><span class="p">)</span>
+<span class="n">special_snake</span><span class="p">.</span><span class="n">max_speed</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">special_snake</span><span class="p">.</span><span class="n">acceleration</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">special_snake</span><span class="p">.</span><span class="n">animations</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">num_tiles</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">set_post_entity_spawn</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">snake</span><span class="p">)</span>
+    <span class="c1">-- 50% chance to make snakes special</span>
+    <span class="k">if</span> <span class="n">prng</span><span class="p">:</span><span class="n">random_chance</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">PRNG_CLASS</span><span class="p">.</span><span class="n">PROCEDURAL_SPAWNS</span><span class="p">)</span> <span class="k">then</span>
+        <span class="c1">-- Assign custom type</span>
+        <span class="n">snake</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">special_snake</span>
+        <span class="c1">-- This is only really needed if types are changed during the level</span>
+        <span class="n">snake</span><span class="p">.</span><span class="n">current_animation</span> <span class="o">=</span> <span class="n">special_snake</span><span class="p">.</span><span class="n">animations</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">end</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">SPAWN_TYPE</span><span class="p">.</span><span class="n">ANY</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">MONSTER</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_SNAKE</span><span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>You can also use Entity.user_data to store the custom type:</p>
+</blockquote>
+<div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Custom player who is buffed a bit every level</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+    <span class="c1">-- Doing this to include HH</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="k">in</span> <span class="nb">ipairs</span><span class="p">(</span><span class="n">get_entities_by_mask</span><span class="p">(</span><span class="n">MASK</span><span class="p">.</span><span class="n">PLAYER</span><span class="p">))</span> <span class="k">do</span>
+        <span class="kd">local</span> <span class="n">player</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+        <span class="c1">-- Create new custom type on the first level, based on the original type</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">player</span><span class="p">.</span><span class="n">user_data</span> <span class="k">then</span>
+            <span class="n">player</span><span class="p">.</span><span class="n">user_data</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">player</span><span class="p">.</span><span class="n">user_data</span><span class="p">.</span><span class="nb">type</span> <span class="o">=</span> <span class="n">EntityDB</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="n">player</span><span class="p">.</span><span class="n">type</span><span class="p">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">end</span>
+
+        <span class="c1">-- Set the player entity type to the custom type every level</span>
+        <span class="n">player</span><span class="p">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">player</span><span class="p">.</span><span class="n">user_data</span><span class="p">.</span><span class="nb">type</span>
+
+        <span class="c1">-- Buff the player every subsequent level</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">level_count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">then</span>
+            <span class="n">player</span><span class="p">.</span><span class="n">type</span><span class="p">.</span><span class="n">max_speed</span> <span class="o">=</span> <span class="n">player</span><span class="p">.</span><span class="n">type</span><span class="p">.</span><span class="n">max_speed</span> <span class="o">*</span> <span class="mi">1</span><span class="p">.</span><span class="mi">1</span>
+            <span class="n">player</span><span class="p">.</span><span class="n">type</span><span class="p">.</span><span class="n">acceleration</span> <span class="o">=</span> <span class="n">player</span><span class="p">.</span><span class="n">type</span><span class="p">.</span><span class="n">acceleration</span> <span class="o">*</span> <span class="mi">1</span><span class="p">.</span><span class="mi">1</span>
+            <span class="n">player</span><span class="p">.</span><span class="n">type</span><span class="p">.</span><span class="n">jump</span> <span class="o">=</span> <span class="n">player</span><span class="p">.</span><span class="n">type</span><span class="p">.</span><span class="n">jump</span> <span class="o">*</span> <span class="mi">1</span><span class="p">.</span><span class="mi">1</span>
+        <span class="k">end</span>
+    <span class="k">end</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">POST_LEVEL_GENERATION</span><span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>Illegal bad example, don&#39;t do this:</p>
+</blockquote>
+<div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+    <span class="c1">-- Nobody owns the new type and the memory is freed immediately, eventually leading to a crash</span>
+    <span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nb">type</span> <span class="o">=</span> <span class="n">EntityDB</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="nb">type</span><span class="p">)</span>
+    <span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">type</span><span class="p">.</span><span class="n">max_speed</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">POST_LEVEL_GENERATION</span><span class="p">)</span>
+</code></pre></div>
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6560,6 +6631,16 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#EntityDB">EntityDB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=EntityDB">new(EntityDB other)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#EntityDB">EntityDB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=EntityDB">new(ENT_TYPE)</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=id">id</a></td>
@@ -9034,6 +9115,11 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 <tr>
 <td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle_count_back_layer">particle_count_back_layer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=entity_uid">entity_uid</a></td>
 <td></td>
 </tr>
@@ -9060,6 +9146,11 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <tr>
 <td>array&lt;<a href="#Particle">Particle</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_particles">emitted_particles</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;<a href="#Particle">Particle</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_particles_back_layer">emitted_particles_back_layer</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -15705,6 +15796,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 <tr>
 <td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_enable_turning">set_enable_turning(bool enabled)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=liberate_from_shop">liberate_from_shop()</a></td>
 <td></td>
 </tr>
@@ -19924,6 +20020,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#VanillaMovableBehavior">VanillaMovableBehavior</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=base_behavior">base_behavior</a></td>
+<td></td>
+</tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_force_state">set_force_state(function force_state)</a></td>

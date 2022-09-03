@@ -79,6 +79,8 @@ void register_usertypes(sol::state& lua)
         &Color::set_ucolor);
     lua.new_usertype<Animation>(
         "Animation",
+        "id",
+        &Animation::key,
         "first_tile",
         &Animation::texture,
         "num_tiles",
@@ -89,6 +91,7 @@ void register_usertypes(sol::state& lua)
         &Animation::repeat);
     lua.new_usertype<EntityDB>(
         "EntityDB",
+        sol::constructors<EntityDB(EntityDB&), EntityDB(ENT_TYPE)>{},
         "id",
         &EntityDB::id,
         "search_flags",
@@ -98,17 +101,13 @@ void register_usertypes(sol::state& lua)
         "height",
         &EntityDB::height,
         "offsetx",
-        sol::property([](EntityDB& e) -> float
-                      { return e.rect_collision.offsetx; }),
+        &EntityDB::default_offsetx,
         "offsety",
-        sol::property([](EntityDB& e) -> float
-                      { return e.rect_collision.offsety; }),
+        &EntityDB::default_offsety,
         "hitboxx",
-        sol::property([](EntityDB& e) -> float
-                      { return e.rect_collision.hitboxx; }),
+        &EntityDB::default_hitboxx,
         "hitboxy",
-        sol::property([](EntityDB& e) -> float
-                      { return e.rect_collision.hitboxy; }),
+        &EntityDB::default_hitboxy,
         "draw_depth",
         &EntityDB::draw_depth,
         "friction",
@@ -299,6 +298,8 @@ void register_usertypes(sol::state& lua)
         &Entity::set_texture,
         "set_draw_depth",
         &Entity::set_draw_depth,
+        "set_enable_turning",
+        &Entity::set_enable_turning,
         "liberate_from_shop",
         &Entity::liberate_from_shop,
         "get_held_entity",

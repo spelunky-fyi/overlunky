@@ -231,6 +231,8 @@ struct State
 {
     size_t location;
 
+    static void set_do_hooks(bool do_hooks);
+
     static void set_write_load_opt(bool allow);
 
     static State& get();

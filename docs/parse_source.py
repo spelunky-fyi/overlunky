@@ -18,6 +18,8 @@ header_files = [
     "../src/game_api/script.hpp",
     "../src/game_api/color.hpp",
     "../src/game_api/entity.hpp",
+    "../src/game_api/entity_db.hpp",
+    "../src/game_api/entity_structs.hpp",
     "../src/game_api/movable.hpp",
     "../src/game_api/movable_behavior.hpp",
     "../src/game_api/game_manager.hpp",

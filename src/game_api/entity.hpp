@@ -12,164 +12,20 @@
 #include <utility>       // for pair
 #include <vector>        // for vector
 
-#include "aliases.hpp" // for ENT_TYPE, LAYER, TEXTURE, STRINGID
-#include "color.hpp"   // for Color
-#include "layer.hpp"   // for EntityList
-#include "math.hpp"    // for AABB
+#include "aliases.hpp"        // for ENT_TYPE, LAYER, TEXTURE, STRINGID
+#include "color.hpp"          // for Color
+#include "entity_db.hpp"      // for EntityDB
+#include "entity_structs.hpp" // for CollisionInfo
+#include "layer.hpp"          // for EntityList
+#include "math.hpp"           // for AABB
 
 struct RenderInfo;
 struct Texture;
 
-enum class REPEAT_TYPE : uint8_t
-{
-    NoRepeat,
-    Linear,
-    BackAndForth,
-};
-
-enum class SHAPE : uint8_t
-{
-    RECTANGLE = 1,
-    CIRCLE = 2,
-};
-
-struct Animation
-{
-    int32_t texture;
-    int32_t count;
-    int32_t interval;
-    uint8_t key;
-    REPEAT_TYPE repeat;
-};
-
-struct Rect
-{
-    float offsetx;
-    float offsety;
-    float hitboxx;
-    float hitboxy;
-};
-
 class Entity;
 class Movable;
-class Container;
 
-template <class FunT>
-struct HookWithId
-{
-    std::uint32_t id;
-    std::function<FunT> fun;
-};
-struct EntityHooksInfo
-{
-    std::int32_t entity;
-    std::uint32_t cbcount;
-    std::vector<HookWithId<void(Entity*)>> on_dtor;
-    std::vector<HookWithId<void(Entity*)>> on_destroy;
-    std::vector<HookWithId<void(Entity*, Entity*)>> on_kill;
-    std::vector<HookWithId<bool(Entity*)>> pre_floor_update;
-    std::vector<HookWithId<void(Entity*)>> post_floor_update;
-    std::vector<HookWithId<bool(Entity*)>> on_player_instagib;
-    std::vector<HookWithId<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)>> on_damage;
-    std::vector<HookWithId<bool(Movable*)>> pre_statemachine;
-    std::vector<HookWithId<void(Movable*)>> post_statemachine;
-    std::vector<HookWithId<void(Container*, Movable*)>> on_open;
-    std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision1;
-    std::vector<HookWithId<bool(Entity*, Entity*)>> pre_collision2;
-    std::vector<HookWithId<bool(Entity*)>> pre_render;
-    std::vector<HookWithId<void(Entity*)>> post_render;
-};
-
-// Creates an instance of this entity
-using EntityCreate = Entity* (*)();
-using EntityDestroy = void (*)(Entity*);
-
-struct EntityDB
-{
-    EntityCreate create_func;
-    EntityDestroy destroy_func;
-    int32_t field_10;
-    ENT_TYPE id;
-    /// MASK
-    uint32_t search_flags;
-    float width;
-    float height;
-    uint8_t draw_depth;
-    uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc (RVA 0x21F30CC4)
-    int16_t field_26;
-    Rect rect_collision;
-    uint8_t default_shape;
-    bool default_hitbox_enabled;
-    uint8_t field_3A;
-    uint8_t field_3B;
-    int32_t field_3C;
-    int32_t field_40;
-    int32_t field_44;
-    int32_t default_flags;
-    int32_t default_more_flags;
-    int32_t properties_flags;
-    float friction;
-    float elasticity;
-    float weight;
-    uint8_t field_60;
-    float acceleration;
-    float max_speed;
-    float sprint_factor;
-    float jump;
-    union
-    {
-        Color default_color;
-        struct
-        {
-            float glow_red;
-            float glow_green;
-            float glow_blue;
-            float glow_alpha;
-        };
-    };
-    int32_t texture;
-    int32_t technique;
-    int32_t tile_x;
-    int32_t tile_y;
-    uint8_t damage;
-    uint8_t life;
-    uint8_t field_96;
-    uint8_t blood_content;
-    bool leaves_corpse_behind;
-    uint8_t field_99;
-    uint8_t field_9A;
-    uint8_t field_9B;
-    STRINGID description;
-    int32_t sound_killed_by_player;
-    int32_t sound_killed_by_other;
-    float field_a8;
-    int32_t field_AC;
-    std::unordered_map<uint8_t, Animation> animations;
-    float default_special_offsetx;
-    float default_special_offsety;
-    uint8_t init;
-};
-
-struct EntityItem
-{
-    std::string name;
-    uint32_t id;
-
-    EntityItem(const std::string& name_, uint32_t id_)
-        : name(name_), id(id_)
-    {
-    }
-    bool operator<(const EntityItem& item) const
-    {
-        return id < item.id;
-    }
-};
-
-EntityDB* get_type(uint32_t id);
-
-ENT_TYPE to_id(std::string_view id);
-
-std::string_view to_name(ENT_TYPE id);
+struct EntityHooksInfo;
 
 class Entity
 {
@@ -193,14 +49,21 @@ class Entity
     float special_offsetx;
     float special_offsety;
     Color color;
-    float offsetx;
-    float offsety;
-    float hitboxx;
-    float hitboxy;
-    SHAPE shape;         // 1 = rectangle, 2 = circle
-    bool hitbox_enabled; // probably, off for bg, deco, logical etc
-    uint8_t b82;
-    uint8_t b83;
+    union
+    {
+        struct
+        {
+            float offsetx;
+            float offsety;
+            float hitboxx;
+            float hitboxy;
+            SHAPE shape;         // 1 = rectangle, 2 = circle
+            bool hitbox_enabled; // probably, off for bg, deco, logical etc
+            uint8_t b82;
+            uint8_t b83;
+        };
+        CollisionInfo collision_info;
+    };
     float angle;
     RenderInfo* rendering_info;
     Texture* texture;
@@ -311,6 +174,7 @@ class Entity
     void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
     void set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render);
     void set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render);
+    void set_enable_turning(bool enabled);
 
     std::span<uint32_t> get_items();
 
@@ -371,67 +235,6 @@ class Entity
     virtual void apply_db() = 0; // This is actually just an initialize call that is happening once after  the entity is created
 };
 
-struct SoundInfo
-{
-    int64_t unknown1;
-    uint32_t sound_id;
-    int32_t unknown2;
-    const char* sound_name;
-    int64_t unknown3;
-    int64_t unknown4;
-    int64_t unknown5;
-};
-
-struct SoundPosition
-{
-    size_t __vftable;
-    float x;
-    float y;
-    SoundInfo* sound_effect_info; // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
-    uint64_t fmod_param_id;       // param to FMOD::Studio::EventInstance::SetParameterByID
-    float POS_SCREEN_X;           // VANILLA_SOUND_PARAM names, for now
-    float DIST_CENTER_X;
-    float DIST_CENTER_Y;
-    float DIST_Z;
-    float DIST_PLAYER; // seams to be always here, even you you get nil in lua
-    float SUBMERGED;
-    float LIQUID_STREAM;
-    float unknown10; // LIQUID_STREAM related? , maybe LIQUID_INTENSITY?
-    float VALUE;
-    float unknown12;
-    float unknown13;
-    float unknown14;
-    float unknown15;
-    float unknown16;
-    float unknown17;
-    float unknown18;
-    float unknown19;
-    float unknown20;
-    float unknown21;
-    float unknown22;
-    float unknown23;
-    float unknown24;
-    float unknown25;
-    float unknown26;
-    float unknown27;
-    float unknown28;
-    float unknown29;
-    float POISONED;
-    float CURSED;
-    float unknown32;
-    float unknown33;
-    float unknown34;
-    float unknown35;
-    float unknown36;
-    float unknown37;
-    float unknown38;
-    float unknown39;
-    float unknown40;
-    float unknown41; // all the values repeat from this point, maybe all those floats are just an array?
-};
-
-std::vector<EntityItem> list_entities();
-
 std::tuple<float, float, uint8_t> get_position(uint32_t uid);
 std::tuple<float, float, uint8_t> get_render_position(uint32_t uid);
 
@@ -439,6 +242,5 @@ std::tuple<float, float> get_velocity(uint32_t uid);
 
 AABB get_hitbox(uint32_t uid, bool use_render_pos);
 
-struct EntityFactory* entity_factory();
 Entity* get_entity_ptr(uint32_t uid);
 Entity* get_entity_ptr_local(uint32_t uid);

@@ -9,23 +9,24 @@
 #include <string>      // for allocator, operator""sv, operator""s
 #include <type_traits> // for move
 
-#include "entities_chars.hpp"   // for Player
-#include "entity.hpp"           // for to_id, Entity, HookWithId, EntityDB
-#include "game_manager.hpp"     // for get_game_manager, GameManager, SaveR...
-#include "items.hpp"            // for Items, SelectPlayerSlot
-#include "level_api.hpp"        // for LevelGenSystem, LevelGenSystem::(ano...
-#include "logger.h"             // for DEBUG
-#include "memory.hpp"           // for write_mem_prot, read_u64, read_u8
-#include "movable.hpp"          // for Movable
-#include "movable_behavior.hpp" // for init_behavior_hooks
-#include "render_api.hpp"       // for init_render_api_hooks
-#include "savedata.hpp"         // for SaveData
-#include "script/events.hpp"    //
-#include "search.hpp"           // for get_address
-#include "spawn_api.hpp"        // for init_spawn_hooks
-#include "strings.hpp"          // for strings_init
-#include "thread_utils.hpp"     // for OnHeapPointer
-#include "virtual_table.hpp"    // for get_virtual_function_address, VTABLE...
+#include "entities_chars.hpp"    // for Player
+#include "entity.hpp"            // for to_id, Entity, HookWithId, EntityDB
+#include "entity_hooks_info.hpp" // for Player
+#include "game_manager.hpp"      // for get_game_manager, GameManager, SaveR...
+#include "items.hpp"             // for Items, SelectPlayerSlot
+#include "level_api.hpp"         // for LevelGenSystem, LevelGenSystem::(ano...
+#include "logger.h"              // for DEBUG
+#include "memory.hpp"            // for write_mem_prot, read_u64, read_u8
+#include "movable.hpp"           // for Movable
+#include "movable_behavior.hpp"  // for init_behavior_hooks
+#include "render_api.hpp"        // for init_render_api_hooks
+#include "savedata.hpp"          // for SaveData
+#include "script/events.hpp"     //
+#include "search.hpp"            // for get_address
+#include "spawn_api.hpp"         // for init_spawn_hooks
+#include "strings.hpp"           // for strings_init
+#include "thread_utils.hpp"      // for OnHeapPointer
+#include "virtual_table.hpp"     // for get_virtual_function_address, VTABLE...
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -68,6 +69,23 @@ inline bool& get_is_init()
 {
     static bool is_init{false};
     return is_init;
+}
+
+inline bool& get_do_hooks()
+{
+    static bool do_hooks{true};
+    return do_hooks;
+}
+void State::set_do_hooks(bool do_hooks)
+{
+    if (get_is_init())
+    {
+        DEBUG("Too late to disable hooks...");
+    }
+    else
+    {
+        get_do_hooks() = do_hooks;
+    }
 }
 
 void do_write_load_opt()
@@ -232,14 +250,20 @@ State& State::get()
         }
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
-        STATE.ptr()->level_gen->init();
-        init_spawn_hooks();
-        init_behavior_hooks();
-        init_render_api_hooks();
-        hook_godmode_functions();
+
+        const bool do_hooks = get_do_hooks();
+        if (do_hooks)
+        {
+            STATE.ptr()->level_gen->init();
+            init_spawn_hooks();
+            init_behavior_hooks();
+            init_render_api_hooks();
+            hook_godmode_functions();
+            strings_init();
+            init_state_update_hook();
+        }
+
         get_is_init() = true;
-        strings_init();
-        init_state_update_hook();
     }
     return STATE;
 }
