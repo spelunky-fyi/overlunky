@@ -19,9 +19,10 @@
 #include <vector>             // for vector, _Vector_const_iterator, _Vector...
 // clang-format on
 
-#include "logger.h"          // for ByteStr, DEBUG
-#include "memory.hpp"        // for Memory, function_start
-#include "virtual_table.hpp" // for VIRT_FUNC, VTABLE_OFFSET, VIRT_FUNC::LO...
+#include "ghidra_byte_string.hpp" // for operator""_gh
+#include "logger.h"               // for ByteStr, DEBUG
+#include "memory.hpp"             // for Memory, function_start
+#include "virtual_table.hpp"      // for VIRT_FUNC, VTABLE_OFFSET, VIRT_FUNC::LO...
 
 // Decodes the program counter inside an instruction
 // The default simple variant is 3 bytes instruction, 4 bytes rel. address, 0 bytes suffix:
@@ -32,7 +33,7 @@
 //      e.g.  mov word ptr[XXXXXXXX], 1 = 66:C705 XXXXXXXX 0100 (opcode_suffix_offset = 2)
 size_t decode_pc(const char* exe, size_t offset, uint8_t opcode_offset, uint8_t opcode_suffix_offset, uint8_t opcode_addr_size)
 {
-    off_t rel;
+    ptrdiff_t rel;
     switch (opcode_addr_size)
     {
     case 1:
@@ -45,13 +46,27 @@ size_t decode_pc(const char* exe, size_t offset, uint8_t opcode_offset, uint8_t 
     default:
         rel = *(int32_t*)(&exe[offset + opcode_offset]);
         break;
+    case 8:
+        rel = *(int64_t*)(&exe[offset + opcode_offset]);
+        break;
     }
     return offset + rel + opcode_offset + opcode_addr_size + opcode_suffix_offset;
 }
 
-size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset)
+size_t decode_imm(const char* exe, size_t offset, uint8_t opcode_offset, uint8_t value_size)
 {
-    return *(uint32_t*)(&exe[offset + opcode_offset]);
+    switch (value_size)
+    {
+    case 1:
+        return *(uint8_t*)(&exe[offset + opcode_offset]);
+    case 2:
+        return *(uint16_t*)(&exe[offset + opcode_offset]);
+    case 4:
+    default:
+        return *(uint32_t*)(&exe[offset + opcode_offset]);
+    case 8:
+        return *(uint64_t*)(&exe[offset + opcode_offset]);
+    }
 }
 
 PIMAGE_NT_HEADERS RtlImageNtHeader(_In_ PVOID Base)
@@ -267,9 +282,9 @@ class PatternCommandBuffer
         commands.push_back({CommandType::DecodePC, {.decode_pc_args = {opcode_prefix, opcode_suffix, opcode_addr}}});
         return *this;
     }
-    PatternCommandBuffer& decode_imm(uint8_t opcode_prefix = 3)
+    PatternCommandBuffer& decode_imm(uint8_t opcode_prefix = 3, uint8_t value_size = 4)
     {
-        commands.push_back({CommandType::DecodeIMM, {.decode_imm_prefix = opcode_prefix}});
+        commands.push_back({CommandType::DecodeIMM, {.decode_imm_args = {opcode_prefix, value_size}}});
         return *this;
     }
     PatternCommandBuffer& decode_call()
@@ -280,6 +295,11 @@ class PatternCommandBuffer
     PatternCommandBuffer& at_exe()
     {
         commands.push_back({CommandType::AtExe});
+        return *this;
+    }
+    PatternCommandBuffer& from_exe()
+    {
+        commands.push_back({CommandType::FromExe});
         return *this;
     }
     PatternCommandBuffer& function_start(uint8_t outside_byte = 0xcc)
@@ -359,13 +379,18 @@ class PatternCommandBuffer
                                     data.decode_pc_args.as_tuple());
                 break;
             case CommandType::DecodeIMM:
-                offset = ::decode_imm(exe, offset, data.decode_imm_prefix);
+                offset = std::apply([=](auto... args)
+                                    { return ::decode_imm(exe, offset, args...); },
+                                    data.decode_imm_args.as_tuple());
                 break;
             case CommandType::DecodeCall:
                 offset = mem.decode_call(offset);
                 break;
             case CommandType::AtExe:
                 offset = mem.at_exe(offset);
+                break;
+            case CommandType::FromExe:
+                offset = offset - mem.exe_ptr;
                 break;
             case CommandType::FunctionStart:
                 offset = ::function_start(offset, data.outside_byte);
@@ -394,6 +419,16 @@ class PatternCommandBuffer
             return {opcode_offset, opcode_suffix_offset, opcode_addr_size};
         }
     };
+    struct DecodeImmArgs
+    {
+        uint8_t opcode_offset;
+        uint8_t value_size;
+
+        std::tuple<uint8_t, uint8_t> as_tuple() const
+        {
+            return {opcode_offset, value_size};
+        }
+    };
     struct FindInstArgs
     {
         std::string_view pattern;
@@ -416,6 +451,7 @@ class PatternCommandBuffer
         DecodeIMM,
         DecodeCall,
         AtExe,
+        FromExe,
         FunctionStart,
         FromExeBase,
     };
@@ -426,7 +462,7 @@ class PatternCommandBuffer
         FindInstArgs find_inst_args;
         int64_t offset;
         DecodePcArgs decode_pc_args;
-        uint8_t decode_imm_prefix;
+        DecodeImmArgs decode_imm_args;
         GetVirtualFunctionAddressArgs get_vfunc_addr_args;
         uint64_t base_offset;
         uint8_t outside_byte;
@@ -609,6 +645,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\xE8****\xE9****\x48\x81\xC6"sv)
             .decode_call()
             .at_exe(),
+    },
+    {
+        "layer_get_entity_at"sv,
+        // Set a bp on spawning entity ENT_TYPE_ITEM_CLIMBABLE_ROPE, then throw a rope, skip first bp
+        // On second bp go back to the caller of load_entity, somewhere upwards this function is called as
+        // layer_get_entity_at(layer, x, y, 0x180, 4, 8, ???)
+        PatternCommandBuffer{}
+            .find_inst("f3 0f 10 5f 7c 0f 28 e2"_gh)
+            .at_exe()
+            .function_start(),
     },
     {
         "virtual_functions_table"sv,
@@ -1115,6 +1161,25 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .get_address("process_ropes_two"sv)
             .find_next_inst("\x83\xF8*\x0F\x87****\x41"sv)
             .offset(0x02)
+            .at_exe(),
+    },
+    {
+        "setup_top_rope_rendering_info_one"sv,
+        // After creating the top rope entity (see attach_thrown_rope_to_background)
+        // two functions are called on the rope->rendering_info
+        PatternCommandBuffer{}
+            .get_address("attach_thrown_rope_to_background"sv)
+            .find_after_inst("48 8b 8b 88 00 00 00"_gh)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        "setup_top_rope_rendering_info_two"sv,
+        // See setup_top_rope_rendering_info_one
+        PatternCommandBuffer{}
+            .get_address("attach_thrown_rope_to_background"sv)
+            .find_after_inst("41 b8 02 00 00 00"_gh)
+            .decode_call()
             .at_exe(),
     },
     {

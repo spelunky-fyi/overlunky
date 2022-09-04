@@ -28,6 +28,7 @@
 #include "level_api.hpp" // IWYU pragma: keep
 #include "logger.h"      // for DEBUG
 #include "script.hpp"    // for ScriptMessage, ScriptImage (ptr only), Scri...
+#include "util.hpp"      // for ON_SCOPE_EXIT
 
 class Player;
 class JournalPage;
@@ -361,7 +362,10 @@ class LuaBackend
     static void for_each_backend(std::function<bool(LuaBackend&)> fun);
     static LuaBackend* get_backend(std::string_view id);
     static LuaBackend* get_backend_by_id(std::string_view id, std::string_view ver = "");
+
     static LuaBackend* get_calling_backend();
+    static void push_calling_backend(LuaBackend*);
+    static void pop_calling_backend(LuaBackend*);
 
     CurrentCallback get_current_callback();
     void set_current_callback(int uid, int id, CallbackType type);
@@ -376,6 +380,9 @@ bool LuaBackend::handle_function(sol::function func, Args&&... args)
 template <class Ret, class... Args>
 std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, Args&&... args)
 {
+    LuaBackend::push_calling_backend(this);
+    ON_SCOPE_EXIT(LuaBackend::pop_calling_backend(this));
+
     auto lua_result = func(std::forward<Args>(args)...);
     if (!lua_result.valid())
     {

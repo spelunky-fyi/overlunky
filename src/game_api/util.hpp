@@ -16,6 +16,14 @@ requires std::is_invocable_r_v<void, FunT> struct OnScopeExit
     FunT Fun;
 };
 
+#define OL_CONCAT_IMPL(x, y) x##y
+#define OL_CONCAT(x, y) OL_CONCAT_IMPL(x, y)
+#define ON_SCOPE_EXIT(expr)                         \
+    OnScopeExit OL_CONCAT(on_scope_exit_, __LINE__) \
+    {                                               \
+        [&]() { expr; }                             \
+    }
+
 inline std::string_view trim(std::string_view str)
 {
     constexpr std::string_view white_spaces = " \t\r\n\v\f";

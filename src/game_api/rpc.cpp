@@ -1124,7 +1124,7 @@ void extinguish_particles(ParticleEmitterInfo* particle_emitter)
     if (particle_emitter != nullptr)
     {
         generic_free(particle_emitter->emitted_particles.memory);
-        generic_free(particle_emitter->emitted_particles2.memory);
+        generic_free(particle_emitter->emitted_particles_back_layer.memory);
         generic_free(particle_emitter);
     }
 }
@@ -1239,14 +1239,17 @@ void set_camp_camera_bounds_enabled(bool b)
     }
 }
 
-void set_explosion_mask(uint32_t mask)
+void set_explosion_mask(int32_t mask)
 {
-    static size_t addr = 0;
-    if (addr == 0)
+    static size_t addr = get_address("explosion_mask");
+    if (mask == -1)
     {
-        addr = get_address("explosion_mask");
+        recover_mem("explosion_mask");
     }
-    write_mem_prot(addr, mask, true);
+    else
+    {
+        write_mem_recoverable("explosion_mask", addr, mask, true);
+    }
 }
 
 void set_max_rope_length(uint8_t length)
@@ -1266,6 +1269,11 @@ void set_max_rope_length(uint8_t length)
     // 4) in the same function at the end of the little loop of process_ropes_two is a comparison to n-1
     uint8_t length_minus_one_8 = length - 1;
     write_mem_prot(get_address("process_ropes_three"), length_minus_one_8, true);
+}
+
+uint8_t get_max_rope_length()
+{
+    return static_cast<uint8_t>(read_u32(get_address("attach_thrown_rope_to_background")));
 }
 
 uint8_t waddler_count_entity(ENT_TYPE entity_type)
@@ -1703,7 +1711,7 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
     }
 }
 
-void add_item_to_shop(int32_t item_uid, int32_t shop_owner)
+void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
 {
     struct dummy // dummy struct
     {
@@ -1713,7 +1721,7 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner)
     using AddRestrictedItemFun = size_t(std::set<ShopRestrictedItem>*, dummy, ShopRestrictedItem);
 
     Movable* item = get_entity_ptr(item_uid)->as<Movable>();
-    Entity* owner = get_entity_ptr(shop_owner);
+    Entity* owner = get_entity_ptr(shop_owner_uid);
     if (item && owner && item->is_movable())
     {
         const static auto room_owners = {
@@ -1742,7 +1750,7 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner)
                 const auto bucket = add_to_items_set(&state.ptr()->shops.items, {state.ptr()->shops.items.end(), 0}, {item_uid, 0, 0});
 
                 auto the_struct = (ShopRestrictedItem*)(bucket + 0x1C); // 0x1C - is just the internal map/set stuff
-                the_struct->owner_uid = shop_owner;
+                the_struct->owner_uid = shop_owner_uid;
                 the_struct->owner_type = owner->type->id;
                 return;
             }

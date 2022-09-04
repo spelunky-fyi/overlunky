@@ -8,12 +8,12 @@
 #include <utility>     // for find_if, min
 #include <vector>      // for vector, _Vector_iterator, allocator, era...
 
-#include "entity.hpp"       // for HookWithId
-#include "game_manager.hpp" // for GameManager, get_game_manager
-#include "logger.h"         // for DEBUG
-#include "screen_arena.hpp" // for ScreenArenaIntro, ScreenArenaItems, Scre...
-#include "state.hpp"        // for StateMemory, get_state_ptr
-#include "vtable_hook.hpp"  // for hook_vtable_no_dtor
+#include "entity_hooks_info.hpp" // for HookWithId
+#include "game_manager.hpp"      // for GameManager, get_game_manager
+#include "logger.h"              // for DEBUG
+#include "screen_arena.hpp"      // for ScreenArenaIntro, ScreenArenaItems, Scre...
+#include "state.hpp"             // for StateMemory, get_state_ptr
+#include "vtable_hook.hpp"       // for hook_vtable_no_dtor
 
 struct ScreenHooksInfo
 {

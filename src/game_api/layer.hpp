@@ -193,6 +193,8 @@ struct Layer
 
     Entity* get_grid_entity_at(float x, float y);
 
+    Entity* get_entity_at(float x, float y, uint32_t search_flags, uint32_t include_flags, uint32_t exclude_flags, uint32_t one_of_flags);
+
     void move_grid_entity(Entity* ent, float x, float y, Layer* dest_layer);
     void move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_layer);
 };

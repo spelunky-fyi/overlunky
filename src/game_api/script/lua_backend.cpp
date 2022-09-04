@@ -1315,19 +1315,41 @@ LuaBackend* LuaBackend::get_backend_by_id(std::string_view id, std::string_view 
     }
     return nullptr;
 }
+
+static LuaBackend* g_CallingBackend{nullptr};
 LuaBackend* LuaBackend::get_calling_backend()
 {
+    if (g_CallingBackend)
+    {
+        return g_CallingBackend;
+    }
+
     static const sol::state& lua = get_lua_vm();
     auto get_script_id = lua["get_script_id"];
     if (get_script_id.get_type() == sol::type::function)
     {
         auto script_id = get_script_id();
-        if (script_id.get_type() == sol::type::string)
+        if (script_id.get_type() == sol::type::string && script_id.valid())
         {
             return LuaBackend::get_backend(script_id.get<std::string_view>());
         }
+        else
+        {
+            sol::error e = script_id;
+            throw std::runtime_error{e.what()};
+        }
     }
     return nullptr;
+}
+void LuaBackend::push_calling_backend(LuaBackend* calling_backend)
+{
+    assert(g_CallingBackend == nullptr);
+    g_CallingBackend = calling_backend;
+}
+void LuaBackend::pop_calling_backend([[maybe_unused]] LuaBackend* calling_backend)
+{
+    assert(g_CallingBackend == calling_backend);
+    g_CallingBackend = nullptr;
 }
 
 CurrentCallback LuaBackend::get_current_callback()

@@ -62,6 +62,8 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<CustomMovableBehavior>(
         "CustomMovableBehavior",
         sol::no_constructor,
+        "base_behavior",
+        &CustomMovableBehavior::base_behavior,
         sol::base_classes,
         sol::bases<MovableBehavior>());
 
