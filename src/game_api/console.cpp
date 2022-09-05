@@ -42,7 +42,8 @@ bool SpelunkyConsole::is_enabled()
 }
 bool SpelunkyConsole::is_toggled()
 {
-    return m_Impl->Lock()->get_enabled();
+    // Directly access `enabled` here, the implementation of `get_enabled` is just faking it
+    return m_Impl->Lock()->enabled;
 }
 
 bool SpelunkyConsole::run()
