@@ -878,7 +878,7 @@ SoundMeta* play_sound(uint32_t sound_id, uint32_t source_uid)
     Entity* source = get_entity_ptr(source_uid);
     SoundMeta* sound_info{nullptr};
 
-    if (source_uid == ~0 || source != nullptr)
+    if (source_uid == ~0 || source != nullptr) // don't play the sound if the entity is not valid
     {
         sound_info = play_sound_func(sound_id);
         if (source != nullptr)

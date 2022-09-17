@@ -256,17 +256,14 @@ struct SoundInfo
     int64_t unknown1;
     uint32_t sound_id;
     int32_t unknown2;       // padding probably
-    const char* sound_name; // sometimes pointer, sometimes static array?
-    int64_t unknown3;
-    int64_t unknown4;
-    int64_t unknown5;
+    std::string sound_name; // not 100% sure it's standard
 };
 
 struct SoundMeta
 {
     float x;
     float y;
-    SoundInfo* sound_effect_info;        // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
+    SoundInfo* sound_info;               // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
     uint64_t fmod_param_id;              // param to FMOD::Studio::EventInstance::SetParameterByID
     std::array<float, 38> left_channel;  // VANILLA_SOUND_PARAM
     std::array<float, 38> right_channel; // VANILLA_SOUND_PARAM
@@ -293,5 +290,6 @@ struct BackGroundSound : public SoundMeta
     bool special_fadeout; // fades out the music then calls destruct (which will crash the game if used on someting in GameManager->BackgroundMusic)
 };
 
-/// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it
+/// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
+/// Returns SoundMeta (read only), beware that after the sound starts, that memory is no longer valid
 SoundMeta* play_sound(uint32_t sound_id, uint32_t source_uid);

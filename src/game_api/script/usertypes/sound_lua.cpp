@@ -171,7 +171,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "y",
         &SoundMeta::y,
         "left_channel",
-        &SoundMeta::left_channel,
+        &SoundMeta::left_channel, // TODO: index 0-37 instead of 1-38
         "right_channel",
         &SoundMeta::right_channel,
         "start_over",

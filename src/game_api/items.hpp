@@ -107,8 +107,9 @@ struct SelectPlayerSlot
 
 struct Items
 {
-    void* __vftable;
-    Player* players[MAX_PLAYERS];
+    std::array<bool, MAX_PLAYERS> unknown_player; // who the original leader was? in local coop is set to true if the leader dies, and then to false when he gets the flag back
+    uint32_t unknown;                             // padding probably
+    std::array<Player*, MAX_PLAYERS> players;
     std::array<Inventory, MAX_PLAYERS> player_inventories;
     std::array<SelectPlayerSlot, MAX_PLAYERS> player_select_slots;
     /// Pet information for level transition
