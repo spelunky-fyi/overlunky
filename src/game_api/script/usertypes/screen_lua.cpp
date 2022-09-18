@@ -10,11 +10,12 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max
 
-#include "aliases.hpp"      // for JournalPageType, JournalPageType::Bestiary
-#include "entity.hpp"       // IWYU pragma: keep
-#include "particles.hpp"    // IWYU pragma: keep
-#include "screen.hpp"       // for ScreenCharacterSelect, ScreenOnlineLobby
-#include "screen_arena.hpp" // for ScreenArenaStagesSelect, ScreenArenaIntro
+#include "aliases.hpp"       // for JournalPageType, JournalPageType::Bestiary
+#include "entity.hpp"        // IWYU pragma: keep
+#include "particles.hpp"     // IWYU pragma: keep
+#include "screen.hpp"        // for ScreenCharacterSelect, ScreenOnlineLobby
+#include "screen_arena.hpp"  // for ScreenArenaStagesSelect, ScreenArenaIntro
+#include "sound_manager.hpp" //
 
 namespace NScreen
 {
