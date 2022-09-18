@@ -644,6 +644,10 @@ void register_usertypes(sol::state& lua)
                               if (n++ >= 30)
                                   break;
                       }),
+        "explosion_and_loop",
+        &ScreenConstellation::explosion_and_loop,
+        "bg_music",
+        &ScreenConstellation::bg_music,
         sol::base_classes,
         sol::bases<Screen>());
 

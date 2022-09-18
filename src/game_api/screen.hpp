@@ -633,8 +633,8 @@ class ScreenConstellation : public Screen // ID: 19
     float constellation_text_opacity;
     char16_t constellation_text[32]; // UTF16 string
     float* credits_progression;
-    size_t unknown37;
-    size_t bg_music_info; /* unsure */
+    SoundMeta* explosion_and_loop;
+    SoundMeta* bg_music;
 };
 
 /// The recap book is drawn on top of the POST render event
