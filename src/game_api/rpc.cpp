@@ -727,27 +727,32 @@ void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_enti
     write_mem_prot(get_address("poison_arrowtrap_projectile"), poison_entity_type, true);
 }
 
+float* g_sparktrap_parameters{nullptr};
 void modify_sparktraps(float angle_increment, float distance)
 {
-    static float* new_array;
-    if (new_array == nullptr)
+    if (g_sparktrap_parameters == nullptr)
     {
         const auto offset = get_address("sparktrap_angle_increment") + 4;
 
-        if (read_u8(offset - 1) != 0x89) // check if sparktraps_hack is active
+        if (read_u8(offset - 1) == 0x89) // check if sparktraps_hack is active
             return;
 
         const int32_t distance_offset = 0xF1;
-        new_array = (float*)alloc_mem_rel32(offset + 4, sizeof(float) * 2);
-        if (!new_array)
+        g_sparktrap_parameters = (float*)alloc_mem_rel32(offset + 4, sizeof(float) * 2);
+        if (!g_sparktrap_parameters)
             return;
 
-        int32_t rel = static_cast<int32_t>((size_t)new_array - (offset + 4));
+        int32_t rel = static_cast<int32_t>((size_t)g_sparktrap_parameters - (offset + 4));
         write_mem_prot(offset, rel, true);
         write_mem_prot(offset + distance_offset, (int32_t)(rel - distance_offset + sizeof(float)), true);
     }
-    *new_array = angle_increment;
-    *(new_array + 1) = distance;
+    *g_sparktrap_parameters = angle_increment;
+    *(g_sparktrap_parameters + 1) = distance;
+}
+
+float* get_sparktraps_parameters_ptr() // only for the UI
+{
+    return g_sparktrap_parameters;
 }
 
 void activate_sparktraps_hack(bool activate)
