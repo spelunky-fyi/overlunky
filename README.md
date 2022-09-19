@@ -149,8 +149,8 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + Try toggling the *Capture third-party overlays* option in *Game Capture*. It's possible to hide OL if running the game through Steam.
     + If you have lag or crashes, check previous question.
   - If you're running **Linux**
-    + The game and OL should run fine with Wine 7 if you install DXVK.
-    + Also works with Proton 7 using the [command line switch](#command-line-switches) `--launch_playlunky ..` for a non-Steam game shortcut. Just make sure the game and the OL shortcut are set to use Proton 7.
+    + The game and OL should run fine with Wine 7 if you install DXVK and the steam emu.
+    + Also works with Proton 7 using the [command line switch](#command-line-switches) `--launch_playlunky ..` for a non-Steam game shortcut. Just make sure the game and the OL shortcut are set to use Proton 7. **Proton actually seems broken for some reason.**
     + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
   - If you **don't have scripts** in the Scripts tab
     + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts).
