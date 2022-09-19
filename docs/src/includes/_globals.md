@@ -41,6 +41,13 @@ end
 A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an [Entity](#Entity).
 ### game_manager
 
+
+```lua
+if game_manager.game_props.game_has_focus == false then
+    message("Come back soon!")
+end
+```
+
 #### [GameManager](#GameManager) game_manager
 
 > Search script examples for [game_manager](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_manager)
@@ -48,12 +55,30 @@ A bunch of [game state](#StateMemory) variables. Your ticket to almost anything 
 The [GameManager](#GameManager) gives access to a couple of Screens as well as the pause and journal UI elements
 ### online
 
+
+```lua
+message = "Currently playing: "
+for _, p in pairs(online.online_players) do
+    if p.ready_state ~= 0 then
+        message = message .. p.player_name .. " "
+    end
+end
+print(message)
+```
+
 #### [Online](#Online) online
 
 > Search script examples for [online](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online)
 
 The [Online](#Online) object has information about the online lobby and its players
 ### players
+
+
+```lua
+> Make the player invisible, use only in single player only mods
+
+players[1].flags = set_flag(players[1].flags, 1)
+```
 
 #### array&lt;[Player](#Player)&gt; players
 
@@ -77,12 +102,40 @@ prinspect(savegame.time_best)
 Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
 ### options
 
+
+```lua
+register_option_bool("bomb_bag", "BombBag", "Spawn bomb bag at the start of every level", false)
+
+set_callback(function()
+    if options.bomb_bag then
+        -- Spawn the bomb bag at player location thanks to the LAYER.PLAYER1
+        spawn_entity_snapped_to_floor(ENT_TYPE.ITEM_PICKUP_BOMBBAG, 0, 0, LAYER.PLAYER1)
+    end
+end, ON.LEVEL)
+```
+
 #### array&lt;mixed&gt; options
 
 > Search script examples for [options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 
-Table of options set in the UI, added with the [register_option_functions](#register_option_int).
+Table of options set in the UI, added with the [register_option_functions](#Option-functions).
 ### prng
+
+
+```lua
+> Make it so there is 50% chance that the Ankh will be destroyed
+
+set_callback(function ()
+    -- more or less 50% chance
+    if prng:random(2) == 1 then
+        -- get all Ankh's in a level
+        ankhs = get_entities_by(ENT_TYPE.ITEM_PICKUP_ANKH, MASK.ITEM, LAYER.BOTH)
+        for _, uid in pairs(ankhs) do
+            get_entity(uid):destroy()
+        end
+    end
+end, ON.LEVEL)
+```
 
 #### [PRNG](#PRNG) prng
 
@@ -1808,6 +1861,18 @@ Send data to specified UDP address. Requires unsafe mode.
 ### register_option_bool
 
 
+```lua
+register_option_bool("bomb_bag", "BombBag", "Spawn bomb bag at the start of every level", false)
+
+set_callback(function()
+    if options.bomb_bag then
+        -- Spawn the bomb bag at player location thanks to the LAYER.PLAYER1
+        spawn_entity_snapped_to_floor(ENT_TYPE.ITEM_PICKUP_BOMBBAG, 0, 0, LAYER.PLAYER1)
+    end
+end, ON.LEVEL)
+```
+
+
 > Search script examples for [register_option_bool](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_bool)
 
 #### nil register_option_bool(string name, string desc, string long_desc, bool value)
@@ -1988,9 +2053,9 @@ Get the game coordinates at the screen position (`x`, `y`)
 ```lua
 -- Draw the level boundaries
 set_callback(function(draw_ctx)
-    local xmin, ymin, xmax, ymax = get_bounds()
-    local sx, sy = screen_position(xmin, ymin) -- top left
-    local sx2, sy2 = screen_position(xmax, ymax) -- bottom right
+    local xmin, ymax, xmax, ymin = get_bounds()
+    local sx, sy = screen_position(xmin, ymax) -- top left
+    local sx2, sy2 = screen_position(xmax, ymin) -- bottom right
     draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
 end, ON.GUIFRAME)
 

@@ -156,9 +156,9 @@ bool | [punish_ball](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pu
 ```lua
 -- Draw the level boundaries
 set_callback(function(draw_ctx)
-    local xmin, ymin, xmax, ymax = get_bounds()
-    local sx, sy = screen_position(xmin, ymin) -- top left
-    local sx2, sy2 = screen_position(xmax, ymax) -- bottom right
+    local xmin, ymax, xmax, ymin = get_bounds()
+    local sx, sy = screen_position(xmin, ymax) -- top left
+    local sx2, sy2 = screen_position(xmax, ymin) -- bottom right
     draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
 end, ON.GUIFRAME)
 
@@ -529,6 +529,22 @@ int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state_id) | Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's<br/>`get_next_state_id` to enter this state, given that the behavior is added to the movable.
 
 ### PRNG
+
+
+```lua
+> Make it so there is 50% chance that the Ankh will be destroyed
+
+set_callback(function ()
+    -- more or less 50% chance
+    if prng:random(2) == 1 then
+        -- get all Ankh's in a level
+        ankhs = get_entities_by(ENT_TYPE.ITEM_PICKUP_ANKH, MASK.ITEM, LAYER.BOTH)
+        for _, uid in pairs(ankhs) do
+            get_entity(uid):destroy()
+        end
+    end
+end, ON.LEVEL)
+```
 
 [PRNG](#PRNG) (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
@@ -1050,6 +1066,17 @@ int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) |
 
 
 ### Online
+
+
+```lua
+message = "Currently playing: "
+for _, p in pairs(online.online_players) do
+    if p.ready_state ~= 0 then
+        message = message .. p.player_name .. " "
+    end
+end
+print(message)
+```
 
 
 Type | Name | Description
@@ -5682,8 +5709,7 @@ int | [move_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move
 int | [health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) | 
 int | [stun_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_timer) | 
 int | [stun_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_state) | 
-int | [lock_input_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_input_timer) | Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you'r on a mount
-int | [some_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=some_state) | Deprecated, it's the same as lock_input_timer, but this name makes no sense
+int | [lock_input_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_input_timer) | Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you're on a mount
 int | [wet_effect_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wet_effect_timer) | 
 int | [poison_tick_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) | 
 int | [airtime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) | airtime = falling_timer

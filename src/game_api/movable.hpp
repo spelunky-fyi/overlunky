@@ -47,11 +47,11 @@ class Movable : public Entity
     uint16_t stun_state;
     union
     { // weird fix to not break compatibility with already exposed some_state
-        /// Deprecated, it's the same as lock_input_timer, but this name makes no sense
+        /// NoDoc
         uint32_t some_state;
         struct
         {
-            /// Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you'r on a mount
+            /// Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you're on a mount
             uint16_t lock_input_timer;
             uint16_t wet_effect_timer; // fading the entity to black, similar to dark_shadow_timer
         };

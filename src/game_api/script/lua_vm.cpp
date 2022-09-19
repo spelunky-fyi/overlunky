@@ -388,7 +388,7 @@ end
             }
         });
 
-    /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
+    /// Table of options set in the UI, added with the [register_option_functions](#Option-functions).
     lua["options"] = lua.create_named_table("options");
 
     /// Load another script by id "author/name" and import its `exports` table. Returns:
