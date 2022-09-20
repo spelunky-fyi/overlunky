@@ -1592,16 +1592,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x48\xC7\x05****\x3C\x00\x00\x00\x48\x8D\x15"sv)
             .at_exe()
             .function_start(),
-    }, 
-     {
-         // Find a string containing STEAMUSERSTATS, the enclosing function returns an `ISteamUserStats**` in `param_1`
-         "get_steam_user_stats"sv,
-         PatternCommandBuffer{}
-             .find_after_inst("41 B8 00 02 00 00 FF 90 D0 00 00 00"_gh)
-             .find_inst("\x48\x8d\x0d"sv)
-             .decode_pc()
-             .at_exe(),
-     },
+    },
+    {
+        // Find a string containing STEAMUSERSTATS, the enclosing function returns an `ISteamUserStats**` in `param_1`
+        "get_steam_user_stats"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("41 B8 00 02 00 00 FF 90 D0 00 00 00"_gh)
+            .find_inst("\x48\x8d\x0d"sv)
+            .decode_pc()
+            .at_exe(),
+    },
     {
         // Set condition bp on spawn_entity (not load_item) for one of the entities spawned by this generator
         // execute to the return two times, you should see this array right above
