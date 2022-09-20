@@ -1109,15 +1109,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x6)
             .decode_pc()
             .at_exe(),
-    },
+    },*/
     {
         "enforce_camp_camera_bounds"sv,
         // Go into basecamp, put a write bp on state.camera.bounds.top
         PatternCommandBuffer{}
-            .find_inst("\xF3\x48\x0F\x2A\xF0\x45\x8B\x78\x4C"sv)
+            .find_inst("F3 48 0F 2A F0 45 8B 79 4C"_gh)
             .at_exe()
             .function_start(),
-    },*/
+    },
     {
         "explosion_mask"sv,
         // Set a conditional bp on load_item for fx_explosion, throw a bomb and let it explode. When the debugger
@@ -1592,16 +1592,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x48\xC7\x05****\x3C\x00\x00\x00\x48\x8D\x15"sv)
             .at_exe()
             .function_start(),
-    }, /*
+    }, 
      {
          // Find a string containing STEAMUSERSTATS, the enclosing function returns an `ISteamUserStats**` in `param_1`
          "get_steam_user_stats"sv,
          PatternCommandBuffer{}
-             .find_after_inst("\xff\x90\xd0\x00\x00\x00\x48\x8d\xbd\xe0\x03\x00\x00"sv)
-             .find_inst("\x48\x8d")
+             .find_after_inst("41 B8 00 02 00 00 FF 90 D0 00 00 00"_gh)
+             .find_inst("\x48\x8d\x0d"sv)
              .decode_pc()
              .at_exe(),
-     },*/
+     },
     {
         // Set condition bp on spawn_entity (not load_item) for one of the entities spawned by this generator
         // execute to the return two times, you should see this array right above
