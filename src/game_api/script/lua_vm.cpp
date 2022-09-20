@@ -182,7 +182,7 @@ end
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
-    // lua["online"] = get_online();
+    lua["online"] = get_online();
     /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See get_player().
     lua["players"] = std::vector<Player*>(get_players());
 
@@ -1649,7 +1649,7 @@ end
     lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
 
     /// Gets the specified setting, values might need to be interpreted differently per setting
-    // lua["get_setting"] = get_setting;
+    lua["get_setting"] = get_setting;
 
     /// Return the name of an unknown number in an enum table
     // lua["enum_get_name"] = [](table enum, int value) -> string
@@ -2018,13 +2018,13 @@ end
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
                            //, "CROSSPROGRESS_AUTOSYNC", 47
     );
-    // for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
-    //{
-    //     std::string setting_name{setting_name_view};
-    //     std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)
-    //                    { return (unsigned char)std::toupper(c); });
-    //     lua["GAME_SETTING"][std::move(setting_name)] = setting_index;
-    // }
+    for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
+    {
+        std::string setting_name{setting_name_view};
+        std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)
+                       { return (unsigned char)std::toupper(c); });
+        lua["GAME_SETTING"][std::move(setting_name)] = setting_index;
+    }
 }
 
 std::vector<std::string> safe_fields{};

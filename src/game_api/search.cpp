@@ -845,17 +845,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x3)
             .decode_call()
             .at_exe(),
-    },
+    },*/
     {
         "online"sv,
         // Find online code in memory (reverse for endianness), look higher up and find __vftable, set read bp on __vftable
         PatternCommandBuffer{}
-            .find_inst("\x66\x0F\x29\x85\xE0\x03\x00\x00"sv)
-            .offset(0x8)
+            .find_after_inst("48 0F 44 DA 8B AB E4 00 00 00 0F A3 CD"_gh)
+            .find_next_inst("\x48\x8B"sv)
             .decode_pc()
             .at_exe(),
     },
-    */
     {
         "particle_emitter_db"sv,
         // Locate the particles init function (see pattern `particle_emitter_list`). At the start you will see the value 1
