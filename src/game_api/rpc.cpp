@@ -1217,26 +1217,26 @@ void set_journal_enabled(bool b)
     g_journal_enabled = b;
 }
 
-void set_camp_camera_bounds_enabled(bool b)
+void set_camp_camera_bounds_enabled([[maybe_unused]]bool b)
 {
-    static size_t offset = 0;
-    static char original_instruction[3] = {0};
-    if (offset == 0)
-    {
-        offset = get_address("enforce_camp_camera_bounds");
-        for (uint8_t x = 0; x < 3; ++x)
-        {
-            original_instruction[x] = read_u8(offset + x);
-        }
-    }
-    if (b)
-    {
-        write_mem_prot(offset, std::string(original_instruction, 3), true);
-    }
-    else
-    {
-        write_mem_prot(offset, "\xC3\x90\x90"s, true);
-    }
+    //static size_t offset = 0;
+    //static char original_instruction[3] = {0};
+    //if (offset == 0)
+    //{
+    //    offset = get_address("enforce_camp_camera_bounds");
+    //    for (uint8_t x = 0; x < 3; ++x)
+    //    {
+    //        original_instruction[x] = read_u8(offset + x);
+    //    }
+    //}
+    //if (b)
+    //{
+    //    write_mem_prot(offset, std::string(original_instruction, 3), true);
+    //}
+    //else
+    //{
+    //    write_mem_prot(offset, "\xC3\x90\x90"s, true);
+    //}
 }
 
 void set_explosion_mask(int32_t mask)

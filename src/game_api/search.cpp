@@ -540,10 +540,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "destroy_game_manager"sv,
         // Called soon after `DispatchMessageA` if `message == 0x12`
         PatternCommandBuffer{}
-            .find_after_inst("\x48\x8b\x8d\xe8\x10\x00\x00\x48\x8b\x71\x08"sv)
-            .find_inst("\xe8"sv)
-            .decode_call()
-            .at_exe(),
+            .find_after_inst("48 8B 87 78 03 00 00 48 8B 48 08"_gh)
+            .at_exe()
+            .function_start(),
     },
     {
         "write_load_opt"sv,
@@ -580,17 +579,18 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_imm(),
     },
     {
+        // in load_item it's written to RCX and then calls spawn_entity
         "entity_factory"sv,
         PatternCommandBuffer{}
-            .find_inst("\x48\x83\xc6\x08\x41\x8b\x44\x24\x18"sv)
-            .offset(-0xc)
+            .find_inst("\x48\x8B\x91\xC8\x98\x03\x00"sv)
+            .offset(-0x7)
             .decode_pc()
             .at_exe(),
     },
     {
         "load_item"sv,
         PatternCommandBuffer{}
-            .find_inst("\x83\x80\x44\x01\x00\x00\xFF"sv)
+            .find_inst("\x83\x81\x20\x01\x00\x00\x01\x80\xBF\x90\x44\x06\x00\x00"sv)
             .at_exe()
             .function_start(),
     },
@@ -602,24 +602,25 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
-    {
-        "remove_from_layer"sv,
-        // Set a data-bp on player.layer, then go through a layer door
-        // Should hit the bp where it runs player.layer = 2, that is this function
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8b\x4d\xe0\x48\x89\xf2\xe8****\x48"sv)
-            .offset(0x7)
-            .decode_call()
-            .at_exe(),
-    },
+    //{
+    //    "remove_from_layer"sv,
+    //    // Set a data-bp on player.layer, then go through a layer door
+    //    // Should hit the bp where it runs player.layer = 2, that is this function
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x48\x8b\x4d\xe0\x48\x89\xf2\xe8****\x48"sv)
+    //        .offset(0x7)
+    //        .decode_call()
+    //        .at_exe(),
+    //},
     {
         "spawn_entity"sv,
         // First call in `load_item` is to this function
         PatternCommandBuffer{}
-            .find_inst("\x44\x88\xb8\xa0\x00\x00\x00\xf3\x0f\x11\x78\x40"sv)
+            .find_inst("\x44\x88\xB8\xA0\x00\x00\x00\xF3\x0F\x11\x78\x40"sv)
             .at_exe()
             .function_start(),
     },
+    /*
     {
         "setup_lake_impostor"sv,
         // After a call to `load_item` that spawns `0x38f` or `0x392` the spawned entity is passed to this function
@@ -629,7 +630,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x3)
             .decode_call()
             .at_exe(),
-    },
+    },*/
     {
         "add_item_ptr"sv,
         // Used in spawn_entity as `add_item_ptr(overlay + 0x18, spawned_entity, false)`
@@ -699,6 +700,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc(4)
             .at_exe(),
     },
+    /*
     {
         "level_gen_entry"sv,
         // Put a bp on the virtual LevelInfo::spawn_level, start a new game, the caller is this function
@@ -853,6 +855,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },
+    */
     {
         "particle_emitter_db"sv,
         // Locate the particles init function (see pattern `particle_emitter_list`). At the start you will see the value 1
@@ -908,6 +911,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
+    /*
     {
         "render_layer"sv,
         // Put a bp into LevelInfo::get_backlayer_lut, step out to the caller
@@ -981,7 +985,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x9)
             .decode_call()
             .at_exe(),
-    },
+    },*/
     {
         "draw_world_texture"sv,
         // Look for cvttss2si instruction at the end of the exe (F3:0F2CC0)
@@ -1076,7 +1080,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_next_inst("\x48\x8B\x40\x10\xC7\x80"sv)
             .offset(0xA)
             .at_exe(),
-    },
+    }, /*
     {
         "coord_inside_active_shop_room"sv,
         // Same pattern as default_zoom_level_shop, check the condition before the jump that decides whether to activate
@@ -1113,7 +1117,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\xF3\x48\x0F\x2A\xF0\x45\x8B\x78\x4C"sv)
             .at_exe()
             .function_start(),
-    },
+    },*/
     {
         "explosion_mask"sv,
         // Set a conditional bp on load_item for fx_explosion, throw a bomb and let it explode. When the debugger
@@ -1182,14 +1186,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
-    {
-        "mount_carry"sv,
-        // Set a bp on player's Entity::overlay, then jump on a turkey
-        PatternCommandBuffer{}
-            .find_inst("\xe8****\x66\xc7\x43\x04\x00\x00"sv)
-            .decode_call()
-            .at_exe(),
-    },
+    //{
+    //    "mount_carry"sv,
+    //    // Set a bp on player's Entity::overlay, then jump on a turkey
+    //    PatternCommandBuffer{}
+    //        .find_inst("\xe8****\x66\xc7\x43\x04\x00\x00"sv)
+    //        .decode_call()
+    //        .at_exe(),
+    //},
     {
         "unequip"sv,
         // Put a bp on the player's item count when it's 1, and unequip a jetpack in game
@@ -1198,24 +1202,24 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x39\x71\x20\x0F\x92\xC2\x48\x0F\x43\xC1\x48"sv)
             .at_exe()
             .function_start(),
-    },
-    {
-        "insta_gib"sv,
-        // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
-        // then place yourself in Quillback's path
-        PatternCommandBuffer{}
-            .find_inst("\x48\x81\xCA\x00\x00\x00\x10\x49\x89\x54\x24\x30"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        "teleport"sv,
-        // Put a bp on `load_item` for ENT_TYPE_FX_TELEPORTSHADOW, do a teleport, the calling function is the one
-        PatternCommandBuffer{}
-            .find_inst("\xB9\x7E\xFC\xFF\xFF\x03\x48\x14\x4C\x89\xE6"sv)
-            .at_exe()
-            .function_start(),
-    },
+    }, /*
+     {
+         "insta_gib"sv,
+         // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
+         // then place yourself in Quillback's path
+         PatternCommandBuffer{}
+             .find_inst("\x48\x81\xCA\x00\x00\x00\x10\x49\x89\x54\x24\x30"sv)
+             .at_exe()
+             .function_start(),
+     },
+     {
+         "teleport"sv,
+         // Put a bp on `load_item` for ENT_TYPE_FX_TELEPORTSHADOW, do a teleport, the calling function is the one
+         PatternCommandBuffer{}
+             .find_inst("\xB9\x7E\xFC\xFF\xFF\x03\x48\x14\x4C\x89\xE6"sv)
+             .at_exe()
+             .function_start(),
+     },*/
     {
         "spawn_companion"sv,
         // Break on `load_item` with a condition of `rdx == 0xD7` (or whatever the id of a hired hand is).
@@ -1224,51 +1228,51 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\xBA\xD7\x00\x00\x00\x0F\x45\xD0"sv)
             .at_exe()
             .function_start(),
-    },
-    {
-        "show_journal"sv,
-        // Break on GameManager.journal_ui.state, open the journal
-        PatternCommandBuffer{}
-            .find_inst("\xC6\x87\x00\x02\x00\x00\x0F"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        "generate_world_particles"sv,
-        // Put read bp on State.particle_emitters, conditionally exclude the couple bp's it hits for just being in the level,
-        // jump and when landing the floorpoof particle emitter id will be loaded into rdx. The subsequent call is the
-        // generate_particles function.
-        PatternCommandBuffer{}
-            .find_inst("\x4D\x8D\x66\x08\x49\x8B\x5E\x08"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        "generate_screen_particles"sv,
-        // Put write bp on GameManager.screen_title.particle_whatever and go to the title screen
-        PatternCommandBuffer{}
-            .find_inst("\xE8****\x48\x89\x86\x40\x01\x00\x00\xF3\x0F\x10\x0D"sv)
-            .decode_call()
-            .at_exe(),
-    },
-    {
-        "advance_screen_particles"sv,
-        // See `generate_screen_particles`, a little bit below, the five pointers coming from the generate function are
-        // passed to another function
-        PatternCommandBuffer{}
-            .find_inst("\xE8****\x48\x8B\x8E\x38\x01\x00\x00\xE8"sv)
-            .decode_call()
-            .at_exe(),
-    },
-    {
-        "render_screen_particles"sv,
-        // Go to the title screen, put a read bp on one of the particle emitter pointers and filter out the simulate call
-        // Next break it hits is the render function (in the same function where the version string gets drawn on the screen)
-        PatternCommandBuffer{}
-            .find_inst("\xE8****\x48\x8B\x8E\x40\x01\x00\x00\x31\xD2"sv)
-            .decode_call()
-            .at_exe(),
-    },
+    }, /*
+     {
+         "show_journal"sv,
+         // Break on GameManager.journal_ui.state, open the journal
+         PatternCommandBuffer{}
+             .find_inst("\xC6\x87\x00\x02\x00\x00\x0F"sv)
+             .at_exe()
+             .function_start(),
+     },
+     {
+         "generate_world_particles"sv,
+         // Put read bp on State.particle_emitters, conditionally exclude the couple bp's it hits for just being in the level,
+         // jump and when landing the floorpoof particle emitter id will be loaded into rdx. The subsequent call is the
+         // generate_particles function.
+         PatternCommandBuffer{}
+             .find_inst("\x4D\x8D\x66\x08\x49\x8B\x5E\x08"sv)
+             .at_exe()
+             .function_start(),
+     },
+     {
+         "generate_screen_particles"sv,
+         // Put write bp on GameManager.screen_title.particle_whatever and go to the title screen
+         PatternCommandBuffer{}
+             .find_inst("\xE8****\x48\x89\x86\x40\x01\x00\x00\xF3\x0F\x10\x0D"sv)
+             .decode_call()
+             .at_exe(),
+     },
+     {
+         "advance_screen_particles"sv,
+         // See `generate_screen_particles`, a little bit below, the five pointers coming from the generate function are
+         // passed to another function
+         PatternCommandBuffer{}
+             .find_inst("\xE8****\x48\x8B\x8E\x38\x01\x00\x00\xE8"sv)
+             .decode_call()
+             .at_exe(),
+     },
+     {
+         "render_screen_particles"sv,
+         // Go to the title screen, put a read bp on one of the particle emitter pointers and filter out the simulate call
+         // Next break it hits is the render function (in the same function where the version string gets drawn on the screen)
+         PatternCommandBuffer{}
+             .find_inst("\xE8****\x48\x8B\x8E\x40\x01\x00\x00\x31\xD2"sv)
+             .decode_call()
+             .at_exe(),
+     },*/
     {
         "generic_free"sv,
         // See `generate_screen_particles`, above that, the pointers to the particleemitters are checked, as well as fields inside
@@ -1277,106 +1281,106 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\xE8****\x48\x8B\xBE\x38\x01\x00\x00\x48\x85\xFF"sv)
             .decode_call()
             .at_exe(),
-    },
-    {
-        "generate_illumination"sv,
-        // Put a bp on load_item lamassu (or any other entity that has an internal Illumination*), follow into the first call of load_item
-        // until the memory gets allocated, then put a write bp on the emmitted_light var inside the newly allocated memory.
-        PatternCommandBuffer{}
-            .find_inst("\xE8****\x48\x89\x86\x60\x01\x00\x00"sv)
-            .decode_call()
-            .at_exe(),
-    },
-    {
-        "refresh_illumination_heap_offset"sv,
-        // Put a bp on any Illumination.timer var, watch how it's written, the heap offset ptr is loaded a bit above
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8B\x05****\x48\x85\xC0\x75\x16\xB9\x10\x00\x00\x00"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "ghost_spawn_time"sv,
-        // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
-        // 10800 frames / 60 fps = 3 minutes = 0x2A30 ( 30 2A 00 00 )
-        // Search for 0x2328 and 0x2A30 in very close proximity, it's in the ghost trigger logic perform virtual
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
-            .find_next_inst("\x74\x05\xB8"sv)
-            .offset(0x3)
-            .at_exe(),
-    },
-    {
-        "ghost_spawn_time_cursed_player1"sv,
-        // See `ghost_spawn_time` on how to search. New in 1.23.x is the fact that now all four players get checked
-        // for curse, and they all have individual ghost trigger timings (all 0x2328 of course)
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
-            .find_next_inst("\x30\xB8"sv)
-            .offset(0x2)
-            .at_exe(),
-    },
-    {
-        "ghost_spawn_time_cursed_player2"sv,
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
-            .find_next_inst("\x30\xB8"sv)
-            .find_next_inst("\x30\xB8"sv)
-            .offset(0x2)
-            .at_exe(),
-    },
-    {
-        "ghost_spawn_time_cursed_player3"sv,
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
-            .find_next_inst("\x30\xB8"sv)
-            .find_next_inst("\x30\xB8"sv)
-            .find_next_inst("\x30\xB8"sv)
-            .offset(0x2)
-            .at_exe(),
-    },
-    {
-        "ghost_spawn_time_cursed_player4"sv,
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
-            .find_next_inst("\x30\xB8"sv)
-            .find_next_inst("\x30\xB8"sv)
-            .find_next_inst("\x30\xB8"sv)
-            .find_next_inst("\x30\xB8"sv)
-            .offset(0x2)
-            .at_exe(),
-    },
-    {
-        "olmec_transition_phase_1_y_level"sv,
-        // Put a write bp on Olmec.attack_phase and trigger phase 1.
-        // There will be a reference to the same float loaded in an xmm register twice,
-        // once compared and once as an arg for a call. Both need to point to our custom float.
-        // This address needs to point 1 after the first movss instruction because the relative
-        // distance to our custom float needs to be calculated from this point.
-        PatternCommandBuffer{}
-            .find_inst("\xF3\x0F\x58\x48\x44\xF3\x0F\x10\x15****\x0F\x2E\xD1"sv)
-            .offset(0xD)
-            .at_exe(),
-    },
-    {
-        "olmec_transition_phase_2_y_level"sv,
-        // Look in the function determined by `olmec_transition_phase_1_y_level`
-        // Search below the phase assignment to a similar pattern (two movss instructions, one
-        // compared, one as arg for a call). The value should point at 83.0
-        PatternCommandBuffer{}
-            .find_inst("\xF3\x0F\x58\x40\x44\xF3\x0F\x10\x0D****\x0F\x2E\xC8\x48\x8B\x45"sv)
-            .offset(0xD)
-            .at_exe(),
-    },
-    {
-        "olmec_transition_phase_1"sv,
-        // Put write bp on olmec.attack_phase (when he's in phase 0)
-        // Look for the condition that jumps over the little section that changes the phase to 1
-        PatternCommandBuffer{}
-            .find_inst("\x0F\x2E\xD1*\x2E\xF3\x0F\x10\x0D"sv)
-            .offset(0x3)
-            .at_exe(),
-    },
+    }, /*
+     {
+         "generate_illumination"sv,
+         // Put a bp on load_item lamassu (or any other entity that has an internal Illumination*), follow into the first call of load_item
+         // until the memory gets allocated, then put a write bp on the emmitted_light var inside the newly allocated memory.
+         PatternCommandBuffer{}
+             .find_inst("\xE8****\x48\x89\x86\x60\x01\x00\x00"sv)
+             .decode_call()
+             .at_exe(),
+     },
+     {
+         "refresh_illumination_heap_offset"sv,
+         // Put a bp on any Illumination.timer var, watch how it's written, the heap offset ptr is loaded a bit above
+         PatternCommandBuffer{}
+             .find_inst("\x48\x8B\x05****\x48\x85\xC0\x75\x16\xB9\x10\x00\x00\x00"sv)
+             .decode_pc()
+             .at_exe(),
+     },
+     {
+         "ghost_spawn_time"sv,
+         // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
+         // 10800 frames / 60 fps = 3 minutes = 0x2A30 ( 30 2A 00 00 )
+         // Search for 0x2328 and 0x2A30 in very close proximity, it's in the ghost trigger logic perform virtual
+         PatternCommandBuffer{}
+             .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+             .find_next_inst("\x74\x05\xB8"sv)
+             .offset(0x3)
+             .at_exe(),
+     },
+     {
+         "ghost_spawn_time_cursed_player1"sv,
+         // See `ghost_spawn_time` on how to search. New in 1.23.x is the fact that now all four players get checked
+         // for curse, and they all have individual ghost trigger timings (all 0x2328 of course)
+         PatternCommandBuffer{}
+             .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+             .find_next_inst("\x30\xB8"sv)
+             .offset(0x2)
+             .at_exe(),
+     },
+     {
+         "ghost_spawn_time_cursed_player2"sv,
+         PatternCommandBuffer{}
+             .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+             .find_next_inst("\x30\xB8"sv)
+             .find_next_inst("\x30\xB8"sv)
+             .offset(0x2)
+             .at_exe(),
+     },
+     {
+         "ghost_spawn_time_cursed_player3"sv,
+         PatternCommandBuffer{}
+             .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+             .find_next_inst("\x30\xB8"sv)
+             .find_next_inst("\x30\xB8"sv)
+             .find_next_inst("\x30\xB8"sv)
+             .offset(0x2)
+             .at_exe(),
+     },
+     {
+         "ghost_spawn_time_cursed_player4"sv,
+         PatternCommandBuffer{}
+             .get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, VIRT_FUNC::LOGIC_PERFORM)
+             .find_next_inst("\x30\xB8"sv)
+             .find_next_inst("\x30\xB8"sv)
+             .find_next_inst("\x30\xB8"sv)
+             .find_next_inst("\x30\xB8"sv)
+             .offset(0x2)
+             .at_exe(),
+     },
+     {
+         "olmec_transition_phase_1_y_level"sv,
+         // Put a write bp on Olmec.attack_phase and trigger phase 1.
+         // There will be a reference to the same float loaded in an xmm register twice,
+         // once compared and once as an arg for a call. Both need to point to our custom float.
+         // This address needs to point 1 after the first movss instruction because the relative
+         // distance to our custom float needs to be calculated from this point.
+         PatternCommandBuffer{}
+             .find_inst("\xF3\x0F\x58\x48\x44\xF3\x0F\x10\x15****\x0F\x2E\xD1"sv)
+             .offset(0xD)
+             .at_exe(),
+     },
+     {
+         "olmec_transition_phase_2_y_level"sv,
+         // Look in the function determined by `olmec_transition_phase_1_y_level`
+         // Search below the phase assignment to a similar pattern (two movss instructions, one
+         // compared, one as arg for a call). The value should point at 83.0
+         PatternCommandBuffer{}
+             .find_inst("\xF3\x0F\x58\x40\x44\xF3\x0F\x10\x0D****\x0F\x2E\xC8\x48\x8B\x45"sv)
+             .offset(0xD)
+             .at_exe(),
+     },
+     {
+         "olmec_transition_phase_1"sv,
+         // Put write bp on olmec.attack_phase (when he's in phase 0)
+         // Look for the condition that jumps over the little section that changes the phase to 1
+         PatternCommandBuffer{}
+             .find_inst("\x0F\x2E\xD1*\x2E\xF3\x0F\x10\x0D"sv)
+             .offset(0x3)
+             .at_exe(),
+     },*/
     {
         "blood_multiplication"sv,
         // Put a read bp on Caveman(EntityDB):blood_content and kill one. If you look up a bit you will see
@@ -1451,17 +1455,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(-0xD)
             .at_exe(),
     },
-    {
-        "first_poison_tick_timer_default"sv,
-        // Put a write bp on a non-poisoned Player(Movable):poison_tick_timer and poison the player
-        // New in 1.21.x: This is only the first delay to a poison tick, from then on, see `subsequent_poison_timer_tick_default`
-        // Note that there is a similar value of 1800 frames being written just above this location, no idea what triggers that
-        PatternCommandBuffer{}
-            .find_inst("\x66\xC7\x86\x20\x01\x00\x00**\xE9"sv)
-            .find_next_inst("\x66\xC7\x86\x20\x01\x00\x00**\xE9"sv)
-            .offset(0x7)
-            .at_exe(),
-    },
+    //{
+    //    "first_poison_tick_timer_default"sv,
+    //    // Put a write bp on a non-poisoned Player(Movable):poison_tick_timer and poison the player
+    //    // New in 1.21.x: This is only the first delay to a poison tick, from then on, see `subsequent_poison_timer_tick_default`
+    //    // Note that there is a similar value of 1800 frames being written just above this location, no idea what triggers that
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x66\xC7\x86\x20\x01\x00\x00**\xE9"sv)
+    //        .find_next_inst("\x66\xC7\x86\x20\x01\x00\x00**\xE9"sv)
+    //        .offset(0x7)
+    //        .at_exe(),
+    //},
     {
         "subsequent_poison_tick_timer_default"sv,
         // Put a write bp on a poisoned Player(Movable):poison_tick_timer after the first poison tick has occurred
@@ -1505,13 +1509,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x4)
             .at_exe(),
     },
-    {
+    /*{
         "character_db"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x6B\xC3\x2C\x48\x8D\x15****\x48"sv)
             .decode_pc(7)
             .at_exe(),
-    },
+    },*/
     {
         "character_gender_mask"sv,
         // Search for the scalar 0xea61c, that is the one you want here
@@ -1534,36 +1538,36 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x44\x21\xe2\x4c\x8b\x91\x78\x02\x00\x00"sv)
             .at_exe()
             .function_start(0xff),
-    },
-    {
-        "construct_soundposition_ptr"sv,
-        // Put a write bp on ACTIVEFLOOR_DRILL sound_pos1 and release the drill
-        PatternCommandBuffer{}
-            .find_inst("\xE8****\x49\x89\x84\x24\x30\x01\x00\x00"sv)
-            .decode_call()
-            .at_exe(),
-    },
-    {
-        // Open the journal on any page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        // scroll up to the top, find refrence to this address (each page is referenced two times, but the top of vtable is like 10 times)
-        "vftable_JournalPages"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x49\x89\x04\x24\x41\x89\x4C\x24\x50"sv)
-            .offset(-0x7)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        // Put bp on state->basecamp_dialogue choose base/extra _dialogue, which ever the character you speak to responses ->line
-        // Scroll down, you should see two calls, first one is to format text (the execution can jump around, call it multiple times)
-        // The second call is this function
-        // Or put write bp on state->speech_bubble(pointer), you will end up somewhere in the middle of the function
-        "speech_bubble_fun"sv,
-        PatternCommandBuffer{}
-            .find_inst("\xE8\xFE\xFF\xFF\xFF\x48\x89\xD6\x48\x89\xCB"sv)
-            .at_exe()
-            .function_start(),
-    },
+    }, /*
+     {
+         "construct_soundposition_ptr"sv,
+         // Put a write bp on ACTIVEFLOOR_DRILL sound_pos1 and release the drill
+         PatternCommandBuffer{}
+             .find_inst("\xE8****\x49\x89\x84\x24\x30\x01\x00\x00"sv)
+             .decode_call()
+             .at_exe(),
+     },
+     {
+         // Open the journal on any page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+         // scroll up to the top, find refrence to this address (each page is referenced two times, but the top of vtable is like 10 times)
+         "vftable_JournalPages"sv,
+         PatternCommandBuffer{}
+             .find_inst("\x49\x89\x04\x24\x41\x89\x4C\x24\x50"sv)
+             .offset(-0x7)
+             .decode_pc()
+             .at_exe(),
+     },*/
+    //{
+    //    // Put bp on state->basecamp_dialogue choose base/extra _dialogue, which ever the character you speak to responses ->line
+    //    // Scroll down, you should see two calls, first one is to format text (the execution can jump around, call it multiple times)
+    //    // The second call is this function
+    //    // Or put write bp on state->speech_bubble(pointer), you will end up somewhere in the middle of the function
+    //    "speech_bubble_fun"sv,
+    //    PatternCommandBuffer{}
+    //        .find_inst("\xE8\xFE\xFF\xFF\xFF\x48\x89\xD6\x48\x89\xCB"sv)
+    //        .at_exe()
+    //        .function_start(),
+    //},
     {
         // Put bp on state->liquid_physics->(which liquid you want)->liquidtile_liquid_amount and spawn this liquid
         // you will see something like "rcx+1", address for the "1" is what you want
@@ -1571,34 +1575,33 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_after_inst("\x8B\x8C\x01\xA0\x00\x00\x00\x8D\x79"sv)
             .at_exe(),
-    },
-    {
-        // Next to `write_to_file` this is the only usage of `fopen`
-        // Couldn't find any useful XREF in Ghidra so this pattern is exactly the function start
-        "read_from_file"sv,
-        PatternCommandBuffer{}
-            .set_optional(true)
-            .find_inst("\x41\x57\x41\x56\x56\x57\x53\x48\x81\xec\x20\x01\x00\x00\x4c\x89\xc3\x49\x89\xd7\x49\x89\xce"sv)
-            .at_exe(),
-    },
+    }, /*
+     {
+         // Next to `write_to_file` this is the only usage of `fopen`
+         // Couldn't find any useful XREF in Ghidra so this pattern is exactly the function start
+         "read_from_file"sv,
+         PatternCommandBuffer{}
+             .set_optional(true)
+             .find_inst("\x41\x57\x41\x56\x56\x57\x53\x48\x81\xec\x20\x01\x00\x00\x4c\x89\xc3\x49\x89\xd7\x49\x89\xce"sv)
+             .at_exe(),
+     },*/
     {
         // Find a function being called as `save_to_file("input.bak", "input.cfg", data_ptr, data_size)`
         "write_to_file"sv,
         PatternCommandBuffer{}
-            .find_inst("\x4d\x89\xf0\x4d\x89\xe1\xe8****\xe9"sv)
-            .find_inst("\xe8")
-            .decode_call()
-            .at_exe(),
-    },
-    {
-        // Find a string containing STEAMUSERSTATS, the enclosing function returns an `ISteamUserStats**` in `param_1`
-        "get_steam_user_stats"sv,
-        PatternCommandBuffer{}
-            .find_after_inst("\xff\x90\xd0\x00\x00\x00\x48\x8d\xbd\xe0\x03\x00\x00"sv)
-            .find_inst("\x48\x8d")
-            .decode_pc()
-            .at_exe(),
-    },
+            .find_inst("\x48\xC7\x05****\x3C\x00\x00\x00\x48\x8D\x15"sv)
+            .at_exe()
+            .function_start(),
+    }, /*
+     {
+         // Find a string containing STEAMUSERSTATS, the enclosing function returns an `ISteamUserStats**` in `param_1`
+         "get_steam_user_stats"sv,
+         PatternCommandBuffer{}
+             .find_after_inst("\xff\x90\xd0\x00\x00\x00\x48\x8d\xbd\xe0\x03\x00\x00"sv)
+             .find_inst("\x48\x8d")
+             .decode_pc()
+             .at_exe(),
+     },*/
     {
         // Set condition bp on spawn_entity (not load_item) for one of the entities spawned by this generator
         // execute to the return two times, you should see this array right above
@@ -1609,15 +1612,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x4)
             .at_exe(),
     },
-    {
-        // Set bp on prize_dispenser->itemid_2 and roll a 7, you should see this array right above
-        // array[25]
-        "dice_shop_prizes"sv,
-        PatternCommandBuffer{}
-            .find_after_inst("\x41\x88\x8C\x24\x36\x01\x00\x00\x41\x0F\xB6\x84\x04\x30\x01\x00\x00"sv)
-            .offset(0x3)
-            .at_exe(),
-    },
+    //{
+    //    // Set bp on prize_dispenser->itemid_2 and roll a 7, you should see this array right above
+    //    // array[25]
+    //    "dice_shop_prizes"sv,
+    //    PatternCommandBuffer{}
+    //        .find_after_inst("\x41\x88\x8C\x24\x36\x01\x00\x00\x41\x0F\xB6\x84\x04\x30\x01\x00\x00"sv)
+    //        .offset(0x3)
+    //        .at_exe(),
+    //},
     {
         // Set condition bp on load_item for ITEM_DICE_PRIZE_DISPENSER, execute first call
         // go to the address in RAX (new entity) and set write bp on +0x130 (or execute till you see function that writes to this address)
@@ -1667,14 +1670,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(3)
             .at_exe(),
     },
-    {
-        // Get ankh, die, when you get respawned on the door, but still not have health, set write bp on Movable.health, looking for (cmp eax,3)
-        "ankh_health"sv,
-        PatternCommandBuffer{}
-            .find_after_inst("\x41\x0F\xB6\x87\x17\x01\x00\x00\x83\xF8"sv)
-            .at_exe(),
-    },
-    {
+    //{
+    //    // Get ankh, die, when you get respawned on the door, but still not have health, set write bp on Movable.health, looking for (cmp eax,3)
+    //    "ankh_health"sv,
+    //    PatternCommandBuffer{}
+    //        .find_after_inst("\x41\x0F\xB6\x87\x17\x01\x00\x00\x83\xF8"sv)
+    //        .at_exe(),
+    //},
+    /*{
         // Set write bp on State->shops->restricted_item_count, this structure is quite common so i chosen pattern before the call
         "add_shopitem"sv,
         PatternCommandBuffer{}
@@ -1682,7 +1685,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(-0x1)
             .decode_call()
             .at_exe(),
-    },
+    },*/
     {
         // Find a string "Basic systems initialized", right after it's usage (found via XREFS)
         // stuff gets emplaced to a map, it is this map
@@ -1701,14 +1704,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x48\x8d"sv)
             .decode_pc()
             .at_exe(),
-    },
-    {
-        "grow_chain_and_blocks"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x31\xC0\x45\x31\xED\x89\x4C\x24\x3C"sv)
-            .at_exe()
-            .function_start(),
-    },
+    }, /*
+     {
+         "grow_chain_and_blocks"sv,
+         PatternCommandBuffer{}
+             .find_inst("\x31\xC0\x45\x31\xED\x89\x4C\x24\x3C"sv)
+             .at_exe()
+             .function_start(),
+     },*/
     {
         // Write bp on first waddler storage item in state
         // We're editing the layer offset in mov rcx,[r14+00001308]
@@ -1717,34 +1720,34 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\xf3\x0f\x10\x55\xe0\xf3\x0f\x10\x5d\xe4"sv)
             .offset(-0x4)
             .at_exe(),
-    },
-    {
-        // Follow the definition of a movable (e.g. ENT_TYPE_MONS_SNAKE) to its
-        // create function, to its vtable, to its virtual apply_db/init to the first
-        // call in there, the call that takes the movable, uint and vtable is add_behavior
-        "add_behavior"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x80\x79\x19\x00\x75\x4f\x48\x39\xc1\x74\x4a"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        "load_screen_func"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x8b\x49\x0c\x41\x8b\x47\x10"sv)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        // Check the 6th virtual of a vtable passed to `add_behavior` which should be
-        // calling `update_movable` at the bottom as
-        // `update_movable(this, &this->movex, this->sprint_factor, 1, 0, 0, 0);`
-        "update_movable"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x03\x50\x14\x83\xfa\x11\x77\x15"sv)
-            .at_exe()
-            .function_start(),
-    },
+    }, /*
+     {
+         // Follow the definition of a movable (e.g. ENT_TYPE_MONS_SNAKE) to its
+         // create function, to its vtable, to its virtual apply_db/init to the first
+         // call in there, the call that takes the movable, uint and vtable is add_behavior
+         "add_behavior"sv,
+         PatternCommandBuffer{}
+             .find_inst("\x80\x79\x19\x00\x75\x4f\x48\x39\xc1\x74\x4a"sv)
+             .at_exe()
+             .function_start(),
+     },
+     {
+         "load_screen_func"sv,
+         PatternCommandBuffer{}
+             .find_inst("\x8b\x49\x0c\x41\x8b\x47\x10"sv)
+             .at_exe()
+             .function_start(),
+     },*/
+    //{
+    //    // Check the 6th virtual of a vtable passed to `add_behavior` which should be
+    //    // calling `update_movable` at the bottom as
+    //    // `update_movable(this, &this->movex, this->sprint_factor, 1, 0, 0, 0);`
+    //    "update_movable"sv,
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x03\x50\x14\x83\xfa\x11\x77\x15"sv)
+    //        .at_exe()
+    //        .function_start(),
+    //},
     {
         "adventure_seed"sv,
         PatternCommandBuffer{}
@@ -1770,14 +1773,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
-    {
-        // Just set bp in create entity for embeds, find unique pattern somewhere in that function
-        "spawn_floor_embeds"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x08\xD1\x48\x0F\x44\xF8\x83\x7F\x0C\x1A"sv)
-            .at_exe()
-            .function_start(),
-    },
+    //{
+    //    // Just set bp in create entity for embeds, find unique pattern somewhere in that function
+    //    "spawn_floor_embeds"sv,
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x08\xD1\x48\x0F\x44\xF8\x83\x7F\x0C\x1A"sv)
+    //        .at_exe()
+    //        .function_start(),
+    //},
     {
         // Set conditional bp for ghost, break the ghost jar, execute past return, we need address for that whole function call to nop it
         "ghost_jar_ghost_spawn"sv,
@@ -1786,19 +1789,19 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x2)
             .at_exe(),
     },
-    {
-        // Borrowed from Playlunky logger.cpp
-        "game_log_function"sv,
-        PatternCommandBuffer{}
-            .find_inst("\x48\x83\x80\x90\x01\x00\x00\x01\x48\x83\xbf\x88\x00\x00\x00\x00"sv)
-            .at_exe()
-            .function_start(),
-    },
+    //{
+    //    // Borrowed from Playlunky logger.cpp
+    //    "game_log_function"sv,
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x48\x83\x80\x90\x01\x00\x00\x01\x48\x83\xbf\x88\x00\x00\x00\x00"sv)
+    //        .at_exe()
+    //        .function_start(),
+    //},
     {
         // Just picked some random call to ^, before that it reads the location of the stream
         "game_log_stream"sv,
         PatternCommandBuffer{}
-            .find_inst("\x48\x8d\x55\xa0\x45\x31\xc0")
+            .find_inst("\x48\x8d\x55\xa0\x45\x31\xc0"sv)
             .offset(-0x7)
             .decode_pc()
             .at_exe(),
@@ -1806,7 +1809,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "reload_shaders"sv,
         PatternCommandBuffer{}
-            .find_inst("\x41\x89\xd9\xff\x90\x78\x01\x00\x00")
+            .find_inst("\x41\x89\xd9\xff\x90\x78\x01\x00\x00"sv)
             .at_exe()
             .function_start(),
     },

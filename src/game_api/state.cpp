@@ -250,7 +250,7 @@ State& State::get()
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
 
-        const bool do_hooks = get_do_hooks();
+        /*const bool do_hooks = get_do_hooks();
         if (do_hooks)
         {
             STATE.ptr()->level_gen->init();
@@ -259,7 +259,7 @@ State& State::get()
             init_render_api_hooks();
             hook_godmode_functions();
             strings_init();
-        }
+        }*/
 
         get_is_init() = true;
     }
