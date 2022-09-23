@@ -256,7 +256,7 @@ State& State::get()
             // STATE.ptr()->level_gen->init();
             // init_spawn_hooks();
             // init_behavior_hooks();
-            //init_render_api_hooks();
+            // init_render_api_hooks();
             // hook_godmode_functions();
             // strings_init();
         }

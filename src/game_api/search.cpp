@@ -848,7 +848,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Find online code in memory (reverse for endianness), look higher up and find __vftable, set read bp on __vftable
         PatternCommandBuffer{}
             .find_inst("\x48\x8B\x05****\x80\xB8\x00\x02\x00\x00\xFF"sv)
-            .offset(0x3)
             .decode_pc()
             .at_exe(),
     },
