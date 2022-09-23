@@ -7,7 +7,7 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 
 [![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.2-green) (Steam version)
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (latest prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.26-green) (Steam version)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (latest prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.27-green) (Steam version)
 
 **Overlunky (or any other modding tool for that matter) does not support the GamePass/Xbox version**, but it might be considered in the future.
 
