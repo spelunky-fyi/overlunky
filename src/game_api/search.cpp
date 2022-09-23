@@ -582,15 +582,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // in load_item it's written to RCX and then calls spawn_entity
         "entity_factory"sv,
         PatternCommandBuffer{}
-            .find_inst("\x48\x8B\x91\xC8\x98\x03\x00"sv)
-            .offset(-0x7)
+            .find_inst("48 83 80 90 01 00 00 01 4C 8B 3D"_gh)
+            .offset(0x8)
             .decode_pc()
             .at_exe(),
     },
     {
         "load_item"sv,
         PatternCommandBuffer{}
-            .find_inst("\x83\x81\x20\x01\x00\x00\x01\x80\xBF\x90\x44\x06\x00\x00"sv)
+            .find_inst("48 8B 0C CA 83 81 44 01 00 00 01"_gh)
             .at_exe()
             .function_start(),
     },
@@ -620,17 +620,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
-    /*
     {
         "setup_lake_impostor"sv,
         // After a call to `load_item` that spawns `0x38f` or `0x392` the spawned entity is passed to this function
         PatternCommandBuffer{}
-            .find_inst("\x0f\x28\xd6\xe8****\x48\x8b\x86\x20"sv)
-            .find_next_inst("\x0f\x28\xd6\xe8****\x48\x8b\x86\x20"sv)
-            .offset(0x3)
-            .decode_call()
-            .at_exe(),
-    },*/
+            .find_inst("F3 0F 10 66 54 0F 2E E0"_gh)
+            .at_exe()
+            .function_start(),
+    },
     {
         "add_item_ptr"sv,
         // Used in spawn_entity as `add_item_ptr(overlay + 0x18, spawned_entity, false)`
@@ -667,8 +664,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_studio"sv,
-        // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
+        "fmod_studio"sv, // probably wrong
+                         // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
         PatternCommandBuffer{}
             .set_optional(true)
             .find_inst("\xba\x03\x02\x02\x00"sv)
@@ -677,9 +674,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_event_properties"sv,
-        // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
-        // Said name comes from an array that is being looped, said array is a global of type EventParameters
+        "fmod_event_properties"sv, // probably wrong
+                                   // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
+                                   // Said name comes from an array that is being looped, said array is a global of type EventParameters
         PatternCommandBuffer{}
             .set_optional(true)
             .find_inst("\x48\x8d\x9d\x38\x01\x00\x00"sv)
@@ -689,10 +686,10 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_event_map"sv,
-        // Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
-        // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
-        // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
+        "fmod_event_map"sv, // probably wrong
+                            // Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
+                            // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
+                            // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
         PatternCommandBuffer{}
             .set_optional(true)
             .find_after_inst("\x48\x89\xf8\x48\xd1\xe8\x83\xe7\x01\x48\x09\xc7\xf3\x48\x0f\x2a\xc7"sv)
@@ -850,8 +847,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "online"sv,
         // Find online code in memory (reverse for endianness), look higher up and find __vftable, set read bp on __vftable
         PatternCommandBuffer{}
-            .find_after_inst("48 0F 44 DA 8B AB E4 00 00 00 0F A3 CD"_gh)
-            .find_next_inst("\x48\x8B"sv)
+            .find_inst("\x48\x8B\x05****\x80\xB8\x00\x02\x00\x00\xFF"sv)
+            .offset(0x3)
             .decode_pc()
             .at_exe(),
     },
@@ -910,34 +907,33 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
-    /*
     {
         "render_layer"sv,
         // Put a bp into LevelInfo::get_backlayer_lut, step out to the caller
         // The next function that is called is this function
         PatternCommandBuffer{}
-            .find_after_inst("\x49\x8b\x8f\x38\x13\x00\x00\x4d\x8b\x87\xa8\x13\x00\x00"sv)
-            .find_inst("\xe8"sv)
-            .decode_call()
-            .at_exe(),
+            .find_after_inst("40 88 D6 48 89 CF 0F 57 C0"_gh)
+            .at_exe()
+            .function_start(),
     },
     {
         "render_loading"sv,
         // This function uses the string "Loading indicator"
+        // additional pattern 48 0F 44 F9 F2 0F 10 87 18 01 00 00
         PatternCommandBuffer{}
             .find_inst("\x64\x0b\x00\x00\xf3\x0f\x10\x86"sv)
             .at_exe()
             .function_start(),
     },
-    {
-        "render_hud"sv,
-        // Locate in memory 2B 00 24 00 25 00 64 00 "+$%d" (UTF16 str of the money gained text)
-        // Find reference to this memory, it's only used in the HUD
-        PatternCommandBuffer{}
-            .find_inst("\xB8\x88\x14\x00\x00\xE8"sv)
-            .at_exe()
-            .function_start(),
-    },
+    //{
+    //    "render_hud"sv,
+    //    // Locate in memory 2B 00 24 00 25 00 64 00 "+$%d" (UTF16 str of the money gained text)
+    //    // Find reference to this memory, it's only used in the HUD
+    //    PatternCommandBuffer{}
+    //        .find_inst("41 C7 87 A8 08 00 00 00 00 40 3F"_gh)
+    //        .at_exe()
+    //        .function_start(),
+    //},
     {
         "prepare_text_for_rendering"sv,
         // Use `render_hud` to find the big function that renders the HUD. After every string preparation you will see two calls very
@@ -953,38 +949,36 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "draw_text"sv,
         // See `prepare_text_for_rendering`
         PatternCommandBuffer{}
-            .find_inst("\x41\x8B\x8F\xD0\x02\x00\x00\x81\xF9\xFF\x50\x25\x02"sv)
-            .offset(-0x5)
-            .decode_call()
-            .at_exe(),
+            .find_inst("4C 8B 56 28 4C 8B 4E 18"_gh)
+            .at_exe()
+            .function_start(),
     },
     {
         "render_pause_menu"sv,
         // Put write bp on GameManager.pause_ui.scroll.y
         PatternCommandBuffer{}
-            .find_inst("\xFE\xFF\xFF\xFF\x83\xB9"sv)
+            .find_inst("F3 0F 5C F0 49 8D 7E 4C"_gh)
             .at_exe()
             .function_start(),
     },
-    {
-        "render_draw_depth"sv,
-        // Break on draw_world_texture and go a couple functions higher in the call stack (4-5) until
-        // you reach one that has rdx counting down from 0x35 to 0x01
-        PatternCommandBuffer{}
-            .find_inst("\x48\x81\xC6\x18\x3F\x06\x00"sv)
-            .at_exe()
-            .function_start(),
-    },
+    //{
+    //    "render_draw_depth"sv,
+    //    // Break on draw_world_texture and go a couple functions higher in the call stack (4-5) until
+    //    // you reach one that has rdx counting down from 0x35 to 0x01
+    //    PatternCommandBuffer{}
+    //        .find_inst("48 8B 50 F8 80 7A 3F 00"_gh)
+    //        .at_exe()
+    //        .function_start(),
+    //},
     {
         "draw_screen_texture"sv,
         // Locate the function in `render_hud`. Towards the bottom you will find calls following a big stack buildup
         // and r8 will have the char* of the texture
         PatternCommandBuffer{}
-            .find_inst("\x4C\x8D\x8D\xD8\x12\x00\x00\xB2\x29"sv)
-            .offset(0x9)
+            .find_after_inst("B2 2D 45 31 C9"_gh)
             .decode_call()
             .at_exe(),
-    },*/
+    },
     {
         "draw_world_texture"sv,
         // Look for cvttss2si instruction at the end of the exe (F3:0F2CC0)
@@ -1109,14 +1103,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },*/
-    {
-        "enforce_camp_camera_bounds"sv,
-        // Go into basecamp, put a write bp on state.camera.bounds.top
-        PatternCommandBuffer{}
-            .find_inst("F3 48 0F 2A F0 45 8B 79 4C"_gh)
-            .at_exe()
-            .function_start(),
-    },
+    //{
+    //    "enforce_camp_camera_bounds"sv,
+    //    // Go into basecamp, put a write bp on state.camera.bounds.top
+    //    PatternCommandBuffer{}
+    //        .find_inst("F3 48 0F 2A F0 45 8B 79 4C"_gh)
+    //        .at_exe()
+    //        .function_start(),
+    //},
     {
         "explosion_mask"sv,
         // Set a conditional bp on load_item for fx_explosion, throw a bomb and let it explode. When the debugger
@@ -1227,15 +1221,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\xBA\xD7\x00\x00\x00\x0F\x45\xD0"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "show_journal"sv,
+        // Break on GameManager.journal_ui.state, open the journal
+        PatternCommandBuffer{}
+            .find_inst("88 5F 04 80 FB 0B 0F"_gh)
+            .at_exe()
+            .function_start(),
     }, /*
-     {
-         "show_journal"sv,
-         // Break on GameManager.journal_ui.state, open the journal
-         PatternCommandBuffer{}
-             .find_inst("\xC6\x87\x00\x02\x00\x00\x0F"sv)
-             .at_exe()
-             .function_start(),
-     },
      {
          "generate_world_particles"sv,
          // Put read bp on State.particle_emitters, conditionally exclude the couple bp's it hits for just being in the level,
@@ -1545,17 +1539,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
              .find_inst("\xE8****\x49\x89\x84\x24\x30\x01\x00\x00"sv)
              .decode_call()
              .at_exe(),
-     },
-     {
-         // Open the journal on any page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-         // scroll up to the top, find refrence to this address (each page is referenced two times, but the top of vtable is like 10 times)
-         "vftable_JournalPages"sv,
-         PatternCommandBuffer{}
-             .find_inst("\x49\x89\x04\x24\x41\x89\x4C\x24\x50"sv)
-             .offset(-0x7)
-             .decode_pc()
-             .at_exe(),
      },*/
+    {
+        // Open the journal on any page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
+        // scroll up to the top, find refrence to this address (each page is referenced two times, but the top of vtable is like 10 times)
+        "vftable_JournalPages"sv,
+        PatternCommandBuffer{}
+            .find_inst("48 89 01 85 D2 74 08"_gh)
+            .offset(-0x7)
+            .decode_pc()
+            .at_exe(),
+    },
     //{
     //    // Put bp on state->basecamp_dialogue choose base/extra _dialogue, which ever the character you speak to responses ->line
     //    // Scroll down, you should see two calls, first one is to format text (the execution can jump around, call it multiple times)
@@ -1574,16 +1568,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_after_inst("\x8B\x8C\x01\xA0\x00\x00\x00\x8D\x79"sv)
             .at_exe(),
-    }, /*
-     {
-         // Next to `write_to_file` this is the only usage of `fopen`
-         // Couldn't find any useful XREF in Ghidra so this pattern is exactly the function start
-         "read_from_file"sv,
-         PatternCommandBuffer{}
-             .set_optional(true)
-             .find_inst("\x41\x57\x41\x56\x56\x57\x53\x48\x81\xec\x20\x01\x00\x00\x4c\x89\xc3\x49\x89\xd7\x49\x89\xce"sv)
-             .at_exe(),
-     },*/
+    },
+    {
+        // Next to `write_to_file` this is the only usage of `fopen`
+        // Couldn't find any useful XREF in Ghidra so this pattern is exactly the function start
+        // additional pattern: 49 89 07 4C 8B 03
+        "read_from_file"sv,
+        PatternCommandBuffer{}
+            .set_optional(true)
+            .find_inst("\x41\x57\x41\x56\x56\x57\x53\x48\x81\xec\x20\x01\x00\x00\x4c\x89\xc3\x49\x89\xd7\x49\x89\xce"sv)
+            .at_exe(),
+    },
     {
         // Find a function being called as `save_to_file("input.bak", "input.cfg", data_ptr, data_size)`
         "write_to_file"sv,
