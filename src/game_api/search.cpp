@@ -1102,14 +1102,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },*/
-    //{
-    //    "enforce_camp_camera_bounds"sv,
-    //    // Go into basecamp, put a write bp on state.camera.bounds.top
-    //    PatternCommandBuffer{}
-    //        .find_inst("F3 48 0F 2A F0 45 8B 79 4C"_gh)
-    //        .at_exe()
-    //        .function_start(),
-    //},
+    {
+        "enforce_camp_camera_bounds"sv,
+        // Go into basecamp, put a write bp on state.camera.bounds.top
+        PatternCommandBuffer{}
+            .find_inst("48 85 D2 0F 94 C0 31 FF 08 D8"_gh)
+            .at_exe()
+            .function_start(),
+    },
     {
         "explosion_mask"sv,
         // Set a conditional bp on load_item for fx_explosion, throw a bomb and let it explode. When the debugger
