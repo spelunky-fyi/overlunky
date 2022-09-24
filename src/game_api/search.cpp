@@ -101,7 +101,7 @@ const char* current_spelunky_version()
         }
         if (rdata_start > 0 && rdata_size > 0)
         {
-            std::string_view needle = "\x31\x2E**\x2E**\x00"sv;
+            std::string_view needle = "1.2"sv;
             const size_t needle_length = needle.size();
             const char* rdata = (const char*)rdata_start;
             size_t offset = 0;
@@ -149,7 +149,7 @@ std::string application_versions()
 
 std::string get_error_information()
 {
-    return fmt::format("\n\nRunning Spelunky 2: {}\nSupported Spelunky 2: 1.25.0b\n\n{}", current_spelunky_version(), application_versions());
+    return fmt::format("\n\nRunning Spelunky 2: {}\nSupported Spelunky 2: 1.27\n\n{}", current_spelunky_version(), application_versions());
 }
 
 size_t find_inst(const char* exe, std::string_view needle, size_t start, std::optional<size_t> end, std::string_view pattern_name, bool is_required)
