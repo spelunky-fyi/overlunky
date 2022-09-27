@@ -4,7 +4,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) I
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.6d"
+meta.version = "2.7"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -71,7 +71,9 @@ local real_default_options = {
     drill = 20,
     kali = true,
     jellyless_chance = 40,
-    crust_chance = 1
+    crust_chance = 0.75,
+    water_chance = 12,
+    themes = true
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -137,6 +139,8 @@ local function register_options()
     register_option_bool("kali", "Random kali items", default_options.kali)
     register_option_float("jellyless_chance", "Easy CO chance (no jelly)", default_options.jellyless_chance, 0, 100)
     register_option_float("crust_chance", "Crust item chance", default_options.crust_chance, 0, 100)
+    register_option_float("water_chance", "Water level chance", default_options.water_chance, 0, 100)
+    register_option_bool("themes", "Remix themes", default_options.themes)
     register_option_button("_reset", "Reset options to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -556,6 +560,18 @@ set_post_entity_spawn(function(ent)
         end
     end)
 end, SPAWN_TYPE.ANY, MASK.MONSTER, ENT_TYPE.MONS_VLAD)
+
+set_post_entity_spawn(function(ent)
+    ent.bombs = prng:random_int(-12, 12, PRNG_CLASS.PROCEDURAL_SPAWNS)
+    ent.ropes = prng:random_int(-12, 12, PRNG_CLASS.PROCEDURAL_SPAWNS)
+end, SPAWN_TYPE.ANY, MASK.ITEM, ENT_TYPE.ITEM_PICKUP_PLAYERBAG)
+
+set_post_entity_spawn(function(ent)
+    if prng:random() < 1 then
+        ent.bomb = prng:random_int(1, 4, PRNG_CLASS.PROCEDURAL_SPAWNS) == 1 and true or false
+        ent.leprechaun = prng:random_int(1, 4, PRNG_CLASS.PROCEDURAL_SPAWNS) == 1 and true or false
+    end
+end, SPAWN_TYPE.ANY, MASK.ITEM, ENT_TYPE.ITEM_CHEST)
 
 local swapping_liquid = false
 local duat_spawn_x = -1
@@ -2804,5 +2820,118 @@ set_callback(function(x, y, l, r)
 1111100222]]
         end
         return data
+    end
+end, ON.PRE_GET_RANDOM_ROOM)
+
+--[[WATER LEVELS]]
+set_callback(function()
+    if #get_entities_by_mask(MASK.LIQUID) > 0 or state.theme == THEME.COSMIC_OCEAN then return end
+    if prng:random() < options.water_chance / 100 then
+        swapping_liquid = false
+        local ax, ay, bx, by = get_bounds()
+        for y=by,ay-8,8 do
+            local box = AABB:new(ax, y+8, bx, y)
+            spawn_impostor_lake(box, LAYER.FRONT, ENT_TYPE.LIQUID_IMPOSTOR_LAKE, 0)
+        end
+    end
+end, ON.POST_LEVEL_GENERATION)
+
+set_post_entity_spawn(function(ent)
+    ent.flags = set_flag(ent.flags, ENT_FLAG.DEAD)
+end, SPAWN_TYPE.ANY, MASK.LIQUID, ENT_TYPE.LIQUID_IMPOSTOR_LAKE)
+
+
+--[[THEME REMIX]]
+theme_ice = CustomTheme:new(100, THEME.DWELLING)
+theme_ice:override(THEME_OVERRIDE.SPAWN_EFFECTS, THEME.ICE_CAVES)
+theme_ice:override(THEME_OVERRIDE.SPAWN_BORDER, THEME.ICE_CAVES)
+theme_ice:override(THEME_OVERRIDE.SPAWN_BACKGROUND, THEME.ICE_CAVES)
+theme_ice:override(THEME_OVERRIDE.SPAWN_DECORATION, THEME.ICE_CAVES)
+theme_ice:post(THEME_OVERRIDE.INIT_LEVEL, function()
+    state.width = prng:random(3, 5)
+    state.height = prng:random(10, 15)
+end)
+theme_ice.textures[DYNAMIC_TEXTURE.FLOOR] = TEXTURE.DATA_TEXTURES_FLOOR_ICE_0
+theme_ice.textures[DYNAMIC_TEXTURE.BACKGROUND] = TEXTURE.DATA_TEXTURES_BG_ICE_0
+
+theme_sunken = CustomTheme:new(101, THEME.SUNKEN_CITY)
+theme_sunken:override(THEME_OVERRIDE.SPAWN_EFFECTS, THEME.SUNKEN_CITY)
+theme_sunken:override(THEME_OVERRIDE.SPAWN_BORDER, THEME.SUNKEN_CITY)
+theme_sunken:override(THEME_OVERRIDE.SPAWN_BACKGROUND, THEME.SUNKEN_CITY)
+theme_sunken.textures[DYNAMIC_TEXTURE.FLOOR] = TEXTURE.DATA_TEXTURES_FLOOR_SUNKEN_0
+theme_sunken.textures[DYNAMIC_TEXTURE.BACKGROUND] = TEXTURE.DATA_TEXTURES_BG_SUNKEN_0
+
+theme_eggy = CustomTheme:new(101, THEME.EGGPLANT_WORLD)
+
+set_callback(function(ctx)
+    if not options.themes then return end
+    ice_bottom = false
+    sunken = false
+    if prng:random(1, 3) < 3 and state.theme == THEME.ICE_CAVES then
+        ctx:override_level_files({"generic.lvl", "icecavesarea.lvl"})
+        force_custom_theme(theme_ice)
+        ice_bottom = true
+    elseif prng:random(1, 3) == 1 and state.theme == THEME.SUNKEN_CITY and state.items.player_inventory[1].bombs > 7 then
+        ctx:override_level_files({"generic.lvl", "sunkencityarea.lvl"})
+        force_custom_theme(theme_sunken)
+        sunken = true
+    end
+end, ON.PRE_LOAD_LEVEL_FILES)
+
+set_callback(function(ctx)
+    if not options.themes then return end
+    if ice_bottom then
+        ctx:set_room_template(prng:random(0, state.width-1), state.height-2, LAYER.FRONT, ROOM_TEMPLATE.EXIT_NOTOP)
+    end
+    if sunken then
+        local ex = prng:random(0, state.width - 1)
+        local ey = 0
+        for y = 0, state.width - 1 do
+            for x = 0, state.height - 1 do
+                if get_room_template(x, y, LAYER.FRONT) == ROOM_TEMPLATE.SIDE then
+                    ctx:set_room_template(x, y, LAYER.FRONT, ROOM_TEMPLATE.ENTRANCE_DROP)
+                    goto entrance_ok
+                end
+            end
+        end
+        ctx:set_room_template(ex, ey, LAYER.FRONT, ROOM_TEMPLATE.ENTRANCE_DROP)
+        if is_machine_room_origin(ex - 1, ey) then
+            ctx:set_room_template(ex - 1, ey, LAYER.FRONT, ROOM_TEMPLATE.SIDE)
+        end
+        if is_machine_room_origin(ex, ey) and get_room_template(ex, ey, LAYER.FRONT) == ROOM_TEMPLATE.MACHINE_WIDEROOM_SIDE then
+            ctx:set_room_template(ex + 1, ey, LAYER.FRONT, ROOM_TEMPLATE.SIDE)
+        end
+        if is_machine_room_origin(ex, ey) and get_room_template(ex, ey, LAYER.FRONT) == ROOM_TEMPLATE.MACHINE_TALLROOM_SIDE then
+            ctx:set_room_template(ex, ey + 1, LAYER.FRONT, ROOM_TEMPLATE.SIDE)
+        end
+        ::entrance_ok::
+        ex = prng:random(0, state.width - 1)
+        ey = state.height - 1
+        ctx:set_room_template(ex, ey, LAYER.FRONT, ROOM_TEMPLATE.EXIT)
+        if is_machine_room_origin(ex, ey) then
+            ctx:set_room_template(ex + 1, ey, LAYER.FRONT, ROOM_TEMPLATE.SIDE)
+        end
+        if is_machine_room_origin(ex - 1, ey) then
+            ctx:set_room_template(ex - 1, ey, LAYER.FRONT, ROOM_TEMPLATE.SIDE)
+        end
+        if is_machine_room_origin(ex, ey - 1) then
+            ctx:set_room_template(ex, ey - 1, LAYER.FRONT, ROOM_TEMPLATE.SIDE)
+        end
+    end
+end, ON.POST_ROOM_GENERATION)
+
+set_callback(function(x, y, l, room_template)
+    if not options.themes then return end
+    if ice_bottom and y == state.height-1 then
+        return [[
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+        ]]
     end
 end, ON.PRE_GET_RANDOM_ROOM)
