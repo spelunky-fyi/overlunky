@@ -2078,7 +2078,7 @@ end, ON.LEVEL)
 set_callback(function()
     --message("Transition")
     if options.door then
-        toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(bosses_left()))
+        --toast("Level "..tostring(state.level_count).." completed!\nBosses remaining: "..tostring(bosses_left()))
         --message("Transition - Setting next level")
         local num = state.level_count+1
         if test_flag(state.quest_flags, 1) then
@@ -2476,14 +2476,31 @@ set_callback(function()
         end
     end
     LevelNum = state.level_count+1
+
+    local level_str = F"{LevelNum}/{#level_order}"
+    if LevelNum > #level_order then
+        level_str = "%d-%d"
+    end
+    set_level_string(level_str)
+    change_string(hash_to_stringid(0xda7c0c5b), F"{level_str} COMPLETED!")
 end, ON.LEVEL)
 
-set_callback(function(ctx)
+set_callback(function()
+    change_string(hash_to_stringid(0xc719580c), "Bosses killed: " .. tostring(#bosses_killed) .. "/" .. tostring(options.door_bosses+1))
+end, ON.TRANSITION)
+
+set_callback(function()
+    if state.screen ~= SCREEN.TRANSITION then
+        set_level_string("%d-%d")
+    end
+end, ON.POST_LOAD_SCREEN)
+
+--[[set_callback(function(ctx)
     if options.door and options.status and state.screen >= ON.LEVEL and state.level_count+1 <= #level_order and state.loading == 0 then
         --ctx:draw_text(-0.065, 0.98, 28, F"{FakeWorld}-{FakeLevel}   {LevelNum}/{#level_order}", 0x44FFFFFF)
         ctx:draw_text(0.9, 0.81, 32, F"{LevelNum}/{#level_order}", 0xBBFFFFFF)
     end
-end, ON.GUIFRAME)
+end, ON.GUIFRAME)]]
 
 --[[LIQUIDS]]
 --[[SPIKES]]

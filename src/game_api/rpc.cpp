@@ -1842,3 +1842,18 @@ void game_log(std::string message)
     const static auto log_stream = (std::ofstream*)read_i64(get_address("game_log_stream"));
     game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
 }
+
+void set_level_string(std::wstring str)
+{
+    static size_t string_offset = 0;
+    if (string_offset == 0)
+    {
+        auto memory = Memory::get();
+        string_offset = memory.at_exe(0x22D8E2C2); // TODO: Yeah this is just the location of the unicode format string %d-%d, which is also used on other places
+    }
+    if (string_offset != 0)
+    {
+        str = str.substr(0, 5);
+        write_mem_prot(string_offset, std::string_view{reinterpret_cast<const char*>(&str), sizeof(str)}, true);
+    }
+}

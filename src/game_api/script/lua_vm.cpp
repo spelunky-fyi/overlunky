@@ -1593,6 +1593,9 @@ end
     /// Clears the name set with `add_custom_name`
     lua["clear_custom_name"] = clear_custom_name;
 
+    /// Sets the level string shown in the hud and journal. The maximum length is 5 characters.
+    lua["set_level_string"] = set_level_string;
+
     /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
     lua["enter_door"] = enter_door;
 
