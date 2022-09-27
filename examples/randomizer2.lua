@@ -547,7 +547,15 @@ set_post_entity_spawn(function(ent)
     if state.theme == THEME.DUAT then
         kill_entity(ent.uid)
     end
-end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SNAP_TRAP)
+end, SPAWN_TYPE.ANY, MASK.ITEM, ENT_TYPE.ITEM_SNAP_TRAP)
+
+set_post_entity_spawn(function(ent)
+    set_post_statemachine(ent.uid, function(ent)
+        if entity_has_item_type(ent.uid, ENT_TYPE.LOGICAL_POISONED_EFFECT) then
+            kill_entity(ent.uid)
+        end
+    end)
+end, SPAWN_TYPE.ANY, MASK.MONSTER, ENT_TYPE.MONS_VLAD)
 
 local swapping_liquid = false
 local duat_spawn_x = -1
