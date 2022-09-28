@@ -3371,8 +3371,8 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
 
     if (type == spark_trap && ent->animation_frame == 7)
     {
-        // TODO: get the real distance from game (can be changed thru API)
-        auto [radx, rady] = UI::screen_position(render_position.first + 3, render_position.second + 3);
+        float distance = UI::get_spark_distance(ent->as<SparkTrap>());
+        auto [radx, rady] = UI::screen_position(render_position.first + distance, render_position.second + distance);
         auto srad = screenify({radx, rady});
         draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }

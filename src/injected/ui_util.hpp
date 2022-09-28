@@ -12,6 +12,7 @@
 
 class Player;
 class Entity;
+class SparkTrap;
 struct SaveData;
 struct Illumination;
 struct AABB;
@@ -77,4 +78,5 @@ class UI
     static void safe_destroy(Entity* ent, bool unsafe = false, bool recurse = true);
     static std::vector<uint32_t> get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer);
     static bool get_focus();
+    static float get_spark_distance(SparkTrap* ent);
 };
