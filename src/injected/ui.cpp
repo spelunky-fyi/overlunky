@@ -1100,6 +1100,66 @@ std::string spawned_type()
     }
 }
 
+void spawn_entityitem(EntityItem to_spawn, bool s)
+{
+    std::pair<float, float> cpos = UI::click_position(g_x, g_y);
+    if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
+    {
+        int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
+        if (!lock_entity)
+            g_last_id = spawned;
+    }
+    else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
+    {
+        bool snap = options["snap_to_grid"];
+        if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
+        {
+            snap = true;
+            g_vx = 0;
+            g_vy = 0;
+
+            auto old_block_id = UI::get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
+            if (old_block_id != -1)
+            {
+                auto old_block = get_entity_ptr(old_block_id);
+
+                if (old_block)
+                    smart_delete(old_block);
+            }
+            else
+            {
+                auto old_activefloor = UI::get_entity_at(std::round(cpos.first), std::round(cpos.second), false, 0.5f, 0x80);
+                if (old_activefloor)
+                    smart_delete(old_activefloor);
+            }
+        }
+        int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
+        if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
+        {
+            if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
+            {
+                if (floor->get_decoration_entity_type() != -1)
+                {
+                    floor->fix_decorations(true, false);
+                }
+                auto fpos = floor->position();
+                auto layer = (LAYER)floor->layer;
+                Callback cb = {g_state->time_total + 2, [fpos, layer]
+                               {
+                                   fix_decorations_at(fpos.first, fpos.second, layer);
+                               }};
+                callbacks.push_back(cb);
+            }
+        }
+        if (!lock_entity)
+            g_last_id = spawned;
+    }
+    else
+    {
+        UI::spawn_liquid(to_spawn.id, cpos.first, cpos.second);
+    }
+}
+
 void spawn_entities(bool s, std::string list = "")
 {
     if (g_game_manager->pause_ui->visibility > 0)
@@ -1124,77 +1184,18 @@ void spawn_entities(bool s, std::string list = "")
                 return;
             }
         }
-        std::pair<float, float> cpos = UI::click_position(g_x, g_y);
-        if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
-        {
-            int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
-            if (!lock_entity)
-                g_last_id = spawned;
-        }
-        else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
-        {
-            bool snap = options["snap_to_grid"];
-            if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
-            {
-                snap = true;
-                g_vx = 0;
-                g_vy = 0;
-
-                auto old_block_id = UI::get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
-                if (old_block_id != -1)
-                {
-                    auto old_block = get_entity_ptr(old_block_id);
-
-                    if (old_block)
-                        smart_delete(old_block);
-                }
-                else
-                {
-                    auto old_activefloor = UI::get_entity_at(std::round(cpos.first), std::round(cpos.second), false, 0.5f, 0x80);
-                    if (old_activefloor)
-                        smart_delete(old_activefloor);
-                }
-            }
-            int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
-            if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
-            {
-                if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
-                {
-                    if (floor->get_decoration_entity_type() != -1)
-                    {
-                        floor->fix_decorations(true, false);
-                    }
-                    auto fpos = floor->position();
-                    auto layer = (LAYER)floor->layer;
-                    Callback cb = {g_state->time_total + 2, [fpos, layer]
-                                   {
-                                       fix_decorations_at(fpos.first, fpos.second, layer);
-                                   }};
-                    callbacks.push_back(cb);
-                }
-            }
-            if (!lock_entity)
-                g_last_id = spawned;
-        }
-        else
-        {
-            UI::spawn_liquid(to_spawn.id, cpos.first, cpos.second);
-        }
+        spawn_entityitem(to_spawn, s);
     }
     else
     {
         std::stringstream textss(text);
         if (list != "")
             textss.str(list);
-        int id;
-        std::vector<int> ents;
-        int spawned{-1};
+        uint32_t id;
         while (textss >> id)
         {
-            spawned = UI::spawn_entity(id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entityitem(EntityItem{entity_full_names[id], id}, s);
         }
-        if (!lock_entity)
-            g_last_id = spawned;
     }
 }
 
