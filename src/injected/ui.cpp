@@ -1259,6 +1259,13 @@ void spawn_kit(Kit* kit)
         {
             g_players.at(0)->pick_up(spawned_ent);
         }
+        else if (item.name.find("MOUNT_") != std::string::npos)
+        {
+            auto spawned_mount = get_entity_ptr(spawned)->as<Mount>();
+            spawned_mount->tame(true);
+            if (!g_players.at(0)->overlay)
+                spawned_mount->carry(g_players.at(0));
+        }
         else if (g_players.at(0)->holding_uid == -1 && test_flag(spawned_ent->flags, 18))
         {
             g_players.at(0)->pick_up(spawned_ent);
