@@ -2067,12 +2067,12 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("zoom_3x", wParam))
     {
-        g_zoom = 23.08f;
+        g_zoom = 23.126f;
         set_zoom();
     }
     else if (pressed("zoom_4x", wParam))
     {
-        g_zoom = 29.87f;
+        g_zoom = 29.928f;
         set_zoom();
     }
     else if (pressed("zoom_5x", wParam))
@@ -3074,21 +3074,21 @@ void render_camera()
     ImGui::SameLine();
     if (ImGui::Button("3x"))
     {
-        g_zoom = 23.08f;
+        g_zoom = 23.126f;
         set_zoom();
     }
     tooltip("3 room wide zoom level.", "zoom_3x");
     ImGui::SameLine();
     if (ImGui::Button("4x"))
     {
-        g_zoom = 29.87f;
+        g_zoom = 29.928f;
         set_zoom();
     }
     tooltip("4 room wide zoom level.", "zoom_4x");
     ImGui::SameLine();
     if (ImGui::Button("5x"))
     {
-        g_zoom = 36.66f;
+        g_zoom = 36.730f;
         set_zoom();
     }
     tooltip("5 room wide zoom level.", "zoom_5x");
