@@ -850,7 +850,7 @@ void load_config(std::string file)
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
     for (auto saved : saved_entities)
     {
-        kits.push_back(new Kit(saved, false));
+        kits.push_back(new Kit({saved, false}));
     }
     saved_entities.clear();
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
@@ -1001,7 +1001,7 @@ void escape()
 
 void save_search()
 {
-    kits.push_back(new Kit(text, false));
+    kits.push_back(new Kit({text, false}));
     save_config(cfgfile);
 }
 
@@ -1111,13 +1111,13 @@ std::string spawned_type()
     }
 }
 
-int32_t spawn_entityitem(EntityItem to_spawn, bool s)
+int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
 {
     std::pair<float, float> cpos = UI::click_position(g_x, g_y);
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
         int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
-        if (!lock_entity)
+        if (!lock_entity && set_last)
             g_last_id = spawned;
         return spawned;
     }
@@ -1163,7 +1163,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s)
                 callbacks.push_back(cb);
             }
         }
-        if (!lock_entity)
+        if (!lock_entity && set_last)
             g_last_id = spawned;
         return spawned;
     }
@@ -1195,14 +1195,18 @@ void spawn_kit([[maybe_unused]] Kit* kit)
     while (textss >> id)
     {
         EntityItem item = EntityItem{entity_full_names[id], id};
-        int32_t spawned;
+        int32_t spawned = -1;
         if (item.name.find("ENT_TYPE_ITEM_PICKUP") != std::string::npos)
         {
             spawned = UI::spawn_entity_over(id, g_players.at(0)->uid, 0.0f, 0.0f);
         }
+        else if (item.name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+        {
+            g_players.at(0)->give_powerup(id);
+        }
         else
         {
-            spawned = spawn_entityitem(item, false);
+            spawned = spawn_entityitem(item, false, false);
         }
 
         if (spawned == -1)
@@ -1210,7 +1214,7 @@ void spawn_kit([[maybe_unused]] Kit* kit)
 
         auto spawned_ent = get_entity_ptr(spawned)->as<Movable>();
 
-        if (std::find(std::begin(wearable), std::end(wearable), spawned) != std::end(wearable) && g_players.at(0)->worn_backitem() == -1)
+        if (std::find(std::begin(wearable), std::end(wearable), id) != std::end(wearable) && g_players.at(0)->worn_backitem() == -1)
         {
             g_players.at(0)->pick_up(spawned_ent);
         }
@@ -1512,7 +1516,7 @@ void force_noclip()
 
 void force_kits()
 {
-    if (g_state->screen == 12 && g_state->time_total == 2 && g_state->time_startup > g_last_kit_spawn)
+    if (g_state->screen == 12 && g_state->time_total == 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
     {
         for (auto kit : kits)
         {
