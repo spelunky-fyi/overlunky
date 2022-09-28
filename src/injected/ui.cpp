@@ -422,6 +422,26 @@ void hook_savegame()
     }
 }
 
+static inline void ltrim(std::string& s)
+{
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch)
+                                    { return !std::isspace(ch); }));
+}
+
+static inline void rtrim(std::string& s)
+{
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
+                         { return !std::isspace(ch); })
+                .base(),
+            s.end());
+}
+
+static inline void trim(std::string& s)
+{
+    ltrim(s);
+    rtrim(s);
+}
+
 ImVec4 hue_shift(ImVec4 in, float hue) // unused
 {
     float U = std::cos(hue * 3.14159265f / 180);
@@ -693,8 +713,9 @@ void save_config(std::string file)
               << "[hotkeys]" << std::endl;
     for (const auto& kv : keys)
     {
-        writeData << std::left << std::setw(24) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# "
-                  << key_string(keys[kv.first]) << std::endl;
+        if (kv.first != "")
+            writeData << std::left << std::setw(24) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# "
+                      << key_string(keys[kv.first]) << std::endl;
     }
 
     writeData << "\n[options] # 0 or 1 unless stated otherwise (default state "
@@ -847,6 +868,8 @@ void load_config(std::string file)
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66f);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0f);
     g_camera_speed = toml::find_or<float>(opts, "camera_speed", 1.0f);
+    kits.clear();
+    saved_entities.clear();
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
     for (auto saved : saved_entities)
     {
@@ -1001,7 +1024,21 @@ void escape()
 
 void save_search()
 {
-    kits.push_back(new Kit({text, false}));
+    std::string items = text;
+    trim(items);
+    std::stringstream sss(items);
+    uint32_t id = 0;
+    sss >> id;
+    if (id != 0)
+    {
+        kits.push_back(new Kit({items, false}));
+    }
+    else if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
+    {
+        EntityItem to_add = g_items[g_filtered_items[g_current_item]];
+        items = fmt::format("{}", to_add.id);
+        kits.push_back(new Kit({items, false}));
+    }
     save_config(cfgfile);
 }
 
@@ -1174,7 +1211,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     return -1;
 }
 
-void spawn_kit([[maybe_unused]] Kit* kit)
+void spawn_kit(Kit* kit)
 {
     if (g_players.size() == 0)
         return;
@@ -1196,7 +1233,11 @@ void spawn_kit([[maybe_unused]] Kit* kit)
     {
         EntityItem item = EntityItem{entity_full_names[id], id};
         int32_t spawned = -1;
-        if (item.name.find("ENT_TYPE_ITEM_PICKUP") != std::string::npos)
+        if (item.name.find("FLOOR_") != std::string::npos || item.name.find("DECORATION_") != std::string::npos || item.name.find("FX_") != std::string::npos || item.name.find("BG_") != std::string::npos || item.name.find("LOGICAL_") != std::string::npos)
+        {
+            continue;
+        }
+        else if (item.name.find("ENT_TYPE_ITEM_PICKUP") != std::string::npos)
         {
             spawned = UI::spawn_entity_over(id, g_players.at(0)->uid, 0.0f, 0.0f);
         }
@@ -2792,8 +2833,24 @@ void render_input()
         ImGui::PopID();
 
         ImGui::PushID(16 * n);
-        ImGui::Checkbox("Auto", &kit->automatic);
+        ImGui::Checkbox("Auto spawn", &kit->automatic);
         tooltip("Spawn automatically on new game.", "");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(32 * n);
+        if (ImGui::Button("Add item"))
+        {
+            if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
+            {
+                EntityItem to_add = g_items[g_filtered_items[g_current_item]];
+                trim(kit->items);
+                kit->items = fmt::format("{} {}", kit->items, to_add.id);
+                trim(kit->items);
+                save_config(cfgfile);
+            }
+        }
+        tooltip("Add selected item to this kit.", "");
         ImGui::PopID();
 
         ImGui::PopID();
@@ -2806,7 +2863,7 @@ void render_input()
         set_focus_entity = false;
     }
     ImVec2 region = ImGui::GetContentRegionMax();
-    ImGui::PushItemWidth(region.x - 110);
+    ImGui::PushItemWidth(region.x - 135);
     if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
     {
         update_filter(text);
@@ -2814,11 +2871,11 @@ void render_input()
     tooltip("Search for entities to spawn. Hit TAB to add the selected id to list.");
     ImGui::PopItemWidth();
     ImGui::SameLine();
-    if (ImGui::Button("Save"))
+    if (ImGui::Button("Save kit"))
     {
         save_search();
     }
-    tooltip("Save entity id(s) as a kit for quick use later.");
+    tooltip("Save entity id(s) or selected item as a kit for quick use later.");
     ImGui::SameLine();
     if (ImGui::Button("Spawn"))
     {
