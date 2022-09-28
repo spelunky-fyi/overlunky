@@ -227,10 +227,16 @@ int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filter
     g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1;
 unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
-uint32_t g_held_flags = 0, g_dark_mode = 0;
+uint32_t g_held_flags = 0, g_dark_mode = 0, g_last_kit_spawn = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
+struct Kit
+{
+    std::string items;
+    bool automatic;
+};
 std::vector<std::string> saved_entities;
+std::vector<Kit*> kits;
 std::vector<Player*> g_players;
 std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
@@ -707,14 +713,14 @@ void save_config(std::string file)
     writeData << "camera_speed = " << std::fixed << std::setprecision(2) << g_camera_speed << " # float" << std::endl;
 
     writeData << "kits = [";
-    for (unsigned int i = 0; i < saved_entities.size(); i++)
+    for (unsigned int i = 0; i < kits.size(); i++)
     {
         writeData << std::endl
-                  << "  \"" << saved_entities[i] << "\"";
-        if (i < saved_entities.size() - 1)
+                  << "  \"" << kits[i]->items << "\"";
+        if (i < kits.size() - 1)
             writeData << ",";
     }
-    if (!saved_entities.empty())
+    if (!kits.empty())
         writeData << std::endl;
     writeData << "]" << std::endl;
 
@@ -842,6 +848,11 @@ void load_config(std::string file)
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0f);
     g_camera_speed = toml::find_or<float>(opts, "camera_speed", 1.0f);
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
+    for (auto saved : saved_entities)
+    {
+        kits.push_back(new Kit(saved, false));
+    }
+    saved_entities.clear();
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
     fontfile = toml::find_or<std::string>(opts, "font_file", "");
@@ -990,7 +1001,7 @@ void escape()
 
 void save_search()
 {
-    saved_entities.push_back(text);
+    kits.push_back(new Kit(text, false));
     save_config(cfgfile);
 }
 
@@ -1100,7 +1111,7 @@ std::string spawned_type()
     }
 }
 
-void spawn_entityitem(EntityItem to_spawn, bool s)
+int32_t spawn_entityitem(EntityItem to_spawn, bool s)
 {
     std::pair<float, float> cpos = UI::click_position(g_x, g_y);
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
@@ -1108,6 +1119,7 @@ void spawn_entityitem(EntityItem to_spawn, bool s)
         int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
         if (!lock_entity)
             g_last_id = spawned;
+        return spawned;
     }
     else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
     {
@@ -1153,10 +1165,59 @@ void spawn_entityitem(EntityItem to_spawn, bool s)
         }
         if (!lock_entity)
             g_last_id = spawned;
+        return spawned;
     }
     else
     {
         UI::spawn_liquid(to_spawn.id, cpos.first, cpos.second);
+    }
+    return -1;
+}
+
+void spawn_kit([[maybe_unused]] Kit* kit)
+{
+    if (g_players.size() == 0)
+        return;
+
+    static const ENT_TYPE wearable[] = {
+        to_id("ENT_TYPE_ITEM_CAPE"),
+        to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
+        to_id("ENT_TYPE_ITEM_JETPACK"),
+        to_id("ENT_TYPE_ITEM_TELEPORTER_BACKPACK"),
+        to_id("ENT_TYPE_ITEM_HOVERPACK"),
+        to_id("ENT_TYPE_ITEM_POWERPACK"),
+    };
+
+    std::stringstream textss(text);
+    if (kit->items != "")
+        textss.str(kit->items);
+    uint32_t id;
+    while (textss >> id)
+    {
+        EntityItem item = EntityItem{entity_full_names[id], id};
+        int32_t spawned;
+        if (item.name.find("ENT_TYPE_ITEM_PICKUP") != std::string::npos)
+        {
+            spawned = UI::spawn_entity_over(id, g_players.at(0)->uid, 0.0f, 0.0f);
+        }
+        else
+        {
+            spawned = spawn_entityitem(item, false);
+        }
+
+        if (spawned == -1)
+            continue;
+
+        auto spawned_ent = get_entity_ptr(spawned)->as<Movable>();
+
+        if (std::find(std::begin(wearable), std::end(wearable), spawned) != std::end(wearable) && g_players.at(0)->worn_backitem() == -1)
+        {
+            g_players.at(0)->pick_up(spawned_ent);
+        }
+        else if (g_players.at(0)->holding_uid == -1 && test_flag(spawned_ent->flags, 18))
+        {
+            g_players.at(0)->pick_up(spawned_ent);
+        }
     }
 }
 
@@ -1446,6 +1507,19 @@ void force_noclip()
                 }
             }
         }
+    }
+}
+
+void force_kits()
+{
+    if (g_state->screen == 12 && g_state->time_total == 2 && g_state->time_startup > g_last_kit_spawn)
+    {
+        for (auto kit : kits)
+        {
+            if (kit->automatic)
+                spawn_kit(kit);
+        }
+        g_last_kit_spawn = g_state->time_startup + 1;
     }
 }
 
@@ -2238,48 +2312,48 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("spawn_kit_1", wParam))
     {
-        if (saved_entities.size() > 0)
-            spawn_entities(false, saved_entities.at(0));
+        if (kits.size() > 0)
+            spawn_kit(kits.at(0));
     }
     else if (pressed("spawn_kit_2", wParam))
     {
-        if (saved_entities.size() > 1)
-            spawn_entities(false, saved_entities.at(1));
+        if (kits.size() > 1)
+            spawn_kit(kits.at(1));
     }
     else if (pressed("spawn_kit_3", wParam))
     {
-        if (saved_entities.size() > 2)
-            spawn_entities(false, saved_entities.at(2));
+        if (kits.size() > 2)
+            spawn_kit(kits.at(2));
     }
     else if (pressed("spawn_kit_4", wParam))
     {
-        if (saved_entities.size() > 3)
-            spawn_entities(false, saved_entities.at(3));
+        if (kits.size() > 3)
+            spawn_kit(kits.at(3));
     }
     else if (pressed("spawn_kit_5", wParam))
     {
-        if (saved_entities.size() > 4)
-            spawn_entities(false, saved_entities.at(4));
+        if (kits.size() > 4)
+            spawn_kit(kits.at(4));
     }
     else if (pressed("spawn_kit_6", wParam))
     {
-        if (saved_entities.size() > 5)
-            spawn_entities(false, saved_entities.at(5));
+        if (kits.size() > 5)
+            spawn_kit(kits.at(5));
     }
     else if (pressed("spawn_kit_7", wParam))
     {
-        if (saved_entities.size() > 6)
-            spawn_entities(false, saved_entities.at(6));
+        if (kits.size() > 6)
+            spawn_kit(kits.at(6));
     }
     else if (pressed("spawn_kit_8", wParam))
     {
-        if (saved_entities.size() > 7)
-            spawn_entities(false, saved_entities.at(7));
+        if (kits.size() > 7)
+            spawn_kit(kits.at(7));
     }
     else if (pressed("spawn_kit_9", wParam))
     {
-        if (saved_entities.size() > 8)
-            spawn_entities(false, saved_entities.at(8));
+        if (kits.size() > 8)
+            spawn_kit(kits.at(8));
     }
     else if (pressed("spawn_warp_door", wParam))
     {
@@ -2661,11 +2735,11 @@ void render_themes()
 void render_input()
 {
     int n = 0;
-    for (auto i : saved_entities)
+    for (auto kit : kits)
     {
-        ImGui::PushID(i.c_str());
+        ImGui::PushID(kit->items.c_str());
         std::string search = "";
-        std::stringstream sss(i);
+        std::stringstream sss(kit->items);
         int item = 0;
         while (sss >> item)
         {
@@ -2679,12 +2753,14 @@ void render_input()
             search.pop_back();
         }
         if (search.empty())
-            search = i;
-
+            search = kit->items;
+        ImGui::Text("%d:", n + 1);
+        ImGui::SameLine();
+        ImGui::TextWrapped("%s", search.c_str());
         ImGui::PushID(2 * n);
         if (ImGui::Button("X"))
         {
-            saved_entities.erase(saved_entities.begin() + n);
+            kits.erase(kits.begin() + n);
             save_config(cfgfile);
         }
         tooltip("Delete kit.");
@@ -2694,7 +2770,7 @@ void render_input()
         ImGui::PushID(4 * n);
         if (ImGui::Button("Load"))
         {
-            text = i;
+            text = kit->items;
             update_filter(text);
             // spawn_entities(false);
         }
@@ -2705,16 +2781,20 @@ void render_input()
         ImGui::PushID(8 * n);
         if (ImGui::Button("Spawn"))
         {
-            spawn_entities(false, i);
+            spawn_kit(kit);
         }
-        tooltip("Spawn saved kit where you're standing.", "spawn_kit_1");
-        ImGui::PopID();
+        tooltip("Spawn saved kit where you're standing,\nautomatically equipping anything wearable.", "spawn_kit_1");
         ImGui::SameLine();
-        ImGui::Text("%d:", n + 1);
         ImGui::PopID();
-        ImGui::SameLine();
-        ImGui::TextWrapped("%s", search.c_str());
+
+        ImGui::PushID(16 * n);
+        ImGui::Checkbox("Auto", &kit->automatic);
+        tooltip("Spawn automatically on new game.", "");
+        ImGui::PopID();
+
+        ImGui::PopID();
         n++;
+        ImGui::Separator();
     }
     if (set_focus_entity)
     {
@@ -6914,6 +6994,7 @@ void imgui_draw()
 void post_draw()
 {
     update_players();
+    force_kits();
     force_zoom();
     force_hud_flags();
     force_time();
