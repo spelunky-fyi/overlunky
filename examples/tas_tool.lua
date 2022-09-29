@@ -287,7 +287,7 @@ set_callback(function(ctx)
 end, ON.GUIFRAME)
 
 set_callback(function()
-    if mode == 1 and pause and state.time_level == 2 then
+    if mode == 1 and pause and not rerecording and state.time_level == 2 then
         state.pause = 0x2
     end
 end, ON.FRAME)
