@@ -55,11 +55,11 @@ struct Memory
                               auto exe = (size_t)GetModuleHandleA("Spel2.exe");
 
                               // Skipping bundle for faster memory search
-                              auto after_bundle = find_after_bundle(exe);
+                              auto after_bundle_ = find_after_bundle(exe);
 
                               return Memory{
                                   exe,
-                                  after_bundle,
+                                  after_bundle_,
                               };
                           }()};
         return mem;
