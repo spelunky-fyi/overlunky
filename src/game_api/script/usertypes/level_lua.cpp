@@ -235,7 +235,7 @@ class CustomTheme : public ThemeInfo
     uint8_t theme;
     /// Base THEME to load enabled functions from, when no other theme is specified.
     uint8_t base_theme;
-    std::string_view backend_id;
+    std::string backend_id;
 
     std::map<THEME_OVERRIDE, std::unique_ptr<ThemeOverride>> overrides;
     /// Add TEXTUREs here to override different dynamic textures.

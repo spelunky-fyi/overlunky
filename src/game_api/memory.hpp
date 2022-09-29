@@ -50,18 +50,18 @@ struct Memory
 
     static Memory& get()
     {
-        static Memory mem{ []() {
-                auto exe = (size_t)GetModuleHandleA("Spel2.exe");
+        static Memory mem{[]()
+                          {
+                              auto exe = (size_t)GetModuleHandleA("Spel2.exe");
 
-                // Skipping bundle for faster memory search
-                auto after_bundle = find_after_bundle(exe);
+                              // Skipping bundle for faster memory search
+                              auto after_bundle = find_after_bundle(exe);
 
-                return Memory{
-                    exe,
-                    after_bundle,
-                };
-            }()
-        };
+                              return Memory{
+                                  exe,
+                                  after_bundle,
+                              };
+                          }()};
         return mem;
     }
 
