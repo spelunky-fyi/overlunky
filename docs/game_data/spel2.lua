@@ -1174,12 +1174,14 @@ function get_rva(address_name) end
 function log_print(message) end
 ---Immediately ends the run with the death screen, also calls the save_progress
 ---@return nil
-function call_death_screen() end
----Saves the game to savegame.sav and displays spinning cog in the bottom right corner
----@return nil
+function load_death_screen() end
+---Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+---@return boolean
 function save_progress() end
----Edit string that's used to display level-world in the hud and journal, you can set it to anything, it doesn't even need to include number
----the default is "%d-%d", remember that this does not apply to everything that displays world-level numbers, there are a few strings in the string files, you can change those with change_string function
+---Runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+---@return boolean
+function save_script() end
+---Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level. Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
 ---@param str string
 ---@return nil
 function set_level_string(str) end
@@ -1254,9 +1256,16 @@ function extinguish_particles(particle_emitter) end
 ---Default function in spawn definitions to check whether a spawn is valid or not
 ---@param x number
 ---@param y number
----@param layer integer
+---@param layer LAYER
 ---@return boolean
 function default_spawn_is_valid(x, y, layer) end
+---Check if position satifies the given POS_TYPE flags, to be used in a custom is_valid function procedural for spawns.
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param flags POS_TYPE
+---@return boolean
+function position_is_valid(x, y, layer, flags) end
 ---Add a callback for a specific tile code that is called before the game handles the tile code.
 ---The callback signature is `bool pre_tile_code(x, y, layer, room_template)`
 ---Return true in order to stop the game or scripts loaded after this script from handling this tile code.

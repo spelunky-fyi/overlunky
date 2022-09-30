@@ -763,6 +763,9 @@
                             <a href="#is_character_female" class="toc-h3 toc-link" data-title="is_character_female">is_character_female</a>
                           </li>
                           <li>
+                            <a href="#load_death_screen" class="toc-h3 toc-link" data-title="load_death_screen">load_death_screen</a>
+                          </li>
+                          <li>
                             <a href="#load_screen" class="toc-h3 toc-link" data-title="load_screen">load_screen</a>
                           </li>
                           <li>
@@ -779,6 +782,12 @@
                           </li>
                           <li>
                             <a href="#rgba" class="toc-h3 toc-link" data-title="rgba">rgba</a>
+                          </li>
+                          <li>
+                            <a href="#save_progress" class="toc-h3 toc-link" data-title="save_progress">save_progress</a>
+                          </li>
+                          <li>
+                            <a href="#save_script" class="toc-h3 toc-link" data-title="save_script">save_script</a>
                           </li>
                           <li>
                             <a href="#script_enabled" class="toc-h3 toc-link" data-title="script_enabled">script_enabled</a>
@@ -1001,6 +1010,9 @@
                             <a href="#get_zoom_level" class="toc-h3 toc-link" data-title="get_zoom_level">get_zoom_level</a>
                           </li>
                           <li>
+                            <a href="#position_is_valid" class="toc-h3 toc-link" data-title="position_is_valid">position_is_valid</a>
+                          </li>
+                          <li>
                             <a href="#screen_aabb" class="toc-h3 toc-link" data-title="screen_aabb">screen_aabb</a>
                           </li>
                           <li>
@@ -1198,6 +1210,9 @@
                           </li>
                           <li>
                             <a href="#hash_to_stringid" class="toc-h3 toc-link" data-title="hash_to_stringid">hash_to_stringid</a>
+                          </li>
+                          <li>
+                            <a href="#set_level_string" class="toc-h3 toc-link" data-title="set_level_string">set_level_string</a>
                           </li>
                       </ul>
                   </li>
@@ -3018,6 +3033,9 @@
                     <a href="#PAUSEUI_VISIBILITY" class="toc-h2 toc-link" data-title="PAUSEUI_VISIBILITY">PAUSEUI_VISIBILITY</a>
                   </li>
                   <li>
+                    <a href="#POS_TYPE" class="toc-h2 toc-link" data-title="POS_TYPE">POS_TYPE</a>
+                  </li>
+                  <li>
                     <a href="#PRNG_CLASS" class="toc-h2 toc-link" data-title="PRNG_CLASS">PRNG_CLASS</a>
                   </li>
                   <li>
@@ -4144,6 +4162,12 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 </blockquote>
 <h4 id='bool-is_character_female-ENT_TYPE-type_id'>bool is_character_female(<a href="#ENT_TYPE">ENT_TYPE</a> type_id)</h4>
 <p>Same as <code>Player.is_female</code></p>
+<h3 id='load_death_screen'>load_death_screen</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_death_screen">load_death_screen</a></p>
+</blockquote>
+<h4 id='nil-load_death_screen'>nil load_death_screen()</h4>
+<p>Immediately ends the run with the death screen, also calls the save_progress</p>
 <h3 id='load_screen'>load_screen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_screen">load_screen</a></p>
@@ -4182,6 +4206,18 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='uColor-rgba-int-r-int-g-int-b-int-a'><a href="#Aliases">uColor</a> rgba(int r, int g, int b, int a)</h4>
 <p>Converts a color to int to be used in drawing functions. Use values from <code>0..255</code>.</p>
+<h3 id='save_progress'>save_progress</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=save_progress">save_progress</a></p>
+</blockquote>
+<h4 id='bool-save_progress'>bool save_progress()</h4>
+<p>Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the <a href="#ON">ON</a>.SAVE callback. Fails and returns false, if you&#39;re trying to save too often (2s).</p>
+<h3 id='save_script'>save_script</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=save_script">save_script</a></p>
+</blockquote>
+<h4 id='bool-save_script'>bool save_script()</h4>
+<p>Runs the <a href="#ON">ON</a>.SAVE callback. Fails and returns false, if you&#39;re trying to save too often (2s).</p>
 <h3 id='script_enabled'>script_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=script_enabled">script_enabled</a></p>
@@ -4616,6 +4652,12 @@ you&#39;re standing on, not real level coordinates.</p>
 </blockquote>
 <h4 id='float-get_zoom_level'>float get_zoom_level()</h4>
 <p>Get the current set zoom level</p>
+<h3 id='position_is_valid'>position_is_valid</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=position_is_valid">position_is_valid</a></p>
+</blockquote>
+<h4 id='bool-position_is_valid-float-x-float-y-LAYER-layer-POS_TYPE-flags'>bool position_is_valid(float x, float y, <a href="#LAYER">LAYER</a> layer, <a href="#POS_TYPE">POS_TYPE</a> flags)</h4>
+<p>Check if position satifies the given <a href="#POS_TYPE">POS_TYPE</a> flags, to be used in a custom is_valid function procedural for spawns.</p>
 <h3 id='screen_aabb'>screen_aabb</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_aabb">screen_aabb</a></p>
@@ -4805,7 +4847,7 @@ Use empty table as argument to reset to the game default</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=default_spawn_is_valid">default_spawn_is_valid</a></p>
 </blockquote>
-<h4 id='bool-default_spawn_is_valid-float-x-float-y-int-layer'>bool default_spawn_is_valid(float x, float y, int layer)</h4>
+<h4 id='bool-default_spawn_is_valid-float-x-float-y-LAYER-layer'>bool default_spawn_is_valid(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
 <p>Default function in spawn definitions to check whether a spawn is valid or not</p>
 <h3 id='define_extra_spawn'>define_extra_spawn</h3>
 <blockquote>
@@ -5052,6 +5094,22 @@ Will return the string of currently choosen language</p>
 <h4 id='STRINGID-hash_to_stringid-int-hash'><a href="#Aliases">STRINGID</a> hash_to_stringid(int hash)</h4>
 <p>Convert the hash to stringid
 Check <a href="game_data/strings00_hashed.str">strings00_hashed.str</a> for the hash values, or extract assets with modlunky and check those.</p>
+<h3 id='set_level_string'>set_level_string</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- set the level string shown in hud, journal and game over</span>
+<span class="c1">-- also change the one used in transitions for consistency</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">screen_next</span> <span class="o">==</span> <span class="n">SCREEN</span><span class="p">.</span><span class="n">LEVEL</span> <span class="k">then</span>
+        <span class="kd">local</span> <span class="n">level_str</span> <span class="o">=</span> <span class="s2">"test"</span> <span class="o">..</span> <span class="nb">tostring</span><span class="p">(</span><span class="n">state</span><span class="p">.</span><span class="n">level_count</span><span class="p">)</span>
+        <span class="n">set_level_string</span><span class="p">(</span><span class="n">level_str</span><span class="p">)</span>
+        <span class="n">change_string</span><span class="p">(</span><span class="n">hash_to_stringid</span><span class="p">(</span><span class="mh">0xda7c0c5b</span><span class="p">),</span> <span class="n">F</span><span class="s2">"{level_str} COMPLETED!"</span><span class="p">)</span>
+    <span class="k">end</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">PRE_LOAD_SCREEN</span><span class="p">)</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_level_string">set_level_string</a></p>
+</blockquote>
+<h4 id='nil-set_level_string-string-str'>nil set_level_string(string str)</h4>
+<p>Set the level number shown in the hud and journal to any string. This is reset to the default &quot;%d-%d&quot; automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level. Use &quot;%d-%d&quot; to reset to default manually. Does not affect the &quot;...COMPLETED!&quot; message in transitions or lines in &quot;Dear Journal&quot;, you need to edit them separately with <code>change_string</code>.</p>
 <h2 id='Texture-functions'>Texture functions</h2><h3 id='define_texture'>define_texture</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_texture">define_texture</a></p>
@@ -24726,6 +24784,94 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSEUI_VISIBILITY.SLIDING_UP">SLIDING_UP</a></td>
 <td>3</td>
 <td></td>
+</tr>
+</tbody></table>
+<h2 id='POS_TYPE'>POS_TYPE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE">POS_TYPE</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.FLOOR">FLOOR</a></td>
+<td>POS_TYPE::FLOOR</td>
+<td>On top of solid floor<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.CEILING">CEILING</a></td>
+<td>POS_TYPE::CEILING</td>
+<td>Below solid ceiling<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.AIR">AIR</a></td>
+<td>POS_TYPE::AIR</td>
+<td>Is a non-solid tile (no need to explicitly add this to everything)<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.WALL">WALL</a></td>
+<td>POS_TYPE::WALL</td>
+<td>Next to a wall<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.ALCOVE">ALCOVE</a></td>
+<td>POS_TYPE::ALCOVE</td>
+<td>Has a floor, ceiling and exactly one wall<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.PIT">PIT</a></td>
+<td>POS_TYPE::PIT</td>
+<td>Has a floor, two walls and no ceiling<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.HOLE">HOLE</a></td>
+<td>POS_TYPE::HOLE</td>
+<td>Air pocket surrounded by floors<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.WATER">WATER</a></td>
+<td>POS_TYPE::WATER</td>
+<td>Is in water (otherwise assumed not in water)<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.LAVA">LAVA</a></td>
+<td>POS_TYPE::LAVA</td>
+<td>Is in lava (otherwise assumed not in lava)<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.SAFE">SAFE</a></td>
+<td>POS_TYPE::SAFE</td>
+<td>Avoid hazards, like certain traps, shops and any special floor<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.EMPTY">EMPTY</a></td>
+<td>POS_TYPE::EMPTY</td>
+<td>Has nothing but decoration and background in it<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.SOLID">SOLID</a></td>
+<td>POS_TYPE::SOLID</td>
+<td>Is inside solid floor or activefloor<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.DEFAULT">DEFAULT</a></td>
+<td>POS_TYPE::DEFAULT</td>
+<td>FLOOR</td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.WALL_LEFT">WALL_LEFT</a></td>
+<td>POS_TYPE::WALL_LEFT</td>
+<td>Next to a wall on the left<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE.WALL_RIGHT">WALL_RIGHT</a></td>
+<td>POS_TYPE::WALL_RIGHT</td>
+<td>Next to a wall on the right<br/></td>
 </tr>
 </tbody></table>
 <h2 id='PRNG_CLASS'>PRNG_CLASS</h2>
