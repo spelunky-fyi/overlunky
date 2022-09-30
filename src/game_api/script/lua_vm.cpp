@@ -1701,11 +1701,24 @@ end
     /// Get the rva for a pattern name
     lua["get_rva"] = [](std::string_view address_name) -> size_t
     {
-        return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe");
+        return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe"); // shouldn't this be  - Memory::get().at_exe(0) ?
     };
 
     /// Log to spelunky.log
     lua["log_print"] = game_log;
+
+    /// Immediately ends the run with the death screen, also calls the save_progress
+    lua["call_death_screen"] = call_death_screen;
+
+    /// Saves the game to savegame.sav and displays spinning cog in the bottom right corner
+    lua["save_progress"] = save_progress;
+
+    /// Edit string that's used to display level-world in the hud and journal, you can set it to anything, it doesn't even need to include number
+    /// the default is "%d-%d", remember that this does not apply to everything that displays world-level numbers, there are a few strings in the string files, you can change those with change_string function
+    lua["set_level_string"] = [](std::u16string str)
+    {
+        return set_level_string(str);
+    };
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

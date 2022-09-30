@@ -1223,6 +1223,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "show_journal"sv,
+        // aka render_journal
         // Break on GameManager.journal_ui.state, open the journal
         PatternCommandBuffer{}
             .find_inst("88 5F 04 80 FB 0B 0F"_gh)
@@ -1807,6 +1808,51 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x41\x89\xd9\xff\x90\x78\x01\x00\x00"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        // Set write bp on write_to_file, take a death in game, return from write_to_file, then from the next function as well
+        // you should be now in the death_screen function, the first call is also the save_progress function
+        "death_screen"sv,
+        PatternCommandBuffer{}
+            .find_inst("4D 0F 44 C1 49 8B 88 F0 12 00 00"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // see death_screen
+        "save_progress"sv,
+        PatternCommandBuffer{}
+            .find_inst("48 8B 90 F0 12 00 00 8B 5A 28"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // find string "%d-%d" go to it's address, look for refrences to that address, one will be inside the render hud funciton
+        // we want the address of the offset (not whole instruction)
+        "hud_level_text"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("41 0F B6 87 D5 02 00 00"_gh)
+            .find_next_inst("4C 8D 05"_gh)
+            .offset(0x3)
+            .at_exe(),
+    },
+    {
+        // same as hud_level_text but we want one in the show_journal/render_journal
+        "journal_level_text"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("44 0F B6 C9 0F B6 42 6A"_gh)
+            .find_next_inst("4C 8D 05"_gh)
+            .offset(0x3)
+            .at_exe(),
+    },
+    {
+        // see hud_level_text, go to address -0x8 from the "%d-%d", look for references to that address, should be only one
+        "journal_map_level_text"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("8B 49 1C 48 8D 15"_gh)
+            .find_next_inst("4C 8D 05"_gh)
+            .offset(0x3)
+            .at_exe(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

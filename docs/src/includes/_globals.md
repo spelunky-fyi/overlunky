@@ -1192,6 +1192,15 @@ Returns true if a bit is set in the flags
 ## Generic functions
 
 
+### call_death_screen
+
+
+> Search script examples for [call_death_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=call_death_screen)
+
+#### nil call_death_screen()
+
+Immediately ends the run with the death screen, also calls the save_progress
+
 ### change_poison_timer
 
 
@@ -1412,6 +1421,15 @@ Adds a command that can be used in the console.
 #### [uColor](#Aliases) rgba(int r, int g, int b, int a)
 
 Converts a color to int to be used in drawing functions. Use values from `0..255`.
+
+### save_progress
+
+
+> Search script examples for [save_progress](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_progress)
+
+#### nil save_progress()
+
+Saves the game to savegame.sav and displays spinning cog in the bottom right corner
 
 ### script_enabled
 
@@ -2725,6 +2743,16 @@ Will return the string of currently choosen language
 
 Convert the hash to stringid
 Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+
+### set_level_string
+
+
+> Search script examples for [set_level_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_string)
+
+#### nil set_level_string(string str)
+
+Edit string that's used to display level-world in the hud and journal, you can set it to anything, it doesn't even need to include number
+the default is "%d-%d", remember that this does not apply to everything that displays world-level numbers, there are a few strings in the string files, you can change those with change_string function
 
 ## Texture functions
 

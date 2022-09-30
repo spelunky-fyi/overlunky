@@ -1172,6 +1172,17 @@ function get_rva(address_name) end
 ---@param message string
 ---@return nil
 function log_print(message) end
+---Immediately ends the run with the death screen, also calls the save_progress
+---@return nil
+function call_death_screen() end
+---Saves the game to savegame.sav and displays spinning cog in the bottom right corner
+---@return nil
+function save_progress() end
+---Edit string that's used to display level-world in the hud and journal, you can set it to anything, it doesn't even need to include number
+---the default is "%d-%d", remember that this does not apply to everything that displays world-level numbers, there are a few strings in the string files, you can change those with change_string function
+---@param str string
+---@return nil
+function set_level_string(str) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -6838,6 +6849,7 @@ ON = {
   CONSTELLATION = 19,
   CREDITS = 17,
   DEATH = 14,
+  DEATH_MESSAGE = 128,
   FRAME = 101,
   GAMEFRAME = 108,
   GUIFRAME = 100,
@@ -6852,11 +6864,13 @@ ON = {
   ONLINE_LOBBY = 29,
   OPTIONS = 5,
   POST_LEVEL_GENERATION = 112,
+  POST_LOAD_SCREEN = 127,
   POST_ROOM_GENERATION = 111,
   PRE_GET_RANDOM_ROOM = 113,
   PRE_HANDLE_ROOM_TILES = 114,
   PRE_LEVEL_GENERATION = 110,
   PRE_LOAD_LEVEL_FILES = 109,
+  PRE_LOAD_SCREEN = 126,
   PROLOGUE = 2,
   RECAP = 20,
   RENDER_POST_DRAW_DEPTH = 122,
