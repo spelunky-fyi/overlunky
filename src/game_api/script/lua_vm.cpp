@@ -1710,8 +1710,18 @@ end
     /// Immediately ends the run with the death screen, also calls the save_progress
     lua["load_death_screen"] = call_death_screen;
 
-    /// Saves the game to savegame.sav and displays spinning cog in the bottom right corner
-    lua["save_progress"] = save_progress;
+    /// Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+    lua["save_progress"] = []() -> bool
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (backend->last_save <= State::get().ptr()->time_startup - 120)
+        {
+            backend->manual_save = true;
+            save_progress();
+            return true;
+        }
+        return false;
+    };
 
     /// Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level. Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
     lua["set_level_string"] = [](std::u16string str)

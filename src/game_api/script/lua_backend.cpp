@@ -508,7 +508,7 @@ bool LuaBackend::update()
                 }
                 case ON::SAVE:
                 {
-                    if (g_state->loading != state.loading && g_state->loading == 1)
+                    if ((g_state->loading != state.loading && g_state->loading == 1) || manual_save)
                     {
                         handle_function(callback.func, SaveContext{get_root(), get_name()});
                         callback.lastRan = now;
@@ -572,6 +572,12 @@ bool LuaBackend::update()
         state.loading = g_state->loading;
         state.reset = (g_state->quest_flags & 1);
         state.quest_flags = g_state->quest_flags;
+
+        if (manual_save)
+        {
+            manual_save = false;
+            last_save = g_state->time_startup;
+        }
     }
     catch (const sol::error& e)
     {
