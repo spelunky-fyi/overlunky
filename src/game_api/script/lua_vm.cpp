@@ -1708,13 +1708,12 @@ end
     lua["log_print"] = game_log;
 
     /// Immediately ends the run with the death screen, also calls the save_progress
-    lua["call_death_screen"] = call_death_screen;
+    lua["load_death_screen"] = call_death_screen;
 
     /// Saves the game to savegame.sav and displays spinning cog in the bottom right corner
     lua["save_progress"] = save_progress;
 
-    /// Edit string that's used to display level-world in the hud and journal, you can set it to anything, it doesn't even need to include number
-    /// the default is "%d-%d", remember that this does not apply to everything that displays world-level numbers, there are a few strings in the string files, you can change those with change_string function
+    /// Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level. Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
     lua["set_level_string"] = [](std::u16string str)
     {
         return set_level_string(str);

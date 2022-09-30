@@ -808,7 +808,8 @@ bool LuaBackend::pre_load_screen()
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen_next <= ON::LEVEL && (ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
     {
-        set_level_string(L"%d-%d");
+        using namespace std::string_view_literals;
+        set_level_string(u"%d-%d"sv);
     }
 
     for (auto& [id, callback] : callbacks)
