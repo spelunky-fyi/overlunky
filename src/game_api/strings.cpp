@@ -132,10 +132,12 @@ const char16_t** get_strings_table()
 STRINGID hash_to_stringid(uint32_t hash)
 {
     const auto& string_hashes{get_string_hashes()};
-    auto it = string_hashes.find(hash);
-    if (it != string_hashes.end())
+    for (auto &it : string_hashes)
     {
-        return it->second;
+        if (it == hash)
+        {
+            return (STRINGID)(&it - &string_hashes[0]);
+        }
     }
 
     return g_original_string_ids_end;
@@ -190,16 +192,23 @@ void change_string(STRINGID string_id, std::u16string_view str)
     else
     {
         auto strings_table = get_strings_table();
-
         const char16_t** old_string = strings_table + string_id;
 
-        const auto data_size = str.size() * sizeof(char16_t);
-        char16_t* new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
-        new_string[str.size()] = u'\0';
-        memcpy(new_string, str.data(), data_size);
+        if (std::char_traits<char16_t>::length(*old_string) < str.length())
+        {
+            const auto data_size = str.size() * sizeof(char16_t);
+            char16_t* new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
+            new_string[str.size()] = u'\0';
+            memcpy(new_string, str.data(), data_size);
 
-        game_free((void*)*old_string);
-        *old_string = new_string;
+            game_free((void*)*old_string);
+            *old_string = new_string;
+        }
+        else
+        {
+            memcpy(const_cast<char16_t*>(*old_string), str.data(), str.length() * sizeof(char16_t));
+            *(const_cast<char16_t*>(*old_string) + str.length()) = NULL;
+        }
     }
 }
 
