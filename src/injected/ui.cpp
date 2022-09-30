@@ -4804,10 +4804,17 @@ int parse_time(std::string time)
 
 void render_savegame()
 {
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
     if (options["disable_savegame"])
     {
-        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Note: You have blocked game saves in the options...");
+        ImGui::TextWrapped("Note: You have blocked game saves in the options, all changes will be temporary unless you click the big button below...");
     }
+    else
+    {
+        ImGui::TextWrapped("Note: Changes are not saved to file automatically, you have to click the big button below...");
+    }
+    ImGui::PopStyleColor(1);
+
     ImGui::PushID("Journal");
     if (ImGui::CollapsingHeader("Journal"))
     {
@@ -5040,10 +5047,17 @@ void render_savegame()
     ImGui::PopID();
 
     ImGui::PushID("UnlockAll");
-    if (ImGui::CollapsingHeader("Big scary button to unlock everything"))
+    if (ImGui::CollapsingHeader("Save changes or unlock everything"))
     {
         ImGui::PushFont(bigfont);
         ImGui::PushItemWidth(ImGui::GetContentRegionMax().x);
+        if (ImGui::Button("Save changes", {ImGui::GetContentRegionMax().x, 0}))
+        {
+            const bool last_state = options["disable_savegame"];
+            options["disable_savegame"] = false;
+            UI::save_progress();
+            options["disable_savegame"] = last_state;
+        }
         if (ImGui::Button("Unlock Everything*", {ImGui::GetContentRegionMax().x, 0}))
         {
             g_save->tutorial_state = 4;

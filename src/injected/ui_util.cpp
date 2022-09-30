@@ -683,3 +683,8 @@ bool UI::get_focus()
 {
     return ::get_game_manager()->game_props->game_has_focus;
 }
+
+void UI::save_progress()
+{
+    ::save_progress();
+}

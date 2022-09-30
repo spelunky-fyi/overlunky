@@ -79,4 +79,5 @@ class UI
     static std::vector<uint32_t> get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer);
     static bool get_focus();
     static float get_spark_distance(SparkTrap* ent);
+    static void save_progress();
 };
