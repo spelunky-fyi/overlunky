@@ -985,6 +985,9 @@ void register_usertypes(sol::state& lua)
     /// Default function in spawn definitions to check whether a spawn is valid or not
     lua["default_spawn_is_valid"] = default_spawn_is_valid;
 
+    /// Check if position satifies the given POS_TYPE flags, to be used in a custom is_valid function procedural for spawns.
+    lua["position_is_valid"] = position_is_valid;
+
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
     /// The callback signature is `bool pre_tile_code(x, y, layer, room_template)`
     /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
@@ -1916,5 +1919,40 @@ void register_usertypes(sol::state& lua)
             lua["PROCEDURAL_CHANCE"][std::move(clean_chance_name)] = chance.id;
         }
     }
+
+    lua.create_named_table("POS_TYPE", "FLOOR", POS_TYPE::FLOOR, "CEILING", POS_TYPE::CEILING, "AIR", POS_TYPE::AIR, "WALL", POS_TYPE::WALL, "ALCOVE", POS_TYPE::ALCOVE, "PIT", POS_TYPE::PIT, "HOLE", POS_TYPE::HOLE, "WATER", POS_TYPE::WATER, "LAVA", POS_TYPE::LAVA, "SAFE", POS_TYPE::SAFE, "EMPTY", POS_TYPE::EMPTY, "SOLID", POS_TYPE::SOLID, "DEFAULT", POS_TYPE::DEFAULT, "WALL_LEFT", POS_TYPE::WALL_LEFT, "WALL_RIGHT", POS_TYPE::WALL_RIGHT);
+
+    /* POS_TYPE
+    // FLOOR
+    // On top of solid floor
+    // CEILING
+    // Below solid ceiling
+    // AIR
+    // Is a non-solid tile (no need to explicitly add this to everything)
+    // WALL
+    // Next to a wall
+    // WALL_LEFT
+    // Next to a wall on the left
+    // WALL_RIGHT
+    // Next to a wall on the right
+    // ALCOVE
+    // Has a floor, ceiling and exactly one wall
+    // PIT
+    // Has a floor, two walls and no ceiling
+    // HOLE
+    // Air pocket surrounded by floors
+    // WATER
+    // Is in water (otherwise assumed not in water)
+    // LAVA
+    // Is in lava (otherwise assumed not in lava)
+    // SAFE
+    // Avoid hazards, like certain traps, shops and any special floor
+    // EMPTY
+    // Has nothing but decoration and background in it
+    // SOLID
+    // Is inside solid floor or activefloor
+    // DEFAULT
+    // FLOOR | SAFE | EMPTY
+    */
 }
 }; // namespace NLevel

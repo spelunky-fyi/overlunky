@@ -412,7 +412,7 @@
 0x39a8e1d0: Tournament
 0x5dac4189: Joust
 0x0df20beb: Frantic
-0xa82ec762: Custom <SYS_ACCEPT_SECONDARY/>
+0xf1afeb6b: Custom <LOG_ACCEPT/>
 0xdb983fba: Favorite
 0x088d9796: Casual: An easy-going ruleset with items.
 0x8790dcfd: Tournament: Fast-paced, itemless rules.
@@ -543,7 +543,7 @@
 0x0252efc9: Very High
 0xce51c026: Items
 0xad2dfde9: Choose which items are available in crates and which you start holding.
-0x95e52f01: <SYS_ACCEPT_SECONDARY/>
+0xe92b22b6: <LOG_ACCEPT/>
 0xe0a88588: <SYS_START/> Next
 0xbeb370c6: Off
 0x66c32276: ALL
@@ -2338,9 +2338,11 @@
 ########################################
 #### Online
 ########################################
+0xa6fc2578: <SYS_ACCEPT/> Report
 0x218b8bc1: Report
 0x25dbcf8a: Describe the inappropiate content or offensive behaviour.
 0x495e5536: <SYS_ACCEPT/> Show Gamercard
+0x82926172: Show Gamercard
 0x4a63b6fd: Feedback
 0x3ab503a8: Describe the bug or suggestion you have encountered while playing Spelunky 2
 0xf0bf05c3: Data to ensure integrity and authenticity of the run will be made public, contact privacy@blitworks.com for removal requests.
@@ -2480,6 +2482,7 @@
 0xc6d6bd22: Chosen One
 0xcf2bb4d1: Parenthood
 0x6cf3d31d: Obtain all other trophies.
+0x2662f15c: Obtain all other achievements.
 0xb5f5fa73: Unlock the entrance.
 0x778e6f43: Make it past 1-4 in a non-seeded run.
 0x23683cf1: Make it past Olmec's Lair in a non-seeded run.
@@ -2487,7 +2490,7 @@
 0xbd5d3f5b: Complete the game in a non-seeded run.
 0xfa7a2042: Complete the game without using shortcuts in a non-seeded, single-player run.
 0x0c7256c2: Complete the game in 10 minutes or less without shortcuts in a non-seeded, single-player run.
-0x377cea8c: Complete the game without collecting any treasure and without using shortcuts in a non-seeded, single-player run.
+0xa34b89d0: Beat the game without collecting any treasure avoiding shortcuts in a non-seeded single-player run.
 0xe778d9fd: Reach the Sunken City in a non-seeded, single-player run.
 0xb2a2812a: Complete the game by defeating Hundun in a non-seeded, single-player run.
 0x45b2bc29: Reach the Cosmic Ocean in a non-seeded, single-player run.

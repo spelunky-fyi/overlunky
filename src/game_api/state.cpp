@@ -342,28 +342,28 @@ void State::zoom(float level)
         switch (roomx)
         {
         case 1:
-            level = 9.50f;
+            level = 9.522f;
             break;
         case 2:
-            level = 16.29f;
+            level = 16.324f;
             break;
         case 3:
-            level = 23.08f;
+            level = 23.126f;
             break;
         case 4:
-            level = 29.87f;
+            level = 29.928f;
             break;
         case 5:
-            level = 36.66f;
+            level = 36.730f;
             break;
         case 6:
-            level = 43.45f;
+            level = 43.532f;
             break;
         case 7:
-            level = 50.24f;
+            level = 50.334f;
             break;
         case 8:
-            level = 57.03f;
+            level = 57.135f;
             break;
         default:
             level = 13.5f;

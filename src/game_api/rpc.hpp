@@ -79,6 +79,7 @@ void warp(uint8_t w, uint8_t l, uint8_t t);
 void set_seed(uint32_t seed);
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type);
 void modify_sparktraps(float angle_increment = 0.015, float distance = 3.0);
+float* get_sparktraps_parameters_ptr(); // for UI
 void activate_sparktraps_hack(bool activate);
 void set_storage_layer(LAYER layer);
 void set_kapala_blood_threshold(uint8_t threshold);
@@ -134,3 +135,6 @@ void update_liquid_collision_at(float x, float y, bool add);
 bool disable_floor_embeds(bool disable);
 void set_cursepot_ghost_enabled(bool enable);
 void game_log(std::string message);
+void call_death_screen();
+void save_progress();
+void set_level_string(std::u16string_view text);
