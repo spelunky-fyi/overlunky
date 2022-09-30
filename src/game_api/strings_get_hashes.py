@@ -29,7 +29,7 @@ for line in data:
         continue
     if line[0] == "#":
         continue
-    print("    {" + line[0:10] + "},")
+    print("    " + line[0:10] + ",")
 
 print(
     """
