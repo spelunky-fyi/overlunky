@@ -1714,7 +1714,7 @@ end
     lua["save_progress"] = save_progress;
 
     /// Edit string that's used to display level-world in the hud and journal, you can set it to anything, it doesn't even need to include number
-    /// the default is "%d-%d", remember that this those not apply to everything that displays world-level numbers, there is few strings in the string files, you can change those with change_string function
+    /// the default is "%d-%d", remember that this does not apply to everything that displays world-level numbers, there are a few strings in the string files, you can change those with change_string function
     lua["set_level_string"] = [](std::u16string str)
     {
         return set_level_string(str);

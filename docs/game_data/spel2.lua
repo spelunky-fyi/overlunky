@@ -1179,7 +1179,7 @@ function call_death_screen() end
 ---@return nil
 function save_progress() end
 ---Edit string that's used to display level-world in the hud and journal, you can set it to anything, it doesn't even need to include number
----the default is "%d-%d", remember that this those not apply to everything that displays world-level numbers, there is few strings in the string files, you can change those with change_string function
+---the default is "%d-%d", remember that this does not apply to everything that displays world-level numbers, there are a few strings in the string files, you can change those with change_string function
 ---@param str string
 ---@return nil
 function set_level_string(str) end

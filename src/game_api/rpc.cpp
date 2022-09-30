@@ -1869,8 +1869,6 @@ void set_level_string(std::u16string_view text)
 
     if (text_data_length == 0 || text_data_length < text.length())
     {
-
-        // 25 00 6C 00 73 00 0A 00
         if (text_data_length != 0)
         {
             VirtualFree(data, 0, MEM_RELEASE);

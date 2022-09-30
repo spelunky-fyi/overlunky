@@ -2752,7 +2752,7 @@ Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values
 #### nil set_level_string(string str)
 
 Edit string that's used to display level-world in the hud and journal, you can set it to anything, it doesn't even need to include number
-the default is "%d-%d", remember that this those not apply to everything that displays world-level numbers, there is few strings in the string files, you can change those with change_string function
+the default is "%d-%d", remember that this does not apply to everything that displays world-level numbers, there are a few strings in the string files, you can change those with change_string function
 
 ## Texture functions
 
