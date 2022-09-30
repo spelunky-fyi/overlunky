@@ -287,6 +287,12 @@ set_callback(function(ctx)
 end, ON.GUIFRAME)
 
 set_callback(function()
+    if mode == 1 and pause and not rerecording and state.time_level == 2 then
+        state.pause = 0x2
+    end
+end, ON.FRAME)
+
+set_callback(function()
     if rerecord_level ~= -1 and state.level_count ~= rerecord_level then
         print("Skipping level")
         state.level_count = state.level_count + 1
@@ -317,7 +323,7 @@ set_callback(function()
         end
         if mode == 1 and pause and state.time_level >= rerecord_frame then -- record
             if state.pause == 0 then
-                state.pause = 0x20
+                state.pause = 0x2
             end
         elseif mode == 2 or state.time_level < rerecord_frame and state.time_level < #frames[state.level_count+1] then -- playback
             steal_input(players[1].uid)
@@ -378,7 +384,7 @@ set_callback(function()
                 stolen = false
                 stopped = true
                 if pause then
-                    state.pause = 0x20
+                    state.pause = 0x2
                 end
                 mode = 1
             elseif stolen and state.time_level <= 1 then
@@ -387,7 +393,7 @@ set_callback(function()
         end
         if mode == 1 and state.time_level == rerecord_frame then
             if pause then
-                state.pause = 0x20
+                state.pause = 0x2
             end
 
             if stolen then
@@ -493,7 +499,7 @@ set_callback(function()
             if state.logic.olmec_cutscene then
                 state.logic.olmec_cutscene.timer = 809
                 if pause and mode == 1 and state.time_level >= rerecord_frame then
-                    state.pause = 0x20
+                    state.pause = 0x2
                 end
             end
         end)
@@ -507,7 +513,7 @@ end, ON.POST_LEVEL_GENERATION)
             cutcb = set_callback(function()
                 if state.pause == 0 then
                     clear_callback(cutcb)
-                    state.pause = 0x20
+                    state.pause = 0x2
                 end
             end, ON.GUIFRAME)
         end

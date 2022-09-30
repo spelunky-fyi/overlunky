@@ -499,18 +499,138 @@ struct CommunityChance;
 using ChanceFunc = void(const CommunityChance& self, float x, float y, Layer* layer);
 using ChanceValidPlacementFunc = bool(const CommunityChance& self, float x, float y, Layer* layer);
 
-auto g_DefaultTestFunc = [](float x, float y, Layer* layer)
+auto g_MaskTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
 {
     if (!layer->get_grid_entity_at(x, y))
     {
-        if (Entity* floor = layer->get_grid_entity_at(x, y - 1.0f))
-        {
-            static auto entrance = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
-            return floor->type->id != entrance && (floor->type->properties_flags & (1 << 20)) != 0; // Can spawn monsters on top
-        }
+        if (!layer->get_entity_at(x, y - 0.229f, flags, 0, 0, 0))
+            return true;
     }
     return false;
 };
+
+auto g_SolidTestFunc = [](float x, float y, Layer* layer)
+{
+    if (Entity* floor = layer->get_grid_entity_at(x, y))
+    {
+        return (floor->flags & (1 << 2)) != 0; // Solid
+    }
+    return false;
+};
+
+auto g_SafeTestFunc = [](float x, float y, Layer* layer)
+{
+    if (Entity* floor = layer->get_grid_entity_at(x, y))
+    {
+        if ((floor->flags & (1 << 1)) != 0)
+        {
+            if ((floor->flags & (1 << 5)) == 0)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+};
+
+auto g_PositionTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
+{
+    uint32_t default_mask = 0x6180;
+    uint32_t empty_mask = 0x61bf;
+
+    if (flags & (uint32_t)POS_TYPE::DEFAULT)
+        flags = (uint32_t)POS_TYPE::FLOOR | (uint32_t)POS_TYPE::SAFE | (uint32_t)POS_TYPE::EMPTY;
+
+    if (flags & (uint32_t)POS_TYPE::WATER || flags & (uint32_t)POS_TYPE::LAVA)
+    {
+        default_mask -= 0x6000;
+        empty_mask -= 0x6000;
+    }
+
+    if (flags & (uint32_t)POS_TYPE::FLOOR)
+    {
+        if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x, y - 1.0f, layer))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::CEILING)
+    {
+        if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x, y + 1.0f, layer))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::AIR)
+    {
+        if (!g_MaskTestFunc(x, y, layer, default_mask))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::WALL)
+    {
+        if (!g_MaskTestFunc(x, y, layer, default_mask) || (!g_SolidTestFunc(x + 1.0f, y, layer) && !g_SolidTestFunc(x - 1.0f, y, layer)))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::WALL_LEFT)
+    {
+        if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x - 1.0f, y, layer))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::WALL_RIGHT)
+    {
+        if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x + 1.0f, y, layer))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::ALCOVE)
+    {
+        if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x, y + 1.0f, layer) || !g_SolidTestFunc(x, y - 1.0f, layer) || (g_SolidTestFunc(x + 1.0f, y, layer) == g_SolidTestFunc(x - 1.0f, y, layer)))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::PIT)
+    {
+        if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x - 1.0f, y, layer) || !g_SolidTestFunc(x + 1.0f, y, layer) || !g_SolidTestFunc(x, y - 1.0f, layer) || g_SolidTestFunc(x, y + 1.0f, layer))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::HOLE)
+    {
+        if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x - 1.0f, y, layer) || !g_SolidTestFunc(x + 1.0f, y, layer) || !g_SolidTestFunc(x, y - 1.0f, layer) || !g_SolidTestFunc(x, y + 1.0f, layer))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::WATER)
+    {
+        if (!g_MaskTestFunc(x, y, layer, 0x180) || g_MaskTestFunc(x, y, layer, 0x2000))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::LAVA)
+    {
+        if (!g_MaskTestFunc(x, y, layer, 0x180) || g_MaskTestFunc(x, y, layer, 0x4000))
+            return false;
+    }
+    auto box = AABB(x - 0.49f, y + 0.49f, x + 0.49f, y - 0.49f);
+    auto layer_num = (LAYER)(layer->is_back_layer ? 1 : 0);
+    if (flags & (uint32_t)POS_TYPE::SAFE)
+    {
+        if (!g_MaskTestFunc(x, y, layer, 0x2180) || !g_SafeTestFunc(x - 1.0f, y, layer) || !g_SafeTestFunc(x + 1.0f, y, layer) || !g_SafeTestFunc(x, y - 1.0f, layer) || !g_SafeTestFunc(x, y + 1.0f, layer))
+            return false;
+        if (is_inside_active_shop_room(x, y, layer_num))
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::EMPTY)
+    {
+        if (get_entities_overlapping_hitbox(0, empty_mask, box, layer_num).size() > 0)
+            return false;
+    }
+    if (flags & (uint32_t)POS_TYPE::SOLID)
+    {
+        if (!layer->get_entity_at(x, y, 0x180, 0, 0, 0))
+            return false;
+        if (Entity* floor = layer->get_grid_entity_at(x, y))
+            return (floor->flags & (1 << 2)) != 0;
+    }
+    return true;
+};
+
+auto g_DefaultTestFunc = [](float x, float y, Layer* layer)
+{
+    return g_PositionTestFunc(x, y, layer, (uint32_t)POS_TYPE::FLOOR | (uint32_t)POS_TYPE::SAFE | (uint32_t)POS_TYPE::EMPTY);
+};
+
 struct CommunityChance
 {
     std::string_view chance;
@@ -1872,9 +1992,16 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
     return false;
 }
 
-bool default_spawn_is_valid(float x, float y, uint8_t layer)
+bool default_spawn_is_valid(float x, float y, LAYER layer)
 {
-    return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
+    uint8_t correct_layer = enum_to_layer(layer);
+    return g_DefaultTestFunc(x, y, State::get().layer_local(correct_layer));
+}
+
+bool position_is_valid(float x, float y, LAYER layer, POS_TYPE flags)
+{
+    uint8_t correct_layer = enum_to_layer(layer);
+    return g_PositionTestFunc(x, y, State::get().layer_local(correct_layer), (uint32_t)flags);
 }
 
 void override_next_levels(std::vector<std::string> next_levels)

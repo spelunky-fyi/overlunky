@@ -269,6 +269,8 @@ class LuaBackend
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
     std::unordered_set<std::string> console_commands;
+    bool manual_save{false};
+    uint32_t last_save{0};
 
     ImDrawList* draw_list{nullptr};
 
