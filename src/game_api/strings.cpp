@@ -132,7 +132,7 @@ const char16_t** get_strings_table()
 STRINGID hash_to_stringid(uint32_t hash)
 {
     const auto& string_hashes{get_string_hashes()};
-    for (auto &it : string_hashes)
+    for (auto& it : string_hashes)
     {
         if (it == hash)
         {
