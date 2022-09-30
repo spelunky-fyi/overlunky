@@ -1593,9 +1593,6 @@ end
     /// Clears the name set with `add_custom_name`
     lua["clear_custom_name"] = clear_custom_name;
 
-    /// Sets the level string shown in the hud and journal. The maximum length is 5 characters. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar. Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately.
-    lua["set_level_string"] = set_level_string;
-
     /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
     lua["enter_door"] = enter_door;
 

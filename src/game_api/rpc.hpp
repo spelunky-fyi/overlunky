@@ -133,4 +133,3 @@ void update_liquid_collision_at(float x, float y, bool add);
 bool disable_floor_embeds(bool disable);
 void set_cursepot_ghost_enabled(bool enable);
 void game_log(std::string message);
-void set_level_string(std::wstring str);
