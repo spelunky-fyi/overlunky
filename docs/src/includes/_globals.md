@@ -1192,15 +1192,6 @@ Returns true if a bit is set in the flags
 ## Generic functions
 
 
-### call_death_screen
-
-
-> Search script examples for [call_death_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=call_death_screen)
-
-#### nil call_death_screen()
-
-Immediately ends the run with the death screen, also calls the save_progress
-
 ### change_poison_timer
 
 
@@ -1366,6 +1357,15 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 
 Same as `Player.is_female`
 
+### load_death_screen
+
+
+> Search script examples for [load_death_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_death_screen)
+
+#### nil load_death_screen()
+
+Immediately ends the run with the death screen, also calls the save_progress
+
 ### load_screen
 
 
@@ -1427,9 +1427,18 @@ Converts a color to int to be used in drawing functions. Use values from `0..255
 
 > Search script examples for [save_progress](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_progress)
 
-#### nil save_progress()
+#### bool save_progress()
 
-Saves the game to savegame.sav and displays spinning cog in the bottom right corner
+Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the [ON](#ON).SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+
+### save_script
+
+
+> Search script examples for [save_script](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_script)
+
+#### bool save_script()
+
+Runs the [ON](#ON).SAVE callback. Fails and returns false, if you're trying to save too often (2s).
 
 ### script_enabled
 
@@ -2095,6 +2104,15 @@ Gets the resolution (width and height) of the screen
 
 Get the current set zoom level
 
+### position_is_valid
+
+
+> Search script examples for [position_is_valid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=position_is_valid)
+
+#### bool position_is_valid(float x, float y, [LAYER](#LAYER) layer, [POS_TYPE](#POS_TYPE) flags)
+
+Check if position satifies the given [POS_TYPE](#POS_TYPE) flags, to be used in a custom is_valid function procedural for spawns.
+
 ### screen_aabb
 
 
@@ -2374,7 +2392,7 @@ Use empty table as argument to reset to the game default
 
 > Search script examples for [default_spawn_is_valid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_spawn_is_valid)
 
-#### bool default_spawn_is_valid(float x, float y, int layer)
+#### bool default_spawn_is_valid(float x, float y, [LAYER](#LAYER) layer)
 
 Default function in spawn definitions to check whether a spawn is valid or not
 
@@ -2747,12 +2765,25 @@ Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values
 ### set_level_string
 
 
+```lua
+-- set the level string shown in hud, journal and game over
+-- also change the one used in transitions for consistency
+set_callback(function()
+    if state.screen_next == SCREEN.LEVEL then
+        local level_str = "test" .. tostring(state.level_count)
+        set_level_string(level_str)
+        change_string(hash_to_stringid(0xda7c0c5b), F"{level_str} COMPLETED!")
+    end
+end, ON.PRE_LOAD_SCREEN)
+
+```
+
+
 > Search script examples for [set_level_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_string)
 
 #### nil set_level_string(string str)
 
-Edit string that's used to display level-world in the hud and journal, you can set it to anything, it doesn't even need to include number
-the default is "%d-%d", remember that this does not apply to everything that displays world-level numbers, there are a few strings in the string files, you can change those with change_string function
+Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level. Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
 
 ## Texture functions
 
