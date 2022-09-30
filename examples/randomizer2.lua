@@ -2513,12 +2513,6 @@ set_callback(function()
     change_string(hash_to_stringid(0xc719580c), "Bosses killed: " .. tostring(#bosses_killed) .. "/" .. tostring(options.door_bosses+1))
 end, ON.TRANSITION)
 
-set_callback(function()
-    if state.screen ~= SCREEN.TRANSITION then
-        set_level_string("%d-%d")
-    end
-end, ON.POST_LOAD_SCREEN)
-
 --[[set_callback(function(ctx)
     if options.door and options.status and state.screen >= ON.LEVEL and state.level_count+1 <= #level_order and state.loading == 0 then
         --ctx:draw_text(-0.065, 0.98, 28, F"{FakeWorld}-{FakeLevel}   {LevelNum}/{#level_order}", 0x44FFFFFF)
