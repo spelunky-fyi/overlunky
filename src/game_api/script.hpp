@@ -9,7 +9,7 @@
 #include <string>  // for string
 #include <vector>  // for vector
 
-struct PlayerInputs;
+struct PlayerSlot;
 class Ai;
 
 ImVec2 screenify(ImVec2 pos);
@@ -40,9 +40,9 @@ struct ScriptMessage
 
 struct ScriptInput
 {
-    uint16_t next;
-    uint16_t current;
-    PlayerInputs* orig_input;
+    uint16_t gameplay;
+    uint16_t all;
+    PlayerSlot* orig_input;
     Ai* orig_ai;
 };
 

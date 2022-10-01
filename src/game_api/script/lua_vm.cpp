@@ -88,7 +88,6 @@
 #include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 
 struct Illumination;
-struct PlayerInputs;
 
 void load_libraries(sol::state& lua)
 {
@@ -1056,81 +1055,117 @@ end
     /// Steal input from a Player or HH.
     lua["steal_input"] = [](int uid)
     {
+        static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
+        static const auto ana = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+        static const auto egg_child = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
+
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) != backend->script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return;
-        ScriptInput* newinput = new ScriptInput();
-        newinput->next = 0;
-        newinput->current = 0;
-        newinput->orig_input = player->input_ptr;
-        newinput->orig_ai = player->ai;
-        player->input_ptr = reinterpret_cast<PlayerInputs*>(newinput);
-        player->ai = 0;
-        backend->script_input[uid] = newinput;
-        // DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
+
+        if (player->type->id == player_ghost)
+        {
+            auto player_gh = player->as<PlayerGhost>();
+            ScriptInput* newinput = new ScriptInput();
+            newinput->gameplay = 0;
+            newinput->all = 0;
+            newinput->orig_input = player_gh->player_inputs;
+            player_gh->player_inputs = reinterpret_cast<PlayerSlot*>(newinput);
+            backend->script_input[uid] = newinput;
+        }
+        else
+        {
+            if (player->type->id < ana || player->type->id > egg_child)
+                return;
+
+            ScriptInput* newinput = new ScriptInput();
+            newinput->gameplay = 0;
+            newinput->all = 0;
+            newinput->orig_input = player->input_ptr;
+            newinput->orig_ai = player->ai;
+            player->input_ptr = reinterpret_cast<PlayerSlot*>(newinput);
+            player->ai = nullptr;
+            backend->script_input[uid] = newinput;
+        }
     };
     /// Return input
     lua["return_input"] = [](int uid)
     {
+        static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
+
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return;
-        // DEBUG("Return input: {:x} -> {:x}", player->input_ptr, backend->script_input[uid]->orig_input);
-        player->input_ptr = backend->script_input[uid]->orig_input;
-        player->ai = backend->script_input[uid]->orig_ai;
+
+        if (player->type->id == player_ghost)
+        {
+            auto player_gh = player->as<PlayerGhost>();
+            player_gh->player_inputs = backend->script_input[uid]->orig_input;
+        }
+        else
+        {
+            player->input_ptr = backend->script_input[uid]->orig_input;
+            player->ai = backend->script_input[uid]->orig_ai;
+        }
         backend->script_input.erase(uid);
     };
     /// Send input
     lua["send_input"] = [](int uid, INPUTS buttons)
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
-        if (backend->script_input.find(uid) != backend->script_input.end())
+        auto it = backend->script_input.find(uid);
+        if (it != backend->script_input.end())
         {
-            backend->script_input[uid]->current = buttons;
-            backend->script_input[uid]->next = buttons;
+            it->second->all = buttons;
+            it->second->gameplay = buttons;
         }
     };
-    /// Read input
+    /// Deprecated
+    /// Use `players[1].input.buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
+    /// Of course, you can get the player by other mean, it doesn't need to be the `players` table
+    /// You can only read inputs from actual players, HH don't have any inputs
     lua["read_input"] = [](int uid) -> INPUTS
     {
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
-            return (uint16_t)0;
-        ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
-        if (!IsBadReadPtr(readinput, 20))
+            return (INPUTS)0;
+
+        if (!IsBadReadPtr(player->input_ptr, 20))
         {
-            return readinput->next;
+            return player->input_ptr->buttons_gameplay;
         }
-        return (uint16_t)0;
+        return (INPUTS)0;
     };
+    /// Deprecated
     /// Read input that has been previously stolen with steal_input
+    /// Use `state.player_inputs.player_slots[player_slot].buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
     lua["read_stolen_input"] = [](int uid) -> INPUTS
     {
         LuaBackend* backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
         {
             // this means that the input is attacked to the real input and not stolen so return early
-            return (uint16_t)0;
+            return (INPUTS)0;
         }
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
-            return (uint16_t)0;
+            return (INPUTS)0;
         ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
         if (!IsBadReadPtr(readinput, 20))
         {
             readinput = reinterpret_cast<ScriptInput*>(readinput->orig_input);
             if (!IsBadReadPtr(readinput, 20))
             {
-                return readinput->next;
+                return readinput->gameplay;
             }
         }
-        return (uint16_t)0;
+        return (INPUTS)0;
     };
 
     /// Clears a callback that is specific to a screen.
