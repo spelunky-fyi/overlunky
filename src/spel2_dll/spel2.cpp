@@ -201,7 +201,7 @@ void Spelunky_FreeScript(SpelunkyScript* script)
     delete script;
 }
 
-void SpelunkyScipt_ReloadScript(SpelunkyScript* script, const char* file_path)
+void SpelunkyScript_ReloadScript(SpelunkyScript* script, const char* file_path)
 {
     std::string code = read_whole_file(file_path);
     if (!code.empty())
@@ -210,11 +210,11 @@ void SpelunkyScipt_ReloadScript(SpelunkyScript* script, const char* file_path)
     }
 }
 
-bool SpelunkyScipt_IsEnabled(SpelunkyScript* script)
+bool SpelunkyScript_IsEnabled(SpelunkyScript* script)
 {
     return script->is_enabled();
 }
-void SpelunkyScipt_SetEnabled(SpelunkyScript* script, bool enabled)
+void SpelunkyScript_SetEnabled(SpelunkyScript* script, bool enabled)
 {
     script->set_enabled(enabled);
 }

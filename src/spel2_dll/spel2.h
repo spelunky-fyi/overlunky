@@ -92,10 +92,10 @@ struct ID3D11Device* SpelunkyGetD3D11Device();
 SpelunkyScript* Spelunky_CreateScript(const char* file_path, bool enabled);
 void Spelunky_FreeScript(SpelunkyScript* script);
 
-void SpelunkyScipt_ReloadScript(SpelunkyScript* script, const char* file_path);
+void SpelunkyScript_ReloadScript(SpelunkyScript* script, const char* file_path);
 
-bool SpelunkyScipt_IsEnabled(SpelunkyScript* script);
-void SpelunkyScipt_SetEnabled(SpelunkyScript* script, bool enabled);
+bool SpelunkyScript_IsEnabled(SpelunkyScript* script);
+void SpelunkyScript_SetEnabled(SpelunkyScript* script, bool enabled);
 
 void SpelunkyScript_Update(SpelunkyScript* script);
 void SpelunkyScript_Draw(SpelunkyScript* script, struct ImDrawList* draw_list);
