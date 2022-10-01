@@ -120,7 +120,17 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_prizedispenser"] = &Entity::as<PrizeDispenser>;
 
     lua.new_usertype<Bomb>(
-        "Bomb", "scale_hor", &Bomb::scale_hor, "scale_ver", &Bomb::scale_ver, "is_big_bomb", &Bomb::is_big_bomb, sol::base_classes, sol::bases<Entity, Movable>());
+        "Bomb",
+        "sound",
+        &Bomb::sound,
+        "scale_hor",
+        &Bomb::scale_hor,
+        "scale_ver",
+        &Bomb::scale_ver,
+        "is_big_bomb",
+        &Bomb::is_big_bomb,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
 
     lua.new_usertype<Backpack>(
         "Backpack",
@@ -148,6 +158,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Bow>(
         "Bow",
+        "get_arrow_special_offset",
+        &Bow::get_arrow_special_offset,
         sol::base_classes,
         sol::bases<Entity, Movable, Purchasable>());
 
@@ -176,6 +188,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Hoverpack>(
         "Hoverpack",
+        "sound",
+        &Hoverpack::sound,
         "is_on",
         &Hoverpack::is_on,
         sol::base_classes,
@@ -213,6 +227,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Flame>(
         "Flame",
+        "sound",
+        &Flame::sound,
         "emitted_light",
         &Flame::emitted_light,
         sol::base_classes,
@@ -330,6 +346,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<ScepterShot>(
         "ScepterShot",
+        "sound",
+        &ScepterShot::sound,
         "speed",
         &ScepterShot::speed,
         "idle_timer",
@@ -348,6 +366,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<SoundShot>(
         "SoundShot",
+        "sound",
+        &SoundShot::sound,
         sol::base_classes,
         sol::bases<Entity, Movable, Projectile, LightShot>());
 
@@ -380,6 +400,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<TiamatShot>(
         "TiamatShot",
+        "sound",
+        &TiamatShot::sound,
         sol::base_classes,
         sol::bases<Entity, Movable, LightEmitter>());
 
@@ -484,6 +506,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<TV>(
         "TV",
+        "sound",
+        &TV::sound,
         "fx_button",
         &TV::fx_button,
         "emitted_light",
@@ -666,6 +690,8 @@ void register_usertypes(sol::state& lua)
         &PlayerGhost::player_inputs,
         "inventory",
         &PlayerGhost::inventory,
+        "sound",
+        &PlayerGhost::sound,
         "body_uid",
         &PlayerGhost::body_uid,
         "shake_timer",
@@ -695,6 +721,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<TreasureHook>(
         "TreasureHook",
+        "sound",
+        &TreasureHook::sound,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -722,6 +750,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<SkullDropTrap>(
         "SkullDropTrap",
+        "sound",
+        &SkullDropTrap::sound,
         "left_skull_uid",
         &SkullDropTrap::left_skull_uid,
         "middle_skull_uid",
@@ -785,6 +815,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<MiniGameShip>(
         "MiniGameShip",
+        "sound",
+        &MiniGameShip::sound,
         "velocity_x",
         &MiniGameShip::velocity_x,
         "velocity_y",
@@ -834,11 +866,15 @@ void register_usertypes(sol::state& lua)
         &CookFire::particles_flames,
         "particles_warp",
         &CookFire::particles_warp,
+        "sound",
+        &CookFire::sound,
         sol::base_classes,
         sol::bases<Entity, Movable, Torch>());
 
     lua.new_usertype<Orb>(
         "Orb",
+        "sound",
+        &Orb::sound,
         "timer",
         &Orb::timer,
         sol::base_classes,
@@ -911,6 +947,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<AnkhPowerup>(
         "AnkhPowerup",
+        "sound",
+        &AnkhPowerup::sound,
         "player",
         &AnkhPowerup::player,
         "fx_glow",
@@ -928,6 +966,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<YellowCape>(
         "YellowCape",
+        "sound",
+        &YellowCape::sound,
         sol::base_classes,
         sol::bases<Entity, Movable, Backpack, Cape>());
 
@@ -940,6 +980,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Boomerang>(
         "Boomerang",
+        "sound",
+        &Boomerang::sound,
         "trail",
         &Boomerang::trail,
         "distance",

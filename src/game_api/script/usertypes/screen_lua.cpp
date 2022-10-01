@@ -409,6 +409,8 @@ void register_usertypes(sol::state& lua)
         &ScreenCharacterSelect::particle_torchflame_smoke4,
         "particle_torchflame_flames4",
         &ScreenCharacterSelect::particle_torchflame_flames4,
+        "sound",
+        &ScreenCharacterSelect::sound,
         sol::base_classes,
         sol::bases<Screen>());
 

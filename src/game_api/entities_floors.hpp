@@ -10,9 +10,10 @@
 
 #include "aliases.hpp"        // for ENT_TYPE
 #include "entities_items.hpp" // for UnknownPointerGroup
-#include "entity.hpp"         // for SoundPosition (ptr only), Entity
+#include "entity.hpp"         // Entity
 
 struct Illumination;
+struct SoundMeta;
 
 enum FLOOR_SIDE
 {
@@ -140,7 +141,7 @@ class MainExit : public ExitDoor
   public:
     /// Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
     Entity* door_blocker;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     float top_value; // unsure
     float value;     // unsure
 };
@@ -230,7 +231,7 @@ class Altar : public Floor
 class SpikeballTrap : public Floor
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     Entity* chain;
     Entity* end_piece;
     /// 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause | going_up is only right when timer is 0, otherwise it just sits at the bottom
@@ -287,8 +288,8 @@ class SlidingWallCeiling : public Floor
     uint8_t state; // i labeled some as wrong_pause cause they are probably not used, they pause the movement but not the sound
     uint8_t unused1;
     uint16_t unused2;
-    SoundPosition* ball_rise;
-    SoundPosition* ball_drop;
+    SoundMeta* ball_rise;
+    SoundMeta* ball_drop;
 };
 
 class QuickSand : public Floor
@@ -317,7 +318,7 @@ class BigSpearTrap : public Floor
 class StickyTrap : public Floor
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     UnknownPointerGroup unknown1;
     int32_t attached_piece_uid;
     int32_t ball_uid;
@@ -382,7 +383,7 @@ class ForceField : public Floor
   public:
     Entity* first_item_beam; // if killed, the whole beam goes out
     Entity* fx;
-    SoundPosition* sound_pos; // starts at timer 140
+    SoundMeta* sound; // starts at timer 140
     Illumination* emitted_light;
     float bounce_force; /* unsure */ // max 1.0 ?
     bool is_on;                      // starts the sound + first_item_beam but not fx for some reason
@@ -404,7 +405,7 @@ class HorizontalForceField : public Floor
   public:
     Entity* first_item_beam; // if killed, the whole beam goes out
     Entity* fx;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     float laser_bounce; /* unsure */
     uint16_t timer;     // As opposite to the vertical one, this one counts for the on and the for the off state
     bool is_on;

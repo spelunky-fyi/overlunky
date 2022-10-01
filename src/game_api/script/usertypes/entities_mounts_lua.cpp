@@ -27,12 +27,10 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Mount>(
         "Mount",
-        "carry",
-        &Mount::carry,
-        "tame",
-        &Mount::tame,
         "rider_uid",
         &Mount::rider_uid,
+        "sound",
+        &Mount::sound,
         "can_doublejump",
         &Mount::can_doublejump,
         "tamed",
@@ -45,6 +43,10 @@ void register_usertypes(sol::state& lua)
         &Mount::used_double_jump,
         "remove_rider",
         &Mount::remove_rider,
+        "carry",
+        &Mount::carry,
+        "tame",
+        &Mount::tame,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable>());
 
@@ -66,6 +68,10 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Mech>(
         "Mech",
+        "crouch_walk_sound",
+        &Mech::crouch_walk_sound,
+        "explosion_sound",
+        &Mech::explosion_sound,
         "gun_cooldown",
         &Mech::gun_cooldown,
         "walking",
@@ -77,6 +83,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Qilin>(
         "Qilin",
+        "fly_gallop_sound",
+        &Qilin::fly_gallop_sound,
         "attack_cooldown",
         &Qilin::attack_cooldown,
         sol::base_classes,

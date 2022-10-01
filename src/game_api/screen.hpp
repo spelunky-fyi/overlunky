@@ -12,7 +12,7 @@
 #include "render_api.hpp" // for TextureRenderingInfo, TextRenderingInfo (p...
 
 struct ParticleEmitterInfo;
-struct SoundPosition;
+struct SoundMeta;
 class Entity;
 
 class Screen
@@ -448,7 +448,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     ParticleEmitterInfo* particle_torchflame_flames3;
     ParticleEmitterInfo* particle_torchflame_smoke4;
     ParticleEmitterInfo* particle_torchflame_flames4;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class ScreenTeamSelect : public Screen // ID: 10

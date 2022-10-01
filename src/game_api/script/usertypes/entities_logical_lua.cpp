@@ -91,6 +91,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<LogicalSound>(
         "LogicalSound",
+        "sound",
+        &LogicalSound::sound,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -155,6 +157,8 @@ void register_usertypes(sol::state& lua)
         "CursedEffect",
         "particle",
         &CursedEffect::particle,
+        "sound",
+        &CursedEffect::sound,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -193,6 +197,8 @@ void register_usertypes(sol::state& lua)
         "BurningRopeEffect",
         "illumination",
         &BurningRopeEffect::illumination,
+        "sound",
+        &BurningRopeEffect::sound,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -276,6 +282,8 @@ void register_usertypes(sol::state& lua)
         "BoulderSpawner",
         "timer",
         &BoulderSpawner::timer,
+        "sound",
+        &BoulderSpawner::sound,
         sol::base_classes,
         sol::bases<Entity>());
 
