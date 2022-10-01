@@ -1342,6 +1342,7 @@ std::optional<LuaBackend::LockedBackend> LuaBackend::get_backend_by_id_safe(std:
 }
 
 LuaBackend* g_CallingBackend{nullptr};
+uint32_t g_CallingBackendRecurse{0};
 LuaBackend::LockedBackend LuaBackend::get_calling_backend()
 {
     return LuaBackend::get_backend(get_calling_backend_id());
@@ -1376,14 +1377,22 @@ std::string LuaBackend::get_calling_backend_id()
 void LuaBackend::push_calling_backend(LuaBackend* calling_backend)
 {
     std::lock_guard global_lock{global_lua_lock};
-    assert(g_CallingBackend == nullptr);
-    g_CallingBackend = calling_backend;
+    assert(g_CallingBackendRecurse == 0 || g_CallingBackend == calling_backend);
+    if (g_CallingBackendRecurse == 0)
+    {
+        g_CallingBackend = calling_backend;
+    }
+    g_CallingBackendRecurse++;
 }
 void LuaBackend::pop_calling_backend([[maybe_unused]] LuaBackend* calling_backend)
 {
     std::lock_guard global_lock{global_lua_lock};
-    assert(g_CallingBackend == calling_backend);
-    g_CallingBackend = nullptr;
+    assert(g_CallingBackendRecurse != 0 && g_CallingBackend == calling_backend);
+    g_CallingBackendRecurse--;
+    if (g_CallingBackendRecurse == 0)
+    {
+        g_CallingBackend = nullptr;
+    }
 }
 
 /**
