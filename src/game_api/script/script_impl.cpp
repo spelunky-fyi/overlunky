@@ -52,7 +52,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     {
         std::string metacode = "";
         std::stringstream metass(code);
-        std::regex reg("(^\\s*meta\\.[a-z]+\\s*=)");
+        std::regex reg("(^\\s*meta\\.[a-zA-Z_][a-zA-Z0-9_]*\\s*=)");
         std::regex regstart("(^\\s*meta\\s*=)");
         std::regex regend("(\\})");
         std::regex multistart("\\[\\[|\\.\\.\\s*($|--)|\\bmeta\\.[a-z]+\\s*=\\s*($|--)");
