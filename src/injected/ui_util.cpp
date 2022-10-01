@@ -18,8 +18,10 @@
 #include "layer.hpp"                 // for Layer, EntityList::Range, Entit...
 #include "level_api.hpp"             // for LevelGenSystem
 #include "math.hpp"                  // for AABB
+#include "memory.hpp"                //
 #include "render_api.hpp"            // for RenderInfo
 #include "rpc.hpp"                   // for get_entities_at, entity_get_ite...
+#include "search.hpp"                //
 #include "spawn_api.hpp"             // for spawn_liquid, spawn_companion
 #include "state.hpp"                 // for State, StateMemory
 #include "state_structs.hpp"         // for Camera, Illumination (ptr only)
@@ -218,6 +220,21 @@ std::pair<float, float> UI::get_position(Entity* ent, bool render)
 bool UI::has_active_render(Entity* ent)
 {
     return (ent->rendering_info && !ent->rendering_info->render_inactive);
+}
+float UI::get_spark_distance(SparkTrap* ent)
+{
+    const static auto offset = get_address("sparktrap_angle_increment") + 4;
+    if (read_u8(offset - 1) == 0x89) // check if sparktraps_hack is active
+    {
+        auto spark = get_entity_ptr(ent->spark_uid)->as<Spark>();
+        return spark->distance;
+    }
+    auto parameters = get_sparktraps_parameters_ptr();
+    if (parameters != nullptr)
+    {
+        return *(parameters + 1); // distance
+    }
+    return 3.0f;
 }
 
 // Redirect to RPC / Spawn_API etc.:
@@ -665,4 +682,9 @@ std::vector<uint32_t> UI::get_entities_overlapping(uint32_t mask, AABB hitbox, L
 bool UI::get_focus()
 {
     return ::get_game_manager()->game_props->game_has_focus;
+}
+
+void UI::save_progress()
+{
+    ::save_progress();
 }

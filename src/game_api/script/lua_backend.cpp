@@ -508,7 +508,7 @@ bool LuaBackend::update()
                 }
                 case ON::SAVE:
                 {
-                    if (g_state->loading != state.loading && g_state->loading == 1)
+                    if ((g_state->loading != state.loading && g_state->loading == 1) || manual_save)
                     {
                         handle_function(callback.func, SaveContext{get_root(), get_name()});
                         callback.lastRan = now;
@@ -572,6 +572,12 @@ bool LuaBackend::update()
         state.loading = g_state->loading;
         state.reset = (g_state->quest_flags & 1);
         state.quest_flags = g_state->quest_flags;
+
+        if (manual_save)
+        {
+            manual_save = false;
+            last_save = g_state->time_startup;
+        }
     }
     catch (const sol::error& e)
     {
@@ -805,6 +811,13 @@ bool LuaBackend::pre_load_screen()
 
     std::lock_guard lock{gil};
 
+    auto state_ptr = State::get().ptr();
+    if ((ON)state_ptr->screen_next <= ON::LEVEL && (ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
+    {
+        using namespace std::string_view_literals;
+        set_level_string(u"%d-%d"sv);
+    }
+
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -821,7 +834,6 @@ bool LuaBackend::pre_load_screen()
         }
     }
 
-    auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::LEVEL && (ON)state_ptr->screen_next != ON::DEATH && (state_ptr->quest_flags & 1) == 0)
     {
         for (auto uid : get_entities_by_mask(1))
