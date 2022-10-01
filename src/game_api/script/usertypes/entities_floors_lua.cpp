@@ -11,6 +11,7 @@
 
 #include "entities_floors.hpp" // for MotherStatue, Floor, ExitDoor, Door
 #include "entity.hpp"          // for Entity
+#include "sound_manager.hpp"   //
 #include "state_structs.hpp"   // IWYU pragma: keep
 
 namespace NEntitiesFloors

@@ -10,6 +10,7 @@
 
 #include "entities_mounts.hpp" // for Mount, Mech, Axolotl, Qilin, Rockdog
 #include "entity.hpp"          // for Entity
+#include "sound_manager.hpp"   //
 
 class Movable;
 class PowerupCapable;
