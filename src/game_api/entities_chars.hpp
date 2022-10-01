@@ -14,6 +14,7 @@
 struct Illumination;
 struct PlayerInputs;
 struct Inventory;
+struct PlayerSlot;
 class Entity;
 
 class Ai
@@ -95,8 +96,9 @@ class Player : public PowerupCapable
     int32_t linked_companion_child;  // entity uid
     int32_t linked_companion_parent; // entity uid
     Ai* ai;
-    PlayerInputs* input_ptr;
-    Entity* basecamp_button_entity_pointer;
+    PlayerSlot* input_ptr;
+    /// Used in base camp to talk with the NPC's
+    Entity* basecamp_button_entity;
     int32_t i168;
     int32_t i16c;
     float y_pos; // not sure why, seams to be the same as abs_y

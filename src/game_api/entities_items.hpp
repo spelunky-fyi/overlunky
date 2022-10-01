@@ -14,7 +14,7 @@ class PowerupCapable;
 struct Illumination;
 struct Inventory;
 struct ParticleEmitterInfo;
-struct PlayerInputs;
+struct PlayerSlot;
 struct SoundMeta;
 
 class Backpack : public Movable
@@ -556,7 +556,7 @@ class PlayerGhost : public LightEmitter
 {
   public:
     ParticleEmitterInfo* sparkles_particle;
-    PlayerInputs* player_inputs;
+    PlayerSlot* player_inputs;
     Inventory* inventory;
     SoundMeta* sound;
     /// Is not set to -1 when crushed
