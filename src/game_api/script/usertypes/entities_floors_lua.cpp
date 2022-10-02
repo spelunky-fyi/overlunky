@@ -149,6 +149,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<MainExit>(
         "MainExit",
+        "door_blocker",
+        &MainExit::door_blocker,
         sol::base_classes,
         sol::bases<Entity, Floor, Door, ExitDoor>());
 
