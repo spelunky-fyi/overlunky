@@ -1153,7 +1153,16 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     std::pair<float, float> cpos = UI::click_position(g_x, g_y);
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
-        int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
+        int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
+        if (!lock_entity && set_last)
+            g_last_id = spawned;
+        return spawned;
+    }
+    else if (to_spawn.name == "ENT_TYPE_ITEM_PLAYERGHOST")
+    {
+        static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+        auto spawned = UI::spawn_playerghost(ana_spelunky + (rand() % 19), cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
+
         if (!lock_entity && set_last)
             g_last_id = spawned;
         return spawned;

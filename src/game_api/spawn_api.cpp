@@ -212,6 +212,9 @@ int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, floa
     if (overlay == nullptr)
         return -1;
     uint8_t layer = overlay->layer;
+    if (layer > 1)
+        return -1;
+
     return state.layer_local(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
 }
 
@@ -514,10 +517,7 @@ Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, floa
         std::pair<float, float> offset_position;
         uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-        aabb.left += offset_position.first;
-        aabb.right += offset_position.first;
-        aabb.top += offset_position.second;
-        aabb.bottom += offset_position.second;
+        aabb.offset(offset_position.first, offset_position.second);
 
         auto [x, y] = aabb.center();
 
@@ -687,7 +687,11 @@ int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
         auto state = get_state_ptr();
         typedef Player* spawn_companion_func(StateMemory*, float x, float y, size_t layer, uint32_t entity_type);
         static spawn_companion_func* sc = (spawn_companion_func*)(offset);
-        Player* spawned = sc(state, x, y, enum_to_layer(layer), companion_type);
+
+        std::pair<float, float> pos_offset;
+        const auto actual_layer = enum_to_layer(layer, pos_offset);
+
+        Player* spawned = sc(state, x + pos_offset.first, y + pos_offset.second, actual_layer, companion_type);
         return spawned->uid;
     }
     return -1;
@@ -741,6 +745,10 @@ int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int1
 
 int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
 {
+    push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
+
     std::pair<float, float> offset;
     const auto l = enum_to_layer(layer, offset);
     auto level_layer = State::get().layer(l);

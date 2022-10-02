@@ -275,9 +275,13 @@ std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, ui
 {
     return ::get_entities_by(entity_types, mask, layer);
 }
-int32_t UI::spawn_companion(ENT_TYPE compatnion_type, float x, float y, LAYER l)
+int32_t UI::spawn_companion(ENT_TYPE compatnion_type, float x, float y, LAYER l, float vx, float vy)
 {
-    return ::spawn_companion(compatnion_type, x, y, l);
+    auto uid = ::spawn_companion(compatnion_type, x, y, (LAYER)enum_to_layer(l));
+    auto ent = get_entity_ptr(uid)->as<Movable>();
+    ent->velocityx = vx;
+    ent->velocityy = vy;
+    return uid;
 }
 void UI::spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, uint32_t liquid_flags, uint32_t amount, float blobs_separation)
 {
@@ -687,4 +691,13 @@ bool UI::get_focus()
 void UI::save_progress()
 {
     ::save_progress();
+}
+
+int32_t UI::spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer, float vx, float vy)
+{
+    auto uid = ::spawn_playerghost(char_type, x, y, (LAYER)enum_to_layer(layer));
+    auto ent = get_entity_ptr(uid)->as<Movable>();
+    ent->velocityx = vx;
+    ent->velocityy = vy;
+    return uid;
 }
