@@ -887,7 +887,7 @@ int32_t sound_name_to_id(const VANILLA_SOUND s_name)
     {
         if (sound == s_name)
         {
-            return int32_t(&sound - &sound_names[0]);
+            return int32_t(&sound - &sound_names[0]) + 1;
         }
     }
     return -1;
