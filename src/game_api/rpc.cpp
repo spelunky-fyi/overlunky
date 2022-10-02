@@ -1225,29 +1225,20 @@ void set_journal_enabled(bool b)
 
 void set_camp_camera_bounds_enabled(bool b)
 {
-    static size_t offset = 0;
-    static char original_instruction[3] = {0};
-    if (offset == 0)
-    {
-        offset = get_address("enforce_camp_camera_bounds");
-        for (uint8_t x = 0; x < 3; ++x)
-        {
-            original_instruction[x] = read_u8(offset + x);
-        }
-    }
+    static const size_t offset = get_address("enforce_camp_camera_bounds");
     if (b)
     {
-        write_mem_prot(offset, std::string(original_instruction, 3), true);
+        recover_mem("camp_camera_bounds");
     }
     else
     {
-        write_mem_prot(offset, "\xC3\x90\x90"s, true);
+        write_mem_recoverable("camp_camera_bounds", offset, "\xC3\x90\x90"s, true);
     }
 }
 
 void set_explosion_mask(int32_t mask)
 {
-    static size_t addr = get_address("explosion_mask");
+    static const size_t addr = get_address("explosion_mask");
     if (mask == -1)
     {
         recover_mem("explosion_mask");
@@ -1279,7 +1270,8 @@ void set_max_rope_length(uint8_t length)
 
 uint8_t get_max_rope_length()
 {
-    return static_cast<uint8_t>(read_u32(get_address("attach_thrown_rope_to_background")));
+    static const auto address = get_address("attach_thrown_rope_to_background");
+    return static_cast<uint8_t>(read_u32(address));
 }
 
 uint8_t waddler_count_entity(ENT_TYPE entity_type)
