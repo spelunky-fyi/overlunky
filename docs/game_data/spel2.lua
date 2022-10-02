@@ -367,6 +367,14 @@ function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
 ---@param y number
 ---@return nil
 function spawn_player(player_slot, x, y) end
+---Spawn the Player Ghost entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+---or change it's `player_inputs` to the `input` of real player so he can control it directly
+---@param char_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_playerghost(char_type, x, y, layer) end
 ---Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
 ---This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
 ---In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
@@ -860,14 +868,6 @@ function return_input(uid) end
 ---@param buttons INPUTS
 ---@return nil
 function send_input(uid, buttons) end
----Read input
----@param uid integer
----@return INPUTS
-function read_input(uid) end
----Read input that has been previously stolen with steal_input
----@param uid integer
----@return INPUTS
-function read_stolen_input(uid) end
 ---Clears a callback that is specific to a screen.
 ---@param screen_id integer
 ---@param cb_id CallbackId
@@ -1446,6 +1446,10 @@ function set_vanilla_sound_callback(name, types, cb) end
 ---@param id CallbackId
 ---@return nil
 function clear_vanilla_sound_callback(id) end
+---@param sound VANILLA_SOUND
+---@param source_uid integer
+---@return SoundMeta
+function play_sound(sound, source_uid) end
 ---Converts a color to int to be used in drawing functions. Use values from `0..255`.
 ---@param r integer
 ---@param g integer
@@ -1719,8 +1723,8 @@ function dump_network() end
     ---@field screen_last integer
     ---@field screen integer
     ---@field screen_next integer
-    ---@field ingame integer
-    ---@field playing integer
+    ---@field ingame boolean
+    ---@field playing boolean
     ---@field pause integer
     ---@field width integer
     ---@field height integer
@@ -1796,7 +1800,7 @@ function dump_network() end
     ---@field set_correct_ushabti fun(self, animation_frame: integer): nil
     ---@field arena ArenaState
     ---@field speedrun_character ENT_TYPE
-    ---@field speedrun_activation_trigger integer
+    ---@field speedrun_activation_trigger boolean
     ---@field end_spaceship_character ENT_TYPE
     ---@field world2_coffin_spawned boolean
     ---@field world4_coffin_spawned boolean
@@ -1908,7 +1912,25 @@ function dump_network() end
     ---@field won_prizes_count integer
     ---@field balance integer
 
+---@class BackgroundMusic
+    ---@field game_startup BackGroundSound
+    ---@field main_backgroundtrack BackGroundSound
+    ---@field basecamp BackGroundSound
+    ---@field win_scene BackGroundSound
+    ---@field arena BackGroundSound
+    ---@field arena_intro_and_win BackGroundSound
+    ---@field level_gameplay BackGroundSound
+    ---@field dark_level BackGroundSound
+    ---@field level_transition BackGroundSound
+    ---@field backlayer BackGroundSound
+    ---@field shop BackGroundSound
+    ---@field angered_shopkeeper BackGroundSound
+    ---@field inside_sunken_city_pipe BackGroundSound
+    ---@field pause_menu BackGroundSound
+    ---@field sunken_city_duat_transition BackGroundSound
+
 ---@class GameManager
+    ---@field backgroundmusic BackgroundMusic
     ---@field game_props GameProps
     ---@field screen_logo ScreenLogo
     ---@field screen_intro ScreenIntro
@@ -2196,8 +2218,10 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field target_uid integer
     ---@field timer integer
     ---@field state integer
+    ---@field last_state integer
     ---@field trust integer
     ---@field whipped integer
+    ---@field walk_pause_timer integer
 
 ---@class Player : PowerupCapable
     ---@field inventory Inventory
@@ -2205,6 +2229,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field linked_companion_parent integer
     ---@field linked_companion_child integer
     ---@field ai Ai
+    ---@field input PlayerSlot
+    ---@field basecamp_button_entity Entity
     ---@field set_jetpack_fuel fun(self, fuel: integer): nil
     ---@field kapala_blood_amount fun(self): integer
     ---@field get_name fun(self): string
@@ -2251,6 +2277,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field unlocked boolean
 
 ---@class MainExit : ExitDoor
+    ---@field sound SoundMeta
 
 ---@class EggShipDoor : Door
     ---@field timer integer
@@ -2282,6 +2309,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
 
 ---@class SpikeballTrap : Floor
+    ---@field sound SoundMeta
     ---@field chain Entity
     ---@field end_piece Entity
     ---@field state integer
@@ -2308,6 +2336,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field attached_piece Entity
     ---@field active_floor_part_uid integer
     ---@field state integer
+    ---@field ball_rise SoundMeta
+    ---@field ball_drop SoundMeta
 
 ---@class QuickSand : Floor
 
@@ -2317,6 +2347,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field trigger fun(self, who_uid: integer, left: boolean): nil
 
 ---@class StickyTrap : Floor
+    ---@field sound SoundMeta
     ---@field attached_piece_uid integer
     ---@field ball_uid integer
     ---@field state integer
@@ -2347,6 +2378,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class ForceField : Floor
     ---@field first_item_beam Entity
     ---@field fx Entity
+    ---@field sound SoundMeta
     ---@field emitted_light Illumination
     ---@field is_on boolean
     ---@field activate_laserbeam fun(self, turn_on: boolean): nil
@@ -2358,6 +2390,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class HorizontalForceField : Floor
     ---@field first_item_beam Entity
     ---@field fx Entity
+    ---@field sound SoundMeta
     ---@field timer integer
     ---@field is_on boolean
 
@@ -2380,6 +2413,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field bounce_back_timer integer
 
 ---@class Olmec : Movable
+    ---@field sound SoundMeta
     ---@field target_uid integer
     ---@field attack_phase integer
     ---@field attack_timer integer
@@ -2399,6 +2433,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field is_rolling integer
 
 ---@class PushBlock : Movable
+    ---@field sound SoundMeta
     ---@field dust_particle ParticleEmitterInfo
     ---@field dest_pos_x number
 
@@ -2419,6 +2454,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field bounce boolean
 
 ---@class Drill : Movable
+    ---@field sound1 SoundMeta
+    ---@field sound2 SoundMeta
     ---@field top_chain_piece Entity
     ---@field trigger fun(self): nil
 
@@ -2444,15 +2481,16 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
 
 ---@class Mount : PowerupCapable
-    ---@field carry fun(self, rider: Movable): nil
-    ---@field tame fun(self, value: boolean): nil
     ---@field rider_uid integer
+    ---@field sound SoundMeta
     ---@field can_doublejump boolean
     ---@field tamed boolean
     ---@field walk_pause_timer integer
     ---@field taming_timer integer
     ---@field used_double_jump fun(self): boolean
     ---@field remove_rider fun(self): nil
+    ---@field carry fun(self, rider: Movable): nil
+    ---@field tame fun(self, value: boolean): nil
 
 ---@class Rockdog : Mount
     ---@field attack_cooldown integer
@@ -2462,11 +2500,14 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field can_teleport boolean
 
 ---@class Mech : Mount
+    ---@field crouch_walk_sound SoundMeta
+    ---@field explosion_sound SoundMeta
     ---@field gun_cooldown integer
     ---@field walking boolean
     ---@field breaking_wall boolean
 
 ---@class Qilin : Mount
+    ---@field fly_gallop_sound SoundMeta
     ---@field attack_cooldown integer
 
 ---@class Monster : PowerupCapable
@@ -2501,6 +2542,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field ghost_behaviour GHOST_BEHAVIOR
     ---@field emitted_light Illumination
     ---@field linked_ghost Entity
+    ---@field sound SoundMeta
 
 ---@class Bat : Monster
     ---@field spawn_x number
@@ -2512,6 +2554,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field on_ceiling boolean
 
 ---@class Monkey : Monster
+    ---@field sound SoundMeta
     ---@field jump_timer integer
     ---@field on_vine boolean
 
@@ -2521,6 +2564,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field poop_count integer
 
 ---@class Mole : Monster
+    ---@field burrowing_sound SoundMeta
+    ---@field nonburrowing_sound SoundMeta
     ---@field burrowing_particle ParticleEmitterInfo
     ---@field burrow_dir_x number
     ---@field burrow_dir_y number
@@ -2583,6 +2628,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field walk_pause_timer integer
     ---@field attack_cooldown_timer integer
     ---@field blood_squirt_timer integer
+    ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
 
 ---@class Mosquito : Monster
@@ -2590,6 +2636,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field direction_y number
     ---@field stuck_rel_pos_x number
     ---@field stuck_rel_pos_y number
+    ---@field sound SoundMeta
     ---@field timer integer
 
 ---@class Mantrap : Monster
@@ -2600,6 +2647,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field explosion_timer integer
 
 ---@class Scarab : Monster
+    ---@field sound SoundMeta
     ---@field emitted_light Illumination
     ---@field timer integer
 
@@ -2616,23 +2664,28 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field player_detect_state integer
 
 ---@class Firebug : Monster
+    ---@field sound SoundMeta
     ---@field fire_timer integer
     ---@field going_up boolean
     ---@field detached_from_chain boolean
 
 ---@class FirebugUnchained : Monster
+    ---@field sound SoundMeta
     ---@field max_flight_height number
     ---@field ai_timer integer
     ---@field walking_timer integer
 
 ---@class Robot : WalkingMonster
+    ---@field sound SoundMeta
     ---@field emitted_light_explosion Illumination
 
 ---@class Quillback : WalkingMonster
+    ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
     ---@field seen_player boolean
 
 ---@class Leprechaun : WalkingMonster
+    ---@field sound SoundMeta
     ---@field hump_timer integer
     ---@field target_in_sight_timer integer
     ---@field gold integer
@@ -2648,11 +2701,13 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field show_text boolean
 
 ---@class WitchDoctor : WalkingMonster
+    ---@field sound SoundMeta
     ---@field skull_regen_timer integer
 
 ---@class WitchDoctorSkull : Monster
     ---@field witch_doctor_uid integer
     ---@field emitted_light Illumination
+    ---@field sound SoundMeta
     ---@field rotation_angle number
 
 ---@class ForestSister : NPC
@@ -2684,6 +2739,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field change_direction_timer integer
 
 ---@class GiantFish : Monster
+    ---@field sound SoundMeta
     ---@field change_direction_timer integer
     ---@field lose_interest_timer integer
 
@@ -2695,6 +2751,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field at_maximum_attack boolean
 
 ---@class Kingu : Monster
+    ---@field sound1 SoundMeta
+    ---@field sound2 SoundMeta
     ---@field climb_direction_x number
     ---@field climb_direction_y number
     ---@field climb_pause_timer integer
@@ -2725,16 +2783,19 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field in_air_timer number
     ---@field halo_emitted_light Illumination
     ---@field fx_entity Entity
+    ---@field sound SoundMeta
     ---@field hover_timer integer
 
 ---@class MagmaMan : Monster
     ---@field emitted_light Illumination
+    ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
     ---@field jump_timer integer
     ---@field alive_timer integer
 
 ---@class Bee : Monster
     ---@field can_rest boolean
+    ---@field sound SoundMeta
     ---@field fly_hang_timer integer
     ---@field targeting_timer integer
     ---@field wobble_x number
@@ -2750,6 +2811,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sync_timer integer
 
 ---@class ApepHead : ApepPart
+    ---@field sound1 SoundMeta
+    ---@field sound2 SoundMeta
     ---@field distance_traveled number
     ---@field tail_uid integer
     ---@field fx_mouthpiece1_uid integer
@@ -2769,11 +2832,14 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field jump_timer integer
 
 ---@class UFO : Monster
+    ---@field sound SoundMeta
     ---@field patrol_distance integer
     ---@field attack_cooldown_timer integer
     ---@field is_falling boolean
 
 ---@class Lahamu : Monster
+    ---@field sound SoundMeta
+    ---@field eyeball Entity
     ---@field attack_cooldown_timer integer
 
 ---@class YetiQueen : Monster
@@ -2787,6 +2853,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field particle_sparkles ParticleEmitterInfo
 
 ---@class Lamassu : Monster
+    ---@field sound SoundMeta
     ---@field attack_effect_entity Entity
     ---@field particle ParticleEmitterInfo
     ---@field emitted_light Illumination
@@ -2804,6 +2871,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field attack_cooldown_timer integer
 
 ---@class Tiamat : Monster
+    ---@field sound SoundMeta
     ---@field fx_tiamat_head integer
     ---@field fx_tiamat_arm_right1 integer
     ---@field fx_tiamat_arm_right2 integer
@@ -2831,6 +2899,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field pause boolean
 
 ---@class FireFrog : Frog
+    ---@field sound SoundMeta
 
 ---@class Grub : Monster
     ---@field rotation_delta number
@@ -2839,6 +2908,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field walk_pause_timer integer
     ---@field turn_into_fly_timer integer
     ---@field particle ParticleEmitterInfo
+    ---@field sound SoundMeta
 
 ---@class Tadpole : Monster
     ---@field acceleration_timer integer
@@ -2846,6 +2916,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class GiantFly : Monster
     ---@field head_entity Entity
+    ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
     ---@field sine_amplitude number
     ---@field sine_frequency number
@@ -2855,6 +2926,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class Ghist : Monster
     ---@field body_uid integer
     ---@field idle_timer integer
+    ---@field sound SoundMeta
     ---@field transparency integer
     ---@field fadeout integer
 
@@ -2863,6 +2935,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field squish_timer integer
 
 ---@class EggplantMinister : Monster
+    ---@field sound SoundMeta
     ---@field walk_pause_timer integer
     ---@field squish_timer integer
 
@@ -2892,6 +2965,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class MegaJellyfish : Monster
     ---@field flipper1 Entity
     ---@field flipper2 Entity
+    ---@field sound SoundMeta
     ---@field orb_uid integer
     ---@field tail_bg_uid integer
     ---@field applied_velocity number
@@ -2912,6 +2986,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field spawn_new_carried_item boolean
 
 ---@class Necromancer : WalkingMonster
+    ---@field sound SoundMeta
     ---@field red_skeleton_spawn_x number
     ---@field red_skeleton_spawn_y number
     ---@field resurrection_uid integer
@@ -2947,6 +3022,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field vertical_flight_direction integer
 
 ---@class CritterLocust : Critter
+    ---@field sound SoundMeta
     ---@field jump_timer integer
 
 ---@class CritterSnail : Critter
@@ -2977,6 +3053,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class CritterDrone : Critter
     ---@field emitted_light Illumination
+    ---@field sound SoundMeta
     ---@field applied_hor_momentum number
     ---@field applied_ver_momentum number
     ---@field move_timer integer
@@ -2993,6 +3070,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field walk_pause_timer integer
 
 ---@class Bomb : Movable
+    ---@field sound SoundMeta
     ---@field scale_hor number
     ---@field scale_ver number
     ---@field is_big_bomb boolean
@@ -3008,6 +3086,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class DummyPurchasableEntity : Purchasable
 
 ---@class Bow : Purchasable
+    ---@field get_arrow_special_offset fun(self): number
 
 ---@class Present : Purchasable
     ---@field inside ENT_TYPE
@@ -3020,6 +3099,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field teleport_number integer
 
 ---@class Hoverpack : Backpack
+    ---@field sound SoundMeta
     ---@field is_on boolean
 
 ---@class Cape : Backpack
@@ -3038,6 +3118,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field in_chamber integer
 
 ---@class Flame : Movable
+    ---@field sound SoundMeta
     ---@field emitted_light Illumination
 
 ---@class FlameSize : Flame
@@ -3090,6 +3171,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field emitted_light Illumination
 
 ---@class ScepterShot : LightEmitter
+    ---@field sound SoundMeta
     ---@field speed number
     ---@field idle_timer integer
 
@@ -3098,6 +3180,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field target_y number
 
 ---@class SoundShot : LightShot
+    ---@field sound SoundMeta
 
 ---@class Spark : Flame
     ---@field particle ParticleEmitterInfo
@@ -3113,6 +3196,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field distance number
 
 ---@class TiamatShot : LightEmitter
+    ---@field sound SoundMeta
 
 ---@class Fireball : SoundShot
     ---@field particle ParticleEmitterInfo
@@ -3160,6 +3244,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field jump_state integer
 
 ---@class TV : Movable
+    ---@field sound SoundMeta
     ---@field fx_button Entity
     ---@field emitted_light Illumination
     ---@field station integer
@@ -3239,8 +3324,9 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class PlayerGhost : LightEmitter
     ---@field sparkles_particle ParticleEmitterInfo
-    ---@field player_inputs PlayerInputs
+    ---@field player_inputs PlayerSlot
     ---@field inventory Inventory
+    ---@field sound SoundMeta
     ---@field body_uid integer
     ---@field shake_timer integer
     ---@field boost_timer integer
@@ -3254,6 +3340,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field emitted_light Illumination
 
 ---@class TreasureHook : Movable
+    ---@field sound SoundMeta
 
 ---@class AxolotlShot : Projectile
     ---@field trapped_uid integer
@@ -3266,6 +3353,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field ceiling Entity
 
 ---@class SkullDropTrap : Movable
+    ---@field sound SoundMeta
     ---@field left_skull_uid integer
     ---@field middle_skull_uid integer
     ---@field right_skull_uid integer
@@ -3294,6 +3382,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field bottom Entity
 
 ---@class MiniGameShip : Movable
+    ---@field sound SoundMeta
     ---@field velocity_x number
     ---@field velocity_y number
     ---@field swing number
@@ -3315,8 +3404,10 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field particles_smoke ParticleEmitterInfo
     ---@field particles_flames ParticleEmitterInfo
     ---@field particles_warp ParticleEmitterInfo
+    ---@field sound SoundMeta
 
 ---@class Orb : Movable
+    ---@field sound SoundMeta
     ---@field timer integer
 
 ---@class EggSac : Movable
@@ -3348,6 +3439,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
 
 ---@class AnkhPowerup : Powerup
+    ---@field sound SoundMeta
     ---@field player Entity
     ---@field fx_glow Entity
     ---@field timer1 integer
@@ -3356,11 +3448,13 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field music_on_off boolean
 
 ---@class YellowCape : Cape
+    ---@field sound SoundMeta
 
 ---@class Teleporter : Purchasable
     ---@field teleport_number integer
 
 ---@class Boomerang : Purchasable
+    ---@field sound SoundMeta
     ---@field trail ParticleEmitterInfo
     ---@field distance number
     ---@field rotation number
@@ -3386,6 +3480,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field on_breaking boolean
 
 ---@class EggshipCenterJetFlame : Movable
+    ---@field sound SoundMeta
     ---@field emitted_light Illumination
     ---@field particle ParticleEmitterInfo
     ---@field smoke_on boolean
@@ -3452,6 +3547,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class FxJetpackFlame : Movable
     ---@field particle_smoke ParticleEmitterInfo
     ---@field particle_flame ParticleEmitterInfo
+    ---@field sound SoundMeta
     ---@field illumination Illumination
 
 ---@class FxPlayerIndicator : Movable
@@ -3565,6 +3661,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field relative_offset_y number
 
 ---@class BGEggshipRoom : Entity
+    ---@field sound SoundMeta
     ---@field fx_shell Entity
     ---@field fx_door Entity
     ---@field platform_left Entity
@@ -3607,6 +3704,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class DestructibleBG : Entity
 
 ---@class PalaceSign : Entity
+    ---@field sound SoundMeta
     ---@field illumination Illumination
     ---@field arrow_illumination Illumination
     ---@field arrow_change_timer integer
@@ -3631,6 +3729,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field platform_spawned boolean
 
 ---@class LogicalSound : Entity
+    ---@field sound SoundMeta
 
 ---@class LogicalStaticSound : LogicalSound
 
@@ -3659,6 +3758,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class CursedEffect : Entity
     ---@field particle ParticleEmitterInfo
+    ---@field sound SoundMeta
 
 ---@class OuroboroCameraAnchor : Entity
     ---@field target_x number
@@ -3676,6 +3776,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class BurningRopeEffect : Entity
     ---@field illumination Illumination
+    ---@field sound SoundMeta
 
 ---@class DustWallApep : Entity
     ---@field particle ParticleEmitterInfo
@@ -3712,6 +3813,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class BoulderSpawner : Entity
     ---@field timer integer
+    ---@field sound SoundMeta
 
 ---@class PipeTravelerSound : LogicalSound
     ---@field enter_exit boolean
@@ -4021,7 +4123,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field level_last integer
     ---@field score_last integer
     ---@field time_last integer
-    ---@field stickers integer[]
+    ---@field stickers ENT_TYPE[]
     ---@field players integer[]
     ---@field constellation Constellation
 
@@ -4077,6 +4179,14 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
     ---@field get_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM): number?
     ---@field set_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM, value: number): boolean
+
+---@class SoundMeta
+    ---@field x number
+    ---@field y number
+    ---@field left_channel number[]
+    ---@field right_channel number[]
+    ---@field start_over boolean
+    ---@field playing boolean
 
 ---@class PlayerSlotSettings
     ---@field controller_vibration boolean
@@ -4509,10 +4619,11 @@ local function AABB_extrude(self, amount_x, amount_y) end
     ---@field particle_torchflame_flames3 ParticleEmitterInfo
     ---@field particle_torchflame_smoke4 ParticleEmitterInfo
     ---@field particle_torchflame_flames4 ParticleEmitterInfo
+    ---@field sound SoundMeta
 
 ---@class FlyingThing
     ---@field texture_info TextureRenderingInfo
-    ---@field entity_type integer
+    ---@field entity_type ENT_TYPE
     ---@field spritesheet_column number
     ---@field spritesheet_row number
     ---@field spritesheet_animation_length number
@@ -7136,6 +7247,24 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
+POS_TYPE = {
+  AIR = 4,
+  ALCOVE = 16,
+  CEILING = 2,
+  DEFAULT = 4096,
+  EMPTY = 1024,
+  FLOOR = 1,
+  HOLE = 64,
+  LAVA = 256,
+  PIT = 32,
+  SAFE = 512,
+  SOLID = 2048,
+  WALL = 8,
+  WALL_LEFT = 8192,
+  WALL_RIGHT = 16384,
+  WATER = 128
+}
+---@alias POS_TYPE integer
 PRNG_CLASS = {
   ENTITY_VARIATION = 3,
   EXTRA_SPAWNS = 5,
