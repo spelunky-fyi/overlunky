@@ -17,6 +17,7 @@
 #include "entities_liquids.hpp"  // for Lava
 #include "entities_monsters.hpp" // for Shopkeeper, RoomOwner
 #include "entity.hpp"            // for to_id, Entity, get_entity_ptr, Enti...
+#include "items.hpp"             //
 #include "layer.hpp"             // for Layer, g_level_max_y, g_level_max_x
 #include "level_api.hpp"         // for LevelGenSystem, ThemeInfo
 #include "logger.h"              // for DEBUG
@@ -736,4 +737,29 @@ int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int1
     // ShopOwnerDetails owner = {.layer = (uint8_t)layer, .room_index = room_index, .shop_owner_uid = keeper_uid};
     // state_ptr->shops.shop_owners.push_back(owner);
     return keeper_uid;
+}
+
+int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
+{
+    std::pair<float, float> offset;
+    const auto l = enum_to_layer(layer, offset);
+    auto level_layer = State::get().layer(l);
+
+    static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
+    static const auto ana = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+    static const auto egg_child = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
+    static PlayerSlot dummy_player_controls;
+    dummy_player_controls.player_slot = -1;
+
+    if (char_type < ana || char_type > egg_child)
+        return -1;
+
+    auto player_ghost_entity = level_layer->spawn_entity(player_ghost, x + offset.first, y + offset.second, false, 0, 0, false)->as<PlayerGhost>();
+    if (player_ghost_entity)
+    {
+        player_ghost_entity->player_inputs = &dummy_player_controls;
+        player_ghost_entity->set_texture(get_type(char_type)->texture);
+        return player_ghost_entity->uid;
+    }
+    return -1;
 }

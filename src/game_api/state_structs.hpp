@@ -88,7 +88,7 @@ struct PlayerSlot
     uint32_t unknown1;
     InputMapping* input_mapping_keyboard;
     InputMapping* input_mapping_controller;
-    uint8_t player_slot;
+    int8_t player_slot;
     bool is_participating;
     uint8_t unknown4; // padding most likely
     uint8_t unknown5; // padding most likely
