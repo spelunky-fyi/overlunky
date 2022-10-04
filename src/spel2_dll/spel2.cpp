@@ -14,7 +14,8 @@
 #include "steam_api.hpp"
 #include "texture.hpp"
 #include "window_api.hpp"
-#include <format>
+
+#include <cstring>
 
 SoundManager* g_SoundManager{nullptr};
 SpelunkyConsole* g_Console{nullptr};
@@ -234,8 +235,7 @@ void SpelunkyScript_DrawOptions(SpelunkyScript* script)
 void SpelunkyScript_GetResult(SpelunkyScript* script, char* out_buffer, size_t out_buffer_size)
 {
     const std::string result = script->get_result();
-    const std::format_to_n_result written_result = std::format_to_n(out_buffer, out_buffer_size - 1, "{}", result);
-    out_buffer[written_result.size] = '\0';
+    strncpy_s(out_buffer, out_buffer_size, result.c_str(), result.size());
 }
 void SpelunkyScript_LoopMessages(SpelunkyScript* script, SpelunkyScript_MessageFun message_fun)
 {
