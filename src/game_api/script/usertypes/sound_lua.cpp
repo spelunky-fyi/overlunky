@@ -179,6 +179,11 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "playing",
         &SoundMeta::playing);
 
+    lua.new_usertype<BackGroundSound>(
+        "BackGroundSound",
+        sol::base_classes,
+        sol::bases<SoundMeta>());
+
     lua["play_sound"] = play_sound;
 
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume

@@ -473,21 +473,21 @@ float | [height()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=heig
 
 Type | Name | Description
 ---- | ---- | -----------
-BackGroundSound | [game_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_startup) | 
-BackGroundSound | [main_backgroundtrack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_backgroundtrack) | 
-BackGroundSound | [basecamp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=basecamp) | 
-BackGroundSound | [win_scene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_scene) | 
-BackGroundSound | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | 
-BackGroundSound | [arena_intro_and_win](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_intro_and_win) | 
-BackGroundSound | [level_gameplay](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gameplay) | 
-BackGroundSound | [dark_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_level) | 
-BackGroundSound | [level_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_transition) | 
-BackGroundSound | [backlayer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer) | 
-BackGroundSound | [shop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop) | 
-BackGroundSound | [angered_shopkeeper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angered_shopkeeper) | 
-BackGroundSound | [inside_sunken_city_pipe](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside_sunken_city_pipe) | 
-BackGroundSound | [pause_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_menu) | 
-BackGroundSound | [sunken_city_duat_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sunken_city_duat_transition) | 
+[BackGroundSound](#BackGroundSound) | [game_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_startup) | 
+[BackGroundSound](#BackGroundSound) | [main_backgroundtrack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_backgroundtrack) | 
+[BackGroundSound](#BackGroundSound) | [basecamp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=basecamp) | 
+[BackGroundSound](#BackGroundSound) | [win_scene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_scene) | 
+[BackGroundSound](#BackGroundSound) | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | 
+[BackGroundSound](#BackGroundSound) | [arena_intro_and_win](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_intro_and_win) | 
+[BackGroundSound](#BackGroundSound) | [level_gameplay](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gameplay) | 
+[BackGroundSound](#BackGroundSound) | [dark_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_level) | 
+[BackGroundSound](#BackGroundSound) | [level_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_transition) | 
+[BackGroundSound](#BackGroundSound) | [backlayer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer) | 
+[BackGroundSound](#BackGroundSound) | [shop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop) | 
+[BackGroundSound](#BackGroundSound) | [angered_shopkeeper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angered_shopkeeper) | 
+[BackGroundSound](#BackGroundSound) | [inside_sunken_city_pipe](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside_sunken_city_pipe) | 
+[BackGroundSound](#BackGroundSound) | [pause_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_menu) | 
+[BackGroundSound](#BackGroundSound) | [sunken_city_duat_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sunken_city_duat_transition) | 
 
 ### Color
 
@@ -2045,6 +2045,14 @@ float | [zoom_target](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=z
 
 ## Sound types
 
+
+### BackGroundSound
+
+Derived from [SoundMeta](#SoundMeta)
+
+
+Type | Name | Description
+---- | ---- | -----------
 
 ### CustomSound
 

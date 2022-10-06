@@ -4188,6 +4188,8 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field start_over boolean
     ---@field playing boolean
 
+---@class BackGroundSound : SoundMeta
+
 ---@class PlayerSlotSettings
     ---@field controller_vibration boolean
     ---@field auto_run_enabled boolean
