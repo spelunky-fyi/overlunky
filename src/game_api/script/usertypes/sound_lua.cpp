@@ -179,8 +179,8 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "playing",
         &SoundMeta::playing);
 
-    lua.new_usertype<BackGroundSound>(
-        "BackGroundSound",
+    lua.new_usertype<BackgroundSound>(
+        "BackgroundSound",
         sol::base_classes,
         sol::bases<SoundMeta>());
 

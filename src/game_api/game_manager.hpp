@@ -45,22 +45,22 @@ struct SaveRelated
 
 struct BackgroundMusic
 {
-    BackGroundSound* game_startup;
-    BackGroundSound* main_backgroundtrack;
-    BackGroundSound* basecamp;
-    BackGroundSound* win_scene;
-    BackGroundSound* arena;
-    BackGroundSound* arena_intro_and_win;
-    BackGroundSound* level_gameplay;
-    BackGroundSound* dark_level;
-    BackGroundSound* level_transition;
-    BackGroundSound* backlayer;
-    BackGroundSound* shop;
-    BackGroundSound* angered_shopkeeper;
-    BackGroundSound* inside_sunken_city_pipe;
-    BackGroundSound* pause_menu;
-    BackGroundSound* unknown15;
-    BackGroundSound* sunken_city_duat_transition;
+    BackgroundSound* game_startup;
+    BackgroundSound* main_backgroundtrack;
+    BackgroundSound* basecamp;
+    BackgroundSound* win_scene;
+    BackgroundSound* arena;
+    BackgroundSound* arena_intro_and_win;
+    BackgroundSound* level_gameplay;
+    BackgroundSound* dark_level;
+    BackgroundSound* level_transition;
+    BackgroundSound* backlayer;
+    BackgroundSound* shop;
+    BackgroundSound* angered_shopkeeper;
+    BackgroundSound* inside_sunken_city_pipe;
+    BackgroundSound* pause_menu;
+    BackgroundSound* unknown15;
+    BackgroundSound* sunken_city_duat_transition;
     uint8_t unknown17;
     uint8_t unknown18;
     uint8_t unknown19;

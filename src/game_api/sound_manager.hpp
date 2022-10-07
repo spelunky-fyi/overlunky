@@ -286,7 +286,7 @@ struct SoundMeta
     virtual bool unknown() = 0;
 };
 
-struct BackGroundSound : public SoundMeta
+struct BackgroundSound : public SoundMeta
 {
     bool special_fadeout; // fades out the music then calls destruct (which will crash the game if used on someting in GameManager->BackgroundMusic)
 };

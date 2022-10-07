@@ -1913,21 +1913,21 @@ function dump_network() end
     ---@field balance integer
 
 ---@class BackgroundMusic
-    ---@field game_startup BackGroundSound
-    ---@field main_backgroundtrack BackGroundSound
-    ---@field basecamp BackGroundSound
-    ---@field win_scene BackGroundSound
-    ---@field arena BackGroundSound
-    ---@field arena_intro_and_win BackGroundSound
-    ---@field level_gameplay BackGroundSound
-    ---@field dark_level BackGroundSound
-    ---@field level_transition BackGroundSound
-    ---@field backlayer BackGroundSound
-    ---@field shop BackGroundSound
-    ---@field angered_shopkeeper BackGroundSound
-    ---@field inside_sunken_city_pipe BackGroundSound
-    ---@field pause_menu BackGroundSound
-    ---@field sunken_city_duat_transition BackGroundSound
+    ---@field game_startup BackgroundSound
+    ---@field main_backgroundtrack BackgroundSound
+    ---@field basecamp BackgroundSound
+    ---@field win_scene BackgroundSound
+    ---@field arena BackgroundSound
+    ---@field arena_intro_and_win BackgroundSound
+    ---@field level_gameplay BackgroundSound
+    ---@field dark_level BackgroundSound
+    ---@field level_transition BackgroundSound
+    ---@field backlayer BackgroundSound
+    ---@field shop BackgroundSound
+    ---@field angered_shopkeeper BackgroundSound
+    ---@field inside_sunken_city_pipe BackgroundSound
+    ---@field pause_menu BackgroundSound
+    ---@field sunken_city_duat_transition BackgroundSound
 
 ---@class GameManager
     ---@field backgroundmusic BackgroundMusic
@@ -4188,7 +4188,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field start_over boolean
     ---@field playing boolean
 
----@class BackGroundSound : SoundMeta
+---@class BackgroundSound : SoundMeta
 
 ---@class PlayerSlotSettings
     ---@field controller_vibration boolean
