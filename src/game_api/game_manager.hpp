@@ -90,10 +90,10 @@ struct GameProps
 
 struct GameManager
 {
-    BackgroundMusic* backgroundmusic;
+    BackgroundMusic* music;
     SaveRelated* save_related;
-    uint8_t buttons_controls[MAX_PLAYERS];
-    uint8_t buttons_movement[MAX_PLAYERS];
+    std::array<uint8_t, MAX_PLAYERS> buttons_controls;
+    std::array<uint8_t, MAX_PLAYERS> buttons_movement;
     GameProps* game_props;
 
     // screen pointers below are most likely in an array and indexed through the screen ID, hence the nullptrs for

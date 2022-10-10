@@ -79,7 +79,7 @@ class ScreenTitle : public Screen // ID: 3
     ParticleEmitterInfo* particle_torchflame_ash;
     uint32_t unknown7;
     float unknown8;
-    SoundMeta* background_music;
+    SoundMeta* music;
     SoundMeta* torch_sound;
 };
 
@@ -120,8 +120,7 @@ class ScreenMenu : public Screen // ID: 4
 
     uint32_t unknown16a;
     uint32_t unknown16b;
-    uint32_t unknown16c;
-    uint32_t unknown16d;
+    SoundMeta* cthulhu_sound;
     size_t unknown16e;
     size_t unknown16f;
     float unknown16g;
@@ -630,7 +629,7 @@ class ScreenConstellation : public Screen // ID: 19
     char16_t constellation_text[32]; // UTF16 string
     float* credits_progression;
     SoundMeta* explosion_and_loop;
-    SoundMeta* bg_music;
+    SoundMeta* music;
 };
 
 /// The recap book is drawn on top of the POST render event

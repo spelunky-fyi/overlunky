@@ -49,8 +49,8 @@ void register_usertypes(sol::state& lua)
         &BackgroundMusic::sunken_city_duat_transition);
     lua.new_usertype<GameManager>(
         "GameManager",
-        "backgroundmusic",
-        &GameManager::backgroundmusic,
+        "music",
+        &GameManager::music,
         "game_props",
         &GameManager::game_props,
         "screen_logo",
