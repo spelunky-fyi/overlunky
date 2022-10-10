@@ -271,24 +271,24 @@ struct SoundMeta
 
     /// when false, current track starts from the beginning, is immediately set back to true
     bool start_over;
-    uint8_t unknown8; // fade out?
+    bool play_ending_sequence;
     /// set to false to turn off
     bool playing;
     uint8_t padding1;
     uint32_t padding2;
 
-    virtual void start() = 0;                               // just sets music_on to true
-    virtual void fade_out(uint8_t) = 0;                     // unsure, parameter sets the unknown8
-    virtual void get_name(void* buttor, uint32_t size) = 0; // unsure?
-    virtual ~SoundMeta() = 0;                               //
-    virtual void update() = 0;                              // disabling this function does not progresses the track, does not stop it at the end level etc.
-                                                            // like if you start a level you have one loop and then after you move, it porgresses to another one
+    virtual void start() = 0;             // just sets music_on to true in most cases
+    virtual void kill(bool fade_out) = 0; // fade_out - set's the play_ending_sequence
+    virtual void get_name(char16_t* buffor, uint32_t size) = 0;
+    virtual ~SoundMeta() = 0;
+    virtual void update() = 0; // disabling this function does not progresses the track, does not stop it at the end level etc.
+                               // like if you start a level you have one loop and then after you move, it porgresses to another one
     virtual bool unknown() = 0;
 };
 
 struct BackgroundSound : public SoundMeta
 {
-    bool special_fadeout; // fades out the music then calls destruct (which will crash the game if used on someting in GameManager->BackgroundMusic)
+    bool destroy_sound; // don't use directly, use the kill function
 };
 
 /// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"

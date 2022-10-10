@@ -79,8 +79,8 @@ class ScreenTitle : public Screen // ID: 3
     ParticleEmitterInfo* particle_torchflame_ash;
     uint32_t unknown7;
     float unknown8;
-    size_t unknown9;
-    size_t unknown10;
+    SoundMeta* background_music;
+    SoundMeta* torch_sound;
 };
 
 struct SpearDanglerAnimFrames
@@ -127,14 +127,10 @@ class ScreenMenu : public Screen // ID: 4
     float unknown16g;
     float unknown16h;
     float unknown16i;
-    uint32_t unknown16j;
+    float unknown16j;
     size_t unknown16k;
-    size_t unknown17;
-    size_t unknown18;
-    size_t unknown19;
-    size_t unknown20;
-    size_t unknown21;
-    size_t unknown22;
+    std::vector<size_t> unknown17;   // pointers
+    std::vector<uint32_t> unknown20; // unsure what's inside
     size_t buttons;
     uint32_t unknown23;
     uint32_t unknown24;

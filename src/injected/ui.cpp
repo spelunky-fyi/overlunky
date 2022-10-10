@@ -1619,6 +1619,12 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->fadein = 1;
     g_state->fadeout = 1;
     g_state->loading = 1;
+
+    if (g_game_manager->main_menu_music)
+    {
+        g_game_manager->main_menu_music->kill(false);
+        g_game_manager->main_menu_music = nullptr;
+    }
 }
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)

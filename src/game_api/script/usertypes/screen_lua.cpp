@@ -107,6 +107,10 @@ void register_usertypes(sol::state& lua)
         &ScreenTitle::particle_torchflame_flames_animated,
         "particle_torchflame_ash",
         &ScreenTitle::particle_torchflame_ash,
+        "background_music",
+        &ScreenTitle::background_music,
+        "torch_sound",
+        &ScreenTitle::torch_sound,
         sol::base_classes,
         sol::bases<Screen>());
 

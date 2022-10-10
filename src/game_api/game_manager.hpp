@@ -130,6 +130,7 @@ struct GameManager
     ScreenOnlineLobby* screen_online_lobby;
     PauseUI* pause_ui;
     JournalUI* journal_ui;
+    BackgroundSound* main_menu_music;
 };
 
 GameManager* get_game_manager();
