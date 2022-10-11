@@ -402,72 +402,40 @@ void register_usertypes(sol::state& lua)
     auto draw_image_rotated = sol::overload(
         static_cast<void (GuiDrawContext::*)(IMAGE, float, float, float, float, float, float, float, float, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated),
         static_cast<void (GuiDrawContext::*)(IMAGE, AABB, AABB, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated));
-    lua.new_usertype<GuiDrawContext>(
-        "GuiDrawContext",
-        "draw_line",
-        &GuiDrawContext::draw_line,
-        "draw_rect",
-        draw_rect,
-        "draw_rect_filled",
-        draw_rect_filled,
-        "draw_triangle",
-        &GuiDrawContext::draw_triangle,
-        "draw_triangle_filled",
-        &GuiDrawContext::draw_triangle_filled,
-        "draw_poly",
-        &GuiDrawContext::draw_poly,
-        "draw_poly_filled",
-        &GuiDrawContext::draw_poly_filled,
-        "draw_bezier_cubic",
-        &GuiDrawContext::draw_bezier_cubic,
-        "draw_bezier_quadratic",
-        &GuiDrawContext::draw_bezier_quadratic,
-        "draw_circle",
-        &GuiDrawContext::draw_circle,
-        "draw_circle_filled",
-        &GuiDrawContext::draw_circle_filled,
-        "draw_text",
-        &GuiDrawContext::draw_text,
-        "draw_image",
-        draw_image,
-        "draw_image_rotated",
-        draw_image_rotated,
-        "window",
-        &GuiDrawContext::window,
-        "win_text",
-        &GuiDrawContext::win_text,
-        "win_separator",
-        &GuiDrawContext::win_separator,
-        "win_inline",
-        &GuiDrawContext::win_inline,
-        "win_sameline",
-        &GuiDrawContext::win_sameline,
-        "win_button",
-        &GuiDrawContext::win_button,
-        "win_input_text",
-        &GuiDrawContext::win_input_text,
-        "win_input_int",
-        &GuiDrawContext::win_input_int,
-        "win_input_float",
-        &GuiDrawContext::win_input_float,
-        "win_slider_int",
-        &GuiDrawContext::win_slider_int,
-        "win_drag_int",
-        &GuiDrawContext::win_drag_int,
-        "win_slider_float",
-        &GuiDrawContext::win_slider_float,
-        "win_drag_float",
-        &GuiDrawContext::win_drag_float,
-        "win_check",
-        &GuiDrawContext::win_check,
-        "win_combo",
-        &GuiDrawContext::win_combo,
-        "win_pushid",
-        &GuiDrawContext::win_pushid,
-        "win_popid",
-        &GuiDrawContext::win_popid,
-        "win_image",
-        &GuiDrawContext::win_image);
+
+    auto guidrawcontext_type = lua.new_usertype<GuiDrawContext>("GuiDrawContext");
+    guidrawcontext_type["draw_line"] = &GuiDrawContext::draw_line;
+    guidrawcontext_type["draw_rect"] = draw_rect;
+    guidrawcontext_type["draw_rect_filled"] = draw_rect_filled;
+    guidrawcontext_type["draw_triangle"] = &GuiDrawContext::draw_triangle;
+    guidrawcontext_type["draw_triangle_filled"] = &GuiDrawContext::draw_triangle_filled;
+    guidrawcontext_type["draw_poly"] = &GuiDrawContext::draw_poly;
+    guidrawcontext_type["draw_poly_filled"] = &GuiDrawContext::draw_poly_filled;
+    guidrawcontext_type["draw_bezier_cubic"] = &GuiDrawContext::draw_bezier_cubic;
+    guidrawcontext_type["draw_bezier_quadratic"] = &GuiDrawContext::draw_bezier_quadratic;
+    guidrawcontext_type["draw_circle"] = &GuiDrawContext::draw_circle;
+    guidrawcontext_type["draw_circle_filled"] = &GuiDrawContext::draw_circle_filled;
+    guidrawcontext_type["draw_text"] = &GuiDrawContext::draw_text;
+    guidrawcontext_type["draw_image"] = draw_image;
+    guidrawcontext_type["draw_image_rotated"] = draw_image_rotated;
+    guidrawcontext_type["window"] = &GuiDrawContext::window;
+    guidrawcontext_type["win_text"] = &GuiDrawContext::win_text;
+    guidrawcontext_type["win_separator"] = &GuiDrawContext::win_separator;
+    guidrawcontext_type["win_inline"] = &GuiDrawContext::win_inline;
+    guidrawcontext_type["win_sameline"] = &GuiDrawContext::win_sameline;
+    guidrawcontext_type["win_button"] = &GuiDrawContext::win_button;
+    guidrawcontext_type["win_input_text"] = &GuiDrawContext::win_input_text;
+    guidrawcontext_type["win_input_int"] = &GuiDrawContext::win_input_int;
+    guidrawcontext_type["win_input_float"] = &GuiDrawContext::win_input_float;
+    guidrawcontext_type["win_slider_int"] = &GuiDrawContext::win_slider_int;
+    guidrawcontext_type["win_drag_int"] = &GuiDrawContext::win_drag_int;
+    guidrawcontext_type["win_slider_float"] = &GuiDrawContext::win_slider_float;
+    guidrawcontext_type["win_drag_float"] = &GuiDrawContext::win_drag_float;
+    guidrawcontext_type["win_check"] = &GuiDrawContext::win_check;
+    guidrawcontext_type["win_combo"] = &GuiDrawContext::win_combo;
+    guidrawcontext_type["win_pushid"] = &GuiDrawContext::win_pushid;
+    guidrawcontext_type["win_popid"] = &GuiDrawContext::win_popid;
+    guidrawcontext_type["win_image"] = &GuiDrawContext::win_image;
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) -> uColor

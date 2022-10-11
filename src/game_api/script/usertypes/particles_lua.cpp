@@ -43,68 +43,37 @@ void register_usertypes(sol::state& lua)
     /// Use `generate_world_particles`
     lua["generate_particles"] = generate_world_particles;
 
-    lua.new_usertype<ParticleDB>(
-        "ParticleDB",
-        "id",
-        &ParticleDB::id,
-        "spawn_count_min",
-        &ParticleDB::spawn_count_min,
-        "spawn_count",
-        &ParticleDB::spawn_count,
-        "lifespan_min",
-        &ParticleDB::lifespan_min,
-        "lifespan",
-        &ParticleDB::lifespan,
-        "sheet_id",
-        &ParticleDB::sheet_id,
-        "animation_sequence_length",
-        &ParticleDB::animation_sequence_length,
-        "spawn_interval",
-        &ParticleDB::spawn_interval,
-        "shrink_growth_factor",
-        &ParticleDB::shrink_growth_factor,
-        "rotation_speed",
-        &ParticleDB::rotation_speed,
-        "opacity",
-        &ParticleDB::opacity,
-        "hor_scattering",
-        &ParticleDB::hor_scattering,
-        "ver_scattering",
-        &ParticleDB::ver_scattering,
-        "scale_x_min",
-        &ParticleDB::scale_x_min,
-        "scale_x",
-        &ParticleDB::scale_x,
-        "scale_y_min",
-        &ParticleDB::scale_y_min,
-        "scale_y",
-        &ParticleDB::scale_y,
-        "hor_deflection_1",
-        &ParticleDB::hor_deflection_1,
-        "ver_deflection_1",
-        &ParticleDB::ver_deflection_1,
-        "hor_deflection_2",
-        &ParticleDB::hor_deflection_2,
-        "ver_deflection_2",
-        &ParticleDB::ver_deflection_2,
-        "hor_velocity",
-        &ParticleDB::hor_velocity,
-        "ver_velocity",
-        &ParticleDB::ver_velocity,
-        "red",
-        &ParticleDB::red,
-        "green",
-        &ParticleDB::green,
-        "blue",
-        &ParticleDB::blue,
-        "permanent",
-        &ParticleDB::permanent,
-        "invisible",
-        &ParticleDB::invisible,
-        "get_texture",
-        &ParticleDB::get_texture,
-        "set_texture",
-        &ParticleDB::set_texture);
+    auto particledb_type = lua.new_usertype<ParticleDB>("ParticleDB");
+    particledb_type["id"] = &ParticleDB::id;
+    particledb_type["spawn_count_min"] = &ParticleDB::spawn_count_min;
+    particledb_type["spawn_count"] = &ParticleDB::spawn_count;
+    particledb_type["lifespan_min"] = &ParticleDB::lifespan_min;
+    particledb_type["lifespan"] = &ParticleDB::lifespan;
+    particledb_type["sheet_id"] = &ParticleDB::sheet_id;
+    particledb_type["animation_sequence_length"] = &ParticleDB::animation_sequence_length;
+    particledb_type["spawn_interval"] = &ParticleDB::spawn_interval;
+    particledb_type["shrink_growth_factor"] = &ParticleDB::shrink_growth_factor;
+    particledb_type["rotation_speed"] = &ParticleDB::rotation_speed;
+    particledb_type["opacity"] = &ParticleDB::opacity;
+    particledb_type["hor_scattering"] = &ParticleDB::hor_scattering;
+    particledb_type["ver_scattering"] = &ParticleDB::ver_scattering;
+    particledb_type["scale_x_min"] = &ParticleDB::scale_x_min;
+    particledb_type["scale_x"] = &ParticleDB::scale_x;
+    particledb_type["scale_y_min"] = &ParticleDB::scale_y_min;
+    particledb_type["scale_y"] = &ParticleDB::scale_y;
+    particledb_type["hor_deflection_1"] = &ParticleDB::hor_deflection_1;
+    particledb_type["ver_deflection_1"] = &ParticleDB::ver_deflection_1;
+    particledb_type["hor_deflection_2"] = &ParticleDB::hor_deflection_2;
+    particledb_type["ver_deflection_2"] = &ParticleDB::ver_deflection_2;
+    particledb_type["hor_velocity"] = &ParticleDB::hor_velocity;
+    particledb_type["ver_velocity"] = &ParticleDB::ver_velocity;
+    particledb_type["red"] = &ParticleDB::red;
+    particledb_type["green"] = &ParticleDB::green;
+    particledb_type["blue"] = &ParticleDB::blue;
+    particledb_type["permanent"] = &ParticleDB::permanent;
+    particledb_type["invisible"] = &ParticleDB::invisible;
+    particledb_type["get_texture"] = &ParticleDB::get_texture;
+    particledb_type["set_texture"] = &ParticleDB::set_texture;
 
     lua.new_usertype<ParticleEmitterInfo>(
         "ParticleEmitterInfo",
