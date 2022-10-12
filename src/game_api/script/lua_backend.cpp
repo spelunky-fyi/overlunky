@@ -255,8 +255,7 @@ bool LuaBackend::update()
 
         // ==========
 
-        lua["state"] = g_state;
-        lua["players"] = get_players();
+        lua["players"] = get_players(g_state);
 
         if (LuaConsole* is_console = dynamic_cast<LuaConsole*>(this))
         {
@@ -1401,12 +1400,6 @@ void LuaBackend::pop_calling_backend([[maybe_unused]] LuaBackend* calling_backen
 /**
  * static functions end
  */
-void LuaBackend::clear_current_callback()
-{
-    current_cb.uid = -1;
-    current_cb.id = -1;
-    current_cb.type = CallbackType::None;
-}
 
 bool LuaBackend::on_pre_state_update()
 {
@@ -1414,7 +1407,7 @@ bool LuaBackend::on_pre_state_update()
         return false;
 
     auto now = get_frame_count();
-    std::lock_guard lock{gil};
+    std::lock_guard lock{global_lua_lock};
 
     for (auto& [id, callback] : callbacks)
     {

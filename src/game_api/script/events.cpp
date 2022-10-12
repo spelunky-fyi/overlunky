@@ -250,9 +250,9 @@ std::u16string pre_toast(char16_t* buffer)
 void update_backends()
 {
     LuaBackend::for_each_backend(
-        [=](LuaBackend& backend)
+        [=](LuaBackend::LockedBackend backend)
         {
-            backend.update();
+            backend->update();
             return true;
         });
 }
@@ -261,9 +261,9 @@ bool pre_state_update()
 {
     bool return_val = false;
     LuaBackend::for_each_backend(
-        [=, &return_val](LuaBackend& backend)
+        [=, &return_val](LuaBackend::LockedBackend backend)
         {
-            if (backend.on_pre_state_update())
+            if (backend->on_pre_state_update())
             {
                 return_val = true;
                 return false;

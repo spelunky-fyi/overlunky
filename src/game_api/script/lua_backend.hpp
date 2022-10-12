@@ -382,6 +382,7 @@ class LuaBackend
     static std::string get_calling_backend_id();
     static void push_calling_backend(LuaBackend*);
     static void pop_calling_backend(LuaBackend*);
+    bool on_pre_state_update();
 };
 
 template <class... Args>
