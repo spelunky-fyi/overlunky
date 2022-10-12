@@ -15,42 +15,25 @@ namespace NGM
 {
 void register_usertypes(sol::state& lua)
 {
-    lua.new_usertype<GameManager>(
-        "GameManager",
-        "game_props",
-        &GameManager::game_props,
-        "screen_logo",
-        &GameManager::screen_logo,
-        "screen_intro",
-        &GameManager::screen_intro,
-        "screen_prologue",
-        &GameManager::screen_prologue,
-        "screen_title",
-        &GameManager::screen_title,
-        "screen_menu",
-        &GameManager::screen_menu,
-        "screen_options",
-        &GameManager::screen_options,
-        "screen_player_profile",
-        &GameManager::screen_player_profile,
-        "screen_leaderboards",
-        &GameManager::screen_leaderboards,
-        "screen_seed_input",
-        &GameManager::screen_seed_input,
-        "screen_camp",
-        &GameManager::screen_camp,
-        "screen_level",
-        &GameManager::screen_level,
-        "screen_online_loading",
-        &GameManager::screen_online_loading,
-        "screen_online_lobby",
-        &GameManager::screen_online_lobby,
-        "pause_ui",
-        &GameManager::pause_ui,
-        "journal_ui",
-        &GameManager::journal_ui,
-        "save_related",
-        &GameManager::save_related);
+    auto gamemanager_type = lua.new_usertype<GameManager>("GameManager");
+    gamemanager_type["game_props"] = &GameManager::game_props;
+    gamemanager_type["screen_logo"] = &GameManager::screen_logo;
+    gamemanager_type["screen_intro"] = &GameManager::screen_intro;
+    gamemanager_type["screen_prologue"] = &GameManager::screen_prologue;
+    gamemanager_type["screen_title"] = &GameManager::screen_title;
+    gamemanager_type["screen_menu"] = &GameManager::screen_menu;
+    gamemanager_type["screen_options"] = &GameManager::screen_options;
+    gamemanager_type["screen_player_profile"] = &GameManager::screen_player_profile;
+    gamemanager_type["screen_leaderboards"] = &GameManager::screen_leaderboards;
+    gamemanager_type["screen_seed_input"] = &GameManager::screen_seed_input;
+    gamemanager_type["screen_camp"] = &GameManager::screen_camp;
+    gamemanager_type["screen_level"] = &GameManager::screen_level;
+    gamemanager_type["screen_online_loading"] = &GameManager::screen_online_loading;
+    gamemanager_type["screen_online_lobby"] = &GameManager::screen_online_lobby;
+    gamemanager_type["pause_ui"] = &GameManager::pause_ui;
+    gamemanager_type["journal_ui"] = &GameManager::journal_ui;
+    gamemanager_type["save_related"] = &GameManager::save_related;
+
     lua.new_usertype<SaveRelated>(
         "SaveRelated",
         "journal_popup_ui",

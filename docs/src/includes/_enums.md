@@ -575,6 +575,31 @@ Name | Data | Description
 [VISIBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.VISIBLE) | 2 | 
 [SLIDING_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.SLIDING_UP) | 3 | 
 
+## POS_TYPE
+
+
+> Search script examples for [POS_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[FLOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.FLOOR) | POS_TYPE::FLOOR | On top of solid floor<br/>
+[CEILING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.CEILING) | POS_TYPE::CEILING | Below solid ceiling<br/>
+[AIR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.AIR) | POS_TYPE::AIR | Is a non-solid tile (no need to explicitly add this to everything)<br/>
+[WALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL) | POS_TYPE::WALL | Next to a wall<br/>
+[ALCOVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.ALCOVE) | POS_TYPE::ALCOVE | Has a floor, ceiling and exactly one wall<br/>
+[PIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.PIT) | POS_TYPE::PIT | Has a floor, two walls and no ceiling<br/>
+[HOLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.HOLE) | POS_TYPE::HOLE | Air pocket surrounded by floors<br/>
+[WATER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WATER) | POS_TYPE::WATER | Is in water (otherwise assumed not in water)<br/>
+[LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.LAVA) | POS_TYPE::LAVA | Is in lava (otherwise assumed not in lava)<br/>
+[SAFE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.SAFE) | POS_TYPE::SAFE | Avoid hazards, like certain traps, shops and any special floor<br/>
+[EMPTY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.EMPTY) | POS_TYPE::EMPTY | Has nothing but decoration and background in it<br/>
+[SOLID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.SOLID) | POS_TYPE::SOLID | Is inside solid floor or activefloor<br/>
+[DEFAULT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.DEFAULT) | POS_TYPE::DEFAULT | FLOOR | SAFE | EMPTY<br/>
+[WALL_LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL_LEFT) | POS_TYPE::WALL_LEFT | Next to a wall on the left<br/>
+[WALL_RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL_RIGHT) | POS_TYPE::WALL_RIGHT | Next to a wall on the right<br/>
+
 ## PRNG_CLASS
 
 

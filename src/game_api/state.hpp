@@ -238,8 +238,9 @@ struct State
     static State& get();
 
     // Returns the main-thread version of StateMemory*
-    StateMemory* ptr() const;
+    StateMemory* ptr_main() const;
     // Returns the local-thread version of StateMemory*
+    StateMemory* ptr() const;
     StateMemory* ptr_local() const;
 
     Layer* layer(uint8_t index) const
@@ -249,12 +250,6 @@ struct State
     Layer* layer_local(uint8_t index) const
     {
         return ptr_local()->layers[index];
-    }
-
-    Items* items() const
-    {
-        auto pointer = ptr()->items;
-        return pointer;
     }
 
     void godmode(bool g);
@@ -283,6 +278,7 @@ struct State
         ptr()->pause = p;
     }
 
+    uint32_t get_frame_count_main() const;
     uint32_t get_frame_count() const;
 
     std::vector<int64_t> read_prng() const;

@@ -235,7 +235,7 @@ class CustomTheme : public ThemeInfo
     uint8_t theme;
     /// Base THEME to load enabled functions from, when no other theme is specified.
     uint8_t base_theme;
-    LuaBackend* backend;
+    std::string backend_id;
 
     std::map<THEME_OVERRIDE, std::unique_ptr<ThemeOverride>> overrides;
     /// Add TEXTUREs here to override different dynamic textures.
@@ -348,6 +348,7 @@ class CustomTheme : public ThemeInfo
     {
         if (overrides.find(index) != overrides.end() && get_override_func_enabled(index))
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<Ret>(overrides[index]->func.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
@@ -358,6 +359,7 @@ class CustomTheme : public ThemeInfo
     {
         if (overrides.find(index) != overrides.end() && get_pre_func_enabled(index))
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<Ret>(overrides[index]->pre.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
@@ -368,6 +370,7 @@ class CustomTheme : public ThemeInfo
     {
         if (overrides.find(index) != overrides.end() && get_post_func_enabled(index))
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<Ret>(overrides[index]->post.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
@@ -379,7 +382,7 @@ class CustomTheme : public ThemeInfo
         level_file = "";
         theme = theme_id_;
         base_theme = base_theme_ - 1;
-        backend = LuaBackend::get_calling_backend();
+        backend_id = LuaBackend::get_calling_backend_id();
         if (defaults)
         {
             overrides[THEME_OVERRIDE::INIT_FLAGS] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
@@ -982,13 +985,16 @@ void register_usertypes(sol::state& lua)
     /// Default function in spawn definitions to check whether a spawn is valid or not
     lua["default_spawn_is_valid"] = default_spawn_is_valid;
 
+    /// Check if position satifies the given POS_TYPE flags, to be used in a custom is_valid function procedural for spawns.
+    lua["position_is_valid"] = position_is_valid;
+
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
     /// The callback signature is `bool pre_tile_code(x, y, layer, room_template)`
     /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
     /// For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
     lua["set_pre_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->pre_tile_code_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
         return backend->cbcount++;
     };
@@ -998,7 +1004,7 @@ void register_usertypes(sol::state& lua)
     /// This is received even if a previous pre-tile-code-callback has returned true
     lua["set_post_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->post_tile_code_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
         return backend->cbcount++;
     };
@@ -1006,7 +1012,7 @@ void register_usertypes(sol::state& lua)
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
     lua["define_tile_code"] = [](std::string tile_code) -> TILE_CODE
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         return backend->g_state->level_gen->data->define_tile_code(std::move(tile_code));
     };
 
@@ -1028,23 +1034,24 @@ void register_usertypes(sol::state& lua)
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
     lua["define_procedural_spawn"] = [](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid) -> PROCEDURAL_CHANCE
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        LevelGenData* data = backend->g_state->level_gen->data;
-        uint32_t chance = data->define_chance(std::move(procedural_spawn));
+        auto backend_id = LuaBackend::get_calling_backend_id();
         std::function<bool(float, float, int)> is_valid_call{nullptr};
         if (is_valid)
         {
-            is_valid_call = [backend, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
+            is_valid_call = [backend_id, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
             {
-                std::lock_guard lock{backend->gil};
+                auto backend = LuaBackend::get_backend(backend_id);
                 return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
             };
         }
-        std::function<void(float, float, int)> do_spawn_call = [backend, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
+        std::function<void(float, float, int)> do_spawn_call = [backend_id, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
         {
-            std::lock_guard lock{backend->gil};
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
         };
+        auto backend = LuaBackend::get_backend(backend_id);
+        LevelGenData* data = backend->g_state->level_gen->data;
+        uint32_t chance = data->define_chance(std::move(procedural_spawn));
         std::uint32_t id = data->register_chance_logic_provider(chance, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
         backend->chance_callbacks.push_back(id);
         return chance;
@@ -1059,21 +1066,22 @@ void register_usertypes(sol::state& lua)
     /// No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
     lua["define_extra_spawn"] = [](sol::function do_spawn, sol::function is_valid, std::uint32_t num_spawns_frontlayer, std::uint32_t num_spawns_backlayer) -> std::uint32_t
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend_id = LuaBackend::get_calling_backend_id();
         std::function<bool(float, float, int)> is_valid_call{nullptr};
         if (is_valid)
         {
-            is_valid_call = [backend, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
+            is_valid_call = [backend_id, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
             {
-                std::lock_guard lock{backend->gil};
+                auto backend = LuaBackend::get_backend(backend_id);
                 return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
             };
         }
-        std::function<void(float, float, int)> do_spawn_call = [backend, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
+        std::function<void(float, float, int)> do_spawn_call = [backend_id, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
         {
-            std::lock_guard lock{backend->gil};
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
         };
+        auto backend = LuaBackend::get_backend(backend_id);
         LevelGenData* data = backend->g_state->level_gen->data;
         std::uint32_t extra_spawn_id = data->define_extra_spawn(num_spawns_frontlayer, num_spawns_backlayer, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
         backend->extra_spawn_callbacks.push_back(extra_spawn_id);
@@ -1173,112 +1181,59 @@ void register_usertypes(sol::state& lua)
     /// Immediately load a screen based on state.screen_next and stuff
     lua["load_screen"] = do_load_screen;
 
-    lua.new_usertype<ThemeInfo>(
-        "ThemeInfo",
-        "sub_theme",
-        &ThemeInfo::sub_theme,
-        "get_unknown1",
-        &ThemeInfo::get_unknown1,
-        "init_flags",
-        &ThemeInfo::init_flags,
-        "init_level",
-        &ThemeInfo::init_level,
-        "unknown_v4",
-        &ThemeInfo::unknown_v4,
-        "unknown_v5",
-        &ThemeInfo::unknown_v5,
-        "add_special_rooms",
-        &ThemeInfo::add_special_rooms,
-        "unknown_v7",
-        &ThemeInfo::unknown_v7,
-        "unknown_v8",
-        &ThemeInfo::unknown_v8,
-        "add_vault",
-        &ThemeInfo::add_vault,
-        "add_coffin",
-        &ThemeInfo::add_coffin,
-        "add_special_feeling",
-        &ThemeInfo::add_special_feeling,
-        "unknown_v12",
-        &ThemeInfo::unknown_v12,
-        "spawn_level",
-        &ThemeInfo::spawn_level,
-        "spawn_border",
-        &ThemeInfo::spawn_border,
-        "post_process_level",
-        &ThemeInfo::post_process_level,
-        "spawn_traps",
-        &ThemeInfo::spawn_traps,
-        "post_process_entities",
-        &ThemeInfo::post_process_entities,
-        "spawn_procedural",
-        &ThemeInfo::spawn_procedural,
-        "spawn_background",
-        &ThemeInfo::spawn_background,
-        "spawn_lights",
-        &ThemeInfo::spawn_lights,
-        "spawn_transition",
-        &ThemeInfo::spawn_transition,
-        "post_transition",
-        &ThemeInfo::post_transition,
-        "spawn_players",
-        &ThemeInfo::spawn_players,
-        "spawn_effects",
-        &ThemeInfo::spawn_effects,
-        "get_level_file",
-        &ThemeInfo::get_level_file,
-        "get_theme_id",
-        &ThemeInfo::get_theme_id,
-        "get_base_id",
-        &ThemeInfo::get_base_id,
-        "get_floor_spreading_type",
-        &ThemeInfo::get_floor_spreading_type,
-        "get_floor_spreading_type2",
-        &ThemeInfo::get_floor_spreading_type2,
-        "unknown_v30",
-        &ThemeInfo::unknown_v30,
-        "get_transition_block_modifier",
-        &ThemeInfo::get_transition_block_modifier,
-        "unknown_v32",
-        &ThemeInfo::unknown_v32,
-        "get_backwall_type",
-        &ThemeInfo::get_backwall_type,
-        "get_border_type",
-        &ThemeInfo::get_border_type,
-        "get_critter_type",
-        &ThemeInfo::get_critter_type,
-        "get_liquid_gravity",
-        &ThemeInfo::get_liquid_gravity,
-        "get_player_damage",
-        &ThemeInfo::get_player_damage,
-        "unknown_v38",
-        &ThemeInfo::unknown_v38,
-        "get_backlayer_lut",
-        &ThemeInfo::get_backlayer_lut,
-        "get_backlayer_light_level",
-        &ThemeInfo::get_backlayer_light_level,
-        "get_loop",
-        &ThemeInfo::get_loop,
-        "get_vault_level",
-        &ThemeInfo::get_vault_level,
-        "get_unknown_1_or_2",
-        &ThemeInfo::get_unknown_1_or_2,
-        "get_dynamic_texture",
-        &ThemeInfo::get_dynamic_texture,
-        "pre_transition",
-        &ThemeInfo::pre_transition,
-        "get_level_height",
-        &ThemeInfo::get_level_height,
-        "unknown_v47",
-        &ThemeInfo::unknown_v47,
-        "spawn_decoration",
-        &ThemeInfo::spawn_decoration,
-        "spawn_decoration2",
-        &ThemeInfo::spawn_decoration2,
-        "spawn_extra",
-        &ThemeInfo::spawn_extra,
-        "unknown_v51",
-        &ThemeInfo::unknown_v51);
+    auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
+    themeinfo_type["sub_theme"] = &ThemeInfo::sub_theme;
+    themeinfo_type["get_unknown1"] = &ThemeInfo::get_unknown1;
+    themeinfo_type["init_flags"] = &ThemeInfo::init_flags;
+    themeinfo_type["init_level"] = &ThemeInfo::init_level;
+    themeinfo_type["unknown_v4"] = &ThemeInfo::unknown_v4;
+    themeinfo_type["unknown_v5"] = &ThemeInfo::unknown_v5;
+    themeinfo_type["add_special_rooms"] = &ThemeInfo::add_special_rooms;
+    themeinfo_type["unknown_v7"] = &ThemeInfo::unknown_v7;
+    themeinfo_type["unknown_v8"] = &ThemeInfo::unknown_v8;
+    themeinfo_type["add_vault"] = &ThemeInfo::add_vault;
+    themeinfo_type["add_coffin"] = &ThemeInfo::add_coffin;
+    themeinfo_type["add_special_feeling"] = &ThemeInfo::add_special_feeling;
+    themeinfo_type["unknown_v12"] = &ThemeInfo::unknown_v12;
+    themeinfo_type["spawn_level"] = &ThemeInfo::spawn_level;
+    themeinfo_type["spawn_border"] = &ThemeInfo::spawn_border;
+    themeinfo_type["post_process_level"] = &ThemeInfo::post_process_level;
+    themeinfo_type["spawn_traps"] = &ThemeInfo::spawn_traps;
+    themeinfo_type["post_process_entities"] = &ThemeInfo::post_process_entities;
+    themeinfo_type["spawn_procedural"] = &ThemeInfo::spawn_procedural;
+    themeinfo_type["spawn_background"] = &ThemeInfo::spawn_background;
+    themeinfo_type["spawn_lights"] = &ThemeInfo::spawn_lights;
+    themeinfo_type["spawn_transition"] = &ThemeInfo::spawn_transition;
+    themeinfo_type["post_transition"] = &ThemeInfo::post_transition;
+    themeinfo_type["spawn_players"] = &ThemeInfo::spawn_players;
+    themeinfo_type["spawn_effects"] = &ThemeInfo::spawn_effects;
+    themeinfo_type["get_level_file"] = &ThemeInfo::get_level_file;
+    themeinfo_type["get_theme_id"] = &ThemeInfo::get_theme_id;
+    themeinfo_type["get_base_id"] = &ThemeInfo::get_base_id;
+    themeinfo_type["get_floor_spreading_type"] = &ThemeInfo::get_floor_spreading_type;
+    themeinfo_type["get_floor_spreading_type2"] = &ThemeInfo::get_floor_spreading_type2;
+    themeinfo_type["unknown_v30"] = &ThemeInfo::unknown_v30;
+    themeinfo_type["get_transition_block_modifier"] = &ThemeInfo::get_transition_block_modifier;
+    themeinfo_type["unknown_v32"] = &ThemeInfo::unknown_v32;
+    themeinfo_type["get_backwall_type"] = &ThemeInfo::get_backwall_type;
+    themeinfo_type["get_border_type"] = &ThemeInfo::get_border_type;
+    themeinfo_type["get_critter_type"] = &ThemeInfo::get_critter_type;
+    themeinfo_type["get_liquid_gravity"] = &ThemeInfo::get_liquid_gravity;
+    themeinfo_type["get_player_damage"] = &ThemeInfo::get_player_damage;
+    themeinfo_type["unknown_v38"] = &ThemeInfo::unknown_v38;
+    themeinfo_type["get_backlayer_lut"] = &ThemeInfo::get_backlayer_lut;
+    themeinfo_type["get_backlayer_light_level"] = &ThemeInfo::get_backlayer_light_level;
+    themeinfo_type["get_loop"] = &ThemeInfo::get_loop;
+    themeinfo_type["get_vault_level"] = &ThemeInfo::get_vault_level;
+    themeinfo_type["get_unknown_1_or_2"] = &ThemeInfo::get_unknown_1_or_2;
+    themeinfo_type["get_dynamic_texture"] = &ThemeInfo::get_dynamic_texture;
+    themeinfo_type["pre_transition"] = &ThemeInfo::pre_transition;
+    themeinfo_type["get_level_height"] = &ThemeInfo::get_level_height;
+    themeinfo_type["unknown_v47"] = &ThemeInfo::unknown_v47;
+    themeinfo_type["spawn_decoration"] = &ThemeInfo::spawn_decoration;
+    themeinfo_type["spawn_decoration2"] = &ThemeInfo::spawn_decoration2;
+    themeinfo_type["spawn_extra"] = &ThemeInfo::spawn_extra;
+    themeinfo_type["unknown_v51"] = &ThemeInfo::unknown_v51;
 
     auto theme_override = sol::overload(
         static_cast<void (CustomTheme::*)(THEME_OVERRIDE, bool)>(&CustomTheme::override),
@@ -1286,146 +1241,81 @@ void register_usertypes(sol::state& lua)
         static_cast<void (CustomTheme::*)(THEME_OVERRIDE, sol::function)>(&CustomTheme::override));
 
     /// Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Check ThemeInfo for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
-    lua.new_usertype<CustomTheme>(
-        "CustomTheme",
-        sol::constructors<CustomTheme(), CustomTheme(uint8_t, uint8_t), CustomTheme(uint8_t, uint8_t, bool)>(),
-        "level_file",
-        &CustomTheme::level_file,
-        "theme",
-        &CustomTheme::theme,
-        "base_theme",
-        sol::property([](CustomTheme& ct) -> uint8_t
-                      {
+    auto customtheme_type = lua.new_usertype<CustomTheme>("CustomTheme", sol::constructors<CustomTheme(), CustomTheme(uint8_t, uint8_t), CustomTheme(uint8_t, uint8_t, bool)>());
+    customtheme_type["level_file"] = &CustomTheme::level_file;
+    customtheme_type["theme"] = &CustomTheme::theme;
+    customtheme_type["base_theme"] = sol::property([](CustomTheme& ct) -> uint8_t
+                                                   {
                           if (ct.base_theme < UINT8_MAX)
                               return ct.base_theme + 1;
                           return UINT8_MAX; },
-                      [](CustomTheme& ct, uint8_t bt)
-                      {
-                          if (bt > 0 && bt < UINT8_MAX)
-                              ct.base_theme = bt - 1;
-                          else
-                              ct.base_theme = 0;
-                      }),
-        "sub_theme",
-        &CustomTheme::sub_theme,
-        "textures",
-        &CustomTheme::textures,
-        "override",
-        theme_override,
-        "pre",
-        &CustomTheme::pre,
-        "post",
-        &CustomTheme::post,
-        "unknown1",
-        &CustomTheme::unknown1,
-        "unknown2",
-        &CustomTheme::unknown2,
-        "unknown3",
-        &CustomTheme::unknown3,
-        "unknown4",
-        &CustomTheme::unknown4,
-        "get_unknown1",
-        &CustomTheme::get_unknown1,
-        "init_flags",
-        &CustomTheme::init_flags,
-        "init_level",
-        &CustomTheme::init_level,
-        "unknown_v4",
-        &CustomTheme::unknown_v4,
-        "unknown_v5",
-        &CustomTheme::unknown_v5,
-        "add_special_rooms",
-        &CustomTheme::add_special_rooms,
-        "unknown_v7",
-        &CustomTheme::unknown_v7,
-        "unknown_v8",
-        &CustomTheme::unknown_v8,
-        "add_vault",
-        &CustomTheme::add_vault,
-        "add_coffin",
-        &CustomTheme::add_coffin,
-        "add_special_feeling",
-        &CustomTheme::add_special_feeling,
-        "unknown_v12",
-        &CustomTheme::unknown_v12,
-        "spawn_level",
-        &CustomTheme::spawn_level,
-        "spawn_border",
-        &CustomTheme::spawn_border,
-        "post_process_level",
-        &CustomTheme::post_process_level,
-        "spawn_traps",
-        &CustomTheme::spawn_traps,
-        "post_process_entities",
-        &CustomTheme::post_process_entities,
-        "spawn_procedural",
-        &CustomTheme::spawn_procedural,
-        "spawn_background",
-        &CustomTheme::spawn_background,
-        "spawn_lights",
-        &CustomTheme::spawn_lights,
-        "spawn_transition",
-        &CustomTheme::spawn_transition,
-        "post_transition",
-        &CustomTheme::post_transition,
-        "spawn_players",
-        &CustomTheme::spawn_players,
-        "spawn_effects",
-        &CustomTheme::spawn_effects,
-        "get_level_file",
-        &CustomTheme::get_level_file,
-        "get_theme_id",
-        &CustomTheme::get_theme_id,
-        "get_base_id",
-        &CustomTheme::get_base_id,
-        "get_floor_spreading_type",
-        &CustomTheme::get_floor_spreading_type,
-        "get_floor_spreading_type2",
-        &CustomTheme::get_floor_spreading_type2,
-        "unknown_v30",
-        &CustomTheme::unknown_v30,
-        "get_transition_block_modifier",
-        &CustomTheme::get_transition_block_modifier,
-        "unknown_v32",
-        &CustomTheme::unknown_v32,
-        "get_backwall_type",
-        &CustomTheme::get_backwall_type,
-        "get_border_type",
-        &CustomTheme::get_border_type,
-        "get_critter_type",
-        &CustomTheme::get_critter_type,
-        "get_liquid_gravity",
-        &CustomTheme::get_liquid_gravity,
-        "get_player_damage",
-        &CustomTheme::get_player_damage,
-        "unknown_v38",
-        &CustomTheme::unknown_v38,
-        "get_backlayer_lut",
-        &CustomTheme::get_backlayer_lut,
-        "get_backlayer_light_level",
-        &CustomTheme::get_backlayer_light_level,
-        "get_loop",
-        &CustomTheme::get_loop,
-        "get_vault_level",
-        &CustomTheme::get_vault_level,
-        "get_unknown_1_or_2",
-        &CustomTheme::get_unknown_1_or_2,
-        "get_dynamic_texture",
-        &CustomTheme::get_dynamic_texture,
-        "pre_transition",
-        &CustomTheme::pre_transition,
-        "get_level_height",
-        &CustomTheme::get_level_height,
-        "unknown_v47",
-        &CustomTheme::unknown_v47,
-        "spawn_decoration",
-        &CustomTheme::spawn_decoration,
-        "spawn_decoration2",
-        &CustomTheme::spawn_decoration2,
-        "spawn_extra",
-        &CustomTheme::spawn_extra,
-        "unknown_v51",
-        &CustomTheme::unknown_v51);
+                                                   [](CustomTheme& ct, uint8_t bt)
+                                                   {
+                                                       if (bt > 0 && bt < UINT8_MAX)
+                                                           ct.base_theme = bt - 1;
+                                                       else
+                                                           ct.base_theme = 0;
+                                                   });
+    customtheme_type["sub_theme"] = &CustomTheme::sub_theme;
+    customtheme_type["textures"] = &CustomTheme::textures;
+    customtheme_type["override"] = theme_override;
+    customtheme_type["pre"] = &CustomTheme::pre;
+    customtheme_type["post"] = &CustomTheme::post;
+    customtheme_type["unknown1"] = &CustomTheme::unknown1;
+    customtheme_type["unknown2"] = &CustomTheme::unknown2;
+    customtheme_type["unknown3"] = &CustomTheme::unknown3;
+    customtheme_type["unknown4"] = &CustomTheme::unknown4;
+    customtheme_type["get_unknown1"] = &CustomTheme::get_unknown1;
+    customtheme_type["init_flags"] = &CustomTheme::init_flags;
+    customtheme_type["init_level"] = &CustomTheme::init_level;
+    customtheme_type["unknown_v4"] = &CustomTheme::unknown_v4;
+    customtheme_type["unknown_v5"] = &CustomTheme::unknown_v5;
+    customtheme_type["add_special_rooms"] = &CustomTheme::add_special_rooms;
+    customtheme_type["unknown_v7"] = &CustomTheme::unknown_v7;
+    customtheme_type["unknown_v8"] = &CustomTheme::unknown_v8;
+    customtheme_type["add_vault"] = &CustomTheme::add_vault;
+    customtheme_type["add_coffin"] = &CustomTheme::add_coffin;
+    customtheme_type["add_special_feeling"] = &CustomTheme::add_special_feeling;
+    customtheme_type["unknown_v12"] = &CustomTheme::unknown_v12;
+    customtheme_type["spawn_level"] = &CustomTheme::spawn_level;
+    customtheme_type["spawn_border"] = &CustomTheme::spawn_border;
+    customtheme_type["post_process_level"] = &CustomTheme::post_process_level;
+    customtheme_type["spawn_traps"] = &CustomTheme::spawn_traps;
+    customtheme_type["post_process_entities"] = &CustomTheme::post_process_entities;
+    customtheme_type["spawn_procedural"] = &CustomTheme::spawn_procedural;
+    customtheme_type["spawn_background"] = &CustomTheme::spawn_background;
+    customtheme_type["spawn_lights"] = &CustomTheme::spawn_lights;
+    customtheme_type["spawn_transition"] = &CustomTheme::spawn_transition;
+    customtheme_type["post_transition"] = &CustomTheme::post_transition;
+    customtheme_type["spawn_players"] = &CustomTheme::spawn_players;
+    customtheme_type["spawn_effects"] = &CustomTheme::spawn_effects;
+    customtheme_type["get_level_file"] = &CustomTheme::get_level_file;
+    customtheme_type["get_theme_id"] = &CustomTheme::get_theme_id;
+    customtheme_type["get_base_id"] = &CustomTheme::get_base_id;
+    customtheme_type["get_floor_spreading_type"] = &CustomTheme::get_floor_spreading_type;
+    customtheme_type["get_floor_spreading_type2"] = &CustomTheme::get_floor_spreading_type2;
+    customtheme_type["unknown_v30"] = &CustomTheme::unknown_v30;
+    customtheme_type["get_transition_block_modifier"] = &CustomTheme::get_transition_block_modifier;
+    customtheme_type["unknown_v32"] = &CustomTheme::unknown_v32;
+    customtheme_type["get_backwall_type"] = &CustomTheme::get_backwall_type;
+    customtheme_type["get_border_type"] = &CustomTheme::get_border_type;
+    customtheme_type["get_critter_type"] = &CustomTheme::get_critter_type;
+    customtheme_type["get_liquid_gravity"] = &CustomTheme::get_liquid_gravity;
+    customtheme_type["get_player_damage"] = &CustomTheme::get_player_damage;
+    customtheme_type["unknown_v38"] = &CustomTheme::unknown_v38;
+    customtheme_type["get_backlayer_lut"] = &CustomTheme::get_backlayer_lut;
+    customtheme_type["get_backlayer_light_level"] = &CustomTheme::get_backlayer_light_level;
+    customtheme_type["get_loop"] = &CustomTheme::get_loop;
+    customtheme_type["get_vault_level"] = &CustomTheme::get_vault_level;
+    customtheme_type["get_unknown_1_or_2"] = &CustomTheme::get_unknown_1_or_2;
+    customtheme_type["get_dynamic_texture"] = &CustomTheme::get_dynamic_texture;
+    customtheme_type["pre_transition"] = &CustomTheme::pre_transition;
+    customtheme_type["get_level_height"] = &CustomTheme::get_level_height;
+    customtheme_type["unknown_v47"] = &CustomTheme::unknown_v47;
+    customtheme_type["spawn_decoration"] = &CustomTheme::spawn_decoration;
+    customtheme_type["spawn_decoration2"] = &CustomTheme::spawn_decoration2;
+    customtheme_type["spawn_extra"] = &CustomTheme::spawn_extra;
+    customtheme_type["unknown_v51"] = &CustomTheme::unknown_v51;
 
     /* CustomTheme
     // override
@@ -1591,84 +1481,45 @@ void register_usertypes(sol::state& lua)
         "beg_state",
         &QuestsInfo::beg_state);
 
-    lua.new_usertype<SaveData>(
-        "SaveData",
-        "places",
-        sol::readonly(&SaveData::places),
-        "bestiary",
-        sol::readonly(&SaveData::bestiary),
-        "people",
-        sol::readonly(&SaveData::people),
-        "items",
-        sol::readonly(&SaveData::items),
-        "traps",
-        sol::readonly(&SaveData::traps),
-        "last_daily",
-        sol::readonly(&SaveData::last_daily),
-        "characters",
-        sol::readonly(&SaveData::characters),
-        "shortcuts",
-        sol::readonly(&SaveData::shortcuts),
-        "bestiary_killed",
-        sol::readonly(&SaveData::bestiary_killed),
-        "bestiary_killed_by",
-        sol::readonly(&SaveData::bestiary_killed_by),
-        "people_killed",
-        sol::readonly(&SaveData::people_killed),
-        "people_killed_by",
-        sol::readonly(&SaveData::people_killed_by),
-        "plays",
-        sol::readonly(&SaveData::plays),
-        "deaths",
-        sol::readonly(&SaveData::deaths),
-        "wins_normal",
-        sol::readonly(&SaveData::wins_normal),
-        "wins_hard",
-        sol::readonly(&SaveData::wins_hard),
-        "wins_special",
-        sol::readonly(&SaveData::wins_special),
-        "score_total",
-        sol::readonly(&SaveData::score_total),
-        "score_top",
-        sol::readonly(&SaveData::score_top),
-        "deepest_area",
-        sol::readonly(&SaveData::deepest_area),
-        "deepest_level",
-        sol::readonly(&SaveData::deepest_level),
-        "time_best",
-        sol::readonly(&SaveData::time_best),
-        "time_total",
-        sol::readonly(&SaveData::time_total),
-        "time_tutorial",
-        sol::readonly(&SaveData::time_tutorial),
-        "character_deaths",
-        sol::readonly(&SaveData::character_deaths),
-        "pets_rescued",
-        sol::readonly(&SaveData::pets_rescued),
-        "completed_normal",
-        sol::readonly(&SaveData::completed_normal),
-        "completed_ironman",
-        sol::readonly(&SaveData::completed_ironman),
-        "completed_hard",
-        sol::readonly(&SaveData::completed_hard),
-        "profile_seen",
-        sol::readonly(&SaveData::profile_seen),
-        "seeded_unlocked",
-        sol::readonly(&SaveData::seeded_unlocked),
-        "world_last",
-        sol::readonly(&SaveData::world_last),
-        "level_last",
-        sol::readonly(&SaveData::level_last),
-        "score_last",
-        sol::readonly(&SaveData::score_last),
-        "time_last",
-        sol::readonly(&SaveData::time_last),
-        "stickers",
-        sol::readonly(&SaveData::stickers),
-        "players",
-        sol::readonly(&SaveData::players),
-        "constellation",
-        &SaveData::constellation);
+    auto savedata_type = lua.new_usertype<SaveData>("SaveData");
+    savedata_type["places"] = sol::readonly(&SaveData::places);
+    savedata_type["bestiary"] = sol::readonly(&SaveData::bestiary);
+    savedata_type["people"] = sol::readonly(&SaveData::people);
+    savedata_type["items"] = sol::readonly(&SaveData::items);
+    savedata_type["traps"] = sol::readonly(&SaveData::traps);
+    savedata_type["last_daily"] = sol::readonly(&SaveData::last_daily);
+    savedata_type["characters"] = sol::readonly(&SaveData::characters);
+    savedata_type["shortcuts"] = sol::readonly(&SaveData::shortcuts);
+    savedata_type["bestiary_killed"] = sol::readonly(&SaveData::bestiary_killed);
+    savedata_type["bestiary_killed_by"] = sol::readonly(&SaveData::bestiary_killed_by);
+    savedata_type["people_killed"] = sol::readonly(&SaveData::people_killed);
+    savedata_type["people_killed_by"] = sol::readonly(&SaveData::people_killed_by);
+    savedata_type["plays"] = sol::readonly(&SaveData::plays);
+    savedata_type["deaths"] = sol::readonly(&SaveData::deaths);
+    savedata_type["wins_normal"] = sol::readonly(&SaveData::wins_normal);
+    savedata_type["wins_hard"] = sol::readonly(&SaveData::wins_hard);
+    savedata_type["wins_special"] = sol::readonly(&SaveData::wins_special);
+    savedata_type["score_total"] = sol::readonly(&SaveData::score_total);
+    savedata_type["score_top"] = sol::readonly(&SaveData::score_top);
+    savedata_type["deepest_area"] = sol::readonly(&SaveData::deepest_area);
+    savedata_type["deepest_level"] = sol::readonly(&SaveData::deepest_level);
+    savedata_type["time_best"] = sol::readonly(&SaveData::time_best);
+    savedata_type["time_total"] = sol::readonly(&SaveData::time_total);
+    savedata_type["time_tutorial"] = sol::readonly(&SaveData::time_tutorial);
+    savedata_type["character_deaths"] = sol::readonly(&SaveData::character_deaths);
+    savedata_type["pets_rescued"] = sol::readonly(&SaveData::pets_rescued);
+    savedata_type["completed_normal"] = sol::readonly(&SaveData::completed_normal);
+    savedata_type["completed_ironman"] = sol::readonly(&SaveData::completed_ironman);
+    savedata_type["completed_hard"] = sol::readonly(&SaveData::completed_hard);
+    savedata_type["profile_seen"] = sol::readonly(&SaveData::profile_seen);
+    savedata_type["seeded_unlocked"] = sol::readonly(&SaveData::seeded_unlocked);
+    savedata_type["world_last"] = sol::readonly(&SaveData::world_last);
+    savedata_type["level_last"] = sol::readonly(&SaveData::level_last);
+    savedata_type["score_last"] = sol::readonly(&SaveData::score_last);
+    savedata_type["time_last"] = sol::readonly(&SaveData::time_last);
+    savedata_type["stickers"] = sol::readonly(&SaveData::stickers);
+    savedata_type["players"] = sol::readonly(&SaveData::players);
+    savedata_type["constellation"] = &SaveData::constellation;
 
     lua.new_usertype<Constellation>(
         "Constellation",
@@ -1855,11 +1706,13 @@ void register_usertypes(sol::state& lua)
         "FLAGGED_LIQUID_ROOMS",
         16);
 
+    StateMemory* main_state = State::get().ptr_main();
+
     lua.create_named_table("TILE_CODE"
                            //, "EMPTY", 0
                            //, "", ...check__[tile_codes.txt]\[game_data/tile_codes.txt\]...
     );
-    for (const auto& [tile_code_name, tile_code] : State::get().ptr()->level_gen->data->tile_codes)
+    for (const auto& [tile_code_name, tile_code] : main_state->level_gen->data->tile_codes)
     {
         std::string clean_tile_code_name = tile_code_name.c_str();
         std::transform(
@@ -1874,7 +1727,7 @@ void register_usertypes(sol::state& lua)
                            //, "", ...check__[room_templates.txt]\[game_data/room_templates.txt\]...
     );
 
-    auto room_templates = State::get().ptr()->level_gen->data->room_templates;
+    auto room_templates = main_state->level_gen->data->room_templates;
     room_templates["empty_backlayer"] = {9};
     room_templates["boss_arena"] = {22};
     room_templates["shop_jail_backlayer"] = {44};
@@ -1897,8 +1750,7 @@ void register_usertypes(sol::state& lua)
                            //, "ARROWTRAP_CHANCE", 0
                            //, "", ...check__[spawn_chances.txt]\[game_data/spawn_chances.txt\]...
     );
-    auto* state = State::get().ptr();
-    for (auto* chances : {&state->level_gen->data->monster_chances, &state->level_gen->data->trap_chances})
+    for (auto* chances : {&main_state->level_gen->data->monster_chances, &main_state->level_gen->data->trap_chances})
     {
         for (const auto& [chance_name, chance] : *chances)
         {
@@ -1910,5 +1762,40 @@ void register_usertypes(sol::state& lua)
             lua["PROCEDURAL_CHANCE"][std::move(clean_chance_name)] = chance.id;
         }
     }
+
+    lua.create_named_table("POS_TYPE", "FLOOR", POS_TYPE::FLOOR, "CEILING", POS_TYPE::CEILING, "AIR", POS_TYPE::AIR, "WALL", POS_TYPE::WALL, "ALCOVE", POS_TYPE::ALCOVE, "PIT", POS_TYPE::PIT, "HOLE", POS_TYPE::HOLE, "WATER", POS_TYPE::WATER, "LAVA", POS_TYPE::LAVA, "SAFE", POS_TYPE::SAFE, "EMPTY", POS_TYPE::EMPTY, "SOLID", POS_TYPE::SOLID, "DEFAULT", POS_TYPE::DEFAULT, "WALL_LEFT", POS_TYPE::WALL_LEFT, "WALL_RIGHT", POS_TYPE::WALL_RIGHT);
+
+    /* POS_TYPE
+    // FLOOR
+    // On top of solid floor
+    // CEILING
+    // Below solid ceiling
+    // AIR
+    // Is a non-solid tile (no need to explicitly add this to everything)
+    // WALL
+    // Next to a wall
+    // WALL_LEFT
+    // Next to a wall on the left
+    // WALL_RIGHT
+    // Next to a wall on the right
+    // ALCOVE
+    // Has a floor, ceiling and exactly one wall
+    // PIT
+    // Has a floor, two walls and no ceiling
+    // HOLE
+    // Air pocket surrounded by floors
+    // WATER
+    // Is in water (otherwise assumed not in water)
+    // LAVA
+    // Is in lava (otherwise assumed not in lava)
+    // SAFE
+    // Avoid hazards, like certain traps, shops and any special floor
+    // EMPTY
+    // Has nothing but decoration and background in it
+    // SOLID
+    // Is inside solid floor or activefloor
+    // DEFAULT
+    // FLOOR | SAFE | EMPTY
+    */
 }
 }; // namespace NLevel

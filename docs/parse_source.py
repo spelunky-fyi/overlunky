@@ -443,11 +443,23 @@ def run_parse():
         data = re.sub(r" ", "", data)
         reParticleHelper = re.compile(r"MakeParticleMemberAccess<(.+?)>\(\)")
         data = reParticleHelper.sub(r"\1", data)
-        m = re.findall(r'new_usertype\<([^\>]*?)\>\s*\(\s*"([^"]*)",(.*?)\);', data)
+        m = re.findall(r'(auto([a-z]+_type)=)?lua\.new_usertype\<([^\>]*?)\>\s*\(\s*"([^"]*)",?(.*?)\);', data)
         for type in m:
-            cpp_type = type[0]
-            name = type[1]
-            attr = type[2]
+            container = type[1]
+            cpp_type = type[2]
+            name = type[3]
+            attr = type[4]
+            if container:
+                extra = []
+                n = re.findall(container+r'\[("[^"]+")\]=([^;]+);', data)
+                for var in n:
+                    extra.append(','.join(var))
+                extra = ','.join(extra)
+                if attr:
+                    attr = attr + "," + extra
+                else:
+                    attr = extra
+
             base = ""
             bm = re.search(r"sol::bases<([^\]]*)>", attr)
             if bm:
