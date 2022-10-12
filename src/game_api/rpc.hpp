@@ -17,6 +17,7 @@ struct Illumination;
 class Entity;
 struct AABB;
 struct Layer;
+struct StateMemory;
 
 void attach_entity(Entity* overlay, Entity* attachee);
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid);
@@ -35,7 +36,7 @@ uint32_t get_level_flags();
 void set_pause(uint8_t pause);
 ENT_TYPE get_entity_type(uint32_t uid);
 int get_entity_ai_state(uint32_t uid);
-std::vector<Player*> get_players();
+std::vector<Player*> get_players(StateMemory* state);
 std::tuple<float, float, float, float> screen_aabb(float x1, float y1, float x2, float y2);
 float screen_distance(float x);
 std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::function<bool(Entity*)> predicate);
@@ -65,6 +66,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
 std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask);
 void lock_door_at(float x, float y);
 void unlock_door_at(float x, float y);
+uint32_t get_frame_count_main();
 uint32_t get_frame_count();
 void carry(uint32_t mount_uid, uint32_t rider_uid);
 void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse = std::nullopt);

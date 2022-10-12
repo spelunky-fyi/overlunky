@@ -3653,20 +3653,21 @@ void render_messages()
 
     using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     std::vector<Message> queue;
-    for (auto& [name, script] : g_scripts)
+    for (auto& script : g_scripts)
     {
-        for (auto message : script->get_messages())
-        {
-            if (options["fade_script_messages"] && now - 12s > message.time)
-                continue;
-            std::istringstream messages(message.message);
-            while (!messages.eof())
+        script.second->loop_messages(
+            [&](const ScriptMessage& message)
             {
-                std::string mline;
-                getline(messages, mline);
-                queue.push_back(std::make_tuple(script->get_name(), mline, message.time, message.color));
-            }
-        }
+                if (options["fade_script_messages"] && now - 12s > message.time)
+                    return;
+                std::istringstream messages(message.message);
+                while (!messages.eof())
+                {
+                    std::string mline;
+                    getline(messages, mline);
+                    queue.push_back(std::make_tuple(script.second->get_name(), mline, message.time, message.color));
+                }
+            });
     }
     for (auto&& message : g_Console->consume_messages())
     {
@@ -4745,7 +4746,8 @@ void render_scripts()
                     {
                         script->set_changed(true);
                     }
-                    ImGui::InputText("##LuaResult", &script->get_result(), ImGuiInputTextFlags_ReadOnly);
+                    std::string result = script->get_result();
+                    ImGui::InputText("##LuaResult", &result, ImGuiInputTextFlags_ReadOnly);
                 }
             }
             else
@@ -7122,7 +7124,7 @@ void init_ui()
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
-    g_state = get_state_ptr();
+    g_state = State::get().ptr_main();
     g_save = UI::savedata();
     g_game_manager = get_game_manager();
 

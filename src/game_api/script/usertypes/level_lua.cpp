@@ -235,7 +235,7 @@ class CustomTheme : public ThemeInfo
     uint8_t theme;
     /// Base THEME to load enabled functions from, when no other theme is specified.
     uint8_t base_theme;
-    LuaBackend* backend;
+    std::string backend_id;
 
     std::map<THEME_OVERRIDE, std::unique_ptr<ThemeOverride>> overrides;
     /// Add TEXTUREs here to override different dynamic textures.
@@ -348,6 +348,7 @@ class CustomTheme : public ThemeInfo
     {
         if (overrides.find(index) != overrides.end() && get_override_func_enabled(index))
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<Ret>(overrides[index]->func.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
@@ -358,6 +359,7 @@ class CustomTheme : public ThemeInfo
     {
         if (overrides.find(index) != overrides.end() && get_pre_func_enabled(index))
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<Ret>(overrides[index]->pre.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
@@ -368,6 +370,7 @@ class CustomTheme : public ThemeInfo
     {
         if (overrides.find(index) != overrides.end() && get_post_func_enabled(index))
         {
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<Ret>(overrides[index]->post.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
@@ -379,7 +382,7 @@ class CustomTheme : public ThemeInfo
         level_file = "";
         theme = theme_id_;
         base_theme = base_theme_ - 1;
-        backend = LuaBackend::get_calling_backend();
+        backend_id = LuaBackend::get_calling_backend_id();
         if (defaults)
         {
             overrides[THEME_OVERRIDE::INIT_FLAGS] = std::unique_ptr<ThemeOverride>{new ThemeOverride{true, UINT8_MAX}};
@@ -991,7 +994,7 @@ void register_usertypes(sol::state& lua)
     /// For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
     lua["set_pre_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->pre_tile_code_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
         return backend->cbcount++;
     };
@@ -1001,7 +1004,7 @@ void register_usertypes(sol::state& lua)
     /// This is received even if a previous pre-tile-code-callback has returned true
     lua["set_post_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->post_tile_code_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
         return backend->cbcount++;
     };
@@ -1009,7 +1012,7 @@ void register_usertypes(sol::state& lua)
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
     lua["define_tile_code"] = [](std::string tile_code) -> TILE_CODE
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         return backend->g_state->level_gen->data->define_tile_code(std::move(tile_code));
     };
 
@@ -1031,23 +1034,24 @@ void register_usertypes(sol::state& lua)
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
     lua["define_procedural_spawn"] = [](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid) -> PROCEDURAL_CHANCE
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        LevelGenData* data = backend->g_state->level_gen->data;
-        uint32_t chance = data->define_chance(std::move(procedural_spawn));
+        auto backend_id = LuaBackend::get_calling_backend_id();
         std::function<bool(float, float, int)> is_valid_call{nullptr};
         if (is_valid)
         {
-            is_valid_call = [backend, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
+            is_valid_call = [backend_id, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
             {
-                std::lock_guard lock{backend->gil};
+                auto backend = LuaBackend::get_backend(backend_id);
                 return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
             };
         }
-        std::function<void(float, float, int)> do_spawn_call = [backend, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
+        std::function<void(float, float, int)> do_spawn_call = [backend_id, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
         {
-            std::lock_guard lock{backend->gil};
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
         };
+        auto backend = LuaBackend::get_backend(backend_id);
+        LevelGenData* data = backend->g_state->level_gen->data;
+        uint32_t chance = data->define_chance(std::move(procedural_spawn));
         std::uint32_t id = data->register_chance_logic_provider(chance, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
         backend->chance_callbacks.push_back(id);
         return chance;
@@ -1062,21 +1066,22 @@ void register_usertypes(sol::state& lua)
     /// No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
     lua["define_extra_spawn"] = [](sol::function do_spawn, sol::function is_valid, std::uint32_t num_spawns_frontlayer, std::uint32_t num_spawns_backlayer) -> std::uint32_t
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend_id = LuaBackend::get_calling_backend_id();
         std::function<bool(float, float, int)> is_valid_call{nullptr};
         if (is_valid)
         {
-            is_valid_call = [backend, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
+            is_valid_call = [backend_id, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
             {
-                std::lock_guard lock{backend->gil};
+                auto backend = LuaBackend::get_backend(backend_id);
                 return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
             };
         }
-        std::function<void(float, float, int)> do_spawn_call = [backend, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
+        std::function<void(float, float, int)> do_spawn_call = [backend_id, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
         {
-            std::lock_guard lock{backend->gil};
+            auto backend = LuaBackend::get_backend(backend_id);
             return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
         };
+        auto backend = LuaBackend::get_backend(backend_id);
         LevelGenData* data = backend->g_state->level_gen->data;
         std::uint32_t extra_spawn_id = data->define_extra_spawn(num_spawns_frontlayer, num_spawns_backlayer, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
         backend->extra_spawn_callbacks.push_back(extra_spawn_id);
@@ -1701,11 +1706,13 @@ void register_usertypes(sol::state& lua)
         "FLAGGED_LIQUID_ROOMS",
         16);
 
+    StateMemory* main_state = State::get().ptr_main();
+
     lua.create_named_table("TILE_CODE"
                            //, "EMPTY", 0
                            //, "", ...check__[tile_codes.txt]\[game_data/tile_codes.txt\]...
     );
-    for (const auto& [tile_code_name, tile_code] : State::get().ptr()->level_gen->data->tile_codes)
+    for (const auto& [tile_code_name, tile_code] : main_state->level_gen->data->tile_codes)
     {
         std::string clean_tile_code_name = tile_code_name.c_str();
         std::transform(
@@ -1720,7 +1727,7 @@ void register_usertypes(sol::state& lua)
                            //, "", ...check__[room_templates.txt]\[game_data/room_templates.txt\]...
     );
 
-    auto room_templates = State::get().ptr()->level_gen->data->room_templates;
+    auto room_templates = main_state->level_gen->data->room_templates;
     room_templates["empty_backlayer"] = {9};
     room_templates["boss_arena"] = {22};
     room_templates["shop_jail_backlayer"] = {44};
@@ -1743,8 +1750,7 @@ void register_usertypes(sol::state& lua)
                            //, "ARROWTRAP_CHANCE", 0
                            //, "", ...check__[spawn_chances.txt]\[game_data/spawn_chances.txt\]...
     );
-    auto* state = State::get().ptr();
-    for (auto* chances : {&state->level_gen->data->monster_chances, &state->level_gen->data->trap_chances})
+    for (auto* chances : {&main_state->level_gen->data->monster_chances, &main_state->level_gen->data->trap_chances})
     {
         for (const auto& [chance_name, chance] : *chances)
         {

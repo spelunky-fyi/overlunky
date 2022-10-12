@@ -25,7 +25,7 @@
 class SoundManager;
 
 LuaConsole::LuaConsole(SoundManager* soundmanager)
-    : LuaBackend(soundmanager, this)
+    : LockableLuaBackend<LuaConsole>(soundmanager, this)
 {
     lua["__script_id"] = "console_proxy.lua";
 
