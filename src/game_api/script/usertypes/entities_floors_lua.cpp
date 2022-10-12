@@ -50,30 +50,17 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_poledeco"] = &Entity::as<PoleDeco>;
     lua["Entity"]["as_junglespeartrap"] = &Entity::as<JungleSpearTrap>;
 
-    lua.new_usertype<Floor>(
-        "Floor",
-        "deco_top",
-        &Floor::deco_top,
-        "deco_bottom",
-        &Floor::deco_bottom,
-        "deco_left",
-        &Floor::deco_left,
-        "deco_right",
-        &Floor::deco_right,
-        "fix_border_tile_animation",
-        &Floor::fix_border_tile_animation,
-        "fix_decorations",
-        &Floor::fix_decorations,
-        "add_decoration",
-        &Floor::add_decoration,
-        "remove_decoration",
-        &Floor::remove_decoration,
-        "decorate_internal",
-        &Floor::decorate_internal,
-        "get_floor_type",
-        &Floor::get_floor_type,
-        sol::base_classes,
-        sol::bases<Entity>());
+    auto floor_type = lua.new_usertype<Floor>("Floor", sol::base_classes, sol::bases<Entity>());
+    floor_type["deco_top"] = &Floor::deco_top;
+    floor_type["deco_bottom"] = &Floor::deco_bottom;
+    floor_type["deco_left"] = &Floor::deco_left;
+    floor_type["deco_right"] = &Floor::deco_right;
+    floor_type["fix_border_tile_animation"] = &Floor::fix_border_tile_animation;
+    floor_type["fix_decorations"] = &Floor::fix_decorations;
+    floor_type["add_decoration"] = &Floor::add_decoration;
+    floor_type["remove_decoration"] = &Floor::remove_decoration;
+    floor_type["decorate_internal"] = &Floor::decorate_internal;
+    floor_type["get_floor_type"] = &Floor::get_floor_type;
 
     // The corner options only work for FLOOR_BORDERTILE and FLOOR_BORDERTILE_OCTOPUS
     lua.create_named_table(
@@ -319,44 +306,24 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
-    lua.new_usertype<MotherStatue>(
-        "MotherStatue",
-        "players_standing",
-        &MotherStatue::players_standing,
-        "player1_standing",
-        &MotherStatue::player1_standing,
-        "player2_standing",
-        &MotherStatue::player2_standing,
-        "player3_standing",
-        &MotherStatue::player3_standing,
-        "player4_standing",
-        &MotherStatue::player4_standing,
-        "players_health_received",
-        &MotherStatue::players_health_received,
-        "player1_health_received",
-        &MotherStatue::player1_health_received,
-        "player2_health_received",
-        &MotherStatue::player2_health_received,
-        "player3_health_received",
-        &MotherStatue::player3_health_received,
-        "player4_health_received",
-        &MotherStatue::player4_health_received,
-        "players_health_timer",
-        &MotherStatue::players_health_timer,
-        "player1_health_timer",
-        &MotherStatue::player1_health_timer,
-        "player2_health_timer",
-        &MotherStatue::player2_health_timer,
-        "player3_health_timer",
-        &MotherStatue::player3_health_timer,
-        "player4_health_timer",
-        &MotherStatue::player4_health_timer,
-        "eggplantchild_timer",
-        &MotherStatue::eggplantchild_timer,
-        "eggplantchild_detected",
-        &MotherStatue::eggplantchild_detected,
-        sol::base_classes,
-        sol::bases<Entity, Floor>());
+    auto motherstatue_type = lua.new_usertype<MotherStatue>("MotherStatue", sol::base_classes, sol::bases<Entity, Floor>());
+    motherstatue_type["players_standing"] = &MotherStatue::players_standing;
+    motherstatue_type["player1_standing"] = &MotherStatue::player1_standing;
+    motherstatue_type["player2_standing"] = &MotherStatue::player2_standing;
+    motherstatue_type["player3_standing"] = &MotherStatue::player3_standing;
+    motherstatue_type["player4_standing"] = &MotherStatue::player4_standing;
+    motherstatue_type["players_health_received"] = &MotherStatue::players_health_received;
+    motherstatue_type["player1_health_received"] = &MotherStatue::player1_health_received;
+    motherstatue_type["player2_health_received"] = &MotherStatue::player2_health_received;
+    motherstatue_type["player3_health_received"] = &MotherStatue::player3_health_received;
+    motherstatue_type["player4_health_received"] = &MotherStatue::player4_health_received;
+    motherstatue_type["players_health_timer"] = &MotherStatue::players_health_timer;
+    motherstatue_type["player1_health_timer"] = &MotherStatue::player1_health_timer;
+    motherstatue_type["player2_health_timer"] = &MotherStatue::player2_health_timer;
+    motherstatue_type["player3_health_timer"] = &MotherStatue::player3_health_timer;
+    motherstatue_type["player4_health_timer"] = &MotherStatue::player4_health_timer;
+    motherstatue_type["eggplantchild_timer"] = &MotherStatue::eggplantchild_timer;
+    motherstatue_type["eggplantchild_detected"] = &MotherStatue::eggplantchild_detected;
 
     lua.new_usertype<TeleportingBorder>(
         "TeleportingBorder",

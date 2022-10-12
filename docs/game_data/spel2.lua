@@ -1884,6 +1884,8 @@ function dump_network() end
     ---@field tiamat_cutscene LogicTiamatCutscene
     ---@field diceshop LogicDiceShop
 
+---@class Logic
+
 ---@class LogicOlmecCutscene : Logic
     ---@field olmec Entity
     ---@field player Entity

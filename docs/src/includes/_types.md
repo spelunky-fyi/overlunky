@@ -1014,6 +1014,12 @@ Type | Name | Description
 ## Logic types
 
 
+### Logic
+
+
+Type | Name | Description
+---- | ---- | -----------
+
 ### LogicDiceShop
 
 Derived from [Logic](#Logic)

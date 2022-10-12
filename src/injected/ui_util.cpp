@@ -53,7 +53,7 @@ void UI::warp(uint8_t world, uint8_t level, uint8_t theme)
 }
 void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
 {
-    auto state = State::get().ptr();
+    auto state = State::get().ptr_main();
     if (state->screen != 12)
     {
         State::get().warp(world, level, theme);
@@ -74,9 +74,9 @@ float UI::get_zoom_level()
 }
 void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
 {
-    auto state = State::get();
+    auto state = State::get().ptr_main();
 
-    auto player = state.items()->player(0);
+    auto player = state->items->player(0);
     if (player == nullptr)
         return;
     player->teleport(x, y, s, vx, vy, snap);
@@ -125,7 +125,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 
     if (mask == 0)
     {
-        for (auto& item : state.layer(state.ptr()->camera_layer)->all_entities.entities())
+        for (auto& item : state.layer(state.ptr_main()->camera_layer)->all_entities.entities())
         {
             check_distance(item);
         }
@@ -137,8 +137,8 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
             if ((mask & current_mask) == 0)
                 continue;
 
-            const auto& entities = state.layer(state.ptr()->camera_layer)->entities_by_mask.find(current_mask);
-            if (entities == state.layer(state.ptr()->camera_layer)->entities_by_mask.end())
+            const auto& entities = state.layer(state.ptr_main()->camera_layer)->entities_by_mask.find(current_mask);
+            if (entities == state.layer(state.ptr_main()->camera_layer)->entities_by_mask.end())
                 continue;
 
             for (auto& item : entities->second.entities())
@@ -257,7 +257,7 @@ ENT_TYPE UI::get_entity_type(int32_t uid)
 }
 std::vector<Player*> UI::get_players()
 {
-    return ::get_players();
+    return ::get_players(State::get().ptr_main());
 }
 int32_t UI::get_grid_entity_at(float x, float y, LAYER l)
 {
@@ -301,12 +301,12 @@ std::pair<float, float> UI::get_room_pos(uint32_t x, uint32_t y)
 }
 std::string_view UI::get_room_template_name(uint16_t room_template)
 {
-    const auto state = State::get().ptr();
+    const auto state = State::get().ptr_main();
     return state->level_gen->get_room_template_name(room_template);
 }
 std::optional<uint16_t> UI::get_room_template(uint32_t x, uint32_t y, uint8_t l)
 {
-    const auto state = State::get().ptr();
+    const auto state = State::get().ptr_main();
     return state->level_gen->get_room_template(x, y, l);
 }
 void UI::steam_achievements(bool on)
@@ -364,7 +364,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
     if ((ent->type->search_flags & 0x100) == 0 || !test_flag(ent->flags, 3))
         return;
     auto floor = ent->as<Floor>();
-    auto state = State::get().ptr();
+    auto state = State::get().ptr_main();
     if (test_flag(state->special_visibility_flags, 1))
     {
         for (auto item : entity_get_items_by(floor->uid, 0, 0x8))

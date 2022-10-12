@@ -257,55 +257,30 @@ void register_usertypes(sol::state& lua)
         "draw_world_texture",
         draw_world_texture);
 
-    lua.new_usertype<TextureRenderingInfo>(
-        "TextureRenderingInfo",
-        "x",
-        &TextureRenderingInfo::x,
-        "y",
-        &TextureRenderingInfo::y,
-
-        "destination_bottom_left_x",
-        &TextureRenderingInfo::destination_bottom_left_x,
-        "destination_bottom_left_y",
-        &TextureRenderingInfo::destination_bottom_left_y,
-        "destination_bottom_right_x",
-        &TextureRenderingInfo::destination_bottom_right_x,
-        "destination_bottom_right_y",
-        &TextureRenderingInfo::destination_bottom_right_y,
-        "destination_top_left_x",
-        &TextureRenderingInfo::destination_top_left_x,
-        "destination_top_left_y",
-        &TextureRenderingInfo::destination_top_left_y,
-        "destination_top_right_x",
-        &TextureRenderingInfo::destination_top_right_x,
-        "destination_top_right_y",
-        &TextureRenderingInfo::destination_top_right_y,
-        "set_destination",
-        &TextureRenderingInfo::set_destination,
-        "dest_get_quad",
-        &TextureRenderingInfo::dest_get_quad,
-        "dest_set_quad",
-        &TextureRenderingInfo::dest_set_quad,
-        "source_bottom_left_x",
-        &TextureRenderingInfo::source_bottom_left_x,
-        "source_bottom_left_y",
-        &TextureRenderingInfo::source_bottom_left_y,
-        "source_bottom_right_x",
-        &TextureRenderingInfo::source_bottom_right_x,
-        "source_bottom_right_y",
-        &TextureRenderingInfo::source_bottom_right_y,
-        "source_top_left_x",
-        &TextureRenderingInfo::source_top_left_x,
-        "source_top_left_y",
-        &TextureRenderingInfo::source_top_left_y,
-        "source_top_right_x",
-        &TextureRenderingInfo::source_top_right_x,
-        "source_top_right_y",
-        &TextureRenderingInfo::source_top_right_y,
-        "source_get_quad",
-        &TextureRenderingInfo::source_get_quad,
-        "source_set_quad",
-        &TextureRenderingInfo::source_set_quad);
+    auto texturerenderinginfo_type = lua.new_usertype<TextureRenderingInfo>("TextureRenderingInfo");
+    texturerenderinginfo_type["x"] = &TextureRenderingInfo::x;
+    texturerenderinginfo_type["y"] = &TextureRenderingInfo::y;
+    texturerenderinginfo_type["destination_bottom_left_x"] = &TextureRenderingInfo::destination_bottom_left_x;
+    texturerenderinginfo_type["destination_bottom_left_y"] = &TextureRenderingInfo::destination_bottom_left_y;
+    texturerenderinginfo_type["destination_bottom_right_x"] = &TextureRenderingInfo::destination_bottom_right_x;
+    texturerenderinginfo_type["destination_bottom_right_y"] = &TextureRenderingInfo::destination_bottom_right_y;
+    texturerenderinginfo_type["destination_top_left_x"] = &TextureRenderingInfo::destination_top_left_x;
+    texturerenderinginfo_type["destination_top_left_y"] = &TextureRenderingInfo::destination_top_left_y;
+    texturerenderinginfo_type["destination_top_right_x"] = &TextureRenderingInfo::destination_top_right_x;
+    texturerenderinginfo_type["destination_top_right_y"] = &TextureRenderingInfo::destination_top_right_y;
+    texturerenderinginfo_type["set_destination"] = &TextureRenderingInfo::set_destination;
+    texturerenderinginfo_type["dest_get_quad"] = &TextureRenderingInfo::dest_get_quad;
+    texturerenderinginfo_type["dest_set_quad"] = &TextureRenderingInfo::dest_set_quad;
+    texturerenderinginfo_type["source_bottom_left_x"] = &TextureRenderingInfo::source_bottom_left_x;
+    texturerenderinginfo_type["source_bottom_left_y"] = &TextureRenderingInfo::source_bottom_left_y;
+    texturerenderinginfo_type["source_bottom_right_x"] = &TextureRenderingInfo::source_bottom_right_x;
+    texturerenderinginfo_type["source_bottom_right_y"] = &TextureRenderingInfo::source_bottom_right_y;
+    texturerenderinginfo_type["source_top_left_x"] = &TextureRenderingInfo::source_top_left_x;
+    texturerenderinginfo_type["source_top_left_y"] = &TextureRenderingInfo::source_top_left_y;
+    texturerenderinginfo_type["source_top_right_x"] = &TextureRenderingInfo::source_top_right_x;
+    texturerenderinginfo_type["source_top_right_y"] = &TextureRenderingInfo::source_top_right_y;
+    texturerenderinginfo_type["source_get_quad"] = &TextureRenderingInfo::source_get_quad;
+    texturerenderinginfo_type["source_set_quad"] = &TextureRenderingInfo::source_set_quad;
 
     lua.new_usertype<TextRenderingInfo>(
         "TextRenderingInfo",

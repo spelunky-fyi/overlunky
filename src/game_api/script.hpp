@@ -1,13 +1,14 @@
 #pragma once
 
-#include <chrono>  // for system_clock, time_point
-#include <cstddef> // for size_t
-#include <cstdint> // for uint16_t
-#include <deque>   // for deque
-#include <imgui.h> // for ImVec2, ImDrawList (ptr only), ImVec4
-#include <memory>  // for unique_ptr
-#include <string>  // for string
-#include <vector>  // for vector
+#include <chrono>     // for system_clock, time_point
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint16_t
+#include <deque>      // for deque
+#include <functional> // for function
+#include <imgui.h>    // for ImVec2, ImDrawList (ptr only), ImVec4
+#include <memory>     // for unique_ptr
+#include <string>     // for string
+#include <vector>     // for vector
 
 struct PlayerSlot;
 class Ai;
@@ -61,20 +62,23 @@ class SpelunkyScript
     SpelunkyScript(std::string script, std::string file, class SoundManager* sound_manager, class SpelunkyConsole* console, bool enable = true);
     ~SpelunkyScript();
 
-    std::deque<ScriptMessage>& get_messages();
+    void loop_messages(std::function<void(const ScriptMessage&)> message_fun) const;
     std::deque<ScriptMessage> consume_messages();
     std::vector<std::string> consume_requires();
 
-    const std::string& get_id() const;
-    const std::string& get_name() const;
-    const std::string& get_description() const;
-    const std::string& get_author() const;
-    const std::string& get_file() const;
-    const std::string& get_filename() const;
-    const std::string& get_path() const;
-    const std::string& get_version() const;
+    std::string get_id() const;
+    std::string get_name() const;
+    std::string get_description() const;
+    std::string get_author() const;
+    std::string get_file() const;
+    std::string get_filename() const;
+    std::string get_path() const;
+    std::string get_version() const;
     bool get_unsafe() const;
     bool get_online_safe() const;
+
+    // Use for non-allocating access to meta
+    void get_meta(std::function<void(const ScriptMeta& meta)> meta_fun);
 
 #ifdef SPEL2_EDITABLE_SCRIPTS
     std::string& get_code() const;
@@ -83,7 +87,7 @@ class SpelunkyScript
 
     void update_code(std::string code);
 
-    std::string& get_result(); // Thanks for non-const imgui
+    std::string get_result();
 
     bool is_enabled() const;
     void set_enabled(bool enabled);
