@@ -351,32 +351,18 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, Projectile, LightShot>());
 
-    lua.new_usertype<Spark>(
-        "Spark",
-        "particle",
-        &Spark::particle,
-        "fx_entity",
-        &Spark::fx_entity,
-        "rotation_center_x",
-        &Spark::rotation_center_x,
-        "rotation_center_y",
-        &Spark::rotation_center_y,
-        "rotation_angle",
-        &Spark::rotation_angle,
-        "size",
-        &Spark::size,
-        "size_multiply",
-        &Spark::size_multiply,
-        "next_size",
-        &Spark::next_size,
-        "size_change_timer",
-        &Spark::size_change_timer,
-        "speed",
-        &Spark::speed,
-        "distance",
-        &Spark::distance,
-        sol::base_classes,
-        sol::bases<Entity, Movable, Flame>());
+    auto spark_type = lua.new_usertype<Spark>("Spark", sol::base_classes, sol::bases<Entity, Movable, Flame>());
+    spark_type["particle"] = &Spark::particle;
+    spark_type["fx_entity"] = &Spark::fx_entity;
+    spark_type["rotation_center_x"] = &Spark::rotation_center_x;
+    spark_type["rotation_center_y"] = &Spark::rotation_center_y;
+    spark_type["rotation_angle"] = &Spark::rotation_angle;
+    spark_type["size"] = &Spark::size;
+    spark_type["size_multiply"] = &Spark::size_multiply;
+    spark_type["next_size"] = &Spark::next_size;
+    spark_type["size_change_timer"] = &Spark::size_change_timer;
+    spark_type["speed"] = &Spark::speed;
+    spark_type["distance"] = &Spark::distance;
 
     lua.new_usertype<TiamatShot>(
         "TiamatShot",
