@@ -1071,7 +1071,7 @@ end
         static const auto ana = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
         static const auto egg_child = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
 
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) != backend->script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
@@ -1108,7 +1108,7 @@ end
     {
         static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
 
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
@@ -1130,7 +1130,7 @@ end
     /// Send input
     lua["send_input"] = [](int uid, INPUTS buttons)
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         auto it = backend->script_input.find(uid);
         if (it != backend->script_input.end())
         {

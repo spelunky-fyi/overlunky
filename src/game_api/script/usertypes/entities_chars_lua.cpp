@@ -109,6 +109,8 @@ void register_usertypes(sol::state& lua)
     player_type["linked_companion_parent"] = &Player::linked_companion_parent;
     player_type["linked_companion_child"] = &Player::linked_companion_child;
     player_type["ai"] = &Player::ai;
+    player_type["input"] = &Player::input_ptr;
+    player_type["basecamp_button_entity"] = &Player::basecamp_button_entity;
     player_type["set_jetpack_fuel"] = &Player::set_jetpack_fuel;
     player_type["kapala_blood_amount"] = &Player::kapala_blood_amount;
     player_type["get_name"] = &Player::get_name;

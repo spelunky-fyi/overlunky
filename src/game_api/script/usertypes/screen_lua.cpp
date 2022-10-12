@@ -129,6 +129,7 @@ void register_usertypes(sol::state& lua)
     screenmenu_type["spear_dangler_related"] = &ScreenMenu::spear_dangler_related;
     screenmenu_type["play_scroll"] = &ScreenMenu::play_scroll;
     screenmenu_type["info_toast"] = &ScreenMenu::info_toast;
+    screenmenu_type["cthulhu_sound"] = &ScreenMenu::cthulhu_sound;
     screenmenu_type["cthulhu_disc_ring_angle"] = &ScreenMenu::cthulhu_disc_ring_angle;
     screenmenu_type["cthulhu_disc_split_progress"] = &ScreenMenu::cthulhu_disc_split_progress;
     screenmenu_type["cthulhu_disc_y"] = &ScreenMenu::cthulhu_disc_y;
@@ -267,6 +268,7 @@ void register_usertypes(sol::state& lua)
     screencharacterselect_type["particle_torchflame_flames3"] = &ScreenCharacterSelect::particle_torchflame_flames3;
     screencharacterselect_type["particle_torchflame_smoke4"] = &ScreenCharacterSelect::particle_torchflame_smoke4;
     screencharacterselect_type["particle_torchflame_flames4"] = &ScreenCharacterSelect::particle_torchflame_flames4;
+    screencharacterselect_type["sound"] = &ScreenCharacterSelect::sound;
 
     lua.new_usertype<FlyingThing>(
         "FlyingThing",
