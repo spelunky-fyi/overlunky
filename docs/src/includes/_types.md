@@ -1743,6 +1743,7 @@ Type | Name | Description
 [TextureRenderingInfo](#TextureRenderingInfo) | [spear_dangler_related](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangler_related) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [play_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_scroll) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [info_toast](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=info_toast) | 
+[SoundMeta](#SoundMeta) | [cthulhu_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_sound) | 
 float | [cthulhu_disc_ring_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_ring_angle) | 
 float | [cthulhu_disc_split_progress](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_split_progress) | 
 float | [cthulhu_disc_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_y) | 
@@ -1975,6 +1976,8 @@ Type | Name | Description
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_torchflame_backflames_animated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_torchflame_backflames_animated) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_torchflame_flames_animated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_torchflame_flames_animated) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_torchflame_ash](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_torchflame_ash) | 
+[SoundMeta](#SoundMeta) | [music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music) | 
+[SoundMeta](#SoundMeta) | [torch_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=torch_sound) | 
 
 ### ScreenTransition
 
@@ -2137,7 +2140,7 @@ float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inert
 
 Type | Name | Description
 ---- | ---- | -----------
-[BackgroundMusic](#BackgroundMusic) | [backgroundmusic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backgroundmusic) | 
+[BackgroundMusic](#BackgroundMusic) | [music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music) | 
 [GameProps](#GameProps) | [game_props](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) | 
 [ScreenLogo](#ScreenLogo) | [screen_logo](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) | 
 [ScreenIntro](#ScreenIntro) | [screen_intro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_intro) | 

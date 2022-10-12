@@ -1932,7 +1932,7 @@ function dump_network() end
     ---@field sunken_city_duat_transition BackgroundSound
 
 ---@class GameManager
-    ---@field backgroundmusic BackgroundMusic
+    ---@field music BackgroundMusic
     ---@field game_props GameProps
     ---@field screen_logo ScreenLogo
     ---@field screen_intro ScreenIntro
@@ -4476,6 +4476,8 @@ local function AABB_extrude(self, amount_x, amount_y) end
     ---@field particle_torchflame_backflames_animated ParticleEmitterInfo
     ---@field particle_torchflame_flames_animated ParticleEmitterInfo
     ---@field particle_torchflame_ash ParticleEmitterInfo
+    ---@field music SoundMeta
+    ---@field torch_sound SoundMeta
 
 ---@class ScreenMenu : Screen
     ---@field tunnel_background TextureRenderingInfo
@@ -4492,6 +4494,7 @@ local function AABB_extrude(self, amount_x, amount_y) end
     ---@field spear_dangler_related TextureRenderingInfo
     ---@field play_scroll TextureRenderingInfo
     ---@field info_toast TextureRenderingInfo
+    ---@field cthulhu_sound SoundMeta
     ---@field cthulhu_disc_ring_angle number
     ---@field cthulhu_disc_split_progress number
     ---@field cthulhu_disc_y number
