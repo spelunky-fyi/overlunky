@@ -242,8 +242,18 @@ void register_usertypes(sol::state& lua)
     statememory_type["screen_last"] = &StateMemory::screen_last;
     statememory_type["screen"] = &StateMemory::screen;
     statememory_type["screen_next"] = &StateMemory::screen_next;
-    statememory_type["ingame"] = &StateMemory::ingame;
-    statememory_type["playing"] = &StateMemory::playing;
+    statememory_type["in_game"] = &StateMemory::playing;
+    statememory_type["is_playing"] = &StateMemory::playing;
+    /// NoDoc
+    statememory_type["ingame"] = sol::property([](StateMemory& sm)
+                                               { return (uint8_t)sm.ingame; },
+                                               [](StateMemory& sm, uint8_t v)
+                                               { sm.ingame = v; });
+    /// NoDoc
+    statememory_type["playing"] = sol::property([](StateMemory& sm)
+                                                { return (uint8_t)sm.playing; },
+                                                [](StateMemory& sm, uint8_t v)
+                                                { sm.playing = v; });
     statememory_type["pause"] = &StateMemory::pause;
     statememory_type["width"] = &StateMemory::w;
     statememory_type["height"] = &StateMemory::h;
