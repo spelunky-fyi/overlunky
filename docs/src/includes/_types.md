@@ -2905,6 +2905,7 @@ Derived from [Entity](#Entity) [Floor](#Floor) [Door](#Door) [ExitDoor](#ExitDoo
 
 Type | Name | Description
 ---- | ---- | -----------
+[Entity](#Entity) | [door_blocker](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_blocker) | Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
 
 ### MotherStatue
 
