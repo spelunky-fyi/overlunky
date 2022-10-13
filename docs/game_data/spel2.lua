@@ -2279,6 +2279,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field unlocked boolean
 
 ---@class MainExit : ExitDoor
+    ---@field door_blocker Entity
     ---@field sound SoundMeta
 
 ---@class EggShipDoor : Door

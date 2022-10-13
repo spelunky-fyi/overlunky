@@ -139,6 +139,8 @@ void register_usertypes(sol::state& lua)
         "MainExit",
         "sound",
         &MainExit::sound,
+        "door_blocker",
+        &MainExit::door_blocker,
         sol::base_classes,
         sol::bases<Entity, Floor, Door, ExitDoor>());
 
