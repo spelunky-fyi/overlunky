@@ -8,5 +8,5 @@ set_callback(function()
             ent:set_texture(TEXTURE.DATA_TEXTURES_CHAR_PINK_0)
         end
         clear_callback()
-    end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.PLAYER)
+    end, SPAWN_TYPE.SYSTEMIC, MASK.PLAYER)
 end, ON.WIN)
