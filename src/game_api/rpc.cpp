@@ -1922,7 +1922,6 @@ void set_ending_unlock(ENT_TYPE type)
     static const ENT_TYPE last = to_id("ENT_TYPE_CHAR_CLASSIC_GUY");
     if (type >= first && type <= last)
     {
-        auto memory = Memory::get();
         const auto offset = get_address("ending_unlock");
         const int32_t char_offset = 10;
 
