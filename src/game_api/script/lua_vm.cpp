@@ -1780,6 +1780,9 @@ end
         return set_level_string(str);
     };
 
+    /// Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys.
+    lua["set_ending_unlock"] = set_ending_unlock;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
