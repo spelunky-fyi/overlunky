@@ -52,10 +52,10 @@ struct StateMemory
     uint32_t fadeout;
     uint32_t fadein;
     uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
-    /// True when you have control over your character
-    bool ingame;
-    /// True whenever you are in an active game (basically everything except the main menu, character select etc.)
-    bool playing;
+    /// Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
+    uint8_t ingame;
+    /// Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
+    uint8_t playing;
     /// `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
     uint8_t pause;
     uint8_t pause_related1;
@@ -64,7 +64,8 @@ struct StateMemory
     uint32_t quest_flags;
     uint8_t correct_ushabti; // correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
     uint8_t padding2[3];
-    ENT_TYPE speedrun_character;      // who administers the speedrun in base camp
+    /// Who administers the tutorial speedrun in base camp
+    ENT_TYPE speedrun_character;      
     bool speedrun_activation_trigger; // must transition from true to false to activate it
     uint8_t padding3[3];
     /// level width in rooms (number of rooms horizontally)
