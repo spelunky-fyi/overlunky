@@ -1185,6 +1185,10 @@ function save_script() end
 ---@param str string
 ---@return nil
 function set_level_string(str) end
+---Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
+---@param type ENT_TYPE
+---@return nil
+function set_ending_unlock(type) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
