@@ -471,6 +471,13 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     ptr()->fadein = 5;
     ptr()->win_state = 0;
     ptr()->loading = 1;
+
+    static auto gm = get_game_manager();
+    if (gm->main_menu_music)
+    {
+        gm->main_menu_music->kill(false);
+        gm->main_menu_music = nullptr;
+    }
 }
 
 void State::set_seed(uint32_t seed)

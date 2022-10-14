@@ -128,7 +128,7 @@ struct SaveData
     int8_t skip7;
     uint32_t score_last;
     uint32_t time_last;
-    std::array<int32_t, 20> stickers;
+    std::array<ENT_TYPE, 20> stickers;
     int8_t skip8[40];                     // first dword is a mask(?) that determines horizontal spacing between stickers
     std::array<float, 20> sticker_angles; // rotation angle for each sticker
     int8_t skip9[40];

@@ -18,6 +18,7 @@
 #include "aliases.hpp"
 #include "audio_buffer.hpp"
 #include "fmod.hpp"
+#include "string_aliases.hpp" // for VANILLA_SOUND
 
 class SoundManager;
 class PlayingSound;
@@ -250,3 +251,46 @@ class SoundManager
 
     std::vector<Sound> m_SoundStorage;
 };
+
+struct SoundInfo
+{
+    int64_t unknown1;
+    uint32_t sound_id;
+    int32_t unknown2;       // padding probably
+    std::string sound_name; // not 100% sure it's standard
+};
+
+struct SoundMeta
+{
+    float x;
+    float y;
+    SoundInfo* sound_info;               // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
+    uint64_t fmod_param_id;              // param to FMOD::Studio::EventInstance::SetParameterByID
+    std::array<float, 38> left_channel;  // VANILLA_SOUND_PARAM
+    std::array<float, 38> right_channel; // VANILLA_SOUND_PARAM
+
+    /// when false, current track starts from the beginning, is immediately set back to true
+    bool start_over;
+    bool play_ending_sequence;
+    /// set to false to turn off
+    bool playing;
+    uint8_t padding1;
+    uint32_t padding2;
+
+    virtual void start() = 0;             // just sets music_on to true in most cases
+    virtual void kill(bool fade_out) = 0; // fade_out - set's the play_ending_sequence
+    virtual void get_name(char16_t* buffor, uint32_t size) = 0;
+    virtual ~SoundMeta() = 0;
+    virtual void update() = 0; // disabling this function does not progresses the track, does not stop it at the end level etc.
+                               // like if you start a level you have one loop and then after you move, it porgresses to another one
+    virtual bool unknown() = 0;
+};
+
+struct BackgroundSound : public SoundMeta
+{
+    bool destroy_sound; // don't use directly, use the kill function
+};
+
+/// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
+/// Returns SoundMeta (read only), beware that after the sound starts, that memory is no longer valid
+SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid);

@@ -6,7 +6,7 @@
 #include "entities_chars.hpp" // for PowerupCapable
 
 class Movable;
-struct SoundPosition;
+struct SoundMeta;
 
 class Mount : public PowerupCapable
 {
@@ -15,7 +15,7 @@ class Mount : public PowerupCapable
     // uint64_t unknown2;
     int32_t rider_uid; // who rides it
     uint32_t unknown4;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     bool can_doublejump; // whether the doublejump has already occurred or not
     bool tamed;
     uint16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
@@ -59,8 +59,8 @@ class Axolotl : public Mount
 class Mech : public Mount
 {
   public:
-    SoundPosition* sound_position;
-    SoundPosition* explosion_sound_pos;
+    SoundMeta* crouch_walk_sound;
+    SoundMeta* explosion_sound;
     uint64_t unknown11;
     uint8_t gun_cooldown;
     uint8_t unknown21;
@@ -71,6 +71,6 @@ class Mech : public Mount
 class Qilin : public Mount
 {
   public:
-    SoundPosition* sound_position;
+    SoundMeta* fly_gallop_sound;
     uint8_t attack_cooldown; // not actually used? you can fire again before it's 0
 };

@@ -1616,24 +1616,6 @@ Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. T
 
 Current mouse cursor position in screen coordinates.
 
-### read_input
-
-
-> Search script examples for [read_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
-
-#### [INPUTS](#INPUTS) read_input(int uid)
-
-Read input
-
-### read_stolen_input
-
-
-> Search script examples for [read_stolen_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
-
-#### [INPUTS](#INPUTS) read_stolen_input(int uid)
-
-Read input that has been previously stolen with steal_input
-
 ### return_input
 
 
@@ -2386,6 +2368,14 @@ Loads a sound from disk relative to this script, ownership might be shared with 
 
 Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
 
+### play_sound
+
+
+> Search script examples for [play_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_sound)
+
+#### [SoundMeta](#SoundMeta) play_sound([VANILLA_SOUND](#VANILLA_SOUND) sound, int source_uid)
+
+
 ## Spawn functions
 
 
@@ -2676,6 +2666,16 @@ Short for [spawn_entity_over](#spawn_entity_over)
 
 Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
+
+### spawn_playerghost
+
+
+> Search script examples for [spawn_playerghost](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_playerghost)
+
+#### int spawn_playerghost([ENT_TYPE](#ENT_TYPE) char_type, float x, float y, [LAYER](#LAYER) layer)
+
+Spawn the [Player](#Player) [Ghost](#Ghost) entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+or change it's `player_inputs` to the `input` of real player so he can control it directly
 
 ### spawn_tree
 
@@ -3123,6 +3123,25 @@ this doesn't actually work at all. See State -> [Camera](#Camera) the for proper
 > Search script examples for [testflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
 
 `nil testflag()`<br/>
+
+### read_input
+
+
+> Search script examples for [read_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
+
+`INPUTS read_input(int uid)`<br/>
+Use `players[1].input.buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
+Of course, you can get the player by other mean, it doesn't need to be the `players` table
+You can only read inputs from actual players, HH don't have any inputs
+
+### read_stolen_input
+
+
+> Search script examples for [read_stolen_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
+
+`INPUTS read_stolen_input(int uid)`<br/>
+Read input that has been previously stolen with steal_input
+Use `state.player_inputs.player_slots[player_slot].buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
 
 ### generate_particles
 

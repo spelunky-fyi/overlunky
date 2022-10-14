@@ -2,6 +2,7 @@
 
 #include "movable.hpp"
 #include "particles.hpp"
+#include "sound_manager.hpp"
 
 struct Illumination;
 
@@ -23,7 +24,7 @@ class LiquidSurface : public Movable
 class EggshipCenterJetFlame : public Movable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     int64_t unknown2;
     Illumination* emitted_light;
     ParticleEmitterInfo* particle;
@@ -179,7 +180,7 @@ class FxJetpackFlame : public Movable
   public:
     ParticleEmitterInfo* particle_smoke;
     ParticleEmitterInfo* particle_flame;
-    SoundPosition* sound_info;
+    SoundMeta* sound;
     Illumination* illumination;
 };
 

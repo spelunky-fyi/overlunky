@@ -10,7 +10,7 @@
 class Entity;
 struct Illumination;
 struct ParticleEmitterInfo;
-struct SoundPosition;
+struct SoundMeta;
 
 // Seams like all activefloors have one virtual function, but it just `return` so no reason to add it
 
@@ -28,7 +28,7 @@ class Crushtrap : public Movable
 class Olmec : public Movable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint32_t target_uid;
     /// 0 = stomp, 1 = bombs, 2 = stomp+ufos, 3 = in lava
     uint8_t attack_phase;
@@ -66,7 +66,7 @@ class PushBlock : public Movable
 {
   public:
     UnknownPointerGroup unknown1;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     ParticleEmitterInfo* dust_particle;
     float dest_pos_x;
     uint32_t unused;
@@ -108,8 +108,8 @@ class UnchainedSpikeBall : public Movable
 class Drill : public Movable
 {
   public:
-    SoundPosition* sound_pos1;
-    SoundPosition* sound_pos2;
+    SoundMeta* sound1;
+    SoundMeta* sound2;
     Entity* top_chain_piece;
     uint8_t unknown1; // it's forced to 0, for whatever reason
 

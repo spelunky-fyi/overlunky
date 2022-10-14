@@ -37,6 +37,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<PalaceSign>(
         "PalaceSign",
+        "sound",
+        &PalaceSign::sound,
         "illumination",
         &PalaceSign::illumination,
         "arrow_illumination",

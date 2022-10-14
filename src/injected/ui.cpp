@@ -1153,7 +1153,16 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     std::pair<float, float> cpos = UI::click_position(g_x, g_y);
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
-        int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
+        int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
+        if (!lock_entity && set_last)
+            g_last_id = spawned;
+        return spawned;
+    }
+    else if (to_spawn.name == "ENT_TYPE_ITEM_PLAYERGHOST")
+    {
+        static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+        auto spawned = UI::spawn_playerghost(ana_spelunky + (rand() % 19), cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
+
         if (!lock_entity && set_last)
             g_last_id = spawned;
         return spawned;
@@ -1610,6 +1619,12 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->fadein = 1;
     g_state->fadeout = 1;
     g_state->loading = 1;
+
+    if (g_game_manager->main_menu_music)
+    {
+        g_game_manager->main_menu_music->kill(false);
+        g_game_manager->main_menu_music = nullptr;
+    }
 }
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
@@ -5005,7 +5020,7 @@ void render_savegame()
         for (int i = 0; i < 9; ++i)
         {
             ImGui::PushID(i);
-            ImGui::InputInt("Sticker", &g_save->stickers[i]);
+            ImGui::InputInt("Sticker", (int32_t*)&g_save->stickers[i]);
             ImGui::PopID();
         }
     }

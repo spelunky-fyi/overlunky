@@ -6,11 +6,12 @@
 #include <exception> // for exception
 #include <memory>    // for remove_if, unique_ptr
 #include <mutex>     // for lock_guard, mutex
-#include <string>    // for allocator, string, hash, operator==, char_...
 
-#include "logger.h"       // for DEBUG
-#include "overloaded.hpp" // for overloaded
-#include "search.hpp"     // for get_address
+#include "entity.hpp"             //
+#include "logger.h"               // for DEBUG
+#include "overloaded.hpp"         // for overloaded
+#include "script/lua_backend.hpp" //
+#include "search.hpp"             // for get_address
 
 #define SOL_ALL_SAFETIES_ON 1
 
@@ -867,4 +868,48 @@ bool SoundManager::set_parameter(PlayingSound playing_sound, VANILLA_SOUND_PARAM
                    [](std::monostate)
                    { return false; }},
         playing_sound.m_FmodHandle);
+}
+
+int32_t sound_name_to_id(const VANILLA_SOUND s_name)
+{
+    static std::vector<std::string> sound_names;
+    if (sound_names.empty())
+    {
+        auto sound_mgr = LuaBackend::get_calling_backend()->sound_manager;
+        sound_mgr->for_each_event_name(
+            [](std::string event_name)
+            {
+                sound_names.push_back(std::move(event_name));
+            });
+    }
+
+    for (auto& sound : sound_names)
+    {
+        if (sound == s_name)
+        {
+            return int32_t(&sound - &sound_names[0]) + 1;
+        }
+    }
+    return -1;
+}
+
+SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid)
+{
+    using play_sound = SoundMeta*(int32_t);
+    static auto play_sound_func = (play_sound*)get_address("play_sound");
+
+    Entity* source = get_entity_ptr(source_uid);
+    SoundMeta* sound_info{nullptr};
+    auto sound_id = sound_name_to_id(sound);
+
+    if (sound_id == -1)
+        return nullptr;
+
+    if (source_uid == ~0 || source != nullptr) // don't play the sound if the entity is not valid
+    {
+        sound_info = play_sound_func(sound_id);
+        if (source != nullptr)
+            source->set_as_sound_source(sound_info);
+    }
+    return sound_info;
 }

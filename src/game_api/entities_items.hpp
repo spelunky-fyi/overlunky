@@ -14,8 +14,8 @@ class PowerupCapable;
 struct Illumination;
 struct Inventory;
 struct ParticleEmitterInfo;
-struct PlayerInputs;
-struct SoundPosition;
+struct PlayerSlot;
+struct SoundMeta;
 
 class Backpack : public Movable
 {
@@ -54,14 +54,14 @@ class TeleporterBackpack : public Backpack
 class Hoverpack : public Backpack
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     bool is_on;
 };
 
 class Bomb : public Movable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     /// 1.25 = default regular bomb, 1.875 = default giant bomb, > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
     float scale_hor;
     float scale_ver;
@@ -145,7 +145,7 @@ class GiantClamTop : public Movable
 class Flame : public Movable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     Illumination* emitted_light;
 };
 
@@ -265,7 +265,7 @@ class LightEmitter : public Movable
 class ScepterShot : public LightEmitter
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     float speed;
     /// short timer before it goes after target
     uint16_t idle_timer;
@@ -282,7 +282,7 @@ class SpecialShot : public LightEmitter
 class SoundShot : public LightShot
 {
   public:
-    SoundPosition* sound_info;
+    SoundMeta* sound;
 };
 
 class Spark : public Flame
@@ -312,7 +312,7 @@ class Spark : public Flame
 class TiamatShot : public LightEmitter
 {
   public:
-    SoundPosition* sound_info;
+    SoundMeta* sound;
 };
 
 class Fireball : public SoundShot
@@ -400,7 +400,7 @@ class Boombox : public Movable
 class TV : public Movable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     Entity* fx_button;
     Illumination* emitted_light;
     uint8_t station; // 0 to turn off, anything above 3 has the music from station 3 and the screen doesn't change
@@ -436,7 +436,7 @@ class CookFire : public Torch
     ParticleEmitterInfo* particles_smoke;
     ParticleEmitterInfo* particles_flames;
     ParticleEmitterInfo* particles_warp;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class WallTorch : public Torch
@@ -556,9 +556,9 @@ class PlayerGhost : public LightEmitter
 {
   public:
     ParticleEmitterInfo* sparkles_particle;
-    PlayerInputs* player_inputs;
+    PlayerSlot* player_inputs;
     Inventory* inventory;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     /// Is not set to -1 when crushed
     int32_t body_uid;
     uint16_t unknown_timer;
@@ -591,7 +591,7 @@ class LaserBeam : public Movable
 class TreasureHook : public Movable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class AxolotlShot : public Projectile
@@ -617,7 +617,7 @@ class TrapPart : public Movable
 class SkullDropTrap : public Movable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     int32_t left_skull_uid;
     int32_t middle_skull_uid;
     int32_t right_skull_uid;
@@ -670,7 +670,7 @@ class Tentacle : public Chain
 class MiniGameShip : public Movable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     float velocity_x;
     float velocity_y;
     float swing; // angle change?
@@ -701,7 +701,7 @@ class CursedPot : public Movable
 class Orb : public Movable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     uint8_t timer;
 };
 
@@ -776,7 +776,7 @@ class TrueCrownPowerup : public Powerup
 class AnkhPowerup : public Powerup
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     Entity* player;
     Entity* fx_glow;
     float unknown1;
@@ -789,7 +789,7 @@ class AnkhPowerup : public Powerup
 class YellowCape : public Cape
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class Teleporter : public Purchasable
@@ -801,7 +801,7 @@ class Teleporter : public Purchasable
 class Boomerang : public Purchasable
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     ParticleEmitterInfo* trail;
     float distance;
     float rotation;
@@ -838,6 +838,7 @@ class PrizeDispenser : public Movable
 
 class Bow : public Purchasable
 {
+  public:
     // When lain on the ground
     virtual float get_arrow_special_offset() = 0;
 };

@@ -10,11 +10,12 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max
 
-#include "aliases.hpp"      // for JournalPageType, JournalPageType::Bestiary
-#include "entity.hpp"       // IWYU pragma: keep
-#include "particles.hpp"    // IWYU pragma: keep
-#include "screen.hpp"       // for ScreenCharacterSelect, ScreenOnlineLobby
-#include "screen_arena.hpp" // for ScreenArenaStagesSelect, ScreenArenaIntro
+#include "aliases.hpp"       // for JournalPageType, JournalPageType::Bestiary
+#include "entity.hpp"        // IWYU pragma: keep
+#include "particles.hpp"     // IWYU pragma: keep
+#include "screen.hpp"        // for ScreenCharacterSelect, ScreenOnlineLobby
+#include "screen_arena.hpp"  // for ScreenArenaStagesSelect, ScreenArenaIntro
+#include "sound_manager.hpp" //
 
 namespace NScreen
 {
@@ -106,6 +107,10 @@ void register_usertypes(sol::state& lua)
         &ScreenTitle::particle_torchflame_flames_animated,
         "particle_torchflame_ash",
         &ScreenTitle::particle_torchflame_ash,
+        "music",
+        &ScreenTitle::music,
+        "torch_sound",
+        &ScreenTitle::torch_sound,
         sol::base_classes,
         sol::bases<Screen>());
 
@@ -124,6 +129,7 @@ void register_usertypes(sol::state& lua)
     screenmenu_type["spear_dangler_related"] = &ScreenMenu::spear_dangler_related;
     screenmenu_type["play_scroll"] = &ScreenMenu::play_scroll;
     screenmenu_type["info_toast"] = &ScreenMenu::info_toast;
+    screenmenu_type["cthulhu_sound"] = &ScreenMenu::cthulhu_sound;
     screenmenu_type["cthulhu_disc_ring_angle"] = &ScreenMenu::cthulhu_disc_ring_angle;
     screenmenu_type["cthulhu_disc_split_progress"] = &ScreenMenu::cthulhu_disc_split_progress;
     screenmenu_type["cthulhu_disc_y"] = &ScreenMenu::cthulhu_disc_y;
@@ -262,6 +268,7 @@ void register_usertypes(sol::state& lua)
     screencharacterselect_type["particle_torchflame_flames3"] = &ScreenCharacterSelect::particle_torchflame_flames3;
     screencharacterselect_type["particle_torchflame_smoke4"] = &ScreenCharacterSelect::particle_torchflame_smoke4;
     screencharacterselect_type["particle_torchflame_flames4"] = &ScreenCharacterSelect::particle_torchflame_flames4;
+    screencharacterselect_type["sound"] = &ScreenCharacterSelect::sound;
 
     lua.new_usertype<FlyingThing>(
         "FlyingThing",
@@ -430,6 +437,10 @@ void register_usertypes(sol::state& lua)
                               if (n++ >= 30)
                                   break;
                       }),
+        "explosion_and_loop",
+        &ScreenConstellation::explosion_and_loop,
+        "music",
+        &ScreenConstellation::music,
         sol::base_classes,
         sol::bases<Screen>());
 

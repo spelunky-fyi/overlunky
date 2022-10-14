@@ -12,7 +12,7 @@ class Portal : public Entity
     size_t unknown5;
     size_t unknown6;
     Illumination* emitted_light;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
     float unknown7;
     uint8_t transition_timer;
     uint8_t level;
@@ -42,7 +42,7 @@ class LogicalDoor : public Entity
 class LogicalSound : public Entity
 {
   public:
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class LogicalStaticSound : public LogicalSound
@@ -108,7 +108,7 @@ class CursedEffect : public Entity
 {
   public:
     ParticleEmitterInfo* particle;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class OuroboroCameraAnchor : public Entity
@@ -140,7 +140,7 @@ class BurningRopeEffect : public Entity
 {
   public:
     Illumination* illumination;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class DustWallApep : public Entity
@@ -234,7 +234,7 @@ class BoulderSpawner : public Entity
     /// Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
     int32_t timer;
     int32_t padding; // unsure
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class PipeTravelerSound : public LogicalSound
