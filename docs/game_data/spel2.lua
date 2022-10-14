@@ -1727,8 +1727,8 @@ function dump_network() end
     ---@field screen_last integer
     ---@field screen integer
     ---@field screen_next integer
-    ---@field ingame boolean
-    ---@field playing boolean
+    ---@field ingame integer
+    ---@field playing integer
     ---@field pause integer
     ---@field width integer
     ---@field height integer
@@ -2283,8 +2283,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field unlocked boolean
 
 ---@class MainExit : ExitDoor
-    ---@field door_blocker Entity
     ---@field sound SoundMeta
+    ---@field door_blocker Entity
 
 ---@class EggShipDoor : Door
     ---@field timer integer

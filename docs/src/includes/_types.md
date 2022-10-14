@@ -2230,8 +2230,8 @@ Type | Name | Description
 int | [screen_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) | 
 int | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) | 
 int | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | 
-bool | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | True when you have control over your character
-bool | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | True whenever you are in an active game (basically everything except the main menu, character select etc.)
+int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
+int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
 int | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
 int | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | level width in rooms (number of rooms horizontally)
 int | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | level height in rooms (number of rooms vertically)
@@ -2306,7 +2306,7 @@ int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ca
 int | [get_correct_ushabti()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_correct_ushabti) | Returns animation_frame of the correct ushabti
 nil | [set_correct_ushabti(int animation_frame)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) | 
 [ArenaState](#ArenaState) | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | 
-[ENT_TYPE](#ENT_TYPE) | [speedrun_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) | 
+[ENT_TYPE](#ENT_TYPE) | [speedrun_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) | Who administers the tutorial speedrun in base camp
 bool | [speedrun_activation_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_activation_trigger) | 
 [ENT_TYPE](#ENT_TYPE) | [end_spaceship_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_spaceship_character) | Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
 bool | [world2_coffin_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world2_coffin_spawned) | 
@@ -2958,8 +2958,8 @@ Derived from [Entity](#Entity) [Floor](#Floor) [Door](#Door) [ExitDoor](#ExitDoo
 
 Type | Name | Description
 ---- | ---- | -----------
-[Entity](#Entity) | [door_blocker](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_blocker) | Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
+[Entity](#Entity) | [door_blocker](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_blocker) | Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
 
 ### MotherStatue
 
