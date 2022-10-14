@@ -802,6 +802,9 @@
                             <a href="#set_character_heart_color" class="toc-h3 toc-link" data-title="set_character_heart_color">set_character_heart_color</a>
                           </li>
                           <li>
+                            <a href="#set_ending_unlock" class="toc-h3 toc-link" data-title="set_ending_unlock">set_ending_unlock</a>
+                          </li>
+                          <li>
                             <a href="#set_journal_enabled" class="toc-h3 toc-link" data-title="set_journal_enabled">set_journal_enabled</a>
                           </li>
                           <li>
@@ -4245,6 +4248,25 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_character_heart_color-ENT_TYPE-type_id-Color-color'>nil set_character_heart_color(<a href="#ENT_TYPE">ENT_TYPE</a> type_id, <a href="#Color">Color</a> color)</h4>
 <p>Same as <code>Player.set_heart_color</code></p>
+<h3 id='set_ending_unlock'>set_ending_unlock</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- change character unlocked by endings to pilot</span>
+<span class="n">set_ending_unlock</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">CHAR_PILOT</span><span class="p">)</span>
+
+<span class="c1">-- change texture of the actual savior in endings to pilot</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+    <span class="n">set_post_entity_spawn</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">screen</span> <span class="o">==</span> <span class="n">SCREEN</span><span class="p">.</span><span class="n">WIN</span> <span class="k">then</span>
+            <span class="n">ent</span><span class="p">:</span><span class="n">set_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_CHAR_PINK_0</span><span class="p">)</span>
+        <span class="k">end</span>
+        <span class="n">clear_callback</span><span class="p">()</span>
+    <span class="k">end</span><span class="p">,</span> <span class="n">SPAWN_TYPE</span><span class="p">.</span><span class="n">SYSTEMIC</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">PLAYER</span><span class="p">)</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">WIN</span><span class="p">)</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_ending_unlock">set_ending_unlock</a></p>
+</blockquote>
+<h4 id='nil-set_ending_unlock-ENT_TYPE-type'>nil set_ending_unlock(<a href="#ENT_TYPE">ENT_TYPE</a> type)</h4>
+<p>Force the character unlocked in either ending to <a href="#ENT_TYPE">ENT_TYPE</a>. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)</p>
 <h3 id='set_journal_enabled'>set_journal_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_journal_enabled">set_journal_enabled</a></p>

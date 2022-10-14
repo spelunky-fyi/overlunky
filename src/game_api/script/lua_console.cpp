@@ -445,9 +445,9 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
         std::vector<std::string_view> possible_options;
         try
         {
-            possible_options = [this](std::string_view to_complete_end, std::string_view to_complete_base)
+            possible_options = [this](std::string_view _to_complete_end, std::string_view _to_complete_base)
             {
-                if (to_complete_base.empty())
+                if (_to_complete_base.empty())
                 {
                     using namespace std::string_view_literals;
                     static constexpr std::array additional_options{
@@ -479,7 +479,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 
                     for (std::string_view opt : additional_options)
                     {
-                        if (opt.starts_with(to_complete_end))
+                        if (opt.starts_with(_to_complete_end))
                         {
                             possibleoptions.push_back(opt);
                         }
@@ -490,7 +490,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                         if (k.get_type() == sol::type::string)
                         {
                             const std::string_view str = k.as<std::string_view>();
-                            if (str.starts_with(to_complete_end) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
+                            if (str.starts_with(_to_complete_end) && (!str.starts_with("__") || _to_complete_end.starts_with("__")))
                             {
                                 possibleoptions.push_back(str);
                             }
@@ -507,7 +507,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                     std::vector<sol::table> source{};
 
                     {
-                        const auto obj = execute_lua(lua, fmt::format("return {}", to_complete_base));
+                        const auto obj = execute_lua(lua, fmt::format("return {}", _to_complete_base));
                         const auto obj_type = obj.get_type();
                         if (obj_type == sol::type::table)
                         {
@@ -524,7 +524,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                         }
                     }
 
-                    const bool grab_all = to_complete_end.empty();
+                    const bool grab_all = _to_complete_end.empty();
                     while (true)
                     {
                         for (const auto& [k, v] : source.back())
@@ -532,7 +532,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
                             if (k.get_type() == sol::type::string)
                             {
                                 const std::string_view str = k.as<std::string_view>();
-                                if ((grab_all || str.starts_with(to_complete_end)) && (!str.starts_with("__") || to_complete_end.starts_with("__")))
+                                if ((grab_all || str.starts_with(_to_complete_end)) && (!str.starts_with("__") || _to_complete_end.starts_with("__")))
                                 {
                                     possibleoptions.push_back(str);
                                 }

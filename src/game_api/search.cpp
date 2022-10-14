@@ -1862,6 +1862,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        "ending_unlock"sv,
+        // Put write bp on savedata.characters
+        PatternCommandBuffer{}
+            .find_after_inst("d1 48 85 c0 48 0f 44 d0 f6 42 38 40 75 5d 31 f6"_gh)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

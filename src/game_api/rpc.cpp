@@ -1907,3 +1907,21 @@ void set_level_string(std::u16string_view text)
     memcpy(data + 4, text.data(), text.length() * sizeof(char16_t));
     *(data + 4 + text.length()) = NULL;
 }
+
+void set_ending_unlock(ENT_TYPE type)
+{
+    static const ENT_TYPE first = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+    static const ENT_TYPE last = to_id("ENT_TYPE_CHAR_CLASSIC_GUY");
+    if (type >= first && type <= last)
+    {
+        const auto offset = get_address("ending_unlock");
+        const int32_t char_offset = 10;
+
+        write_mem_recoverable("ending_unlock", offset, "\x90\x90\x90\x90\x90\x90\x90\x90"sv, true);
+        write_mem_recoverable("ending_unlock", offset + char_offset, type, true);
+    }
+    else
+    {
+        recover_mem("ending_unlock");
+    }
+}

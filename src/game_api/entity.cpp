@@ -453,9 +453,9 @@ void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<vo
             [](Entity* self, void (*original)(Entity*))
             {
                 EntityHooksInfo& _hook_info = self->get_hooks();
-                for (auto& [id, on_destroy] : _hook_info.on_destroy)
+                for (auto& [id, _on_destroy] : _hook_info.on_destroy)
                 {
-                    on_destroy(self);
+                    _on_destroy(self);
                 }
                 original(self);
             },
@@ -473,9 +473,9 @@ void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(
             [](Entity* self, bool _some_bool, Entity* from, void (*original)(Entity*, bool, Entity*))
             {
                 EntityHooksInfo& _hook_info = self->get_hooks();
-                for (auto& [id, on_kill] : _hook_info.on_kill)
+                for (auto& [id, _on_kill] : _hook_info.on_kill)
                 {
-                    on_kill(self, from);
+                    _on_kill(self, from);
                 }
                 original(self, _some_bool, from);
             },
@@ -509,9 +509,9 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
                 {
                     EntityHooksInfo& _hook_info = self->get_hooks();
                     bool skip_orig = false;
-                    for (auto& [id, on_damage] : _hook_info.on_damage)
+                    for (auto& [id, _on_damage] : _hook_info.on_damage)
                     {
-                        if (on_damage(self, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
+                        if (_on_damage(self, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
                         {
                             skip_orig = true;
                         }
