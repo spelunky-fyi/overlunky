@@ -272,7 +272,7 @@ def run_parse():
                             # move ctor is useless for Lua
                             is_move_ctr = (
                                 re.fullmatch(r"^[a-zA-Z0-9_]*$", name)
-                                and re.fullmatch(fr"\s*{name}\s*&&[^,]*", m[4])
+                                and re.fullmatch(rf"\s*{name}\s*&&[^,]*", m[4])
                                 and not m[2]
                             )
                             if not is_move_ctr:
@@ -443,7 +443,10 @@ def run_parse():
         data = re.sub(r" ", "", data)
         reParticleHelper = re.compile(r"MakeParticleMemberAccess<(.+?)>\(\)")
         data = reParticleHelper.sub(r"\1", data)
-        m = re.findall(r'(auto([a-z]+_type)=)?lua\.new_usertype\<([^\>]*?)\>\s*\(\s*"([^"]*)",?(.*?)\);', data)
+        m = re.findall(
+            r'(auto([a-z]+_type)=)?lua\.new_usertype\<([^\>]*?)\>\s*\(\s*"([^"]*)",?(.*?)\);',
+            data,
+        )
         for type in m:
             container = type[1]
             cpp_type = type[2]
@@ -451,10 +454,12 @@ def run_parse():
             attr = type[4]
             if container:
                 extra = []
-                n = re.findall(container+r'\[("[^"]+")\]=([^;]+);', data)
+                n = re.findall(
+                    r"(?<!NoDoc)" + container + r'\[("[^"]+")\]=([^;]+);', data
+                )
                 for var in n:
-                    extra.append(','.join(var))
-                extra = ','.join(extra)
+                    extra.append(",".join(var))
+                extra = ",".join(extra)
                 if attr:
                     attr = attr + "," + extra
                 else:
@@ -513,13 +518,13 @@ def run_parse():
 
                 if var[1].startswith("sol::property"):
                     param_match = re.match(
-                        fr"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)",
+                        rf"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)",
                         cpp,
                     )
                     if param_match:
                         type_var_name = param_match[1]
                         m_var_return = re.search(
-                            fr"return[^;]*{type_var_name}\.([\w.]+)", cpp
+                            rf"return[^;]*{type_var_name}\.([\w.]+)", cpp
                         )
                         if m_var_return:
                             cpp_name = m_var_return[1]

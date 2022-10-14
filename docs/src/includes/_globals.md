@@ -1476,6 +1476,32 @@ Set the current adventure seed pair
 
 Same as `Player.set_heart_color`
 
+### set_ending_unlock
+
+
+```lua
+-- change character unlocked by endings to pilot
+set_ending_unlock(ENT_TYPE.CHAR_PILOT)
+
+-- change texture of the actual savior in endings to pilot
+set_callback(function()
+    set_post_entity_spawn(function(ent)
+        if state.screen == SCREEN.WIN then
+            ent:set_texture(TEXTURE.DATA_TEXTURES_CHAR_PINK_0)
+        end
+        clear_callback()
+    end, SPAWN_TYPE.SYSTEMIC, MASK.PLAYER)
+end, ON.WIN)
+
+```
+
+
+> Search script examples for [set_ending_unlock](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ending_unlock)
+
+#### nil set_ending_unlock([ENT_TYPE](#ENT_TYPE) type)
+
+Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
+
 ### set_journal_enabled
 
 

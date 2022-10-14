@@ -9,7 +9,7 @@ jobs:
   build:
     name: Build
 
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
       - uses: llvm/actions/install-ninja@main
 
