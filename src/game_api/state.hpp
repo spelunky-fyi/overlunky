@@ -52,27 +52,25 @@ struct StateMemory
     uint32_t fadeout;
     uint32_t fadein;
     uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
-
-    /// True when you have control over your character
+    /// Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
     uint8_t ingame;
-    /// True whenever you are in an active game (basically everything except the main menu, character select etc.)
+    /// Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
     uint8_t playing;
     /// `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
     uint8_t pause;
-    uint8_t b33;
-    int32_t i34;
+    uint8_t pause_related1;
+    uint8_t pause_related2;
+    uint8_t padding1[3];
     uint32_t quest_flags;
-    /// correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
-    uint8_t correct_ushabti;
-    uint8_t i3cb;
-    uint8_t i3cc;
-    uint8_t i3cd;
-    ENT_TYPE speedrun_character;         // who administers the speedrun in base camp
-    uint8_t speedrun_activation_trigger; // must transition from true to false to activate it
-    uint8_t padding4;
-    uint8_t padding5;
-    uint8_t padding6;
+    uint8_t correct_ushabti; // correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
+    uint8_t padding2[3];
+    /// Who administers the tutorial speedrun in base camp
+    ENT_TYPE speedrun_character;      
+    bool speedrun_activation_trigger; // must transition from true to false to activate it
+    uint8_t padding3[3];
+    /// level width in rooms (number of rooms horizontally)
     uint32_t w;
+    /// level height in rooms (number of rooms vertically)
     uint32_t h;
     int8_t kali_favor;
     int8_t kali_status;
@@ -80,9 +78,8 @@ struct StateMemory
     int8_t kali_altars_destroyed;
     /// 0 - none, 1 - item, 3 - kapala
     int8_t kali_gifts;
-    int32_t i50; // kali related?
-    /// total $ spent at shops, persists between levels, number will be negative
-    int32_t money_shop_total;
+    int32_t i50;              // kali related?
+    int32_t money_shop_total; // total $ spent at shops, persists between levels, number will be negative
     uint8_t world_start;
     uint8_t level_start;
     uint8_t theme_start;
@@ -98,7 +95,7 @@ struct StateMemory
     uint8_t theme_next;
     /// 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     uint8_t win_state;
-    uint8_t b73;
+    uint8_t b73; // padding probably
     /// Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
     ENT_TYPE end_spaceship_character;
     uint8_t shoppie_aggro;
@@ -122,7 +119,7 @@ struct StateMemory
     std::array<int16_t, 99> waddler_storage_meta; // to store mattock durability for example
     uint16_t journal_progression_count;
     std::array<JournalProgressionSlot, 40> journal_progression_slots;
-    uint8_t skip2[844];
+    uint8_t skip2[844]; // TODO
     ThemeProgression theme_progression;
     uint8_t unknown3;
     uint8_t unknown4;
@@ -150,8 +147,8 @@ struct StateMemory
     uint8_t padding12;
     ENT_TYPE cause_of_death_entity_type;
     int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
-    size_t toast;
-    size_t speechbubble;
+    OnScreenMessage* toast;
+    OnScreenMessage* speechbubble;
     uint32_t speechbubble_timer;
     uint32_t toast_timer;
     int32_t speechbubble_owner;
@@ -195,26 +192,29 @@ struct StateMemory
     LiquidPhysics* liquid_physics;
     std::vector<ParticleEmitterInfo*>* particle_emitters;
     std::vector<Illumination*>* lightsources;
-    size_t unknown27;
+    size_t unknown27; // lookup entity struct
 
     // This is a Robin Hood Table
     uint32_t uid_to_entity_mask;
     uint32_t padding13;
     RobinHoodTableEntry* uid_to_entity_data;
 
-    size_t backlayer_player_related1;
-    size_t backlayer_player_related2;
-
-    size_t unknown30;
+    custom_vector<std::pair<Entity*, uint8_t>> backlayer_player_related1; // inside vector: player and destination layer?
     uint32_t layer_transition_effect_timer;
     uint8_t camera_layer;
-    uint8_t unknown31a;
+    uint8_t unknown31a; // padding probably
     uint8_t unknown31b;
     uint8_t unknown31c;
     ShopsInfo shops;
     uint32_t time_startup;
     uint32_t special_visibility_flags;
     Camera* camera;
+    uint8_t unknown40;
+    int8_t unknown41; // other character related (hired hand, basecamp characters)
+    uint8_t unknown42;
+    uint8_t unknown43;
+    uint32_t unknown44;
+    uint64_t unknown45;
 
     /// This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
     void force_current_theme(uint32_t t);
@@ -293,8 +293,6 @@ struct State
     SaveData* savedata();
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
 };
-
-void init_state_update_hook();
 
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
 uint8_t enum_to_layer(const LAYER layer);

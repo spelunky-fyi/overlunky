@@ -45,9 +45,9 @@ void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<vo
                 if (opener->movey > 0)
                 {
                     EntityHooksInfo& _hook_info = self->get_hooks();
-                    for (auto& [id, on_open] : _hook_info.on_open)
+                    for (auto& [id, _on_open] : _hook_info.on_open)
                     {
-                        on_open(self, opener);
+                        _on_open(self, opener);
                     }
                 }
                 original(self, opener);

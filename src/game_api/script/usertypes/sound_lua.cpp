@@ -165,6 +165,28 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "set_parameter",
         &PlayingSound::set_parameter);
 
+    lua.new_usertype<SoundMeta>(
+        "SoundMeta",
+        "x",
+        &SoundMeta::x,
+        "y",
+        &SoundMeta::y,
+        //"left_channel",
+        //&SoundMeta::left_channel, // TODO: index 0-37 instead of 1-38
+        //"right_channel",
+        //&SoundMeta::right_channel,
+        "start_over",
+        &SoundMeta::start_over,
+        "playing",
+        &SoundMeta::playing);
+
+    lua.new_usertype<BackgroundSound>(
+        "BackgroundSound",
+        sol::base_classes,
+        sol::bases<SoundMeta>());
+
+    lua["play_sound"] = play_sound;
+
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
     lua.create_named_table("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
     /// Paramater to `PlayingSound:set_looping()`, specifies what type of looping this sound should do

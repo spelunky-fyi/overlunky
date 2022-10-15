@@ -286,8 +286,10 @@ Type | Name | Description
 int | [target_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_uid) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | AI state (patrol, sleep, attack, aggro...)
+int | [last_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_state) | 
 int | [trust](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trust) | Levels completed with, 0..3
 int | [whipped](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=whipped) | Number of times whipped by player
+int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) | positive: walking, negative: wating/idle
 
 ### Animation
 
@@ -465,6 +467,27 @@ float | [area()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) 
 tuple&lt;float, float&gt; | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
 float | [width()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | Short for `aabb.right - aabb.left`.
 float | [height()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Short for `aabb.top - aabb.bottom`.
+
+### BackgroundMusic
+
+
+Type | Name | Description
+---- | ---- | -----------
+[BackgroundSound](#BackgroundSound) | [game_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_startup) | 
+[BackgroundSound](#BackgroundSound) | [main_backgroundtrack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_backgroundtrack) | 
+[BackgroundSound](#BackgroundSound) | [basecamp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=basecamp) | 
+[BackgroundSound](#BackgroundSound) | [win_scene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_scene) | 
+[BackgroundSound](#BackgroundSound) | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | 
+[BackgroundSound](#BackgroundSound) | [arena_intro_and_win](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_intro_and_win) | 
+[BackgroundSound](#BackgroundSound) | [level_gameplay](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gameplay) | 
+[BackgroundSound](#BackgroundSound) | [dark_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_level) | 
+[BackgroundSound](#BackgroundSound) | [level_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_transition) | 
+[BackgroundSound](#BackgroundSound) | [backlayer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer) | 
+[BackgroundSound](#BackgroundSound) | [shop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop) | 
+[BackgroundSound](#BackgroundSound) | [angered_shopkeeper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angered_shopkeeper) | 
+[BackgroundSound](#BackgroundSound) | [inside_sunken_city_pipe](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside_sunken_city_pipe) | 
+[BackgroundSound](#BackgroundSound) | [pause_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_menu) | 
+[BackgroundSound](#BackgroundSound) | [sunken_city_duat_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sunken_city_duat_transition) | 
 
 ### Color
 
@@ -933,7 +956,7 @@ float | [offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offs
 float | [offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) | 
 float | [distortion](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distortion) | 
 int | [entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) | 
-int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
 int | [type_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type_flags) | Only one can be set: 1 - Follow camera, 2 - Follow [Entity](#Entity), 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
 bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
 int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
@@ -1234,7 +1257,7 @@ int | [world_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=worl
 int | [level_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_last) | 
 int | [score_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_last) | 
 int | [time_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last) | 
-array&lt;int, 20&gt; | [stickers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) | 
+array&lt;[ENT_TYPE](#ENT_TYPE), 20&gt; | [stickers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) | 
 array&lt;int, 4&gt; | [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) | 
 [Constellation](#Constellation) | [constellation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation) | 
 
@@ -1247,7 +1270,7 @@ array&lt;int, 4&gt; | [players](https://github.com/spelunky-fyi/overlunky/search
 Type | Name | Description
 ---- | ---- | -----------
 [TextureRenderingInfo](#TextureRenderingInfo) | [texture_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_info) | 
-int | [entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_type) | 
+[ENT_TYPE](#ENT_TYPE) | [entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_type) | 
 float | [spritesheet_column](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spritesheet_column) | 
 float | [spritesheet_row](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spritesheet_row) | 
 float | [spritesheet_animation_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spritesheet_animation_length) | 
@@ -1610,6 +1633,7 @@ int | [flying_thing_countdown](https://github.com/spelunky-fyi/overlunky/search?
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_torchflame_flames3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_torchflame_flames3) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_torchflame_smoke4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_torchflame_smoke4) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_torchflame_flames4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_torchflame_flames4) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### ScreenConstellation
 
@@ -1719,6 +1743,7 @@ Type | Name | Description
 [TextureRenderingInfo](#TextureRenderingInfo) | [spear_dangler_related](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangler_related) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [play_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_scroll) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [info_toast](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=info_toast) | 
+[SoundMeta](#SoundMeta) | [cthulhu_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_sound) | 
 float | [cthulhu_disc_ring_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_ring_angle) | 
 float | [cthulhu_disc_split_progress](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_split_progress) | 
 float | [cthulhu_disc_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_y) | 
@@ -1951,6 +1976,8 @@ Type | Name | Description
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_torchflame_backflames_animated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_torchflame_backflames_animated) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_torchflame_flames_animated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_torchflame_flames_animated) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_torchflame_ash](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_torchflame_ash) | 
+[SoundMeta](#SoundMeta) | [music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music) | 
+[SoundMeta](#SoundMeta) | [torch_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=torch_sound) | 
 
 ### ScreenTransition
 
@@ -2028,6 +2055,14 @@ float | [zoom_target](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=z
 ## Sound types
 
 
+### BackgroundSound
+
+Derived from [SoundMeta](#SoundMeta)
+
+
+Type | Name | Description
+---- | ---- | -----------
+
 ### CustomSound
 
 Handle to a loaded sound, can be used to play the sound and receive a `PlayingSound` for more control
@@ -2059,6 +2094,18 @@ bool | [set_callback(SoundCallbackFunction callback)](https://github.com/spelunk
 map&lt;[VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM), string&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
 optional&lt;float&gt; | [get_parameter(VANILLA_SOUND_PARAM parameter_index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter) | 
 bool | [set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter) | 
+
+### SoundMeta
+
+
+Type | Name | Description
+---- | ---- | -----------
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+array&lt;float, 38&gt; | [left_channel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_channel) | 
+array&lt;float, 38&gt; | [right_channel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_channel) | 
+bool | [start_over](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_over) | when false, current track starts from the beginning, is immediately set back to true
+bool | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | set to false to turn off
 
 ## State types
 
@@ -2093,6 +2140,7 @@ float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inert
 
 Type | Name | Description
 ---- | ---- | -----------
+[BackgroundMusic](#BackgroundMusic) | [music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music) | 
 [GameProps](#GameProps) | [game_props](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_props) | 
 [ScreenLogo](#ScreenLogo) | [screen_logo](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_logo) | 
 [ScreenIntro](#ScreenIntro) | [screen_intro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_intro) | 
@@ -2182,11 +2230,11 @@ Type | Name | Description
 int | [screen_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) | 
 int | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) | 
 int | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | 
-int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | True when you have control over your character
-int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | True whenever you are in an active game (basically everything except the main menu, character select etc.)
+int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
+int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
 int | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
-int | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
-int | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
+int | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | level width in rooms (number of rooms horizontally)
+int | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | level height in rooms (number of rooms vertically)
 int | [kali_favor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_favor) | 
 int | [kali_status](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_status) | 
 int | [kali_altars_destroyed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_altars_destroyed) | Also affects if the player has punish ball, if the punish ball is destroyed it is set to -1
@@ -2226,7 +2274,7 @@ int | [saved_hamsters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [win_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_state) | 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
 [Illumination](#Illumination) | [illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) | 
 int | [money_last_levels](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_last_levels) | 
-int | [money_shop_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) | total $ spent at shops, persists between levels, number will be negative
+int | [money_shop_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) | 
 [PlayerInputs](#PlayerInputs) | [player_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) | 
 [QuestsInfo](#QuestsInfo) | [quests](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quests) | 
 [Camera](#Camera) | [camera](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera) | 
@@ -2237,7 +2285,7 @@ int | [toast_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toa
 int | [speechbubble_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_timer) | 
 int | [speechbubble_owner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_owner) | 
 [LevelGenSystem](#LevelGenSystem) | [level_gen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gen) | 
-int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | correct_ushabti = anim_frame - (2  floor(anim_frame/12))
+int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | 
 [Items](#Items) | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | 
 int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | 
 [ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
@@ -2258,8 +2306,8 @@ int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ca
 int | [get_correct_ushabti()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_correct_ushabti) | Returns animation_frame of the correct ushabti
 nil | [set_correct_ushabti(int animation_frame)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) | 
 [ArenaState](#ArenaState) | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | 
-[ENT_TYPE](#ENT_TYPE) | [speedrun_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) | 
-int | [speedrun_activation_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_activation_trigger) | 
+[ENT_TYPE](#ENT_TYPE) | [speedrun_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) | Who administers the tutorial speedrun in base camp
+bool | [speedrun_activation_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_activation_trigger) | 
 [ENT_TYPE](#ENT_TYPE) | [end_spaceship_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_spaceship_character) | Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
 bool | [world2_coffin_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world2_coffin_spawned) | 
 bool | [world4_coffin_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world4_coffin_spawned) | 
@@ -2534,6 +2582,7 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Entity](#Entity) | [fx_shell](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_shell) | 
 [Entity](#Entity) | [fx_door](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_door) | 
 [Entity](#Entity) | [platform_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_left) | 
@@ -2655,6 +2704,7 @@ Derived from [Entity](#Entity)
 Type | Name | Description
 ---- | ---- | -----------
 [Illumination](#Illumination) | [illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### CursedEffect
 
@@ -2664,6 +2714,7 @@ Derived from [Entity](#Entity)
 Type | Name | Description
 ---- | ---- | -----------
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### FrostBreathEffect
 
@@ -2839,6 +2890,7 @@ Type | Name | Description
 ---- | ---- | -----------
 [Entity](#Entity) | [first_item_beam](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_item_beam) | 
 [Entity](#Entity) | [fx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
 bool | [is_on](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) | 
 nil | [activate_laserbeam(bool turn_on)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_laserbeam) | 
@@ -2865,6 +2917,7 @@ Type | Name | Description
 ---- | ---- | -----------
 [Entity](#Entity) | [first_item_beam](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_item_beam) | 
 [Entity](#Entity) | [fx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 bool | [is_on](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) | 
 
@@ -2905,6 +2958,8 @@ Derived from [Entity](#Entity) [Floor](#Floor) [Door](#Door) [ExitDoor](#ExitDoo
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
+[Entity](#Entity) | [door_blocker](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_blocker) | Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
 
 ### MotherStatue
 
@@ -2969,6 +3024,8 @@ Type | Name | Description
 [Entity](#Entity) | [attached_piece](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece) | 
 int | [active_floor_part_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active_floor_part_uid) | 
 int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 1 - going up / is at the top, 2 - pause
+[SoundMeta](#SoundMeta) | [ball_rise](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ball_rise) | 
+[SoundMeta](#SoundMeta) | [ball_drop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ball_drop) | 
 
 ### SparkTrap
 
@@ -2987,6 +3044,7 @@ Derived from [Entity](#Entity) [Floor](#Floor)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Entity](#Entity) | [chain](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chain) | 
 [Entity](#Entity) | [end_piece](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_piece) | 
 int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause | going_up is only right when timer is 0, otherwise it just sits at the bottom
@@ -2999,6 +3057,7 @@ Derived from [Entity](#Entity) [Floor](#Floor)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [attached_piece_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_piece_uid) | 
 int | [ball_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ball_uid) | 
 int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 0 - none, 1 - start, 2 - going down, 3 - is at the bottom, 4 - going up, 5 - pause
@@ -3065,6 +3124,7 @@ Derived from [Entity](#Entity)
 Type | Name | Description
 ---- | ---- | -----------
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### CameraFlash
 
@@ -3283,6 +3343,7 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | The neon buzz sound
 [Illumination](#Illumination) | [illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) | 
 [Illumination](#Illumination) | [arrow_illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_illumination) | 
 int | [arrow_change_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arrow_change_timer) | 
@@ -3421,6 +3482,7 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### LogicalStaticSound
 
@@ -3486,6 +3548,8 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound1) | 
+[SoundMeta](#SoundMeta) | [sound2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound2) | 
 float | [distance_traveled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance_traveled) | 
 int | [tail_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tail_uid) | 
 int | [fx_mouthpiece1_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_mouthpiece1_uid) | 
@@ -3530,6 +3594,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 Type | Name | Description
 ---- | ---- | -----------
 bool | [can_rest](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_rest) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [fly_hang_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fly_hang_timer) | 
 int | [targeting_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=targeting_timer) | 
 float | [wobble_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wobble_x) | 
@@ -3655,6 +3720,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 Type | Name | Description
 ---- | ---- | -----------
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 float | [applied_hor_momentum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=applied_hor_momentum) | 
 float | [applied_ver_momentum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=applied_ver_momentum) | 
 int | [move_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_timer) | 
@@ -3690,6 +3756,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [jump_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) | 
 
 ### CritterPenguin
@@ -3751,6 +3818,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) | 
 int | [squish_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=squish_timer) | 
 
@@ -3761,6 +3829,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### Firebug
 
@@ -3769,6 +3838,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [fire_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fire_timer) | 
 bool | [going_up](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=going_up) | 
 bool | [detached_from_chain](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=detached_from_chain) | 
@@ -3780,6 +3850,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 float | [max_flight_height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_flight_height) | 
 int | [ai_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_timer) | 
 int | [walking_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking_timer) | 
@@ -3822,6 +3893,7 @@ Type | Name | Description
 ---- | ---- | -----------
 int | [body_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=body_uid) | 
 int | [idle_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=idle_timer) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [transparency](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transparency) | 
 int | [fadeout](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadeout) | 
 
@@ -3837,6 +3909,7 @@ float | [velocity_multiplier](https://github.com/spelunky-fyi/overlunky/search?l
 [GHOST_BEHAVIOR](#GHOST_BEHAVIOR) | [ghost_behaviour](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost_behaviour) | 
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
 [Entity](#Entity) | [linked_ghost](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_ghost) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### GiantFish
 
@@ -3845,6 +3918,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [change_direction_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_direction_timer) | when bouncing into a wall
 int | [lose_interest_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lose_interest_timer) | delay in-between attacks
 
@@ -3856,6 +3930,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 Type | Name | Description
 ---- | ---- | -----------
 [Entity](#Entity) | [head_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=head_entity) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
 float | [sine_amplitude](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_amplitude) | 
 float | [sine_frequency](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sine_frequency) | 
@@ -3902,6 +3977,7 @@ int | [looking_for_new_direction_timer](https://github.com/spelunky-fyi/overlunk
 int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) | 
 int | [turn_into_fly_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=turn_into_fly_timer) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### HangSpider
 
@@ -3939,6 +4015,7 @@ int | [eaten_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=eaten
 int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) | alternates between walking and pausing when timer reaches zero
 int | [attack_cooldown_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown_timer) | won't attack until timer reaches zero
 int | [blood_squirt_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blood_squirt_timer) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
 
 ### Hundun
@@ -4011,6 +4088,8 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound1) | initialized when breaking the shell (sliding down sound maybe?)
+[SoundMeta](#SoundMeta) | [sound2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound2) | Turning into stone sound
 float | [climb_direction_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=climb_direction_x) | 
 float | [climb_direction_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=climb_direction_y) | 
 int | [climb_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=climb_pause_timer) | 
@@ -4026,6 +4105,8 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
+[Entity](#Entity) | [eyeball](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=eyeball) | 
 int | [attack_cooldown_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown_timer) | 
 
 ### Lamassu
@@ -4035,6 +4116,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Entity](#Entity) | [attack_effect_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_effect_entity) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
@@ -4064,6 +4146,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [hump_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hump_timer) | 
 int | [target_in_sight_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_in_sight_timer) | 
 int | [gold](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gold) | amount of gold he picked up, will be drooped on death
@@ -4077,6 +4160,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 Type | Name | Description
 ---- | ---- | -----------
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
 int | [jump_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) | 
 int | [alive_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=alive_timer) | 
@@ -4098,6 +4182,8 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [crouch_walk_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=crouch_walk_sound) | 
+[SoundMeta](#SoundMeta) | [explosion_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_sound) | 
 int | [gun_cooldown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gun_cooldown) | 
 bool | [walking](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking) | 
 bool | [breaking_wall](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=breaking_wall) | 
@@ -4111,6 +4197,7 @@ Type | Name | Description
 ---- | ---- | -----------
 [Entity](#Entity) | [flipper1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipper1) | 
 [Entity](#Entity) | [flipper2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipper2) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [orb_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=orb_uid) | the closest orb, does not gets updated
 int | [tail_bg_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tail_bg_uid) | 
 float | [applied_velocity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=applied_velocity) | 
@@ -4125,6 +4212,8 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [burrowing_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=burrowing_sound) | 
+[SoundMeta](#SoundMeta) | [nonburrowing_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=nonburrowing_sound) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [burrowing_particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=burrowing_particle) | 
 float | [burrow_dir_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=burrow_dir_x) | 
 float | [burrow_dir_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=burrow_dir_y) | 
@@ -4141,6 +4230,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [jump_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) | 
 bool | [on_vine](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_vine) | 
 
@@ -4165,6 +4255,7 @@ float | [direction_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=d
 float | [direction_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction_y) | 
 float | [stuck_rel_pos_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stuck_rel_pos_x) | 
 float | [stuck_rel_pos_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stuck_rel_pos_y) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 
 ### Mount
@@ -4174,15 +4265,16 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
-nil | [carry(Movable rider)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) | 
-nil | [tame(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tame) | 
 int | [rider_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rider_uid) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 bool | [can_doublejump](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_doublejump) | 
 bool | [tamed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tamed) | 
 int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) | 
 int | [taming_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=taming_timer) | 
 bool | [used_double_jump()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=used_double_jump) | 
 nil | [remove_rider()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_rider) | 
+nil | [carry(Movable rider)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) | 
+nil | [tame(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tame) | 
 
 ### Mummy
 
@@ -4212,6 +4304,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 float | [red_skeleton_spawn_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red_skeleton_spawn_x) | 
 float | [red_skeleton_spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red_skeleton_spawn_y) | 
 int | [resurrection_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=resurrection_uid) | 
@@ -4286,6 +4379,8 @@ Type | Name | Description
 int | [linked_companion_parent](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_companion_parent) | 
 int | [linked_companion_child](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_companion_child) | 
 [Ai](#Ai) | [ai](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai) | 
+[PlayerSlot](#PlayerSlot) | [input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input) | 
+[Entity](#Entity) | [basecamp_button_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=basecamp_button_entity) | Used in base camp to talk with the [NPC](#NPC)'s
 nil | [set_jetpack_fuel(int fuel)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) | 
 int | [kapala_blood_amount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) | 
 string | [get_name()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_name) | Get the full name of the character, this will be the modded name not only the vanilla name.
@@ -4327,6 +4422,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [fly_gallop_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fly_gallop_sound) | 
 int | [attack_cooldown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown) | 
 
 ### Quillback
@@ -4336,6 +4432,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
 bool | [seen_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seen_player) | 
 
@@ -4346,6 +4443,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Illumination](#Illumination) | [emitted_light_explosion](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light_explosion) | 
 
 ### Rockdog
@@ -4381,6 +4479,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | how long to stay in current position
 
@@ -4426,6 +4525,7 @@ int | [inbetween_attack_timer](https://github.com/spelunky-fyi/overlunky/search?
 float | [in_air_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=in_air_timer) | 
 [Illumination](#Illumination) | [halo_emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=halo_emitted_light) | 
 [Entity](#Entity) | [fx_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_entity) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [hover_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hover_timer) | 
 
 ### Spider
@@ -4468,6 +4568,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | Turning into stone sound
 int | [fx_tiamat_head](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_tiamat_head) | 
 int | [fx_tiamat_arm_right1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_tiamat_arm_right1) | 
 int | [fx_tiamat_arm_right2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_tiamat_arm_right2) | 
@@ -4501,6 +4602,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [patrol_distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=patrol_distance) | 
 int | [attack_cooldown_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown_timer) | 
 bool | [is_falling](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_falling) | 
@@ -4566,6 +4668,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [skull_regen_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=skull_regen_timer) | 
 
 ### WitchDoctorSkull
@@ -4577,6 +4680,7 @@ Type | Name | Description
 ---- | ---- | -----------
 int | [witch_doctor_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=witch_doctor_uid) | 
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 float | [rotation_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_angle) | 
 
 ### Yama
@@ -4643,6 +4747,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Powerup](#Powerup)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Entity](#Entity) | [player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) | 
 [Entity](#Entity) | [fx_glow](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_glow) | 
 int | [timer1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer1) | 
@@ -4702,6 +4807,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 float | [scale_hor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_hor) | 1.25 = default regular bomb, 1.875 = default giant bomb, > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
 float | [scale_ver](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale_ver) | 
 bool | [is_big_bomb](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_big_bomb) | is bomb from powerpack
@@ -4737,6 +4843,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Purchasable](#Purchasable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [trail](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trail) | 
 float | [distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) | 
 float | [rotation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation) | 
@@ -4758,6 +4865,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Purchasable](#Purchasable)
 
 Type | Name | Description
 ---- | ---- | -----------
+float | [get_arrow_special_offset()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_arrow_special_offset) | 
 
 ### Bullet
 
@@ -4905,6 +5013,7 @@ Type | Name | Description
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particles_smoke](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_smoke) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particles_flames](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_flames) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particles_warp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_warp) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### Crushtrap
 
@@ -4951,6 +5060,8 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound1) | 
+[SoundMeta](#SoundMeta) | [sound2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound2) | 
 [Entity](#Entity) | [top_chain_piece](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_chain_piece) | 
 nil | [trigger()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) | 
 
@@ -4978,6 +5089,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
 bool | [smoke_on](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=smoke_on) | 
@@ -5048,6 +5160,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
 
 ### FlameSize
@@ -5174,6 +5287,7 @@ Type | Name | Description
 ---- | ---- | -----------
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_smoke](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_smoke) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_flame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_flame) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Illumination](#Illumination) | [illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) | 
 
 ### FxKinguSliding
@@ -5472,6 +5586,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Backpack](#Backpack)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 bool | [is_on](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on) | 
 
 ### HundunChest
@@ -5644,6 +5759,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 float | [velocity_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_x) | 
 float | [velocity_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocity_y) | 
 float | [swing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=swing) | 
@@ -5744,6 +5860,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [target_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_uid) | 
 int | [attack_phase](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_phase) | 0 = stomp, 1 = bombs, 2 = stomp+ufos, 3 = in lava
 int | [attack_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) | in phase 0/2: time spent looking for player, in phase 1: time between bomb salvo
@@ -5781,6 +5898,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 
 ### ParachutePowerup
@@ -5812,8 +5930,9 @@ Derived from [Entity](#Entity) [Movable](#Movable) [LightEmitter](#LightEmitter)
 Type | Name | Description
 ---- | ---- | -----------
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [sparkles_particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sparkles_particle) | 
-[PlayerInputs](#PlayerInputs) | [player_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) | 
+[PlayerSlot](#PlayerSlot) | [player_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) | 
 [Inventory](#Inventory) | [inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [body_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=body_uid) | Is not set to -1 when crushed
 int | [shake_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_timer) | 
 int | [boost_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=boost_timer) | 
@@ -5889,6 +6008,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [dust_particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dust_particle) | 
 float | [dest_pos_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dest_pos_x) | 
 
@@ -5925,6 +6045,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [LightEmitter](#LightEmitter)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 float | [speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) | 
 int | [idle_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=idle_timer) | short timer before it goes after target
 
@@ -5944,6 +6065,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [left_skull_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_skull_uid) | 
 int | [middle_skull_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=middle_skull_uid) | 
 int | [right_skull_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_skull_uid) | 
@@ -5978,6 +6100,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Projectile](#Projectile) [Li
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### Spark
 
@@ -6046,6 +6169,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Entity](#Entity) | [fx_button](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) | 
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
 int | [station](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=station) | 
@@ -6104,6 +6228,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [LightEmitter](#LightEmitter)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### TimedPowderkeg
 
@@ -6172,6 +6297,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### TrueCrownPowerup
 
@@ -6264,3 +6390,4 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Backpack](#Backpack) [Cape](
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 

@@ -3,8 +3,9 @@
 #include <cstddef> // for size_t
 #include <cstdint> // for uint32_t, uint8_t, int8_t
 
-#include "aliases.hpp"      // for MAX_PLAYERS
-#include "render_api.hpp"   // for TextureRenderingInfo
+#include "aliases.hpp"    // for MAX_PLAYERS
+#include "render_api.hpp" // for TextureRenderingInfo
+#include "sound_manager.hpp"
 #include "thread_utils.hpp" // for OnHeapPointer
 
 struct SaveData;
@@ -42,6 +43,33 @@ struct SaveRelated
     JournalPopupUI journal_popup_ui;
 };
 
+struct BackgroundMusic
+{
+    BackgroundSound* game_startup;
+    BackgroundSound* main_backgroundtrack;
+    BackgroundSound* basecamp;
+    BackgroundSound* win_scene;
+    BackgroundSound* arena;
+    BackgroundSound* arena_intro_and_win;
+    BackgroundSound* level_gameplay;
+    BackgroundSound* dark_level;
+    BackgroundSound* level_transition;
+    BackgroundSound* backlayer;
+    BackgroundSound* shop;
+    BackgroundSound* angered_shopkeeper;
+    BackgroundSound* inside_sunken_city_pipe;
+    BackgroundSound* pause_menu;
+    BackgroundSound* unknown15;
+    BackgroundSound* sunken_city_duat_transition;
+    uint8_t unknown17;
+    uint8_t unknown18;
+    uint8_t unknown19;
+    uint8_t unknown20;
+    int8_t skip[2400]; // 600 floats, mostly seem to be 1.0
+    float idle_counter;
+    uint32_t unknown22;
+};
+
 struct GameProps
 {
     uint32_t buttons;
@@ -62,10 +90,10 @@ struct GameProps
 
 struct GameManager
 {
-    void* backgroundmusic;
+    BackgroundMusic* music;
     SaveRelated* save_related;
-    uint8_t buttons_controls[MAX_PLAYERS];
-    uint8_t buttons_movement[MAX_PLAYERS];
+    std::array<uint8_t, MAX_PLAYERS> buttons_controls;
+    std::array<uint8_t, MAX_PLAYERS> buttons_movement;
     GameProps* game_props;
 
     // screen pointers below are most likely in an array and indexed through the screen ID, hence the nullptrs for
@@ -102,6 +130,7 @@ struct GameManager
     ScreenOnlineLobby* screen_online_lobby;
     PauseUI* pause_ui;
     JournalUI* journal_ui;
+    BackgroundSound* main_menu_music;
 };
 
 GameManager* get_game_manager();

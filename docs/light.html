@@ -802,6 +802,9 @@
                             <a href="#set_character_heart_color" class="toc-h3 toc-link" data-title="set_character_heart_color">set_character_heart_color</a>
                           </li>
                           <li>
+                            <a href="#set_ending_unlock" class="toc-h3 toc-link" data-title="set_ending_unlock">set_ending_unlock</a>
+                          </li>
+                          <li>
                             <a href="#set_journal_enabled" class="toc-h3 toc-link" data-title="set_journal_enabled">set_journal_enabled</a>
                           </li>
                           <li>
@@ -826,12 +829,6 @@
                           </li>
                           <li>
                             <a href="#mouse_position" class="toc-h3 toc-link" data-title="mouse_position">mouse_position</a>
-                          </li>
-                          <li>
-                            <a href="#read_input" class="toc-h3 toc-link" data-title="read_input">read_input</a>
-                          </li>
-                          <li>
-                            <a href="#read_stolen_input" class="toc-h3 toc-link" data-title="read_stolen_input">read_stolen_input</a>
                           </li>
                           <li>
                             <a href="#return_input" class="toc-h3 toc-link" data-title="return_input">return_input</a>
@@ -1090,6 +1087,9 @@
                           <li>
                             <a href="#get_sound" class="toc-h3 toc-link" data-title="get_sound">get_sound</a>
                           </li>
+                          <li>
+                            <a href="#play_sound" class="toc-h3 toc-link" data-title="play_sound">play_sound</a>
+                          </li>
                       </ul>
                   </li>
                   <li>
@@ -1172,6 +1172,9 @@
                           </li>
                           <li>
                             <a href="#spawn_player" class="toc-h3 toc-link" data-title="spawn_player">spawn_player</a>
+                          </li>
+                          <li>
+                            <a href="#spawn_playerghost" class="toc-h3 toc-link" data-title="spawn_playerghost">spawn_playerghost</a>
                           </li>
                           <li>
                             <a href="#spawn_tree" class="toc-h3 toc-link" data-title="spawn_tree">spawn_tree</a>
@@ -1346,6 +1349,12 @@
                             <a href="#testflag" class="toc-h3 toc-link" data-title="testflag">testflag</a>
                           </li>
                           <li>
+                            <a href="#read_input" class="toc-h3 toc-link" data-title="read_input">read_input</a>
+                          </li>
+                          <li>
+                            <a href="#read_stolen_input" class="toc-h3 toc-link" data-title="read_stolen_input">read_stolen_input</a>
+                          </li>
+                          <li>
                             <a href="#generate_particles" class="toc-h3 toc-link" data-title="generate_particles">generate_particles</a>
                           </li>
                           <li>
@@ -1498,6 +1507,9 @@
                       <ul class="toc-list-h3">
                           <li>
                             <a href="#AABB" class="toc-h3 toc-link" data-title="AABB">AABB</a>
+                          </li>
+                          <li>
+                            <a href="#BackgroundMusic" class="toc-h3 toc-link" data-title="BackgroundMusic">BackgroundMusic</a>
                           </li>
                           <li>
                             <a href="#Color" class="toc-h3 toc-link" data-title="Color">Color</a>
@@ -1813,10 +1825,16 @@
                     <a href="#Sound-types" class="toc-h2 toc-link" data-title="Sound types">Sound types</a>
                       <ul class="toc-list-h3">
                           <li>
+                            <a href="#BackgroundSound" class="toc-h3 toc-link" data-title="BackgroundSound">BackgroundSound</a>
+                          </li>
+                          <li>
                             <a href="#CustomSound" class="toc-h3 toc-link" data-title="CustomSound">CustomSound</a>
                           </li>
                           <li>
                             <a href="#PlayingSound" class="toc-h3 toc-link" data-title="PlayingSound">PlayingSound</a>
+                          </li>
+                          <li>
+                            <a href="#SoundMeta" class="toc-h3 toc-link" data-title="SoundMeta">SoundMeta</a>
                           </li>
                       </ul>
                   </li>
@@ -4245,6 +4263,25 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_character_heart_color-ENT_TYPE-type_id-Color-color'>nil set_character_heart_color(<a href="#ENT_TYPE">ENT_TYPE</a> type_id, <a href="#Color">Color</a> color)</h4>
 <p>Same as <code>Player.set_heart_color</code></p>
+<h3 id='set_ending_unlock'>set_ending_unlock</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- change character unlocked by endings to pilot</span>
+<span class="n">set_ending_unlock</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">CHAR_PILOT</span><span class="p">)</span>
+
+<span class="c1">-- change texture of the actual savior in endings to pilot</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+    <span class="n">set_post_entity_spawn</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">screen</span> <span class="o">==</span> <span class="n">SCREEN</span><span class="p">.</span><span class="n">WIN</span> <span class="k">then</span>
+            <span class="n">ent</span><span class="p">:</span><span class="n">set_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_CHAR_PINK_0</span><span class="p">)</span>
+        <span class="k">end</span>
+        <span class="n">clear_callback</span><span class="p">()</span>
+    <span class="k">end</span><span class="p">,</span> <span class="n">SPAWN_TYPE</span><span class="p">.</span><span class="n">SYSTEMIC</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">PLAYER</span><span class="p">)</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">WIN</span><span class="p">)</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_ending_unlock">set_ending_unlock</a></p>
+</blockquote>
+<h4 id='nil-set_ending_unlock-ENT_TYPE-type'>nil set_ending_unlock(<a href="#ENT_TYPE">ENT_TYPE</a> type)</h4>
+<p>Force the character unlocked in either ending to <a href="#ENT_TYPE">ENT_TYPE</a>. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)</p>
 <h3 id='set_journal_enabled'>set_journal_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_journal_enabled">set_journal_enabled</a></p>
@@ -4331,18 +4368,6 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='tuple-lt-float-float-gt-mouse_position'>tuple&lt;float, float&gt; mouse_position()</h4>
 <p>Current mouse cursor position in screen coordinates.</p>
-<h3 id='read_input'>read_input</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read_input">read_input</a></p>
-</blockquote>
-<h4 id='INPUTS-read_input-int-uid'><a href="#INPUTS">INPUTS</a> read_input(int uid)</h4>
-<p>Read input</p>
-<h3 id='read_stolen_input'>read_stolen_input</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read_stolen_input">read_stolen_input</a></p>
-</blockquote>
-<h4 id='INPUTS-read_stolen_input-int-uid'><a href="#INPUTS">INPUTS</a> read_stolen_input(int uid)</h4>
-<p>Read input that has been previously stolen with steal_input</p>
 <h3 id='return_input'>return_input</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=return_input">return_input</a></p>
@@ -4828,7 +4853,11 @@ Use empty table as argument to reset to the game default</p>
 </blockquote>
 <h4 id='optional-lt-CustomSound-gt-get_sound-string-path_or_vanilla_sound'>optional&lt;<a href="#CustomSound">CustomSound</a>&gt; get_sound(string path_or_vanilla_sound)</h4>
 <p>Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game</p>
-<h2 id='Spawn-functions'>Spawn functions</h2><h3 id='change_altar_damage_spawns'>change_altar_damage_spawns</h3>
+<h3 id='play_sound'>play_sound</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=play_sound">play_sound</a></p>
+</blockquote>
+<h4 id='SoundMeta-play_sound-VANILLA_SOUND-sound-int-source_uid'><a href="#SoundMeta">SoundMeta</a> play_sound(<a href="#VANILLA_SOUND">VANILLA_SOUND</a> sound, int source_uid)</h4><h2 id='Spawn-functions'>Spawn functions</h2><h3 id='change_altar_damage_spawns'>change_altar_damage_spawns</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_altar_damage_spawns">change_altar_damage_spawns</a></p>
 </blockquote>
@@ -5026,6 +5055,13 @@ Returns uid of the base or -1 if it wasn&#39;t able to spawn</p>
 <h4 id='nil-spawn_player-int-player_slot-float-x-float-y'>nil spawn_player(int player_slot, float x, float y)</h4>
 <p>Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 If you want to respawn a player that is a ghost, set in his inventory <code>health</code> to above 0, and <code>time_of_death</code> to 0 and call this function, the ghost entity will be removed automatically</p>
+<h3 id='spawn_playerghost'>spawn_playerghost</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_playerghost">spawn_playerghost</a></p>
+</blockquote>
+<h4 id='int-spawn_playerghost-ENT_TYPE-char_type-float-x-float-y-LAYER-layer'>int spawn_playerghost(<a href="#ENT_TYPE">ENT_TYPE</a> char_type, float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
+<p>Spawn the <a href="#Player">Player</a> <a href="#Ghost">Ghost</a> entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+or change it&#39;s <code>player_inputs</code> to the <code>input</code> of real player so he can control it directly</p>
 <h3 id='spawn_tree'>spawn_tree</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_tree">spawn_tree</a></p>
@@ -5319,6 +5355,23 @@ Set level flag 18 on post room generation instead, to properly force every level
 </blockquote>
 
 <p><code>nil testflag()</code><br/></p>
+<h3 id='read_input'>read_input</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read_input">read_input</a></p>
+</blockquote>
+
+<p><code>INPUTS read_input(int uid)</code><br/>
+Use <code>players[1].input.buttons_gameplay</code> for only the inputs during the game, or <code>.buttons</code> for all the inputs, even during the pause menu
+Of course, you can get the player by other mean, it doesn&#39;t need to be the <code>players</code> table
+You can only read inputs from actual players, HH don&#39;t have any inputs</p>
+<h3 id='read_stolen_input'>read_stolen_input</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read_stolen_input">read_stolen_input</a></p>
+</blockquote>
+
+<p><code>INPUTS read_stolen_input(int uid)</code><br/>
+Read input that has been previously stolen with steal_input
+Use <code>state.player_inputs.player_slots[player_slot].buttons_gameplay</code> for only the inputs during the game, or <code>.buttons</code> for all the inputs, even during the pause menu</p>
 <h3 id='generate_particles'>generate_particles</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=generate_particles">generate_particles</a></p>
@@ -6584,6 +6637,11 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 <tr>
 <td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=last_state">last_state</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trust">trust</a></td>
 <td>Levels completed with, 0..3</td>
 </tr>
@@ -6591,6 +6649,11 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=whipped">whipped</a></td>
 <td>Number of times whipped by player</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=walk_pause_timer">walk_pause_timer</a></td>
+<td>positive: walking, negative: wating/idle</td>
 </tr>
 </tbody></table>
 <h3 id='Animation'>Animation</h3>
@@ -7121,6 +7184,90 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=height">height()</a></td>
 <td>Short for <code>aabb.top - aabb.bottom</code>.</td>
+</tr>
+</tbody></table>
+<h3 id='BackgroundMusic'>BackgroundMusic</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=game_startup">game_startup</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=main_backgroundtrack">main_backgroundtrack</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=basecamp">basecamp</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_scene">win_scene</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=arena">arena</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=arena_intro_and_win">arena_intro_and_win</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_gameplay">level_gameplay</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dark_level">dark_level</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_transition">level_transition</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=backlayer">backlayer</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=shop">shop</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=angered_shopkeeper">angered_shopkeeper</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inside_sunken_city_pipe">inside_sunken_city_pipe</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause_menu">pause_menu</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sunken_city_duat_transition">sunken_city_duat_transition</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h3 id='Color'>Color</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- make a semi transparent red color and print it in different formats</span>
@@ -8561,7 +8708,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flags">flags</a></td>
-<td>see <a href="../src/game_api/flags.hpp">flags.hpp</a> illumination_flags</td>
+<td>see <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp">flags.hpp</a> illumination_flags</td>
 </tr>
 <tr>
 <td>int</td>
@@ -9545,7 +9692,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td>array&lt;int, 20&gt;</td>
+<td>array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, 20&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=stickers">stickers</a></td>
 <td></td>
 </tr>
@@ -9574,7 +9721,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=entity_type">entity_type</a></td>
 <td></td>
 </tr>
@@ -11051,6 +11198,11 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle_torchflame_flames4">particle_torchflame_flames4</a></td>
 <td></td>
 </tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='ScreenConstellation'>ScreenConstellation</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- forces any level transition to immediately go to constellation ending with custom text</span>
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -11270,6 +11422,11 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <tr>
 <td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=info_toast">info_toast</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=cthulhu_sound">cthulhu_sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -12142,6 +12299,16 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle_torchflame_ash">particle_torchflame_ash</a></td>
 <td></td>
 </tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=music">music</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=torch_sound">torch_sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='ScreenTransition'>ScreenTransition</h3>
 <p>Derived from <a href="#Screen">Screen</a></p>
@@ -12429,7 +12596,18 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 </tbody></table>
-<h2 id='Sound-types'>Sound types</h2><h3 id='CustomSound'>CustomSound</h3>
+<h2 id='Sound-types'>Sound types</h2><h3 id='BackgroundSound'>BackgroundSound</h3>
+<p>Derived from <a href="#SoundMeta">SoundMeta</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='CustomSound'>CustomSound</h3>
 <p>Handle to a loaded sound, can be used to play the sound and receive a <code>PlayingSound</code> for more control
 It is up to you to not release this as long as any sounds returned by <code>CustomSound:play()</code> are still playing</p>
 
@@ -12531,6 +12709,45 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_parameter">set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)</a></td>
 <td></td>
+</tr>
+</tbody></table>
+<h3 id='SoundMeta'>SoundMeta</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;float, 38&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=left_channel">left_channel</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;float, 38&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=right_channel">right_channel</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=start_over">start_over</a></td>
+<td>when false, current track starts from the beginning, is immediately set back to true</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=playing">playing</a></td>
+<td>set to false to turn off</td>
 </tr>
 </tbody></table>
 <h2 id='State-types'>State types</h2><h3 id='Camera'>Camera</h3>
@@ -12645,6 +12862,11 @@ You can just discard this handle if you do not need extended control anymore</p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#BackgroundMusic">BackgroundMusic</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=music">music</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#GameProps">GameProps</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=game_props">game_props</a></td>
@@ -12946,12 +13168,12 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ingame">ingame</a></td>
-<td></td>
+<td>Is 1 when you in a game, is set to 0 or 1 in main menu, can&#39;t be trusted there, normally in a level is 1 unless you go to the options</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=playing">playing</a></td>
-<td></td>
+<td>Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don&#39;t trust it</td>
 </tr>
 <tr>
 <td>int</td>
@@ -12961,12 +13183,12 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=width">width</a></td>
-<td></td>
+<td>level width in rooms (number of rooms horizontally)</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=height">height</a></td>
-<td></td>
+<td>level height in rooms (number of rooms vertically)</td>
 </tr>
 <tr>
 <td>int</td>
@@ -13326,10 +13548,10 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=speedrun_character">speedrun_character</a></td>
-<td></td>
+<td>Who administers the tutorial speedrun in base camp</td>
 </tr>
 <tr>
-<td>int</td>
+<td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=speedrun_activation_trigger">speedrun_activation_trigger</a></td>
 <td></td>
 </tr>
@@ -14315,6 +14537,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fx_shell">fx_shell</a></td>
 <td></td>
@@ -14585,6 +14812,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=illumination">illumination</a></td>
 <td></td>
 </tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='CursedEffect'>CursedEffect</h3>
 <p>Derived from <a href="#Entity">Entity</a></p>
@@ -14599,6 +14831,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle">particle</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -14998,6 +15235,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#Illumination">Illumination</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_light">emitted_light</a></td>
 <td></td>
@@ -15067,6 +15309,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fx">fx</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -15153,6 +15400,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Entity">Entity</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door_blocker">door_blocker</a></td>
+<td>Normally <code>FX_MAIN_EXIT_DOOR</code> but setting any entity here will block the door</td>
+</tr>
 </tbody></table>
 <h3 id='MotherStatue'>MotherStatue</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Floor">Floor</a></p>
@@ -15328,6 +15585,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=state">state</a></td>
 <td>1 - going up / is at the top, 2 - pause</td>
 </tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ball_rise">ball_rise</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ball_drop">ball_drop</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='SparkTrap'>SparkTrap</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Floor">Floor</a></p>
@@ -15361,6 +15628,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=chain">chain</a></td>
 <td></td>
@@ -15391,6 +15663,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attached_piece_uid">attached_piece_uid</a></td>
@@ -15531,6 +15808,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
 <td>Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow</td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h3 id='CameraFlash'>CameraFlash</h3>
@@ -16109,6 +16391,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td>The neon buzz sound</td>
+</tr>
+<tr>
 <td><a href="#Illumination">Illumination</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=illumination">illumination</a></td>
 <td></td>
@@ -16377,6 +16664,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='LogicalStaticSound'>LogicalStaticSound</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#LogicalSound">LogicalSound</a></p>
@@ -16514,6 +16806,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound1">sound1</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound2">sound2</a></td>
+<td></td>
+</tr>
+<tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance_traveled">distance_traveled</a></td>
 <td></td>
@@ -16615,6 +16917,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=can_rest">can_rest</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -16895,6 +17202,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=applied_hor_momentum">applied_hor_momentum</a></td>
 <td></td>
@@ -16982,6 +17294,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=jump_timer">jump_timer</a></td>
@@ -17143,6 +17460,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=walk_pause_timer">walk_pause_timer</a></td>
 <td></td>
@@ -17163,6 +17485,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='Firebug'>Firebug</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#PowerupCapable">PowerupCapable</a> <a href="#Monster">Monster</a></p>
@@ -17174,6 +17501,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fire_timer">fire_timer</a></td>
@@ -17200,6 +17532,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=max_flight_height">max_flight_height</a></td>
@@ -17295,6 +17632,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=transparency">transparency</a></td>
 <td></td>
@@ -17340,6 +17682,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=linked_ghost">linked_ghost</a></td>
 <td></td>
 </tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='GiantFish'>GiantFish</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#PowerupCapable">PowerupCapable</a> <a href="#Monster">Monster</a></p>
@@ -17351,6 +17698,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_direction_timer">change_direction_timer</a></td>
@@ -17375,6 +17727,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=head_entity">head_entity</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -17520,6 +17877,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle">particle</a></td>
 <td></td>
 </tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='HangSpider'>HangSpider</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#PowerupCapable">PowerupCapable</a> <a href="#Monster">Monster</a></p>
@@ -17616,6 +17978,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=blood_squirt_timer">blood_squirt_timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -17805,6 +18172,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound1">sound1</a></td>
+<td>initialized when breaking the shell (sliding down sound maybe?)</td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound2">sound2</a></td>
+<td>Turning into stone sound</td>
+</tr>
+<tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=climb_direction_x">climb_direction_x</a></td>
 <td></td>
@@ -17851,6 +18228,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Entity">Entity</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=eyeball">eyeball</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attack_cooldown_timer">attack_cooldown_timer</a></td>
 <td></td>
@@ -17866,6 +18253,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attack_effect_entity">attack_effect_entity</a></td>
@@ -17954,6 +18346,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=hump_timer">hump_timer</a></td>
 <td></td>
@@ -17987,6 +18384,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#Illumination">Illumination</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_light">emitted_light</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -18037,6 +18439,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=crouch_walk_sound">crouch_walk_sound</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=explosion_sound">explosion_sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=gun_cooldown">gun_cooldown</a></td>
 <td></td>
@@ -18070,6 +18482,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flipper2">flipper2</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -18113,6 +18530,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=burrowing_sound">burrowing_sound</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=nonburrowing_sound">nonburrowing_sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=burrowing_particle">burrowing_particle</a></td>
@@ -18164,6 +18591,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=jump_timer">jump_timer</a></td>
@@ -18227,6 +18659,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
 <td></td>
@@ -18243,18 +18680,13 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
-<td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=carry">carry(Movable rider)</a></td>
-<td></td>
-</tr>
-<tr>
-<td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tame">tame(bool value)</a></td>
-<td></td>
-</tr>
-<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rider_uid">rider_uid</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -18285,6 +18717,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=remove_rider">remove_rider()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=carry">carry(Movable rider)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tame">tame(bool value)</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -18345,6 +18787,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=red_skeleton_spawn_x">red_skeleton_spawn_x</a></td>
@@ -18542,6 +18989,16 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
+<td><a href="#PlayerSlot">PlayerSlot</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input">input</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Entity">Entity</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=basecamp_button_entity">basecamp_button_entity</a></td>
+<td>Used in base camp to talk with the <a href="#NPC">NPC</a>&#39;s</td>
+</tr>
+<tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_jetpack_fuel">set_jetpack_fuel(int fuel)</a></td>
 <td></td>
@@ -18660,6 +19117,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fly_gallop_sound">fly_gallop_sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attack_cooldown">attack_cooldown</a></td>
 <td></td>
@@ -18675,6 +19137,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle">particle</a></td>
@@ -18696,6 +19163,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#Illumination">Illumination</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_light_explosion">emitted_light_explosion</a></td>
@@ -18784,6 +19256,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#Illumination">Illumination</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_light">emitted_light</a></td>
@@ -18894,6 +19371,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=hover_timer">hover_timer</a></td>
 <td></td>
@@ -18987,6 +19469,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td>Turning into stone sound</td>
+</tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fx_tiamat_head">fx_tiamat_head</a></td>
@@ -19094,6 +19581,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=patrol_distance">patrol_distance</a></td>
@@ -19246,6 +19738,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=skull_regen_timer">skull_regen_timer</a></td>
 <td></td>
@@ -19269,6 +19766,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#Illumination">Illumination</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_light">emitted_light</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -19412,6 +19914,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player">player</a></td>
@@ -19563,6 +20070,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scale_hor">scale_hor</a></td>
 <td>1.25 = default regular bomb, 1.875 = default giant bomb, &gt; 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION</td>
@@ -19651,6 +20163,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trail">trail</a></td>
 <td></td>
@@ -19697,6 +20214,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_arrow_special_offset">get_arrow_special_offset()</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='Bullet'>Bullet</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#Projectile">Projectile</a></p>
@@ -20026,6 +20548,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particles_warp">particles_warp</a></td>
 <td></td>
 </tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='Crushtrap'>Crushtrap</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a></p>
@@ -20137,6 +20664,16 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound1">sound1</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound2">sound2</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=top_chain_piece">top_chain_piece</a></td>
 <td></td>
@@ -20184,6 +20721,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#Illumination">Illumination</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_light">emitted_light</a></td>
@@ -20331,6 +20873,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td><a href="#Illumination">Illumination</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_light">emitted_light</a></td>
@@ -20582,6 +21129,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle_flame">particle_flame</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -21176,6 +21728,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_on">is_on</a></td>
 <td></td>
@@ -21513,6 +22070,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=velocity_x">velocity_x</a></td>
@@ -21898,6 +22460,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=target_uid">target_uid</a></td>
 <td></td>
@@ -21996,6 +22563,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
 <td></td>
@@ -22064,13 +22636,18 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td><a href="#PlayerInputs">PlayerInputs</a></td>
+<td><a href="#PlayerSlot">PlayerSlot</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_inputs">player_inputs</a></td>
 <td></td>
 </tr>
 <tr>
 <td><a href="#Inventory">Inventory</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inventory">inventory</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
 </tr>
 <tr>
@@ -22217,6 +22794,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dust_particle">dust_particle</a></td>
 <td></td>
@@ -22281,6 +22863,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=speed">speed</a></td>
 <td></td>
@@ -22317,6 +22904,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=left_skull_uid">left_skull_uid</a></td>
@@ -22400,6 +22992,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='Spark'>Spark</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#Flame">Flame</a></p>
@@ -22567,6 +23164,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fx_button">fx_button</a></td>
 <td></td>
@@ -22682,6 +23284,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='TimedPowderkeg'>TimedPowderkeg</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#PushBlock">PushBlock</a></p>
@@ -22819,6 +23426,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='TrueCrownPowerup'>TrueCrownPowerup</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#Powerup">Powerup</a></p>
@@ -22985,6 +23597,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h1 id='Enums'>Enums</h1>
 <p>Enums are like numbers but in text that&#39;s easier to remember.</p>

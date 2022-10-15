@@ -62,7 +62,7 @@ class UI
     static Illumination* create_illumination(Color color, float size, float x, float y);
     static void set_camp_camera_bounds_enabled(bool b);
     static std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer);
-    static int32_t spawn_companion(ENT_TYPE compatnion_type, float x, float y, LAYER l);
+    static int32_t spawn_companion(ENT_TYPE compatnion_type, float x, float y, LAYER l, float velocityx, float velocityy);
     static void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, uint32_t liquid_flags, uint32_t amount, float blobs_separation = INFINITY);
     static void spawn_liquid(ENT_TYPE entity_type, float x, float y);
     static int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, float y);
@@ -80,4 +80,5 @@ class UI
     static bool get_focus();
     static float get_spark_distance(SparkTrap* ent);
     static void save_progress();
+    static int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer, float vx, float vy);
 };

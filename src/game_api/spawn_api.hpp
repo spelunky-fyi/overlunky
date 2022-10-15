@@ -53,3 +53,4 @@ void spawn_player(int8_t player_slot, float x, float y);
 int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer);
 int32_t spawn_shopkeeper(float x, float y, LAYER layer, ROOM_TEMPLATE room_template = 65);
 int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int16_t room_template = -1);
+int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer);

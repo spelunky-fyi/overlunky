@@ -84,6 +84,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<EggshipCenterJetFlame>(
         "EggshipCenterJetFlame",
+        "sound",
+        &EggshipCenterJetFlame::sound,
         "emitted_light",
         &EggshipCenterJetFlame::emitted_light,
         "particle",
@@ -232,6 +234,8 @@ void register_usertypes(sol::state& lua)
         &FxJetpackFlame::particle_smoke,
         "particle_flame",
         &FxJetpackFlame::particle_flame,
+        "sound",
+        &FxJetpackFlame::sound,
         "illumination",
         &FxJetpackFlame::illumination,
         sol::base_classes,

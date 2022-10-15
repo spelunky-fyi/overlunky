@@ -14,16 +14,18 @@
 struct Illumination;
 struct PlayerInputs;
 struct Inventory;
+struct PlayerSlot;
 class Entity;
 
 class Ai
 {
   public:
-    uint32_t unknown1a; // flags?
-    uint32_t unknown1b; // flags?
-    int32_t unknown2;
-    int32_t unknown3; // garbage?
-    size_t unknown4;
+    uint32_t unknown1a;     // flags?
+    uint32_t unknown1b;     // flags?
+    int16_t unknown2a;      // unknown
+    int16_t unknown2b;      // garbage/padding?
+    int32_t unknown3;       // garbage/padding?
+    size_t unknown4;        // array of targets? (uids)
     size_t button_sequence; /*unsure*/
     Entity* self_pointer;
     size_t unknown7;
@@ -35,14 +37,15 @@ class Ai
     int32_t timer;
     /// AI state (patrol, sleep, attack, aggro...)
     int8_t state; // 8 = HH agro
-    int8_t unknown12;
+    int8_t last_state;
     /// Levels completed with, 0..3
     uint8_t trust;
     /// Number of times whipped by player
     uint8_t whipped;
     int8_t unknown15;
     int8_t unknown16;
-    int16_t unknown17;
+    /// positive: walking, negative: wating/idle
+    int16_t walk_pause_timer;
     int16_t unknown19;
     int16_t unknown20; // distance to target?
     int32_t target_uid;
@@ -93,8 +96,9 @@ class Player : public PowerupCapable
     int32_t linked_companion_child;  // entity uid
     int32_t linked_companion_parent; // entity uid
     Ai* ai;
-    PlayerInputs* input_ptr;
-    Entity* basecamp_button_entity_pointer;
+    PlayerSlot* input_ptr;
+    /// Used in base camp to talk with the NPC's
+    Entity* basecamp_button_entity;
     int32_t i168;
     int32_t i16c;
     float y_pos; // not sure why, seams to be the same as abs_y

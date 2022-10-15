@@ -11,6 +11,7 @@
 
 #include "entities_floors.hpp" // for MotherStatue, Floor, ExitDoor, Door
 #include "entity.hpp"          // for Entity
+#include "sound_manager.hpp"   //
 #include "state_structs.hpp"   // IWYU pragma: keep
 
 namespace NEntitiesFloors
@@ -136,6 +137,10 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<MainExit>(
         "MainExit",
+        "sound",
+        &MainExit::sound,
+        "door_blocker",
+        &MainExit::door_blocker,
         sol::base_classes,
         sol::bases<Entity, Floor, Door, ExitDoor>());
 
@@ -206,6 +211,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<SpikeballTrap>(
         "SpikeballTrap",
+        "sound",
+        &SpikeballTrap::sound,
         "chain",
         &SpikeballTrap::chain,
         "end_piece",
@@ -263,6 +270,10 @@ void register_usertypes(sol::state& lua)
         &SlidingWallCeiling::active_floor_part_uid,
         "state",
         &SlidingWallCeiling::state,
+        "ball_rise",
+        &SlidingWallCeiling::ball_rise,
+        "ball_drop",
+        &SlidingWallCeiling::ball_drop,
         sol::base_classes,
         sol::bases<Entity, Floor>());
 
@@ -284,6 +295,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<StickyTrap>(
         "StickyTrap",
+        "sound",
+        &StickyTrap::sound,
         "attached_piece_uid",
         &StickyTrap::attached_piece_uid,
         "ball_uid",
@@ -327,6 +340,8 @@ void register_usertypes(sol::state& lua)
         &ForceField::first_item_beam,
         "fx",
         &ForceField::fx,
+        "sound",
+        &ForceField::sound,
         "emitted_light",
         &ForceField::emitted_light,
         "is_on",
@@ -351,6 +366,8 @@ void register_usertypes(sol::state& lua)
         &HorizontalForceField::first_item_beam,
         "fx",
         &HorizontalForceField::fx,
+        "sound",
+        &HorizontalForceField::sound,
         "timer",
         &HorizontalForceField::timer,
         "is_on",

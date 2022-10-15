@@ -15,7 +15,41 @@ namespace NGM
 {
 void register_usertypes(sol::state& lua)
 {
+    lua.new_usertype<BackgroundMusic>(
+        "BackgroundMusic",
+        "game_startup",
+        &BackgroundMusic::game_startup,
+        "main_backgroundtrack",
+        &BackgroundMusic::main_backgroundtrack,
+        "basecamp",
+        &BackgroundMusic::basecamp,
+        "win_scene",
+        &BackgroundMusic::win_scene,
+        "arena",
+        &BackgroundMusic::arena,
+        "arena_intro_and_win",
+        &BackgroundMusic::arena_intro_and_win,
+        "level_gameplay",
+        &BackgroundMusic::level_gameplay,
+        "dark_level",
+        &BackgroundMusic::dark_level,
+        "level_transition",
+        &BackgroundMusic::level_transition,
+        "backlayer",
+        &BackgroundMusic::backlayer,
+        "shop",
+        &BackgroundMusic::shop,
+        "angered_shopkeeper",
+        &BackgroundMusic::angered_shopkeeper,
+        "inside_sunken_city_pipe",
+        &BackgroundMusic::inside_sunken_city_pipe,
+        "pause_menu",
+        &BackgroundMusic::pause_menu,
+        "sunken_city_duat_transition",
+        &BackgroundMusic::sunken_city_duat_transition);
+
     auto gamemanager_type = lua.new_usertype<GameManager>("GameManager");
+    gamemanager_type["music"] = &GameManager::music;
     gamemanager_type["game_props"] = &GameManager::game_props;
     gamemanager_type["screen_logo"] = &GameManager::screen_logo;
     gamemanager_type["screen_intro"] = &GameManager::screen_intro;

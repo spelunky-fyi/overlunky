@@ -11,6 +11,7 @@
 #include "entities_activefloors.hpp" // for Olmec, ClamBase, Crushtrap, Ele...
 #include "entity.hpp"                // for Entity
 #include "particles.hpp"             // IWYU pragma: keep
+#include "sound_manager.hpp"         //
 #include "state_structs.hpp"         // IWYU pragma: keep
 
 class Movable;
@@ -51,6 +52,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Olmec>(
         "Olmec",
+        "sound",
+        &Olmec::sound,
         "target_uid",
         &Olmec::target_uid,
         "attack_phase",
@@ -92,6 +95,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<PushBlock>(
         "PushBlock",
+        "sound",
+        &PushBlock::sound,
         "dust_particle",
         &PushBlock::dust_particle,
         "dest_pos_x",
@@ -138,6 +143,10 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Drill>(
         "Drill",
+        "sound1",
+        &Drill::sound1,
+        "sound2",
+        &Drill::sound2,
         "top_chain_piece",
         &Drill::top_chain_piece,
         "trigger",

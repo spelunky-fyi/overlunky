@@ -68,6 +68,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<BGEggshipRoom>(
         "BGEggshipRoom",
+        "sound",
+        &BGEggshipRoom::sound,
         "fx_shell",
         &BGEggshipRoom::fx_shell,
         "fx_door",
