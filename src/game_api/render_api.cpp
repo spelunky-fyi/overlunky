@@ -237,9 +237,9 @@ void free_text_post_rendering(TextRenderingInfo* info)
     {
         game_free(info->unknown4);
     }
-    if (info->unknown5 != nullptr)
+    if (info->letter_textures != nullptr)
     {
-        game_free(info->unknown5);
+        game_free(info->letter_textures);
     }
     if (info->unknown6 != nullptr)
     {
