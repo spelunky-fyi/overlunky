@@ -78,7 +78,6 @@ void SpelunkyConsole::save_history(std::string_view path)
 {
     if (std::ofstream history_file = std::ofstream(std::string{path}))
     {
-        std::string line;
         auto impl = m_Impl->Lock();
         for (const auto& history_item : impl->history)
         {
