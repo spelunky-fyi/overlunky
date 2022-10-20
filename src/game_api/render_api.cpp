@@ -231,10 +231,27 @@ bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text
     }
     return false;
 }
+void free_text_post_rendering(TextRenderingInfo* info)
+{
+    if (info->unknown4 != nullptr)
+    {
+        game_free(info->unknown4);
+    }
+    if (info->unknown5 != nullptr)
+    {
+        game_free(info->unknown5);
+    }
+    if (info->unknown6 != nullptr)
+    {
+        game_free(info->unknown6);
+    }
+}
 
 void RenderAPI::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
-    TextRenderingInfo tri = {0};
+    TextRenderingInfo tri{};
+    ON_SCOPE_EXIT(free_text_post_rendering(&tri));
+
     if (!prepare_text_for_rendering(&tri, text, x, y, scale_x, scale_y, alignment, fontstyle))
     {
         return;
@@ -256,7 +273,9 @@ void RenderAPI::draw_text(const std::string& text, float x, float y, float scale
 
 std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
 {
-    TextRenderingInfo tri = {0};
+    TextRenderingInfo tri{};
+    ON_SCOPE_EXIT(free_text_post_rendering(&tri));
+
     if (!prepare_text_for_rendering(&tri, text, 0, 0, scale_x, scale_y, 1 /*center*/, fontstyle))
     {
         return std::make_pair(0.0f, 0.0f);

@@ -193,9 +193,10 @@ struct TextRenderingInfo
     float width;
     float height;
     uint32_t unknown3;      // padding probably
-    size_t unknown4;        // unknown4 + letter_textures + unknown5 is most likely a vector
-    size_t letter_textures; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
-    size_t unknown5;
+    // These 3 fields are sized 3 * wcslen(input_text)
+    float* unknown4;
+    float* letter_textures; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
+    short* unknown6;
     uint16_t unknown7;
     uint16_t unknown8; // padding probably
     int32_t unknown9;
