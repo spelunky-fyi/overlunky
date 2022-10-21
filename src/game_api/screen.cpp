@@ -261,14 +261,14 @@ Screen* get_screen_ptr(uint32_t screen_id)
     return nullptr;
 }
 
-JournalPageStory* JournalPageStory::construct(bool right_side, uint32_t page_number)
+JournalPageStory* JournalPageStory::construct(bool right_side, uint32_t pn)
 {
     static auto journal_storypage_vtable = get_address("vftable_JournalPages") + JOURNAL_VFTABLE::STORY;
 
     size_t* mem = (size_t*)game_malloc(0x58);
     *mem = journal_storypage_vtable;
     JournalPageStory* page = (JournalPageStory*)mem;
-    page->page_number = page_number;
+    page->page_number = pn;
 
     page->background.y = 0;
     page->background.dest_set_quad(Quad(AABB(-0.775f, 0.888888f, 0.775f, -0.888888f)));
