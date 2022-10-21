@@ -125,6 +125,7 @@ std::map<std::string, int64_t> keys{
     {"warp_next_level_a", OL_KEY_CTRL | 'A'},
     {"warp_next_level_b", OL_KEY_CTRL | 'B'},
     {"hide_ui", VK_F11},
+    {"switch_ui", VK_F12},
     {"zoom_in", OL_KEY_CTRL | VK_OEM_COMMA},
     {"zoom_out", OL_KEY_CTRL | VK_OEM_PERIOD},
     {"zoom_default", OL_KEY_CTRL | '2'},
@@ -284,6 +285,9 @@ inline constexpr unsigned int unsafe_entity_mask = 0;
 
 inline constexpr int default_entity_mask = 0x18f;
 inline constexpr int default_hitbox_mask = 0x80bf;
+
+std::chrono::time_point<std::chrono::system_clock> last_focus_time;
+bool last_focus;
 
 std::map<std::string, bool> options = {
     {"mouse_control", true},
@@ -2075,6 +2079,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     if (pressed("hide_ui", wParam))
     {
         hide_ui = !hide_ui;
+    }
+    else if (pressed("switch_ui", wParam))
+    {
+        options["menu_ui"] ^= true;
+        hide_ui = false;
     }
     else if (pressed("tool_options", wParam))
     {
@@ -3977,7 +3986,9 @@ void render_clickhandler()
             ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             subtext);
     }
-    if (options["mouse_control"] && UI::get_focus())
+    using namespace std::chrono_literals;
+    auto now = std::chrono::system_clock::now();
+    if (options["mouse_control"] && now > last_focus_time + 200ms && (!options["menu_ui"] || mouse_pos().y > ImGui::GetTextLineHeight()))
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         if (ImGui::BeginDragDropTarget())
@@ -4402,11 +4413,11 @@ void render_options()
 {
     if (options["menu_ui"] && !detached("tool_options"))
     {
-        if (ImGui::MenuItem("Switch to windowed UI"))
+        if (ImGui::MenuItem("Switch to windowed UI", key_string(keys["switch_ui"]).c_str()))
             options["menu_ui"] = false;
-        if (ImGui::MenuItem("Save options"))
+        if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
             save_config(cfgfile);
-        if (ImGui::MenuItem("Load options"))
+        if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
             load_config(cfgfile);
         ImGui::Separator();
     }
@@ -4508,7 +4519,7 @@ void render_options()
     tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
 
     ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
-    tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.");
+    tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.", "switch_ui");
 
     ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
     tooltip("Am I annoying you already :(");
@@ -6771,7 +6782,7 @@ void render_prohud()
     auto base = ImGui::GetMainViewport();
     ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
     auto topmargin = 0.0f;
-    if (options["menu_ui"])
+    if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
     std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
@@ -6965,7 +6976,7 @@ void imgui_draw()
                 }
                 if (ImGui::BeginMenu("Settings"))
                 {
-                    if (ImGui::MenuItem("Switch to menu UI"))
+                    if (ImGui::MenuItem("Switch to menu UI", key_string(keys["switch_ui"]).c_str()))
                         options["menu_ui"] = true;
                     ImGui::Separator();
                     for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
@@ -7102,8 +7113,19 @@ void imgui_draw()
     }
 }
 
+void check_focus()
+{
+    if (last_focus != UI::get_focus())
+    {
+        if (UI::get_focus())
+            last_focus_time = std::chrono::system_clock::now();
+        last_focus = UI::get_focus();
+    }
+}
+
 void post_draw()
 {
+    check_focus();
     update_players();
     force_kits();
     force_zoom();

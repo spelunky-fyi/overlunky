@@ -98,6 +98,7 @@ Current features and their *default* keyboard shortcuts.
   - **F9**: Options
       + Lots of options. **Check the key config for hotkeys for these and other stuff!**
   - **F11**: Hide overlay
+  - **F12**: Switch UI style (default menu bar / floating dockable windows)
   - **\~ (or your native Console Key)**: Toggle developer console
     - The console is its own script environment, where you can run some quick oneliners or paste snippets in.
     - **Enter**: Execute
