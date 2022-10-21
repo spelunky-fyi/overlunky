@@ -200,6 +200,7 @@ struct Window
     std::string name;
     bool detached;
     bool open;
+    bool popup;
 };
 std::map<std::string, Window*> windows;
 
@@ -937,7 +938,9 @@ bool toggle(std::string tool)
     }
     else if (options["menu_ui"])
     {
-        activate_tab = tool;
+        for (auto [name, window] : windows)
+            window->popup = false;
+        windows[tool]->popup = true;
         return true;
     }
     else
@@ -6909,7 +6912,13 @@ void imgui_draw()
                     if (windows[tab]->detached)
                         continue;
                     ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {600.0f, base->Size.y - 50.0f});
-                    if (ImGui::BeginMenu(windows[tab]->name.c_str(), true))
+                    bool ismenu = false;
+                    if (windows[tab]->popup)
+                    {
+                        ImGui::OpenPopup(windows[tab]->name.c_str());
+                        windows[tab]->popup = false;
+                    }
+                    if ((ImGui::BeginMenu(windows[tab]->name.c_str(), true) && (ismenu = true) == true) || ImGui::BeginPopup(windows[tab]->name.c_str()))
                     {
                         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
                         active_tab = tab;
@@ -6922,7 +6931,10 @@ void imgui_draw()
                         ImGui::GetIO().WantCaptureKeyboard = true;
                         render_tool(tab);
                         ImGui::PopStyleVar();
-                        ImGui::EndMenu();
+                        if (ismenu)
+                            ImGui::EndMenu();
+                        else
+                            ImGui::EndPopup();
                     }
                 }
                 ImGui::EndMainMenuBar();

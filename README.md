@@ -41,7 +41,6 @@ Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut 
 Current features and their *default* keyboard shortcuts.
 
   - There's a LOT of useful keys that are not listed here because this list is getting pretty long, check settings or `overlunky.ini` for cool beans.
-  - *The F-keys don't work in the (default) Menu UI* at the moment.
   - The default keys are also changed from time to time to make room for better features, so check the key config for your current keys, or delete the ini (section) to revert to default keys.
   - **F1**: Search and spawn entities where you're standing
       + **Ctrl+Enter**: Spawn entity
