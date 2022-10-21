@@ -693,7 +693,7 @@ end
     /// Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
     /// If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
     lua["spawn_player"] = spawn_player;
-    /// Spawn the Player Ghost entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+    /// Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
     /// or change it's `player_inputs` to the `input` of real player so he can control it directly
     lua["spawn_playerghost"] = spawn_playerghost;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
@@ -1638,7 +1638,7 @@ end
     lua["raise"] = std::raise;
 
     /// Convert the hash to stringid
-    /// Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+    /// Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
     lua["hash_to_stringid"] = hash_to_stringid;
 
     /// Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
@@ -1934,7 +1934,11 @@ end
         "TOAST",
         ON::TOAST,
         "DEATH_MESSAGE",
-        ON::DEATH_MESSAGE);
+        ON::DEATH_MESSAGE,
+        "PRE_LOAD_JOURNAL_CHAPTER",
+        ON::PRE_LOAD_JOURNAL_CHAPTER,
+        "POST_LOAD_JOURNAL_CHAPTER",
+        ON::POST_LOAD_JOURNAL_CHAPTER);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -2034,6 +2038,16 @@ end
     // DEATH_MESSAGE
     // Params: `STRINGID id`
     // Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.
+    // PRE_LOAD_JOURNAL_CHAPTER
+    // Params: JOURNALUI_PAGE_SHOWN `chapter`
+    // Runs before the journal or any of it's chapter is opened
+    // Return behavior: return true to not load the chapter (or journal as a whole)
+    // POST_LOAD_JOURNAL_CHAPTER
+    // Params: JOURNALUI_PAGE_SHOWN `chapter`, `array pages`
+    // Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it
+    // All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
+    // Return behavior: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
+    // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
     */
 
     lua.create_named_table(

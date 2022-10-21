@@ -572,6 +572,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        // Find reference to SetWindowPos or SetWindowLongA, below one of the references you should see a few instructions like:
+        // mov rcx,qword ptr ds:[rsi+80FD0]
         "render_api_offset"sv,
         PatternCommandBuffer{}
             .find_inst("\xBA\xF0\xFF\xFF\xFF\x41\xB8\x00\x00\x00\x90"sv)
@@ -1223,7 +1225,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "show_journal"sv,
-        // aka render_journal
+        // aka render_journal / open journal chapter
         // Break on GameManager.journal_ui.state, open the journal
         PatternCommandBuffer{}
             .find_inst("88 5F 04 80 FB 0B 0F"_gh)
@@ -1868,6 +1870,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_after_inst("d1 48 85 c0 48 0f 44 d0 f6 42 38 40 75 5d 31 f6"_gh)
             .at_exe(),
+    },
+    {
+        // Caller of the show_journal when selecting element from menu (like places, people etc.)
+        "journal_menu_select"sv,
+        PatternCommandBuffer{}
+            .find_inst("48 8B 88 18 01 00 00 41 B0 01"_gh)
+            .at_exe()
+            .function_start(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

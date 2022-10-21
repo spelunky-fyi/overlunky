@@ -1273,6 +1273,68 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
     return return_value.value_or(std::u16string{no_return_str});
 }
 
+bool LuaBackend::pre_load_journal_chapter(uint8_t chapter)
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LOAD_JOURNAL_CHAPTER)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            if (auto return_value = handle_function_with_return<bool>(callback.func, chapter))
+            {
+                if (return_value.value())
+                {
+                    return true;
+                }
+            }
+            clear_current_callback();
+        }
+    }
+    return false;
+}
+
+std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages)
+{
+    if (!get_enabled())
+        return {};
+
+    auto now = get_frame_count();
+    std::vector<uint32_t> new_pages;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LOAD_JOURNAL_CHAPTER)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            if (auto returned_pages = handle_function_with_return<sol::object>(callback.func, chapter, pages).value_or<sol::object>({}))
+            {
+                if (returned_pages.get_type() == sol::type::table)
+                {
+                    new_pages.clear();
+                    new_pages = returned_pages.as<std::vector<uint32_t>>();
+                }
+                else if (returned_pages.get_type() == sol::type::userdata)
+                {
+                    // TODO
+                }
+            }
+            clear_current_callback();
+        }
+    }
+    return new_pages;
+}
+
 CurrentCallback LuaBackend::get_current_callback()
 {
     return current_cb;

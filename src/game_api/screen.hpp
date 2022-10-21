@@ -7,9 +7,10 @@
 #include <string>     // for allocator, string
 #include <vector>     // for vector
 
-#include "aliases.hpp"    // for STRINGID, MAX_PLAYERS
-#include "color.hpp"      // for Color
-#include "render_api.hpp" // for TextureRenderingInfo, TextRenderingInfo (p...
+#include "aliases.hpp"                  // for STRINGID, MAX_PLAYERS
+#include "color.hpp"                    // for Color
+#include "containers/custom_vector.hpp" //
+#include "render_api.hpp"               // for TextureRenderingInfo, TextRenderingInfo (p...
 
 struct ParticleEmitterInfo;
 struct SoundMeta;
@@ -820,17 +821,21 @@ class JournalPage
     uint32_t page_number;
     uint32_t unknown2;
 
-    virtual ~JournalPage() = 0;
-    virtual void v1() = 0;
-    virtual void v2() = 0;
-    virtual void v3() = 0;
-    virtual void render() = 0;
-
     template <typename T>
     T* as()
     {
         return static_cast<T*>(this);
     }
+
+    /// background.x < 0
+    bool is_right_side_page();
+    void set_page_background_side(bool right);
+
+    virtual ~JournalPage() = 0;
+    virtual void v1() = 0;
+    virtual void v2() = 0;
+    virtual void v3() = 0;
+    virtual void render() = 0;
 };
 
 class JournalPageProgress : public JournalPage
@@ -943,6 +948,8 @@ class JournalPageStory : public JournalPage
 {
   public:
     virtual ~JournalPageStory() = 0;
+
+    static JournalPageStory* construct(bool right_side, uint32_t page_number);
 };
 
 class JournalPageFeats : public JournalPage
@@ -1054,8 +1061,8 @@ struct JournalUI
 
     uint8_t unknown1;
     uint16_t unknown2;
-    std::vector<JournalPage*> pages;
-    std::vector<size_t> unknown3;
+    custom_vector<JournalPage*> pages;     // adding pages directly to it crash the game (on vector resize)
+    custom_vector<JournalPage*> pages_tmp; // pages are constructed in the show_journal function and put here, later transfered to the pages vector
     uint32_t current_page;
     uint32_t flipping_to_page;
     uint32_t unknown10;
