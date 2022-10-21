@@ -1317,16 +1317,19 @@ std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, con
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            if (auto returned_pages = handle_function_with_return<sol::object>(callback.func, chapter, pages).value_or<sol::object>({}))
+            if (auto returned_pages = handle_function_with_return<sol::object>(callback.func, chapter, sol::as_table(pages)).value_or<sol::object>({}))
             {
-                if (returned_pages.get_type() == sol::type::table)
+                if (returned_pages.get_type() == sol::type::table || returned_pages.get_type() == sol::type::userdata)
                 {
                     new_pages.clear();
-                    new_pages = returned_pages.as<std::vector<uint32_t>>();
-                }
-                else if (returned_pages.get_type() == sol::type::userdata)
-                {
-                    // TODO
+                    const auto table = returned_pages.as<sol::table>();
+                    for (auto something : table)
+                    {
+                        if (something.second.get_type() == sol::type::number)
+                        {
+                            new_pages.push_back(static_cast<uint32_t>(something.second.as<double>()));
+                        }
+                    }
                 }
             }
             clear_current_callback();

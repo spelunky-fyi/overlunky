@@ -267,7 +267,7 @@ std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vect
 {
     std::vector<uint32_t> new_pages;
     LuaBackend::for_each_backend(
-        [=, &new_pages](LuaBackend::LockedBackend backend)
+        [=, &new_pages, &pages](LuaBackend::LockedBackend backend)
         {
             auto returned_pages = backend->post_load_journal_chapter(chapter, pages);
             if (!returned_pages.empty())

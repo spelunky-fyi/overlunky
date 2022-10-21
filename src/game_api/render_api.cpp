@@ -229,6 +229,7 @@ void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool unknow
     {
         return;
     }
+
     if (!g_selecting_from_menu_scope && pre_load_journal_chapter(chapter))
     {
         // journal_ui->pages.clear(); // bug fix, probably not needed anymore, left just in case
@@ -237,7 +238,8 @@ void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool unknow
 
     g_on_show_journal_trampoline(journal_ui, chapter, unknown1, unknown2);
 
-    std::vector<uint32_t> pages(journal_ui->pages_tmp.size());
+    std::vector<uint32_t> pages;
+    pages.reserve(journal_ui->pages_tmp.size());
     for (auto p : journal_ui->pages_tmp)
     {
         pages.push_back(p->page_number);
