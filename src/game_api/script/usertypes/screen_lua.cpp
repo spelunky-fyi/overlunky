@@ -874,10 +874,12 @@ void register_usertypes(sol::state& lua)
         7,
         "STORY",
         8,
-        "RECAP",
+        "FEATS",
         9,
+        "RECAP",
+        10,
         "DEATH",
-        10);
+        11);
 
     lua.create_named_table(
         "JOURNAL_PAGE_TYPE",
