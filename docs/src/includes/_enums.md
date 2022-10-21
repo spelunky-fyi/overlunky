@@ -336,8 +336,9 @@ Name | Data | Description
 [ITEMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.ITEMS) | 6 | 
 [TRAPS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.TRAPS) | 7 | 
 [STORY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.STORY) | 8 | 
-[RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.RECAP) | 9 | 
-[DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.DEATH) | 10 | 
+[FEATS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.FEATS) | 9 | 
+[RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.RECAP) | 10 | 
+[DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.DEATH) | 11 | 
 
 ## JOURNALUI_STATE
 
@@ -546,6 +547,8 @@ Name | Data | Description
 [SPEECH_BUBBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) | ON::SPEECH_BUBBLE | Params: `Entity speaking_entity, string text`<br/>Runs before any speech bubble is created, even the one using `say` function<br/>Return behavior: if you don't return anything it will execute the speech bubble function normally with default message<br/>if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [TOAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TOAST) | ON::TOAST | Params: `string text`<br/>Runs before any toast is created, even the one using `toast` function<br/>Return behavior: if you don't return anything it will execute the toast function normally with default message<br/>if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [DEATH_MESSAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH_MESSAGE) | ON::DEATH_MESSAGE | Params: `STRINGID id`<br/>Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.<br/>
+[PRE_LOAD_JOURNAL_CHAPTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_JOURNAL_CHAPTER) | ON::PRE_LOAD_JOURNAL_CHAPTER | Params: [JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) `chapter`<br/>Runs before the journal or any of it's chapter is opened<br/>Return behavior: return true to not load the chapter (or journal as a whole)<br/>
+[POST_LOAD_JOURNAL_CHAPTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_JOURNAL_CHAPTER) | ON::POST_LOAD_JOURNAL_CHAPTER | Params: [JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) `chapter`, `array pages`<br/>Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return behavior: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...<br/>
 
 ## PARTICLEEMITTER
 

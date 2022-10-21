@@ -720,6 +720,7 @@ Type | Name | Description
 ---- | ---- | -----------
 [TextureRenderingInfo](#TextureRenderingInfo) | [background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background) | 
 int | [page_number](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_number) | 
+bool | [is_right_side_page()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_right_side_page) | background.x < 0
 
 ### JournalPageBestiary
 
