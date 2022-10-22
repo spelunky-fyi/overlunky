@@ -45,8 +45,8 @@ void register_usertypes(sol::state& lua)
         &BackgroundMusic::inside_sunken_city_pipe,
         "pause_menu",
         &BackgroundMusic::pause_menu,
-        "sunken_city_duat_transition",
-        &BackgroundMusic::sunken_city_duat_transition);
+        "death_transition",
+        &BackgroundMusic::death_transition);
 
     auto gamemanager_type = lua.new_usertype<GameManager>("GameManager");
     gamemanager_type["music"] = &GameManager::music;

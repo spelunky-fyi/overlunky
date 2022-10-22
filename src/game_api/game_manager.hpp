@@ -60,7 +60,7 @@ struct BackgroundMusic
     BackgroundSound* inside_sunken_city_pipe;
     BackgroundSound* pause_menu;
     BackgroundSound* unknown15;
-    BackgroundSound* sunken_city_duat_transition;
+    BackgroundSound* death_transition;
     uint8_t unknown17;
     uint8_t unknown18;
     uint8_t unknown19;
