@@ -487,7 +487,7 @@ Type | Name | Description
 [BackgroundSound](#BackgroundSound) | [angered_shopkeeper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angered_shopkeeper) | 
 [BackgroundSound](#BackgroundSound) | [inside_sunken_city_pipe](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inside_sunken_city_pipe) | 
 [BackgroundSound](#BackgroundSound) | [pause_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_menu) | 
-[BackgroundSound](#BackgroundSound) | [sunken_city_duat_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sunken_city_duat_transition) | 
+[BackgroundSound](#BackgroundSound) | [death_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=death_transition) | 
 
 ### Color
 

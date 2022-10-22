@@ -1933,7 +1933,7 @@ function dump_network() end
     ---@field angered_shopkeeper BackgroundSound
     ---@field inside_sunken_city_pipe BackgroundSound
     ---@field pause_menu BackgroundSound
-    ---@field sunken_city_duat_transition BackgroundSound
+    ---@field death_transition BackgroundSound
 
 ---@class GameManager
     ---@field music BackgroundMusic
