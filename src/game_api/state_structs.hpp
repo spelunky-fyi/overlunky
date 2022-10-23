@@ -980,10 +980,10 @@ struct ShopsInfo
     std::vector<ShopOwnerDetails> shop_owners;
 };
 
-struct OnScreenMessage
+struct MultiLineTextRendering
 {
-    uint32_t* timer;                       // it's some struct, game increments this value and one at +0x40, touching just one freezes the game
+    size_t* timer;                         // some struct? game increments this value and one at +0x40, seam to be related to rendering, touching just the first one freezes the game
     std::vector<TextRenderingInfo*> lines; // each line is separete TextRenderingInfo
-    float x;
-    float z;
+    float x;                               // center of the text box?
+    float z;                               // center of the text box?
 };

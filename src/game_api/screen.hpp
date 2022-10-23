@@ -14,6 +14,7 @@
 
 struct ParticleEmitterInfo;
 struct SoundMeta;
+struct MultiLineTextRendering;
 class Entity;
 
 class Screen
@@ -887,7 +888,7 @@ class JournalPageDiscoverable : public JournalPage
     uint32_t unknown9;
     float unknown10;
     TextRenderingInfo* title_text_info;
-    size_t unknown12;
+    MultiLineTextRendering* text_lines;
     TextRenderingInfo* entry_text_info;
     TextRenderingInfo* chapter_title_text_info;
 

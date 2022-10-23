@@ -1535,7 +1535,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(0xff),
     },
     {
-        "construct_soundposition_ptr"sv,
+        "construct_soundmeta"sv,
         // Put a write bp on ACTIVEFLOOR_DRILL sound_pos1 and release the drill
         PatternCommandBuffer{}
             .find_inst("\xE8****\x49\x89\x84\x24\x30\x01\x00\x00"sv)
@@ -1878,6 +1878,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("48 8B 88 18 01 00 00 41 B0 01"_gh)
             .at_exe()
             .function_start(),
+    },
+    {
+        // Put write bp on GameManager->backgroundmusic->main_background while in a level, then die, we want the address of the call qword ptr ds:[rax+8]
+        // there are two places where it's cleared
+        // this assumes that both are identical, NOP'ing 27 bytes
+        "stop_background_music1"sv,
+        PatternCommandBuffer{}
+            .find_inst("48 8B 82 C8 12 00 00 80 B8 61 05 00 00 00"_gh)
+            .find_next_inst("FF 50 08"_gh)
+            .at_exe(),
+    },
+    {
+        "stop_background_music2"sv,
+        PatternCommandBuffer{}
+            .find_inst("74 2C 48 8B 01 B2 01"_gh)
+            .find_next_inst("FF 50 08"_gh)
+            .at_exe(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
