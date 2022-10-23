@@ -93,10 +93,12 @@ function setup_page(x, y, render_ctx, page_type, page_number)
             render_ctx:draw_text(get_string(string_ids.killed_by), text_x, 0.2748, 0.0014, 0.0007, Color:new(), VANILLA_TEXT_ALIGNMENT.LEFT, VANILLA_FONT_STYLE.ITALIC)
             
             header_text = get_string(string_ids.bestiary_header)
+
+        -- TODO: add the background textures and other details for all the pages
         elseif page_type == JOURNAL_PAGE_TYPE.PLACES then
             header_text = get_string(string_ids.places_header)
         elseif page_type == JOURNAL_PAGE_TYPE.PEOPLE then
-            -- should have similar stuff as BESTIARY, but i din't want to write extra logic for character pages etc.
+            -- should have almost identical stuff as BESTIARY, but i din't want to write extra logic for character pages etc.
             header_text = get_string(string_ids.people_header)
         elseif page_type == JOURNAL_PAGE_TYPE.ITEMS then
             header_text = get_string(string_ids.items_header)
