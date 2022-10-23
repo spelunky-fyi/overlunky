@@ -97,6 +97,7 @@ enum class ON
     PRE_LOAD_SCREEN,
     POST_LOAD_SCREEN,
     DEATH_MESSAGE,
+    FEAT,
 };
 
 struct IntOption
@@ -344,6 +345,7 @@ class LuaBackend
     void post_level_generation();
     void post_load_screen();
     void on_death_message(STRINGID stringid);
+    void on_feat(FEAT feat);
 
     std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template);
     struct PreHandleRoomTilesResult

@@ -100,6 +100,15 @@ void on_death_message(STRINGID stringid)
             return true;
         });
 }
+void on_feat(FEAT feat)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->on_feat(feat);
+            return true;
+        });
+}
 
 std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template)
 {

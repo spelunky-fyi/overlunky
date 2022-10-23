@@ -59,6 +59,7 @@ header_files = [
     "../src/imgui/imgui.h",
     "../src/game_api/script/usertypes/level_lua.cpp",
     "../src/game_api/script/usertypes/gui_lua.cpp",
+    "../src/game_api/script/usertypes/steam_lua.cpp",
     "../src/game_api/search.hpp",
 ]
 api_files = [
@@ -101,6 +102,7 @@ api_files = [
     "../src/game_api/script/usertypes/screen_lua.cpp",
     "../src/game_api/script/usertypes/screen_arena_lua.cpp",
     "../src/game_api/script/usertypes/socket_lua.cpp",
+    "../src/game_api/script/usertypes/steam_lua.cpp",
 ]
 rpc = []
 classes = []

@@ -84,6 +84,7 @@
 #include "usertypes/socket_lua.hpp"                // for register_usertypes
 #include "usertypes/sound_lua.hpp"                 // for register_usertypes
 #include "usertypes/state_lua.hpp"                 // for register_usertypes
+#include "usertypes/steam_lua.hpp"                 // for register_usertypes
 #include "usertypes/texture_lua.hpp"               // for register_usertypes
 #include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 
@@ -175,6 +176,7 @@ end
     NEntityFlags::register_usertypes(lua);
     NEntityCasting::register_usertypes(lua);
     NBehavior::register_usertypes(lua);
+    NSteam::register_usertypes(lua);
 
     StateMemory* main_state = State::get().ptr_main();
     std::vector<Player*> players = get_players(main_state);
@@ -1934,7 +1936,9 @@ end
         "TOAST",
         ON::TOAST,
         "DEATH_MESSAGE",
-        ON::DEATH_MESSAGE);
+        ON::DEATH_MESSAGE,
+        "FEAT",
+        ON::FEAT);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`

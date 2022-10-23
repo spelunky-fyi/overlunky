@@ -1015,6 +1015,28 @@ void LuaBackend::on_death_message(STRINGID stringid)
     }
 }
 
+void LuaBackend::on_feat(FEAT feat)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::FEAT)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function(callback.func, feat);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+
 std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template)
 {
     if (!get_enabled())
