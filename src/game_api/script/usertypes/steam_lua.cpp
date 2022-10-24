@@ -37,19 +37,19 @@ namespace NSteam
 {
 void register_usertypes(sol::state& lua)
 {
-    /// Check if the user has performed a feat (Real Steam achievement or a hooked one)
+    /// Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `unlocked, hidden, name, description`
     lua["get_feat"] = get_feat;
 
-    /// Bypass Steam achievements with your own callback when the game asks if a feat is unlocked. The game will call this function per feat per frame when rendering the Feats page. The callback signature is `bool get_feat(FEAT)`.
+    /// Bypass Steam achievements with your own callback when the game asks if a feat is unlocked. The game will call this function every frame for every feat when rendering the Feats page. Do not do any complicated stuff in here, just return predetermined things. The callback signature is `bool get_feat(FEAT)`.
     lua["set_on_get_feat"] = set_on_get_feat;
 
     /// Bypass Steam achievements with your own callback instead when the game tries to unlock a vanilla feat. It may be called again if you don't  The callback signature is `nil set_feat(FEAT)`.
     lua["set_on_set_feat"] = set_on_set_feat;
 
     /// Helper function to set the title and description for a FEAT with change_string, as well as the hidden state.
-    lua["change_feat"] = [](FEAT feat, std::u16string name, std::u16string description, bool hidden)
+    lua["change_feat"] = [](FEAT feat, bool hidden, std::u16string name, std::u16string description)
     {
-        return change_feat(feat, name, description, hidden);
+        return change_feat(feat, hidden, name, description);
     };
 
     lua.create_named_table("FEAT");
