@@ -1300,7 +1300,7 @@ float | [slide_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 Type | Name | Description
 ---- | ---- | -----------
 int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 
-int | [chapter_shown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_shown) | 
+[JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) | [chapter_shown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_shown) | 
 int | [current_page](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_page) | 
 int | [flipping_to_page](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipping_to_page) | 
 int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_page_count) | 

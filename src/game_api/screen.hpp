@@ -1055,10 +1055,12 @@ class JournalPageLastGamePlayed : public JournalPage
     virtual ~JournalPageLastGamePlayed() = 0;
 };
 
+using JOURNALUI_PAGE_SHOWN = uint8_t; // NoAlias
+
 struct JournalUI
 {
     uint32_t state;
-    uint8_t chapter_shown;
+    JOURNALUI_PAGE_SHOWN chapter_shown;
 
     uint8_t unknown1;
     uint16_t unknown2;

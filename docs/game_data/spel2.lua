@@ -4817,7 +4817,7 @@ local function AABB_extrude(self, amount_x, amount_y) end
 
 ---@class JournalUI
     ---@field state integer
-    ---@field chapter_shown integer
+    ---@field chapter_shown JOURNALUI_PAGE_SHOWN
     ---@field current_page integer
     ---@field flipping_to_page integer
     ---@field max_page_count integer
