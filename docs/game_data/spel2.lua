@@ -1553,6 +1553,23 @@ function udp_send(host, port, msg) end
 ---Hook the sendto and recvfrom functions and start dumping network data to terminal
 ---@return nil
 function dump_network() end
+---Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
+---@param feat FEAT
+---@return boolean, boolean, string, string
+function get_feat(feat) end
+---Bypass Steam achievements with your own callback when the game asks if a feat is unlocked. The game will call this function every frame for every feat when rendering the Feats page. Do not do any complicated stuff in here, just return predetermined things. The callback signature is `bool get_feat(FEAT)`.
+---@return nil
+function set_on_get_feat() end
+---Bypass Steam achievements with your own callback instead when the game tries to unlock a vanilla feat. It may be called again if you don't  The callback signature is `nil set_feat(FEAT)`.
+---@return nil
+function set_on_set_feat() end
+---Helper function to set the title and description strings for a FEAT with change_string, as well as the hidden state.
+---@param feat FEAT
+---@param hidden boolean
+---@param name string
+---@param description string
+---@return nil
+function change_feat(feat, hidden, name, description) end
 
 --## Types
 
@@ -9297,3 +9314,4 @@ local MAX_PLAYERS = 4
 ---@alias uColor integer;
 ---@alias SHORT_TILE_CODE integer;
 ---@alias STRINGID integer;
+---@alias FEAT integer;
