@@ -434,6 +434,8 @@ for func in ps.funcs:
         cat = "Lighting functions"
     elif any(subs in func["name"] for subs in ["sound"]):
         cat = "Sound functions"
+    elif any(subs in func["name"] for subs in ["feat"]):
+        cat = "Feat functions"
     if not cat in func_cats:
         func_cats[cat] = []
     func_cats[cat].append(func)

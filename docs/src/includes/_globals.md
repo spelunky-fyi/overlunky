@@ -230,6 +230,61 @@ Sets a callback that is called right when an entity is destroyed, e.g. as if by 
 The callback signature is `nil on_destroy(Entity self)`
 Use this only when no other approach works, this call can be expensive if overused.
 
+### set_on_get_feat
+
+
+```lua
+-- Keep custom feats in a table, unlock some by default for some reason
+feats = {
+    [FEAT.THE_FULL_SPELUNKY] = false,
+    [32] = true
+}
+
+-- Unlock a feat in our table and toast for it
+function perform(feat)
+    done, hidden, name, desc = get_feat(feat)
+    if feats[feat] == false then
+        toast(F"{name}\n{desc}")
+    end
+    feats[feat] = true
+    prinspect("Unlocked custom feat", feat, name)
+end
+
+-- Change "Parenthood" and make it visible
+change_feat(FEAT.PARENTHOOD, false, "I am the eggman", "This is impossible to get, but you already have it")
+
+-- Change the first feat and make it hidden
+change_feat(1, true, "I am the walrus", "Play as Guy Spelunky from the hit game Spelunky")
+set_callback(function()
+    if players[1].type.id == ENT_TYPE.CHAR_GUY_SPELUNKY then perform(1) end
+end, ON.LEVEL)
+
+-- One more
+change_feat(2, false, "Borscht", "Die to lava")
+set_callback(function(id)
+    if id == hash_to_stringid(0x9c821452) then perform(2) end -- MELTED
+end, ON.DEATH_MESSAGE)
+
+-- Return feats from our table when asked, default to false
+set_on_get_feat(function(feat)
+    return feats[feat] or false
+end)
+
+-- Block vanilla feats, although they wouldn't show up on the Feats page,
+-- they would still trigger Steam achievements if not blocked otherwise
+set_on_set_feat(function(feat)
+    prinspect("Tried to unlock a vanilla feat", enum_get_name(FEAT, feat))
+end)
+
+```
+
+
+> Search script examples for [set_on_get_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_get_feat)
+
+#### nil set_on_get_feat()
+
+Bypass Steam achievements with your own callback when the game asks if a feat is unlocked. The game will call this function every frame for every feat when rendering the Feats page. Do not do any complicated stuff in here, just return predetermined things. The callback signature is `bool get_feat(FEAT)`.
+
 ### set_on_kill
 
 
@@ -268,6 +323,15 @@ The callback signature is `bool on_player_instagib(Entity self)`
 The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
 This is so that when the entity dies (from other causes), the death screen still gets shown.
 Use this only when no other approach works, this call can be expensive if overused.
+
+### set_on_set_feat
+
+
+> Search script examples for [set_on_set_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_set_feat)
+
+#### nil set_on_set_feat()
+
+Bypass Steam achievements with your own callback instead when the game tries to unlock a vanilla feat. It may be called again if you don't  The callback signature is `nil set_feat(FEAT)`.
 
 ### set_post_entity_spawn
 
@@ -1104,6 +1168,27 @@ Store an entity type in [Waddler](#Waddler)'s storage. Returns the slot number t
 #### int worn_backitem(int who_uid)
 
 Returns the uid of the currently worn backitem, or -1 if wearing nothing
+
+## Feat functions
+
+
+### change_feat
+
+
+> Search script examples for [change_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_feat)
+
+#### nil change_feat([FEAT](#Aliases) feat, bool hidden, string name, string description)
+
+Helper function to set the title and description strings for a [FEAT](#Aliases) with change_string, as well as the hidden state.
+
+### get_feat
+
+
+> Search script examples for [get_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_feat)
+
+#### tuple&lt;bool, bool, const string, const string&gt; get_feat([FEAT](#Aliases) feat)
+
+Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
 
 ## Flag functions
 
