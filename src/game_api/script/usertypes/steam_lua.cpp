@@ -7,6 +7,9 @@
 #include "steam_api.hpp"
 #include "vtable_hook.hpp" // for get_hook_function, register_hook_function
 
+namespace NSteam
+{
+
 void set_on_get_feat(sol::function get_feat_func = nullptr)
 {
     if (get_feat_func)
@@ -33,12 +36,16 @@ void set_on_set_feat(sol::function set_feat_func = nullptr)
     hook_set_feat(nullptr);
 }
 
-namespace NSteam
-{
 void register_usertypes(sol::state& lua)
 {
     /// Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
     lua["get_feat"] = get_feat;
+
+    /// Get the visibility of a feat
+    lua["get_feat_hidden"] = get_feat_hidden;
+
+    /// Set the visibility of a feat
+    lua["set_feat_hidden"] = set_feat_hidden;
 
     /// Bypass Steam achievements with your own callback when the game asks if a feat is unlocked. The game will call this function every frame for every feat when rendering the Feats page. Do not do any complicated stuff in here, just return predetermined things. The callback signature is `bool get_feat(FEAT)`.
     lua["set_on_get_feat"] = set_on_get_feat;

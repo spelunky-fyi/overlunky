@@ -78,6 +78,8 @@ void disable_steam_achievements();
 void reset_all_steam_achievements();
 void change_feat(FEAT feat, bool hidden, std::u16string_view name, std::u16string_view description);
 std::tuple<bool, bool, const char16_t*, const char16_t*> get_feat(FEAT feat);
+bool get_feat_hidden(FEAT feat);
+void set_feat_hidden(FEAT feat, bool hidden);
 void init_achievement_hooks();
 void hook_get_feat(std::function<bool(FEAT)> func);
 void hook_set_feat(std::function<void(FEAT)> func);

@@ -352,6 +352,8 @@ for func in ps.funcs:
         for subs in ["get_address", "get_rva", "raise", "dump_network"]
     ):
         cat = "Debug functions"
+    elif any(subs in func["name"] for subs in ["feat"]):
+        cat = "Feat functions"
     elif any(subs in func["name"] for subs in ["tile_code"]):
         cat = "Tile code functions"
     elif any(
@@ -434,8 +436,6 @@ for func in ps.funcs:
         cat = "Lighting functions"
     elif any(subs in func["name"] for subs in ["sound"]):
         cat = "Sound functions"
-    elif any(subs in func["name"] for subs in ["feat"]):
-        cat = "Feat functions"
     if not cat in func_cats:
         func_cats[cat] = []
     func_cats[cat].append(func)

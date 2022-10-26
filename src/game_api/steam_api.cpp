@@ -73,6 +73,8 @@ std::function<void(FEAT)> g_set_feat{nullptr};
 
 void set_feat_hidden(FEAT feat, bool hidden)
 {
+    if (--feat > 31)
+        return;
     auto memory = Memory::get();
     auto offset = get_address("get_feat_hidden"sv);
     auto mask = read_u32(offset);
@@ -85,6 +87,8 @@ void set_feat_hidden(FEAT feat, bool hidden)
 
 bool get_feat_hidden(FEAT feat)
 {
+    if (--feat > 31)
+        return false;
     auto memory = Memory::get();
     auto offset = get_address("get_feat_hidden"sv);
     auto mask = read_u32(offset);
@@ -115,7 +119,7 @@ std::tuple<bool, bool, const char16_t*, const char16_t*> get_feat(FEAT feat)
         return std::make_tuple(false, false, u"", u"");
 
     static const STRINGID first_feat = hash_to_stringid(0x335dbbd4); // The Full Spelunky
-    auto data = std::make_tuple(feat_unlocked(feat), get_feat_hidden(feat), get_string(first_feat + feat), get_string(first_feat + feat + 33));
+    auto data = std::make_tuple(feat_unlocked(feat), get_feat_hidden(feat + 1), get_string(first_feat + feat), get_string(first_feat + feat + 33));
     return data;
 }
 
@@ -131,7 +135,7 @@ void change_feat(FEAT feat, bool hidden, std::u16string_view name, std::u16strin
     if (feat == 0)
         change_string(first_feat + 32, description);
 
-    set_feat_hidden(feat, hidden);
+    set_feat_hidden(feat + 1, hidden);
 }
 
 void init_achievement_hooks()
