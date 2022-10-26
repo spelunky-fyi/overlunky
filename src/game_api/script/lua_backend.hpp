@@ -97,6 +97,8 @@ enum class ON
     PRE_LOAD_SCREEN,
     POST_LOAD_SCREEN,
     DEATH_MESSAGE,
+    PRE_LOAD_JOURNAL_CHAPTER,
+    POST_LOAD_JOURNAL_CHAPTER,
 };
 
 struct IntOption
@@ -365,6 +367,9 @@ class LuaBackend
 
     std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
     std::u16string pre_toast(char16_t* buffer);
+
+    bool pre_load_journal_chapter(uint8_t chapter);
+    std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages);
 
     CurrentCallback get_current_callback();
     void set_current_callback(int uid, int id, CallbackType type);

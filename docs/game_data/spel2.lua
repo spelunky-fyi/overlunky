@@ -367,7 +367,7 @@ function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
 ---@param y number
 ---@return nil
 function spawn_player(player_slot, x, y) end
----Spawn the Player Ghost entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+---Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
 ---or change it's `player_inputs` to the `input` of real player so he can control it directly
 ---@param char_type ENT_TYPE
 ---@param x number
@@ -1006,7 +1006,7 @@ function set_post_render(uid, fun) end
 ---@return nil
 function raise() end
 ---Convert the hash to stringid
----Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+---Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
 ---@param hash integer
 ---@return STRINGID
 function hash_to_stringid(hash) end
@@ -4817,7 +4817,7 @@ local function AABB_extrude(self, amount_x, amount_y) end
 
 ---@class JournalUI
     ---@field state integer
-    ---@field chapter_shown integer
+    ---@field chapter_shown JOURNALUI_PAGE_SHOWN
     ---@field current_page integer
     ---@field flipping_to_page integer
     ---@field max_page_count integer
@@ -4831,6 +4831,7 @@ local function AABB_extrude(self, amount_x, amount_y) end
 ---@class JournalPage
     ---@field background TextureRenderingInfo
     ---@field page_number integer
+    ---@field is_right_side_page fun(self): boolean
 
 ---@class JournalPageProgress : JournalPage
     ---@field coffeestain_top TextureRenderingInfo
@@ -6866,13 +6867,14 @@ INPUTS = {
 ---@alias INPUTS integer
 JOURNALUI_PAGE_SHOWN = {
   BESTIARY = 5,
-  DEATH = 10,
+  DEATH = 11,
+  FEATS = 9,
   ITEMS = 6,
   JOURNAL = 2,
   PEOPLE = 4,
   PLACES = 3,
   PLAYER_PROFILE = 1,
-  RECAP = 9,
+  RECAP = 10,
   STORY = 8,
   TRAPS = 7
 }
@@ -6996,11 +6998,13 @@ ON = {
   ONLINE_LOBBY = 29,
   OPTIONS = 5,
   POST_LEVEL_GENERATION = 112,
+  POST_LOAD_JOURNAL_CHAPTER = 130,
   POST_LOAD_SCREEN = 127,
   POST_ROOM_GENERATION = 111,
   PRE_GET_RANDOM_ROOM = 113,
   PRE_HANDLE_ROOM_TILES = 114,
   PRE_LEVEL_GENERATION = 110,
+  PRE_LOAD_JOURNAL_CHAPTER = 129,
   PRE_LOAD_LEVEL_FILES = 109,
   PRE_LOAD_SCREEN = 126,
   PROLOGUE = 2,

@@ -2674,7 +2674,7 @@ If you want to respawn a player that is a ghost, set in his inventory `health` t
 
 #### int spawn_playerghost([ENT_TYPE](#ENT_TYPE) char_type, float x, float y, [LAYER](#LAYER) layer)
 
-Spawn the [Player](#Player) [Ghost](#Ghost) entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+Spawn the [PlayerGhost](#PlayerGhost) entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
 or change it's `player_inputs` to the `input` of real player so he can control it directly
 
 ### spawn_tree
@@ -2786,7 +2786,7 @@ Will return the string of currently choosen language
 #### [STRINGID](#Aliases) hash_to_stringid(int hash)
 
 Convert the hash to stringid
-Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
 
 ### set_level_string
 

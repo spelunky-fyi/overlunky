@@ -1196,39 +1196,9 @@ void refresh_illumination(Illumination* illumination)
     illumination->timer = *offset;
 }
 
-static bool g_journal_enabled = true;
-using OnShowJournalFun = void(void*, uint8_t);
-OnShowJournalFun* g_on_show_journal_trampoline{nullptr};
-void on_show_journal(void* journal_ui, uint8_t page_shown)
-{
-    if (!g_journal_enabled && page_shown == 2) // page 2 = journal
-    {
-        return;
-    }
-    g_on_show_journal_trampoline(journal_ui, page_shown);
-}
-
 void set_journal_enabled(bool b)
 {
-    static bool function_hooked = false;
-    if (!function_hooked)
-    {
-        g_on_show_journal_trampoline = (OnShowJournalFun*)get_address("show_journal");
-
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-
-        DetourAttach((void**)&g_on_show_journal_trampoline, &on_show_journal);
-
-        const LONG error = DetourTransactionCommit();
-        if (error != NO_ERROR)
-        {
-            DEBUG("Failed hooking on_show_journal: {}\n", error);
-        }
-
-        function_hooked = true;
-    }
-    g_journal_enabled = b;
+    get_journal_enabled() = b;
 }
 
 void set_camp_camera_bounds_enabled(bool b)
