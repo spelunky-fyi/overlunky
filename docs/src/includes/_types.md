@@ -720,6 +720,7 @@ Type | Name | Description
 ---- | ---- | -----------
 [TextureRenderingInfo](#TextureRenderingInfo) | [background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background) | 
 int | [page_number](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_number) | 
+bool | [is_right_side_page()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_right_side_page) | background.x < 0
 
 ### JournalPageBestiary
 
@@ -1299,7 +1300,7 @@ float | [slide_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 Type | Name | Description
 ---- | ---- | -----------
 int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 
-int | [chapter_shown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_shown) | 
+[JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) | [chapter_shown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chapter_shown) | 
 int | [current_page](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_page) | 
 int | [flipping_to_page](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipping_to_page) | 
 int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_page_count) | 

@@ -37,3 +37,6 @@ void trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType pag
 
 std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
 std::u16string pre_toast(char16_t* buffer);
+
+bool pre_load_journal_chapter(uint8_t chapter);
+std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages);

@@ -567,7 +567,9 @@ void register_usertypes(sol::state& lua)
         "background",
         &JournalPage::background,
         "page_number",
-        &JournalPage::page_number);
+        &JournalPage::page_number,
+        "is_right_side_page",
+        &JournalPage::is_right_side_page);
 
     lua["JournalPage"]["as_journal_page_progress"] = &JournalPage::as<JournalPageProgress>;
     lua["JournalPage"]["as_journal_page_journalmenu"] = &JournalPage::as<JournalPageJournalMenu>;
@@ -874,10 +876,12 @@ void register_usertypes(sol::state& lua)
         7,
         "STORY",
         8,
-        "RECAP",
+        "FEATS",
         9,
+        "RECAP",
+        10,
         "DEATH",
-        10);
+        11);
 
     lua.create_named_table(
         "JOURNAL_PAGE_TYPE",

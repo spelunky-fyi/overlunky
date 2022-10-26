@@ -248,3 +248,4 @@ struct TextureRenderingInfo
 };
 
 void init_render_api_hooks();
+bool& get_journal_enabled();

@@ -8,12 +8,14 @@
 #include <utility>     // for find_if, min
 #include <vector>      // for vector, _Vector_iterator, allocator, era...
 
-#include "entity_hooks_info.hpp" // for HookWithId
-#include "game_manager.hpp"      // for GameManager, get_game_manager
-#include "logger.h"              // for DEBUG
-#include "screen_arena.hpp"      // for ScreenArenaIntro, ScreenArenaItems, Scre...
-#include "state.hpp"             // for StateMemory, get_state_ptr
-#include "vtable_hook.hpp"       // for hook_vtable_no_dtor
+#include "containers/game_allocator.hpp" //
+#include "entity_hooks_info.hpp"         // for HookWithId
+#include "game_manager.hpp"              // for GameManager, get_game_manager
+#include "logger.h"                      // for DEBUG
+#include "screen_arena.hpp"              // for ScreenArenaIntro, ScreenArenaItems, Scre...
+#include "search.hpp"                    //
+#include "state.hpp"                     // for StateMemory, get_state_ptr
+#include "vtable_hook.hpp"               // for hook_vtable_no_dtor
 
 struct ScreenHooksInfo
 {
@@ -257,4 +259,53 @@ Screen* get_screen_ptr(uint32_t screen_id)
     }
     DEBUG("Screen pointer requested for unknown screen ID: {}", screen_id);
     return nullptr;
+}
+
+JournalPageStory* JournalPageStory::construct(bool right_side, uint32_t pn)
+{
+    static auto journal_storypage_vtable = get_address("vftable_JournalPages") + JOURNAL_VFTABLE::STORY;
+
+    size_t* mem = (size_t*)game_malloc(0x58);
+    *mem = journal_storypage_vtable;
+    JournalPageStory* page = (JournalPageStory*)mem;
+    page->page_number = pn;
+
+    page->background.y = 0;
+    page->background.dest_set_quad(Quad(AABB(-0.775f, 0.888888f, 0.775f, -0.888888f)));
+
+    if (right_side == false)
+    {
+        page->background.x = 0.225f;
+        page->background.source_set_quad(Quad(AABB(0.1125f, 0, 0.5f, 1.0f)));
+    }
+    else
+    {
+        page->background.x = -0.225f;
+        page->background.source_set_quad(Quad(AABB(0.5f, 0, 0.8875f, 1.0f)));
+    }
+    return page;
+}
+
+bool JournalPage::is_right_side_page()
+{
+    return (this->background.x < 0);
+}
+void JournalPage::set_page_background_side(bool right)
+{
+    if (right)
+    {
+        if (is_right_side_page())
+            return;
+
+        this->background.x *= -1;
+        this->background.source_set_quad(Quad(AABB(0.5f, 0, 0.8875f, 1.0f)));
+    }
+    else
+    {
+        if (!is_right_side_page())
+            return;
+
+        this->background.x *= -1;
+        this->background.source_set_quad(Quad(AABB(0.1125f, 0, 0.5f, 1.0f)));
+    }
 }

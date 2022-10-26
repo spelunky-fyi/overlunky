@@ -255,3 +255,36 @@ std::u16string pre_toast(char16_t* buffer)
         });
     return return_empty_str ? u"" : new_string;
 }
+
+bool pre_load_journal_chapter(uint8_t chapter)
+{
+    bool return_value = false;
+    LuaBackend::for_each_backend(
+        [=, &chapter, &return_value](LuaBackend::LockedBackend backend)
+        {
+            return_value = backend->pre_load_journal_chapter(chapter);
+            if (return_value)
+                return false;
+
+            return true;
+        });
+
+    return return_value;
+}
+
+std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages)
+{
+    std::vector<uint32_t> new_pages;
+    LuaBackend::for_each_backend(
+        [=, &new_pages, &pages](LuaBackend::LockedBackend backend)
+        {
+            auto returned_pages = backend->post_load_journal_chapter(chapter, pages);
+            if (!returned_pages.empty())
+            {
+                new_pages = std::move(returned_pages);
+            }
+            return true;
+        });
+
+    return new_pages;
+}

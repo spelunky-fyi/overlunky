@@ -147,8 +147,8 @@ struct StateMemory
     uint8_t padding12;
     ENT_TYPE cause_of_death_entity_type;
     int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
-    OnScreenMessage* toast;
-    OnScreenMessage* speechbubble;
+    MultiLineTextRendering* toast;
+    MultiLineTextRendering* speechbubble;
     uint32_t speechbubble_timer;
     uint32_t toast_timer;
     int32_t speechbubble_owner;
