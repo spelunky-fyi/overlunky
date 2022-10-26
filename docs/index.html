@@ -5060,7 +5060,7 @@ If you want to respawn a player that is a ghost, set in his inventory <code>heal
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_playerghost">spawn_playerghost</a></p>
 </blockquote>
 <h4 id='int-spawn_playerghost-ENT_TYPE-char_type-float-x-float-y-LAYER-layer'>int spawn_playerghost(<a href="#ENT_TYPE">ENT_TYPE</a> char_type, float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
-<p>Spawn the <a href="#Player">Player</a> <a href="#Ghost">Ghost</a> entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+<p>Spawn the <a href="#PlayerGhost">PlayerGhost</a> entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
 or change it&#39;s <code>player_inputs</code> to the <code>input</code> of real player so he can control it directly</p>
 <h3 id='spawn_tree'>spawn_tree</h3>
 <blockquote>
@@ -5132,7 +5132,7 @@ Will return the string of currently choosen language</p>
 </blockquote>
 <h4 id='STRINGID-hash_to_stringid-int-hash'><a href="#Aliases">STRINGID</a> hash_to_stringid(int hash)</h4>
 <p>Convert the hash to stringid
-Check <a href="game_data/strings00_hashed.str">strings00_hashed.str</a> for the hash values, or extract assets with modlunky and check those.</p>
+Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str">strings00_hashed.str</a> for the hash values, or extract assets with modlunky and check those.</p>
 <h3 id='set_level_string'>set_level_string</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- set the level string shown in hud, journal and game over</span>
 <span class="c1">-- also change the one used in transitions for consistency</span>
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -8053,6 +8053,11 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=page_number">page_number</a></td>
 <td></td>
 </tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_right_side_page">is_right_side_page()</a></td>
+<td>background.x &lt; 0</td>
+</tr>
 </tbody></table>
 <h3 id='JournalPageBestiary'>JournalPageBestiary</h3>
 <p>Derived from <a href="#JournalPage">JournalPage</a> <a href="#JournalPageDiscoverable">JournalPageDiscoverable</a></p>
@@ -9824,7 +9829,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=chapter_shown">chapter_shown</a></td>
 <td></td>
 </tr>
@@ -24596,13 +24601,18 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=JOURNALUI_PAGE_SHOWN.RECAP">RECAP</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=JOURNALUI_PAGE_SHOWN.FEATS">FEATS</a></td>
 <td>9</td>
 <td></td>
 </tr>
 <tr>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=JOURNALUI_PAGE_SHOWN.DEATH">DEATH</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=JOURNALUI_PAGE_SHOWN.RECAP">RECAP</a></td>
 <td>10</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=JOURNALUI_PAGE_SHOWN.DEATH">DEATH</a></td>
+<td>11</td>
 <td></td>
 </tr>
 </tbody></table>
@@ -25352,6 +25362,16 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.DEATH_MESSAGE">DEATH_MESSAGE</a></td>
 <td>ON::DEATH_MESSAGE</td>
 <td>Params: <code>STRINGID id</code><br/>Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LOAD_JOURNAL_CHAPTER">PRE_LOAD_JOURNAL_CHAPTER</a></td>
+<td>ON::PRE_LOAD_JOURNAL_CHAPTER</td>
+<td>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> <code>chapter</code><br/>Runs before the journal or any of it&#39;s chapter is opened<br/>Return behavior: return true to not load the chapter (or journal as a whole)<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_JOURNAL_CHAPTER">POST_LOAD_JOURNAL_CHAPTER</a></td>
+<td>ON::POST_LOAD_JOURNAL_CHAPTER</td>
+<td>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> <code>chapter</code>, <code>array pages</code><br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return behavior: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></td>
 </tr>
 </tbody></table>
 <h2 id='PARTICLEEMITTER'>PARTICLEEMITTER</h2>
