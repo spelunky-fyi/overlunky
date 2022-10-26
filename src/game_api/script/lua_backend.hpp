@@ -99,7 +99,6 @@ enum class ON
     DEATH_MESSAGE,
     PRE_LOAD_JOURNAL_CHAPTER,
     POST_LOAD_JOURNAL_CHAPTER,
-    FEAT,
     PRE_GET_FEAT,
     PRE_SET_FEAT,
 };
@@ -349,7 +348,6 @@ class LuaBackend
     void post_level_generation();
     void post_load_screen();
     void on_death_message(STRINGID stringid);
-    void on_feat(FEAT feat);
     std::optional<bool> pre_get_feat(FEAT feat);
     bool pre_set_feat(FEAT feat);
 

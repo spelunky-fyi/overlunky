@@ -1941,8 +1941,6 @@ end
         ON::PRE_LOAD_JOURNAL_CHAPTER,
         "POST_LOAD_JOURNAL_CHAPTER",
         ON::POST_LOAD_JOURNAL_CHAPTER,
-        "FEAT",
-        ON::FEAT,
         "PRE_GET_FEAT",
         ON::PRE_GET_FEAT,
         "PRE_SET_FEAT",
@@ -2056,8 +2054,6 @@ end
     // All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
     // Return behavior: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
     // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
-    // FEAT
-    // Runs after a vanilla feat has been performer
     // PRE_GET_FEAT
     // Runs before getting performed status for a FEAT when rendering the Feats page in journal. Return a boolean to override the vanilla feat with your own. Defaults to Steam GetAchievement.
     // PRE_SET_FEAT

@@ -107,7 +107,6 @@ void unlock_feat(uint8_t feat)
 {
     if (!pre_set_feat(feat + 1) && g_set_feat_trampoline)
         g_set_feat_trampoline(feat);
-    on_feat(feat);
 }
 
 std::tuple<bool, bool, const char16_t*, const char16_t*> get_feat(FEAT feat)

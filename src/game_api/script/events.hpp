@@ -20,7 +20,6 @@ void post_room_generation();
 void post_level_generation();
 void post_load_screen();
 void on_death_message(STRINGID stringid);
-void on_feat(FEAT feat);
 std::optional<bool> pre_get_feat(FEAT feat);
 bool pre_set_feat(FEAT feat);
 
