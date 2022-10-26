@@ -1879,6 +1879,31 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        // It's the hardcoded mask (0xfc007e18) right after the call to get_feat
+        "get_feat_hidden"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh)
+            .offset(25)
+            .at_exe(),
+    },
+    {
+        // It's the function that calls ISteamUserStats::GetAchievement virtual when viewing the Feats page
+        "get_feat"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh) // Same as ^ btw
+            .offset(0x7)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        // It's the function that calls ISteamUserStats::SetAchievement virtual when performing feats
+        "set_feat"sv,
+        PatternCommandBuffer{}
+            .find_inst("8b 05 4f a0 12 00 65 48 8b 0c 25 58 00 00 00"_gh)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

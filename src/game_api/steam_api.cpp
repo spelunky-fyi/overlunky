@@ -74,7 +74,7 @@ std::function<void(FEAT)> g_set_feat{nullptr};
 void set_feat_hidden(FEAT feat, bool hidden)
 {
     auto memory = Memory::get();
-    auto offset = memory.at_exe(0x22c720d7); // TODO: It's the 32bit hardcoded mask for hidden feats (0xfc007e18U)
+    auto offset = get_address("get_feat_hidden"sv);
     auto mask = read_u32(offset);
     if (hidden)
         mask |= (1U << feat);
@@ -86,7 +86,7 @@ void set_feat_hidden(FEAT feat, bool hidden)
 bool get_feat_hidden(FEAT feat)
 {
     auto memory = Memory::get();
-    auto offset = memory.at_exe(0x22c720d7); // TODO: It's the 32bit hardcoded mask for hidden feats (0xfc007e18U)
+    auto offset = get_address("get_feat_hidden"sv);
     auto mask = read_u32(offset);
     return (mask & (1U << feat)) > 0;
 }
@@ -140,8 +140,8 @@ void init_achievement_hooks()
     if (!hooked)
     {
         auto memory = Memory::get();
-        g_get_feat_trampoline = (GetFeatFun*)memory.at_exe(0x22cc4c70); // TODO: It's the function that calls steamapi getachievement
-        g_set_feat_trampoline = (SetFeatFun*)memory.at_exe(0x22cc45b0); // TODO: It's the function that calls steamapi setachievement
+        g_get_feat_trampoline = (GetFeatFun*)get_address("get_feat"sv);
+        g_set_feat_trampoline = (SetFeatFun*)get_address("set_feat"sv);
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
