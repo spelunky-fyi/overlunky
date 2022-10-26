@@ -75,7 +75,6 @@ void set_feat_hidden(FEAT feat, bool hidden)
 {
     if (--feat > 31)
         return;
-    auto memory = Memory::get();
     auto offset = get_address("get_feat_hidden"sv);
     auto mask = read_u32(offset);
     if (hidden)
@@ -89,7 +88,6 @@ bool get_feat_hidden(FEAT feat)
 {
     if (--feat > 31)
         return false;
-    auto memory = Memory::get();
     auto offset = get_address("get_feat_hidden"sv);
     auto mask = read_u32(offset);
     return (mask & (1U << feat)) > 0;
@@ -97,8 +95,9 @@ bool get_feat_hidden(FEAT feat)
 
 bool feat_unlocked(uint8_t feat)
 {
-    if (g_get_feat)
-        return g_get_feat(feat + 1);
+    auto pre = pre_get_feat(feat + 1);
+    if (pre.has_value())
+        return pre.value();
     else if (g_get_feat_trampoline)
         return g_get_feat_trampoline(feat);
     return false;
@@ -106,11 +105,9 @@ bool feat_unlocked(uint8_t feat)
 
 void unlock_feat(uint8_t feat)
 {
-    on_feat(feat);
-    if (g_set_feat)
-        g_set_feat(feat + 1);
-    else if (g_set_feat_trampoline)
+    if (!pre_set_feat(feat + 1) && g_set_feat_trampoline)
         g_set_feat_trampoline(feat);
+    on_feat(feat);
 }
 
 std::tuple<bool, bool, const char16_t*, const char16_t*> get_feat(FEAT feat)
@@ -143,7 +140,6 @@ void init_achievement_hooks()
     static bool hooked = false;
     if (!hooked)
     {
-        auto memory = Memory::get();
         g_get_feat_trampoline = (GetFeatFun*)get_address("get_feat"sv);
         g_set_feat_trampoline = (SetFeatFun*)get_address("set_feat"sv);
 
@@ -161,14 +157,4 @@ void init_achievement_hooks()
 
         hooked = true;
     }
-}
-
-void hook_get_feat(std::function<bool(FEAT)> func = nullptr)
-{
-    g_get_feat = func;
-}
-
-void hook_set_feat(std::function<void(FEAT)> func = nullptr)
-{
-    g_set_feat = func;
 }

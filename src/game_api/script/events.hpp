@@ -21,6 +21,8 @@ void post_level_generation();
 void post_load_screen();
 void on_death_message(STRINGID stringid);
 void on_feat(FEAT feat);
+std::optional<bool> pre_get_feat(FEAT feat);
+bool pre_set_feat(FEAT feat);
 
 std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template);
 std::optional<LevelGenRoomData> pre_handle_room_tiles(LevelGenRoomData room_data, int x, int y, uint16_t room_template);
