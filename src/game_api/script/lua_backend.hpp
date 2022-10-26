@@ -99,6 +99,8 @@ enum class ON
     DEATH_MESSAGE,
     PRE_LOAD_JOURNAL_CHAPTER,
     POST_LOAD_JOURNAL_CHAPTER,
+    PRE_GET_FEAT,
+    PRE_SET_FEAT,
 };
 
 struct IntOption
@@ -346,6 +348,8 @@ class LuaBackend
     void post_level_generation();
     void post_load_screen();
     void on_death_message(STRINGID stringid);
+    std::optional<bool> pre_get_feat(FEAT feat);
+    bool pre_set_feat(FEAT feat);
 
     std::string pre_get_random_room(int x, int y, uint8_t layer, uint16_t room_template);
     struct PreHandleRoomTilesResult

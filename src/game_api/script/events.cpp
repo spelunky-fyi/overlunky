@@ -279,3 +279,33 @@ std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vect
 
     return new_pages;
 }
+
+std::optional<bool> pre_get_feat(FEAT feat)
+{
+    std::optional<bool> got;
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            std::optional<bool> ret = backend->pre_get_feat(feat);
+            if (ret.has_value())
+            {
+                block = true;
+                got = ret;
+            }
+            return !block;
+        });
+    return got;
+}
+
+bool pre_set_feat(FEAT feat)
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_set_feat(feat);
+            return !block;
+        });
+    return block;
+}

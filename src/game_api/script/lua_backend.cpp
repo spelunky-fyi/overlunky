@@ -1338,6 +1338,62 @@ std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, con
     return new_pages;
 }
 
+std::optional<bool> LuaBackend::pre_get_feat(FEAT feat)
+{
+    if (!get_enabled())
+        return std::nullopt;
+
+    auto now = get_frame_count();
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_GET_FEAT)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            if (auto return_value = handle_function_with_return<bool>(callback.func, feat))
+            {
+                if (return_value.has_value())
+                {
+                    return return_value.value();
+                }
+            }
+            clear_current_callback();
+        }
+    }
+    return std::nullopt;
+}
+
+bool LuaBackend::pre_set_feat(FEAT feat)
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_SET_FEAT)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            if (auto return_value = handle_function_with_return<bool>(callback.func, feat))
+            {
+                if (return_value.has_value() && return_value.value())
+                {
+                    return return_value.value();
+                }
+            }
+            clear_current_callback();
+        }
+    }
+    return false;
+}
+
 CurrentCallback LuaBackend::get_current_callback()
 {
     return current_cb;

@@ -23,9 +23,10 @@
 #include "savedata.hpp"          // for SaveData
 #include "search.hpp"            // for get_address
 #include "spawn_api.hpp"         // for init_spawn_hooks
-#include "strings.hpp"           // for strings_init
-#include "thread_utils.hpp"      // for OnHeapPointer
-#include "virtual_table.hpp"     // for get_virtual_function_address, VTABLE...
+#include "steam_api.hpp"
+#include "strings.hpp"       // for strings_init
+#include "thread_utils.hpp"  // for OnHeapPointer
+#include "virtual_table.hpp" // for get_virtual_function_address, VTABLE...
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -257,6 +258,7 @@ State& State::get()
             init_spawn_hooks();
             init_behavior_hooks();
             init_render_api_hooks();
+            init_achievement_hooks();
             hook_godmode_functions();
             strings_init();
         }
