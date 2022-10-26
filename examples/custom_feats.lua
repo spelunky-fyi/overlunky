@@ -1,3 +1,8 @@
+meta.name = 'Custom Feats'
+meta.version = 'WIP'
+meta.description = 'Replace a few Feats with our own and create hooks for them.'
+meta.author = 'Dregu'
+
 -- Keep custom feats in a table, unlock some by default for some reason
 -- We could just leave this empty though, cause we default to false later
 feats = {
