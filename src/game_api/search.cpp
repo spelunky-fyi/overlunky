@@ -1233,13 +1233,21 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        "show_journal_from_popup"sv,
+        "toggle_journal"sv,
         // Break on GameManager.journal_ui.state, open the journal when a popup is on
         // Also calls show_journal
         PatternCommandBuffer{}
             .find_inst("89 4e 38 89 4e 3c 48 8b 40 08"_gh)
             .at_exe()
             .function_start(),
+    },
+    {
+        "journal_popup_open"sv,
+        // A jump that checks if JournalPopupUI is open in toggle_journal
+        PatternCommandBuffer{}
+            .find_inst("89 4e 38 89 4e 3c 48 8b 40 08"_gh)
+            .offset(-0x37)
+            .at_exe(),
     },
     {
         "generate_world_particles"sv,

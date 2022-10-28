@@ -1100,5 +1100,6 @@ struct JournalUI
 };
 
 Screen* get_screen_ptr(uint32_t screen_id);
-void show_journal(uint8_t chapter, uint32_t page);
-void input_journal();
+void force_journal(uint32_t chapter, uint32_t entry);
+void toggle_journal();
+void show_journal(JOURNALUI_PAGE_SHOWN chapter);
