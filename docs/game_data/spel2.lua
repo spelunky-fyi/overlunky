@@ -4860,6 +4860,7 @@ local function AABB_extrude(self, amount_x, amount_y) end
     ---@field unknown23 TextureRenderingInfo
     ---@field entire_book TextureRenderingInfo
     ---@field page_timer integer
+    ---@field fade_timer integer
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo

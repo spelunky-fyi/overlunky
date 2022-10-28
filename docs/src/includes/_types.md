@@ -1310,6 +1310,7 @@ int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 [TextureRenderingInfo](#TextureRenderingInfo) | [unknown23](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown23) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [entire_book](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) | 
 int | [page_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) | 
+int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | 
 
 ### PauseUI
 
