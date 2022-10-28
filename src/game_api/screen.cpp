@@ -338,8 +338,22 @@ void toggle_journal()
     show(gm->journal_ui, heap_base());
 }
 
-void show_journal(uint8_t chapter)
+void show_journal(JOURNALUI_PAGE_SHOWN chapter, uint32_t page)
 {
     auto gm = get_game_manager();
-    on_open_journal_chapter(gm->journal_ui, chapter, false, true);
+    if (chapter > 2 && chapter < 10 && gm->journal_ui->state == 0)
+    {
+        on_open_journal_chapter(gm->journal_ui, 2, false, true);
+        if (gm->journal_ui->state == 1 && gm->journal_ui->chapter_shown == 2)
+            on_open_journal_chapter(gm->journal_ui, chapter, false, false);
+    }
+    else
+    {
+        on_open_journal_chapter(gm->journal_ui, chapter, false, true);
+    }
+    if (chapter > 2 && chapter < 10 && gm->journal_ui->chapter_shown == chapter && page > 0)
+    {
+        gm->journal_ui->current_page = page;
+        gm->journal_ui->flipping_to_page = page;
+    }
 }

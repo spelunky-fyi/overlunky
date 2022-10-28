@@ -22,7 +22,7 @@ namespace NScreen
 void register_usertypes(sol::state& lua)
 {
 
-    /// Force the journal to open on a chapter and entry# every time when pressing the journal button. Only use even entry numbers.
+    /// Force the journal to open on a chapter and entry# every time when pressing the journal button. Only use even entry numbers. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
     lua["force_journal"] = force_journal;
 
     /// Open or close the journal as if pressing the journal button
