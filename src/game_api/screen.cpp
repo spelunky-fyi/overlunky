@@ -310,17 +310,23 @@ void JournalPage::set_page_background_side(bool right)
     }
 }
 
-void show_journal(uint8_t chapter, uint32_t page, bool instant, bool sound)
+void show_journal(uint8_t chapter, uint32_t page)
 {
     auto gm = get_game_manager();
+    if (gm->journal_ui->state != 0)
+        return;
     typedef bool show_journal_func(JournalUI*, uint8_t, bool, bool);
     static show_journal_func* show = (show_journal_func*)(get_address("show_journal"sv));
-    gm->journal_ui->current_page = page;
-    gm->journal_ui->flipping_to_page = page;
-    show(gm->journal_ui, chapter, instant, sound);
+    show(gm->journal_ui, 0, false, true);
+    show(gm->journal_ui, chapter, false, false);
+    if (page)
+    {
+        gm->journal_ui->current_page = page;
+        gm->journal_ui->flipping_to_page = page;
+    }
 }
 
-void show_journal_from_popup()
+void input_journal()
 {
     auto gm = get_game_manager();
     typedef bool show_journal_func(JournalUI*, size_t);

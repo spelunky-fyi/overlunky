@@ -1538,6 +1538,16 @@ function get_render_hitbox(uid, extrude, offsetx, offsety) end
 ---@param box AABB
 ---@return AABB
 function screen_aabb(box) end
+---Open the journal to a chapter and page. Note that the main journal spread is pages 0..1 and the pages in the sub-chapters start at 2. Only use even page numbers.
+---@param chapter JOURNALUI_PAGE_SHOWN
+---@param page integer
+---@param instant boolean
+---@param play_sound boolean
+---@return nil
+function show_journal(chapter, page, instant, play_sound) end
+---Open the journal to the chapter and page set in currently open JournalPopupUI, as if pressing tab to check the popup
+---@return nil
+function show_journal_from_popup() end
 ---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 ---@param host string
 ---@param port in_port_t
