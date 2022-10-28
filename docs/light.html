@@ -4040,69 +4040,7 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='int-worn_backitem-int-who_uid'>int worn_backitem(int who_uid)</h4>
 <p>Returns the uid of the currently worn backitem, or -1 if wearing nothing</p>
-<h2 id='Feat-functions'>Feat functions</h2><h3 id='change_feat'>change_feat</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Keep custom feats in a table, unlock some by default for some reason</span>
-<span class="c1">-- We could just leave this empty though, cause we default to false later</span>
-<span class="n">feats</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">FEAT</span><span class="p">.</span><span class="n">THE_FULL_SPELUNKY</span><span class="p">]</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="p">[</span><span class="mi">32</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span>
-<span class="p">}</span>
-
-<span class="c1">-- Unlock a feat in our table and toast for it</span>
-<span class="k">function</span> <span class="nf">perform</span><span class="p">(</span><span class="n">feat</span><span class="p">)</span>
-    <span class="n">done</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">desc</span> <span class="o">=</span> <span class="n">get_feat</span><span class="p">(</span><span class="n">feat</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">feats</span><span class="p">[</span><span class="n">feat</span><span class="p">]</span> <span class="o">==</span> <span class="kc">false</span> <span class="k">then</span>
-        <span class="n">toast</span><span class="p">(</span><span class="n">F</span><span class="s2">"{name}\n{desc}"</span><span class="p">)</span>
-    <span class="k">end</span>
-    <span class="n">feats</span><span class="p">[</span><span class="n">feat</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span>
-    <span class="n">prinspect</span><span class="p">(</span><span class="s2">"Unlocked custom feat"</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-<span class="k">end</span>
-
-<span class="c1">-- Change "Parenthood" and make it visible</span>
-<span class="n">change_feat</span><span class="p">(</span><span class="n">FEAT</span><span class="p">.</span><span class="n">PARENTHOOD</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="s2">"I am the eggman"</span><span class="p">,</span> <span class="s2">"This is impossible to get, but you already have it"</span><span class="p">)</span>
-
-<span class="c1">-- Change the first feat and make it hidden</span>
-<span class="n">change_feat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">true</span><span class="p">,</span> <span class="s2">"I am the walrus"</span><span class="p">,</span> <span class="s2">"Play as Guy Spelunky from the hit game Spelunky"</span><span class="p">)</span>
-<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">type</span><span class="p">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">CHAR_GUY_SPELUNKY</span> <span class="k">then</span> <span class="n">perform</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">end</span>
-<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">LEVEL</span><span class="p">)</span>
-
-<span class="c1">-- One more</span>
-<span class="n">change_feat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="s2">"Borscht"</span><span class="p">,</span> <span class="s2">"Die to lava"</span><span class="p">)</span>
-<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">id</span> <span class="o">==</span> <span class="n">hash_to_stringid</span><span class="p">(</span><span class="mh">0x9c821452</span><span class="p">)</span> <span class="k">then</span>
-        <span class="n">perform</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-        <span class="c1">-- Reveal the first feat only after getting this one</span>
-        <span class="n">set_feat_hidden</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
-    <span class="k">end</span> <span class="c1">-- MELTED</span>
-<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">DEATH_MESSAGE</span><span class="p">)</span>
-
-<span class="c1">-- Return feat status from our table when asked, defaulting to false if not found</span>
-<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">feat</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">feats</span><span class="p">[</span><span class="n">feat</span><span class="p">]</span> <span class="ow">or</span> <span class="kc">false</span>
-
-    <span class="c1">-- this would default to vanilla behaviour for feats missing from the table,</span>
-    <span class="c1">-- if you only want to override some of them</span>
-    <span class="c1">--return feats[feat]</span>
-<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">PRE_GET_FEAT</span><span class="p">)</span>
-
-<span class="c1">-- Block vanilla feats, although they wouldn't show up on the Feats page,</span>
-<span class="c1">-- they would still trigger Steam achievements if not blocked otherwise</span>
-<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">feat</span><span class="p">)</span>
-    <span class="n">prinspect</span><span class="p">(</span><span class="s2">"Tried to unlock a vanilla feat"</span><span class="p">,</span> <span class="n">enum_get_name</span><span class="p">(</span><span class="n">FEAT</span><span class="p">,</span> <span class="n">feat</span><span class="p">))</span>
-    <span class="k">return</span> <span class="kc">true</span>
-
-    <span class="c1">-- this would default to vanilla behaviour for feats missing from the table,</span>
-    <span class="c1">-- if you only want to override some of them</span>
-    <span class="c1">--if feats[feat] ~= nil then return true end</span>
-<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">PRE_SET_FEAT</span><span class="p">)</span>
-
-<span class="c1">-- Clear the feats our mod doesn't use.</span>
-<span class="k">for</span> <span class="n">i</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="mi">31</span> <span class="k">do</span>
-    <span class="n">change_feat</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="kc">false</span><span class="p">,</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
-<span class="k">end</span>
-
-</code></pre></div>
+<h2 id='Feat-functions'>Feat functions</h2><h3 id='change_feat'>change_feat</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_feat">change_feat</a></p>
 </blockquote>
