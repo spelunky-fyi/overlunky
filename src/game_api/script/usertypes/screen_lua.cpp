@@ -570,7 +570,9 @@ void register_usertypes(sol::state& lua)
         "entire_book",
         &JournalUI::entire_book,
         "page_timer",
-        &JournalUI::page_timer);
+        &JournalUI::page_timer,
+        "fade_timer",
+        &JournalUI::fade_timer);
 
     lua.new_usertype<JournalPage>(
         "JournalPage",

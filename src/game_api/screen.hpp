@@ -1088,7 +1088,7 @@ struct JournalUI
     TextureRenderingInfo unknown23;
     TextureRenderingInfo entire_book;
 
-    float unknown25;
+    uint8_t fade_timer;
     float unknown26;
 
     uint32_t page_timer;
