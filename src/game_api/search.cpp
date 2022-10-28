@@ -1233,6 +1233,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        "show_journal_from_popup"sv,
+        // Break on GameManager.journal_ui.state, open the journal when a popup is on
+        // Also calls show_journal
+        PatternCommandBuffer{}
+            .find_inst("89 4e 38 89 4e 3c 48 8b 40 08"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "generate_world_particles"sv,
         // Put read bp on State.particle_emitters, conditionally exclude the couple bp's it hits for just being in the level,
         // jump and when landing the floorpoof particle emitter id will be loaded into rdx. The subsequent call is the

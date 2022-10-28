@@ -1100,3 +1100,5 @@ struct JournalUI
 };
 
 Screen* get_screen_ptr(uint32_t screen_id);
+void show_journal(uint8_t chapter, uint32_t page, bool instant = true, bool sound = false);
+void show_journal_from_popup();

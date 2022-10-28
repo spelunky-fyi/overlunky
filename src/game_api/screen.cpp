@@ -309,3 +309,21 @@ void JournalPage::set_page_background_side(bool right)
         this->background.source_set_quad(Quad(AABB(0.1125f, 0, 0.5f, 1.0f)));
     }
 }
+
+void show_journal(uint8_t chapter, uint32_t page, bool instant, bool sound)
+{
+    auto gm = get_game_manager();
+    typedef bool show_journal_func(JournalUI*, uint8_t, bool, bool);
+    static show_journal_func* show = (show_journal_func*)(get_address("show_journal"sv));
+    gm->journal_ui->current_page = page;
+    gm->journal_ui->flipping_to_page = page;
+    show(gm->journal_ui, chapter, instant, sound);
+}
+
+void show_journal_from_popup()
+{
+    auto gm = get_game_manager();
+    typedef bool show_journal_func(JournalUI*, size_t);
+    static show_journal_func* show = (show_journal_func*)(get_address("show_journal_from_popup"sv));
+    show(gm->journal_ui, heap_base());
+}

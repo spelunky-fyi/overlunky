@@ -35,11 +35,12 @@
 #include "memory.hpp"           // for write_mem_prot, write_mem_recoverable
 #include "movable.hpp"          // for Movable
 #include "particles.hpp"        // for ParticleEmitterInfo
-#include "search.hpp"           // for get_address, find_inst
-#include "state.hpp"            // for State, get_state_ptr, enum_to_layer
-#include "state_structs.hpp"    // for ShopRestrictedItem, Illumination
-#include "thread_utils.hpp"     // for OnHeapPointer
-#include "virtual_table.hpp"    // for get_virtual_function_address, VIRT_FUNC
+#include "screen.hpp"
+#include "search.hpp"        // for get_address, find_inst
+#include "state.hpp"         // for State, get_state_ptr, enum_to_layer
+#include "state_structs.hpp" // for ShopRestrictedItem, Illumination
+#include "thread_utils.hpp"  // for OnHeapPointer
+#include "virtual_table.hpp" // for get_virtual_function_address, VIRT_FUNC
 
 uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
 {

@@ -21,6 +21,18 @@ namespace NScreen
 {
 void register_usertypes(sol::state& lua)
 {
+
+    /// Open the journal to a chapter and page. Note that the main journal spread is pages 0..1 and the pages in the sub-chapters start at 2. Only use even page numbers.
+    lua["show_journal"] = [](JOURNALUI_PAGE_SHOWN chapter, uint32_t page, bool instant, bool play_sound)
+    {
+        if (chapter > 2)
+            show_journal(2, 0, instant, play_sound);
+        show_journal(chapter, page, instant, play_sound);
+    };
+
+    /// Open the journal to the chapter and page set in currently open JournalPopupUI, as if pressing tab to check the popup
+    lua["show_journal_from_popup"] = show_journal_from_popup;
+
     lua.new_usertype<Screen>(
         "Screen",
         "render_timer",
