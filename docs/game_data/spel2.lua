@@ -1538,16 +1538,19 @@ function get_render_hitbox(uid, extrude, offsetx, offsety) end
 ---@param box AABB
 ---@return AABB
 function screen_aabb(box) end
----Open the journal to a chapter and page. Note that the main journal spread is pages 0..1 and the pages in the sub-chapters start at 2. Only use even page numbers.
+---Force the journal to open on a chapter and entry# every time when pressing the journal button. Only use even entry numbers. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
+---@param chapter integer
+---@param entry integer
+---@return nil
+function force_journal(chapter, entry) end
+---Open or close the journal as if pressing the journal button
+---@return nil
+function toggle_journal() end
+---Open the journal on a chapter and page
 ---@param chapter JOURNALUI_PAGE_SHOWN
 ---@param page integer
----@param instant boolean
----@param play_sound boolean
 ---@return nil
-function show_journal(chapter, page, instant, play_sound) end
----Open the journal to the chapter and page set in currently open JournalPopupUI, as if pressing tab to check the popup
----@return nil
-function show_journal_from_popup() end
+function show_journal(chapter, page) end
 ---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 ---@param host string
 ---@param port in_port_t
