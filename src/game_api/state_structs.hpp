@@ -453,8 +453,8 @@ class LogicDiceShop : public Logic
     uint32_t bet_machine; // entity uid
     uint32_t die1;        // entity uid
     uint32_t die2;        // entity uid
-    uint8_t die_1_value;
-    uint8_t die_2_value;
+    int8_t die_1_value;
+    int8_t die_2_value;
     uint16_t unknown8;
     uint32_t prize_dispenser; // entity uid
     uint32_t prize;           // entity uid
@@ -467,7 +467,7 @@ class LogicDiceShop : public Logic
     uint8_t unknown14;
     uint8_t unknown15;
     uint8_t unknown16;
-    uint32_t balance; // cash balance of all the games
+    int32_t balance; // cash balance of all the games
 
     virtual ~LogicDiceShop() = 0;
 };
