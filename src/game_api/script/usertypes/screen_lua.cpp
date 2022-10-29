@@ -21,6 +21,16 @@ namespace NScreen
 {
 void register_usertypes(sol::state& lua)
 {
+
+    /// Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
+    lua["force_journal"] = force_journal;
+
+    /// Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.
+    lua["toggle_journal"] = toggle_journal;
+
+    /// Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
+    lua["show_journal"] = show_journal;
+
     lua.new_usertype<Screen>(
         "Screen",
         "render_timer",
@@ -560,7 +570,9 @@ void register_usertypes(sol::state& lua)
         "entire_book",
         &JournalUI::entire_book,
         "page_timer",
-        &JournalUI::page_timer);
+        &JournalUI::page_timer,
+        "fade_timer",
+        &JournalUI::fade_timer);
 
     lua.new_usertype<JournalPage>(
         "JournalPage",

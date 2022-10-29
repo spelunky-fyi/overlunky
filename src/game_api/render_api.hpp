@@ -15,6 +15,8 @@
 #include "math.hpp"    // for Quad, AABB (ptr only)
 #include "texture.hpp" // for Texture
 
+struct JournalUI;
+
 enum JOURNAL_VFTABLE
 {
     // to get those offsets, find "vftable_JournalPages" then go to each page in journal, then to it's first vtable function address
@@ -249,3 +251,4 @@ struct TextureRenderingInfo
 
 void init_render_api_hooks();
 bool& get_journal_enabled();
+void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);

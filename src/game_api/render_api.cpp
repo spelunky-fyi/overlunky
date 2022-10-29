@@ -223,7 +223,7 @@ void on_select_from_journal(void* unknown, uint8_t index)
 static bool g_journal_enabled = true;
 using OnShowJournalFun = void(JournalUI*, uint8_t, bool, bool);
 OnShowJournalFun* g_on_show_journal_trampoline{nullptr};
-void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool unknown1, bool unknown2)
+void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound)
 {
     if (!g_journal_enabled && chapter == 2)
     {
@@ -236,7 +236,7 @@ void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool unknow
         return;
     }
 
-    g_on_show_journal_trampoline(journal_ui, chapter, unknown1, unknown2);
+    g_on_show_journal_trampoline(journal_ui, chapter, instant, play_sound);
 
     std::vector<uint32_t> pages;
     pages.reserve(journal_ui->pages_tmp.size());

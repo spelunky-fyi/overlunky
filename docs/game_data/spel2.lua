@@ -1538,6 +1538,19 @@ function get_render_hitbox(uid, extrude, offsetx, offsety) end
 ---@param box AABB
 ---@return AABB
 function screen_aabb(box) end
+---Force the journal to open on a chapter and entry# every time when pressing the journal button. Only use even entry numbers. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
+---@param chapter integer
+---@param entry integer
+---@return nil
+function force_journal(chapter, entry) end
+---Open or close the journal as if pressing the journal button
+---@return nil
+function toggle_journal() end
+---Open the journal on a chapter and page
+---@param chapter JOURNALUI_PAGE_SHOWN
+---@param page integer
+---@return nil
+function show_journal(chapter, page) end
 ---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 ---@param host string
 ---@param port in_port_t
@@ -4847,6 +4860,7 @@ local function AABB_extrude(self, amount_x, amount_y) end
     ---@field unknown23 TextureRenderingInfo
     ---@field entire_book TextureRenderingInfo
     ---@field page_timer integer
+    ---@field fade_timer integer
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo

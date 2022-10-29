@@ -1088,7 +1088,7 @@ struct JournalUI
     TextureRenderingInfo unknown23;
     TextureRenderingInfo entire_book;
 
-    float unknown25;
+    uint8_t fade_timer;
     float unknown26;
 
     uint32_t page_timer;
@@ -1100,3 +1100,6 @@ struct JournalUI
 };
 
 Screen* get_screen_ptr(uint32_t screen_id);
+void force_journal(uint32_t chapter, uint32_t entry);
+void toggle_journal();
+void show_journal(JOURNALUI_PAGE_SHOWN chapter, uint32_t page);
