@@ -738,6 +738,9 @@
                             <a href="#disable_floor_embeds" class="toc-h3 toc-link" data-title="disable_floor_embeds">disable_floor_embeds</a>
                           </li>
                           <li>
+                            <a href="#force_journal" class="toc-h3 toc-link" data-title="force_journal">force_journal</a>
+                          </li>
+                          <li>
                             <a href="#get_adventure_seed" class="toc-h3 toc-link" data-title="get_adventure_seed">get_adventure_seed</a>
                           </li>
                           <li>
@@ -829,6 +832,12 @@
                           </li>
                           <li>
                             <a href="#set_storage_layer" class="toc-h3 toc-link" data-title="set_storage_layer">set_storage_layer</a>
+                          </li>
+                          <li>
+                            <a href="#show_journal" class="toc-h3 toc-link" data-title="show_journal">show_journal</a>
+                          </li>
+                          <li>
+                            <a href="#toggle_journal" class="toc-h3 toc-link" data-title="toggle_journal">toggle_journal</a>
                           </li>
                           <li>
                             <a href="#update_liquid_collision_at" class="toc-h3 toc-link" data-title="update_liquid_collision_at">update_liquid_collision_at</a>
@@ -4136,6 +4145,12 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='bool-disable_floor_embeds-bool-disable'>bool disable_floor_embeds(bool disable)</h4>
 <p>Disable all crust item spawns, returns whether they were already disabled before the call</p>
+<h3 id='force_journal'>force_journal</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_journal">force_journal</a></p>
+</blockquote>
+<h4 id='nil-force_journal-int-chapter-int-entry'>nil force_journal(int chapter, int entry)</h4>
+<p>Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to <code>JOURNALUI_PAGE_SHOWN.JOURNAL</code> to reset. (This forces the journal toggle to always read from <code>game_manager.save_related.journal_popup_ui.entry_to_show</code> etc.)</p>
 <h3 id='get_adventure_seed'>get_adventure_seed</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_adventure_seed">get_adventure_seed</a></p>
@@ -4385,6 +4400,18 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_storage_layer-LAYER-layer'>nil set_storage_layer(<a href="#LAYER">LAYER</a> layer)</h4>
 <p>Set layer to search for storage items on</p>
+<h3 id='show_journal'>show_journal</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=show_journal">show_journal</a></p>
+</blockquote>
+<h4 id='nil-show_journal-JOURNALUI_PAGE_SHOWN-chapter-int-page'>nil show_journal(<a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, int page)</h4>
+<p>Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.</p>
+<h3 id='toggle_journal'>toggle_journal</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=toggle_journal">toggle_journal</a></p>
+</blockquote>
+<h4 id='nil-toggle_journal'>nil toggle_journal()</h4>
+<p>Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.</p>
 <h3 id='update_liquid_collision_at'>update_liquid_collision_at</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=update_liquid_collision_at">update_liquid_collision_at</a></p>
@@ -9921,6 +9948,11 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=page_timer">page_timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fade_timer">fade_timer</a></td>
 <td></td>
 </tr>
 </tbody></table>

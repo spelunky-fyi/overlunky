@@ -1265,7 +1265,7 @@ Disable all crust item spawns, returns whether they were already disabled before
 
 #### nil force_journal(int chapter, int entry)
 
-Force the journal to open on a chapter and entry# every time when pressing the journal button. Only use even entry numbers. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
+Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
 
 ### get_adventure_seed
 
@@ -1628,7 +1628,7 @@ Set layer to search for storage items on
 
 #### nil show_journal([JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) chapter, int page)
 
-Open the journal on a chapter and page
+Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
 
 ### toggle_journal
 
@@ -1637,7 +1637,7 @@ Open the journal on a chapter and page
 
 #### nil toggle_journal()
 
-Open or close the journal as if pressing the journal button
+Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.
 
 ### update_liquid_collision_at
 

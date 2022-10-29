@@ -1538,15 +1538,15 @@ function get_render_hitbox(uid, extrude, offsetx, offsety) end
 ---@param box AABB
 ---@return AABB
 function screen_aabb(box) end
----Force the journal to open on a chapter and entry# every time when pressing the journal button. Only use even entry numbers. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
+---Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
 ---@param chapter integer
 ---@param entry integer
 ---@return nil
 function force_journal(chapter, entry) end
----Open or close the journal as if pressing the journal button
+---Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.
 ---@return nil
 function toggle_journal() end
----Open the journal on a chapter and page
+---Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
 ---@param chapter JOURNALUI_PAGE_SHOWN
 ---@param page integer
 ---@return nil
