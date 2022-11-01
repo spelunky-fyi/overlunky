@@ -1258,6 +1258,15 @@ Create image from file. Returns a tuple containing id, width and height.
 
 Disable all crust item spawns, returns whether they were already disabled before the call
 
+### force_journal
+
+
+> Search script examples for [force_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_journal)
+
+#### nil force_journal(int chapter, int entry)
+
+Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
+
 ### get_adventure_seed
 
 
@@ -1611,6 +1620,24 @@ end, "waddler")
 #### nil set_storage_layer([LAYER](#LAYER) layer)
 
 Set layer to search for storage items on
+
+### show_journal
+
+
+> Search script examples for [show_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_journal)
+
+#### nil show_journal([JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) chapter, int page)
+
+Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
+
+### toggle_journal
+
+
+> Search script examples for [toggle_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_journal)
+
+#### nil toggle_journal()
+
+Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.
 
 ### update_liquid_collision_at
 
