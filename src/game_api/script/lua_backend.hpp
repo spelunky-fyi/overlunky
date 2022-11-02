@@ -182,7 +182,8 @@ enum class CallbackType
     None,
     Normal,
     Entity,
-    Screen
+    Screen,
+    Theme,
 };
 
 struct CurrentCallback
@@ -271,6 +272,8 @@ class LuaBackend
     std::vector<std::pair<int, std::uint32_t>> entity_dtor_hooks;
     std::vector<std::pair<int, std::uint32_t>> screen_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
+    std::vector<std::pair<int, std::uint32_t>> theme_hooks;
+    std::vector<std::pair<int, std::uint32_t>> clear_theme_hooks;
     std::vector<CustomMovableBehaviorStorage> custom_movable_behaviors;
     std::unordered_map<std::uint32_t, UserData> user_datas;
     std::unordered_map<int, SavedUserData> saved_user_datas;
@@ -337,6 +340,7 @@ class LuaBackend
     bool is_callback_cleared(int32_t callback_id);
     bool is_entity_callback_cleared(std::pair<int, uint32_t> callback_id);
     bool is_screen_callback_cleared(std::pair<int, uint32_t> callback_id);
+    bool is_theme_callback_cleared(std::pair<int, uint32_t> callback_id);
 
     bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);

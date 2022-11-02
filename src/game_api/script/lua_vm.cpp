@@ -385,6 +385,9 @@ end
             case CallbackType::Screen:
                 backend->clear_screen_hooks.push_back({caller.uid, caller.id});
                 break;
+            case CallbackType::Theme:
+                backend->clear_theme_hooks.push_back({caller.uid, caller.id});
+                break;
             case CallbackType::None:
                 // DEBUG("No callback to clear");
             default:
@@ -1634,6 +1637,98 @@ end
             return id;
         }
         return sol::nullopt;
+    };
+
+    /// Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right before the specified ThemeInfo function, if implemented. Return true or expected value to skip default behavior.
+    lua["set_pre_theme"] = [&lua](uint8_t theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
+    {
+        auto themeinfo = State::get().ptr_main()->level_gen->themes[theme - 1];
+        auto backend_id = LuaBackend::get_calling_backend_id();
+        std::uint32_t id = themeinfo->reserve_callback_id();
+
+        switch (override)
+        {
+        case THEME_OVERRIDE::INIT_FLAGS:
+            themeinfo->set_pre_init_flags(
+                id,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self)
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return false;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    auto return_value = backend->handle_function_with_return<bool>(fun, self).value_or(false);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            break;
+        case THEME_OVERRIDE::SPAWN_EFFECTS:
+            themeinfo->set_pre_spawn_effects(
+                id,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self)
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return false;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    auto return_value = backend->handle_function_with_return<bool>(fun, self).value_or(false);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            break;
+
+        default:
+            break;
+        }
+        auto backend = LuaBackend::get_backend(backend_id);
+        backend->theme_hooks.push_back({theme, id});
+        return id;
+    };
+
+    /// Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
+    /// Sets a callback that is called right after the specified ThemeInfo function, if implemented.
+    lua["set_post_theme"] = [&lua](uint8_t theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
+    {
+        auto themeinfo = State::get().ptr_main()->level_gen->themes[theme - 1];
+        auto backend_id = LuaBackend::get_calling_backend_id();
+        std::uint32_t id = themeinfo->reserve_callback_id();
+
+        switch (override)
+        {
+        case THEME_OVERRIDE::INIT_FLAGS:
+            themeinfo->set_post_init_flags(
+                id,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self)
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    backend->handle_function(fun, self);
+                    backend->clear_current_callback();
+                });
+            break;
+        case THEME_OVERRIDE::SPAWN_EFFECTS:
+            themeinfo->set_post_spawn_effects(
+                id,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self)
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    backend->handle_function(fun, self);
+                    backend->clear_current_callback();
+                });
+            break;
+
+        default:
+            break;
+        }
+        auto backend = LuaBackend::get_backend(backend_id);
+        backend->theme_hooks.push_back({theme, id});
+        return id;
     };
 
     /// Raise a signal and probably crash the game

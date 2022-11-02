@@ -179,6 +179,16 @@ class ThemeInfo
     uint32_t unknown3;
     uint32_t unknown4;
 
+    std::uint32_t reserve_callback_id();
+    void unhook(std::uint32_t id);
+    struct ThemeHooksInfo& get_hooks();
+
+    void set_pre_init_flags(std::uint32_t reserved_callback_id, std::function<bool(ThemeInfo*)> pre_init_flags);
+    void set_post_init_flags(std::uint32_t reserved_callback_id, std::function<void(ThemeInfo*)> post_init_flags);
+
+    void set_pre_spawn_effects(std::uint32_t reserved_callback_id, std::function<bool(ThemeInfo*)> pre_spawn_effects);
+    void set_post_spawn_effects(std::uint32_t reserved_callback_id, std::function<void(ThemeInfo*)> post_spawn_effects);
+
     virtual ~ThemeInfo()
     {
     }

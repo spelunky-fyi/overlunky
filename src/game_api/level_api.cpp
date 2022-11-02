@@ -20,6 +20,7 @@
 
 #include "entities_monsters.hpp" // for GHOST_BEHAVIOR, GHOST_BEHAVIOR::MED...
 #include "entity.hpp"            // for to_id, Entity, get_entity_ptr, Enti...
+#include "entity_hooks_info.hpp" // for HookWithId
 #include "layer.hpp"             // for Layer, g_level_max_y, g_level_max_x
 #include "logger.h"              // for DEBUG
 #include "memory.hpp"            // for to_le_bytes, write_mem_prot, Execut...
@@ -45,6 +46,155 @@ std::unordered_map<std::uint32_t, std::string_view> g_tile_code_id_to_name;
 std::unordered_map<std::string_view, std::uint32_t> g_name_to_tile_code_id;
 std::unordered_map<std::uint32_t, std::string_view> g_monster_chance_id_to_name;
 std::unordered_map<std::uint32_t, std::string_view> g_trap_chance_id_to_name;
+
+struct ThemeHooksInfo
+{
+    ThemeInfo* theme;
+    std::uint32_t cbcount;
+
+    std::vector<HookWithId<bool(ThemeInfo*)>> pre_init_flags;
+    std::vector<HookWithId<void(ThemeInfo*)>> post_init_flags;
+
+    std::vector<HookWithId<bool(ThemeInfo*)>> pre_spawn_effects;
+    std::vector<HookWithId<void(ThemeInfo*)>> post_spawn_effects;
+};
+std::vector<ThemeHooksInfo> g_theme_hooks;
+
+ThemeHooksInfo& ThemeInfo::get_hooks()
+{
+    auto it = std::find_if(g_theme_hooks.begin(), g_theme_hooks.end(), [this](auto& hook)
+                           { return hook.theme == this; });
+    if (it == g_theme_hooks.end())
+    {
+        g_theme_hooks.push_back({this});
+        return g_theme_hooks.back();
+    }
+    return *it;
+}
+
+void hook_init_flags(ThemeInfo* self)
+{
+    hook_vtable_no_dtor<void(ThemeInfo*)>(
+        self,
+        [](ThemeInfo* lmbd_self, void (*original)(ThemeInfo*))
+        {
+            ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
+
+            bool skip_orig = false;
+            for (auto& [id, pre] : hook_info.pre_init_flags)
+            {
+                if (pre(lmbd_self))
+                {
+                    skip_orig = true;
+                }
+            }
+
+            if (!skip_orig)
+            {
+                original(lmbd_self);
+            }
+
+            for (auto& [id, post] : hook_info.post_init_flags)
+            {
+                post(lmbd_self);
+            }
+        },
+        2);
+}
+
+void hook_spawn_effects(ThemeInfo* self)
+{
+    hook_vtable_no_dtor<void(ThemeInfo*)>(
+        self,
+        [](ThemeInfo* lmbd_self, void (*original)(ThemeInfo*))
+        {
+            ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
+
+            bool skip_orig = false;
+            for (auto& [id, pre] : hook_info.pre_spawn_effects)
+            {
+                if (pre(lmbd_self))
+                {
+                    skip_orig = true;
+                }
+            }
+
+            if (!skip_orig)
+            {
+                original(lmbd_self);
+            }
+
+            for (auto& [id, post] : hook_info.post_spawn_effects)
+            {
+                post(lmbd_self);
+            }
+        },
+        24);
+}
+
+std::uint32_t ThemeInfo::reserve_callback_id()
+{
+    ThemeHooksInfo& hook_info = get_hooks();
+    return hook_info.cbcount++;
+}
+
+void ThemeInfo::unhook(std::uint32_t id)
+{
+    auto it = std::find_if(g_theme_hooks.begin(), g_theme_hooks.end(), [this](auto& hook)
+                           { return hook.theme == this; });
+    if (it != g_theme_hooks.end())
+    {
+        std::erase_if(it->pre_init_flags, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->post_init_flags, [id](auto& hook)
+                      { return hook.id == id; });
+
+        std::erase_if(it->pre_spawn_effects, [id](auto& hook)
+                      { return hook.id == id; });
+        std::erase_if(it->post_spawn_effects, [id](auto& hook)
+                      { return hook.id == id; });
+    }
+}
+
+void ThemeInfo::set_pre_init_flags(std::uint32_t reserved_callback_id, std::function<bool(ThemeInfo*)> pre_init_flags)
+{
+    ThemeHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_init_flags.empty() && hook_info.post_init_flags.empty())
+    {
+        hook_init_flags(this);
+    }
+    hook_info.pre_init_flags.push_back({reserved_callback_id, std::move(pre_init_flags)});
+}
+
+void ThemeInfo::set_post_init_flags(std::uint32_t reserved_callback_id, std::function<void(ThemeInfo*)> post_init_flags)
+{
+    ThemeHooksInfo& hook_info = get_hooks();
+    if (hook_info.post_init_flags.empty() && hook_info.post_init_flags.empty())
+    {
+        hook_init_flags(this);
+    }
+    hook_info.post_init_flags.push_back({reserved_callback_id, std::move(post_init_flags)});
+}
+
+void ThemeInfo::set_pre_spawn_effects(std::uint32_t reserved_callback_id, std::function<bool(ThemeInfo*)> pre_spawn_effects)
+{
+    ThemeHooksInfo& hook_info = get_hooks();
+    if (hook_info.pre_spawn_effects.empty() && hook_info.post_spawn_effects.empty())
+    {
+        hook_spawn_effects(this);
+    }
+    hook_info.pre_spawn_effects.push_back({reserved_callback_id, std::move(pre_spawn_effects)});
+}
+
+void ThemeInfo::set_post_spawn_effects(std::uint32_t reserved_callback_id, std::function<void(ThemeInfo*)> post_spawn_effects)
+{
+    ThemeHooksInfo& hook_info = get_hooks();
+    if (hook_info.post_spawn_effects.empty() && hook_info.post_spawn_effects.empty())
+    {
+        hook_spawn_effects(this);
+    }
+    hook_info.post_spawn_effects.push_back({reserved_callback_id, std::move(post_spawn_effects)});
+}
 
 struct FloorRequiringEntity
 {

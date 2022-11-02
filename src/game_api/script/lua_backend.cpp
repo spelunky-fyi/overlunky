@@ -136,6 +136,13 @@ void LuaBackend::clear_all_callbacks()
             screen->unhook(id);
         }
     }
+    for (auto& [theme_id, id] : theme_hooks)
+    {
+        if (ThemeInfo* theme = State::get().ptr_main()->level_gen->themes[theme_id - 1])
+        {
+            theme->unhook(id);
+        }
+    }
     for (auto& console_command : console_commands)
     {
         console->unregister_command(this, console_command);
@@ -145,6 +152,8 @@ void LuaBackend::clear_all_callbacks()
     entity_dtor_hooks.clear();
     screen_hooks.clear();
     clear_screen_hooks.clear();
+    theme_hooks.clear();
+    clear_theme_hooks.clear();
     options.clear();
     for (auto& [uid, user_data] : user_datas)
     {
@@ -373,6 +382,20 @@ bool LuaBackend::update()
             }
         }
         clear_screen_hooks.clear();
+        for (auto& [theme_id, id] : clear_theme_hooks)
+        {
+            auto it = std::find(theme_hooks.begin(), theme_hooks.end(), std::pair{theme_id, id});
+            if (it != theme_hooks.end())
+            {
+                auto theme = State::get().ptr_main()->level_gen->themes[theme_id - 1];
+                if (theme != nullptr)
+                {
+                    theme->unhook(id);
+                }
+                theme_hooks.erase(it);
+            }
+        }
+        clear_theme_hooks.clear();
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {
@@ -711,6 +734,10 @@ bool LuaBackend::is_entity_callback_cleared(std::pair<int, uint32_t> callback_id
 bool LuaBackend::is_screen_callback_cleared(std::pair<int, uint32_t> callback_id)
 {
     return std::find(clear_screen_hooks.begin(), clear_screen_hooks.end(), callback_id) != clear_screen_hooks.end();
+}
+bool LuaBackend::is_theme_callback_cleared(std::pair<int, uint32_t> callback_id)
+{
+    return std::find(clear_theme_hooks.begin(), clear_theme_hooks.end(), callback_id) != clear_theme_hooks.end();
 }
 
 bool LuaBackend::pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template)
