@@ -1648,7 +1648,7 @@ end
 
     /// Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before the specified ThemeInfo function, if implemented. Return true or expected value to skip default behavior.
-    lua["set_pre_theme"] = [&lua](THEME theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_theme"] = [](THEME theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
     {
         auto themeinfo = State::get().ptr_main()->level_gen->themes[theme - 1];
         auto backend_id = LuaBackend::get_calling_backend_id();
@@ -1686,7 +1686,7 @@ end
             themeinfo->set_pre(
                 id,
                 override,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self)
+                [=, fun = std::move(fun)](ThemeInfo* self)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
@@ -1707,7 +1707,7 @@ end
             themeinfo->set_pre_bool(
                 id,
                 override,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<bool>
+                [=, fun = std::move(fun)](ThemeInfo* self) -> std::optional<bool>
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
@@ -1724,7 +1724,7 @@ end
             themeinfo->set_pre_u8(
                 id,
                 override,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<uint8_t>
+                [=, fun = std::move(fun)](ThemeInfo* self) -> std::optional<uint8_t>
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
@@ -1748,7 +1748,7 @@ end
             themeinfo->set_pre_u32(
                 id,
                 override,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<uint32_t>
+                [=, fun = std::move(fun)](ThemeInfo* self) -> std::optional<uint32_t>
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
@@ -1764,7 +1764,7 @@ end
             themeinfo->set_pre_float(
                 id,
                 override,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<float>
+                [=, fun = std::move(fun)](ThemeInfo* self) -> std::optional<float>
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
@@ -1779,7 +1779,7 @@ end
             themeinfo->set_pre_texture(
                 id,
                 override,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self, int32_t texture_id) -> std::optional<uint32_t>
+                [=, fun = std::move(fun)](ThemeInfo* self, int32_t texture_id) -> std::optional<uint32_t>
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
@@ -1801,7 +1801,7 @@ end
 
     /// Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right after the specified ThemeInfo function, if implemented.
-    lua["set_post_theme"] = [&lua](THEME theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_theme"] = [](THEME theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
     {
         auto themeinfo = State::get().ptr_main()->level_gen->themes[theme - 1];
         auto backend_id = LuaBackend::get_calling_backend_id();
@@ -1861,7 +1861,7 @@ end
             themeinfo->set_post(
                 id,
                 override,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self)
+                [=, fun = std::move(fun)](ThemeInfo* self)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
@@ -1875,7 +1875,7 @@ end
             themeinfo->set_post_texture(
                 id,
                 override,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self, int32_t texture_id)
+                [=, fun = std::move(fun)](ThemeInfo* self, int32_t texture_id)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
