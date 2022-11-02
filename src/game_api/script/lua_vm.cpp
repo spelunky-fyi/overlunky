@@ -1697,6 +1697,100 @@ end
                     return return_value;
                 });
             break;
+        case THEME_OVERRIDE::UNKNOWN_V1:
+        case THEME_OVERRIDE::UNKNOWN_V12:
+        case THEME_OVERRIDE::UNKNOWN_V30:
+        case THEME_OVERRIDE::PLAYER_DAMAGE:
+        case THEME_OVERRIDE::UNKNOWN_V38:
+        case THEME_OVERRIDE::LOOP:
+        case THEME_OVERRIDE::GET_UNKNOWN1_OR_2:
+            themeinfo->set_pre_bool(
+                id,
+                override,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<bool>
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return std::nullopt;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    auto return_value = backend->handle_function_with_return<bool>(fun, self);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            break;
+        case THEME_OVERRIDE::THEME_ID:
+        case THEME_OVERRIDE::BASE_ID:
+        case THEME_OVERRIDE::VAULT_LEVEL:
+            themeinfo->set_pre_u8(
+                id,
+                override,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<uint8_t>
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return std::nullopt;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    auto return_value = backend->handle_function_with_return<uint8_t>(fun, self);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            break;
+        case THEME_OVERRIDE::ENT_FLOOR_SPREADING:
+        case THEME_OVERRIDE::ENT_FLOOR_SPREADING2:
+        case THEME_OVERRIDE::TRANSITION_MODIFIER:
+        case THEME_OVERRIDE::UNKNOWN_V32:
+        case THEME_OVERRIDE::ENT_BACKWALL:
+        case THEME_OVERRIDE::ENT_BORDER:
+        case THEME_OVERRIDE::ENT_CRITTER:
+        case THEME_OVERRIDE::TEXTURE_BACKLAYER_LUT:
+        case THEME_OVERRIDE::LEVEL_HEIGHT:
+        case THEME_OVERRIDE::UNKNOWN_V47:
+            themeinfo->set_pre_u32(
+                id,
+                override,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<uint32_t>
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return std::nullopt;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    auto return_value = backend->handle_function_with_return<uint32_t>(fun, self);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            break;
+        case THEME_OVERRIDE::GRAVITY:
+        case THEME_OVERRIDE::BACKLAYER_LIGHT_LEVEL:
+            themeinfo->set_pre_float(
+                id,
+                override,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<float>
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return std::nullopt;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    auto return_value = backend->handle_function_with_return<float>(fun, self);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            break;
+        case THEME_OVERRIDE::TEXTURE_DYNAMIC:
+            themeinfo->set_pre_texture(
+                id,
+                override,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self, int32_t texture_id) -> std::optional<uint32_t>
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return std::nullopt;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    auto return_value = backend->handle_function_with_return<uint32_t>(fun, self, texture_id);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            break;
+        case THEME_OVERRIDE::LVL_FILE:
         default:
             break;
         }
@@ -1742,7 +1836,7 @@ end
         case THEME_OVERRIDE::SPAWN_DECORATION2:
         case THEME_OVERRIDE::SPAWN_EXTRA:
         case THEME_OVERRIDE::UNKNOWN_V51:
-            themeinfo->set_post_void(
+            themeinfo->set_post_bool(
                 id,
                 override,
                 [=, &lua, fun = std::move(fun)](ThemeInfo* self)
@@ -1755,7 +1849,27 @@ end
                     backend->clear_current_callback();
                 });
             break;
-
+        case THEME_OVERRIDE::UNKNOWN_V1:
+        case THEME_OVERRIDE::UNKNOWN_V12:
+        case THEME_OVERRIDE::UNKNOWN_V30:
+        case THEME_OVERRIDE::PLAYER_DAMAGE:
+        case THEME_OVERRIDE::UNKNOWN_V38:
+        case THEME_OVERRIDE::LOOP:
+        case THEME_OVERRIDE::GET_UNKNOWN1_OR_2:
+            themeinfo->set_post_bool(
+                id,
+                override,
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<bool>
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return std::nullopt;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    auto return_value = backend->handle_function_with_return<bool>(fun, self);
+                    backend->clear_current_callback();
+                    return return_value;
+                });
+            break;
         default:
             break;
         }

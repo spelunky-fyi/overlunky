@@ -241,6 +241,21 @@ class ThemeInfo
     void set_pre_void(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<bool(ThemeInfo*)> pre_func);
     void set_post_void(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func);
 
+    void set_pre_bool(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<bool>(ThemeInfo*)> pre_func);
+    void set_post_bool(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func);
+
+    void set_pre_u8(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<uint8_t>(ThemeInfo*)> pre_func);
+    void set_post_u8(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func);
+
+    void set_pre_u32(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<uint32_t>(ThemeInfo*)> pre_func);
+    void set_post_u32(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func);
+
+    void set_pre_float(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<float>(ThemeInfo*)> pre_func);
+    void set_post_float(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func);
+
+    void set_pre_texture(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<uint32_t>(ThemeInfo*, int32_t)> pre_func);
+    void set_post_texture(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*, int32_t)> post_func);
+
     virtual ~ThemeInfo()
     {
     }
