@@ -291,5 +291,10 @@ class DMSpawning : public Entity
 class DMAlienBlast : public Entity
 {
   public:
-    int32_t last_owner_uid;
+    int32_t owner_uid;
+    int32_t unknown1;
+    Entity* fx_internal_reticule;
+    Entity* fx_external_reticule;
+    SoundMeta* sound;
+    uint8_t timer;
 };
