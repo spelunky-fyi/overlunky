@@ -343,6 +343,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<DMAlienBlast>(
         "DMAlienBlast",
+        "last_owner_uid",
+        &DMAlienBlast::last_owner_uid,
         sol::base_classes,
         sol::bases<Entity>());
 }

@@ -291,5 +291,5 @@ class DMSpawning : public Entity
 class DMAlienBlast : public Entity
 {
   public:
-    int32_t unknown; // EntityUID? it's always -1
+    int32_t last_owner_uid;
 };
