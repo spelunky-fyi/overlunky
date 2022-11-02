@@ -1192,6 +1192,13 @@ end
         backend->clear_screen_hooks.push_back({screen_id, cb_id});
     };
 
+    /// Clears a callback that is specific to a theme.
+    lua["clear_theme_callback"] = [](THEME theme, CallbackId cb_id)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->clear_theme_hooks.push_back({theme, cb_id});
+    };
+
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
     lua["set_pre_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
@@ -1641,7 +1648,7 @@ end
 
     /// Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before the specified ThemeInfo function, if implemented. Return true or expected value to skip default behavior.
-    lua["set_pre_theme"] = [&lua](uint8_t theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_theme"] = [&lua](THEME theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
     {
         auto themeinfo = State::get().ptr_main()->level_gen->themes[theme - 1];
         auto backend_id = LuaBackend::get_calling_backend_id();
@@ -1650,22 +1657,35 @@ end
         switch (override)
         {
         case THEME_OVERRIDE::INIT_FLAGS:
-            themeinfo->set_pre_init_flags(
-                id,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
-                        return false;
-                    backend->set_current_callback(theme, id, CallbackType::Theme);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, self).value_or(false);
-                    backend->clear_current_callback();
-                    return return_value;
-                });
-            break;
+        case THEME_OVERRIDE::INIT_LEVEL:
+        case THEME_OVERRIDE::UNKNOWN_V4:
+        case THEME_OVERRIDE::UNKNOWN_V5:
+        case THEME_OVERRIDE::SPECIAL_ROOMS:
+        case THEME_OVERRIDE::UNKNOWN_V7:
+        case THEME_OVERRIDE::UNKNOWN_V8:
+        case THEME_OVERRIDE::VAULT:
+        case THEME_OVERRIDE::COFFIN:
+        case THEME_OVERRIDE::FEELING:
+        case THEME_OVERRIDE::SPAWN_LEVEL:
+        case THEME_OVERRIDE::SPAWN_BORDER:
+        case THEME_OVERRIDE::POST_PROCESS_LEVEL:
+        case THEME_OVERRIDE::SPAWN_TRAPS:
+        case THEME_OVERRIDE::POST_PROCESS_ENTITIES:
+        case THEME_OVERRIDE::SPAWN_PROCEDURAL:
+        case THEME_OVERRIDE::SPAWN_BACKGROUND:
+        case THEME_OVERRIDE::SPAWN_LIGHTS:
+        case THEME_OVERRIDE::SPAWN_TRANSITION:
+        case THEME_OVERRIDE::POST_TRANSITION:
+        case THEME_OVERRIDE::SPAWN_PLAYERS:
         case THEME_OVERRIDE::SPAWN_EFFECTS:
-            themeinfo->set_pre_spawn_effects(
+        case THEME_OVERRIDE::PRE_TRANSITION:
+        case THEME_OVERRIDE::SPAWN_DECORATION:
+        case THEME_OVERRIDE::SPAWN_DECORATION2:
+        case THEME_OVERRIDE::SPAWN_EXTRA:
+        case THEME_OVERRIDE::UNKNOWN_V51:
+            themeinfo->set_pre_void(
                 id,
+                override,
                 [=, &lua, fun = std::move(fun)](ThemeInfo* self)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
@@ -1677,7 +1697,6 @@ end
                     return return_value;
                 });
             break;
-
         default:
             break;
         }
@@ -1688,7 +1707,7 @@ end
 
     /// Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right after the specified ThemeInfo function, if implemented.
-    lua["set_post_theme"] = [&lua](uint8_t theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_theme"] = [&lua](THEME theme, THEME_OVERRIDE override, sol::function fun) -> sol::optional<CallbackId>
     {
         auto themeinfo = State::get().ptr_main()->level_gen->themes[theme - 1];
         auto backend_id = LuaBackend::get_calling_backend_id();
@@ -1697,21 +1716,35 @@ end
         switch (override)
         {
         case THEME_OVERRIDE::INIT_FLAGS:
-            themeinfo->set_post_init_flags(
-                id,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
-                        return;
-                    backend->set_current_callback(theme, id, CallbackType::Theme);
-                    backend->handle_function(fun, self);
-                    backend->clear_current_callback();
-                });
-            break;
+        case THEME_OVERRIDE::INIT_LEVEL:
+        case THEME_OVERRIDE::UNKNOWN_V4:
+        case THEME_OVERRIDE::UNKNOWN_V5:
+        case THEME_OVERRIDE::SPECIAL_ROOMS:
+        case THEME_OVERRIDE::UNKNOWN_V7:
+        case THEME_OVERRIDE::UNKNOWN_V8:
+        case THEME_OVERRIDE::VAULT:
+        case THEME_OVERRIDE::COFFIN:
+        case THEME_OVERRIDE::FEELING:
+        case THEME_OVERRIDE::SPAWN_LEVEL:
+        case THEME_OVERRIDE::SPAWN_BORDER:
+        case THEME_OVERRIDE::POST_PROCESS_LEVEL:
+        case THEME_OVERRIDE::SPAWN_TRAPS:
+        case THEME_OVERRIDE::POST_PROCESS_ENTITIES:
+        case THEME_OVERRIDE::SPAWN_PROCEDURAL:
+        case THEME_OVERRIDE::SPAWN_BACKGROUND:
+        case THEME_OVERRIDE::SPAWN_LIGHTS:
+        case THEME_OVERRIDE::SPAWN_TRANSITION:
+        case THEME_OVERRIDE::POST_TRANSITION:
+        case THEME_OVERRIDE::SPAWN_PLAYERS:
         case THEME_OVERRIDE::SPAWN_EFFECTS:
-            themeinfo->set_post_spawn_effects(
+        case THEME_OVERRIDE::PRE_TRANSITION:
+        case THEME_OVERRIDE::SPAWN_DECORATION:
+        case THEME_OVERRIDE::SPAWN_DECORATION2:
+        case THEME_OVERRIDE::SPAWN_EXTRA:
+        case THEME_OVERRIDE::UNKNOWN_V51:
+            themeinfo->set_post_void(
                 id,
+                override,
                 [=, &lua, fun = std::move(fun)](ThemeInfo* self)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);

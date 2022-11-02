@@ -19,9 +19,10 @@ using LEVEL_CONFIG = uint32_t;                // NoAlias
 using TILE_CODE = uint32_t;                   // NoAlias
 using IMAGE = int64_t;                        // NoAlias
 using WORLD_SHADER = uint8_t;                 // NoAlias
-using SHORT_TILE_CODE = uint8_t;
-using STRINGID = uint32_t;
-using FEAT = uint8_t;
+using SHORT_TILE_CODE = uint8_t;              //
+using STRINGID = uint32_t;                    //
+using FEAT = uint8_t;                         // NoAlias
+using THEME = uint8_t;                        // NoAlias
 
 inline constexpr uint8_t MAX_PLAYERS = 4;
 

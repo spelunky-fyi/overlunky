@@ -19,6 +19,61 @@
 #include "level_api_types.hpp"               // for ShortTileCodeDef
 #include "math.hpp"                          // for AABB (ptr only), Vec2
 
+enum class THEME_OVERRIDE : uint8_t
+{
+    BASE,
+    UNKNOWN_V1,
+    INIT_FLAGS,
+    INIT_LEVEL,
+    UNKNOWN_V4,
+    UNKNOWN_V5,
+    SPECIAL_ROOMS,
+    UNKNOWN_V7,
+    UNKNOWN_V8,
+    VAULT,
+    COFFIN,
+    FEELING,
+    UNKNOWN_V12,
+    SPAWN_LEVEL,
+    SPAWN_BORDER,
+    POST_PROCESS_LEVEL,
+    SPAWN_TRAPS,
+    POST_PROCESS_ENTITIES,
+    SPAWN_PROCEDURAL,
+    SPAWN_BACKGROUND,
+    SPAWN_LIGHTS,
+    SPAWN_TRANSITION,
+    POST_TRANSITION,
+    SPAWN_PLAYERS,
+    SPAWN_EFFECTS,
+    LVL_FILE,
+    THEME_ID,
+    BASE_ID,
+    ENT_FLOOR_SPREADING,
+    ENT_FLOOR_SPREADING2,
+    UNKNOWN_V30,
+    TRANSITION_MODIFIER,
+    UNKNOWN_V32,
+    ENT_BACKWALL,
+    ENT_BORDER,
+    ENT_CRITTER,
+    GRAVITY,
+    PLAYER_DAMAGE,
+    UNKNOWN_V38,
+    TEXTURE_BACKLAYER_LUT,
+    BACKLAYER_LIGHT_LEVEL,
+    LOOP,
+    VAULT_LEVEL,
+    GET_UNKNOWN1_OR_2,
+    TEXTURE_DYNAMIC,
+    PRE_TRANSITION,
+    LEVEL_HEIGHT,
+    UNKNOWN_V47,
+    SPAWN_DECORATION,
+    SPAWN_DECORATION2,
+    SPAWN_EXTRA,
+    UNKNOWN_V51
+};
 struct TileCodeDef
 {
     std::uint32_t id;
@@ -183,11 +238,8 @@ class ThemeInfo
     void unhook(std::uint32_t id);
     struct ThemeHooksInfo& get_hooks();
 
-    void set_pre_init_flags(std::uint32_t reserved_callback_id, std::function<bool(ThemeInfo*)> pre_init_flags);
-    void set_post_init_flags(std::uint32_t reserved_callback_id, std::function<void(ThemeInfo*)> post_init_flags);
-
-    void set_pre_spawn_effects(std::uint32_t reserved_callback_id, std::function<bool(ThemeInfo*)> pre_spawn_effects);
-    void set_post_spawn_effects(std::uint32_t reserved_callback_id, std::function<void(ThemeInfo*)> post_spawn_effects);
+    void set_pre_void(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<bool(ThemeInfo*)> pre_func);
+    void set_post_void(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func);
 
     virtual ~ThemeInfo()
     {
@@ -580,60 +632,4 @@ enum class DYNAMIC_TEXTURE : int32_t
     BACKGROUND_DECORATION = -8,
     KALI_STATUE = -9,
     COFFIN = -10
-};
-
-enum class THEME_OVERRIDE : uint8_t
-{
-    BASE,
-    UNKNOWN_V1,
-    INIT_FLAGS,
-    INIT_LEVEL,
-    UNKNOWN_V4,
-    UNKNOWN_V5,
-    SPECIAL_ROOMS,
-    UNKNOWN_V7,
-    UNKNOWN_V8,
-    VAULT,
-    COFFIN,
-    FEELING,
-    UNKNOWN_V12,
-    SPAWN_LEVEL,
-    SPAWN_BORDER,
-    POST_PROCESS_LEVEL,
-    SPAWN_TRAPS,
-    POST_PROCESS_ENTITIES,
-    SPAWN_PROCEDURAL,
-    SPAWN_BACKGROUND,
-    SPAWN_LIGHTS,
-    SPAWN_TRANSITION,
-    POST_TRANSITION,
-    SPAWN_PLAYERS,
-    SPAWN_EFFECTS,
-    LVL_FILE,
-    THEME_ID,
-    BASE_ID,
-    ENT_FLOOR_SPREADING,
-    ENT_FLOOR_SPREADING2,
-    UNKNOWN_V30,
-    TRANSITION_MODIFIER,
-    UNKNOWN_V32,
-    ENT_BACKWALL,
-    ENT_BORDER,
-    ENT_CRITTER,
-    GRAVITY,
-    PLAYER_DAMAGE,
-    UNKNOWN_V38,
-    TEXTURE_BACKLAYER_LUT,
-    BACKLAYER_LIGHT_LEVEL,
-    LOOP,
-    VAULT_LEVEL,
-    GET_UNKNOWN1_OR_2,
-    TEXTURE_DYNAMIC,
-    PRE_TRANSITION,
-    LEVEL_HEIGHT,
-    UNKNOWN_V47,
-    SPAWN_DECORATION,
-    SPAWN_DECORATION2,
-    SPAWN_EXTRA,
-    UNKNOWN_V51
 };
