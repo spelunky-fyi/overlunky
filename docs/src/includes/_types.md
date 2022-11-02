@@ -3167,6 +3167,7 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
+int | [last_owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_owner_uid) | 
 
 ### DMSpawning
 

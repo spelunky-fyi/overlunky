@@ -3879,6 +3879,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
 
 ---@class DMAlienBlast : Entity
+    ---@field last_owner_uid integer
 
 ---@class MovableBehavior
     ---@field get_state_id MovableBehavior_get_state_id
