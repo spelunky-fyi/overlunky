@@ -3167,7 +3167,11 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [last_owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_owner_uid) | 
+int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
+[Entity](#Entity) | [reticule_internal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reticule_internal) | 
+[Entity](#Entity) | [reticule_external](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reticule_external) | 
 
 ### DMSpawning
 
