@@ -1683,7 +1683,7 @@ end
         case THEME_OVERRIDE::SPAWN_DECORATION2:
         case THEME_OVERRIDE::SPAWN_EXTRA:
         case THEME_OVERRIDE::UNKNOWN_V51:
-            themeinfo->set_pre_void(
+            themeinfo->set_pre(
                 id,
                 override,
                 [=, &lua, fun = std::move(fun)](ThemeInfo* self)
@@ -1836,7 +1836,29 @@ end
         case THEME_OVERRIDE::SPAWN_DECORATION2:
         case THEME_OVERRIDE::SPAWN_EXTRA:
         case THEME_OVERRIDE::UNKNOWN_V51:
-            themeinfo->set_post_bool(
+        case THEME_OVERRIDE::UNKNOWN_V1:
+        case THEME_OVERRIDE::UNKNOWN_V12:
+        case THEME_OVERRIDE::UNKNOWN_V30:
+        case THEME_OVERRIDE::PLAYER_DAMAGE:
+        case THEME_OVERRIDE::UNKNOWN_V38:
+        case THEME_OVERRIDE::LOOP:
+        case THEME_OVERRIDE::GET_UNKNOWN1_OR_2:
+        case THEME_OVERRIDE::THEME_ID:
+        case THEME_OVERRIDE::BASE_ID:
+        case THEME_OVERRIDE::VAULT_LEVEL:
+        case THEME_OVERRIDE::ENT_FLOOR_SPREADING:
+        case THEME_OVERRIDE::ENT_FLOOR_SPREADING2:
+        case THEME_OVERRIDE::TRANSITION_MODIFIER:
+        case THEME_OVERRIDE::UNKNOWN_V32:
+        case THEME_OVERRIDE::ENT_BACKWALL:
+        case THEME_OVERRIDE::ENT_BORDER:
+        case THEME_OVERRIDE::ENT_CRITTER:
+        case THEME_OVERRIDE::TEXTURE_BACKLAYER_LUT:
+        case THEME_OVERRIDE::LEVEL_HEIGHT:
+        case THEME_OVERRIDE::UNKNOWN_V47:
+        case THEME_OVERRIDE::GRAVITY:
+        case THEME_OVERRIDE::BACKLAYER_LIGHT_LEVEL:
+            themeinfo->set_post(
                 id,
                 override,
                 [=, &lua, fun = std::move(fun)](ThemeInfo* self)
@@ -1849,25 +1871,18 @@ end
                     backend->clear_current_callback();
                 });
             break;
-        case THEME_OVERRIDE::UNKNOWN_V1:
-        case THEME_OVERRIDE::UNKNOWN_V12:
-        case THEME_OVERRIDE::UNKNOWN_V30:
-        case THEME_OVERRIDE::PLAYER_DAMAGE:
-        case THEME_OVERRIDE::UNKNOWN_V38:
-        case THEME_OVERRIDE::LOOP:
-        case THEME_OVERRIDE::GET_UNKNOWN1_OR_2:
-            themeinfo->set_post_bool(
+        case THEME_OVERRIDE::TEXTURE_DYNAMIC:
+            themeinfo->set_post_texture(
                 id,
                 override,
-                [=, &lua, fun = std::move(fun)](ThemeInfo* self) -> std::optional<bool>
+                [=, &lua, fun = std::move(fun)](ThemeInfo* self, int32_t texture_id)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
-                        return std::nullopt;
+                        return;
                     backend->set_current_callback(theme, id, CallbackType::Theme);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, self);
+                    backend->handle_function(fun, self, texture_id);
                     backend->clear_current_callback();
-                    return return_value;
                 });
             break;
         default:

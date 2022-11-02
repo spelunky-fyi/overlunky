@@ -52,16 +52,12 @@ struct ThemeHooksInfo
     ThemeInfo* theme;
     std::uint32_t cbcount;
 
-    std::map<THEME_OVERRIDE, std::vector<HookWithId<bool(ThemeInfo*)>>> pre_void;
-    std::map<THEME_OVERRIDE, std::vector<HookWithId<void(ThemeInfo*)>>> post_void;
+    std::map<THEME_OVERRIDE, std::vector<HookWithId<bool(ThemeInfo*)>>> pre;
+    std::map<THEME_OVERRIDE, std::vector<HookWithId<void(ThemeInfo*)>>> post;
     std::map<THEME_OVERRIDE, std::vector<HookWithId<std::optional<bool>(ThemeInfo*)>>> pre_bool;
-    std::map<THEME_OVERRIDE, std::vector<HookWithId<void(ThemeInfo*)>>> post_bool;
     std::map<THEME_OVERRIDE, std::vector<HookWithId<std::optional<uint8_t>(ThemeInfo*)>>> pre_u8;
-    std::map<THEME_OVERRIDE, std::vector<HookWithId<void(ThemeInfo*)>>> post_u8;
     std::map<THEME_OVERRIDE, std::vector<HookWithId<std::optional<uint32_t>(ThemeInfo*)>>> pre_u32;
-    std::map<THEME_OVERRIDE, std::vector<HookWithId<void(ThemeInfo*)>>> post_u32;
     std::map<THEME_OVERRIDE, std::vector<HookWithId<std::optional<float>(ThemeInfo*)>>> pre_float;
-    std::map<THEME_OVERRIDE, std::vector<HookWithId<void(ThemeInfo*)>>> post_float;
     std::map<THEME_OVERRIDE, std::vector<HookWithId<std::optional<uint32_t>(ThemeInfo*, int32_t)>>> pre_texture;
     std::map<THEME_OVERRIDE, std::vector<HookWithId<void(ThemeInfo*, int32_t)>>> post_texture;
 };
@@ -81,7 +77,7 @@ void hook_void(ThemeInfo* self, THEME_OVERRIDE index)
             ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
 
             bool skip_orig = false;
-            for (auto& [id, pre] : hook_info.pre_void[index])
+            for (auto& [id, pre] : hook_info.pre[index])
             {
                 if (pre(lmbd_self))
                 {
@@ -92,7 +88,7 @@ void hook_void(ThemeInfo* self, THEME_OVERRIDE index)
             {
                 original(lmbd_self);
             }
-            for (auto& [id, post] : hook_info.post_void[index])
+            for (auto& [id, post] : hook_info.post[index])
             {
                 post(lmbd_self);
             }
@@ -117,7 +113,7 @@ void hook_bool(ThemeInfo* self, THEME_OVERRIDE index)
             }
             if (!return_value.has_value())
                 return_value = original(lmbd_self);
-            for (auto& [id, post] : hook_info.post_bool[index])
+            for (auto& [id, post] : hook_info.post[index])
             {
                 post(lmbd_self);
             }
@@ -143,7 +139,7 @@ void hook_u8(ThemeInfo* self, THEME_OVERRIDE index)
             }
             if (!return_value.has_value())
                 return_value = original(lmbd_self);
-            for (auto& [id, post] : hook_info.post_u8[index])
+            for (auto& [id, post] : hook_info.post[index])
             {
                 post(lmbd_self);
             }
@@ -169,7 +165,7 @@ void hook_u32(ThemeInfo* self, THEME_OVERRIDE index)
             }
             if (!return_value.has_value())
                 return_value = original(lmbd_self);
-            for (auto& [id, post] : hook_info.post_u32[index])
+            for (auto& [id, post] : hook_info.post[index])
             {
                 post(lmbd_self);
             }
@@ -195,7 +191,7 @@ void hook_float(ThemeInfo* self, THEME_OVERRIDE index)
             }
             if (!return_value.has_value())
                 return_value = original(lmbd_self);
-            for (auto& [id, post] : hook_info.post_float[index])
+            for (auto& [id, post] : hook_info.post[index])
             {
                 post(lmbd_self);
             }
@@ -238,12 +234,12 @@ std::uint32_t ThemeInfo::reserve_callback_id()
 
 void ThemeInfo::unhook(std::uint32_t id)
 {
-    for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].pre_void)
+    for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].pre)
     {
         std::erase_if(funcs, [id](auto& hook)
                       { return hook.id == id; });
     }
-    for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].post_void)
+    for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].post)
     {
         std::erase_if(funcs, [id](auto& hook)
                       { return hook.id == id; });
@@ -253,17 +249,7 @@ void ThemeInfo::unhook(std::uint32_t id)
         std::erase_if(funcs, [id](auto& hook)
                       { return hook.id == id; });
     }
-    for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].post_bool)
-    {
-        std::erase_if(funcs, [id](auto& hook)
-                      { return hook.id == id; });
-    }
     for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].pre_u8)
-    {
-        std::erase_if(funcs, [id](auto& hook)
-                      { return hook.id == id; });
-    }
-    for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].post_u8)
     {
         std::erase_if(funcs, [id](auto& hook)
                       { return hook.id == id; });
@@ -273,17 +259,7 @@ void ThemeInfo::unhook(std::uint32_t id)
         std::erase_if(funcs, [id](auto& hook)
                       { return hook.id == id; });
     }
-    for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].post_u32)
-    {
-        std::erase_if(funcs, [id](auto& hook)
-                      { return hook.id == id; });
-    }
     for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].pre_float)
-    {
-        std::erase_if(funcs, [id](auto& hook)
-                      { return hook.id == id; });
-    }
-    for (auto& [theme, funcs] : g_theme_hooks[this->get_theme_id()].post_float)
     {
         std::erase_if(funcs, [id](auto& hook)
                       { return hook.id == id; });
@@ -300,123 +276,67 @@ void ThemeInfo::unhook(std::uint32_t id)
     }
 }
 
-void ThemeInfo::set_pre_void(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<bool(ThemeInfo*)> pre_func)
+void ThemeInfo::set_pre(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<bool(ThemeInfo*)> pre_func)
 {
     ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_void.find(index) == hook_info.pre_void.end() && hook_info.post_void.find(index) == hook_info.post_void.end())
-    {
+    if (!get_hook_function((void***)this, (uint8_t)index))
         hook_void(this, index);
-    }
-    hook_info.pre_void[index].push_back({reserved_callback_id, std::move(pre_func)});
+    hook_info.pre[index].push_back({reserved_callback_id, std::move(pre_func)});
 }
 
-void ThemeInfo::set_post_void(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func)
+void ThemeInfo::set_post(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func)
 {
     ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_void.find(index) == hook_info.pre_void.end() && hook_info.post_void.find(index) == hook_info.post_void.end())
-    {
+    if (!get_hook_function((void***)this, (uint8_t)index))
         hook_void(this, index);
-    }
-    hook_info.post_void[index].push_back({reserved_callback_id, std::move(post_func)});
+    hook_info.post[index].push_back({reserved_callback_id, std::move(post_func)});
 }
 
 void ThemeInfo::set_pre_bool(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<bool>(ThemeInfo*)> pre_func)
 {
     ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_bool.find(index) == hook_info.pre_bool.end() && hook_info.post_bool.find(index) == hook_info.post_bool.end())
-    {
+    if (!get_hook_function((void***)this, (uint8_t)index))
         hook_bool(this, index);
-    }
     hook_info.pre_bool[index].push_back({reserved_callback_id, std::move(pre_func)});
-}
-
-void ThemeInfo::set_post_bool(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func)
-{
-    ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_bool.find(index) == hook_info.pre_bool.end() && hook_info.post_bool.find(index) == hook_info.post_bool.end())
-    {
-        hook_bool(this, index);
-    }
-    hook_info.post_bool[index].push_back({reserved_callback_id, std::move(post_func)});
 }
 
 void ThemeInfo::set_pre_u8(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<uint8_t>(ThemeInfo*)> pre_func)
 {
     ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_u8.find(index) == hook_info.pre_u8.end() && hook_info.post_u8.find(index) == hook_info.post_u8.end())
-    {
+    if (!get_hook_function((void***)this, (uint8_t)index))
         hook_u8(this, index);
-    }
     hook_info.pre_u8[index].push_back({reserved_callback_id, std::move(pre_func)});
-}
-
-void ThemeInfo::set_post_u8(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func)
-{
-    ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_u8.find(index) == hook_info.pre_u8.end() && hook_info.post_u8.find(index) == hook_info.post_u8.end())
-    {
-        hook_u8(this, index);
-    }
-    hook_info.post_u8[index].push_back({reserved_callback_id, std::move(post_func)});
 }
 
 void ThemeInfo::set_pre_u32(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<uint32_t>(ThemeInfo*)> pre_func)
 {
     ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_u32.find(index) == hook_info.pre_u32.end() && hook_info.post_u32.find(index) == hook_info.post_u32.end())
-    {
+    if (!get_hook_function((void***)this, (uint8_t)index))
         hook_u32(this, index);
-    }
     hook_info.pre_u32[index].push_back({reserved_callback_id, std::move(pre_func)});
-}
-
-void ThemeInfo::set_post_u32(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func)
-{
-    ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_u32.find(index) == hook_info.pre_u32.end() && hook_info.post_u32.find(index) == hook_info.post_u32.end())
-    {
-        hook_u32(this, index);
-    }
-    hook_info.post_u32[index].push_back({reserved_callback_id, std::move(post_func)});
 }
 
 void ThemeInfo::set_pre_float(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<float>(ThemeInfo*)> pre_func)
 {
     ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_float.find(index) == hook_info.pre_float.end() && hook_info.post_float.find(index) == hook_info.post_float.end())
-    {
+    if (!get_hook_function((void***)this, (uint8_t)index))
         hook_float(this, index);
-    }
     hook_info.pre_float[index].push_back({reserved_callback_id, std::move(pre_func)});
-}
-
-void ThemeInfo::set_post_float(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*)> post_func)
-{
-    ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_float.find(index) == hook_info.pre_float.end() && hook_info.post_float.find(index) == hook_info.post_float.end())
-    {
-        hook_float(this, index);
-    }
-    hook_info.post_float[index].push_back({reserved_callback_id, std::move(post_func)});
 }
 
 void ThemeInfo::set_pre_texture(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<std::optional<uint32_t>(ThemeInfo*, int32_t)> pre_func)
 {
     ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_texture.find(index) == hook_info.pre_texture.end() && hook_info.post_texture.find(index) == hook_info.post_texture.end())
-    {
+    if (!get_hook_function((void***)this, (uint8_t)index))
         hook_texture(this, index);
-    }
     hook_info.pre_texture[index].push_back({reserved_callback_id, std::move(pre_func)});
 }
 
 void ThemeInfo::set_post_texture(std::uint32_t reserved_callback_id, THEME_OVERRIDE index, std::function<void(ThemeInfo*, int32_t)> post_func)
 {
     ThemeHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_texture.find(index) == hook_info.pre_texture.end() && hook_info.post_texture.find(index) == hook_info.post_texture.end())
-    {
+    if (!get_hook_function((void***)this, (uint8_t)index))
         hook_texture(this, index);
-    }
     hook_info.post_texture[index].push_back({reserved_callback_id, std::move(post_func)});
 }
 
