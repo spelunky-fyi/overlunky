@@ -31,7 +31,7 @@ class Backpack : public Movable
     virtual void v95() = 0; // just return
     virtual void on_putting_on(Entity* who) = 0;
     virtual void on_putting_off(Entity* who) = 0;
-    virtual bool is_active() = 0;          // for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack, hoverpack.is_on, teleporter and powerpack return false
+    virtual bool is_active() = 0;         // for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack, hoverpack.is_on, teleporter and powerpack return false
     virtual void trigger_explosion() = 0; // Causes the backpack to play its warning sound and triggers the explosion
 };
 
