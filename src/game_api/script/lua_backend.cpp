@@ -690,6 +690,13 @@ void LuaBackend::render_options()
                         handle_function(option.on_click);
                     }
                 },
+                [&](CustomOption& option)
+                {
+                    auto& name = name_option_pair.first;
+                    GuiDrawContext draw_ctx(this);
+                    lua["options"][name] = handle_function_with_return<sol::object>(option.func, draw_ctx);
+                },
+
             },
             name_option_pair.second.option_impl);
         if (!name_option_pair.second.long_desc.empty())

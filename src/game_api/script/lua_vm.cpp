@@ -598,9 +598,9 @@ end
         });
     /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
     /// with a double `\0\0` at the end. `value` is the default index 1..n.
-    // lua["register_option_combo"] = [&lua](std::string name, std::string desc, std::string long_desc, std::string opts)
+    // lua["register_option_combo"] = [&lua](std::string name, std::string desc, std::string long_desc, std::string opts, int value)
     lua["register_option_combo"] = sol::overload(
-        [&lua](std::string name, std::string desc, std::string long_desc, std::string opts, unsigned int value)
+        [&lua](std::string name, std::string desc, std::string long_desc, std::string opts, int value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ComboOption{value - 1, opts}};
@@ -612,7 +612,7 @@ end
             backend->options[name] = {desc, long_desc, ComboOption{0, opts}};
             lua["options"][name] = 1;
         },
-        [&lua](std::string name, std::string desc, std::string opts, unsigned int value)
+        [&lua](std::string name, std::string desc, std::string opts, int value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ComboOption{value - 1, opts}};
@@ -639,6 +639,13 @@ end
             backend->options[name] = {desc, "", ButtonOption{callback}};
             lua["options"][name] = -1;
         });
+    /// Add custom options using the window drawing functions. Your callback will be called with a GuiDrawContext as a parameter and everything drawn in it will be rendered in the options window and the return value saved to `options[name]`.
+    // lua["register_option_callback"] = [&lua](std::string name, sol::function callback)
+    lua["register_option_callback"] = [&lua](std::string name, sol::function callback)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->options[name] = {"", "", CustomOption{callback}};
+    };
     auto spawn_liquid = sol::overload(
         static_cast<void (*)(ENT_TYPE, float, float)>(::spawn_liquid),
         static_cast<void (*)(ENT_TYPE, float, float, float, float, uint32_t, uint32_t)>(::spawn_liquid_ex),

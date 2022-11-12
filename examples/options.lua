@@ -16,7 +16,7 @@ register_option_combo('e', 'Choice E', 'Red\0Green\0Blue\0\0')
 
 -- you can use a table to initialize this too, that way you can easily reference the string later with the index
 colors = {'Bulbasaur', 'Charmander', 'Squirtle'}
-register_option_combo('f', 'Choice F', table.concat(colors, '\0')..'\0\0')
+register_option_combo('f', 'Choice F', table.concat(colors, '\0')..'\0\0', 3)
 
 -- a button needs a callback function
 register_option_button('g', 'Button G', function()
@@ -27,7 +27,29 @@ end)
 tests = {'Chi-Squared', 'McNemar', 'Portmanteau'}
 register_option_combo('h', 'Choice H', 'This is a really long description that is probably not necessary because I should\'ve just made the option more clear in the first place. But here we are, having to live with an option that spans probably 4or 5 lines just to explain something that most likely is too complicate for users to touch anyways.', table.concat(tests, '\0')..'\0\0')
 
+-- single custom option with the help of the window api, return value saved to options.x
+register_option_callback("x", function(draw_ctx)
+    draw_ctx:win_separator()
+    draw_ctx:win_text("Custom options here:")
+    return draw_ctx:win_input_text('Custom text X', options.x or '')
+end)
+
+-- multiple custom options in one callback, save to the options table or wherever you want
+-- note: changing to traditional options in the script are not actually reflected in the gui atm
+customoption = false
+additionaloption = false
+register_option_callback("y", function(draw_ctx)
+    options.z = draw_ctx:win_slider_int('Custom int Z', options.z or 5, 0, 10)
+    customoption = draw_ctx:win_check('Custom checkbox', customoption)
+    draw_ctx:window("Additional options", 0, 0, 0, 0, true, function()
+        draw_ctx:win_text("This window will also be shown whenever the options are shown.")
+        draw_ctx:win_check('Additional checkbox', additionaloption)
+    end)
+    options.a = 42
+    -- not returning anything, options.y will be nil but we can write to other options
+end)
+
 -- just print these out real quick
-set_callback(function()
-    message('Options: A:'..tostring(options.a)..', B:'..tostring(options.b)..', C:'..tostring(options.c)..', D:'..tostring(options.d)..', E:'..tostring(options.e)..', F:'..colors[options.f]..', G:'..tostring(options.g)..', H:'..tostring(options.h))
-end, ON.FRAME)
+set_global_interval(function()
+    message('Options: A:'..tostring(options.a)..', B:'..tostring(options.b)..', C:'..tostring(options.c)..', D:'..tostring(options.d)..', E:'..tostring(options.e)..', F:'..colors[options.f]..', G:'..tostring(options.g)..', H:'..tostring(options.h)..', X: '..tostring(options.x)..', Y: '..tostring(options.y)..', Z: '..tostring(options.z)..' '..tostring(customoption))
+end, 15)
