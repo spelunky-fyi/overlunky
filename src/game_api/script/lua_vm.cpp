@@ -539,13 +539,13 @@ end
     /// limits, you can override them in the UI with double click.
     // lua["register_option_int"] = [](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
     lua["register_option_int"] = sol::overload(
-        [&lua](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
+        [](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, IntOption{value, min, max}};
             backend->lua[sol::create_if_nil]["options"][name] = value;
         },
-        [&lua](std::string name, std::string desc, int value, int min, int max)
+        [](std::string name, std::string desc, int value, int min, int max)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", IntOption{value, min, max}};
@@ -555,43 +555,43 @@ end
     /// limits, you can override them in the UI with double click.
     // lua["register_option_float"] = [](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
     lua["register_option_float"] = sol::overload(
-        [&lua](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
+        [](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, FloatOption{value, min, max}};
             backend->lua[sol::create_if_nil]["options"][name] = value;
         },
-        [&lua](std::string name, std::string desc, float value, float min, float max)
+        [](std::string name, std::string desc, float value, float min, float max)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", FloatOption{value, min, max}};
             backend->lua[sol::create_if_nil]["options"][name] = value;
         });
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
-    // lua["register_option_bool"] = [&lua](std::string name, std::string desc, std::string long_desc, bool value)
+    // lua["register_option_bool"] = [](std::string name, std::string desc, std::string long_desc, bool value)
     lua["register_option_bool"] = sol::overload(
-        [&lua](std::string name, std::string desc, std::string long_desc, bool value)
+        [](std::string name, std::string desc, std::string long_desc, bool value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, BoolOption{value}};
             backend->lua[sol::create_if_nil]["options"][name] = value;
         },
-        [&lua](std::string name, std::string desc, bool value)
+        [](std::string name, std::string desc, bool value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", BoolOption{value}};
             backend->lua[sol::create_if_nil]["options"][name] = value;
         });
     /// Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
-    // lua["register_option_string"] = [&lua](std::string name, std::string desc, std::string long_desc, std::string value)
+    // lua["register_option_string"] = [](std::string name, std::string desc, std::string long_desc, std::string value)
     lua["register_option_string"] = sol::overload(
-        [&lua](std::string name, std::string desc, std::string long_desc, std::string value)
+        [](std::string name, std::string desc, std::string long_desc, std::string value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, StringOption{value}};
             backend->lua[sol::create_if_nil]["options"][name] = value;
         },
-        [&lua](std::string name, std::string desc, std::string value)
+        [](std::string name, std::string desc, std::string value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", StringOption{value}};
@@ -599,49 +599,49 @@ end
         });
     /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
     /// with a double `\0\0` at the end. `value` is the default index 1..n.
-    // lua["register_option_combo"] = [&lua](std::string name, std::string desc, std::string long_desc, std::string opts, int value)
+    // lua["register_option_combo"] = [](std::string name, std::string desc, std::string long_desc, std::string opts, int value)
     lua["register_option_combo"] = sol::overload(
-        [&lua](std::string name, std::string desc, std::string long_desc, std::string opts, int value)
+        [](std::string name, std::string desc, std::string long_desc, std::string opts, int value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ComboOption{value - 1, opts}};
             backend->lua[sol::create_if_nil]["options"][name] = value;
         },
-        [&lua](std::string name, std::string desc, std::string long_desc, std::string opts)
+        [](std::string name, std::string desc, std::string long_desc, std::string opts)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ComboOption{0, opts}};
             backend->lua[sol::create_if_nil]["options"][name] = 1;
         },
-        [&lua](std::string name, std::string desc, std::string opts, int value)
+        [](std::string name, std::string desc, std::string opts, int value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ComboOption{value - 1, opts}};
             backend->lua[sol::create_if_nil]["options"][name] = value;
         },
-        [&lua](std::string name, std::string desc, std::string opts)
+        [](std::string name, std::string desc, std::string opts)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ComboOption{0, opts}};
             backend->lua[sol::create_if_nil]["options"][name] = 1;
         });
     /// Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
-    // lua["register_option_button"] = [&lua](std::string name, std::string desc, std::string long_desc, sol::function on_click)
+    // lua["register_option_button"] = [](std::string name, std::string desc, std::string long_desc, sol::function on_click)
     lua["register_option_button"] = sol::overload(
-        [&lua](std::string name, std::string desc, std::string long_desc, sol::function callback)
+        [](std::string name, std::string desc, std::string long_desc, sol::function callback)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ButtonOption{callback}};
             backend->lua[sol::create_if_nil]["options"][name] = -1;
         },
-        [&lua](std::string name, std::string desc, sol::function callback)
+        [](std::string name, std::string desc, sol::function callback)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ButtonOption{callback}};
             backend->lua[sol::create_if_nil]["options"][name] = -1;
         });
     /// Add custom options using the window drawing functions. Your callback will be called with a GuiDrawContext as a parameter and everything drawn in it will be rendered in the options window and the return value saved to `options[name]`.
-    lua["register_option_callback"] = [&lua](std::string name, sol::function callback)
+    lua["register_option_callback"] = [](std::string name, sol::function callback)
     {
         auto backend = LuaBackend::get_calling_backend();
         backend->options[name] = {"", "", CustomOption{callback}};

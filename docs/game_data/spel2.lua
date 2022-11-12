@@ -4314,6 +4314,8 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field win_pushid fun(self, id: integer): nil
     ---@field win_popid fun(self): nil
     ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil
+    ---@field win_section any @&GuiDrawContext::win_section
+    ---@field win_indent fun(self, width: number): nil
 
 ---@class GuiDrawContext_draw_rect
 ---@param rect AABB

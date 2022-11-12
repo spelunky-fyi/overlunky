@@ -41,17 +41,23 @@ additionaloption = false
 register_option_callback('y', function(draw_ctx)
     options.z = draw_ctx:win_slider_int('Custom int Z', options.z or 5, 0, 10)
     customoption = draw_ctx:win_check('Custom checkbox', customoption)
+
     draw_ctx:window('Additional options', 0, 0, 0, 0, true, function()
         draw_ctx:win_text('This window will also be shown whenever the options are shown.')
         additionaloption = draw_ctx:win_check('Additional checkbox', additionaloption)
     end)
-    options.a = draw_ctx:win_slider_int('A, but slider', options.a or 100, 100, 200)
-    if draw_ctx:win_button('Set B to 1.23') then
-        options.b = 1.23
-    end
-    if draw_ctx:win_button('Try to set A to banana') then
-        options.a = 'banana'
-    end
+
+    draw_ctx:win_section('Fancy stuff behind this', function()
+        draw_ctx:win_indent(20)
+        options.a = draw_ctx:win_slider_int('A, but slider', options.a or 100, 100, 200)
+        if draw_ctx:win_button('Set B to 1.23') then
+            options.b = 1.23
+        end
+        if draw_ctx:win_button('Try to set A to banana') then
+            options.a = 'banana'
+        end
+        draw_ctx:win_indent(-20)
+    end)
     -- not returning anything, options.y will be nil but we have set a bunch of others in here
 end)
 
