@@ -1963,8 +1963,8 @@ end
         ON::PRE_SET_FEAT);
     /* ON
     // GUIFRAME
-    // Params: `GuiDrawContext draw_ctx`
-    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a `GuiDrawContext`
+    // Params: GuiDrawContext draw_ctx
+    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a GuiDrawContext
     // FRAME
     // Runs while playing the game while the player is controllable, not in the base camp or the arena mode
     // GAMEFRAME
@@ -1976,12 +1976,12 @@ end
     // RESET
     // Runs when resetting a run
     // PRE_LOAD_LEVEL_FILES
-    // Params: `PreLoadLevelFilesContext load_level_ctx`
+    // Params: PreLoadLevelFilesContext load_level_ctx
     // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
     // Runs before any level generation, no entities should exist at this point
     // POST_ROOM_GENERATION
-    // Params: `PostRoomGenerationContext room_gen_ctx`
+    // Params: PostRoomGenerationContext room_gen_ctx
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
     // Runs right after level generation is done, before any entities are updated
@@ -1992,44 +1992,43 @@ end
     // POST_LOAD_SCREEN
     // Runs right after a screen is loaded, before rendering anything
     // PRE_GET_RANDOM_ROOM
-    // Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`
+    // Params: int x, int y, LAYER layer, ROOM_TEMPLATE room_template
     // Return: `string room_data`
     // Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.
     // If the size of the string returned does not match with the room templates expected size the room is discarded.
     // White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.
     // PRE_HANDLE_ROOM_TILES
-    // Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`
+    // Params: int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx
     // Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this
     // Runs after a random room was selected and right before it would spawn entities for each tile code
     // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
     // SAVE
-    // Params: `SaveContext save_ctx`
+    // Params: SaveContext save_ctx
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
     // LOAD
-    // Params: `LoadContext load_ctx`
+    // Params: LoadContext load_ctx
     // Runs as soon as your script is loaded, including reloads, then never again
     // RENDER_PRE_HUD
-    // Params: `VanillaRenderContext render_ctx`
+    // Params: VanillaRenderContext render_ctx
     // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_POST_HUD
-    // Params: `VanillaRenderContext render_ctx`
+    // Params: VanillaRenderContext render_ctx
     // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_PAUSE_MENU
-    // Params: `VanillaRenderContext render_ctx`
+    // Params: VanillaRenderContext render_ctx
     // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_POST_PAUSE_MENU
-    // Params: `VanillaRenderContext render_ctx`
+    // Params: VanillaRenderContext render_ctx
     // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_DRAW_DEPTH
-    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Params: VanillaRenderContext render_ctx, int draw_depth
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     // RENDER_POST_DRAW_DEPTH
-    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Params: VanillaRenderContext render_ctx, int draw_depth
     // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     // RENDER_POST_JOURNAL_PAGE
-    // Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`
-    // Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
-    // The page_type parameter values can be found in the JOURNAL_PAGE_TYPE ENUM
+    // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
+    // Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the VanillaRenderContext
     // The JournalPage parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:
     // `page:as_journal_page_progress()`
     // `page:as_journal_page_journalmenu()`
@@ -2046,34 +2045,36 @@ end
     // `page:as_journal_page_playerprofile()`
     // `page:as_journal_page_lastgameplayed()`
     // SPEECH_BUBBLE
-    // Params: `Entity speaking_entity, string text`
-    // Runs before any speech bubble is created, even the one using `say` function
-    // Return behavior: if you don't return anything it will execute the speech bubble function normally with default message
+    // Params: Entity speaking_entity, string text
+    // Runs before any speech bubble is created, even the one using [say](#say) function
+    // Return: if you don't return anything it will execute the speech bubble function normally with default message
     // if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original
     // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
     // TOAST
-    // Params: `string text`
-    // Runs before any toast is created, even the one using `toast` function
-    // Return behavior: if you don't return anything it will execute the toast function normally with default message
+    // Params: string text
+    // Runs before any toast is created, even the one using [toast](#toast) function
+    // Return: if you don't return anything it will execute the toast function normally with default message
     // if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
     // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
     // DEATH_MESSAGE
-    // Params: `STRINGID id`
+    // Params: STRINGID id
     // Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.
     // PRE_LOAD_JOURNAL_CHAPTER
-    // Params: JOURNALUI_PAGE_SHOWN `chapter`
+    // Params: JOURNALUI_PAGE_SHOWN chapter
     // Runs before the journal or any of it's chapter is opened
-    // Return behavior: return true to not load the chapter (or journal as a whole)
+    // Return: return true to not load the chapter (or journal as a whole)
     // POST_LOAD_JOURNAL_CHAPTER
-    // Params: JOURNALUI_PAGE_SHOWN `chapter`, `array pages`
+    // Params: JOURNALUI_PAGE_SHOWN chapter, array pages
     // Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it
     // All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
-    // Return behavior: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
+    // Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
     // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
     // PRE_GET_FEAT
-    // Runs before getting performed status for a FEAT when rendering the Feats page in journal. Return a boolean to override the vanilla feat with your own. Defaults to Steam GetAchievement.
+    // Runs before getting performed status for a FEAT when rendering the Feats page in journal.
+    // Return: true to override the vanilla feat with your own. Defaults to Steam GetAchievement.
     // PRE_SET_FEAT
-    // Runs before the game sets a vanilla feat performed. Return true to block the default behaviour of calling Steam SetAchievement.
+    // Runs before the game sets a vanilla feat performed.
+    // Return: true to block the default behaviour of calling Steam SetAchievement.
     */
 
     lua.create_named_table(
