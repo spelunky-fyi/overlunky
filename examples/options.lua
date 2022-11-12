@@ -34,7 +34,8 @@ register_option_callback('x', function(draw_ctx)
     return draw_ctx:win_input_text('Custom text X', options.x or '')
 end)
 
--- multiple custom options in one callback, save to the options table or wherever you want
+-- multiple custom options in one callback, saved to the options table or wherever you want
+-- also editing conventional options with different kind of interface
 customoption = false
 additionaloption = false
 register_option_callback('y', function(draw_ctx)
@@ -44,9 +45,7 @@ register_option_callback('y', function(draw_ctx)
         draw_ctx:win_text('This window will also be shown whenever the options are shown.')
         additionaloption = draw_ctx:win_check('Additional checkbox', additionaloption)
     end)
-    if draw_ctx:win_button('Set A to 123') then
-        options.a = 123
-    end
+    options.a = draw_ctx:win_slider_int('A, but slider', options.a or 100, 100, 200)
     if draw_ctx:win_button('Set B to 1.23') then
         options.b = 1.23
     end

@@ -183,13 +183,14 @@ function register_option_bool(name, desc, long_desc, value) end
 ---@return nil
 function register_option_string(name, desc, long_desc, value) end
 ---Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
----with a double `\0\0` at the end.
+---with a double `\0\0` at the end. `value` is the default index 1..n.
 ---@param name string
 ---@param desc string
 ---@param long_desc string
 ---@param opts string
+---@param value integer
 ---@return nil
-function register_option_combo(name, desc, long_desc, opts) end
+function register_option_combo(name, desc, long_desc, opts, value) end
 ---Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
 ---@param name string
 ---@param desc string
@@ -197,6 +198,11 @@ function register_option_combo(name, desc, long_desc, opts) end
 ---@param on_click fun(): any
 ---@return nil
 function register_option_button(name, desc, long_desc, on_click) end
+---Add custom options using the window drawing functions. Your callback will be called with a GuiDrawContext as a parameter and everything drawn in it will be rendered in the options window and the return value saved to `options[name]`.
+---@param name string
+---@param callback fun(): any
+---@return nil
+function register_option_callback(name, callback) end
 ---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
 ---Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 ---`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
