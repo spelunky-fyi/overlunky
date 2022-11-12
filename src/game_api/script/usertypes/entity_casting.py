@@ -2,8 +2,7 @@ import re
 import json
 import urllib.request
 
-# Parse all Entity::as_xxx functions so we know which ones are currently
-# defined
+# Parse all Entity::as_xxx functions so we know which ones are currently defined
 entities_files = ["entity_lua.cpp",
                   "entities_items_lua.cpp",
                   "entities_chars_lua.cpp", 
@@ -30,8 +29,7 @@ for f in entities_files:
             line = fp.readline()
 
 # Download Spelunky2.json from the x64dbg github repo
-#url =
-#"https://gitcdn.link/repo/spelunky-fyi/Spelunky2X64DbgPlugin/master/resources/Spelunky2.json"
+#url = "https://gitcdn.link/repo/spelunky-fyi/Spelunky2X64DbgPlugin/master/resources/Spelunky2.json"
 url = "https://raw.githubusercontent.com/spelunky-fyi/Spelunky2X64DbgPlugin/master/resources/Spelunky2.json"
 response = urllib.request.urlopen(url)
 spelunky2json = response.read().decode('utf-8')
