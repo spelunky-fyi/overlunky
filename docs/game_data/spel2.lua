@@ -3118,6 +3118,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class Backpack : Movable
     ---@field explosion_trigger boolean
     ---@field explosion_timer integer
+    ---@field trigger_explosion fun(self): nil
 
 ---@class Projectile : Movable
 

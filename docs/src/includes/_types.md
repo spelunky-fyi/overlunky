@@ -4798,6 +4798,7 @@ Type | Name | Description
 ---- | ---- | -----------
 bool | [explosion_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_trigger) | More like on fire trigger, the explosion happens when the timer reaches > 29
 int | [explosion_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_timer) | 
+nil | [trigger_explosion()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_explosion) | 
 
 ### Birdies
 
