@@ -2,7 +2,8 @@ import re
 import json
 import urllib.request
 
-# Parse all Entity::as_xxx functions so we know which ones are currently defined
+# Parse all Entity::as_xxx functions so we know which ones are currently
+# defined
 entities_files = ["entity_lua.cpp",
                   "entities_items_lua.cpp",
                   "entities_chars_lua.cpp", 
@@ -29,7 +30,8 @@ for f in entities_files:
             line = fp.readline()
 
 # Download Spelunky2.json from the x64dbg github repo
-#url = "https://gitcdn.link/repo/spelunky-fyi/Spelunky2X64DbgPlugin/master/resources/Spelunky2.json"
+#url =
+#"https://gitcdn.link/repo/spelunky-fyi/Spelunky2X64DbgPlugin/master/resources/Spelunky2.json"
 url = "https://raw.githubusercontent.com/spelunky-fyi/Spelunky2X64DbgPlugin/master/resources/Spelunky2.json"
 response = urllib.request.urlopen(url)
 spelunky2json = response.read().decode('utf-8')
@@ -56,7 +58,7 @@ def first_base_class(type):
         return entity_class_hierarchy[type]
 
 def linked_type_hierarchy(type, arr):
-    arr.append("[" + type + "](script-api.md#" + type + ")")
+    arr.append("[" + type + "](https://spelunky-fyi.github.io/overlunky/#" + type + ")")
     if type in entity_class_hierarchy:
         parent_type = entity_class_hierarchy[type]
         linked_type_hierarchy(parent_type, arr)
@@ -78,20 +80,20 @@ with open("../../../../docs/game_data/entities.json") as fp:
                 regex_match_found = True
                 as_function = "as_" + entityclass.lower()
 
-                table_def = 'lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["' + as_function + '"];  // '  + short_entityname
-                movable_table_def = 'lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["as_movable"];  // '  + short_entityname + " (NOT IMPLEMENTED YET, FORCED TO MOVABLE)"
+                table_def = 'lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["' + as_function + '"];  // ' + short_entityname
+                movable_table_def = 'lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["as_movable"];  // ' + short_entityname + " (NOT IMPLEMENTED YET, FORCED TO MOVABLE)"
 
                 if as_function not in known_casts or as_function == "as_entity":
                     if as_function == "as_entity":
                         mapping[entitydetails["id"]] = "// " + table_def + " (plain entity)"
-                        doc_entry = doc_entry + "[Entity](script-api.md#Entity)"
+                        doc_entry = doc_entry + "[Entity](https://spelunky-fyi.github.io/overlunky/#Entity)"
                     elif is_movable(entityclass):
                         mapping[entitydetails["id"]] = movable_table_def
                         derived_mapping[entityclass] = "as_entity"
-                        doc_entry = doc_entry + "[Entity](script-api.md#Entity) > [Movable](script-api.md#Movable) - NOT IMPLEMENTED YET, FORCED TO MOVABLE"
+                        doc_entry = doc_entry + "[Entity](https://spelunky-fyi.github.io/overlunky/#Entity) > [Movable](https://spelunky-fyi.github.io/overlunky/#Movable) - NOT IMPLEMENTED YET, FORCED TO MOVABLE"
                     else:
                         mapping[entitydetails["id"]] = "// " + table_def + " (NOT IMPLEMENTED YET)"
-                        doc_entry = doc_entry + "[Entity](script-api.md#Entity) - NOT IMPLEMENTED YET"
+                        doc_entry = doc_entry + "[Entity](https://spelunky-fyi.github.io/overlunky/#Entity) - NOT IMPLEMENTED YET"
                 else:
                     mapping[entitydetails["id"]] = table_def
 
@@ -107,8 +109,8 @@ with open("../../../../docs/game_data/entities.json") as fp:
 
                 break
         if not regex_match_found:
-            mapping[entitydetails["id"]] = '// lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["?"]; // '  + short_entityname + ' (UNKNOWN IN PLUGIN)'
-            doc_entry = doc_entry + "[Entity](script-api.md#Entity) - UNKNOWN IN PLUGIN"
+            mapping[entitydetails["id"]] = '// lua["TYPE_MAP"][' + str(entitydetails["id"]) + '] = lua["Entity"]["?"]; // ' + short_entityname + ' (UNKNOWN IN PLUGIN)'
+            doc_entry = doc_entry + "[Entity](https://spelunky-fyi.github.io/overlunky/#Entity) - UNKNOWN IN PLUGIN"
         
         hierarchy_doc_entries.append(doc_entry)
 
