@@ -1108,7 +1108,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
         { return a.id < b.id; });
 
     std::filesystem::create_directories("game_data");
-    
+
     if (std::ofstream entities_file = std::ofstream("game_data/entities.json"))
     {
         float_json entities(float_json::object());
