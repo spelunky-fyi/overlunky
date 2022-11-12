@@ -25,253 +25,131 @@ namespace NState
 {
 void register_usertypes(sol::state& lua)
 {
-    lua.new_usertype<ArenaConfigArenas>(
-        "ArenaConfigArenas",
-        "dwelling_1",
-        &ArenaConfigArenas::dwelling_1,
-        "dwelling_2",
-        &ArenaConfigArenas::dwelling_2,
-        "dwelling_3",
-        &ArenaConfigArenas::dwelling_3,
-        "dwelling_4",
-        &ArenaConfigArenas::dwelling_4,
-        "dwelling_5",
-        &ArenaConfigArenas::dwelling_5,
-        "jungle_1",
-        &ArenaConfigArenas::jungle_1,
-        "jungle_2",
-        &ArenaConfigArenas::jungle_2,
-        "jungle_3",
-        &ArenaConfigArenas::jungle_3,
-        "jungle_4",
-        &ArenaConfigArenas::jungle_4,
-        "jungle_5",
-        &ArenaConfigArenas::jungle_5,
-        "volcana_1",
-        &ArenaConfigArenas::volcana_1,
-        "volcana_2",
-        &ArenaConfigArenas::volcana_2,
-        "volcana_3",
-        &ArenaConfigArenas::volcana_3,
-        "volcana_4",
-        &ArenaConfigArenas::volcana_4,
-        "volcana_5",
-        &ArenaConfigArenas::volcana_5,
-        "tidepool_1",
-        &ArenaConfigArenas::tidepool_1,
-        "tidepool_2",
-        &ArenaConfigArenas::tidepool_2,
-        "tidepool_3",
-        &ArenaConfigArenas::tidepool_3,
-        "tidepool_4",
-        &ArenaConfigArenas::tidepool_4,
-        "tidepool_5",
-        &ArenaConfigArenas::tidepool_5,
-        "temple_1",
-        &ArenaConfigArenas::temple_1,
-        "temple_2",
-        &ArenaConfigArenas::temple_2,
-        "temple_3",
-        &ArenaConfigArenas::temple_3,
-        "temple_4",
-        &ArenaConfigArenas::temple_4,
-        "temple_5",
-        &ArenaConfigArenas::temple_5,
-        "icecaves_1",
-        &ArenaConfigArenas::icecaves_1,
-        "icecaves_2",
-        &ArenaConfigArenas::icecaves_2,
-        "icecaves_3",
-        &ArenaConfigArenas::icecaves_3,
-        "icecaves_4",
-        &ArenaConfigArenas::icecaves_4,
-        "icecaves_5",
-        &ArenaConfigArenas::icecaves_5,
-        "neobabylon_1",
-        &ArenaConfigArenas::neobabylon_1,
-        "neobabylon_2",
-        &ArenaConfigArenas::neobabylon_2,
-        "neobabylon_3",
-        &ArenaConfigArenas::neobabylon_3,
-        "neobabylon_4",
-        &ArenaConfigArenas::neobabylon_4,
-        "neobabylon_5",
-        &ArenaConfigArenas::neobabylon_5,
-        "sunkencity_1",
-        &ArenaConfigArenas::sunkencity_1,
-        "sunkencity_2",
-        &ArenaConfigArenas::sunkencity_2,
-        "sunkencity_3",
-        &ArenaConfigArenas::sunkencity_3,
-        "sunkencity_4",
-        &ArenaConfigArenas::sunkencity_4,
-        "sunkencity_5",
-        &ArenaConfigArenas::sunkencity_5);
+    auto arenaconfigarenas_type = lua.new_usertype<ArenaConfigArenas>("ArenaConfigArenas");
+    arenaconfigarenas_type["dwelling_1"] = &ArenaConfigArenas::dwelling_1;
+    arenaconfigarenas_type["dwelling_2"] = &ArenaConfigArenas::dwelling_2;
+    arenaconfigarenas_type["dwelling_3"] = &ArenaConfigArenas::dwelling_3;
+    arenaconfigarenas_type["dwelling_4"] = &ArenaConfigArenas::dwelling_4;
+    arenaconfigarenas_type["dwelling_5"] = &ArenaConfigArenas::dwelling_5;
+    arenaconfigarenas_type["jungle_1"] = &ArenaConfigArenas::jungle_1;
+    arenaconfigarenas_type["jungle_2"] = &ArenaConfigArenas::jungle_2;
+    arenaconfigarenas_type["jungle_3"] = &ArenaConfigArenas::jungle_3;
+    arenaconfigarenas_type["jungle_4"] = &ArenaConfigArenas::jungle_4;
+    arenaconfigarenas_type["jungle_5"] = &ArenaConfigArenas::jungle_5;
+    arenaconfigarenas_type["volcana_1"] = &ArenaConfigArenas::volcana_1;
+    arenaconfigarenas_type["volcana_2"] = &ArenaConfigArenas::volcana_2;
+    arenaconfigarenas_type["volcana_3"] = &ArenaConfigArenas::volcana_3;
+    arenaconfigarenas_type["volcana_4"] = &ArenaConfigArenas::volcana_4;
+    arenaconfigarenas_type["volcana_5"] = &ArenaConfigArenas::volcana_5;
+    arenaconfigarenas_type["tidepool_1"] = &ArenaConfigArenas::tidepool_1;
+    arenaconfigarenas_type["tidepool_2"] = &ArenaConfigArenas::tidepool_2;
+    arenaconfigarenas_type["tidepool_3"] = &ArenaConfigArenas::tidepool_3;
+    arenaconfigarenas_type["tidepool_4"] = &ArenaConfigArenas::tidepool_4;
+    arenaconfigarenas_type["tidepool_5"] = &ArenaConfigArenas::tidepool_5;
+    arenaconfigarenas_type["temple_1"] = &ArenaConfigArenas::temple_1;
+    arenaconfigarenas_type["temple_2"] = &ArenaConfigArenas::temple_2;
+    arenaconfigarenas_type["temple_3"] = &ArenaConfigArenas::temple_3;
+    arenaconfigarenas_type["temple_4"] = &ArenaConfigArenas::temple_4;
+    arenaconfigarenas_type["temple_5"] = &ArenaConfigArenas::temple_5;
+    arenaconfigarenas_type["icecaves_1"] = &ArenaConfigArenas::icecaves_1;
+    arenaconfigarenas_type["icecaves_2"] = &ArenaConfigArenas::icecaves_2;
+    arenaconfigarenas_type["icecaves_3"] = &ArenaConfigArenas::icecaves_3;
+    arenaconfigarenas_type["icecaves_4"] = &ArenaConfigArenas::icecaves_4;
+    arenaconfigarenas_type["icecaves_5"] = &ArenaConfigArenas::icecaves_5;
+    arenaconfigarenas_type["neobabylon_1"] = &ArenaConfigArenas::neobabylon_1;
+    arenaconfigarenas_type["neobabylon_2"] = &ArenaConfigArenas::neobabylon_2;
+    arenaconfigarenas_type["neobabylon_3"] = &ArenaConfigArenas::neobabylon_3;
+    arenaconfigarenas_type["neobabylon_4"] = &ArenaConfigArenas::neobabylon_4;
+    arenaconfigarenas_type["neobabylon_5"] = &ArenaConfigArenas::neobabylon_5;
+    arenaconfigarenas_type["sunkencity_1"] = &ArenaConfigArenas::sunkencity_1;
+    arenaconfigarenas_type["sunkencity_2"] = &ArenaConfigArenas::sunkencity_2;
+    arenaconfigarenas_type["sunkencity_3"] = &ArenaConfigArenas::sunkencity_3;
+    arenaconfigarenas_type["sunkencity_4"] = &ArenaConfigArenas::sunkencity_4;
+    arenaconfigarenas_type["sunkencity_5"] = &ArenaConfigArenas::sunkencity_5;
 
-    lua.new_usertype<ArenaConfigItems>(
-        "ArenaConfigItems",
-        "rock",
-        &ArenaConfigItems::rock,
-        "pot",
-        &ArenaConfigItems::pot,
-        "bombbag",
-        &ArenaConfigItems::bombbag,
-        "bombbox",
-        &ArenaConfigItems::bombbox,
-        "ropepile",
-        &ArenaConfigItems::ropepile,
-        "pickup_12bag",
-        &ArenaConfigItems::pickup_12bag,
-        "pickup_24bag",
-        &ArenaConfigItems::pickup_24bag,
-        "cooked_turkey",
-        &ArenaConfigItems::cooked_turkey,
-        "royal_jelly",
-        &ArenaConfigItems::royal_jelly,
-        "torch",
-        &ArenaConfigItems::torch,
-        "boomerang",
-        &ArenaConfigItems::boomerang,
-        "machete",
-        &ArenaConfigItems::machete,
-        "mattock",
-        &ArenaConfigItems::mattock,
-        "crossbow",
-        &ArenaConfigItems::crossbow,
-        "webgun",
-        &ArenaConfigItems::webgun,
-        "freezeray",
-        &ArenaConfigItems::freezeray,
-        "shotgun",
-        &ArenaConfigItems::shotgun,
-        "camera",
-        &ArenaConfigItems::camera,
-        "plasma_cannon",
-        &ArenaConfigItems::plasma_cannon,
-        "wooden_shield",
-        &ArenaConfigItems::wooden_shield,
-        "metal_shield",
-        &ArenaConfigItems::metal_shield,
-        "teleporter",
-        &ArenaConfigItems::teleporter,
-        "mine",
-        &ArenaConfigItems::mine,
-        "snaptrap",
-        &ArenaConfigItems::snaptrap,
-        "paste",
-        &ArenaConfigItems::paste,
-        "climbing_gloves",
-        &ArenaConfigItems::climbing_gloves,
-        "pitchers_mitt",
-        &ArenaConfigItems::pitchers_mitt,
-        "spike_shoes",
-        &ArenaConfigItems::spike_shoes,
-        "spring_shoes",
-        &ArenaConfigItems::spring_shoes,
-        "parachute",
-        &ArenaConfigItems::parachute,
-        "cape",
-        &ArenaConfigItems::cape,
-        "vlads_cape",
-        &ArenaConfigItems::vlads_cape,
-        "jetpack",
-        &ArenaConfigItems::jetpack,
-        "hoverpack",
-        &ArenaConfigItems::hoverpack,
-        "telepack",
-        &ArenaConfigItems::telepack,
-        "powerpack",
-        &ArenaConfigItems::powerpack,
-        "excalibur",
-        &ArenaConfigItems::excalibur,
-        "scepter",
-        &ArenaConfigItems::scepter,
-        "kapala",
-        &ArenaConfigItems::kapala,
-        "true_crown",
-        &ArenaConfigItems::true_crown);
+    auto arenaconfigitems_type = lua.new_usertype<ArenaConfigItems>("ArenaConfigItems");
+    arenaconfigitems_type["rock"] = &ArenaConfigItems::rock;
+    arenaconfigitems_type["pot"] = &ArenaConfigItems::pot;
+    arenaconfigitems_type["bombbag"] = &ArenaConfigItems::bombbag;
+    arenaconfigitems_type["bombbox"] = &ArenaConfigItems::bombbox;
+    arenaconfigitems_type["ropepile"] = &ArenaConfigItems::ropepile;
+    arenaconfigitems_type["pickup_12bag"] = &ArenaConfigItems::pickup_12bag;
+    arenaconfigitems_type["pickup_24bag"] = &ArenaConfigItems::pickup_24bag;
+    arenaconfigitems_type["cooked_turkey"] = &ArenaConfigItems::cooked_turkey;
+    arenaconfigitems_type["royal_jelly"] = &ArenaConfigItems::royal_jelly;
+    arenaconfigitems_type["torch"] = &ArenaConfigItems::torch;
+    arenaconfigitems_type["boomerang"] = &ArenaConfigItems::boomerang;
+    arenaconfigitems_type["machete"] = &ArenaConfigItems::machete;
+    arenaconfigitems_type["mattock"] = &ArenaConfigItems::mattock;
+    arenaconfigitems_type["crossbow"] = &ArenaConfigItems::crossbow;
+    arenaconfigitems_type["webgun"] = &ArenaConfigItems::webgun;
+    arenaconfigitems_type["freezeray"] = &ArenaConfigItems::freezeray;
+    arenaconfigitems_type["shotgun"] = &ArenaConfigItems::shotgun;
+    arenaconfigitems_type["camera"] = &ArenaConfigItems::camera;
+    arenaconfigitems_type["plasma_cannon"] = &ArenaConfigItems::plasma_cannon;
+    arenaconfigitems_type["wooden_shield"] = &ArenaConfigItems::wooden_shield;
+    arenaconfigitems_type["metal_shield"] = &ArenaConfigItems::metal_shield;
+    arenaconfigitems_type["teleporter"] = &ArenaConfigItems::teleporter;
+    arenaconfigitems_type["mine"] = &ArenaConfigItems::mine;
+    arenaconfigitems_type["snaptrap"] = &ArenaConfigItems::snaptrap;
+    arenaconfigitems_type["paste"] = &ArenaConfigItems::paste;
+    arenaconfigitems_type["climbing_gloves"] = &ArenaConfigItems::climbing_gloves;
+    arenaconfigitems_type["pitchers_mitt"] = &ArenaConfigItems::pitchers_mitt;
+    arenaconfigitems_type["spike_shoes"] = &ArenaConfigItems::spike_shoes;
+    arenaconfigitems_type["spring_shoes"] = &ArenaConfigItems::spring_shoes;
+    arenaconfigitems_type["parachute"] = &ArenaConfigItems::parachute;
+    arenaconfigitems_type["cape"] = &ArenaConfigItems::cape;
+    arenaconfigitems_type["vlads_cape"] = &ArenaConfigItems::vlads_cape;
+    arenaconfigitems_type["jetpack"] = &ArenaConfigItems::jetpack;
+    arenaconfigitems_type["hoverpack"] = &ArenaConfigItems::hoverpack;
+    arenaconfigitems_type["telepack"] = &ArenaConfigItems::telepack;
+    arenaconfigitems_type["powerpack"] = &ArenaConfigItems::powerpack;
+    arenaconfigitems_type["excalibur"] = &ArenaConfigItems::excalibur;
+    arenaconfigitems_type["scepter"] = &ArenaConfigItems::scepter;
+    arenaconfigitems_type["kapala"] = &ArenaConfigItems::kapala;
+    arenaconfigitems_type["true_crown"] = &ArenaConfigItems::true_crown;
 
-    lua.new_usertype<ArenaConfigEquippedItems>(
-        "ArenaConfigEquippedItems",
-        "paste",
-        &ArenaConfigEquippedItems::paste,
-        "climbing_gloves",
-        &ArenaConfigEquippedItems::climbing_gloves,
-        "pitchers_mitt",
-        &ArenaConfigEquippedItems::pitchers_mitt,
-        "spike_shoes",
-        &ArenaConfigEquippedItems::spike_shoes,
-        "spring_shoes",
-        &ArenaConfigEquippedItems::spring_shoes,
-        "parachute",
-        &ArenaConfigEquippedItems::parachute,
-        "kapala",
-        &ArenaConfigEquippedItems::kapala,
-        "scepter",
-        &ArenaConfigEquippedItems::scepter);
+    auto arenaconfigequippeditems_type = lua.new_usertype<ArenaConfigEquippedItems>("ArenaConfigEquippedItems");
+    arenaconfigequippeditems_type["paste"] = &ArenaConfigEquippedItems::paste;
+    arenaconfigequippeditems_type["climbing_gloves"] = &ArenaConfigEquippedItems::climbing_gloves;
+    arenaconfigequippeditems_type["pitchers_mitt"] = &ArenaConfigEquippedItems::pitchers_mitt;
+    arenaconfigequippeditems_type["spike_shoes"] = &ArenaConfigEquippedItems::spike_shoes;
+    arenaconfigequippeditems_type["spring_shoes"] = &ArenaConfigEquippedItems::spring_shoes;
+    arenaconfigequippeditems_type["parachute"] = &ArenaConfigEquippedItems::parachute;
+    arenaconfigequippeditems_type["kapala"] = &ArenaConfigEquippedItems::kapala;
+    arenaconfigequippeditems_type["scepter"] = &ArenaConfigEquippedItems::scepter;
 
-    lua.new_usertype<ArenaState>(
-        "ArenaState",
-        "current_arena",
-        &ArenaState::current_arena,
-        "player_teams",
-        &ArenaState::player_teams,
-        "format",
-        &ArenaState::format,
-        "ruleset",
-        &ArenaState::ruleset,
-        "player_lives",
-        &ArenaState::player_lives,
-        "player_totalwins",
-        &ArenaState::player_totalwins,
-        "player_won",
-        &ArenaState::player_won,
-        "timer",
-        &ArenaState::timer,
-        "timer_ending",
-        &ArenaState::timer_ending,
-        "wins",
-        &ArenaState::wins,
-        "lives",
-        &ArenaState::lives,
-        "player_idolheld_countdown",
-        &ArenaState::player_idolheld_countdown,
-        "health",
-        &ArenaState::health,
-        "bombs",
-        &ArenaState::bombs,
-        "ropes",
-        &ArenaState::ropes,
-        "stun_time",
-        &ArenaState::stun_time,
-        "mount",
-        &ArenaState::mount,
-        "arena_select",
-        &ArenaState::arena_select,
-        "arenas",
-        &ArenaState::arenas,
-        "dark_level_chance",
-        &ArenaState::dark_level_chance,
-        "crate_frequency",
-        &ArenaState::crate_frequency,
-        "items_enabled",
-        &ArenaState::items_enabled,
-        "items_in_crate",
-        &ArenaState::items_in_crate,
-        "held_item",
-        &ArenaState::held_item,
-        "equipped_backitem",
-        &ArenaState::equipped_backitem,
-        "equipped_items",
-        &ArenaState::equipped_items,
-        "whip_damage",
-        &ArenaState::whip_damage,
-        "final_ghost",
-        &ArenaState::final_ghost,
-        "breath_cooldown",
-        &ArenaState::breath_cooldown,
-        "punish_ball",
-        &ArenaState::punish_ball);
+    auto arenastate_type = lua.new_usertype<ArenaState>("ArenaState");
+    arenastate_type["current_arena"] = &ArenaState::current_arena;
+    arenastate_type["player_teams"] = &ArenaState::player_teams;
+    arenastate_type["format"] = &ArenaState::format;
+    arenastate_type["ruleset"] = &ArenaState::ruleset;
+    arenastate_type["player_lives"] = &ArenaState::player_lives;
+    arenastate_type["player_totalwins"] = &ArenaState::player_totalwins;
+    arenastate_type["player_won"] = &ArenaState::player_won;
+    arenastate_type["timer"] = &ArenaState::timer;
+    arenastate_type["timer_ending"] = &ArenaState::timer_ending;
+    arenastate_type["wins"] = &ArenaState::wins;
+    arenastate_type["lives"] = &ArenaState::lives;
+    arenastate_type["player_idolheld_countdown"] = &ArenaState::player_idolheld_countdown;
+    arenastate_type["health"] = &ArenaState::health;
+    arenastate_type["bombs"] = &ArenaState::bombs;
+    arenastate_type["ropes"] = &ArenaState::ropes;
+    arenastate_type["stun_time"] = &ArenaState::stun_time;
+    arenastate_type["mount"] = &ArenaState::mount;
+    arenastate_type["arena_select"] = &ArenaState::arena_select;
+    arenastate_type["arenas"] = &ArenaState::arenas;
+    arenastate_type["dark_level_chance"] = &ArenaState::dark_level_chance;
+    arenastate_type["crate_frequency"] = &ArenaState::crate_frequency;
+    arenastate_type["items_enabled"] = &ArenaState::items_enabled;
+    arenastate_type["items_in_crate"] = &ArenaState::items_in_crate;
+    arenastate_type["held_item"] = &ArenaState::held_item;
+    arenastate_type["equipped_backitem"] = &ArenaState::equipped_backitem;
+    arenastate_type["equipped_items"] = &ArenaState::equipped_items;
+    arenastate_type["whip_damage"] = &ArenaState::whip_damage;
+    arenastate_type["final_ghost"] = &ArenaState::final_ghost;
+    arenastate_type["breath_cooldown"] = &ArenaState::breath_cooldown;
+    arenastate_type["punish_ball"] = &ArenaState::punish_ball;
 
     lua.new_usertype<SelectPlayerSlot>(
         "SelectPlayerSlot",
@@ -360,228 +238,105 @@ void register_usertypes(sol::state& lua)
         "STAGNANT_LAVA",
         5);
 
-    auto state_usertype = lua.new_usertype<StateMemory>(
-        "StateMemory",
-        "screen_last",
-        &StateMemory::screen_last,
-        "screen",
-        &StateMemory::screen,
-        "screen_next",
-        &StateMemory::screen_next,
-        "ingame",
-        &StateMemory::ingame,
-        "playing",
-        &StateMemory::playing,
-        "pause",
-        &StateMemory::pause,
-        "width",
-        &StateMemory::w,
-        "height",
-        &StateMemory::h,
-        "kali_favor",
-        &StateMemory::kali_favor,
-        "kali_status",
-        &StateMemory::kali_status,
-        "kali_altars_destroyed",
-        &StateMemory::kali_altars_destroyed,
-        "kali_gifts",
-        &StateMemory::kali_gifts,
-        "seed",
-        &StateMemory::seed,
-        "time_total",
-        &StateMemory::time_total,
-        "world",
-        &StateMemory::world,
-        "world_next",
-        &StateMemory::world_next,
-        "world_start",
-        &StateMemory::world_start,
-        "level",
-        &StateMemory::level,
-        "level_next",
-        &StateMemory::level_next,
-        "level_start",
-        &StateMemory::level_start,
-        "theme",
-        &StateMemory::theme,
-        "theme_next",
-        &StateMemory::theme_next,
-        "theme_start",
-        &StateMemory::theme_start,
-        "force_current_theme",
-        &StateMemory::force_current_theme,
-        "shoppie_aggro",
-        &StateMemory::shoppie_aggro,
-        "shoppie_aggro_next",
-        &StateMemory::shoppie_aggro_levels,
-        "merchant_aggro",
-        &StateMemory::merchant_aggro,
-        "kills_npc",
-        &StateMemory::kills_npc,
-        "level_count",
-        &StateMemory::level_count,
-        "damage_taken",
-        &StateMemory::damage_taken,
-        "journal_flags",
-        &StateMemory::journal_flags,
-        "time_last_level",
-        &StateMemory::time_last_level,
-        "time_level",
-        &StateMemory::time_level,
-        "level_flags",
-        &StateMemory::level_flags,
-        "loading",
-        &StateMemory::loading,
-        "quest_flags",
-        &StateMemory::quest_flags,
-        "presence_flags",
-        &StateMemory::presence_flags,
-        "fadevalue",
-        &StateMemory::fadevalue,
-        "fadeout",
-        &StateMemory::fadeout,
-        "fadein",
-        &StateMemory::fadein,
-        "loading_black_screen_timer",
-        &StateMemory::loading_black_screen_timer,
-        "saved_dogs",
-        &StateMemory::saved_dogs,
-        "saved_cats",
-        &StateMemory::saved_cats,
-        "saved_hamsters",
-        &StateMemory::saved_hamsters,
-        "win_state",
-        &StateMemory::win_state,
-        "illumination",
-        &StateMemory::illumination,
-        "money_last_levels",
-        &StateMemory::money_last_levels,
-        "money_shop_total",
-        &StateMemory::money_shop_total,
-        "player_inputs",
-        sol::readonly(&StateMemory::player_inputs),
-        "quests",
-        &StateMemory::quests,
-        "camera",
-        &StateMemory::camera,
-        "special_visibility_flags",
-        &StateMemory::special_visibility_flags,
-        "cause_of_death",
-        &StateMemory::cause_of_death,
-        "cause_of_death_entity_type",
-        &StateMemory::cause_of_death_entity_type,
-        "toast_timer",
-        &StateMemory::toast_timer,
-        "speechbubble_timer",
-        &StateMemory::speechbubble_timer,
-        "speechbubble_owner",
-        &StateMemory::speechbubble_owner,
-        "level_gen",
-        &StateMemory::level_gen,
-        "correct_ushabti",
-        &StateMemory::correct_ushabti,
-        "items",
-        &StateMemory::items,
-        "camera_layer",
-        &StateMemory::camera_layer,
-        "screen_team_select",
-        &StateMemory::screen_team_select,
-        "screen_character_select",
-        &StateMemory::screen_character_select,
-        "screen_transition",
-        &StateMemory::screen_transition,
-        "screen_death",
-        &StateMemory::screen_death,
-        "screen_win",
-        &StateMemory::screen_win,
-        "screen_credits",
-        &StateMemory::screen_credits,
-        "screen_scores",
-        &StateMemory::screen_scores,
-        "screen_constellation",
-        &StateMemory::screen_constellation,
-        "screen_recap",
-        &StateMemory::screen_recap,
-        "screen_arena_stages_select",
-        &StateMemory::screen_arena_stages_select1,
-        "screen_arena_intro",
-        &StateMemory::screen_arena_intro,
-        "screen_arena_level",
-        &StateMemory::screen_arena_level,
-        "screen_arena_score",
-        &StateMemory::screen_arena_score,
-        "screen_arena_menu",
-        &StateMemory::screen_arena_menu,
-        "screen_arena_items",
-        &StateMemory::screen_arena_items,
-        "get_correct_ushabti",
-        &StateMemory::get_correct_ushabti,
-        "set_correct_ushabti",
-        &StateMemory::set_correct_ushabti,
-        "arena",
-        &StateMemory::arena,
-        /* state got so big that adding stuff here will couse `compiler out of heap space`
-        * to solve this, we add stuff in this comment for the autodoc, and then for real below to the `state_usertype`
-        * lol maybe we should remove this house of cards then and add stuff in a way that doesn't break the compiler when you add one little thing. and fix the autodoc.
-
-        "speedrun_character",
-        &StateMemory::speedrun_character,
-        "speedrun_activation_trigger",
-        &StateMemory::speedrun_activation_trigger,
-        "end_spaceship_character",
-        &StateMemory::end_spaceship_character,
-        "world2_coffin_spawned",
-        &StateMemory::world2_coffin_spawned,
-        "world4_coffin_spawned",
-        &StateMemory::world4_coffin_spawned,
-        "world6_coffin_spawned",
-        &StateMemory::world6_coffin_spawned,
-        "first_damage_cause",
-        &StateMemory::first_damage_cause,
-        "first_damage_world",
-        &StateMemory::first_damage_world,
-        "first_damage_level",
-        &StateMemory::first_damage_level,
-        "time_speedrun",
-        &StateMemory::time_speedrun,
-        "coffin_contents",
-        &StateMemory::coffin_contents,
-        "screen_change_counter",
-        &StateMemory::screen_change_counter,
-        "time_startup",
-        &StateMemory::time_startup,
-        "storage_uid",
-        &StateMemory::waddler_floor_storage,
-        "waddler_storage",
-        &StateMemory::waddler_storage,
-        "waddler_metadata",
-        &StateMemory::waddler_storage_meta,
-        "theme_info",
-        &StateMemory::current_theme,
-
-        */
-        "logic",
-        &StateMemory::logic,
-        "liquid",
-        &StateMemory::liquid_physics); // had to have something at the at for the "comma" before the big comment block
-
-    state_usertype["speedrun_character"] = &StateMemory::speedrun_character;
-    state_usertype["speedrun_activation_trigger"] = &StateMemory::speedrun_activation_trigger;
-    state_usertype["end_spaceship_character"] = &StateMemory::end_spaceship_character;
-    state_usertype["world2_coffin_spawned"] = &StateMemory::world2_coffin_spawned;
-    state_usertype["world4_coffin_spawned"] = &StateMemory::world4_coffin_spawned;
-    state_usertype["world6_coffin_spawned"] = &StateMemory::world6_coffin_spawned;
-    state_usertype["first_damage_cause"] = &StateMemory::first_damage_cause;
-    state_usertype["first_damage_world"] = &StateMemory::first_damage_world;
-    state_usertype["first_damage_level"] = &StateMemory::first_damage_level;
-    state_usertype["time_speedrun"] = &StateMemory::time_speedrun;
-    state_usertype["coffin_contents"] = &StateMemory::coffin_contents;
-    state_usertype["screen_change_counter"] = &StateMemory::screen_change_counter;
-    state_usertype["time_startup"] = &StateMemory::time_startup;
-    state_usertype["storage_uid"] = &StateMemory::waddler_floor_storage;
-    state_usertype["waddler_storage"] = &StateMemory::waddler_storage;
-    state_usertype["waddler_metadata"] = &StateMemory::waddler_storage_meta;
-    state_usertype["theme_info"] = &StateMemory::current_theme;
+    auto statememory_type = lua.new_usertype<StateMemory>("StateMemory");
+    statememory_type["screen_last"] = &StateMemory::screen_last;
+    statememory_type["screen"] = &StateMemory::screen;
+    statememory_type["screen_next"] = &StateMemory::screen_next;
+    statememory_type["ingame"] = &StateMemory::ingame;
+    statememory_type["playing"] = &StateMemory::playing;
+    statememory_type["pause"] = &StateMemory::pause;
+    statememory_type["width"] = &StateMemory::w;
+    statememory_type["height"] = &StateMemory::h;
+    statememory_type["kali_favor"] = &StateMemory::kali_favor;
+    statememory_type["kali_status"] = &StateMemory::kali_status;
+    statememory_type["kali_altars_destroyed"] = &StateMemory::kali_altars_destroyed;
+    statememory_type["kali_gifts"] = &StateMemory::kali_gifts;
+    statememory_type["seed"] = &StateMemory::seed;
+    statememory_type["time_total"] = &StateMemory::time_total;
+    statememory_type["world"] = &StateMemory::world;
+    statememory_type["world_next"] = &StateMemory::world_next;
+    statememory_type["world_start"] = &StateMemory::world_start;
+    statememory_type["level"] = &StateMemory::level;
+    statememory_type["level_next"] = &StateMemory::level_next;
+    statememory_type["level_start"] = &StateMemory::level_start;
+    statememory_type["theme"] = &StateMemory::theme;
+    statememory_type["theme_next"] = &StateMemory::theme_next;
+    statememory_type["theme_start"] = &StateMemory::theme_start;
+    statememory_type["force_current_theme"] = &StateMemory::force_current_theme;
+    statememory_type["shoppie_aggro"] = &StateMemory::shoppie_aggro;
+    statememory_type["shoppie_aggro_next"] = &StateMemory::shoppie_aggro_levels;
+    statememory_type["merchant_aggro"] = &StateMemory::merchant_aggro;
+    statememory_type["kills_npc"] = &StateMemory::kills_npc;
+    statememory_type["level_count"] = &StateMemory::level_count;
+    statememory_type["damage_taken"] = &StateMemory::damage_taken;
+    statememory_type["journal_flags"] = &StateMemory::journal_flags;
+    statememory_type["time_last_level"] = &StateMemory::time_last_level;
+    statememory_type["time_level"] = &StateMemory::time_level;
+    statememory_type["level_flags"] = &StateMemory::level_flags;
+    statememory_type["loading"] = &StateMemory::loading;
+    statememory_type["quest_flags"] = &StateMemory::quest_flags;
+    statememory_type["presence_flags"] = &StateMemory::presence_flags;
+    statememory_type["fadevalue"] = &StateMemory::fadevalue;
+    statememory_type["fadeout"] = &StateMemory::fadeout;
+    statememory_type["fadein"] = &StateMemory::fadein;
+    statememory_type["loading_black_screen_timer"] = &StateMemory::loading_black_screen_timer;
+    statememory_type["saved_dogs"] = &StateMemory::saved_dogs;
+    statememory_type["saved_cats"] = &StateMemory::saved_cats;
+    statememory_type["saved_hamsters"] = &StateMemory::saved_hamsters;
+    statememory_type["win_state"] = &StateMemory::win_state;
+    statememory_type["illumination"] = &StateMemory::illumination;
+    statememory_type["money_last_levels"] = &StateMemory::money_last_levels;
+    statememory_type["money_shop_total"] = &StateMemory::money_shop_total;
+    statememory_type["player_inputs"] = sol::readonly(&StateMemory::player_inputs);
+    statememory_type["quests"] = &StateMemory::quests;
+    statememory_type["camera"] = &StateMemory::camera;
+    statememory_type["special_visibility_flags"] = &StateMemory::special_visibility_flags;
+    statememory_type["cause_of_death"] = &StateMemory::cause_of_death;
+    statememory_type["cause_of_death_entity_type"] = &StateMemory::cause_of_death_entity_type;
+    statememory_type["toast_timer"] = &StateMemory::toast_timer;
+    statememory_type["speechbubble_timer"] = &StateMemory::speechbubble_timer;
+    statememory_type["speechbubble_owner"] = &StateMemory::speechbubble_owner;
+    statememory_type["level_gen"] = &StateMemory::level_gen;
+    statememory_type["correct_ushabti"] = &StateMemory::correct_ushabti;
+    statememory_type["items"] = &StateMemory::items;
+    statememory_type["camera_layer"] = &StateMemory::camera_layer;
+    statememory_type["screen_team_select"] = &StateMemory::screen_team_select;
+    statememory_type["screen_character_select"] = &StateMemory::screen_character_select;
+    statememory_type["screen_transition"] = &StateMemory::screen_transition;
+    statememory_type["screen_death"] = &StateMemory::screen_death;
+    statememory_type["screen_win"] = &StateMemory::screen_win;
+    statememory_type["screen_credits"] = &StateMemory::screen_credits;
+    statememory_type["screen_scores"] = &StateMemory::screen_scores;
+    statememory_type["screen_constellation"] = &StateMemory::screen_constellation;
+    statememory_type["screen_recap"] = &StateMemory::screen_recap;
+    statememory_type["screen_arena_stages_select"] = &StateMemory::screen_arena_stages_select1;
+    statememory_type["screen_arena_intro"] = &StateMemory::screen_arena_intro;
+    statememory_type["screen_arena_level"] = &StateMemory::screen_arena_level;
+    statememory_type["screen_arena_score"] = &StateMemory::screen_arena_score;
+    statememory_type["screen_arena_menu"] = &StateMemory::screen_arena_menu;
+    statememory_type["screen_arena_items"] = &StateMemory::screen_arena_items;
+    statememory_type["get_correct_ushabti"] = &StateMemory::get_correct_ushabti;
+    statememory_type["set_correct_ushabti"] = &StateMemory::set_correct_ushabti;
+    statememory_type["arena"] = &StateMemory::arena;
+    statememory_type["speedrun_character"] = &StateMemory::speedrun_character;
+    statememory_type["speedrun_activation_trigger"] = &StateMemory::speedrun_activation_trigger;
+    statememory_type["end_spaceship_character"] = &StateMemory::end_spaceship_character;
+    statememory_type["world2_coffin_spawned"] = &StateMemory::world2_coffin_spawned;
+    statememory_type["world4_coffin_spawned"] = &StateMemory::world4_coffin_spawned;
+    statememory_type["world6_coffin_spawned"] = &StateMemory::world6_coffin_spawned;
+    statememory_type["first_damage_cause"] = &StateMemory::first_damage_cause;
+    statememory_type["first_damage_world"] = &StateMemory::first_damage_world;
+    statememory_type["first_damage_level"] = &StateMemory::first_damage_level;
+    statememory_type["time_speedrun"] = &StateMemory::time_speedrun;
+    statememory_type["coffin_contents"] = &StateMemory::coffin_contents;
+    statememory_type["screen_change_counter"] = &StateMemory::screen_change_counter;
+    statememory_type["time_startup"] = &StateMemory::time_startup;
+    statememory_type["storage_uid"] = &StateMemory::waddler_floor_storage;
+    statememory_type["waddler_storage"] = &StateMemory::waddler_storage;
+    statememory_type["waddler_metadata"] = &StateMemory::waddler_storage_meta;
+    statememory_type["theme_info"] = &StateMemory::current_theme;
+    statememory_type["logic"] = &StateMemory::logic;
+    statememory_type["liquid"] = &StateMemory::liquid_physics;
 
     lua.new_usertype<LightParams>(
         "LightParams",
@@ -593,83 +348,47 @@ void register_usertypes(sol::state& lua)
         &LightParams::blue,
         "size",
         &LightParams::size);
-    lua.new_usertype<Illumination>(
-        "Illumination",
-        "lights",
-        &Illumination::lights,
-        "light1",
-        &Illumination::light1,
-        "light2",
-        &Illumination::light2,
-        "light3",
-        &Illumination::light3,
-        "light4",
-        &Illumination::light4,
-        "brightness",
-        &Illumination::brightness,
-        "brightness_multiplier",
-        &Illumination::brightness_multiplier,
-        "light_pos_x",
-        &Illumination::light_pos_x,
-        "light_pos_y",
-        &Illumination::light_pos_y,
-        "offset_x",
-        &Illumination::offset_x,
-        "offset_y",
-        &Illumination::offset_y,
-        "distortion",
-        &Illumination::distortion,
-        "entity_uid",
-        &Illumination::entity_uid,
-        "flags",
-        &Illumination::flags,
-        "type_flags",
-        &Illumination::type_flags,
-        "enabled",
-        &Illumination::enabled,
-        "layer",
-        &Illumination::layer);
 
-    lua.new_usertype<Camera>(
-        "Camera",
-        "bounds_left",
-        &Camera::bounds_left,
-        "bounds_right",
-        &Camera::bounds_right,
-        "bounds_bottom",
-        &Camera::bounds_bottom,
-        "bounds_top",
-        &Camera::bounds_top,
-        "adjusted_focus_x",
-        &Camera::adjusted_focus_x,
-        "adjusted_focus_y",
-        &Camera::adjusted_focus_y,
-        "focus_offset_x",
-        &Camera::focus_offset_x,
-        "focus_offset_y",
-        &Camera::focus_offset_y,
-        "focus_x",
-        &Camera::focus_x,
-        "focus_y",
-        &Camera::focus_y,
-        "vertical_pan",
-        &Camera::vertical_pan,
-        "shake_countdown_start",
-        &Camera::shake_countdown_start,
-        "shake_countdown",
-        &Camera::shake_countdown,
-        "shake_amplitude",
-        &Camera::shake_amplitude,
-        "shake_multiplier_x",
-        &Camera::shake_multiplier_x,
-        "shake_multiplier_y",
-        &Camera::shake_multiplier_y,
-        "uniform_shake",
-        &Camera::uniform_shake,
-        "focused_entity_uid",
-        &Camera::focused_entity_uid,
-        "inertia",
-        &Camera::inertia);
+    auto illumination_type = lua.new_usertype<Illumination>("Illumination");
+    illumination_type["lights"] = &Illumination::lights;
+    illumination_type["light1"] = &Illumination::light1;
+    illumination_type["light2"] = &Illumination::light2;
+    illumination_type["light3"] = &Illumination::light3;
+    illumination_type["light4"] = &Illumination::light4;
+    illumination_type["brightness"] = &Illumination::brightness;
+    illumination_type["brightness_multiplier"] = &Illumination::brightness_multiplier;
+    illumination_type["light_pos_x"] = &Illumination::light_pos_x;
+    illumination_type["light_pos_y"] = &Illumination::light_pos_y;
+    illumination_type["offset_x"] = &Illumination::offset_x;
+    illumination_type["offset_y"] = &Illumination::offset_y;
+    illumination_type["distortion"] = &Illumination::distortion;
+    illumination_type["entity_uid"] = &Illumination::entity_uid;
+    illumination_type["flags"] = &Illumination::flags;
+    illumination_type["type_flags"] = &Illumination::type_flags;
+    illumination_type["enabled"] = &Illumination::enabled;
+    illumination_type["layer"] = &Illumination::layer;
+
+    auto camera_type = lua.new_usertype<Camera>("Camera");
+    camera_type["bounds_left"] = &Camera::bounds_left;
+    camera_type["bounds_right"] = &Camera::bounds_right;
+    camera_type["bounds_bottom"] = &Camera::bounds_bottom;
+    camera_type["bounds_top"] = &Camera::bounds_top;
+    camera_type["adjusted_focus_x"] = &Camera::adjusted_focus_x;
+    camera_type["adjusted_focus_y"] = &Camera::adjusted_focus_y;
+    camera_type["focus_offset_x"] = &Camera::focus_offset_x;
+    camera_type["focus_offset_y"] = &Camera::focus_offset_y;
+    camera_type["focus_x"] = &Camera::focus_x;
+    camera_type["focus_y"] = &Camera::focus_y;
+    camera_type["vertical_pan"] = &Camera::vertical_pan;
+    camera_type["shake_countdown_start"] = &Camera::shake_countdown_start;
+    camera_type["shake_countdown"] = &Camera::shake_countdown;
+    camera_type["shake_amplitude"] = &Camera::shake_amplitude;
+    camera_type["shake_multiplier_x"] = &Camera::shake_multiplier_x;
+    camera_type["shake_multiplier_y"] = &Camera::shake_multiplier_y;
+    camera_type["uniform_shake"] = &Camera::uniform_shake;
+    camera_type["focused_entity_uid"] = &Camera::focused_entity_uid;
+    camera_type["inertia"] = &Camera::inertia;
+
     lua.new_usertype<Online>(
         "Online",
         "online_players",
@@ -726,38 +445,22 @@ void register_usertypes(sol::state& lua)
         &LogicTiamatCutscene::timer,
         sol::base_classes,
         sol::bases<Logic>());
-    lua.new_usertype<LogicDiceShop>(
-        "LogicDiceShop",
-        "bet_machine",
-        &LogicDiceShop::bet_machine,
-        "die1",
-        &LogicDiceShop::die1,
-        "die2",
-        &LogicDiceShop::die2,
-        "die_1_value",
-        &LogicDiceShop::die_1_value,
-        "die_2_value",
-        &LogicDiceShop::die_2_value,
-        "prize_dispenser",
-        &LogicDiceShop::prize_dispenser,
-        "prize",
-        &LogicDiceShop::prize,
-        "forcefield",
-        &LogicDiceShop::forcefield,
-        "bet_active",
-        &LogicDiceShop::bet_active,
-        "forcefield_deactivated",
-        &LogicDiceShop::forcefield_deactivated,
-        "boss_angry",
-        &LogicDiceShop::boss_angry,
-        "result_announcement_timer",
-        &LogicDiceShop::result_announcement_timer,
-        "won_prizes_count",
-        &LogicDiceShop::won_prizes_count,
-        "balance",
-        &LogicDiceShop::balance,
-        sol::base_classes,
-        sol::bases<Logic>());
+
+    auto logicdiceshop_type = lua.new_usertype<LogicDiceShop>("LogicDiceShop", sol::base_classes, sol::bases<Logic>());
+    logicdiceshop_type["bet_machine"] = &LogicDiceShop::bet_machine;
+    logicdiceshop_type["die1"] = &LogicDiceShop::die1;
+    logicdiceshop_type["die2"] = &LogicDiceShop::die2;
+    logicdiceshop_type["die_1_value"] = &LogicDiceShop::die_1_value;
+    logicdiceshop_type["die_2_value"] = &LogicDiceShop::die_2_value;
+    logicdiceshop_type["prize_dispenser"] = &LogicDiceShop::prize_dispenser;
+    logicdiceshop_type["prize"] = &LogicDiceShop::prize;
+    logicdiceshop_type["forcefield"] = &LogicDiceShop::forcefield;
+    logicdiceshop_type["bet_active"] = &LogicDiceShop::bet_active;
+    logicdiceshop_type["forcefield_deactivated"] = &LogicDiceShop::forcefield_deactivated;
+    logicdiceshop_type["boss_angry"] = &LogicDiceShop::boss_angry;
+    logicdiceshop_type["result_announcement_timer"] = &LogicDiceShop::result_announcement_timer;
+    logicdiceshop_type["won_prizes_count"] = &LogicDiceShop::won_prizes_count;
+    logicdiceshop_type["balance"] = &LogicDiceShop::balance;
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 

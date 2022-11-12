@@ -15,6 +15,8 @@
 #include "texture.hpp"
 #include "window_api.hpp"
 
+#include <cstring>
+
 SoundManager* g_SoundManager{nullptr};
 SpelunkyConsole* g_Console{nullptr};
 
@@ -200,7 +202,7 @@ void Spelunky_FreeScript(SpelunkyScript* script)
     delete script;
 }
 
-void SpelunkyScipt_ReloadScript(SpelunkyScript* script, const char* file_path)
+void SpelunkyScript_ReloadScript(SpelunkyScript* script, const char* file_path)
 {
     std::string code = read_whole_file(file_path);
     if (!code.empty())
@@ -209,11 +211,11 @@ void SpelunkyScipt_ReloadScript(SpelunkyScript* script, const char* file_path)
     }
 }
 
-bool SpelunkyScipt_IsEnabled(SpelunkyScript* script)
+bool SpelunkyScript_IsEnabled(SpelunkyScript* script)
 {
     return script->is_enabled();
 }
-void SpelunkyScipt_SetEnabled(SpelunkyScript* script, bool enabled)
+void SpelunkyScript_SetEnabled(SpelunkyScript* script, bool enabled)
 {
     script->set_enabled(enabled);
 }
@@ -230,41 +232,40 @@ void SpelunkyScript_DrawOptions(SpelunkyScript* script)
 {
     script->render_options();
 }
-const char* SpelunkyScript_GetResult(SpelunkyScript* script)
+void SpelunkyScript_GetResult(SpelunkyScript* script, char* out_buffer, size_t out_buffer_size)
 {
-    return script->get_result().c_str();
+    const std::string result = script->get_result();
+    strncpy_s(out_buffer, out_buffer_size, result.c_str(), result.size());
 }
-size_t SpelunkyScript_GetNumMessages(SpelunkyScript* script)
+void SpelunkyScript_LoopMessages(SpelunkyScript* script, SpelunkyScript_MessageFun message_fun)
 {
-    return script->get_messages().size();
+    script->loop_messages(
+        [=](const ScriptMessage& message)
+        {
+            message_fun(SpelunkyScriptMessage{
+                message.message.c_str(),
+                static_cast<size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(message.time.time_since_epoch()).count()),
+            });
+        });
 }
-SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, size_t message_idx)
+void SpelunkyScript_GetMeta(SpelunkyScript* script, SpelunkyScript_MetaFun meta_fun)
 {
-    const auto& messages = script->get_messages();
-    if (message_idx < messages.size())
-    {
-        const auto& message = messages[message_idx];
-        return SpelunkyScriptMessage{
-            message.message.c_str(),
-            static_cast<size_t>(std::chrono::duration_cast<std::chrono::milliseconds>(message.time.time_since_epoch()).count()),
-        };
-    }
-    return SpelunkyScriptMessage{};
-}
-SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script)
-{
-    return {
-        script->get_file().c_str(),
-        script->get_name().c_str(),
-        script->get_version().c_str(),
-        script->get_description().c_str(),
-        script->get_author().c_str(),
-        script->get_id().c_str(),
-        script->get_path().c_str(),
-        script->get_filename().c_str(),
-        script->get_unsafe(),
-        script->get_online_safe(),
-    };
+    script->get_meta(
+        [=](const ScriptMeta& meta)
+        {
+            meta_fun(SpelunkyScriptMeta{
+                meta.file.c_str(),
+                meta.name.c_str(),
+                meta.version.c_str(),
+                meta.description.c_str(),
+                meta.author.c_str(),
+                meta.id.c_str(),
+                meta.path.c_str(),
+                meta.filename.c_str(),
+                meta.unsafe,
+                meta.online_safe,
+            });
+        });
 }
 
 SpelunkyConsole* CreateConsole()
@@ -320,22 +321,13 @@ bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* o
     out_buffer[num_written] = '\0';
     return static_cast<size_t>(num_written) < out_buffer_size;
 }
-size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console)
+void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console, SpelunkyConsole_MessageFun message_fun)
 {
-    return console->get_messages().size();
-}
-const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, size_t message_idx)
-{
-    const auto& messages = console->get_messages();
-    if (message_idx < messages.size())
+    const auto& messages = console->consume_messages();
+    for (const auto& message : messages)
     {
-        return messages[message_idx].message.c_str();
+        message_fun(message.message.c_str());
     }
-    return nullptr;
-}
-void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console)
-{
-    console->consume_messages();
 }
 
 bool SpelunkyConsole_HasNewHistory(SpelunkyConsole* console)

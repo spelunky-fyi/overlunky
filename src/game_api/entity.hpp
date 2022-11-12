@@ -21,6 +21,7 @@
 
 struct RenderInfo;
 struct Texture;
+struct SoundMeta;
 
 class Entity;
 class Movable;
@@ -211,7 +212,7 @@ class Entity
     virtual void set_draw_depth(uint8_t draw_depth) = 0;
     virtual void resume_ai() = 0; // works on entities with ai_func != 0; runs when companions are let go from being held. AI resumes anyway in 1.23.3
     virtual float friction() = 0;
-    virtual void v20() = 0;
+    virtual void set_as_sound_source(SoundMeta*) = 0; // update sound position to entity position?
     virtual void remove_item_ptr(Entity*) = 0;
     virtual Entity* get_held_entity() = 0;
     virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", tiggers use self as the first parameter
@@ -242,5 +243,6 @@ std::tuple<float, float> get_velocity(uint32_t uid);
 
 AABB get_hitbox(uint32_t uid, bool use_render_pos);
 
+struct EntityFactory* entity_factory();
 Entity* get_entity_ptr(uint32_t uid);
 Entity* get_entity_ptr_local(uint32_t uid);

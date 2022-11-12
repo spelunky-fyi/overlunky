@@ -1,9 +1,10 @@
 #include "entities_activefloors.hpp"
 
-#include "entity.hpp" // for Entity, to_id, EntityDB, SoundPosition (ptr only)
-#include "items.hpp"  // IWYU pragma: keep
-#include "layer.hpp"  // for EntityList::Range, EntityList, EntityList::Ent...
-#include "search.hpp" // for get_address
+#include "entity.hpp"        // for Entity, to_id, EntityDB
+#include "items.hpp"         // IWYU pragma: keep
+#include "layer.hpp"         // for EntityList::Range, EntityList, EntityList::Ent...
+#include "search.hpp"        // for get_address
+#include "sound_manager.hpp" //
 
 uint8_t Olmec::broken_floaters()
 {
@@ -37,8 +38,8 @@ void Drill::trigger()
     move_state = 6;
     flags = flags & ~(1U << (10 - 1));
 
-    using construct_soundposition_ptr_fun_t = SoundPosition*(uint32_t id, uint32_t unknown);
-    static auto construct_soundposition_ptr_call = (construct_soundposition_ptr_fun_t*)get_address("construct_soundposition_ptr");
-    sound_pos1 = construct_soundposition_ptr_call(0x159, 0);
-    sound_pos2 = construct_soundposition_ptr_call(0x153, 0);
+    using construct_soundposition_ptr_fun_t = SoundMeta*(uint32_t id, bool background_sound);
+    static auto construct_soundposition_ptr_call = (construct_soundposition_ptr_fun_t*)get_address("construct_soundmeta");
+    sound1 = construct_soundposition_ptr_call(0x159, 0);
+    sound2 = construct_soundposition_ptr_call(0x153, 0);
 }

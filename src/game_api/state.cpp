@@ -23,9 +23,10 @@
 #include "savedata.hpp"          // for SaveData
 #include "search.hpp"            // for get_address
 #include "spawn_api.hpp"         // for init_spawn_hooks
-#include "strings.hpp"           // for strings_init
-#include "thread_utils.hpp"      // for OnHeapPointer
-#include "virtual_table.hpp"     // for get_virtual_function_address, VTABLE...
+#include "steam_api.hpp"
+#include "strings.hpp"       // for strings_init
+#include "thread_utils.hpp"  // for OnHeapPointer
+#include "virtual_table.hpp" // for get_virtual_function_address, VTABLE...
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -120,10 +121,10 @@ static bool g_godmode_companions_active = false;
 
 bool is_active_player(Entity* e)
 {
-    auto state = State::get();
+    auto state = State::get().ptr();
     for (uint8_t i = 0; i < MAX_PLAYERS; i++)
     {
-        auto player = state.items()->player(i);
+        auto player = state->items->player(i);
         if (player && player == e)
         {
             return true;
@@ -253,10 +254,11 @@ State& State::get()
         const bool do_hooks = get_do_hooks();
         if (do_hooks)
         {
-            STATE.ptr()->level_gen->init();
+            STATE.ptr_main()->level_gen->init();
             init_spawn_hooks();
             init_behavior_hooks();
             init_render_api_hooks();
+            init_achievement_hooks();
             hook_godmode_functions();
             strings_init();
         }
@@ -266,10 +268,15 @@ State& State::get()
     return STATE;
 }
 
-StateMemory* State::ptr() const
+StateMemory* State::ptr_main() const
 {
     OnHeapPointer<StateMemory> p(read_u64(location));
     return p.decode();
+}
+
+StateMemory* State::ptr() const
+{
+    return ptr_local();
 }
 
 StateMemory* State::ptr_local() const
@@ -337,28 +344,28 @@ void State::zoom(float level)
         switch (roomx)
         {
         case 1:
-            level = 9.50f;
+            level = 9.522f;
             break;
         case 2:
-            level = 16.29f;
+            level = 16.324f;
             break;
         case 3:
-            level = 23.08f;
+            level = 23.126f;
             break;
         case 4:
-            level = 29.87f;
+            level = 29.928f;
             break;
         case 5:
-            level = 36.66f;
+            level = 36.730f;
             break;
         case 6:
-            level = 43.45f;
+            level = 43.532f;
             break;
         case 7:
-            level = 50.24f;
+            level = 50.334f;
             break;
         case 8:
-            level = 57.03f;
+            level = 57.135f;
             break;
         default:
             level = 13.5f;
@@ -466,6 +473,13 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     ptr()->fadein = 5;
     ptr()->win_state = 0;
     ptr()->loading = 1;
+
+    static auto gm = get_game_manager();
+    if (gm->main_menu_music)
+    {
+        gm->main_menu_music->kill(false);
+        gm->main_menu_music = nullptr;
+    }
 }
 
 void State::set_seed(uint32_t seed)
@@ -583,6 +597,10 @@ LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
     return nullptr;
 }
 
+uint32_t State::get_frame_count_main() const
+{
+    return read_u32((size_t)ptr_main() - 0xd0);
+}
 uint32_t State::get_frame_count() const
 {
     return read_u32((size_t)ptr() - 0xd0);
@@ -614,8 +632,8 @@ uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_positio
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
+        auto state = State::get().ptr();
+        auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
             player_position = player->position();
@@ -635,8 +653,8 @@ uint8_t enum_to_layer(const LAYER layer)
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get();
-        auto player = state.items()->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
+        auto state = State::get().ptr();
+        auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
             return player->layer;

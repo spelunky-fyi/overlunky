@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Continuous Integration ${{ matrix.target_name }} ${{ matrix.toolset_name }} ${{ matrix.build_type }}
-    runs-on: windows-2019
+    runs-on: windows-latest
     strategy:
       matrix:
         build_type: [Debug, Release]
@@ -17,7 +17,7 @@ jobs:
         build_dll: [false, true]
         include:
           - toolset_name: MSVC
-            toolset: v142
+            toolset: v143
           - toolset_name: Clang
             toolset: ClangCL
           - build_dll: false

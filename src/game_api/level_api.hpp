@@ -69,6 +69,25 @@ enum class RoomTemplateType
     MachineRoom = 4,
 };
 
+enum class POS_TYPE
+{
+    FLOOR = 0x1,
+    CEILING = 0x2,
+    AIR = 0x4,
+    WALL = 0x8,
+    ALCOVE = 0x10,
+    PIT = 0x20,
+    HOLE = 0x40,
+    WATER = 0x80,
+    LAVA = 0x100,
+    SAFE = 0x200,
+    EMPTY = 0x400,
+    SOLID = 0x800,
+    DEFAULT = 0x1000,
+    WALL_LEFT = 0x2000,
+    WALL_RIGHT = 0x4000,
+};
+
 struct LevelGenData
 {
     void init();
@@ -479,8 +498,8 @@ struct LevelGenSystem
         };
     };
     uint8_t flags;
-    uint8_t unknown39;
-    uint8_t unknown40;
+    uint8_t unknown39; // also flags?
+    uint8_t unknown40; // also flags?
     union
     {
         ShopType shop_types[2];
@@ -521,7 +540,8 @@ struct LevelGenSystem
     ~LevelGenSystem() = delete; // cuz it was complaining
 };
 
-bool default_spawn_is_valid(float x, float y, uint8_t layer);
+bool default_spawn_is_valid(float x, float y, LAYER layer);
+bool position_is_valid(float x, float y, LAYER layer, POS_TYPE flags);
 
 void override_next_levels(std::vector<std::string> next_levels);
 void add_next_levels(std::vector<std::string> next_levels);

@@ -48,7 +48,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [](std::string path) -> sol::optional<CustomSound>
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         if (CustomSound sound = backend->sound_manager->get_sound((backend->get_root_path() / path).string()))
         {
             return sound;
@@ -59,7 +59,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
     lua["get_sound"] = [](std::string path_or_vanilla_sound) -> sol::optional<CustomSound>
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         if (CustomSound event = backend->sound_manager->get_event(path_or_vanilla_sound))
         {
             return event;
@@ -78,13 +78,14 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`
     lua["set_vanilla_sound_callback"] = [](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        auto safe_cb = [backend, cb = std::move(cb)](PlayingSound sound)
+        auto backend_id = LuaBackend::get_calling_backend_id();
+        auto safe_cb = [backend_id, cb = std::move(cb)](PlayingSound sound)
         {
-            std::lock_guard gil_guard{backend->gil};
+            auto backend = LuaBackend::get_backend(backend_id);
             if (backend->get_enabled())
                 backend->handle_function(cb, std::make_unique<PlayingSound>(sound));
         };
+        auto backend = LuaBackend::get_backend(backend_id);
         std::uint32_t id = backend->sound_manager->set_callback(name, std::move(safe_cb), static_cast<FMODStudio::EventCallbackType>(types));
         backend->vanilla_sound_callbacks.push_back(id);
         return id;
@@ -92,7 +93,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Clears a previously set callback
     lua["clear_vanilla_sound_callback"] = [](CallbackId id)
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->sound_manager->clear_callback(id);
         auto it = std::find(backend->vanilla_sound_callbacks.begin(), backend->vanilla_sound_callbacks.end(), id);
         if (it != backend->vanilla_sound_callbacks.end())
@@ -122,10 +123,10 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 
     auto set_callback = [](PlayingSound* sound, sol::function callback)
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        auto safe_cb = [backend, callback = std::move(callback)]()
+        auto backend_id = LuaBackend::get_calling_backend_id();
+        auto safe_cb = [backend_id, callback = std::move(callback)]()
         {
-            std::lock_guard gil_guard{backend->gil};
+            auto backend = LuaBackend::get_backend(backend_id);
             if (backend->get_enabled())
                 backend->handle_function(callback);
         };
@@ -163,6 +164,28 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         &PlayingSound::get_parameter,
         "set_parameter",
         &PlayingSound::set_parameter);
+
+    lua.new_usertype<SoundMeta>(
+        "SoundMeta",
+        "x",
+        &SoundMeta::x,
+        "y",
+        &SoundMeta::y,
+        //"left_channel",
+        //&SoundMeta::left_channel, // TODO: index 0-37 instead of 1-38
+        //"right_channel",
+        //&SoundMeta::right_channel,
+        "start_over",
+        &SoundMeta::start_over,
+        "playing",
+        &SoundMeta::playing);
+
+    lua.new_usertype<BackgroundSound>(
+        "BackgroundSound",
+        sol::base_classes,
+        sol::bases<SoundMeta>());
+
+    lua["play_sound"] = play_sound;
 
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
     lua.create_named_table("SOUND_TYPE", "SFX", 0, "MUSIC", 1);

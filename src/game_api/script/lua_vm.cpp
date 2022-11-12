@@ -84,11 +84,11 @@
 #include "usertypes/socket_lua.hpp"                // for register_usertypes
 #include "usertypes/sound_lua.hpp"                 // for register_usertypes
 #include "usertypes/state_lua.hpp"                 // for register_usertypes
+#include "usertypes/steam_lua.hpp"                 // for register_usertypes
 #include "usertypes/texture_lua.hpp"               // for register_usertypes
 #include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 
 struct Illumination;
-struct PlayerInputs;
 
 void load_libraries(sol::state& lua)
 {
@@ -176,20 +176,24 @@ end
     NEntityFlags::register_usertypes(lua);
     NEntityCasting::register_usertypes(lua);
     NBehavior::register_usertypes(lua);
+    NSteam::register_usertypes(lua);
+
+    StateMemory* main_state = State::get().ptr_main();
+    std::vector<Player*> players = get_players(main_state);
 
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
-    lua["state"] = get_state_ptr();
+    lua["state"] = main_state;
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
     lua["online"] = get_online();
     /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See get_player().
-    lua["players"] = std::vector<Player*>(get_players());
+    lua["players"] = players;
 
     auto get_player = sol::overload(
         [&lua](int8_t slot) -> sol::object // -> Player
         {
-            for (auto player : get_players())
+            for (auto player : get_players(State::get().ptr()))
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);
@@ -198,7 +202,7 @@ end
         },
         [&lua](int8_t slot, bool or_ghost) -> sol::object
         {
-            for (auto player : get_players())
+            for (auto player : get_players(State::get().ptr()))
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);
@@ -238,7 +242,7 @@ end
     /// Print a log message on screen.
     lua["print"] = [](std::string message) -> void
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
         if (backend->messages.size() > 20)
             backend->messages.pop_front();
@@ -248,7 +252,7 @@ end
     /// Print a log message to console.
     lua["console_print"] = [](std::string message) -> void
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->console->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
         if (backend->console->messages.size() > 20)
             backend->console->messages.pop_front();
@@ -300,11 +304,11 @@ end
     /// Adds a command that can be used in the console.
     lua["register_console_command"] = [](std::string name, sol::function cmd)
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         if (backend->console)
         {
             backend->console_commands.insert(name);
-            backend->console->register_command(backend, std::move(name), std::move(cmd));
+            backend->console->register_command(backend.get(), std::move(name), std::move(cmd));
         }
     };
 
@@ -312,7 +316,7 @@ end
     /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         auto luaCb = IntervalCallback{cb, frames, -1};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
@@ -321,7 +325,7 @@ end
     /// Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_timeout"] = [](sol::function cb, int frames) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         int now = backend->g_state->time_level;
         auto luaCb = TimeoutCallback{cb, now + frames};
         backend->level_timers[backend->cbcount] = luaCb;
@@ -331,7 +335,7 @@ end
     /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
     lua["set_global_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         auto luaCb = IntervalCallback{cb, frames, -1};
         backend->global_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
@@ -340,7 +344,7 @@ end
     /// Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
     lua["set_global_timeout"] = [](sol::function cb, int frames) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         int now = get_frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
         backend->global_timers[backend->cbcount] = luaCb;
@@ -350,7 +354,7 @@ end
     /// Add global callback function to be called on an [event](#ON).
     lua["set_callback"] = [](sol::function cb, int screen) -> CallbackId
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         auto luaCb = ScreenCallback{cb, (ON)screen, -1};
         if (luaCb.screen == ON::LOAD)
             backend->load_callbacks[backend->cbcount] = luaCb; // Make sure load always runs before other callbacks
@@ -363,12 +367,12 @@ end
     lua["clear_callback"] = sol::overload(
         [](CallbackId id)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->clear_callbacks.push_back(id);
         },
         []()
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             auto caller = backend->get_current_callback();
             switch (caller.type)
             {
@@ -401,14 +405,15 @@ end
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->required_scripts.push_back(sanitize(id));
-            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)));
-            if (!import_backend)
+            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)));
+            if (!import_backend_opt.has_value())
             {
                 luaL_error(lua, "Imported script not found");
                 return sol::make_object(lua, sol::lua_nil);
             }
+            auto& import_backend = import_backend_opt.value();
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
@@ -418,14 +423,15 @@ end
         },
         [&lua](std::string id, std::string version)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->required_scripts.push_back(sanitize(id));
-            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)), std::string_view(version));
-            if (!import_backend)
+            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)), std::string_view(version));
+            if (!import_backend_opt.has_value())
             {
                 luaL_error(lua, "Imported script not found");
                 return sol::make_object(lua, sol::lua_nil);
             }
+            auto& import_backend = import_backend_opt.value();
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
@@ -435,15 +441,16 @@ end
         },
         [&lua](std::string id, std::string version, bool optional)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->required_scripts.push_back(sanitize(id));
-            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)), std::string_view(version));
-            if (!import_backend)
+            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)), std::string_view(version));
+            if (!import_backend_opt.has_value())
             {
                 if (!optional)
                     luaL_error(lua, "Imported script not found");
                 return sol::make_object(lua, false);
             }
+            auto& import_backend = import_backend_opt.value();
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
@@ -453,15 +460,16 @@ end
         },
         [&lua](std::string id, bool optional)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->required_scripts.push_back(sanitize(id));
-            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)));
-            if (!import_backend)
+            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)));
+            if (!import_backend_opt.has_value())
             {
                 if (!optional)
                     luaL_error(lua, "Imported script not found");
                 return sol::make_object(lua, false);
             }
+            auto& import_backend = import_backend_opt.value();
             if (!import_backend->get_enabled())
             {
                 import_backend->set_enabled(true);
@@ -479,16 +487,18 @@ end
     lua["script_enabled"] = sol::overload(
         [](std::string id)
         {
-            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)));
-            if (!import_backend)
+            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)));
+            if (!import_backend_opt.has_value())
                 return false;
+            auto& import_backend = import_backend_opt.value();
             return import_backend->get_enabled();
         },
         [](std::string id, std::string version)
         {
-            LuaBackend* import_backend = LuaBackend::get_backend_by_id(std::string_view(sanitize(id)), std::string_view(version));
-            if (!import_backend)
+            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)), std::string_view(version));
+            if (!import_backend_opt.has_value())
                 return false;
+            auto& import_backend = import_backend_opt.value();
             return import_backend->get_enabled();
         });
 
@@ -501,7 +511,7 @@ end
     /// Get your sanitized script id to be used in import.
     lua["get_id"] = []() -> std::string
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         return backend->get_id();
     };
 
@@ -530,13 +540,13 @@ end
     lua["register_option_int"] = sol::overload(
         [&lua](std::string name, std::string desc, std::string long_desc, int value, int min, int max)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, IntOption{value, min, max}};
             lua["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, int value, int min, int max)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", IntOption{value, min, max}};
             lua["options"][name] = value;
         });
@@ -546,13 +556,13 @@ end
     lua["register_option_float"] = sol::overload(
         [&lua](std::string name, std::string desc, std::string long_desc, float value, float min, float max)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, FloatOption{value, min, max}};
             lua["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, float value, float min, float max)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", FloatOption{value, min, max}};
             lua["options"][name] = value;
         });
@@ -561,13 +571,13 @@ end
     lua["register_option_bool"] = sol::overload(
         [&lua](std::string name, std::string desc, std::string long_desc, bool value)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, BoolOption{value}};
             lua["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, bool value)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", BoolOption{value}};
             lua["options"][name] = value;
         });
@@ -576,13 +586,13 @@ end
     lua["register_option_string"] = sol::overload(
         [&lua](std::string name, std::string desc, std::string long_desc, std::string value)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, StringOption{value}};
             lua["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, std::string value)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", StringOption{value}};
             lua["options"][name] = value;
         });
@@ -592,13 +602,13 @@ end
     lua["register_option_combo"] = sol::overload(
         [&lua](std::string name, std::string desc, std::string long_desc, std::string opts)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ComboOption{0, opts}};
             lua["options"][name] = 1;
         },
         [&lua](std::string name, std::string desc, std::string opts)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ComboOption{0, opts}};
             lua["options"][name] = 1;
         });
@@ -607,13 +617,13 @@ end
     lua["register_option_button"] = sol::overload(
         [&lua](std::string name, std::string desc, std::string long_desc, sol::function callback)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ButtonOption{callback}};
             lua["options"][name] = -1;
         },
         [&lua](std::string name, std::string desc, sol::function callback)
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ButtonOption{callback}};
             lua["options"][name] = -1;
         });
@@ -685,6 +695,9 @@ end
     /// Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
     /// If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
     lua["spawn_player"] = spawn_player;
+    /// Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+    /// or change it's `player_inputs` to the `input` of real player so he can control it directly
+    lua["spawn_playerghost"] = spawn_playerghost;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
@@ -703,7 +716,7 @@ end
         }
         std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(types));
 
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
         return backend->cbcount++;
     };
@@ -724,7 +737,7 @@ end
         }
         std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(types));
 
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
         return backend->cbcount++;
     };
@@ -1024,7 +1037,7 @@ end
     /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y
     lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         return std::make_tuple(2.5f, 122.5f, backend->g_state->w * 10.0f + 2.5f, 122.5f - backend->g_state->h * 8.0f);
     };
     /// Gets the current camera position in the level
@@ -1056,87 +1069,123 @@ end
     /// Steal input from a Player or HH.
     lua["steal_input"] = [](int uid)
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
+        static const auto ana = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+        static const auto egg_child = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
+
+        auto backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) != backend->script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return;
-        ScriptInput* newinput = new ScriptInput();
-        newinput->next = 0;
-        newinput->current = 0;
-        newinput->orig_input = player->input_ptr;
-        newinput->orig_ai = player->ai;
-        player->input_ptr = reinterpret_cast<PlayerInputs*>(newinput);
-        player->ai = 0;
-        backend->script_input[uid] = newinput;
-        // DEBUG("Steal input: {:x} -> {:x}", newinput->orig_input, player->input_ptr);
+
+        if (player->type->id == player_ghost)
+        {
+            auto player_gh = player->as<PlayerGhost>();
+            ScriptInput* newinput = new ScriptInput();
+            newinput->gameplay = 0;
+            newinput->all = 0;
+            newinput->orig_input = player_gh->player_inputs;
+            player_gh->player_inputs = reinterpret_cast<PlayerSlot*>(newinput);
+            backend->script_input[uid] = newinput;
+        }
+        else
+        {
+            if (player->type->id < ana || player->type->id > egg_child)
+                return;
+
+            ScriptInput* newinput = new ScriptInput();
+            newinput->gameplay = 0;
+            newinput->all = 0;
+            newinput->orig_input = player->input_ptr;
+            newinput->orig_ai = player->ai;
+            player->input_ptr = reinterpret_cast<PlayerSlot*>(newinput);
+            player->ai = nullptr;
+            backend->script_input[uid] = newinput;
+        }
     };
     /// Return input
     lua["return_input"] = [](int uid)
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
+
+        auto backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
             return;
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
             return;
-        // DEBUG("Return input: {:x} -> {:x}", player->input_ptr, backend->script_input[uid]->orig_input);
-        player->input_ptr = backend->script_input[uid]->orig_input;
-        player->ai = backend->script_input[uid]->orig_ai;
+
+        if (player->type->id == player_ghost)
+        {
+            auto player_gh = player->as<PlayerGhost>();
+            player_gh->player_inputs = backend->script_input[uid]->orig_input;
+        }
+        else
+        {
+            player->input_ptr = backend->script_input[uid]->orig_input;
+            player->ai = backend->script_input[uid]->orig_ai;
+        }
         backend->script_input.erase(uid);
     };
     /// Send input
     lua["send_input"] = [](int uid, INPUTS buttons)
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
-        if (backend->script_input.find(uid) != backend->script_input.end())
+        auto backend = LuaBackend::get_calling_backend();
+        auto it = backend->script_input.find(uid);
+        if (it != backend->script_input.end())
         {
-            backend->script_input[uid]->current = buttons;
-            backend->script_input[uid]->next = buttons;
+            it->second->all = buttons;
+            it->second->gameplay = buttons;
         }
     };
-    /// Read input
+    /// Deprecated
+    /// Use `players[1].input.buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
+    /// Of course, you can get the player by other mean, it doesn't need to be the `players` table
+    /// You can only read inputs from actual players, HH don't have any inputs
     lua["read_input"] = [](int uid) -> INPUTS
     {
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
-            return (uint16_t)0;
-        ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
-        if (!IsBadReadPtr(readinput, 20))
+            return (INPUTS)0;
+
+        if (!IsBadReadPtr(player->input_ptr, 20))
         {
-            return readinput->next;
+            return player->input_ptr->buttons_gameplay;
         }
-        return (uint16_t)0;
+        return (INPUTS)0;
     };
+    /// Deprecated
     /// Read input that has been previously stolen with steal_input
+    /// Use `state.player_inputs.player_slots[player_slot].buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
     lua["read_stolen_input"] = [](int uid) -> INPUTS
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         if (backend->script_input.find(uid) == backend->script_input.end())
         {
             // this means that the input is attacked to the real input and not stolen so return early
-            return (uint16_t)0;
+            return (INPUTS)0;
         }
         Player* player = get_entity_ptr(uid)->as<Player>();
         if (player == nullptr)
-            return (uint16_t)0;
+            return (INPUTS)0;
         ScriptInput* readinput = reinterpret_cast<ScriptInput*>(player->input_ptr);
         if (!IsBadReadPtr(readinput, 20))
         {
             readinput = reinterpret_cast<ScriptInput*>(readinput->orig_input);
             if (!IsBadReadPtr(readinput, 20))
             {
-                return readinput->next;
+                return readinput->gameplay;
             }
         }
-        return (uint16_t)0;
+        return (INPUTS)0;
     };
 
     /// Clears a callback that is specific to a screen.
     lua["clear_screen_callback"] = [](int screen_id, CallbackId cb_id)
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->clear_screen_hooks.push_back({screen_id, cb_id});
     };
 
@@ -1146,12 +1195,13 @@ end
     {
         if (Screen* screen = get_screen_ptr(screen_id))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = screen->reserve_callback_id();
             screen->set_pre_render(
                 id,
                 [=, fun = std::move(fun)](Screen* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
                     {
                         return false;
@@ -1163,6 +1213,7 @@ end
                     backend->clear_current_callback();
                     return return_value;
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->screen_hooks.push_back({screen_id, id});
             return id;
         }
@@ -1174,12 +1225,13 @@ end
     {
         if (Screen* screen = get_screen_ptr(screen_id))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = screen->reserve_callback_id();
             screen->set_post_render(
                 id,
                 [=, fun = std::move(fun)](Screen* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
                     {
                         return;
@@ -1189,6 +1241,7 @@ end
                     backend->handle_function(fun, self, render_ctx);
                     backend->clear_current_callback();
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->screen_hooks.push_back({screen_id, id});
             return id;
         }
@@ -1198,7 +1251,7 @@ end
     /// Clears a callback that is specific to an entity.
     lua["clear_entity_callback"] = [](int uid, CallbackId cb_id)
     {
-        LuaBackend* backend = LuaBackend::get_calling_backend();
+        auto backend = LuaBackend::get_calling_backend();
         backend->clear_entity_hooks.push_back({uid, cb_id});
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -1210,12 +1263,13 @@ end
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = movable->reserve_callback_id();
             movable->set_pre_statemachine(
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
@@ -1223,6 +1277,7 @@ end
                     backend->clear_current_callback();
                     return return_value;
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1238,18 +1293,20 @@ end
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = movable->reserve_callback_id();
             movable->set_post_statemachine(
                 id,
                 [=, &lua, fun = std::move(fun)](Movable* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
                     backend->handle_function(fun, lua["cast_entity"](self));
                     backend->clear_current_callback();
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1264,18 +1321,20 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_destroy(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
                     backend->handle_function(fun, lua["cast_entity"](self));
                     backend->clear_current_callback();
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1290,18 +1349,20 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_kill(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](killer));
                     backend->clear_current_callback();
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1318,12 +1379,13 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_player_instagib(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
@@ -1331,6 +1393,7 @@ end
                     backend->clear_current_callback();
                     return return_value;
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1348,12 +1411,13 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_damage(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Entity* damage_dealer, int8_t damage_amount, float velocity_x, float velocity_y, uint16_t stun_amount, uint8_t iframes)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
@@ -1361,6 +1425,7 @@ end
                     backend->clear_current_callback();
                     return return_value;
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1375,12 +1440,13 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_pre_floor_update(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
@@ -1388,6 +1454,7 @@ end
                     backend->clear_current_callback();
                     return return_value;
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1402,18 +1469,20 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_post_floor_update(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
                     backend->handle_function(fun, lua["cast_entity"](self));
                     backend->clear_current_callback();
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1429,18 +1498,20 @@ end
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_open(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
                     backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
                     backend->clear_current_callback();
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1455,12 +1526,13 @@ end
     {
         if (Entity* e = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = e->reserve_callback_id();
             e->set_pre_collision1(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Entity* collision_entity)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
@@ -1468,6 +1540,7 @@ end
                     backend->clear_current_callback();
                     return return_value;
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(e);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1482,12 +1555,13 @@ end
     {
         if (Entity* e = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = e->reserve_callback_id();
             e->set_pre_collision2(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self, Entity* collision_entity)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
                     backend->set_current_callback(uid, id, CallbackType::Entity);
@@ -1495,6 +1569,7 @@ end
                     backend->clear_current_callback();
                     return return_value;
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(e);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1509,12 +1584,13 @@ end
     {
         if (Entity* e = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = e->reserve_callback_id();
             e->set_pre_render(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return false;
                     VanillaRenderContext render_ctx{};
@@ -1523,6 +1599,7 @@ end
                     backend->clear_current_callback();
                     return return_value;
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(e);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1537,12 +1614,13 @@ end
     {
         if (Entity* e = get_entity_ptr(uid))
         {
-            LuaBackend* backend = LuaBackend::get_calling_backend();
+            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = e->reserve_callback_id();
             e->set_post_render(
                 id,
                 [=, &lua, fun = std::move(fun)](Entity* self)
                 {
+                    auto backend = LuaBackend::get_backend(backend_id);
                     if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
                         return;
                     VanillaRenderContext render_ctx{};
@@ -1550,6 +1628,7 @@ end
                     backend->handle_function(fun, render_ctx, lua["cast_entity"](self));
                     backend->clear_current_callback();
                 });
+            auto backend = LuaBackend::get_backend(backend_id);
             backend->hook_entity_dtor(e);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1561,7 +1640,7 @@ end
     lua["raise"] = std::raise;
 
     /// Convert the hash to stringid
-    /// Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+    /// Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
     lua["hash_to_stringid"] = hash_to_stringid;
 
     /// Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
@@ -1701,11 +1780,48 @@ end
     /// Get the rva for a pattern name
     lua["get_rva"] = [](std::string_view address_name) -> size_t
     {
-        return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe");
+        return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe"); // shouldn't this be  - Memory::get().at_exe(0) ?
     };
 
     /// Log to spelunky.log
     lua["log_print"] = game_log;
+
+    /// Immediately ends the run with the death screen, also calls the save_progress
+    lua["load_death_screen"] = call_death_screen;
+
+    /// Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+    lua["save_progress"] = []() -> bool
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (backend->last_save <= State::get().ptr()->time_startup - 120)
+        {
+            backend->manual_save = true;
+            save_progress();
+            return true;
+        }
+        return false;
+    };
+
+    /// Runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+    lua["save_script"] = []() -> bool
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (backend->last_save <= State::get().ptr()->time_startup - 120)
+        {
+            backend->manual_save = true;
+            return true;
+        }
+        return false;
+    };
+
+    /// Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level. Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
+    lua["set_level_string"] = [](std::u16string str)
+    {
+        return set_level_string(str);
+    };
+
+    /// Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
+    lua["set_ending_unlock"] = set_ending_unlock;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
@@ -1820,7 +1936,15 @@ end
         "TOAST",
         ON::TOAST,
         "DEATH_MESSAGE",
-        ON::DEATH_MESSAGE);
+        ON::DEATH_MESSAGE,
+        "PRE_LOAD_JOURNAL_CHAPTER",
+        ON::PRE_LOAD_JOURNAL_CHAPTER,
+        "POST_LOAD_JOURNAL_CHAPTER",
+        ON::POST_LOAD_JOURNAL_CHAPTER,
+        "PRE_GET_FEAT",
+        ON::PRE_GET_FEAT,
+        "PRE_SET_FEAT",
+        ON::PRE_SET_FEAT);
     /* ON
     // GUIFRAME
     // Params: `GuiDrawContext draw_ctx`
@@ -1920,6 +2044,20 @@ end
     // DEATH_MESSAGE
     // Params: `STRINGID id`
     // Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.
+    // PRE_LOAD_JOURNAL_CHAPTER
+    // Params: JOURNALUI_PAGE_SHOWN `chapter`
+    // Runs before the journal or any of it's chapter is opened
+    // Return behavior: return true to not load the chapter (or journal as a whole)
+    // POST_LOAD_JOURNAL_CHAPTER
+    // Params: JOURNALUI_PAGE_SHOWN `chapter`, `array pages`
+    // Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it
+    // All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
+    // Return behavior: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
+    // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
+    // PRE_GET_FEAT
+    // Runs before getting performed status for a FEAT when rendering the Feats page in journal. Return a boolean to override the vanilla feat with your own. Defaults to Steam GetAchievement.
+    // PRE_SET_FEAT
+    // Runs before the game sets a vanilla feat performed. Return true to block the default behaviour of calling Steam SetAchievement.
     */
 
     lua.create_named_table(
@@ -2027,6 +2165,8 @@ end
     }
 }
 
+std::recursive_mutex global_lua_lock;
+
 std::vector<std::string> safe_fields{};
 std::vector<std::string> unsafe_fields{};
 
@@ -2034,6 +2174,7 @@ std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
 {
     static std::shared_ptr<sol::state> global_vm = [sound_manager]()
     {
+        std::unique_lock lock{global_lua_lock};
         std::shared_ptr<sol::state> global_vms = std::make_shared<sol::state>();
         sol::state& lua_vm = *global_vms;
         load_libraries(lua_vm);

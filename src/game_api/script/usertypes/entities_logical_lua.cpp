@@ -10,6 +10,7 @@
 
 #include "entities_logical.hpp" // for Portal, DMSpawning, LogicalDoor, Our...
 #include "entity.hpp"           // for Entity
+#include "sound_manager.hpp"    //
 #include "state_structs.hpp"    // IWYU pragma: keep
 
 namespace NEntitiesLogical
@@ -91,6 +92,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<LogicalSound>(
         "LogicalSound",
+        "sound",
+        &LogicalSound::sound,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -155,6 +158,8 @@ void register_usertypes(sol::state& lua)
         "CursedEffect",
         "particle",
         &CursedEffect::particle,
+        "sound",
+        &CursedEffect::sound,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -193,6 +198,8 @@ void register_usertypes(sol::state& lua)
         "BurningRopeEffect",
         "illumination",
         &BurningRopeEffect::illumination,
+        "sound",
+        &BurningRopeEffect::sound,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -276,6 +283,8 @@ void register_usertypes(sol::state& lua)
         "BoulderSpawner",
         "timer",
         &BoulderSpawner::timer,
+        "sound",
+        &BoulderSpawner::sound,
         sol::base_classes,
         sol::bases<Entity>());
 
@@ -334,6 +343,16 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<DMAlienBlast>(
         "DMAlienBlast",
+        "owner_uid",
+        &DMAlienBlast::owner_uid,
+        "timer",
+        &DMAlienBlast::timer,
+        "sound",
+        &DMAlienBlast::sound,
+        "reticule_internal",
+        &DMAlienBlast::fx_internal_reticule,
+        "reticule_external",
+        &DMAlienBlast::fx_external_reticule,
         sol::base_classes,
         sol::bases<Entity>());
 }

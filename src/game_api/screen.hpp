@@ -7,12 +7,14 @@
 #include <string>     // for allocator, string
 #include <vector>     // for vector
 
-#include "aliases.hpp"    // for STRINGID, MAX_PLAYERS
-#include "color.hpp"      // for Color
-#include "render_api.hpp" // for TextureRenderingInfo, TextRenderingInfo (p...
+#include "aliases.hpp"                  // for STRINGID, MAX_PLAYERS
+#include "color.hpp"                    // for Color
+#include "containers/custom_vector.hpp" //
+#include "render_api.hpp"               // for TextureRenderingInfo, TextRenderingInfo (p...
 
 struct ParticleEmitterInfo;
-struct SoundPosition;
+struct SoundMeta;
+struct MultiLineTextRendering;
 class Entity;
 
 class Screen
@@ -79,8 +81,8 @@ class ScreenTitle : public Screen // ID: 3
     ParticleEmitterInfo* particle_torchflame_ash;
     uint32_t unknown7;
     float unknown8;
-    size_t unknown9;
-    size_t unknown10;
+    SoundMeta* music;
+    SoundMeta* torch_sound;
 };
 
 struct SpearDanglerAnimFrames
@@ -120,21 +122,16 @@ class ScreenMenu : public Screen // ID: 4
 
     uint32_t unknown16a;
     uint32_t unknown16b;
-    uint32_t unknown16c;
-    uint32_t unknown16d;
+    SoundMeta* cthulhu_sound;
     size_t unknown16e;
     size_t unknown16f;
     float unknown16g;
     float unknown16h;
     float unknown16i;
-    uint32_t unknown16j;
+    float unknown16j;
     size_t unknown16k;
-    size_t unknown17;
-    size_t unknown18;
-    size_t unknown19;
-    size_t unknown20;
-    size_t unknown21;
-    size_t unknown22;
+    std::vector<size_t> unknown17;   // pointers
+    std::vector<uint32_t> unknown20; // unsure what's inside
     size_t buttons;
     uint32_t unknown23;
     uint32_t unknown24;
@@ -303,7 +300,7 @@ class ScreenSeedInput : public Screen // ID: 8
 struct FlyingThing
 {
     TextureRenderingInfo texture_info;
-    uint32_t entity_type;
+    ENT_TYPE entity_type;
     bool unknown1;
     uint8_t padding1;
     uint8_t padding2;
@@ -448,7 +445,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     ParticleEmitterInfo* particle_torchflame_flames3;
     ParticleEmitterInfo* particle_torchflame_smoke4;
     ParticleEmitterInfo* particle_torchflame_flames4;
-    SoundPosition* sound_pos;
+    SoundMeta* sound;
 };
 
 class ScreenTeamSelect : public Screen // ID: 10
@@ -633,8 +630,8 @@ class ScreenConstellation : public Screen // ID: 19
     float constellation_text_opacity;
     char16_t constellation_text[32]; // UTF16 string
     float* credits_progression;
-    size_t unknown37;
-    size_t bg_music_info; /* unsure */
+    SoundMeta* explosion_and_loop;
+    SoundMeta* music;
 };
 
 /// The recap book is drawn on top of the POST render event
@@ -825,17 +822,21 @@ class JournalPage
     uint32_t page_number;
     uint32_t unknown2;
 
-    virtual ~JournalPage() = 0;
-    virtual void v1() = 0;
-    virtual void v2() = 0;
-    virtual void v3() = 0;
-    virtual void render() = 0;
-
     template <typename T>
     T* as()
     {
         return static_cast<T*>(this);
     }
+
+    /// background.x < 0
+    bool is_right_side_page();
+    void set_page_background_side(bool right);
+
+    virtual ~JournalPage() = 0;
+    virtual void v1() = 0;
+    virtual void v2() = 0;
+    virtual void v3() = 0;
+    virtual void render() = 0;
 };
 
 class JournalPageProgress : public JournalPage
@@ -887,7 +888,7 @@ class JournalPageDiscoverable : public JournalPage
     uint32_t unknown9;
     float unknown10;
     TextRenderingInfo* title_text_info;
-    size_t unknown12;
+    MultiLineTextRendering* text_lines;
     TextRenderingInfo* entry_text_info;
     TextRenderingInfo* chapter_title_text_info;
 
@@ -948,6 +949,8 @@ class JournalPageStory : public JournalPage
 {
   public:
     virtual ~JournalPageStory() = 0;
+
+    static JournalPageStory* construct(bool right_side, uint32_t page_number);
 };
 
 class JournalPageFeats : public JournalPage
@@ -1052,15 +1055,17 @@ class JournalPageLastGamePlayed : public JournalPage
     virtual ~JournalPageLastGamePlayed() = 0;
 };
 
+using JOURNALUI_PAGE_SHOWN = uint8_t; // NoAlias
+
 struct JournalUI
 {
     uint32_t state;
-    uint8_t chapter_shown;
+    JOURNALUI_PAGE_SHOWN chapter_shown;
 
     uint8_t unknown1;
     uint16_t unknown2;
-    std::vector<JournalPage*> pages;
-    std::vector<size_t> unknown3;
+    custom_vector<JournalPage*> pages;     // adding pages directly to it crash the game (on vector resize)
+    custom_vector<JournalPage*> pages_tmp; // pages are constructed in the show_journal function and put here, later transfered to the pages vector
     uint32_t current_page;
     uint32_t flipping_to_page;
     uint32_t unknown10;
@@ -1083,7 +1088,7 @@ struct JournalUI
     TextureRenderingInfo unknown23;
     TextureRenderingInfo entire_book;
 
-    float unknown25;
+    uint8_t fade_timer;
     float unknown26;
 
     uint32_t page_timer;
@@ -1095,3 +1100,6 @@ struct JournalUI
 };
 
 Screen* get_screen_ptr(uint32_t screen_id);
+void force_journal(uint32_t chapter, uint32_t entry);
+void toggle_journal();
+void show_journal(JOURNALUI_PAGE_SHOWN chapter, uint32_t page);

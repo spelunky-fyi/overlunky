@@ -125,6 +125,7 @@ std::map<std::string, int64_t> keys{
     {"warp_next_level_a", OL_KEY_CTRL | 'A'},
     {"warp_next_level_b", OL_KEY_CTRL | 'B'},
     {"hide_ui", VK_F11},
+    {"switch_ui", VK_F12},
     {"zoom_in", OL_KEY_CTRL | VK_OEM_COMMA},
     {"zoom_out", OL_KEY_CTRL | VK_OEM_PERIOD},
     {"zoom_default", OL_KEY_CTRL | '2'},
@@ -200,6 +201,7 @@ struct Window
     std::string name;
     bool detached;
     bool open;
+    bool popup;
 };
 std::map<std::string, Window*> windows;
 
@@ -227,10 +229,16 @@ int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filter
     g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1;
 unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
-uint32_t g_held_flags = 0, g_dark_mode = 0;
+uint32_t g_held_flags = 0, g_dark_mode = 0, g_last_kit_spawn = 0;
 std::vector<EntityItem> g_items;
 std::vector<int> g_filtered_items;
+struct Kit
+{
+    std::string items;
+    bool automatic;
+};
 std::vector<std::string> saved_entities;
+std::vector<Kit*> kits;
 std::vector<Player*> g_players;
 std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
@@ -277,6 +285,9 @@ inline constexpr unsigned int unsafe_entity_mask = 0;
 
 inline constexpr int default_entity_mask = 0x18f;
 inline constexpr int default_hitbox_mask = 0x80bf;
+
+std::chrono::time_point<std::chrono::system_clock> last_focus_time;
+bool last_focus;
 
 std::map<std::string, bool> options = {
     {"mouse_control", true},
@@ -414,6 +425,26 @@ void hook_savegame()
                                       original(backup_file, file, data, data_size); });
         savegame_hooked = true;
     }
+}
+
+static inline void ltrim(std::string& s)
+{
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch)
+                                    { return !std::isspace(ch); }));
+}
+
+static inline void rtrim(std::string& s)
+{
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch)
+                         { return !std::isspace(ch); })
+                .base(),
+            s.end());
+}
+
+static inline void trim(std::string& s)
+{
+    ltrim(s);
+    rtrim(s);
 }
 
 ImVec4 hue_shift(ImVec4 in, float hue) // unused
@@ -687,8 +718,9 @@ void save_config(std::string file)
               << "[hotkeys]" << std::endl;
     for (const auto& kv : keys)
     {
-        writeData << std::left << std::setw(24) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# "
-                  << key_string(keys[kv.first]) << std::endl;
+        if (kv.first != "")
+            writeData << std::left << std::setw(24) << kv.first << " = " << std::hex << "0x" << std::setw(8) << kv.second << "# "
+                      << key_string(keys[kv.first]) << std::endl;
     }
 
     writeData << "\n[options] # 0 or 1 unless stated otherwise (default state "
@@ -707,14 +739,14 @@ void save_config(std::string file)
     writeData << "camera_speed = " << std::fixed << std::setprecision(2) << g_camera_speed << " # float" << std::endl;
 
     writeData << "kits = [";
-    for (unsigned int i = 0; i < saved_entities.size(); i++)
+    for (unsigned int i = 0; i < kits.size(); i++)
     {
         writeData << std::endl
-                  << "  \"" << saved_entities[i] << "\"";
-        if (i < saved_entities.size() - 1)
+                  << "  \"" << kits[i]->items << "\"";
+        if (i < kits.size() - 1)
             writeData << ",";
     }
-    if (!saved_entities.empty())
+    if (!kits.empty())
         writeData << std::endl;
     writeData << "]" << std::endl;
 
@@ -841,7 +873,14 @@ void load_config(std::string file)
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66f);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0f);
     g_camera_speed = toml::find_or<float>(opts, "camera_speed", 1.0f);
+    kits.clear();
+    saved_entities.clear();
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
+    for (auto saved : saved_entities)
+    {
+        kits.push_back(new Kit({saved, false}));
+    }
+    saved_entities.clear();
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
     fontfile = toml::find_or<std::string>(opts, "font_file", "");
@@ -903,7 +942,9 @@ bool toggle(std::string tool)
     }
     else if (options["menu_ui"])
     {
-        activate_tab = tool;
+        for (auto [name, window] : windows)
+            window->popup = false;
+        windows[tool]->popup = true;
         return true;
     }
     else
@@ -990,7 +1031,21 @@ void escape()
 
 void save_search()
 {
-    saved_entities.push_back(text);
+    std::string items = text;
+    trim(items);
+    std::stringstream sss(items);
+    uint32_t id = 0;
+    sss >> id;
+    if (id != 0)
+    {
+        kits.push_back(new Kit({items, false}));
+    }
+    else if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
+    {
+        EntityItem to_add = g_items[g_filtered_items[g_current_item]];
+        items = fmt::format("{}", to_add.id);
+        kits.push_back(new Kit({items, false}));
+    }
     save_config(cfgfile);
 }
 
@@ -1100,6 +1155,140 @@ std::string spawned_type()
     }
 }
 
+int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
+{
+    std::pair<float, float> cpos = UI::click_position(g_x, g_y);
+    if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
+    {
+        int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
+        if (!lock_entity && set_last)
+            g_last_id = spawned;
+        return spawned;
+    }
+    else if (to_spawn.name == "ENT_TYPE_ITEM_PLAYERGHOST")
+    {
+        static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+        auto spawned = UI::spawn_playerghost(ana_spelunky + (rand() % 19), cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
+
+        if (!lock_entity && set_last)
+            g_last_id = spawned;
+        return spawned;
+    }
+    else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
+    {
+        bool snap = options["snap_to_grid"];
+        if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
+        {
+            snap = true;
+            g_vx = 0;
+            g_vy = 0;
+
+            auto old_block_id = UI::get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
+            if (old_block_id != -1)
+            {
+                auto old_block = get_entity_ptr(old_block_id);
+
+                if (old_block)
+                    smart_delete(old_block);
+            }
+            else
+            {
+                auto old_activefloor = UI::get_entity_at(std::round(cpos.first), std::round(cpos.second), false, 0.5f, 0x80);
+                if (old_activefloor)
+                    smart_delete(old_activefloor);
+            }
+        }
+        int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
+        if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
+        {
+            if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
+            {
+                if (floor->get_decoration_entity_type() != -1)
+                {
+                    floor->fix_decorations(true, false);
+                }
+                auto fpos = floor->position();
+                auto layer = (LAYER)floor->layer;
+                Callback cb = {g_state->time_total + 2, [fpos, layer]
+                               {
+                                   fix_decorations_at(fpos.first, fpos.second, layer);
+                               }};
+                callbacks.push_back(cb);
+            }
+        }
+        if (!lock_entity && set_last)
+            g_last_id = spawned;
+        return spawned;
+    }
+    else
+    {
+        UI::spawn_liquid(to_spawn.id, cpos.first, cpos.second);
+    }
+    return -1;
+}
+
+void spawn_kit(Kit* kit)
+{
+    if (g_players.size() == 0)
+        return;
+
+    static const ENT_TYPE wearable[] = {
+        to_id("ENT_TYPE_ITEM_CAPE"),
+        to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
+        to_id("ENT_TYPE_ITEM_JETPACK"),
+        to_id("ENT_TYPE_ITEM_TELEPORTER_BACKPACK"),
+        to_id("ENT_TYPE_ITEM_HOVERPACK"),
+        to_id("ENT_TYPE_ITEM_POWERPACK"),
+    };
+
+    std::stringstream textss(text);
+    if (kit->items != "")
+        textss.str(kit->items);
+    uint32_t id;
+    while (textss >> id)
+    {
+        EntityItem item = EntityItem{entity_full_names[id], id};
+        int32_t spawned = -1;
+        if (item.name.find("FLOOR_") != std::string::npos || item.name.find("DECORATION_") != std::string::npos || item.name.find("FX_") != std::string::npos || item.name.find("BG_") != std::string::npos || item.name.find("LOGICAL_") != std::string::npos)
+        {
+            continue;
+        }
+        else if (item.name.find("ENT_TYPE_ITEM_PICKUP") != std::string::npos)
+        {
+            spawned = UI::spawn_entity_over(id, g_players.at(0)->uid, 0.0f, 0.0f);
+        }
+        else if (item.name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+        {
+            g_players.at(0)->give_powerup(id);
+        }
+        else
+        {
+            spawned = spawn_entityitem(item, false, false);
+        }
+
+        if (spawned == -1)
+            continue;
+
+        auto spawned_ent = get_entity_ptr(spawned)->as<Movable>();
+
+        if (std::find(std::begin(wearable), std::end(wearable), id) != std::end(wearable) && g_players.at(0)->worn_backitem() == -1)
+        {
+            g_players.at(0)->pick_up(spawned_ent);
+        }
+        else if (item.name.find("MOUNT_") != std::string::npos)
+        {
+            auto spawned_mount = get_entity_ptr(spawned)->as<Mount>();
+            spawned_mount->tame(true);
+            if (!g_players.at(0)->overlay)
+                spawned_mount->carry(g_players.at(0));
+        }
+        else if (g_players.at(0)->holding_uid == -1 && test_flag(spawned_ent->flags, 18))
+        {
+            g_players.at(0)->pick_up(spawned_ent);
+        }
+    }
+}
+
 void spawn_entities(bool s, std::string list = "")
 {
     if (g_game_manager->pause_ui->visibility > 0)
@@ -1124,77 +1313,18 @@ void spawn_entities(bool s, std::string list = "")
                 return;
             }
         }
-        std::pair<float, float> cpos = UI::click_position(g_x, g_y);
-        if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
-        {
-            int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER);
-            if (!lock_entity)
-                g_last_id = spawned;
-        }
-        else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
-        {
-            bool snap = options["snap_to_grid"];
-            if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
-            {
-                snap = true;
-                g_vx = 0;
-                g_vy = 0;
-
-                auto old_block_id = UI::get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
-                if (old_block_id != -1)
-                {
-                    auto old_block = get_entity_ptr(old_block_id);
-
-                    if (old_block)
-                        smart_delete(old_block);
-                }
-                else
-                {
-                    auto old_activefloor = UI::get_entity_at(std::round(cpos.first), std::round(cpos.second), false, 0.5f, 0x80);
-                    if (old_activefloor)
-                        smart_delete(old_activefloor);
-                }
-            }
-            int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
-            if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
-            {
-                if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
-                {
-                    if (floor->get_decoration_entity_type() != -1)
-                    {
-                        floor->fix_decorations(true, false);
-                    }
-                    auto fpos = floor->position();
-                    auto layer = (LAYER)floor->layer;
-                    Callback cb = {g_state->time_total + 2, [fpos, layer]
-                                   {
-                                       fix_decorations_at(fpos.first, fpos.second, layer);
-                                   }};
-                    callbacks.push_back(cb);
-                }
-            }
-            if (!lock_entity)
-                g_last_id = spawned;
-        }
-        else
-        {
-            UI::spawn_liquid(to_spawn.id, cpos.first, cpos.second);
-        }
+        spawn_entityitem(to_spawn, s);
     }
     else
     {
         std::stringstream textss(text);
         if (list != "")
             textss.str(list);
-        int id;
-        std::vector<int> ents;
-        int spawned{-1};
+        uint32_t id;
         while (textss >> id)
         {
-            spawned = UI::spawn_entity(id, g_x, g_y, s, g_vx, g_vy, options["snap_to_grid"]);
+            spawn_entityitem(EntityItem{entity_full_names[id], id}, s);
         }
-        if (!lock_entity)
-            g_last_id = spawned;
     }
 }
 
@@ -1448,6 +1578,19 @@ void force_noclip()
     }
 }
 
+void force_kits()
+{
+    if (g_state->screen == 12 && g_state->time_total == 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
+    {
+        for (auto kit : kits)
+        {
+            if (kit->automatic)
+                spawn_kit(kit);
+        }
+        g_last_kit_spawn = g_state->time_startup + 1;
+    }
+}
+
 void frame_advance()
 {
     if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
@@ -1483,6 +1626,12 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->fadein = 1;
     g_state->fadeout = 1;
     g_state->loading = 1;
+
+    if (g_game_manager->main_menu_music)
+    {
+        g_game_manager->main_menu_music->kill(false);
+        g_game_manager->main_menu_music = nullptr;
+    }
 }
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
@@ -1931,6 +2080,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         hide_ui = !hide_ui;
     }
+    else if (pressed("switch_ui", wParam))
+    {
+        options["menu_ui"] ^= true;
+        hide_ui = false;
+    }
     else if (pressed("tool_options", wParam))
     {
         toggle("tool_options");
@@ -2067,12 +2221,12 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("zoom_3x", wParam))
     {
-        g_zoom = 23.08f;
+        g_zoom = 23.126f;
         set_zoom();
     }
     else if (pressed("zoom_4x", wParam))
     {
-        g_zoom = 29.87f;
+        g_zoom = 29.928f;
         set_zoom();
     }
     else if (pressed("zoom_5x", wParam))
@@ -2237,48 +2391,48 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("spawn_kit_1", wParam))
     {
-        if (saved_entities.size() > 0)
-            spawn_entities(false, saved_entities.at(0));
+        if (kits.size() > 0)
+            spawn_kit(kits.at(0));
     }
     else if (pressed("spawn_kit_2", wParam))
     {
-        if (saved_entities.size() > 1)
-            spawn_entities(false, saved_entities.at(1));
+        if (kits.size() > 1)
+            spawn_kit(kits.at(1));
     }
     else if (pressed("spawn_kit_3", wParam))
     {
-        if (saved_entities.size() > 2)
-            spawn_entities(false, saved_entities.at(2));
+        if (kits.size() > 2)
+            spawn_kit(kits.at(2));
     }
     else if (pressed("spawn_kit_4", wParam))
     {
-        if (saved_entities.size() > 3)
-            spawn_entities(false, saved_entities.at(3));
+        if (kits.size() > 3)
+            spawn_kit(kits.at(3));
     }
     else if (pressed("spawn_kit_5", wParam))
     {
-        if (saved_entities.size() > 4)
-            spawn_entities(false, saved_entities.at(4));
+        if (kits.size() > 4)
+            spawn_kit(kits.at(4));
     }
     else if (pressed("spawn_kit_6", wParam))
     {
-        if (saved_entities.size() > 5)
-            spawn_entities(false, saved_entities.at(5));
+        if (kits.size() > 5)
+            spawn_kit(kits.at(5));
     }
     else if (pressed("spawn_kit_7", wParam))
     {
-        if (saved_entities.size() > 6)
-            spawn_entities(false, saved_entities.at(6));
+        if (kits.size() > 6)
+            spawn_kit(kits.at(6));
     }
     else if (pressed("spawn_kit_8", wParam))
     {
-        if (saved_entities.size() > 7)
-            spawn_entities(false, saved_entities.at(7));
+        if (kits.size() > 7)
+            spawn_kit(kits.at(7));
     }
     else if (pressed("spawn_kit_9", wParam))
     {
-        if (saved_entities.size() > 8)
-            spawn_entities(false, saved_entities.at(8));
+        if (kits.size() > 8)
+            spawn_kit(kits.at(8));
     }
     else if (pressed("spawn_warp_door", wParam))
     {
@@ -2660,11 +2814,11 @@ void render_themes()
 void render_input()
 {
     int n = 0;
-    for (auto i : saved_entities)
+    for (auto kit : kits)
     {
-        ImGui::PushID(i.c_str());
+        ImGui::PushID(kit->items.c_str());
         std::string search = "";
-        std::stringstream sss(i);
+        std::stringstream sss(kit->items);
         int item = 0;
         while (sss >> item)
         {
@@ -2678,12 +2832,14 @@ void render_input()
             search.pop_back();
         }
         if (search.empty())
-            search = i;
-
+            search = kit->items;
+        ImGui::Text("%d:", n + 1);
+        ImGui::SameLine();
+        ImGui::TextWrapped("%s", search.c_str());
         ImGui::PushID(2 * n);
         if (ImGui::Button("X"))
         {
-            saved_entities.erase(saved_entities.begin() + n);
+            kits.erase(kits.begin() + n);
             save_config(cfgfile);
         }
         tooltip("Delete kit.");
@@ -2693,7 +2849,7 @@ void render_input()
         ImGui::PushID(4 * n);
         if (ImGui::Button("Load"))
         {
-            text = i;
+            text = kit->items;
             update_filter(text);
             // spawn_entities(false);
         }
@@ -2704,16 +2860,36 @@ void render_input()
         ImGui::PushID(8 * n);
         if (ImGui::Button("Spawn"))
         {
-            spawn_entities(false, i);
+            spawn_kit(kit);
         }
-        tooltip("Spawn saved kit where you're standing.", "spawn_kit_1");
-        ImGui::PopID();
+        tooltip("Spawn saved kit where you're standing,\nautomatically equipping anything wearable.", "spawn_kit_1");
         ImGui::SameLine();
-        ImGui::Text("%d:", n + 1);
         ImGui::PopID();
+
+        ImGui::PushID(16 * n);
+        ImGui::Checkbox("Auto spawn", &kit->automatic);
+        tooltip("Spawn automatically on new game.", "");
         ImGui::SameLine();
-        ImGui::TextWrapped("%s", search.c_str());
+        ImGui::PopID();
+
+        ImGui::PushID(32 * n);
+        if (ImGui::Button("Add item"))
+        {
+            if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
+            {
+                EntityItem to_add = g_items[g_filtered_items[g_current_item]];
+                trim(kit->items);
+                kit->items = fmt::format("{} {}", kit->items, to_add.id);
+                trim(kit->items);
+                save_config(cfgfile);
+            }
+        }
+        tooltip("Add selected item to this kit.", "");
+        ImGui::PopID();
+
+        ImGui::PopID();
         n++;
+        ImGui::Separator();
     }
     if (set_focus_entity)
     {
@@ -2721,7 +2897,7 @@ void render_input()
         set_focus_entity = false;
     }
     ImVec2 region = ImGui::GetContentRegionMax();
-    ImGui::PushItemWidth(region.x - 110);
+    ImGui::PushItemWidth(region.x - 135);
     if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
     {
         update_filter(text);
@@ -2729,11 +2905,11 @@ void render_input()
     tooltip("Search for entities to spawn. Hit TAB to add the selected id to list.");
     ImGui::PopItemWidth();
     ImGui::SameLine();
-    if (ImGui::Button("Save"))
+    if (ImGui::Button("Save kit"))
     {
         save_search();
     }
-    tooltip("Save entity id(s) as a kit for quick use later.");
+    tooltip("Save entity id(s) or selected item as a kit for quick use later.");
     ImGui::SameLine();
     if (ImGui::Button("Spawn"))
     {
@@ -3074,21 +3250,21 @@ void render_camera()
     ImGui::SameLine();
     if (ImGui::Button("3x"))
     {
-        g_zoom = 23.08f;
+        g_zoom = 23.126f;
         set_zoom();
     }
     tooltip("3 room wide zoom level.", "zoom_3x");
     ImGui::SameLine();
     if (ImGui::Button("4x"))
     {
-        g_zoom = 29.87f;
+        g_zoom = 29.928f;
         set_zoom();
     }
     tooltip("4 room wide zoom level.", "zoom_4x");
     ImGui::SameLine();
     if (ImGui::Button("5x"))
     {
-        g_zoom = 36.66f;
+        g_zoom = 36.730f;
         set_zoom();
     }
     tooltip("5 room wide zoom level.", "zoom_5x");
@@ -3371,8 +3547,8 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
 
     if (type == spark_trap && ent->animation_frame == 7)
     {
-        // TODO: get the real distance from game (can be changed thru API)
-        auto [radx, rady] = UI::screen_position(render_position.first + 3, render_position.second + 3);
+        float distance = UI::get_spark_distance(ent->as<SparkTrap>());
+        auto [radx, rady] = UI::screen_position(render_position.first + distance, render_position.second + distance);
         auto srad = screenify({radx, rady});
         draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
     }
@@ -3504,20 +3680,21 @@ void render_messages()
 
     using Message = std::tuple<std::string, std::string, std::chrono::time_point<std::chrono::system_clock>, ImVec4>;
     std::vector<Message> queue;
-    for (auto& [name, script] : g_scripts)
+    for (auto& script : g_scripts)
     {
-        for (auto message : script->get_messages())
-        {
-            if (options["fade_script_messages"] && now - 12s > message.time)
-                continue;
-            std::istringstream messages(message.message);
-            while (!messages.eof())
+        script.second->loop_messages(
+            [&](const ScriptMessage& message)
             {
-                std::string mline;
-                getline(messages, mline);
-                queue.push_back(std::make_tuple(script->get_name(), mline, message.time, message.color));
-            }
-        }
+                if (options["fade_script_messages"] && now - 12s > message.time)
+                    return;
+                std::istringstream messages(message.message);
+                while (!messages.eof())
+                {
+                    std::string mline;
+                    getline(messages, mline);
+                    queue.push_back(std::make_tuple(script.second->get_name(), mline, message.time, message.color));
+                }
+            });
     }
     for (auto&& message : g_Console->consume_messages())
     {
@@ -3809,7 +3986,9 @@ void render_clickhandler()
             ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             subtext);
     }
-    if (options["mouse_control"] && UI::get_focus())
+    using namespace std::chrono_literals;
+    auto now = std::chrono::system_clock::now();
+    if (options["mouse_control"] && now > last_focus_time + 200ms && (!options["menu_ui"] || mouse_pos().y > ImGui::GetTextLineHeight()))
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         if (ImGui::BeginDragDropTarget())
@@ -4234,11 +4413,11 @@ void render_options()
 {
     if (options["menu_ui"] && !detached("tool_options"))
     {
-        if (ImGui::MenuItem("Switch to windowed UI"))
+        if (ImGui::MenuItem("Switch to windowed UI", key_string(keys["switch_ui"]).c_str()))
             options["menu_ui"] = false;
-        if (ImGui::MenuItem("Save options"))
+        if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
             save_config(cfgfile);
-        if (ImGui::MenuItem("Load options"))
+        if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
             load_config(cfgfile);
         ImGui::Separator();
     }
@@ -4340,7 +4519,7 @@ void render_options()
     tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
 
     ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
-    tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.");
+    tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.", "switch_ui");
 
     ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
     tooltip("Am I annoying you already :(");
@@ -4596,7 +4775,8 @@ void render_scripts()
                     {
                         script->set_changed(true);
                     }
-                    ImGui::InputText("##LuaResult", &script->get_result(), ImGuiInputTextFlags_ReadOnly);
+                    std::string result = script->get_result();
+                    ImGui::InputText("##LuaResult", &result, ImGuiInputTextFlags_ReadOnly);
                 }
             }
             else
@@ -4655,10 +4835,17 @@ int parse_time(std::string time)
 
 void render_savegame()
 {
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
     if (options["disable_savegame"])
     {
-        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Note: You have blocked game saves in the options...");
+        ImGui::TextWrapped("Note: You have blocked game saves in the options, all changes will be temporary unless you click the big button below...");
     }
+    else
+    {
+        ImGui::TextWrapped("Note: Changes are not saved to file automatically, you have to click the big button below...");
+    }
+    ImGui::PopStyleColor(1);
+
     ImGui::PushID("Journal");
     if (ImGui::CollapsingHeader("Journal"))
     {
@@ -4847,7 +5034,7 @@ void render_savegame()
         for (int i = 0; i < 9; ++i)
         {
             ImGui::PushID(i);
-            ImGui::InputInt("Sticker", &g_save->stickers[i]);
+            ImGui::InputInt("Sticker", (int32_t*)&g_save->stickers[i]);
             ImGui::PopID();
         }
     }
@@ -4891,10 +5078,17 @@ void render_savegame()
     ImGui::PopID();
 
     ImGui::PushID("UnlockAll");
-    if (ImGui::CollapsingHeader("Big scary button to unlock everything"))
+    if (ImGui::CollapsingHeader("Save changes or unlock everything"))
     {
         ImGui::PushFont(bigfont);
         ImGui::PushItemWidth(ImGui::GetContentRegionMax().x);
+        if (ImGui::Button("Save changes", {ImGui::GetContentRegionMax().x, 0}))
+        {
+            const bool last_state = options["disable_savegame"];
+            options["disable_savegame"] = false;
+            UI::save_progress();
+            options["disable_savegame"] = last_state;
+        }
         if (ImGui::Button("Unlock Everything*", {ImGui::GetContentRegionMax().x, 0}))
         {
             g_save->tutorial_state = 4;
@@ -6588,7 +6782,7 @@ void render_prohud()
     auto base = ImGui::GetMainViewport();
     ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
     auto topmargin = 0.0f;
-    if (options["menu_ui"])
+    if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
     std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
@@ -6729,7 +6923,13 @@ void imgui_draw()
                     if (windows[tab]->detached)
                         continue;
                     ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {600.0f, base->Size.y - 50.0f});
-                    if (ImGui::BeginMenu(windows[tab]->name.c_str(), true))
+                    bool ismenu = false;
+                    if (windows[tab]->popup)
+                    {
+                        ImGui::OpenPopup(windows[tab]->name.c_str());
+                        windows[tab]->popup = false;
+                    }
+                    if ((ImGui::BeginMenu(windows[tab]->name.c_str(), true) && (ismenu = true) == true) || ImGui::BeginPopup(windows[tab]->name.c_str()))
                     {
                         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
                         active_tab = tab;
@@ -6742,7 +6942,10 @@ void imgui_draw()
                         ImGui::GetIO().WantCaptureKeyboard = true;
                         render_tool(tab);
                         ImGui::PopStyleVar();
-                        ImGui::EndMenu();
+                        if (ismenu)
+                            ImGui::EndMenu();
+                        else
+                            ImGui::EndPopup();
                     }
                 }
                 ImGui::EndMainMenuBar();
@@ -6773,7 +6976,7 @@ void imgui_draw()
                 }
                 if (ImGui::BeginMenu("Settings"))
                 {
-                    if (ImGui::MenuItem("Switch to menu UI"))
+                    if (ImGui::MenuItem("Switch to menu UI", key_string(keys["switch_ui"]).c_str()))
                         options["menu_ui"] = true;
                     ImGui::Separator();
                     for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
@@ -6910,9 +7113,21 @@ void imgui_draw()
     }
 }
 
+void check_focus()
+{
+    if (last_focus != UI::get_focus())
+    {
+        if (UI::get_focus())
+            last_focus_time = std::chrono::system_clock::now();
+        last_focus = UI::get_focus();
+    }
+}
+
 void post_draw()
 {
+    check_focus();
     update_players();
+    force_kits();
     force_zoom();
     force_hud_flags();
     force_time();
@@ -6958,7 +7173,7 @@ void init_ui()
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
-    g_state = get_state_ptr();
+    g_state = State::get().ptr_main();
     g_save = UI::savedata();
     g_game_manager = get_game_manager();
 

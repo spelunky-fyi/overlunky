@@ -28,7 +28,7 @@ class LuaConsole;
 class SoundManager;
 
 ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound_mgr, LuaConsole* con, bool enable)
-    : LuaBackend(sound_mgr, con)
+    : LockableLuaBackend<ScriptImpl>(sound_mgr, con)
 {
 #ifdef SPEL2_EDITABLE_SCRIPTS
     code = script;
@@ -52,7 +52,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     {
         std::string metacode = "";
         std::stringstream metass(code);
-        std::regex reg("(^\\s*meta\\.[a-z]+\\s*=)");
+        std::regex reg("(^\\s*meta\\.[a-zA-Z_][a-zA-Z0-9_]*\\s*=)");
         std::regex regstart("(^\\s*meta\\s*=)");
         std::regex regend("(\\})");
         std::regex multistart("\\[\\[|\\.\\.\\s*($|--)|\\bmeta\\.[a-z]+\\s*=\\s*($|--)");
@@ -131,7 +131,6 @@ bool ScriptImpl::reset()
     // Compile & Evaluate the script if the script is changed
     try
     {
-        std::lock_guard gil_guard{gil};
         auto lua_result = execute_lua(lua, code);
 
         sol::optional<std::string> meta_name = lua["meta"]["name"];

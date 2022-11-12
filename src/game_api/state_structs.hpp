@@ -2,6 +2,7 @@
 
 #include "aliases.hpp"
 #include "containers/custom_vector.hpp"
+#include "render_api.hpp"
 #include <array>
 #include <cstdint>
 #include <set>
@@ -49,7 +50,7 @@ struct Illumination
     uint32_t timer;
     union
     {
-        /// see [flags.hpp](../src/game_api/flags.hpp) illumination_flags
+        /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
         uint32_t flags;
         struct
         {
@@ -87,7 +88,7 @@ struct PlayerSlot
     uint32_t unknown1;
     InputMapping* input_mapping_keyboard;
     InputMapping* input_mapping_controller;
-    uint8_t player_slot;
+    int8_t player_slot;
     bool is_participating;
     uint8_t unknown4; // padding most likely
     uint8_t unknown5; // padding most likely
@@ -346,17 +347,17 @@ struct ArenaState
     std::array<uint8_t, 4> player_totalwins;
     int8_t unknown9;
     std::array<bool, 4> player_won;
-    uint8_t unknown14a;
-    uint8_t unknown14b;
-    uint8_t unknown14c;
-    uint8_t unknown14d;
+    uint8_t unknown14a; // player1_bot_ai
+    uint8_t unknown14b; // player2_bot_ai
+    uint8_t unknown14c; // player3_bot_ai
+    uint8_t unknown14d; // player4_bot_ai
     uint8_t unknown14e;
     /// The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 10 minutes and 20 == infinite. Can go higher, although this will glitch the menu text. Actual time (seconds) = (state.arena.timer + 1) x 30
     uint8_t timer;
     uint8_t timer_ending;
     uint8_t wins;
     uint8_t lives;
-    uint8_t unknown15;
+    uint8_t unknown15; // time_to_win
     uint8_t unknown16;
     std::array<uint16_t, 4> player_idolheld_countdown;
     uint8_t health;
@@ -452,8 +453,8 @@ class LogicDiceShop : public Logic
     uint32_t bet_machine; // entity uid
     uint32_t die1;        // entity uid
     uint32_t die2;        // entity uid
-    uint8_t die_1_value;
-    uint8_t die_2_value;
+    int8_t die_1_value;
+    int8_t die_2_value;
     uint16_t unknown8;
     uint32_t prize_dispenser; // entity uid
     uint32_t prize;           // entity uid
@@ -466,7 +467,7 @@ class LogicDiceShop : public Logic
     uint8_t unknown14;
     uint8_t unknown15;
     uint8_t unknown16;
-    uint32_t balance; // cash balance of all the games
+    int32_t balance; // cash balance of all the games
 
     virtual ~LogicDiceShop() = 0;
 };
@@ -735,7 +736,7 @@ struct LiquidPhysicsEngine
 
 struct LiquidPhysicsParams
 {
-    int32_t shader_type; // can also be flags, as for water, any value with bit one is fine
+    int32_t shader_type; // ? can also be flags, as for water, any value with bit one is fine
     uint8_t unknown2;    // shader related, shader id maybe?
     uint8_t padding1;
     uint8_t padding2;
@@ -802,7 +803,7 @@ struct LiquidLake
 
 struct LiquidPhysics
 {
-    size_t unknown1; // MysteryLiquidPointer1 in plugin
+    size_t unknown1; // MysteryLiquidPointer1 in plugin, collision with floors/activefloors related
     union
     {
         LiquidPool pools[5];
@@ -825,12 +826,14 @@ struct LiquidPhysics
             LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
-    size_t unknown2;
-    size_t unknown3;
-    custom_vector<LiquidLake> impostor_lakes;
-    uint32_t total_liquid_spawned; // Total number of spawned liquid entities, all types.
-    uint32_t unknown8;
-    size_t unknown9;
+    std::list<uint32_t>* floors;              // pointer to map/list that contains all floor uids that the liquid interact with
+    std::list<uint32_t>* push_blocks;         // pointer to map/list that contains all activefloor uids that the liquid interact with
+    custom_vector<LiquidLake> impostor_lakes; //
+    uint32_t total_liquid_spawned;            // Total number of spawned liquid entities, all types.
+    uint32_t unknown8;                        // padding probably
+    uint8_t* unknown9;                        // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
+                                              // always allocates after the LiquidPhysics
+
     uint32_t total_liquid_spawned2; // Same as total_liquid_spawned?
     bool unknown12;
     uint8_t padding12a;
@@ -975,4 +978,12 @@ struct ShopsInfo
 {
     std::set<ShopRestrictedItem> items; // could also be a map
     std::vector<ShopOwnerDetails> shop_owners;
+};
+
+struct MultiLineTextRendering
+{
+    size_t* timer;                         // some struct? game increments this value and one at +0x40, seam to be related to rendering, touching just the first one freezes the game
+    std::vector<TextRenderingInfo*> lines; // each line is separete TextRenderingInfo
+    float x;                               // center of the text box?
+    float z;                               // center of the text box?
 };

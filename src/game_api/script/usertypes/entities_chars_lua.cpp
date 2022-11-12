@@ -40,82 +40,49 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
-    lua.new_usertype<Inventory>(
-        "Inventory",
-        "money",
-        &Inventory::money,
-        "bombs",
-        &Inventory::bombs,
-        "ropes",
-        &Inventory::ropes,
-        "player_slot", /*
-        &Inventory::player_slot,
-                       */
-        sol::property([](Inventory& i) -> int8_t
-                      {
+    auto inventory_type = lua.new_usertype<Inventory>("Inventory");
+    inventory_type["money"] = &Inventory::money;
+    inventory_type["bombs"] = &Inventory::bombs;
+    inventory_type["ropes"] = &Inventory::ropes;
+    inventory_type["player_slot"] = sol::property([](Inventory& i) -> int8_t
+                                                  {
                           if (i.player_slot >= 0)
                               return i.player_slot + 1;
                           else
                               return i.player_slot; },
-                      [](Inventory& i, int8_t s)
-                      {
-                          if (s > 0)
-                              i.player_slot = s - 1;
-                          else
-                              i.player_slot = -1;
-                      }),
-        "poison_tick_timer",
-        &Inventory::poison_tick_timer,
-        "cursed",
-        &Inventory::cursed,
-        "elixir_buff",
-        &Inventory::elixir_buff,
-        "health",
-        &Inventory::health,
-        "kapala_blood_amount",
-        &Inventory::kapala_blood_amount,
-        "time_of_death",
-        &Inventory::time_of_death,
-        "held_item",
-        &Inventory::held_item,
-        "held_item_metadata",
-        &Inventory::held_item_metadata,
-        "mount_type",
-        &Inventory::mount_type,
-        "mount_metadata",
-        &Inventory::mount_metadata,
-        "kills_level",
-        &Inventory::kills_level,
-        "kills_total",
-        &Inventory::kills_total,
-        "collected_money_total",
-        &Inventory::collected_money_total,
-        "collected_money_count",
-        &Inventory::collected_money_count,
-        "collected_money",
-        &Inventory::collected_money,
-        "collected_money_values",
-        &Inventory::collected_money_values,
-        "killed_enemies",
-        &Inventory::killed_enemies,
-        "companion_count",
-        &Inventory::companion_count,
-        "companions",
-        &Inventory::companions,
-        "companion_held_items",
-        &Inventory::companion_held_items,
-        "companion_held_item_metadatas",
-        &Inventory::companion_held_item_metadatas,
-        "companion_trust",
-        &Inventory::companion_trust,
-        "companion_health",
-        &Inventory::companion_health,
-        "companion_poison_tick_timers",
-        &Inventory::companion_poison_tick_timers,
-        "is_companion_cursed",
-        &Inventory::is_companion_cursed,
-        "acquired_powerups",
-        &Inventory::acquired_powerups);
+                                                  [](Inventory& i, int8_t s)
+                                                  {
+                                                      if (s > 0)
+                                                          i.player_slot = s - 1;
+                                                      else
+                                                          i.player_slot = -1;
+                                                  });
+    inventory_type["poison_tick_timer"] = &Inventory::poison_tick_timer;
+    inventory_type["cursed"] = &Inventory::cursed;
+    inventory_type["elixir_buff"] = &Inventory::elixir_buff;
+    inventory_type["health"] = &Inventory::health;
+    inventory_type["kapala_blood_amount"] = &Inventory::kapala_blood_amount;
+    inventory_type["time_of_death"] = &Inventory::time_of_death;
+    inventory_type["held_item"] = &Inventory::held_item;
+    inventory_type["held_item_metadata"] = &Inventory::held_item_metadata;
+    inventory_type["mount_type"] = &Inventory::mount_type;
+    inventory_type["mount_metadata"] = &Inventory::mount_metadata;
+    inventory_type["kills_level"] = &Inventory::kills_level;
+    inventory_type["kills_total"] = &Inventory::kills_total;
+    inventory_type["collected_money_total"] = &Inventory::collected_money_total;
+    inventory_type["collected_money_count"] = &Inventory::collected_money_count;
+    inventory_type["collected_money"] = &Inventory::collected_money;
+    inventory_type["collected_money_values"] = &Inventory::collected_money_values;
+    inventory_type["killed_enemies"] = &Inventory::killed_enemies;
+    inventory_type["companion_count"] = &Inventory::companion_count;
+    inventory_type["companions"] = &Inventory::companions;
+    inventory_type["companion_held_items"] = &Inventory::companion_held_items;
+    inventory_type["companion_held_item_metadatas"] = &Inventory::companion_held_item_metadatas;
+    inventory_type["companion_trust"] = &Inventory::companion_trust;
+    inventory_type["companion_health"] = &Inventory::companion_health;
+    inventory_type["companion_poison_tick_timers"] = &Inventory::companion_poison_tick_timers;
+    inventory_type["is_companion_cursed"] = &Inventory::is_companion_cursed;
+    inventory_type["acquired_powerups"] = &Inventory::acquired_powerups;
 
     lua.new_usertype<Ai>(
         "Ai",
@@ -127,41 +94,31 @@ void register_usertypes(sol::state& lua)
         &Ai::timer,
         "state",
         &Ai::state,
+        "last_state",
+        &Ai::last_state,
         "trust",
         &Ai::trust,
         "whipped",
-        &Ai::whipped);
+        &Ai::whipped,
+        "walk_pause_timer",
+        &Ai::walk_pause_timer);
 
-    lua.new_usertype<Player>(
-        "Player",
-        "inventory",
-        &Player::inventory_ptr,
-        "emitted_light",
-        &Player::emitted_light,
-        "linked_companion_parent",
-        &Player::linked_companion_parent,
-        "linked_companion_child",
-        &Player::linked_companion_child,
-        "ai",
-        &Player::ai,
-        "set_jetpack_fuel",
-        &Player::set_jetpack_fuel,
-        "kapala_blood_amount",
-        &Player::kapala_blood_amount,
-        "get_name",
-        &Player::get_name,
-        "get_short_name",
-        &Player::get_short_name,
-        "get_heart_color",
-        &Player::get_heart_color,
-        "is_female",
-        &Player::is_female,
-        "set_heart_color",
-        &Player::set_heart_color,
-        "let_go",
-        &Player::let_go,
-        sol::base_classes,
-        sol::bases<Entity, Movable, PowerupCapable>());
+    auto player_type = lua.new_usertype<Player>("Player", sol::base_classes, sol::bases<Entity, Movable, PowerupCapable>());
+    player_type["inventory"] = &Player::inventory_ptr;
+    player_type["emitted_light"] = &Player::emitted_light;
+    player_type["linked_companion_parent"] = &Player::linked_companion_parent;
+    player_type["linked_companion_child"] = &Player::linked_companion_child;
+    player_type["ai"] = &Player::ai;
+    player_type["input"] = &Player::input_ptr;
+    player_type["basecamp_button_entity"] = &Player::basecamp_button_entity;
+    player_type["set_jetpack_fuel"] = &Player::set_jetpack_fuel;
+    player_type["kapala_blood_amount"] = &Player::kapala_blood_amount;
+    player_type["get_name"] = &Player::get_name;
+    player_type["get_short_name"] = &Player::get_short_name;
+    player_type["get_heart_color"] = &Player::get_heart_color;
+    player_type["is_female"] = &Player::is_female;
+    player_type["set_heart_color"] = &Player::set_heart_color;
+    player_type["let_go"] = &Player::let_go;
 
     /// Same as `Player.get_name`
     lua["get_character_name"] = get_character_name;

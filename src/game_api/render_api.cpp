@@ -15,12 +15,13 @@
 #include "level_api.hpp"          // for ThemeInfo
 #include "logger.h"               // for DEBUG
 #include "memory.hpp"             // for read_u64, to_le_bytes, write_mem_prot
+#include "screen.hpp"             //
 #include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
 #include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
 #include "search.hpp"             // for get_address
 #include "state.hpp"              // for State, StateMemory
-#include "strings.hpp"
-#include "texture.hpp" // for Texture, get_textures, get_texture
+#include "strings.hpp"            //
+#include "texture.hpp"            // for Texture, get_textures, get_texture
 
 class JournalPage;
 struct Camera;
@@ -205,6 +206,103 @@ void render_journal_page_last_game_played(JournalPage* page)
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::LastGamePlayed, page);
 }
 
+using OnSelectFromJournalMenu = void(void*, uint8_t);
+OnSelectFromJournalMenu* g_on_select_from_journal_menu_trampoline{nullptr};
+bool g_selecting_from_menu_scope = false;
+void on_select_from_journal(void* unknown, uint8_t index)
+{
+    g_selecting_from_menu_scope = true;
+    if (pre_load_journal_chapter(index + 3))
+    {
+        return;
+    }
+    g_on_select_from_journal_menu_trampoline(unknown, index);
+    g_selecting_from_menu_scope = false;
+}
+
+static bool g_journal_enabled = true;
+using OnShowJournalFun = void(JournalUI*, uint8_t, bool, bool);
+OnShowJournalFun* g_on_show_journal_trampoline{nullptr};
+void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound)
+{
+    if (!g_journal_enabled && chapter == 2)
+    {
+        return;
+    }
+
+    if (!g_selecting_from_menu_scope && pre_load_journal_chapter(chapter))
+    {
+        // journal_ui->pages.clear(); // bug fix, probably not needed anymore, left just in case
+        return;
+    }
+
+    g_on_show_journal_trampoline(journal_ui, chapter, instant, play_sound);
+
+    std::vector<uint32_t> pages;
+    pages.reserve(journal_ui->pages_tmp.size());
+    for (auto p : journal_ui->pages_tmp)
+    {
+        pages.push_back(p->page_number);
+    }
+
+    auto return_pages = post_load_journal_chapter(chapter, pages);
+
+    if (!return_pages.empty())
+    {
+        std::map<JournalPage*, bool> pages_copy;
+        for (auto p : journal_ui->pages_tmp)
+        {
+            pages_copy.insert({p, true});
+        }
+
+        auto find_page = [](std::map<JournalPage*, bool>& x, uint32_t find) -> JournalPage*
+        {
+            for (auto& it : x)
+            {
+                if (it.first->page_number == find)
+                {
+                    if (it.second == false)
+                        return nullptr;
+
+                    it.second = false;
+                    return it.first;
+                }
+            }
+            return nullptr;
+        };
+
+        journal_ui->pages_tmp.clear();
+        uint8_t side = 0;
+        journal_ui->max_page_count = 0x7FFFFFFF;
+        for (auto page_id : return_pages)
+        {
+            auto p = find_page(pages_copy, page_id);
+            if (p)
+            {
+                journal_ui->pages_tmp.push_back(p);
+                // p->set_page_background_side(side); // only changes background, all the text and graphics are still rendered with the old offset
+            }
+            else
+            {
+                journal_ui->pages_tmp.push_back(JournalPageStory::construct(side, page_id));
+            }
+            side ^= 0x1;
+        }
+        for (auto p : pages_copy) // free unused screens
+        {
+            if (p.second)
+            {
+                p.first->~JournalPage();
+            }
+        }
+    }
+}
+
+bool& get_journal_enabled()
+{
+    return g_journal_enabled;
+}
+
 bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
 {
     static size_t text_rendering_func1_offset = 0;
@@ -231,10 +329,27 @@ bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text
     }
     return false;
 }
+void free_text_post_rendering(TextRenderingInfo* info)
+{
+    if (info->unknown4 != nullptr)
+    {
+        game_free(info->unknown4);
+    }
+    if (info->letter_textures != nullptr)
+    {
+        game_free(info->letter_textures);
+    }
+    if (info->unknown6 != nullptr)
+    {
+        game_free(info->unknown6);
+    }
+}
 
 void RenderAPI::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
-    TextRenderingInfo tri = {0};
+    TextRenderingInfo tri{};
+    ON_SCOPE_EXIT(free_text_post_rendering(&tri));
+
     if (!prepare_text_for_rendering(&tri, text, x, y, scale_x, scale_y, alignment, fontstyle))
     {
         return;
@@ -256,7 +371,9 @@ void RenderAPI::draw_text(const std::string& text, float x, float y, float scale
 
 std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
 {
-    TextRenderingInfo tri = {0};
+    TextRenderingInfo tri{};
+    ON_SCOPE_EXIT(free_text_post_rendering(&tri));
+
     if (!prepare_text_for_rendering(&tri, text, 0, 0, scale_x, scale_y, 1 /*center*/, fontstyle))
     {
         return std::make_pair(0.0f, 0.0f);
@@ -440,6 +557,8 @@ void init_render_api_hooks()
     g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud"sv);
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
     g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth"sv);
+    g_on_show_journal_trampoline = (OnShowJournalFun*)get_address("show_journal");
+    g_on_select_from_journal_menu_trampoline = (OnSelectFromJournalMenu*)get_address("journal_menu_select");
 
     const size_t fourth_virt = 4 * sizeof(size_t);
     const size_t journal_vftable = get_address("vftable_JournalPages"sv);
@@ -497,6 +616,8 @@ void init_render_api_hooks()
     DetourAttach((void**)&g_render_journal_page_recap_trampoline, &render_journal_page_recap);
     DetourAttach((void**)&g_render_journal_page_player_profile_trampoline, &render_journal_page_player_profile);
     DetourAttach((void**)&g_render_journal_page_last_game_played_trampoline, &render_journal_page_last_game_played);
+    DetourAttach((void**)&g_on_show_journal_trampoline, &on_open_journal_chapter);
+    DetourAttach((void**)&g_on_select_from_journal_menu_trampoline, &on_select_from_journal);
 
     DetourAttach((void**)&g_prepare_text_trampoline, prepare_text);
 

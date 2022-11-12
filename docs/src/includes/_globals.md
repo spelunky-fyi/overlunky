@@ -1158,6 +1158,45 @@ Store an entity type in [Waddler](#Waddler)'s storage. Returns the slot number t
 
 Returns the uid of the currently worn backitem, or -1 if wearing nothing
 
+## Feat functions
+
+
+### change_feat
+
+
+> Search script examples for [change_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_feat)
+
+#### nil change_feat([FEAT](#Aliases) feat, bool hidden, string name, string description)
+
+Helper function to set the title and description strings for a [FEAT](#Aliases) with change_string, as well as the hidden state.
+
+### get_feat
+
+
+> Search script examples for [get_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_feat)
+
+#### tuple&lt;bool, bool, const string, const string&gt; get_feat([FEAT](#Aliases) feat)
+
+Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
+
+### get_feat_hidden
+
+
+> Search script examples for [get_feat_hidden](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_feat_hidden)
+
+#### bool get_feat_hidden([FEAT](#Aliases) feat)
+
+Get the visibility of a feat
+
+### set_feat_hidden
+
+
+> Search script examples for [set_feat_hidden](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_feat_hidden)
+
+#### nil set_feat_hidden([FEAT](#Aliases) feat, bool hidden)
+
+Set the visibility of a feat
+
 ## Flag functions
 
 
@@ -1271,6 +1310,15 @@ Create image from file. Returns a tuple containing id, width and height.
 #### bool disable_floor_embeds(bool disable)
 
 Disable all crust item spawns, returns whether they were already disabled before the call
+
+### force_journal
+
+
+> Search script examples for [force_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_journal)
+
+#### nil force_journal(int chapter, int entry)
+
+Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
 
 ### get_adventure_seed
 
@@ -1410,6 +1458,15 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 
 Same as `Player.is_female`
 
+### load_death_screen
+
+
+> Search script examples for [load_death_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_death_screen)
+
+#### nil load_death_screen()
+
+Immediately ends the run with the death screen, also calls the save_progress
+
 ### load_screen
 
 
@@ -1466,6 +1523,24 @@ Adds a command that can be used in the console.
 
 Converts a color to int to be used in drawing functions. Use values from `0..255`.
 
+### save_progress
+
+
+> Search script examples for [save_progress](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_progress)
+
+#### bool save_progress()
+
+Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the [ON](#ON).SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+
+### save_script
+
+
+> Search script examples for [save_script](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_script)
+
+#### bool save_script()
+
+Runs the [ON](#ON).SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+
 ### script_enabled
 
 
@@ -1501,6 +1576,32 @@ Set the current adventure seed pair
 #### nil set_character_heart_color([ENT_TYPE](#ENT_TYPE) type_id, [Color](#Color) color)
 
 Same as `Player.set_heart_color`
+
+### set_ending_unlock
+
+
+```lua
+-- change character unlocked by endings to pilot
+set_ending_unlock(ENT_TYPE.CHAR_PILOT)
+
+-- change texture of the actual savior in endings to pilot
+set_callback(function()
+    set_post_entity_spawn(function(ent)
+        if state.screen == SCREEN.WIN then
+            ent:set_texture(TEXTURE.DATA_TEXTURES_CHAR_PINK_0)
+        end
+        clear_callback()
+    end, SPAWN_TYPE.SYSTEMIC, MASK.PLAYER)
+end, ON.WIN)
+
+```
+
+
+> Search script examples for [set_ending_unlock](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ending_unlock)
+
+#### nil set_ending_unlock([ENT_TYPE](#ENT_TYPE) type)
+
+Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
 
 ### set_journal_enabled
 
@@ -1573,6 +1674,24 @@ end, "waddler")
 
 Set layer to search for storage items on
 
+### show_journal
+
+
+> Search script examples for [show_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_journal)
+
+#### nil show_journal([JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) chapter, int page)
+
+Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
+
+### toggle_journal
+
+
+> Search script examples for [toggle_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_journal)
+
+#### nil toggle_journal()
+
+Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.
+
 ### update_liquid_collision_at
 
 
@@ -1615,24 +1734,6 @@ Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. T
 #### tuple&lt;float, float&gt; mouse_position()
 
 Current mouse cursor position in screen coordinates.
-
-### read_input
-
-
-> Search script examples for [read_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
-
-#### [INPUTS](#INPUTS) read_input(int uid)
-
-Read input
-
-### read_stolen_input
-
-
-> Search script examples for [read_stolen_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
-
-#### [INPUTS](#INPUTS) read_stolen_input(int uid)
-
-Read input that has been previously stolen with steal_input
 
 ### return_input
 
@@ -2142,6 +2243,15 @@ Gets the resolution (width and height) of the screen
 
 Get the current set zoom level
 
+### position_is_valid
+
+
+> Search script examples for [position_is_valid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=position_is_valid)
+
+#### bool position_is_valid(float x, float y, [LAYER](#LAYER) layer, [POS_TYPE](#POS_TYPE) flags)
+
+Check if position satifies the given [POS_TYPE](#POS_TYPE) flags, to be used in a custom is_valid function procedural for spawns.
+
 ### screen_aabb
 
 
@@ -2389,6 +2499,14 @@ Loads a sound from disk relative to this script, ownership might be shared with 
 
 Gets an existing sound, either if a file at the same path was already loaded or if it is already loaded by the game
 
+### play_sound
+
+
+> Search script examples for [play_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_sound)
+
+#### [SoundMeta](#SoundMeta) play_sound([VANILLA_SOUND](#VANILLA_SOUND) sound, int source_uid)
+
+
 ## Spawn functions
 
 
@@ -2421,7 +2539,7 @@ Use empty table as argument to reset to the game default
 
 > Search script examples for [default_spawn_is_valid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_spawn_is_valid)
 
-#### bool default_spawn_is_valid(float x, float y, int layer)
+#### bool default_spawn_is_valid(float x, float y, [LAYER](#LAYER) layer)
 
 Default function in spawn definitions to check whether a spawn is valid or not
 
@@ -2680,6 +2798,16 @@ Short for [spawn_entity_over](#spawn_entity_over)
 Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 
+### spawn_playerghost
+
+
+> Search script examples for [spawn_playerghost](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_playerghost)
+
+#### int spawn_playerghost([ENT_TYPE](#ENT_TYPE) char_type, float x, float y, [LAYER](#LAYER) layer)
+
+Spawn the [PlayerGhost](#PlayerGhost) entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+or change it's `player_inputs` to the `input` of real player so he can control it directly
+
 ### spawn_tree
 
 
@@ -2789,7 +2917,30 @@ Will return the string of currently choosen language
 #### [STRINGID](#Aliases) hash_to_stringid(int hash)
 
 Convert the hash to stringid
-Check [strings00_hashed.str](game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+
+### set_level_string
+
+
+```lua
+-- set the level string shown in hud, journal and game over
+-- also change the one used in transitions for consistency
+set_callback(function()
+    if state.screen_next == SCREEN.LEVEL then
+        local level_str = "test" .. tostring(state.level_count)
+        set_level_string(level_str)
+        change_string(hash_to_stringid(0xda7c0c5b), F"{level_str} COMPLETED!")
+    end
+end, ON.PRE_LOAD_SCREEN)
+
+```
+
+
+> Search script examples for [set_level_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_string)
+
+#### nil set_level_string(string str)
+
+Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level. Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
 
 ## Texture functions
 
@@ -3103,6 +3254,25 @@ this doesn't actually work at all. See State -> [Camera](#Camera) the for proper
 > Search script examples for [testflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
 
 `nil testflag()`<br/>
+
+### read_input
+
+
+> Search script examples for [read_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_input)
+
+`INPUTS read_input(int uid)`<br/>
+Use `players[1].input.buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
+Of course, you can get the player by other mean, it doesn't need to be the `players` table
+You can only read inputs from actual players, HH don't have any inputs
+
+### read_stolen_input
+
+
+> Search script examples for [read_stolen_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_stolen_input)
+
+`INPUTS read_stolen_input(int uid)`<br/>
+Read input that has been previously stolen with steal_input
+Use `state.player_inputs.player_slots[player_slot].buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
 
 ### generate_particles
 

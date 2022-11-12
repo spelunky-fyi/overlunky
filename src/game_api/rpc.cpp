@@ -27,6 +27,7 @@
 #include "entities_liquids.hpp" // for Liquid
 #include "entities_mounts.hpp"  // for Mount
 #include "entity.hpp"           // for get_entity_ptr, to_id, Entity, EntityDB
+#include "game_manager.hpp"     //
 #include "items.hpp"            // for Items
 #include "layer.hpp"            // for EntityList, EntityList::Range, Layer
 #include "logger.h"             // for DEBUG
@@ -265,13 +266,16 @@ ENT_TYPE get_entity_type(uint32_t uid)
     return UINT32_MAX; // TODO: shouldn't this be 0?
 }
 
-std::vector<Player*> get_players()
+std::vector<Player*> get_players(StateMemory* state)
 {
-    auto state = State::get();
+    state = state != nullptr
+                ? state
+                : State::get().ptr();
+
     std::vector<Player*> found;
     for (uint8_t i = 0; i < MAX_PLAYERS; i++)
     {
-        auto player = state.items()->player(i);
+        auto player = state->items->player(i);
         if (player)
             found.push_back((Player*)player);
     }
@@ -646,6 +650,11 @@ void unlock_door_at(float x, float y)
     }
 }
 
+uint32_t get_frame_count_main()
+{
+    auto state = State::get();
+    return state.get_frame_count_main();
+}
 uint32_t get_frame_count()
 {
     auto state = State::get();
@@ -727,27 +736,32 @@ void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_enti
     write_mem_prot(get_address("poison_arrowtrap_projectile"), poison_entity_type, true);
 }
 
+float* g_sparktrap_parameters{nullptr};
 void modify_sparktraps(float angle_increment, float distance)
 {
-    static float* new_array;
-    if (new_array == nullptr)
+    if (g_sparktrap_parameters == nullptr)
     {
         const auto offset = get_address("sparktrap_angle_increment") + 4;
 
-        if (read_u8(offset - 1) != 0x89) // check if sparktraps_hack is active
+        if (read_u8(offset - 1) == 0x89) // check if sparktraps_hack is active
             return;
 
         const int32_t distance_offset = 0xF1;
-        new_array = (float*)alloc_mem_rel32(offset + 4, sizeof(float) * 2);
-        if (!new_array)
+        g_sparktrap_parameters = (float*)alloc_mem_rel32(offset + 4, sizeof(float) * 2);
+        if (!g_sparktrap_parameters)
             return;
 
-        int32_t rel = static_cast<int32_t>((size_t)new_array - (offset + 4));
+        int32_t rel = static_cast<int32_t>((size_t)g_sparktrap_parameters - (offset + 4));
         write_mem_prot(offset, rel, true);
         write_mem_prot(offset + distance_offset, (int32_t)(rel - distance_offset + sizeof(float)), true);
     }
-    *new_array = angle_increment;
-    *(new_array + 1) = distance;
+    *g_sparktrap_parameters = angle_increment;
+    *(g_sparktrap_parameters + 1) = distance;
+}
+
+float* get_sparktraps_parameters_ptr() // only for the UI
+{
+    return g_sparktrap_parameters;
 }
 
 void activate_sparktraps_hack(bool activate)
@@ -1182,66 +1196,27 @@ void refresh_illumination(Illumination* illumination)
     illumination->timer = *offset;
 }
 
-static bool g_journal_enabled = true;
-using OnShowJournalFun = void(void*, uint8_t);
-OnShowJournalFun* g_on_show_journal_trampoline{nullptr};
-void on_show_journal(void* journal_ui, uint8_t page_shown)
-{
-    if (!g_journal_enabled && page_shown == 2) // page 2 = journal
-    {
-        return;
-    }
-    g_on_show_journal_trampoline(journal_ui, page_shown);
-}
-
 void set_journal_enabled(bool b)
 {
-    static bool function_hooked = false;
-    if (!function_hooked)
-    {
-        g_on_show_journal_trampoline = (OnShowJournalFun*)get_address("show_journal");
-
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-
-        DetourAttach((void**)&g_on_show_journal_trampoline, &on_show_journal);
-
-        const LONG error = DetourTransactionCommit();
-        if (error != NO_ERROR)
-        {
-            DEBUG("Failed hooking on_show_journal: {}\n", error);
-        }
-
-        function_hooked = true;
-    }
-    g_journal_enabled = b;
+    get_journal_enabled() = b;
 }
 
 void set_camp_camera_bounds_enabled(bool b)
 {
-    static size_t offset = 0;
-    static char original_instruction[3] = {0};
-    if (offset == 0)
-    {
-        offset = get_address("enforce_camp_camera_bounds");
-        for (uint8_t x = 0; x < 3; ++x)
-        {
-            original_instruction[x] = read_u8(offset + x);
-        }
-    }
+    static const size_t offset = get_address("enforce_camp_camera_bounds");
     if (b)
     {
-        write_mem_prot(offset, std::string(original_instruction, 3), true);
+        recover_mem("camp_camera_bounds");
     }
     else
     {
-        write_mem_prot(offset, "\xC3\x90\x90"s, true);
+        write_mem_recoverable("camp_camera_bounds", offset, "\xC3\x90\x90"s, true);
     }
 }
 
 void set_explosion_mask(int32_t mask)
 {
-    static size_t addr = get_address("explosion_mask");
+    static const size_t addr = get_address("explosion_mask");
     if (mask == -1)
     {
         recover_mem("explosion_mask");
@@ -1273,7 +1248,8 @@ void set_max_rope_length(uint8_t length)
 
 uint8_t get_max_rope_length()
 {
-    return static_cast<uint8_t>(read_u32(get_address("attach_thrown_rope_to_background")));
+    static const auto address = get_address("attach_thrown_rope_to_background");
+    return static_cast<uint8_t>(read_u32(address));
 }
 
 uint8_t waddler_count_entity(ENT_TYPE entity_type)
@@ -1841,4 +1817,81 @@ void game_log(std::string message)
     const static auto game_log_fun = (GameLogFun*)get_address("game_log_function");
     const static auto log_stream = (std::ofstream*)read_i64(get_address("game_log_stream"));
     game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
+}
+
+void call_death_screen()
+{
+    using DeathScreen = void();
+    static auto death_screen = (DeathScreen*)get_address("death_screen");
+    death_screen();
+}
+
+void save_progress()
+{
+    using SaveProgress = void(SaveRelated*);
+    static auto save_game_to_file = (SaveProgress*)get_address("save_progress");
+    static auto gm = get_game_manager();
+    save_game_to_file(gm->save_related);
+}
+
+void set_level_string(std::u16string_view text)
+{
+    const static auto hud_text_address = get_address("hud_level_text");
+    const static auto journal_text_address = get_address("journal_level_text");
+    const static auto journal_map_text_address = get_address("journal_map_level_text");
+    static char16_t* data;
+    static size_t text_data_length = 0;
+
+    if (text_data_length == 0 || text_data_length < text.length())
+    {
+        if (text_data_length != 0)
+        {
+            VirtualFree(data, 0, MEM_RELEASE);
+        }
+        text_data_length = text.length() == 0 ? 1 : text.length(); // just to make sure it's not set to 0
+
+        auto new_array_offset = hud_text_address;
+        if (journal_text_address > new_array_offset)
+        {
+            new_array_offset = journal_text_address;
+        }
+        if (journal_map_text_address > new_array_offset)
+        {
+            new_array_offset = journal_map_text_address;
+        }
+
+        data = (char16_t*)alloc_mem_rel32(new_array_offset + 4, (text_data_length + 5) * sizeof(char16_t));
+        *data = 0x25; // for the theme name in the journal map
+        *(data + 1) = 0x6C;
+        *(data + 2) = 0x73;
+        *(data + 3) = 0x0A;
+
+        const int32_t hud_rel = static_cast<int32_t>((size_t)(data + 4) - (hud_text_address + 4));
+        const int32_t journal_rel = static_cast<int32_t>((size_t)(data + 4) - (journal_text_address + 4));
+        const int32_t journal_map_rel = static_cast<int32_t>((size_t)(data) - (journal_map_text_address + 4));
+
+        write_mem_prot(hud_text_address, hud_rel, true);
+        write_mem_prot(journal_text_address, journal_rel, true);
+        write_mem_prot(journal_map_text_address, journal_map_rel, true);
+    }
+    memcpy(data + 4, text.data(), text.length() * sizeof(char16_t));
+    *(data + 4 + text.length()) = NULL;
+}
+
+void set_ending_unlock(ENT_TYPE type)
+{
+    static const ENT_TYPE first = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+    static const ENT_TYPE last = to_id("ENT_TYPE_CHAR_CLASSIC_GUY");
+    if (type >= first && type <= last)
+    {
+        const auto offset = get_address("ending_unlock");
+        const int32_t char_offset = 10;
+
+        write_mem_recoverable("ending_unlock", offset, "\x90\x90\x90\x90\x90\x90\x90\x90"sv, true);
+        write_mem_recoverable("ending_unlock", offset + char_offset, type, true);
+    }
+    else
+    {
+        recover_mem("ending_unlock");
+    }
 }

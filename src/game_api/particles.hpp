@@ -200,7 +200,7 @@ struct ParticleEmitterInfo
     float offset_x;
     float offset_y;
 
-    uint8_t unknown54a;
+    uint8_t unknown54a; // layer?
     uint8_t unknown54b;
     uint8_t unknown54c;
     uint8_t unknown54d;
@@ -208,7 +208,7 @@ struct ParticleEmitterInfo
     uint32_t unknown56;
     uint32_t total_particles;
     uint32_t unknown58;
-    uint32_t unknown59;
+    uint32_t unknown59; // max_particles?
     uint32_t unknown60;
 };
 

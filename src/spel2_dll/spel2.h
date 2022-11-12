@@ -92,23 +92,23 @@ struct ID3D11Device* SpelunkyGetD3D11Device();
 SpelunkyScript* Spelunky_CreateScript(const char* file_path, bool enabled);
 void Spelunky_FreeScript(SpelunkyScript* script);
 
-void SpelunkyScipt_ReloadScript(SpelunkyScript* script, const char* file_path);
+void SpelunkyScript_ReloadScript(SpelunkyScript* script, const char* file_path);
 
-bool SpelunkyScipt_IsEnabled(SpelunkyScript* script);
-void SpelunkyScipt_SetEnabled(SpelunkyScript* script, bool enabled);
+bool SpelunkyScript_IsEnabled(SpelunkyScript* script);
+void SpelunkyScript_SetEnabled(SpelunkyScript* script, bool enabled);
 
 void SpelunkyScript_Update(SpelunkyScript* script);
 void SpelunkyScript_Draw(SpelunkyScript* script, struct ImDrawList* draw_list);
 void SpelunkyScript_DrawOptions(SpelunkyScript* script);
-const char* SpelunkyScript_GetResult(SpelunkyScript* script);
+void SpelunkyScript_GetResult(SpelunkyScript* script, char* out_buffer, size_t out_buffer_size);
 
 struct SpelunkyScriptMessage
 {
     const char* Message{nullptr};
     size_t TimeMilliSecond{0};
 };
-size_t SpelunkyScript_GetNumMessages(SpelunkyScript* script);
-SpelunkyScriptMessage SpelunkyScript_GetMessage(SpelunkyScript* script, size_t message_idx);
+using SpelunkyScript_MessageFun = void (*)(SpelunkyScriptMessage);
+void SpelunkyScript_LoopMessages(SpelunkyScript* script, SpelunkyScript_MessageFun message_fun);
 
 struct SpelunkyScriptMeta
 {
@@ -123,7 +123,8 @@ struct SpelunkyScriptMeta
     bool unsafe;
     bool online_safe;
 };
-SpelunkyScriptMeta SpelunkyScript_GetMeta(SpelunkyScript* script);
+using SpelunkyScript_MetaFun = void (*)(const SpelunkyScriptMeta&);
+void SpelunkyScript_GetMeta(SpelunkyScript* script, SpelunkyScript_MetaFun meta_fun);
 
 SpelunkyConsole* CreateConsole();
 void FreeConsole(SpelunkyConsole* console);
@@ -135,9 +136,8 @@ bool SpelunkyConsole_IsToggled(SpelunkyConsole* console);
 void SpelunkyConsole_Toggle(SpelunkyConsole* console);
 bool SpelunkyConsole_Execute(SpelunkyConsole* console, const char* code, char* out_buffer, size_t out_buffer_size);
 
-size_t SpelunkyConsole_GetNumMessages(SpelunkyConsole* console);
-const char* SpelunkyConsole_GetMessage(SpelunkyConsole* console, size_t message_idx);
-void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console);
+using SpelunkyConsole_MessageFun = void (*)(const char*);
+void SpelunkyConsole_ConsumeMessages(SpelunkyConsole* console, SpelunkyConsole_MessageFun message_fun);
 
 bool SpelunkyConsole_HasNewHistory(SpelunkyConsole* console);
 void SpelunkyConsole_SetMaxHistorySize(SpelunkyConsole* console, size_t max_history);

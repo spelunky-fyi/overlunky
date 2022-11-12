@@ -7,7 +7,7 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 
 [![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.2-green) (Steam version)
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (latest prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.2-green) (Steam version)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (latest prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.27-green) (Steam version)
 
 **Overlunky (or any other modding tool for that matter) does not support the GamePass/Xbox version**, but it might be considered in the future.
 
@@ -41,7 +41,6 @@ Check the generated `Spelunky 2/overlunky.ini` after running to change shortcut 
 Current features and their *default* keyboard shortcuts.
 
   - There's a LOT of useful keys that are not listed here because this list is getting pretty long, check settings or `overlunky.ini` for cool beans.
-  - *The F-keys don't work in the (default) Menu UI* at the moment.
   - The default keys are also changed from time to time to make room for better features, so check the key config for your current keys, or delete the ini (section) to revert to default keys.
   - **F1**: Search and spawn entities where you're standing
       + **Ctrl+Enter**: Spawn entity
@@ -99,6 +98,7 @@ Current features and their *default* keyboard shortcuts.
   - **F9**: Options
       + Lots of options. **Check the key config for hotkeys for these and other stuff!**
   - **F11**: Hide overlay
+  - **F12**: Switch UI style (default menu bar / floating dockable windows)
   - **\~ (or your native Console Key)**: Toggle developer console
     - The console is its own script environment, where you can run some quick oneliners or paste snippets in.
     - **Enter**: Execute
@@ -149,8 +149,8 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + Try toggling the *Capture third-party overlays* option in *Game Capture*. It's possible to hide OL if running the game through Steam.
     + If you have lag or crashes, check previous question.
   - If you're running **Linux**
-    + The game and OL should run fine with Wine 7 if you install DXVK.
-    + Also works with Proton 7 using the [command line switch](#command-line-switches) `--launch_playlunky ..` for a non-Steam game shortcut. Just make sure the game and the OL shortcut are set to use Proton 7.
+    + The game and OL should run fine with Wine 7 if you install DXVK and the steam emu.
+    + Also works with Proton 7 using the [command line switch](#command-line-switches) `--launch_playlunky ..` for a non-Steam game shortcut. Just make sure the game and the OL shortcut are set to use Proton 7. **Proton actually seems broken for some reason.**
     + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
   - If you **don't have scripts** in the Scripts tab
     + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts).

@@ -336,8 +336,9 @@ Name | Data | Description
 [ITEMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.ITEMS) | 6 | 
 [TRAPS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.TRAPS) | 7 | 
 [STORY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.STORY) | 8 | 
-[RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.RECAP) | 9 | 
-[DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.DEATH) | 10 | 
+[FEATS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.FEATS) | 9 | 
+[RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.RECAP) | 10 | 
+[DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_PAGE_SHOWN.DEATH) | 11 | 
 
 ## JOURNALUI_STATE
 
@@ -546,6 +547,10 @@ Name | Data | Description
 [SPEECH_BUBBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) | ON::SPEECH_BUBBLE | Params: `Entity speaking_entity, string text`<br/>Runs before any speech bubble is created, even the one using `say` function<br/>Return behavior: if you don't return anything it will execute the speech bubble function normally with default message<br/>if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [TOAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TOAST) | ON::TOAST | Params: `string text`<br/>Runs before any toast is created, even the one using `toast` function<br/>Return behavior: if you don't return anything it will execute the toast function normally with default message<br/>if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [DEATH_MESSAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH_MESSAGE) | ON::DEATH_MESSAGE | Params: `STRINGID id`<br/>Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.<br/>
+[PRE_LOAD_JOURNAL_CHAPTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_JOURNAL_CHAPTER) | ON::PRE_LOAD_JOURNAL_CHAPTER | Params: [JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) `chapter`<br/>Runs before the journal or any of it's chapter is opened<br/>Return behavior: return true to not load the chapter (or journal as a whole)<br/>
+[POST_LOAD_JOURNAL_CHAPTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_JOURNAL_CHAPTER) | ON::POST_LOAD_JOURNAL_CHAPTER | Params: [JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) `chapter`, `array pages`<br/>Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return behavior: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...<br/>
+[PRE_GET_FEAT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GET_FEAT) | ON::PRE_GET_FEAT | Runs before getting performed status for a [FEAT](#Aliases) when rendering the Feats page in journal. Return a boolean to override the vanilla feat with your own. Defaults to Steam GetAchievement.<br/>
+[PRE_SET_FEAT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_SET_FEAT) | ON::PRE_SET_FEAT | Runs before the game sets a vanilla feat performed. Return true to block the default behaviour of calling Steam SetAchievement.<br/>
 
 ## PARTICLEEMITTER
 
@@ -572,6 +577,31 @@ Name | Data | Description
 [SLIDING_DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.SLIDING_DOWN) | 1 | 
 [VISIBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.VISIBLE) | 2 | 
 [SLIDING_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.SLIDING_UP) | 3 | 
+
+## POS_TYPE
+
+
+> Search script examples for [POS_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[FLOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.FLOOR) | POS_TYPE::FLOOR | On top of solid floor<br/>
+[CEILING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.CEILING) | POS_TYPE::CEILING | Below solid ceiling<br/>
+[AIR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.AIR) | POS_TYPE::AIR | Is a non-solid tile (no need to explicitly add this to everything)<br/>
+[WALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL) | POS_TYPE::WALL | Next to a wall<br/>
+[ALCOVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.ALCOVE) | POS_TYPE::ALCOVE | Has a floor, ceiling and exactly one wall<br/>
+[PIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.PIT) | POS_TYPE::PIT | Has a floor, two walls and no ceiling<br/>
+[HOLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.HOLE) | POS_TYPE::HOLE | Air pocket surrounded by floors<br/>
+[WATER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WATER) | POS_TYPE::WATER | Is in water (otherwise assumed not in water)<br/>
+[LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.LAVA) | POS_TYPE::LAVA | Is in lava (otherwise assumed not in lava)<br/>
+[SAFE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.SAFE) | POS_TYPE::SAFE | Avoid hazards, like certain traps, shops and any special floor<br/>
+[EMPTY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.EMPTY) | POS_TYPE::EMPTY | Has nothing but decoration and background in it<br/>
+[SOLID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.SOLID) | POS_TYPE::SOLID | Is inside solid floor or activefloor<br/>
+[DEFAULT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.DEFAULT) | POS_TYPE::DEFAULT | FLOOR | SAFE | EMPTY<br/>
+[WALL_LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL_LEFT) | POS_TYPE::WALL_LEFT | Next to a wall on the left<br/>
+[WALL_RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL_RIGHT) | POS_TYPE::WALL_RIGHT | Next to a wall on the right<br/>
 
 ## PRNG_CLASS
 

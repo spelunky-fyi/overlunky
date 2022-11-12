@@ -15,6 +15,8 @@
 #include "math.hpp"    // for Quad, AABB (ptr only)
 #include "texture.hpp" // for Texture
 
+struct JournalUI;
+
 enum JOURNAL_VFTABLE
 {
     // to get those offsets, find "vftable_JournalPages" then go to each page in journal, then to it's first vtable function address
@@ -86,10 +88,8 @@ struct RenderAPI
     void reload_shaders();
 };
 
-// straight out of the x64dbg plugin
 struct RenderInfo
 {
-    size_t __vftable;
     float x;
     float y;
     uint32_t unknown3;
@@ -179,6 +179,12 @@ struct RenderInfo
     float* unknown59;
     uint32_t unknown60;
     uint32_t unknown61; // end, next RenderInfo below
+
+    virtual ~RenderInfo() = 0;
+    virtual void unknown_v2() = 0;
+    virtual void update() = 0;
+    virtual void draw(size_t) = 0;
+    virtual bool unknown_3() = 0; // init? sets darkness to 1.0 at the start, then does some other stuff
 };
 
 struct TextRenderingInfo
@@ -188,15 +194,26 @@ struct TextRenderingInfo
     uint32_t text_length;
     float width;
     float height;
-    uint32_t unknown3;
-    size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
+    uint32_t unknown3; // padding probably
+    // These 3 fields are sized 3 * wcslen(input_text)
+    float* unknown4;
+    float* letter_textures; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
+    short* unknown6;
     uint16_t unknown7;
-    uint16_t unknown8;
+    uint16_t unknown8; // padding probably
     int32_t unknown9;
-    size_t unknown10;
+    uint8_t shader;
+    uint8_t padding1[3];
+    uint32_t padding2;
     Texture* font;
+    float unknown13;
+    uint16_t unknown14;
+    uint16_t unknown15;
+    float unknown16;
+    float unknown17;
+    uint32_t unknown18;
+    float unknown19;
+    float unknown20;
 };
 
 struct TextureRenderingInfo
@@ -233,3 +250,5 @@ struct TextureRenderingInfo
 };
 
 void init_render_api_hooks();
+bool& get_journal_enabled();
+void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);

@@ -29,9 +29,9 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<PlayerSlot>(
         "PlayerSlot",
         "buttons_gameplay",
-        sol::readonly(&PlayerSlot::buttons_gameplay),
+        &PlayerSlot::buttons_gameplay,
         "buttons",
-        sol::readonly(&PlayerSlot::buttons),
+        &PlayerSlot::buttons,
         "input_mapping_keyboard",
         sol::readonly(&PlayerSlot::input_mapping_keyboard),
         "input_mapping_controller",
