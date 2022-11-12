@@ -393,74 +393,6 @@ end
             }
         });
 
-    auto set_option = [&lua](std::string name, sol::object value)
-    {
-        auto backend = LuaBackend::get_calling_backend();
-        std::visit(
-            overloaded{
-                [&](IntOption& option)
-                {
-                    option.value = value.as<int>();
-                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
-                },
-                [&](FloatOption& option)
-                {
-                    option.value = value.as<float>();
-                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
-                },
-                [&](BoolOption& option)
-                {
-                    option.value = value.as<bool>();
-                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
-                },
-                [&](StringOption& option)
-                {
-                    option.value = value.as<std::string>();
-                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
-                },
-                [&](ComboOption& option)
-                {
-                    option.value = value.as<bool>();
-                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
-                },
-                [&](auto&) {}},
-            backend->options[name].option_impl);
-    };
-
-    auto get_option = [&lua](std::string name) -> sol::object
-    {
-        auto backend = LuaBackend::get_calling_backend();
-        sol::object ret = sol::nil;
-        if (backend->options.contains(name))
-        {
-            std::visit(
-                overloaded{
-                    [&](IntOption& option)
-                    {
-                        ret = sol::make_object<int>(lua, option.value);
-                    },
-                    [&](FloatOption& option)
-                    {
-                        ret = sol::make_object<float>(lua, option.value);
-                    },
-                    [&](BoolOption& option)
-                    {
-                        ret = sol::make_object<bool>(lua, option.value);
-                    },
-                    [&](StringOption& option)
-                    {
-                        ret = sol::make_object<std::string>(lua, option.value);
-                    },
-                    [&](ComboOption& option)
-                    {
-                        ret = sol::make_object<bool>(lua, option.value);
-                    },
-                    [&](auto&) {}},
-                backend->options[name].option_impl);
-        }
-        return ret;
-    };
-
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
     // lua["options"] = lua.create_named_table("options");
 
@@ -714,10 +646,6 @@ end
         auto backend = LuaBackend::get_calling_backend();
         backend->options[name] = {"", "", CustomOption{callback}};
     };
-    /// Change options programmatically
-    lua["set_option"] = set_option;
-    /// Get option value
-    lua["get_option"] = get_option;
 
     auto spawn_liquid = sol::overload(
         static_cast<void (*)(ENT_TYPE, float, float)>(::spawn_liquid),

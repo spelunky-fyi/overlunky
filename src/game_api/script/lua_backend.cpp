@@ -641,43 +641,38 @@ void LuaBackend::render_options()
             overloaded{
                 [&](IntOption& option)
                 {
-                    if (ImGui::DragInt(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value);
+                    ImGui::DragInt(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max);
+                    lua["options"][name] = option.value;
                 },
                 [&](FloatOption& option)
                 {
-                    if (ImGui::DragFloat(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value);
+                    ImGui::DragFloat(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max);
+                    lua["options"][name] = option.value;
                 },
                 [&](BoolOption& option)
                 {
-                    if (ImGui::Checkbox(name_option_pair.second.desc.c_str(), &option.value))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value);
+                    ImGui::Checkbox(name_option_pair.second.desc.c_str(), &option.value);
+                    lua["options"][name] = option.value;
                 },
                 [&](StringOption& option)
                 {
-                    if (InputString(name_option_pair.second.desc.c_str(), &option.value, 0, nullptr, nullptr))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value);
+                    InputString(name_option_pair.second.desc.c_str(), &option.value, 0, nullptr, nullptr);
+                    lua["options"][name] = option.value;
                 },
                 [&](ComboOption& option)
                 {
-                    if (ImGui::Combo(name_option_pair.second.desc.c_str(), &option.value, option.options.c_str()))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value + 1;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value + 1) - 1;
+                    ImGui::Combo(name_option_pair.second.desc.c_str(), &option.value, option.options.c_str());
+                    lua["options"][name] = option.value + 1;
                 },
                 [&](ButtonOption& option)
                 {

@@ -35,7 +35,6 @@ register_option_callback('x', function(draw_ctx)
 end)
 
 -- multiple custom options in one callback, save to the options table or wherever you want
--- note: changes to options table in the script are not reflected in the gui, use set_option
 customoption = false
 additionaloption = false
 register_option_callback('y', function(draw_ctx)
@@ -46,12 +45,15 @@ register_option_callback('y', function(draw_ctx)
         additionaloption = draw_ctx:win_check('Additional checkbox', additionaloption)
     end)
     if draw_ctx:win_button('Set A to 123') then
-        set_option('a', 123)
+        options.a = 123
     end
     if draw_ctx:win_button('Set B to 1.23') then
         options.b = 1.23
     end
-    -- not returning anything, options.y will be nil
+    if draw_ctx:win_button('Try to set A to banana') then
+        options.a = 'banana'
+    end
+    -- not returning anything, options.y will be nil but we have set a bunch of others in here
 end)
 
 -- just print these out real quick
