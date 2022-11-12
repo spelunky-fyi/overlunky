@@ -74,8 +74,8 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Returns unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
     /// Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
     /// Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
-    /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any
-    /// properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`
+    /// If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any properties on the sound. Otherwise you may cause a deadlock.
+    /// The callback signature is nil on_vanilla_sound(PlayingSound sound)
     lua["set_vanilla_sound_callback"] = [](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CallbackId
     {
         auto backend_id = LuaBackend::get_calling_backend_id();
