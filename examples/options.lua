@@ -28,25 +28,30 @@ tests = {'Chi-Squared', 'McNemar', 'Portmanteau'}
 register_option_combo('h', 'Choice H', 'This is a really long description that is probably not necessary because I should\'ve just made the option more clear in the first place. But here we are, having to live with an option that spans probably 4or 5 lines just to explain something that most likely is too complicate for users to touch anyways.', table.concat(tests, '\0')..'\0\0')
 
 -- single custom option with the help of the window api, return value saved to options.x
-register_option_callback("x", function(draw_ctx)
+register_option_callback('x', function(draw_ctx)
     draw_ctx:win_separator()
-    draw_ctx:win_text("Custom options here:")
+    draw_ctx:win_text('Custom options here:')
     return draw_ctx:win_input_text('Custom text X', options.x or '')
 end)
 
 -- multiple custom options in one callback, save to the options table or wherever you want
--- note: changing to traditional options in the script are not actually reflected in the gui atm
+-- note: changes to options table in the script are not reflected in the gui, use set_option
 customoption = false
 additionaloption = false
-register_option_callback("y", function(draw_ctx)
+register_option_callback('y', function(draw_ctx)
     options.z = draw_ctx:win_slider_int('Custom int Z', options.z or 5, 0, 10)
     customoption = draw_ctx:win_check('Custom checkbox', customoption)
-    draw_ctx:window("Additional options", 0, 0, 0, 0, true, function()
-        draw_ctx:win_text("This window will also be shown whenever the options are shown.")
-        draw_ctx:win_check('Additional checkbox', additionaloption)
+    draw_ctx:window('Additional options', 0, 0, 0, 0, true, function()
+        draw_ctx:win_text('This window will also be shown whenever the options are shown.')
+        additionaloption = draw_ctx:win_check('Additional checkbox', additionaloption)
     end)
-    options.a = 42
-    -- not returning anything, options.y will be nil but we can write to other options
+    if draw_ctx:win_button('Set A to 123') then
+        set_option('a', 123)
+    end
+    if draw_ctx:win_button('Set B to 1.23') then
+        options.b = 1.23
+    end
+    -- not returning anything, options.y will be nil
 end)
 
 -- just print these out real quick

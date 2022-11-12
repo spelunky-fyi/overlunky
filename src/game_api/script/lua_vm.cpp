@@ -44,6 +44,7 @@
 #include "math.hpp"                                // for AABB
 #include "movable.hpp"                             // for Movable
 #include "online.hpp"                              // for get_online
+#include "overloaded.hpp"                          // for overloaded
 #include "rpc.hpp"                                 // for get_entities_by
 #include "savedata.hpp"                            // IWYU pragma: keep
 #include "screen.hpp"                              // for get_screen_ptr
@@ -392,8 +393,76 @@ end
             }
         });
 
+    auto set_option = [&lua](std::string name, sol::object value)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        std::visit(
+            overloaded{
+                [&](IntOption& option)
+                {
+                    option.value = value.as<int>();
+                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
+                },
+                [&](FloatOption& option)
+                {
+                    option.value = value.as<float>();
+                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
+                },
+                [&](BoolOption& option)
+                {
+                    option.value = value.as<bool>();
+                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
+                },
+                [&](StringOption& option)
+                {
+                    option.value = value.as<std::string>();
+                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
+                },
+                [&](ComboOption& option)
+                {
+                    option.value = value.as<bool>();
+                    backend->lua[sol::create_if_nil]["options"][name] = option.value;
+                },
+                [&](auto&) {}},
+            backend->options[name].option_impl);
+    };
+
+    auto get_option = [&lua](std::string name) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        sol::object ret = sol::nil;
+        if (backend->options.contains(name))
+        {
+            std::visit(
+                overloaded{
+                    [&](IntOption& option)
+                    {
+                        ret = sol::make_object<int>(lua, option.value);
+                    },
+                    [&](FloatOption& option)
+                    {
+                        ret = sol::make_object<float>(lua, option.value);
+                    },
+                    [&](BoolOption& option)
+                    {
+                        ret = sol::make_object<bool>(lua, option.value);
+                    },
+                    [&](StringOption& option)
+                    {
+                        ret = sol::make_object<std::string>(lua, option.value);
+                    },
+                    [&](ComboOption& option)
+                    {
+                        ret = sol::make_object<bool>(lua, option.value);
+                    },
+                    [&](auto&) {}},
+                backend->options[name].option_impl);
+        }
+        return ret;
+    };
+
     /// Table of options set in the UI, added with the [register_option_functions](#register_option_int).
-    lua["options"] = lua.create_named_table("options");
+    // lua["options"] = lua.create_named_table("options");
 
     /// Load another script by id "author/name" and import its `exports` table. Returns:
     ///
@@ -542,13 +611,13 @@ end
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, IntOption{value, min, max}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, int value, int min, int max)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", IntOption{value, min, max}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         });
     /// Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
@@ -558,13 +627,13 @@ end
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, FloatOption{value, min, max}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, float value, float min, float max)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", FloatOption{value, min, max}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         });
     /// Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
     // lua["register_option_bool"] = [&lua](std::string name, std::string desc, std::string long_desc, bool value)
@@ -573,13 +642,13 @@ end
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, BoolOption{value}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, bool value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", BoolOption{value}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         });
     /// Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
     // lua["register_option_string"] = [&lua](std::string name, std::string desc, std::string long_desc, std::string value)
@@ -588,13 +657,13 @@ end
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, StringOption{value}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, std::string value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", StringOption{value}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         });
     /// Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
     /// with a double `\0\0` at the end. `value` is the default index 1..n.
@@ -604,25 +673,25 @@ end
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ComboOption{value - 1, opts}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, std::string long_desc, std::string opts)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ComboOption{0, opts}};
-            lua["options"][name] = 1;
+            backend->lua[sol::create_if_nil]["options"][name] = 1;
         },
         [&lua](std::string name, std::string desc, std::string opts, int value)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ComboOption{value - 1, opts}};
-            lua["options"][name] = value;
+            backend->lua[sol::create_if_nil]["options"][name] = value;
         },
         [&lua](std::string name, std::string desc, std::string opts)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ComboOption{0, opts}};
-            lua["options"][name] = 1;
+            backend->lua[sol::create_if_nil]["options"][name] = 1;
         });
     /// Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
     // lua["register_option_button"] = [&lua](std::string name, std::string desc, std::string long_desc, sol::function on_click)
@@ -631,21 +700,25 @@ end
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, long_desc, ButtonOption{callback}};
-            lua["options"][name] = -1;
+            backend->lua[sol::create_if_nil]["options"][name] = -1;
         },
         [&lua](std::string name, std::string desc, sol::function callback)
         {
             auto backend = LuaBackend::get_calling_backend();
             backend->options[name] = {desc, "", ButtonOption{callback}};
-            lua["options"][name] = -1;
+            backend->lua[sol::create_if_nil]["options"][name] = -1;
         });
     /// Add custom options using the window drawing functions. Your callback will be called with a GuiDrawContext as a parameter and everything drawn in it will be rendered in the options window and the return value saved to `options[name]`.
-    // lua["register_option_callback"] = [&lua](std::string name, sol::function callback)
     lua["register_option_callback"] = [&lua](std::string name, sol::function callback)
     {
         auto backend = LuaBackend::get_calling_backend();
         backend->options[name] = {"", "", CustomOption{callback}};
     };
+    /// Change options programmatically
+    lua["set_option"] = set_option;
+    /// Get option value
+    lua["get_option"] = get_option;
+
     auto spawn_liquid = sol::overload(
         static_cast<void (*)(ENT_TYPE, float, float)>(::spawn_liquid),
         static_cast<void (*)(ENT_TYPE, float, float, float, float, uint32_t, uint32_t)>(::spawn_liquid_ex),
