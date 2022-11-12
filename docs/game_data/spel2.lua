@@ -198,11 +198,13 @@ function register_option_combo(name, desc, long_desc, opts, value) end
 ---@param on_click fun(): any
 ---@return nil
 function register_option_button(name, desc, long_desc, on_click) end
----Add custom options using the window drawing functions. Your callback will be called with a GuiDrawContext as a parameter and everything drawn in it will be rendered in the options window and the return value saved to `options[name]`.
+---Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+---The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
 ---@param name string
----@param callback fun(): any
+---@param value object
+---@param on_render fun(): any
 ---@return nil
-function register_option_callback(name, callback) end
+function register_option_callback(name, value, on_render) end
 ---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
 ---Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 ---`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore

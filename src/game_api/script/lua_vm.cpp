@@ -640,11 +640,16 @@ end
             backend->options[name] = {desc, "", ButtonOption{callback}};
             backend->lua[sol::create_if_nil]["options"][name] = -1;
         });
-    /// Add custom options using the window drawing functions. Your callback will be called with a GuiDrawContext as a parameter and everything drawn in it will be rendered in the options window and the return value saved to `options[name]`.
-    lua["register_option_callback"] = [](std::string name, sol::function callback)
+    /// Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+    /// The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
+    lua["register_option_callback"] = [](std::string name, sol::object value, sol::function on_render)
     {
         auto backend = LuaBackend::get_calling_backend();
-        backend->options[name] = {"", "", CustomOption{callback}};
+        backend->options[name] = {"", "", CustomOption{on_render}};
+        if (name != "")
+            backend->lua[sol::create_if_nil]["options"][name] = value;
+        else
+            backend->lua[sol::create_if_nil]["options"] = value;
     };
 
     auto spawn_liquid = sol::overload(

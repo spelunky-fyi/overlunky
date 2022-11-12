@@ -152,9 +152,10 @@ Clears a previously set callback
 
 > Search script examples for [register_option_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_callback)
 
-#### nil register_option_callback(string name, function callback)
+#### nil register_option_callback(string name, object value, function on_render)
 
-Add custom options using the window drawing functions. Your callback will be called with a [GuiDrawContext](#GuiDrawContext) as a parameter and everything drawn in it will be rendered in the options window and the return value saved to `options[name]`.
+Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+The callback signature is optional<any> on_render([GuiDrawContext](#GuiDrawContext) draw_ctx)
 
 ### set_callback
 
