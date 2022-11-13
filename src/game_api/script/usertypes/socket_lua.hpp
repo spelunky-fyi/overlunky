@@ -16,16 +16,6 @@ class UdpServer
     sockpp::udp_socket sock;
 };
 
-class HttpRequest
-{
-  public:
-    HttpRequest(std::string url, sol::function cb);
-    std::string url;
-    sol::function cb;
-    std::string response;
-    std::string error;
-};
-
 namespace NSocket
 {
 void register_usertypes(sol::state& lua);
