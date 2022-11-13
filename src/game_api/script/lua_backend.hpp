@@ -132,11 +132,15 @@ struct ButtonOption
 {
     sol::function on_click;
 };
+struct CustomOption
+{
+    sol::function func;
+};
 struct ScriptOption
 {
     std::string desc;
     std::string long_desc;
-    std::variant<IntOption, FloatOption, BoolOption, StringOption, ComboOption, ButtonOption> option_impl;
+    std::variant<IntOption, FloatOption, BoolOption, StringOption, ComboOption, ButtonOption, CustomOption> option_impl;
 };
 
 struct IntervalCallback
