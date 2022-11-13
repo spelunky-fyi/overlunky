@@ -81,7 +81,7 @@ Provides a read-only access to the save data, updated as soon as something chang
 
 > Search script examples for [options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 
-Table of options set in the UI, added with the [register_option_functions](#register_option_int).
+Table of options set in the UI, added with the [register_option_functions](#Option-functions). You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
 ### prng
 
 #### [PRNG](#PRNG) prng
