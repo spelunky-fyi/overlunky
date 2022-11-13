@@ -5,8 +5,8 @@ meta.author = 'Dregu'
 
 -- initialize some options, some that are not in fact registered options, but this should still work.
 -- also, you can write any defaults here before registering the option and this value will be used instead of the registered default.
--- that ought to be useful when saving and loading options
-options = { x='world', z=5 }
+-- that ought to be useful when saving and loading options (see "Options test 2")
+options = { x='world', d='asd', z=5 }
 
 -- options are displayed in alphabetical order by name in the ui
 -- use the callback type to organize your options more freely

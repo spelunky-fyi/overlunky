@@ -26,27 +26,27 @@ end, ON.SAVE)
 -- load options from disk
 set_callback(function(ctx)
     local options_json = ctx:load()
-    if options_json ~= "" then
+    if options_json ~= '' then
         options = json.decode(options_json)
     end
 end, ON.LOAD)
 
 -- do everything in one callback
-register_option_callback("", options, function(ctx)
+register_option_callback('', options, function(ctx)
     -- now we're in complete control of the order
-    options.name = ctx:win_input_text("Name", options.name)
-    options.shoe_size = ctx:win_slider_float("Shoe size (US)", options.shoe_size, 1, 20)
-    ctx:win_section("Random checkboxes", function()
-        options.checkboxes.a = ctx:win_check("A", options.checkboxes.a)
-        options.checkboxes.b = ctx:win_check("B", options.checkboxes.b)
-        options.checkboxes.c = ctx:win_check("C", options.checkboxes.c)
-        options.checkboxes.d = ctx:win_check("D", options.checkboxes.d)
-        options.checkboxes.e = ctx:win_check("E", options.checkboxes.e)
+    options.name = ctx:win_input_text('Name', options.name)
+    options.shoe_size = ctx:win_slider_float('Shoe size (US)', options.shoe_size, 1, 20)
+    ctx:win_section('Random checkboxes', function()
+        options.checkboxes.a = ctx:win_check('A', options.checkboxes.a)
+        options.checkboxes.b = ctx:win_check('B', options.checkboxes.b)
+        options.checkboxes.c = ctx:win_check('C', options.checkboxes.c)
+        options.checkboxes.d = ctx:win_check('D', options.checkboxes.d)
+        options.checkboxes.e = ctx:win_check('E', options.checkboxes.e)
         ctx:win_separator()
     end)
-    options.age = ctx:win_input_int("Age", options.age)
-    options.debug = ctx:win_check("Debug window", options.debug)
-    if ctx:win_button("Save options") then
+    options.age = ctx:win_input_int('Age', options.age)
+    options.debug = ctx:win_check('Debug window', options.debug)
+    if ctx:win_button('Save options') then
         save_script()
     end
 
