@@ -352,6 +352,8 @@ for func in ps.funcs:
         for subs in ["get_address", "get_rva", "raise", "dump_network"]
     ):
         cat = "Debug functions"
+    elif any(subs in func["name"] for subs in ["_option"]):
+        cat = "Option functions"
     elif any(subs in func["name"] for subs in ["feat"]):
         cat = "Feat functions"
     elif any(subs in func["name"] for subs in ["tile_code"]):
@@ -407,8 +409,6 @@ for func in ps.funcs:
         cat = "Theme functions"
     elif any(subs in func["name"] for subs in ["_lut", "_texture"]):
         cat = "Texture functions"
-    elif any(subs in func["name"] for subs in ["_option"]):
-        cat = "Option functions"
     elif any(subs in func["name"] for subs in ["_input", "_io", "mouse_"]):
         cat = "Input functions"
     elif any(
