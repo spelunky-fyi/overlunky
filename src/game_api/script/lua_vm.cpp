@@ -520,20 +520,28 @@ end
     /// Read the game prng state. Use [prng](#PRNG):get_pair() instead.
     lua["read_prng"] = []() -> std::vector<int64_t>
     { return read_prng(); };
+
+    using Toast = void(wchar_t*);
+    using Say = void(size_t, Entity*, wchar_t*, int, bool);
+
     /// Show a message that looks like a level feeling.
     lua["toast"] = [](std::wstring message)
     {
-        auto toast = get_toast();
-        toast(message.data());
+        Toast* toast_fun = (Toast*)get_address("toast");
+        toast_fun(message.data());
     };
     /// Show a message coming from an entity
-    lua["say"] = [](uint32_t entity_uid, std::wstring message, int unk_type, bool top)
+    lua["say"] = [](uint32_t entity_uid, std::wstring message, int sound_type, bool top)
     {
-        auto say = get_say();
+        auto say = (Say*)get_address("speech_bubble_fun");
+        const static auto say_context = get_address("say_context");
+
         auto entity = get_entity_ptr(entity_uid);
+
         if (entity == nullptr)
             return;
-        say((void*)get_say_context(), entity, message.data(), unk_type, top);
+
+        say(say_context, entity, message.data(), sound_type, top);
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
@@ -735,13 +743,13 @@ end
     /// Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
     /// If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
     lua["spawn_player"] = spawn_player;
-    /// Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use steal_input and send_input to controll it
+    /// Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](#steal_input) and send_input to controll it
     /// or change it's `player_inputs` to the `input` of real player so he can control it directly
     lua["spawn_playerghost"] = spawn_playerghost;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
-    /// The callback signature is `optional<int> pre_entity_spawn(entity_type, x, y, layer, overlay_entity, spawn_flags)`
+    /// The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<ENT_TYPE> types;
@@ -762,7 +770,7 @@ end
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
-    /// The callback signature is `nil post_entity_spawn(entity, spawn_flags)`
+    /// The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<ENT_TYPE> types;
@@ -1106,7 +1114,7 @@ end
     lua["get_window_size"] = []() -> std::tuple<int, int>
     { return {(int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y}; };
 
-    /// Steal input from a Player or HH.
+    /// Steal input from a Player, HiredHand or PlayerGhost
     lua["steal_input"] = [](int uid)
     {
         static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
@@ -1145,7 +1153,7 @@ end
             backend->script_input[uid] = newinput;
         }
     };
-    /// Return input
+    /// Return input previously stolen with [steal_input](#steal_input)
     lua["return_input"] = [](int uid)
     {
         static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
@@ -1169,7 +1177,7 @@ end
         }
         backend->script_input.erase(uid);
     };
-    /// Send input
+    /// Send input to entity, has to be previously stolen with [steal_input](#steal_input)
     lua["send_input"] = [](int uid, INPUTS buttons)
     {
         auto backend = LuaBackend::get_calling_backend();
@@ -1197,7 +1205,7 @@ end
         return (INPUTS)0;
     };
     /// Deprecated
-    /// Read input that has been previously stolen with steal_input
+    /// Read input that has been previously stolen with [steal_input](#steal_input)
     /// Use `state.player_inputs.player_slots[player_slot].buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
     lua["read_stolen_input"] = [](int uid) -> INPUTS
     {
@@ -1231,6 +1239,7 @@ end
 
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
+    /// The callback signature is bool render_screen(Screen* self, VanillaRenderContext render_ctx)
     lua["set_pre_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
@@ -1261,6 +1270,7 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right after the screen is drawn.
+    /// The callback signature is nil render_screen(Screen* self, VanillaRenderContext render_ctx)
     lua["set_post_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
@@ -1299,6 +1309,7 @@ end
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// The callback signature is bool statemachine(Entity self)
     lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1329,6 +1340,7 @@ end
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// The callback signature is nil statemachine(Entity self)
     lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1355,8 +1367,8 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
-    /// The callback signature is `nil on_destroy(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// The callback signature is nil on_destroy(Entity self)
     lua["set_on_destroy"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1383,8 +1395,8 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
-    /// The callback signature is `nil on_kill(Entity self, Entity killer)`
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// The callback signature is nil on_kill(Entity self, Entity killer)
     lua["set_on_kill"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1411,10 +1423,10 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
-    /// The callback signature is `bool on_player_instagib(Entity self)`
     /// The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
     /// This is so that when the entity dies (from other causes), the death screen still gets shown.
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// The callback signature is bool on_player_instagib(Entity self)
     lua["set_on_player_instagib"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1442,11 +1454,11 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
-    /// The callback signature is `bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)`
     /// Note that damage_dealer can be nil ! (long fall, ...)
     /// DO NOT CALL `self:damage()` in the callback !
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)
     lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1474,8 +1486,8 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
-    /// The callback signature is `bool pre_floor_update(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// The callback signature is bool pre_floor_update(Entity self)
     lua["set_pre_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1503,8 +1515,8 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right after a floor is updated (by killed neighbor).
-    /// The callback signature is `nil post_floor_update(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// The callback signature is nil post_floor_update(Entity self)
     lua["set_post_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1531,9 +1543,9 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
-    /// The callback signature is `nil on_open(Entity entity_self, Entity opener)`
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// The callback signature is nil on_open(Entity entity_self, Entity opener)
     lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
@@ -1562,6 +1574,7 @@ end
     /// Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
     lua["set_pre_collision1"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1591,6 +1604,7 @@ end
     /// Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
     lua["set_pre_collision2"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1617,9 +1631,10 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
-    /// where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
+    /// Sets a callback that is called right after the entity is rendered.
+    /// Return `true` to skip the original rendering function and all later pre_render callbacks.
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
     lua["set_pre_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1647,9 +1662,9 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-    /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
-    /// where `render_ctx` is a `VanillaRenderContext`.
+    /// Sets a callback that is called right after the entity is rendered.
     /// Use this only when no other approach works, this call can be expensive if overused.
+    /// The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
     lua["set_post_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1746,7 +1761,7 @@ end
     lua["poison_entity"] = poison_entity;
 
     /// Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
-    /// `beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing, Set `health` to 0 return to game default values,
+    /// `beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing. Set `health` to 0 to return to the game defaults
     /// If you set `health` above the game max health it will be forced down to the game max
     lua["modify_ankh_health_gain"] = modify_ankh_health_gain;
 
@@ -1854,7 +1869,8 @@ end
         return false;
     };
 
-    /// Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level. Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
+    /// Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level.
+    /// Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
     lua["set_level_string"] = [](std::u16string str)
     {
         return set_level_string(str);
@@ -1987,8 +2003,8 @@ end
         ON::PRE_SET_FEAT);
     /* ON
     // GUIFRAME
-    // Params: `GuiDrawContext draw_ctx`
-    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a `GuiDrawContext`
+    // Params: GuiDrawContext draw_ctx
+    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a GuiDrawContext
     // FRAME
     // Runs while playing the game while the player is controllable, not in the base camp or the arena mode
     // GAMEFRAME
@@ -2000,12 +2016,12 @@ end
     // RESET
     // Runs when resetting a run
     // PRE_LOAD_LEVEL_FILES
-    // Params: `PreLoadLevelFilesContext load_level_ctx`
+    // Params: PreLoadLevelFilesContext load_level_ctx
     // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
     // Runs before any level generation, no entities should exist at this point
     // POST_ROOM_GENERATION
-    // Params: `PostRoomGenerationContext room_gen_ctx`
+    // Params: PostRoomGenerationContext room_gen_ctx
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
     // Runs right after level generation is done, before any entities are updated
@@ -2016,44 +2032,43 @@ end
     // POST_LOAD_SCREEN
     // Runs right after a screen is loaded, before rendering anything
     // PRE_GET_RANDOM_ROOM
-    // Params: `int x,::int y, LAYER layer, ROOM_TEMPLATE room_template`
+    // Params: int x, int y, LAYER layer, ROOM_TEMPLATE room_template
     // Return: `string room_data`
     // Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.
     // If the size of the string returned does not match with the room templates expected size the room is discarded.
     // White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.
     // PRE_HANDLE_ROOM_TILES
-    // Params: `int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx`
+    // Params: int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx
     // Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this
     // Runs after a random room was selected and right before it would spawn entities for each tile code
     // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
     // SAVE
-    // Params: `SaveContext save_ctx`
+    // Params: SaveContext save_ctx
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
     // LOAD
-    // Params: `LoadContext load_ctx`
+    // Params: LoadContext load_ctx
     // Runs as soon as your script is loaded, including reloads, then never again
     // RENDER_PRE_HUD
-    // Params: `VanillaRenderContext render_ctx`
+    // Params: VanillaRenderContext render_ctx
     // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_POST_HUD
-    // Params: `VanillaRenderContext render_ctx`
+    // Params: VanillaRenderContext render_ctx
     // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_PAUSE_MENU
-    // Params: `VanillaRenderContext render_ctx`
+    // Params: VanillaRenderContext render_ctx
     // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_POST_PAUSE_MENU
-    // Params: `VanillaRenderContext render_ctx`
+    // Params: VanillaRenderContext render_ctx
     // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_DRAW_DEPTH
-    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Params: VanillaRenderContext render_ctx, int draw_depth
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     // RENDER_POST_DRAW_DEPTH
-    // Params: `VanillaRenderContext render_ctx, int draw_depth`
+    // Params: VanillaRenderContext render_ctx, int draw_depth
     // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
     // RENDER_POST_JOURNAL_PAGE
-    // Params: `VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page`
-    // Runs after the journal page is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
-    // The page_type parameter values can be found in the JOURNAL_PAGE_TYPE ENUM
+    // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
+    // Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the VanillaRenderContext
     // The JournalPage parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:
     // `page:as_journal_page_progress()`
     // `page:as_journal_page_journalmenu()`
@@ -2070,34 +2085,36 @@ end
     // `page:as_journal_page_playerprofile()`
     // `page:as_journal_page_lastgameplayed()`
     // SPEECH_BUBBLE
-    // Params: `Entity speaking_entity, string text`
-    // Runs before any speech bubble is created, even the one using `say` function
-    // Return behavior: if you don't return anything it will execute the speech bubble function normally with default message
+    // Params: Entity speaking_entity, string text
+    // Runs before any speech bubble is created, even the one using [say](#say) function
+    // Return: if you don't return anything it will execute the speech bubble function normally with default message
     // if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original
     // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
     // TOAST
-    // Params: `string text`
-    // Runs before any toast is created, even the one using `toast` function
-    // Return behavior: if you don't return anything it will execute the toast function normally with default message
+    // Params: string text
+    // Runs before any toast is created, even the one using [toast](#toast) function
+    // Return: if you don't return anything it will execute the toast function normally with default message
     // if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
     // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
     // DEATH_MESSAGE
-    // Params: `STRINGID id`
+    // Params: STRINGID id
     // Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.
     // PRE_LOAD_JOURNAL_CHAPTER
-    // Params: JOURNALUI_PAGE_SHOWN `chapter`
+    // Params: JOURNALUI_PAGE_SHOWN chapter
     // Runs before the journal or any of it's chapter is opened
-    // Return behavior: return true to not load the chapter (or journal as a whole)
+    // Return: return true to not load the chapter (or journal as a whole)
     // POST_LOAD_JOURNAL_CHAPTER
-    // Params: JOURNALUI_PAGE_SHOWN `chapter`, `array pages`
+    // Params: JOURNALUI_PAGE_SHOWN chapter, array pages
     // Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it
     // All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
-    // Return behavior: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
+    // Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
     // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
     // PRE_GET_FEAT
-    // Runs before getting performed status for a FEAT when rendering the Feats page in journal. Return a boolean to override the vanilla feat with your own. Defaults to Steam GetAchievement.
+    // Runs before getting performed status for a FEAT when rendering the Feats page in journal.
+    // Return: true to override the vanilla feat with your own. Defaults to Steam GetAchievement.
     // PRE_SET_FEAT
-    // Runs before the game sets a vanilla feat performed. Return true to block the default behaviour of calling Steam SetAchievement.
+    // Runs before the game sets a vanilla feat performed.
+    // Return: true to block the default behaviour of calling Steam SetAchievement.
     */
 
     lua.create_named_table(
