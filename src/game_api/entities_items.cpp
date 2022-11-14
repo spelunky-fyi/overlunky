@@ -38,7 +38,7 @@ void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<vo
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.on_open.empty())
     {
-        hook_vtable<void(Container*, Movable*)>(
+        hook_vtable<void(Container*, Movable*), 0x18>(
             this,
             [](Container* self, Movable* opener, void (*original)(Container*, Movable*))
             {
@@ -51,8 +51,7 @@ void Container::set_on_open(std::uint32_t reserved_callback_id, std::function<vo
                     }
                 }
                 original(self, opener);
-            },
-            0x18);
+            });
     }
     hook_info.on_open.push_back({reserved_callback_id, std::move(on_open)});
 }
