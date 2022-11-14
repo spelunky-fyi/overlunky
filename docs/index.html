@@ -410,9 +410,6 @@
                             <a href="#clear_vanilla_sound_callback" class="toc-h3 toc-link" data-title="clear_vanilla_sound_callback">clear_vanilla_sound_callback</a>
                           </li>
                           <li>
-                            <a href="#register_option_callback" class="toc-h3 toc-link" data-title="register_option_callback">register_option_callback</a>
-                          </li>
-                          <li>
                             <a href="#set_callback" class="toc-h3 toc-link" data-title="set_callback">set_callback</a>
                           </li>
                           <li>
@@ -955,6 +952,9 @@
                           </li>
                           <li>
                             <a href="#register_option_button" class="toc-h3 toc-link" data-title="register_option_button">register_option_button</a>
+                          </li>
+                          <li>
+                            <a href="#register_option_callback" class="toc-h3 toc-link" data-title="register_option_callback">register_option_callback</a>
                           </li>
                           <li>
                             <a href="#register_option_combo" class="toc-h3 toc-link" data-title="register_option_combo">register_option_combo</a>
@@ -3390,13 +3390,6 @@
 </blockquote>
 <h4 id='nil-clear_vanilla_sound_callback-CallbackId-id'>nil clear_vanilla_sound_callback(<a href="#Aliases">CallbackId</a> id)</h4>
 <p>Clears a previously set callback</p>
-<h3 id='register_option_callback'>register_option_callback</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=register_option_callback">register_option_callback</a></p>
-</blockquote>
-<h4 id='nil-register_option_callback-string-name-object-value-function-on_render'>nil register_option_callback(string name, object value, function on_render)</h4>
-<p>Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to <code>options[name]</code> or overwriting the whole <code>options</code> table if using and empty name. <code>value</code> is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
-The callback signature is optional<any> on_render(<a href="#GuiDrawContext">GuiDrawContext</a> draw_ctx)</p>
 <h3 id='set_callback'>set_callback</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_callback">set_callback</a></p>
@@ -4595,6 +4588,13 @@ be returned instead.</p>
 </blockquote>
 <h4 id='nil-register_option_button-string-name-string-desc-string-long_desc-function-on_click'>nil register_option_button(string name, string desc, string long_desc, function on_click)</h4>
 <p>Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.</p>
+<h3 id='register_option_callback'>register_option_callback</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=register_option_callback">register_option_callback</a></p>
+</blockquote>
+<h4 id='nil-register_option_callback-string-name-object-value-function-on_render'>nil register_option_callback(string name, object value, function on_render)</h4>
+<p>Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to <code>options[name]</code> or overwriting the whole <code>options</code> table if using and empty name. <code>value</code> is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+The callback signature is optional<any> on_render(<a href="#GuiDrawContext">GuiDrawContext</a> draw_ctx)</p>
 <h3 id='register_option_combo'>register_option_combo</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=register_option_combo">register_option_combo</a></p>
