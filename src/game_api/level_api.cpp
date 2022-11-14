@@ -70,9 +70,9 @@ struct ThemeHooksInfo
                 ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
 
                 bool skip_orig = false;
-                for (auto& [id, pre] : hook_info.pre[index])
+                for (auto& [id, prefun] : hook_info.pre[index])
                 {
-                    if (pre(lmbd_self))
+                    if (prefun(lmbd_self))
                     {
                         skip_orig = true;
                     }
@@ -81,9 +81,9 @@ struct ThemeHooksInfo
                 {
                     original(lmbd_self);
                 }
-                for (auto& [id, post] : hook_info.post[index])
+                for (auto& [id, postfun] : hook_info.post[index])
                 {
-                    post(lmbd_self);
+                    postfun(lmbd_self);
                 }
             },
             (uint8_t)index);
@@ -99,17 +99,17 @@ struct ThemeHooksInfo
                 ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
 
                 std::optional<T> return_value;
-                for (auto& [id, pre] : (hook_info.*PreHooks)[index])
+                for (auto& [id, prefun] : (hook_info.*PreHooks)[index])
                 {
-                    auto ret = pre(lmbd_self);
+                    auto ret = prefun(lmbd_self);
                     if (ret.has_value() && !return_value.has_value())
                         return_value = ret.value();
                 }
                 if (!return_value.has_value())
                     return_value = original(lmbd_self);
-                for (auto& [id, post] : (hook_info.*PostHooks)[index])
+                for (auto& [id, postfun] : (hook_info.*PostHooks)[index])
                 {
-                    post(lmbd_self);
+                    postfun(lmbd_self);
                 }
                 return return_value.value();
             },
@@ -145,17 +145,17 @@ struct ThemeHooksInfo
                 ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
 
                 std::optional<uint32_t> return_value;
-                for (auto& [id, pre] : hook_info.pre_texture[index])
+                for (auto& [id, prefun] : hook_info.pre_texture[index])
                 {
-                    auto ret = pre(lmbd_self, lmbd_texture);
+                    auto ret = prefun(lmbd_self, lmbd_texture);
                     if (ret.has_value() && !return_value.has_value())
                         return_value = ret.value();
                 }
                 if (!return_value.has_value())
                     return_value = original(lmbd_self, lmbd_texture);
-                for (auto& [id, post] : hook_info.post_texture[index])
+                for (auto& [id, postfun] : hook_info.post_texture[index])
                 {
-                    post(lmbd_self, lmbd_texture);
+                    postfun(lmbd_self, lmbd_texture);
                 }
                 return return_value.value();
             },
