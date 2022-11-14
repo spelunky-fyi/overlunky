@@ -1,4 +1,4 @@
-> Make it so there is 50% chance that the Ankh will be destroyed
+--Make it so there is 50% chance that the Ankh will be destroyed
 
 set_callback(function ()
     -- more or less 50% chance
