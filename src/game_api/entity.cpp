@@ -434,13 +434,12 @@ uint32_t Movable::get_behavior()
 
 void Movable::set_gravity(float gravity)
 {
-    hook_vtable<void(Movable*, float)>(
+    hook_vtable<void(Movable*, float), 0x53>(
         this,
         [gravity](Movable* ent, [[maybe_unused]] float _gravity, void (*original)(Movable*, float))
         {
             original(ent, gravity);
-        },
-        0x53);
+        });
 }
 
 void Movable::reset_gravity()
