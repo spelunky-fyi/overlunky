@@ -4,15 +4,6 @@
 #include <imgui.h> // for ImVec2, ImGuiInputTextCallback, ImDrawList (ptr ...
 #include <string>  // for string
 
-class Entity;
-
-using Toast = void (*)(wchar_t*);
-Toast get_toast();
-
-using Say = void (*)(void*, Entity*, wchar_t*, int unk_type /* 0, 2, 3 */, bool top /* top or bottom */);
-Say get_say();
-size_t get_say_context();
-
 float screenify(float dis);
 
 ImVec2 screenify(ImVec2 pos);
