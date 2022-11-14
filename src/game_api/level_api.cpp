@@ -60,170 +60,113 @@ struct ThemeHooksInfo
     std::map<THEME_OVERRIDE, std::vector<HookWithId<std::optional<float>(ThemeInfo*)>>> pre_float;
     std::map<THEME_OVERRIDE, std::vector<HookWithId<std::optional<uint32_t>(ThemeInfo*, int32_t)>>> pre_texture;
     std::map<THEME_OVERRIDE, std::vector<HookWithId<void(ThemeInfo*, int32_t)>>> post_texture;
+
+    static void hook_void(ThemeInfo* self, THEME_OVERRIDE index)
+    {
+        hook_vtable_no_dtor<void(ThemeInfo*)>(
+            self,
+            [index](ThemeInfo* lmbd_self, void (*original)(ThemeInfo*))
+            {
+                ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
+
+                bool skip_orig = false;
+                for (auto& [id, pre] : hook_info.pre[index])
+                {
+                    if (pre(lmbd_self))
+                    {
+                        skip_orig = true;
+                    }
+                }
+                if (!skip_orig)
+                {
+                    original(lmbd_self);
+                }
+                for (auto& [id, post] : hook_info.post[index])
+                {
+                    post(lmbd_self);
+                }
+            },
+            (uint8_t)index);
+    }
+
+    template <class T, auto PreHooks, auto PostHooks>
+    static void hook_non_void(ThemeInfo* self, THEME_OVERRIDE index)
+    {
+        hook_vtable_no_dtor<T(ThemeInfo*)>(
+            self,
+            [index](ThemeInfo* lmbd_self, T (*original)(ThemeInfo*))
+            {
+                ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
+
+                std::optional<T> return_value;
+                for (auto& [id, pre] : (hook_info.*PreHooks)[index])
+                {
+                    auto ret = pre(lmbd_self);
+                    if (ret.has_value() && !return_value.has_value())
+                        return_value = ret.value();
+                }
+                if (!return_value.has_value())
+                    return_value = original(lmbd_self);
+                for (auto& [id, post] : (hook_info.*PostHooks)[index])
+                {
+                    post(lmbd_self);
+                }
+                return return_value.value();
+            },
+            (uint8_t)index);
+    }
+
+    static void hook_bool(ThemeInfo* self, THEME_OVERRIDE index)
+    {
+        hook_non_void<bool, &ThemeHooksInfo::pre_bool, &ThemeHooksInfo::post>(self, index);
+    }
+
+    static void hook_u8(ThemeInfo* self, THEME_OVERRIDE index)
+    {
+        hook_non_void<uint8_t, &ThemeHooksInfo::pre_u8, &ThemeHooksInfo::post>(self, index);
+    }
+
+    static void hook_u32(ThemeInfo* self, THEME_OVERRIDE index)
+    {
+        hook_non_void<uint32_t, &ThemeHooksInfo::pre_u32, &ThemeHooksInfo::post>(self, index);
+    }
+
+    static void hook_float(ThemeInfo* self, THEME_OVERRIDE index)
+    {
+        hook_non_void<float, &ThemeHooksInfo::pre_float, &ThemeHooksInfo::post>(self, index);
+    }
+
+    static void hook_texture(ThemeInfo* self, THEME_OVERRIDE index)
+    {
+        hook_vtable_no_dtor<uint32_t(ThemeInfo*, int32_t)>(
+            self,
+            [index](ThemeInfo* lmbd_self, int32_t lmbd_texture, uint32_t (*original)(ThemeInfo*, int32_t))
+            {
+                ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
+
+                std::optional<uint32_t> return_value;
+                for (auto& [id, pre] : hook_info.pre_texture[index])
+                {
+                    auto ret = pre(lmbd_self, lmbd_texture);
+                    if (ret.has_value() && !return_value.has_value())
+                        return_value = ret.value();
+                }
+                if (!return_value.has_value())
+                    return_value = original(lmbd_self, lmbd_texture);
+                for (auto& [id, post] : hook_info.post_texture[index])
+                {
+                    post(lmbd_self, lmbd_texture);
+                }
+                return return_value.value();
+            },
+            (uint8_t)index);
+    }
 };
 std::map<THEME, ThemeHooksInfo> g_theme_hooks;
 
 ThemeHooksInfo& ThemeInfo::get_hooks()
 {
     return g_theme_hooks[this->get_theme_id()];
-}
-
-void hook_void(ThemeInfo* self, THEME_OVERRIDE index)
-{
-    hook_vtable_no_dtor<void(ThemeInfo*)>(
-        self,
-        [index](ThemeInfo* lmbd_self, void (*original)(ThemeInfo*))
-        {
-            ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
-
-            bool skip_orig = false;
-            for (auto& [id, pre] : hook_info.pre[index])
-            {
-                if (pre(lmbd_self))
-                {
-                    skip_orig = true;
-                }
-            }
-            if (!skip_orig)
-            {
-                original(lmbd_self);
-            }
-            for (auto& [id, post] : hook_info.post[index])
-            {
-                post(lmbd_self);
-            }
-        },
-        (uint8_t)index);
-}
-
-void hook_bool(ThemeInfo* self, THEME_OVERRIDE index)
-{
-    hook_vtable_no_dtor<bool(ThemeInfo*)>(
-        self,
-        [index](ThemeInfo* lmbd_self, bool (*original)(ThemeInfo*))
-        {
-            ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
-
-            std::optional<bool> return_value;
-            for (auto& [id, pre] : hook_info.pre_bool[index])
-            {
-                auto ret = pre(lmbd_self);
-                if (ret.has_value() && !return_value.has_value())
-                    return_value = ret.value();
-            }
-            if (!return_value.has_value())
-                return_value = original(lmbd_self);
-            for (auto& [id, post] : hook_info.post[index])
-            {
-                post(lmbd_self);
-            }
-            return return_value.value();
-        },
-        (uint8_t)index);
-}
-
-void hook_u8(ThemeInfo* self, THEME_OVERRIDE index)
-{
-    hook_vtable_no_dtor<uint8_t(ThemeInfo*)>(
-        self,
-        [index](ThemeInfo* lmbd_self, uint8_t (*original)(ThemeInfo*))
-        {
-            ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
-
-            std::optional<uint8_t> return_value;
-            for (auto& [id, pre] : hook_info.pre_u8[index])
-            {
-                auto ret = pre(lmbd_self);
-                if (ret.has_value() && !return_value.has_value())
-                    return_value = ret.value();
-            }
-            if (!return_value.has_value())
-                return_value = original(lmbd_self);
-            for (auto& [id, post] : hook_info.post[index])
-            {
-                post(lmbd_self);
-            }
-            return return_value.value();
-        },
-        (uint8_t)index);
-}
-
-void hook_u32(ThemeInfo* self, THEME_OVERRIDE index)
-{
-    hook_vtable_no_dtor<uint32_t(ThemeInfo*)>(
-        self,
-        [index](ThemeInfo* lmbd_self, uint32_t (*original)(ThemeInfo*))
-        {
-            ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
-
-            std::optional<uint32_t> return_value;
-            for (auto& [id, pre] : hook_info.pre_u32[index])
-            {
-                auto ret = pre(lmbd_self);
-                if (ret.has_value() && !return_value.has_value())
-                    return_value = ret.value();
-            }
-            if (!return_value.has_value())
-                return_value = original(lmbd_self);
-            for (auto& [id, post] : hook_info.post[index])
-            {
-                post(lmbd_self);
-            }
-            return return_value.value();
-        },
-        (uint8_t)index);
-}
-
-void hook_float(ThemeInfo* self, THEME_OVERRIDE index)
-{
-    hook_vtable_no_dtor<float(ThemeInfo*)>(
-        self,
-        [index](ThemeInfo* lmbd_self, float (*original)(ThemeInfo*))
-        {
-            ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
-
-            std::optional<float> return_value;
-            for (auto& [id, pre] : hook_info.pre_float[index])
-            {
-                auto ret = pre(lmbd_self);
-                if (ret.has_value() && !return_value.has_value())
-                    return_value = ret.value();
-            }
-            if (!return_value.has_value())
-                return_value = original(lmbd_self);
-            for (auto& [id, post] : hook_info.post[index])
-            {
-                post(lmbd_self);
-            }
-            return return_value.value();
-        },
-        (uint8_t)index);
-}
-
-void hook_texture(ThemeInfo* self, THEME_OVERRIDE index)
-{
-    hook_vtable_no_dtor<uint32_t(ThemeInfo*, int32_t)>(
-        self,
-        [index](ThemeInfo* lmbd_self, int32_t lmbd_texture, uint32_t (*original)(ThemeInfo*, int32_t))
-        {
-            ThemeHooksInfo& hook_info = lmbd_self->get_hooks();
-
-            std::optional<uint32_t> return_value;
-            for (auto& [id, pre] : hook_info.pre_texture[index])
-            {
-                auto ret = pre(lmbd_self, lmbd_texture);
-                if (ret.has_value() && !return_value.has_value())
-                    return_value = ret.value();
-            }
-            if (!return_value.has_value())
-                return_value = original(lmbd_self, lmbd_texture);
-            for (auto& [id, post] : hook_info.post_texture[index])
-            {
-                post(lmbd_self, lmbd_texture);
-            }
-            return return_value.value();
-        },
-        (uint8_t)index);
 }
 
 std::uint32_t ThemeInfo::reserve_callback_id()
@@ -280,7 +223,7 @@ void ThemeInfo::set_pre(std::uint32_t reserved_callback_id, THEME_OVERRIDE index
 {
     ThemeHooksInfo& hook_info = get_hooks();
     if (!get_hook_function((void***)this, (uint8_t)index))
-        hook_void(this, index);
+        ThemeHooksInfo::hook_void(this, index);
     hook_info.pre[index].push_back({reserved_callback_id, std::move(pre_func)});
 }
 
@@ -288,7 +231,7 @@ void ThemeInfo::set_post(std::uint32_t reserved_callback_id, THEME_OVERRIDE inde
 {
     ThemeHooksInfo& hook_info = get_hooks();
     if (!get_hook_function((void***)this, (uint8_t)index))
-        hook_void(this, index);
+        ThemeHooksInfo::hook_void(this, index);
     hook_info.post[index].push_back({reserved_callback_id, std::move(post_func)});
 }
 
@@ -296,7 +239,7 @@ void ThemeInfo::set_pre_bool(std::uint32_t reserved_callback_id, THEME_OVERRIDE 
 {
     ThemeHooksInfo& hook_info = get_hooks();
     if (!get_hook_function((void***)this, (uint8_t)index))
-        hook_bool(this, index);
+        ThemeHooksInfo::hook_bool(this, index);
     hook_info.pre_bool[index].push_back({reserved_callback_id, std::move(pre_func)});
 }
 
@@ -304,7 +247,7 @@ void ThemeInfo::set_pre_u8(std::uint32_t reserved_callback_id, THEME_OVERRIDE in
 {
     ThemeHooksInfo& hook_info = get_hooks();
     if (!get_hook_function((void***)this, (uint8_t)index))
-        hook_u8(this, index);
+        ThemeHooksInfo::hook_u8(this, index);
     hook_info.pre_u8[index].push_back({reserved_callback_id, std::move(pre_func)});
 }
 
@@ -312,7 +255,7 @@ void ThemeInfo::set_pre_u32(std::uint32_t reserved_callback_id, THEME_OVERRIDE i
 {
     ThemeHooksInfo& hook_info = get_hooks();
     if (!get_hook_function((void***)this, (uint8_t)index))
-        hook_u32(this, index);
+        ThemeHooksInfo::hook_u32(this, index);
     hook_info.pre_u32[index].push_back({reserved_callback_id, std::move(pre_func)});
 }
 
@@ -320,7 +263,7 @@ void ThemeInfo::set_pre_float(std::uint32_t reserved_callback_id, THEME_OVERRIDE
 {
     ThemeHooksInfo& hook_info = get_hooks();
     if (!get_hook_function((void***)this, (uint8_t)index))
-        hook_float(this, index);
+        ThemeHooksInfo::hook_float(this, index);
     hook_info.pre_float[index].push_back({reserved_callback_id, std::move(pre_func)});
 }
 
@@ -328,7 +271,7 @@ void ThemeInfo::set_pre_texture(std::uint32_t reserved_callback_id, THEME_OVERRI
 {
     ThemeHooksInfo& hook_info = get_hooks();
     if (!get_hook_function((void***)this, (uint8_t)index))
-        hook_texture(this, index);
+        ThemeHooksInfo::hook_texture(this, index);
     hook_info.pre_texture[index].push_back({reserved_callback_id, std::move(pre_func)});
 }
 
@@ -336,7 +279,7 @@ void ThemeInfo::set_post_texture(std::uint32_t reserved_callback_id, THEME_OVERR
 {
     ThemeHooksInfo& hook_info = get_hooks();
     if (!get_hook_function((void***)this, (uint8_t)index))
-        hook_texture(this, index);
+        ThemeHooksInfo::hook_texture(this, index);
     hook_info.post_texture[index].push_back({reserved_callback_id, std::move(post_func)});
 }
 
