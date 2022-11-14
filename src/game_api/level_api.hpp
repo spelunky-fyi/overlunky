@@ -22,18 +22,18 @@
 enum class THEME_OVERRIDE : uint8_t
 {
     BASE,
-    UNKNOWN_V1,
+    RESET_THEME_FLAGS,
     INIT_FLAGS,
     INIT_LEVEL,
     UNKNOWN_V4,
-    UNKNOWN_V5,
+    GENERATE_PATH,
     SPECIAL_ROOMS,
-    UNKNOWN_V7,
-    UNKNOWN_V8,
+    PLAYER_COFFIN,
+    DIRK_COFFIN,
+    IDOL,
     VAULT,
     COFFIN,
     FEELING,
-    UNKNOWN_V12,
     SPAWN_LEVEL,
     SPAWN_BORDER,
     POST_PROCESS_LEVEL,
@@ -64,11 +64,11 @@ enum class THEME_OVERRIDE : uint8_t
     BACKLAYER_LIGHT_LEVEL,
     LOOP,
     VAULT_LEVEL,
-    GET_UNKNOWN1_OR_2,
+    GET_THEME_FLAG,
     TEXTURE_DYNAMIC,
     PRE_TRANSITION,
-    LEVEL_HEIGHT,
-    UNKNOWN_V47,
+    EXIT_ROOM_Y_LEVEL,
+    SHOP_CHANCE,
     SPAWN_DECORATION,
     SPAWN_DECORATION2,
     SPAWN_EXTRA,
@@ -251,7 +251,7 @@ class ThemeInfo
     {
     }
 
-    virtual bool get_unknown1() = 0;
+    virtual bool reset_theme_flags() = 0;
 
     /// dwelling,tidepool: unset levelgen.flags.flag12
     /// jungle,volcana.olmec,icecaves,neobab,cog,duat,abzu,tiamat,eggplant,hundun,basecamp,arena: nop
@@ -265,10 +265,13 @@ class ThemeInfo
     // ???
     virtual void init_level() = 0;
 
-    /// most themes call the same function, some check whether they are in CO
+    /// flags liquid rooms
+    /// sets the bee flag true if in non-CO jung/temp
+    /// sets unknown2 flag to true in some themes
+    /// sets the drill room position in Volcana.
     virtual void unknown_v4() = 0;
 
-    virtual void unknown_v5() = 0;
+    virtual void generate_path() = 0;
 
     /// dwelling: does stuff when level == 4 or udjat present
     /// jungle: when black market present
@@ -278,10 +281,12 @@ class ThemeInfo
     virtual void add_special_rooms() = 0;
 
     /// can't trigger, dwelling (quillback) and abzu do something special (arena just returns)
-    virtual void unknown_v7() = 0;
+    virtual void add_player_coffin() = 0;
 
     /// does something depending on levelgen.data.unknown7
-    virtual void unknown_v8() = 0;
+    virtual void add_dirk_coffin() = 0;
+
+    virtual void add_idol() = 0;
 
     // ???
     virtual void add_vault() = 0;
@@ -291,9 +296,6 @@ class ThemeInfo
 
     /// metal clanking and air of oppression
     virtual void add_special_feeling() = 0;
-
-    // Note: Inserted somewhere between init_flags and spawn_level
-    virtual bool unknown_v12() = 0;
 
     /// spawns all floor etc tiles based on the room layout
     /// disable this and only the player is spawned in the level
@@ -422,7 +424,7 @@ class ThemeInfo
     virtual uint8_t get_vault_level() = 0;
 
     /// index == 0 ? return unknown1 : return unknown2
-    virtual bool get_unknown_1_or_2(uint8_t index) = 0;
+    virtual bool get_theme_flag(uint8_t index) = 0;
 
     // e.g. for dwelling:
     // texture_id == -4 -> returns 122 BG_CAVE_0
@@ -444,10 +446,10 @@ class ThemeInfo
 
     /// default = return state.h - 1
     /// for special levels (black market, vlad, ...) fixed heights are returned
-    virtual uint32_t get_level_height() = 0;
+    virtual uint32_t get_exit_room_y_level() = 0;
 
     /// returns a value that appears to affect room generation and is based on current world,level
-    virtual uint32_t unknown_v47() = 0;
+    virtual uint32_t get_shop_chance() = 0;
 
     /// used e.g. in Vlad's castle to insert the big banner in the center with the two demon statues
     /// also implemented for neobab (i think in the zoos)

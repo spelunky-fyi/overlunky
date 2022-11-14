@@ -1699,10 +1699,11 @@ end
         case THEME_OVERRIDE::INIT_FLAGS:
         case THEME_OVERRIDE::INIT_LEVEL:
         case THEME_OVERRIDE::UNKNOWN_V4:
-        case THEME_OVERRIDE::UNKNOWN_V5:
+        case THEME_OVERRIDE::GENERATE_PATH:
         case THEME_OVERRIDE::SPECIAL_ROOMS:
-        case THEME_OVERRIDE::UNKNOWN_V7:
-        case THEME_OVERRIDE::UNKNOWN_V8:
+        case THEME_OVERRIDE::PLAYER_COFFIN:
+        case THEME_OVERRIDE::DIRK_COFFIN:
+        case THEME_OVERRIDE::IDOL:
         case THEME_OVERRIDE::VAULT:
         case THEME_OVERRIDE::COFFIN:
         case THEME_OVERRIDE::FEELING:
@@ -1737,13 +1738,12 @@ end
                     return return_value;
                 });
             break;
-        case THEME_OVERRIDE::UNKNOWN_V1:
-        case THEME_OVERRIDE::UNKNOWN_V12:
+        case THEME_OVERRIDE::RESET_THEME_FLAGS:
         case THEME_OVERRIDE::UNKNOWN_V30:
         case THEME_OVERRIDE::PLAYER_DAMAGE:
         case THEME_OVERRIDE::UNKNOWN_V38:
         case THEME_OVERRIDE::LOOP:
-        case THEME_OVERRIDE::GET_UNKNOWN1_OR_2:
+        case THEME_OVERRIDE::GET_THEME_FLAG:
             themeinfo->set_pre_bool(
                 id,
                 override,
@@ -1783,8 +1783,8 @@ end
         case THEME_OVERRIDE::ENT_BORDER:
         case THEME_OVERRIDE::ENT_CRITTER:
         case THEME_OVERRIDE::TEXTURE_BACKLAYER_LUT:
-        case THEME_OVERRIDE::LEVEL_HEIGHT:
-        case THEME_OVERRIDE::UNKNOWN_V47:
+        case THEME_OVERRIDE::EXIT_ROOM_Y_LEVEL:
+        case THEME_OVERRIDE::SHOP_CHANCE:
             themeinfo->set_pre_u32(
                 id,
                 override,
@@ -1852,10 +1852,11 @@ end
         case THEME_OVERRIDE::INIT_FLAGS:
         case THEME_OVERRIDE::INIT_LEVEL:
         case THEME_OVERRIDE::UNKNOWN_V4:
-        case THEME_OVERRIDE::UNKNOWN_V5:
+        case THEME_OVERRIDE::GENERATE_PATH:
         case THEME_OVERRIDE::SPECIAL_ROOMS:
-        case THEME_OVERRIDE::UNKNOWN_V7:
-        case THEME_OVERRIDE::UNKNOWN_V8:
+        case THEME_OVERRIDE::PLAYER_COFFIN:
+        case THEME_OVERRIDE::DIRK_COFFIN:
+        case THEME_OVERRIDE::IDOL:
         case THEME_OVERRIDE::VAULT:
         case THEME_OVERRIDE::COFFIN:
         case THEME_OVERRIDE::FEELING:
@@ -1876,13 +1877,12 @@ end
         case THEME_OVERRIDE::SPAWN_DECORATION2:
         case THEME_OVERRIDE::SPAWN_EXTRA:
         case THEME_OVERRIDE::UNKNOWN_V51:
-        case THEME_OVERRIDE::UNKNOWN_V1:
-        case THEME_OVERRIDE::UNKNOWN_V12:
+        case THEME_OVERRIDE::RESET_THEME_FLAGS:
         case THEME_OVERRIDE::UNKNOWN_V30:
         case THEME_OVERRIDE::PLAYER_DAMAGE:
         case THEME_OVERRIDE::UNKNOWN_V38:
         case THEME_OVERRIDE::LOOP:
-        case THEME_OVERRIDE::GET_UNKNOWN1_OR_2:
+        case THEME_OVERRIDE::GET_THEME_FLAG:
         case THEME_OVERRIDE::THEME_ID:
         case THEME_OVERRIDE::BASE_ID:
         case THEME_OVERRIDE::VAULT_LEVEL:
@@ -1894,8 +1894,8 @@ end
         case THEME_OVERRIDE::ENT_BORDER:
         case THEME_OVERRIDE::ENT_CRITTER:
         case THEME_OVERRIDE::TEXTURE_BACKLAYER_LUT:
-        case THEME_OVERRIDE::LEVEL_HEIGHT:
-        case THEME_OVERRIDE::UNKNOWN_V47:
+        case THEME_OVERRIDE::EXIT_ROOM_Y_LEVEL:
+        case THEME_OVERRIDE::SHOP_CHANCE:
         case THEME_OVERRIDE::GRAVITY:
         case THEME_OVERRIDE::BACKLAYER_LIGHT_LEVEL:
             themeinfo->set_post(
