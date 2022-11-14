@@ -203,6 +203,8 @@ int | [win_combo(string label, int selected, string opts)](https://github.com/sp
 nil | [win_pushid(int id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) | Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 nil | [win_popid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) | Pop unique identifier from the stack. Put after the input.
 nil | [win_image(IMAGE image, int width, int height)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) | Draw image to window.
+nil | [win_section(string title, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_section) | Add a collapsing accordion section, put contents in the callback function.
+nil | [win_indent(float width)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_indent) | Indent contents, or unindent if negative
 
 ### LoadContext
 

@@ -96,6 +96,10 @@ class GuiDrawContext
     void win_popid();
     /// Draw image to window.
     void win_image(IMAGE image, int width, int height);
+    /// Add a collapsing accordion section, put contents in the callback function.
+    void win_section(std::string title, sol::function callback);
+    /// Indent contents, or unindent if negative
+    void win_indent(float width);
 
   private:
     class LuaBackend* backend;
