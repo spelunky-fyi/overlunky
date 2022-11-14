@@ -12,10 +12,12 @@
 #include "entity_hooks_info.hpp"         // for HookWithId
 #include "game_manager.hpp"              // for GameManager, get_game_manager
 #include "logger.h"                      // for DEBUG
-#include "screen_arena.hpp"              // for ScreenArenaIntro, ScreenArenaItems, Scre...
-#include "search.hpp"                    //
-#include "state.hpp"                     // for StateMemory, get_state_ptr
-#include "vtable_hook.hpp"               // for hook_vtable_no_dtor
+#include "memory.hpp"
+#include "render_api.hpp"
+#include "screen_arena.hpp" // for ScreenArenaIntro, ScreenArenaItems, Scre...
+#include "search.hpp"       //
+#include "state.hpp"        // for StateMemory, get_state_ptr
+#include "vtable_hook.hpp"  // for hook_vtable_no_dtor
 
 struct ScreenHooksInfo
 {
@@ -307,5 +309,51 @@ void JournalPage::set_page_background_side(bool right)
 
         this->background.x *= -1;
         this->background.source_set_quad(Quad(AABB(0.1125f, 0, 0.5f, 1.0f)));
+    }
+}
+
+void force_journal(uint32_t chapter, uint32_t entry)
+{
+    auto gm = get_game_manager();
+    if (chapter > 2)
+    {
+        gm->save_related->journal_popup_ui.chapter_to_show = chapter;
+        gm->save_related->journal_popup_ui.entry_to_show = entry;
+        gm->save_related->journal_popup_ui.timer = 0;
+        gm->save_related->journal_popup_ui.slide_position = 0;
+        // NOP the check for JournalPopupUI being visible in toggle_journal to always open the given entry
+        write_mem_recoverable("journal_popup_hack", get_address("journal_popup_open"sv), "\x90\x90"sv, true);
+    }
+    else
+    {
+        recover_mem("journal_popup_hack");
+    }
+}
+
+void toggle_journal()
+{
+    auto gm = get_game_manager();
+    typedef void show_journal_func(JournalUI*, size_t);
+    static show_journal_func* show = (show_journal_func*)(get_address("toggle_journal"sv));
+    show(gm->journal_ui, heap_base());
+}
+
+void show_journal(JOURNALUI_PAGE_SHOWN chapter, uint32_t page)
+{
+    auto gm = get_game_manager();
+    if (chapter > 2 && chapter < 10 && gm->journal_ui->state == 0)
+    {
+        on_open_journal_chapter(gm->journal_ui, 2, false, true);
+        if (gm->journal_ui->state == 1 && gm->journal_ui->chapter_shown == 2)
+            on_open_journal_chapter(gm->journal_ui, chapter, false, false);
+    }
+    else
+    {
+        on_open_journal_chapter(gm->journal_ui, chapter, false, true);
+    }
+    if (chapter > 2 && chapter < 10 && gm->journal_ui->chapter_shown == chapter && page > 0)
+    {
+        gm->journal_ui->current_page = page;
+        gm->journal_ui->flipping_to_page = page;
     }
 }

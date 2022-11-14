@@ -368,6 +368,18 @@ void GuiDrawContext::win_image(IMAGE image, int width, int height)
         height = image_ptr->height;
     ImGui::Image(image_ptr->texture, ImVec2(static_cast<float>(width), static_cast<float>(height)));
 };
+void GuiDrawContext::win_section(std::string title, sol::function callback)
+{
+    if (ImGui::CollapsingHeader(title.c_str()))
+        backend->handle_function(callback);
+};
+void GuiDrawContext::win_indent(float width)
+{
+    if (width > 0)
+        ImGui::Indent(width);
+    else if (width < 0)
+        ImGui::Unindent(-width);
+}
 
 namespace NGui
 {
@@ -436,6 +448,8 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_pushid"] = &GuiDrawContext::win_pushid;
     guidrawcontext_type["win_popid"] = &GuiDrawContext::win_popid;
     guidrawcontext_type["win_image"] = &GuiDrawContext::win_image;
+    guidrawcontext_type["win_section"] = &GuiDrawContext::win_section;
+    guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) -> uColor

@@ -203,6 +203,8 @@ int | [win_combo(string label, int selected, string opts)](https://github.com/sp
 nil | [win_pushid(int id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) | Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 nil | [win_popid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) | Pop unique identifier from the stack. Put after the input.
 nil | [win_image(IMAGE image, int width, int height)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) | Draw image to window.
+nil | [win_section(string title, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_section) | Add a collapsing accordion section, put contents in the callback function.
+nil | [win_indent(float width)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_indent) | Indent contents, or unindent if negative
 
 ### LoadContext
 
@@ -1310,6 +1312,7 @@ int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 [TextureRenderingInfo](#TextureRenderingInfo) | [unknown23](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown23) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [entire_book](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) | 
 int | [page_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) | 
+int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | 
 
 ### PauseUI
 
@@ -3166,6 +3169,11 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
+int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
+[Entity](#Entity) | [reticule_internal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reticule_internal) | 
+[Entity](#Entity) | [reticule_external](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reticule_external) | 
 
 ### DMSpawning
 
@@ -4792,6 +4800,7 @@ Type | Name | Description
 ---- | ---- | -----------
 bool | [explosion_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_trigger) | More like on fire trigger, the explosion happens when the timer reaches > 29
 int | [explosion_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_timer) | 
+nil | [trigger_explosion()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_explosion) | 
 
 ### Birdies
 

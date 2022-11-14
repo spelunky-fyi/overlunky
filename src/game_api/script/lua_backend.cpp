@@ -664,43 +664,38 @@ void LuaBackend::render_options()
             overloaded{
                 [&](IntOption& option)
                 {
-                    if (ImGui::DragInt(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value);
+                    ImGui::DragInt(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max);
+                    lua[sol::create_if_nil]["options"][name] = option.value;
                 },
                 [&](FloatOption& option)
                 {
-                    if (ImGui::DragFloat(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value);
+                    ImGui::DragFloat(name_option_pair.second.desc.c_str(), &option.value, 0.5f, option.min, option.max);
+                    lua[sol::create_if_nil]["options"][name] = option.value;
                 },
                 [&](BoolOption& option)
                 {
-                    if (ImGui::Checkbox(name_option_pair.second.desc.c_str(), &option.value))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value);
+                    ImGui::Checkbox(name_option_pair.second.desc.c_str(), &option.value);
+                    lua[sol::create_if_nil]["options"][name] = option.value;
                 },
                 [&](StringOption& option)
                 {
-                    if (InputString(name_option_pair.second.desc.c_str(), &option.value, 0, nullptr, nullptr))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value);
+                    InputString(name_option_pair.second.desc.c_str(), &option.value, 0, nullptr, nullptr);
+                    lua[sol::create_if_nil]["options"][name] = option.value;
                 },
                 [&](ComboOption& option)
                 {
-                    if (ImGui::Combo(name_option_pair.second.desc.c_str(), &option.value, option.options.c_str()))
-                    {
-                        auto& name = name_option_pair.first;
-                        lua["options"][name] = option.value + 1;
-                    }
+                    auto& name = name_option_pair.first;
+                    option.value = lua["options"][name].get_or(option.value + 1) - 1;
+                    ImGui::Combo(name_option_pair.second.desc.c_str(), &option.value, option.options.c_str());
+                    lua[sol::create_if_nil]["options"][name] = option.value + 1;
                 },
                 [&](ButtonOption& option)
                 {
@@ -709,10 +704,24 @@ void LuaBackend::render_options()
                         uint64_t now =
                             std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
                         auto& name = name_option_pair.first;
-                        lua["options"][name] = now;
+                        lua[sol::create_if_nil]["options"][name] = now;
                         handle_function(option.on_click);
                     }
                 },
+                [&](CustomOption& option)
+                {
+                    auto& name = name_option_pair.first;
+                    GuiDrawContext draw_ctx(this);
+                    auto return_value = handle_function_with_return<sol::object>(option.func, draw_ctx);
+                    if (return_value.has_value())
+                    {
+                        if (name != "")
+                            lua[sol::create_if_nil]["options"][name] = return_value.value();
+                        else
+                            lua[sol::create_if_nil]["options"] = return_value.value();
+                    }
+                },
+
             },
             name_option_pair.second.option_impl);
         if (!name_option_pair.second.long_desc.empty())

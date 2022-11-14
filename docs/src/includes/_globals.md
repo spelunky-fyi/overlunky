@@ -81,7 +81,7 @@ Provides a read-only access to the save data, updated as soon as something chang
 
 > Search script examples for [options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 
-Table of options set in the UI, added with the [register_option_functions](#register_option_int).
+Table of options set in the UI, added with the [register_option_functions](#Option-functions). You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
 ### prng
 
 #### [PRNG](#PRNG) prng
@@ -146,6 +146,16 @@ Clears a callback that is specific to a screen.
 #### nil clear_vanilla_sound_callback([CallbackId](#Aliases) id)
 
 Clears a previously set callback
+
+### register_option_callback
+
+
+> Search script examples for [register_option_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_callback)
+
+#### nil register_option_callback(string name, object value, function on_render)
+
+Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+The callback signature is optional<any> on_render([GuiDrawContext](#GuiDrawContext) draw_ctx)
 
 ### set_callback
 
@@ -1258,6 +1268,15 @@ Create image from file. Returns a tuple containing id, width and height.
 
 Disable all crust item spawns, returns whether they were already disabled before the call
 
+### force_journal
+
+
+> Search script examples for [force_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_journal)
+
+#### nil force_journal(int chapter, int entry)
+
+Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
+
 ### get_adventure_seed
 
 
@@ -1612,6 +1631,24 @@ end, "waddler")
 
 Set layer to search for storage items on
 
+### show_journal
+
+
+> Search script examples for [show_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_journal)
+
+#### nil show_journal([JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) chapter, int page)
+
+Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
+
+### toggle_journal
+
+
+> Search script examples for [toggle_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_journal)
+
+#### nil toggle_journal()
+
+Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.
+
 ### update_liquid_collision_at
 
 
@@ -1902,10 +1939,10 @@ Add a button that the user can click in the UI. Sets the timestamp of last click
 
 > Search script examples for [register_option_combo](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_combo)
 
-#### nil register_option_combo(string name, string desc, string long_desc, string opts)
+#### nil register_option_combo(string name, string desc, string long_desc, string opts, int value)
 
 Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
-with a double `\0\0` at the end.
+with a double `\0\0` at the end. `value` is the default index 1..n.
 
 ### register_option_float
 

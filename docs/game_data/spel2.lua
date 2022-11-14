@@ -183,13 +183,14 @@ function register_option_bool(name, desc, long_desc, value) end
 ---@return nil
 function register_option_string(name, desc, long_desc, value) end
 ---Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
----with a double `\0\0` at the end.
+---with a double `\0\0` at the end. `value` is the default index 1..n.
 ---@param name string
 ---@param desc string
 ---@param long_desc string
 ---@param opts string
+---@param value integer
 ---@return nil
-function register_option_combo(name, desc, long_desc, opts) end
+function register_option_combo(name, desc, long_desc, opts, value) end
 ---Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
 ---@param name string
 ---@param desc string
@@ -197,6 +198,13 @@ function register_option_combo(name, desc, long_desc, opts) end
 ---@param on_click fun(): any
 ---@return nil
 function register_option_button(name, desc, long_desc, on_click) end
+---Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+---The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
+---@param name string
+---@param value object
+---@param on_render fun(): any
+---@return nil
+function register_option_callback(name, value, on_render) end
 ---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
 ---Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 ---`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
@@ -1538,6 +1546,19 @@ function get_render_hitbox(uid, extrude, offsetx, offsety) end
 ---@param box AABB
 ---@return AABB
 function screen_aabb(box) end
+---Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
+---@param chapter integer
+---@param entry integer
+---@return nil
+function force_journal(chapter, entry) end
+---Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.
+---@return nil
+function toggle_journal() end
+---Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
+---@param chapter JOURNALUI_PAGE_SHOWN
+---@param page integer
+---@return nil
+function show_journal(chapter, page) end
 ---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 ---@param host string
 ---@param port in_port_t
@@ -3105,6 +3126,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class Backpack : Movable
     ---@field explosion_trigger boolean
     ---@field explosion_timer integer
+    ---@field trigger_explosion fun(self): nil
 
 ---@class Projectile : Movable
 
@@ -3866,6 +3888,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
 
 ---@class DMAlienBlast : Entity
+    ---@field owner_uid integer
+    ---@field timer integer
+    ---@field sound SoundMeta
+    ---@field reticule_internal Entity
+    ---@field reticule_external Entity
 
 ---@class MovableBehavior
     ---@field get_state_id MovableBehavior_get_state_id
@@ -4289,6 +4316,8 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field win_pushid fun(self, id: integer): nil
     ---@field win_popid fun(self): nil
     ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil
+    ---@field win_section any @&GuiDrawContext::win_section
+    ---@field win_indent fun(self, width: number): nil
 
 ---@class GuiDrawContext_draw_rect
 ---@param rect AABB
@@ -4847,6 +4876,7 @@ local function AABB_extrude(self, amount_x, amount_y) end
     ---@field unknown23 TextureRenderingInfo
     ---@field entire_book TextureRenderingInfo
     ---@field page_timer integer
+    ---@field fade_timer integer
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo

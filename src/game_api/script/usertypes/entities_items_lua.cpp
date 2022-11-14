@@ -139,6 +139,8 @@ void register_usertypes(sol::state& lua)
         &Backpack::explosion_trigger,
         "explosion_timer",
         &Backpack::explosion_timer,
+        "trigger_explosion",
+        &Backpack::trigger_explosion,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
