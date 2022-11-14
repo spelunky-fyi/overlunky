@@ -1877,15 +1877,54 @@ end
         case THEME_OVERRIDE::SPAWN_DECORATION2:
         case THEME_OVERRIDE::SPAWN_EXTRA:
         case THEME_OVERRIDE::UNKNOWN_V51:
+            themeinfo->set_post(
+                id,
+                override,
+                [=, fun = std::move(fun)](ThemeInfo* self)
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    backend->handle_function(fun, self);
+                    backend->clear_current_callback();
+                });
+            break;
         case THEME_OVERRIDE::RESET_THEME_FLAGS:
         case THEME_OVERRIDE::UNKNOWN_V30:
         case THEME_OVERRIDE::PLAYER_DAMAGE:
         case THEME_OVERRIDE::UNKNOWN_V38:
         case THEME_OVERRIDE::LOOP:
         case THEME_OVERRIDE::GET_THEME_FLAG:
+            themeinfo->set_post_bool(
+                id,
+                override,
+                [=, fun = std::move(fun)](ThemeInfo* self)
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    backend->handle_function(fun, self);
+                    backend->clear_current_callback();
+                });
+            break;
         case THEME_OVERRIDE::THEME_ID:
         case THEME_OVERRIDE::BASE_ID:
         case THEME_OVERRIDE::VAULT_LEVEL:
+            themeinfo->set_post_u8(
+                id,
+                override,
+                [=, fun = std::move(fun)](ThemeInfo* self)
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    backend->handle_function(fun, self);
+                    backend->clear_current_callback();
+                });
+            break;
         case THEME_OVERRIDE::ENT_FLOOR_SPREADING:
         case THEME_OVERRIDE::ENT_FLOOR_SPREADING2:
         case THEME_OVERRIDE::TRANSITION_MODIFIER:
@@ -1896,9 +1935,22 @@ end
         case THEME_OVERRIDE::TEXTURE_BACKLAYER_LUT:
         case THEME_OVERRIDE::EXIT_ROOM_Y_LEVEL:
         case THEME_OVERRIDE::SHOP_CHANCE:
+            themeinfo->set_post_u32(
+                id,
+                override,
+                [=, fun = std::move(fun)](ThemeInfo* self)
+                {
+                    auto backend = LuaBackend::get_backend(backend_id);
+                    if (!backend->get_enabled() || backend->is_theme_callback_cleared({theme, id}))
+                        return;
+                    backend->set_current_callback(theme, id, CallbackType::Theme);
+                    backend->handle_function(fun, self);
+                    backend->clear_current_callback();
+                });
+            break;
         case THEME_OVERRIDE::GRAVITY:
         case THEME_OVERRIDE::BACKLAYER_LIGHT_LEVEL:
-            themeinfo->set_post(
+            themeinfo->set_post_float(
                 id,
                 override,
                 [=, fun = std::move(fun)](ThemeInfo* self)
@@ -1925,6 +1977,7 @@ end
                     backend->clear_current_callback();
                 });
             break;
+        case THEME_OVERRIDE::LVL_FILE:
         default:
             break;
         }
