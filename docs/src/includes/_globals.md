@@ -46,6 +46,7 @@ A bunch of [game state](#StateMemory) variables. Your ticket to almost anything 
 if game_manager.game_props.game_has_focus == false then
     message("Come back soon!")
 end
+
 ```
 
 #### [GameManager](#GameManager) game_manager
@@ -64,6 +65,7 @@ for _, p in pairs(online.online_players) do
     end
 end
 print(message)
+
 ```
 
 #### [Online](#Online) online
@@ -75,9 +77,10 @@ The [Online](#Online) object has information about the online lobby and its play
 
 
 ```lua
-> Make the player invisible, use only in single player only mods
+-- Make the player invisible, use only in single player only mods
 
 players[1].flags = set_flag(players[1].flags, 1)
+
 ```
 
 #### array&lt;[Player](#Player)&gt; players
@@ -112,6 +115,7 @@ set_callback(function()
         spawn_entity_snapped_to_floor(ENT_TYPE.ITEM_PICKUP_BOMBBAG, 0, 0, LAYER.PLAYER1)
     end
 end, ON.LEVEL)
+
 ```
 
 #### array&lt;mixed&gt; options
@@ -123,7 +127,7 @@ Table of options set in the UI, added with the [register_option_functions](#Opti
 
 
 ```lua
-> Make it so there is 50% chance that the Ankh will be destroyed
+--Make it so there is 50% chance that the Ankh will be destroyed
 
 set_callback(function ()
     -- more or less 50% chance
@@ -135,6 +139,7 @@ set_callback(function ()
         end
     end
 end, ON.LEVEL)
+
 ```
 
 #### [PRNG](#PRNG) prng
@@ -1978,6 +1983,7 @@ set_callback(function()
         spawn_entity_snapped_to_floor(ENT_TYPE.ITEM_PICKUP_BOMBBAG, 0, 0, LAYER.PLAYER1)
     end
 end, ON.LEVEL)
+
 ```
 
 
