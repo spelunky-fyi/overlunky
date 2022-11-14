@@ -147,16 +147,6 @@ Clears a callback that is specific to a screen.
 
 Clears a previously set callback
 
-### register_option_callback
-
-
-> Search script examples for [register_option_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_callback)
-
-#### nil register_option_callback(string name, object value, function on_render)
-
-Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
-The callback signature is optional<any> on_render([GuiDrawContext](#GuiDrawContext) draw_ctx)
-
 ### set_callback
 
 
@@ -1933,6 +1923,16 @@ Add a boolean option that the user can change in the UI. Read with `options.name
 #### nil register_option_button(string name, string desc, string long_desc, function on_click)
 
 Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
+
+### register_option_callback
+
+
+> Search script examples for [register_option_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_callback)
+
+#### nil register_option_callback(string name, object value, function on_render)
+
+Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+The callback signature is optional<any> on_render([GuiDrawContext](#GuiDrawContext) draw_ctx)
 
 ### register_option_combo
 
