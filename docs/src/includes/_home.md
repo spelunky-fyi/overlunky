@@ -110,4 +110,3 @@ Flags | int;
 uColor | int;
 SHORT_TILE_CODE | int;
 STRINGID | int;
-FEAT | int;

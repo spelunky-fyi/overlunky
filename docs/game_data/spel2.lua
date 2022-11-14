@@ -881,6 +881,11 @@ function send_input(uid, buttons) end
 ---@param cb_id CallbackId
 ---@return nil
 function clear_screen_callback(screen_id, cb_id) end
+---Clears a callback that is specific to a theme.
+---@param theme THEME
+---@param cb_id CallbackId
+---@return nil
+function clear_theme_callback(theme, cb_id) end
 ---Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
 ---Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
 ---@param screen_id integer
@@ -1010,6 +1015,20 @@ function set_pre_render(uid, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_post_render(uid, fun) end
+---Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before the specified ThemeInfo function, if implemented. Return true or expected value to skip default behavior.
+---@param theme THEME
+---@param override THEME_OVERRIDE
+---@param fun fun(): any
+---@return CallbackId?
+function set_pre_theme(theme, override, fun) end
+---Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the specified ThemeInfo function, if implemented.
+---@param theme THEME
+---@param override THEME_OVERRIDE
+---@param fun fun(): any
+---@return CallbackId?
+function set_post_theme(theme, override, fun) end
 ---Raise a signal and probably crash the game
 ---@return nil
 function raise() end
@@ -3970,18 +3989,18 @@ local function MovableBehavior_get_state_id(self) end
 
 ---@class ThemeInfo
     ---@field sub_theme ThemeInfo
-    ---@field get_unknown1 fun(self): boolean
+    ---@field reset_theme_flags fun(self): boolean
     ---@field init_flags fun(self): nil
     ---@field init_level fun(self): nil
     ---@field unknown_v4 fun(self): nil
-    ---@field unknown_v5 fun(self): nil
+    ---@field generate_path fun(self): nil
     ---@field add_special_rooms fun(self): nil
-    ---@field unknown_v7 fun(self): nil
-    ---@field unknown_v8 fun(self): nil
+    ---@field add_player_coffin fun(self): nil
+    ---@field add_dirk_coffin fun(self): nil
+    ---@field add_idol fun(self): nil
     ---@field add_vault fun(self): nil
     ---@field add_coffin fun(self): nil
     ---@field add_special_feeling fun(self): nil
-    ---@field unknown_v12 fun(self): boolean
     ---@field spawn_level fun(self): nil
     ---@field spawn_border fun(self): nil
     ---@field post_process_level fun(self): nil
@@ -4012,11 +4031,11 @@ local function MovableBehavior_get_state_id(self) end
     ---@field get_backlayer_light_level fun(self): number
     ---@field get_loop fun(self): boolean
     ---@field get_vault_level fun(self): integer
-    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
+    ---@field get_theme_flag fun(self, index: integer): boolean
     ---@field get_dynamic_texture fun(self, texture_id: integer): integer
     ---@field pre_transition fun(self): nil
-    ---@field get_level_height fun(self): integer
-    ---@field unknown_v47 fun(self): integer
+    ---@field get_exit_room_y_level fun(self): integer
+    ---@field get_shop_chance fun(self): integer
     ---@field spawn_decoration fun(self): nil
     ---@field spawn_decoration2 fun(self): nil
     ---@field spawn_extra fun(self): nil
@@ -4035,18 +4054,18 @@ local function MovableBehavior_get_state_id(self) end
     ---@field unknown2 any @&CustomTheme::unknown2
     ---@field unknown3 any @&CustomTheme::unknown3
     ---@field unknown4 any @&CustomTheme::unknown4
-    ---@field get_unknown1 fun(self): boolean
+    ---@field reset_theme_flags fun(self): boolean
     ---@field init_flags fun(self): nil
     ---@field init_level fun(self): nil
     ---@field unknown_v4 fun(self): nil
-    ---@field unknown_v5 fun(self): nil
+    ---@field generate_path fun(self): nil
     ---@field add_special_rooms fun(self): nil
-    ---@field unknown_v7 fun(self): nil
-    ---@field unknown_v8 fun(self): nil
+    ---@field add_player_coffin fun(self): nil
+    ---@field add_dirk_coffin fun(self): nil
+    ---@field add_idol fun(self): nil
     ---@field add_vault fun(self): nil
     ---@field add_coffin fun(self): nil
     ---@field add_special_feeling fun(self): nil
-    ---@field unknown_v12 fun(self): boolean
     ---@field spawn_level fun(self): nil
     ---@field spawn_border fun(self): nil
     ---@field post_process_level fun(self): nil
@@ -4077,11 +4096,11 @@ local function MovableBehavior_get_state_id(self) end
     ---@field get_backlayer_light_level fun(self): number
     ---@field get_loop fun(self): boolean
     ---@field get_vault_level fun(self): integer
-    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
+    ---@field get_theme_flag fun(self, index: integer): boolean
     ---@field get_dynamic_texture fun(self, texture_id: integer): integer
     ---@field pre_transition fun(self): nil
-    ---@field get_level_height fun(self): integer
-    ---@field unknown_v47 fun(self): integer
+    ---@field get_exit_room_y_level fun(self): integer
+    ---@field get_shop_chance fun(self): integer
     ---@field spawn_decoration fun(self): nil
     ---@field spawn_decoration2 fun(self): nil
     ---@field spawn_extra fun(self): nil
@@ -9351,4 +9370,3 @@ local MAX_PLAYERS = 4
 ---@alias uColor integer;
 ---@alias SHORT_TILE_CODE integer;
 ---@alias STRINGID integer;
----@alias FEAT integer;

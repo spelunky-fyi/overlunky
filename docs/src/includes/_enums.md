@@ -549,7 +549,7 @@ Name | Data | Description
 [DEATH_MESSAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH_MESSAGE) | ON::DEATH_MESSAGE | Params: `STRINGID id`<br/>Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.<br/>
 [PRE_LOAD_JOURNAL_CHAPTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_JOURNAL_CHAPTER) | ON::PRE_LOAD_JOURNAL_CHAPTER | Params: [JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) `chapter`<br/>Runs before the journal or any of it's chapter is opened<br/>Return behavior: return true to not load the chapter (or journal as a whole)<br/>
 [POST_LOAD_JOURNAL_CHAPTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_JOURNAL_CHAPTER) | ON::POST_LOAD_JOURNAL_CHAPTER | Params: [JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) `chapter`, `array pages`<br/>Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return behavior: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...<br/>
-[PRE_GET_FEAT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GET_FEAT) | ON::PRE_GET_FEAT | Runs before getting performed status for a [FEAT](#Aliases) when rendering the Feats page in journal. Return a boolean to override the vanilla feat with your own. Defaults to Steam GetAchievement.<br/>
+[PRE_GET_FEAT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GET_FEAT) | ON::PRE_GET_FEAT | Runs before getting performed status for a FEAT when rendering the Feats page in journal. Return a boolean to override the vanilla feat with your own. Defaults to Steam GetAchievement.<br/>
 [PRE_SET_FEAT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_SET_FEAT) | ON::PRE_SET_FEAT | Runs before the game sets a vanilla feat performed. Return true to block the default behaviour of calling Steam SetAchievement.<br/>
 
 ## PARTICLEEMITTER
@@ -856,18 +856,18 @@ Overrides for different [CustomTheme](#CustomTheme) functions. Warning: We WILL 
 Name | Data | Description
 ---- | ---- | -----------
 [BASE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BASE) | THEME_OVERRIDE::BASE | 
-[UNKNOWN_V1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V1) | THEME_OVERRIDE::UNKNOWN_V1 | 
+[RESET_THEME_FLAGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.RESET_THEME_FLAGS) | THEME_OVERRIDE::RESET_THEME_FLAGS | 
 [INIT_FLAGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_FLAGS) | THEME_OVERRIDE::INIT_FLAGS | 
 [INIT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_LEVEL) | THEME_OVERRIDE::INIT_LEVEL | 
 [UNKNOWN_V4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V4) | THEME_OVERRIDE::UNKNOWN_V4 | 
-[UNKNOWN_V5](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V5) | THEME_OVERRIDE::UNKNOWN_V5 | 
+[GENERATE_PATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.GENERATE_PATH) | THEME_OVERRIDE::GENERATE_PATH | 
 [SPECIAL_ROOMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPECIAL_ROOMS) | THEME_OVERRIDE::SPECIAL_ROOMS | 
-[UNKNOWN_V7](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V7) | THEME_OVERRIDE::UNKNOWN_V7 | 
-[UNKNOWN_V8](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V8) | THEME_OVERRIDE::UNKNOWN_V8 | 
+[PLAYER_COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PLAYER_COFFIN) | THEME_OVERRIDE::PLAYER_COFFIN | 
+[DIRK_COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.DIRK_COFFIN) | THEME_OVERRIDE::DIRK_COFFIN | 
 [VAULT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.VAULT) | THEME_OVERRIDE::VAULT | 
 [COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.COFFIN) | THEME_OVERRIDE::COFFIN | 
 [FEELING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.FEELING) | THEME_OVERRIDE::FEELING | 
-[UNKNOWN_V12](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V12) | THEME_OVERRIDE::UNKNOWN_V12 | 
+[IDOL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.IDOL) | THEME_OVERRIDE::IDOL | 
 [SPAWN_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_LEVEL) | THEME_OVERRIDE::SPAWN_LEVEL | 
 [SPAWN_BORDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_BORDER) | THEME_OVERRIDE::SPAWN_BORDER | 
 [POST_PROCESS_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_LEVEL) | THEME_OVERRIDE::POST_PROCESS_LEVEL | 
@@ -898,11 +898,11 @@ Name | Data | Description
 [BACKLAYER_LIGHT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BACKLAYER_LIGHT_LEVEL) | THEME_OVERRIDE::BACKLAYER_LIGHT_LEVEL | 
 [LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.LOOP) | THEME_OVERRIDE::LOOP | 
 [VAULT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.VAULT_LEVEL) | THEME_OVERRIDE::VAULT_LEVEL | 
-[GET_UNKNOWN1_OR_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.GET_UNKNOWN1_OR_2) | THEME_OVERRIDE::GET_UNKNOWN1_OR_2 | 
+[GET_THEME_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.GET_THEME_FLAG) | THEME_OVERRIDE::GET_THEME_FLAG | 
 [TEXTURE_DYNAMIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TEXTURE_DYNAMIC) | THEME_OVERRIDE::TEXTURE_DYNAMIC | 
 [PRE_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PRE_TRANSITION) | THEME_OVERRIDE::PRE_TRANSITION | 
-[LEVEL_HEIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.LEVEL_HEIGHT) | THEME_OVERRIDE::LEVEL_HEIGHT | 
-[UNKNOWN_V47](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V47) | THEME_OVERRIDE::UNKNOWN_V47 | 
+[EXIT_ROOM_Y_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.EXIT_ROOM_Y_LEVEL) | THEME_OVERRIDE::EXIT_ROOM_Y_LEVEL | 
+[SHOP_CHANCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SHOP_CHANCE) | THEME_OVERRIDE::SHOP_CHANCE | 
 [SPAWN_DECORATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION) | THEME_OVERRIDE::SPAWN_DECORATION | 
 [SPAWN_DECORATION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION2) | THEME_OVERRIDE::SPAWN_DECORATION2 | 
 [SPAWN_EXTRA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_EXTRA) | THEME_OVERRIDE::SPAWN_EXTRA | 

@@ -138,6 +138,15 @@ Clears a callback that is specific to an entity.
 
 Clears a callback that is specific to a screen.
 
+### clear_theme_callback
+
+
+> Search script examples for [clear_theme_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_theme_callback)
+
+#### nil clear_theme_callback([THEME](#THEME) theme, [CallbackId](#Aliases) cb_id)
+
+Clears a callback that is specific to a theme.
+
 ### clear_vanilla_sound_callback
 
 
@@ -359,6 +368,16 @@ Sets a callback that is called right after the statemachine, so you can override
 Use this only when no other approach works, this call can be expensive if overused.
 Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 
+### set_post_theme
+
+
+> Search script examples for [set_post_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_theme)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_post_theme([THEME](#THEME) theme, [THEME_OVERRIDE](#THEME_OVERRIDE) override, function fun)
+
+Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
+Sets a callback that is called right after the specified [ThemeInfo](#ThemeInfo) function, if implemented.
+
 ### set_pre_collision1
 
 
@@ -441,6 +460,16 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
 Use this only when no other approach works, this call can be expensive if overused.
 Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+
+### set_pre_theme
+
+
+> Search script examples for [set_pre_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_theme)
+
+#### optional&lt;[CallbackId](#Aliases)&gt; set_pre_theme([THEME](#THEME) theme, [THEME_OVERRIDE](#THEME_OVERRIDE) override, function fun)
+
+Returns unique id for the callback to be used in [clear_theme_callback](#clear_theme_callback) or `nil` if uid is not valid.
+Sets a callback that is called right before the specified [ThemeInfo](#ThemeInfo) function, if implemented. Return true or expected value to skip default behavior.
 
 ### set_timeout
 
@@ -1113,16 +1142,16 @@ Returns the uid of the currently worn backitem, or -1 if wearing nothing
 
 > Search script examples for [change_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_feat)
 
-#### nil change_feat([FEAT](#Aliases) feat, bool hidden, string name, string description)
+#### nil change_feat(FEAT feat, bool hidden, string name, string description)
 
-Helper function to set the title and description strings for a [FEAT](#Aliases) with change_string, as well as the hidden state.
+Helper function to set the title and description strings for a FEAT with change_string, as well as the hidden state.
 
 ### get_feat
 
 
 > Search script examples for [get_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_feat)
 
-#### tuple&lt;bool, bool, const string, const string&gt; get_feat([FEAT](#Aliases) feat)
+#### tuple&lt;bool, bool, const string, const string&gt; get_feat(FEAT feat)
 
 Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
 
@@ -1131,7 +1160,7 @@ Check if the user has performed a feat (Real Steam achievement or a hooked one).
 
 > Search script examples for [get_feat_hidden](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_feat_hidden)
 
-#### bool get_feat_hidden([FEAT](#Aliases) feat)
+#### bool get_feat_hidden(FEAT feat)
 
 Get the visibility of a feat
 
@@ -1140,7 +1169,7 @@ Get the visibility of a feat
 
 > Search script examples for [set_feat_hidden](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_feat_hidden)
 
-#### nil set_feat_hidden([FEAT](#Aliases) feat, bool hidden)
+#### nil set_feat_hidden(FEAT feat, bool hidden)
 
 Set the visibility of a feat
 

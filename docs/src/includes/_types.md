@@ -2453,18 +2453,18 @@ nil | [post(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-f
  | [unknown2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown2) | 
  | [unknown3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown3) | 
  | [unknown4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown4) | 
-bool | [get_unknown1()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_unknown1) | 
+bool | [reset_theme_flags()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_theme_flags) | 
 nil | [init_flags()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_flags) | 
 nil | [init_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_level) | 
 nil | [unknown_v4()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v4) | 
-nil | [unknown_v5()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v5) | 
+nil | [generate_path()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_path) | 
 nil | [add_special_rooms()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_special_rooms) | 
-nil | [unknown_v7()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v7) | 
-nil | [unknown_v8()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v8) | 
+nil | [add_player_coffin()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_player_coffin) | 
+nil | [add_dirk_coffin()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_dirk_coffin) | 
+nil | [add_idol()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_idol) | 
 nil | [add_vault()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_vault) | 
 nil | [add_coffin()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_coffin) | 
 nil | [add_special_feeling()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_special_feeling) | 
-bool | [unknown_v12()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v12) | 
 nil | [spawn_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_level) | 
 nil | [spawn_border()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_border) | 
 nil | [post_process_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post_process_level) | 
@@ -2495,11 +2495,11 @@ int | [get_backlayer_lut()](https://github.com/spelunky-fyi/overlunky/search?l=L
 float | [get_backlayer_light_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_backlayer_light_level) | 
 bool | [get_loop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_loop) | 
 int | [get_vault_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_vault_level) | 
-bool | [get_unknown_1_or_2(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_unknown_1_or_2) | 
+bool | [get_theme_flag(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_flag) | 
 int | [get_dynamic_texture(int texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dynamic_texture) | Add TEXTUREs to `textures` to override different dynamic textures easily.
 nil | [pre_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre_transition) | 
-int | [get_level_height()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_height) | 
-int | [unknown_v47()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v47) | 
+int | [get_exit_room_y_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_exit_room_y_level) | 
+int | [get_shop_chance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_shop_chance) | 
 nil | [spawn_decoration()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_decoration) | 
 nil | [spawn_decoration2()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_decoration2) | 
 nil | [spawn_extra()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_extra) | 
@@ -2511,18 +2511,18 @@ nil | [unknown_v51()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=u
 Type | Name | Description
 ---- | ---- | -----------
 [ThemeInfo](#ThemeInfo) | [sub_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_theme) | 
-bool | [get_unknown1()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_unknown1) | 
+bool | [reset_theme_flags()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_theme_flags) | 
 nil | [init_flags()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_flags) | dwelling,tidepool: unset levelgen.flags.flag12<br/>jungle,volcana.olmec,icecaves,neobab,cog,duat,abzu,tiamat,eggplant,hundun,basecamp,arena: nop<br/>temple: unset levelgen.flags.flag10 + calculate chance of grasshopper critter spawn<br/>sunken: unset levelgen.flags.flag9, 10, 17, 18 + if state.level == 1 -> unset flag 11<br/>cosmic: calls same virtual on its sub_theme
 nil | [init_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_level) | does random calculations and calls function to determine the start room in most themes
-nil | [unknown_v4()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v4) | most themes call the same function, some check whether they are in CO
-nil | [unknown_v5()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v5) | 
+nil | [unknown_v4()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v4) | flags liquid rooms<br/>sets the bee flag true if in non-CO jung/temp<br/>sets unknown2 flag to true in some themes<br/>sets the drill room position in Volcana.
+nil | [generate_path()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_path) | 
 nil | [add_special_rooms()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_special_rooms) | dwelling: does stuff when level == 4 or udjat present<br/>jungle: when black market present<br/>volcana: when drill present<br/>touches the rooms and sometimes the meta info about the rooms
-nil | [unknown_v7()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v7) | can't trigger, dwelling (quillback) and abzu do something special (arena just returns)
-nil | [unknown_v8()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v8) | does something depending on levelgen.data.unknown7
+nil | [add_player_coffin()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_player_coffin) | can't trigger, dwelling (quillback) and abzu do something special (arena just returns)
+nil | [add_dirk_coffin()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_dirk_coffin) | does something depending on levelgen.data.unknown7
+nil | [add_idol()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_idol) | 
 nil | [add_vault()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_vault) | 
 nil | [add_coffin()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_coffin) | 
 nil | [add_special_feeling()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_special_feeling) | metal clanking and air of oppression
-bool | [unknown_v12()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v12) | 
 nil | [spawn_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_level) | spawns all floor etc tiles based on the room layout<br/>disable this and only the player is spawned in the level
 nil | [spawn_border()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_border) | spawns CO: teleportingborder / Duat: dust / theme specific border tiles around the level
 nil | [post_process_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post_process_level) | volcana: checks if state.coffin_contents = cocovondiamonds -> chooses one of the four coffins in vlad's castle at random to put her in<br/>tidepool: spawns impostor lake, some door and a litwalltorch, ...<br/>neobab: assigns the correct animation_frame to all the ushabtis<br/>co, arena: forwards to the same virtual of the sub_theme<br/>abzu, tiamat: spawns impostor lake
@@ -2553,11 +2553,11 @@ int | [get_backlayer_lut()](https://github.com/spelunky-fyi/overlunky/search?l=L
 float | [get_backlayer_light_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_backlayer_light_level) | a value between 0.0 (default) and 1.0 used to illuminate (backlayer) locations<br/>depending on camera level (thus player y-level), the brightness is increased gradually<br/>used in black market, vlad's castle, ice caves backlayer, pleasure palace<br/>for tiamat: the value is always 1.0 for full backlayer global illumination (ship)
 bool | [get_loop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_loop) | this is used for CO (checks that player is in the level, not in the transition)<br/>if enabled in another theme, it adds an extra border and if you zoom out, you see the level loop if you move to the side
 int | [get_vault_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_vault_level) | not 100% sure, this is used in a random calculation that determines whether a vault spawns<br/>looks to be the highest level a vault can spawn; it's mostly 3 or 4, but for neobab it's 1, which makes sense
-bool | [get_unknown_1_or_2(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_unknown_1_or_2) | index == 0 ? return unknown1 : return unknown2
+bool | [get_theme_flag(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_flag) | index == 0 ? return unknown1 : return unknown2
 int | [get_dynamic_texture(int texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dynamic_texture) | the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number<br/>that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)
 nil | [pre_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre_transition) | manipulates state.level_next, world_next and theme_next; triggers when exiting a level<br/>for dwelling, it just increments level_next because the world/theme choice is made by which door you pick<br/>for jungle/volcana, it checks whether it's on the fourth level, if so, sets theme_next (4), world_next (3) and level_next (1) correctly for olmec<br/>for CO it checks whether the next level is 99, and set state.win_state to 3 to finish the game
-int | [get_level_height()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_height) | default = return state.h - 1<br/>for special levels (black market, vlad, ...) fixed heights are returned
-int | [unknown_v47()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_v47) | returns a value that appears to affect room generation and is based on current world,level
+int | [get_exit_room_y_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_exit_room_y_level) | default = return state.h - 1<br/>for special levels (black market, vlad, ...) fixed heights are returned
+int | [get_shop_chance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_shop_chance) | returns a value that appears to affect room generation and is based on current world,level
 nil | [spawn_decoration()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_decoration) | used e.g. in [Vlad](#Vlad)'s castle to insert the big banner in the center with the two demon statues<br/>also implemented for neobab (i think in the zoos)<br/>might do other things as well
 nil | [spawn_decoration2()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_decoration2) | dwelling: adds the decal above the udjat chest<br/>jungle: adds the colorful jungle flowers on top of the blocks<br/>does lots of other things as well, not sure about difference between this and spawn_decoration
 nil | [spawn_extra()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_extra) | dwelling udjat level: adds the key in random place<br/>vlad's castle: adds decorative banners<br/>tidepool: adds hanging seaweed, red lanterns, ...<br/>temple: adds temple sand deco, ...<br/>neobab: adds neon signs, hanging wires, ...
