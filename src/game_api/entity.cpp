@@ -243,7 +243,7 @@ bool Movable::is_button_released(BUTTON button)
 
 void hook_movable_state_machine(Movable* _self)
 {
-    hook_vtable<void(Movable*)>(
+    hook_vtable<void(Movable*), 0x2>(
         _self,
         [](Movable* self, void (*original)(Movable*))
         {
@@ -267,8 +267,7 @@ void hook_movable_state_machine(Movable* _self)
             {
                 post(self);
             }
-        },
-        0x2);
+        });
 }
 void Movable::set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine)
 {
@@ -448,7 +447,7 @@ void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<vo
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.on_destroy.empty())
     {
-        hook_vtable<void(Entity*)>(
+        hook_vtable<void(Entity*), 0x5>(
             this,
             [](Entity* self, void (*original)(Entity*))
             {
@@ -458,8 +457,7 @@ void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<vo
                     _on_destroy(self);
                 }
                 original(self);
-            },
-            0x5);
+            });
     }
     hook_info.on_destroy.push_back({reserved_callback_id, std::move(on_destroy)});
 }
@@ -468,7 +466,7 @@ void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.on_kill.empty())
     {
-        hook_vtable<void(Entity*, bool, Entity*)>(
+        hook_vtable<void(Entity*, bool, Entity*), 0x3>(
             this,
             [](Entity* self, bool _some_bool, Entity* from, void (*original)(Entity*, bool, Entity*))
             {
@@ -478,8 +476,7 @@ void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(
                     _on_kill(self, from);
                 }
                 original(self, _some_bool, from);
-            },
-            0x3);
+            });
     }
     hook_info.on_kill.push_back({reserved_callback_id, std::move(on_kill)});
 }
@@ -503,7 +500,7 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
         }
         else
         {
-            hook_vtable<void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t)>(
+            hook_vtable<void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t), 0x30>(
                 this,
                 [](Entity* self, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint16_t stun_amount, uint8_t iframes, void (*original)(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t))
                 {
@@ -521,8 +518,7 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
                     {
                         original(self, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
                     }
-                },
-                0x30);
+                });
         }
     }
     hook_info.on_damage.push_back({reserved_callback_id, std::move(on_damage)});
@@ -530,7 +526,7 @@ void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<boo
 
 auto hook_update_callback(Entity* self)
 {
-    hook_vtable<void(Entity*)>(
+    hook_vtable<void(Entity*), 0x26>(
         self,
         [](Entity* entity, void (*original)(Entity*))
         {
@@ -552,8 +548,7 @@ auto hook_update_callback(Entity* self)
             {
                 post(entity);
             }
-        },
-        0x26);
+        });
 }
 void Entity::set_pre_floor_update(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_update)
 {
@@ -615,7 +610,7 @@ void Entity::set_pre_collision1(std::uint32_t reserved_callback_id, std::functio
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.pre_collision1.empty())
     {
-        hook_vtable<void(Entity*, Entity*)>(
+        hook_vtable<void(Entity*, Entity*), 0x4>(
             this,
             [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
             {
@@ -634,8 +629,7 @@ void Entity::set_pre_collision1(std::uint32_t reserved_callback_id, std::functio
                 {
                     original(self, collision_entity);
                 }
-            },
-            0x4);
+            });
     }
     hook_info.pre_collision1.push_back({reserved_callback_id, std::move(pre_collision1)});
 }
@@ -645,7 +639,7 @@ void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::functio
     EntityHooksInfo& hook_info = get_hooks();
     if (hook_info.pre_collision2.empty())
     {
-        hook_vtable<void(Entity*, Entity*)>(
+        hook_vtable<void(Entity*, Entity*), 0x1A>(
             this,
             [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
             {
@@ -664,15 +658,14 @@ void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::functio
                 {
                     original(self, collision_entity);
                 }
-            },
-            0x1A);
+            });
     }
     hook_info.pre_collision2.push_back({reserved_callback_id, std::move(pre_collision2)});
 }
 
 auto hook_render_callback(Entity* self, RenderInfo* self_rendering_info)
 {
-    hook_vtable<void(RenderInfo*, float*)>(
+    hook_vtable<void(RenderInfo*, float*), 0x3>(
         self_rendering_info,
         [uid = self->uid](RenderInfo* render_info, float* floats, void (*original)(RenderInfo*, float* floats))
         {
@@ -695,8 +688,7 @@ auto hook_render_callback(Entity* self, RenderInfo* self_rendering_info)
             {
                 post(entity);
             }
-        },
-        0x3);
+        });
 }
 void Entity::set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render)
 {
@@ -792,13 +784,12 @@ uint32_t Movable::get_behavior()
 
 void Movable::set_gravity(float gravity)
 {
-    hook_vtable<void(Movable*, float)>(
+    hook_vtable<void(Movable*, float), 0x53>(
         this,
         [gravity](Movable* ent, [[maybe_unused]] float _gravity, void (*original)(Movable*, float))
         {
             original(ent, gravity);
-        },
-        0x53);
+        });
 }
 
 void Movable::reset_gravity()
