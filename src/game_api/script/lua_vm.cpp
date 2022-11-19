@@ -381,10 +381,10 @@ end
                 backend->clear_callbacks.push_back(caller.id);
                 break;
             case CallbackType::Entity:
-                backend->clear_entity_hooks.push_back({caller.uid, caller.id});
+                backend->clear_entity_hooks.push_back({caller.aux_id, caller.id});
                 break;
             case CallbackType::Screen:
-                backend->clear_screen_hooks.push_back({caller.uid, caller.id});
+                backend->clear_screen_hooks.push_back({caller.aux_id, caller.id});
                 break;
             case CallbackType::None:
                 // DEBUG("No callback to clear");

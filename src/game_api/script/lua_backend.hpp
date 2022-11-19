@@ -191,8 +191,8 @@ enum class CallbackType
 
 struct CurrentCallback
 {
-    int uid;
-    int id;
+    int32_t aux_id;
+    int32_t id;
     CallbackType type;
 };
 
@@ -254,7 +254,7 @@ class LuaBackend
     ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;
-    CurrentCallback current_cb = {-1, 0, CallbackType::None};
+    CurrentCallback current_cb = {0, 0, CallbackType::None};
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
@@ -338,9 +338,9 @@ class LuaBackend
     void draw(ImDrawList* dl);
     void render_options();
 
-    bool is_callback_cleared(int32_t callback_id);
-    bool is_entity_callback_cleared(std::pair<int, uint32_t> callback_id);
-    bool is_screen_callback_cleared(std::pair<int, uint32_t> callback_id);
+    bool is_callback_cleared(int32_t callback_id) const;
+    bool is_entity_callback_cleared(std::pair<int32_t, uint32_t> callback_id) const;
+    bool is_screen_callback_cleared(std::pair<int32_t, uint32_t> callback_id) const;
 
     bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
@@ -380,7 +380,7 @@ class LuaBackend
     std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages);
 
     CurrentCallback get_current_callback();
-    void set_current_callback(int uid, int id, CallbackType type);
+    void set_current_callback(int32_t aux_id, int32_t id, CallbackType type);
     void clear_current_callback();
 
     static void for_each_backend(std::function<bool(LockedBackend)> fun);

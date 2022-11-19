@@ -709,15 +709,15 @@ void LuaBackend::render_options()
     ImGui::PopID();
 }
 
-bool LuaBackend::is_callback_cleared(int32_t callback_id)
+bool LuaBackend::is_callback_cleared(int32_t callback_id) const
 {
     return std::find(clear_callbacks.begin(), clear_callbacks.end(), callback_id) != clear_callbacks.end();
 }
-bool LuaBackend::is_entity_callback_cleared(std::pair<int, uint32_t> callback_id)
+bool LuaBackend::is_entity_callback_cleared(std::pair<int32_t, uint32_t> callback_id) const
 {
     return std::find(clear_entity_hooks.begin(), clear_entity_hooks.end(), callback_id) != clear_entity_hooks.end();
 }
-bool LuaBackend::is_screen_callback_cleared(std::pair<int, uint32_t> callback_id)
+bool LuaBackend::is_screen_callback_cleared(std::pair<int32_t, uint32_t> callback_id) const
 {
     return std::find(clear_screen_hooks.begin(), clear_screen_hooks.end(), callback_id) != clear_screen_hooks.end();
 }
@@ -1408,17 +1408,17 @@ CurrentCallback LuaBackend::get_current_callback()
     return current_cb;
 }
 
-void LuaBackend::set_current_callback(int uid, int id, CallbackType type)
+void LuaBackend::set_current_callback(int32_t aux_id, int32_t id, CallbackType type)
 {
-    current_cb.uid = uid;
+    current_cb.aux_id = aux_id;
     current_cb.id = id;
     current_cb.type = type;
 }
 
 void LuaBackend::clear_current_callback()
 {
-    current_cb.uid = -1;
-    current_cb.id = -1;
+    current_cb.aux_id = 0;
+    current_cb.id = 0;
     current_cb.type = CallbackType::None;
 }
 
