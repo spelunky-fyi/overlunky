@@ -13,6 +13,7 @@ replace_table = {
     "int16_t": "integer",
     "int32_t": "integer",
     "int64_t": "integer",
+    "size_t": "integer",
     "ImU32": "integer",
     "vector": "Array",
     "array": "Array",
@@ -27,7 +28,6 @@ replace_table = {
     "pair": "tuple",
     "std::": "",
     "sol::": "",
-    "function": "fun(): any",
     " = nullopt": "",
     "void": "",
     "constexpr": "",
@@ -39,6 +39,7 @@ replace_table = {
     "const ": "",
     "ShopType": "SHOP_TYPE",
     "EmittedParticlesInfo": "Array<Particle>",
+    "object": "any",
 }
 
 reFloat = re.compile(r"\bfloat\b")
@@ -91,7 +92,7 @@ reRemoveDefault = re.compile(r" = .*")
 reHandleConst = re.compile(r"const (\w+) (\w+)")
 
 
-def cpp_params_to_emmy_lua(params_text):
+def cpp_params_to_emmy_lua(params_text, func_signature=None):
     return_typed = ""
     return_normal = ""
     params_iterator = reGetParam.finditer(params_text)
@@ -105,6 +106,10 @@ def cpp_params_to_emmy_lua(params_text):
             if m := reHandleConst.match(p_name):
                 p_type = m.group(1)
                 p_name = m.group(2)
+            if func_signature and "function" in p_type:
+                params = cpp_params_to_emmy_lua_fun(func_signature["param"])
+                ret = replace_all(func_signature["return"])
+                p_type = p_type.replace("function", f"fun({params}): {ret}")
             return_typed += f"\n---@param {p_name} {p_type}"
             return_normal += p_name
         return_normal += ", "
@@ -113,18 +118,12 @@ def cpp_params_to_emmy_lua(params_text):
 
 
 def cpp_params_to_emmy_lua_fun(params_text):
-    ret = ""
-    params_iterator = reGetParam.finditer(params_text)
-    for param_match in params_iterator:
-        p_type = param_match.group(1)
-        p_name = param_match.group(2)
-        p_name = reRemoveDefault.sub("", p_name)
-        if m := reHandleConst.match(p_name):
-            p_type = m.group(1)
-            p_name = m.group(2)
-        ret += f"{p_name}: {p_type}, "
-    ret = ret[:-2]
-    return ret[:-2]
+    params = replace_all(params_text).strip().split(",")
+    params = [
+        ": ".join([part.strip() for part in param.rsplit(" ", 1)[::-1]])
+        for param in params
+    ]
+    return ", ".join(params)
 
 
 reTuple = re.compile(r"tuple<(.*?)>")
@@ -167,7 +166,7 @@ def print_af(lf, af):
 gu.setup_stdout("game_data/spel2.lua")
 
 print(
-    """---@diagnostic disable: unused-function,lowercase-global
+    """---@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias
 ---@class Meta
 ---@field name string
 ---@field version string
@@ -223,7 +222,9 @@ for lf in ps.funcs:
             ret = replace_all(m.group(2)).strip() or "nil"
         if m or m2:
             params = (m or m2).group(1)
-            typed_params, params = cpp_params_to_emmy_lua(params)
+            typed_params, params = cpp_params_to_emmy_lua(
+                params, lf["cb_signature"] if "cb_signature" in lf else ""
+            )
             typed_params = replace_all(typed_params).strip()
         name = lf["name"]
         print_comment(lf)
@@ -249,12 +250,7 @@ for type in ps.types:
                 if ret.startswith("static"):
                     continue
                 name = m.group(2)
-                params = replace_all(m.group(3)).strip().split(",")
-                params = [
-                    ": ".join([part.strip() for part in param.rsplit(" ", 1)[::-1]])
-                    for param in params
-                ]
-                params = ", ".join(params)
+                params = cpp_params_to_emmy_lua_fun(m.group(3))
                 var_name = var["name"]
                 if "overloads" in type and var_name in type["overloads"]:
                     type["overloads"][var_name].append(
@@ -285,6 +281,11 @@ for type in ps.types:
                     index += 1
                     continue
                 elif params:
+                    # if "cb_signature" in var and var["cb_signature"] and "function" in params:
+                    #    cb_signature = var["cb_signature"]
+                    #    cb_params = cpp_params_to_emmy_lua_fun(cb_signature["param"])
+                    #    ret = replace_all(cb_signature["return"])
+                    #    params = params.replace("function", f"fun({cb_params}): {ret}")
                     signature = f"---@field {name} fun(self, {params}): {ret}"
                 else:
                     signature = f"---@field {name} fun(self): {ret}"
@@ -366,7 +367,7 @@ print(
 ---@alias Texture any
 ---@alias SpearDanglerAnimFrames any
 ---@alias OnlineLobbyScreenPlayer any
----@alias SoundCallbackFunction fun(): any"""
+---@alias SoundCallbackFunction function"""
 )
 
 print("\n--## Aliases\n")
@@ -393,6 +394,9 @@ final_replace_stuff = {
     ---@field keyreleased fun(key: number | string): boolean""",
     "---@field gamepad any @sol::property([](){g_WantUpdateHasGamepad=true;returnget_gamepad()/**/;})": "---@field gamepad Gamepad",
     "---@field user_data fun(self): nil": "---@field user_data table?",
+    """---@param number> p tuple<number,
+---@return Vec2
+function Vec2.new(self, number> p) end""": "",
 }
 
 with open("./game_data/spel2.lua", "r") as file:

@@ -132,6 +132,18 @@ not_functions = [
 replace_fun = None
 
 reConstructorFix = re.compile(r"const (\w+)(?: \w+)?(&&|&)?")
+reSignature = re.compile(r"signature .*is ([\S]*) (\w*?)\((.*?)\)")
+
+
+def get_cb_signature(text):
+    signature_m = reSignature.search(text)
+    if signature_m:
+        return {
+            "return": signature_m[1],
+            "name": signature_m[2],
+            "param": signature_m[3],
+        }
+    return None
 
 
 def fix_constructor_param(params_text):
@@ -259,8 +271,10 @@ def run_parse():
                     or (brackets_depth == 3 and in_anonymous_struct)
                 ):
                     m = re.search(r"/// ?(.*)$", line)
+                    cb_signature = None
                     if m:
                         comment.append(m[1])
+                        cb_signature = get_cb_signature(m[1])
                     else:
                         m = re.search(
                             r"^\s*(?::|\/\/)", line
@@ -393,6 +407,9 @@ def run_parse():
                                         [p.strip() for p in af["param"].split(",")[1:]]
                                     ),
                                     "comment": af["comment"],
+                                    "cb_signature": af["cb_signature"]
+                                    if "cb_signature" in af
+                                    else None,
                                 }
                             )
                     else:
@@ -422,10 +439,13 @@ def run_parse():
                 m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', line)
                 if m and not m.group(1).startswith("__"):
                     if not getfunc(m.group(1)):
+                        if comment:
+                            cb_signature = get_cb_signature(comment[-1])
                         func = {
                             "name": m.group(1),
                             "cpp": m.group(2),
                             "comment": comment,
+                            "cb_signature": cb_signature,
                         }
                         if not comment or "NoDoc" not in comment[0]:
                             if comment and comment[0] == "Deprecated":

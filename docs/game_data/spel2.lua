@@ -1,4 +1,4 @@
----@diagnostic disable: unused-function,lowercase-global
+---@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias
 ---@class Meta
 ---@field name string
 ---@field version string
@@ -73,36 +73,36 @@ function prinspect(...) end
 function messpect(...) end
 ---Adds a command that can be used in the console.
 ---@param name string
----@param cmd fun(): any
+---@param cmd function
 ---@return nil
 function register_console_command(name, cmd) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
 ---Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
----@param cb fun(): any
+---@param cb function
 ---@param frames integer
 ---@return CallbackId
 function set_interval(cb, frames) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 ---Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
----@param cb fun(): any
+---@param cb function
 ---@param frames integer
 ---@return CallbackId
 function set_timeout(cb, frames) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
 ---Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
----@param cb fun(): any
+---@param cb function
 ---@param frames integer
 ---@return CallbackId
 function set_global_interval(cb, frames) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 ---Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
----@param cb fun(): any
+---@param cb function
 ---@param frames integer
 ---@return CallbackId
 function set_global_timeout(cb, frames) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 ---Add global callback function to be called on an [event](#ON).
----@param cb fun(): any
+---@param cb function
 ---@param screen integer
 ---@return CallbackId
 function set_callback(cb, screen) end
@@ -195,14 +195,14 @@ function register_option_combo(name, desc, long_desc, opts, value) end
 ---@param name string
 ---@param desc string
 ---@param long_desc string
----@param on_click fun(): any
+---@param on_click function
 ---@return nil
 function register_option_button(name, desc, long_desc, on_click) end
 ---Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
 ---The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
 ---@param name string
----@param value object
----@param on_render fun(): any
+---@param value any
+---@param on_render fun(draw_ctx: GuiDrawContext): any?
 ---@return nil
 function register_option_callback(name, value, on_render) end
 ---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
@@ -387,7 +387,7 @@ function spawn_playerghost(char_type, x, y, layer) end
 ---This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
 ---In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
 ---The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
----@param cb fun(): any
+---@param cb fun(entity_type: ENT_TYPE, x: number, y: number, layer: integer, overlay_entity: Entity, spawn_flags: SPAWN_TYPE): integer?
 ---@param flags SPAWN_TYPE
 ---@param mask integer
 ---@vararg any
@@ -396,7 +396,7 @@ function set_pre_entity_spawn(cb, flags, mask, ...) end
 ---Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
 ---This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
 ---The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
----@param cb fun(): any
+---@param cb fun(ent: Entity, spawn_flags: SPAWN_TYPE): nil
 ---@param flags SPAWN_TYPE
 ---@param mask integer
 ---@vararg any
@@ -493,7 +493,7 @@ function get_type(id) end
 function get_grid_entity_at(x, y, layer) end
 ---Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
 ---@param entities integer[]
----@param predicate fun(): any
+---@param predicate function
 ---@return integer[]
 function filter_entities(entities, predicate) end
 ---Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
@@ -885,14 +885,14 @@ function clear_screen_callback(screen_id, cb_id) end
 ---Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
 ---The callback signature is bool render_screen(Screen self, VanillaRenderContext render_ctx)
 ---@param screen_id integer
----@param fun fun(): any
+---@param fun fun(self: Screen, render_ctx: VanillaRenderContext): boolean
 ---@return CallbackId?
 function set_pre_render_screen(screen_id, fun) end
 ---Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
 ---Sets a callback that is called right after the screen is drawn.
 ---The callback signature is nil render_screen(Screen self, VanillaRenderContext render_ctx)
 ---@param screen_id integer
----@param fun fun(): any
+---@param fun fun(self: Screen, render_ctx: VanillaRenderContext): nil
 ---@return CallbackId?
 function set_post_render_screen(screen_id, fun) end
 ---Clears a callback that is specific to an entity.
@@ -907,7 +907,7 @@ function clear_entity_callback(uid, cb_id) end
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---The callback signature is bool statemachine(Entity self)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(self: Entity): boolean
 ---@return CallbackId?
 function set_pre_statemachine(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -917,7 +917,7 @@ function set_pre_statemachine(uid, fun) end
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---The callback signature is nil statemachine(Entity self)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(self: Entity): nil
 ---@return CallbackId?
 function set_post_statemachine(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -925,7 +925,7 @@ function set_post_statemachine(uid, fun) end
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---The callback signature is nil on_destroy(Entity self)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(self: Entity): nil
 ---@return CallbackId?
 function set_on_destroy(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -933,7 +933,7 @@ function set_on_destroy(uid, fun) end
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---The callback signature is nil on_kill(Entity self, Entity killer)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(self: Entity, killer: Entity): nil
 ---@return CallbackId?
 function set_on_kill(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -943,7 +943,7 @@ function set_on_kill(uid, fun) end
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---The callback signature is bool on_player_instagib(Entity self)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(self: Entity): boolean
 ---@return CallbackId?
 function set_on_player_instagib(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -954,7 +954,7 @@ function set_on_player_instagib(uid, fun) end
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(self: Entity, damage_dealer: Entity, damage_amount: integer, velocity_x: number, velocity_y: number, stun_amount: integer, iframes: integer): boolean
 ---@return CallbackId?
 function set_on_damage(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -962,7 +962,7 @@ function set_on_damage(uid, fun) end
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---The callback signature is bool pre_floor_update(Entity self)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(self: Entity): boolean
 ---@return CallbackId?
 function set_pre_floor_update(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -970,7 +970,7 @@ function set_pre_floor_update(uid, fun) end
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---The callback signature is nil post_floor_update(Entity self)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(self: Entity): nil
 ---@return CallbackId?
 function set_post_floor_update(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -979,7 +979,7 @@ function set_post_floor_update(uid, fun) end
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---The callback signature is nil on_open(Entity entity_self, Entity opener)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(entity_self: Entity, opener: Entity): nil
 ---@return CallbackId?
 function set_on_open(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -988,7 +988,7 @@ function set_on_open(uid, fun) end
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(entity_self: Entity, collision_entity: Entity): boolean
 ---@return CallbackId?
 function set_pre_collision1(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -997,7 +997,7 @@ function set_pre_collision1(uid, fun) end
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(self: Entity, collision_entity: Entity): boolean
 ---@return CallbackId?
 function set_pre_collision2(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -1006,7 +1006,7 @@ function set_pre_collision2(uid, fun) end
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(render_ctx: VanillaRenderContext, self: Entity): boolean
 ---@return CallbackId?
 function set_pre_render(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
@@ -1014,7 +1014,7 @@ function set_pre_render(uid, fun) end
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
 ---@param uid integer
----@param fun fun(): any
+---@param fun fun(render_ctx: VanillaRenderContext, self: Entity): nil
 ---@return CallbackId?
 function set_post_render(uid, fun) end
 ---Raise a signal and probably crash the game
@@ -1177,11 +1177,11 @@ function update_liquid_collision_at(x, y, add) end
 function disable_floor_embeds(disable) end
 ---Get the address for a pattern name
 ---@param address_name string
----@return size_t
+---@return integer
 function get_address(address_name) end
 ---Get the rva for a pattern name
 ---@param address_name string
----@return size_t
+---@return integer
 function get_rva(address_name) end
 ---Log to spelunky.log
 ---@param message string
@@ -1290,7 +1290,7 @@ function position_is_valid(x, y, layer, flags) end
 ---Return true in order to stop the game or scripts loaded after this script from handling this tile code.
 ---For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
 ---The callback signature is bool pre_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
----@param cb fun(): any
+---@param cb fun(x: number, y: number, layer: integer, room_template: ROOM_TEMPLATE): boolean
 ---@param tile_code string
 ---@return CallbackId
 function set_pre_tile_code_callback(cb, tile_code) end
@@ -1298,7 +1298,7 @@ function set_pre_tile_code_callback(cb, tile_code) end
 ---Use this to affect what the game or other scripts spawned in this position.
 ---This is received even if a previous pre-tile-code-callback has returned true
 ---The callback signature is nil post_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
----@param cb fun(): any
+---@param cb fun(x: number, y: number, layer: integer, room_template: ROOM_TEMPLATE): nil
 ---@param tile_code string
 ---@return CallbackId
 function set_post_tile_code_callback(cb, tile_code) end
@@ -1321,8 +1321,8 @@ function get_short_tile_code_definition(short_tile_code) end
 ---Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 ---If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
 ---@param procedural_spawn string
----@param do_spawn fun(): any
----@param is_valid fun(): any
+---@param do_spawn function
+---@param is_valid function
 ---@return PROCEDURAL_CHANCE
 function define_procedural_spawn(procedural_spawn, do_spawn, is_valid) end
 ---Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.
@@ -1332,8 +1332,8 @@ function define_procedural_spawn(procedural_spawn, do_spawn, is_valid) end
 ---Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 ---To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
 ---No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
----@param do_spawn fun(): any
----@param is_valid fun(): any
+---@param do_spawn function
+---@param is_valid function
 ---@param num_spawns_frontlayer integer
 ---@param num_spawns_backlayer integer
 ---@return integer
@@ -1459,7 +1459,7 @@ function get_sound(path_or_vanilla_sound) end
 ---The callback signature is nil on_vanilla_sound(PlayingSound sound)
 ---@param name VANILLA_SOUND
 ---@param types VANILLA_SOUND_CALLBACK_TYPE
----@param cb fun(): any
+---@param cb fun(sound: PlayingSound): nil
 ---@return CallbackId
 function set_vanilla_sound_callback(name, types, cb) end
 ---Clears a previously set callback
@@ -1570,7 +1570,7 @@ function show_journal(chapter, page) end
 ---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 ---@param host string
 ---@param port in_port_t
----@param cb fun(): any
+---@param cb function
 ---@return UdpServer
 function udp_listen(host, port, cb) end
 ---Send data to specified UDP address. Requires unsafe mode.
@@ -2136,7 +2136,7 @@ local function PRNG_random(self, min, max) end
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean
     ---@field set_draw_depth fun(self, draw_depth: integer): nil
     ---@field set_enable_turning fun(self, enabled: boolean): nil
-    ---@field liberate_from_shop any @&Entity::liberate_from_shop
+    ---@field liberate_from_shop fun(self): nil
     ---@field get_held_entity fun(self): Entity
     ---@field set_layer fun(self, layer: LAYER): nil
     ---@field remove fun(self): nil
@@ -3914,12 +3914,12 @@ local function MovableBehavior_get_state_id(self) end
 
 ---@class CustomMovableBehavior : MovableBehavior
     ---@field base_behavior VanillaMovableBehavior
-    ---@field set_force_state fun(self, force_state: fun(): any): nil
-    ---@field set_on_enter fun(self, on_enter: fun(): any): nil
-    ---@field set_on_exit fun(self, on_exit: fun(): any): nil
-    ---@field set_update_logic fun(self, update_logic: fun(): any): nil
-    ---@field set_update_world fun(self, update_world: fun(): any): nil
-    ---@field set_get_next_state_id fun(self, get_next_state_id: fun(): any): nil
+    ---@field state fun(self, force_state: function): nilset_force_
+    ---@field set_on_enter fun(self, on_enter: function): nil
+    ---@field set_on_exit fun(self, on_exit: function): nil
+    ---@field set_update_logic fun(self, update_logic: function): nil
+    ---@field set_update_world fun(self, update_world: function): nil
+    ---@field set_get_next_state_id fun(self, get_next_state_id: function): nil
 
 ---@class ParticleDB
     ---@field id integer
@@ -4037,8 +4037,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field sub_theme any @&CustomTheme::sub_theme
     ---@field textures table<DYNAMIC_TEXTURE, integer>
     ---@field override any @theme_override
-    ---@field pre any @&CustomTheme::pre
-    ---@field post any @&CustomTheme::post
+    ---@field pre fun(self, index: THEME_OVERRIDE, func_: function): nil
+    ---@field post fun(self, index: THEME_OVERRIDE, func_: function): nil
     ---@field unknown1 any @&CustomTheme::unknown1
     ---@field unknown2 any @&CustomTheme::unknown2
     ---@field unknown3 any @&CustomTheme::unknown3
@@ -4306,7 +4306,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil
     ---@field draw_image GuiDrawContext_draw_image
     ---@field draw_image_rotated GuiDrawContext_draw_image_rotated
-    ---@field window any @&GuiDrawContext::window
+    ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: function): boolean
     ---@field win_text fun(self, text: string): nil
     ---@field win_separator fun(self): nil
     ---@field win_inline fun(self): nil
@@ -4324,7 +4324,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field win_pushid fun(self, id: integer): nil
     ---@field win_popid fun(self): nil
     ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil
-    ---@field win_section any @&GuiDrawContext::win_section
+    ---@field win_section fun(self, title: string, callback: function): nil
     ---@field win_indent fun(self, width: number): nil
 
 ---@class GuiDrawContext_draw_rect
@@ -5200,7 +5200,7 @@ function EntityDB.new(self, other) end
 function EntityDB.new(self, other) end
 
 CustomTheme = nil
----Create a new theme with an id and base theme, overriding defaults. Check [theme fun(): anys that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
+---Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
 ---@param theme_id_ integer
 ---@param base_theme_ integer
 ---@param defaults boolean
@@ -5225,9 +5225,7 @@ function Vec2.new(self, vec2) end
 ---@param y_ number
 ---@return Vec2
 function Vec2.new(self, x_, y_) end
----@param number> p tuple<number,
----@return Vec2
-function Vec2.new(self, number> p) end
+
 
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
@@ -9386,7 +9384,7 @@ local MAX_PLAYERS = 4
 ---@alias Texture any
 ---@alias SpearDanglerAnimFrames any
 ---@alias OnlineLobbyScreenPlayer any
----@alias SoundCallbackFunction fun(): any
+---@alias SoundCallbackFunction function
 
 --## Aliases
 
