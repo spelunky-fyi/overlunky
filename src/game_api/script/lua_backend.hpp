@@ -386,6 +386,8 @@ class LuaBackend
     void set_current_callback(int32_t aux_id, int32_t id, CallbackType type);
     void clear_current_callback();
 
+    sol::protected_function_result cast_entity(Entity* ent);
+
     static void for_each_backend(std::function<bool(LockedBackend)> fun);
     static LockedBackend get_backend(std::string_view id);
     static std::optional<LockedBackend> get_backend_safe(std::string_view id);
@@ -396,6 +398,21 @@ class LuaBackend
     static std::string get_calling_backend_id();
     static void push_calling_backend(LuaBackend*);
     static void pop_calling_backend(LuaBackend*);
+
+  private:
+    template <class T>
+    auto cast_if_entity(T&& val)
+    {
+        static constexpr bool is_entity_ptr{std::is_base_of_v<Entity, std::remove_pointer_t<std::decay_t<T>>>};
+        if constexpr (is_entity_ptr)
+        {
+            return cast_entity(val);
+        }
+        else
+        {
+            return std::forward<T>(val);
+        }
+    }
 };
 
 template <class... Args>
@@ -404,7 +421,8 @@ sol::protected_function_result handle_function_raw(sol::function func, Args&&...
     LuaBackend::push_calling_backend(this);
     ON_SCOPE_EXIT(LuaBackend::pop_calling_backend(this));
 
-    auto lua_result = func(std::forward<Args>(args)...);
+    auto lua_result = func(LuaBackend::cast_if_entity(std::forward<Args>(args))...);
+
     if (!lua_result.valid())
     {
         sol::error e = lua_result;

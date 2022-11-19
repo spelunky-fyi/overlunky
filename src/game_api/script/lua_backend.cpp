@@ -1126,7 +1126,7 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
             if (type_match)
             {
                 set_current_callback(-1, callback.id, CallbackType::Normal);
-                handle_function(callback.func, lua["cast_entity"](entity), spawn_type_flags);
+                handle_function(callback.func, entity, spawn_type_flags);
                 clear_current_callback();
             }
         }
@@ -1238,7 +1238,7 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            if (auto speech_value = handle_function_with_return<std::u16string>(callback.func, lua["cast_entity"](entity), buffer))
+            if (auto speech_value = handle_function_with_return<std::u16string>(callback.func, entity, buffer))
             {
                 if (!return_value)
                 {
@@ -1420,6 +1420,11 @@ void LuaBackend::clear_current_callback()
     current_cb.aux_id = 0;
     current_cb.id = 0;
     current_cb.type = CallbackType::None;
+}
+
+sol::protected_function_result LuaBackend::cast_entity(Entity* ent)
+{
+    return lua["cast_entity"](ent);
 }
 
 /**
