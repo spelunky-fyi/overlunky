@@ -35,7 +35,8 @@ struct VDestructorDetour
 };
 
 template <class VFunT>
-requires std::is_function_v<VFunT> struct VTableDetour;
+requires std::is_function_v<VFunT>
+struct VTableDetour;
 
 template <class RetT, class ClassT, class... ArgsT>
 struct VTableDetour<RetT(ClassT*, ArgsT...)>

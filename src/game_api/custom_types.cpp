@@ -346,8 +346,8 @@ const std::map<CUSTOM_TYPE, std::string_view> custom_type_names = {
 };
 
 template <CUSTOM_TYPE CustomEntityType, class... StrArgs>
-requires(std::is_same_v<const char*, StrArgs>&&...)
-    std::span<const ENT_TYPE> make_custom_entity_type_list(StrArgs... ent_type_ids)
+requires(std::is_same_v<const char*, StrArgs> && ...)
+std::span<const ENT_TYPE> make_custom_entity_type_list(StrArgs... ent_type_ids)
 {
     static const std::array<ENT_TYPE, sizeof...(StrArgs)> s_entity_types{
         to_id(ent_type_ids)...,
