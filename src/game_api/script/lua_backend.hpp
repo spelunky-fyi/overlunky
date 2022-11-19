@@ -416,7 +416,7 @@ class LuaBackend
 };
 
 template <class... Args>
-sol::protected_function_result handle_function_raw(sol::function func, Args&&... args)
+sol::protected_function_result LuaBackend::handle_function_raw(sol::function func, Args&&... args)
 {
     LuaBackend::push_calling_backend(this);
     ON_SCOPE_EXIT(LuaBackend::pop_calling_backend(this));
