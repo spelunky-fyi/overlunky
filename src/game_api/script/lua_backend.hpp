@@ -298,6 +298,9 @@ class LuaBackend
     virtual ~LuaBackend();
 
     template <class... Args>
+    sol::protected_function_result handle_function_raw(sol::function func, Args&&... args);
+
+    template <class... Args>
     bool handle_function(sol::function func, Args&&... args);
     template <class Ret, class... Args>
     std::optional<Ret> handle_function_with_return(sol::function func, Args&&... args);
@@ -396,12 +399,7 @@ class LuaBackend
 };
 
 template <class... Args>
-bool LuaBackend::handle_function(sol::function func, Args&&... args)
-{
-    return handle_function_with_return<std::monostate>(std::move(func), std::forward<Args>(args)...) != std::nullopt;
-}
-template <class Ret, class... Args>
-std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, Args&&... args)
+sol::protected_function_result handle_function_raw(sol::function func, Args&&... args)
 {
     LuaBackend::push_calling_backend(this);
     ON_SCOPE_EXIT(LuaBackend::pop_calling_backend(this));
@@ -423,9 +421,25 @@ std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, A
                 messages.pop_front();
         }
 #endif
+    }
+
+    return lua_result;
+}
+
+template <class... Args>
+bool LuaBackend::handle_function(sol::function func, Args&&... args)
+{
+    return handle_function_with_return<std::monostate>(std::move(func), std::forward<Args>(args)...) != std::nullopt;
+}
+template <class Ret, class... Args>
+std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, Args&&... args)
+{
+    auto lua_result = handle_function_raw(std::move(func), std::forward<Args>(args)...);
+    if (!lua_result.valid())
+    {
         return std::nullopt;
     }
-    if constexpr (std::is_same_v<Ret, std::monostate>)
+    else if constexpr (std::is_same_v<Ret, std::monostate>)
     {
         return std::optional{std::monostate{}};
     }
