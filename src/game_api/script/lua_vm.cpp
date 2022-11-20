@@ -46,6 +46,7 @@
 #include "online.hpp"                              // for get_online
 #include "overloaded.hpp"                          // for overloaded
 #include "rpc.hpp"                                 // for get_entities_by
+#include "safe_cb.hpp"                             // for make_safe_clearable_cb
 #include "savedata.hpp"                            // IWYU pragma: keep
 #include "screen.hpp"                              // for get_screen_ptr
 #include "script.hpp"                              // for ScriptMessage
@@ -1235,25 +1236,18 @@ end
     {
         if (Screen* screen = get_screen_ptr(screen_id))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = screen->reserve_callback_id();
             screen->set_pre_render(
                 id,
-                [=, fun = std::move(fun)](Screen* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
-                    {
-                        return false;
-                    }
+                make_safe_clearable_cb<bool(Screen*), CallbackType::Screen>(
+                    std::move(fun),
+                    screen_id,
+                    id,
+                    FrontBinder{},
+                    BackBinder{[]()
+                               { return VanillaRenderContext{}; }}));
 
-                    VanillaRenderContext render_ctx;
-                    backend->set_current_callback(screen_id, id, CallbackType::Screen);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, self, render_ctx).value_or(false);
-                    backend->clear_current_callback();
-                    return return_value;
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+            auto backend = LuaBackend::get_calling_backend();
             backend->screen_hooks.push_back({screen_id, id});
             return id;
         }
@@ -1265,23 +1259,18 @@ end
     {
         if (Screen* screen = get_screen_ptr(screen_id))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = screen->reserve_callback_id();
             screen->set_post_render(
                 id,
-                [=, fun = std::move(fun)](Screen* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_screen_callback_cleared({screen_id, id}))
-                    {
-                        return;
-                    }
-                    VanillaRenderContext render_ctx;
-                    backend->set_current_callback(screen_id, id, CallbackType::Screen);
-                    backend->handle_function(fun, self, render_ctx);
-                    backend->clear_current_callback();
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<void(Screen*), CallbackType::Screen>(
+                    std::move(fun),
+                    screen_id,
+                    id,
+                    FrontBinder{},
+                    BackBinder{[]()
+                               { return VanillaRenderContext{}; }}));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->screen_hooks.push_back({screen_id, id});
             return id;
         }
@@ -1303,21 +1292,13 @@ end
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = movable->reserve_callback_id();
             movable->set_pre_statemachine(
                 id,
-                [=, &lua, fun = std::move(fun)](Movable* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return false;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
-                    backend->clear_current_callback();
-                    return return_value;
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<bool(Movable*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1333,20 +1314,13 @@ end
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = movable->reserve_callback_id();
             movable->set_post_statemachine(
                 id,
-                [=, &lua, fun = std::move(fun)](Movable* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    backend->handle_function(fun, lua["cast_entity"](self));
-                    backend->clear_current_callback();
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<void(Movable*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->hook_entity_dtor(movable);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1361,20 +1335,13 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_destroy(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    backend->handle_function(fun, lua["cast_entity"](self));
-                    backend->clear_current_callback();
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<void(Entity*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1389,20 +1356,13 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_kill(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self, Entity* killer)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](killer));
-                    backend->clear_current_callback();
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<void(Entity*, Entity*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1419,21 +1379,13 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_player_instagib(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return false;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
-                    backend->clear_current_callback();
-                    return return_value;
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<bool(Entity*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1451,21 +1403,14 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_damage(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self, Entity* damage_dealer, int8_t damage_amount, float velocity_x, float velocity_y, uint16_t stun_amount, uint8_t iframes)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return false;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](damage_dealer), damage_amount, velocity_x, velocity_y, stun_amount, iframes).value_or(false);
-                    backend->clear_current_callback();
-                    return return_value;
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<
+                    bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t),
+                    CallbackType::Entity>(std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1480,21 +1425,13 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_pre_floor_update(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return false;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self)).value_or(false);
-                    backend->clear_current_callback();
-                    return return_value;
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<bool(Entity*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1509,20 +1446,13 @@ end
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_post_floor_update(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    backend->handle_function(fun, lua["cast_entity"](self));
-                    backend->clear_current_callback();
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<void(Entity*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1538,20 +1468,13 @@ end
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_open(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self, Movable* opener)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    backend->handle_function(fun, lua["cast_entity"](self), lua["cast_entity"](opener));
-                    backend->clear_current_callback();
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
+                make_safe_clearable_cb<void(Entity*, Movable*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
             backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
@@ -1564,24 +1487,16 @@ end
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_collision1"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
-        if (Entity* e = get_entity_ptr(uid))
+        if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
-            std::uint32_t id = e->reserve_callback_id();
-            e->set_pre_collision1(
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_pre_collision1(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self, Entity* collision_entity)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return false;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](collision_entity)).value_or(false);
-                    backend->clear_current_callback();
-                    return return_value;
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
-            backend->hook_entity_dtor(e);
+                make_safe_clearable_cb<bool(Entity*, Entity*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
+            backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }
@@ -1593,24 +1508,16 @@ end
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     lua["set_pre_collision2"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
-        if (Entity* e = get_entity_ptr(uid))
+        if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
-            std::uint32_t id = e->reserve_callback_id();
-            e->set_pre_collision2(
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_pre_collision2(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self, Entity* collision_entity)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return false;
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, lua["cast_entity"](self), lua["cast_entity"](collision_entity)).value_or(false);
-                    backend->clear_current_callback();
-                    return return_value;
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
-            backend->hook_entity_dtor(e);
+                make_safe_clearable_cb<bool(Entity*, Entity*), CallbackType::Entity>(
+                    std::move(fun), uid, id));
+
+            auto backend = LuaBackend::get_calling_backend();
+            backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }
@@ -1622,25 +1529,20 @@ end
     /// Use this only when no other approach works, this call can be expensive if overused.
     lua["set_pre_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
-        if (Entity* e = get_entity_ptr(uid))
+        if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
-            std::uint32_t id = e->reserve_callback_id();
-            e->set_pre_render(
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_pre_render(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return false;
-                    VanillaRenderContext render_ctx{};
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    auto return_value = backend->handle_function_with_return<bool>(fun, render_ctx, lua["cast_entity"](self)).value_or(false);
-                    backend->clear_current_callback();
-                    return return_value;
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
-            backend->hook_entity_dtor(e);
+                make_safe_clearable_cb<bool(Entity*), CallbackType::Entity>(
+                    std::move(fun),
+                    uid,
+                    id,
+                    FrontBinder{[]()
+                                { return VanillaRenderContext{}; }}));
+
+            auto backend = LuaBackend::get_calling_backend();
+            backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }
@@ -1652,24 +1554,20 @@ end
     /// Use this only when no other approach works, this call can be expensive if overused.
     lua["set_post_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
-        if (Entity* e = get_entity_ptr(uid))
+        if (Entity* entity = get_entity_ptr(uid))
         {
-            auto backend_id = LuaBackend::get_calling_backend_id();
-            std::uint32_t id = e->reserve_callback_id();
-            e->set_post_render(
+            std::uint32_t id = entity->reserve_callback_id();
+            entity->set_post_render(
                 id,
-                [=, &lua, fun = std::move(fun)](Entity* self)
-                {
-                    auto backend = LuaBackend::get_backend(backend_id);
-                    if (!backend->get_enabled() || backend->is_entity_callback_cleared({uid, id}))
-                        return;
-                    VanillaRenderContext render_ctx{};
-                    backend->set_current_callback(uid, id, CallbackType::Entity);
-                    backend->handle_function(fun, render_ctx, lua["cast_entity"](self));
-                    backend->clear_current_callback();
-                });
-            auto backend = LuaBackend::get_backend(backend_id);
-            backend->hook_entity_dtor(e);
+                make_safe_clearable_cb<void(Entity*), CallbackType::Entity>(
+                    std::move(fun),
+                    uid,
+                    id,
+                    FrontBinder{[]()
+                                { return VanillaRenderContext{}; }}));
+
+            auto backend = LuaBackend::get_calling_backend();
+            backend->hook_entity_dtor(entity);
             backend->entity_hooks.push_back({uid, id});
             return id;
         }

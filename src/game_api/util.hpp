@@ -125,3 +125,33 @@ class GlobalMutexProtectedResource
   private:
     T Object;
 };
+
+// clang-format off
+template <template <typename...> class Template, typename T>
+struct is_instantiation_of : std::false_type {};
+template <template <typename...> class Template, typename... Args>
+struct is_instantiation_of<Template, Template<Args...>> : std::true_type {};
+template <template <typename...> class Template, typename T>
+inline constexpr auto is_instantiation_of_v = is_instantiation_of<Template, T>::value;
+// clang-format on
+
+template <class T>
+struct unwrap_optional
+{
+    using type = T;
+};
+template <class T>
+struct unwrap_optional<std::optional<T>>
+{
+    using type = typename unwrap_optional<T>::type;
+};
+template <class T>
+struct unwrap_optional<sol::optional<T>>
+{
+    using type = typename unwrap_optional<T>::type;
+};
+template <class T>
+using unwrap_optional_t = typename unwrap_optional<T>::type;
+
+template <class T>
+inline constexpr auto is_optional_v = is_instantiation_of_v<std::optional, T> || is_instantiation_of_v<sol::optional, T>;

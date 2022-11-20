@@ -26,6 +26,7 @@
 #include "fmod.hpp"               // for EventCallbackType, Created, Destroyed
 #include "logger.h"               // for DEBUG
 #include "script/lua_backend.hpp" // for LuaBackend
+#include "script/safe_cb.hpp"     // for make_safe_cb
 #include "sound_manager.hpp"      // for CustomSound, PlayingSound, SoundMa...
 #include "string_aliases.hpp"     // for VANILLA_SOUND
 
@@ -78,14 +79,16 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// properties on the sound. Otherwise you may cause a deadlock. The callback signature is `nil on_vanilla_sound(PlayingSound sound)`
     lua["set_vanilla_sound_callback"] = [](VANILLA_SOUND name, VANILLA_SOUND_CALLBACK_TYPE types, sol::function cb) -> CallbackId
     {
-        auto backend_id = LuaBackend::get_calling_backend_id();
-        auto safe_cb = [backend_id, cb = std::move(cb)](PlayingSound sound)
+        static constexpr auto clone_sound = [](const PlayingSound& sound)
         {
-            auto backend = LuaBackend::get_backend(backend_id);
-            if (backend->get_enabled())
-                backend->handle_function(cb, std::make_unique<PlayingSound>(sound));
+            return std::make_unique<PlayingSound>(sound);
         };
-        auto backend = LuaBackend::get_backend(backend_id);
+        auto safe_cb = make_safe_cb<void(PlayingSound)>(
+            std::move(cb),
+            FrontBinder{},
+            BackBinder{clone_sound});
+
+        auto backend = LuaBackend::get_calling_backend();
         std::uint32_t id = backend->sound_manager->set_callback(name, std::move(safe_cb), static_cast<FMODStudio::EventCallbackType>(types));
         backend->vanilla_sound_callbacks.push_back(id);
         return id;
@@ -123,14 +126,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 
     auto set_callback = [](PlayingSound* sound, sol::function callback)
     {
-        auto backend_id = LuaBackend::get_calling_backend_id();
-        auto safe_cb = [backend_id, callback = std::move(callback)]()
-        {
-            auto backend = LuaBackend::get_backend(backend_id);
-            if (backend->get_enabled())
-                backend->handle_function(callback);
-        };
-        sound->set_callback(std::move(safe_cb));
+        sound->set_callback(make_safe_cb<void()>(std::move(callback)));
     };
     auto get_parameters = [](PlayingSound& self)
     {
