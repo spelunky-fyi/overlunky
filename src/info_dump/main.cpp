@@ -1282,7 +1282,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
         // file << "---@diagnostic disable: lowercase-global,deprecated" << std::endl;
     }
 
-    auto* state = State::get().ptr();
+    auto state = State::get().ptr_main();
 
     if (auto file = std::ofstream("game_data/tile_codes.txt"))
     {

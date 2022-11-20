@@ -156,9 +156,9 @@ bool | [punish_ball](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pu
 ```lua
 -- Draw the level boundaries
 set_callback(function(draw_ctx)
-    local xmin, ymin, xmax, ymax = get_bounds()
-    local sx, sy = screen_position(xmin, ymin) -- top left
-    local sx2, sy2 = screen_position(xmax, ymax) -- bottom right
+    local xmin, ymax, xmax, ymin = get_bounds()
+    local sx, sy = screen_position(xmin, ymax) -- top left
+    local sx2, sy2 = screen_position(xmax, ymin) -- bottom right
     draw_ctx:draw_rect(sx, sy, sx2, sy2, 4, 0, rgba(255, 255, 255, 255))
 end, ON.GUIFRAME)
 
@@ -5814,8 +5814,7 @@ int | [move_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move
 int | [health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) | 
 int | [stun_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_timer) | 
 int | [stun_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_state) | 
-int | [lock_input_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_input_timer) | Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you'r on a mount
-int | [some_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=some_state) | Deprecated, it's the same as lock_input_timer, but this name makes no sense
+int | [lock_input_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_input_timer) | Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you're on a mount
 int | [wet_effect_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wet_effect_timer) | 
 int | [poison_tick_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) | 
 int | [airtime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) | airtime = falling_timer
