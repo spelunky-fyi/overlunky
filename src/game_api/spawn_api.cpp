@@ -121,7 +121,7 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float
 
     if (liquid_spawn_info != nullptr)
     {
-        auto some_value = get_address("spawn_liquid_amount");
+        static auto some_value = get_address("spawn_liquid_amount");
         const uint8_t tmp_value = read_u8(some_value);
         write_mem_prot(some_value, (uint8_t)0, true);
 
@@ -410,7 +410,8 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
 
 int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture)
 {
-    return spawn_unrolled_player_rope(x, y, layer, texture, static_cast<uint16_t>(read_u32(get_address("attach_thrown_rope_to_background"))));
+    static const auto rope_offset = get_address("attach_thrown_rope_to_background");
+    return spawn_unrolled_player_rope(x, y, layer, texture, static_cast<uint16_t>(read_u32(rope_offset)));
 }
 int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture, uint16_t max_length)
 {
@@ -677,7 +678,7 @@ void spawn_player(int8_t player_slot, float x, float y)
 
 int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
 {
-    auto offset = get_address("spawn_companion");
+    static auto offset = get_address("spawn_companion");
     if (offset != 0)
     {
         push_spawn_type_flags(SPAWN_TYPE_SCRIPT);

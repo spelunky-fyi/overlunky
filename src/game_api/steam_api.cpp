@@ -75,7 +75,7 @@ void set_feat_hidden(FEAT feat, bool hidden)
 {
     if (--feat > 31)
         return;
-    auto offset = get_address("get_feat_hidden"sv);
+    static auto offset = get_address("get_feat_hidden"sv);
     auto mask = read_u32(offset);
     if (hidden)
         mask |= (1U << feat);
@@ -88,7 +88,7 @@ bool get_feat_hidden(FEAT feat)
 {
     if (--feat > 31)
         return false;
-    auto offset = get_address("get_feat_hidden"sv);
+    static auto offset = get_address("get_feat_hidden"sv);
     auto mask = read_u32(offset);
     return (mask & (1U << feat)) > 0;
 }

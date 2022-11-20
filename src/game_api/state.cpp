@@ -305,8 +305,8 @@ std::pair<float, float> State::screen_position(float x, float y)
 
 size_t State::get_zoom_level_address()
 {
-    size_t obj1 = get_address("zoom_level");
-
+    static const size_t obj1 = get_address("zoom_level");
+    static const size_t zoom_level_offset = get_address("zoom_level_offset");
     size_t obj2 = read_u64(obj1);
     if (obj2 == 0)
     {
@@ -318,7 +318,7 @@ size_t State::get_zoom_level_address()
     {
         return 0;
     }
-    return obj3 + get_address("zoom_level_offset");
+    return obj3 + zoom_level_offset;
 }
 
 float State::get_zoom_level()
@@ -374,11 +374,16 @@ void State::zoom(float level)
 
     const auto level_str = to_le_bytes(level);
 
+    static const auto zoom_level = get_address("default_zoom_level");
+    static const auto zoom_shop = get_address("default_zoom_level_shop");
+    static const auto zoom_camp = get_address("default_zoom_level_camp");
+    static const auto zoom_telescope = get_address("default_zoom_level_telescope");
+
     // overwrite the defaults
-    write_mem_prot(get_address("default_zoom_level"), level_str, true);
-    write_mem_prot(get_address("default_zoom_level_shop"), level_str, true);
-    write_mem_prot(get_address("default_zoom_level_camp"), level_str, true);
-    write_mem_prot(get_address("default_zoom_level_telescope"), level_str, true);
+    write_mem_prot(zoom_level, level_str, true);
+    write_mem_prot(zoom_shop, level_str, true);
+    write_mem_prot(zoom_camp, level_str, true);
+    write_mem_prot(zoom_telescope, level_str, true);
 
     // overwrite the current value
     auto zla = get_zoom_level_address();
@@ -401,35 +406,24 @@ void StateMemory::force_current_theme(uint32_t t)
 
 void State::darkmode(bool g)
 {
-    static size_t addr_dark = 0;
-    static char original_instructions[2] = {0};
-    if (addr_dark == 0)
-    {
-        addr_dark = get_address("force_dark_level");
-        original_instructions[0] = read_u8(addr_dark);
-        original_instructions[1] = read_u8(addr_dark + 1);
-    }
+    static const size_t addr_dark = get_address("force_dark_level");
+
     if (g)
     {
-        write_mem_prot(addr_dark, ("\x90\x90"s), true);
+        write_mem_recoverable("darkmode", addr_dark, "\x90\x90"sv, true);
     }
     else
     {
-        write_mem_prot(addr_dark, std::string(original_instructions, 2), true);
+        recover_mem("darkmode");
     }
 }
 
 std::pair<float, float> State::get_camera_position()
 {
-    static size_t addr = 0;
-    if (addr == 0)
-    {
-        addr = get_address("camera_position");
-    }
-
-    auto cx = (float*)addr;
-    auto cy = (float*)(addr + 4);
-    return {*cx, *cy};
+    static const auto addr = (float*)get_address("camera_position");
+    auto cx = *addr;
+    auto cy = *(addr + 1);
+    return {cx, cy};
 }
 
 void State::set_camera_position(float cx, float cy)

@@ -353,10 +353,10 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called on an [event](#ON).
-    lua["set_callback"] = [](sol::function cb, int screen) -> CallbackId
+    lua["set_callback"] = [](sol::function cb, ON event) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto luaCb = ScreenCallback{cb, (ON)screen, -1};
+        auto luaCb = ScreenCallback{cb, event, -1};
         if (luaCb.screen == ON::LOAD)
             backend->load_callbacks[backend->cbcount] = luaCb; // Make sure load always runs before other callbacks
         else
@@ -527,14 +527,14 @@ end
     /// Show a message that looks like a level feeling.
     lua["toast"] = [](std::wstring message)
     {
-        Toast* toast_fun = (Toast*)get_address("toast");
+        static Toast* toast_fun = (Toast*)get_address("toast");
         toast_fun(message.data());
     };
     /// Show a message coming from an entity
     lua["say"] = [](uint32_t entity_uid, std::wstring message, int sound_type, bool top)
     {
-        auto say = (Say*)get_address("speech_bubble_fun");
-        const static auto say_context = get_address("say_context");
+        static auto say = (Say*)get_address("speech_bubble_fun");
+        static const auto say_context = get_address("say_context");
 
         auto entity = get_entity_ptr(entity_uid);
 
@@ -1079,7 +1079,7 @@ end
         if (ea == nullptr || eb == nullptr)
             return -1.0f;
         else
-            return (float)sqrt(pow(ea->position().first - eb->position().first, 2) + pow(ea->position().second - eb->position().second, 2));
+            return (float)std::sqrt(std::pow(ea->position().first - eb->position().first, 2) + std::pow(ea->position().second - eb->position().second, 2));
     };
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
     /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y
