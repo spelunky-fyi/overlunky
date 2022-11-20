@@ -73,15 +73,19 @@
 
 template <class... T>
 struct FrontBinder;
+template <>
+struct FrontBinder<> {};
 template <class... T>
 struct BackBinder;
+template <>
+struct BackBinder<> {};
 
 template <class FunT, class CallableT, class... FrontTs, class... BackTs>
 requires(std::is_function_v<FunT>)
 static auto make_safe_cb(
     CallableT&& cb,
-    FrontBinder<FrontTs...> front_binder = FrontBinder{},
-    BackBinder<BackTs...> back_binder = BackBinder{});
+    FrontBinder<FrontTs...> front_binder = FrontBinder<>{},
+    BackBinder<BackTs...> back_binder = BackBinder<>{});
 
 template <class FunT, CallbackType CbType, class CallableT, class... FrontTs, class... BackTs>
 requires(std::is_function_v<FunT>)
@@ -89,7 +93,7 @@ static auto make_safe_clearable_cb(
     CallableT&& cb,
     int32_t id,
     int32_t aux_id,
-    FrontBinder<FrontTs...> front_binder = FrontBinder{},
-    BackBinder<BackTs...> back_binder = BackBinder{});
+    FrontBinder<FrontTs...> front_binder = FrontBinder<>{},
+    BackBinder<BackTs...> back_binder = BackBinder<>{});
 
 #include "safe_cb.inl"

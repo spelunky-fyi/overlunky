@@ -129,19 +129,22 @@ struct make_safe_cb_impl<RetT(ArgsT...)>
                 set_current_cb = std::forward<SetCurrentCb>(set_current_cb),
                 front_binder = std::move(front_binder),
                 back_binder = std::move(back_binder),
-                tests...](ArgsT... args) -> RetT
+                tests...](ArgsT&&... args) -> RetT
         {
             auto backend = LuaBackend::get_backend(backend_id);
             if ((tests(*backend) && ...))
             {
-                static constexpr bool is_clearable = !std::is_same_v<SetCurrentCb, std::monostate>;
-                if constexpr (is_clearable)
+                if constexpr (std::is_invocable_v<SetCurrentCb, LuaBackend&>)
                 {
                     set_current_cb(*backend);
+                    ON_SCOPE_EXIT(backend->clear_current_callback());
+                    return invoke<RetT>(cb, *backend, front_binder, back_binder, std::forward<ArgsT>(args)...);
                 }
-                ON_SCOPE_EXIT(if constexpr (is_clearable) { backend->clear_current_callback(); });
-
-                return invoke<RetT>(cb, *backend, front_binder, back_binder, std::forward<ArgsT>(args)...);
+                else
+                {
+                    (void)set_current_cb;
+                    return invoke<RetT>(cb, *backend, front_binder, back_binder, std::forward<ArgsT>(args)...);
+                }
             }
 
             return RetT();

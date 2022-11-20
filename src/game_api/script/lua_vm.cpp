@@ -1288,7 +1288,7 @@ end
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_statemachine"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
@@ -1310,7 +1310,7 @@ end
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_statemachine"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
         {
@@ -1331,7 +1331,7 @@ end
     /// Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
     /// The callback signature is `nil on_destroy(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_on_destroy"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_on_destroy"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
@@ -1352,7 +1352,7 @@ end
     /// Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
     /// The callback signature is `nil on_kill(Entity self, Entity killer)`
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_on_kill"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_on_kill"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
@@ -1375,7 +1375,7 @@ end
     /// The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
     /// This is so that when the entity dies (from other causes), the death screen still gets shown.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_on_player_instagib"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_on_player_instagib"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
@@ -1399,7 +1399,7 @@ end
     /// DO NOT CALL `self:damage()` in the callback !
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_on_damage"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
@@ -1421,7 +1421,7 @@ end
     /// Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
     /// The callback signature is `bool pre_floor_update(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_pre_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_floor_update"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
@@ -1442,7 +1442,7 @@ end
     /// Sets a callback that is called right after a floor is updated (by killed neighbor).
     /// The callback signature is `nil post_floor_update(Entity self)`
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_post_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_floor_update"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
@@ -1464,7 +1464,7 @@ end
     /// The callback signature is `nil on_open(Entity entity_self, Entity opener)`
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_on_open"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
         {
@@ -1485,7 +1485,7 @@ end
     /// Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    lua["set_pre_collision1"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_collision1"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
@@ -1506,7 +1506,7 @@ end
     /// Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    lua["set_pre_collision2"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_collision2"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
@@ -1527,7 +1527,7 @@ end
     /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `bool pre_render(render_ctx, entity)`
     /// where `render_ctx` is a `VanillaRenderContext`. Return `true` to skip the original rendering function and all later pre_render callbacks.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_pre_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_pre_render"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
@@ -1552,7 +1552,7 @@ end
     /// Sets a callback that is called right after the entity is rendered. The signature of the callback is `nil post_render(render_ctx, entity)`
     /// where `render_ctx` is a `VanillaRenderContext`.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    lua["set_post_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_post_render"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
