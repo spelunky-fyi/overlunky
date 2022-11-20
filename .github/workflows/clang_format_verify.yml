@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: SK83RJOSH/clang-format-lint-action@master
+      - uses: DoozyX/clang-format-lint-action@v0.15
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.do_formatting != 'true' }}
         with:
           source: "src"
@@ -25,7 +25,7 @@ jobs:
           exclude: "./src/game_api/lua_libs"
           clangFormatVersion: 15
 
-      - uses: SK83RJOSH/clang-format-lint-action@master
+      - uses: DoozyX/clang-format-lint-action@v0.15
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.do_formatting == 'true' }}
         with:
           source: "src"
