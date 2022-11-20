@@ -74,11 +74,15 @@
 template <class... T>
 struct FrontBinder;
 template <>
-struct FrontBinder<> {};
+struct FrontBinder<>
+{
+};
 template <class... T>
 struct BackBinder;
 template <>
-struct BackBinder<> {};
+struct BackBinder<>
+{
+};
 
 template <class FunT, class CallableT, class... FrontTs, class... BackTs>
 requires(std::is_function_v<FunT>)
