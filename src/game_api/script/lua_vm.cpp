@@ -188,7 +188,7 @@ end
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
     lua["online"] = get_online();
-    /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See get_player().
+    /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See [get_player](#get_player).
     lua["players"] = players;
 
     auto get_player = sol::overload(
@@ -235,7 +235,7 @@ end
         }
         return nullptr;
     };
-    /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.)
+    /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) or manually with [save_progress](#save_progress)
     lua["savegame"] = State::get().savedata();
 
     /// Standard lua print function, prints directly to the terminal but not to the game
@@ -1089,7 +1089,10 @@ end
         return std::make_tuple(2.5f, 122.5f, backend->g_state->w * 10.0f + 2.5f, 122.5f - backend->g_state->h * 8.0f);
     };
     /// Gets the current camera position in the level
-    lua["get_camera_position"] = get_camera_position;
+    lua["get_camera_position"] = []() -> std::pair<float, float>
+    {
+        return State::get_camera_position();
+    };
     /// Deprecated
     /// this doesn't actually work at all. See State -> Camera the for proper camera handling
     lua["set_camera_position"] = set_camera_position;

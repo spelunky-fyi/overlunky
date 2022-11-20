@@ -706,12 +706,6 @@ void flip_entity(uint32_t uid)
     }
 }
 
-std::pair<float, float> get_camera_position()
-{
-    auto state = State::get();
-    return state.get_camera_position();
-}
-
 void set_camera_position(float cx, float cy)
 {
     auto state = State::get();
