@@ -807,15 +807,16 @@ end
     /// Set the zoom level used in levels and shops. 13.5 is the default.
     lua["zoom"] = [](float level)
     { State::get().zoom(level); };
-    /// Enable/disable game engine pause.
+    /// Pause/unpause the game.
     /// This is just short for `state.pause == 32`, but that produces an audio bug
-    /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
+    /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](#set_global_interval) will still work
     lua["pause"] = [](bool p)
     {
+        auto state = State::get();
         if (p)
-            set_pause(0x20);
+            state.set_pause(0x20);
         else
-            set_pause(0);
+            state.set_pause(0);
     };
     auto move_entity_abs = sol::overload(
         static_cast<void (*)(uint32_t, float, float, float, float)>(::move_entity_abs),
@@ -1022,13 +1023,14 @@ end
     /// Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
     lua["modify_sparktraps"] = modify_sparktraps;
     /// Activate custom variables for speed and distance in the `ITEM_SPARK`
-    /// note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+    /// note: because those the variables are custom and game does not initiate them, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
     /// default game values are: speed = -0.015, distance = 3.0
     lua["activate_sparktraps_hack"] = activate_sparktraps_hack;
     /// Set layer to search for storage items on
     lua["set_storage_layer"] = set_storage_layer;
-    /// Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
-    /// Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
+    /// Deprecated
+    /// This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
+    /// `default_multiplier` doesn't do anything due to some changes in last game updates, `vladscape_multiplier` only changes the multiplier to some entities death's blood spit
     lua["set_blood_multiplication"] = set_blood_multiplication;
     /// Flip entity around by uid. All new entities face right by default.
     lua["flip_entity"] = flip_entity;
@@ -1397,7 +1399,7 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-    /// Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
+    /// Sets a callback that is called right when an entity is eradicated, before the game applies any side effects.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// The callback signature is nil on_kill(Entity self, Entity killer)
     lua["set_on_kill"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
@@ -1460,12 +1462,16 @@ end
     /// Note that damage_dealer can be nil ! (long fall, ...)
     /// DO NOT CALL `self:damage()` in the callback !
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+    /// The entity has to be of a [Movable](#Movable) type, .
     /// The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)
     lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
         {
+            // damage virtual is only available for Movable type
+            if (!entity->is_movable())
+                return sol::nullopt;
+
             auto backend_id = LuaBackend::get_calling_backend_id();
             std::uint32_t id = entity->reserve_callback_id();
             entity->set_on_damage(
@@ -1844,7 +1850,7 @@ end
     /// Log to spelunky.log
     lua["log_print"] = game_log;
 
-    /// Immediately ends the run with the death screen, also calls the save_progress
+    /// Immediately ends the run with the death screen, also calls the [save_progress](#save_progress)
     lua["load_death_screen"] = call_death_screen;
 
     /// Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).

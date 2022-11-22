@@ -251,12 +251,6 @@ void set_level_flags(uint32_t flags)
     state.set_flags(flags);
 }
 
-void set_pause(uint8_t pause)
-{
-    auto state = State::get();
-    state.set_pause(pause);
-}
-
 ENT_TYPE get_entity_type(uint32_t uid)
 {
     auto entity = get_entity_ptr(uid);
