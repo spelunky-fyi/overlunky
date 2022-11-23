@@ -16,7 +16,7 @@
 #include "items.hpp"             // for Items, SelectPlayerSlot
 #include "level_api.hpp"         // for LevelGenSystem, LevelGenSystem::(ano...
 #include "logger.h"              // for DEBUG
-#include "memory.hpp"            // for write_mem_prot, read_u64, read_u8
+#include "memory.hpp"            // for write_mem_prot, memory_read
 #include "movable.hpp"           // for Movable
 #include "movable_behavior.hpp"  // for init_behavior_hooks
 #include "render_api.hpp"        // for init_render_api_hooks
@@ -270,7 +270,7 @@ State& State::get()
 
 StateMemory* State::ptr_main() const
 {
-    OnHeapPointer<StateMemory> p(read_u64(location));
+    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
     return p.decode();
 }
 
@@ -281,7 +281,7 @@ StateMemory* State::ptr() const
 
 StateMemory* State::ptr_local() const
 {
-    OnHeapPointer<StateMemory> p(read_u64(location));
+    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
     return p.decode_local();
 }
 
@@ -307,13 +307,13 @@ size_t State::get_zoom_level_address()
 {
     static const size_t obj1 = get_address("zoom_level");
     static const size_t zoom_level_offset = get_address("zoom_level_offset");
-    size_t obj2 = read_u64(obj1);
+    size_t obj2 = memory_read<uint64_t>(obj1);
     if (obj2 == 0)
     {
         return 0;
     }
 
-    size_t obj3 = read_u64(obj2 + 0x10);
+    size_t obj3 = memory_read<uint64_t>(obj2 + 0x10);
     if (obj3 == 0)
     {
         return 0;
@@ -333,7 +333,7 @@ float State::get_zoom_level()
         }
         offset = addr;
     }
-    return read_f32(offset);
+    return memory_read<float>(offset);
 }
 
 void State::zoom(float level)
@@ -593,11 +593,11 @@ LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
 
 uint32_t State::get_frame_count_main() const
 {
-    return read_u32((size_t)ptr_main() - 0xd0);
+    return memory_read<uint32_t>((size_t)ptr_main() - 0xd0);
 }
 uint32_t State::get_frame_count() const
 {
-    return read_u32((size_t)ptr() - 0xd0);
+    return memory_read<uint32_t>((size_t)ptr() - 0xd0);
 }
 
 std::vector<int64_t> State::read_prng() const
@@ -605,7 +605,7 @@ std::vector<int64_t> State::read_prng() const
     std::vector<int64_t> prng;
     for (int i = 0; i < 20; ++i)
     {
-        prng.push_back(read_i64((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
+        prng.push_back(memory_read<int64_t>((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
     }
     return prng;
 }

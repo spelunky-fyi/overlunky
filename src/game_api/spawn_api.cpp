@@ -22,7 +22,7 @@
 #include "level_api.hpp"         // for LevelGenSystem, ThemeInfo
 #include "logger.h"              // for DEBUG
 #include "math.hpp"              // for AABB
-#include "memory.hpp"            // for write_mem_prot, read_u8
+#include "memory.hpp"            // for write_mem_prot, memory_read
 #include "prng.hpp"              // for PRNG, PRNG::PRNG_CLASS, PRNG::ENTIT...
 #include "script/events.hpp"     // for post_entity_spawn, pre_entity_spawn
 #include "search.hpp"            // for get_address
@@ -122,7 +122,7 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float
     if (liquid_spawn_info != nullptr)
     {
         static auto some_value = get_address("spawn_liquid_amount");
-        const uint8_t tmp_value = read_u8(some_value);
+        const uint8_t tmp_value = memory_read<uint8_t>(some_value);
         write_mem_prot(some_value, (uint8_t)0, true);
 
         // Save default liquid physics spawn values
@@ -411,7 +411,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
 int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture)
 {
     static const auto rope_offset = get_address("attach_thrown_rope_to_background");
-    return spawn_unrolled_player_rope(x, y, layer, texture, static_cast<uint16_t>(read_u32(rope_offset)));
+    return spawn_unrolled_player_rope(x, y, layer, texture, static_cast<uint16_t>(memory_read<uint32_t>(rope_offset)));
 }
 int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture, uint16_t max_length)
 {

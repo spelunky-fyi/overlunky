@@ -733,7 +733,7 @@ void modify_sparktraps(float angle_increment, float distance)
     {
         static const auto offset = get_address("sparktrap_angle_increment") + 4;
 
-        if (read_u8(offset - 1) == 0x89) // check if sparktraps_hack is active
+        if (memory_read<uint8_t>(offset - 1) == 0x89) // check if sparktraps_hack is active
             return;
 
         const int32_t distance_offset = 0xF1;
@@ -1224,7 +1224,7 @@ void set_max_rope_length(uint8_t length)
 uint8_t get_max_rope_length()
 {
     static const auto address = get_address("attach_thrown_rope_to_background");
-    return static_cast<uint8_t>(read_u32(address));
+    return static_cast<uint8_t>(memory_read<uint32_t>(address));
 }
 
 uint8_t waddler_count_entity(ENT_TYPE entity_type)
@@ -1367,7 +1367,7 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
 
     uint32_t ent_types_size = static_cast<uint32_t>(ent_types.size());
     static const auto offset = get_address("sun_chalenge_generator_ent_types");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(offset) + offset + 4);
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(offset) + offset + 4);
 
     if (ent_types_size == 0)
     {
@@ -1379,7 +1379,7 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
         return;
     }
 
-    const uint8_t old_size = ((read_u8(offset - 4)) >> 2) + 1;
+    const uint8_t old_size = ((memory_read<uint8_t>(offset - 4)) >> 2) + 1;
 
     if (ent_types_size >= 32)
         ent_types_size = 32;
@@ -1427,8 +1427,8 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
 {
     static const auto offset = get_address("dice_shop_prizes_id_roll");
     static const auto array_offset = get_address("dice_shop_prizes");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
-    bool original_instr = (read_u8(offset) == 0x89);
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(array_offset) + array_offset + 4);
+    bool original_instr = (memory_read<uint8_t>(offset) == 0x89);
 
     if (ent_types.size() > 255 || ent_types.size() < 6) // has to be min 6 as the game needs 6 uniqe item ids for prize_dispenser
     {
@@ -1442,8 +1442,8 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
         return;
     }
 
-    if ((original_instr && ent_types.size() == 25) ||                 // if it's the unchanged instruction and we set the same number of ent_type's
-        (!original_instr && read_u8(offset + 5) == ent_types.size())) // or new instruction but the same size
+    if ((original_instr && ent_types.size() == 25) ||                              // if it's the unchanged instruction and we set the same number of ent_type's
+        (!original_instr && memory_read<uint8_t>(offset + 5) == ent_types.size())) // or new instruction but the same size
     {
         for (unsigned int i = 0; i < ent_types.size(); ++i)
             write_mem_recoverable("diceshop_prizes", (size_t)&old_types_array[i], ent_types[i], true);
@@ -1488,11 +1488,11 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
         return;
 
     static const auto array_offset = get_address("altar_break_ent_types");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(array_offset) + array_offset + 4);
     const auto code_offset = array_offset + 0xDD;
     const auto instruction_shr = array_offset + 0x13D;
     const auto instruction_to_modifiy = array_offset + 0x204;
-    const auto original_instr = (read_u8(instruction_shr) == 0x41);
+    const auto original_instr = (memory_read<uint8_t>(instruction_shr) == 0x41);
     if (ent_types.empty())
     {
         if (!original_instr)
@@ -1501,7 +1501,7 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
         recover_mem("altar_damage_spawn");
         return;
     }
-    if (!original_instr && read_u8(code_offset + 2) == ent_types.size())
+    if (!original_instr && memory_read<uint8_t>(code_offset + 2) == ent_types.size())
     {
         // original array is used for something else as well, so i never edit that content
         for (uint32_t i = 0; i < ent_types.size(); ++i)
@@ -1544,7 +1544,7 @@ void change_waddler_drop(std::vector<ENT_TYPE> ent_types)
 
     static const auto offset = get_address("waddler_drop_size");
     static const auto array_offset = get_address("waddler_drop_array");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(array_offset) + array_offset + 4);
 
     if (ent_types.size() > 255 || ent_types.size() < 1)
     {
@@ -1559,8 +1559,8 @@ void change_waddler_drop(std::vector<ENT_TYPE> ent_types)
         return;
     }
 
-    if ((!modified && ent_types.size() == 3) ||            // if it's the unchanged instruction and we set the same number of ent_type's
-        (modified && read_u8(offset) == ent_types.size())) // or new instruction but the same size
+    if ((!modified && ent_types.size() == 3) ||                         // if it's the unchanged instruction and we set the same number of ent_type's
+        (modified && memory_read<uint8_t>(offset) == ent_types.size())) // or new instruction but the same size
     {
         for (unsigned int i = 0; i < ent_types.size(); ++i)
             write_mem_recoverable("waddler_drop", (size_t)&old_types_array[i], ent_types[i], true);
@@ -1626,7 +1626,7 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
             offsets[2] = memory.at_exe(offsets[2] + 5);
             offsets[3] = memory.at_exe(offsets[3] + 7);
         }
-        const uint8_t game_maxhp = read_u8(offsets[2] - 14);
+        const uint8_t game_maxhp = memory_read<uint8_t>(offsets[2] - 14);
         if (health > game_maxhp)
             health = game_maxhp;
 
@@ -1642,7 +1642,7 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
             }
             else
             {
-                if (read_u8(offsets[3]) != 3)
+                if (memory_read<uint8_t>(offsets[3]) != 3)
                     recover_mem("ankh_health", offsets[3]);
             }
         }
@@ -1740,7 +1740,7 @@ std::pair<int64_t, int64_t> get_adventure_seed()
     static const size_t offset = get_address("adventure_seed");
     if (offset != 0)
     {
-        return {read_i64(offset), read_i64(offset + 8)};
+        return {memory_read<int64_t>(offset), memory_read<int64_t>(offset + 8)};
     }
     return {0, 0};
 }
@@ -1761,7 +1761,7 @@ void update_liquid_collision_at(float x, float y, bool add)
 bool disable_floor_embeds(bool disable)
 {
     static const auto address = get_address("spawn_floor_embeds");
-    const bool current_value = read_u8(address) == 0xc3;
+    const bool current_value = memory_read<uint8_t>(address) == 0xc3;
     if (disable)
     {
         write_mem_recoverable("disable_floor_embeds", address, "\xC3"sv, true);
@@ -1790,7 +1790,7 @@ void game_log(std::string message)
 {
     using GameLogFun = void(std::ofstream*, const char*, void*, LogLevel);
     static const auto game_log_fun = (GameLogFun*)get_address("game_log_function");
-    static const auto log_stream = (std::ofstream*)read_i64(get_address("game_log_stream"));
+    static const auto log_stream = (std::ofstream*)memory_read<int64_t>(get_address("game_log_stream"));
     game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
 }
 

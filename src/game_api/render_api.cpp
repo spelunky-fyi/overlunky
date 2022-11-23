@@ -14,7 +14,7 @@
 #include "entity.hpp"             // for Entity, EntityDB
 #include "level_api.hpp"          // for ThemeInfo
 #include "logger.h"               // for DEBUG
-#include "memory.hpp"             // for read_u64, to_le_bytes, write_mem_prot
+#include "memory.hpp"             // for memory_read, to_le_bytes, write_mem_prot
 #include "screen.hpp"             //
 #include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
 #include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
@@ -39,12 +39,12 @@ RenderAPI& RenderAPI::get()
 
 size_t RenderAPI::renderer() const
 {
-    return read_u64(*api + 0x10);
+    return memory_read<uint64_t>(*api + 0x10);
 }
 
 size_t RenderAPI::swap_chain() const
 {
-    return read_u64(renderer() + swap_chain_off);
+    return memory_read<uint64_t>(renderer() + swap_chain_off);
 }
 
 void (*g_post_render_game)(){nullptr};
