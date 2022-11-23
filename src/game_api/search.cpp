@@ -1901,7 +1901,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "get_feat_hidden"sv,
         PatternCommandBuffer{}
             .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh)
-            .offset(25)
+            .offset(25) // or .find_next_inst("\xE8****\xB8") .offset(0x6)
             .at_exe(),
     },
     {
@@ -1909,7 +1909,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "get_feat"sv,
         PatternCommandBuffer{}
             .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh) // Same as ^ btw
-            .offset(0x7)
+            .find_next_inst("\xE8"sv)
             .decode_call()
             .at_exe(),
     },
@@ -1917,9 +1917,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // It's the function that calls ISteamUserStats::SetAchievement virtual when performing feats
         "set_feat"sv,
         PatternCommandBuffer{}
-            .find_inst("8b 05 4f a0 12 00 65 48 8b 0c 25 58 00 00 00"_gh)
-            .at_exe()
-            .function_start(),
+            .find_after_inst("FF 90 B0 00 00 00 F6 46 32 08"_gh)
+            .find_next_inst("B1 01 E8"_gh)
+            .offset(0x2)
+            .decode_call()
+            .at_exe(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
