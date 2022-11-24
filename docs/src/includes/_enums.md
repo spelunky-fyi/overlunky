@@ -476,11 +476,11 @@ Name | Data | Description
 [FLOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.FLOOR) | 0x100 | All FLOOR_* and FLOORSTYLED_* entities<br/>Various types, all `Floor`<br/>
 [DECORATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.DECORATION) | 0x200 | All DECORATION_* entities except: DECORATION_CHAINANDBLOCKS_CHAINDECORATION, DECORATION_SLIDINGWALL_CHAINDECORATION, DECORATION_PALACE_PORTRAIT<br/>Also includes: EMBED_GOLD, ENT_TYPE_EMBED_GOLD_BIG<br/>Various types, all `Entity`<br/>
 [BG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.BG) | 0x400 | All MIDBG* entities and most of the BG_* entities<br/>does not include: a lot .. check [default_flags_more_flags.txt](internal/entity.type.default_flags_more_flags.txt) for full list<br/>Also includes: DECORATION_PALACE_PORTRAIT<br/>Various types, all `Entity`<br/>
-[SHADOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.SHADOW) | 0x800 | All the BG_* entities excluded from `BG` (MASK.BG | MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above<br/>Various types, all `Entity`<br/>
+[SHADOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.SHADOW) | 0x800 | All the BG_* entities excluded from `BG` (MASK.BG &#124 MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above<br/>Various types, all `Entity`<br/>
 [LOGICAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LOGICAL) | 0x1000 | All LOGICAL_* entities<br/>Also includes: ITEM_POWERUP_*, FX_COMPASS, FX_SPECIALCOMPASS, FX_LEADER_FLAG, FX_PLAYERINDICATOR, FX_PLAYERINDICATORPORTRAIT<br/>Various types, all `Entity`<br/>
 [WATER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.WATER) | 0x2000 | Only: LIQUID_WATER, LIQUID_COARSE_WATER, LIQUID_IMPOSTOR_LAKE<br/>Various types, all `Entity`<br/>
 [LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) | 0x4000 | Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA<br/>Various types, all `Entity`<br/>
-[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for ([MASK](#MASK).WATER | [MASK](#MASK).LAVA)<br/>
+[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for ([MASK](#MASK).WATER &#124 [MASK](#MASK).LAVA)<br/>
 [ANY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ANY) | 0x0 | Value of 0, treated by all the functions as ANY mask<br/>
 
 ## ON
@@ -498,6 +498,7 @@ Name | Data | Description
 [TITLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TITLE) | ON::TITLE | 
 [MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.MENU) | ON::MENU | 
 [OPTIONS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.OPTIONS) | ON::OPTIONS | 
+[PLAYER_PROFILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PLAYER_PROFILE) | ON::PLAYER_PROFILE | 
 [LEADERBOARD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LEADERBOARD) | ON::LEADERBOARD | 
 [SEED_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SEED_INPUT) | ON::SEED_INPUT | 
 [CHARACTER_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CHARACTER_SELECT) | ON::CHARACTER_SELECT | 
@@ -513,6 +514,9 @@ Name | Data | Description
 [CONSTELLATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CONSTELLATION) | ON::CONSTELLATION | 
 [RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RECAP) | ON::RECAP | 
 [ARENA_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MENU) | ON::ARENA_MENU | 
+[ARENA_STAGES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_STAGES) | ON::ARENA_STAGES | 
+[ARENA_ITEMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_ITEMS) | ON::ARENA_ITEMS | 
+[ARENA_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_SELECT) | ON::ARENA_SELECT | 
 [ARENA_INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_INTRO) | ON::ARENA_INTRO | 
 [ARENA_MATCH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MATCH) | ON::ARENA_MATCH | 
 [ARENA_SCORE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_SCORE) | ON::ARENA_SCORE | 

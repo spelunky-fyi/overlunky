@@ -103,9 +103,9 @@ function set_global_timeout(cb, frames) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
 ---Add global callback function to be called on an [event](#ON).
 ---@param cb fun(): any
----@param screen integer
+---@param event ON
 ---@return CallbackId
-function set_callback(cb, screen) end
+function set_callback(cb, event) end
 ---Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.
 ---@param id CallbackId?
 ---@return nil
@@ -198,8 +198,9 @@ function register_option_combo(name, desc, long_desc, opts, value) end
 ---@param on_click fun(): any
 ---@return nil
 function register_option_button(name, desc, long_desc, on_click) end
----Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
----The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
+---Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name.
+---`value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+---<br/>The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
 ---@param name string
 ---@param value object
 ---@param on_render fun(): any
@@ -386,7 +387,7 @@ function spawn_playerghost(char_type, x, y, layer) end
 ---Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
 ---This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
 ---In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
----The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
+---<br/>The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
 ---@param cb fun(): any
 ---@param flags SPAWN_TYPE
 ---@param mask integer
@@ -395,7 +396,7 @@ function spawn_playerghost(char_type, x, y, layer) end
 function set_pre_entity_spawn(cb, flags, mask, ...) end
 ---Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
 ---This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
----The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
+---<br/>The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
 ---@param cb fun(): any
 ---@param flags SPAWN_TYPE
 ---@param mask integer
@@ -424,9 +425,9 @@ function god_companions(g) end
 ---@param level number
 ---@return nil
 function zoom(level) end
----Enable/disable game engine pause.
+---Pause/unpause the game.
 ---This is just short for `state.pause == 32`, but that produces an audio bug
----I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
+---I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](#set_global_interval) will still work
 ---@param p boolean
 ---@return nil
 function pause(p) end
@@ -727,7 +728,7 @@ function set_kapala_hud_icon(icon_index) end
 ---@return nil
 function modify_sparktraps(angle_increment, distance) end
 ---Activate custom variables for speed and distance in the `ITEM_SPARK`
----note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+---note: because those the variables are custom and game does not initiate them, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
 ---default game values are: speed = -0.015, distance = 3.0
 ---@param activate boolean
 ---@return nil
@@ -736,12 +737,6 @@ function activate_sparktraps_hack(activate) end
 ---@param layer LAYER
 ---@return nil
 function set_storage_layer(layer) end
----Sets the multiplication factor for blood droplets upon death (default/no Vlad's cape = 1, with Vlad's cape = 2)
----Due to changes in 1.23.x only the Vlad's cape value you provide will be used. The default is automatically Vlad's cape value - 1
----@param default_multiplier integer
----@param vladscape_multiplier integer
----@return nil
-function set_blood_multiplication(default_multiplier, vladscape_multiplier) end
 ---Flip entity around by uid. All new entities face right by default.
 ---@param uid integer
 ---@return nil
@@ -883,14 +878,14 @@ function send_input(uid, buttons) end
 function clear_screen_callback(screen_id, cb_id) end
 ---Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
 ---Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
----The callback signature is bool render_screen(Screen self, VanillaRenderContext render_ctx)
+---<br/>The callback signature is bool render_screen(Screen self, VanillaRenderContext render_ctx)
 ---@param screen_id integer
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_pre_render_screen(screen_id, fun) end
 ---Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
 ---Sets a callback that is called right after the screen is drawn.
----The callback signature is nil render_screen(Screen self, VanillaRenderContext render_ctx)
+---<br/>The callback signature is nil render_screen(Screen self, VanillaRenderContext render_ctx)
 ---@param screen_id integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -905,7 +900,7 @@ function clear_entity_callback(uid, cb_id) end
 ---Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----The callback signature is bool statemachine(Entity self)
+---<br/>The callback signature is bool statemachine(Entity self)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -915,7 +910,7 @@ function set_pre_statemachine(uid, fun) end
 ---Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----The callback signature is nil statemachine(Entity self)
+---<br/>The callback signature is nil statemachine(Entity self)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -923,15 +918,15 @@ function set_post_statemachine(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
 ---Use this only when no other approach works, this call can be expensive if overused.
----The callback signature is nil on_destroy(Entity self)
+---<br/>The callback signature is nil on_destroy(Entity self)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_on_destroy(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
+---Sets a callback that is called right when an entity is eradicated, before the game applies any side effects.
 ---Use this only when no other approach works, this call can be expensive if overused.
----The callback signature is nil on_kill(Entity self, Entity killer)
+---<br/>The callback signature is nil on_kill(Entity self, Entity killer)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -941,7 +936,7 @@ function set_on_kill(uid, fun) end
 ---The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
 ---This is so that when the entity dies (from other causes), the death screen still gets shown.
 ---Use this only when no other approach works, this call can be expensive if overused.
----The callback signature is bool on_player_instagib(Entity self)
+---<br/>The callback signature is bool on_player_instagib(Entity self)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -951,8 +946,8 @@ function set_on_player_instagib(uid, fun) end
 ---Note that damage_dealer can be nil ! (long fall, ...)
 ---DO NOT CALL `self:damage()` in the callback !
 ---Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)
+---The entity has to be of a [Movable](#Movable) type.
+---<br/>The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float vel_x, float vel_y, int stun_amount, int iframes)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -960,7 +955,7 @@ function set_on_damage(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
 ---Use this only when no other approach works, this call can be expensive if overused.
----The callback signature is bool pre_floor_update(Entity self)
+---<br/>The callback signature is bool pre_floor_update(Entity self)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -968,7 +963,7 @@ function set_pre_floor_update(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right after a floor is updated (by killed neighbor).
 ---Use this only when no other approach works, this call can be expensive if overused.
----The callback signature is nil post_floor_update(Entity self)
+---<br/>The callback signature is nil post_floor_update(Entity self)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -977,7 +972,7 @@ function set_post_floor_update(uid, fun) end
 ---Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----The callback signature is nil on_open(Entity entity_self, Entity opener)
+---<br/>The callback signature is nil on_open(Entity entity_self, Entity opener)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -986,7 +981,7 @@ function set_on_open(uid, fun) end
 ---Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
+---<br/>The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -995,7 +990,7 @@ function set_pre_collision1(uid, fun) end
 ---Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
+---<br/>The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -1004,7 +999,7 @@ function set_pre_collision2(uid, fun) end
 ---Sets a callback that is called right after the entity is rendered.
 ---Return `true` to skip the original rendering function and all later pre_render callbacks.
 ---Use this only when no other approach works, this call can be expensive if overused.
----The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
+---<br/>The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -1012,7 +1007,7 @@ function set_pre_render(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right after the entity is rendered.
 ---Use this only when no other approach works, this call can be expensive if overused.
----The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
+---<br/>The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
 ---@param uid integer
 ---@param fun fun(): any
 ---@return CallbackId?
@@ -1187,7 +1182,7 @@ function get_rva(address_name) end
 ---@param message string
 ---@return nil
 function log_print(message) end
----Immediately ends the run with the death screen, also calls the save_progress
+---Immediately ends the run with the death screen, also calls the [save_progress](#save_progress)
 ---@return nil
 function load_death_screen() end
 ---Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).
@@ -1289,7 +1284,7 @@ function position_is_valid(x, y, layer, flags) end
 ---Add a callback for a specific tile code that is called before the game handles the tile code.
 ---Return true in order to stop the game or scripts loaded after this script from handling this tile code.
 ---For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
----The callback signature is bool pre_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
+---<br/>The callback signature is bool pre_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
 ---@param cb fun(): any
 ---@param tile_code string
 ---@return CallbackId
@@ -1297,7 +1292,7 @@ function set_pre_tile_code_callback(cb, tile_code) end
 ---Add a callback for a specific tile code that is called after the game handles the tile code.
 ---Use this to affect what the game or other scripts spawned in this position.
 ---This is received even if a previous pre-tile-code-callback has returned true
----The callback signature is nil post_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
+---<br/>The callback signature is nil post_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
 ---@param cb fun(): any
 ---@param tile_code string
 ---@return CallbackId
@@ -1456,7 +1451,7 @@ function get_sound(path_or_vanilla_sound) end
 ---Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
 ---Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 ---If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any properties on the sound. Otherwise you may cause a deadlock.
----The callback signature is nil on_vanilla_sound(PlayingSound sound)
+---<br/>The callback signature is nil on_vanilla_sound(PlayingSound sound)
 ---@param name VANILLA_SOUND
 ---@param types VANILLA_SOUND_CALLBACK_TYPE
 ---@param cb fun(): any
@@ -1490,6 +1485,7 @@ function create_image(path) end
 ---@return number, number
 function mouse_position() end
 ---Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+---
 ---- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
 ---- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
 ---- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
@@ -7068,9 +7064,12 @@ MASK = {
 ---@alias MASK integer
 ON = {
   ARENA_INTRO = 25,
+  ARENA_ITEMS = 23,
   ARENA_MATCH = 26,
   ARENA_MENU = 21,
   ARENA_SCORE = 27,
+  ARENA_SELECT = 24,
+  ARENA_STAGES = 22,
   CAMP = 11,
   CHARACTER_SELECT = 9,
   CONSTELLATION = 19,
@@ -7090,6 +7089,7 @@ ON = {
   ONLINE_LOADING = 28,
   ONLINE_LOBBY = 29,
   OPTIONS = 5,
+  PLAYER_PROFILE = 6,
   POST_LEVEL_GENERATION = 112,
   POST_LOAD_JOURNAL_CHAPTER = 130,
   POST_LOAD_SCREEN = 127,

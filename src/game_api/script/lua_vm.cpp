@@ -660,8 +660,9 @@ end
             backend->options[name] = {desc, "", ButtonOption{callback}};
             backend->lua[sol::create_if_nil]["options"][name] = -1;
         });
-    /// Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name. `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
-    /// The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
+    /// Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name.
+    /// `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+    /// <br/>The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
     lua["register_option_callback"] = [](std::string name, sol::object value, sol::function on_render)
     {
         auto backend = LuaBackend::get_calling_backend();
@@ -749,7 +750,7 @@ end
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
-    /// The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
+    /// <br/>The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<ENT_TYPE> types;
@@ -770,7 +771,7 @@ end
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
-    /// The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
+    /// <br/>The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
     lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<ENT_TYPE> types;
@@ -1244,7 +1245,7 @@ end
 
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
-    /// The callback signature is bool render_screen(Screen* self, VanillaRenderContext render_ctx)
+    /// <br/>The callback signature is bool render_screen(Screen* self, VanillaRenderContext render_ctx)
     lua["set_pre_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
@@ -1275,7 +1276,7 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right after the screen is drawn.
-    /// The callback signature is nil render_screen(Screen* self, VanillaRenderContext render_ctx)
+    /// <br/>The callback signature is nil render_screen(Screen* self, VanillaRenderContext render_ctx)
     lua["set_post_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
@@ -1314,7 +1315,7 @@ end
     /// Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    /// The callback signature is bool statemachine(Entity self)
+    /// <br/>The callback signature is bool statemachine(Entity self)
     lua["set_pre_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1345,7 +1346,7 @@ end
     /// Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    /// The callback signature is nil statemachine(Entity self)
+    /// <br/>The callback signature is nil statemachine(Entity self)
     lua["set_post_statemachine"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Movable* movable = get_entity_ptr(uid)->as<Movable>())
@@ -1373,7 +1374,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// The callback signature is nil on_destroy(Entity self)
+    /// <br/>The callback signature is nil on_destroy(Entity self)
     lua["set_on_destroy"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1401,7 +1402,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right when an entity is eradicated, before the game applies any side effects.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// The callback signature is nil on_kill(Entity self, Entity killer)
+    /// <br/>The callback signature is nil on_kill(Entity self, Entity killer)
     lua["set_on_kill"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1431,7 +1432,7 @@ end
     /// The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
     /// This is so that when the entity dies (from other causes), the death screen still gets shown.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// The callback signature is bool on_player_instagib(Entity self)
+    /// <br/>The callback signature is bool on_player_instagib(Entity self)
     lua["set_on_player_instagib"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1462,8 +1463,8 @@ end
     /// Note that damage_dealer can be nil ! (long fall, ...)
     /// DO NOT CALL `self:damage()` in the callback !
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// The entity has to be of a [Movable](#Movable) type, .
-    /// The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)
+    /// The entity has to be of a [Movable](#Movable) type.
+    /// <br/>The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float vel_x, float vel_y, int stun_amount, int iframes)
     lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1496,7 +1497,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// The callback signature is bool pre_floor_update(Entity self)
+    /// <br/>The callback signature is bool pre_floor_update(Entity self)
     lua["set_pre_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1525,7 +1526,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right after a floor is updated (by killed neighbor).
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// The callback signature is nil post_floor_update(Entity self)
+    /// <br/>The callback signature is nil post_floor_update(Entity self)
     lua["set_post_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* entity = get_entity_ptr(uid))
@@ -1554,7 +1555,7 @@ end
     /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    /// The callback signature is nil on_open(Entity entity_self, Entity opener)
+    /// <br/>The callback signature is nil on_open(Entity entity_self, Entity opener)
     lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Container* entity = get_entity_ptr(uid)->as<Container>())
@@ -1583,7 +1584,7 @@ end
     /// Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    /// The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
+    /// <br/>The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
     lua["set_pre_collision1"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1613,7 +1614,7 @@ end
     /// Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-    /// The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
+    /// <br/>The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
     lua["set_pre_collision2"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1643,7 +1644,7 @@ end
     /// Sets a callback that is called right after the entity is rendered.
     /// Return `true` to skip the original rendering function and all later pre_render callbacks.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
+    /// <br/>The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
     lua["set_pre_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))
@@ -1673,7 +1674,7 @@ end
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right after the entity is rendered.
     /// Use this only when no other approach works, this call can be expensive if overused.
-    /// The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
+    /// <br/>The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
     lua["set_post_render"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* e = get_entity_ptr(uid))

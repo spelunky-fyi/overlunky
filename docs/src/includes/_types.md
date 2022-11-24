@@ -555,6 +555,23 @@ int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 
 ### PRNG
 
+
+```lua
+--Make it so there is 50% chance that the Ankh will be destroyed
+
+set_callback(function ()
+    -- more or less 50% chance
+    if prng:random(2) == 1 then
+        -- get all Ankh's in a level
+        ankhs = get_entities_by(ENT_TYPE.ITEM_PICKUP_ANKH, MASK.ITEM, LAYER.BOTH)
+        for _, uid in pairs(ankhs) do
+            get_entity(uid):destroy()
+        end
+    end
+end, ON.LEVEL)
+
+```
+
 [PRNG](#PRNG) (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
 The used buffer is determined by [PRNG_CLASS](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
@@ -1082,6 +1099,18 @@ int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) |
 
 
 ### Online
+
+
+```lua
+message = "Currently playing: "
+for _, p in pairs(online.online_players) do
+    if p.ready_state ~= 0 then
+        message = message .. p.player_name .. " "
+    end
+end
+print(message)
+
+```
 
 
 Type | Name | Description
@@ -3051,7 +3080,7 @@ Type | Name | Description
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Entity](#Entity) | [chain](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chain) | 
 [Entity](#Entity) | [end_piece](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_piece) | 
-int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause | going_up is only right when timer is 0, otherwise it just sits at the bottom
+int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause; going_up is only right when timer is 0, otherwise it just sits at the bottom
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | for the start and retract
 
 ### StickyTrap
@@ -4146,7 +4175,7 @@ int | [shoot_lava_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 int | [jump_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_pause_timer) | 
 int | [lava_detection_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lava_detection_timer) | 
 bool | [is_hot](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_hot) | 
-int | [player_detect_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_detect_state) | 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava | probably used so he won't spit imminently after seeing the player
+int | [player_detect_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_detect_state) | 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
 
 ### Leprechaun
 
@@ -4892,11 +4921,11 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [button_sprite](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_sprite) | [Flags](#Aliases): 1 - pad: A, key: Z | 2 - pad: X, key: X | 3 - pad: B, key: C | 4- pad: Y, key: D<br/>5 - pad: LB, key: L Shift | 6 - pad: RB, key: A | 7 - pad: menu?, key: (none) | 8 - pad: copy?, key: Tab
+int | [button_sprite](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_sprite) | Only one can be set:<br/>1 - pad: A, key: Z<br/>2 - pad: X, key: X<br/>4 - pad: B, key: C<br/>8 - pad: Y, key: D<br/>16 - pad: LB, key: L Shift<br/>32 - pad: RB, key: A<br/>64 - pad: menu?, key: (none)<br/>128 - pad: copy?, key: Tab
 float | [visibility](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) | 
 bool | [is_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_visible) | It's false for selldialog used in shops
 bool | [player_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_trigger) | It's set true even if player does not see the button, like the drill or COG door
-int | [seen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seen) | -1 - hasn't been seen | 0 - last seen by player 1 | 1 - last seen by player 2 | 2 - last seen by player 3 | 3 - last seen by player 4
+int | [seen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seen) | <br/>-1 - hasn't been seen<br/>0 - last seen by player 1<br/>1 - last seen by player 2<br/>2 - last seen by player 3<br/>3 - last seen by player 4
 
 ### Cape
 
@@ -5180,7 +5209,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Flame](#Flame)
 
 Type | Name | Description
 ---- | ---- | -----------
-float | [flame_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_size) | if changed, gradually goes down |0.03 per frame| to the default size
+float | [flame_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_size) | if changed, gradually goes down (0.03 per frame) to the default size
 
 ### Fly
 
@@ -5874,7 +5903,7 @@ int | [target_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=targ
 int | [attack_phase](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_phase) | 0 = stomp, 1 = bombs, 2 = stomp+ufos, 3 = in lava
 int | [attack_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) | in phase 0/2: time spent looking for player, in phase 1: time between bomb salvo
 int | [ai_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_timer) | general timer that counts down whenever olmec is active
-int | [move_direction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_direction) | -1 = left, 0 = down, 1 = right | phase 0/2: depends on target, phase 1: travel direction
+int | [move_direction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_direction) | -1 = left, 0 = down, 1 = right, phase 0/2: depends on target, phase 1: travel direction
 int | [jump_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) | 
 int | [phase1_amount_of_bomb_salvos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase1_amount_of_bomb_salvos) | 
 int | [unknown_attack_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_attack_state) | 

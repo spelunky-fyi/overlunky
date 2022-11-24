@@ -381,7 +381,7 @@ void register_usertypes(sol::state& lua)
     // Also includes: DECORATION_PALACE_PORTRAIT
     // Various types, all `Entity`
     // SHADOW
-    // All the BG_* entities excluded from `BG` (MASK.BG | MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above
+    // All the BG_* entities excluded from `BG` (MASK.BG &#124 MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above
     // Various types, all `Entity`
     // LOGICAL
     // All LOGICAL_* entities
@@ -394,7 +394,7 @@ void register_usertypes(sol::state& lua)
     // Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA
     // Various types, all `Entity`
     // LIQUID
-    // Short for (MASK.WATER | MASK.LAVA)
+    // Short for (MASK.WATER &#124 MASK.LAVA)
     // ANY
     // Value of 0, treated by all the functions as ANY mask
     */

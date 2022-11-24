@@ -623,12 +623,13 @@ void register_usertypes(sol::state& lua)
                           return get_gamepad() /**/; }));
 
     /// Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+    ///
     /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
     /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
     /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
     /// - Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+    // lua["get_io"] = []() -> ImGuiIO
     lua["get_io"] = ImGui::GetIO;
-
     /// Deprecated
     /// Use `GuiDrawContext.draw_line` instead
     lua["draw_line"] = [](float x1, float y1, float x2, float y2, float thickness, uColor color)
