@@ -528,9 +528,18 @@ void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
     if (container == nullptr)
         return;
     uint32_t type = container->type->id;
-    if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") &&
-        type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
+    static auto compatible_entities = {
+        to_id("ENT_TYPE_ITEM_COFFIN"),
+        to_id("ENT_TYPE_ITEM_CRATE"),
+        to_id("ENT_TYPE_ITEM_DMCRATE"),
+        to_id("ENT_TYPE_ITEM_PRESENT"),
+        to_id("ENT_TYPE_ITEM_GHIST_PRESENT"),
+        to_id("ENT_TYPE_ITEM_POT"),
+        to_id("ENT_TYPE_ALIVE_EMBEDDED_ON_ICE")};
+
+    if (std::find(compatible_entities.begin(), compatible_entities.end(), type) == compatible_entities.end())
         return;
+
     container->as<Container>()->inside = item_entity_type;
 }
 

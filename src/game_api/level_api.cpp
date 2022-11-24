@@ -2014,7 +2014,7 @@ void add_next_levels(std::vector<std::string> next_levels)
     std::move(next_levels.begin(), next_levels.end(), std::back_inserter(g_levels_to_load));
 }
 
-int8_t get_co_subtheme()
+COSUBTHEME get_co_subtheme()
 {
     auto state = get_state_ptr();
     if (state->theme != 10)
@@ -2058,7 +2058,8 @@ int8_t get_co_subtheme()
 
     return -2;
 }
-void force_co_subtheme(int8_t subtheme)
+
+void force_co_subtheme(COSUBTHEME subtheme)
 {
     static size_t offset = get_address("cosmic_ocean_subtheme");
 

@@ -214,7 +214,7 @@ void register_usertypes(sol::state& lua)
         }
     };
 
-    /// Force the LUT texture for the given layer (or both) until it is reset
+    /// Force the LUT texture for the given layer (or both) until it is reset.
     /// Pass `nil` in the first parameter to reset
     lua["set_lut"] = [](sol::optional<TEXTURE> texture_id, LAYER layer)
     {

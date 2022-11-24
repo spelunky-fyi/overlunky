@@ -133,7 +133,7 @@ Name | Data | Description
 Name | Data | Description
 ---- | ---- | -----------
 [ALTAR_DICE_CLIMBINGGLOVES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.ALTAR_DICE_CLIMBINGGLOVES) | 0 | 
-...see [drops.cpp](../src/game_api/drops.cpp) for a list of possible drops... |  | 
+...see [drops.cpp](https:github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp) for a list of possible drops... |  | 
 [YETI_PITCHERSMITT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROP.YETI_PITCHERSMITT) | 85 | 
 
 ## DROPCHANCE
@@ -145,7 +145,7 @@ Name | Data | Description
 Name | Data | Description
 ---- | ---- | -----------
 [BONEBLOCK_SKELETONKEY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.BONEBLOCK_SKELETONKEY) | 0 | 
-...see [drops.cpp](../src/game_api/drops.cpp) for a list of possible dropchances... |  | 
+...see [drops.cpp](https:github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp) for a list of possible dropchances... |  | 
 [YETI_PITCHERSMITT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DROPCHANCE.YETI_PITCHERSMITT) | 10 | 
 
 ## DYNAMIC_TEXTURE

@@ -686,7 +686,7 @@ end
     /// `amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
     lua["spawn_liquid"] = spawn_liquid;
     /// Spawn an entity in position with some velocity and return the uid of spawned entity.
-    /// Uses level coordinates with [LAYER.FRONT](#LAYER) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
+    /// Uses level coordinates with [LAYER.FRONT](#LAYER) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYER(n), where (n) is a player number (1-4).
     lua["spawn_entity"] = spawn_entity_abs;
     /// Short for [spawn_entity](#spawn_entity).
     lua["spawn"] = spawn_entity_abs;
@@ -832,7 +832,8 @@ end
     lua["set_door"] = set_door_target;
     /// Get door target `world`, `level`, `theme`
     lua["get_door_target"] = get_door_target;
-    /// Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
+    /// Set the contents of [Coffin](#Coffin), [Present](#Present), [Pot](#Pot), [Container](#Container)
+    /// Check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) for what the exact ENT_TYPE's can this function affect
     lua["set_contents"] = set_contents;
     /// Get the Entity behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
     // lua["get_entity"] = [](uint32_t uid) -> Entity* {};
@@ -882,10 +883,12 @@ end
     auto get_entities_by = sol::overload(
         static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, LAYER)>(::get_entities_by),
         static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, LAYER)>(::get_entities_by));
-    /// Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+    /// Get uids of entities by some conditions ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
+    /// Recommended to always set the mask, even if you look for one entity type
     lua["get_entities_by"] = get_entities_by;
     /// Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
     /// You can even pass a table!
+    /// This function can be slower than the [get_entities_by](#get_entities_by) with the mask parameter filled
     lua["get_entities_by_type"] = [](sol::variadic_args va) -> std::vector<uint32_t>
     {
         sol::type type = va.get_type();
@@ -913,7 +916,8 @@ end
     auto get_entities_at = sol::overload(
         static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, float, float, LAYER, float)>(::get_entities_at),
         static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, float, float, LAYER, float)>(::get_entities_at));
-    /// Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+    /// Get uids of matching entities inside some radius ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+    /// Recommended to always set the mask, even if you look for one entity type
     lua["get_entities_at"] = get_entities_at;
 
     auto get_entities_overlapping = sol::overload(
@@ -986,7 +990,7 @@ end
     auto entity_get_items_by = sol::overload(
         static_cast<std::vector<uint32_t> (*)(uint32_t, ENT_TYPE, uint32_t)>(::entity_get_items_by),
         static_cast<std::vector<uint32_t> (*)(uint32_t, std::vector<ENT_TYPE>, uint32_t)>(::entity_get_items_by));
-    /// Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
+    /// Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](#MASK)) to filter, set them to 0 to return all attached entities.
     lua["entity_get_items_by"] = entity_get_items_by;
     /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
     lua["kill_entity"] = kill_entity;
@@ -1012,7 +1016,7 @@ end
     /// Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
     lua["carry"] = carry;
     /// Deprecated
-    /// Use `replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)` and `replace_drop(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type)` instead
+    /// Use [replace_drop](#replace_drop)(DROP.ARROWTRAP_WOODENARROW, new_arrow_type) and [replace_drop](#replace_drop)(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead
     lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
     /// Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
     lua["set_kapala_blood_threshold"] = set_kapala_blood_threshold;
@@ -1085,11 +1089,17 @@ end
             return (float)std::sqrt(std::pow(ea->position().first - eb->position().first, 2) + std::pow(ea->position().second - eb->position().second, 2));
     };
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
-    /// inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y
+    /// inside these boundaries. The order is: left x, top y, right x, bottom y
     lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
     {
         auto backend = LuaBackend::get_calling_backend();
         return std::make_tuple(2.5f, 122.5f, backend->g_state->w * 10.0f + 2.5f, 122.5f - backend->g_state->h * 8.0f);
+    };
+    /// Same as [get_bounds](#get_bounds) but returns AABB struct instead of loose floats
+    lua["get_aabb_bounds"] = []() -> AABB
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        return {2.5f, 122.5f, backend->g_state->w * 10.0f + 2.5f, 122.5f - backend->g_state->h * 8.0f};
     };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = []() -> std::pair<float, float>
@@ -1196,7 +1206,7 @@ end
     };
     /// Deprecated
     /// Use `players[1].input.buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
-    /// Of course, you can get the player by other mean, it doesn't need to be the `players` table
+    /// Of course, you can get the Player by other mean, it doesn't need to be the `players` table
     /// You can only read inputs from actual players, HH don't have any inputs
     lua["read_input"] = [](int uid) -> INPUTS
     {
@@ -1708,7 +1718,7 @@ end
     /// Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
     lua["hash_to_stringid"] = hash_to_stringid;
 
-    /// Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+    /// Get string behind STRINGID, don't use stringid diretcly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
     /// Will return the string of currently choosen language
     lua["get_string"] = get_string;
 
@@ -1725,7 +1735,7 @@ end
 
     /// Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
     /// if the entity has no localized name
-    lua["get_entity_name"] = [](ENT_TYPE type, sol::optional<bool> fallback_strategy)
+    lua["get_entity_name"] = [](ENT_TYPE type, sol::optional<bool> fallback_strategy) -> std::u16string
     {
         return get_entity_name(type, fallback_strategy.value_or(false));
     };
@@ -1734,40 +1744,40 @@ end
     /// This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
     lua["add_custom_name"] = add_custom_name;
 
-    /// Clears the name set with `add_custom_name`
+    /// Clears the name set with [add_custom_name](#add_custom_name)
     lua["clear_custom_name"] = clear_custom_name;
 
     /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
     lua["enter_door"] = enter_door;
 
-    /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
-    /// {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
-    /// Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance")
+    /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:<br/>
+    /// {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}<br/>
+    /// Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance").
     /// Use empty table as argument to reset to the game default
     lua["change_sunchallenge_spawns"] = change_sunchallenge_spawns;
 
-    /// Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
+    /// Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:<br/>
     /// {ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
     /// ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
-    /// ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
-    /// Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
-    /// If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser)
+    /// ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}<br/>
+    /// Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance").
+    /// If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser).
     /// Use empty table as argument to reset to the game default
     lua["change_diceshop_prizes"] = change_diceshop_prizes;
 
-    /// Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
-    /// {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
-    /// Max 255 types
+    /// Change ENT_TYPE's spawned when you damage the altar, by default there are 6:<br/>
+    /// {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}<br/>
+    /// Max 255 types.
     /// Use empty table as argument to reset to the game default
     lua["change_altar_damage_spawns"] = change_altar_damage_spawns;
 
-    /// Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
-    /// {ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
-    /// Max 255 types
+    /// Change ENT_TYPE's spawned when Waddler dies, by default there are 3:<br/>
+    /// {ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}<br/>
+    /// Max 255 types.
     /// Use empty table as argument to reset to the game default
     lua["change_waddler_drop"] = change_waddler_drop;
 
-    /// Poisons entity, to cure poison set `poison_tick_timer` to -1
+    /// Poisons entity, to cure poison set [Movable](#Movable).`poison_tick_timer` to -1
     lua["poison_entity"] = poison_entity;
 
     /// Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
@@ -1775,7 +1785,8 @@ end
     /// If you set `health` above the game max health it will be forced down to the game max
     lua["modify_ankh_health_gain"] = modify_ankh_health_gain;
 
-    /// Adds entity as shop item, has to be movable (haven't tested many)
+    /// Adds entity as shop item, has to be of [Purchasable](#Purchasable) type, check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) to find all the Purchasable entity types.
+    /// Adding other entities will result in not obtainable items or game crash
     lua["add_item_to_shop"] = add_item_to_shop;
 
     /// Change the amount of frames after the damage from poison is applied
@@ -1784,7 +1795,7 @@ end
     auto create_illumination = sol::overload(
         static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),
         static_cast<Illumination* (*)(Color color, float size, uint32_t uid)>(::create_illumination));
-    /// Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+    /// Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
     lua["create_illumination"] = create_illumination;
     /// Refreshes an Illumination, keeps it from fading out
     lua["refresh_illumination"] = refresh_illumination;
@@ -1805,7 +1816,7 @@ end
         end
     )");
 
-    /// Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see spawn_roomowner.
+    /// Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](#spawn_roomowner).
     // lua["spawn_shopkeeper"] = [](float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = ROOM_TEMPLATE.SHOP) -> uint32_t
     lua["spawn_shopkeeper"] = sol::overload(
         [](float x, float y, LAYER layer)
@@ -1817,7 +1828,7 @@ end
             return spawn_shopkeeper(x, y, layer, room_template);
         });
 
-    /// Spawn a RoomOwner (or a few other like CavemanShopkeeper) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
+    /// Spawn a RoomOwner (or a few other like [CavemanShopkeeper](#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
     // lua["spawn_roomowner"] = [](ENT_TYPE owner_type, float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = -1) -> uint32_t
     lua["spawn_roomowner"] = sol::overload(
         [](ENT_TYPE owner_type, float x, float y, LAYER layer)
@@ -1880,7 +1891,7 @@ end
     };
 
     /// Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level.
-    /// Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
+    /// Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with [change_string](#change_string).
     lua["set_level_string"] = [](std::u16string str)
     {
         return set_level_string(str);

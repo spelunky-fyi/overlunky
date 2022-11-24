@@ -230,7 +230,7 @@ function spawn_liquid(entity_type, x, y) end
 ---@return nil
 function spawn_liquid(entity_type, x, y, velocityx, velocityy, liquid_flags, amount, blobs_separation) end
 ---Spawn an entity in position with some velocity and return the uid of spawned entity.
----Uses level coordinates with [LAYER.FRONT](#LAYER) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn.
+---Uses level coordinates with [LAYER.FRONT](#LAYER) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYER(n), where (n) is a player number (1-4).
 ---@param entity_type ENT_TYPE
 ---@param x number
 ---@param y number
@@ -473,7 +473,8 @@ function set_door(uid, w, l, t) end
 ---@param uid integer
 ---@return integer, integer, integer
 function get_door_target(uid) end
----Set the contents of ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_CRATE or ENT_TYPE.ITEM_COFFIN `uid` to ENT_TYPE... `item_entity_type`
+---Set the contents of [Coffin](#Coffin), [Present](#Present), [Pot](#Pot), [Container](#Container)
+---Check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) for what the exact ENT_TYPE's can this function affect
 ---@param uid integer
 ---@param item_entity_type ENT_TYPE
 ---@return nil
@@ -497,13 +498,15 @@ function get_grid_entity_at(x, y, layer) end
 ---@param predicate fun(): any
 ---@return integer[]
 function filter_entities(entities, predicate) end
----Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---Get uids of entities by some conditions ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
+---Recommended to always set the mask, even if you look for one entity type
 ---@param entity_types ENT_TYPE[]
 ---@param mask integer
 ---@param layer LAYER
 ---@return integer[]
 function get_entities_by(entity_types, mask, layer) end
----Get uids of entities by some conditions. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---Get uids of entities by some conditions ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
+---Recommended to always set the mask, even if you look for one entity type
 ---@param entity_type ENT_TYPE
 ---@param mask integer
 ---@param layer LAYER
@@ -511,10 +514,12 @@ function get_entities_by(entity_types, mask, layer) end
 function get_entities_by(entity_type, mask, layer) end
 ---Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
 ---You can even pass a table!
+---This function can be slower than the [get_entities_by](#get_entities_by) with the mask parameter filled
 ---@vararg any
 ---@return integer[]
 function get_entities_by_type(...) end
----Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---Get uids of matching entities inside some radius ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---Recommended to always set the mask, even if you look for one entity type
 ---@param entity_types ENT_TYPE[]
 ---@param mask integer
 ---@param x number
@@ -523,7 +528,8 @@ function get_entities_by_type(...) end
 ---@param radius number
 ---@return integer[]
 function get_entities_at(entity_types, mask, x, y, layer, radius) end
----Get uids of matching entities inside some radius. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---Get uids of matching entities inside some radius ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
+---Recommended to always set the mask, even if you look for one entity type
 ---@param entity_type ENT_TYPE
 ---@param mask integer
 ---@param x number
@@ -651,13 +657,13 @@ function entity_has_item_type(uid, entity_types) end
 ---@param entity_type ENT_TYPE
 ---@return boolean
 function entity_has_item_type(uid, entity_type) end
----Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
+---Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](#MASK)) to filter, set them to 0 to return all attached entities.
 ---@param uid integer
 ---@param entity_types ENT_TYPE[]
 ---@param mask integer
 ---@return integer[]
 function entity_get_items_by(uid, entity_types, mask) end
----Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` to filter, set them to 0 to return all attached entities.
+---Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](#MASK)) to filter, set them to 0 to return all attached entities.
 ---@param uid integer
 ---@param entity_type ENT_TYPE
 ---@param mask integer
@@ -834,9 +840,12 @@ function spawn_companion(companion_type, x, y, layer) end
 ---@return number
 function distance(uid_a, uid_b) end
 ---Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
----inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y
+---inside these boundaries. The order is: left x, top y, right x, bottom y
 ---@return number, number, number, number
 function get_bounds() end
+---Same as [get_bounds](#get_bounds) but returns AABB struct instead of loose floats
+---@return AABB
+function get_aabb_bounds() end
 ---Gets the current camera position in the level
 ---@return number, number
 function get_camera_position() end
@@ -1020,7 +1029,7 @@ function raise() end
 ---@param hash integer
 ---@return STRINGID
 function hash_to_stringid(hash) end
----Get string behind STRINGID (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+---Get string behind STRINGID, don't use stringid diretcly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
 ---Will return the string of currently choosen language
 ---@param string_id STRINGID
 ---@return string
@@ -1040,7 +1049,7 @@ function add_string(str) end
 ---if the entity has no localized name
 ---@param type ENT_TYPE
 ---@param fallback_strategy boolean?
----@return nil
+---@return string
 function get_entity_name(type, fallback_strategy) end
 ---Adds custom name to the item by uid used in the shops
 ---This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
@@ -1048,7 +1057,7 @@ function get_entity_name(type, fallback_strategy) end
 ---@param name string
 ---@return nil
 function add_custom_name(uid, name) end
----Clears the name set with `add_custom_name`
+---Clears the name set with [add_custom_name](#add_custom_name)
 ---@param uid integer
 ---@return nil
 function clear_custom_name(uid) end
@@ -1057,38 +1066,38 @@ function clear_custom_name(uid) end
 ---@param door_uid integer
 ---@return nil
 function enter_door(player_uid, door_uid) end
----Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
----{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
----Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance")
+---Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:<br/>
+---{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}<br/>
+---Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance").
 ---Use empty table as argument to reset to the game default
 ---@param ent_types ENT_TYPE[]
 ---@return nil
 function change_sunchallenge_spawns(ent_types) end
----Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
+---Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:<br/>
 ---{ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
 ---ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
----ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
----Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance")
----If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser)
+---ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}<br/>
+---Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance").
+---If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser).
 ---Use empty table as argument to reset to the game default
 ---@param ent_types ENT_TYPE[]
 ---@return nil
 function change_diceshop_prizes(ent_types) end
----Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
----{MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
----Max 255 types
+---Change ENT_TYPE's spawned when you damage the altar, by default there are 6:<br/>
+---{MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}<br/>
+---Max 255 types.
 ---Use empty table as argument to reset to the game default
 ---@param ent_types ENT_TYPE[]
 ---@return nil
 function change_altar_damage_spawns(ent_types) end
----Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
----{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
----Max 255 types
+---Change ENT_TYPE's spawned when Waddler dies, by default there are 3:<br/>
+---{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}<br/>
+---Max 255 types.
 ---Use empty table as argument to reset to the game default
 ---@param ent_types ENT_TYPE[]
 ---@return nil
 function change_waddler_drop(ent_types) end
----Poisons entity, to cure poison set `poison_tick_timer` to -1
+---Poisons entity, to cure poison set [Movable](#Movable).`poison_tick_timer` to -1
 ---@param entity_uid integer
 ---@return nil
 function poison_entity(entity_uid) end
@@ -1099,7 +1108,8 @@ function poison_entity(entity_uid) end
 ---@param beat_add_health integer
 ---@return nil
 function modify_ankh_health_gain(max_health, beat_add_health) end
----Adds entity as shop item, has to be movable (haven't tested many)
+---Adds entity as shop item, has to be of [Purchasable](#Purchasable) type, check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) to find all the Purchasable entity types.
+---Adding other entities will result in not obtainable items or game crash
 ---@param item_uid integer
 ---@param shop_owner_uid integer
 ---@return nil
@@ -1108,14 +1118,14 @@ function add_item_to_shop(item_uid, shop_owner_uid) end
 ---@param frames integer
 ---@return nil
 function change_poison_timer(frames) end
----Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+---Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
 ---@param color Color
 ---@param size number
 ---@param x number
 ---@param y number
 ---@return Illumination
 function create_illumination(color, size, x, y) end
----Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the illumination.lua script for an example
+---Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
 ---@param color Color
 ---@param size number
 ---@param uid integer
@@ -1137,14 +1147,14 @@ function get_setting(setting) end
 ---@param value integer
 ---@return string
 function enum_get_name(enum, value) end
----Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see spawn_roomowner.
+---Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](#spawn_roomowner).
 ---@param x number
 ---@param y number,
 ---@param layer LAYER
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
 function spawn_shopkeeper(x, y, layer, room_template) end
----Spawn a RoomOwner (or a few other like CavemanShopkeeper) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
+---Spawn a RoomOwner (or a few other like [CavemanShopkeeper](#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
 ---@param owner_type ENT_TYPE
 ---@param x number
 ---@param y number,
@@ -1192,7 +1202,7 @@ function save_progress() end
 ---@return boolean
 function save_script() end
 ---Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level.
----Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with `change_string`.
+---Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with [change_string](#change_string).
 ---@param str string
 ---@return nil
 function set_level_string(str) end
@@ -1297,7 +1307,7 @@ function set_pre_tile_code_callback(cb, tile_code) end
 ---@param tile_code string
 ---@return CallbackId
 function set_post_tile_code_callback(cb, tile_code) end
----Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
+---Define a new tile code, to make this tile code do anything you have to use either [set_pre_tile_code_callback](#set_pre_tile_code_callback) or [set_post_tile_code_callback](#set_post_tile_code_callback).
 ---If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
 ---@param tile_code string
 ---@return TILE_CODE
@@ -1369,7 +1379,7 @@ function is_machine_room_origin(x, y) end
 ---@param room_template integer
 ---@return string
 function get_room_template_name(room_template) end
----Define a new room remplate to use with `set_room_template`
+---Define a new room template to use with `set_room_template`
 ---@param room_template string
 ---@param type ROOM_TEMPLATE_TYPE
 ---@return integer
@@ -1385,11 +1395,11 @@ function set_room_template_size(room_template, width, height) end
 ---@param chance_id PROCEDURAL_CHANCE
 ---@return integer
 function get_procedural_spawn_chance(chance_id) end
----Gets the sub theme of the current cosmic ocean level, returns `COSUBTHEME.NONE` if the current level is not a CO level.
----@return integer
+---Gets the sub theme of the current cosmic ocean level, returns COSUBTHEME.NONE if the current level is not a CO level.
+---@return COSUBTHEME
 function get_co_subtheme() end
----Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use `COSUBTHEME.RESET` to reset to default random behaviour)
----@param subtheme integer
+---Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use COSUBTHEME.RESET to reset to default random behaviour)
+---@param subtheme COSUBTHEME
 ---@return nil
 function force_co_subtheme(subtheme) end
 ---Gets the value for the specified config
@@ -1420,25 +1430,27 @@ function grow_poles(l, max_lengh) end
 ---@param destroy_broken boolean
 ---@return nil
 function grow_poles(l, max_lengh, area, destroy_broken) end
----Grow chains from `CHAIN_CEILING` and chain with blocks on it from `CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level
----To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
+---Grow chains from `ENT_TYPE_FLOOR_CHAIN_CEILING` and chain with blocks on it from `ENT_TYPE_FLOOR_CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level.
+---To limit it use the parameters, so x = 10 will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
 ---@return boolean
 function grow_chainandblocks() end
----Grow chains from `CHAIN_CEILING` and chain with blocks on it from `CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level
----To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
+---Grow chains from `ENT_TYPE_FLOOR_CHAIN_CEILING` and chain with blocks on it from `ENT_TYPE_FLOOR_CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level.
+---To limit it use the parameters, so x = 10 will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
 ---@param x integer
 ---@param y integer
 ---@return boolean
 function grow_chainandblocks(x, y) end
----Immediately load a screen based on state.screen_next and stuff
+---Immediately load a screen based on [state](#state).screen_next and stuff
 ---@return nil
 function load_screen() end
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
+---@param e customthem
 ---@return nil
-function force_custom_theme() end
+function force_custom_theme(e) end
 ---Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.
+---@param e customthem
 ---@return nil
-function force_custom_subtheme() end
+function force_custom_subtheme(e) end
 ---Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
 ---@param path string
 ---@return CustomSound?
@@ -1478,6 +1490,7 @@ function rgba(r, g, b, a) end
 ---@return number, number
 function draw_text_size(size, text) end
 ---Create image from file. Returns a tuple containing id, width and height.
+---Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
 ---@param path string
 ---@return IMAGE, integer, integer
 function create_image(path) end
@@ -1492,7 +1505,7 @@ function mouse_position() end
 ---- Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ---@return ImGuiIO
 function get_io() end
----Force the LUT texture for the given layer (or both) until it is reset
+---Force the LUT texture for the given layer (or both) until it is reset.
 ---Pass `nil` in the first parameter to reset
 ---@param texture_id TEXTURE?
 ---@param layer LAYER
@@ -1528,7 +1541,7 @@ function define_texture(texture_data) end
 ---@return TEXTURE?
 function get_texture(texture_data) end
 ---Reloads a texture from disk, use this only as a development tool for example in the console
----Note that `define_texture` will also reload the texture if it already exists
+---Note that [define_texture](#define_texture) will also reload the texture if it already exists
 ---@param texture_path string
 ---@return nil
 function reload_texture(texture_path) end
@@ -1555,7 +1568,7 @@ function screen_aabb(box) end
 ---@param entry integer
 ---@return nil
 function force_journal(chapter, entry) end
----Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.
+---Open or close the journal as if pressing the journal button. Will respect visible journal popups and [force_journal](#force_journal).
 ---@return nil
 function toggle_journal() end
 ---Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
