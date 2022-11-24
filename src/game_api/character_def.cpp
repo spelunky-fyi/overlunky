@@ -41,7 +41,7 @@ std::span<CharacterDB> GetCharacterDefinitions()
 {
     static std::span<CharacterDB> static_character_table = []()
     {
-        static const auto character_db = get_address("character_db");
+        const auto character_db = get_address("character_db");
         std::span<CharacterDB> character_table{(CharacterDB*)character_db, 20};
 
         struct KnownCharacter
