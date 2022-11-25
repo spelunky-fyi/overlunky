@@ -110,6 +110,14 @@ struct AABB
     /// Copy an axis aligned bounding box
     AABB(const AABB&) = default;
 
+    AABB(const std::tuple<float, float, float, float> tuple)
+    {
+        left = std::get<0>(tuple);
+        top = std::get<1>(tuple);
+        right = std::get<2>(tuple);
+        bottom = std::get<3>(tuple);
+    };
+
     /// Create a new axis aligned bounding box by specifying its values
     AABB(float left_, float top_, float right_, float bottom_)
         : left(left_), top(top_), right(right_), bottom(bottom_){};
@@ -203,6 +211,10 @@ struct AABB
     float height() const
     {
         return (top - bottom);
+    }
+    operator std::tuple<float, float, float, float>()
+    {
+        return {left, top, right, bottom};
     }
 
     float left{0};

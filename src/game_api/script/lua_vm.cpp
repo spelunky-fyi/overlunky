@@ -1092,14 +1092,14 @@ end
     /// inside these boundaries. The order is: left x, top y, right x, bottom y
     lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
     {
-        auto backend = LuaBackend::get_calling_backend();
-        return std::make_tuple(2.5f, 122.5f, backend->g_state->w * 10.0f + 2.5f, 122.5f - backend->g_state->h * 8.0f);
+        auto state = State::get().ptr();
+        return std::make_tuple(2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f);
     };
     /// Same as [get_bounds](#get_bounds) but returns AABB struct instead of loose floats
     lua["get_aabb_bounds"] = []() -> AABB
     {
-        auto backend = LuaBackend::get_calling_backend();
-        return {2.5f, 122.5f, backend->g_state->w * 10.0f + 2.5f, 122.5f - backend->g_state->h * 8.0f};
+        auto state = State::get().ptr();
+        return {2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f};
     };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = []() -> std::pair<float, float>
