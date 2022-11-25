@@ -25,6 +25,7 @@ namespace NState
 {
 void register_usertypes(sol::state& lua)
 {
+    /// Used in ArenaState
     auto arenaconfigarenas_type = lua.new_usertype<ArenaConfigArenas>("ArenaConfigArenas");
     arenaconfigarenas_type["dwelling_1"] = &ArenaConfigArenas::dwelling_1;
     arenaconfigarenas_type["dwelling_2"] = &ArenaConfigArenas::dwelling_2;
@@ -67,6 +68,7 @@ void register_usertypes(sol::state& lua)
     arenaconfigarenas_type["sunkencity_4"] = &ArenaConfigArenas::sunkencity_4;
     arenaconfigarenas_type["sunkencity_5"] = &ArenaConfigArenas::sunkencity_5;
 
+    ///Used in ArenaState
     auto arenaconfigitems_type = lua.new_usertype<ArenaConfigItems>("ArenaConfigItems");
     arenaconfigitems_type["rock"] = &ArenaConfigItems::rock;
     arenaconfigitems_type["pot"] = &ArenaConfigItems::pot;
@@ -109,6 +111,7 @@ void register_usertypes(sol::state& lua)
     arenaconfigitems_type["kapala"] = &ArenaConfigItems::kapala;
     arenaconfigitems_type["true_crown"] = &ArenaConfigItems::true_crown;
 
+    /// Used in ArenaState
     auto arenaconfigequippeditems_type = lua.new_usertype<ArenaConfigEquippedItems>("ArenaConfigEquippedItems");
     arenaconfigequippeditems_type["paste"] = &ArenaConfigEquippedItems::paste;
     arenaconfigequippeditems_type["climbing_gloves"] = &ArenaConfigEquippedItems::climbing_gloves;
@@ -119,6 +122,7 @@ void register_usertypes(sol::state& lua)
     arenaconfigequippeditems_type["kapala"] = &ArenaConfigEquippedItems::kapala;
     arenaconfigequippeditems_type["scepter"] = &ArenaConfigEquippedItems::scepter;
 
+    /// Used in StateMemory
     auto arenastate_type = lua.new_usertype<ArenaState>("ArenaState");
     arenastate_type["current_arena"] = &ArenaState::current_arena;
     arenastate_type["player_teams"] = &ArenaState::player_teams;

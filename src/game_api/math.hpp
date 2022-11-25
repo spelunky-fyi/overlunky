@@ -85,6 +85,10 @@ struct Vec2
     {
         return x == a.x && y == a.y;
     }
+    /*
+    std::tuple<float, float> split()
+    {} // just for the autodoc
+    */
     operator std::pair<float, float>() const
     {
         return {x, y};
@@ -109,7 +113,7 @@ struct AABB
 
     /// Copy an axis aligned bounding box
     AABB(const AABB&) = default;
-
+    /// NoDoc
     AABB(const std::tuple<float, float, float, float> tuple)
     {
         left = std::get<0>(tuple);
@@ -212,6 +216,10 @@ struct AABB
     {
         return (top - bottom);
     }
+    /*
+    std::tuple<float, float, float, float> split()
+    {} // just for the autodoc
+    */
     operator std::tuple<float, float, float, float>()
     {
         return {left, top, right, bottom};

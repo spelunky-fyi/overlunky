@@ -50,6 +50,7 @@ void register_usertypes(sol::state& lua)
     color_type["get_ucolor"] = &Color::get_ucolor;
     color_type["set_ucolor"] = &Color::set_ucolor;
 
+    /// Used in EntityDB
     lua.new_usertype<Animation>(
         "Animation",
         "id",
@@ -63,6 +64,8 @@ void register_usertypes(sol::state& lua)
         "repeat_mode",
         &Animation::repeat);
 
+    /// Used in Entity and [get_type](#get_type)<br/>
+    /// Stores static common data for an ENT_TYPE. You can also clone entity types with the copy constructor to create new custom entities with different common properties. [This tool](https://dregu.github.io/Spelunky2ls/animation.html) can be helpful when messing with the animations. The default values are also listed in [entities.json](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json).
     auto entitydb_type = lua.new_usertype<EntityDB>("EntityDB", sol::constructors<EntityDB(EntityDB&), EntityDB(ENT_TYPE)>{});
     entitydb_type["id"] = &EntityDB::id;
     entitydb_type["search_flags"] = &EntityDB::search_flags;
@@ -99,7 +102,7 @@ void register_usertypes(sol::state& lua)
     entitydb_type["tilex"] = &EntityDB::tile_x;
     entitydb_type["tiley"] = &EntityDB::tile_y;
 
-    /// Some information used to render the entity, can not be changed
+    /// Some information used to render the entity, can not be changed, used in Entity
     lua.new_usertype<RenderInfo>(
         "RenderInfo",
         "x",

@@ -2585,7 +2585,7 @@ The function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, 
 The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
-To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
+To change the number of spawns use `PostRoomGenerationContext:set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
 No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
 
 ### define_procedural_spawn
@@ -2826,7 +2826,7 @@ Short for [spawn_entity_over](#spawn_entity_over)
 #### nil spawn_player(int player_slot, float x, float y)
 
 Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
-If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
+If you want to respawn a player that is a ghost, set in his [Inventory](#Inventory) `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 
 ### spawn_playerghost
 

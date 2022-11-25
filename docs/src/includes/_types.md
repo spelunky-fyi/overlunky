@@ -7,6 +7,7 @@
 
 ### ArenaConfigArenas
 
+Used in [ArenaState](#ArenaState)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -53,6 +54,7 @@ bool | [sunkencity_5](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=s
 
 ### ArenaConfigEquippedItems
 
+Used in [ArenaState](#ArenaState)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -67,6 +69,7 @@ bool | [scepter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scepte
 
 ### ArenaConfigItems
 
+Used in [ArenaState](#ArenaState)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -113,6 +116,7 @@ bool | [true_crown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tru
 
 ### ArenaState
 
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -164,6 +168,7 @@ end, ON.GUIFRAME)
 
 ```
 
+Used in [register_option_callback](#register_option_callback) and [set_callback](#set_callback) with [ON](#ON).GUIFRAME
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -185,7 +190,7 @@ nil | [draw_image(IMAGE image, float left, float top, float right, float bottom,
 nil | [draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) | Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 nil | [draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) | Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 nil | [draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) | Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
-bool | [window(string title, float x, float y, float w, float h, bool movable, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) | Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving<br/>still, this is just the first draft. Felt cute, might delete later!<br/>Returns false if the window was closed from the X.
+bool | [window(string title, float x, float y, float w, float h, bool movable, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) | Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving<br/>still, this is just the first draft. Felt cute, might delete later!<br/>Returns false if the window was closed from the X.<br/>The callback signature is nil win(GuiDrawContext ctx)
 nil | [win_text(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text) | Add some text to window, automatically wrapped
 nil | [win_separator()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator) | Add a separator line to window
 nil | [win_inline()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline) | Add next thing on the same line. This is same as `win_sameline(0, -1)`
@@ -208,6 +213,8 @@ nil | [win_indent(float width)](https://github.com/spelunky-fyi/overlunky/search
 
 ### LoadContext
 
+Context received in [ON](#ON).LOAD
+Used to load from save_{}.dat into a string
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -215,6 +222,8 @@ string | [load()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load)
 
 ### PostRoomGenerationContext
 
+Context received in [ON](#ON).POST_ROOM_GENERATION.
+Used to change the room templates in the level and other shenanigans that affect level gen.
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -230,6 +239,8 @@ nil | [change_short_tile_code(SHORT_TILE_CODE short_tile_code, ShortTileCodeDef 
 
 ### PreHandleRoomTilesContext
 
+Context received in [ON](#ON).PRE_HANDLE_ROOM_TILES.
+Used to change the room data as well as add a backlayer room if none is set yet.
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -243,6 +254,7 @@ nil | [add_copied_back_layer()](https://github.com/spelunky-fyi/overlunky/search
 
 ### PreLoadLevelFilesContext
 
+Context received in [ON](#ON).PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -251,6 +263,9 @@ nil | [add_level_files(array<string> levels)](https://github.com/spelunky-fyi/ov
 
 ### SaveContext
 
+Context received in [ON](#ON).SAVE
+Used to save a string to some form of save_{}.dat
+Future calls to this will override the save
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -258,6 +273,7 @@ bool | [save(string data)](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 
 ### VanillaRenderContext
 
+Used in [set_callback](#set_callback) [ON](#ON).RENDER_ callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -281,6 +297,7 @@ nil | [draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& de
 
 ### Ai
 
+Used in [Player](#Player)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -295,6 +312,7 @@ int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 
 ### Animation
 
+Used in [EntityDB](#EntityDB)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -306,8 +324,6 @@ int | [interval](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=interv
 
 ### EntityDB
 
-
-Used to store static common data for an ENT_TYPE. You can also clone entity types with the copy constructor to create new custom entities with different common properties. [This tool](https://dregu.github.io/Spelunky2ls/animation.html) can be helpful when messing with the animations. The default values are also listed in [entities.json](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json).
 
 > When cloning an entity type, remember to save it in the script for as long as you need it. Otherwise the memory will be freed immediately, which eventually leads to a crash when used or overwritten by other stuff:
 
@@ -368,6 +384,8 @@ end, ON.POST_LEVEL_GENERATION)
 ```
 
 
+Used in [Entity](#Entity) and [get_type](#get_type)<br/>
+Stores static common data for an [ENT_TYPE](#ENT_TYPE). You can also clone entity types with the copy constructor to create new custom entities with different common properties. [This tool](https://dregu.github.io/Spelunky2ls/animation.html) can be helpful when messing with the animations. The default values are also listed in [entities.json](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json).
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -410,6 +428,7 @@ int | [tiley](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiley) |
 
 ### Inventory
 
+Used in [Player](#Player), [PlayerGhost](#PlayerGhost) and [Items](#Items)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -469,9 +488,11 @@ float | [area()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) 
 tuple&lt;float, float&gt; | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
 float | [width()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | Short for `aabb.right - aabb.left`.
 float | [height()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Short for `aabb.top - aabb.bottom`.
+tuple&lt;float, float, float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ### BackgroundMusic
 
+Used in [GameManager](#GameManager)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -546,7 +567,7 @@ float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) |
 
 ### MovableBehavior
 
-Opaque handle to a movable behavior
+Opaque handle to a movable behavior used in some [Movable](#Movable) functions
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -575,7 +596,7 @@ end, ON.LEVEL)
 [PRNG](#PRNG) (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
 The used buffer is determined by [PRNG_CLASS](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
-If you don't care what part of the game you affect just use `prng.random`.
+If you don't care what part of the game you affect just use [prng](#prng)`.random`.
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -617,7 +638,7 @@ tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split
 
 ### RenderInfo
 
-Some information used to render the entity, can not be changed
+Some information used to render the entity, can not be changed, used in [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -633,6 +654,7 @@ bool | [render_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 
 ### ShortTileCodeDef
 
+Used in [get_short_tile_code](#get_short_tile_code), [get_short_tile_code_definition](#get_short_tile_code_definition) and [PostRoomGenerationContext](#PostRoomGenerationContext)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -652,7 +674,7 @@ Type | Name | Description
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 [Vec2](#Vec2)& | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | 
- | [split](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
+tuple&lt;float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ## Input types
 
@@ -943,6 +965,7 @@ float | [door2_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2
 
 ### LevelGenSystem
 
+Data relating to level generation, changing anything in here from [ON](#ON).LEVEL or later will likely have no effect
 
 Type | Name | Description
 ---- | ---- | -----------

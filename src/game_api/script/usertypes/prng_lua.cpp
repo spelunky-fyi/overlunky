@@ -27,7 +27,7 @@ void register_usertypes(sol::state& lua)
     /// PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
     /// The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
     /// The used buffer is determined by [PRNG_CLASS](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
-    /// If you don't care what part of the game you affect just use `prng.random`.
+    /// If you don't care what part of the game you affect just use [prng](#prng)`.random`.
     lua.new_usertype<PRNG>(
         "PRNG",
         "seed",

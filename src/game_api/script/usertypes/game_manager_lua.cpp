@@ -15,6 +15,7 @@ namespace NGM
 {
 void register_usertypes(sol::state& lua)
 {
+    /// Used in GameManager
     lua.new_usertype<BackgroundMusic>(
         "BackgroundMusic",
         "game_startup",

@@ -742,7 +742,7 @@ end
     /// Fixes the bounds of impostor lakes in the liquid physics engine to match the bounds of the impostor lake entities.
     lua["fix_impostor_lake_positions"] = fix_impostor_lake_positions;
     /// Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
-    /// If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
+    /// If you want to respawn a player that is a ghost, set in his Inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
     lua["spawn_player"] = spawn_player;
     /// Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](#steal_input) and send_input to controll it
     /// or change it's `player_inputs` to the `input` of real player so he can control it directly

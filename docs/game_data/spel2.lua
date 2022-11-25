@@ -370,7 +370,7 @@ function spawn_unrolled_player_rope(x, y, layer, texture) end
 ---@return integer
 function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
 ---Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
----If you want to respawn a player that is a ghost, set in his inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
+---If you want to respawn a player that is a ghost, set in his Inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 ---@param player_slot integer
 ---@param x number
 ---@param y number
@@ -1335,7 +1335,7 @@ function define_procedural_spawn(procedural_spawn, do_spawn, is_valid) end
 ---The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
 ---Use for example when you can spawn only on the ceiling, under water or inside a shop.
 ---Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
----To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
+---To change the number of spawns use `PostRoomGenerationContext:set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
 ---No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
 ---@param do_spawn fun(): any
 ---@param is_valid fun(): any
@@ -4482,7 +4482,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field x number
     ---@field y number
     ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
-    ---@field split any @&Vec2::operatorstd::pair<float
+    ---@field split fun(self): number, number
 
 ---@class AABB
     ---@field left number
@@ -4497,6 +4497,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field center fun(self): number, number
     ---@field width fun(self): number
     ---@field height fun(self): number
+    ---@field split fun(self): number, number, number, number
 
 ---@class AABB_extrude
 ---@param amount_x number
@@ -5246,6 +5247,11 @@ function AABB.new(self) end
 ---@param aabb AABB
 ---@return AABB
 function AABB.new(self, aabb) end
+---NoDoc
+---@param number tuple<number,
+---@param number> tuple number,
+---@return AABB
+function AABB.new(self, number, number> tuple) end
 ---Create a new axis aligned bounding box by specifying its values
 ---@param left_ number
 ---@param top_ number

@@ -1062,7 +1062,7 @@ void register_usertypes(sol::state& lua)
     /// The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
     /// Use for example when you can spawn only on the ceiling, under water or inside a shop.
     /// Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
-    /// To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
+    /// To change the number of spawns use `PostRoomGenerationContext:set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
     /// No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
     lua["define_extra_spawn"] = [](sol::function do_spawn, sol::function is_valid, std::uint32_t num_spawns_frontlayer, std::uint32_t num_spawns_backlayer) -> std::uint32_t
     {
@@ -1363,7 +1363,7 @@ void register_usertypes(sol::state& lua)
                 State::get().ptr()->level_gen->theme_cosmicocean->sub_theme = State::get().ptr()->level_gen->themes[customtheme - 1];
         });
 
-    // Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
+    /// Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
     lua.new_usertype<PreLoadLevelFilesContext>(
         "PreLoadLevelFilesContext",
         sol::no_constructor,
@@ -1374,7 +1374,7 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
-    // Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect
+    /// Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect
     lua.new_usertype<LevelGenSystem>(
         "LevelGenSystem",
         sol::no_constructor,
@@ -1400,8 +1400,8 @@ void register_usertypes(sol::state& lua)
         "flags",
         &LevelGenSystem::flags);
 
-    // Context received in ON.POST_ROOM_GENERATION.
-    // Used to change the room templates in the level and other shenanigans that affect level gen.
+    /// Context received in ON.POST_ROOM_GENERATION.
+    /// Used to change the room templates in the level and other shenanigans that affect level gen.
     lua.new_usertype<PostRoomGenerationContext>(
         "PostRoomGenerationContext",
         "set_room_template",
@@ -1439,8 +1439,8 @@ void register_usertypes(sol::state& lua)
         return positions_converted;
     };
 
-    // Context received in ON.PRE_HANDLE_ROOM_TILES.
-    // Used to change the room data as well as add a backlayer room if none is set yet.
+    /// Context received in ON.PRE_HANDLE_ROOM_TILES.
+    /// Used to change the room data as well as add a backlayer room if none is set yet.
     lua.new_usertype<PreHandleRoomTilesContext>(
         "PreHandleRoomTilesContext",
         sol::no_constructor,
@@ -1459,6 +1459,7 @@ void register_usertypes(sol::state& lua)
         "add_copied_back_layer",
         &PreHandleRoomTilesContext::add_copied_back_layer);
 
+    /// Used in [get_short_tile_code](#get_short_tile_code), [get_short_tile_code_definition](#get_short_tile_code_definition) and PostRoomGenerationContext
     lua.new_usertype<ShortTileCodeDef>(
         "ShortTileCodeDef",
         "tile_code",
