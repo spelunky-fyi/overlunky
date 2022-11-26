@@ -1118,14 +1118,14 @@ function add_item_to_shop(item_uid, shop_owner_uid) end
 ---@param frames integer
 ---@return nil
 function change_poison_timer(frames) end
----Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
 ---@param color Color
 ---@param size number
 ---@param x number
 ---@param y number
 ---@return Illumination
 function create_illumination(color, size, x, y) end
----Creates a new Illumination. Don't forget to continuously call `refresh_illumination`, otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
 ---@param color Color
 ---@param size number
 ---@param uid integer
@@ -1502,7 +1502,7 @@ function mouse_position() end
 ---- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
 ---- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
 ---- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
----- Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+---- Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ---@return ImGuiIO
 function get_io() end
 ---Force the LUT texture for the given layer (or both) until it is reset.
@@ -1779,7 +1779,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field engine LiquidPhysicsEngine
 
 ---@class LiquidPhysics
-    ---@field pools LiquidPool[] @size: 5
+    ---@field pools LiquidPool[]
 
 ---@class StateMemory
     ---@field screen_last integer
@@ -1947,6 +1947,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field diceshop LogicDiceShop
 
 ---@class Logic
+    ---@field logic_index integer
 
 ---@class LogicOlmecCutscene : Logic
     ---@field olmec Entity
@@ -4376,7 +4377,7 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
 
 ---@class Gamepad
     ---@field enabled boolean
-    ---@field buttons any @&Gamepad::wButtons
+    ---@field buttons Flags
     ---@field lt number
     ---@field rt number
     ---@field lx number

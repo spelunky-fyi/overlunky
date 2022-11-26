@@ -68,7 +68,7 @@ void register_usertypes(sol::state& lua)
     arenaconfigarenas_type["sunkencity_4"] = &ArenaConfigArenas::sunkencity_4;
     arenaconfigarenas_type["sunkencity_5"] = &ArenaConfigArenas::sunkencity_5;
 
-    ///Used in ArenaState
+    /// Used in ArenaState
     auto arenaconfigitems_type = lua.new_usertype<ArenaConfigItems>("ArenaConfigItems");
     arenaconfigitems_type["rock"] = &ArenaConfigItems::rock;
     arenaconfigitems_type["pot"] = &ArenaConfigItems::pot;
@@ -155,6 +155,7 @@ void register_usertypes(sol::state& lua)
     arenastate_type["breath_cooldown"] = &ArenaState::breath_cooldown;
     arenastate_type["punish_ball"] = &ArenaState::punish_ball;
 
+    /// Used in Items
     lua.new_usertype<SelectPlayerSlot>(
         "SelectPlayerSlot",
         "activated",
@@ -163,6 +164,7 @@ void register_usertypes(sol::state& lua)
         &SelectPlayerSlot::character,
         "texture",
         &SelectPlayerSlot::texture_id);
+    /// Used in StateMemory
     lua.new_usertype<Items>(
         "Items",
         "player_count",
@@ -190,6 +192,7 @@ void register_usertypes(sol::state& lua)
         sol::property([](Items& s)
                       { return std::ref(s.player_inventories); }));
 
+    /// Used in LiquidPool
     lua.new_usertype<LiquidPhysicsEngine>(
         "LiquidPhysicsEngine",
         "pause",
@@ -207,6 +210,7 @@ void register_usertypes(sol::state& lua)
         "count",
         &LiquidPhysicsEngine::entity_count);
 
+    /// Used in LiquidPool
     lua.new_usertype<LiquidPhysicsParams>(
         "LiquidPhysicsParams",
         "gravity",
@@ -216,6 +220,7 @@ void register_usertypes(sol::state& lua)
         "elasticity",
         &LiquidPhysicsParams::agitation);
 
+    /// Used in LiquidPhysics
     lua.new_usertype<LiquidPool>(
         "LiquidPool",
         "default",
@@ -223,6 +228,8 @@ void register_usertypes(sol::state& lua)
         "engine",
         &LiquidPool::physics_engine);
 
+    /// Use LIQUID_POOL enum for the index<br/>
+    /// Used in StateMemory
     lua.new_usertype<LiquidPhysics>(
         "LiquidPhysics",
         "pools",
@@ -242,6 +249,7 @@ void register_usertypes(sol::state& lua)
         "STAGNANT_LAVA",
         5);
 
+    /// Can be accessed via global [state](#state)
     auto statememory_type = lua.new_usertype<StateMemory>("StateMemory");
     statememory_type["screen_last"] = &StateMemory::screen_last;
     statememory_type["screen"] = &StateMemory::screen;
@@ -342,6 +350,7 @@ void register_usertypes(sol::state& lua)
     statememory_type["logic"] = &StateMemory::logic;
     statememory_type["liquid"] = &StateMemory::liquid_physics;
 
+    /// Used in Illumination
     lua.new_usertype<LightParams>(
         "LightParams",
         "red",
@@ -353,6 +362,8 @@ void register_usertypes(sol::state& lua)
         "size",
         &LightParams::size);
 
+    /// Generic obcject for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
+    /// Used in StateMemory, Player, PlayerGhost, BurningRopeEffect ...
     auto illumination_type = lua.new_usertype<Illumination>("Illumination");
     illumination_type["lights"] = &Illumination::lights;
     illumination_type["light1"] = &Illumination::light1;
@@ -393,6 +404,7 @@ void register_usertypes(sol::state& lua)
     camera_type["focused_entity_uid"] = &Camera::focused_entity_uid;
     camera_type["inertia"] = &Camera::inertia;
 
+    /// Can be accessed via global [online](#online)
     lua.new_usertype<Online>(
         "Online",
         "online_players",
@@ -401,6 +413,7 @@ void register_usertypes(sol::state& lua)
         &Online::local_player,
         "lobby",
         &Online::lobby);
+    /// Used in Online
     lua.new_usertype<OnlinePlayer>(
         "OnlinePlayer",
         "ready_state",
@@ -409,12 +422,14 @@ void register_usertypes(sol::state& lua)
         &OnlinePlayer::character,
         "player_name",
         sol::readonly(&OnlinePlayer::player_name));
+    /// Used in Online
     lua.new_usertype<OnlineLobby>(
         "OnlineLobby",
         "code",
         &OnlineLobby::code,
         "get_code",
         &OnlineLobby::get_code);
+    /// Used in StateMemory
     lua.new_usertype<LogicList>(
         "LogicList",
         "olmec_cutscene",
@@ -423,8 +438,12 @@ void register_usertypes(sol::state& lua)
         &LogicList::tiamat_cutscene,
         "diceshop",
         &LogicList::diceshop);
+    /// Used in LogicList
     lua.new_usertype<Logic>(
-        "Logic");
+        "Logic",
+        "logic_index",
+        &Logic::logic_index);
+    /// Used in LogicList
     lua.new_usertype<LogicOlmecCutscene>(
         "LogicOlmecCutscene",
         "olmec",
@@ -437,6 +456,7 @@ void register_usertypes(sol::state& lua)
         &LogicOlmecCutscene::timer,
         sol::base_classes,
         sol::bases<Logic>());
+    /// Used in LogicList
     lua.new_usertype<LogicTiamatCutscene>(
         "LogicTiamatCutscene",
         "tiamat",
@@ -450,6 +470,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Logic>());
 
+    /// Used in LogicList
     auto logicdiceshop_type = lua.new_usertype<LogicDiceShop>("LogicDiceShop", sol::base_classes, sol::bases<Logic>());
     logicdiceshop_type["bet_machine"] = &LogicDiceShop::bet_machine;
     logicdiceshop_type["die1"] = &LogicDiceShop::die1;

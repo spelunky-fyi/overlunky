@@ -681,11 +681,12 @@ tuple&lt;float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/
 
 ### Gamepad
 
+Used in [ImGuiIO](#ImGuiIO)
 
 Type | Name | Description
 ---- | ---- | -----------
 bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
- | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+[Flags](#Aliases) | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
 float | [lt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lt) | 
 float | [rt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rt) | 
 float | [lx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lx) | 
@@ -695,6 +696,14 @@ float | [ry](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ry) |
 
 ### ImGuiIO
 
+Used in [get_io](#get_io)
+Function declarations:<br/>
+bool keydown(int keycode)<br/>
+bool keydown(char key)<br/>
+bool keypressed(int keycode, bool repeat = false)<br/>
+bool keypressed(char key, bool repeat = false)<br/>
+bool keyreleased(int keycode)<br/>
+bool keyreleased(char key)<br/>
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -715,10 +724,11 @@ bool        | [mousedown[5]](https://github.com/spelunky-fyi/overlunky/search?l=
 bool        | [mouseclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
 bool        | [mousedoubleclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
 float       | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) | 
- | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
+[Gamepad](#Gamepad) | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
 
 ### InputMapping
 
+Used in [PlayerSlot](#PlayerSlot)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -737,6 +747,7 @@ int | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) |
 
 ### PlayerInputs
 
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -756,6 +767,7 @@ array&lt;[PlayerSlotSettings](#PlayerSlotSettings), MAX_PLAYERS&gt; | [player_se
 
 ### JournalPage
 
+Used in [set_callback](#set_callback) with [ON](#ON).RENDER_POST_JOURNAL_PAGE
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -955,6 +967,8 @@ Type | Name | Description
 
 ### DoorCoords
 
+Deprecated
+ kept for backward compatibility, don't use, check [LevelGenSystem](#LevelGenSystem).exit_doors
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -965,7 +979,7 @@ float | [door2_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2
 
 ### LevelGenSystem
 
-Data relating to level generation, changing anything in here from [ON](#ON).LEVEL or later will likely have no effect
+Data relating to level generation, changing anything in here from [ON](#ON).LEVEL or later will likely have no effect, used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -983,6 +997,8 @@ array&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlu
 
 ### Illumination
 
+Generic obcject for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
+Used in [StateMemory](#StateMemory), [Player](#Player), [PlayerGhost](#PlayerGhost), [BurningRopeEffect](#BurningRopeEffect) ...
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1006,6 +1022,7 @@ int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) |
 
 ### LightParams
 
+Used in [Illumination](#Illumination)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1019,13 +1036,16 @@ float | [size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) |
 
 ### LiquidPhysics
 
+Use [LIQUID_POOL](#LIQUID_POOL) enum for the index<br/>
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
-[LiquidPool](#LiquidPool) | [pools[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pools) | 
+array&lt;[LiquidPool](#LiquidPool), 5&gt; | [pools](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pools) | 
 
 ### LiquidPhysicsEngine
 
+Used in [LiquidPool](#LiquidPool)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1039,6 +1059,7 @@ int | [count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=count) |
 
 ### LiquidPhysicsParams
 
+Used in [LiquidPool](#LiquidPool)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1048,6 +1069,7 @@ float | [elasticity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=el
 
 ### LiquidPool
 
+Used in [LiquidPhysics](#LiquidPhysics)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1059,12 +1081,15 @@ Type | Name | Description
 
 ### Logic
 
+Used in [LogicList](#LogicList)
 
 Type | Name | Description
 ---- | ---- | -----------
+int | [logic_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic_index) | 
 
 ### LogicDiceShop
 
+Used in [LogicList](#LogicList)
 Derived from [Logic](#Logic)
 
 
@@ -1087,6 +1112,7 @@ int | [balance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=balance
 
 ### LogicList
 
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1096,6 +1122,7 @@ Type | Name | Description
 
 ### LogicOlmecCutscene
 
+Used in [LogicList](#LogicList)
 Derived from [Logic](#Logic)
 
 
@@ -1108,6 +1135,7 @@ int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) |
 
 ### LogicTiamatCutscene
 
+Used in [LogicList](#LogicList)
 Derived from [Logic](#Logic)
 
 
@@ -1135,6 +1163,7 @@ print(message)
 
 ```
 
+Can be accessed via global [online](#online)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1144,6 +1173,7 @@ OnlinePlayerShort | [local_player](https://github.com/spelunky-fyi/overlunky/sea
 
 ### OnlineLobby
 
+Used in [Online](#Online)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1152,6 +1182,7 @@ string | [get_code()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g
 
 ### OnlinePlayer
 
+Used in [Online](#Online)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1164,6 +1195,7 @@ string | [player_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 
 ### Particle
 
+Used in [ParticleEmitterInfo](#ParticleEmitterInfo)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1179,6 +1211,7 @@ int | [max_lifetime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ma
 
 ### ParticleDB
 
+Used in [ParticleDB](#ParticleDB), [get_particle_type](#get_particle_type)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1215,6 +1248,8 @@ bool | [set_texture(int texture_id)](https://github.com/spelunky-fyi/overlunky/s
 
 ### ParticleEmitterInfo
 
+Generic type for creating particles in the game, you can make your own with [generate_world_particles](#generate_world_particles) or [generate_screen_particles](#generate_screen_particles)<br/>
+Used in [ScreenCharacterSelect](#ScreenCharacterSelect), [ScreenTitle](#ScreenTitle), [CursedEffect](#CursedEffect), [OnFireEffect](#OnFireEffect), [PoisonedEffect](#PoisonedEffect) ...
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2193,6 +2228,7 @@ float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inert
 
 ### GameManager
 
+Can be accessed via global[game_manager](#game_manager)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2225,6 +2261,7 @@ bool | [game_has_focus](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 
 ### Items
 
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2271,6 +2308,7 @@ int | [beg_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=beg_s
 
 ### SelectPlayerSlot
 
+Used in [Items](#Items)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2280,6 +2318,7 @@ int | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture
 
 ### StateMemory
 
+Can be accessed via global [state](#state)
 
 Type | Name | Description
 ---- | ---- | -----------

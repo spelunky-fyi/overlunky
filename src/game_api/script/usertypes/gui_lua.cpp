@@ -35,6 +35,9 @@ static PFN_XInputGetState g_XInputGetState = NULL;
 
 struct Gamepad : XINPUT_GAMEPAD
 {
+    /*
+    Flags wButtons; // just for the autodoc
+    */
     bool enabled;
 };
 
@@ -518,6 +521,7 @@ void register_usertypes(sol::state& lua)
         "y",
         &ImVec2::y);
 
+    /// Used in ImGuiIO
     lua.new_usertype<Gamepad>(
         "Gamepad",
         "enabled",
@@ -578,6 +582,14 @@ void register_usertypes(sol::state& lua)
         {
             return ImGui::IsKeyReleased((int)key);
         });
+    /// Used in [get_io](#get_io)
+    /// Function declarations:<br/>
+    /// bool keydown(int keycode)<br/>
+    /// bool keydown(char key)<br/>
+    /// bool keypressed(int keycode, bool repeat = false)<br/>
+    /// bool keypressed(char key, bool repeat = false)<br/>
+    /// bool keyreleased(int keycode)<br/>
+    /// bool keyreleased(char key)<br/>
     lua.new_usertype<ImGuiIO>(
         "ImGuiIO",
         "displaysize",
@@ -619,7 +631,7 @@ void register_usertypes(sol::state& lua)
         "mousewheel",
         &ImGuiIO::MouseWheel,
         "gamepad",
-        sol::property([]()
+        sol::property([]() -> Gamepad
                       {
                           g_WantUpdateHasGamepad = true;
                           return get_gamepad() /**/; }));
@@ -629,7 +641,7 @@ void register_usertypes(sol::state& lua)
     /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
     /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
     /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
-    /// - Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+    /// - Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
     // lua["get_io"] = []() -> ImGuiIO
     lua["get_io"] = ImGui::GetIO;
     /// Deprecated
