@@ -163,9 +163,9 @@ void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
     }
 }
 
-using OnInstaGibFun = void(Entity*, size_t);
+using OnInstaGibFun = void(Entity*, bool);
 OnInstaGibFun* g_on_instagib_trampoline{nullptr};
-void on_instagib(Entity* victim, size_t unknown)
+void on_instagib(Entity* victim, bool destroy_corpse)
 {
     if (g_godmode_player_active && is_active_player(victim))
     {
@@ -195,7 +195,7 @@ void on_instagib(Entity* victim, size_t unknown)
 
     if (!skip_orig)
     {
-        g_on_instagib_trampoline(victim, unknown);
+        g_on_instagib_trampoline(victim, destroy_corpse);
     }
 }
 

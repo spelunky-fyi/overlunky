@@ -1198,9 +1198,10 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "insta_gib"sv,
+        // This should be just called/jumped to at the end of kill virtual fror the CHAR_* entity
         // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
         // Or write bp on Movable::health, the next function after setting it to 0 should be this one
-        // then place yourself in Quillback's path
+        // then die to a ghost
         PatternCommandBuffer{}
             .find_inst("80 79 19 00 74 04"_gh)
             .at_exe()

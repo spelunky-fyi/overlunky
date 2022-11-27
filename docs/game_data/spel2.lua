@@ -2138,7 +2138,7 @@ local function PRNG_random(self, min, max) end
     ---@field offsetx number
     ---@field offsety number
     ---@field rendering_info RenderInfo
-    ---@field user_data any @user_data
+    ---@field user_data any
     ---@field topmost fun(self): Entity
     ---@field topmost_mount fun(self): Entity
     ---@field overlaps_with Entity_overlaps_with
