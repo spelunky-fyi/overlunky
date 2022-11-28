@@ -6,7 +6,9 @@
 #include <fmt/format.h> // for format_error
 #include <list>         // for _List_iterator, _List_co...
 #include <sol/sol.hpp>  // for table_proxy, optional
+#include <stack>        // for stack
 #include <tuple>        // for get
+#include <vector>       // for vector
 
 #include "aliases.hpp"                      // for IMAGE, JournalPageType
 #include "constants.hpp"                    // for no_return_str
@@ -1476,8 +1478,16 @@ std::optional<LuaBackend::LockedBackend> LuaBackend::get_backend_by_id_safe(std:
     return std::nullopt;
 }
 
-LuaBackend* g_CallingBackend{nullptr};
-uint32_t g_CallingBackendRecurse{0};
+// A callstack may end up as something like:
+//  - backend: update
+//  - script0: update
+//  - script0: spawn_entity
+//  - backend: post_entity_spawn
+//  - script1: callback
+//  > script1: errors...
+//      if we were not using a stack here the error
+//      would propagate to script0 instead of script1
+std::stack<LuaBackend*, std::vector<LuaBackend*>> g_CallingBackend{};
 LuaBackend::LockedBackend LuaBackend::get_calling_backend()
 {
     return LuaBackend::get_backend(get_calling_backend_id());
@@ -1486,9 +1496,9 @@ std::string LuaBackend::get_calling_backend_id()
 {
     std::lock_guard global_lock{global_lua_lock};
 
-    if (g_CallingBackend)
+    if (!g_CallingBackend.empty())
     {
-        return g_CallingBackend->get_path();
+        return g_CallingBackend.top()->get_path();
     }
 
     static const sol::state& lua = get_lua_vm();
@@ -1512,22 +1522,12 @@ std::string LuaBackend::get_calling_backend_id()
 void LuaBackend::push_calling_backend(LuaBackend* calling_backend)
 {
     std::lock_guard global_lock{global_lua_lock};
-    assert(g_CallingBackendRecurse == 0 || g_CallingBackend == calling_backend);
-    if (g_CallingBackendRecurse == 0)
-    {
-        g_CallingBackend = calling_backend;
-    }
-    g_CallingBackendRecurse++;
+    g_CallingBackend.push(calling_backend);
 }
 void LuaBackend::pop_calling_backend([[maybe_unused]] LuaBackend* calling_backend)
 {
     std::lock_guard global_lock{global_lua_lock};
-    assert(g_CallingBackendRecurse != 0 && g_CallingBackend == calling_backend);
-    g_CallingBackendRecurse--;
-    if (g_CallingBackendRecurse == 0)
-    {
-        g_CallingBackend = nullptr;
-    }
+    g_CallingBackend.pop();
 }
 
 /**
