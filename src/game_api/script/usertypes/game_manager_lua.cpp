@@ -49,7 +49,7 @@ void register_usertypes(sol::state& lua)
         "death_transition",
         &BackgroundMusic::death_transition);
 
-    /// Can be accessed via global[game_manager](#game_manager)
+    /// Can be accessed via global [game_manager](#game_manager)
     auto gamemanager_type = lua.new_usertype<GameManager>("GameManager");
     gamemanager_type["music"] = &GameManager::music;
     gamemanager_type["game_props"] = &GameManager::game_props;

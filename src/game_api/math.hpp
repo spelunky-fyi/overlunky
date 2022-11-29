@@ -331,9 +331,14 @@ struct Quad
 
         return *this;
     }
-
+    /*
     /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
     std::tuple<Vec2, Vec2, Vec2, Vec2> split()
+    {} // just for the autodoc
+    */
+
+    /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
+    operator std::tuple<Vec2, Vec2, Vec2, Vec2>()
     {
         return {{bottom_left_x, bottom_left_y}, {bottom_right_x, bottom_right_y}, {top_right_x, top_right_y}, {top_left_x, top_left_y}};
     }
