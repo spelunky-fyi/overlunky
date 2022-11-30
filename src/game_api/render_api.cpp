@@ -14,7 +14,7 @@
 #include "entity.hpp"             // for Entity, EntityDB
 #include "level_api.hpp"          // for ThemeInfo
 #include "logger.h"               // for DEBUG
-#include "memory.hpp"             // for read_u64, to_le_bytes, write_mem_prot
+#include "memory.hpp"             // for memory_read, to_le_bytes, write_mem_prot
 #include "screen.hpp"             //
 #include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
 #include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
@@ -39,12 +39,12 @@ RenderAPI& RenderAPI::get()
 
 size_t RenderAPI::renderer() const
 {
-    return read_u64(*api + 0x10);
+    return memory_read<uint64_t>(*api + 0x10);
 }
 
 size_t RenderAPI::swap_chain() const
 {
-    return read_u64(renderer() + swap_chain_off);
+    return memory_read<uint64_t>(renderer() + swap_chain_off);
 }
 
 void (*g_post_render_game)(){nullptr};
@@ -305,11 +305,7 @@ bool& get_journal_enabled()
 
 bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
 {
-    static size_t text_rendering_func1_offset = 0;
-    if (text_rendering_func1_offset == 0)
-    {
-        text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
-    }
+    static size_t text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
 
     if (text_rendering_func1_offset != 0)
     {
@@ -355,11 +351,7 @@ void RenderAPI::draw_text(const std::string& text, float x, float y, float scale
         return;
     }
 
-    static size_t text_rendering_func2_offset = 0;
-    if (text_rendering_func2_offset == 0)
-    {
-        text_rendering_func2_offset = get_address("draw_text"sv);
-    }
+    static size_t text_rendering_func2_offset = get_address("draw_text"sv);
 
     if (text_rendering_func2_offset != 0)
     {
@@ -420,13 +412,8 @@ void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Co
 
 void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader)
 {
-    static size_t func_offset = 0;
-    static size_t param_7 = 0;
-    if (func_offset == 0)
-    {
-        func_offset = get_address("draw_world_texture"sv);
-        param_7 = get_address("draw_world_texture_param_7"sv);
-    }
+    static const size_t func_offset = get_address("draw_world_texture"sv);
+    static const size_t param_7 = get_address("draw_world_texture_param_7"sv);
 
     if (func_offset != 0)
     {
@@ -470,7 +457,7 @@ void RenderAPI::set_advanced_hud()
 void RenderAPI::reload_shaders()
 {
     using ReloadShadersFun = void(size_t);
-    ReloadShadersFun* reload_shaders_impl = (ReloadShadersFun*)get_address("reload_shaders"sv);
+    static ReloadShadersFun* reload_shaders_impl = (ReloadShadersFun*)get_address("reload_shaders"sv);
     reload_shaders_impl(renderer());
 }
 

@@ -16,7 +16,7 @@
 #include "items.hpp"             // for Items, SelectPlayerSlot
 #include "level_api.hpp"         // for LevelGenSystem, LevelGenSystem::(ano...
 #include "logger.h"              // for DEBUG
-#include "memory.hpp"            // for write_mem_prot, read_u64, read_u8
+#include "memory.hpp"            // for write_mem_prot, memory_read
 #include "movable.hpp"           // for Movable
 #include "movable_behavior.hpp"  // for init_behavior_hooks
 #include "render_api.hpp"        // for init_render_api_hooks
@@ -163,9 +163,9 @@ void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
     }
 }
 
-using OnInstaGibFun = void(Entity*, size_t);
+using OnInstaGibFun = void(Entity*, bool);
 OnInstaGibFun* g_on_instagib_trampoline{nullptr};
-void on_instagib(Entity* victim, size_t unknown)
+void on_instagib(Entity* victim, bool destroy_corpse)
 {
     if (g_godmode_player_active && is_active_player(victim))
     {
@@ -195,7 +195,7 @@ void on_instagib(Entity* victim, size_t unknown)
 
     if (!skip_orig)
     {
-        g_on_instagib_trampoline(victim, unknown);
+        g_on_instagib_trampoline(victim, destroy_corpse);
     }
 }
 
@@ -270,7 +270,7 @@ State& State::get()
 
 StateMemory* State::ptr_main() const
 {
-    OnHeapPointer<StateMemory> p(read_u64(location));
+    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
     return p.decode();
 }
 
@@ -281,7 +281,7 @@ StateMemory* State::ptr() const
 
 StateMemory* State::ptr_local() const
 {
-    OnHeapPointer<StateMemory> p(read_u64(location));
+    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
     return p.decode_local();
 }
 
@@ -305,20 +305,20 @@ std::pair<float, float> State::screen_position(float x, float y)
 
 size_t State::get_zoom_level_address()
 {
-    size_t obj1 = get_address("zoom_level");
-
-    size_t obj2 = read_u64(obj1);
+    static const size_t obj1 = get_address("zoom_level");
+    static const size_t zoom_level_offset = get_address("zoom_level_offset");
+    size_t obj2 = memory_read<uint64_t>(obj1);
     if (obj2 == 0)
     {
         return 0;
     }
 
-    size_t obj3 = read_u64(obj2 + 0x10);
+    size_t obj3 = memory_read<uint64_t>(obj2 + 0x10);
     if (obj3 == 0)
     {
         return 0;
     }
-    return obj3 + get_address("zoom_level_offset");
+    return obj3 + zoom_level_offset;
 }
 
 float State::get_zoom_level()
@@ -333,7 +333,7 @@ float State::get_zoom_level()
         }
         offset = addr;
     }
-    return read_f32(offset);
+    return memory_read<float>(offset);
 }
 
 void State::zoom(float level)
@@ -374,11 +374,16 @@ void State::zoom(float level)
 
     const auto level_str = to_le_bytes(level);
 
+    static const auto zoom_level = get_address("default_zoom_level");
+    static const auto zoom_shop = get_address("default_zoom_level_shop");
+    static const auto zoom_camp = get_address("default_zoom_level_camp");
+    static const auto zoom_telescope = get_address("default_zoom_level_telescope");
+
     // overwrite the defaults
-    write_mem_prot(get_address("default_zoom_level"), level_str, true);
-    write_mem_prot(get_address("default_zoom_level_shop"), level_str, true);
-    write_mem_prot(get_address("default_zoom_level_camp"), level_str, true);
-    write_mem_prot(get_address("default_zoom_level_telescope"), level_str, true);
+    write_mem_prot(zoom_level, level_str, true);
+    write_mem_prot(zoom_shop, level_str, true);
+    write_mem_prot(zoom_camp, level_str, true);
+    write_mem_prot(zoom_telescope, level_str, true);
 
     // overwrite the current value
     auto zla = get_zoom_level_address();
@@ -401,35 +406,24 @@ void StateMemory::force_current_theme(uint32_t t)
 
 void State::darkmode(bool g)
 {
-    static size_t addr_dark = 0;
-    static char original_instructions[2] = {0};
-    if (addr_dark == 0)
-    {
-        addr_dark = get_address("force_dark_level");
-        original_instructions[0] = read_u8(addr_dark);
-        original_instructions[1] = read_u8(addr_dark + 1);
-    }
+    static const size_t addr_dark = get_address("force_dark_level");
+
     if (g)
     {
-        write_mem_prot(addr_dark, ("\x90\x90"s), true);
+        write_mem_recoverable("darkmode", addr_dark, "\x90\x90"sv, true);
     }
     else
     {
-        write_mem_prot(addr_dark, std::string(original_instructions, 2), true);
+        recover_mem("darkmode");
     }
 }
 
 std::pair<float, float> State::get_camera_position()
 {
-    static size_t addr = 0;
-    if (addr == 0)
-    {
-        addr = get_address("camera_position");
-    }
-
-    auto cx = (float*)addr;
-    auto cy = (float*)(addr + 4);
-    return {*cx, *cy};
+    static const auto addr = (float*)get_address("camera_position");
+    auto cx = *addr;
+    auto cy = *(addr + 1);
+    return {cx, cy};
 }
 
 void State::set_camera_position(float cx, float cy)
@@ -599,11 +593,11 @@ LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
 
 uint32_t State::get_frame_count_main() const
 {
-    return read_u32((size_t)ptr_main() - 0xd0);
+    return memory_read<uint32_t>((size_t)ptr_main() - 0xd0);
 }
 uint32_t State::get_frame_count() const
 {
-    return read_u32((size_t)ptr() - 0xd0);
+    return memory_read<uint32_t>((size_t)ptr() - 0xd0);
 }
 
 std::vector<int64_t> State::read_prng() const
@@ -611,7 +605,7 @@ std::vector<int64_t> State::read_prng() const
     std::vector<int64_t> prng;
     for (int i = 0; i < 20; ++i)
     {
-        prng.push_back(read_i64((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
+        prng.push_back(memory_read<int64_t>((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
     }
     return prng;
 }

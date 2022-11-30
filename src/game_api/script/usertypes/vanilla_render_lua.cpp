@@ -214,7 +214,7 @@ void register_usertypes(sol::state& lua)
         }
     };
 
-    /// Force the LUT texture for the given layer (or both) until it is reset
+    /// Force the LUT texture for the given layer (or both) until it is reset.
     /// Pass `nil` in the first parameter to reset
     lua["set_lut"] = [](sol::optional<TEXTURE> texture_id, LAYER layer)
     {
@@ -246,6 +246,7 @@ void register_usertypes(sol::state& lua)
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color, WORLD_SHADER)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color, WORLD_SHADER)>(&VanillaRenderContext::draw_world_texture));
+    /// Used in [set_callback](#set_callback) ON.RENDER_* callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
     lua.new_usertype<VanillaRenderContext>(
         "VanillaRenderContext",
         "draw_text",

@@ -25,7 +25,7 @@ void register_usertypes(sol::state& lua)
     /// Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
     lua["force_journal"] = force_journal;
 
-    /// Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.
+    /// Open or close the journal as if pressing the journal button. Will respect visible journal popups and [force_journal](#force_journal).
     lua["toggle_journal"] = toggle_journal;
 
     /// Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
@@ -574,6 +574,7 @@ void register_usertypes(sol::state& lua)
         "fade_timer",
         &JournalUI::fade_timer);
 
+    /// Used in [set_callback](#set_callback) with ON.RENDER_POST_JOURNAL_PAGE
     lua.new_usertype<JournalPage>(
         "JournalPage",
         "background",

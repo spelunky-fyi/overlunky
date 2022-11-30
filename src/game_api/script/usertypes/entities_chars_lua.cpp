@@ -40,6 +40,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
+    /// Used in Player, PlayerGhost and Items
     auto inventory_type = lua.new_usertype<Inventory>("Inventory");
     inventory_type["money"] = &Inventory::money;
     inventory_type["bombs"] = &Inventory::bombs;
@@ -84,6 +85,7 @@ void register_usertypes(sol::state& lua)
     inventory_type["is_companion_cursed"] = &Inventory::is_companion_cursed;
     inventory_type["acquired_powerups"] = &Inventory::acquired_powerups;
 
+    /// Used in Player
     lua.new_usertype<Ai>(
         "Ai",
         "target",
