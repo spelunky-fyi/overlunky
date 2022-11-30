@@ -609,9 +609,6 @@
                             <a href="#replace_drop" class="toc-h3 toc-link" data-title="replace_drop">replace_drop</a>
                           </li>
                           <li>
-                            <a href="#set_blood_multiplication" class="toc-h3 toc-link" data-title="set_blood_multiplication">set_blood_multiplication</a>
-                          </li>
-                          <li>
                             <a href="#set_contents" class="toc-h3 toc-link" data-title="set_contents">set_contents</a>
                           </li>
                           <li>
@@ -1009,6 +1006,9 @@
                             <a href="#game_position" class="toc-h3 toc-link" data-title="game_position">game_position</a>
                           </li>
                           <li>
+                            <a href="#get_aabb_bounds" class="toc-h3 toc-link" data-title="get_aabb_bounds">get_aabb_bounds</a>
+                          </li>
+                          <li>
                             <a href="#get_bounds" class="toc-h3 toc-link" data-title="get_bounds">get_bounds</a>
                           </li>
                           <li>
@@ -1364,6 +1364,9 @@
                           </li>
                           <li>
                             <a href="#set_arrowtrap_projectile" class="toc-h3 toc-link" data-title="set_arrowtrap_projectile">set_arrowtrap_projectile</a>
+                          </li>
+                          <li>
+                            <a href="#set_blood_multiplication" class="toc-h3 toc-link" data-title="set_blood_multiplication">set_blood_multiplication</a>
                           </li>
                           <li>
                             <a href="#set_camera_position" class="toc-h3 toc-link" data-title="set_camera_position">set_camera_position</a>
@@ -3343,7 +3346,7 @@
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=players">players</a></p>
 </blockquote>
 
-<p>An array of <a href="#Player">Player</a> of the current players. This is just a list of existing <a href="#Player">Player</a> entities in order, i.e., <code>players[1]</code> is not guaranteed to be P1 if they have been gibbed for example. See get_player().</p>
+<p>An array of <a href="#Player">Player</a> of the current players. This is just a list of existing <a href="#Player">Player</a> entities in order, i.e., <code>players[1]</code> is not guaranteed to be P1 if they have been gibbed for example. See <a href="#get_player">get_player</a>.</p>
 <h3 id='savegame'>savegame</h3>
 <blockquote>
 <p>Print best time from savegame</p>
@@ -3354,7 +3357,7 @@
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=savegame">savegame</a></p>
 </blockquote>
 
-<p>Provides a read-only access to the save data, updated as soon as something changes (i.e. before it&#39;s written to savegame.sav.)</p>
+<p>Provides a read-only access to the save data, updated as soon as something changes (i.e. before it&#39;s written to savegame.sav.) or manually with <a href="#save_progress">save_progress</a></p>
 <h3 id='options'>options</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">register_option_bool</span><span class="p">(</span><span class="s2">"bomb_bag"</span><span class="p">,</span> <span class="s2">"BombBag"</span><span class="p">,</span> <span class="s2">"Spawn bomb bag at the start of every level"</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
 
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -3432,7 +3435,7 @@
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_callback">set_callback</a></p>
 </blockquote>
-<h4 id='CallbackId-set_callback-function-cb-int-screen'><a href="#Aliases">CallbackId</a> set_callback(function cb, int screen)</h4>
+<h4 id='CallbackId-set_callback-function-cb-ON-event'><a href="#Aliases">CallbackId</a> set_callback(function cb, <a href="#ON">ON</a> event)</h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_callback">clear_callback</a>.
 Add global callback function to be called on an <a href="#ON">event</a>.</p>
 <h3 id='set_global_interval'>set_global_interval</h3>
@@ -3479,8 +3482,8 @@ Sets a callback that is called right before an entity is damaged, return <code>t
 Note that damage_dealer can be nil ! (long fall, ...)
 DO NOT CALL <code>self:damage()</code> in the callback !
 Use this only when no other approach works, this call can be expensive if overused.
-Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.
-The callback signature is bool on_damage(<a href="#Entity">Entity</a> self, <a href="#Entity">Entity</a> damage_dealer, int damage_amount, float velocity_x, float velocity_y, int stun_amount, int iframes)</p>
+The entity has to be of a <a href="#Movable">Movable</a> type.
+<br/>The callback signature is bool on_damage(<a href="#Entity">Entity</a> self, <a href="#Entity">Entity</a> damage_dealer, int damage_amount, float vel_x, float vel_y, int stun_amount, int iframes)</p>
 <h3 id='set_on_destroy'>set_on_destroy</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_destroy">set_on_destroy</a></p>
@@ -3489,16 +3492,16 @@ The callback signature is bool on_damage(<a href="#Entity">Entity</a> self, <a h
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
 Sets a callback that is called right when an entity is destroyed, e.g. as if by <code>Entity.destroy()</code> before the game applies any side effects.
 Use this only when no other approach works, this call can be expensive if overused.
-The callback signature is nil on_destroy(<a href="#Entity">Entity</a> self)</p>
+<br/>The callback signature is nil on_destroy(<a href="#Entity">Entity</a> self)</p>
 <h3 id='set_on_kill'>set_on_kill</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_kill">set_on_kill</a></p>
 </blockquote>
 <h4 id='optional-lt-CallbackId-gt-set_on_kill-int-uid-function-fun'>optional&lt;<a href="#Aliases">CallbackId</a>&gt; set_on_kill(int uid, function fun)</h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
-Sets a callback that is called right when an entity is eradicated (killing monsters that leave a body behind will not trigger this), before the game applies any side effects.
+Sets a callback that is called right when an entity is eradicated, before the game applies any side effects.
 Use this only when no other approach works, this call can be expensive if overused.
-The callback signature is nil on_kill(<a href="#Entity">Entity</a> self, <a href="#Entity">Entity</a> killer)</p>
+<br/>The callback signature is nil on_kill(<a href="#Entity">Entity</a> self, <a href="#Entity">Entity</a> killer)</p>
 <h3 id='set_on_open'>set_on_open</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_open">set_on_open</a></p>
@@ -3508,7 +3511,7 @@ The callback signature is nil on_kill(<a href="#Entity">Entity</a> self, <a href
 Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
 Use this only when no other approach works, this call can be expensive if overused.
 Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.
-The callback signature is nil on_open(<a href="#Entity">Entity</a> entity_self, <a href="#Entity">Entity</a> opener)</p>
+<br/>The callback signature is nil on_open(<a href="#Entity">Entity</a> entity_self, <a href="#Entity">Entity</a> opener)</p>
 <h3 id='set_on_player_instagib'>set_on_player_instagib</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_player_instagib">set_on_player_instagib</a></p>
@@ -3519,7 +3522,7 @@ Sets a callback that is called right when an player/hired hand is crushed/insta-
 The game&#39;s instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity&#39;s health is zero.
 This is so that when the entity dies (from other causes), the death screen still gets shown.
 Use this only when no other approach works, this call can be expensive if overused.
-The callback signature is bool on_player_instagib(<a href="#Entity">Entity</a> self)</p>
+<br/>The callback signature is bool on_player_instagib(<a href="#Entity">Entity</a> self)</p>
 <h3 id='set_post_entity_spawn'>set_post_entity_spawn</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_entity_spawn">set_post_entity_spawn</a></p>
@@ -3527,7 +3530,7 @@ The callback signature is bool on_player_instagib(<a href="#Entity">Entity</a> s
 <h4 id='CallbackId-set_post_entity_spawn-function-cb-SPAWN_TYPE-flags-int-mask-variadic_args-entity_types'><a href="#Aliases">CallbackId</a> set_post_entity_spawn(function cb, <a href="#SPAWN_TYPE">SPAWN_TYPE</a> flags, int mask, variadic_args entity_types)</h4>
 <p>Add a callback for a spawn of specific entity types or mask. Set <code>mask</code> to <code>MASK.ANY</code> to ignore that.
 This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
-The callback signature is nil post_entity_spawn(<a href="#Entity">Entity</a> ent, <a href="#SPAWN_TYPE">SPAWN_TYPE</a> spawn_flags)</p>
+<br/>The callback signature is nil post_entity_spawn(<a href="#Entity">Entity</a> ent, <a href="#SPAWN_TYPE">SPAWN_TYPE</a> spawn_flags)</p>
 <h3 id='set_post_floor_update'>set_post_floor_update</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Use FLOOR_GENERIC from different themes in your level,</span>
 <span class="c1">-- with textures that update correctly when destroyed</span>
 
@@ -3564,7 +3567,7 @@ The callback signature is nil post_entity_spawn(<a href="#Entity">Entity</a> ent
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
 Sets a callback that is called right after a floor is updated (by killed neighbor).
 Use this only when no other approach works, this call can be expensive if overused.
-The callback signature is nil post_floor_update(<a href="#Entity">Entity</a> self)</p>
+<br/>The callback signature is nil post_floor_update(<a href="#Entity">Entity</a> self)</p>
 <h3 id='set_post_render'>set_post_render</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_render">set_post_render</a></p>
@@ -3573,7 +3576,7 @@ The callback signature is nil post_floor_update(<a href="#Entity">Entity</a> sel
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
 Sets a callback that is called right after the entity is rendered.
 Use this only when no other approach works, this call can be expensive if overused.
-The callback signature is nil post_render(<a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Entity">Entity</a> self)</p>
+<br/>The callback signature is nil post_render(<a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Entity">Entity</a> self)</p>
 <h3 id='set_post_render_screen'>set_post_render_screen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_render_screen">set_post_render_screen</a></p>
@@ -3581,7 +3584,7 @@ The callback signature is nil post_render(<a href="#VanillaRenderContext">Vanill
 <h4 id='optional-lt-CallbackId-gt-set_post_render_screen-int-screen_id-function-fun'>optional&lt;<a href="#Aliases">CallbackId</a>&gt; set_post_render_screen(int screen_id, function fun)</h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_screen_callback">clear_screen_callback</a> or <code>nil</code> if screen_id is not valid.
 Sets a callback that is called right after the screen is drawn.
-The callback signature is nil render_screen(<a href="#Screen">Screen</a> self, <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx)</p>
+<br/>The callback signature is nil render_screen(<a href="#Screen">Screen</a> self, <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx)</p>
 <h3 id='set_post_statemachine'>set_post_statemachine</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_statemachine">set_post_statemachine</a></p>
@@ -3592,7 +3595,7 @@ The callback signature is nil render_screen(<a href="#Screen">Screen</a> self, <
 Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. <code>animation_frame</code>).
 Use this only when no other approach works, this call can be expensive if overused.
 Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.
-The callback signature is nil statemachine(<a href="#Entity">Entity</a> self)</p>
+<br/>The callback signature is nil statemachine(<a href="#Entity">Entity</a> self)</p>
 <h3 id='set_pre_collision1'>set_pre_collision1</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_collision1">set_pre_collision1</a></p>
@@ -3602,7 +3605,7 @@ The callback signature is nil statemachine(<a href="#Entity">Entity</a> self)</p
 Sets a callback that is called right before the collision 1 event, return <code>true</code> to skip the game&#39;s collision handling.
 Use this only when no other approach works, this call can be expensive if overused.
 Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.
-The callback signature is bool pre_collision1(<a href="#Entity">Entity</a> entity_self, <a href="#Entity">Entity</a> collision_entity)</p>
+<br/>The callback signature is bool pre_collision1(<a href="#Entity">Entity</a> entity_self, <a href="#Entity">Entity</a> collision_entity)</p>
 <h3 id='set_pre_collision2'>set_pre_collision2</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_collision2">set_pre_collision2</a></p>
@@ -3612,7 +3615,7 @@ The callback signature is bool pre_collision1(<a href="#Entity">Entity</a> entit
 Sets a callback that is called right before the collision 2 event, return <code>true</code> to skip the game&#39;s collision handling.
 Use this only when no other approach works, this call can be expensive if overused.
 Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.
-The callback signature is bool pre_collision12(<a href="#Entity">Entity</a> self, <a href="#Entity">Entity</a> collision_entity)</p>
+<br/>The callback signature is bool pre_collision12(<a href="#Entity">Entity</a> self, <a href="#Entity">Entity</a> collision_entity)</p>
 <h3 id='set_pre_entity_spawn'>set_pre_entity_spawn</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_entity_spawn">set_pre_entity_spawn</a></p>
@@ -3621,7 +3624,7 @@ The callback signature is bool pre_collision12(<a href="#Entity">Entity</a> self
 <p>Add a callback for a spawn of specific entity types or mask. Set <code>mask</code> to <code>MASK.ANY</code> to ignore that.
 This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
 In many cases replacing the intended entity won&#39;t have the indended effect or will even break the game, so use only if you really know what you&#39;re doing.
-The callback signature is optional<int> pre_entity_spawn(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, float x, float y, int layer, <a href="#Entity">Entity</a> overlay_entity, <a href="#SPAWN_TYPE">SPAWN_TYPE</a> spawn_flags)</p>
+<br/>The callback signature is optional<int> pre_entity_spawn(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, float x, float y, int layer, <a href="#Entity">Entity</a> overlay_entity, <a href="#SPAWN_TYPE">SPAWN_TYPE</a> spawn_flags)</p>
 <h3 id='set_pre_floor_update'>set_pre_floor_update</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_floor_update">set_pre_floor_update</a></p>
@@ -3630,7 +3633,7 @@ The callback signature is optional<int> pre_entity_spawn(<a href="#ENT_TYPE">ENT
 <p>Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
 Sets a callback that is called right before a floor is updated (by killed neighbor), return <code>true</code> to skip the game&#39;s neighbor update handling.
 Use this only when no other approach works, this call can be expensive if overused.
-The callback signature is bool pre_floor_update(<a href="#Entity">Entity</a> self)</p>
+<br/>The callback signature is bool pre_floor_update(<a href="#Entity">Entity</a> self)</p>
 <h3 id='set_pre_render'>set_pre_render</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_render">set_pre_render</a></p>
@@ -3640,7 +3643,7 @@ The callback signature is bool pre_floor_update(<a href="#Entity">Entity</a> sel
 Sets a callback that is called right after the entity is rendered.
 Return <code>true</code> to skip the original rendering function and all later pre_render callbacks.
 Use this only when no other approach works, this call can be expensive if overused.
-The callback signature is bool render(<a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Entity">Entity</a> self)</p>
+<br/>The callback signature is bool render(<a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Entity">Entity</a> self)</p>
 <h3 id='set_pre_render_screen'>set_pre_render_screen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_render_screen">set_pre_render_screen</a></p>
@@ -3648,7 +3651,7 @@ The callback signature is bool render(<a href="#VanillaRenderContext">VanillaRen
 <h4 id='optional-lt-CallbackId-gt-set_pre_render_screen-int-screen_id-function-fun'>optional&lt;<a href="#Aliases">CallbackId</a>&gt; set_pre_render_screen(int screen_id, function fun)</h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_screen_callback">clear_screen_callback</a> or <code>nil</code> if screen_id is not valid.
 Sets a callback that is called right before the screen is drawn, return <code>true</code> to skip the default rendering.
-The callback signature is bool render_screen(<a href="#Screen">Screen</a> self, <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx)</p>
+<br/>The callback signature is bool render_screen(<a href="#Screen">Screen</a> self, <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx)</p>
 <h3 id='set_pre_statemachine'>set_pre_statemachine</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_statemachine">set_pre_statemachine</a></p>
@@ -3659,7 +3662,7 @@ The callback signature is bool render_screen(<a href="#Screen">Screen</a> self, 
 Sets a callback that is called right before the statemachine, return <code>true</code> to skip the statemachine update.
 Use this only when no other approach works, this call can be expensive if overused.
 Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.
-The callback signature is bool statemachine(<a href="#Entity">Entity</a> self)</p>
+<br/>The callback signature is bool statemachine(<a href="#Entity">Entity</a> self)</p>
 <h3 id='set_timeout'>set_timeout</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_timeout">set_timeout</a></p>
@@ -3676,7 +3679,7 @@ Add per level callback function to be called after <code>frames</code> engine fr
 Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any properties on the sound. Otherwise you may cause a deadlock.
-The callback signature is nil on_vanilla_sound(<a href="#PlayingSound">PlayingSound</a> sound)</p>
+<br/>The callback signature is nil on_vanilla_sound(<a href="#PlayingSound">PlayingSound</a> sound)</p>
 <h2 id='Debug-functions'>Debug functions</h2><h3 id='dump_network'>dump_network</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dump_network">dump_network</a></p>
@@ -3721,7 +3724,7 @@ The callback signature is nil on_vanilla_sound(<a href="#PlayingSound">PlayingSo
 </blockquote>
 <h4 id='nil-activate_sparktraps_hack-bool-activate'>nil activate_sparktraps_hack(bool activate)</h4>
 <p>Activate custom variables for speed and distance in the <code>ITEM_SPARK</code>
-note: because those the variables are custom and game does not initiate then, you need to do it yourself for each spark, recommending <code>set_post_entity_spawn</code>
+note: because those the variables are custom and game does not initiate them, you need to do it yourself for each spark, recommending <code>set_post_entity_spawn</code>
 default game values are: speed = -0.015, distance = 3.0</p>
 <h3 id='apply_entity_db'>apply_entity_db</h3>
 <blockquote>
@@ -3753,9 +3756,9 @@ However this function offsets <code>attachee</code> (so you don&#39;t have to) a
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_waddler_drop">change_waddler_drop</a></p>
 </blockquote>
 <h4 id='nil-change_waddler_drop-array-lt-ENT_TYPE-gt-ent_types'>nil change_waddler_drop(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; ent_types)</h4>
-<p>Change <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s spawned when <a href="#Waddler">Waddler</a> dies, by default there are 3:
-{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
-Max 255 types
+<p>Change <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s spawned when <a href="#Waddler">Waddler</a> dies, by default there are 3:<br/>
+{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}<br/>
+Max 255 types.
 Use empty table as argument to reset to the game default</p>
 <h3 id='drop'>drop</h3>
 <blockquote>
@@ -3774,7 +3777,7 @@ Use empty table as argument to reset to the game default</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=entity_get_items_by">entity_get_items_by</a></p>
 </blockquote>
 <h4 id='array-lt-int-gt-entity_get_items_by-int-uid-array-lt-ENT_TYPE-gt-entity_types-int-mask'>array&lt;int&gt; entity_get_items_by(int uid, array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask)</h4><h4 id='array-lt-int-gt-entity_get_items_by-int-uid-ENT_TYPE-entity_type-int-mask'>array&lt;int&gt; entity_get_items_by(int uid, <a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask)</h4>
-<p>Gets uids of entities attached to given entity uid. Use <code>entity_type</code> and <code>mask</code> to filter, set them to 0 to return all attached entities.</p>
+<p>Gets uids of entities attached to given entity uid. Use <code>entity_type</code> and <code>mask</code> (<a href="#MASK">MASK</a>) to filter, set them to 0 to return all attached entities.</p>
 <h3 id='entity_has_item_type'>entity_has_item_type</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=entity_has_item_type">entity_has_item_type</a></p>
@@ -3822,7 +3825,8 @@ Use empty table as argument to reset to the game default</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_at">get_entities_at</a></p>
 </blockquote>
 <h4 id='array-lt-int-gt-get_entities_at-array-lt-ENT_TYPE-gt-entity_types-int-mask-float-x-float-y-LAYER-layer-float-radius'>array&lt;int&gt; get_entities_at(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, float x, float y, <a href="#LAYER">LAYER</a> layer, float radius)</h4><h4 id='array-lt-int-gt-get_entities_at-ENT_TYPE-entity_type-int-mask-float-x-float-y-LAYER-layer-float-radius'>array&lt;int&gt; get_entities_at(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, float x, float y, <a href="#LAYER">LAYER</a> layer, float radius)</h4>
-<p>Get uids of matching entities inside some radius. Set <code>entity_type</code> or <code>mask</code> to <code>0</code> to ignore that, can also use table of entity_types</p>
+<p>Get uids of matching entities inside some radius (<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#MASK">MASK</a>). Set <code>entity_type</code> or <code>mask</code> to <code>0</code> to ignore that, can also use table of entity_types
+Recommended to always set the mask, even if you look for one entity type</p>
 <h3 id='get_entities_by'>get_entities_by</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- find all cavemen and give them bombs</span>
 <span class="c1">-- using a type and mask in get_entities_by speeds up the search, cause the api knows which bucket to search in</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">uid</span> <span class="k">in</span> <span class="nb">ipairs</span><span class="p">(</span><span class="n">get_entities_by</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_CAVEMAN</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">MONSTER</span><span class="p">,</span> <span class="n">LAYER</span><span class="p">.</span><span class="n">BOTH</span><span class="p">))</span> <span class="k">do</span>
@@ -3835,7 +3839,8 @@ Use empty table as argument to reset to the game default</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by">get_entities_by</a></p>
 </blockquote>
 <h4 id='array-lt-int-gt-get_entities_by-array-lt-ENT_TYPE-gt-entity_types-int-mask-LAYER-layer'>array&lt;int&gt; get_entities_by(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='array-lt-int-gt-get_entities_by-ENT_TYPE-entity_type-int-mask-LAYER-layer'>array&lt;int&gt; get_entities_by(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, <a href="#LAYER">LAYER</a> layer)</h4>
-<p>Get uids of entities by some conditions. Set <code>entity_type</code> or <code>mask</code> to <code>0</code> to ignore that, can also use table of entity_types</p>
+<p>Get uids of entities by some conditions (<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#MASK">MASK</a>). Set <code>entity_type</code> or <code>mask</code> to <code>0</code> to ignore that, can also use table of entity_types.
+Recommended to always set the mask, even if you look for one entity type</p>
 <h3 id='get_entities_by_type'>get_entities_by_type</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="kd">local</span> <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_SNAKE</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_BAT</span><span class="p">}</span>
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
     <span class="kd">local</span> <span class="n">uids</span> <span class="o">=</span> <span class="n">get_entities_by_type</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_SNAKE</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_BAT</span><span class="p">)</span>
@@ -3850,7 +3855,8 @@ Use empty table as argument to reset to the game default</p>
 </blockquote>
 <h4 id='array-lt-int-gt-get_entities_by_type-int-int'>array&lt;int&gt; get_entities_by_type(int, int...)</h4>
 <p>Get uids of entities matching id. This function is variadic, meaning it accepts any number of id&#39;s.
-You can even pass a table!</p>
+You can even pass a table!
+This function can be slower than the <a href="#get_entities_by">get_entities_by</a> with the mask parameter filled</p>
 <h3 id='get_entities_overlapping_hitbox'>get_entities_overlapping_hitbox</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_overlapping_hitbox">get_entities_overlapping_hitbox</a></p>
@@ -3867,7 +3873,7 @@ You can even pass a table!</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_name">get_entity_name</a></p>
 </blockquote>
-<h4 id='nil-get_entity_name-ENT_TYPE-type-optional-fallback_strategy'>nil get_entity_name(<a href="#ENT_TYPE">ENT_TYPE</a> type, optional<bool> fallback_strategy)</h4>
+<h4 id='string-get_entity_name-ENT_TYPE-type-optional-fallback_strategy'>string get_entity_name(<a href="#ENT_TYPE">ENT_TYPE</a> type, optional<bool> fallback_strategy)</h4>
 <p>Get localized name of an entity, pass <code>fallback_strategy</code> as <code>true</code> to fall back to the <code>ENT_TYPE.</code> enum name
 if the entity has no localized name</p>
 <h3 id='get_entity_type'>get_entity_type</h3>
@@ -3954,7 +3960,7 @@ Distance from center: if you go above 3.0 the game might crash because a spark m
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=poison_entity">poison_entity</a></p>
 </blockquote>
 <h4 id='nil-poison_entity-int-entity_uid'>nil poison_entity(int entity_uid)</h4>
-<p>Poisons entity, to cure poison set <code>poison_tick_timer</code> to -1</p>
+<p>Poisons entity, to cure poison set <a href="#Movable">Movable</a>.<code>poison_tick_timer</code> to -1</p>
 <h3 id='replace_drop'>replace_drop</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=replace_drop">replace_drop</a></p>
@@ -3962,19 +3968,13 @@ Distance from center: if you go above 3.0 the game might crash because a spark m
 <h4 id='nil-replace_drop-int-drop_id-ENT_TYPE-new_drop_entity_type'>nil replace_drop(int drop_id, <a href="#ENT_TYPE">ENT_TYPE</a> new_drop_entity_type)</h4>
 <p>Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(<a href="#DROP">DROP</a>.VAN_HORSING_DIAMOND, <a href="#ENT_TYPE">ENT_TYPE</a>.ITEM_PLASMACANNON))
 Use <code>0</code> as type to reset this drop to default, use <code>-1</code> as drop_id to reset all to default</p>
-<h3 id='set_blood_multiplication'>set_blood_multiplication</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_blood_multiplication">set_blood_multiplication</a></p>
-</blockquote>
-<h4 id='nil-set_blood_multiplication-int-default_multiplier-int-vladscape_multiplier'>nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)</h4>
-<p>Sets the multiplication factor for blood droplets upon death (default/no <a href="#Vlad">Vlad</a>&#39;s cape = 1, with <a href="#Vlad">Vlad</a>&#39;s cape = 2)
-Due to changes in 1.23.x only the <a href="#Vlad">Vlad</a>&#39;s cape value you provide will be used. The default is automatically <a href="#Vlad">Vlad</a>&#39;s cape value - 1</p>
 <h3 id='set_contents'>set_contents</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_contents">set_contents</a></p>
 </blockquote>
 <h4 id='nil-set_contents-int-uid-ENT_TYPE-item_entity_type'>nil set_contents(int uid, <a href="#ENT_TYPE">ENT_TYPE</a> item_entity_type)</h4>
-<p>Set the contents of <a href="#ENT_TYPE">ENT_TYPE</a>.ITEM_POT, <a href="#ENT_TYPE">ENT_TYPE</a>.ITEM_CRATE or <a href="#ENT_TYPE">ENT_TYPE</a>.ITEM_COFFIN <code>uid</code> to ENT_TYPE... <code>item_entity_type</code></p>
+<p>Set the contents of <a href="#Coffin">Coffin</a>, <a href="#Present">Present</a>, <a href="#Pot">Pot</a>, <a href="#Container">Container</a>
+Check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md">entity hierarchy list</a> for what the exact <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s can this function affect</p>
 <h3 id='set_cursepot_ghost_enabled'>set_cursepot_ghost_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_cursepot_ghost_enabled">set_cursepot_ghost_enabled</a></p>
@@ -4186,7 +4186,8 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_image">create_image</a></p>
 </blockquote>
 <h4 id='tuple-lt-IMAGE-int-int-gt-create_image-string-path'>tuple&lt;IMAGE, int, int&gt; create_image(string path)</h4>
-<p>Create image from file. Returns a tuple containing id, width and height.</p>
+<p>Create image from file. Returns a tuple containing id, width and height.
+Depending on the image size, this can take a moment, preferably don&#39;t create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts</p>
 <h3 id='disable_floor_embeds'>disable_floor_embeds</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=disable_floor_embeds">disable_floor_embeds</a></p>
@@ -4258,8 +4259,8 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=grow_chainandblocks">grow_chainandblocks</a></p>
 </blockquote>
 <h4 id='bool-grow_chainandblocks'>bool grow_chainandblocks()</h4><h4 id='bool-grow_chainandblocks-int-x-int-y'>bool grow_chainandblocks(int x, int y)</h4>
-<p>Grow chains from <code>CHAIN_CEILING</code> and chain with blocks on it from <code>CHAINANDBLOCKS_CEILING</code>, it starts looking for the ceilings from the top left corner of a level
-To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x &lt; 10, with y = 10 it&#39;s ceilings that have y &gt; (level bound top - 10)</p>
+<p>Grow chains from <code>ENT_TYPE_FLOOR_CHAIN_CEILING</code> and chain with blocks on it from <code>ENT_TYPE_FLOOR_CHAINANDBLOCKS_CEILING</code>, it starts looking for the ceilings from the top left corner of a level.
+To limit it use the parameters, so x = 10 will only grow chains from ceilings with x &lt; 10, with y = 10 it&#39;s ceilings that have y &gt; (level bound top - 10)</p>
 <h3 id='grow_poles'>grow_poles</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=grow_poles">grow_poles</a></p>
@@ -4296,13 +4297,13 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_death_screen">load_death_screen</a></p>
 </blockquote>
 <h4 id='nil-load_death_screen'>nil load_death_screen()</h4>
-<p>Immediately ends the run with the death screen, also calls the save_progress</p>
+<p>Immediately ends the run with the death screen, also calls the <a href="#save_progress">save_progress</a></p>
 <h3 id='load_screen'>load_screen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_screen">load_screen</a></p>
 </blockquote>
 <h4 id='nil-load_screen'>nil load_screen()</h4>
-<p>Immediately load a screen based on state.screen_next and stuff</p>
+<p>Immediately load a screen based on <a href="#state">state</a>.screen_next and stuff</p>
 <h3 id='lowbias32'>lowbias32</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lowbias32">lowbias32</a></p>
@@ -4320,9 +4321,9 @@ To limit it use the parameters, so if you set x to 10, it will only grow chains 
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></p>
 </blockquote>
 <h4 id='nil-pause-bool-p'>nil pause(bool p)</h4>
-<p>Enable/disable game engine pause.
+<p>Pause/unpause the game.
 This is just short for <code>state.pause == 32</code>, but that produces an audio bug
-I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <code>state.pause == 16</code> will do the same but <code>set_global_interval</code> will still work</p>
+I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <code>state.pause == 16</code> will do the same but <a href="#set_global_interval">set_global_interval</a> will still work</p>
 <h3 id='register_console_command'>register_console_command</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=register_console_command">register_console_command</a></p>
@@ -4459,7 +4460,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=toggle_journal">toggle_journal</a></p>
 </blockquote>
 <h4 id='nil-toggle_journal'>nil toggle_journal()</h4>
-<p>Open or close the journal as if pressing the journal button. Will respect visible journal popups and force_journal.</p>
+<p>Open or close the journal as if pressing the journal button. Will respect visible journal popups and <a href="#force_journal">force_journal</a>.</p>
 <h3 id='update_liquid_collision_at'>update_liquid_collision_at</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=update_liquid_collision_at">update_liquid_collision_at</a></p>
@@ -4476,12 +4477,15 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_io">get_io</a></p>
 </blockquote>
-<h4 id='Access-via-get_io'>// Access via get_io()</h4>
-<p>Returns: <a href="#ImGuiIO">ImGuiIO</a> for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
-- Note: The clicked/pressed actions only make sense in <code>ON.GUIFRAME</code>.
-- Note: Lua starts indexing at 1, you need <code>keysdown[string.byte(&#39;A&#39;) + 1]</code> to find the A key.
-- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
-- Note: <code>gamepad</code> is basically <a href="https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad">XINPUT_GAMEPAD</a> but variables are renamed and values are normalized to -1.0..1.0 range.</p>
+<h4 id='ImGuiIO-get_io'><a href="#ImGuiIO">ImGuiIO</a> get_io()</h4>
+<p>Returns: <a href="#ImGuiIO">ImGuiIO</a> for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.</p>
+
+<ul>
+<li>Note: The clicked/pressed actions only make sense in <code>ON.GUIFRAME</code>.</li>
+<li>Note: Lua starts indexing at 1, you need <code>keysdown[string.byte(&#39;A&#39;) + 1]</code> to find the A key.</li>
+<li>Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.</li>
+<li>Note: <a href="#Gamepad">Gamepad</a> is basically <a href="https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad">XINPUT_GAMEPAD</a> but variables are renamed and values are normalized to -1.0..1.0 range.</li>
+</ul>
 <h3 id='mouse_position'>mouse_position</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mouse_position">mouse_position</a></p>
@@ -4511,7 +4515,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_illumination">create_illumination</a></p>
 </blockquote>
 <h4 id='Illumination-create_illumination-Color-color-float-size-float-x-float-y'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Color">Color</a> color, float size, float x, float y)</h4><h4 id='Illumination-create_illumination-Color-color-float-size-int-uid'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Color">Color</a> color, float size, int uid)</h4>
-<p>Creates a new <a href="#Illumination">Illumination</a>. Don&#39;t forget to continuously call <code>refresh_illumination</code>, otherwise your light emitter fades out! Check out the illumination.lua script for an example</p>
+<p>Creates a new <a href="#Illumination">Illumination</a>. Don&#39;t forget to continuously call <a href="#refresh_illumination">refresh_illumination</a>, otherwise your light emitter fades out! Check out the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua">illumination.lua</a> script for an example</p>
 <h3 id='refresh_illumination'>refresh_illumination</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=refresh_illumination">refresh_illumination</a></p>
@@ -4647,8 +4651,9 @@ be returned instead.</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=register_option_callback">register_option_callback</a></p>
 </blockquote>
 <h4 id='nil-register_option_callback-string-name-object-value-function-on_render'>nil register_option_callback(string name, object value, function on_render)</h4>
-<p>Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to <code>options[name]</code> or overwriting the whole <code>options</code> table if using and empty name. <code>value</code> is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
-The callback signature is optional<any> on_render(<a href="#GuiDrawContext">GuiDrawContext</a> draw_ctx)</p>
+<p>Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to <code>options[name]</code> or overwriting the whole <code>options</code> table if using and empty name.
+<code>value</code> is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+<br/>The callback signature is optional<any> on_render(<a href="#GuiDrawContext">GuiDrawContext</a> draw_ctx)</p>
 <h3 id='register_option_combo'>register_option_combo</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=register_option_combo">register_option_combo</a></p>
@@ -4752,6 +4757,12 @@ limits, you can override them in the UI with double click.</p>
 </blockquote>
 <h4 id='tuple-lt-float-float-gt-game_position-float-x-float-y'>tuple&lt;float, float&gt; game_position(float x, float y)</h4>
 <p>Get the game coordinates at the screen position (<code>x</code>, <code>y</code>)</p>
+<h3 id='get_aabb_bounds'>get_aabb_bounds</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_aabb_bounds">get_aabb_bounds</a></p>
+</blockquote>
+<h4 id='AABB-get_aabb_bounds'><a href="#AABB">AABB</a> get_aabb_bounds()</h4>
+<p>Same as <a href="#get_bounds">get_bounds</a> but returns <a href="#AABB">AABB</a> struct instead of loose floats</p>
 <h3 id='get_bounds'>get_bounds</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Draw the level boundaries</span>
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">draw_ctx</span><span class="p">)</span>
     <span class="kd">local</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span> <span class="o">=</span> <span class="n">get_bounds</span><span class="p">()</span>
@@ -4766,7 +4777,7 @@ limits, you can override them in the UI with double click.</p>
 </blockquote>
 <h4 id='tuple-lt-float-float-float-float-gt-get_bounds'>tuple&lt;float, float, float, float&gt; get_bounds()</h4>
 <p>Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
-inside these boundaries. The order is: top left x, top left y, bottom right x, bottom right y</p>
+inside these boundaries. The order is: left x, top y, right x, bottom y</p>
 <h3 id='get_camera_position'>get_camera_position</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_camera_position">get_camera_position</a></p>
@@ -4857,7 +4868,7 @@ you&#39;re standing on, not real level coordinates.</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_room_template">define_room_template</a></p>
 </blockquote>
 <h4 id='int-define_room_template-string-room_template-ROOM_TEMPLATE_TYPE-type'>int define_room_template(string room_template, <a href="#ROOM_TEMPLATE_TYPE">ROOM_TEMPLATE_TYPE</a> type)</h4>
-<p>Define a new room remplate to use with <code>set_room_template</code></p>
+<p>Define a new room template to use with <code>set_room_template</code></p>
 <h3 id='get_room_index'>get_room_index</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_room_index">get_room_index</a></p>
@@ -4924,24 +4935,25 @@ you&#39;re standing on, not real level coordinates.</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_roomowner">spawn_roomowner</a></p>
 </blockquote>
 <h4 id='int-spawn_roomowner-ENT_TYPE-owner_type-float-x-float-y-LAYER-layer-ROOM_TEMPLATE-room_template-1'>int spawn_roomowner(<a href="#ENT_TYPE">ENT_TYPE</a> owner_type, float x, float, y, <a href="#LAYER">LAYER</a> layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template = -1)</h4>
-<p>Spawn a <a href="#RoomOwner">RoomOwner</a> (or a few other like CavemanShopkeeper) in the coordinates and make them own the room, optionally changing the room template. Returns the <a href="#RoomOwner">RoomOwner</a> uid.</p>
+<p>Spawn a <a href="#RoomOwner">RoomOwner</a> (or a few other like <a href="#CavemanShopkeeper">CavemanShopkeeper</a>) in the coordinates and make them own the room, optionally changing the room template. Returns the <a href="#RoomOwner">RoomOwner</a> uid.</p>
 <h2 id='Shop-functions'>Shop functions</h2><h3 id='add_item_to_shop'>add_item_to_shop</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_item_to_shop">add_item_to_shop</a></p>
 </blockquote>
 <h4 id='nil-add_item_to_shop-int-item_uid-int-shop_owner_uid'>nil add_item_to_shop(int item_uid, int shop_owner_uid)</h4>
-<p>Adds entity as shop item, has to be movable (haven&#39;t tested many)</p>
+<p>Adds entity as shop item, has to be of <a href="#Purchasable">Purchasable</a> type, check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md">entity hierarchy list</a> to find all the <a href="#Purchasable">Purchasable</a> entity types.
+Adding other entities will result in not obtainable items or game crash</p>
 <h3 id='change_diceshop_prizes'>change_diceshop_prizes</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_diceshop_prizes">change_diceshop_prizes</a></p>
 </blockquote>
 <h4 id='nil-change_diceshop_prizes-array-lt-ENT_TYPE-gt-ent_types'>nil change_diceshop_prizes(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; ent_types)</h4>
-<p>Change <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s spawned in dice shops (Madame Tusk as well), by default there are 25:
+<p>Change <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s spawned in dice shops (Madame Tusk as well), by default there are 25:<br/>
 {ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
 ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
-ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
-Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher &quot;spawn chance&quot;)
-If you use this function in the level with diceshop in it, you have to update <code>item_ids</code> in the <a href="#PrizeDispenser">ITEM_DICE_PRIZE_DISPENSER</a>
+ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}<br/>
+Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher &quot;spawn chance&quot;).
+If you use this function in the level with diceshop in it, you have to update <code>item_ids</code> in the <a href="#PrizeDispenser">ITEM_DICE_PRIZE_DISPENSER</a>.
 Use empty table as argument to reset to the game default</p>
 <h3 id='is_inside_active_shop_room'>is_inside_active_shop_room</h3>
 <blockquote>
@@ -4976,7 +4988,7 @@ Use empty table as argument to reset to the game default</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_shopkeeper">spawn_shopkeeper</a></p>
 </blockquote>
 <h4 id='int-spawn_shopkeeper-float-x-float-y-LAYER-layer-ROOM_TEMPLATE-room_template-ROOM_TEMPLATE-SHOP'>int spawn_shopkeeper(float x, float, y, <a href="#LAYER">LAYER</a> layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template = <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a>.SHOP)</h4>
-<p>Spawn a <a href="#Shopkeeper">Shopkeeper</a> in the coordinates and make the room their shop. Returns the <a href="#Shopkeeper">Shopkeeper</a> uid. Also see spawn_roomowner.</p>
+<p>Spawn a <a href="#Shopkeeper">Shopkeeper</a> in the coordinates and make the room their shop. Returns the <a href="#Shopkeeper">Shopkeeper</a> uid. Also see <a href="#spawn_roomowner">spawn_roomowner</a>.</p>
 <h2 id='Sound-functions'>Sound functions</h2><h3 id='create_sound'>create_sound</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_sound">create_sound</a></p>
@@ -4998,18 +5010,18 @@ Use empty table as argument to reset to the game default</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_altar_damage_spawns">change_altar_damage_spawns</a></p>
 </blockquote>
 <h4 id='nil-change_altar_damage_spawns-array-lt-ENT_TYPE-gt-ent_types'>nil change_altar_damage_spawns(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; ent_types)</h4>
-<p>Change <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s spawned when you damage the altar, by default there are 6:
-{MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
-Max 255 types
+<p>Change <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s spawned when you damage the altar, by default there are 6:<br/>
+{MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}<br/>
+Max 255 types.
 Use empty table as argument to reset to the game default</p>
 <h3 id='change_sunchallenge_spawns'>change_sunchallenge_spawns</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_sunchallenge_spawns">change_sunchallenge_spawns</a></p>
 </blockquote>
 <h4 id='nil-change_sunchallenge_spawns-array-lt-ENT_TYPE-gt-ent_types'>nil change_sunchallenge_spawns(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; ent_types)</h4>
-<p>Change <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s spawned by <code>FLOOR_SUNCHALLENGE_GENERATOR</code>, by default there are 4:
-{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
-Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher &quot;spawn chance&quot;)
+<p>Change <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s spawned by <code>FLOOR_SUNCHALLENGE_GENERATOR</code>, by default there are 4:<br/>
+{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}<br/>
+Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher &quot;spawn chance&quot;).
 Use empty table as argument to reset to the game default</p>
 <h3 id='default_spawn_is_valid'>default_spawn_is_valid</h3>
 <blockquote>
@@ -5027,7 +5039,7 @@ The function <code>nil do_spawn(x, y, layer)</code> contains your code to spawn 
 The function <code>bool is_valid(x, y, layer)</code> determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set <code>is_valid</code> to <code>nil</code> in order to use the default rule (aka. on top of floor and not obstructed).
-To change the number of spawns use <code>PostRoomGenerationContext::set_num_extra_spawns</code> during <code>ON.POST_ROOM_GENERATION</code>
+To change the number of spawns use <code>PostRoomGenerationContext:set_num_extra_spawns</code> during <code>ON.POST_ROOM_GENERATION</code>
 No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.</p>
 <h3 id='define_procedural_spawn'>define_procedural_spawn</h3>
 <blockquote>
@@ -5123,7 +5135,7 @@ Uses level coordinates with <a href="#LAYER">LAYER</a>.FRONT and <a href="#LAYER
 </blockquote>
 <h4 id='int-spawn_entity-ENT_TYPE-entity_type-float-x-float-y-LAYER-layer-float-vx-float-vy'>int spawn_entity(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, float x, float y, <a href="#LAYER">LAYER</a> layer, float vx, float vy)</h4>
 <p>Spawn an entity in position with some velocity and return the uid of spawned entity.
-Uses level coordinates with <a href="#LAYER"><a href="#LAYER">LAYER</a>.FRONT</a> and <a href="#LAYER">LAYER</a>.BACK, but player-relative coordinates with <a href="#LAYER">LAYER</a>.PLAYERn.</p>
+Uses level coordinates with <a href="#LAYER"><a href="#LAYER">LAYER</a>.FRONT</a> and <a href="#LAYER">LAYER</a>.BACK, but player-relative coordinates with <a href="#LAYER">LAYER</a>.PLAYER(n), where (n) is a player number (1-4).</p>
 <h3 id='spawn_entity_nonreplaceable'>spawn_entity_nonreplaceable</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_entity_nonreplaceable">spawn_entity_nonreplaceable</a></p>
@@ -5190,7 +5202,7 @@ Returns uid of the base or -1 if it wasn&#39;t able to spawn</p>
 </blockquote>
 <h4 id='nil-spawn_player-int-player_slot-float-x-float-y'>nil spawn_player(int player_slot, float x, float y)</h4>
 <p>Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
-If you want to respawn a player that is a ghost, set in his inventory <code>health</code> to above 0, and <code>time_of_death</code> to 0 and call this function, the ghost entity will be removed automatically</p>
+If you want to respawn a player that is a ghost, set in his <a href="#Inventory">Inventory</a> <code>health</code> to above 0, and <code>time_of_death</code> to 0 and call this function, the ghost entity will be removed automatically</p>
 <h3 id='spawn_playerghost'>spawn_playerghost</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_playerghost">spawn_playerghost</a></p>
@@ -5236,7 +5248,7 @@ This edits custom string and in game strings but changing the language in settin
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clear_custom_name">clear_custom_name</a></p>
 </blockquote>
 <h4 id='nil-clear_custom_name-int-uid'>nil clear_custom_name(int uid)</h4>
-<p>Clears the name set with <code>add_custom_name</code></p>
+<p>Clears the name set with <a href="#add_custom_name">add_custom_name</a></p>
 <h3 id='enum_get_name'>enum_get_name</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enum_get_name">enum_get_name</a></p>
@@ -5260,7 +5272,7 @@ This edits custom string and in game strings but changing the language in settin
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_string">get_string</a></p>
 </blockquote>
 <h4 id='const-string-get_string-STRINGID-string_id'>const string get_string(<a href="#Aliases">STRINGID</a> string_id)</h4>
-<p>Get string behind <a href="#Aliases">STRINGID</a> (don&#39;t use stringid diretcly for vanilla string, use <code>hash_to_stringid</code> first)
+<p>Get string behind <a href="#Aliases">STRINGID</a>, don&#39;t use stringid diretcly for vanilla string, use <a href="#hash_to_stringid">hash_to_stringid</a> first
 Will return the string of currently choosen language</p>
 <h3 id='hash_to_stringid'>hash_to_stringid</h3>
 <blockquote>
@@ -5285,7 +5297,7 @@ Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_dat
 </blockquote>
 <h4 id='nil-set_level_string-string-str'>nil set_level_string(string str)</h4>
 <p>Set the level number shown in the hud and journal to any string. This is reset to the default &quot;%d-%d&quot; automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level.
-Use &quot;%d-%d&quot; to reset to default manually. Does not affect the &quot;...COMPLETED!&quot; message in transitions or lines in &quot;Dear Journal&quot;, you need to edit them separately with <code>change_string</code>.</p>
+Use &quot;%d-%d&quot; to reset to default manually. Does not affect the &quot;...COMPLETED!&quot; message in transitions or lines in &quot;Dear Journal&quot;, you need to edit them separately with <a href="#change_string">change_string</a>.</p>
 <h2 id='Texture-functions'>Texture functions</h2><h3 id='define_texture'>define_texture</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_texture">define_texture</a></p>
@@ -5311,7 +5323,7 @@ If a texture with the same definition already exists the texture will be reloade
 </blockquote>
 <h4 id='nil-reload_texture-string-texture_path'>nil reload_texture(string texture_path)</h4>
 <p>Reloads a texture from disk, use this only as a development tool for example in the console
-Note that <code>define_texture</code> will also reload the texture if it already exists</p>
+Note that <a href="#define_texture">define_texture</a> will also reload the texture if it already exists</p>
 <h3 id='reset_lut'>reset_lut</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=reset_lut">reset_lut</a></p>
@@ -5323,38 +5335,38 @@ Note that <code>define_texture</code> will also reload the texture if it already
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_lut">set_lut</a></p>
 </blockquote>
 <h4 id='nil-set_lut-optional-lt-TEXTURE-gt-texture_id-LAYER-layer'>nil set_lut(optional&lt;<a href="#TEXTURE">TEXTURE</a>&gt; texture_id, <a href="#LAYER">LAYER</a> layer)</h4>
-<p>Force the LUT texture for the given layer (or both) until it is reset
+<p>Force the LUT texture for the given layer (or both) until it is reset.
 Pass <code>nil</code> in the first parameter to reset</p>
 <h2 id='Theme-functions'>Theme functions</h2><h3 id='force_co_subtheme'>force_co_subtheme</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_co_subtheme">force_co_subtheme</a></p>
 </blockquote>
-<h4 id='nil-force_co_subtheme-int-subtheme'>nil force_co_subtheme(int subtheme)</h4>
-<p>Forces the theme of the next cosmic ocean level(s) (use e.g. <code>force_co_subtheme(COSUBTHEME.JUNGLE)</code>. Use <code>COSUBTHEME.RESET</code> to reset to default random behaviour)</p>
+<h4 id='nil-force_co_subtheme-COSUBTHEME-subtheme'>nil force_co_subtheme(<a href="#COSUBTHEME">COSUBTHEME</a> subtheme)</h4>
+<p>Forces the theme of the next cosmic ocean level(s) (use e.g. <code>force_co_subtheme(COSUBTHEME.JUNGLE)</code>. Use COSUBTHEME.RESET to reset to default random behaviour)</p>
 <h3 id='force_custom_subtheme'>force_custom_subtheme</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_custom_subtheme">force_custom_subtheme</a></p>
 </blockquote>
-<h4 id='nil-force_custom_subtheme'>nil force_custom_subtheme()</h4>
+<h4 id='nil-force_custom_subtheme-customtheme'>nil force_custom_subtheme(customtheme)</h4>
 <p>Force current subtheme used in the CO theme. You can pass a <a href="#CustomTheme">CustomTheme</a>, <a href="#ThemeInfo">ThemeInfo</a> or <a href="#THEME">THEME</a>. Not to be confused with force_co_subtheme.</p>
 <h3 id='force_custom_theme'>force_custom_theme</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_custom_theme">force_custom_theme</a></p>
 </blockquote>
-<h4 id='nil-force_custom_theme'>nil force_custom_theme()</h4>
+<h4 id='nil-force_custom_theme-customtheme'>nil force_custom_theme(customtheme)</h4>
 <p>Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a <a href="#CustomTheme">CustomTheme</a>, <a href="#ThemeInfo">ThemeInfo</a> or <a href="#THEME">THEME</a>.</p>
 <h3 id='get_co_subtheme'>get_co_subtheme</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_co_subtheme">get_co_subtheme</a></p>
 </blockquote>
-<h4 id='int-get_co_subtheme'>int get_co_subtheme()</h4>
-<p>Gets the sub theme of the current cosmic ocean level, returns <code>COSUBTHEME.NONE</code> if the current level is not a CO level.</p>
+<h4 id='COSUBTHEME-get_co_subtheme'><a href="#COSUBTHEME">COSUBTHEME</a> get_co_subtheme()</h4>
+<p>Gets the sub theme of the current cosmic ocean level, returns <a href="#COSUBTHEME">COSUBTHEME</a>.NONE if the current level is not a CO level.</p>
 <h2 id='Tile-code-functions'>Tile code functions</h2><h3 id='define_tile_code'>define_tile_code</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_tile_code">define_tile_code</a></p>
 </blockquote>
 <h4 id='TILE_CODE-define_tile_code-string-tile_code'><a href="#TILE_CODE">TILE_CODE</a> define_tile_code(string tile_code)</h4>
-<p>Define a new tile code, to make this tile code do anything you have to use either <code>set_pre_tile_code_callback</code> or <code>set_post_tile_code_callback</code>.
+<p>Define a new tile code, to make this tile code do anything you have to use either <a href="#set_pre_tile_code_callback">set_pre_tile_code_callback</a> or <a href="#set_post_tile_code_callback">set_post_tile_code_callback</a>.
 If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.</p>
 <h3 id='get_short_tile_code'>get_short_tile_code</h3>
 <blockquote>
@@ -5376,7 +5388,7 @@ If a user disables your script but still uses your level mod nothing will be spa
 <p>Add a callback for a specific tile code that is called after the game handles the tile code.
 Use this to affect what the game or other scripts spawned in this position.
 This is received even if a previous pre-tile-code-callback has returned true
-The callback signature is nil post_tile_code(float x, float y, int layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template)</p>
+<br/>The callback signature is nil post_tile_code(float x, float y, int layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template)</p>
 <h3 id='set_pre_tile_code_callback'>set_pre_tile_code_callback</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_tile_code_callback">set_pre_tile_code_callback</a></p>
@@ -5385,7 +5397,7 @@ The callback signature is nil post_tile_code(float x, float y, int layer, <a hre
 <p>Add a callback for a specific tile code that is called before the game handles the tile code.
 Return true in order to stop the game or scripts loaded after this script from handling this tile code.
 For example, when returning true in this callback set for <code>&quot;floor&quot;</code> then no floor will spawn in the game (unless you spawn it yourself)
-The callback signature is bool pre_tile_code(float x, float y, int layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template)</p>
+<br/>The callback signature is bool pre_tile_code(float x, float y, int layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template)</p>
 <h2 id='Deprecated-functions'>Deprecated functions</h2>
 <aside class='warning'>These functions still exist but their usage is discouraged, they all have alternatives mentioned here so please use those!</aside>
 <h3 id='on_frame'>on_frame</h3>
@@ -5467,7 +5479,14 @@ Set level flag 18 on post room generation instead, to properly force every level
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_arrowtrap_projectile">set_arrowtrap_projectile</a></p>
 </blockquote>
 <h4 id='nil-set_arrowtrap_projectile-ENT_TYPE-regular_entity_type-ENT_TYPE-poison_entity_type'>nil set_arrowtrap_projectile(<a href="#ENT_TYPE">ENT_TYPE</a> regular_entity_type, <a href="#ENT_TYPE">ENT_TYPE</a> poison_entity_type)</h4>
-<p>Use <code>replace_drop(DROP.ARROWTRAP_WOODENARROW, new_arrow_type)</code> and <code>replace_drop(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type)</code> instead</p>
+<p>Use <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.ARROWTRAP_WOODENARROW, new_arrow_type) and <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead</p>
+<h3 id='set_blood_multiplication'>set_blood_multiplication</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_blood_multiplication">set_blood_multiplication</a></p>
+</blockquote>
+<h4 id='nil-set_blood_multiplication-int-default_multiplier-int-vladscape_multiplier'>nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)</h4>
+<p>This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
+<code>default_multiplier</code> doesn&#39;t do anything due to some changes in last game updates, <code>vladscape_multiplier</code> only changes the multiplier to some entities death&#39;s blood spit</p>
 <h3 id='set_camera_position'>set_camera_position</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_camera_position">set_camera_position</a></p>
@@ -5499,7 +5518,7 @@ Set level flag 18 on post room generation instead, to properly force every level
 
 <p><code>INPUTS read_input(int uid)</code><br/>
 Use <code>players[1].input.buttons_gameplay</code> for only the inputs during the game, or <code>.buttons</code> for all the inputs, even during the pause menu
-Of course, you can get the player by other mean, it doesn&#39;t need to be the <code>players</code> table
+Of course, you can get the <a href="#Player">Player</a> by other mean, it doesn&#39;t need to be the <code>players</code> table
 You can only read inputs from actual players, HH don&#39;t have any inputs</p>
 <h3 id='read_stolen_input'>read_stolen_input</h3>
 <blockquote>
@@ -5521,183 +5540,185 @@ Use <code>state.player_inputs.player_slots[player_slot].buttons_gameplay</code> 
 </blockquote>
 
 <p><code>nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)</code><br/>
-Use <code>GuiDrawContext.draw_line</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.draw_line</code> instead</p>
 <h3 id='draw_rect'>draw_rect</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_rect">draw_rect</a></p>
 </blockquote>
 
 <p><code>nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)</code><br/>
-Use <code>GuiDrawContext.draw_rect</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.draw_rect</code> instead</p>
 <h3 id='draw_rect_filled'>draw_rect_filled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_rect_filled">draw_rect_filled</a></p>
 </blockquote>
 
 <p><code>nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)</code><br/>
-Use <code>GuiDrawContext.draw_rect_filled</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.draw_rect_filled</code> instead</p>
 <h3 id='draw_circle'>draw_circle</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_circle">draw_circle</a></p>
 </blockquote>
 
 <p><code>nil draw_circle(float x, float y, float radius, float thickness, uColor color)</code><br/>
-Use <code>GuiDrawContext.draw_circle</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.draw_circle</code> instead</p>
 <h3 id='draw_circle_filled'>draw_circle_filled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_circle_filled">draw_circle_filled</a></p>
 </blockquote>
 
 <p><code>nil draw_circle_filled(float x, float y, float radius, uColor color)</code><br/>
-Use <code>GuiDrawContext.draw_circle_filled</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.draw_circle_filled</code> instead</p>
 <h3 id='draw_text'>draw_text</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text</a></p>
 </blockquote>
 
 <p><code>nil draw_text(float x, float y, float size, string text, uColor color)</code><br/>
-Use <code>GuiDrawContext.draw_text</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.draw_text</code> instead</p>
 <h3 id='draw_image'>draw_image</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_image">draw_image</a></p>
 </blockquote>
 
 <p><code>nil draw_image(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)</code><br/>
-Use <code>GuiDrawContext.draw_image</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.draw_image</code> instead</p>
 <h3 id='draw_image_rotated'>draw_image_rotated</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_image_rotated">draw_image_rotated</a></p>
 </blockquote>
 
 <p><code>nil draw_image_rotated(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)</code><br/>
-Use <code>GuiDrawContext.draw_image_rotated</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.draw_image_rotated</code> instead</p>
 <h3 id='window'>window</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=window">window</a></p>
 </blockquote>
 
 <p><code>nil window(string title, float x, float y, float w, float h, bool movable, function callback)</code><br/>
-Use <code>GuiDrawContext.window</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.window</code> instead</p>
 <h3 id='win_text'>win_text</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_text">win_text</a></p>
 </blockquote>
 
 <p><code>nil win_text(string text)</code><br/>
-Use <code>GuiDrawContext.win_text</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_text</code> instead</p>
 <h3 id='win_separator'>win_separator</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_separator">win_separator</a></p>
 </blockquote>
 
 <p><code>nil win_separator()</code><br/>
-Use <code>GuiDrawContext.win_separator</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_separator</code> instead</p>
 <h3 id='win_inline'>win_inline</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_inline">win_inline</a></p>
 </blockquote>
 
 <p><code>nil win_inline()</code><br/>
-Use <code>GuiDrawContext.win_inline</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_inline</code> instead</p>
 <h3 id='win_sameline'>win_sameline</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_sameline">win_sameline</a></p>
 </blockquote>
 
 <p><code>nil win_sameline(float offset, float spacing)</code><br/>
-Use <code>GuiDrawContext.win_sameline</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_sameline</code> instead</p>
 <h3 id='win_button'>win_button</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_button">win_button</a></p>
 </blockquote>
 
 <p><code>bool win_button(string text)</code><br/>
-Use <code>GuiDrawContext.win_button</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_button</code> instead</p>
 <h3 id='win_input_text'>win_input_text</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_input_text">win_input_text</a></p>
 </blockquote>
 
 <p><code>string win_input_text(string label, string value)</code><br/>
-Use <code>GuiDrawContext.win_input_text</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_input_text</code> instead</p>
 <h3 id='win_input_int'>win_input_int</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_input_int">win_input_int</a></p>
 </blockquote>
 
 <p><code>int win_input_int(string label, int value)</code><br/>
-Use <code>GuiDrawContext.win_input_int</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_input_int</code> instead</p>
 <h3 id='win_input_float'>win_input_float</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_input_float">win_input_float</a></p>
 </blockquote>
 
 <p><code>float win_input_float(string label, float value)</code><br/>
-Use <code>GuiDrawContext.win_input_float</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_input_float</code> instead</p>
 <h3 id='win_slider_int'>win_slider_int</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_slider_int">win_slider_int</a></p>
 </blockquote>
 
 <p><code>int win_slider_int(string label, int value, int min, int max)</code><br/>
-Use <code>GuiDrawContext.win_slider_int</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_slider_int</code> instead</p>
 <h3 id='win_drag_int'>win_drag_int</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_drag_int">win_drag_int</a></p>
 </blockquote>
 
 <p><code>int win_drag_int(string label, int value, int min, int max)</code><br/>
-Use <code>GuiDrawContext.win_drag_int</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_drag_int</code> instead</p>
 <h3 id='win_slider_float'>win_slider_float</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_slider_float">win_slider_float</a></p>
 </blockquote>
 
 <p><code>float win_slider_float(string label, float value, float min, float max)</code><br/>
-Use <code>GuiDrawContext.win_slider_float</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_slider_float</code> instead</p>
 <h3 id='win_drag_float'>win_drag_float</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_drag_float">win_drag_float</a></p>
 </blockquote>
 
 <p><code>float win_drag_float(string label, float value, float min, float max)</code><br/>
-Use <code>GuiDrawContext.win_drag_float</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_drag_float</code> instead</p>
 <h3 id='win_check'>win_check</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_check">win_check</a></p>
 </blockquote>
 
 <p><code>bool win_check(string label, bool value)</code><br/>
-Use <code>GuiDrawContext.win_check</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_check</code> instead</p>
 <h3 id='win_combo'>win_combo</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_combo">win_combo</a></p>
 </blockquote>
 
 <p><code>int win_combo(string label, int selected, string opts)</code><br/>
-Use <code>GuiDrawContext.win_combo</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_combo</code> instead</p>
 <h3 id='win_pushid'>win_pushid</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_pushid">win_pushid</a></p>
 </blockquote>
 
 <p><code>nil win_pushid(int id)</code><br/>
-Use <code>GuiDrawContext.win_pushid</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_pushid</code> instead</p>
 <h3 id='win_popid'>win_popid</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_popid">win_popid</a></p>
 </blockquote>
 
 <p><code>nil win_popid()</code><br/>
-Use <code>GuiDrawContext.win_popid</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_popid</code> instead</p>
 <h3 id='win_image'>win_image</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_image">win_image</a></p>
 </blockquote>
 
 <p><code>nil win_image(IMAGE image, int width, int height)</code><br/>
-Use <code>GuiDrawContext.win_image</code> instead</p>
+Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead</p>
 <h1 id='Non-Entity-types'>Non-Entity types</h1><h2 id='Arena-types'>Arena types</h2><h3 id='ArenaConfigArenas'>ArenaConfigArenas</h3>
+<p>Used in <a href="#ArenaState">ArenaState</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -5907,6 +5928,8 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='ArenaConfigEquippedItems'>ArenaConfigEquippedItems</h3>
+<p>Used in <a href="#ArenaState">ArenaState</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -5956,6 +5979,8 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='ArenaConfigItems'>ArenaConfigItems</h3>
+<p>Used in <a href="#ArenaState">ArenaState</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6165,6 +6190,8 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='ArenaState'>ArenaState</h3>
+<p>Used in <a href="#StateMemory">StateMemory</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6332,6 +6359,8 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">GUIFRAME</span><span class="p">)</span>
 
 </code></pre></div>
+<p>Used in <a href="#register_option_callback">register_option_callback</a> and <a href="#set_callback">set_callback</a> with <a href="#ON">ON</a>.GUIFRAME</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6432,7 +6461,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=window">window(string title, float x, float y, float w, float h, bool movable, function callback)</a></td>
-<td>Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/><a href="https://github.com/ocornut/imgui/">ImGui</a> widgets, so read more about them there. Use screen position and distance, or <code>0, 0, 0, 0</code> to<br/>autosize in center. Use just a <code>##Label</code> as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add <code>##SomeUniqueLabel</code> after the text, or use pushid to<br/>give things unique ids. ImGui doesn&#39;t know what you clicked if all your buttons have the same text... The window api is probably evolving<br/>still, this is just the first draft. Felt cute, might delete later!<br/>Returns false if the window was closed from the X.</td>
+<td>Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/><a href="https://github.com/ocornut/imgui/">ImGui</a> widgets, so read more about them there. Use screen position and distance, or <code>0, 0, 0, 0</code> to<br/>autosize in center. Use just a <code>##Label</code> as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add <code>##SomeUniqueLabel</code> after the text, or use pushid to<br/>give things unique ids. ImGui doesn&#39;t know what you clicked if all your buttons have the same text... The window api is probably evolving<br/>still, this is just the first draft. Felt cute, might delete later!<br/>Returns false if the window was closed from the X.<br/>The callback signature is nil win(GuiDrawContext ctx)</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -6531,6 +6560,9 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='LoadContext'>LoadContext</h3>
+<p>Context received in <a href="#ON">ON</a>.LOAD
+Used to load from save_{}.dat into a string</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6545,6 +6577,9 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='PostRoomGenerationContext'>PostRoomGenerationContext</h3>
+<p>Context received in <a href="#ON">ON</a>.POST_ROOM_GENERATION.
+Used to change the room templates in the level and other shenanigans that affect level gen.</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6599,6 +6634,9 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='PreHandleRoomTilesContext'>PreHandleRoomTilesContext</h3>
+<p>Context received in <a href="#ON">ON</a>.PRE_HANDLE_ROOM_TILES.
+Used to change the room data as well as add a backlayer room if none is set yet.</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6643,6 +6681,8 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='PreLoadLevelFilesContext'>PreLoadLevelFilesContext</h3>
+<p>Context received in <a href="#ON">ON</a>.PRE_LOAD_LEVEL_FILES, used for forcing specific <code>.lvl</code> files to load.</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6662,6 +6702,10 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='SaveContext'>SaveContext</h3>
+<p>Context received in <a href="#ON">ON</a>.SAVE
+Used to save a string to some form of save_{}.dat
+Future calls to this will override the save</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6676,6 +6720,8 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='VanillaRenderContext'>VanillaRenderContext</h3>
+<p>Used in <a href="#set_callback">set_callback</a> <a href="#ON">ON</a>.RENDER_ callbacks, <a href="#set_post_render">set_post_render</a>, <a href="#set_post_render_screen">set_post_render_screen</a>, <a href="#set_pre_render">set_pre_render</a>, <a href="#set_pre_render_screen">set_pre_render_screen</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6755,6 +6801,8 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h2 id='Entity-related-types'>Entity related types</h2><h3 id='Ai'>Ai</h3>
+<p>Used in <a href="#Player">Player</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6804,6 +6852,8 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='Animation'>Animation</h3>
+<p>Used in <a href="#EntityDB">EntityDB</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -6838,8 +6888,6 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='EntityDB'>EntityDB</h3>
-<p>Used to store static common data for an ENT_TYPE. You can also clone entity types with the copy constructor to create new custom entities with different common properties. <a href="https://dregu.github.io/Spelunky2ls/animation.html">This tool</a> can be helpful when messing with the animations. The default values are also listed in <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json">entities.json</a>.</p>
-
 <blockquote>
 <p>When cloning an entity type, remember to save it in the script for as long as you need it. Otherwise the memory will be freed immediately, which eventually leads to a crash when used or overwritten by other stuff:</p>
 </blockquote>
@@ -6895,6 +6943,9 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
     <span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">type</span><span class="p">.</span><span class="n">max_speed</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">POST_LEVEL_GENERATION</span><span class="p">)</span>
 </code></pre></div>
+<p>Used in <a href="#Entity">Entity</a> and <a href="#get_type">get_type</a><br/>
+Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also clone entity types with the copy constructor to create new custom entities with different common properties. <a href="https://dregu.github.io/Spelunky2ls/animation.html">This tool</a> can be helpful when messing with the animations. The default values are also listed in <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json">entities.json</a>.</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -7084,6 +7135,8 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='Inventory'>Inventory</h3>
+<p>Used in <a href="#Player">Player</a>, <a href="#PlayerGhost">PlayerGhost</a> and <a href="#Items">Items</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -7332,8 +7385,15 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=height">height()</a></td>
 <td>Short for <code>aabb.top - aabb.bottom</code>.</td>
 </tr>
+<tr>
+<td>tuple&lt;float, float, float, float&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split()</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='BackgroundMusic'>BackgroundMusic</h3>
+<p>Used in <a href="#GameManager">GameManager</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -7589,7 +7649,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 </tr>
 </tbody></table>
 <h3 id='MovableBehavior'>MovableBehavior</h3>
-<p>Opaque handle to a movable behavior</p>
+<p>Opaque handle to a movable behavior used in some <a href="#Movable">Movable</a> functions</p>
 
 <table><thead>
 <tr>
@@ -7613,7 +7673,7 @@ Use <code>GuiDrawContext.win_image</code> instead</p>
 <p><a href="#PRNG">PRNG</a> (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
 The used buffer is determined by <a href="#PRNG_CLASS">PRNG_CLASS</a>. If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
-If you don&#39;t care what part of the game you affect just use <code>prng.random</code>.</p>
+If you don&#39;t care what part of the game you affect just use <a href="#prng">prng</a><code>.random</code>.</p>
 
 <table><thead>
 <tr>
@@ -7778,7 +7838,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='RenderInfo'>RenderInfo</h3>
-<p>Some information used to render the entity, can not be changed</p>
+<p>Some information used to render the entity, can not be changed, used in <a href="#Entity">Entity</a></p>
 
 <table><thead>
 <tr>
@@ -7834,6 +7894,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='ShortTileCodeDef'>ShortTileCodeDef</h3>
+<p>Used in <a href="#get_short_tile_code">get_short_tile_code</a>, <a href="#get_short_tile_code_definition">get_short_tile_code_definition</a> and <a href="#PostRoomGenerationContext">PostRoomGenerationContext</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -7901,12 +7963,14 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split</a></td>
+<td>tuple&lt;float, float&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split()</a></td>
 <td></td>
 </tr>
 </tbody></table>
 <h2 id='Input-types'>Input types</h2><h3 id='Gamepad'>Gamepad</h3>
+<p>Used in <a href="#ImGuiIO">ImGuiIO</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -7920,7 +7984,7 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td><a href="#Aliases">Flags</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
 <td></td>
 </tr>
@@ -7956,6 +8020,15 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='ImGuiIO'>ImGuiIO</h3>
+<p>Used in <a href="#get_io">get_io</a>
+Function declarations:<br/>
+bool keydown(int keycode)<br/>
+bool keydown(char key)<br/>
+bool keypressed(int keycode, bool repeat = false)<br/>
+bool keypressed(char key, bool repeat = false)<br/>
+bool keyreleased(int keycode)<br/>
+bool keyreleased(char key)<br/></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8049,12 +8122,14 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td><a href="#Gamepad">Gamepad</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=gamepad">gamepad</a></td>
 <td></td>
 </tr>
 </tbody></table>
 <h3 id='InputMapping'>InputMapping</h3>
+<p>Used in <a href="#PlayerSlot">PlayerSlot</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8124,6 +8199,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='PlayerInputs'>PlayerInputs</h3>
+<p>Used in <a href="#StateMemory">StateMemory</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8183,6 +8260,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h2 id='Journal-types'>Journal types</h2><h3 id='JournalPage'>JournalPage</h3>
+<p>Used in <a href="#set_callback">set_callback</a> with <a href="#ON">ON</a>.RENDER_POST_JOURNAL_PAGE</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8707,6 +8786,9 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h2 id='Levelgen-types'>Levelgen types</h2><h3 id='DoorCoords'>DoorCoords</h3>
+<p>Deprecated
+ kept for backward compatibility, don&#39;t use, check <a href="#LevelGenSystem">LevelGenSystem</a>.exit_doors</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8736,6 +8818,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='LevelGenSystem'>LevelGenSystem</h3>
+<p>Data relating to level generation, changing anything in here from <a href="#ON">ON</a>.LEVEL or later will likely have no effect, used in <a href="#StateMemory">StateMemory</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8785,6 +8869,9 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h2 id='Lighting-types'>Lighting types</h2><h3 id='Illumination'>Illumination</h3>
+<p>Generic obcject for lights in the game, you can make your own with <a href="#create_illumination">create_illumination</a><br/>
+Used in <a href="#StateMemory">StateMemory</a>, <a href="#Player">Player</a>, <a href="#PlayerGhost">PlayerGhost</a>, <a href="#BurningRopeEffect">BurningRopeEffect</a> ...</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8879,6 +8966,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='LightParams'>LightParams</h3>
+<p>Used in <a href="#Illumination">Illumination</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8908,6 +8997,9 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h2 id='Liquid-types'>Liquid types</h2><h3 id='LiquidPhysics'>LiquidPhysics</h3>
+<p>Use <a href="#LIQUID_POOL">LIQUID_POOL</a> enum for the index<br/>
+Used in <a href="#StateMemory">StateMemory</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8916,12 +9008,14 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </thead><tbody>
 <tr>
-<td><a href="#LiquidPool">LiquidPool</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pools">pools[5]</a></td>
+<td>array&lt;<a href="#LiquidPool">LiquidPool</a>, 5&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pools">pools</a></td>
 <td></td>
 </tr>
 </tbody></table>
 <h3 id='LiquidPhysicsEngine'>LiquidPhysicsEngine</h3>
+<p>Used in <a href="#LiquidPool">LiquidPool</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8966,6 +9060,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='LiquidPhysicsParams'>LiquidPhysicsParams</h3>
+<p>Used in <a href="#LiquidPool">LiquidPool</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -8990,6 +9086,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='LiquidPool'>LiquidPool</h3>
+<p>Used in <a href="#LiquidPhysics">LiquidPhysics</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -9009,6 +9107,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h2 id='Logic-types'>Logic types</h2><h3 id='Logic'>Logic</h3>
+<p>Used in <a href="#LogicList">LogicList</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -9016,9 +9116,15 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=logic_index">logic_index</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='LogicDiceShop'>LogicDiceShop</h3>
-<p>Derived from <a href="#Logic">Logic</a></p>
+<p>Used in <a href="#LogicList">LogicList</a>
+Derived from <a href="#Logic">Logic</a></p>
 
 <table><thead>
 <tr>
@@ -9099,6 +9205,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='LogicList'>LogicList</h3>
+<p>Used in <a href="#StateMemory">StateMemory</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -9123,7 +9231,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='LogicOlmecCutscene'>LogicOlmecCutscene</h3>
-<p>Derived from <a href="#Logic">Logic</a></p>
+<p>Used in <a href="#LogicList">LogicList</a>
+Derived from <a href="#Logic">Logic</a></p>
 
 <table><thead>
 <tr>
@@ -9154,7 +9263,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='LogicTiamatCutscene'>LogicTiamatCutscene</h3>
-<p>Derived from <a href="#Logic">Logic</a></p>
+<p>Used in <a href="#LogicList">LogicList</a>
+Derived from <a href="#Logic">Logic</a></p>
 
 <table><thead>
 <tr>
@@ -9185,6 +9295,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h2 id='Online-types'>Online types</h2><h3 id='Online'>Online</h3>
+<p>Can be accessed via global <a href="#online">online</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -9209,6 +9321,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='OnlineLobby'>OnlineLobby</h3>
+<p>Used in <a href="#Online">Online</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -9228,6 +9342,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='OnlinePlayer'>OnlinePlayer</h3>
+<p>Used in <a href="#Online">Online</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -9252,6 +9368,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h2 id='Particle-types'>Particle types</h2><h3 id='Particle'>Particle</h3>
+<p>Used in <a href="#ParticleEmitterInfo">ParticleEmitterInfo</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -9306,6 +9424,8 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='ParticleDB'>ParticleDB</h3>
+<p>Used in <a href="#ParticleDB">ParticleDB</a>, <a href="#get_particle_type">get_particle_type</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -9465,6 +9585,9 @@ If you don&#39;t care what part of the game you affect just use <code>prng.rando
 </tr>
 </tbody></table>
 <h3 id='ParticleEmitterInfo'>ParticleEmitterInfo</h3>
+<p>Generic type for creating particles in the game, you can make your own with <a href="#generate_world_particles">generate_world_particles</a> or <a href="#generate_screen_particles">generate_screen_particles</a><br/>
+Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#ScreenTitle">ScreenTitle</a>, <a href="#CursedEffect">CursedEffect</a>, <a href="#OnFireEffect">OnFireEffect</a>, <a href="#PoisonedEffect">PoisonedEffect</a> ...</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -13012,6 +13135,8 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </tbody></table>
 <h3 id='GameManager'>GameManager</h3>
+<p>Can be accessed via global <a href="#game_manager">game_manager</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -13130,6 +13255,8 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </tbody></table>
 <h3 id='Items'>Items</h3>
+<p>Used in <a href="#StateMemory">StateMemory</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -13276,6 +13403,8 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </tbody></table>
 <h3 id='SelectPlayerSlot'>SelectPlayerSlot</h3>
+<p>Used in <a href="#Items">Items</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -13300,6 +13429,8 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </tbody></table>
 <h3 id='StateMemory'>StateMemory</h3>
+<p>Can be accessed via global <a href="#state">state</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -15802,7 +15933,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=state">state</a></td>
-<td>0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause</td>
+<td>0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause; going_up is only right when timer is 0, otherwise it just sits at the bottom</td>
 </tr>
 <tr>
 <td>int</td>
@@ -16284,7 +16415,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>any</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=user_data">user_data</a></td>
 <td>You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before <a href="#ON">ON</a>.PRE_LOAD_SCREEN from a level and loaded right before <a href="#ON">ON</a>.POST_LEVEL_GENERATION.<br/></td>
 </tr>
@@ -18514,7 +18645,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_detect_state">player_detect_state</a></td>
-<td>0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava</td>
+<td>0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won&#39;t spit imminently after seeing the player</td>
 </tr>
 </tbody></table>
 <h3 id='Leprechaun'>Leprechaun</h3>
@@ -20431,7 +20562,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=button_sprite">button_sprite</a></td>
-<td><a href="#Aliases">Flags</a>: 1 - pad: A, key: Z</td>
+<td>Only one can be set:<br/>1 - pad: A, key: Z<br/>2 - pad: X, key: X<br/>4 - pad: B, key: C<br/>8 - pad: Y, key: D<br/>16 - pad: LB, key: L Shift<br/>32 - pad: RB, key: A<br/>64 - pad: menu?, key: (none)<br/>128 - pad: copy?, key: Tab</td>
 </tr>
 <tr>
 <td>float</td>
@@ -20451,7 +20582,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seen">seen</a></td>
-<td>-1 - hasn&#39;t been seen</td>
+<td><br/>-1 - hasn&#39;t been seen<br/>0 - last seen by player 1<br/>1 - last seen by player 2<br/>2 - last seen by player 3<br/>3 - last seen by player 4</td>
 </tr>
 </tbody></table>
 <h3 id='Cape'>Cape</h3>
@@ -21084,7 +21215,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flame_size">flame_size</a></td>
-<td>if changed, gradually goes down</td>
+<td>if changed, gradually goes down (0.03 per frame) to the default size</td>
 </tr>
 </tbody></table>
 <h3 id='Fly'>Fly</h3>
@@ -22669,7 +22800,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move_direction">move_direction</a></td>
-<td>-1 = left, 0 = down, 1 = right</td>
+<td>-1 = left, 0 = down, 1 = right, phase 0/2: depends on target, phase 1: travel direction</td>
 </tr>
 <tr>
 <td>int</td>
@@ -24155,7 +24286,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td>...see <a href="../src/game_api/drops.cpp">drops.cpp</a> for a list of possible drops...</td>
+<td>...see <a href="https:github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible drops...</td>
 <td></td>
 <td></td>
 </tr>
@@ -24183,7 +24314,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td>...see <a href="../src/game_api/drops.cpp">drops.cpp</a> for a list of possible dropchances...</td>
+<td>...see <a href="https:github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible dropchances...</td>
 <td></td>
 <td></td>
 </tr>
@@ -25225,7 +25356,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.SHADOW">SHADOW</a></td>
 <td>0x800</td>
-<td>All the BG_* entities excluded from <code>BG</code> (MASK.BG</td>
+<td>All the BG_* entities excluded from <code>BG</code> (MASK.BG &amp;#124 MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above<br/>Various types, all <code>Entity</code><br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.LOGICAL">LOGICAL</a></td>
@@ -25245,7 +25376,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.LIQUID">LIQUID</a></td>
 <td>0x6000</td>
-<td>Short for (<a href="#MASK">MASK</a>.WATER</td>
+<td>Short for (<a href="#MASK">MASK</a>.WATER &amp;#124 <a href="#MASK">MASK</a>.LAVA)<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.ANY">ANY</a></td>
@@ -25293,6 +25424,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.OPTIONS">OPTIONS</a></td>
 <td>ON::OPTIONS</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PLAYER_PROFILE">PLAYER_PROFILE</a></td>
+<td>ON::PLAYER_PROFILE</td>
 <td></td>
 </tr>
 <tr>
@@ -25368,6 +25504,21 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.ARENA_MENU">ARENA_MENU</a></td>
 <td>ON::ARENA_MENU</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.ARENA_STAGES">ARENA_STAGES</a></td>
+<td>ON::ARENA_STAGES</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.ARENA_ITEMS">ARENA_ITEMS</a></td>
+<td>ON::ARENA_ITEMS</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.ARENA_SELECT">ARENA_SELECT</a></td>
+<td>ON::ARENA_SELECT</td>
 <td></td>
 </tr>
 <tr>
@@ -25548,7 +25699,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_JOURNAL_CHAPTER">POST_LOAD_JOURNAL_CHAPTER</a></td>
 <td>ON::POST_LOAD_JOURNAL_CHAPTER</td>
-<td>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as JournalPageStory, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></td>
+<td>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as <a href="#JournalPageStory">JournalPageStory</a>, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_GET_FEAT">PRE_GET_FEAT</a></td>
@@ -27194,7 +27345,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <h1 id='Automatic-casting-of-entities'>Automatic casting of entities</h1>
 <p>When using <code>get_entity()</code> the returned entity will automatically be of the correct type. It is not necessary to use the <code>as_&lt;typename&gt;</code> functions.</p>
 
-<p>To figure out what type of entity you get back, consult the <a href="entities-hierarchy.md">entity hierarchy list</a>.</p>
+<p>To figure out what type of entity you get back, consult the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md">entity hierarchy list</a>.</p>
 
 <p>You can also use the types (uppercase <code>&lt;typename&gt;</code>) as <code>ENT_TYPE.&lt;typename&gt;</code> in <code>get_entities</code> functions and <code>pre/post spawn</code> callbacks</p>
 
