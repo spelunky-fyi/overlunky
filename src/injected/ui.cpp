@@ -245,7 +245,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -256,6 +256,7 @@ std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "", detach_tab = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
+std::vector<std::string> tab_order_main = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options"};
 std::vector<std::string> tabs_open = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"};
 std::vector<std::string> tabs_detached = {};
 
@@ -2656,6 +2657,35 @@ void tooltip(const char* tip, const char* key)
     }
 }
 
+void indent(float x)
+{
+    if (!in_menu)
+        ImGui::Indent(x);
+}
+
+void unindent(float x)
+{
+    if (!in_menu)
+        ImGui::Unindent(x);
+}
+
+bool submenu(const char* title)
+{
+    if (in_menu)
+    {
+        ImGui::SetNextWindowSizeConstraints({300, 100}, {1000, -1});
+        return ImGui::BeginMenu(title);
+    }
+    else
+        return ImGui::CollapsingHeader(title);
+}
+
+void endmenu()
+{
+    if (in_menu)
+        ImGui::EndMenu();
+}
+
 void render_uid(int uid, const char* section, bool rembtn = false)
 {
     std::string uidc = std::to_string(uid);
@@ -2727,7 +2757,7 @@ void render_illumination(Illumination* light, const char* sect = "")
 void render_liquid_pool(int i)
 {
     ImGui::PushID(i);
-    if (ImGui::CollapsingHeader(liquid_pool_names[i]))
+    if (submenu(liquid_pool_names[i]))
     {
         auto engine = g_state->liquid_physics->pools[i].physics_engine;
         auto defaults = g_state->liquid_physics->pools[i].physics_defaults;
@@ -2740,6 +2770,7 @@ void render_liquid_pool(int i)
         }
         ImGui::DragFloat("Default gravity##LiquidDefaultGravity", &defaults.gravity, 0.01f, -5.f, 5.f);
         ImGui::DragFloat("Default elasticity##LiquidDefaultElasticity", &defaults.agitation, 0.01f, -1.f, 5.f);
+        endmenu();
     }
     ImGui::PopID();
 }
@@ -3300,7 +3331,7 @@ void render_camera()
     ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2f, 1.0f);
     ImGui::InputFloat("Camera Real X##CameraRealX", &g_state->camera->adjusted_focus_x, 0.2f, 1.0f);
     ImGui::InputFloat("Camera Real Y##CameraRealY", &g_state->camera->adjusted_focus_y, 0.2f, 1.0f);
-    if (ImGui::CollapsingHeader("Camera Bounds"))
+    if (submenu("Camera Bounds"))
     {
         ImGui::InputFloat("Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2f, 1.0f);
         ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
@@ -3323,6 +3354,7 @@ void render_camera()
             }
         }
         tooltip("Disable to free the camera in camp.\nAutomatically disabled when zooming.");
+        endmenu();
     }
 }
 
@@ -4416,125 +4448,293 @@ void render_clickhandler()
     ImGui::PopStyleVar();
 }
 
+void render_style_editor()
+{
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImGuiIO& io = ImGui::GetIO();
+    if (options["menu_ui"])
+    {
+        if (ImGui::MenuItem("Randomize"))
+        {
+            g_hue = (float)rand() / RAND_MAX;
+            g_sat = (float)rand() / RAND_MAX;
+            g_val = (float)rand() / RAND_MAX;
+            style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
+        }
+        ImGui::Separator();
+    }
+    ImGui::TextWrapped("Leave empty to use embedded font 'Hack'. You must save and restart for font changes to take effect.");
+    ImGui::InputText("Font file##FontFile", &fontfile);
+    tooltip("Just the filename, e.g. comic.ttf");
+    ImGui::DragFloat("Small print##FontSmall", &fontsize[0], 0.1f, 6.0f, 32.0f);
+    ImGui::DragFloat("Medium print##FontMedium", &fontsize[1], 0.1f, 16.0f, 48.0f);
+    ImGui::DragFloat("Large print##FontLarge", &fontsize[2], 0.1f, 24.0f, 96.0f);
+    ImGui::Separator();
+    ImGui::DragFloat("Hue##StyleHue", &g_hue, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Saturation##StyleSaturation", &g_sat, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Alpha##StyleAlpha", &style.Alpha, 0.01f, 0.2f, 1.0f);
+    ImGui::DragFloat("Scale##StyleScale", &io.FontGlobalScale, 0.01f, 0.2f, 2.0f);
+    if (!options["menu_ui"])
+    {
+        if (ImGui::Button("Randomize##StyleRandomize"))
+        {
+            g_hue = (float)rand() / RAND_MAX;
+            g_sat = (float)rand() / RAND_MAX;
+            g_val = (float)rand() / RAND_MAX;
+            style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Save options##StyleSave"))
+        {
+            save_config(cfgfile);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Load options##StyleLoad"))
+        {
+            load_config(cfgfile);
+            refresh_script_files();
+        }
+    }
+    set_colors();
+}
+
+void render_keyconfig()
+{
+    ImGui::PushID("keyconfig");
+    ImGui::BeginTable("##keyconfig", 4);
+    ImGui::TableSetupColumn("Tool");
+    ImGui::TableSetupColumn("Keys");
+    ImGui::TableSetupColumn("Keycode");
+    ImGui::TableSetupColumn("");
+    ImGui::TableHeadersRow();
+    for (const auto& kv : keys)
+    {
+        ImGui::PushID(kv.first.c_str());
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", kv.first.c_str());
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", key_string(keys[kv.first]).c_str());
+        ImGui::TableNextColumn();
+        ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "0x%X", ImGuiInputTextFlags_CharsHexadecimal);
+        ImGui::TableNextColumn();
+        if (ImGui::Button("Capture"))
+        {
+            g_change_key = kv.first;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Disable"))
+        {
+            keys[kv.first] = 0;
+        }
+        ImGui::PopID();
+    }
+    ImGui::EndTable();
+    ImGui::PopID();
+
+    if (g_change_key != "")
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        io.WantCaptureKeyboard = true;
+        auto base = ImGui::GetMainViewport();
+        ImGui::SetNextWindowSize(base->Size);
+        ImGui::SetNextWindowPos(base->Pos);
+        ImGui::SetNextWindowViewport(base->ID);
+        ImGui::SetNextWindowBgAlpha(0.75);
+        ImGui::Begin(
+            "KeyCapture",
+            NULL,
+            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking);
+        ImGui::InvisibleButton("KeyCaptureCanvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
+        ImDrawList* dl = ImGui::GetForegroundDrawList();
+        ImGui::PushFont(bigfont);
+        std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl, Alt and Shift are available.", g_change_key);
+        ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
+        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + base->Size.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
+        ImGui::PopFont();
+
+        // Buttons
+        for (size_t i = 0; i < 5; ++i)
+        {
+            if (io.MouseDown[i])
+            {
+                size_t keycode = 0x400 + i + 1;
+                if (io.KeysDown[VK_CONTROL])
+                    keycode += 0x100;
+                if (io.KeysDown[VK_SHIFT])
+                    keycode += 0x200;
+                keys[g_change_key] = keycode;
+                save_config(cfgfile);
+                g_change_key = "";
+            }
+        }
+
+        // Wheel
+        if (io.MouseWheel != 0)
+        {
+            size_t keycode = 0x400;
+            if (io.MouseWheel < 0)
+                keycode += OL_WHEEL_DOWN;
+            else if (io.MouseWheel > 0)
+                keycode += OL_WHEEL_UP;
+            if (io.KeysDown[VK_CONTROL])
+                keycode += 0x100;
+            if (io.KeysDown[VK_SHIFT])
+                keycode += 0x200;
+            keys[g_change_key] = keycode;
+            save_config(cfgfile);
+            g_change_key = "";
+        }
+
+        // Keys
+        for (size_t i = 0; i < VK_LSHIFT; ++i)
+        {
+            if (ImGui::IsKeyDown((ImGuiKey)i))
+            {
+                size_t keycode = i;
+                if (ImGui::GetIO().KeyCtrl)
+                    keycode += 0x100;
+                if (ImGui::GetIO().KeyShift)
+                    keycode += 0x200;
+                if (ImGui::GetIO().KeyAlt)
+                    keycode += 0x800;
+                keys[g_change_key] = keycode;
+                save_config(cfgfile);
+                g_change_key = "";
+            }
+        }
+        ImGui::End();
+    }
+}
+
 void render_options()
 {
     if (options["menu_ui"] && !detached("tool_options"))
     {
         if (ImGui::MenuItem("Switch to windowed UI", key_string(keys["switch_ui"]).c_str()))
             options["menu_ui"] = false;
-        if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
-            save_config(cfgfile);
-        if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
-            load_config(cfgfile);
-        ImGui::Separator();
+        if (ImGui::BeginMenu("Style"))
+        {
+            render_style_editor();
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Keys"))
+        {
+            render_keyconfig();
+            ImGui::EndMenu();
+        }
     }
-    ImGui::Text("Game cheats");
-    if (ImGui::Checkbox("God mode (players)##Godmode", &options["god_mode"]))
+    if (submenu("Game cheats"))
     {
-        UI::godmode(options["god_mode"]);
+        if (ImGui::Checkbox("God mode (players)##Godmode", &options["god_mode"]))
+        {
+            UI::godmode(options["god_mode"]);
+        }
+        tooltip("Make the players completely deathproof.", "toggle_godmode");
+        if (ImGui::Checkbox("God mode (companions)##GodmodeCompanions", &options["god_mode_companions"]))
+        {
+            UI::godmode_companions(options["god_mode_companions"]);
+        }
+        tooltip("Make the hired hands completely deathproof.");
+        if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
+        {
+            toggle_noclip();
+        }
+        tooltip("Fly through walls and ignored by enemies.", "toggle_noclip");
+        ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
+        tooltip("Enables the default level lighting everywhere.", "toggle_lights");
+        if (ImGui::CheckboxFlags("Force dark levels", &g_dark_mode, 1))
+        {
+            clr_flag(g_dark_mode, 2);
+            g_ui_scripts["light"]->set_enabled(false);
+            g_ui_scripts["dark"]->set_enabled(test_flag(g_dark_mode, 1));
+        }
+        tooltip("Forces every level dark, including bosses, CO or camp.");
+        if (ImGui::CheckboxFlags("Disable dark levels", &g_dark_mode, 2))
+        {
+            clr_flag(g_dark_mode, 1);
+            g_ui_scripts["dark"]->set_enabled(false);
+            g_ui_scripts["light"]->set_enabled(test_flag(g_dark_mode, 2));
+        }
+        tooltip("Forces every level to be lit af.");
+        if (ImGui::Checkbox("Disable ghosts and time jelly", &options["disable_ghost_timer"]))
+        {
+            UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
+            UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
+            UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
+        }
+        tooltip("Disables the timed ghost and jelly.", "toggle_ghost");
+        if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
+        {
+            force_hud_flags();
+        }
+        tooltip("Disables manual or automatic pausing when alt+tabbed.\nUncheck and you can always pause, even when ankhed.", "toggle_disable_pause");
+        if (ImGui::Checkbox("Block Steam achievements", &options["disable_achievements"]))
+        {
+            if (options["disable_achievements"])
+                UI::steam_achievements(false);
+            else
+                UI::steam_achievements(true);
+        }
+        tooltip("Enable this if playing on Steam and don't want\nto unlock everything when fooling around.");
+        if (ImGui::Checkbox("Block game saves", &options["disable_savegame"]))
+        {
+            if (options["disable_savegame"])
+                hook_savegame();
+        }
+        tooltip("Enable this if you want to keep your\nsave game unaffected by tomfoolery.");
+        if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 5.f))
+        {
+            speedhack();
+        }
+        tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
+        endmenu();
     }
-    tooltip("Make the players completely deathproof.", "toggle_godmode");
-    if (ImGui::Checkbox("God mode (companions)##GodmodeCompanions", &options["god_mode_companions"]))
-    {
-        UI::godmode_companions(options["god_mode_companions"]);
-    }
-    tooltip("Make the hired hands completely deathproof.");
-    if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
-    {
-        toggle_noclip();
-    }
-    tooltip("Fly through walls and ignored by enemies.", "toggle_noclip");
-    ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
-    tooltip("Enables the default level lighting everywhere.", "toggle_lights");
-    if (ImGui::CheckboxFlags("Force dark levels", &g_dark_mode, 1))
-    {
-        clr_flag(g_dark_mode, 2);
-        g_ui_scripts["light"]->set_enabled(false);
-        g_ui_scripts["dark"]->set_enabled(test_flag(g_dark_mode, 1));
-    }
-    tooltip("Forces every level dark, including bosses, CO or camp.");
-    if (ImGui::CheckboxFlags("Disable dark levels", &g_dark_mode, 2))
-    {
-        clr_flag(g_dark_mode, 1);
-        g_ui_scripts["dark"]->set_enabled(false);
-        g_ui_scripts["light"]->set_enabled(test_flag(g_dark_mode, 2));
-    }
-    tooltip("Forces every level to be lit af.");
-    if (ImGui::Checkbox("Disable ghosts and time jelly", &options["disable_ghost_timer"]))
-    {
-        UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
-        UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
-        UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
-    }
-    tooltip("Disables the timed ghost and jelly.", "toggle_ghost");
-    if (ImGui::Checkbox("Disable pause menu", &options["disable_pause"]))
-    {
-        force_hud_flags();
-    }
-    tooltip("Disables manual or automatic pausing when alt+tabbed.\nUncheck and you can always pause, even when ankhed.", "toggle_disable_pause");
-    if (ImGui::Checkbox("Block Steam achievements", &options["disable_achievements"]))
-    {
-        if (options["disable_achievements"])
-            UI::steam_achievements(false);
-        else
-            UI::steam_achievements(true);
-    }
-    tooltip("Enable this if playing on Steam and don't want\nto unlock everything when fooling around.");
-    if (ImGui::Checkbox("Block game saves", &options["disable_savegame"]))
-    {
-        if (options["disable_savegame"])
-            hook_savegame();
-    }
-    tooltip("Enable this if you want to keep your\nsave game unaffected by tomfoolery.");
-    if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 5.f))
-    {
-        speedhack();
-    }
-    tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
-    ImGui::Separator();
 
-    ImGui::Text("User interface");
-    ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
-    tooltip("Enables to spawn entities, teleport and pick entities with mouse.\nDisable for scripts that require mouse clicking.", "toggle_mouse");
-    ImGui::Checkbox("Keyboard controls##keyevents", &options["keyboard_control"]);
-    tooltip("Enables all hotkeys.\nDisable for scripts that extensively use keyboard.");
-    ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
-    tooltip("Spawn items etc snapped to grid.\nAlways enabled for floor.", "toggle_snap");
-    ImGui::Checkbox("Spawn floor decorated##Decorate", &options["spawn_floor_decorated"]);
-    tooltip("Add decorations to spawned floor.");
-    ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
-    tooltip("Draw hitboxes for all movable and hovered entities.", "toggle_hitboxes");
-    ImGui::SameLine();
-    ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
-    tooltip("Use interpolated render position for smoother hitboxes on hifps.\nActual game logic is not interpolated like this though.");
-    ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
-    tooltip("Smooth camera movement when dragging, unless paused.");
-    ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
-    tooltip("Faster camera movement when dragging.");
-    ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
-    tooltip("Show outlines of tiles and rooms, with roomtypes.", "toggle_grid");
-    ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
-    tooltip("Show enabled cheats and random\ninteresting state variables on screen.", "toggle_hud");
-
-    if (ImGui::Checkbox("Drag windows outside the game window", &options["multi_viewports"]))
+    if (submenu("User interface"))
     {
-        if (options["multi_viewports"])
-            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-        else
-            ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+        ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
+        tooltip("Enables to spawn entities, teleport and pick entities with mouse.\nDisable for scripts that require mouse clicking.", "toggle_mouse");
+        ImGui::Checkbox("Keyboard controls##keyevents", &options["keyboard_control"]);
+        tooltip("Enables all hotkeys.\nDisable for scripts that extensively use keyboard.");
+        ImGui::Checkbox("Snap to grid##Snap", &options["snap_to_grid"]);
+        tooltip("Spawn items etc snapped to grid.\nAlways enabled for floor.", "toggle_snap");
+        ImGui::Checkbox("Spawn floor decorated##Decorate", &options["spawn_floor_decorated"]);
+        tooltip("Add decorations to spawned floor.");
+        ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
+        tooltip("Draw hitboxes for all movable and hovered entities.", "toggle_hitboxes");
+        ImGui::SameLine();
+        ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
+        tooltip("Use interpolated render position for smoother hitboxes on hifps.\nActual game logic is not interpolated like this though.");
+        ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
+        tooltip("Smooth camera movement when dragging, unless paused.");
+        ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
+        tooltip("Faster camera movement when dragging.");
+        ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
+        tooltip("Show outlines of tiles and rooms, with roomtypes.", "toggle_grid");
+        ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
+        tooltip("Show enabled cheats and random\ninteresting state variables on screen.", "toggle_hud");
+        if (ImGui::Checkbox("Drag windows outside the game window", &options["multi_viewports"]))
+        {
+            if (options["multi_viewports"])
+                ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+            else
+                ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+        }
+        tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
+
+        ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
+        tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.", "switch_ui");
+
+        ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
+        tooltip("Am I annoying you already :(");
+        endmenu();
     }
-    tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
 
-    ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
-    tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.", "switch_ui");
-
-    ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
-    tooltip("Am I annoying you already :(");
-
-    if (ImGui::CollapsingHeader("Hitbox entity types to draw"))
+    if (submenu("Hitbox entity types to draw"))
     {
         ImGui::PushID("HitboxMask");
-        ImGui::Indent(16.0f);
         for (int i = 0; i < 15; i++)
         {
             if (i % 2)
@@ -4546,14 +4746,13 @@ void render_options()
         tooltip("Some cherry-picked entities like traps and invisible walls.");
         if (ImGui::Button("Defaults##RestoreDefaultHitboxMask"))
             g_hitbox_mask = default_hitbox_mask;
-        ImGui::Unindent(16.0f);
         ImGui::PopID();
+        endmenu();
     }
 
-    if (ImGui::CollapsingHeader("Entity types to grab by default"))
+    if (submenu("Entity types to grab by default"))
     {
         ImGui::PushID("PickerMask");
-        ImGui::Indent(16.0f);
         for (int i = 0; i < 15; i++)
         {
             if (i % 2)
@@ -4565,12 +4764,19 @@ void render_options()
         ImGui::SameLine();
         if (ImGui::Button("Defaults##RestoreDefaultEntityMask"))
             safe_entity_mask = default_entity_mask;
-        ImGui::Unindent(16.0f);
         ImGui::PopID();
+        endmenu();
     }
 
     if (options["menu_ui"])
+    {
+        if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
+            save_config(cfgfile);
+        if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
+            load_config(cfgfile);
         return;
+    }
+
     if (ImGui::Button("Edit style"))
     {
         toggle("tool_style");
@@ -4726,7 +4932,7 @@ void render_scripts()
         {
             ImGui::PushStyleColor(ImGuiCol_Header, origcolor);
         }
-        if (ImGui::CollapsingHeader(name.c_str()))
+        if (submenu(name.c_str()))
         {
             ImGui::Text(
                 "%s %s by %s (%s)",
@@ -4790,6 +4996,7 @@ void render_scripts()
             {
                 ImGui::TextWrapped("\nYou have not enabled running unsafe scripts. Bye.");
             }
+            endmenu();
         }
         else
         {
@@ -4804,9 +5011,10 @@ void render_scripts()
         if (it != g_scripts.end())
             g_scripts.erase(id);
     }
-    if (ImGui::CollapsingHeader("Load new script##LoadScriptFile"))
+    if (submenu("Load new script##LoadScriptFile"))
     {
         render_script_files();
+        endmenu();
     }
     ImGui::PopItemWidth();
 }
@@ -4854,11 +5062,11 @@ void render_savegame()
     ImGui::PopStyleColor(1);
 
     ImGui::PushID("Journal");
-    if (ImGui::CollapsingHeader("Journal"))
+    if (submenu("Journal"))
     {
-        ImGui::Indent(16.0f);
+        indent(16.0f);
         ImGui::PushID("Places");
-        if (ImGui::CollapsingHeader("Places"))
+        if (submenu("Places"))
         {
             for (int i = 0; i < 16; ++i)
             {
@@ -4866,10 +5074,11 @@ void render_savegame()
                 ImGui::Checkbox(places_flags[i], &g_save->places[i]);
                 ImGui::PopID();
             }
+            endmenu();
         }
         ImGui::PopID();
         ImGui::PushID("People");
-        if (ImGui::CollapsingHeader("People"))
+        if (submenu("People"))
         {
             ImGui::Text("");
             ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
@@ -4892,10 +5101,11 @@ void render_savegame()
                 ImGui::PopItemWidth();
                 ImGui::PopID();
             }
+            endmenu();
         }
         ImGui::PopID();
         ImGui::PushID("Bestiary");
-        if (ImGui::CollapsingHeader("Bestiary"))
+        if (submenu("Bestiary"))
         {
             ImGui::Text("");
             ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
@@ -4918,10 +5128,11 @@ void render_savegame()
                 ImGui::PopItemWidth();
                 ImGui::PopID();
             }
+            endmenu();
         }
         ImGui::PopID();
         ImGui::PushID("Items");
-        if (ImGui::CollapsingHeader("Items"))
+        if (submenu("Items"))
         {
             for (int i = 0; i < 54; ++i)
             {
@@ -4929,10 +5140,11 @@ void render_savegame()
                 ImGui::Checkbox(items_flags[i], &g_save->items[i]);
                 ImGui::PopID();
             }
+            endmenu();
         }
         ImGui::PopID();
         ImGui::PushID("Traps");
-        if (ImGui::CollapsingHeader("Traps"))
+        if (submenu("Traps"))
         {
             for (int i = 0; i < 24; ++i)
             {
@@ -4940,14 +5152,16 @@ void render_savegame()
                 ImGui::Checkbox(traps_flags[i], &g_save->traps[i]);
                 ImGui::PopID();
             }
+            endmenu();
         }
         ImGui::PopID();
-        ImGui::Unindent(16.0f);
+        unindent(16.0f);
+        endmenu();
     }
     ImGui::PopID();
 
     ImGui::PushID("Characters");
-    if (ImGui::CollapsingHeader("Characters"))
+    if (submenu("Characters"))
     {
         ImGui::Text("");
         ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.75f);
@@ -4964,11 +5178,12 @@ void render_savegame()
             ImGui::PopItemWidth();
             ImGui::PopID();
         }
+        endmenu();
     }
     ImGui::PopID();
 
     ImGui::PushID("Shortcuts");
-    if (ImGui::CollapsingHeader("Shortcuts"))
+    if (submenu("Shortcuts"))
     {
         int current = g_save->shortcuts;
         for (int i = 0; i < 11; ++i)
@@ -4979,11 +5194,12 @@ void render_savegame()
         }
         if (g_save->shortcuts != static_cast<uint8_t>(current))
             g_save->shortcuts = static_cast<uint8_t>(current);
+        endmenu();
     }
     ImGui::PopID();
 
     ImGui::PushID("Player Profile");
-    if (ImGui::CollapsingHeader("Player Profile"))
+    if (submenu("Player Profile"))
     {
         ImGui::PushItemWidth(-ImGui::GetContentRegionAvail().x * 0.5f);
         ImGui::DragInt("Plays", &g_save->plays);
@@ -5023,11 +5239,12 @@ void render_savegame()
         ImGui::Checkbox("Completed ironman", &g_save->completed_ironman);
         ImGui::Checkbox("Completed hard", &g_save->completed_hard);
         ImGui::PopItemWidth();
+        endmenu();
     }
     ImGui::PopID();
 
     ImGui::PushID("Last Game Played");
-    if (ImGui::CollapsingHeader("Last Game Played"))
+    if (submenu("Last Game Played"))
     {
         SliderByte("World##LastWorld", (char*)&g_save->world_last, 1, 8);
         SliderByte("Level##LastLevel", (char*)&g_save->level_last, 1, 99);
@@ -5044,11 +5261,12 @@ void render_savegame()
             ImGui::InputInt("Sticker", (int32_t*)&g_save->stickers[i]);
             ImGui::PopID();
         }
+        endmenu();
     }
     ImGui::PopID();
 
     ImGui::PushID("Miscellaneous");
-    if (ImGui::CollapsingHeader("Miscellaneous"))
+    if (submenu("Miscellaneous"))
     {
         bool tutorialcomplete = g_save->tutorial_state > 2;
         if (ImGui::Checkbox("Tutorial completed", &tutorialcomplete))
@@ -5081,11 +5299,14 @@ void render_savegame()
         ImGui::SliderScalar("Rescued cats", ImGuiDataType_U8, &g_save->pets_rescued[1], &u8_min, &u8_max);
         ImGui::SliderScalar("Rescued hamsters", ImGuiDataType_U8, &g_save->pets_rescued[2], &u8_min, &u8_max);
         ImGui::InputText("Last daily", g_save->last_daily, sizeof(g_save->last_daily) + 1, 0);
+        endmenu();
     }
     ImGui::PopID();
 
     ImGui::PushID("UnlockAll");
-    if (ImGui::CollapsingHeader("Save changes or unlock everything"))
+    if (options["menu_ui"])
+        ImGui::SetNextWindowSize({400, -1});
+    if (submenu("Save changes or unlock everything"))
     {
         ImGui::PushFont(bigfont);
         ImGui::PushItemWidth(ImGui::GetContentRegionMax().x);
@@ -5109,6 +5330,7 @@ void render_savegame()
         ImGui::PopItemWidth();
         ImGui::PopFont();
         ImGui::TextWrapped("*Tutorial, seeded, characters, shortcuts, camp");
+        endmenu();
     }
     ImGui::PopID();
 }
@@ -5323,7 +5545,7 @@ void render_entity_finder()
     // ImGui::DragIntRange2("Draw depth##EntitySearchDepth", &search_entity_depth[0], &search_entity_depth[1], 1.0f, 0, 52);
 
     static int search_entity_mask = 0;
-    if (ImGui::CollapsingHeader("Mask##EntitySearchMask"))
+    if (submenu("Mask##EntitySearchMask"))
     {
         for (int i = 0; i < 15; i++)
         {
@@ -5331,6 +5553,7 @@ void render_entity_finder()
                 ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
             ImGui::CheckboxFlags(mask_names[i], &search_entity_mask, (int)std::pow(2, i));
         }
+        endmenu();
     }
 
     static unsigned int search_entity_flags = 0;
@@ -5345,7 +5568,7 @@ void render_entity_finder()
     static const ImVec4 white = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
     ImGui::PushStyleColor(ImGuiCol_CheckMark, white);
 
-    if (ImGui::CollapsingHeader("Flags##EntitySearchFlags"))
+    if (submenu("Flags##EntitySearchFlags"))
     {
         ImGui::PushID("EntitySearchFlags");
         for (int i = 0; i < 32; i++)
@@ -5361,8 +5584,9 @@ void render_entity_finder()
             ImGui::PopID();
         }
         ImGui::PopID();
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("More Flags##EntitySearchMoreFlags"))
+    if (submenu("More Flags##EntitySearchMoreFlags"))
     {
         ImGui::PushID("EntitySearchMoreFlags");
         for (int i = 0; i < 23; i++)
@@ -5378,8 +5602,9 @@ void render_entity_finder()
             ImGui::PopID();
         }
         ImGui::PopID();
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Properties Flags##EntitySearchPropertiesFlags"))
+    if (submenu("Properties Flags##EntitySearchPropertiesFlags"))
     {
         ImGui::PushID("EntitySearchPropertiesFlags");
         for (int i = 0; i < 27; i++)
@@ -5395,6 +5620,7 @@ void render_entity_finder()
             ImGui::PopID();
         }
         ImGui::PopID();
+        endmenu();
     }
     ImGui::PopStyleColor();
     ImGui::Text("");
@@ -5673,7 +5899,7 @@ void render_entity_props(int uid, bool detached = false)
         entity->destroy();
     }
     tooltip("Destroy the entity quietly,\nlike just get rid of it, no boom, drops or decorating.");
-    if (ImGui::CollapsingHeader("State"))
+    if (submenu("State"))
     {
         auto overlay = entity->overlay;
         if (overlay && !IsBadReadPtr(overlay, 0x178))
@@ -5772,8 +5998,9 @@ void render_entity_props(int uid, bool detached = false)
                 render_uid(movable->last_owner_uid, "StateOwnerLast");
             }
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Position"))
+    if (submenu("Position"))
     {
         auto movable = entity->as<Movable>();
         if (ImGui::Button("Change"))
@@ -5819,8 +6046,9 @@ void render_entity_props(int uid, bool detached = false)
             const char* damagenum[] = {"0", "1", "2", "4", "99"};
             SliderByte("Fall damage##EntityFallDamage", (char*)&falldamage, 0, 4, damagenum[falldamage]);
         }
+        endmenu();
     }
-    if (is_movable && ImGui::CollapsingHeader("Stats"))
+    if (is_movable && submenu("Stats"))
     {
         auto movable = entity->as<Player>();
         ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&movable->health, 0.5f, &u8_one, &u8_max);
@@ -5833,15 +6061,17 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::DragInt("Level kills##EntityLevelKills", (int*)&movable->inventory_ptr->kills_level, 0.5f, 0, INT_MAX, "%d");
             ImGui::DragInt("Total kills##EntityTotalKills", (int*)&movable->inventory_ptr->kills_total, 0.5f, 0, INT_MAX, "%d");
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Items"))
+    if (submenu("Items"))
     {
         for (uint32_t item_uid : entity->items.uids())
         {
             render_uid(item_uid, "EntityItems", true);
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Global attributes") && entity->type)
+    if (submenu("Global attributes") && entity->type)
     {
         ImGui::DragScalar("Damage##GlobalDamage", ImGuiDataType_U8, (char*)&entity->type->damage, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Health##GlobalLife", ImGuiDataType_U8, (char*)&entity->type->life, 0.5f, &u8_one, &u8_max);
@@ -5853,15 +6083,16 @@ void render_entity_props(int uid, bool detached = false)
         ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &entity->type->sprint_factor, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::DragFloat("Jump power##GlobalJumpPower", &entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::InputScalar("Search flags##SearchFlags", ImGuiDataType_U32, &entity->type->search_flags, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
-        if (ImGui::CollapsingHeader("Properties flags"))
+        if (submenu("Properties flags"))
         {
             for (int i = 0; i < 32; i++)
             {
                 ImGui::CheckboxFlags(entity_type_properties_flags[i], &entity->type->properties_flags, (int)std::pow(2, i));
             }
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Special attributes"))
+    if (submenu("Special attributes"))
     {
         const auto entity_type = entity->type->id;
         if (entity_type == to_id("ENT_TYPE_ITEM_COFFIN"))
@@ -6001,8 +6232,9 @@ void render_entity_props(int uid, bool detached = false)
                 }
             }
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Color, Size, Texture"))
+    if (submenu("Color, Size, Texture"))
     {
         auto textureid = entity->get_texture();
         std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid));
@@ -6032,22 +6264,25 @@ void render_entity_props(int uid, bool detached = false)
         ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &entity->animation_frame, 0.2f, &u16_zero, &u16_max);
         ImGui::InputText(fmt::format("Texture: {}##EntityTexture", textureid).c_str(), &texture, ImGuiInputTextFlags_ReadOnly);
         // ImGui::InputText("Texture path##EntityTexturePath", &texturepath, ImGuiInputTextFlags_ReadOnly);
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Flags"))
+    if (submenu("Flags"))
     {
         for (int i = 0; i < 32; i++)
         {
             ImGui::CheckboxFlags(entity_flags[i], &entity->flags, (int)std::pow(2, i));
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("More Flags"))
+    if (submenu("More Flags"))
     {
         for (int i = 0; i < 32; i++)
         {
             ImGui::CheckboxFlags(more_flags[i], &entity->more_flags, (int)std::pow(2, i));
         }
+        endmenu();
     }
-    if (is_movable && ImGui::CollapsingHeader("Input Display"))
+    if (is_movable && submenu("Input Display"))
     {
         auto const movable_entity = entity->as<Movable>();
         ImVec2 region = ImGui::GetContentRegionMax();
@@ -6073,12 +6308,14 @@ void render_entity_props(int uid, bool detached = false)
             if (i < 5)
                 ImGui::SameLine(region.x / 6 * (i + 1));
         }
+        endmenu();
     }
-    if ((entity->type->search_flags & 0x1) && ImGui::CollapsingHeader("Illumination"))
+    if ((entity->type->search_flags & 0x1) && submenu("Illumination"))
     {
         auto entity_player = entity->as<Player>();
         if (entity_player->emitted_light)
             render_illumination(entity_player->emitted_light, "Entity illumination");
+        endmenu();
     }
     ImGui::PopItemWidth();
 }
@@ -6187,7 +6424,7 @@ void render_game_props()
     if (g_state == 0)
         return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    if (ImGui::CollapsingHeader("State"))
+    if (submenu("State"))
     {
         render_screen("Current screen", g_state->screen);
         render_screen("Last screen", g_state->screen_last);
@@ -6210,8 +6447,9 @@ void render_game_props()
                 g_state->pause = 0;
         }
         tooltip("Pause time while still being able to teleport, spawn and move entities", "toggle_pause");
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Timer"))
+    if (submenu("Timer"))
     {
         render_timer();
         std::string lasttime = format_time(g_state->time_last_level);
@@ -6242,8 +6480,9 @@ void render_game_props()
             g_total_time = parse_time(totaltime);
             g_state->time_total = g_total_time;
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Level"))
+    if (submenu("Level"))
     {
         ImGui::InputInt2("Level size##LevelSize", (int*)&g_state->w, ImGuiInputTextFlags_ReadOnly);
         ImGui::DragScalar("World##Worldnumber", ImGuiDataType_U8, (char*)&g_state->world, 0.5f, &u8_one, &u8_max);
@@ -6262,12 +6501,13 @@ void render_game_props()
         ImGui::SameLine();
         ImGui::Text("%s", theme_name(g_state->theme_start));
         ImGui::DragScalar("Levels completed##LevelsCompleted", ImGuiDataType_U8, (char*)&g_state->level_count, 0.5f, &u8_zero, &u8_max);
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Quests"))
+    if (submenu("Quests"))
     {
-        ImGui::Indent(16.0f);
+        indent(16.0f);
 
-        if (ImGui::CollapsingHeader("Yang"))
+        if (submenu("Yang"))
         {
             if (ImGui::Checkbox("Freeze current state##FreezeQuestYang", &freeze_quest_yang))
             {
@@ -6286,9 +6526,10 @@ void render_game_props()
             ImGui::RadioButton("2 turkeys bought##QuestYang2", &yang_state, 6);
             ImGui::RadioButton("3 turkeys bought##QuestYang3", &yang_state, 7);
             g_state->quests->yang_state = static_cast<int8_t>(yang_state);
+            endmenu();
         }
 
-        if (ImGui::CollapsingHeader("Jungle Sisters"))
+        if (submenu("Jungle Sisters"))
         {
             if (ImGui::Checkbox("Freeze current state##FreezeQuestSisters", &freeze_quest_sisters))
             {
@@ -6316,9 +6557,10 @@ void render_game_props()
                 ImGui::CheckboxFlags("Met in palace##QuestSistersNeoBabylon", &sisters_state, 16);
             }
             g_state->quests->jungle_sisters_flags = static_cast<int8_t>(sisters_state);
+            endmenu();
         }
 
-        if (ImGui::CollapsingHeader("Van Horsing"))
+        if (submenu("Van Horsing"))
         {
             if (ImGui::Checkbox("Freeze current state##FreezeQuestHorsing", &freeze_quest_horsing))
             {
@@ -6338,9 +6580,10 @@ void render_game_props()
             ImGui::RadioButton("Got alien compass##QuestHorsingComplass", &horsing_state, 6);
             ImGui::RadioButton("Palace basement ending##QuestHorsingTusk", &horsing_state, 7);
             g_state->quests->van_horsing_state = static_cast<int8_t>(horsing_state);
+            endmenu();
         }
 
-        if (ImGui::CollapsingHeader("Sparrow"))
+        if (submenu("Sparrow"))
         {
             if (ImGui::Checkbox("Freeze current state##FreezeQuestSparrow", &freeze_quest_sparrow))
             {
@@ -6361,9 +6604,10 @@ void render_game_props()
             ImGui::RadioButton("Met in Neo Babylon##QuestSparrowSecondComplete", &sparrow_state, 7);
             ImGui::RadioButton("Palace basement ending##QuestSparrowTusk", &sparrow_state, 8);
             g_state->quests->sparrow_state = static_cast<int8_t>(sparrow_state);
+            endmenu();
         }
 
-        if (ImGui::CollapsingHeader("Madame Tusk"))
+        if (submenu("Madame Tusk"))
         {
             if (ImGui::Checkbox("Freeze current state##FreezeQuestTusk", &freeze_quest_tusk))
             {
@@ -6380,9 +6624,10 @@ void render_game_props()
             ImGui::RadioButton("High roller##QuestTuskHighRoller", &tusk_state, 2);
             ImGui::RadioButton("Palace ending##QuestTuskPalace", &tusk_state, 3);
             g_state->quests->madame_tusk_state = static_cast<int8_t>(tusk_state);
+            endmenu();
         }
 
-        if (ImGui::CollapsingHeader("Beg"))
+        if (submenu("Beg"))
         {
             if (ImGui::Checkbox("Freeze current state##FreezeQuestBeg", &freeze_quest_beg))
             {
@@ -6400,11 +6645,13 @@ void render_game_props()
             ImGui::RadioButton("Spawned with true crown##QuestBegCrown", &beg_state, 4);
             ImGui::RadioButton("Got true crown##QuestBegGotCrown", &beg_state, 5);
             g_state->quests->beg_state = static_cast<int8_t>(beg_state);
+            endmenu();
         }
 
-        ImGui::Unindent(16.0f);
+        unindent(16.0f);
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Street cred"))
+    if (submenu("Street cred"))
     {
         ImGui::DragScalar("Shoppie aggro##ShoppieAggro", ImGuiDataType_U8, &g_state->shoppie_aggro, 0.5f, &u8_min, &u8_max, "%d");
         ImGui::DragScalar("Shoppie aggro levels##ShoppieAggroLevels", ImGuiDataType_U8, &g_state->shoppie_aggro_levels, 0.5f, &u8_min, &u8_max, "%d");
@@ -6413,47 +6660,54 @@ void render_game_props()
         ImGui::DragScalar("Kali favor##PorFavor", ImGuiDataType_S8, (char*)&g_state->kali_favor, 0.5f, &s8_min, &s8_max);
         ImGui::DragScalar("Kali status##KaliStatus", ImGuiDataType_S8, (char*)&g_state->kali_status, 0.5f, &s8_min, &s8_max);
         ImGui::DragScalar("Altars destroyed##KaliAltars", ImGuiDataType_S8, (char*)&g_state->kali_altars_destroyed, 0.5f, &s8_min, &s8_max);
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Players"))
+    if (submenu("Players"))
     {
         render_players();
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Level flags"))
+    if (submenu("Level flags"))
     {
         for (int i = 0; i < 32; i++)
         {
             ImGui::CheckboxFlags(level_flags[i], &g_state->level_flags, (int)std::pow(2, i));
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Quest flags"))
+    if (submenu("Quest flags"))
     {
         for (int i = 0; i < 32; i++)
         {
             ImGui::CheckboxFlags(quest_flags[i], &g_state->quest_flags, (int)std::pow(2, i));
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Journal flags"))
+    if (submenu("Journal flags"))
     {
         for (int i = 0; i < 21; i++)
         {
             ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, (int)std::pow(2, i));
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Presence flags"))
+    if (submenu("Presence flags"))
     {
         for (int i = 0; i < 11; i++)
         {
             ImGui::CheckboxFlags(presence_flags[i], &g_state->presence_flags, (int)std::pow(2, i));
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Special visibility flags"))
+    if (submenu("Special visibility flags"))
     {
         for (int i = 0; i < 32; i++)
         {
             ImGui::CheckboxFlags(special_visibility_flags[i], &g_state->special_visibility_flags, (int)std::pow(2, i));
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("AI targets"))
+    if (submenu("AI targets"))
     {
         for (size_t x = 0; x < 8; ++x)
         {
@@ -6489,13 +6743,15 @@ void render_game_props()
                 }
             }
         }
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Global illumination"))
+    if (submenu("Global illumination"))
     {
         if (g_state->illumination)
             render_illumination(g_state->illumination, "Global illumination");
+        endmenu();
     }
-    if (ImGui::CollapsingHeader("Liquid pools"))
+    if (submenu("Liquid pools"))
     {
         static bool global_pause = false;
         bool global_pause_changed = ImGui::Checkbox("Global pause physics##LiquidGlobalPause", &global_pause);
@@ -6512,6 +6768,7 @@ void render_game_props()
                     g_state->liquid_physics->pools[i].physics_engine->gravity = global_gravity;
             }
         }
+        endmenu();
     }
     ImGui::PopItemWidth();
 }
@@ -6615,166 +6872,6 @@ void load_font()
 
     bigfont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[1]);
     hugefont = io.Fonts->AddFontFromMemoryCompressedTTF(OLFont_compressed_data, OLFont_compressed_size, fontsize[2]);
-}
-
-void render_style_editor()
-{
-    ImGuiStyle& style = ImGui::GetStyle();
-    ImGuiIO& io = ImGui::GetIO();
-    if (options["menu_ui"])
-    {
-        if (ImGui::MenuItem("Randomize"))
-        {
-            g_hue = (float)rand() / RAND_MAX;
-            g_sat = (float)rand() / RAND_MAX;
-            g_val = (float)rand() / RAND_MAX;
-            style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
-        }
-        ImGui::Separator();
-    }
-    ImGui::TextWrapped("Leave empty to use embedded font 'Hack'. You must save and restart for font changes to take effect.");
-    ImGui::InputText("Font file##FontFile", &fontfile);
-    tooltip("Just the filename, e.g. comic.ttf");
-    ImGui::DragFloat("Small print##FontSmall", &fontsize[0], 0.1f, 6.0f, 32.0f);
-    ImGui::DragFloat("Medium print##FontMedium", &fontsize[1], 0.1f, 16.0f, 48.0f);
-    ImGui::DragFloat("Large print##FontLarge", &fontsize[2], 0.1f, 24.0f, 96.0f);
-    ImGui::Separator();
-    ImGui::DragFloat("Hue##StyleHue", &g_hue, 0.01f, 0.0f, 1.0f);
-    ImGui::DragFloat("Saturation##StyleSaturation", &g_sat, 0.01f, 0.0f, 1.0f);
-    ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01f, 0.0f, 1.0f);
-    ImGui::DragFloat("Alpha##StyleAlpha", &style.Alpha, 0.01f, 0.2f, 1.0f);
-    ImGui::DragFloat("Scale##StyleScale", &io.FontGlobalScale, 0.01f, 0.2f, 2.0f);
-    if (!options["menu_ui"])
-    {
-        if (ImGui::Button("Randomize##StyleRandomize"))
-        {
-            g_hue = (float)rand() / RAND_MAX;
-            g_sat = (float)rand() / RAND_MAX;
-            g_val = (float)rand() / RAND_MAX;
-            style.Alpha = (float)rand() / RAND_MAX * 0.5f + 0.4f;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Save options##StyleSave"))
-        {
-            save_config(cfgfile);
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Load options##StyleLoad"))
-        {
-            load_config(cfgfile);
-            refresh_script_files();
-        }
-    }
-    set_colors();
-}
-
-void render_keyconfig()
-{
-    ImGui::PushID("keyconfig");
-    ImGui::BeginTable("##keyconfig", 4);
-    ImGui::TableSetupColumn("Tool");
-    ImGui::TableSetupColumn("Keys");
-    ImGui::TableSetupColumn("Keycode");
-    ImGui::TableSetupColumn("");
-    ImGui::TableHeadersRow();
-    for (const auto& kv : keys)
-    {
-        ImGui::PushID(kv.first.c_str());
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-        ImGui::Text("%s", kv.first.c_str());
-        ImGui::TableNextColumn();
-        ImGui::Text("%s", key_string(keys[kv.first]).c_str());
-        ImGui::TableNextColumn();
-        ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "0x%X", ImGuiInputTextFlags_CharsHexadecimal);
-        ImGui::TableNextColumn();
-        if (ImGui::Button("Capture"))
-        {
-            g_change_key = kv.first;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("Disable"))
-        {
-            keys[kv.first] = 0;
-        }
-        ImGui::PopID();
-    }
-    ImGui::EndTable();
-    ImGui::PopID();
-
-    if (g_change_key != "")
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        io.WantCaptureKeyboard = true;
-        auto base = ImGui::GetMainViewport();
-        ImGui::SetNextWindowSize(base->Size);
-        ImGui::SetNextWindowPos(base->Pos);
-        ImGui::SetNextWindowViewport(base->ID);
-        ImGui::SetNextWindowBgAlpha(0.75);
-        ImGui::Begin(
-            "KeyCapture",
-            NULL,
-            ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking);
-        ImGui::InvisibleButton("KeyCaptureCanvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
-        ImDrawList* dl = ImGui::GetForegroundDrawList();
-        ImGui::PushFont(bigfont);
-        std::string buf = fmt::format("Enter new key/button combo for {}.\nModifiers Ctrl, Alt and Shift are available.", g_change_key);
-        ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
-        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + base->Size.y / 2 - textsize.y / 2}, ImColor(1.0f, 1.0f, 1.0f, .8f), buf.c_str());
-        ImGui::PopFont();
-
-        // Buttons
-        for (size_t i = 0; i < 5; ++i)
-        {
-            if (io.MouseDown[i])
-            {
-                size_t keycode = 0x400 + i + 1;
-                if (io.KeysDown[VK_CONTROL])
-                    keycode += 0x100;
-                if (io.KeysDown[VK_SHIFT])
-                    keycode += 0x200;
-                keys[g_change_key] = keycode;
-                save_config(cfgfile);
-                g_change_key = "";
-            }
-        }
-
-        // Wheel
-        if (io.MouseWheel != 0)
-        {
-            size_t keycode = 0x400;
-            if (io.MouseWheel < 0)
-                keycode += OL_WHEEL_DOWN;
-            else if (io.MouseWheel > 0)
-                keycode += OL_WHEEL_UP;
-            if (io.KeysDown[VK_CONTROL])
-                keycode += 0x100;
-            if (io.KeysDown[VK_SHIFT])
-                keycode += 0x200;
-            keys[g_change_key] = keycode;
-            save_config(cfgfile);
-            g_change_key = "";
-        }
-
-        // Keys
-        for (size_t i = 0; i < VK_LSHIFT; ++i)
-        {
-            if (ImGui::IsKeyDown((ImGuiKey)i))
-            {
-                size_t keycode = i;
-                if (ImGui::GetIO().KeyCtrl)
-                    keycode += 0x100;
-                if (ImGui::GetIO().KeyShift)
-                    keycode += 0x200;
-                if (ImGui::GetIO().KeyAlt)
-                    keycode += 0x800;
-                keys[g_change_key] = keycode;
-                save_config(cfgfile);
-                g_change_key = "";
-            }
-        }
-        ImGui::End();
-    }
 }
 
 void render_spawner()
@@ -6924,14 +7021,15 @@ void imgui_draw()
         ImGui::SetNextWindowSize({600, base->Size.y / 2}, ImGuiCond_FirstUseEver);
         if (options["menu_ui"])
         {
+            in_menu = true;
             ImGui::PushID("MainMenu");
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {0, 0});
             if (ImGui::BeginMainMenuBar())
             {
                 ImGui::PopStyleVar();
-                for (size_t i = 0; i < tab_order.size(); ++i)
+                for (size_t i = 0; i < tab_order_main.size(); ++i)
                 {
-                    auto tab = tab_order[i];
+                    auto tab = tab_order_main[i];
                     if (windows[tab]->detached)
                         continue;
                     ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {600.0f, base->Size.y - 50.0f});
@@ -6963,6 +7061,7 @@ void imgui_draw()
                 ImGui::EndMainMenuBar();
             }
             ImGui::PopID();
+            in_menu = false;
         }
         else
         {
