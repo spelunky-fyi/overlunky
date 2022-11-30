@@ -93,6 +93,12 @@ std::pair<float, float> UI::screen_position(float x, float y)
 {
     return State::screen_position(x, y);
 }
+float UI::screen_distance(float x)
+{
+    auto a = State::screen_position(0, 0);
+    auto b = State::screen_position(x, 0);
+    return b.first - a.first;
+}
 Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
     auto state = State::get();

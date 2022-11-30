@@ -3524,6 +3524,10 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         if (ent_spark->size >= 1.0)
             color = ImColor(255, 0, 0, 150);
     }
+    else if (ent->type->search_flags == 0x10) // Explosion
+    {
+        color = ImColor(255, 0, 0, 150);
+    }
     if (ent->shape == SHAPE::CIRCLE)
         if (filled)
             draw_list->AddCircleFilled(fix_pos(spos), sboxb.x - spos.x, color);
@@ -3549,9 +3553,11 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
     if (type == spark_trap && ent->animation_frame == 7)
     {
         float distance = UI::get_spark_distance(ent->as<SparkTrap>());
+        auto thick = UI::screen_distance(0.55f);
+        auto sthick = screenify(thick);
         auto [radx, rady] = UI::screen_position(render_position.first + distance, render_position.second + distance);
         auto srad = screenify({radx, rady});
-        draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 150), 0, 2.0f);
+        draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 40), 0, sthick);
     }
     else if (type == bomb)
     {

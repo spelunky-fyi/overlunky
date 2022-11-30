@@ -45,6 +45,7 @@ class UI
     static float get_zoom_level();
     static void teleport(float x, float y, bool s, float vx, float vy, bool snap);
     static std::pair<float, float> screen_position(float x, float y);
+    static float screen_distance(float x);
     static Entity* get_entity_at(float x, float y, bool s, float radius, uint32_t mask);
     static void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap);
     static SaveData* savedata();
