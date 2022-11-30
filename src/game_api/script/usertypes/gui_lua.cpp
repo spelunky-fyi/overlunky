@@ -38,17 +38,17 @@ struct Gamepad : XINPUT_GAMEPAD
     bool enabled;
 };
 
-Gamepad get_gamepad()
+Gamepad get_gamepad(unsigned int index = 1)
 {
     if (g_WantUpdateHasGamepad)
     {
         XINPUT_CAPABILITIES caps;
-        g_HasGamepad = g_XInputGetCapabilities ? (g_XInputGetCapabilities(0, XINPUT_FLAG_GAMEPAD, &caps) == ERROR_SUCCESS) : false;
+        g_HasGamepad = g_XInputGetCapabilities ? (g_XInputGetCapabilities(index - 1, XINPUT_FLAG_GAMEPAD, &caps) == ERROR_SUCCESS) : false;
         // g_WantUpdateHasGamepad = false;
     }
 
     XINPUT_STATE xinput_state;
-    if (g_HasGamepad && g_XInputGetState && g_XInputGetState(0, &xinput_state) == ERROR_SUCCESS)
+    if (g_HasGamepad && g_XInputGetState && g_XInputGetState(index - 1, &xinput_state) == ERROR_SUCCESS)
     {
         return {xinput_state.Gamepad, true};
     }
@@ -620,7 +620,13 @@ void register_usertypes(sol::state& lua)
         sol::property([]()
                       {
                           g_WantUpdateHasGamepad = true;
-                          return get_gamepad() /**/; }));
+                          return get_gamepad(1) /**/; }),
+        "gamepads",
+        [](unsigned int index)
+        {
+            g_WantUpdateHasGamepad = true;
+            return get_gamepad(index) /**/;
+        });
 
     /// Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
     /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
