@@ -403,15 +403,12 @@ class LuaBackend
     template <class T>
     auto cast_if_entity(T&& val)
     {
-        static constexpr bool is_entity_ptr{std::is_base_of_v<Entity, std::remove_pointer_t<std::decay_t<T>>>};
-        if constexpr (is_entity_ptr)
-        {
-            return cast_entity(val);
-        }
-        else
-        {
-            return std::forward<T>(val);
-        }
+        return std::forward<T>(val);
+    }
+    template <std::derived_from<Entity> T>
+    auto cast_if_entity(T* val)
+    {
+        return cast_entity(val);
     }
 };
 
