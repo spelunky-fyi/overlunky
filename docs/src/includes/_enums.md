@@ -252,6 +252,54 @@ Name | Data | Description
 [BOTTOM_LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_LEFT) | FLOOR_SIDE::BOTTOM_LEFT | 
 [BOTTOM_RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FLOOR_SIDE.BOTTOM_RIGHT) | FLOOR_SIDE::BOTTOM_RIGHT | 
 
+## GAMEPAD
+
+
+> Search script examples for [GAMEPAD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.UP) | 0x0001 | 
+[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.DOWN) | 0x0002 | 
+[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.LEFT) | 0x0004 | 
+[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.RIGHT) | 0x0008 | 
+[START](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.START) | 0x0010 | 
+[BACK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.BACK) | 0x0020 | 
+[LEFT_THUMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.LEFT_THUMB) | 0x0040 | 
+[RIGHT_THUMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.RIGHT_THUMB) | 0x0080 | 
+[LEFT_SHOULDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.LEFT_SHOULDER) | 0x0100 | 
+[RIGHT_SHOULDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.RIGHT_SHOULDER) | 0x0200 | 
+[A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.A) | 0x1000 | 
+[B](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.B) | 0x2000 | 
+[X](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.X) | 0x4000 | 
+[Y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD.Y) | 0x8000 | 
+
+## GAMEPAD_FLAG
+
+
+> Search script examples for [GAMEPAD_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.UP) | 1 | 
+[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.DOWN) | 2 | 
+[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.LEFT) | 3 | 
+[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.RIGHT) | 4 | 
+[START](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.START) | 5 | 
+[BACK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.BACK) | 6 | 
+[LEFT_THUMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.LEFT_THUMB) | 7 | 
+[RIGHT_THUMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.RIGHT_THUMB) | 8 | 
+[LEFT_SHOULDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.LEFT_SHOULDER) | 9 | 
+[RIGHT_SHOULDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.RIGHT_SHOULDER) | 10 | 
+[A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.A) | 11 | 
+[B](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.B) | 12 | 
+[X](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.X) | 13 | 
+[Y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.Y) | 14 | 
+
 ## GAME_SETTING
 
 
@@ -318,6 +366,28 @@ Name | Data | Description
 [RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RIGHT) | 512 | 
 [UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.UP) | 1024 | 
 [DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOWN) | 2048 | 
+
+## INPUT_FLAG
+
+
+> Search script examples for [INPUT_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.JUMP) | 1 | 
+[WHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.WHIP) | 2 | 
+[BOMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.BOMB) | 3 | 
+[ROPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.ROPE) | 4 | 
+[RUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.RUN) | 5 | 
+[DOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.DOOR) | 6 | 
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.MENU) | 7 | 
+[JOURNAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.JOURNAL) | 8 | 
+[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.LEFT) | 9 | 
+[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.RIGHT) | 10 | 
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.UP) | 11 | 
+[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUT_FLAG.DOWN) | 12 | 
 
 ## JOURNALUI_PAGE_SHOWN
 

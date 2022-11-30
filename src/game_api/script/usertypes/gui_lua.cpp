@@ -36,7 +36,7 @@ static PFN_XInputGetState g_XInputGetState = NULL;
 struct Gamepad : XINPUT_GAMEPAD
 {
     /*
-    Flags wButtons; // just for the autodoc
+    GAMEPAD wButtons; // just for the autodoc
     */
     bool enabled;
 };
@@ -583,13 +583,6 @@ void register_usertypes(sol::state& lua)
             return ImGui::IsKeyReleased((int)key);
         });
     /// Used in [get_io](#get_io)
-    /// Function declarations:<br/>
-    /// bool keydown(int keycode)<br/>
-    /// bool keydown(char key)<br/>
-    /// bool keypressed(int keycode, bool repeat = false)<br/>
-    /// bool keypressed(char key, bool repeat = false)<br/>
-    /// bool keyreleased(int keycode)<br/>
-    /// bool keyreleased(char key)<br/>
     lua.new_usertype<ImGuiIO>(
         "ImGuiIO",
         "displaysize",
@@ -642,7 +635,28 @@ void register_usertypes(sol::state& lua)
             return get_gamepad(index) /**/;
         });
 
-    /// Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+    /* ImGuiIO
+    // keydown
+    // bool keydown(int keycode)
+    // bool keydown(char key)
+    // keypressed
+    // bool keypressed(int keycode, bool repeat = false)
+    // bool keypressed(char key, bool repeat = false)
+    // keyreleased
+    // bool keyreleased(int keycode)
+    // bool keyreleased(char key)
+    // gamepads
+    // Gamepad gamepads(int index)
+    // This is the XInput index 1..4, might not be the same as the player slot.
+    */
+
+    lua.create_named_table("GAMEPAD", "UP", 0x0001, "DOWN", 0x0002, "LEFT", 0x0004, "RIGHT", 0x0008, "START", 0x0010, "BACK", 0x0020, "LEFT_THUMB", 0x0040, "RIGHT_THUMB", 0x0080, "LEFT_SHOULDER", 0x0100, "RIGHT_SHOULDER", 0x0200, "A", 0x1000, "B", 0x2000, "X", 0x4000, "Y", 0x8000);
+
+    lua.create_named_table("GAMEPAD_FLAG", "UP", 1, "DOWN", 2, "LEFT", 3, "RIGHT", 4, "START", 5, "BACK", 6, "LEFT_THUMB", 7, "RIGHT_THUMB", 8, "LEFT_SHOULDER", 9, "RIGHT_SHOULDER", 10, "A", 11, "B", 12, "X", 13, "Y", 14);
+
+    lua.create_named_table("INPUT_FLAG", "JUMP", 1, "WHIP", 2, "BOMB", 3, "ROPE", 4, "RUN", 5, "DOOR", 6, "MENU", 7, "JOURNAL", 8, "LEFT", 9, "RIGHT", 10, "UP", 11, "DOWN", 12);
+
+    /// Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
     ///
     /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
     /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
