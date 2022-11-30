@@ -81,6 +81,7 @@ std::map<std::string, int64_t> keys{
     {"toggle_mouse", OL_KEY_CTRL | 'M'},
     {"toggle_godmode", OL_KEY_CTRL | 'G'},
     {"toggle_noclip", OL_KEY_CTRL | 'F'},
+    {"toggle_flymode", OL_KEY_CTRL | OL_KEY_SHIFT | 'F'},
     {"toggle_snap", OL_KEY_CTRL | 'S'},
     {"toggle_pause", OL_KEY_CTRL | VK_SPACE},
     {"toggle_disable_pause", OL_KEY_CTRL | OL_KEY_SHIFT | 'P'},
@@ -297,6 +298,7 @@ std::map<std::string, bool> options = {
     {"god_mode", false},
     {"god_mode_companions", false},
     {"noclip", false},
+    {"fly_mode", false},
     {"snap_to_grid", false},
     {"spawn_floor_decorated", true},
     {"disable_pause", false},
@@ -1596,6 +1598,15 @@ void force_cheats()
             UI::destroy_entity_item_type(ent, ink);
         }
     }
+    if (options["fly_mode"])
+    {
+        for (auto ent : g_players)
+        {
+            auto player = (Movable*)(ent->topmost_mount());
+            if ((player->buttons & 1) == 1 && player->velocityy < 0.18f)
+                player->velocityy = 0.18f;
+        }
+    }
 }
 
 void force_kits()
@@ -2268,6 +2279,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["noclip"] = !options["noclip"];
         toggle_noclip();
+    }
+    else if (pressed("toggle_flymode", wParam))
+    {
+        options["fly_mode"] = !options["fly_mode"];
     }
     else if (pressed("toggle_hitboxes", wParam))
     {
@@ -4668,6 +4683,8 @@ void render_options()
             toggle_noclip();
         }
         tooltip("Fly through walls and ignored by enemies.", "toggle_noclip");
+        ImGui::Checkbox("Fly mode##FlyMode", &options["fly_mode"]);
+        tooltip("Fly while holding the jump button.", "toggle_flymode");
         ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
         tooltip("Enables the default level lighting everywhere.", "toggle_lights");
         if (ImGui::CheckboxFlags("Force dark levels", &g_dark_mode, 1))
@@ -6919,7 +6936,7 @@ void render_prohud()
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
+    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
