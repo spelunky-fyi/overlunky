@@ -1610,8 +1610,8 @@ GAMEPAD = {
   Y = 32768
 }
 GAMEPAD_FLAG = {
-  A = 11,
-  B = 12,
+  A = 13,
+  B = 14,
   BACK = 6,
   DOWN = 2,
   LEFT = 3,
@@ -1622,8 +1622,8 @@ GAMEPAD_FLAG = {
   RIGHT_THUMB = 8,
   START = 5,
   UP = 1,
-  X = 13,
-  Y = 14
+  X = 15,
+  Y = 16
 }
 GAME_SETTING = {
   ANGRY_SHOPKEEPER = 28,
@@ -4104,4 +4104,3 @@ YANG = {
   TURKEY_SHOP_SPAWNED = 4,
   TWO_TURKEYS_BOUGHT = 6
 }
-

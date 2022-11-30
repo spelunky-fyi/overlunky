@@ -652,7 +652,7 @@ void register_usertypes(sol::state& lua)
 
     lua.create_named_table("GAMEPAD", "UP", 0x0001, "DOWN", 0x0002, "LEFT", 0x0004, "RIGHT", 0x0008, "START", 0x0010, "BACK", 0x0020, "LEFT_THUMB", 0x0040, "RIGHT_THUMB", 0x0080, "LEFT_SHOULDER", 0x0100, "RIGHT_SHOULDER", 0x0200, "A", 0x1000, "B", 0x2000, "X", 0x4000, "Y", 0x8000);
 
-    lua.create_named_table("GAMEPAD_FLAG", "UP", 1, "DOWN", 2, "LEFT", 3, "RIGHT", 4, "START", 5, "BACK", 6, "LEFT_THUMB", 7, "RIGHT_THUMB", 8, "LEFT_SHOULDER", 9, "RIGHT_SHOULDER", 10, "A", 11, "B", 12, "X", 13, "Y", 14);
+    lua.create_named_table("GAMEPAD_FLAG", "UP", 1, "DOWN", 2, "LEFT", 3, "RIGHT", 4, "START", 5, "BACK", 6, "LEFT_THUMB", 7, "RIGHT_THUMB", 8, "LEFT_SHOULDER", 9, "RIGHT_SHOULDER", 10, "A", 13, "B", 14, "X", 15, "Y", 16);
 
     lua.create_named_table("INPUT_FLAG", "JUMP", 1, "WHIP", 2, "BOMB", 3, "ROPE", 4, "RUN", 5, "DOOR", 6, "MENU", 7, "JOURNAL", 8, "LEFT", 9, "RIGHT", 10, "UP", 11, "DOWN", 12);
 
