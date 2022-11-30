@@ -1497,7 +1497,7 @@ function create_image(path) end
 ---Current mouse cursor position in screen coordinates.
 ---@return number, number
 function mouse_position() end
----Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+---Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 ---
 ---- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
 ---- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
@@ -4377,7 +4377,7 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
 
 ---@class Gamepad
     ---@field enabled boolean
-    ---@field buttons Flags
+    ---@field buttons GAMEPAD
     ---@field lt number
     ---@field rt number
     ---@field lx number
@@ -4404,6 +4404,7 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field mousedoubleclicked boolean       [] @size: 5
     ---@field mousewheel number
     ---@field gamepad Gamepad
+    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
 
 ---@class VanillaRenderContext
     ---@field draw_text fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
@@ -6889,6 +6890,40 @@ FLOOR_SIDE = {
   TOP_RIGHT = 5
 }
 ---@alias FLOOR_SIDE integer
+GAMEPAD = {
+  A = 4096,
+  B = 8192,
+  BACK = 32,
+  DOWN = 2,
+  LEFT = 4,
+  LEFT_SHOULDER = 256,
+  LEFT_THUMB = 64,
+  RIGHT = 8,
+  RIGHT_SHOULDER = 512,
+  RIGHT_THUMB = 128,
+  START = 16,
+  UP = 1,
+  X = 16384,
+  Y = 32768
+}
+---@alias GAMEPAD integer
+GAMEPAD_FLAG = {
+  A = 13,
+  B = 14,
+  BACK = 6,
+  DOWN = 2,
+  LEFT = 3,
+  LEFT_SHOULDER = 9,
+  LEFT_THUMB = 7,
+  RIGHT = 4,
+  RIGHT_SHOULDER = 10,
+  RIGHT_THUMB = 8,
+  START = 5,
+  UP = 1,
+  X = 15,
+  Y = 16
+}
+---@alias GAMEPAD_FLAG integer
 GAME_SETTING = {
   ANGRY_SHOPKEEPER = 28,
   BRIGHTNESS = 10,
@@ -6974,6 +7009,21 @@ INPUTS = {
   WHIP = 2
 }
 ---@alias INPUTS integer
+INPUT_FLAG = {
+  BOMB = 3,
+  DOOR = 6,
+  DOWN = 12,
+  JOURNAL = 8,
+  JUMP = 1,
+  LEFT = 9,
+  MENU = 7,
+  RIGHT = 10,
+  ROPE = 4,
+  RUN = 5,
+  UP = 11,
+  WHIP = 2
+}
+---@alias INPUT_FLAG integer
 JOURNALUI_PAGE_SHOWN = {
   BESTIARY = 5,
   DEATH = 11,

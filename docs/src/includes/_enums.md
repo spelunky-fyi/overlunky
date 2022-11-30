@@ -295,10 +295,10 @@ Name | Data | Description
 [RIGHT_THUMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.RIGHT_THUMB) | 8 | 
 [LEFT_SHOULDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.LEFT_SHOULDER) | 9 | 
 [RIGHT_SHOULDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.RIGHT_SHOULDER) | 10 | 
-[A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.A) | 11 | 
-[B](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.B) | 12 | 
-[X](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.X) | 13 | 
-[Y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.Y) | 14 | 
+[A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.A) | 13 | 
+[B](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.B) | 14 | 
+[X](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.X) | 15 | 
+[Y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.Y) | 16 | 
 
 ## GAME_SETTING
 

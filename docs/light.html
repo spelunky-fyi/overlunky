@@ -3041,6 +3041,12 @@
                     <a href="#FLOOR_SIDE" class="toc-h2 toc-link" data-title="FLOOR_SIDE">FLOOR_SIDE</a>
                   </li>
                   <li>
+                    <a href="#GAMEPAD" class="toc-h2 toc-link" data-title="GAMEPAD">GAMEPAD</a>
+                  </li>
+                  <li>
+                    <a href="#GAMEPAD_FLAG" class="toc-h2 toc-link" data-title="GAMEPAD_FLAG">GAMEPAD_FLAG</a>
+                  </li>
+                  <li>
                     <a href="#GAME_SETTING" class="toc-h2 toc-link" data-title="GAME_SETTING">GAME_SETTING</a>
                   </li>
                   <li>
@@ -3051,6 +3057,9 @@
                   </li>
                   <li>
                     <a href="#INPUTS" class="toc-h2 toc-link" data-title="INPUTS">INPUTS</a>
+                  </li>
+                  <li>
+                    <a href="#INPUT_FLAG" class="toc-h2 toc-link" data-title="INPUT_FLAG">INPUT_FLAG</a>
                   </li>
                   <li>
                     <a href="#JOURNALUI_PAGE_SHOWN" class="toc-h2 toc-link" data-title="JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a>
@@ -4478,7 +4487,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_io">get_io</a></p>
 </blockquote>
 <h4 id='ImGuiIO-get_io'><a href="#ImGuiIO">ImGuiIO</a> get_io()</h4>
-<p>Returns: <a href="#ImGuiIO">ImGuiIO</a> for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.</p>
+<p>Returns: <a href="#ImGuiIO">ImGuiIO</a> for raw keyboard, mouse and xinput gamepad stuff.</p>
 
 <ul>
 <li>Note: The clicked/pressed actions only make sense in <code>ON.GUIFRAME</code>.</li>
@@ -6461,7 +6470,7 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=window">window(string title, float x, float y, float w, float h, bool movable, function callback)</a></td>
-<td>Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/><a href="https://github.com/ocornut/imgui/">ImGui</a> widgets, so read more about them there. Use screen position and distance, or <code>0, 0, 0, 0</code> to<br/>autosize in center. Use just a <code>##Label</code> as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add <code>##SomeUniqueLabel</code> after the text, or use pushid to<br/>give things unique ids. ImGui doesn&#39;t know what you clicked if all your buttons have the same text... The window api is probably evolving<br/>still, this is just the first draft. Felt cute, might delete later!<br/>Returns false if the window was closed from the X.<br/>The callback signature is nil win(GuiDrawContext ctx)</td>
+<td>Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/><a href="https://github.com/ocornut/imgui/">ImGui</a> widgets, so read more about them there. Use screen position and distance, or <code>0, 0, 0, 0</code> to<br/>autosize in center. Use just a <code>##Label</code> as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add <code>##SomeUniqueLabel</code> after the text, or use pushid to<br/>give things unique ids. ImGui doesn&#39;t know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx)</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -7984,7 +7993,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td><a href="#Aliases">Flags</a></td>
+<td><a href="#GAMEPAD">GAMEPAD</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
 <td></td>
 </tr>
@@ -8020,14 +8029,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 </tbody></table>
 <h3 id='ImGuiIO'>ImGuiIO</h3>
-<p>Used in <a href="#get_io">get_io</a>
-Function declarations:<br/>
-bool keydown(int keycode)<br/>
-bool keydown(char key)<br/>
-bool keypressed(int keycode, bool repeat = false)<br/>
-bool keypressed(char key, bool repeat = false)<br/>
-bool keyreleased(int keycode)<br/>
-bool keyreleased(char key)<br/></p>
+<p>Used in <a href="#get_io">get_io</a></p>
 
 <table><thead>
 <tr>
@@ -8059,17 +8061,17 @@ bool keyreleased(char key)<br/></p>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keydown">keydown</a></td>
-<td></td>
+<td>bool keydown(int keycode)<br/>bool keydown(char key)<br/></td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keypressed">keypressed</a></td>
-<td></td>
+<td>bool keypressed(int keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/></td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyreleased">keyreleased</a></td>
-<td></td>
+<td>bool keyreleased(int keycode)<br/>bool keyreleased(char key)<br/></td>
 </tr>
 <tr>
 <td>bool</td>
@@ -8125,6 +8127,11 @@ bool keyreleased(char key)<br/></p>
 <td><a href="#Gamepad">Gamepad</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=gamepad">gamepad</a></td>
 <td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=gamepads">gamepads</a></td>
+<td><a href="#Gamepad">Gamepad</a> gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/></td>
 </tr>
 </tbody></table>
 <h3 id='InputMapping'>InputMapping</h3>
@@ -24664,6 +24671,172 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 </tbody></table>
+<h2 id='GAMEPAD'>GAMEPAD</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD">GAMEPAD</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.UP">UP</a></td>
+<td>0x0001</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.DOWN">DOWN</a></td>
+<td>0x0002</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.LEFT">LEFT</a></td>
+<td>0x0004</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.RIGHT">RIGHT</a></td>
+<td>0x0008</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.START">START</a></td>
+<td>0x0010</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.BACK">BACK</a></td>
+<td>0x0020</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.LEFT_THUMB">LEFT_THUMB</a></td>
+<td>0x0040</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.RIGHT_THUMB">RIGHT_THUMB</a></td>
+<td>0x0080</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.LEFT_SHOULDER">LEFT_SHOULDER</a></td>
+<td>0x0100</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.RIGHT_SHOULDER">RIGHT_SHOULDER</a></td>
+<td>0x0200</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.A">A</a></td>
+<td>0x1000</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.B">B</a></td>
+<td>0x2000</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.X">X</a></td>
+<td>0x4000</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD.Y">Y</a></td>
+<td>0x8000</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='GAMEPAD_FLAG'>GAMEPAD_FLAG</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG">GAMEPAD_FLAG</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.UP">UP</a></td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.DOWN">DOWN</a></td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.LEFT">LEFT</a></td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.RIGHT">RIGHT</a></td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.START">START</a></td>
+<td>5</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.BACK">BACK</a></td>
+<td>6</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.LEFT_THUMB">LEFT_THUMB</a></td>
+<td>7</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.RIGHT_THUMB">RIGHT_THUMB</a></td>
+<td>8</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.LEFT_SHOULDER">LEFT_SHOULDER</a></td>
+<td>9</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.RIGHT_SHOULDER">RIGHT_SHOULDER</a></td>
+<td>10</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.A">A</a></td>
+<td>13</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.B">B</a></td>
+<td>14</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.X">X</a></td>
+<td>15</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAMEPAD_FLAG.Y">Y</a></td>
+<td>16</td>
+<td></td>
+</tr>
+</tbody></table>
 <h2 id='GAME_SETTING'>GAME_SETTING</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAME_SETTING">GAME_SETTING</a></p>
@@ -24853,6 +25026,79 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUTS.DOWN">DOWN</a></td>
 <td>2048</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='INPUT_FLAG'>INPUT_FLAG</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG">INPUT_FLAG</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.JUMP">JUMP</a></td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.WHIP">WHIP</a></td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.BOMB">BOMB</a></td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.ROPE">ROPE</a></td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.RUN">RUN</a></td>
+<td>5</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.DOOR">DOOR</a></td>
+<td>6</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.MENU">MENU</a></td>
+<td>7</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.JOURNAL">JOURNAL</a></td>
+<td>8</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.LEFT">LEFT</a></td>
+<td>9</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.RIGHT">RIGHT</a></td>
+<td>10</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.UP">UP</a></td>
+<td>11</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=INPUT_FLAG.DOWN">DOWN</a></td>
+<td>12</td>
 <td></td>
 </tr>
 </tbody></table>
