@@ -46,6 +46,7 @@
 #include "savedata.hpp"
 #include "screen.hpp"
 #include "script.hpp"
+#include "settings_api.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"
 #include "version.hpp"
@@ -6892,6 +6893,11 @@ void imgui_draw()
 {
     auto base = ImGui::GetMainViewport();
     ImGuiContext& g = *GImGui;
+
+    if (get_setting(GAME_SETTING::WINDOW_MODE) == 0)
+        ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+    else if (options["multi_viewports"])
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     for (int i = 1; i < g.PlatformIO.Viewports.Size; i++)
     {
