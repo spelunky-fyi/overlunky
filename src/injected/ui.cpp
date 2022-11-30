@@ -1543,7 +1543,7 @@ void toggle_noclip()
     }
 }
 
-void force_noclip()
+void force_cheats()
 {
     g_players = UI::get_players();
     if (options["noclip"])
@@ -1576,6 +1576,24 @@ void force_noclip()
                     player->teleport_abs(cpos.first, cpos.second, player->velocityx, player->velocityy);
                 }
             }
+        }
+    }
+    static const auto ink = to_id("ENT_TYPE_FX_INK_BLINDNESS");
+    static const auto bubble = to_id("ENT_TYPE_FX_INK_BLINDNESS");
+    if (options["god_mode"])
+    {
+        for (auto ent : g_players)
+        {
+            // Remove icecage, stun, poison, curse, axo bubble, inkspit etc
+            ent->frozen_timer = 0;
+            ent->stun_timer = 0;
+            ent->poison_tick_timer = -1;
+            ent->onfire_effect_timer = 0;
+            ent->wet_effect_timer = 0;
+            ent->lock_input_timer = 0;
+            ent->set_cursed(false);
+            ent->more_flags &= ~(1U << 16);
+            UI::destroy_entity_item_type(ent, ink);
         }
     }
 }
@@ -6097,6 +6115,7 @@ void render_entity_props(int uid, bool detached = false)
             {
                 ImGui::CheckboxFlags(entity_type_properties_flags[i], &entity->type->properties_flags, (int)std::pow(2, i));
             }
+            endmenu();
         }
         endmenu();
     }
@@ -7250,7 +7269,7 @@ void post_draw()
     force_zoom();
     force_hud_flags();
     force_time();
-    force_noclip();
+    force_cheats();
     force_lights();
     frame_advance();
 }
