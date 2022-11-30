@@ -232,7 +232,7 @@ bool UI::has_active_render(Entity* ent)
 float UI::get_spark_distance(SparkTrap* ent)
 {
     const static auto offset = get_address("sparktrap_angle_increment") + 4;
-    if (read_u8(offset - 1) == 0x89) // check if sparktraps_hack is active
+    if (memory_read<uint8_t>(offset - 1) == 0x89) // check if sparktraps_hack is active
     {
         auto spark = get_entity_ptr(ent->spark_uid)->as<Spark>();
         return spark->distance;

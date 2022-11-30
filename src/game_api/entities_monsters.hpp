@@ -378,7 +378,7 @@ class Lavamander : public Monster
     uint16_t jump_pause_timer; // jump pause when cool; runs continuously when hot
     uint8_t lava_detection_timer;
     bool is_hot;
-    /// 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava | probably used so he won't spit imminently after seeing the player
+    /// 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
     uint8_t player_detect_state;
     uint8_t padding2;
 };

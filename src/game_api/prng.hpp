@@ -66,5 +66,5 @@ struct PRNG
     {
         return random_int(min, max, static_cast<PRNG_CLASS>(7));
     }
-    prng_pair pairs[10];
+    std::array<prng_pair, 10> pairs;
 };

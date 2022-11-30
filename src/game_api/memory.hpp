@@ -119,23 +119,11 @@ requires std::is_trivially_copyable_v<T> void write_mem_prot(void* addr, const T
     write_mem_prot((size_t)addr, to_le_bytes(payload), prot);
 }
 
-#define DEFINE_ACCESSOR(name, type)                       \
-    [[maybe_unused]] inline type read_##name(size_t addr) \
-    {                                                     \
-        return *(type*)(addr);                            \
-    }
-
-DEFINE_ACCESSOR(u8, uint8_t);
-
-DEFINE_ACCESSOR(u32, uint32_t);
-
-DEFINE_ACCESSOR(u64, uint64_t);
-
-DEFINE_ACCESSOR(i32, int32_t);
-
-DEFINE_ACCESSOR(i64, int64_t);
-
-DEFINE_ACCESSOR(f32, float);
+template <typename T>
+inline T memory_read(size_t addr)
+{
+    return *(T*)(addr);
+}
 
 template <class FunT, typename T>
 FunT* vtable_find(T* obj, size_t index)

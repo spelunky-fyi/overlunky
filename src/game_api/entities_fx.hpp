@@ -44,8 +44,15 @@ class MiniGameShipOffset : public Movable
 class Button : public Movable
 {
   public:
-    /// Flags: 1 - pad: A, key: Z | 2 - pad: X, key: X | 3 - pad: B, key: C | 4- pad: Y, key: D
-    /// 5 - pad: LB, key: L Shift | 6 - pad: RB, key: A | 7 - pad: menu?, key: (none) | 8 - pad: copy?, key: Tab
+    /// Only one can be set:
+    /// 1 - pad: A, key: Z
+    /// 2 - pad: X, key: X
+    /// 4 - pad: B, key: C
+    /// 8 - pad: Y, key: D
+    /// 16 - pad: LB, key: L Shift
+    /// 32 - pad: RB, key: A
+    /// 64 - pad: menu?, key: (none)
+    /// 128 - pad: copy?, key: Tab
     uint8_t button_sprite; // changes the button shown, setting more then one flag defaults to the first
     int8_t unknown2;
     int16_t padding1;
@@ -60,7 +67,12 @@ class Button : public Movable
     int32_t player2_on_screen_timer; // they all are not even per player, as they run in sync
     int32_t player3_on_screen_timer; // timers sometimes stay, sometimes are set back to -1
     int32_t player4_on_screen_timer;
-    /// -1 - hasn't been seen | 0 - last seen by player 1 | 1 - last seen by player 2 | 2 - last seen by player 3 | 3 - last seen by player 4
+    ///
+    /// -1 - hasn't been seen
+    /// 0 - last seen by player 1
+    /// 1 - last seen by player 2
+    /// 2 - last seen by player 3
+    /// 3 - last seen by player 4
     int8_t seen;
     int8_t unknown11;
     int16_t padding3;

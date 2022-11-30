@@ -47,7 +47,7 @@ void register_usertypes(sol::state& lua)
         static_cast<void (*)(Movable*, Vec2, float, bool, bool)>(::update_movable));
     lua["Movable"]["generic_update_world"] = update_movable;
 
-    /// Opaque handle to a movable behavior
+    /// Opaque handle to a movable behavior used in some Movable functions
     lua.new_usertype<MovableBehavior>(
         "MovableBehavior",
         sol::no_constructor);

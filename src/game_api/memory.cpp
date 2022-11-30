@@ -71,7 +71,7 @@ void write_mem(size_t addr, std::string payload)
 size_t function_start(size_t off, uint8_t outside_byte)
 {
     off &= ~0xf;
-    while (read_u8(off - 1) != outside_byte)
+    while (memory_read<uint8_t>(off - 1) != outside_byte)
     {
         off -= 0x10;
     }

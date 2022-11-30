@@ -52,7 +52,7 @@ void register_usertypes(sol::state& lua)
         return get_texture(texture_path);
     };
     /// Reloads a texture from disk, use this only as a development tool for example in the console
-    /// Note that `define_texture` will also reload the texture if it already exists
+    /// Note that [define_texture](#define_texture) will also reload the texture if it already exists
     lua["reload_texture"] = [](std::string texture_path)
     {
         auto backend = LuaBackend::get_calling_backend();

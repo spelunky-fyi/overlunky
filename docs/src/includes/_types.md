@@ -7,6 +7,7 @@
 
 ### ArenaConfigArenas
 
+Used in [ArenaState](#ArenaState)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -53,6 +54,7 @@ bool | [sunkencity_5](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=s
 
 ### ArenaConfigEquippedItems
 
+Used in [ArenaState](#ArenaState)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -67,6 +69,7 @@ bool | [scepter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scepte
 
 ### ArenaConfigItems
 
+Used in [ArenaState](#ArenaState)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -113,6 +116,7 @@ bool | [true_crown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tru
 
 ### ArenaState
 
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -164,6 +168,7 @@ end, ON.GUIFRAME)
 
 ```
 
+Used in [register_option_callback](#register_option_callback) and [set_callback](#set_callback) with [ON](#ON).GUIFRAME
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -185,7 +190,7 @@ nil | [draw_image(IMAGE image, float left, float top, float right, float bottom,
 nil | [draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) | Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 nil | [draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) | Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 nil | [draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) | Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
-bool | [window(string title, float x, float y, float w, float h, bool movable, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) | Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving<br/>still, this is just the first draft. Felt cute, might delete later!<br/>Returns false if the window was closed from the X.
+bool | [window(string title, float x, float y, float w, float h, bool movable, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) | Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving<br/>still, this is just the first draft. Felt cute, might delete later!<br/>Returns false if the window was closed from the X.<br/>The callback signature is nil win(GuiDrawContext ctx)
 nil | [win_text(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text) | Add some text to window, automatically wrapped
 nil | [win_separator()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator) | Add a separator line to window
 nil | [win_inline()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline) | Add next thing on the same line. This is same as `win_sameline(0, -1)`
@@ -208,6 +213,8 @@ nil | [win_indent(float width)](https://github.com/spelunky-fyi/overlunky/search
 
 ### LoadContext
 
+Context received in [ON](#ON).LOAD
+Used to load from save_{}.dat into a string
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -215,6 +222,8 @@ string | [load()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load)
 
 ### PostRoomGenerationContext
 
+Context received in [ON](#ON).POST_ROOM_GENERATION.
+Used to change the room templates in the level and other shenanigans that affect level gen.
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -230,6 +239,8 @@ nil | [change_short_tile_code(SHORT_TILE_CODE short_tile_code, ShortTileCodeDef 
 
 ### PreHandleRoomTilesContext
 
+Context received in [ON](#ON).PRE_HANDLE_ROOM_TILES.
+Used to change the room data as well as add a backlayer room if none is set yet.
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -243,6 +254,7 @@ nil | [add_copied_back_layer()](https://github.com/spelunky-fyi/overlunky/search
 
 ### PreLoadLevelFilesContext
 
+Context received in [ON](#ON).PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -251,6 +263,9 @@ nil | [add_level_files(array<string> levels)](https://github.com/spelunky-fyi/ov
 
 ### SaveContext
 
+Context received in [ON](#ON).SAVE
+Used to save a string to some form of save_{}.dat
+Future calls to this will override the save
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -258,6 +273,7 @@ bool | [save(string data)](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 
 ### VanillaRenderContext
 
+Used in [set_callback](#set_callback) [ON](#ON).RENDER_ callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -281,6 +297,7 @@ nil | [draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& de
 
 ### Ai
 
+Used in [Player](#Player)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -295,6 +312,7 @@ int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 
 ### Animation
 
+Used in [EntityDB](#EntityDB)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -306,8 +324,6 @@ int | [interval](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=interv
 
 ### EntityDB
 
-
-Used to store static common data for an ENT_TYPE. You can also clone entity types with the copy constructor to create new custom entities with different common properties. [This tool](https://dregu.github.io/Spelunky2ls/animation.html) can be helpful when messing with the animations. The default values are also listed in [entities.json](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json).
 
 > When cloning an entity type, remember to save it in the script for as long as you need it. Otherwise the memory will be freed immediately, which eventually leads to a crash when used or overwritten by other stuff:
 
@@ -368,6 +384,8 @@ end, ON.POST_LEVEL_GENERATION)
 ```
 
 
+Used in [Entity](#Entity) and [get_type](#get_type)<br/>
+Stores static common data for an [ENT_TYPE](#ENT_TYPE). You can also clone entity types with the copy constructor to create new custom entities with different common properties. [This tool](https://dregu.github.io/Spelunky2ls/animation.html) can be helpful when messing with the animations. The default values are also listed in [entities.json](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json).
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -410,6 +428,7 @@ int | [tiley](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiley) |
 
 ### Inventory
 
+Used in [Player](#Player), [PlayerGhost](#PlayerGhost) and [Items](#Items)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -469,9 +488,11 @@ float | [area()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) 
 tuple&lt;float, float&gt; | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
 float | [width()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | Short for `aabb.right - aabb.left`.
 float | [height()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Short for `aabb.top - aabb.bottom`.
+tuple&lt;float, float, float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ### BackgroundMusic
 
+Used in [GameManager](#GameManager)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -546,7 +567,7 @@ float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) |
 
 ### MovableBehavior
 
-Opaque handle to a movable behavior
+Opaque handle to a movable behavior used in some [Movable](#Movable) functions
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -555,10 +576,27 @@ int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 
 ### PRNG
 
+
+```lua
+--Make it so there is 50% chance that the Ankh will be destroyed
+
+set_callback(function ()
+    -- more or less 50% chance
+    if prng:random(2) == 1 then
+        -- get all Ankh's in a level
+        ankhs = get_entities_by(ENT_TYPE.ITEM_PICKUP_ANKH, MASK.ITEM, LAYER.BOTH)
+        for _, uid in pairs(ankhs) do
+            get_entity(uid):destroy()
+        end
+    end
+end, ON.LEVEL)
+
+```
+
 [PRNG](#PRNG) (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
 The game uses specific buffers for specific scenarios, for example the third buffer is used every time particles are spawned to determine a random velocity.
 The used buffer is determined by [PRNG_CLASS](#PRNG_CLASS). If you want to make a mod that does not affect level generation but still uses the prng then you want to stay away from specific buffers.
-If you don't care what part of the game you affect just use `prng.random`.
+If you don't care what part of the game you affect just use [prng](#prng)`.random`.
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -600,7 +638,7 @@ tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split
 
 ### RenderInfo
 
-Some information used to render the entity, can not be changed
+Some information used to render the entity, can not be changed, used in [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -616,6 +654,7 @@ bool | [render_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 
 ### ShortTileCodeDef
 
+Used in [get_short_tile_code](#get_short_tile_code), [get_short_tile_code_definition](#get_short_tile_code_definition) and [PostRoomGenerationContext](#PostRoomGenerationContext)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -635,18 +674,19 @@ Type | Name | Description
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 [Vec2](#Vec2)& | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | 
- | [split](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
+tuple&lt;float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ## Input types
 
 
 ### Gamepad
 
+Used in [ImGuiIO](#ImGuiIO)
 
 Type | Name | Description
 ---- | ---- | -----------
 bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
- | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+[Flags](#Aliases) | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
 float | [lt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lt) | 
 float | [rt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rt) | 
 float | [lx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lx) | 
@@ -656,6 +696,14 @@ float | [ry](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ry) |
 
 ### ImGuiIO
 
+Used in [get_io](#get_io)
+Function declarations:<br/>
+bool keydown(int keycode)<br/>
+bool keydown(char key)<br/>
+bool keypressed(int keycode, bool repeat = false)<br/>
+bool keypressed(char key, bool repeat = false)<br/>
+bool keyreleased(int keycode)<br/>
+bool keyreleased(char key)<br/>
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -676,10 +724,11 @@ bool        | [mousedown[5]](https://github.com/spelunky-fyi/overlunky/search?l=
 bool        | [mouseclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
 bool        | [mousedoubleclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
 float       | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) | 
- | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
+[Gamepad](#Gamepad) | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
 
 ### InputMapping
 
+Used in [PlayerSlot](#PlayerSlot)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -698,6 +747,7 @@ int | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) |
 
 ### PlayerInputs
 
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -717,6 +767,7 @@ array&lt;[PlayerSlotSettings](#PlayerSlotSettings), MAX_PLAYERS&gt; | [player_se
 
 ### JournalPage
 
+Used in [set_callback](#set_callback) with [ON](#ON).RENDER_POST_JOURNAL_PAGE
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -916,6 +967,8 @@ Type | Name | Description
 
 ### DoorCoords
 
+Deprecated
+ kept for backward compatibility, don't use, check [LevelGenSystem](#LevelGenSystem).exit_doors
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -926,6 +979,7 @@ float | [door2_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2
 
 ### LevelGenSystem
 
+Data relating to level generation, changing anything in here from [ON](#ON).LEVEL or later will likely have no effect, used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -943,6 +997,8 @@ array&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlu
 
 ### Illumination
 
+Generic obcject for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
+Used in [StateMemory](#StateMemory), [Player](#Player), [PlayerGhost](#PlayerGhost), [BurningRopeEffect](#BurningRopeEffect) ...
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -966,6 +1022,7 @@ int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) |
 
 ### LightParams
 
+Used in [Illumination](#Illumination)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -979,13 +1036,16 @@ float | [size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) |
 
 ### LiquidPhysics
 
+Use [LIQUID_POOL](#LIQUID_POOL) enum for the index<br/>
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
-[LiquidPool](#LiquidPool) | [pools[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pools) | 
+array&lt;[LiquidPool](#LiquidPool), 5&gt; | [pools](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pools) | 
 
 ### LiquidPhysicsEngine
 
+Used in [LiquidPool](#LiquidPool)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -999,6 +1059,7 @@ int | [count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=count) |
 
 ### LiquidPhysicsParams
 
+Used in [LiquidPool](#LiquidPool)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1008,6 +1069,7 @@ float | [elasticity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=el
 
 ### LiquidPool
 
+Used in [LiquidPhysics](#LiquidPhysics)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1019,12 +1081,15 @@ Type | Name | Description
 
 ### Logic
 
+Used in [LogicList](#LogicList)
 
 Type | Name | Description
 ---- | ---- | -----------
+int | [logic_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic_index) | 
 
 ### LogicDiceShop
 
+Used in [LogicList](#LogicList)
 Derived from [Logic](#Logic)
 
 
@@ -1047,6 +1112,7 @@ int | [balance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=balance
 
 ### LogicList
 
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1056,6 +1122,7 @@ Type | Name | Description
 
 ### LogicOlmecCutscene
 
+Used in [LogicList](#LogicList)
 Derived from [Logic](#Logic)
 
 
@@ -1068,6 +1135,7 @@ int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) |
 
 ### LogicTiamatCutscene
 
+Used in [LogicList](#LogicList)
 Derived from [Logic](#Logic)
 
 
@@ -1084,6 +1152,19 @@ int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) |
 ### Online
 
 
+```lua
+message = "Currently playing: "
+for _, p in pairs(online.online_players) do
+    if p.ready_state ~= 0 then
+        message = message .. p.player_name .. " "
+    end
+end
+print(message)
+
+```
+
+Can be accessed via global [online](#online)
+
 Type | Name | Description
 ---- | ---- | -----------
 array&lt;[OnlinePlayer](#OnlinePlayer), 4&gt; | [online_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online_players) | 
@@ -1092,6 +1173,7 @@ OnlinePlayerShort | [local_player](https://github.com/spelunky-fyi/overlunky/sea
 
 ### OnlineLobby
 
+Used in [Online](#Online)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1100,6 +1182,7 @@ string | [get_code()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g
 
 ### OnlinePlayer
 
+Used in [Online](#Online)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1112,6 +1195,7 @@ string | [player_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 
 ### Particle
 
+Used in [ParticleEmitterInfo](#ParticleEmitterInfo)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1127,6 +1211,7 @@ int | [max_lifetime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ma
 
 ### ParticleDB
 
+Used in [ParticleDB](#ParticleDB), [get_particle_type](#get_particle_type)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1163,6 +1248,8 @@ bool | [set_texture(int texture_id)](https://github.com/spelunky-fyi/overlunky/s
 
 ### ParticleEmitterInfo
 
+Generic type for creating particles in the game, you can make your own with [generate_world_particles](#generate_world_particles) or [generate_screen_particles](#generate_screen_particles)<br/>
+Used in [ScreenCharacterSelect](#ScreenCharacterSelect), [ScreenTitle](#ScreenTitle), [CursedEffect](#CursedEffect), [OnFireEffect](#OnFireEffect), [PoisonedEffect](#PoisonedEffect) ...
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2141,6 +2228,7 @@ float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inert
 
 ### GameManager
 
+Can be accessed via global[game_manager](#game_manager)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2173,6 +2261,7 @@ bool | [game_has_focus](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 
 ### Items
 
+Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2219,6 +2308,7 @@ int | [beg_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=beg_s
 
 ### SelectPlayerSlot
 
+Used in [Items](#Items)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2228,6 +2318,7 @@ int | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture
 
 ### StateMemory
 
+Can be accessed via global [state](#state)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -3051,7 +3142,7 @@ Type | Name | Description
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Entity](#Entity) | [chain](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chain) | 
 [Entity](#Entity) | [end_piece](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_piece) | 
-int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause | going_up is only right when timer is 0, otherwise it just sits at the bottom
+int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause; going_up is only right when timer is 0, otherwise it just sits at the bottom
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | for the start and retract
 
 ### StickyTrap
@@ -3242,7 +3333,7 @@ bool | [hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
 float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
 [RenderInfo](#RenderInfo) | [rendering_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rendering_info) | 
- | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before [ON](#ON).PRE_LOAD_SCREEN from a level and loaded right before [ON](#ON).POST_LEVEL_GENERATION.<br/> 
+any | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before [ON](#ON).PRE_LOAD_SCREEN from a level and loaded right before [ON](#ON).POST_LEVEL_GENERATION.<br/> 
 [Entity](#Entity) | [topmost()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) | 
 [Entity](#Entity) | [topmost_mount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) | 
 bool | [overlaps_with(AABB hitbox)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
@@ -4146,7 +4237,7 @@ int | [shoot_lava_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 int | [jump_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_pause_timer) | 
 int | [lava_detection_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lava_detection_timer) | 
 bool | [is_hot](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_hot) | 
-int | [player_detect_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_detect_state) | 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava | probably used so he won't spit imminently after seeing the player
+int | [player_detect_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_detect_state) | 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
 
 ### Leprechaun
 
@@ -4892,11 +4983,11 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [button_sprite](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_sprite) | [Flags](#Aliases): 1 - pad: A, key: Z | 2 - pad: X, key: X | 3 - pad: B, key: C | 4- pad: Y, key: D<br/>5 - pad: LB, key: L Shift | 6 - pad: RB, key: A | 7 - pad: menu?, key: (none) | 8 - pad: copy?, key: Tab
+int | [button_sprite](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_sprite) | Only one can be set:<br/>1 - pad: A, key: Z<br/>2 - pad: X, key: X<br/>4 - pad: B, key: C<br/>8 - pad: Y, key: D<br/>16 - pad: LB, key: L Shift<br/>32 - pad: RB, key: A<br/>64 - pad: menu?, key: (none)<br/>128 - pad: copy?, key: Tab
 float | [visibility](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) | 
 bool | [is_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_visible) | It's false for selldialog used in shops
 bool | [player_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_trigger) | It's set true even if player does not see the button, like the drill or COG door
-int | [seen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seen) | -1 - hasn't been seen | 0 - last seen by player 1 | 1 - last seen by player 2 | 2 - last seen by player 3 | 3 - last seen by player 4
+int | [seen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seen) | <br/>-1 - hasn't been seen<br/>0 - last seen by player 1<br/>1 - last seen by player 2<br/>2 - last seen by player 3<br/>3 - last seen by player 4
 
 ### Cape
 
@@ -5180,7 +5271,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Flame](#Flame)
 
 Type | Name | Description
 ---- | ---- | -----------
-float | [flame_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_size) | if changed, gradually goes down |0.03 per frame| to the default size
+float | [flame_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_size) | if changed, gradually goes down (0.03 per frame) to the default size
 
 ### Fly
 
@@ -5874,7 +5965,7 @@ int | [target_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=targ
 int | [attack_phase](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_phase) | 0 = stomp, 1 = bombs, 2 = stomp+ufos, 3 = in lava
 int | [attack_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) | in phase 0/2: time spent looking for player, in phase 1: time between bomb salvo
 int | [ai_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_timer) | general timer that counts down whenever olmec is active
-int | [move_direction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_direction) | -1 = left, 0 = down, 1 = right | phase 0/2: depends on target, phase 1: travel direction
+int | [move_direction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_direction) | -1 = left, 0 = down, 1 = right, phase 0/2: depends on target, phase 1: travel direction
 int | [jump_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) | 
 int | [phase1_amount_of_bomb_salvos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase1_amount_of_bomb_salvos) | 
 int | [unknown_attack_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown_attack_state) | 

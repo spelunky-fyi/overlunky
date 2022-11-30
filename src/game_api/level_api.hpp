@@ -546,8 +546,9 @@ bool position_is_valid(float x, float y, LAYER layer, POS_TYPE flags);
 void override_next_levels(std::vector<std::string> next_levels);
 void add_next_levels(std::vector<std::string> next_levels);
 
-int8_t get_co_subtheme();
-void force_co_subtheme(int8_t subtheme);
+using COSUBTHEME = int8_t; // NoAlias
+COSUBTHEME get_co_subtheme();
+void force_co_subtheme(COSUBTHEME subtheme);
 
 void grow_vines(LAYER l, uint32_t max_lengh);
 void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken);

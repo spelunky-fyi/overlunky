@@ -251,12 +251,6 @@ void set_level_flags(uint32_t flags)
     state.set_flags(flags);
 }
 
-void set_pause(uint8_t pause)
-{
-    auto state = State::get();
-    state.set_pause(pause);
-}
-
 ENT_TYPE get_entity_type(uint32_t uid)
 {
     auto entity = get_entity_ptr(uid);
@@ -534,9 +528,18 @@ void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
     if (container == nullptr)
         return;
     uint32_t type = container->type->id;
-    if (type != to_id("ENT_TYPE_ITEM_COFFIN") && type != to_id("ENT_TYPE_ITEM_CRATE") && type != to_id("ENT_TYPE_ITEM_PRESENT") &&
-        type != to_id("ENT_TYPE_ITEM_GHIST_PRESENT") && type != to_id("ENT_TYPE_ITEM_POT"))
+    static auto compatible_entities = {
+        to_id("ENT_TYPE_ITEM_COFFIN"),
+        to_id("ENT_TYPE_ITEM_CRATE"),
+        to_id("ENT_TYPE_ITEM_DMCRATE"),
+        to_id("ENT_TYPE_ITEM_PRESENT"),
+        to_id("ENT_TYPE_ITEM_GHIST_PRESENT"),
+        to_id("ENT_TYPE_ITEM_POT"),
+        to_id("ENT_TYPE_ALIVE_EMBEDDED_ON_ICE")};
+
+    if (std::find(compatible_entities.begin(), compatible_entities.end(), type) == compatible_entities.end())
         return;
+
     container->as<Container>()->inside = item_entity_type;
 }
 
@@ -706,12 +709,6 @@ void flip_entity(uint32_t uid)
     }
 }
 
-std::pair<float, float> get_camera_position()
-{
-    auto state = State::get();
-    return state.get_camera_position();
-}
-
 void set_camera_position(float cx, float cy)
 {
     auto state = State::get();
@@ -732,8 +729,10 @@ void set_seed(uint32_t seed)
 
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
 {
-    write_mem_prot(get_address("arrowtrap_projectile"), regular_entity_type, true);
-    write_mem_prot(get_address("poison_arrowtrap_projectile"), poison_entity_type, true);
+    static const auto arrowtrap = get_address("arrowtrap_projectile");
+    static const auto poison_arrowtrap = get_address("poison_arrowtrap_projectile");
+    write_mem_prot(arrowtrap, regular_entity_type, true);
+    write_mem_prot(poison_arrowtrap, poison_entity_type, true);
 }
 
 float* g_sparktrap_parameters{nullptr};
@@ -741,9 +740,9 @@ void modify_sparktraps(float angle_increment, float distance)
 {
     if (g_sparktrap_parameters == nullptr)
     {
-        const auto offset = get_address("sparktrap_angle_increment") + 4;
+        static const auto offset = get_address("sparktrap_angle_increment") + 4;
 
-        if (read_u8(offset - 1) == 0x89) // check if sparktraps_hack is active
+        if (memory_read<uint8_t>(offset - 1) == 0x89) // check if sparktraps_hack is active
             return;
 
         const int32_t distance_offset = 0xF1;
@@ -768,7 +767,7 @@ void activate_sparktraps_hack(bool activate)
 {
     if (activate)
     {
-        const auto offset = get_address("sparktrap_angle_increment");
+        static const auto offset = get_address("sparktrap_angle_increment");
         const int32_t distance_offset = 0xF1;
 
         write_mem_recoverable("sparktraps_hack", offset, "\xF3\x0F\x58\x89\x6C\x01\x00\x00"sv, true);
@@ -782,13 +781,15 @@ void activate_sparktraps_hack(bool activate)
 
 void set_storage_layer(LAYER layer)
 {
+    static const auto storage_layer = get_address("storage_layer");
     if (layer == LAYER::FRONT || layer == LAYER::BACK)
-        write_mem_prot(get_address("storage_layer"), 0x1300 + 8 * (uint8_t)layer, true);
+        write_mem_prot(storage_layer, 0x1300 + 8 * (uint8_t)layer, true);
 }
 
 void set_kapala_blood_threshold(uint8_t threshold)
 {
-    write_mem_prot(get_address("kapala_blood_threshold"), threshold, true);
+    static const auto kapala_blood_threshold = get_address("kapala_blood_threshold");
+    write_mem_prot(kapala_blood_threshold, threshold, true);
 }
 
 void set_kapala_hud_icon(int8_t icon_index)
@@ -826,7 +827,8 @@ void set_kapala_hud_icon(int8_t icon_index)
 void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscape_multiplier)
 {
     // Due to changes in 1.23.x, the default multiplier is automatically vlads - 1.
-    write_mem_prot(get_address("blood_multiplication"), vladscape_multiplier, true);
+    static const auto blood_multiplication = get_address("blood_multiplication");
+    write_mem_prot(blood_multiplication, vladscape_multiplier, true);
 }
 
 std::vector<int64_t> read_prng()
@@ -857,11 +859,7 @@ void drop(uint32_t who_uid, uint32_t what_uid)
 
 void unequip_backitem(uint32_t who_uid)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("unequip");
-    }
+    static size_t offset = get_address("unequip");
 
     if (offset != 0)
     {
@@ -973,11 +971,17 @@ void force_olmec_phase_0(bool b)
 
 void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
 {
-    write_mem_prot(get_address("ghost_spawn_time"), normal, true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player1"), cursed, true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player2"), cursed, true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player3"), cursed, true);
-    write_mem_prot(get_address("ghost_spawn_time_cursed_player4"), cursed, true);
+    static const auto ghost_spawn_time = get_address("ghost_spawn_time");
+    static const auto ghost_spawn_time_cursed_p1 = get_address("ghost_spawn_time_cursed_player1");
+    static const auto ghost_spawn_time_cursed_p2 = get_address("ghost_spawn_time_cursed_player2");
+    static const auto ghost_spawn_time_cursed_p3 = get_address("ghost_spawn_time_cursed_player3");
+    static const auto ghost_spawn_time_cursed_p4 = get_address("ghost_spawn_time_cursed_player4");
+
+    write_mem_prot(ghost_spawn_time, normal, true);
+    write_mem_prot(ghost_spawn_time_cursed_p1, cursed, true);
+    write_mem_prot(ghost_spawn_time_cursed_p2, cursed, true);
+    write_mem_prot(ghost_spawn_time_cursed_p3, cursed, true);
+    write_mem_prot(ghost_spawn_time_cursed_p4, cursed, true);
 }
 
 void set_time_ghost_enabled(bool b)
@@ -1021,11 +1025,7 @@ void set_time_jelly_enabled(bool b)
 
 bool is_inside_active_shop_room(float x, float y, LAYER layer)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("coord_inside_active_shop_room");
-    }
+    static size_t offset = get_address("coord_inside_active_shop_room");
     if (offset != 0)
     {
         typedef bool coord_inside_shop_func(StateMemory*, uint32_t layer, float x, float y);
@@ -1057,11 +1057,7 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
 
 ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint32_t uid)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("generate_world_particles");
-    }
+    static size_t offset = get_address("generate_world_particles");
 
     if (offset != 0)
     {
@@ -1079,11 +1075,7 @@ ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint
 
 ParticleEmitterInfo* generate_screen_particles(uint32_t particle_emitter_id, float x, float y)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("generate_screen_particles");
-    }
+    static size_t offset = get_address("generate_screen_particles");
 
     if (offset != 0)
     {
@@ -1096,11 +1088,7 @@ ParticleEmitterInfo* generate_screen_particles(uint32_t particle_emitter_id, flo
 
 void advance_screen_particles(ParticleEmitterInfo* particle_emitter)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("advance_screen_particles");
-    }
+    static size_t offset = get_address("advance_screen_particles");
 
     if (offset != 0)
     {
@@ -1112,11 +1100,7 @@ void advance_screen_particles(ParticleEmitterInfo* particle_emitter)
 
 void render_screen_particles(ParticleEmitterInfo* particle_emitter)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("render_screen_particles");
-    }
+    static size_t offset = get_address("render_screen_particles");
 
     if (offset != 0)
     {
@@ -1145,11 +1129,7 @@ void extinguish_particles(ParticleEmitterInfo* particle_emitter)
 
 Illumination* create_illumination_internal(Color color, float size, float x, float y, int32_t uid)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("generate_illumination");
-    }
+    static size_t offset = get_address("generate_illumination");
 
     if (offset != 0)
     {
@@ -1230,26 +1210,30 @@ void set_explosion_mask(int32_t mask)
 void set_max_rope_length(uint8_t length)
 {
     uint32_t length_32 = length;
+    static const auto attach_thrown_rope = get_address("attach_thrown_rope_to_background");
+    static const auto process_ropes_one = get_address("process_ropes_one");
+    static const auto process_ropes_two = get_address("process_ropes_two");
+    static const auto process_ropes_three = get_address("process_ropes_three");
 
     // there's four instances where the max (default=6) is used
 
     // 1) When throwing a rope and it attaches to the background, the initial entity is
     // given a start value in its segment_nr_inverse variable
-    write_mem_prot(get_address("attach_thrown_rope_to_background"), length_32, true);
+    write_mem_prot(attach_thrown_rope, length_32, true);
 
     // 2) and 3) at the top of the rope processing function are two comparisons to the max
-    write_mem_prot(get_address("process_ropes_one"), length, true);
-    write_mem_prot(get_address("process_ropes_two"), length, true);
+    write_mem_prot(process_ropes_one, length, true);
+    write_mem_prot(process_ropes_two, length, true);
 
     // 4) in the same function at the end of the little loop of process_ropes_two is a comparison to n-1
     uint8_t length_minus_one_8 = length - 1;
-    write_mem_prot(get_address("process_ropes_three"), length_minus_one_8, true);
+    write_mem_prot(process_ropes_three, length_minus_one_8, true);
 }
 
 uint8_t get_max_rope_length()
 {
     static const auto address = get_address("attach_thrown_rope_to_background");
-    return static_cast<uint8_t>(read_u32(address));
+    return static_cast<uint8_t>(memory_read<uint32_t>(address));
 }
 
 uint8_t waddler_count_entity(ENT_TYPE entity_type)
@@ -1391,8 +1375,8 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
     static bool modified = false;
 
     uint32_t ent_types_size = static_cast<uint32_t>(ent_types.size());
-    const auto offset = get_address("sun_chalenge_generator_ent_types");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(offset) + offset + 4);
+    static const auto offset = get_address("sun_chalenge_generator_ent_types");
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(offset) + offset + 4);
 
     if (ent_types_size == 0)
     {
@@ -1404,7 +1388,7 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
         return;
     }
 
-    const uint8_t old_size = ((read_u8(offset - 4)) >> 2) + 1;
+    const uint8_t old_size = ((memory_read<uint8_t>(offset - 4)) >> 2) + 1;
 
     if (ent_types_size >= 32)
         ent_types_size = 32;
@@ -1450,10 +1434,10 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
 
 void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
 {
-    auto offset = get_address("dice_shop_prizes_id_roll");
-    const auto array_offset = get_address("dice_shop_prizes");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
-    bool original_instr = (read_u8(offset) == 0x89);
+    static const auto offset = get_address("dice_shop_prizes_id_roll");
+    static const auto array_offset = get_address("dice_shop_prizes");
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(array_offset) + array_offset + 4);
+    bool original_instr = (memory_read<uint8_t>(offset) == 0x89);
 
     if (ent_types.size() > 255 || ent_types.size() < 6) // has to be min 6 as the game needs 6 uniqe item ids for prize_dispenser
     {
@@ -1467,8 +1451,8 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
         return;
     }
 
-    if ((original_instr && ent_types.size() == 25) ||                 // if it's the unchanged instruction and we set the same number of ent_type's
-        (!original_instr && read_u8(offset + 5) == ent_types.size())) // or new instruction but the same size
+    if ((original_instr && ent_types.size() == 25) ||                              // if it's the unchanged instruction and we set the same number of ent_type's
+        (!original_instr && memory_read<uint8_t>(offset + 5) == ent_types.size())) // or new instruction but the same size
     {
         for (unsigned int i = 0; i < ent_types.size(); ++i)
             write_mem_recoverable("diceshop_prizes", (size_t)&old_types_array[i], ent_types[i], true);
@@ -1512,12 +1496,12 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
     if (ent_types.size() > 255)
         return;
 
-    const auto array_offset = get_address("altar_break_ent_types");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
+    static const auto array_offset = get_address("altar_break_ent_types");
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(array_offset) + array_offset + 4);
     const auto code_offset = array_offset + 0xDD;
     const auto instruction_shr = array_offset + 0x13D;
     const auto instruction_to_modifiy = array_offset + 0x204;
-    const auto original_instr = (read_u8(instruction_shr) == 0x41);
+    const auto original_instr = (memory_read<uint8_t>(instruction_shr) == 0x41);
     if (ent_types.empty())
     {
         if (!original_instr)
@@ -1526,7 +1510,7 @@ void change_altar_damage_spawns(std::vector<ENT_TYPE> ent_types)
         recover_mem("altar_damage_spawn");
         return;
     }
-    if (!original_instr && read_u8(code_offset + 2) == ent_types.size())
+    if (!original_instr && memory_read<uint8_t>(code_offset + 2) == ent_types.size())
     {
         // original array is used for something else as well, so i never edit that content
         for (uint32_t i = 0; i < ent_types.size(); ++i)
@@ -1567,9 +1551,9 @@ void change_waddler_drop(std::vector<ENT_TYPE> ent_types)
 {
     static bool modified = false;
 
-    const auto offset = get_address("waddler_drop_size");
-    const auto array_offset = get_address("waddler_drop_array");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(read_i32(array_offset) + array_offset + 4);
+    static const auto offset = get_address("waddler_drop_size");
+    static const auto array_offset = get_address("waddler_drop_array");
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(array_offset) + array_offset + 4);
 
     if (ent_types.size() > 255 || ent_types.size() < 1)
     {
@@ -1584,8 +1568,8 @@ void change_waddler_drop(std::vector<ENT_TYPE> ent_types)
         return;
     }
 
-    if ((!modified && ent_types.size() == 3) ||            // if it's the unchanged instruction and we set the same number of ent_type's
-        (modified && read_u8(offset) == ent_types.size())) // or new instruction but the same size
+    if ((!modified && ent_types.size() == 3) ||                         // if it's the unchanged instruction and we set the same number of ent_type's
+        (modified && memory_read<uint8_t>(offset) == ent_types.size())) // or new instruction but the same size
     {
         for (unsigned int i = 0; i < ent_types.size(); ++i)
             write_mem_recoverable("waddler_drop", (size_t)&old_types_array[i], ent_types[i], true);
@@ -1615,7 +1599,7 @@ void poison_entity(int32_t entity_uid)
     if (ent)
     {
         using PoisonEntity_fun = void(Entity*, bool);
-        auto poison_entity = (PoisonEntity_fun*)get_address("poison_entity");
+        static auto poison_entity = (PoisonEntity_fun*)get_address("poison_entity");
         poison_entity(ent, true);
     }
 }
@@ -1623,7 +1607,7 @@ void poison_entity(int32_t entity_uid)
 void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
 {
     static size_t offsets[4];
-    auto size_minus_one = get_address("ankh_health");
+    static auto size_minus_one = get_address("ankh_health");
     if (!health)
     {
         recover_mem("ankh_health");
@@ -1651,7 +1635,7 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
             offsets[2] = memory.at_exe(offsets[2] + 5);
             offsets[3] = memory.at_exe(offsets[3] + 7);
         }
-        const uint8_t game_maxhp = read_u8(offsets[2] - 14);
+        const uint8_t game_maxhp = memory_read<uint8_t>(offsets[2] - 14);
         if (health > game_maxhp)
             health = game_maxhp;
 
@@ -1667,7 +1651,7 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
             }
             else
             {
-                if (read_u8(offsets[3]) != 3)
+                if (memory_read<uint8_t>(offsets[3]) != 3)
                     recover_mem("ankh_health", offsets[3]);
             }
         }
@@ -1713,7 +1697,7 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
         {
             if (owner->type->id == it) // TODO: check what happens if it's not room owner/shopkeeper
             {
-                auto add_to_items_set = (AddRestrictedItemFun*)get_address("add_shopitem");
+                static auto add_to_items_set = (AddRestrictedItemFun*)get_address("add_shopitem");
                 auto state = State::get();
                 item->flags = setflag(item->flags, 23); // shop item
                 item->flags = setflag(item->flags, 20); // Enable button prompt (flag is problably: show dialogs and other fx)
@@ -1736,8 +1720,8 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
 
 void change_poison_timer(int16_t frames)
 {
-    const static size_t offset_first = get_address("first_poison_tick_timer_default");
-    const static size_t offset_subsequent = get_address("subsequent_poison_tick_timer_default");
+    static const size_t offset_first = get_address("first_poison_tick_timer_default");
+    static const size_t offset_subsequent = get_address("subsequent_poison_tick_timer_default");
 
     if (frames == -1)
     {
@@ -1752,7 +1736,7 @@ void change_poison_timer(int16_t frames)
 
 void set_adventure_seed(int64_t first, int64_t second)
 {
-    const static size_t offset = get_address("adventure_seed");
+    static const size_t offset = get_address("adventure_seed");
     if (offset != 0)
     {
         write_mem_prot(offset, first, true);
@@ -1762,10 +1746,10 @@ void set_adventure_seed(int64_t first, int64_t second)
 
 std::pair<int64_t, int64_t> get_adventure_seed()
 {
-    const static size_t offset = get_address("adventure_seed");
+    static const size_t offset = get_address("adventure_seed");
     if (offset != 0)
     {
-        return {read_i64(offset), read_i64(offset + 8)};
+        return {memory_read<int64_t>(offset), memory_read<int64_t>(offset + 8)};
     }
     return {0, 0};
 }
@@ -1773,8 +1757,8 @@ std::pair<int64_t, int64_t> get_adventure_seed()
 void update_liquid_collision_at(float x, float y, bool add)
 {
     using UpdateLiquidCollision = void(LiquidPhysics*, int32_t, int32_t, bool); // setting last parameter to true just skips the whole function
-    UpdateLiquidCollision* RemoveLiquidCollision_fun = (UpdateLiquidCollision*)get_address("remove_from_liquid_collision_map");
-    UpdateLiquidCollision* AddLiquidCollision_fun = (UpdateLiquidCollision*)get_address("add_from_liquid_collision_map");
+    static UpdateLiquidCollision* RemoveLiquidCollision_fun = (UpdateLiquidCollision*)get_address("remove_from_liquid_collision_map");
+    static UpdateLiquidCollision* AddLiquidCollision_fun = (UpdateLiquidCollision*)get_address("add_from_liquid_collision_map");
     auto state = get_state_ptr();
 
     if (add)
@@ -1785,8 +1769,8 @@ void update_liquid_collision_at(float x, float y, bool add)
 
 bool disable_floor_embeds(bool disable)
 {
-    const static auto address = get_address("spawn_floor_embeds");
-    const bool current_value = read_u8(address) == 0xc3;
+    static const auto address = get_address("spawn_floor_embeds");
+    const bool current_value = memory_read<uint8_t>(address) == 0xc3;
     if (disable)
     {
         write_mem_recoverable("disable_floor_embeds", address, "\xC3"sv, true);
@@ -1800,7 +1784,7 @@ bool disable_floor_embeds(bool disable)
 
 void set_cursepot_ghost_enabled(bool enable)
 {
-    const static auto address = get_address("ghost_jar_ghost_spawn");
+    static const auto address = get_address("ghost_jar_ghost_spawn");
     if (!enable)
     {
         write_mem_recoverable("ghost_jar_ghost_spawn", address, "\x90\x90\x90\x90\x90"sv, true);
@@ -1814,8 +1798,8 @@ void set_cursepot_ghost_enabled(bool enable)
 void game_log(std::string message)
 {
     using GameLogFun = void(std::ofstream*, const char*, void*, LogLevel);
-    const static auto game_log_fun = (GameLogFun*)get_address("game_log_function");
-    const static auto log_stream = (std::ofstream*)read_i64(get_address("game_log_stream"));
+    static const auto game_log_fun = (GameLogFun*)get_address("game_log_function");
+    static const auto log_stream = (std::ofstream*)memory_read<int64_t>(get_address("game_log_stream"));
     game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
 }
 
@@ -1836,9 +1820,9 @@ void save_progress()
 
 void set_level_string(std::u16string_view text)
 {
-    const static auto hud_text_address = get_address("hud_level_text");
-    const static auto journal_text_address = get_address("journal_level_text");
-    const static auto journal_map_text_address = get_address("journal_map_level_text");
+    static const auto hud_text_address = get_address("hud_level_text");
+    static const auto journal_text_address = get_address("journal_level_text");
+    static const auto journal_map_text_address = get_address("journal_map_level_text");
     static char16_t* data;
     static size_t text_data_length = 0;
 
@@ -1884,7 +1868,7 @@ void set_ending_unlock(ENT_TYPE type)
     static const ENT_TYPE last = to_id("ENT_TYPE_CHAR_CLASSIC_GUY");
     if (type >= first && type <= last)
     {
-        const auto offset = get_address("ending_unlock");
+        static const auto offset = get_address("ending_unlock");
         const int32_t char_offset = 10;
 
         write_mem_recoverable("ending_unlock", offset, "\x90\x90\x90\x90\x90\x90\x90\x90"sv, true);

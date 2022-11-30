@@ -806,7 +806,7 @@ struct LiquidPhysics
     size_t unknown1; // MysteryLiquidPointer1 in plugin, collision with floors/activefloors related
     union
     {
-        LiquidPool pools[5];
+        std::array<LiquidPool, 5> pools;
         struct
         {
             LiquidPhysicsParams water_physics_defaults;
