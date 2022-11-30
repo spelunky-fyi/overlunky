@@ -73,7 +73,7 @@ Current features and their *default* keyboard shortcuts.
       + **Ctrl+.**: Zoom out
       + **Ctrl+0**: Auto fit level width to screen
       + **Ctrl+2345**: Zoom to X level width
-      + **Shift+ArrowKey**: Move camera in desired direction
+      + **Shift+IJKL**: Move camera in desired direction
       + **Mouse 4**: Drag camera around or focus on an entity
       + **Mouse 4 longpress**: Reset camera focus to player
       + **Mouse 4+Wheel**: Zoom

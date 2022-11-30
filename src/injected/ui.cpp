@@ -139,10 +139,10 @@ std::map<std::string, int64_t> keys{
     {"teleport_up", 0x0},
     {"teleport_right", 0x0},
     {"teleport_down", 0x0},
-    {"camera_left", OL_KEY_SHIFT | VK_LEFT},
-    {"camera_up", OL_KEY_SHIFT | VK_UP},
-    {"camera_right", OL_KEY_SHIFT | VK_RIGHT},
-    {"camera_down", OL_KEY_SHIFT | VK_DOWN},
+    {"camera_left", OL_KEY_SHIFT | 'J'},
+    {"camera_up", OL_KEY_SHIFT | 'I'},
+    {"camera_right", OL_KEY_SHIFT | 'L'},
+    {"camera_down", OL_KEY_SHIFT | 'K'},
     {"coordinate_left", 0x0},
     {"coordinate_up", 0x0},
     {"coordinate_right", 0x0},
@@ -2345,29 +2345,37 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("camera_left", wParam))
     {
-        if (g_state->camera->focused_entity_uid == -1)
-            g_state->camera->focus_x -= 0.2f;
+        enable_camera_bounds = false;
+        set_camera_bounds(enable_camera_bounds);
+        g_state->camera->focused_entity_uid = -1;
+        g_state->camera->focus_x -= 0.5f;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
     }
     else if (pressed("camera_right", wParam))
     {
-        if (g_state->camera->focused_entity_uid == -1)
-            g_state->camera->focus_x += 0.2f;
+        enable_camera_bounds = false;
+        set_camera_bounds(enable_camera_bounds);
+        g_state->camera->focused_entity_uid = -1;
+        g_state->camera->focus_x += 0.5f;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
     }
     else if (pressed("camera_up", wParam))
     {
-        if (g_state->camera->focused_entity_uid == -1)
-            g_state->camera->focus_y += 0.2f;
+        enable_camera_bounds = false;
+        set_camera_bounds(enable_camera_bounds);
+        g_state->camera->focused_entity_uid = -1;
+        g_state->camera->focus_y += 0.5f;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
     }
     else if (pressed("camera_down", wParam))
     {
-        if (g_state->camera->focused_entity_uid == -1)
-            g_state->camera->focus_y -= 0.2f;
+        enable_camera_bounds = false;
+        set_camera_bounds(enable_camera_bounds);
+        g_state->camera->focused_entity_uid = -1;
+        g_state->camera->focus_y -= 0.5f;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
     }
