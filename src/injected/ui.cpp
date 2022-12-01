@@ -90,6 +90,7 @@ std::map<std::string, int64_t> keys{
     {"toggle_hud", OL_KEY_CTRL | 'H'},
     {"toggle_lights", OL_KEY_CTRL | 'L'},
     {"toggle_ghost", OL_KEY_CTRL | 'O'},
+    {"toggle_speedhack_auto", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
     {"tool_entity", VK_F1},
@@ -299,6 +300,7 @@ std::map<std::string, bool> options = {
     {"god_mode_companions", false},
     {"noclip", false},
     {"fly_mode", false},
+    {"speedhack", false},
     {"snap_to_grid", false},
     {"spawn_floor_decorated", true},
     {"disable_pause", false},
@@ -1545,6 +1547,11 @@ void toggle_noclip()
     }
 }
 
+bool should_speedhack()
+{
+    return (g_state->screen != 11 && g_state->screen != 12 && g_state->screen != 5 && g_state->screen != 4) || (g_state->screen != 5 && g_game_manager->pause_ui && g_game_manager->pause_ui->visibility > 0) || ((g_state->level_flags & (1U << 20)) > 0) || g_state->loading > 0;
+}
+
 void force_cheats()
 {
     g_players = UI::get_players();
@@ -1606,6 +1613,13 @@ void force_cheats()
             if ((player->buttons & 1) == 1 && player->velocityy < 0.18f)
                 player->velocityy = 0.18f;
         }
+    }
+    if (options["speedhack"])
+    {
+        if (should_speedhack())
+            speedhack(10.0f);
+        else if (g_speedhack_multiplier == 10.0f && !should_speedhack())
+            speedhack(1.0f);
     }
 }
 
@@ -2284,6 +2298,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["fly_mode"] = !options["fly_mode"];
     }
+    else if (pressed("toggle_speedhack_auto", wParam))
+    {
+        options["speedhack"] = !options["speedhack"];
+    }
     else if (pressed("toggle_hitboxes", wParam))
     {
         options["draw_hitboxes"] = !options["draw_hitboxes"];
@@ -2555,6 +2573,8 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("speedhack_increase", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         g_speedhack_multiplier += 0.1f;
         if (g_speedhack_multiplier > 10.f)
             g_speedhack_multiplier = 10.f;
@@ -2562,6 +2582,8 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("speedhack_decrease", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         g_speedhack_multiplier -= 0.1f;
         if (g_speedhack_multiplier < 0.1f)
             g_speedhack_multiplier = 0.1f;
@@ -2569,52 +2591,75 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("speedhack_10pct", wParam))
     {
-        g_speedhack_multiplier = 0.1f;
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(0.1f);
     }
     else if (pressed("speedhack_20pct", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(0.2f);
     }
     else if (pressed("speedhack_30pct", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(0.3f);
     }
     else if (pressed("speedhack_40pct", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(0.4f);
     }
     else if (pressed("speedhack_50pct", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(0.5f);
     }
     else if (pressed("speedhack_60pct", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(0.6f);
     }
     else if (pressed("speedhack_70pct", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(0.7f);
     }
     else if (pressed("speedhack_80pct", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(0.8f);
     }
     else if (pressed("speedhack_90pct", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(0.9f);
     }
     else if (pressed("speedhack_normal", wParam))
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         speedhack(1.0f);
     }
     else if (pressed("speedhack_turbo", wParam) && !repeat)
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         g_speedhack_old_multiplier = g_speedhack_multiplier;
         speedhack(5.f); // TODO: configurable
     }
     else if (pressed("speedhack_slow", wParam) && !repeat)
     {
+        if (should_speedhack())
+            options["speedhack"] = false;
         g_speedhack_old_multiplier = g_speedhack_multiplier;
         speedhack(0.2f); // TODO: configurable
     }
@@ -4729,9 +4774,13 @@ void render_options()
         tooltip("Enable this if you want to keep your\nsave game unaffected by tomfoolery.");
         if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 5.f))
         {
+            if (should_speedhack())
+                options["speedhack"] = false;
             speedhack();
         }
         tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
+        ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
+        tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
         endmenu();
     }
 
@@ -6936,7 +6985,7 @@ void render_prohud()
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
+    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (options["speedhack"] ? "TURBO " : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
