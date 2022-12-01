@@ -1588,7 +1588,6 @@ void force_cheats()
         }
     }
     static const auto ink = to_id("ENT_TYPE_FX_INK_BLINDNESS");
-    static const auto bubble = to_id("ENT_TYPE_FX_INK_BLINDNESS");
     if (options["god_mode"])
     {
         for (auto ent : g_players)
