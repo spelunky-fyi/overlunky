@@ -1,9 +1,21 @@
 #pragma once
 
-#include <type_traits>
+#include <type_traits> // for true_type, is_invocable_r_v
+
+template <class CallableT, class Signature>
+requires(std::is_function_v<Signature>)
+struct is_invocable_as : std::false_type
+{
+};
+template <class CallableT, class RetT, class... ArgsT>
+struct is_invocable_as<CallableT, RetT(ArgsT...)> : std::is_invocable_r<RetT, CallableT, ArgsT...>
+{
+};
+template <class CallableT, class Signature>
+inline constexpr auto is_invocable_as_v = is_invocable_as<CallableT, Signature>::value;
 
 template <class FunT>
-requires std::is_invocable_r_v<void, FunT>
+requires is_invocable_as_v<FunT, void()>
 struct OnScopeExit
 {
     OnScopeExit(FunT&& fun)
@@ -155,3 +167,27 @@ using unwrap_optional_t = typename unwrap_optional<T>::type;
 
 template <class T>
 inline constexpr auto is_optional_v = is_instantiation_of_v<std::optional, T> || is_instantiation_of_v<sol::optional, T>;
+
+template <class LhsSignature, class RhsSignature>
+requires(std::is_function_v<LhsSignature> && std::is_function_v<RhsSignature>)
+struct is_same_function : std::false_type
+{
+};
+template <class RetT, class... ArgsT>
+struct is_same_function<RetT(ArgsT...), RetT(ArgsT...)> : std::true_type
+{
+};
+template <class LhsSignature, class RhsSignature>
+inline constexpr auto is_same_function_v = is_same_function<LhsSignature, RhsSignature>::value;
+
+template <class LhsSignature, class RhsSignature>
+requires(std::is_function_v<LhsSignature> && std::is_function_v<RhsSignature>)
+struct is_same_args : std::false_type
+{
+};
+template <class LhsRetT, class RhsRetT, class... ArgsT>
+struct is_same_args<LhsRetT(ArgsT...), RhsRetT(ArgsT...)> : std::true_type
+{
+};
+template <class LhsSignature, class RhsSignature>
+inline constexpr auto is_same_args_v = is_same_args<LhsSignature, RhsSignature>::value;

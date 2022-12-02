@@ -221,7 +221,7 @@ static auto make_safe_clearable_cb(
         return detail::make_safe_cb_impl<FunT>::build(
             COMMON_ARGS,
             [=](const LuaBackend& backend)
-            { return !backend.is_entity_callback_cleared({aux_id, id}); });
+            { return !backend.HookHandler<Entity, CallbackType::Entity>::is_hook_cleared(id, aux_id); });
     }
     else if constexpr (CbType == CallbackType::Screen)
     {

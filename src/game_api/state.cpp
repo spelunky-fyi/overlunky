@@ -21,6 +21,7 @@
 #include "movable_behavior.hpp"  // for init_behavior_hooks
 #include "render_api.hpp"        // for init_render_api_hooks
 #include "savedata.hpp"          // for SaveData
+#include "script/events.hpp"     // for pre_entity_instagib
 #include "search.hpp"            // for get_address
 #include "spawn_api.hpp"         // for init_spawn_hooks
 #include "steam_api.hpp"
@@ -146,26 +147,12 @@ void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
         return;
     }
 
-    // because Player::on_damage is always hooked here, we have to check whether a script has hooked this function as well
-    EntityHooksInfo& _hook_info = victim->get_hooks();
-    bool skip_orig = false;
-    for (auto& [id, backend_on_damage] : _hook_info.on_damage)
-    {
-        if (backend_on_damage(victim, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
-        {
-            skip_orig = true;
-        }
-    }
-
-    if (!skip_orig)
-    {
-        g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
-    }
+    g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
 }
 
-using OnInstaGibFun = void(Entity*, size_t);
+using OnInstaGibFun = void(Entity*, bool, size_t);
 OnInstaGibFun* g_on_instagib_trampoline{nullptr};
-void on_instagib(Entity* victim, size_t unknown)
+void on_instagib(Entity* victim, bool param_2, size_t param_3)
 {
     if (g_godmode_player_active && is_active_player(victim))
     {
@@ -176,26 +163,11 @@ void on_instagib(Entity* victim, size_t unknown)
         return;
     }
 
-    // because on_instagib is only hooked here, we have to check whether a script has hooked this function as well
-    EntityHooksInfo& _hook_info = victim->get_hooks();
-    bool skip_orig = false;
-    for (auto& [id, backend_on_player_instagib] : _hook_info.on_player_instagib)
-    {
-        if (backend_on_player_instagib(victim))
-        {
-            skip_orig = true;
-        }
-    }
-
-    // The instagib function needs to be called when the entity is dead, otherwise the death screen will never be opened
-    if (victim->as<Movable>()->health == 0)
-    {
-        skip_orig = false;
-    }
+    const bool skip_orig = pre_entity_instagib(victim) && !victim->as<Movable>()->health == 0;
 
     if (!skip_orig)
     {
-        g_on_instagib_trampoline(victim, unknown);
+        g_on_instagib_trampoline(victim, param_2, param_3);
     }
 }
 

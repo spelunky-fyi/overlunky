@@ -24,11 +24,12 @@
 #include <variant>       // for variant
 #include <vector>        // for vector
 
-#include "aliases.hpp"   // for IMAGE, JournalPageType, SPAWN_TYPE
-#include "level_api.hpp" // IWYU pragma: keep
-#include "logger.h"      // for DEBUG
-#include "script.hpp"    // for ScriptMessage, ScriptImage (ptr only), Scri...
-#include "util.hpp"      // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
+#include "aliases.hpp"      // for IMAGE, JournalPageType, SPAWN_TYPE
+#include "hook_handler.hpp" // for HookHandler
+#include "level_api.hpp"    // IWYU pragma: keep
+#include "logger.h"         // for DEBUG
+#include "script.hpp"       // for ScriptMessage, ScriptImage (ptr only), Scri...
+#include "util.hpp"         // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
 
 extern std::recursive_mutex global_lua_lock;
 
@@ -179,15 +180,14 @@ struct EntitySpawnCallback
     sol::function func;
 };
 
-using TimerCallback = std::variant<IntervalCallback, TimeoutCallback>; // NoAlias
-
-enum class CallbackType
+struct EntityInstagibCallback
 {
-    None,
-    Normal,
-    Entity,
-    Screen
+    int id;
+    int uid;
+    sol::function func;
 };
+
+using TimerCallback = std::variant<IntervalCallback, TimeoutCallback>; // NoAlias
 
 struct CurrentCallback
 {
@@ -223,7 +223,7 @@ struct ScriptState
 struct UserData
 {
     sol::object data;
-    std::uint32_t hook_id;
+    std::uint32_t dtor_hook_id;
 };
 
 struct SavedUserData
@@ -237,8 +237,11 @@ struct SavedUserData
 struct StateMemory;
 class SoundManager;
 class LuaConsole;
+struct RenderInfo;
 
 class LuaBackend
+    : public HookHandler<Entity, CallbackType::Entity>,
+      public HookHandler<RenderInfo, CallbackType::Entity>
 {
   public:
     using ProtectedBackend = GlobalMutexProtectedResource<LuaBackend*, &global_lua_lock>;
@@ -267,12 +270,10 @@ class LuaBackend
     std::vector<LevelGenCallback> post_tile_code_callbacks;
     std::vector<EntitySpawnCallback> pre_entity_spawn_callbacks;
     std::vector<EntitySpawnCallback> post_entity_spawn_callbacks;
+    std::vector<EntityInstagibCallback> pre_entity_instagib_callbacks;
     std::vector<std::uint32_t> chance_callbacks;
     std::vector<std::uint32_t> extra_spawn_callbacks;
     std::vector<int> clear_callbacks;
-    std::vector<std::pair<int, std::uint32_t>> entity_hooks;
-    std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;
-    std::vector<std::pair<int, std::uint32_t>> entity_dtor_hooks;
     std::vector<std::pair<int, std::uint32_t>> screen_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<CustomMovableBehaviorStorage> custom_movable_behaviors;
@@ -342,7 +343,6 @@ class LuaBackend
     void render_options();
 
     bool is_callback_cleared(int32_t callback_id) const;
-    bool is_entity_callback_cleared(std::pair<int32_t, uint32_t> callback_id) const;
     bool is_screen_callback_cleared(std::pair<int32_t, uint32_t> callback_id) const;
 
     bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
@@ -369,8 +369,7 @@ class LuaBackend
     Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
     void post_entity_spawn(Entity* entity, int spawn_type_flags);
 
-    void hook_entity_dtor(Entity* entity);
-    void pre_entity_destroyed(Entity* entity);
+    bool pre_entity_instagib(Entity* victim);
 
     void process_vanilla_render_callbacks(ON event);
     void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);

@@ -22,6 +22,7 @@
 #include "state.hpp"              // for State, StateMemory
 #include "strings.hpp"            //
 #include "texture.hpp"            // for Texture, get_textures, get_texture
+#include "thread_utils.hpp"       // for OnHeapPointer
 
 class JournalPage;
 struct Camera;
@@ -626,6 +627,11 @@ void init_render_api_hooks()
     {
         DEBUG("Failed hooking render_api: {}\n", error);
     }
+}
+
+uint32_t RenderInfo::get_aux_id() const
+{
+    return OnHeapPointer<Entity>{entity_offset}.decode_local()->uid;
 }
 
 void TextureRenderingInfo::set_destination(const AABB& bbox)
