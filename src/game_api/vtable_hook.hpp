@@ -85,23 +85,6 @@ void hook_dtor(void* obj, HookFunT&& hook_fun, std::size_t dtor_index = 0)
 }
 
 template <class VTableFunT, std::size_t VTableIndex, class T, class HookFunT>
-void hook_vtable(T* obj, HookFunT&& hook_fun, std::size_t dtor_index = 0)
-{
-    using DetourT = VTableDetour<VTableFunT, VTableIndex>;
-    void*** vtable = (void***)obj;
-    if (!get_hook_function(vtable, VTableIndex))
-    {
-        DetourT::s_Originals[*vtable] = (VTableFunT*)register_hook_function(vtable, VTableIndex, (void*)&DetourT::detour);
-    }
-    DetourT::s_Functions[obj] = hook_fun;
-
-    hook_dtor(
-        obj, [](void* self)
-        { DetourT::s_Functions.erase((T*)self); },
-        dtor_index);
-}
-
-template <class VTableFunT, std::size_t VTableIndex, class T, class HookFunT>
 void hook_vtable_no_dtor(T* obj, HookFunT&& hook_fun)
 {
     using DetourT = VTableDetour<VTableFunT, VTableIndex>;
@@ -110,7 +93,40 @@ void hook_vtable_no_dtor(T* obj, HookFunT&& hook_fun)
     {
         DetourT::s_Originals[*vtable] = (VTableFunT*)register_hook_function(vtable, VTableIndex, (void*)&DetourT::detour);
     }
-    DetourT::s_Functions[obj] = hook_fun;
+    DetourT::s_Functions[obj] = std::forward<HookFunT>(hook_fun);
+}
+
+template <class VTableFunT, std::size_t VTableIndex, class T, class HookFunT>
+void hook_vtable(T* obj, HookFunT&& hook_fun, std::size_t dtor_index = 0)
+{
+    if constexpr (std::is_same_v<VTableFunT, void(T*)>)
+    {
+        if (VTableIndex == dtor_index)
+        {
+            // Just throw this directly into the dtor
+            hook_dtor(
+                obj,
+                [hook_fun = std::forward<HookFunT>(hook_fun)](void* self)
+                {
+                    // Pass a nullop as the original, it's not okay to skip dtors
+                    hook_fun(self, [](void*) {});
+                },
+                dtor_index);
+            return;
+        }
+    }
+
+    hook_vtable_no_dtor<VTableFunT, VTableIndex>(obj, std::forward<HookFunT>(hook_fun));
+
+    // Unhook in dtor
+    hook_dtor(
+        obj,
+        [](void* self)
+        {
+            using DetourT = VTableDetour<VTableFunT, VTableIndex>;
+            DetourT::s_Functions.erase((T*)self);
+        },
+        dtor_index);
 }
 
 // Stupid runtime wrappers, we can think about something better in the future 🤷‍♀️
