@@ -152,7 +152,7 @@ class Flame : public Movable
 class FlameSize : public Flame
 {
   public:
-    /// if changed, gradually goes down |0.03 per frame| to the default size
+    /// if changed, gradually goes down (0.03 per frame) to the default size
     float flame_size;
 };
 

@@ -36,7 +36,7 @@ class Olmec : public Movable
     uint8_t attack_timer;
     /// general timer that counts down whenever olmec is active
     uint8_t ai_timer;
-    /// -1 = left, 0 = down, 1 = right | phase 0/2: depends on target, phase 1: travel direction
+    /// -1 = left, 0 = down, 1 = right, phase 0/2: depends on target, phase 1: travel direction
     int8_t move_direction;
     uint8_t jump_timer;
     uint8_t phase1_amount_of_bomb_salvos;

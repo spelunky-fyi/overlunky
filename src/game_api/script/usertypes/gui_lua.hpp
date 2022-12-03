@@ -58,9 +58,9 @@ class GuiDrawContext
     /// [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
     /// autosize in center. Use just a `##Label` as title to hide titlebar.
     /// **Important: Keep all your labels unique!** If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
-    /// give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text... The window api is probably evolving
-    /// still, this is just the first draft. Felt cute, might delete later!
+    /// give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...
     /// Returns false if the window was closed from the X.
+    /// <br/>The callback signature is nil win(GuiDrawContext ctx)
     bool window(std::string title, float x, float y, float w, float h, bool movable, sol::function callback);
     /// Add some text to window, automatically wrapped
     void win_text(std::string text);

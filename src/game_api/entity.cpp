@@ -181,13 +181,8 @@ void Entity::remove_item(uint32_t item_uid)
 
 void Movable::poison(int16_t frames)
 {
-    static size_t offset_first = 0;
-    static size_t offset_subsequent = 0;
-    if (offset_first == 0)
-    {
-        offset_first = get_address("first_poison_tick_timer_default");
-        offset_subsequent = get_address("subsequent_poison_tick_timer_default");
-    }
+    static const size_t offset_first = get_address("first_poison_tick_timer_default");
+    static const size_t offset_subsequent = get_address("subsequent_poison_tick_timer_default");
     poison_tick_timer = frames;
 
     if (frames == -1)

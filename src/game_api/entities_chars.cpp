@@ -14,11 +14,7 @@
 
 void PowerupCapable::remove_powerup(ENT_TYPE powerup_type)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("remove_powerup");
-    }
+    static size_t offset = get_address("remove_powerup");
 
     if (offset != 0)
     {
@@ -30,11 +26,7 @@ void PowerupCapable::remove_powerup(ENT_TYPE powerup_type)
 
 void PowerupCapable::give_powerup(ENT_TYPE powerup_type)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("give_powerup");
-    }
+    static size_t offset = get_address("give_powerup");
 
     if (offset != 0)
     {

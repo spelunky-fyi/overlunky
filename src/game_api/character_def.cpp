@@ -72,7 +72,7 @@ std::span<CharacterDB> GetCharacterDefinitions()
             KnownCharacter{.full_name{u"Classic Guy"}, .short_name{u"Classic Guy"}},
         };
 
-        [[maybe_unused]] const auto string_table = (const char16_t**)get_address("string_table");
+        [[maybe_unused]] const auto string_table = get_strings_table();
         for (size_t i = 0; i < 20; i++)
         {
             [[maybe_unused]] const CharacterDB& character = character_table[i];
@@ -137,7 +137,7 @@ void set_character_gender(std::uint32_t character_index, bool female)
 {
     auto& char_def = get_character_definition(character_index);
     write_mem_prot(&char_def.gender, female ? CharGender::Female : CharGender::Male, true);
-    auto* gender_mask = (uint32_t*)get_address("character_gender_mask");
+    static auto gender_mask = (uint32_t*)get_address("character_gender_mask");
     auto gender_bit = 0x1u << character_index;
     auto new_gender_mask = female
                                ? *gender_mask & ~gender_bit

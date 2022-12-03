@@ -33,7 +33,6 @@ uint32_t get_entity_flags2(uint32_t uid);
 void set_entity_flags2(uint32_t uid, uint32_t flags);
 void set_level_flags(uint32_t flags);
 uint32_t get_level_flags();
-void set_pause(uint8_t pause);
 ENT_TYPE get_entity_type(uint32_t uid);
 int get_entity_ai_state(uint32_t uid);
 std::vector<Player*> get_players(StateMemory* state);
@@ -73,7 +72,6 @@ void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse = std::nullopt
 void destroy_entity(uint32_t uid);
 void apply_entity_db(uint32_t uid);
 void flip_entity(uint32_t uid);
-std::pair<float, float> get_camera_position();
 void set_camera_position(float cx, float cy);
 void warp(uint8_t w, uint8_t l, uint8_t t);
 void set_seed(uint32_t seed);

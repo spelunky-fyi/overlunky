@@ -45,6 +45,7 @@ class UI
     static float get_zoom_level();
     static void teleport(float x, float y, bool s, float vx, float vy, bool snap);
     static std::pair<float, float> screen_position(float x, float y);
+    static float screen_distance(float x);
     static Entity* get_entity_at(float x, float y, bool s, float radius, uint32_t mask);
     static void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap);
     static SaveData* savedata();
@@ -71,6 +72,7 @@ class UI
     static std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l);
     static void steam_achievements(bool on);
     static int32_t destroy_entity_items(Entity* ent);
+    static bool destroy_entity_item_type(Entity* ent, ENT_TYPE type);
     static void destroy_entity_overlay(Entity* ent);
     static void kill_entity_overlay(Entity* ent);
     static void update_floor_at(float x, float y, LAYER l);

@@ -75,6 +75,9 @@ class Entity
     uint8_t b9a;
     uint8_t b9b;
     uint32_t i9c;
+    /* for the autodoc
+    any user_data;
+    */
 
     size_t pointer()
     {

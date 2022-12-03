@@ -2012,7 +2012,7 @@ void add_next_levels(std::vector<std::string> next_levels)
     std::move(next_levels.begin(), next_levels.end(), std::back_inserter(g_levels_to_load));
 }
 
-int8_t get_co_subtheme()
+COSUBTHEME get_co_subtheme()
 {
     auto state = get_state_ptr();
     if (state->theme != 10)
@@ -2056,13 +2056,10 @@ int8_t get_co_subtheme()
 
     return -2;
 }
-void force_co_subtheme(int8_t subtheme)
+
+void force_co_subtheme(COSUBTHEME subtheme)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("cosmic_ocean_subtheme");
-    }
+    static size_t offset = get_address("cosmic_ocean_subtheme");
 
     // There isn't enough room to overwrite the result of the random number generation with a `mov r8, <subtheme>`
     // so we overwrite the start of the random number generator with this instruction and then jump to where the
@@ -2254,13 +2251,13 @@ bool grow_chain_and_blocks()
 bool grow_chain_and_blocks(uint32_t x, uint32_t y)
 {
     using GrowChainAndBlocks = bool(uint32_t, uint32_t);
-    auto grow_fun = (GrowChainAndBlocks*)get_address("grow_chain_and_blocks");
+    static auto grow_fun = (GrowChainAndBlocks*)get_address("grow_chain_and_blocks");
     return grow_fun(x, y);
 }
 
 void do_load_screen()
 {
-    auto load_screen_fun = (LoadScreenFun*)get_address("load_screen_func");
+    static auto load_screen_fun = (LoadScreenFun*)get_address("load_screen_func");
     const auto state = State::get().ptr();
     if (pre_load_screen())
         return;

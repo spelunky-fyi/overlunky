@@ -54,16 +54,16 @@ namespace NSaveContext
 {
 void register_usertypes(sol::state& lua)
 {
-    // Context received in ON.SAVE
-    // Used to save a string to some form of save_{}.dat
-    // Future calls to this will override the save
+    /// Context received in ON.SAVE
+    /// Used to save a string to some form of save_{}.dat
+    /// Future calls to this will override the save
     lua.new_usertype<SaveContext>("SaveContext", sol::no_constructor, "save", &SaveContext::Save);
     /* SaveContext
         bool save(string data)
         */
 
-    // Context received in ON.LOAD
-    // Used to load from save_{}.dat into a string
+    /// Context received in ON.LOAD
+    /// Used to load from save_{}.dat into a string
     lua.new_usertype<LoadContext>("LoadContext", sol::no_constructor, "load", &LoadContext::Load);
     /* LoadContext
         string load()

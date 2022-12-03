@@ -40,6 +40,7 @@ void register_usertypes(sol::state& lua)
         sol::readonly(&PlayerSlot::player_slot),
         "is_participating",
         sol::readonly(&PlayerSlot::is_participating));
+    /// Used in PlayerSlot
     lua.new_usertype<InputMapping>(
         "InputMapping",
         "jump",
@@ -66,6 +67,7 @@ void register_usertypes(sol::state& lua)
         sol::readonly(&InputMapping::up),
         "down",
         sol::readonly(&InputMapping::down));
+    /// Used in StateMemory
     lua.new_usertype<PlayerInputs>(
         "PlayerInputs",
         "player_slots",

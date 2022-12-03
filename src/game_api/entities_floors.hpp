@@ -234,7 +234,7 @@ class SpikeballTrap : public Floor
     SoundMeta* sound;
     Entity* chain;
     Entity* end_piece;
-    /// 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause | going_up is only right when timer is 0, otherwise it just sits at the bottom
+    /// 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause; going_up is only right when timer is 0, otherwise it just sits at the bottom
     int8_t state;
     /// for the start and retract
     uint8_t timer;

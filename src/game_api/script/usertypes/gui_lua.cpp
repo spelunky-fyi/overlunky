@@ -35,20 +35,23 @@ static PFN_XInputGetState g_XInputGetState = NULL;
 
 struct Gamepad : XINPUT_GAMEPAD
 {
+    /*
+    GAMEPAD wButtons; // just for the autodoc
+    */
     bool enabled;
 };
 
-Gamepad get_gamepad()
+Gamepad get_gamepad(unsigned int index = 1)
 {
     if (g_WantUpdateHasGamepad)
     {
         XINPUT_CAPABILITIES caps;
-        g_HasGamepad = g_XInputGetCapabilities ? (g_XInputGetCapabilities(0, XINPUT_FLAG_GAMEPAD, &caps) == ERROR_SUCCESS) : false;
+        g_HasGamepad = g_XInputGetCapabilities ? (g_XInputGetCapabilities(index - 1, XINPUT_FLAG_GAMEPAD, &caps) == ERROR_SUCCESS) : false;
         // g_WantUpdateHasGamepad = false;
     }
 
     XINPUT_STATE xinput_state;
-    if (g_HasGamepad && g_XInputGetState && g_XInputGetState(0, &xinput_state) == ERROR_SUCCESS)
+    if (g_HasGamepad && g_XInputGetState && g_XInputGetState(index - 1, &xinput_state) == ERROR_SUCCESS)
     {
         return {xinput_state.Gamepad, true};
     }
@@ -254,7 +257,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     flag |= ImGuiWindowFlags_NoDocking;
     ImGui::Begin(title.c_str(), &win_open, flag);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() / 2);
-    backend->handle_function(callback);
+    backend->handle_function(callback, this);
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
@@ -415,6 +418,7 @@ void register_usertypes(sol::state& lua)
         static_cast<void (GuiDrawContext::*)(IMAGE, float, float, float, float, float, float, float, float, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated),
         static_cast<void (GuiDrawContext::*)(IMAGE, AABB, AABB, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated));
 
+    /// Used in [register_option_callback](#register_option_callback) and [set_callback](#set_callback) with ON.GUIFRAME
     auto guidrawcontext_type = lua.new_usertype<GuiDrawContext>("GuiDrawContext");
     guidrawcontext_type["draw_line"] = &GuiDrawContext::draw_line;
     guidrawcontext_type["draw_rect"] = draw_rect;
@@ -485,6 +489,7 @@ void register_usertypes(sol::state& lua)
         }
     };
     /// Create image from file. Returns a tuple containing id, width and height.
+    /// Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
     lua["create_image"] = [](std::string path) -> std::tuple<IMAGE, int, int>
     {
         ScriptImage* image = new ScriptImage;
@@ -516,6 +521,7 @@ void register_usertypes(sol::state& lua)
         "y",
         &ImVec2::y);
 
+    /// Used in ImGuiIO
     lua.new_usertype<Gamepad>(
         "Gamepad",
         "enabled",
@@ -576,6 +582,7 @@ void register_usertypes(sol::state& lua)
         {
             return ImGui::IsKeyReleased((int)key);
         });
+    /// Used in [get_io](#get_io)
     lua.new_usertype<ImGuiIO>(
         "ImGuiIO",
         "displaysize",
@@ -617,69 +624,97 @@ void register_usertypes(sol::state& lua)
         "mousewheel",
         &ImGuiIO::MouseWheel,
         "gamepad",
-        sol::property([]()
+        sol::property([]() -> Gamepad
                       {
                           g_WantUpdateHasGamepad = true;
-                          return get_gamepad() /**/; }));
+                          return get_gamepad(1) /**/; }),
+        "gamepads",
+        [](unsigned int index)
+        {
+            g_WantUpdateHasGamepad = true;
+            return get_gamepad(index) /**/;
+        });
 
-    /// Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff. This is kinda bare and might change.
+    /* ImGuiIO
+    // keydown
+    // bool keydown(int keycode)
+    // bool keydown(char key)
+    // keypressed
+    // bool keypressed(int keycode, bool repeat = false)
+    // bool keypressed(char key, bool repeat = false)
+    // keyreleased
+    // bool keyreleased(int keycode)
+    // bool keyreleased(char key)
+    // gamepads
+    // Gamepad gamepads(int index)
+    // This is the XInput index 1..4, might not be the same as the player slot.
+    */
+
+    lua.create_named_table("GAMEPAD", "UP", 0x0001, "DOWN", 0x0002, "LEFT", 0x0004, "RIGHT", 0x0008, "START", 0x0010, "BACK", 0x0020, "LEFT_THUMB", 0x0040, "RIGHT_THUMB", 0x0080, "LEFT_SHOULDER", 0x0100, "RIGHT_SHOULDER", 0x0200, "A", 0x1000, "B", 0x2000, "X", 0x4000, "Y", 0x8000);
+
+    lua.create_named_table("GAMEPAD_FLAG", "UP", 1, "DOWN", 2, "LEFT", 3, "RIGHT", 4, "START", 5, "BACK", 6, "LEFT_THUMB", 7, "RIGHT_THUMB", 8, "LEFT_SHOULDER", 9, "RIGHT_SHOULDER", 10, "A", 13, "B", 14, "X", 15, "Y", 16);
+
+    lua.create_named_table("INPUT_FLAG", "JUMP", 1, "WHIP", 2, "BOMB", 3, "ROPE", 4, "RUN", 5, "DOOR", 6, "MENU", 7, "JOURNAL", 8, "LEFT", 9, "RIGHT", 10, "UP", 11, "DOWN", 12);
+
+    /// Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
+    ///
     /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
     /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
     /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
-    /// - Note: `gamepad` is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+    /// - Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+    // lua["get_io"] = []() -> ImGuiIO
     lua["get_io"] = ImGui::GetIO;
-
     /// Deprecated
-    /// Use `GuiDrawContext.draw_line` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.draw_line` instead
     lua["draw_line"] = [](float x1, float y1, float x2, float y2, float thickness, uColor color)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).draw_line(x1, y1, x2, y2, thickness, color);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.draw_rect` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.draw_rect` instead
     lua["draw_rect"] = [](float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).draw_rect(x1, y1, x2, y2, thickness, rounding, color);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.draw_rect_filled` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.draw_rect_filled` instead
     lua["draw_rect_filled"] = [](float x1, float y1, float x2, float y2, float rounding, uColor color)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).draw_rect_filled(x1, y1, x2, y2, rounding, color);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.draw_circle` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.draw_circle` instead
     lua["draw_circle"] = [](float x, float y, float radius, float thickness, uColor color)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).draw_circle(x, y, radius, thickness, color);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.draw_circle_filled` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.draw_circle_filled` instead
     lua["draw_circle_filled"] = [](float x, float y, float radius, uColor color)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).draw_circle_filled(x, y, radius, color);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.draw_text` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.draw_text` instead
     lua["draw_text"] = [](float x, float y, float size, std::string text, uColor color)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).draw_text(x, y, size, std::move(text), color);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.draw_image` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.draw_image` instead
     lua["draw_image"] = [](IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).draw_image(image, x1, y1, x2, y2, uvx1, uvy1, uvx2, uvy2, color);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.draw_image_rotated` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.draw_image_rotated` instead
     lua["draw_image_rotated"] = [](IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)
     {
         auto backend = LuaBackend::get_calling_backend();
@@ -687,126 +722,126 @@ void register_usertypes(sol::state& lua)
     };
 
     /// Deprecated
-    /// Use `GuiDrawContext.window` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.window` instead
     lua["window"] = [](std::string title, float x, float y, float w, float h, bool movable, sol::function callback)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).window(std::move(title), x, y, w, h, movable, std::move(callback));
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_text` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_text` instead
     lua["win_text"] = [](std::string text)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).win_text(std::move(text));
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_separator` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_separator` instead
     lua["win_separator"] = []()
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).win_separator();
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_inline` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_inline` instead
     lua["win_inline"] = []()
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).win_inline();
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_sameline` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_sameline` instead
     lua["win_sameline"] = [](float offset, float spacing)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).win_sameline(offset, spacing);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_button` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_button` instead
     lua["win_button"] = [](std::string text) -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_button(std::move(text));
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_input_text` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_input_text` instead
     lua["win_input_text"] = [](std::string label, std::string value) -> std::string
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_input_text(std::move(label), std::move(value));
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_input_int` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_input_int` instead
     lua["win_input_int"] = [](std::string label, int value) -> int
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_input_int(std::move(label), value);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_input_float` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_input_float` instead
     lua["win_input_float"] = [](std::string label, float value) -> float
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_input_float(std::move(label), value);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_slider_int` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_slider_int` instead
     lua["win_slider_int"] = [](std::string label, int value, int min, int max) -> int
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_slider_int(std::move(label), value, min, max);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_drag_int` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_drag_int` instead
     lua["win_drag_int"] = [](std::string label, int value, int min, int max) -> int
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_drag_int(std::move(label), value, min, max);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_slider_float` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_slider_float` instead
     lua["win_slider_float"] = [](std::string label, float value, float min, float max) -> float
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_slider_float(std::move(label), value, min, max);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_drag_float` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_drag_float` instead
     lua["win_drag_float"] = [](std::string label, float value, float min, float max) -> float
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_drag_float(std::move(label), value, min, max);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_check` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_check` instead
     lua["win_check"] = [](std::string label, bool value) -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_check(std::move(label), value);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_combo` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_combo` instead
     lua["win_combo"] = [](std::string label, int selected, std::string opts) -> int
     {
         auto backend = LuaBackend::get_calling_backend();
         return GuiDrawContext(backend.get()).win_combo(std::move(label), selected, std::move(opts));
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_pushid` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_pushid` instead
     lua["win_pushid"] = [](int id)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).win_pushid(id);
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_popid` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_popid` instead
     lua["win_popid"] = []()
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).win_popid();
     };
     /// Deprecated
-    /// Use `GuiDrawContext.win_image` instead
+    /// Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
     lua["win_image"] = [](IMAGE image, int width, int height)
     {
         auto backend = LuaBackend::get_calling_backend();

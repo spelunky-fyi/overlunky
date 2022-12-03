@@ -85,6 +85,10 @@ struct Vec2
     {
         return x == a.x && y == a.y;
     }
+    /*
+    std::tuple<float, float> split()
+    {} // just for the autodoc
+    */
     operator std::pair<float, float>() const
     {
         return {x, y};
@@ -109,6 +113,14 @@ struct AABB
 
     /// Copy an axis aligned bounding box
     AABB(const AABB&) = default;
+    /// NoDoc
+    AABB(const std::tuple<float, float, float, float> tuple)
+    {
+        left = std::get<0>(tuple);
+        top = std::get<1>(tuple);
+        right = std::get<2>(tuple);
+        bottom = std::get<3>(tuple);
+    };
 
     /// Create a new axis aligned bounding box by specifying its values
     AABB(float left_, float top_, float right_, float bottom_)
@@ -203,6 +215,14 @@ struct AABB
     float height() const
     {
         return (top - bottom);
+    }
+    /*
+    std::tuple<float, float, float, float> split()
+    {} // just for the autodoc
+    */
+    operator std::tuple<float, float, float, float>()
+    {
+        return {left, top, right, bottom};
     }
 
     float left{0};
@@ -311,9 +331,14 @@ struct Quad
 
         return *this;
     }
-
+    /*
     /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
     std::tuple<Vec2, Vec2, Vec2, Vec2> split()
+    {} // just for the autodoc
+    */
+
+    /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
+    operator std::tuple<Vec2, Vec2, Vec2, Vec2>()
     {
         return {{bottom_left_x, bottom_left_y}, {bottom_right_x, bottom_right_y}, {top_right_x, top_right_y}, {top_left_x, top_left_y}};
     }

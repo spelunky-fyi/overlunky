@@ -78,6 +78,7 @@ void register_usertypes(sol::state& lua)
         "rotate",
         &Vec2::rotate,
         "split",
+        // &Vec2::split); // for the autodoc
         &Vec2::operator std::pair<float, float>);
 
     const auto extrude = sol::overload(
@@ -111,7 +112,10 @@ void register_usertypes(sol::state& lua)
         "width",
         &AABB::width,
         "height",
-        &AABB::height);
+        &AABB::height,
+        "split",
+        // &Vec2::split); // for the autodoc
+        &AABB::operator std::tuple<float, float, float, float>);
 
     lua.new_usertype<Quad>(
         "Quad",
@@ -143,6 +147,7 @@ void register_usertypes(sol::state& lua)
         "flip_vertically",
         &Quad::flip_vertically,
         "split",
-        &Quad::split);
+        // &Quad::split); // for the autodoc
+        &Quad::operator std::tuple<Vec2, Vec2, Vec2, Vec2>);
 }
 } // namespace NHitbox
