@@ -1380,7 +1380,7 @@ end
     /// This is so that when the entity dies (from other causes), the death screen still gets shown.
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// <br/>The callback signature is bool on_player_instagib(Entity self)
-    lua["set_on_player_instagib"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
+    lua["set_on_player_instagib"] = [](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Entity* ent = get_entity_ptr(uid))
         {
@@ -1401,7 +1401,7 @@ end
     /// <br/>The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float vel_x, float vel_y, int stun_amount, int iframes)
     lua["set_on_damage"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
-        if (Entity* ent = get_entity_ptr(uid))
+        if (Entity* ent = get_entity_ptr(uid); ent != nullptr && ent->is_movable())
         {
             return lua["Movable"]["set_pre_damage"](ent, std::move(fun));
         }
@@ -1415,9 +1415,9 @@ end
     /// <br/>The callback signature is bool pre_floor_update(Entity self)
     lua["set_pre_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
-        if (Entity* ent = get_entity_ptr(uid))
+        if (Entity* ent = get_entity_ptr(uid)) // TODO: Requires ent->is_floor
         {
-            return lua["Movable"]["set_pre_floor_update"](ent, std::move(fun));
+            return lua["Floor"]["set_pre_floor_update"](ent, std::move(fun));
         }
         return sol::nullopt;
     };
@@ -1429,9 +1429,9 @@ end
     /// <br/>The callback signature is nil post_floor_update(Entity self)
     lua["set_post_floor_update"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
-        if (Entity* ent = get_entity_ptr(uid))
+        if (Entity* ent = get_entity_ptr(uid)) // TODO: Requires ent->is_floor
         {
-            return lua["Movable"]["set_post_floor_update"](ent, std::move(fun));
+            return lua["Floor"]["set_post_floor_update"](ent, std::move(fun));
         }
         return sol::nullopt;
     };
@@ -1444,7 +1444,7 @@ end
     /// <br/>The callback signature is nil on_open(Entity entity_self, Entity opener)
     lua["set_on_open"] = [&lua](int uid, sol::function fun) -> sol::optional<CallbackId>
     {
-        if (Entity* ent = get_entity_ptr(uid))
+        if (Entity* ent = get_entity_ptr(uid)) // TODO: Requires ent->is_container
         {
             return lua["Container"]["set_on_open"](ent, std::move(fun));
         }
