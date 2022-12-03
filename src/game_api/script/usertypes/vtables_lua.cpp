@@ -1,10 +1,11 @@
 #include "entity_lua.hpp"
 
-#include "entities_items.hpp"  // for Container
-#include "entity.hpp"          // for Entity
-#include "hookable_vtable.hpp" // for HookableVTable
-#include "movable.hpp"         // for Movable
-#include "render_api.hpp"      // for RenderInfo
+#include "entities_items.hpp"                      // for Container
+#include "entity.hpp"                              // for Entity
+#include "hookable_vtable.hpp"                     // for HookableVTable
+#include "movable.hpp"                             // for Movable
+#include "render_api.hpp"                          // for RenderInfo
+#include "script/usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
 
 namespace NVTables
 {
@@ -47,7 +48,7 @@ void register_usertypes(sol::state& lua)
         RenderInfo,
         CallbackType::Entity,
         VTableEntry<"dtor", 0x0, void()>,
-        VTableEntry<"render", 0x3, void()>>;
+        VTableEntry<"render", 0x3, void(), BackBinder<VanillaRenderContext>>>;
     static RenderInfoVTable render_info_vtable(lua, lua["RenderInfo"], "ENTITY_OVERRIDE");
 
     // Define the implementations for the LuaBackend handlers

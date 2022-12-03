@@ -1465,7 +1465,7 @@ end
         return sol::nullopt;
     };
     /// Deprecated
-    /// Use `entity.rendering_info:set_pre_render` instead.
+    /// Use `entity.rendering_info:set_pre_render` in combination with `render_info:get_entity` instead.
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right after the entity is rendered.
     /// Return `true` to skip the original rendering function and all later pre_render callbacks.
@@ -1478,12 +1478,12 @@ end
             auto backend_id = LuaBackend::get_calling_backend_id();
             return lua["RenderInfo"]["set_pre_render"](
                 ent->rendering_info,
-                [backend_id, fun = std::move(fun)](RenderInfo* ri)
+                [backend_id, fun = std::move(fun)](RenderInfo* ri, VanillaRenderContext render_ctx)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     return backend->handle_function_with_return<bool>(
                                       fun,
-                                      VanillaRenderContext{},
+                                      render_ctx,
                                       OnHeapPointer<Entity>{ri->entity_offset}.decode_local())
                         .value_or(false);
                 });
@@ -1491,7 +1491,7 @@ end
         return sol::nullopt;
     };
     /// Deprecated
-    /// Use `entity.rendering_info:set_post_render` instead.
+    /// Use `entity.rendering_info:set_post_render` in combination with `render_info:get_entity` instead.
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right after the entity is rendered.
     /// Use this only when no other approach works, this call can be expensive if overused.
@@ -1503,12 +1503,12 @@ end
             auto backend_id = LuaBackend::get_calling_backend_id();
             return lua["RenderInfo"]["set_post_render"](
                 ent->rendering_info,
-                [backend_id, fun = std::move(fun)](RenderInfo* ri)
+                [backend_id, fun = std::move(fun)](RenderInfo* ri, VanillaRenderContext render_ctx)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     return backend->handle_function_with_return<bool>(
                                       fun,
-                                      VanillaRenderContext{},
+                                      render_ctx,
                                       OnHeapPointer<Entity>{ri->entity_offset}.decode_local())
                         .value_or(false);
                 });
