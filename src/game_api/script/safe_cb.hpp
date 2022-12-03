@@ -84,15 +84,13 @@ struct BackBinder<>
 {
 };
 
-template <class FunT, class CallableT, class... FrontTs, class... BackTs>
-requires(std::is_function_v<FunT>)
+template <function_signature FunT, class CallableT, class... FrontTs, class... BackTs>
 static auto make_safe_cb(
     CallableT&& cb,
     FrontBinder<FrontTs...> front_binder = FrontBinder<>{},
     BackBinder<BackTs...> back_binder = BackBinder<>{});
 
-template <class FunT, CallbackType CbType, class CallableT, class... FrontTs, class... BackTs>
-requires(std::is_function_v<FunT>)
+template <function_signature FunT, CallbackType CbType, class CallableT, class... FrontTs, class... BackTs>
 static auto make_safe_clearable_cb(
     CallableT&& cb,
     int32_t id,

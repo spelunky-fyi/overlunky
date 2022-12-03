@@ -145,6 +145,8 @@ template <template <typename...> class Template, typename... Args>
 struct is_instantiation_of<Template, Template<Args...>> : std::true_type {};
 template <template <typename...> class Template, typename T>
 inline constexpr auto is_instantiation_of_v = is_instantiation_of<Template, T>::value;
+template <typename T, template <typename...> class Template>
+concept instance_of = is_instantiation_of_v<Template, T>;
 // clang-format on
 
 template <class T>
@@ -191,3 +193,41 @@ struct is_same_args<LhsRetT(ArgsT...), RhsRetT(ArgsT...)> : std::true_type
 };
 template <class LhsSignature, class RhsSignature>
 inline constexpr auto is_same_args_v = is_same_args<LhsSignature, RhsSignature>::value;
+
+template <class FunT>
+concept function_signature = std::is_function_v<FunT>;
+
+template <std::size_t N>
+struct LiteralString
+{
+    consteval LiteralString() = default;
+    consteval LiteralString(const char (&str)[N])
+    {
+        std::copy(std::begin(str), std::end(str), std::begin(Str));
+    }
+
+    template <class T>
+    constexpr T to() const
+    {
+        if constexpr (requires { T{Str, Size}; })
+        {
+            return T{Str, Size};
+        }
+        else if constexpr (requires { T{std::begin(Str), std::end(Str)}; })
+        {
+            return T{std::begin(Str), std::end(Str)};
+        }
+    }
+
+    char Str[N]{};
+    size_t Size{N - 1};
+};
+
+template <LiteralString Left, LiteralString Right>
+consteval auto JoinLiteralStrings()
+{
+    LiteralString<Left.Size + Right.Size + 1> result{};
+    std::copy(std::begin(Left.Str), std::end(Left.Str), std::begin(result.Str));
+    std::copy(std::begin(Right.Str), std::end(Right.Str), std::begin(result.Str) + Left.Size);
+    return result;
+}
