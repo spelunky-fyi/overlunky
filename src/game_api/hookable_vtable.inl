@@ -92,11 +92,11 @@ struct VTableEntryImpl<VTableEntry<Name, Index, RetT(ArgsT...), BindBack, DoHook
     {
         if constexpr (DoHooks)
         {
-            lua_type[JoinLiteralStrings<"set_pre_", Name>().to<std::string_view>()] = [&vtable](SelfT* self, sol::function fun)
+            lua_type[JoinLiteralStrings<"set_pre_", Name>().template to<std::string_view>()] = [&vtable](SelfT* self, sol::function fun)
             {
                 std::uint32_t callback_id = vtable.reserve_callback_id(self);
                 std::uint32_t aux_id = self->get_aux_id();
-                vtable.set_pre<FreeSignature, MyIndex>(
+                vtable.template set_pre<FreeSignature, MyIndex>(
                     self,
                     callback_id,
                     make_safe_clearable_cb<FreePreSignature, MyCallbackType>(
@@ -110,11 +110,11 @@ struct VTableEntryImpl<VTableEntry<Name, Index, RetT(ArgsT...), BindBack, DoHook
                 backend->MyHookHandler::add_hook(callback_id, aux_id);
                 return callback_id;
             };
-            lua_type[JoinLiteralStrings<"set_post_", Name>().to<std::string_view>()] = [&vtable](SelfT* self, sol::function fun)
+            lua_type[JoinLiteralStrings<"set_post_", Name>().template to<std::string_view>()] = [&vtable](SelfT* self, sol::function fun)
             {
                 std::uint32_t callback_id = vtable.reserve_callback_id(self);
                 std::uint32_t aux_id = self->get_aux_id();
-                vtable.set_post<FreeSignature, MyIndex>(
+                vtable.template set_post<FreeSignature, MyIndex>(
                     self,
                     callback_id,
                     make_safe_clearable_cb<FreePostSignature, MyCallbackType>(
@@ -227,8 +227,8 @@ template <
 struct VTableHookInfos : UniquePreHookInfos<Signatures...>,
                          UniquePostHookInfos<Signatures...>
 {
-    using UniquePreSignatures = UniquePreHookInfos<Signatures...>::UniqueSignaturesList;
-    using UniquePostSignatures = UniquePostHookInfos<Signatures...>::UniqueSignaturesList;
+    using UniquePreSignatures = typename UniquePreHookInfos<Signatures...>::UniqueSignaturesList;
+    using UniquePostSignatures = typename UniquePostHookInfos<Signatures...>::UniqueSignaturesList;
 
     std::uint32_t callback_count{0};
 
@@ -376,7 +376,7 @@ struct HookableVTable
                 }
                 return sol::nullopt;
             };
-            lua_type["clear_virtual"] = [this](std::int32_t aux_id, std::uint32_t callback_id)
+            lua_type["clear_virtual"] = [](std::int32_t aux_id, std::uint32_t callback_id)
             {
                 auto backend = LuaBackend::get_calling_backend();
                 backend->MyHookHandler::clear_hook(callback_id, aux_id);
@@ -430,7 +430,7 @@ struct HookableVTable
             hook_vtable_impl<Signature, Index>::call(*this, obj);
             hook_info.set_hooked((void***)obj, Index, dtor_index);
         }
-        hook_info.get_pre<Signature>()[Index].push_back({callback_id, std::move(pre_fun)});
+        hook_info.template get_pre<Signature>()[Index].push_back({callback_id, std::move(pre_fun)});
     }
     template <function_signature Signature, std::uint32_t Index, class CallableT>
     void set_post(SelfT* obj, std::uint32_t callback_id, CallableT post_fun)
@@ -442,7 +442,7 @@ struct HookableVTable
             hook_vtable_impl<Signature, Index>::call(*this, obj);
             hook_info.set_hooked((void***)obj, Index, dtor_index);
         }
-        hook_info.get_post<Signature>()[Index].push_back({callback_id, std::move(post_fun)});
+        hook_info.template get_post<Signature>()[Index].push_back({callback_id, std::move(post_fun)});
     }
     void unhook(SelfT* obj, std::uint32_t callback_id)
     {
@@ -465,7 +465,7 @@ struct HookableVTable
                     MyHookInfos& hook_info = self.get_hooks(inner_obj);
 
                     bool skip_orig = false;
-                    for (auto& [id, prefun] : hook_info.get_pre<void(SelfT*, ArgsT...)>()[Index])
+                    for (auto& [id, prefun] : hook_info.template get_pre<void(SelfT*, ArgsT...)>()[Index])
                     {
                         skip_orig = prefun(inner_obj, args...);
                     }
@@ -473,7 +473,7 @@ struct HookableVTable
                     {
                         original(inner_obj, args...);
                     }
-                    for (auto& [id, postfun] : hook_info.get_post<void(SelfT*, ArgsT...)>()[Index])
+                    for (auto& [id, postfun] : hook_info.template get_post<void(SelfT*, ArgsT...)>()[Index])
                     {
                         postfun(inner_obj, args...);
                     }
@@ -492,7 +492,7 @@ struct HookableVTable
                     MyHookInfos& hook_info = self.get_hooks(inner_obj);
 
                     std::optional<RetT> return_value;
-                    for (auto& [id, prefun] : hook_info.get_pre<RetT(SelfT*, ArgsT...)>()[Index])
+                    for (auto& [id, prefun] : hook_info.template get_pre<RetT(SelfT*, ArgsT...)>()[Index])
                     {
                         auto ret = prefun(inner_obj);
                         if (ret.has_value() && !return_value.has_value())
@@ -504,7 +504,7 @@ struct HookableVTable
                     {
                         return_value = original(inner_obj);
                     }
-                    for (auto& [id, postfun] : hook_info.get_post<RetT(SelfT*, ArgsT...)>()[Index])
+                    for (auto& [id, postfun] : hook_info.template get_post<RetT(SelfT*, ArgsT...)>()[Index])
                     {
                         postfun(inner_obj);
                     }
@@ -514,17 +514,17 @@ struct HookableVTable
     };
 
     std::unordered_map<std::uint32_t, std::string> index_to_name{
-        std::pair{VTableEntries::MyIndex, VTableEntries::MyRawName.to<std::string>()}...,
+        std::pair{VTableEntries::MyIndex, VTableEntries::MyRawName.template to<std::string>()}...,
     };
     inline static constexpr std::uint32_t dtor_index{
         []() -> std::uint32_t
         {
-            std::vector name_and_index{
-                std::pair{VTableEntries::MyRawName.to<std::string_view>(), VTableEntries::MyIndex}...,
+            std::vector index_and_name{
+                std::pair{VTableEntries::MyIndex, VTableEntries::MyRawName.template to<std::string>()}...,
             };
 
             using namespace std::string_view_literals;
-            for (auto [name, idx] : name_and_index)
+            for (auto [idx, name] : index_and_name)
             {
                 if (name == "dtor"sv)
                 {

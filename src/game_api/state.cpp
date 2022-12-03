@@ -163,7 +163,7 @@ void on_instagib(Entity* victim, bool destroy_corpse, size_t param_3)
         return;
     }
 
-    const bool skip_orig = pre_entity_instagib(victim) && !victim->as<Movable>()->health == 0;
+    const bool skip_orig = pre_entity_instagib(victim) && !(victim->as<Movable>()->health == 0);
 
     if (!skip_orig)
     {
