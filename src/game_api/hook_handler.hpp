@@ -56,7 +56,8 @@ struct HookHandler
     }
     void clear_all_hooks()
     {
-        for (auto [callback_id, aux_id] : hooks)
+        cleared_hooks = std::move(hooks);
+        for (auto [callback_id, aux_id] : cleared_hooks)
         {
             unhook(callback_id, aux_id);
         }
@@ -108,6 +109,20 @@ struct HookHandler
     void unhook(std::uint32_t callback_id, std::uint32_t aux_id)
     {
         unhook_impl(callback_id, aux_id);
+
+        const auto aux_id_equal = [aux_id](Hook& hook)
+        { return hook.aux_id == aux_id; };
+
+        std::erase(hooks, Hook{callback_id, aux_id});
+        if (std::count_if(hooks.begin(), hooks.end(), aux_id_equal) == 0)
+        {
+            auto it = std::find_if(dtor_hooks.begin(), dtor_hooks.end(), aux_id_equal);
+            if (it != dtor_hooks.end())
+            {
+                unhook_impl(it->callback_id, aux_id);
+                dtor_hooks.erase(it);
+            }
+        }
     }
     inline static std::function<void(std::uint32_t, std::uint32_t)> unhook_impl{};
 };
