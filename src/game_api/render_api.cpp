@@ -629,9 +629,14 @@ void init_render_api_hooks()
     }
 }
 
+Entity* RenderInfo::get_entity() const
+{
+    return OnHeapPointer<Entity>{entity_offset}.decode_local();
+}
+
 uint32_t RenderInfo::get_aux_id() const
 {
-    return OnHeapPointer<Entity>{entity_offset}.decode_local()->uid;
+    return get_entity()->uid;
 }
 
 void TextureRenderingInfo::set_destination(const AABB& bbox)

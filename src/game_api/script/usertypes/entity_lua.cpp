@@ -111,17 +111,18 @@ void register_usertypes(sol::state& lua)
         "source",
         &RenderInfo::source,
         "destination",
-        sol::property([](const RenderInfo& ri) -> Quad
-                      { return Quad{
-                            ri.destination_bottom_left_x,
-                            ri.destination_bottom_left_y,
-                            ri.destination_bottom_right_x,
-                            ri.destination_bottom_right_y,
-                            ri.destination_top_right_x,
-                            ri.destination_top_right_y,
-                            ri.destination_top_left_x,
-                            ri.destination_top_left_y,
-                        }; }),
+        sol::property(
+            [](const RenderInfo& ri) -> Quad
+            { return Quad{
+                  ri.destination_bottom_left_x,
+                  ri.destination_bottom_left_y,
+                  ri.destination_bottom_right_x,
+                  ri.destination_bottom_right_y,
+                  ri.destination_top_right_x,
+                  ri.destination_top_right_y,
+                  ri.destination_top_left_x,
+                  ri.destination_top_left_y,
+              }; }),
         "tilew",
         &RenderInfo::tilew,
         "tileh",
@@ -129,7 +130,9 @@ void register_usertypes(sol::state& lua)
         "facing_left",
         &RenderInfo::flip_horizontal,
         "render_inactive",
-        &RenderInfo::render_inactive);
+        &RenderInfo::render_inactive,
+        "get_entity",
+        &RenderInfo::get_entity);
 
     auto get_overlay = [&lua](Entity& entity)
     {
