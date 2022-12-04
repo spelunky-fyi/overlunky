@@ -26,6 +26,7 @@
 #include "level_api.hpp"                     // for THEME_OVERRIDE, ThemeInfo
 #include "math.hpp"                          // for AABB
 #include "savedata.hpp"                      // for SaveData, Constellation...
+#include "script/handle_lua_function.hpp"    // for handle_function
 #include "script/lua_backend.hpp"            // for LuaBackend, LevelGenCal...
 #include "script/safe_cb.hpp"                // for make_safe_cb
 #include "state.hpp"                         // for State, StateMemory, enu...
@@ -350,7 +351,7 @@ class CustomTheme : public ThemeInfo
         if (overrides.find(index) != overrides.end() && get_override_func_enabled(index))
         {
             auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<Ret>(overrides[index]->func.value(), std::forward<Args>(args)...);
+            return handle_function<Ret>(backend.get(), overrides[index]->func.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
     }
@@ -361,7 +362,7 @@ class CustomTheme : public ThemeInfo
         if (overrides.find(index) != overrides.end() && get_pre_func_enabled(index))
         {
             auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<Ret>(overrides[index]->pre.value(), std::forward<Args>(args)...);
+            return handle_function<Ret>(backend.get(), overrides[index]->pre.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
     }
@@ -372,7 +373,7 @@ class CustomTheme : public ThemeInfo
         if (overrides.find(index) != overrides.end() && get_post_func_enabled(index))
         {
             auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<Ret>(overrides[index]->post.value(), std::forward<Args>(args)...);
+            return handle_function<Ret>(backend.get(), overrides[index]->post.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
     }

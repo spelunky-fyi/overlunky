@@ -35,6 +35,7 @@
 #include "entities_items.hpp"                      // for Container, Player...
 #include "entity.hpp"                              // for get_entity_ptr
 #include "game_manager.hpp"                        // for get_game_manager
+#include "handle_lua_function.hpp"                 // for handle_function
 #include "items.hpp"                               // for Inventory
 #include "layer.hpp"                               // for g_level_max_x
 #include "lua_backend.hpp"                         // for LuaBackend, ON
@@ -1497,11 +1498,11 @@ end
                 [backend_id, fun = std::move(fun)](RenderInfo* ri, VanillaRenderContext render_ctx)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
-                    return backend->handle_function_with_return<bool>(
-                                      fun,
-                                      render_ctx,
-                                      OnHeapPointer<Entity>{ri->entity_offset}.decode_local())
-                        .value_or(false);
+                    return handle_function<bool>(
+                        backend.get(),
+                        fun,
+                        render_ctx,
+                        ri->get_entity());
                 });
         }
         return sol::nullopt;
@@ -1522,11 +1523,11 @@ end
                 [backend_id, fun = std::move(fun)](RenderInfo* ri, VanillaRenderContext render_ctx)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
-                    return backend->handle_function_with_return<bool>(
-                                      fun,
-                                      render_ctx,
-                                      OnHeapPointer<Entity>{ri->entity_offset}.decode_local())
-                        .value_or(false);
+                    return handle_function<bool>(
+                        backend.get(),
+                        fun,
+                        render_ctx,
+                        ri->get_entity());
                 });
         }
         return sol::nullopt;

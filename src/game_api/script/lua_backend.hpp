@@ -302,14 +302,6 @@ class LuaBackend
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();
 
-    template <class... Args>
-    sol::protected_function_result handle_function_raw(sol::function func, Args&&... args);
-
-    template <class... Args>
-    bool handle_function(sol::function func, Args&&... args);
-    template <class Ret, class... Args>
-    std::optional<Ret> handle_function_with_return(sol::function func, Args&&... args);
-
     void clear();
     void clear_all_callbacks();
 
@@ -389,7 +381,7 @@ class LuaBackend
     void set_current_callback(int32_t aux_id, int32_t id, CallbackType type);
     void clear_current_callback();
 
-    sol::protected_function_result cast_entity(Entity* ent);
+    void set_error(std::string err);
 
     static void for_each_backend(std::function<bool(LockedBackend)> fun);
     static LockedBackend get_backend(std::string_view id);
@@ -401,85 +393,7 @@ class LuaBackend
     static std::string get_calling_backend_id();
     static void push_calling_backend(LuaBackend*);
     static void pop_calling_backend(LuaBackend*);
-
-  private:
-    template <class T>
-    auto cast_if_entity(T&& val)
-    {
-        return std::forward<T>(val);
-    }
-    template <std::derived_from<Entity> T>
-    auto cast_if_entity(T* val)
-    {
-        return cast_entity(val);
-    }
 };
-
-template <class... Args>
-sol::protected_function_result LuaBackend::handle_function_raw(sol::function func, Args&&... args)
-{
-    LuaBackend::push_calling_backend(this);
-    ON_SCOPE_EXIT(LuaBackend::pop_calling_backend(this));
-
-    auto lua_result = func(LuaBackend::cast_if_entity(std::forward<Args>(args))...);
-
-    if (!lua_result.valid())
-    {
-        sol::error e = lua_result;
-        result = e.what();
-#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-        std::istringstream errors(result);
-        while (!errors.eof())
-        {
-            std::string eline;
-            getline(errors, eline);
-            messages.push_back({eline, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
-            DEBUG("{}", result);
-            if (messages.size() > 30)
-                messages.pop_front();
-        }
-#endif
-    }
-
-    return lua_result;
-}
-
-template <class... Args>
-bool LuaBackend::handle_function(sol::function func, Args&&... args)
-{
-    return handle_function_with_return<std::monostate>(std::move(func), std::forward<Args>(args)...) != std::nullopt;
-}
-template <class Ret, class... Args>
-std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, Args&&... args)
-{
-    auto lua_result = handle_function_raw(std::move(func), std::forward<Args>(args)...);
-    if (!lua_result.valid())
-    {
-        return std::nullopt;
-    }
-    else if constexpr (std::is_same_v<Ret, std::monostate>)
-    {
-        return std::optional{std::monostate{}};
-    }
-    else
-    {
-        try
-        {
-            auto return_type = lua_result.get_type();
-            if (return_type == sol::type::none || return_type == sol::type::nil)
-            {
-                return std::optional<Ret>{};
-            }
-            Ret return_value = lua_result;
-            return return_value;
-        }
-        catch (...)
-        {
-            result = "Unexpected return type from function.";
-            return std::nullopt;
-        }
-    }
-}
 
 template <class Inheriting>
 class LockableLuaBackend : public LuaBackend

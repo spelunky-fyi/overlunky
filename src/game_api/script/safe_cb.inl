@@ -5,6 +5,8 @@
 
 #include "safe_cb.hpp"
 
+#include "handle_lua_function.hpp" // for handle_function_raw, handle_function
+
 template <class T>
 struct Binder
 {
@@ -79,20 +81,20 @@ decltype(auto) invoke(
     {
         if constexpr (std::is_same_v<RetT, auto_tag_t>)
         {
-            return backend.handle_function_raw(callable, COMMON_ARGS);
+            return handle_function_raw(&backend, callable, COMMON_ARGS);
         }
         else if constexpr (std::is_void_v<RetT>)
         {
-            (void)backend.handle_function(callable, COMMON_ARGS);
+            (void)handle_function<void>(&backend, callable, COMMON_ARGS);
             return;
         }
         else if constexpr (is_optional_v<RetT>)
         {
-            return backend.handle_function_with_return<unwrap_optional_t<RetT>>(callable, COMMON_ARGS);
+            return handle_function<unwrap_optional_t<RetT>>(&backend, callable, COMMON_ARGS);
         }
         else
         {
-            return backend.handle_function_with_return<unwrap_optional_t<RetT>>(callable, COMMON_ARGS).value_or(RetT{});
+            return handle_function<unwrap_optional_t<RetT>>(&backend, callable, COMMON_ARGS).value_or(RetT{});
         }
     }
     else if constexpr (std::is_invocable_r_v<RetT, CallableT, LuaBackend&, ArgsT...>)
