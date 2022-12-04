@@ -292,9 +292,9 @@ struct VTableHookInfos : UniquePreHookInfos<Signatures...>,
     {
         static void call(VTableHookInfos& self, std::uint32_t callback_id)
         {
-            auto unhook_impl = [callback_id](auto& hooks)
+            auto unhook_impl = [callback_id](auto& pre_hooks)
             {
-                for (auto& [index, funcs] : hooks)
+                for (auto& [index, funcs] : pre_hooks)
                 {
                     std::erase_if(funcs, [callback_id](auto& hook)
                                   { return hook.id == callback_id; });
@@ -311,9 +311,9 @@ struct VTableHookInfos : UniquePreHookInfos<Signatures...>,
     {
         static void call(VTableHookInfos& self, std::uint32_t callback_id)
         {
-            auto unhook_impl = [callback_id](auto& hooks)
+            auto unhook_impl = [callback_id](auto& post_hooks)
             {
-                for (auto& [index, funcs] : hooks)
+                for (auto& [index, funcs] : post_hooks)
                 {
                     std::erase_if(funcs, [callback_id](auto& hook)
                                   { return hook.id == callback_id; });
