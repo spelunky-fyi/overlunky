@@ -1562,7 +1562,7 @@ end
         return sol::nullopt;
     };
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-    /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+    /// Sets a callback that is called right when a container is opened (up+whip or damage to the container)
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     /// <br/>The callback signature is nil on_open(Entity entity_self, Entity opener)

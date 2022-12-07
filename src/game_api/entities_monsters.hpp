@@ -934,7 +934,7 @@ class MegaJellyfish : public Monster
     Entity* flipper1;
     Entity* flipper2;
     SoundMeta* sound;
-    /// the closest orb, does not gets updated
+    /// game checks if this uid, and two following exist, if not, the Jellyfish starts chasing player
     int32_t orb_uid;
     int32_t tail_bg_uid;
     float applied_velocity;

@@ -93,8 +93,10 @@ class Player : public PowerupCapable
   public:
     Inventory* inventory_ptr;
     Illumination* emitted_light;
-    int32_t linked_companion_child;  // entity uid
-    int32_t linked_companion_parent; // entity uid
+    /// entity uid
+    int32_t linked_companion_child;
+    /// entity uid
+    int32_t linked_companion_parent;
     Ai* ai;
     PlayerSlot* input_ptr;
     /// Used in base camp to talk with the NPC's

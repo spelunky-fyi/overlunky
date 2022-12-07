@@ -978,7 +978,7 @@ function set_pre_floor_update(uid, fun) end
 ---@return CallbackId?
 function set_post_floor_update(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+---Sets a callback that is called right when a container is opened (up+whip or damage to the container)
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---<br/>The callback signature is nil on_open(Entity entity_self, Entity opener)
@@ -2157,7 +2157,7 @@ local function PRNG_random(self, min, max) end
     ---@field activate fun(self, activator: Entity): nil
     ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil
     ---@field trigger_action fun(self, user: Entity): boolean
-    ---@field get_metadata any @&Entity::get_metadata
+    ---@field get_metadata fun(self): integer
     ---@field apply_metadata fun(self, metadata: integer): nil
     ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self): integer[]

@@ -3027,7 +3027,7 @@ Derived from [Entity](#Entity) [Floor](#Floor)
 Type | Name | Description
 ---- | ---- | -----------
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
-int | [reset_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_timer) | after triggering counts from 0 to 255, changes the 'phase_2' then counts from 0 to 104
+int | [reset_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_timer) | after triggering counts from 0 to 255, changes the `phase_2` then counts from 0 to 104
 bool | [phase_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase_2) | 
 nil | [trigger(int who_uid)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) | The uid must be movable entity for ownership transfers
 
@@ -3347,7 +3347,7 @@ nil | [destroy()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destr
 nil | [activate(Entity activator)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate) | Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
 nil | [perform_teleport(int delta_x, int delta_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=perform_teleport) | Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
 bool | [trigger_action(Entity user)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_action) | Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
- | [get_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) | 
+int | [get_metadata()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_metadata) | e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
 nil | [apply_metadata(int metadata)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_metadata) | 
 nil | [set_invisible(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
 array&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
@@ -3593,7 +3593,7 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [min_empty_distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=min_empty_distance) | Used in bigspeartrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles
+int | [min_empty_distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=min_empty_distance) | Used in [BigSpearTrap](#BigSpearTrap) when it has to have minimum 2 free spaces to be able to trigger, value in tiles
 int | [trigger_distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_distance) | Value in tiles
 bool | [vertical](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vertical) | 
 
@@ -4292,7 +4292,7 @@ Type | Name | Description
 [Entity](#Entity) | [flipper1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipper1) | 
 [Entity](#Entity) | [flipper2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flipper2) | 
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
-int | [orb_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=orb_uid) | the closest orb, does not gets updated
+int | [orb_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=orb_uid) | game checks if this uid, and two following exist, if not, the Jellyfish starts chasing player
 int | [tail_bg_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tail_bg_uid) | 
 float | [applied_velocity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=applied_velocity) | 
 float | [wagging_tail_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wagging_tail_counter) | 
@@ -4470,8 +4470,8 @@ Type | Name | Description
 ---- | ---- | -----------
 [Inventory](#Inventory) | [inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) | 
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
-int | [linked_companion_parent](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_companion_parent) | 
-int | [linked_companion_child](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_companion_child) | 
+int | [linked_companion_parent](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_companion_parent) | entity uid
+int | [linked_companion_child](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=linked_companion_child) | entity uid
 [Ai](#Ai) | [ai](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai) | 
 [PlayerSlot](#PlayerSlot) | [input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input) | 
 [Entity](#Entity) | [basecamp_button_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=basecamp_button_entity) | Used in base camp to talk with the [NPC](#NPC)'s
@@ -5197,7 +5197,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 Type | Name | Description
 ---- | ---- | -----------
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
-int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | puase timer, counts down 60 to 0
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | pause timer, counts down 60 to 0
 bool | [moving_up](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=moving_up) | 
 
 ### EmpressGrave
@@ -6166,7 +6166,7 @@ int | [right_skull_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 int | [left_skull_drop_time](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_skull_drop_time) | 
 int | [middle_skull_drop_time](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=middle_skull_drop_time) | 
 int | [right_skull_drop_time](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_skull_drop_time) | 
-int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | counts from 60 3 times, the last time dropping the skulls, then random longer timer for reset
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | counts from 60 to 0, 3 times, the last time dropping the skulls, then random longer timer for reset
 
 ### SleepBubble
 
@@ -6210,10 +6210,10 @@ float | [rotation_center_y](https://github.com/spelunky-fyi/overlunky/search?l=L
 float | [rotation_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_angle) | 
 float | [size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) | slowly goes down to default 1.0, is 0.0 when not on screen
 float | [size_multiply](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size_multiply) | 0.0 when not on screen
-float | [next_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_size) | width and height will be set to this value  size_multiply next frame
+float | [next_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_size) | width and height will be set to `next_size  size_multiply` next frame
 int | [size_change_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size_change_timer) | very short timer before next size change, giving a pulsing effect
-float | [speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) | This is cusome variable, you need to use `activate_sparktraps_hack` to use it
-float | [distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) | This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+float | [speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) | This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
+float | [distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) | This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
 
 ### Spear
 

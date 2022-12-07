@@ -203,7 +203,7 @@ class LaserTrap : public Floor
 {
   public:
     Illumination* emitted_light;
-    /// after triggering counts from 0 to 255, changes the 'phase_2' then counts from 0 to 104
+    /// after triggering counts from 0 to 255, changes the `phase_2` then counts from 0 to 104
     uint8_t reset_timer;
     bool phase_2;
     /// The uid must be movable entity for ownership transfers
