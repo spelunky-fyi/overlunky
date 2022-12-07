@@ -11,30 +11,6 @@
 #include "script/lua_vm.hpp" // for get_lua_vm
 #include "util.hpp"          // for ON_SCOPE_EXIT
 
-inline auto cast_entity(Entity* ent)
-{
-    static auto& lua{get_lua_vm()};
-    return lua["cast_entity"](ent);
-}
-
-template <class T>
-T&& forward_or_cast_entity(
-    std::remove_reference_t<T>& val) noexcept
-{
-    return static_cast<T&&>(val);
-}
-template <class T>
-T&& forward_or_cast_entity(std::remove_reference_t<T>&& val) noexcept
-{
-    static_assert(!std::is_lvalue_reference_v<T>, "bad forward call");
-    return static_cast<T&&>(val);
-}
-template <std::derived_from<Entity> T>
-auto forward_or_cast_entity(T* val)
-{
-    return cast_entity(val);
-}
-
 template <class... ArgsT>
 auto handle_function_raw(LuaBackend* calling_backend, sol::function fun, ArgsT&&... args)
 {
@@ -104,8 +80,44 @@ auto handle_function_with_cast_entities(LuaBackend* calling_backend, sol::functi
     return handle_function_impl<RetT>::call(calling_backend, std::move(fun), std::forward<ArgsT>(args)...);
 }
 
+template<class T>
+concept entity_ptr = std::derived_from<std::remove_pointer_t<std::remove_reference_t<T>>, Entity>;
+inline auto cast_entity(Entity* ent)
+{
+    static auto& lua{get_lua_vm()};
+    return lua["cast_entity"](ent);
+}
+
+template <class T>
+struct forward_or_cast_entity_impl
+{
+    static T&& call(std::remove_reference_t<T>& val) noexcept
+    {
+        return static_cast<T&&>(val);
+    }
+    static T&& call(std::remove_reference_t<T>&& val) noexcept
+    {
+        static_assert(!std::is_lvalue_reference_v<T>, "bad forward call");
+        return static_cast<T&&>(val);
+    }
+};
+template <entity_ptr T>
+struct forward_or_cast_entity_impl<T>
+{
+    static auto call(Entity* val) noexcept
+    {
+        return cast_entity(val);
+    }
+};
+
+template <class T>
+auto forward_or_cast_entity(T&& val) noexcept
+{
+    return forward_or_cast_entity_impl<T>::call(val);
+}
+
 template <class RetT, class... ArgsT>
 optional_function_result<RetT> handle_function(LuaBackend* calling_backend, sol::function fun, ArgsT&&... args)
 {
-    return handle_function_with_cast_entities<RetT>(calling_backend, std::move(fun), forward_or_cast_entity<ArgsT>(args)...);
+    return handle_function_with_cast_entities<RetT>(calling_backend, std::move(fun), forward_or_cast_entity(std::forward<ArgsT>(args))...);
 }
