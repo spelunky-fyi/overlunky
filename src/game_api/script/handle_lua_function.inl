@@ -80,7 +80,7 @@ auto handle_function_with_cast_entities(LuaBackend* calling_backend, sol::functi
     return handle_function_impl<RetT>::call(calling_backend, std::move(fun), std::forward<ArgsT>(args)...);
 }
 
-template<class T>
+template <class T>
 concept entity_ptr = std::derived_from<std::remove_pointer_t<std::remove_reference_t<T>>, Entity>;
 inline auto cast_entity(Entity* ent)
 {
