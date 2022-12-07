@@ -1929,7 +1929,7 @@ function change_feat(feat, hidden, name, description) end
 
 ---@class Online
     ---@field online_players OnlinePlayer[]
-    ---@field local_player OnlinePlayerShort
+    ---@field local_player OnlinePlayer
     ---@field lobby OnlineLobby
 
 ---@class OnlinePlayer
@@ -1939,6 +1939,7 @@ function change_feat(feat, hidden, name, description) end
 
 ---@class OnlineLobby
     ---@field code integer
+    ---@field local_player_slot integer
     ---@field get_code fun(self): string
 
 ---@class LogicList
@@ -5237,6 +5238,7 @@ function Vec2.new(self, vec2) end
 ---@param y_ number
 ---@return Vec2
 function Vec2.new(self, x_, y_) end
+---NoDoc
 ---@param number> p tuple<number,
 ---@return Vec2
 function Vec2.new(self, number> p) end

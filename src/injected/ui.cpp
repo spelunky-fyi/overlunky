@@ -7089,7 +7089,7 @@ void imgui_draw()
     auto base = ImGui::GetMainViewport();
     ImGuiContext& g = *GImGui;
 
-    if (get_setting(GAME_SETTING::WINDOW_MODE) == 0)
+    if (get_setting(GAME_SETTING::WINDOW_MODE) == (unsigned)0)
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     else if (options["multi_viewports"])
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;

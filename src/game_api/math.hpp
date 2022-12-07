@@ -12,6 +12,7 @@ struct Vec2
     Vec2(float x_, float y_)
         : x(x_), y(y_){};
 
+    /// NoDoc
     Vec2(std::pair<float, float> p)
         : x(p.first), y(p.second){};
 
