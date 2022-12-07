@@ -6,6 +6,9 @@
 
 #include "script/lua_backend.hpp" // for LuaBackend
 
+// Helper to cast an entity to its real type as a Lua userdata
+inline auto cast_entity(class Entity* ent);
+
 template <class T>
 using optional_function_result = std::conditional_t<
     std::is_void_v<T>,
