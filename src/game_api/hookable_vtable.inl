@@ -388,7 +388,8 @@ struct HookableVTable
             auto toupper = [](std::string_view strv)
             {
                 std::string str{strv};
-                std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+                std::transform(str.begin(), str.end(), str.begin(), [](char c)
+                               { return static_cast<char>(::toupper(c)); });
                 return str;
             };
             auto table = lua[table_name];
