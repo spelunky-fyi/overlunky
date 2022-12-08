@@ -22,7 +22,8 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"kill", 0x3, void(bool, Entity*)>,
         VTableEntry<"collision1", 0x4, void(Entity*)>,
         VTableEntry<"destroy", 0x5, void()>,
-        VTableEntry<"trigger_action", 0x18, void(Movable*)>,
+        VTableEntry<"get_held_entity", 0x16, Entity*()>,
+        VTableEntry<"trigger_action", 0x18, void(Entity*)>,
         VTableEntry<"collision2", 0x1a, void(Entity*)>>;
     static EntityVTable entity_vtable(lua, lua["Entity"], "ENTITY_OVERRIDE");
 
@@ -32,13 +33,6 @@ void register_usertypes(sol::state& lua)
         EntityVTable,
         VTableEntry<"damage", 0x30, void(Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t)>>;
     static MovableVTable movable_vtable(lua, lua["Movable"], "ENTITY_OVERRIDE");
-
-    using ContainerVTable = HookableVTable<
-        Entity,
-        CallbackType::Entity,
-        MovableVTable,
-        VTableEntry<"open", 0x18, void(Movable*)>>;
-    static ContainerVTable container_vtable(lua, lua["Container"], "ENTITY_OVERRIDE");
 
     using FloorVTable = HookableVTable<
         Entity,
@@ -81,35 +75,34 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"spawn_transition", 21, void()>,
         VTableEntry<"post_transition", 22, void()>,
         VTableEntry<"spawn_players", 23, void()>,
-        VTableEntry<"spawn_effects", 24, void()> /*,
-         VTableEntry<"lvl_file", 25, const char*()>,
-         VTableEntry<"theme_id", 26, uint8_t()>,
-         VTableEntry<"base_id", 27, uint8_t()>,
-         VTableEntry<"ent_floor_spreading", 28, uint32_t()>,
-         VTableEntry<"ent_floor_spreading2", 29, uint32_t()>,
-         VTableEntry<"transition_styled_floor", 30, bool()>,
-         VTableEntry<"transition_modifier", 31, uint32_t()>,
-         VTableEntry<"ent_transition_styled_floor", 32, uint32_t()>,
-         VTableEntry<"ent_backwall", 33, uint32_t()>,
-         VTableEntry<"ent_border", 34, uint32_t()>,
-         VTableEntry<"ent_critter", 35, uint32_t()>,
-         VTableEntry<"gravity", 36, float()>,
-         VTableEntry<"player_damage", 37, bool()>,
-         VTableEntry<"soot", 38, bool()>,
-         VTableEntry<"texture_backlayer_lut", 39, uint32_t()>,
-         VTableEntry<"backlayer_light_level", 40, float()>,
-         VTableEntry<"loop", 41, bool()>,
-         VTableEntry<"vault_level", 42, uint8_t()>,
-         VTableEntry<"theme_flag", 43, bool(uint8_t)>,
-         VTableEntry<"dynamic_texture", 44, uint32_t(int32_t)>,
-         VTableEntry<"pre_transition", 45, void()>,
-         VTableEntry<"exit_room_y_level", 46, uint32_t()>,
-         VTableEntry<"shop_chance", 47, uint32_t()>,
-         VTableEntry<"spawn_decoration", 48, void()>,
-         VTableEntry<"spawn_decoration2", 49, void()>,
-         VTableEntry<"spawn_extra", 50, void()>,
-         VTableEntry<"unknown_v51", 51, void()>*/
-        >;
+        VTableEntry<"spawn_effects", 24, void()>,
+        VTableEntry<"lvl_file", 25, const char*()>,
+        VTableEntry<"theme_id", 26, uint8_t()>,
+        VTableEntry<"base_id", 27, uint8_t()>,
+        VTableEntry<"ent_floor_spreading", 28, uint32_t()>,
+        VTableEntry<"ent_floor_spreading2", 29, uint32_t()>,
+        VTableEntry<"transition_styled_floor", 30, bool()>,
+        VTableEntry<"transition_modifier", 31, uint32_t()>,
+        VTableEntry<"ent_transition_styled_floor", 32, uint32_t()>,
+        VTableEntry<"ent_backwall", 33, uint32_t()>,
+        VTableEntry<"ent_border", 34, uint32_t()>,
+        VTableEntry<"ent_critter", 35, uint32_t()>,
+        VTableEntry<"gravity", 36, float()>,
+        VTableEntry<"player_damage", 37, bool()>,
+        VTableEntry<"soot", 38, bool()>,
+        VTableEntry<"texture_backlayer_lut", 39, uint32_t()>,
+        VTableEntry<"backlayer_light_level", 40, float()>,
+        VTableEntry<"loop", 41, bool()>,
+        VTableEntry<"vault_level", 42, uint8_t()>,
+        VTableEntry<"theme_flag", 43, bool(uint8_t)>,
+        VTableEntry<"dynamic_texture", 44, uint32_t(int32_t)>,
+        VTableEntry<"pre_transition", 45, void()>,
+        VTableEntry<"exit_room_y_level", 46, uint32_t()>,
+        VTableEntry<"shop_chance", 47, uint32_t()>,
+        VTableEntry<"spawn_decoration", 48, void()>,
+        VTableEntry<"spawn_decoration2", 49, void()>,
+        VTableEntry<"spawn_extra", 50, void()>,
+        VTableEntry<"unknown_v51", 51, void()>>;
     static ThemeVTable theme_vtable(lua, lua["ThemeInfo"], "THEME_OVERRIDE");
 
     // Define the implementations for the LuaBackend handlers

@@ -197,6 +197,15 @@ inline constexpr auto is_same_args_v = is_same_args<LhsSignature, RhsSignature>:
 template <class FunT>
 concept function_signature = std::is_function_v<FunT>;
 
+template <class T, function_signature FunT>
+struct invokable_as_impl;
+template <class T, class RetT, class... ArgsT>
+struct invokable_as_impl<T, RetT(ArgsT...)> : std::is_invocable_r<RetT, T, ArgsT...>
+{
+};
+template <class T, class FunT>
+concept invokable_as = invokable_as_impl<T, FunT>::value;
+
 template <std::size_t N>
 struct LiteralString
 {
