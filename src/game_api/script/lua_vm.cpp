@@ -391,6 +391,9 @@ end
             case CallbackType::Screen:
                 backend->clear_screen_hooks.push_back({caller.aux_id, caller.id});
                 break;
+            case CallbackType::Theme:
+                backend->HookHandler<ThemeInfo, CallbackType::Theme>::clear_hook(caller.id, caller.aux_id);
+                break;
             case CallbackType::None:
                 // DEBUG("No callback to clear");
             default:
