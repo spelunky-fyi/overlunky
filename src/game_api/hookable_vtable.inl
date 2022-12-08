@@ -411,9 +411,9 @@ struct HookableVTable
     }
 
     // clang-format off
-    using MyHookInfos = VTableHookInfos<SelfT, 
+    using MyHookInfos = VTableHookInfos<SelfT,
         VTableHooksSignature<
-            typename VTableEntryImpl<VTableEntries, SelfT, CbType>::FreeSignature, 
+            typename VTableEntryImpl<VTableEntries, SelfT, CbType>::FreeSignature,
             VTableEntries::MyDoHooks
         >...>;
     // clang-format on
@@ -567,7 +567,7 @@ template <
     CallbackType BaseCbType,
     class... BaseVTableEntries,
     class... VTableEntries>
-requires(std::is_same_v<SelfT, BaseSelfT> && CbType == BaseCbType)
+    requires(std::is_same_v<SelfT, BaseSelfT> && CbType == BaseCbType)
 struct HookableVTable<SelfT, CbType, HookableVTable<BaseSelfT, BaseCbType, BaseVTableEntries...>, VTableEntries...>
     : HookableVTable<SelfT, CbType, base_table_entry_t<BaseVTableEntries>..., VTableEntries...>
 {
