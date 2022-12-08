@@ -21,6 +21,7 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"collision1", 0x4, void(Entity*)>,
         VTableEntry<"destroy", 0x5, void()>,
         VTableEntry<"get_held_entity", 0x16, Entity*()>,
+        VTableEntry<"trigger_action", 0x18, void(Entity*)>,
         VTableEntry<"collision2", 0x1a, void(Entity*)>>;
     static EntityVTable entity_vtable(lua, lua["Entity"], "ENTITY_OVERRIDE");
 
@@ -30,13 +31,6 @@ void register_usertypes(sol::state& lua)
         EntityVTable,
         VTableEntry<"damage", 0x30, void(Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t)>>;
     static MovableVTable movable_vtable(lua, lua["Movable"], "ENTITY_OVERRIDE");
-
-    using ContainerVTable = HookableVTable<
-        Entity,
-        CallbackType::Entity,
-        MovableVTable,
-        VTableEntry<"open", 0x18, void(Movable*)>>;
-    static ContainerVTable container_vtable(lua, lua["Container"], "ENTITY_OVERRIDE");
 
     using FloorVTable = HookableVTable<
         Entity,

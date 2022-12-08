@@ -1437,7 +1437,7 @@ end
         return sol::nullopt;
     };
     /// Deprecated
-    /// Use `entity:set_on_open` instead.
+    /// Use `entity:set_pre_trigger_action` instead.
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
     /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
     /// Use this only when no other approach works, this call can be expensive if overused.
@@ -1447,7 +1447,16 @@ end
     {
         if (Entity* ent = get_entity_ptr(uid)) // TODO: Requires ent->is_container
         {
-            return lua["Container"]["set_on_open"](ent, std::move(fun));
+            return lua["Entity"]["set_pre_trigger_action"](
+                ent,
+                [fun = std::move(fun)](Entity* usee, Entity* user)
+                {
+                    if (user->is_movable() && user->as<Movable>()->movey > 0)
+                    {
+                        auto backend = LuaBackend::get_calling_backend();
+                        handle_function<void>(backend.get(), fun, usee, user);
+                    }
+                });
         }
         return sol::nullopt;
     };
