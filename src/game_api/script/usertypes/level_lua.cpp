@@ -1176,6 +1176,7 @@ void register_usertypes(sol::state& lua)
     themeinfo_type["unknown2"] = &ThemeInfo::unknown2;
     themeinfo_type["unknown3"] = &ThemeInfo::unknown3;
     themeinfo_type["unknown4"] = &ThemeInfo::unknown4;
+    themeinfo_type["theme"] = &ThemeInfo::padding3; // this is totally not a real thing, but there was space to store it for vtable hooks
     themeinfo_type["sub_theme"] = &ThemeInfo::sub_theme;
     themeinfo_type["reset_theme_flags"] = &ThemeInfo::reset_theme_flags;
     themeinfo_type["init_flags"] = &ThemeInfo::init_flags;

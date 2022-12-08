@@ -395,17 +395,16 @@ class ThemeInfo
 
     virtual void unknown_v51() = 0;
 
-    inline static uint32_t aux_id = 0;
-
     // Themes don't seem to know their real THEME, so LevelGenSystem::init tells them
+    // I'm sure this is a brilliant place to store it
     void set_aux_id(uint32_t id)
     {
-        aux_id = id;
+        padding3 = id;
     }
 
     uint32_t get_aux_id()
     {
-        return aux_id;
+        return padding3;
     }
 };
 static_assert(sizeof(ThemeInfo) == 0x20);
