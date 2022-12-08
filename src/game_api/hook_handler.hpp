@@ -9,7 +9,8 @@ enum class CallbackType
     None,
     Normal,
     Entity,
-    Screen
+    Screen,
+    Theme
 };
 
 template <

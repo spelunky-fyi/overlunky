@@ -12,5 +12,3 @@ AllowAllArgumentsOnNextLine: true
 AllowShortBlocksOnASingleLine: Always
 AllowShortFunctionsOnASingleLine: None
 PointerAlignment: Left
-RequiresClausePosition: OwnLine
-IndentRequiresClause: false
