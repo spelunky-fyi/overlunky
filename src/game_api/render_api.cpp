@@ -212,8 +212,9 @@ bool g_selecting_from_menu_scope = false;
 void on_select_from_journal(void* unknown, uint8_t index)
 {
     g_selecting_from_menu_scope = true;
-    if (pre_load_journal_chapter(index + 3))
+    if (pre_load_journal_chapter(index + 3)) // convert from menu index to chapter
     {
+        g_selecting_from_menu_scope = false;
         return;
     }
     g_on_select_from_journal_menu_trampoline(unknown, index);
@@ -303,28 +304,30 @@ bool& get_journal_enabled()
     return g_journal_enabled;
 }
 
-bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+bool prepare_text_for_rendering(TextRenderingInfo* info, const std::u16string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
 {
     static size_t text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
 
     if (text_rendering_func1_offset != 0)
     {
-        auto convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), nullptr, 0);
-        if (convert_result <= 0)
-        {
-            return false;
-        }
-        std::wstring wide_text;
-        wide_text.resize(convert_result + 10);
-        convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), &wide_text[0], static_cast<int>(wide_text.size()));
-
-        typedef void func1(uint32_t fontstyle, void* text_to_draw, uint32_t, float x, float y, TextRenderingInfo*, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t);
+        typedef void func1(uint32_t fontstyle, const char16_t* text_to_draw, uint32_t, float x, float y, TextRenderingInfo*, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t);
         static func1* f1 = (func1*)(text_rendering_func1_offset);
-        f1(fontstyle, wide_text.data(), 2, x, y, info, scale_x, scale_y, alignment, 2, 0);
+        f1(fontstyle, text.c_str(), 2, x, y, info, scale_x, scale_y, alignment, 2, 0);
         return true;
     }
     return false;
 }
+
+bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+
+    std::u16string wide_text;
+    wide_text.resize(text.size());
+    wide_text = convert.from_bytes(text);
+    return prepare_text_for_rendering(info, wide_text, x, y, scale_x, scale_y, alignment, fontstyle);
+}
+
 void free_text_post_rendering(TextRenderingInfo* info)
 {
     if (info->unknown4 != nullptr)
@@ -497,9 +500,9 @@ void fetch_texture(Entity* entity, int32_t texture_id)
     }
 }
 
-using PrepareTextFun = void(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11);
+using PrepareTextFun = void(uint32_t fontstyle, const char16_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11);
 PrepareTextFun* g_prepare_text_trampoline{nullptr};
-void prepare_text(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11)
+void prepare_text(uint32_t fontstyle, const char16_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11)
 {
     static const STRINGID first_death = hash_to_stringid(0x5a52a061);
     static const STRINGID last_death = hash_to_stringid(0x5c9b2332);
