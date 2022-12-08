@@ -504,7 +504,7 @@ struct HookableVTable
                     std::optional<RetT> return_value;
                     for (auto& [id, prefun] : hook_info.template get_pre<RetT(SelfT*, ArgsT...)>()[Index])
                     {
-                        auto ret = prefun(inner_obj);
+                        auto ret = prefun(inner_obj, args...);
                         if (ret.has_value() && !return_value.has_value())
                         {
                             return_value = ret.value();
@@ -512,11 +512,11 @@ struct HookableVTable
                     }
                     if (!return_value.has_value())
                     {
-                        return_value = original(inner_obj);
+                        return_value = original(inner_obj, args...);
                     }
                     for (auto& [id, postfun] : hook_info.template get_post<RetT(SelfT*, ArgsT...)>()[Index])
                     {
-                        postfun(inner_obj);
+                        postfun(inner_obj, args...);
                     }
                     return return_value.value();
                 });
