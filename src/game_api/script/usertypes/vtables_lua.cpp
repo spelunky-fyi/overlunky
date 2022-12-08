@@ -20,6 +20,7 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"kill", 0x3, void(bool, Entity*)>,
         VTableEntry<"collision1", 0x4, void(Entity*)>,
         VTableEntry<"destroy", 0x5, void()>,
+        VTableEntry<"get_held_entity", 0x16, Entity*()>,
         VTableEntry<"collision2", 0x1a, void(Entity*)>>;
     static EntityVTable entity_vtable(lua, lua["Entity"], "ENTITY_OVERRIDE");
 

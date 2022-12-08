@@ -48,6 +48,9 @@ struct IsVTableEntry<VTableEntry<Name, Index, Signature, BindBack, DoHooks>> : s
 template <class T>
 concept vtable_entry = IsVTableEntry<T>::value;
 
+template<class RetT>
+using VTablePreRetT = std::conditional_t<std::is_void_v<RetT>, bool, std::optional<RetT>>;
+
 template <vtable_entry OriginalEntry>
 using DontHookVTableEntry = VTableEntry<
     OriginalEntry::MyRawName,
@@ -83,8 +86,7 @@ struct VTableEntryImpl<VTableEntry<Name, Index, RetT(ArgsT...), BindBack, DoHook
     using MemberSignature = RetT(ArgsT...);
     using FreeSignature = RetT(SelfT*, ArgsT...);
 
-    using PreRetT = std::conditional_t<std::is_void_v<RetT>, bool, std::optional<RetT>>;
-    using FreePreSignature = PreRetT(SelfT*, ArgsT...);
+    using FreePreSignature = VTablePreRetT<RetT>(SelfT*, ArgsT...);
     using FreePostSignature = void(SelfT*, ArgsT...);
 
     template <class VTableImpl>
@@ -137,22 +139,18 @@ struct PreHookInfos;
 template <function_signature Signature>
 struct PostHookInfos;
 
-template <class... ArgsT>
-struct PreHookInfos<void(ArgsT...)>
-{
-    std::unordered_map<std::uint32_t, std::vector<HookWithId<bool(ArgsT...)>>> hooks;
-};
 template <class RetT, class... ArgsT>
 struct PreHookInfos<RetT(ArgsT...)>
 {
-    using PreRetT = std::conditional_t<std::is_void_v<RetT>, bool, std::optional<RetT>>;
-    std::unordered_map<std::uint32_t, std::vector<HookWithId<PreRetT(ArgsT...)>>> hooks;
+    using FunT = VTablePreRetT<RetT>(ArgsT...);
+    std::unordered_map<std::uint32_t, std::vector<HookWithId<FunT>>> hooks;
 };
 
 template <class RetT, class... ArgsT>
 struct PostHookInfos<RetT(ArgsT...)>
 {
-    std::unordered_map<std::uint32_t, std::vector<HookWithId<void(ArgsT...)>>> hooks;
+    using FunT = void(ArgsT...);
+    std::unordered_map<std::uint32_t, std::vector<HookWithId<FunT>>> hooks;
 };
 
 template <class... T>
@@ -198,6 +196,23 @@ struct UniquePreHookInfosImpl<type_list<UniqueSignatures...>, Signature, Signatu
 {
 };
 
+template<class Signature>
+struct make_void_return;
+template<class RetT, class... ArgsT>
+struct make_void_return<RetT(ArgsT...)>
+{
+    using type = void(ArgsT...);
+};
+template<
+    function_signature Signature,
+    bool Include>
+struct make_void_return<VTableHooksSignature<Signature, Include>>
+{
+    using type = VTableHooksSignature<typename make_void_return<Signature>::type, Include>;
+};
+template<class Signature>
+using make_void_return_t = typename make_void_return<Signature>::type;
+
 template <class VTableHooksTuple, vtable_hook_signature... Signatures>
 struct UniquePostHookInfosImpl;
 template <vtable_hook_signature... UniqueSignatures, vtable_hook_signature Signature>
@@ -225,7 +240,7 @@ template <
     class SelfT,
     vtable_hook_signature... Signatures>
 struct VTableHookInfos : UniquePreHookInfos<Signatures...>,
-                         UniquePostHookInfos<Signatures...>
+                         UniquePostHookInfos<make_void_return_t<Signatures>...>
 {
     using UniquePreSignatures = typename UniquePreHookInfos<Signatures...>::UniqueSignaturesList;
     using UniquePostSignatures = typename UniquePostHookInfos<Signatures...>::UniqueSignaturesList;
@@ -240,7 +255,7 @@ struct VTableHookInfos : UniquePreHookInfos<Signatures...>,
     template <function_signature Signature>
     auto& get_post()
     {
-        return get_post_impl<Signature>::call(*this);
+        return static_cast<PostHookInfos<make_void_return_t<Signature>>*>(this)->hooks;
     }
     void unhook(std::uint32_t callback_id)
     {
@@ -274,17 +289,6 @@ struct VTableHookInfos : UniquePreHookInfos<Signatures...>,
     }
 
   private:
-    template <class Signature>
-    struct get_post_impl;
-    template <class RetT, class... ArgsT>
-    struct get_post_impl<RetT(ArgsT...)>
-    {
-        static auto& call(VTableHookInfos& self)
-        {
-            return static_cast<PostHookInfos<void(ArgsT...)>&>(self).hooks;
-        }
-    };
-
     template <class UniqueSignaturesList>
     struct unhook_pre_impl;
     template <class... UniqueSignatures>
@@ -337,6 +341,11 @@ struct IsHookableVTable<HookableVTable<SelfT, CbType, VTableEntries...>> : std::
 };
 template <class T>
 concept hookable_vtable = IsHookableVTable<T>::value;
+
+template <class T, class FunT>
+concept invokable_as_pre_fun = invokable_as<T, typename PreHookInfos<FunT>::FunT>;
+template <class T, class FunT>
+concept invokable_as_post_fun = invokable_as<T, typename PostHookInfos<FunT>::FunT>;
 
 template <
     class SelfT,
@@ -421,7 +430,7 @@ struct HookableVTable
         MyHookInfos& hook_info = get_hooks(obj);
         return hook_info.callback_count++;
     }
-    template <function_signature Signature, std::uint32_t Index, class CallableT>
+    template <function_signature Signature, std::uint32_t Index, invokable_as_pre_fun<Signature> CallableT>
     void set_pre(SelfT* obj, std::uint32_t callback_id, CallableT pre_fun)
     {
         // Note: Not using get_hook_function, we assume no one else hooks this (R.I.P. whoever is using this before us)
@@ -433,7 +442,7 @@ struct HookableVTable
         }
         hook_info.template get_pre<Signature>()[Index].push_back({callback_id, std::move(pre_fun)});
     }
-    template <function_signature Signature, std::uint32_t Index, class CallableT>
+    template <function_signature Signature, std::uint32_t Index, invokable_as_post_fun<Signature> CallableT>
     void set_post(SelfT* obj, std::uint32_t callback_id, CallableT post_fun)
     {
         // Note: Not using get_hook_function, we assume no one else hooks this (R.I.P. whoever is using this before us)
@@ -484,7 +493,7 @@ struct HookableVTable
     template <class RetT, class... ArgsT, std::uint32_t Index>
     struct hook_vtable_impl<RetT(SelfT*, ArgsT...), Index>
     {
-        static void call(HookableVTable self, SelfT* obj)
+        static void call(HookableVTable& self, SelfT* obj)
         {
             hook_vtable<RetT(SelfT*, ArgsT...), Index>(
                 obj,
