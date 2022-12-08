@@ -76,7 +76,8 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"post_transition", 22, void()>,
         VTableEntry<"spawn_players", 23, void()>,
         VTableEntry<"spawn_effects", 24, void()>,
-        VTableEntry<"lvl_file", 25, const char*()>,
+        /* this just doesn't work
+        VTableEntry<"lvl_file", 25, char*()>, */
         VTableEntry<"theme_id", 26, uint8_t()>,
         VTableEntry<"base_id", 27, uint8_t()>,
         VTableEntry<"ent_floor_spreading", 28, uint32_t()>,
@@ -94,14 +95,16 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"backlayer_light_level", 40, float()>,
         VTableEntry<"loop", 41, bool()>,
         VTableEntry<"vault_level", 42, uint8_t()>,
+        /* these fellas won't compile, template doesn't like signature
         VTableEntry<"theme_flag", 43, bool(uint8_t)>,
-        VTableEntry<"dynamic_texture", 44, uint32_t(int32_t)>,
+        VTableEntry<"texture_dynamic", 44, uint32_t(int32_t)>, */
         VTableEntry<"pre_transition", 45, void()>,
         VTableEntry<"exit_room_y_level", 46, uint32_t()>,
         VTableEntry<"shop_chance", 47, uint32_t()>,
         VTableEntry<"spawn_decoration", 48, void()>,
         VTableEntry<"spawn_decoration2", 49, void()>,
         VTableEntry<"spawn_extra", 50, void()>,
+        /* Pretty sure this doesn't even exist, nobody calls it and it crashes the game */
         VTableEntry<"unknown_v51", 51, void()>>;
     static ThemeVTable theme_vtable(lua, lua["ThemeInfo"], "THEME_OVERRIDE");
 
