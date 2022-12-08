@@ -95,9 +95,8 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"backlayer_light_level", 40, float()>,
         VTableEntry<"loop", 41, bool()>,
         VTableEntry<"vault_level", 42, uint8_t()>,
-        /* these fellas won't compile, template doesn't like signature
         VTableEntry<"theme_flag", 43, bool(uint8_t)>,
-        VTableEntry<"texture_dynamic", 44, uint32_t(int32_t)>, */
+        VTableEntry<"texture_dynamic", 44, uint32_t(int32_t)>,
         VTableEntry<"pre_transition", 45, void()>,
         VTableEntry<"exit_room_y_level", 46, uint32_t()>,
         VTableEntry<"shop_chance", 47, uint32_t()>,
