@@ -48,7 +48,7 @@ struct IsVTableEntry<VTableEntry<Name, Index, Signature, BindBack, DoHooks>> : s
 template <class T>
 concept vtable_entry = IsVTableEntry<T>::value;
 
-template<class RetT>
+template <class RetT>
 using VTablePreRetT = std::conditional_t<std::is_void_v<RetT>, bool, std::optional<RetT>>;
 
 template <vtable_entry OriginalEntry>
@@ -196,21 +196,21 @@ struct UniquePreHookInfosImpl<type_list<UniqueSignatures...>, Signature, Signatu
 {
 };
 
-template<class Signature>
+template <class Signature>
 struct make_void_return;
-template<class RetT, class... ArgsT>
+template <class RetT, class... ArgsT>
 struct make_void_return<RetT(ArgsT...)>
 {
     using type = void(ArgsT...);
 };
-template<
+template <
     function_signature Signature,
     bool Include>
 struct make_void_return<VTableHooksSignature<Signature, Include>>
 {
     using type = VTableHooksSignature<typename make_void_return<Signature>::type, Include>;
 };
-template<class Signature>
+template <class Signature>
 using make_void_return_t = typename make_void_return<Signature>::type;
 
 template <class VTableHooksTuple, vtable_hook_signature... Signatures>
