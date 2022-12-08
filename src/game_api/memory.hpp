@@ -97,26 +97,26 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
 void recover_mem(std::string name, size_t addr = NULL);
 
 template <typename T>
-requires std::is_trivially_copyable_v<T>
+    requires std::is_trivially_copyable_v<T>
 std::string_view to_le_bytes(const T& payload)
 {
     return std::string_view{reinterpret_cast<const char*>(&payload), sizeof(payload)};
 }
 
 template <class T>
-requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>)
+    requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>)
 void write_mem_recoverable(std::string name, size_t addr, const T& payload, bool prot)
 {
     write_mem_recoverable(name, addr, to_le_bytes(payload), prot);
 }
 template <class T>
-requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>)
+    requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>)
 void write_mem_prot(size_t addr, const T& payload, bool prot)
 {
     write_mem_prot(addr, to_le_bytes(payload), prot);
 }
 template <class T>
-requires std::is_trivially_copyable_v<T>
+    requires std::is_trivially_copyable_v<T>
 void write_mem_prot(void* addr, const T& payload, bool prot)
 {
     write_mem_prot((size_t)addr, to_le_bytes(payload), prot);
