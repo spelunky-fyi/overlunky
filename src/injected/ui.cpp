@@ -907,10 +907,15 @@ void load_config(std::string file)
     UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
     UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
     UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
-    if (options["multi_viewports"])
+    if (options["multi_viewports"] && !detect_wine())
+    {
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    }
     else
+    {
+        options["multi_viewports"] = false;
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
+    }
     save_config(file);
 }
 
@@ -7039,7 +7044,8 @@ void imgui_pre_init(ImGuiContext*)
     ImGuiIO& io = ImGui::GetIO();
     io.MouseDrawCursor = true;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    if (!detect_wine())
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigViewportsNoTaskBarIcon = true;
 }
 
