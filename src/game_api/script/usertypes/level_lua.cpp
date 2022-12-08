@@ -426,9 +426,15 @@ class CustomTheme : public ThemeInfo
     {
         overrides.clear();
     }
-    bool get_unknown1()
+    void reset_theme_flags()
     {
-        return unknown1;
+        auto index = THEME_OVERRIDE::RESET_THEME_FLAGS;
+        run_pre_func<std::monostate>(index);
+        if (get_override_func_enabled(index))
+            run_override_func<std::monostate>(index);
+        else if (get_override_enabled(index))
+            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->reset_theme_flags();
+        run_post_func<std::monostate>(index);
     }
     void init_flags()
     {
@@ -450,24 +456,24 @@ class CustomTheme : public ThemeInfo
             State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->init_level();
         run_post_func<std::monostate>(index);
     }
-    void unknown_v4()
+    void init_rooms()
     {
-        auto index = THEME_OVERRIDE::UNKNOWN_V4;
+        auto index = THEME_OVERRIDE::INIT_ROOMS;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->unknown_v4();
+            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->init_rooms();
         run_post_func<std::monostate>(index);
     }
-    void unknown_v5()
+    void generate_path()
     {
-        auto index = THEME_OVERRIDE::UNKNOWN_V5;
+        auto index = THEME_OVERRIDE::GENERATE_PATH;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->unknown_v5();
+            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->generate_path();
         run_post_func<std::monostate>(index);
     }
     void add_special_rooms()
@@ -480,24 +486,34 @@ class CustomTheme : public ThemeInfo
             State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_special_rooms();
         run_post_func<std::monostate>(index);
     }
-    void unknown_v7()
+    void add_player_coffin()
     {
-        auto index = THEME_OVERRIDE::UNKNOWN_V7;
+        auto index = THEME_OVERRIDE::PLAYER_COFFIN;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->unknown_v7();
+            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_player_coffin();
         run_post_func<std::monostate>(index);
     }
-    void unknown_v8()
+    void add_dirk_coffin()
     {
-        auto index = THEME_OVERRIDE::UNKNOWN_V8;
+        auto index = THEME_OVERRIDE::DIRK_COFFIN;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->unknown_v8();
+            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_dirk_coffin();
+        run_post_func<std::monostate>(index);
+    }
+    void add_idol()
+    {
+        auto index = THEME_OVERRIDE::IDOL;
+        run_pre_func<std::monostate>(index);
+        if (get_override_func_enabled(index))
+            run_override_func<std::monostate>(index);
+        else if (get_override_enabled(index))
+            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_idol();
         run_post_func<std::monostate>(index);
     }
     void add_vault()
@@ -529,18 +545,6 @@ class CustomTheme : public ThemeInfo
         else if (get_override_enabled(index))
             State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_special_feeling();
         run_post_func<std::monostate>(index);
-    }
-    bool unknown_v12()
-    {
-        auto index = THEME_OVERRIDE::UNKNOWN_V12;
-        bool ret = false;
-        run_pre_func<std::monostate>(index);
-        if (get_override_func_enabled(index))
-            ret = run_override_func<bool>(index).value_or(ret);
-        else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->unknown_v12();
-        run_post_func<std::monostate>(index, ret);
-        return ret;
     }
     void spawn_level()
     {
@@ -724,19 +728,19 @@ class CustomTheme : public ThemeInfo
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
-    bool unknown_v30()
+    bool get_transition_styled_floor()
     {
-        auto index = THEME_OVERRIDE::UNKNOWN_V30;
+        auto index = THEME_OVERRIDE::TRANSITION_STYLED_FLOOR;
         bool ret = false;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             ret = run_override_func<bool>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->unknown_v30();
+            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_transition_styled_floor();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
-    uint32_t get_transition_block_modifier()
+    uint32_t get_transition_floor_modifier()
     {
         auto index = THEME_OVERRIDE::TRANSITION_MODIFIER;
         uint32_t ret = 85; // TODO: don't know what this is
@@ -748,15 +752,15 @@ class CustomTheme : public ThemeInfo
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
-    uint32_t unknown_v32()
+    uint32_t get_transition_styled_floor_type()
     {
-        auto index = THEME_OVERRIDE::UNKNOWN_V32;
+        auto index = THEME_OVERRIDE::ENT_TRANSITION_STYLED_FLOOR;
         uint32_t ret = 12; // TODO: don't know what this is
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->unknown_v32();
+            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_transition_styled_floor_type();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -820,15 +824,15 @@ class CustomTheme : public ThemeInfo
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
-    bool unknown_v38()
+    bool get_explosion_soot()
     {
-        auto index = THEME_OVERRIDE::UNKNOWN_V38;
+        auto index = THEME_OVERRIDE::SOOT;
         bool ret = true;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             ret = run_override_func<bool>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->unknown_v38();
+            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_explosion_soot();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -880,7 +884,7 @@ class CustomTheme : public ThemeInfo
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
-    bool get_unknown_1_or_2(uint8_t index)
+    bool get_theme_flag(uint8_t index)
     {
         if (index == 0)
             return unknown1;
@@ -914,27 +918,27 @@ class CustomTheme : public ThemeInfo
             State::get().ptr_local()->level_gen->themes[get_override_theme_or_dwelling(index)]->pre_transition();
         run_post_func<std::monostate>(index);
     }
-    uint32_t get_level_height()
+    uint32_t get_exit_room_y_level()
     {
-        auto index = THEME_OVERRIDE::LEVEL_HEIGHT;
+        auto index = THEME_OVERRIDE::EXIT_ROOM_Y_LEVEL;
         uint32_t ret = State::get().ptr_local()->h - 1;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_level_height();
+            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_exit_room_y_level();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
-    uint32_t unknown_v47()
+    uint32_t get_shop_chance()
     {
-        auto index = THEME_OVERRIDE::UNKNOWN_V47;
+        auto index = THEME_OVERRIDE::SHOP_CHANCE;
         uint32_t ret = 0;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->unknown_v47();
+            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_shop_chance();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -1168,19 +1172,23 @@ void register_usertypes(sol::state& lua)
     lua["load_screen"] = do_load_screen;
 
     auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
+    themeinfo_type["unknown1"] = &ThemeInfo::unknown1;
+    themeinfo_type["unknown2"] = &ThemeInfo::unknown2;
+    themeinfo_type["unknown3"] = &ThemeInfo::unknown3;
+    themeinfo_type["unknown4"] = &ThemeInfo::unknown4;
     themeinfo_type["sub_theme"] = &ThemeInfo::sub_theme;
-    themeinfo_type["get_unknown1"] = &ThemeInfo::get_unknown1;
+    themeinfo_type["reset_theme_flags"] = &ThemeInfo::reset_theme_flags;
     themeinfo_type["init_flags"] = &ThemeInfo::init_flags;
     themeinfo_type["init_level"] = &ThemeInfo::init_level;
-    themeinfo_type["unknown_v4"] = &ThemeInfo::unknown_v4;
-    themeinfo_type["unknown_v5"] = &ThemeInfo::unknown_v5;
+    themeinfo_type["init_rooms"] = &ThemeInfo::init_rooms;
+    themeinfo_type["generate_path"] = &ThemeInfo::generate_path;
     themeinfo_type["add_special_rooms"] = &ThemeInfo::add_special_rooms;
-    themeinfo_type["unknown_v7"] = &ThemeInfo::unknown_v7;
-    themeinfo_type["unknown_v8"] = &ThemeInfo::unknown_v8;
+    themeinfo_type["add_player_coffin"] = &ThemeInfo::add_player_coffin;
+    themeinfo_type["add_dirk_coffin"] = &ThemeInfo::add_dirk_coffin;
+    themeinfo_type["add_idol"] = &ThemeInfo::add_idol;
     themeinfo_type["add_vault"] = &ThemeInfo::add_vault;
     themeinfo_type["add_coffin"] = &ThemeInfo::add_coffin;
     themeinfo_type["add_special_feeling"] = &ThemeInfo::add_special_feeling;
-    themeinfo_type["unknown_v12"] = &ThemeInfo::unknown_v12;
     themeinfo_type["spawn_level"] = &ThemeInfo::spawn_level;
     themeinfo_type["spawn_border"] = &ThemeInfo::spawn_border;
     themeinfo_type["post_process_level"] = &ThemeInfo::post_process_level;
@@ -1198,24 +1206,24 @@ void register_usertypes(sol::state& lua)
     themeinfo_type["get_base_id"] = &ThemeInfo::get_base_id;
     themeinfo_type["get_floor_spreading_type"] = &ThemeInfo::get_floor_spreading_type;
     themeinfo_type["get_floor_spreading_type2"] = &ThemeInfo::get_floor_spreading_type2;
-    themeinfo_type["unknown_v30"] = &ThemeInfo::unknown_v30;
-    themeinfo_type["get_transition_block_modifier"] = &ThemeInfo::get_transition_block_modifier;
-    themeinfo_type["unknown_v32"] = &ThemeInfo::unknown_v32;
+    themeinfo_type["get_transition_styled_floor"] = &ThemeInfo::get_transition_styled_floor;
+    themeinfo_type["get_transition_floor_modifier"] = &ThemeInfo::get_transition_floor_modifier;
+    themeinfo_type["get_transition_styled_floor_type"] = &ThemeInfo::get_transition_styled_floor_type;
     themeinfo_type["get_backwall_type"] = &ThemeInfo::get_backwall_type;
     themeinfo_type["get_border_type"] = &ThemeInfo::get_border_type;
     themeinfo_type["get_critter_type"] = &ThemeInfo::get_critter_type;
     themeinfo_type["get_liquid_gravity"] = &ThemeInfo::get_liquid_gravity;
     themeinfo_type["get_player_damage"] = &ThemeInfo::get_player_damage;
-    themeinfo_type["unknown_v38"] = &ThemeInfo::unknown_v38;
+    themeinfo_type["get_explosion_soot"] = &ThemeInfo::get_explosion_soot;
     themeinfo_type["get_backlayer_lut"] = &ThemeInfo::get_backlayer_lut;
     themeinfo_type["get_backlayer_light_level"] = &ThemeInfo::get_backlayer_light_level;
     themeinfo_type["get_loop"] = &ThemeInfo::get_loop;
     themeinfo_type["get_vault_level"] = &ThemeInfo::get_vault_level;
-    themeinfo_type["get_unknown_1_or_2"] = &ThemeInfo::get_unknown_1_or_2;
+    themeinfo_type["get_theme_flag"] = &ThemeInfo::get_theme_flag;
     themeinfo_type["get_dynamic_texture"] = &ThemeInfo::get_dynamic_texture;
     themeinfo_type["pre_transition"] = &ThemeInfo::pre_transition;
-    themeinfo_type["get_level_height"] = &ThemeInfo::get_level_height;
-    themeinfo_type["unknown_v47"] = &ThemeInfo::unknown_v47;
+    themeinfo_type["get_exit_room_y_level"] = &ThemeInfo::get_exit_room_y_level;
+    themeinfo_type["get_shop_chance"] = &ThemeInfo::get_shop_chance;
     themeinfo_type["spawn_decoration"] = &ThemeInfo::spawn_decoration;
     themeinfo_type["spawn_decoration2"] = &ThemeInfo::spawn_decoration2;
     themeinfo_type["spawn_extra"] = &ThemeInfo::spawn_extra;
@@ -1227,7 +1235,7 @@ void register_usertypes(sol::state& lua)
         static_cast<void (CustomTheme::*)(THEME_OVERRIDE, sol::function)>(&CustomTheme::override));
 
     /// Customizable ThemeInfo with ability to override certain theming functions from different themes or write custom functions. Check ThemeInfo for some notes on the vanilla theme functions. Warning: We WILL change these function names, especially the unknown ones, when you figure out what they do.
-    auto customtheme_type = lua.new_usertype<CustomTheme>("CustomTheme", sol::constructors<CustomTheme(), CustomTheme(uint8_t, uint8_t), CustomTheme(uint8_t, uint8_t, bool)>());
+    auto customtheme_type = lua.new_usertype<CustomTheme>("CustomTheme", sol::constructors<CustomTheme(), CustomTheme(uint8_t, uint8_t), CustomTheme(uint8_t, uint8_t, bool)>(), sol::base_classes, sol::bases<ThemeInfo>());
     customtheme_type["level_file"] = &CustomTheme::level_file;
     customtheme_type["theme"] = &CustomTheme::theme;
     customtheme_type["base_theme"] = sol::property([](CustomTheme& ct) -> uint8_t
@@ -1242,27 +1250,24 @@ void register_usertypes(sol::state& lua)
                                                        else
                                                            ct.base_theme = 0;
                                                    });
-    customtheme_type["sub_theme"] = &CustomTheme::sub_theme;
     customtheme_type["textures"] = &CustomTheme::textures;
     customtheme_type["override"] = theme_override;
     customtheme_type["pre"] = &CustomTheme::pre;
     customtheme_type["post"] = &CustomTheme::post;
-    customtheme_type["unknown1"] = &CustomTheme::unknown1;
-    customtheme_type["unknown2"] = &CustomTheme::unknown2;
-    customtheme_type["unknown3"] = &CustomTheme::unknown3;
-    customtheme_type["unknown4"] = &CustomTheme::unknown4;
-    customtheme_type["get_unknown1"] = &CustomTheme::get_unknown1;
+
+    /*
+    customtheme_type["reset_theme_flags"] = &CustomTheme::reset_theme_flags;
     customtheme_type["init_flags"] = &CustomTheme::init_flags;
     customtheme_type["init_level"] = &CustomTheme::init_level;
-    customtheme_type["unknown_v4"] = &CustomTheme::unknown_v4;
-    customtheme_type["unknown_v5"] = &CustomTheme::unknown_v5;
+    customtheme_type["init_rooms"] = &CustomTheme::init_rooms;
+    customtheme_type["generate_path"] = &CustomTheme::generate_path;
     customtheme_type["add_special_rooms"] = &CustomTheme::add_special_rooms;
-    customtheme_type["unknown_v7"] = &CustomTheme::unknown_v7;
-    customtheme_type["unknown_v8"] = &CustomTheme::unknown_v8;
+    customtheme_type["add_player_coffin"] = &CustomTheme::add_player_coffin;
+    customtheme_type["add_dirk_coffin"] = &CustomTheme::add_dirk_coffin;
+    customtheme_type["add_idol"] = &CustomTheme::add_idol;
     customtheme_type["add_vault"] = &CustomTheme::add_vault;
     customtheme_type["add_coffin"] = &CustomTheme::add_coffin;
-    customtheme_type["add_special_feeling"] = &CustomTheme::add_special_feeling;
-    customtheme_type["unknown_v12"] = &CustomTheme::unknown_v12;
+    customtheme_type["add_feeling"] = &CustomTheme::add_feeling;
     customtheme_type["spawn_level"] = &CustomTheme::spawn_level;
     customtheme_type["spawn_border"] = &CustomTheme::spawn_border;
     customtheme_type["post_process_level"] = &CustomTheme::post_process_level;
@@ -1280,28 +1285,29 @@ void register_usertypes(sol::state& lua)
     customtheme_type["get_base_id"] = &CustomTheme::get_base_id;
     customtheme_type["get_floor_spreading_type"] = &CustomTheme::get_floor_spreading_type;
     customtheme_type["get_floor_spreading_type2"] = &CustomTheme::get_floor_spreading_type2;
-    customtheme_type["unknown_v30"] = &CustomTheme::unknown_v30;
-    customtheme_type["get_transition_block_modifier"] = &CustomTheme::get_transition_block_modifier;
-    customtheme_type["unknown_v32"] = &CustomTheme::unknown_v32;
+    customtheme_type["get_transition_styled_floor"] = &CustomTheme::get_transition_styled_floor;
+    customtheme_type["get_transition_floor_modifier"] = &CustomTheme::get_transition_floor_modifier;
+    customtheme_type["get_transition_styled_floor_type"] = &CustomTheme::get_transition_styled_floor_type;
     customtheme_type["get_backwall_type"] = &CustomTheme::get_backwall_type;
     customtheme_type["get_border_type"] = &CustomTheme::get_border_type;
     customtheme_type["get_critter_type"] = &CustomTheme::get_critter_type;
     customtheme_type["get_liquid_gravity"] = &CustomTheme::get_liquid_gravity;
     customtheme_type["get_player_damage"] = &CustomTheme::get_player_damage;
-    customtheme_type["unknown_v38"] = &CustomTheme::unknown_v38;
+    customtheme_type["get_explosion_soot"] = &CustomTheme::get_explosion_soot;
     customtheme_type["get_backlayer_lut"] = &CustomTheme::get_backlayer_lut;
     customtheme_type["get_backlayer_light_level"] = &CustomTheme::get_backlayer_light_level;
     customtheme_type["get_loop"] = &CustomTheme::get_loop;
     customtheme_type["get_vault_level"] = &CustomTheme::get_vault_level;
-    customtheme_type["get_unknown_1_or_2"] = &CustomTheme::get_unknown_1_or_2;
+    customtheme_type["get_theme_flag"] = &CustomTheme::get_theme_flag;
     customtheme_type["get_dynamic_texture"] = &CustomTheme::get_dynamic_texture;
     customtheme_type["pre_transition"] = &CustomTheme::pre_transition;
-    customtheme_type["get_level_height"] = &CustomTheme::get_level_height;
-    customtheme_type["unknown_v47"] = &CustomTheme::unknown_v47;
+    customtheme_type["get_exit_room_y_level"] = &CustomTheme::get_exit_room_y_level;
+    customtheme_type["get_shop_chance"] = &CustomTheme::get_shop_chance;
     customtheme_type["spawn_decoration"] = &CustomTheme::spawn_decoration;
     customtheme_type["spawn_decoration2"] = &CustomTheme::spawn_decoration2;
     customtheme_type["spawn_extra"] = &CustomTheme::spawn_extra;
     customtheme_type["unknown_v51"] = &CustomTheme::unknown_v51;
+    */
 
     /* CustomTheme
     // override
@@ -1313,7 +1319,7 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("DYNAMIC_TEXTURE", "INVISIBLE", DYNAMIC_TEXTURE::INVISIBLE, "BACKGROUND", DYNAMIC_TEXTURE::BACKGROUND, "FLOOR", DYNAMIC_TEXTURE::FLOOR, "DOOR", DYNAMIC_TEXTURE::DOOR, "DOOR_LAYER", DYNAMIC_TEXTURE::DOOR_LAYER, "BACKGROUND_DECORATION", DYNAMIC_TEXTURE::BACKGROUND_DECORATION, "KALI_STATUE", DYNAMIC_TEXTURE::KALI_STATUE, "COFFIN", DYNAMIC_TEXTURE::COFFIN);
 
     /// Overrides for different CustomTheme functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
-    lua.create_named_table("THEME_OVERRIDE", "BASE", THEME_OVERRIDE::BASE, "UNKNOWN_V1", THEME_OVERRIDE::UNKNOWN_V1, "INIT_FLAGS", THEME_OVERRIDE::INIT_FLAGS, "INIT_LEVEL", THEME_OVERRIDE::INIT_LEVEL, "UNKNOWN_V4", THEME_OVERRIDE::UNKNOWN_V4, "UNKNOWN_V5", THEME_OVERRIDE::UNKNOWN_V5, "SPECIAL_ROOMS", THEME_OVERRIDE::SPECIAL_ROOMS, "UNKNOWN_V7", THEME_OVERRIDE::UNKNOWN_V7, "UNKNOWN_V8", THEME_OVERRIDE::UNKNOWN_V8, "VAULT", THEME_OVERRIDE::VAULT, "COFFIN", THEME_OVERRIDE::COFFIN, "FEELING", THEME_OVERRIDE::FEELING, "UNKNOWN_V12", THEME_OVERRIDE::UNKNOWN_V12, "SPAWN_LEVEL", THEME_OVERRIDE::SPAWN_LEVEL, "SPAWN_BORDER", THEME_OVERRIDE::SPAWN_BORDER, "POST_PROCESS_LEVEL", THEME_OVERRIDE::POST_PROCESS_LEVEL, "SPAWN_TRAPS", THEME_OVERRIDE::SPAWN_TRAPS, "POST_PROCESS_ENTITIES", THEME_OVERRIDE::POST_PROCESS_ENTITIES, "SPAWN_PROCEDURAL", THEME_OVERRIDE::SPAWN_PROCEDURAL, "SPAWN_BACKGROUND", THEME_OVERRIDE::SPAWN_BACKGROUND, "SPAWN_LIGHTS", THEME_OVERRIDE::SPAWN_LIGHTS, "SPAWN_TRANSITION", THEME_OVERRIDE::SPAWN_TRANSITION, "POST_TRANSITION", THEME_OVERRIDE::POST_TRANSITION, "SPAWN_PLAYERS", THEME_OVERRIDE::SPAWN_PLAYERS, "SPAWN_EFFECTS", THEME_OVERRIDE::SPAWN_EFFECTS, "LVL_FILE", THEME_OVERRIDE::LVL_FILE, "THEME_ID", THEME_OVERRIDE::THEME_ID, "BASE_ID", THEME_OVERRIDE::BASE_ID, "ENT_FLOOR_SPREADING", THEME_OVERRIDE::ENT_FLOOR_SPREADING, "ENT_FLOOR_SPREADING2", THEME_OVERRIDE::ENT_FLOOR_SPREADING2, "UNKNOWN_V30", THEME_OVERRIDE::UNKNOWN_V30, "TRANSITION_MODIFIER", THEME_OVERRIDE::TRANSITION_MODIFIER, "UNKNOWN_V32", THEME_OVERRIDE::UNKNOWN_V32, "ENT_BACKWALL", THEME_OVERRIDE::ENT_BACKWALL, "ENT_BORDER", THEME_OVERRIDE::ENT_BORDER, "ENT_CRITTER", THEME_OVERRIDE::ENT_CRITTER, "GRAVITY", THEME_OVERRIDE::GRAVITY, "PLAYER_DAMAGE", THEME_OVERRIDE::PLAYER_DAMAGE, "UNKNOWN_V38", THEME_OVERRIDE::UNKNOWN_V38, "TEXTURE_BACKLAYER_LUT", THEME_OVERRIDE::TEXTURE_BACKLAYER_LUT, "BACKLAYER_LIGHT_LEVEL", THEME_OVERRIDE::BACKLAYER_LIGHT_LEVEL, "LOOP", THEME_OVERRIDE::LOOP, "VAULT_LEVEL", THEME_OVERRIDE::VAULT_LEVEL, "GET_UNKNOWN1_OR_2", THEME_OVERRIDE::GET_UNKNOWN1_OR_2, "TEXTURE_DYNAMIC", THEME_OVERRIDE::TEXTURE_DYNAMIC, "PRE_TRANSITION", THEME_OVERRIDE::PRE_TRANSITION, "LEVEL_HEIGHT", THEME_OVERRIDE::LEVEL_HEIGHT, "UNKNOWN_V47", THEME_OVERRIDE::UNKNOWN_V47, "SPAWN_DECORATION", THEME_OVERRIDE::SPAWN_DECORATION, "SPAWN_DECORATION2", THEME_OVERRIDE::SPAWN_DECORATION2, "SPAWN_EXTRA", THEME_OVERRIDE::SPAWN_EXTRA, "UNKNOWN_V51", THEME_OVERRIDE::UNKNOWN_V51);
+    // lua.create_named_table("THEME_OVERRIDE", "BASE", THEME_OVERRIDE::BASE, "UNKNOWN_V1", THEME_OVERRIDE::UNKNOWN_V1, "INIT_FLAGS", THEME_OVERRIDE::INIT_FLAGS, "INIT_LEVEL", THEME_OVERRIDE::INIT_LEVEL, "UNKNOWN_V4", THEME_OVERRIDE::UNKNOWN_V4, "UNKNOWN_V5", THEME_OVERRIDE::UNKNOWN_V5, "SPECIAL_ROOMS", THEME_OVERRIDE::SPECIAL_ROOMS, "UNKNOWN_V7", THEME_OVERRIDE::UNKNOWN_V7, "UNKNOWN_V8", THEME_OVERRIDE::UNKNOWN_V8, "VAULT", THEME_OVERRIDE::VAULT, "COFFIN", THEME_OVERRIDE::COFFIN, "FEELING", THEME_OVERRIDE::FEELING, "UNKNOWN_V12", THEME_OVERRIDE::UNKNOWN_V12, "SPAWN_LEVEL", THEME_OVERRIDE::SPAWN_LEVEL, "SPAWN_BORDER", THEME_OVERRIDE::SPAWN_BORDER, "POST_PROCESS_LEVEL", THEME_OVERRIDE::POST_PROCESS_LEVEL, "SPAWN_TRAPS", THEME_OVERRIDE::SPAWN_TRAPS, "POST_PROCESS_ENTITIES", THEME_OVERRIDE::POST_PROCESS_ENTITIES, "SPAWN_PROCEDURAL", THEME_OVERRIDE::SPAWN_PROCEDURAL, "SPAWN_BACKGROUND", THEME_OVERRIDE::SPAWN_BACKGROUND, "SPAWN_LIGHTS", THEME_OVERRIDE::SPAWN_LIGHTS, "SPAWN_TRANSITION", THEME_OVERRIDE::SPAWN_TRANSITION, "POST_TRANSITION", THEME_OVERRIDE::POST_TRANSITION, "SPAWN_PLAYERS", THEME_OVERRIDE::SPAWN_PLAYERS, "SPAWN_EFFECTS", THEME_OVERRIDE::SPAWN_EFFECTS, "LVL_FILE", THEME_OVERRIDE::LVL_FILE, "THEME_ID", THEME_OVERRIDE::THEME_ID, "BASE_ID", THEME_OVERRIDE::BASE_ID, "ENT_FLOOR_SPREADING", THEME_OVERRIDE::ENT_FLOOR_SPREADING, "ENT_FLOOR_SPREADING2", THEME_OVERRIDE::ENT_FLOOR_SPREADING2, "UNKNOWN_V30", THEME_OVERRIDE::UNKNOWN_V30, "TRANSITION_MODIFIER", THEME_OVERRIDE::TRANSITION_MODIFIER, "UNKNOWN_V32", THEME_OVERRIDE::UNKNOWN_V32, "ENT_BACKWALL", THEME_OVERRIDE::ENT_BACKWALL, "ENT_BORDER", THEME_OVERRIDE::ENT_BORDER, "ENT_CRITTER", THEME_OVERRIDE::ENT_CRITTER, "GRAVITY", THEME_OVERRIDE::GRAVITY, "PLAYER_DAMAGE", THEME_OVERRIDE::PLAYER_DAMAGE, "UNKNOWN_V38", THEME_OVERRIDE::UNKNOWN_V38, "TEXTURE_BACKLAYER_LUT", THEME_OVERRIDE::TEXTURE_BACKLAYER_LUT, "BACKLAYER_LIGHT_LEVEL", THEME_OVERRIDE::BACKLAYER_LIGHT_LEVEL, "LOOP", THEME_OVERRIDE::LOOP, "VAULT_LEVEL", THEME_OVERRIDE::VAULT_LEVEL, "GET_UNKNOWN1_OR_2", THEME_OVERRIDE::GET_UNKNOWN1_OR_2, "TEXTURE_DYNAMIC", THEME_OVERRIDE::TEXTURE_DYNAMIC, "PRE_TRANSITION", THEME_OVERRIDE::PRE_TRANSITION, "LEVEL_HEIGHT", THEME_OVERRIDE::LEVEL_HEIGHT, "UNKNOWN_V47", THEME_OVERRIDE::UNKNOWN_V47, "SPAWN_DECORATION", THEME_OVERRIDE::SPAWN_DECORATION, "SPAWN_DECORATION2", THEME_OVERRIDE::SPAWN_DECORATION2, "SPAWN_EXTRA", THEME_OVERRIDE::SPAWN_EXTRA, "UNKNOWN_V51", THEME_OVERRIDE::UNKNOWN_V51);
 
     /// Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
     // lua["force_custom_theme"] = [](* customtheme)
