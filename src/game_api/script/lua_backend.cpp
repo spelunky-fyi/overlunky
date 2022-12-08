@@ -122,7 +122,6 @@ void LuaBackend::clear_all_callbacks()
 
     HookHandler<Entity, CallbackType::Entity>::clear_all_hooks();
     HookHandler<RenderInfo, CallbackType::Entity>::clear_all_hooks();
-
     HookHandler<ThemeInfo, CallbackType::Theme>::clear_all_hooks();
 
     for (auto& [screen_id, id] : screen_hooks)
