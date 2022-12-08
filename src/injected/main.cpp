@@ -55,16 +55,10 @@ void attach_stdout(DWORD pid)
     }
 }
 
-extern "C" __declspec(dllexport) void run(DWORD pid)
+extern "C" __declspec(dllexport) void run(DWORD pid = 0)
 {
-    attach_stdout(pid);
-    FILE* fp;
-    auto err = fopen_s(&fp, "spelunky.log", "a");
-    if (err == 0)
-    {
-        fputs("Overlunky loaded\n", fp);
-        fclose(fp);
-    }
+    if (pid)
+        attach_stdout(pid);
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
     register_application_version(fmt::format("Overlunky {}", get_version()));
@@ -106,4 +100,15 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
             }
         } while (true);
     }
+}
+
+BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinst, DWORD dwReason, [[maybe_unused]] LPVOID reserved)
+{
+    if (dwReason == DLL_PROCESS_ATTACH)
+    {
+        DisableThreadLibraryCalls(hinst);
+        std::thread thr(run, 0);
+        thr.detach();
+    }
+    return TRUE;
 }

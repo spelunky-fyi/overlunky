@@ -7,7 +7,8 @@ add_executable(injector
     ${CMAKE_SOURCE_DIR}/res/injector.rc)
 target_link_libraries(injector PRIVATE
     shared
-    overlunky_warnings)
+    overlunky_warnings
+    lib_detours_overlunky)
 add_dependencies(injector injected)
 
 if(MSVC AND EXISTS ${SPELUNKY_INSTALL_DIR})

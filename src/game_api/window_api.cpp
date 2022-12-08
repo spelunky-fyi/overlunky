@@ -12,7 +12,17 @@
 
 #include "logger.h"
 #include "memory.hpp"
-#include "wine.h"
+
+bool detect_wine()
+{
+    static const HMODULE hntdll = GetModuleHandle("ntdll.dll");
+    if (!hntdll)
+        return false;
+    static const void* wgv = GetProcAddress(hntdll, "wine_get_version");
+    if (!wgv)
+        return false;
+    return true;
+}
 
 IDXGISwapChain* g_SwapChain{nullptr};
 ID3D11Device* g_Device{nullptr};
