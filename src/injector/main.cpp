@@ -209,6 +209,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
 
 bool inject(fs::path overlunky_path, [[maybe_unused]] bool attach)
 {
+    SetConsoleTitle("Overlunky | Start your game or press ENTER to launch ../Spel2.exe!");
     INFO("Searching for Spel2.exe process...");
     INFO("Start your game or press ENTER to launch ../Spel2.exe!");
     Process proc;
@@ -291,7 +292,6 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
     if (!do_inject && DetourCreateProcessWithDlls(NULL, (LPSTR)exe_path.string().c_str(), NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi, 1, dll_paths, NULL))
     {
         INFO("Game launched with DLL");
-        SetConsoleTitle("Overlunky");
         CloseHandle(pi.hThread);
         CloseHandle(out_write);
 
@@ -312,7 +312,6 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
     else if (CreateProcess((LPSTR)exe_path.string().c_str(), NULL, NULL, NULL, TRUE, 0, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi))
     {
         INFO("Game launched, injecting DLL...");
-        SetConsoleTitle("Overlunky");
         CloseHandle(pi.hThread);
         CloseHandle(out_write);
         if (!inject(overlunky_path, false) && g_console)
@@ -334,12 +333,33 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
 
 int main(int argc, char** argv)
 {
-    SetConsoleTitle("Overlunky | Start your game or press ENTER to launch ../Spel2.exe!");
+    CmdLineParser cmd_line_parser(argc, argv);
 
     std::string version(get_version());
     INFO("Overlunky launcher version: {}", version);
+    if (GetCmdLineParam<bool>(cmd_line_parser, "version", false))
+        return 0;
 
-    if (version.find(".") == std::string::npos)
+    bool help = GetCmdLineParam<bool>(cmd_line_parser, "help", false);
+    if (help)
+    {
+        INFO("Usage:");
+        INFO("Without --launch_game the launcher will search for a process called Spel2.exe and inject OL when found.");
+        INFO("You can press ENTER to stop searching and try to launch the game from the parent folder.");
+        INFO("Command line switches:");
+        INFO("  --launch_game [path]    launch ../Spel2.exe, path/Spel2.exe, or a specific exe, and load OL with Detours");
+        INFO("  --console               keep console open to debug scripts etc");
+        INFO("  --inject                use the old injection method instead of Detours with --launch_game");
+        INFO("  --info_dump             output a bunch of game data to 'Spelunky 2/game_data'");
+        INFO("  --update                run the AutoUpdate, even on stable builds");
+        INFO("  --help                  show this helpful help");
+        INFO("  --version               show version information");
+        return 0;
+    }
+
+    bool update = GetCmdLineParam<bool>(cmd_line_parser, "update", false);
+
+    if (version.find(".") == std::string::npos || update)
     {
         auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/injected.dll", "injected.dll");
     }
@@ -347,8 +367,6 @@ int main(int argc, char** argv)
     {
         INFO("AutoUpdate: Disabled on stable releases. Get the WHIP build to get automatic updates.");
     }
-
-    CmdLineParser cmd_line_parser(argc, argv);
 
     bool info_dump = GetCmdLineParam<bool>(cmd_line_parser, "info_dump", false);
     auto overlunky_path = get_dll_path(info_dump ? "\\info_dump.dll" : "\\injected.dll");
@@ -393,4 +411,5 @@ int main(int argc, char** argv)
             launch(fs::canonical("../Spel2.exe"), overlunky_path, do_inject);
         }
     }
+    return 0;
 }
