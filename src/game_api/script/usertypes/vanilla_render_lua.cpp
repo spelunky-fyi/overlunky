@@ -185,6 +185,13 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& so
     draw_world_texture(texture_id, source, dest, color, (WORLD_SHADER)WorldShader::TextureColor);
 }
 
+// For the custom constructor
+void TextRenderingInfo_ctor(TextRenderingInfo& uninitialized_memory, const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    new (&uninitialized_memory) TextRenderingInfo{};
+    uninitialized_memory.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
+}
+
 namespace NVanillaRender
 {
 void register_usertypes(sol::state& lua)
@@ -294,6 +301,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<TextRenderingInfo>(
         "TextRenderingInfo",
+        "new",
+        sol::initializers(&TextRenderingInfo_ctor),
         "x",
         &TextRenderingInfo::x,
         "y",
@@ -308,6 +317,15 @@ void register_usertypes(sol::state& lua)
         &TextRenderingInfo::font,
         "text_size",
         &TextRenderingInfo::text_size);
+
+    /* TextRenderingInfo
+    // new
+    // TextRenderingInfo:new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)
+    // Creates new TextRenderingInfo that can be used in VanillaRenderContext draw_text
+    // For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you
+    // text_length
+    // You can also just use `#` operator to get the text lenght
+    */
 
     lua.create_named_table(
         "WORLD_SHADER",

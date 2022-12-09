@@ -978,7 +978,7 @@ function set_pre_floor_update(uid, fun) end
 ---@return CallbackId?
 function set_post_floor_update(uid, fun) end
 ---Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when a container is opened (up+whip or damage to the container)
+---Sets a callback that is called right when a container is opened by the player (up+whip)
 ---Use this only when no other approach works, this call can be expensive if overused.
 ---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 ---<br/>The callback signature is nil on_open(Entity entity_self, Entity opener)
@@ -4408,10 +4408,16 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
 
 ---@class VanillaRenderContext
-    ---@field draw_text fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
+    ---@field draw_text VanillaRenderContext_draw_text
     ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number
     ---@field draw_screen_texture VanillaRenderContext_draw_screen_texture
     ---@field draw_world_texture VanillaRenderContext_draw_world_texture
+
+---@class VanillaRenderContext_draw_text
+---@param tri TextRenderingInfo
+---@param color Color
+---@overload fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
+local function VanillaRenderContext_draw_text(self, tri, color) end
 
 ---@class VanillaRenderContext_draw_screen_texture
 ---@param texture_id TEXTURE
@@ -4463,12 +4469,14 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field source_set_quad fun(self, quad: Quad): nil
 
 ---@class TextRenderingInfo
+    ---@field new any @sol::initializers(&TextRenderingInfo_ctor)
     ---@field x number
     ---@field y number
     ---@field text_length integer
     ---@field width number
     ---@field height number
     ---@field font Texture
+    ---@field text_size fun(self): number, number
 
 ---@class TextureDefinition
     ---@field texture_path string

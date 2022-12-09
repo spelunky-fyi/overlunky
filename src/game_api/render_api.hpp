@@ -70,13 +70,16 @@ struct TextRenderingInfo
 
     void set_text(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
     void set_text(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
-
     /// {width, height}
     std::pair<float, float> text_size()
     {
         return {width, height};
     }
     uint32_t length()
+    {
+        return text_length;
+    }
+    uint32_t size()
     {
         return text_length;
     }
