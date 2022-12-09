@@ -530,6 +530,8 @@ void register_usertypes(sol::state& lua)
         "VanHorsing",
         "show_text",
         &VanHorsing::show_text,
+        "special_message_shown",
+        &VanHorsing::special_message_shown,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, NPC>());
 

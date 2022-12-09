@@ -449,6 +449,8 @@ class VanHorsing : public NPC
   public:
     /// if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
     bool show_text;
+    /// one way door message has been shown
+    bool special_message_shown;
 };
 
 class WitchDoctor : public WalkingMonster
