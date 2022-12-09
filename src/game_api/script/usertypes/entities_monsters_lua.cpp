@@ -339,6 +339,8 @@ void register_usertypes(sol::state& lua)
         &Pet::func_timer,
         "active_state",
         &Pet::active_state,
+        "petted_counter",
+        &Pet::petted_counter,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 

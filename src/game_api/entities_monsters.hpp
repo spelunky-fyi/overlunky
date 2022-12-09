@@ -285,6 +285,8 @@ class Pet : public Monster
     int16_t func_timer;
     /// -1 = sitting and yelling, 0 = either running, dead or picked up
     int8_t active_state;
+    /// number of times petted in the camp
+    uint8_t petted_counter;
 };
 
 class Caveman : public WalkingMonster
