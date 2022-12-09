@@ -294,7 +294,6 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<TextRenderingInfo>(
         "TextRenderingInfo",
-        // sol::constructors<TextRenderingInfo(const std::string, float, float, float, float, uint32_t, uint32_t)>{},
         "x",
         &TextRenderingInfo::x,
         "y",

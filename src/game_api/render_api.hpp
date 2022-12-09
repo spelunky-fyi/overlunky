@@ -64,10 +64,12 @@ enum class WorldShader : std::uint8_t
 struct TextRenderingInfo
 {
     /// NoDoc
-    TextRenderingInfo(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
-    TextRenderingInfo(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+    TextRenderingInfo() = default;
     TextRenderingInfo(TextRenderingInfo&) = delete;
     ~TextRenderingInfo();
+
+    void set_text(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+    void set_text(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
 
     /// {width, height}
     std::pair<float, float> text_size()

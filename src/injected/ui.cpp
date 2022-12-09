@@ -7400,7 +7400,9 @@ void init_ui()
     const std::string version_string = fmt::format("Overlunky {}", get_version());
     const float scale{0.00035f};
 
-    static TextRenderingInfo tri{version_string, 0, 0, scale, scale, 1, 0};
+    static TextRenderingInfo tri{};
+    tri.set_text(version_string, 0, 0, scale, scale, 1, 0);
+
     const auto [w, h] = tri.text_size();
     tri.y = -1.0f + std::abs(h) / 2.0f;
 
