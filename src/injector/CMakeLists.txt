@@ -15,3 +15,5 @@ if(MSVC AND EXISTS ${SPELUNKY_INSTALL_DIR})
     set_target_properties(injector PROPERTIES
         VS_DEBUGGER_COMMAND_ARGUMENTS "--launch_game \"${SPELUNKY_INSTALL_DIR}\"")
 endif()
+
+set_target_properties(injector PROPERTIES OUTPUT_NAME Overlunky)

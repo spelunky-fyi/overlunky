@@ -96,7 +96,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
         }
 
         // Get current version
-        std::ifstream viStream("overlunky.version");
+        std::ifstream viStream("Overlunky.version");
         if (!viStream.fail())
         {
             std::stringstream buffer;
@@ -104,7 +104,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
             old_version = buffer.str();
             if (old_version.find("disabled") != std::string::npos)
             {
-                INFO("AutoUpdate: Disabled, delete overlunky.version to enable again.");
+                INFO("AutoUpdate: Disabled, delete Overlunky.version or run with --update to enable again.");
                 return true;
             }
         }
@@ -113,13 +113,13 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
             answer = MessageBoxA(NULL, "Overlunky WHIP can update automatically!\nDo you want to enable automatic updates?", "Overlunky Update", MB_ICONASTERISK | MB_YESNO);
             if (answer == IDNO)
             {
-                std::ofstream voStream("overlunky.version");
+                std::ofstream voStream("Overlunky.version");
                 if (!voStream.fail())
                 {
                     voStream << "disabled" << std::endl;
                     voStream.close();
                 }
-                INFO("AutoUpdate: Disabled, delete overlunky.version to enable again.");
+                INFO("AutoUpdate: Disabled, delete Overlunky.version or run with --update to enable again.");
                 return true;
             }
         }
@@ -199,7 +199,7 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
         return false;
     }
 
-    std::ofstream vStream("overlunky.version");
+    std::ofstream vStream("Overlunky.version");
     if (!vStream.fail())
     {
         vStream << new_version;
@@ -462,11 +462,11 @@ int main(int argc, char** argv)
     bool do_update_launcher = GetCmdLineParam<bool>(cmd_line_parser, "update_launcher", false);
 
     if (do_update)
-        remove("overlunky.version");
+        remove("Overlunky.version");
 
     if (version.find(".") == std::string::npos || do_update)
     {
-        auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/injected.dll", "injected.dll", do_update_launcher);
+        auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/Overlunky.dll", "Overlunky.dll", do_update_launcher);
     }
     else
     {
@@ -479,7 +479,7 @@ int main(int argc, char** argv)
     }
 
     bool info_dump = GetCmdLineParam<bool>(cmd_line_parser, "info_dump", false);
-    auto overlunky_path = get_dll_path(info_dump ? "\\info_dump.dll" : "\\injected.dll");
+    auto overlunky_path = get_dll_path(info_dump ? "\\info_dump.dll" : "\\Overlunky.dll");
 
     if (!fs::exists(overlunky_path))
     {
