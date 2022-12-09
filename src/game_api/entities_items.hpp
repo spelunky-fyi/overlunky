@@ -487,7 +487,8 @@ class PunishBall : public Movable
 {
   public:
     int32_t attached_to_uid;
-    uint8_t unknown_state; /* unsure */
+    /// counts down from 20 while the ball is eligible to break a floor and tries to break it at 0
+    uint8_t timer;
     uint8_t unused1;
     uint16_t unused2;
     float x_pos;
