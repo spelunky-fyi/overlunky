@@ -43,8 +43,9 @@ fs::path get_dll_path(const char* rel_path)
     return path.parent_path().concat(rel_path);
 }
 
-bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeader = NULL)
+bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
 {
+    const char* sHeader = NULL;
     const int BUFFER_SIZE = 32768;
     DWORD iFlags;
     const char* sAgent = "Overlunky Updater";
@@ -204,6 +205,105 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
         vStream << new_version;
         vStream.close();
     }
+    yes = true;
+    return true;
+}
+
+bool update_launcher(const char* sURL, const char* sSaveFilename)
+{
+    const char* sHeader = NULL;
+    const int BUFFER_SIZE = 32768;
+    DWORD iFlags;
+    const char* sAgent = "Overlunky Updater";
+    HINTERNET hInternet;
+    HINTERNET hConnect;
+    char acBuffer[BUFFER_SIZE];
+    DWORD iReadBytes;
+    FILE* pFile = NULL;
+    DWORD iBytesToRead = 0;
+    DWORD iReadBytesOfRq = 4;
+
+    // Get connection state
+    InternetGetConnectedState(&iFlags, 0);
+    if (iFlags & INTERNET_CONNECTION_OFFLINE)
+    {
+        INFO("AutoUpdate: Can't connect to the internet");
+        return false;
+    }
+
+    // Open internet session
+    if (!(iFlags & INTERNET_CONNECTION_PROXY))
+    {
+        hInternet = InternetOpenA(sAgent, INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY, NULL, NULL, 0);
+    }
+    else
+    {
+        hInternet = InternetOpenA(sAgent, INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+    }
+    if (hInternet)
+    {
+        if (sHeader == NULL)
+        {
+            sHeader = "Accept: */*\r\n\r\n";
+        }
+
+        // Get URL
+        hConnect = InternetOpenUrlA(hInternet, sURL, sHeader, lstrlenA(sHeader), INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, 0);
+        if (!hConnect)
+        {
+            InternetCloseHandle(hInternet);
+            INFO("AutoUpdate: Can't get release information from github");
+            return false;
+        }
+
+        remove("Overlunky.old");
+        rename("Overlunky.exe", "Overlunky.old");
+
+        INFO("AutoUpdate: Downloading {}...", sSaveFilename);
+
+        // Open file to write
+        errno_t err;
+        if ((err = fopen_s(&pFile, sSaveFilename, "wb")) != 0)
+        {
+            InternetCloseHandle(hInternet);
+            INFO("AutoUpdate: Can't write new file");
+            return false;
+        }
+
+        // Get content size
+        if (!HttpQueryInfo(hConnect, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, (LPVOID)&iBytesToRead, &iReadBytesOfRq, NULL))
+        {
+            iBytesToRead = 0;
+        }
+
+        do
+        {
+            if (!InternetReadFile(hConnect, acBuffer, BUFFER_SIZE, &iReadBytes))
+            {
+                fclose(pFile);
+                InternetCloseHandle(hInternet);
+                INFO("AutoUpdate: Can't read file from github");
+                return false;
+            }
+            if (iReadBytes > 0)
+            {
+                fwrite(acBuffer, sizeof(char), iReadBytes, pFile);
+            }
+            if (iReadBytes <= 0)
+            {
+                break;
+            }
+        } while (TRUE);
+        fflush(pFile);
+        fclose(pFile);
+        InternetCloseHandle(hInternet);
+    }
+    else
+    {
+        INFO("AutoUpdate: Can't connect to github");
+        return false;
+    }
+
     return true;
 }
 
@@ -351,21 +451,31 @@ int main(int argc, char** argv)
         INFO("  --console               keep console open to debug scripts etc");
         INFO("  --inject                use the old injection method instead of Detours with --launch_game");
         INFO("  --info_dump             output a bunch of game data to 'Spelunky 2/game_data'");
-        INFO("  --update                run the AutoUpdate, even on stable builds");
+        INFO("  --update                update launcher and DLL to the latest WHIP build");
+        INFO("  --update_launcher       update launcher to the latest WHIP build");
         INFO("  --help                  show this helpful help");
         INFO("  --version               show version information");
         return 0;
     }
 
-    bool update = GetCmdLineParam<bool>(cmd_line_parser, "update", false);
+    bool do_update = GetCmdLineParam<bool>(cmd_line_parser, "update", false);
+    bool do_update_launcher = GetCmdLineParam<bool>(cmd_line_parser, "update_launcher", false);
 
-    if (version.find(".") == std::string::npos || update)
+    if (do_update)
+        remove("overlunky.version");
+
+    if (version.find(".") == std::string::npos || do_update)
     {
-        auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/injected.dll", "injected.dll");
+        auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/injected.dll", "injected.dll", do_update_launcher);
     }
     else
     {
         INFO("AutoUpdate: Disabled on stable releases. Get the WHIP build to get automatic updates.");
+    }
+    if (do_update_launcher)
+    {
+        update_launcher("https://github.com/spelunky-fyi/overlunky/releases/download/whip/Overlunky.exe", "Overlunky.exe");
+        return 0;
     }
 
     bool info_dump = GetCmdLineParam<bool>(cmd_line_parser, "info_dump", false);
