@@ -90,7 +90,7 @@ void register_usertypes(sol::state& lua)
     entitydb_type["damage"] = &EntityDB::damage;
     entitydb_type["life"] = &EntityDB::life;
     entitydb_type["blood_content"] = &EntityDB::blood_content;
-    entitydb_type["texture"] = &EntityDB::texture;
+    entitydb_type["texture"] = &EntityDB::texture_id;
     entitydb_type["animations"] = &EntityDB::animations;
     entitydb_type["properties_flags"] = &EntityDB::properties_flags;
     entitydb_type["default_flags"] = &EntityDB::default_flags;

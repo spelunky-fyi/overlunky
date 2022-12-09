@@ -66,7 +66,8 @@ struct TextRenderingInfo
     /// NoDoc
     TextRenderingInfo(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
     TextRenderingInfo(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
-    //~TextRenderingInfo();
+    TextRenderingInfo(TextRenderingInfo&) = delete;
+    ~TextRenderingInfo();
 
     /// {width, height}
     std::pair<float, float> text_size()
@@ -84,25 +85,24 @@ struct TextRenderingInfo
     float width;
     float height;
     uint32_t unknown3; // padding probably
-    // These 3 fields are sized 3 * wcslen(input_text)
-    float* unknown4;
-    float* letter_textures; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
-    short* unknown6;
-    uint16_t unknown7;
-    uint16_t unknown8; // padding probably
-    int32_t unknown9;
-    uint8_t shader;
+
+    // These 2 fields are sized 12 * wcslen(input_text)
+    // maybe it's something like the Quad in the RenderInfo, with the unknown after each pair?
+    float* dest;
+    float* source; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
+    // 6 * wcslen(input_text), just numbers in order 0, 1, 2 ... have some strage effect if you change them
+    uint16_t* unknown6;
+
+    uint16_t special_character; // changes texture used to the `special_texture_id`, only from the last character, so setting 2 will change the last two characters
+                                // setting higher value than the `text_length` will crash
+    uint16_t unknown8;          // padding probably
+    int32_t special_texture_id; // default -1 wich is the buttons texture
+
+    uint8_t shader; // ? changing it can change the text color, or make the text all rectangles?
     uint8_t padding1[3];
     uint32_t padding2;
     Texture* font;
-    float unknown13;
-    uint16_t unknown14;
-    uint16_t unknown15;
-    float unknown16;
-    float unknown17;
-    uint32_t unknown18;
-    float unknown19;
-    float unknown20;
+    size_t unknown13; // probably garbage
 };
 
 struct TextureRenderingInfo

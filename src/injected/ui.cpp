@@ -1647,7 +1647,7 @@ void frame_advance()
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
     static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-    const auto ana_texture = get_type(ana_spelunky)->texture;
+    const auto ana_texture = get_type(ana_spelunky)->texture_id;
 
     g_state->items->player_select_slots[0].activated = true;
     g_state->items->player_select_slots[0].character = g_save->players[0] + ana_spelunky;
