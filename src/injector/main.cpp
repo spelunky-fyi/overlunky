@@ -33,6 +33,7 @@
 
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
+bool g_console = false;
 
 fs::path get_dll_path(const char* rel_path)
 {
@@ -206,7 +207,37 @@ bool auto_update(const char* sURL, const char* sSaveFilename, const char* sHeade
     return true;
 }
 
-bool launch(fs::path exe_path, fs::path overlunky_path, bool do_inject)
+bool inject(fs::path overlunky_path, [[maybe_unused]] bool attach)
+{
+    INFO("Searching for Spel2.exe process...");
+    INFO("Start your game or press ENTER to launch ../Spel2.exe!");
+    Process proc;
+    while (true)
+    {
+        if (auto res = find_process("Spel2.exe"))
+        {
+            proc = res.value();
+            break;
+        }
+        if (kbhit())
+        {
+            if (getche() == '\r')
+            {
+                return true;
+            }
+        }
+        std::this_thread::sleep_for(200ms);
+    }
+    SetConsoleTitle("Overlunky");
+    INFO("Found Spel2.exe PID: {}", proc.info.pid);
+    inject_dll(proc, overlunky_path.string());
+    INFO("DLL injected");
+    // if (g_console && attach)
+    //    call(proc, find_function(proc, overlunky_path.string(), "attach_stdout"), (LPVOID)(uint64_t)GetCurrentProcessId());
+    return false;
+}
+
+bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
 {
     auto exe_dir = fs::canonical(exe_path).parent_path();
     auto cwd = fs::current_path();
@@ -218,7 +249,10 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool do_inject)
         dll_path,
     };
 
-    INFO("Launching {} {} {} {}", exe_path.string(), exe_dir.string(), cwd.string(), overlunky_path.string());
+    if (do_inject)
+        INFO("Launching game... {}", exe_path.string());
+    else
+        INFO("Launching game with DLL... {}", exe_path.string());
 
     const auto child_env = []()
     {
@@ -243,52 +277,65 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool do_inject)
     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
     sa.bInheritHandle = TRUE;
 
+    HANDLE out_read = 0;
+    HANDLE out_write = 0;
+
+    CreatePipe(&out_read, &out_write, &sa, 0);
+
     STARTUPINFOA si{};
     si.cb = sizeof(STARTUPINFO);
+    si.hStdOutput = out_write;
+    si.hStdError = out_write;
     si.dwFlags |= STARTF_USESTDHANDLES;
 
     if (!do_inject && DetourCreateProcessWithDlls(NULL, (LPSTR)exe_path.string().c_str(), NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi, 1, dll_paths, NULL))
     {
+        INFO("Game launched with DLL");
+        SetConsoleTitle("Overlunky");
         CloseHandle(pi.hThread);
+        CloseHandle(out_write);
+
+        if (g_console)
+        {
+            char buffer[1024 + 1] = {};
+            DWORD read = 0;
+
+            while (ReadFile(out_read, buffer, 1024, &read, NULL))
+            {
+                buffer[read] = '\0';
+                fmt::print("{}", buffer);
+            }
+        }
+        CloseHandle(out_read);
         return true;
     }
     else if (CreateProcess((LPSTR)exe_path.string().c_str(), NULL, NULL, NULL, TRUE, 0, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi))
     {
+        INFO("Game launched, injecting DLL...");
+        SetConsoleTitle("Overlunky");
         CloseHandle(pi.hThread);
+        CloseHandle(out_write);
+        if (!inject(overlunky_path, false) && g_console)
+        {
+            char buffer[1024 + 1] = {};
+            DWORD read = 0;
+            while (ReadFile(out_read, buffer, 1024, &read, NULL))
+            {
+                buffer[read] = '\0';
+                fmt::print("{}", buffer);
+            }
+        }
+        CloseHandle(out_read);
         return false;
     }
 
     return false;
 }
 
-bool inject(fs::path overlunky_path)
-{
-    INFO("Searching for Spel2.exe process...");
-    INFO("You can launch the game yourself or press ENTER to try ../Spel2.exe");
-    Process proc{0};
-    while (true)
-    {
-        if (auto res = find_process("Spel2.exe"))
-        {
-            proc = res.value();
-            break;
-        }
-        if (kbhit())
-        {
-            if (getche() == '\r')
-            {
-                return true;
-            }
-        }
-        std::this_thread::sleep_for(200ms);
-    }
-    INFO("Found Spel2.exe PID: {}", proc.info.pid);
-    inject_dll(proc, overlunky_path.string());
-    return false;
-}
-
 int main(int argc, char** argv)
 {
+    SetConsoleTitle("Overlunky | Start your game or press ENTER to launch ../Spel2.exe!");
+
     std::string version(get_version());
     INFO("Overlunky launcher version: {}", version);
 
@@ -312,15 +359,17 @@ int main(int argc, char** argv)
     }
 
     auto launch_game_default = GetCmdLineParam<bool>(cmd_line_parser, "launch_game", false);
-    auto launch_playlunky_default = GetCmdLineParam<bool>(cmd_line_parser, "launch_playlunky", false);
     auto launch_game = GetCmdLineParam<std::string_view>(cmd_line_parser, "launch_game", "");
-    auto launch_playlunky = GetCmdLineParam<std::string_view>(cmd_line_parser, "launch_playlunky", "");
     if (launch_game.empty() && launch_game_default)
         launch_game = "../Spel2.exe";
-    if (launch_playlunky.empty() && launch_playlunky_default)
-        launch_playlunky = "../playlunky_launcher.exe";
 
-    bool do_inject = false;
+    bool do_inject = GetCmdLineParam<bool>(cmd_line_parser, "inject", false);
+    g_console = GetCmdLineParam<bool>(cmd_line_parser, "console", false);
+    if (info_dump)
+    {
+        do_inject = true;
+        g_console = false;
+    }
     fs::path exe;
 
     if (!launch_game.empty())
@@ -331,21 +380,17 @@ int main(int argc, char** argv)
         else if (fs::is_regular_file(launch_path))
             exe = launch_path;
     }
-    else if (!launch_playlunky.empty())
-    {
-        auto launch_path = fs::canonical(launch_playlunky);
-        if (fs::is_directory(launch_path))
-            exe = launch_path / "playlunky_launcher.exe";
-        else if (fs::is_regular_file(launch_path))
-            exe = launch_path;
-        do_inject = true;
-    }
 
     if (fs::exists(exe))
+    {
         if (launch(exe, overlunky_path, do_inject))
             return 0;
-
-    if (!fs::exists(exe) || do_inject)
-        if (inject(overlunky_path))
-            launch(fs::canonical("../Spel2.exe"), overlunky_path, false);
+    }
+    else
+    {
+        if (inject(overlunky_path, true))
+        {
+            launch(fs::canonical("../Spel2.exe"), overlunky_path, do_inject);
+        }
+    }
 }
