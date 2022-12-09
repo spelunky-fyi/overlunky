@@ -1,4 +1,6 @@
-#include <Windows.h>    // for AttachConsole, DWORD, FreeConsole, SetCons...
+#include <Windows.h> // for AttachConsole, DWORD, FreeConsole, SetCons...
+
+#include <TlHelp32.h>   // for PROCESSENTRY32, CreateToolhelp32Snapshot, Pro...
 #include <chrono>       // for operator<=>, operator-, operator+, operato...
 #include <compare>      // for operator<, operator<=, operator>
 #include <cstdio>       // for freopen_s, fclose, fopen_s, fputs, FILE, NULL
@@ -23,6 +25,55 @@
 
 using namespace std::chrono_literals;
 
+struct ProcessInfo
+{
+    std::string name;
+    DWORD pid;
+};
+
+struct Process
+{
+    HANDLE handle;
+    ProcessInfo info;
+};
+
+std::vector<ProcessInfo> get_processes()
+{
+    // No unicode
+#undef Process32First
+#undef Process32Next
+#undef PROCESSENTRY32
+    std::vector<ProcessInfo> res;
+    auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == nullptr)
+        return {};
+
+    PROCESSENTRY32 ppe = {sizeof(ppe)};
+    auto proc = Process32First(snapshot, &ppe);
+
+    while (proc)
+    {
+        auto name = ppe.szExeFile;
+        if (auto delim = strrchr(name, '\\'))
+            name = delim;
+        res.push_back({name, ppe.th32ProcessID});
+        proc = Process32Next(snapshot, &ppe);
+    }
+    return res;
+}
+
+std::optional<Process> find_process(std::string name)
+{
+    for (auto& proc : get_processes())
+    {
+        if (proc.name == name)
+        {
+            return Process{OpenProcess(PROCESS_ALL_ACCESS, 0, proc.pid), proc};
+        }
+    }
+    return {};
+}
+
 BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 {
     switch (ctrl_type)
@@ -39,7 +90,7 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type)
     return TRUE;
 }
 
-extern "C" __declspec(dllexport) void attach_stdout(DWORD pid)
+void attach_stdout(DWORD pid)
 {
     AttachConsole(pid);
     SetConsoleCtrlHandler(ctrl_handler, 1);
@@ -47,14 +98,18 @@ extern "C" __declspec(dllexport) void attach_stdout(DWORD pid)
     FILE* stream;
     freopen_s(&stream, "CONOUT$", "w", stdout);
     freopen_s(&stream, "CONOUT$", "w", stderr);
-    freopen_s(&stream, "CONIN$", "r", stdin);
-    DEBUG("Running in debug mode.");
+    // freopen_s(&stream, "CONIN$", "r", stdin);
+    INFO("Press Ctrl+C to detach this window from the process.");
 }
 
 void run()
 {
-
-    DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
+    Process proc;
+    if (auto res = find_process("Overlunky.exe"))
+    {
+        proc = res.value();
+        attach_stdout(proc.info.pid);
+    }
 
     register_application_version(fmt::format("Overlunky {}", get_version()));
     preload_addresses();

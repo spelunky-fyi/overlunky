@@ -307,7 +307,28 @@ bool update_launcher(const char* sURL, const char* sSaveFilename)
     return true;
 }
 
-bool inject(fs::path overlunky_path, [[maybe_unused]] bool attach)
+void wait()
+{
+    if (g_console)
+    {
+        while (true)
+        {
+            if (auto res = find_process("Spel2.exe"))
+                std::this_thread::sleep_for(1s);
+            else
+                break;
+        }
+    }
+}
+
+void inject_proc(fs::path overlunky_path, Process proc)
+{
+    inject_dll(proc, overlunky_path.string());
+    INFO("DLL injected");
+    wait();
+}
+
+bool inject_search(fs::path overlunky_path)
 {
     SetConsoleTitle("Overlunky | Start your game or press ENTER to launch ../Spel2.exe!");
     INFO("Searching for Spel2.exe process...");
@@ -333,8 +354,7 @@ bool inject(fs::path overlunky_path, [[maybe_unused]] bool attach)
     INFO("Found Spel2.exe PID: {}", proc.info.pid);
     inject_dll(proc, overlunky_path.string());
     INFO("DLL injected");
-    // if (g_console && attach)
-    //    call(proc, find_function(proc, overlunky_path.string(), "attach_stdout"), (LPVOID)(uint64_t)GetCurrentProcessId());
+    wait();
     return false;
 }
 
@@ -374,57 +394,22 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
     }();
 
     PROCESS_INFORMATION pi{};
-    SECURITY_ATTRIBUTES sa{};
-    sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-    sa.bInheritHandle = TRUE;
-
-    HANDLE out_read = 0;
-    HANDLE out_write = 0;
-
-    CreatePipe(&out_read, &out_write, &sa, 0);
-
     STARTUPINFOA si{};
     si.cb = sizeof(STARTUPINFO);
-    si.hStdOutput = out_write;
-    si.hStdError = out_write;
-    si.dwFlags |= STARTF_USESTDHANDLES;
 
     if (!do_inject && DetourCreateProcessWithDlls(NULL, (LPSTR)exe_path.string().c_str(), NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi, 1, dll_paths, NULL))
     {
         INFO("Game launched with DLL");
+        wait();
         CloseHandle(pi.hThread);
-        CloseHandle(out_write);
-
-        if (g_console)
-        {
-            char buffer[1024 + 1] = {};
-            DWORD read = 0;
-
-            while (ReadFile(out_read, buffer, 1024, &read, NULL))
-            {
-                buffer[read] = '\0';
-                fmt::print("{}", buffer);
-            }
-        }
-        CloseHandle(out_read);
         return true;
     }
     else if (CreateProcess((LPSTR)exe_path.string().c_str(), NULL, NULL, NULL, TRUE, 0, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi))
     {
+        auto proc = Process{pi.hProcess, {"Spel2.exe", pi.dwProcessId}};
         INFO("Game launched, injecting DLL...");
+        inject_proc(overlunky_path, proc);
         CloseHandle(pi.hThread);
-        CloseHandle(out_write);
-        if (!inject(overlunky_path, false) && g_console)
-        {
-            char buffer[1024 + 1] = {};
-            DWORD read = 0;
-            while (ReadFile(out_read, buffer, 1024, &read, NULL))
-            {
-                buffer[read] = '\0';
-                fmt::print("{}", buffer);
-            }
-        }
-        CloseHandle(out_read);
         return false;
     }
 
@@ -451,7 +436,7 @@ int main(int argc, char** argv)
         INFO("  --console               keep console open to debug scripts etc");
         INFO("  --inject                use the old injection method instead of Detours with --launch_game");
         INFO("  --info_dump             output a bunch of game data to 'Spelunky 2/game_data'");
-        INFO("  --update                update launcher and DLL to the latest WHIP build");
+        INFO("  --update                reset AutoUpdate setting and update launcher and DLL to the latest WHIP build");
         INFO("  --update_launcher       update launcher to the latest WHIP build");
         INFO("  --help                  show this helpful help");
         INFO("  --version               show version information");
@@ -474,8 +459,8 @@ int main(int argc, char** argv)
     }
     if (do_update_launcher)
     {
-        update_launcher("https://github.com/spelunky-fyi/overlunky/releases/download/whip/Overlunky.exe", "Overlunky.exe");
-        return 0;
+        if (update_launcher("https://github.com/spelunky-fyi/overlunky/releases/download/whip/Overlunky.exe", "Overlunky.exe"))
+            INFO("AutoUpdate: Launcher was updated, you might want to restart it.");
     }
 
     bool info_dump = GetCmdLineParam<bool>(cmd_line_parser, "info_dump", false);
@@ -516,7 +501,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        if (inject(overlunky_path, true))
+        if (inject_search(overlunky_path))
         {
             launch(fs::canonical("../Spel2.exe"), overlunky_path, do_inject);
         }
