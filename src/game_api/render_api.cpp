@@ -304,30 +304,6 @@ bool& get_journal_enabled()
     return g_journal_enabled;
 }
 
-bool prepare_text_for_rendering(TextRenderingInfo* info, const std::u16string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
-{
-    static size_t text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
-
-    if (text_rendering_func1_offset != 0)
-    {
-        typedef void func1(uint32_t fontstyle, const char16_t* text_to_draw, uint32_t, float x, float y, TextRenderingInfo*, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t);
-        static func1* f1 = (func1*)(text_rendering_func1_offset);
-        f1(fontstyle, text.c_str(), 2, x, y, info, scale_x, scale_y, alignment, 2, 0);
-        return true;
-    }
-    return false;
-}
-
-bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
-{
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-
-    std::u16string wide_text;
-    wide_text.resize(text.size());
-    wide_text = convert.from_bytes(text);
-    return prepare_text_for_rendering(info, wide_text, x, y, scale_x, scale_y, alignment, fontstyle);
-}
-
 void free_text_post_rendering(TextRenderingInfo* info)
 {
     if (info->unknown4 != nullptr)
@@ -346,34 +322,36 @@ void free_text_post_rendering(TextRenderingInfo* info)
 
 void RenderAPI::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
-    TextRenderingInfo tri{};
+    TextRenderingInfo tri{text, x, y, scale_x, scale_y, alignment, fontstyle};
     ON_SCOPE_EXIT(free_text_post_rendering(&tri));
-
-    if (!prepare_text_for_rendering(&tri, text, x, y, scale_x, scale_y, alignment, fontstyle))
-    {
-        return;
-    }
 
     static size_t text_rendering_func2_offset = get_address("draw_text"sv);
 
     if (text_rendering_func2_offset != 0)
     {
-        typedef void func2(TextRenderingInfo*, Color * color);
+        typedef void func2(const TextRenderingInfo*, Color* color);
         static func2* f2 = (func2*)(text_rendering_func2_offset);
         f2(&tri, &color);
     }
 }
 
+void RenderAPI::draw_text(const TextRenderingInfo* tri, Color color)
+{
+    static size_t text_rendering_func2_offset = get_address("draw_text"sv);
+
+    if (text_rendering_func2_offset != 0)
+    {
+        typedef void func2(const TextRenderingInfo*, Color* color);
+        static func2* f2 = (func2*)(text_rendering_func2_offset);
+        f2(tri, &color);
+    }
+}
+
 std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
 {
-    TextRenderingInfo tri{};
+    TextRenderingInfo tri{text, 0, 0, scale_x, scale_y, 1 /*center*/, fontstyle};
     ON_SCOPE_EXIT(free_text_post_rendering(&tri));
-
-    if (!prepare_text_for_rendering(&tri, text, 0, 0, scale_x, scale_y, 1 /*center*/, fontstyle))
-    {
-        return std::make_pair(0.0f, 0.0f);
-    }
-    return std::make_pair(tri.width, tri.height);
+    return tri.text_size();
 }
 
 void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color)
@@ -668,3 +646,44 @@ void TextureRenderingInfo::source_set_quad(const Quad& quad)
     source_top_left_x = quad.top_left_x;
     source_top_left_y = quad.top_left_y;
 }
+
+TextRenderingInfo::TextRenderingInfo(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    static size_t text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
+    if (text_rendering_func1_offset != 0)
+    {
+        typedef void func1(uint32_t, const char16_t*, uint32_t, float, float, TextRenderingInfo*, float, float, uint32_t, uint32_t, int8_t);
+        static auto f1 = (func1*)(text_rendering_func1_offset);
+        f1(fontstyle, text.c_str(), 2, x, y, this, scale_x, scale_y, alignment, 2, 0);
+    }
+}
+TextRenderingInfo::TextRenderingInfo(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    static size_t text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
+    if (text_rendering_func1_offset != 0)
+    {
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+
+        std::u16string wide_text;
+        wide_text.resize(text.size());
+        wide_text = convert.from_bytes(text);
+        typedef void func1(uint32_t, const char16_t*, uint32_t, float, float, TextRenderingInfo*, float, float, uint32_t, uint32_t, int8_t);
+        static auto f1 = (func1*)(text_rendering_func1_offset);
+        f1(fontstyle, wide_text.c_str(), 2, x, y, this, scale_x, scale_y, alignment, 2, 0);
+    }
+}
+//TextRenderingInfo::~TextRenderingInfo()
+//{
+//    if (unknown4 != nullptr)
+//    {
+//        game_free(unknown4);
+//    }
+//    if (letter_textures != nullptr)
+//    {
+//        game_free(letter_textures);
+//    }
+//    if (unknown6 != nullptr)
+//    {
+//        game_free(unknown6);
+//    }
+//}

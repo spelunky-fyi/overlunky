@@ -18,6 +18,11 @@ void VanillaRenderContext::draw_text(const std::string& text, float x, float y, 
     RenderAPI::get().draw_text(text, x, y, scale_x, scale_y, color, alignment, fontstyle);
 }
 
+void VanillaRenderContext::draw_text(const TextRenderingInfo* tri, Color color)
+{
+    RenderAPI::get().draw_text(tri, color);
+}
+
 std::pair<float, float> VanillaRenderContext::draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
 {
     return RenderAPI::get().draw_text_size(text, scale_x, scale_y, fontstyle);
@@ -246,11 +251,15 @@ void register_usertypes(sol::state& lua)
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color, WORLD_SHADER)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color, WORLD_SHADER)>(&VanillaRenderContext::draw_world_texture));
+    auto draw_text = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const std::string&, float, float, float, float, Color, uint32_t, uint32_t)>(&VanillaRenderContext::draw_text),
+        static_cast<void (VanillaRenderContext::*)(const TextRenderingInfo*, Color)>(&VanillaRenderContext::draw_text));
+
     /// Used in [set_callback](#set_callback) ON.RENDER_* callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
     lua.new_usertype<VanillaRenderContext>(
         "VanillaRenderContext",
         "draw_text",
-        &VanillaRenderContext::draw_text,
+        draw_text,
         "draw_text_size",
         &VanillaRenderContext::draw_text_size,
         "draw_screen_texture",
@@ -285,6 +294,7 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<TextRenderingInfo>(
         "TextRenderingInfo",
+        // sol::constructors<TextRenderingInfo(const std::string, float, float, float, float, uint32_t, uint32_t)>{},
         "x",
         &TextRenderingInfo::x,
         "y",
@@ -296,7 +306,9 @@ void register_usertypes(sol::state& lua)
         "height",
         &TextRenderingInfo::height,
         "font",
-        &TextRenderingInfo::font);
+        &TextRenderingInfo::font,
+        "text_size",
+        &TextRenderingInfo::text_size);
 
     lua.create_named_table(
         "WORLD_SHADER",

@@ -61,6 +61,83 @@ enum class WorldShader : std::uint8_t
     DeferredTextureColor_EmissiveColorizedGlow_Saturation = 0x18,
 };
 
+struct TextRenderingInfo
+{
+    /// NoDoc
+    TextRenderingInfo(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+    TextRenderingInfo(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+    //~TextRenderingInfo();
+
+    /// {width, height}
+    std::pair<float, float> text_size()
+    {
+        return {width, height};
+    }
+    uint32_t length()
+    {
+        return text_length;
+    }
+
+    float x;
+    float y;
+    uint32_t text_length;
+    float width;
+    float height;
+    uint32_t unknown3; // padding probably
+    // These 3 fields are sized 3 * wcslen(input_text)
+    float* unknown4;
+    float* letter_textures; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
+    short* unknown6;
+    uint16_t unknown7;
+    uint16_t unknown8; // padding probably
+    int32_t unknown9;
+    uint8_t shader;
+    uint8_t padding1[3];
+    uint32_t padding2;
+    Texture* font;
+    float unknown13;
+    uint16_t unknown14;
+    uint16_t unknown15;
+    float unknown16;
+    float unknown17;
+    uint32_t unknown18;
+    float unknown19;
+    float unknown20;
+};
+
+struct TextureRenderingInfo
+{
+    // where to draw on the screen:
+    float x;
+    float y;
+
+    // destination is relative to the x,y centerpoint
+    float destination_bottom_left_x;
+    float destination_bottom_left_y;
+    float destination_bottom_right_x;
+    float destination_bottom_right_y;
+    float destination_top_left_x;
+    float destination_top_left_y;
+    float destination_top_right_x;
+    float destination_top_right_y;
+
+    // source rectangle in the texture to render
+    float source_bottom_left_x;
+    float source_bottom_left_y;
+    float source_bottom_right_x;
+    float source_bottom_right_y;
+    float source_top_left_x;
+    float source_top_left_y;
+    float source_top_right_x;
+    float source_top_right_y;
+
+    void set_destination(const AABB& bbox);
+    Quad dest_get_quad();
+    void dest_set_quad(const Quad& quad);
+    Quad source_get_quad();
+    void source_set_quad(const Quad& quad);
+};
+
 struct RenderAPI
 {
     const size_t* api;
@@ -78,6 +155,7 @@ struct RenderAPI
     void reset_lut(uint8_t layer);
 
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
+    void draw_text(const TextRenderingInfo* tri, Color color);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
     void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color);
     void draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader);
@@ -185,68 +263,6 @@ struct RenderInfo
     virtual void update() = 0;
     virtual void draw(size_t) = 0;
     virtual bool unknown_3() = 0; // init? sets darkness to 1.0 at the start, then does some other stuff
-};
-
-struct TextRenderingInfo
-{
-    float x;
-    float y;
-    uint32_t text_length;
-    float width;
-    float height;
-    uint32_t unknown3; // padding probably
-    // These 3 fields are sized 3 * wcslen(input_text)
-    float* unknown4;
-    float* letter_textures; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
-    short* unknown6;
-    uint16_t unknown7;
-    uint16_t unknown8; // padding probably
-    int32_t unknown9;
-    uint8_t shader;
-    uint8_t padding1[3];
-    uint32_t padding2;
-    Texture* font;
-    float unknown13;
-    uint16_t unknown14;
-    uint16_t unknown15;
-    float unknown16;
-    float unknown17;
-    uint32_t unknown18;
-    float unknown19;
-    float unknown20;
-};
-
-struct TextureRenderingInfo
-{
-    // where to draw on the screen:
-    float x;
-    float y;
-
-    // destination is relative to the x,y centerpoint
-    float destination_bottom_left_x;
-    float destination_bottom_left_y;
-    float destination_bottom_right_x;
-    float destination_bottom_right_y;
-    float destination_top_left_x;
-    float destination_top_left_y;
-    float destination_top_right_x;
-    float destination_top_right_y;
-
-    // source rectangle in the texture to render
-    float source_bottom_left_x;
-    float source_bottom_left_y;
-    float source_bottom_right_x;
-    float source_bottom_right_y;
-    float source_top_left_x;
-    float source_top_left_y;
-    float source_top_right_x;
-    float source_top_right_y;
-
-    void set_destination(const AABB& bbox);
-    Quad dest_get_quad();
-    void dest_set_quad(const Quad& quad);
-    Quad source_get_quad();
-    void source_set_quad(const Quad& quad);
 };
 
 void init_render_api_hooks();
