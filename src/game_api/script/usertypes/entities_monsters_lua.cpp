@@ -1217,6 +1217,8 @@ void register_usertypes(sol::state& lua)
         &CritterCrab::walk_pause_timer,
         "walking_left",
         &CritterCrab::walking_left,
+        "unfriendly",
+        &CritterCrab::unfriendly,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
@@ -1304,6 +1306,8 @@ void register_usertypes(sol::state& lua)
         &CritterDrone::applied_hor_momentum,
         "applied_ver_momentum",
         &CritterDrone::applied_ver_momentum,
+        "unfriendly",
+        &CritterDrone::unfriendly,
         "move_timer",
         &CritterDrone::move_timer,
         sol::base_classes,

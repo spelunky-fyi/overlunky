@@ -1031,6 +1031,8 @@ class CritterCrab : public Critter
   public:
     uint8_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     bool walking_left;
+    /// moves away from its target instead of towards it
+    bool unfriendly;
 };
 
 class CritterButterfly : public Critter
@@ -1101,7 +1103,8 @@ class CritterDrone : public Critter
     SoundMeta* sound;
     float applied_hor_momentum;
     float applied_ver_momentum;
-    bool unknown1;
+    /// moves away from its target instead of towards it
+    bool unfriendly;
     uint8_t move_timer;
 };
 
