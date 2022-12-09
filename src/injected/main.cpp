@@ -39,26 +39,21 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type)
     return TRUE;
 }
 
-void attach_stdout(DWORD pid)
+extern "C" __declspec(dllexport) void attach_stdout(DWORD pid)
 {
-    size_t env_var_size;
-    getenv_s(&env_var_size, NULL, 0, "OL_DEBUG");
-    if (env_var_size > 0)
-    {
-        AttachConsole(pid);
-        SetConsoleCtrlHandler(ctrl_handler, 1);
+    AttachConsole(pid);
+    SetConsoleCtrlHandler(ctrl_handler, 1);
 
-        FILE* stream;
-        freopen_s(&stream, "CONOUT$", "w", stdout);
-        freopen_s(&stream, "CONOUT$", "w", stderr);
-        freopen_s(&stream, "CONIN$", "r", stdin);
-    }
+    FILE* stream;
+    freopen_s(&stream, "CONOUT$", "w", stdout);
+    freopen_s(&stream, "CONOUT$", "w", stderr);
+    freopen_s(&stream, "CONIN$", "r", stdin);
+    DEBUG("Running in debug mode.");
 }
 
-extern "C" __declspec(dllexport) void run(DWORD pid = 0)
+void run()
 {
-    if (pid)
-        attach_stdout(pid);
+
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
     register_application_version(fmt::format("Overlunky {}", get_version()));
@@ -67,7 +62,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid = 0)
     while (true)
     {
         auto entities = list_entities();
-        if (entities.size() >= 850)
+        if (entities.size() >= 876)
         {
             DEBUG("Found {} entities, that's enough", entities.size());
             std::this_thread::sleep_for(100ms);
@@ -85,21 +80,6 @@ extern "C" __declspec(dllexport) void run(DWORD pid = 0)
     auto& api = RenderAPI::get();
     init_ui();
     init_hooks((void*)api.swap_chain());
-    size_t env_var_size;
-    getenv_s(&env_var_size, NULL, 0, "OL_DEBUG");
-    if (env_var_size > 0)
-    {
-        DEBUG("Running in debug mode.");
-        do
-        {
-            std::string line;
-            std::getline(std::cin, line);
-            if (std::cin.fail() || std::cin.eof())
-            {
-                std::cin.clear();
-            }
-        } while (true);
-    }
 }
 
 BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinst, DWORD dwReason, [[maybe_unused]] LPVOID reserved)
@@ -107,7 +87,7 @@ BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinst, DWORD dwReason, [[maybe_un
     if (dwReason == DLL_PROCESS_ATTACH)
     {
         DisableThreadLibraryCalls(hinst);
-        std::thread thr(run, 0);
+        std::thread thr(run);
         thr.detach();
     }
     return TRUE;
