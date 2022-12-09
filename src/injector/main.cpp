@@ -357,20 +357,20 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
 
     const auto child_env = []()
     {
-        std::string child_env = "SteamAppId=418530";
+        std::string child_env_ = "SteamAppId=418530";
 
         const auto this_env = GetEnvironmentStrings();
         auto lpszVariable = this_env;
         while (*lpszVariable)
         {
-            child_env += '\0';
-            child_env += lpszVariable;
+            child_env_ += '\0';
+            child_env_ += lpszVariable;
             lpszVariable += strlen(lpszVariable) + 1;
         }
         FreeEnvironmentStrings(this_env);
 
-        child_env += '\0';
-        return child_env;
+        child_env_ += '\0';
+        return child_env_;
     }();
 
     PROCESS_INFORMATION pi{};
