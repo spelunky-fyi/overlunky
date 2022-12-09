@@ -582,6 +582,8 @@ void register_usertypes(sol::state& lua)
         "PunishBall",
         "attached_to_uid",
         &PunishBall::attached_to_uid,
+        "timer",
+        &PunishBall::timer,
         "x_pos",
         &PunishBall::x_pos,
         "y_pos",
