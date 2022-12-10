@@ -29,19 +29,20 @@
 #include <utility>       // for min, max, pair, get
 #include <vector>        // for vector, _Vector_i...
 
-#include "aliases.hpp"                             // for CallbackId, ENT_TYPE
-#include "color.hpp"                               // for Color
-#include "entities_chars.hpp"                      // for Player
-#include "entities_items.hpp"                      // for Container, Player...
-#include "entity.hpp"                              // for get_entity_ptr
-#include "game_manager.hpp"                        // for get_game_manager
-#include "items.hpp"                               // for Inventory
-#include "layer.hpp"                               // for g_level_max_x
-#include "lua_backend.hpp"                         // for LuaBackend, ON
-#include "lua_console.hpp"                         // for LuaConsole
-#include "lua_libs/lua_libs.hpp"                   // for require_format_lua
-#include "lua_require.hpp"                         // for register_custom_r...
-#include "math.hpp"                                // for AABB
+#include "aliases.hpp"           // for CallbackId, ENT_TYPE
+#include "color.hpp"             // for Color
+#include "entities_chars.hpp"    // for Player
+#include "entities_items.hpp"    // for Container, Player...
+#include "entity.hpp"            // for get_entity_ptr
+#include "game_manager.hpp"      // for get_game_manager
+#include "items.hpp"             // for Inventory
+#include "layer.hpp"             // for g_level_max_x
+#include "lua_backend.hpp"       // for LuaBackend, ON
+#include "lua_console.hpp"       // for LuaConsole
+#include "lua_libs/lua_libs.hpp" // for require_format_lua
+#include "lua_require.hpp"       // for register_custom_r...
+#include "math.hpp"              // for AABB
+#include "memory.hpp"
 #include "movable.hpp"                             // for Movable
 #include "online.hpp"                              // for get_online
 #include "overloaded.hpp"                          // for overloaded
@@ -1856,7 +1857,7 @@ end
     /// Get the rva for a pattern name
     lua["get_rva"] = [](std::string_view address_name) -> size_t
     {
-        return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe"); // shouldn't this be  - Memory::get().at_exe(0) ?
+        return get_address(address_name) - Memory::get().at_exe(0);
     };
 
     /// Log to spelunky.log

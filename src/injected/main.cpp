@@ -144,7 +144,7 @@ extern "C" __declspec(dllexport) const char* dll_version()
 
 BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinst, DWORD dwReason, [[maybe_unused]] LPVOID reserved)
 {
-    if (dwReason == DLL_PROCESS_ATTACH && GetModuleHandleA("Spel2.exe"))
+    if (dwReason == DLL_PROCESS_ATTACH)
     {
         DisableThreadLibraryCalls(hinst);
         std::thread thr(run);
