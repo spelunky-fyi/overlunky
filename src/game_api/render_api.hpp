@@ -83,7 +83,7 @@ struct TextRenderingInfo
     ~TextRenderingInfo();
 
     /// Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
-    void set_text(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+    void set_textx(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
 
     void set_text(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
     void set_text(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
@@ -102,6 +102,7 @@ struct TextRenderingInfo
 
     float x;
     float y;
+    /// You can also just use `#` operator on the whole object to get the text lenght
     uint32_t text_length;
     float width;
     float height;

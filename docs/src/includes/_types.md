@@ -2427,13 +2427,13 @@ Type | Name | Description
  | [new](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=new) | [TextRenderingInfo](#TextRenderingInfo):new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)<br/>Creates new [TextRenderingInfo](#TextRenderingInfo) that can be used in [VanillaRenderContext](#VanillaRenderContext) draw_text<br/>For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you<br/> 
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
-int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) | You can also just use `#` operator to get the text lenght<br/> 
+int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) | You can also just use `#` operator on the whole object to get the text lenght
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
 Texture | [font](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=font) | 
 tuple&lt;float, float&gt; | [text_size()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_size) | {width, height}, is only updated when you set/change the text
 nil | [rotate(float angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
- | [set_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_text) | 
+nil | [set_text(const string text, float scale_x, float scale_y, int alignment, int fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_text) | Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
 
 ### TextureDefinition
 
@@ -3309,8 +3309,8 @@ Type | Name | Description
 ---- | ---- | -----------
 [EntityDB](#EntityDB) | [type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) | Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the [EntityDB](#EntityDB)
 [Entity](#Entity) | [overlay](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlay) | 
-int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) entity_flags
-int | [more_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=more_flags) | see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) more_flags
+[ENT_FLAG](#ENT_FLAG) | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) entity_flags
+[ENT_MORE_FLAG](#ENT_MORE_FLAG) | [more_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=more_flags) | see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) more_flags
 int | [uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) | Unique id of the entity, save it to variable to check this entity later (don't use the whole [Entity](#Entity) type as it will be replaced with a different one when this is destroyed)
 int | [animation_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) | Number (id) of the sprite in the texture
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
@@ -3325,8 +3325,8 @@ float | [tile_width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ti
 float | [tile_height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_height) | Size of the sprite in the texture
 float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) | 
 [Color](#Color) | [color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=color) | 
-float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | Width of the hitbox
-float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | Height of the hitbox
+float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | Half of the width of the hitbox
+float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | Half of the height of the hitbox
 [SHAPE](#SHAPE) | [shape](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shape) | 
 bool | [hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitbox_enabled) | 
 float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | Offset of the hitbox in relation to the entity position

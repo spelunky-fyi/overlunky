@@ -9,9 +9,9 @@
 #include <tuple>       // for get
 #include <type_traits> // for move, declval
 
-#include "render_api.hpp"   // for TextureRenderingInfo, WorldShader, TextRen...
-#include "state.hpp"        // for enum_to_layer
-#include "texture.hpp"      // for Texture, get_texture
+#include "render_api.hpp" // for TextureRenderingInfo, WorldShader, TextRen...
+#include "state.hpp"      // for enum_to_layer
+#include "texture.hpp"    // for Texture, get_texture
 
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
@@ -320,16 +320,12 @@ void register_usertypes(sol::state& lua)
         "rotate",
         &TextRenderingInfo::rotate,
         "set_text",
-        // set_text);
-        static_cast<void (TextRenderingInfo::*)(std::u16string, float, float, uint32_t, uint32_t)>(&TextRenderingInfo::set_text));
-
+        &TextRenderingInfo::set_textx);
     /* TextRenderingInfo
     // new
     // TextRenderingInfo:new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)
     // Creates new TextRenderingInfo that can be used in VanillaRenderContext draw_text
     // For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you
-    // text_length
-    // You can also just use `#` operator to get the text lenght
     */
 
     lua.create_named_table(

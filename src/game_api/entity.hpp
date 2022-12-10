@@ -27,6 +27,8 @@ class Entity;
 class Movable;
 
 struct EntityHooksInfo;
+using ENT_FLAG = uint32_t;
+using ENT_MORE_FLAG = uint32_t;
 
 class Entity
 {
@@ -36,9 +38,9 @@ class Entity
     Entity* overlay;
     EntityList items;
     /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) entity_flags
-    uint32_t flags;
+    ENT_FLAG flags;
     /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) more_flags
-    uint32_t more_flags;
+    ENT_MORE_FLAG more_flags;
     /// Unique id of the entity, save it to variable to check this entity later (don't use the whole Entity type as it will be replaced with a different one when this is destroyed)
     int32_t uid;
     /// Number (id) of the sprite in the texture
@@ -70,9 +72,9 @@ class Entity
             float offsetx;
             /// Offset of the hitbox in relation to the entity position
             float offsety;
-            /// Width of the hitbox
+            /// Half of the width of the hitbox
             float hitboxx;
-            /// Height of the hitbox
+            /// Half of the height of the hitbox
             float hitboxy;
             SHAPE shape;         // 1 = rectangle, 2 = circle
             bool hitbox_enabled; // probably, off for bg, deco, logical etc

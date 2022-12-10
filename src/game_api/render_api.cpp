@@ -657,7 +657,7 @@ void TextRenderingInfo::set_text(const std::u16string text, float _x, float _y, 
         f1(fontstyle, text.c_str(), 2, _x, _y, this, scale_x, scale_y, alignment, 2, 0);
     }
 }
-void TextRenderingInfo::set_text(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+void TextRenderingInfo::set_textx(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
 {
     set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
 }

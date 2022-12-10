@@ -2116,8 +2116,8 @@ local function PRNG_random(self, min, max) end
 ---@class Entity
     ---@field type EntityDB
     ---@field overlay Entity
-    ---@field flags integer
-    ---@field more_flags integer
+    ---@field flags ENT_FLAG
+    ---@field more_flags ENT_MORE_FLAG
     ---@field uid integer
     ---@field animation_frame integer
     ---@field draw_depth integer
@@ -4478,7 +4478,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field font Texture
     ---@field text_size fun(self): number, number
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil
-    ---@field set_text any @//set_text
+    ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil
 
 ---@class TextureDefinition
     ---@field texture_path string
