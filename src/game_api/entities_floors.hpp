@@ -203,9 +203,19 @@ class LaserTrap : public Floor
 {
   public:
     Illumination* emitted_light;
-    /// after triggering counts from 0 to 255, changes the 'phase_2' then counts from 0 to 104
-    uint8_t reset_timer;
-    bool phase_2;
+    union
+    {
+        /// counts up from 0 after triggering, cannot shoot again until 360
+        uint16_t timer;
+        // Deprecated
+        struct
+        {
+            /// NoDoc
+            uint8_t reset_timer;
+            /// NoDoc
+            bool phase_2;
+        };
+    };
     /// The uid must be movable entity for ownership transfers
     void trigger(int32_t who_uid)
     {

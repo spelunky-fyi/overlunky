@@ -285,6 +285,8 @@ class Pet : public Monster
     int16_t func_timer;
     /// -1 = sitting and yelling, 0 = either running, dead or picked up
     int8_t active_state;
+    /// number of times petted in the camp
+    uint8_t petted_counter;
 };
 
 class Caveman : public WalkingMonster
@@ -447,6 +449,8 @@ class VanHorsing : public NPC
   public:
     /// if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
     bool show_text;
+    /// one way door message has been shown
+    bool special_message_shown;
 };
 
 class WitchDoctor : public WalkingMonster
@@ -1031,6 +1035,8 @@ class CritterCrab : public Critter
   public:
     uint8_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     bool walking_left;
+    /// moves away from its target instead of towards it
+    bool unfriendly;
 };
 
 class CritterButterfly : public Critter
@@ -1101,7 +1107,8 @@ class CritterDrone : public Critter
     SoundMeta* sound;
     float applied_hor_momentum;
     float applied_ver_momentum;
-    bool unknown1;
+    /// moves away from its target instead of towards it
+    bool unfriendly;
     uint8_t move_timer;
 };
 
