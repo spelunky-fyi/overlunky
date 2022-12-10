@@ -416,12 +416,37 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
     return false;
 }
 
+std::string get_dll_version(fs::path overlunky_path)
+{
+    static const HMODULE dll = LoadLibrary(overlunky_path.string().c_str());
+    if (!dll)
+        return "UNKNOWN";
+    typedef const char*(__stdcall * dll_version_fun)();
+    dll_version_fun dll_version = nullptr;
+    dll_version = reinterpret_cast<dll_version_fun>(GetProcAddress(dll, "dll_version"));
+    if (!dll_version)
+        return "UNKNOWN";
+    return std::string((*dll_version)());
+}
+
 int main(int argc, char** argv)
 {
     CmdLineParser cmd_line_parser(argc, argv);
 
+    bool info_dump = GetCmdLineParam<bool>(cmd_line_parser, "info_dump", false);
+    auto overlunky_path = get_dll_path(info_dump ? "\\info_dump.dll" : "\\Overlunky.dll");
+
     std::string version(get_version());
-    INFO("Overlunky launcher version: {}", version);
+    INFO("Overlunky EXE version: {}", version);
+    if (fs::exists(overlunky_path))
+    {
+        std::string dllversion(get_dll_version(overlunky_path));
+        INFO("Overlunky DLL version: {}", dllversion);
+    }
+    else
+    {
+        INFO("Overlunky DLL version: MISSING");
+    }
     if (GetCmdLineParam<bool>(cmd_line_parser, "version", false))
         return 0;
 
@@ -451,20 +476,27 @@ int main(int argc, char** argv)
 
     if (version.find(".") == std::string::npos || do_update)
     {
-        auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/Overlunky.dll", "Overlunky.dll", do_update_launcher);
+        bool updated = false;
+        auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/Overlunky.dll", "Overlunky.dll", updated);
+        if (updated)
+        {
+            if (fs::exists(overlunky_path))
+            {
+                std::string dllversion(get_dll_version(overlunky_path));
+                INFO("Overlunky DLL version: {}", dllversion);
+            }
+            do_update_launcher = true;
+        }
     }
-    else
+    else if (!do_update)
     {
-        INFO("AutoUpdate: Disabled on stable releases. Get the WHIP build to get automatic updates.");
+        INFO("AutoUpdate: Disabled on stable releases. Get the WHIP build to get automatic updates or run with --update.");
     }
     if (do_update_launcher)
     {
         if (update_launcher("https://github.com/spelunky-fyi/overlunky/releases/download/whip/Overlunky.exe", "Overlunky.exe"))
             INFO("AutoUpdate: Launcher was updated, you might want to restart it.");
     }
-
-    bool info_dump = GetCmdLineParam<bool>(cmd_line_parser, "info_dump", false);
-    auto overlunky_path = get_dll_path(info_dump ? "\\info_dump.dll" : "\\Overlunky.dll");
 
     if (!fs::exists(overlunky_path))
     {

@@ -137,9 +137,14 @@ void run()
     init_hooks((void*)api.swap_chain());
 }
 
+extern "C" __declspec(dllexport) const char* dll_version()
+{
+    return get_version_cstr();
+}
+
 BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinst, DWORD dwReason, [[maybe_unused]] LPVOID reserved)
 {
-    if (dwReason == DLL_PROCESS_ATTACH)
+    if (dwReason == DLL_PROCESS_ATTACH && GetModuleHandleA("Spel2.exe"))
     {
         DisableThreadLibraryCalls(hinst);
         std::thread thr(run);
