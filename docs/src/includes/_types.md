@@ -2432,7 +2432,7 @@ float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
 Texture | [font](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=font) | 
 tuple&lt;float, float&gt; | [text_size()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_size) | {width, height}, is only updated when you set/change the text
-nil | [rotate(float angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | 
+nil | [rotate(float angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
  | [set_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_text) | 
 
 ### TextureDefinition
@@ -3307,30 +3307,30 @@ Type | Name | Description
 
 Type | Name | Description
 ---- | ---- | -----------
-[EntityDB](#EntityDB) | [type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) | 
+[EntityDB](#EntityDB) | [type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) | Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the [EntityDB](#EntityDB)
 [Entity](#Entity) | [overlay](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlay) | 
-int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
-int | [more_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=more_flags) | 
-int | [uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) | 
-int | [animation_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) | 
-int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Don't edit this directly, use `set_draw_depth`
-float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
-float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
-int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
-float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
-float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
-float | [special_offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_offsetx) | 
-float | [special_offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_offsety) | 
-float | [tile_width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_width) | 
-float | [tile_height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_height) | 
+int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) entity_flags
+int | [more_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=more_flags) | see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) more_flags
+int | [uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) | Unique id of the entity, save it to variable to check this entity later (don't use the whole [Entity](#Entity) type as it will be replaced with a different one when this is destroyed)
+int | [animation_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) | Number (id) of the sprite in the texture
+int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
+int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | Use `set_layer` to change
+float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | Width of the sprite
+float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Height of the sprite
+float | [special_offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_offsetx) | Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
+float | [special_offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_offsety) | Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
+float | [tile_width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_width) | Size of the sprite in the texture
+float | [tile_height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_height) | Size of the sprite in the texture
 float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) | 
 [Color](#Color) | [color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=color) | 
-float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | 
-float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | 
+float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | Width of the hitbox
+float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | Height of the hitbox
 [SHAPE](#SHAPE) | [shape](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shape) | 
 bool | [hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitbox_enabled) | 
-float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
-float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
+float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | Offset of the hitbox in relation to the entity position
+float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | Offset of the hitbox in relation to the entity position
 [RenderInfo](#RenderInfo) | [rendering_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rendering_info) | 
 any | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before [ON](#ON).PRE_LOAD_SCREEN from a level and loaded right before [ON](#ON).POST_LEVEL_GENERATION.<br/> 
 [Entity](#Entity) | [topmost()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) | 
@@ -3357,6 +3357,7 @@ nil | [apply_metadata(int metadata)](https://github.com/spelunky-fyi/overlunky/s
 nil | [set_invisible(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_invisible) | 
 array&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
 bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | Returns true if entity is in water/lava
+bool | [is_cursed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_cursed) | 
 
 ### IceSlidingSound
 
@@ -5883,20 +5884,20 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
-[Vec2](#Vec2) | [move](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move) | 
-float | [movex](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) | 
-float | [movey](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movey) | 
+[Vec2](#Vec2) | [move](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move) | {movex, movey}
+float | [movex](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movex) | Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
+float | [movey](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movey) | Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
 [BUTTON](#BUTTON) | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
 [BUTTON](#BUTTON) | [buttons_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_previous) | 
 int | [stand_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stand_counter) | 
-float | [jump_height_multiplier](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_height_multiplier) | 
+float | [jump_height_multiplier](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_height_multiplier) | [EntityDB](#EntityDB).jump gets multiplied by this to get the jump
 int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
 int | [last_owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_owner_uid) | 
 [Animation](#Animation) | [current_animation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_animation) | 
 int | [idle_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=idle_counter) | 
 int | [standing_on_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=standing_on_uid) | 
-float | [velocityx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocityx) | 
-float | [velocityy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocityy) | 
+float | [velocityx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocityx) | speed, can be relative to the platform you standing on (pushblocks, elevators), use [get_velocity](#get_velocity) to get accurate speed in the game world
+float | [velocityy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=velocityy) | speed, can be relative to the platform you standing on (pushblocks, elevators), use [get_velocity](#get_velocity) to get accurate speed in the game world
 int | [holding_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=holding_uid) | 
 int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 
 int | [last_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_state) | 
@@ -5906,9 +5907,8 @@ int | [stun_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun
 int | [stun_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun_state) | 
 int | [lock_input_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_input_timer) | Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you're on a mount
 int | [wet_effect_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wet_effect_timer) | 
-int | [poison_tick_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) | 
-int | [airtime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=airtime) | airtime = falling_timer
-int | [falling_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falling_timer) | airtime = falling_timer
+int | [poison_tick_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison_tick_timer) | Used to apply damage from poison, can be set to -1 to cure poison, to set poison use [poison_entity](#poison_entity)
+int | [falling_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=falling_timer) | 
 bool | [is_poisoned()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned) | 
 int | [dark_shadow_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark_shadow_timer) | 
 int | [onfire_effect_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=onfire_effect_timer) | 

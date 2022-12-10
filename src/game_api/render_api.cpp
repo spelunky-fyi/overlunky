@@ -19,7 +19,6 @@
 #include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
 #include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
 #include "search.hpp"             // for get_address
-#include "settings_api.hpp"       //
 #include "state.hpp"              // for State, StateMemory
 #include "strings.hpp"            //
 #include "texture.hpp"            // for Texture, get_textures, get_texture
@@ -688,10 +687,8 @@ TextRenderingInfo::~TextRenderingInfo()
 }
 void TextRenderingInfo::rotate(float angle, std::optional<float> px, std::optional<float> py)
 {
-    const auto resx = static_cast<float>(get_setting(GAME_SETTING::RESOLUTIONX).value_or(16));
-    const auto resy = static_cast<float>(get_setting(GAME_SETTING::RESOLUTIONY).value_or(9));
-    const float ratio = resx / resy;
-    const float inverse_ratio = resy / resx;
+    constexpr float ratio = 16.0f / 9.0f;
+    constexpr float inverse_ratio = 9.0f / 16.0f;
 
     const float sin_a{std::sin(angle)};
     const float cos_a{std::cos(angle)};

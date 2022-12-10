@@ -31,6 +31,7 @@ struct EntityHooksInfo;
 class Entity
 {
   public:
+    /// Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the EntityDB
     EntityDB* type;
     Entity* overlay;
     EntityList items;
@@ -38,27 +39,40 @@ class Entity
     uint32_t flags;
     /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) more_flags
     uint32_t more_flags;
+    /// Unique id of the entity, save it to variable to check this entity later (don't use the whole Entity type as it will be replaced with a different one when this is destroyed)
     int32_t uid;
+    /// Number (id) of the sprite in the texture
     uint16_t animation_frame;
-    /// Don't edit this directly, use `set_draw_depth`
+    /// Depth level that this entity is drawn on.
+    /// Don't edit this directly, use `set_draw_depth` function
     uint8_t draw_depth;
     uint8_t b3f; // depth related, changed when going thru doors etc.
+    /// Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
     float x;
+    /// Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
     float y;
     float abs_x; // only for movable entities, or entities that can be spawned without overlay, for the rest it's FLOAT_MIN?
     float abs_y;
+    /// Width of the sprite
     float w;
+    /// Height of the sprite
     float h;
+    /// Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
     float special_offsetx;
+    /// Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
     float special_offsety;
     Color color;
     union
     {
         struct
         {
+            /// Offset of the hitbox in relation to the entity position
             float offsetx;
+            /// Offset of the hitbox in relation to the entity position
             float offsety;
+            /// Width of the hitbox
             float hitboxx;
+            /// Height of the hitbox
             float hitboxy;
             SHAPE shape;         // 1 = rectangle, 2 = circle
             bool hitbox_enabled; // probably, off for bg, deco, logical etc
@@ -70,8 +84,11 @@ class Entity
     float angle;
     RenderInfo* rendering_info;
     Texture* texture;
+    /// Size of the sprite in the texture
     float tilew;
+    /// Size of the sprite in the texture
     float tileh;
+    /// Use `set_layer` to change
     uint8_t layer;
     uint8_t b99; // this looks like FLOORSTYLED post-processing
     uint8_t b9a;

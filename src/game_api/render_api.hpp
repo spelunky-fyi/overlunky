@@ -97,6 +97,7 @@ struct TextRenderingInfo
     {
         return text_length;
     }
+    /// Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     void rotate(float angle, std::optional<float> px, std::optional<float> py);
 
     float x;

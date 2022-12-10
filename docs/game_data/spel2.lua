@@ -2162,6 +2162,7 @@ local function PRNG_random(self, min, max) end
     ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self): integer[]
     ---@field is_in_liquid fun(self): boolean
+    ---@field is_cursed fun(self): boolean
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -2195,7 +2196,6 @@ local function Entity_overlaps_with(self, other) end
     ---@field some_state integer
     ---@field wet_effect_timer integer
     ---@field poison_tick_timer integer
-    ---@field airtime integer
     ---@field falling_timer integer
     ---@field is_poisoned fun(self): boolean
     ---@field poison fun(self, frames: integer): nil

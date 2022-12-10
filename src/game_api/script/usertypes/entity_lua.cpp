@@ -261,6 +261,7 @@ void register_usertypes(sol::state& lua)
     movable_type["some_state"] = &Movable::some_state;
     movable_type["wet_effect_timer"] = &Movable::wet_effect_timer;
     movable_type["poison_tick_timer"] = &Movable::poison_tick_timer;
+    /// NoDoc
     movable_type["airtime"] = &Movable::falling_timer;
     movable_type["falling_timer"] = &Movable::falling_timer;
     movable_type["is_poisoned"] = &Movable::is_poisoned;

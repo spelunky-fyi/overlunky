@@ -10,7 +10,6 @@
 #include <type_traits> // for move, declval
 
 #include "render_api.hpp"   // for TextureRenderingInfo, WorldShader, TextRen...
-#include "settings_api.hpp" //
 #include "state.hpp"        // for enum_to_layer
 #include "texture.hpp"      // for Texture, get_texture
 
@@ -44,10 +43,8 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
     Quad dest{rect};
     if (angle != 0)
     {
-        const auto resx = static_cast<float>(get_setting(GAME_SETTING::RESOLUTIONX).value_or(16));
-        const auto resy = static_cast<float>(get_setting(GAME_SETTING::RESOLUTIONY).value_or(9));
-        const float ratio = resx / resy;
-        const float inverse_ratio = resy / resx;
+        constexpr float ratio = 16.0f / 9.0f;
+        constexpr float inverse_ratio = 9.0f / 16.0f;
 
         // fix ratio to 1/1 to properly rotate the coordinates
         const AABB new_rect{rect.left * ratio, rect.top, rect.right * ratio, rect.bottom};

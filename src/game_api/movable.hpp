@@ -18,10 +18,13 @@ class Movable : public Entity
     int64_t ic8;
     union
     {
+        /// {movex, movey}
         Vec2 move;
         struct
         {
+            /// Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
             float movex;
+            /// Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
             float movey;
         };
     };
@@ -29,14 +32,17 @@ class Movable : public Entity
     BUTTON buttons_previous;
     int16_t unknown_padding; // garbage?
     uint32_t stand_counter;
-    float jump_height_multiplier; // entitydb.jump gets multiplied by this value
+    /// EntityDB.jump gets multiplied by this to get the jump
+    float jump_height_multiplier;
     int32_t price;
     int32_t owner_uid;
     int32_t last_owner_uid;
     Animation* current_animation;
     uint32_t idle_counter;
     int32_t standing_on_uid;
+    /// speed, can be relative to the platform you standing on (pushblocks, elevators), use [get_velocity](#get_velocity) to get accurate speed in the game world
     float velocityx;
+    /// speed, can be relative to the platform you standing on (pushblocks, elevators), use [get_velocity](#get_velocity) to get accurate speed in the game world
     float velocityy;
     int32_t holding_uid;
     uint8_t state;
@@ -56,6 +62,7 @@ class Movable : public Entity
             uint16_t wet_effect_timer; // fading the entity to black, similar to dark_shadow_timer
         };
     };
+    /// Used to apply damage from poison, can be set to -1 to cure poison, to set poison use [poison_entity](#poison_entity)
     int16_t poison_tick_timer;
     uint8_t onfire_effect_timer;
     uint8_t exit_invincibility_timer;   // when exiting a door or a pipe, ...
@@ -68,7 +75,6 @@ class Movable : public Entity
     uint8_t i120c; // timer
     uint8_t i120d;
     uint8_t b124;
-    /// airtime = falling_timer
     uint8_t falling_timer;
     uint8_t b126; // timer, after layer change?
     uint8_t b127;
