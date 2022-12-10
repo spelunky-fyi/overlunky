@@ -2998,8 +2998,7 @@ Derived from [Entity](#Entity) [Floor](#Floor)
 Type | Name | Description
 ---- | ---- | -----------
 [Illumination](#Illumination) | [emitted_light](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_light) | 
-int | [reset_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_timer) | after triggering counts from 0 to 255, changes the 'phase_2' then counts from 0 to 104
-bool | [phase_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=phase_2) | 
+int | [reset_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_timer) | counts up from 0 after triggering, cannot shoot again until 360
 nil | [trigger(int who_uid)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) | The uid must be movable entity for ownership transfers
 
 ### LockedDoor
