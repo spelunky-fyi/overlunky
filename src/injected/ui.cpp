@@ -6685,7 +6685,8 @@ void render_game_props()
                     quest_sparrow_state.reset();
             }
             int sparrow_state = static_cast<int>(g_state->quests->sparrow_state);
-            ImGui::RadioButton("Angry##QuestSparrowAngry", &sparrow_state, -1);
+            ImGui::RadioButton("Angry##QuestSparrowAngry", &sparrow_state, -2);
+            ImGui::RadioButton("Dead##QuestSparrowDead", &sparrow_state, -1);
             ImGui::RadioButton("Not started##QuestSparrowDefault", &sparrow_state, 0);
             ImGui::RadioButton("Thief##QuestSparrowThief", &sparrow_state, 1);
             ImGui::RadioButton("Finished level as thief##QuestSparrowThiefLevel", &sparrow_state, 2);
@@ -6695,6 +6696,7 @@ void render_game_props()
             ImGui::RadioButton("Spawned in Neo Babylon##QuestSparrowSecond", &sparrow_state, 6);
             ImGui::RadioButton("Met in Neo Babylon##QuestSparrowSecondComplete", &sparrow_state, 7);
             ImGui::RadioButton("Palace basement ending##QuestSparrowTusk", &sparrow_state, 8);
+            ImGui::RadioButton("Final reward thrown##QuestSparrowFinalRewardThrown", &sparrow_state, 9);
             g_state->quests->sparrow_state = static_cast<int8_t>(sparrow_state);
             endmenu();
         }
@@ -7089,7 +7091,7 @@ void imgui_draw()
     auto base = ImGui::GetMainViewport();
     ImGuiContext& g = *GImGui;
 
-    if (get_setting(GAME_SETTING::WINDOW_MODE) == (unsigned)0)
+    if (get_setting(GAME_SETTING::WINDOW_MODE) == 0u)
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     else if (options["multi_viewports"])
         ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;

@@ -105,7 +105,8 @@ class Player : public PowerupCapable
     int32_t i16c;
     float y_pos; // not sure why, seams to be the same as abs_y
     uint8_t jump_flags_a;
-    uint8_t jump_flags_b;
+    /// can jump while airborne if greater than 0
+    int8_t coyote_timer;
     uint8_t jump_flags_c;
     uint8_t jump_flags_d;
     uint8_t timer_since_last_jump; // something different happens before or after 6
