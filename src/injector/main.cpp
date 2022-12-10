@@ -418,7 +418,7 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
 
 std::string get_dll_version(fs::path overlunky_path)
 {
-    static const HMODULE dll = LoadLibrary(overlunky_path.string().c_str());
+    static const HMODULE dll = LoadLibraryEx(overlunky_path.string().c_str(), NULL, DONT_RESOLVE_DLL_REFERENCES);
     if (!dll)
         return "UNKNOWN";
     typedef const char*(__stdcall * dll_version_fun)();
