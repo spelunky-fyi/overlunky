@@ -4477,6 +4477,8 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field height number
     ---@field font Texture
     ---@field text_size fun(self): number, number
+    ---@field rotate fun(self, angle: number, px: number?, py: number?): nil
+    ---@field set_text any @//set_text
 
 ---@class TextureDefinition
     ---@field texture_path string

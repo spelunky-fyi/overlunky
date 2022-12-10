@@ -64,7 +64,7 @@ void register_usertypes(sol::state& lua)
         sol::meta_function::addition,
         &Vec2::operator+,
         sol::meta_function::subtraction,
-        &Vec2::operator-,
+        static_cast<Vec2(Vec2::*)(const Vec2&) const>(&Vec2::operator-),
         sol::meta_function::equal_to,
         &Vec2::operator==,
         sol::meta_function::multiplication,

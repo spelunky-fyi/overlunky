@@ -9,9 +9,10 @@
 #include <tuple>       // for get
 #include <type_traits> // for move, declval
 
-#include "render_api.hpp" // for TextureRenderingInfo, WorldShader, TextRen...
-#include "state.hpp"      // for enum_to_layer
-#include "texture.hpp"    // for Texture, get_texture
+#include "render_api.hpp"   // for TextureRenderingInfo, WorldShader, TextRen...
+#include "settings_api.hpp" //
+#include "state.hpp"        // for enum_to_layer
+#include "texture.hpp"      // for Texture, get_texture
 
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
@@ -43,8 +44,10 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
     Quad dest{rect};
     if (angle != 0)
     {
-        constexpr float ratio = 16.0f / 9.0f;
-        constexpr float inverse_ratio = 9.0f / 16.0f;
+        const auto resx = static_cast<float>(get_setting(GAME_SETTING::RESOLUTIONX).value_or(16));
+        const auto resy = static_cast<float>(get_setting(GAME_SETTING::RESOLUTIONY).value_or(9));
+        const float ratio = resx / resy;
+        const float inverse_ratio = resy / resx;
 
         // fix ratio to 1/1 to properly rotate the coordinates
         const AABB new_rect{rect.left * ratio, rect.top, rect.right * ratio, rect.bottom};
@@ -316,7 +319,12 @@ void register_usertypes(sol::state& lua)
         "font",
         &TextRenderingInfo::font,
         "text_size",
-        &TextRenderingInfo::text_size);
+        &TextRenderingInfo::text_size,
+        "rotate",
+        &TextRenderingInfo::rotate,
+        "set_text",
+        // set_text);
+        static_cast<void (TextRenderingInfo::*)(std::u16string, float, float, uint32_t, uint32_t)>(&TextRenderingInfo::set_text));
 
     /* TextRenderingInfo
     // new

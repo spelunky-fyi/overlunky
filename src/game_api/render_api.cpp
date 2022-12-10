@@ -19,6 +19,7 @@
 #include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
 #include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
 #include "search.hpp"             // for get_address
+#include "settings_api.hpp"       //
 #include "state.hpp"              // for State, StateMemory
 #include "strings.hpp"            //
 #include "texture.hpp"            // for Texture, get_textures, get_texture
@@ -636,10 +637,30 @@ void TextRenderingInfo::set_text(const std::u16string text, float _x, float _y, 
     static size_t text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
     if (text_rendering_func1_offset != 0)
     {
+        if (dest != nullptr)
+        {
+            game_free(dest);
+            dest = nullptr;
+        }
+        if (source != nullptr)
+        {
+            game_free(source);
+            source = nullptr;
+        }
+        if (unknown6 != nullptr)
+        {
+            game_free(unknown6);
+            unknown6 = nullptr;
+        }
+
         typedef void func1(uint32_t, const char16_t*, uint32_t, float, float, TextRenderingInfo*, float, float, uint32_t, uint32_t, int8_t);
         static auto f1 = (func1*)(text_rendering_func1_offset);
         f1(fontstyle, text.c_str(), 2, _x, _y, this, scale_x, scale_y, alignment, 2, 0);
     }
+}
+void TextRenderingInfo::set_text(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
 }
 void TextRenderingInfo::set_text(const std::string text, float _x, float _y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
 {
@@ -663,5 +684,53 @@ TextRenderingInfo::~TextRenderingInfo()
     if (unknown6 != nullptr)
     {
         game_free(unknown6);
+    }
+}
+void TextRenderingInfo::rotate(float angle, std::optional<float> px, std::optional<float> py)
+{
+    const auto resx = static_cast<float>(get_setting(GAME_SETTING::RESOLUTIONX).value_or(16));
+    const auto resy = static_cast<float>(get_setting(GAME_SETTING::RESOLUTIONY).value_or(9));
+    const float ratio = resx / resy;
+    const float inverse_ratio = resy / resx;
+
+    const float sin_a{std::sin(angle)};
+    const float cos_a{std::cos(angle)};
+
+    const Vec2 p{px.value_or(0.f), py.value_or(0.f)};
+    const Vec2 mp{-px.value_or(0.f), -py.value_or(0.f)};
+
+    auto rotate_around_pivot = [=](Vec2 in) -> Vec2
+    {
+        in += mp;
+        const Vec2 old = in;
+        in.x = old.x * cos_a - old.y * sin_a;
+        in.y = old.y * cos_a + old.x * sin_a;
+        in += p;
+        return in;
+    };
+
+    for (uint32_t i = 0; i < size(); ++i)
+    {
+        auto letter = (dest + i);
+        letter->bottom.A.x *= ratio;
+        letter->bottom.B.x *= ratio;
+        letter->bottom.C.x *= ratio;
+        letter->top.A.x *= ratio;
+        letter->top.B.x *= ratio;
+        letter->top.C.x *= ratio;
+
+        letter->bottom.A = rotate_around_pivot(letter->bottom.A);
+        letter->bottom.B = rotate_around_pivot(letter->bottom.B);
+        letter->bottom.C = rotate_around_pivot(letter->bottom.C);
+        letter->top.A = rotate_around_pivot(letter->top.A);
+        letter->top.B = rotate_around_pivot(letter->top.B);
+        letter->top.C = rotate_around_pivot(letter->top.C);
+
+        letter->bottom.A.x *= inverse_ratio;
+        letter->bottom.B.x *= inverse_ratio;
+        letter->bottom.C.x *= inverse_ratio;
+        letter->top.A.x *= inverse_ratio;
+        letter->top.B.x *= inverse_ratio;
+        letter->top.C.x *= inverse_ratio;
     }
 }

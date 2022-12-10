@@ -61,28 +61,43 @@ enum class WorldShader : std::uint8_t
     DeferredTextureColor_EmissiveColorizedGlow_Saturation = 0x18,
 };
 
+struct Letter
+{
+    Vec2 center()
+    {
+        // there is probably better way of doing this?
+        auto right = std::max({bottom.A.x, bottom.B.x, bottom.C.x, top.A.x, top.B.x, top.C.x});
+        auto left = std::min({bottom.A.x, bottom.B.x, bottom.C.x, top.A.x, top.B.x, top.C.x});
+        auto _top = std::max({bottom.A.y, bottom.B.y, bottom.C.y, top.A.y, top.B.y, top.C.y});
+        auto _bottom = std::min({bottom.A.y, bottom.B.y, bottom.C.y, top.A.y, top.B.y, top.C.y});
+        return AABB{left, _bottom, right, _top}.center();
+    }
+    Triangle bottom;
+    Triangle top;
+};
+
 struct TextRenderingInfo
 {
-    /// NoDoc
     TextRenderingInfo() = default;
     TextRenderingInfo(TextRenderingInfo&) = delete;
     ~TextRenderingInfo();
 
+    /// Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
+    void set_text(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+
     void set_text(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
     void set_text(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
-    /// {width, height}
-    std::pair<float, float> text_size()
+
+    /// {width, height}, is only updated when you set/change the text
+    std::pair<float, float> text_size() const
     {
         return {width, height};
     }
-    uint32_t length()
+    uint32_t size() const
     {
         return text_length;
     }
-    uint32_t size()
-    {
-        return text_length;
-    }
+    void rotate(float angle, std::optional<float> px, std::optional<float> py);
 
     float x;
     float y;
@@ -91,12 +106,10 @@ struct TextRenderingInfo
     float height;
     uint32_t unknown3; // padding probably
 
-    // These 2 fields are sized 12 * wcslen(input_text)
-    // maybe it's something like the Quad in the RenderInfo, with the unknown after each pair?
-    float* dest;
-    float* source; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
+    Letter* dest{nullptr};
+    Letter* source{nullptr};
     // 6 * wcslen(input_text), just numbers in order 0, 1, 2 ... have some strage effect if you change them
-    uint16_t* unknown6;
+    uint16_t* unknown6{nullptr};
 
     uint16_t special_character; // changes texture used to the `special_texture_id`, only from the last character, so setting 2 will change the last two characters
                                 // setting higher value than the `text_length` will crash

@@ -2431,7 +2431,9 @@ int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tex
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
 Texture | [font](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=font) | 
-tuple&lt;float, float&gt; | [text_size()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_size) | {width, height}
+tuple&lt;float, float&gt; | [text_size()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_size) | {width, height}, is only updated when you set/change the text
+nil | [rotate(float angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | 
+ | [set_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_text) | 
 
 ### TextureDefinition
 

@@ -38,6 +38,10 @@ struct Vec2
     {
         return Vec2{x - a.x, y - a.y};
     }
+    Vec2 operator-() const
+    {
+        return {-x, -y};
+    }
     Vec2 operator*(const Vec2& a) const
     {
         return Vec2{x * a.x, y * a.y};
@@ -230,6 +234,57 @@ struct AABB
     float top{0};
     float right{0};
     float bottom{0};
+};
+
+struct Triangle
+{
+    Triangle() = default;
+    Triangle(const Triangle&) = default;
+    Triangle(Vec2& _a, Vec2& _b, Vec2& _c)
+        : A(_a), B(_b), C(_c){};
+    Triangle(float ax, float ay, float bx, float by, float cx, float cy)
+        : A(ax, ay), B(bx, by), C(cx, cy){};
+
+    Triangle& offset(const Vec2& off)
+    {
+        A += off;
+        B += off;
+        C += off;
+        return *this;
+    }
+    Triangle& offset(float x, float y)
+    {
+        return offset({x, y});
+    }
+    Triangle operator+(const Vec2& a) const
+    {
+        Triangle new_triangle{*this};
+        new_triangle.offset(a);
+        return new_triangle;
+    }
+    Triangle operator-(const Vec2& a) const
+    {
+        Triangle new_triangle{*this};
+        new_triangle.offset(-a);
+        return new_triangle;
+    }
+    Triangle& rotate(float angle, float px, float py)
+    {
+        A.rotate(angle, px, py);
+        B.rotate(angle, px, py);
+        C.rotate(angle, px, py);
+        return *this;
+    }
+
+    /// Returns the corners
+    operator std::tuple<Vec2, Vec2, Vec2>()
+    {
+        return {A, B, C};
+    }
+
+    Vec2 A;
+    Vec2 B;
+    Vec2 C;
 };
 
 struct Quad
