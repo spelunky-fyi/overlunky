@@ -34,7 +34,9 @@ class Entity
     EntityDB* type;
     Entity* overlay;
     EntityList items;
+    /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) entity_flags
     uint32_t flags;
+    /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) more_flags
     uint32_t more_flags;
     int32_t uid;
     uint16_t animation_frame;
@@ -165,6 +167,10 @@ class Entity
     bool is_player();
     bool is_movable();
     bool is_liquid();
+    bool is_cursed()
+    {
+        return more_flags & 0x4000;
+    };
 
     std::uint32_t set_on_dtor(std::function<void(Entity*)> cb);
     std::uint32_t reserve_callback_id();
