@@ -3776,6 +3776,7 @@ Type | Name | Description
 ---- | ---- | -----------
 int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) | 
 bool | [walking_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walking_left) | 
+bool | [unfriendly](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unfriendly) | moves away from its target instead of towards it
 
 ### CritterDrone
 
@@ -3788,6 +3789,7 @@ Type | Name | Description
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 float | [applied_hor_momentum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=applied_hor_momentum) | 
 float | [applied_ver_momentum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=applied_ver_momentum) | 
+bool | [unfriendly](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unfriendly) | moves away from its target instead of towards it
 int | [move_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_timer) | 
 
 ### CritterFirefly
@@ -4431,6 +4433,7 @@ int | [petting_by_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [yell_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yell_counter) | counts up to 400 (6.6 sec), when 0 the pet yells out
 int | [func_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=func_timer) | used when free running in the camp
 int | [active_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active_state) | -1 = sitting and yelling, 0 = either running, dead or picked up
+int | [petted_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=petted_counter) | number of times petted in the camp
 
 ### Player
 
@@ -4446,6 +4449,7 @@ int | [linked_companion_child](https://github.com/spelunky-fyi/overlunky/search?
 [Ai](#Ai) | [ai](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai) | 
 [PlayerSlot](#PlayerSlot) | [input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input) | 
 [Entity](#Entity) | [basecamp_button_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=basecamp_button_entity) | Used in base camp to talk with the [NPC](#NPC)'s
+int | [coyote_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coyote_timer) | can jump while airborne if greater than 0
 nil | [set_jetpack_fuel(int fuel)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) | 
 int | [kapala_blood_amount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) | 
 string | [get_name()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_name) | Get the full name of the character, this will be the modded name not only the vanilla name.
@@ -4693,6 +4697,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 Type | Name | Description
 ---- | ---- | -----------
 bool | [show_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_text) | if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
+bool | [special_message_shown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_message_shown) | one way door message has been shown
 
 ### Vlad
 
@@ -6055,6 +6060,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 Type | Name | Description
 ---- | ---- | -----------
 int | [attached_to_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attached_to_uid) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | counts down from 20 while the ball is eligible to break a floor and tries to break it at 0
 float | [x_pos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x_pos) | 
 float | [y_pos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_pos) | 
 

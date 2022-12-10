@@ -2296,6 +2296,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field ai Ai
     ---@field input PlayerSlot
     ---@field basecamp_button_entity Entity
+    ---@field coyote_timer integer
     ---@field set_jetpack_fuel fun(self, fuel: integer): nil
     ---@field kapala_blood_amount fun(self): integer
     ---@field get_name fun(self): string
@@ -2679,6 +2680,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field yell_counter integer
     ---@field func_timer integer
     ---@field active_state integer
+    ---@field petted_counter integer
 
 ---@class Caveman : WalkingMonster
     ---@field wake_up_timer integer
@@ -2765,6 +2767,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class VanHorsing : NPC
     ---@field show_text boolean
+    ---@field special_message_shown boolean
 
 ---@class WitchDoctor : WalkingMonster
     ---@field sound SoundMeta
@@ -3082,6 +3085,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class CritterCrab : Critter
     ---@field walk_pause_timer integer
     ---@field walking_left boolean
+    ---@field unfriendly boolean
 
 ---@class CritterButterfly : Critter
     ---@field change_direction_timer integer
@@ -3122,6 +3126,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sound SoundMeta
     ---@field applied_hor_momentum number
     ---@field applied_ver_momentum number
+    ---@field unfriendly boolean
     ---@field move_timer integer
 
 ---@class CritterSlime : Critter
@@ -3350,6 +3355,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class PunishBall : Movable
     ---@field attached_to_uid integer
+    ---@field timer integer
     ---@field x_pos number
     ---@field y_pos number
 
@@ -7872,6 +7878,9 @@ SOUND_TYPE = {
 }
 ---@alias SOUND_TYPE integer
 SPARROW = {
+  ANGRY = -2,
+  DEAD = -1,
+  FINAL_REWARD_THROWN = 9,
   FINISHED_LEVEL_WITH_THIEF_STATUS = 2,
   FIRST_ENCOUNTER_ROPES_THROWN = 4,
   FIRST_HIDEOUT_SPAWNED_ROPE_THROW = 3,

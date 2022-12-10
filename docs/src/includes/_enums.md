@@ -851,6 +851,8 @@ Sparrow quest states
 
 Name | Data | Description
 ---- | ---- | -----------
+[ANGRY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPARROW.ANGRY) | -2 | 
+[DEAD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPARROW.DEAD) | -1 | 
 [QUEST_NOT_STARTED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPARROW.QUEST_NOT_STARTED) | 0 | 
 [THIEF_STATUS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPARROW.THIEF_STATUS) | 1 | 
 [FINISHED_LEVEL_WITH_THIEF_STATUS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPARROW.FINISHED_LEVEL_WITH_THIEF_STATUS) | 2 | 
@@ -860,6 +862,7 @@ Name | Data | Description
 [SECOND_HIDEOUT_SPAWNED_NEOBAB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPARROW.SECOND_HIDEOUT_SPAWNED_NEOBAB) | 6 | 
 [SECOND_ENCOUNTER_INTERACTED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPARROW.SECOND_ENCOUNTER_INTERACTED) | 7 | 
 [MEETING_AT_TUSK_BASEMENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPARROW.MEETING_AT_TUSK_BASEMENT) | 8 | 
+[FINAL_REWARD_THROWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPARROW.FINAL_REWARD_THROWN) | 9 | 
 
 ## SPAWN_TYPE
 
