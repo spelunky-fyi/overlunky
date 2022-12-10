@@ -2364,7 +2364,9 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class LaserTrap : Floor
     ---@field emitted_light Illumination
+    ---@field timer integer
     ---@field reset_timer integer
+    ---@field phase_2 boolean
     ---@field trigger fun(self, who_uid: integer): nil
 
 ---@class SparkTrap : Floor

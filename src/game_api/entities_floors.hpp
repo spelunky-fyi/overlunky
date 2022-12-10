@@ -203,8 +203,19 @@ class LaserTrap : public Floor
 {
   public:
     Illumination* emitted_light;
-    /// counts up from 0 after triggering, cannot shoot again until 360
-    uint16_t reset_timer;
+    union
+    {
+        /// counts up from 0 after triggering, cannot shoot again until 360
+        uint16_t timer;
+        // Deprecated
+        struct
+        {
+            /// NoDoc
+            uint8_t reset_timer;
+            /// NoDoc
+            bool phase_2;
+        };
+    };
     /// The uid must be movable entity for ownership transfers
     void trigger(int32_t who_uid)
     {
