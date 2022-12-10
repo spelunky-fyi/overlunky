@@ -102,7 +102,7 @@ class Player : public PowerupCapable
     int32_t i168;
     int32_t i16c;
     float y_pos; // not sure why, seams to be the same as abs_y
-    uint8_t jump_flags_a;
+    uint8_t drop_through_timer; // Set when dropping off a ledge, through a platform, etc. Set to max value on normal jumps.
     /// can jump while airborne if greater than 0
     int8_t coyote_timer;
     uint8_t jump_flags_c;

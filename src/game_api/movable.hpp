@@ -62,7 +62,7 @@ class Movable : public Entity
     uint8_t invincibility_frames_timer; // blinks the entity
     uint8_t frozen_timer;
     uint8_t unknown_damage_counter_a;
-    uint8_t unknown_damage_counter_b;
+    uint8_t damage_iframe_power;
     uint8_t i120a; // timer, damage related
     uint8_t i120b; // timer
     uint8_t i120c; // timer

@@ -55,7 +55,7 @@ struct EntityDB
         };
         CollisionInfo default_collision_info;
     };
-    int32_t field_3C;
+    int32_t collision2_mask;
     int32_t field_40;
     int32_t field_44;
     int32_t default_flags;
