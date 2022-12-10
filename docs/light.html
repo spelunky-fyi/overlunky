@@ -15655,13 +15655,8 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 <tr>
 <td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=reset_timer">reset_timer</a></td>
-<td>after triggering counts from 0 to 255, changes the &#39;phase_2&#39; then counts from 0 to 104</td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=phase_2">phase_2</a></td>
-<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td>counts up from 0 after triggering, cannot shoot again until 360</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -17505,6 +17500,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=walking_left">walking_left</a></td>
 <td></td>
 </tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unfriendly">unfriendly</a></td>
+<td>moves away from its target instead of towards it</td>
+</tr>
 </tbody></table>
 <h3 id='CritterDrone'>CritterDrone</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#PowerupCapable">PowerupCapable</a> <a href="#Monster">Monster</a> <a href="#Critter">Critter</a></p>
@@ -17535,6 +17535,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=applied_ver_momentum">applied_ver_momentum</a></td>
 <td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unfriendly">unfriendly</a></td>
+<td>moves away from its target instead of towards it</td>
 </tr>
 <tr>
 <td>int</td>
@@ -19272,6 +19277,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=active_state">active_state</a></td>
 <td>-1 = sitting and yelling, 0 = either running, dead or picked up</td>
 </tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=petted_counter">petted_counter</a></td>
+<td>number of times petted in the camp</td>
+</tr>
 </tbody></table>
 <h3 id='Player'>Player</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#PowerupCapable">PowerupCapable</a></p>
@@ -19317,6 +19327,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=basecamp_button_entity">basecamp_button_entity</a></td>
 <td>Used in base camp to talk with the <a href="#NPC">NPC</a>&#39;s</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=coyote_timer">coyote_timer</a></td>
+<td>can jump while airborne if greater than 0</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -19972,6 +19987,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=show_text">show_text</a></td>
 <td>if set to true, he will say &#39;i&#39;ve been hunting this fiend a long time!&#39; when on screen</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=special_message_shown">special_message_shown</a></td>
+<td>one way door message has been shown</td>
 </tr>
 </tbody></table>
 <h3 id='Vlad'>Vlad</h3>
@@ -23080,6 +23100,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attached_to_uid">attached_to_uid</a></td>
 <td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td>counts down from 20 while the ball is eligible to break a floor and tries to break it at 0</td>
 </tr>
 <tr>
 <td>float</td>
@@ -26597,6 +26622,16 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SPARROW.ANGRY">ANGRY</a></td>
+<td>-2</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SPARROW.DEAD">DEAD</a></td>
+<td>-1</td>
+<td></td>
+</tr>
+<tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SPARROW.QUEST_NOT_STARTED">QUEST_NOT_STARTED</a></td>
 <td>0</td>
 <td></td>
@@ -26639,6 +26674,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SPARROW.MEETING_AT_TUSK_BASEMENT">MEETING_AT_TUSK_BASEMENT</a></td>
 <td>8</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SPARROW.FINAL_REWARD_THROWN">FINAL_REWARD_THROWN</a></td>
+<td>9</td>
 <td></td>
 </tr>
 </tbody></table>
