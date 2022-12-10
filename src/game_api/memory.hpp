@@ -52,7 +52,7 @@ struct Memory
     {
         static Memory mem{[]()
                           {
-                              auto exe = (size_t)GetModuleHandleA("Spel2.exe");
+                              auto exe = (size_t)GetModuleHandleA(NULL);
 
                               // Skipping bundle for faster memory search
                               auto after_bundle_ = find_after_bundle(exe);
