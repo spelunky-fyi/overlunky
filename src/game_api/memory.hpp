@@ -53,12 +53,7 @@ struct Memory
     {
         static Memory mem{[]()
                           {
-                              char filename[MAX_PATH + 1];
-                              auto len = GetModuleFileName(NULL, filename, MAX_PATH + 1);
-                              if (!len)
-                                  PANIC("Can't find the game in memory");
-                              auto name = std::filesystem::path(filename).filename().string();
-                              auto exe = (size_t)GetModuleHandleA(name.c_str());
+                              auto exe = (size_t)GetModuleHandleA(NULL);
 
                               // Skipping bundle for faster memory search
                               auto after_bundle_ = find_after_bundle(exe);
