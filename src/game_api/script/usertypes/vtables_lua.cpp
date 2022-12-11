@@ -3,11 +3,9 @@
 #include "entities_items.hpp"                      // for Container
 #include "entity.hpp"                              // for Entity
 #include "hookable_vtable.hpp"                     // for HookableVTable
-#include "level_api.hpp"                           // for ThemeInfo
 #include "movable.hpp"                             // for Movable
 #include "render_api.hpp"                          // for RenderInfo
 #include "script/usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
-#include "state.hpp"                               // for State
 
 namespace NVTables
 {
@@ -22,7 +20,8 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"kill", 0x3, void(bool, Entity*)>,
         VTableEntry<"collision1", 0x4, void(Entity*)>,
         VTableEntry<"destroy", 0x5, void()>,
-        VTableEntry<"trigger_action", 0x18, void(Movable*)>,
+        VTableEntry<"get_held_entity", 0x16, Entity*()>,
+        VTableEntry<"trigger_action", 0x18, void(Entity*)>,
         VTableEntry<"collision2", 0x1a, void(Entity*)>>;
     static EntityVTable entity_vtable(lua, lua["Entity"], "ENTITY_OVERRIDE");
 

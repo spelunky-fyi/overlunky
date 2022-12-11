@@ -3,7 +3,7 @@
 #include <type_traits> // for true_type, is_invocable_r_v
 
 template <class CallableT, class Signature>
-    requires(std::is_function_v<Signature>)
+requires(std::is_function_v<Signature>)
 struct is_invocable_as : std::false_type
 {
 };
@@ -15,7 +15,7 @@ template <class CallableT, class Signature>
 inline constexpr auto is_invocable_as_v = is_invocable_as<CallableT, Signature>::value;
 
 template <class FunT>
-    requires is_invocable_as_v<FunT, void()>
+requires is_invocable_as_v<FunT, void()>
 struct OnScopeExit
 {
     OnScopeExit(FunT&& fun)
@@ -171,7 +171,7 @@ template <class T>
 inline constexpr auto is_optional_v = is_instantiation_of_v<std::optional, T> || is_instantiation_of_v<sol::optional, T>;
 
 template <class LhsSignature, class RhsSignature>
-    requires(std::is_function_v<LhsSignature> && std::is_function_v<RhsSignature>)
+requires(std::is_function_v<LhsSignature> && std::is_function_v<RhsSignature>)
 struct is_same_function : std::false_type
 {
 };
@@ -183,7 +183,7 @@ template <class LhsSignature, class RhsSignature>
 inline constexpr auto is_same_function_v = is_same_function<LhsSignature, RhsSignature>::value;
 
 template <class LhsSignature, class RhsSignature>
-    requires(std::is_function_v<LhsSignature> && std::is_function_v<RhsSignature>)
+requires(std::is_function_v<LhsSignature> && std::is_function_v<RhsSignature>)
 struct is_same_args : std::false_type
 {
 };
