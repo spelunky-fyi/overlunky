@@ -275,6 +275,17 @@ struct Triangle
         C.rotate(angle, px, py);
         return *this;
     }
+    /// Also known as centroid
+    Vec2 center()
+    {
+        return {(A.x + B.x + C.x) / 3, (A.y + B.y + C.y) / 3};
+    }
+
+    /*
+    /// Returns the corners
+    std::tuple<Vec2, Vec2, Vec2> split()
+    {} // just for the autodoc
+    */
 
     /// Returns the corners
     operator std::tuple<Vec2, Vec2, Vec2>()

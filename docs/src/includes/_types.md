@@ -566,6 +566,15 @@ Type | Name | Description
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 
+### Letter
+
+
+Type | Name | Description
+---- | ---- | -----------
+[Triangle](#Triangle) | [bottom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom) | 
+[Triangle](#Triangle) | [top](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top) | 
+[Vec2](#Vec2) | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | 
+
 ### MovableBehavior
 
 Opaque handle to a movable behavior used in some [Movable](#Movable) functions
@@ -663,8 +672,26 @@ Type | Name | Description
 int | [chance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chance) | Chance in percent to pick `tile_code` over `alt_tile_code`, ignored if `chance == 0`. Defaults to 100.
 [TILE_CODE](#TILE_CODE) | [alt_tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=alt_tile_code) | Alternative tile code, ignored if `chance == 100`. Defaults to 0.
 
+### Triangle
+
+
+Type | Name | Description
+---- | ---- | -----------
+[Triangle](#Triangle) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
+[Triangle](#Triangle) | [new(Triangle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
+[Triangle](#Triangle) | [new(Vec2& _a, Vec2& _b, Vec2& _c)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
+[Triangle](#Triangle) | [new(float ax, float ay, float bx, float by, float cx, float cy)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
+[Vec2](#Vec2) | [A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=A) | 
+[Vec2](#Vec2) | [B](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=B) | 
+[Vec2](#Vec2) | [C](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=C) | 
+[Triangle](#Triangle)& | [offset(const Vec2& off)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | 
+[Triangle](#Triangle)& | [offset(float x, float y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | 
+[Triangle](#Triangle)& | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | 
+tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corners
+
 ### Vec2
 
+Simple object to hold pair of coordinates
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2431,6 +2458,8 @@ int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tex
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
 Texture | [font](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=font) | 
+array&lt;[Letter](#Letter)&gt; | [get_dest()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dest) | Returns refrence to the letter coordinates relative to the x,y position
+array&lt;[Letter](#Letter)&gt; | [get_source()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_source) | Returns refrence to the letter coordinates in the texture
 tuple&lt;float, float&gt; | [text_size()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_size) | {width, height}, is only updated when you set/change the text
 nil | [rotate(float angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
 nil | [set_text(const string text, float scale_x, float scale_y, int alignment, int fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_text) | Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters

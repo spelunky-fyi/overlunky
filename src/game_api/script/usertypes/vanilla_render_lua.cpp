@@ -299,6 +299,15 @@ void register_usertypes(sol::state& lua)
     texturerenderinginfo_type["source_get_quad"] = &TextureRenderingInfo::source_get_quad;
     texturerenderinginfo_type["source_set_quad"] = &TextureRenderingInfo::source_set_quad;
 
+    lua.new_usertype<Letter>(
+        "Letter",
+        "bottom",
+        &Letter::bottom,
+        "top",
+        &Letter::top,
+        "center",
+        &Letter::center);
+
     lua.new_usertype<TextRenderingInfo>(
         "TextRenderingInfo",
         "new",
@@ -315,6 +324,10 @@ void register_usertypes(sol::state& lua)
         &TextRenderingInfo::height,
         "font",
         &TextRenderingInfo::font,
+        "get_dest",
+        &TextRenderingInfo::get_dest,
+        "get_source",
+        &TextRenderingInfo::get_source,
         "text_size",
         &TextRenderingInfo::text_size,
         "rotate",

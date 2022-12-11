@@ -88,6 +88,17 @@ struct TextRenderingInfo
     void set_text(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
     void set_text(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
 
+    /// Returns refrence to the letter coordinates relative to the x,y position
+    std::span<Letter> get_dest()
+    {
+        return {dest, (dest + text_length)};
+    }
+    /// Returns refrence to the letter coordinates in the texture
+    std::span<Letter> get_source()
+    {
+        return {source, (source + text_length)};
+    }
+
     /// {width, height}, is only updated when you set/change the text
     std::pair<float, float> text_size() const
     {

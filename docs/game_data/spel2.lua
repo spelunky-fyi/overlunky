@@ -4475,6 +4475,11 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field source_get_quad fun(self): Quad
     ---@field source_set_quad fun(self, quad: Quad): nil
 
+---@class Letter
+    ---@field bottom Triangle
+    ---@field top Triangle
+    ---@field center fun(self): Vec2
+
 ---@class TextRenderingInfo
     ---@field new any @sol::initializers(&TextRenderingInfo_ctor)
     ---@field x number
@@ -4483,6 +4488,8 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field width number
     ---@field height number
     ---@field font Texture
+    ---@field get_dest fun(self): Letter[]
+    ---@field get_source fun(self): Letter[]
     ---@field text_size fun(self): number, number
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil
@@ -4524,6 +4531,20 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
 ---@param amount_y number
 ---@overload fun(self, amount: number): AABB
 local function AABB_extrude(self, amount_x, amount_y) end
+
+---@class Triangle
+    ---@field A Vec2
+    ---@field B Vec2
+    ---@field C Vec2
+    ---@field offset Triangle_offset
+    ---@field rotate fun(self, angle: number, px: number, py: number): Triangle
+    ---@field split fun(self): Vec2, Vec2, Vec2
+
+---@class Triangle_offset
+---@param x number
+---@param y number
+---@overload fun(self, off: Vec2): Triangle
+local function Triangle_offset(self, x, y) end
 
 ---@class Quad
     ---@field bottom_left_x number
@@ -5280,6 +5301,26 @@ function AABB.new(self, number, number> tuple) end
 ---@param bottom_ number
 ---@return AABB
 function AABB.new(self, left_, top_, right_, bottom_) end
+
+Triangle = nil
+---@return Triangle
+function Triangle.new(self) end
+---@param triangle Triangle
+---@return Triangle
+function Triangle.new(self, triangle) end
+---@param _a Vec2
+---@param _b Vec2
+---@param _c Vec2
+---@return Triangle
+function Triangle.new(self, _a, _b, _c) end
+---@param ax number
+---@param ay number
+---@param bx number
+---@param by number
+---@param cx number
+---@param cy number
+---@return Triangle
+function Triangle.new(self, ax, ay, bx, by, cx, cy) end
 
 Quad = nil
 ---@return Quad
