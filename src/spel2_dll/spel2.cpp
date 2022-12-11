@@ -447,7 +447,7 @@ void Spelunky_DrawText(const char* text, float x, float y, float scale_x, float 
 {
     TextRenderingInfo tri{};
     tri.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
-    RenderAPI::get().draw_text(&tri, std::move(Color{color}));
+    RenderAPI::get().draw_text(&tri, Color{color});
 }
 
 void Spelunky_EnabledAdvancedHud()
