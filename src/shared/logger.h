@@ -60,6 +60,7 @@ struct fmt::formatter<ByteStr>
     try                                                     \
     {                                                       \
         fmt::print("[" name "] " format "\n", __VA_ARGS__); \
+        fflush(stdout);                                     \
     }                                                       \
     catch (fmt::format_error & e)                           \
     {                                                       \

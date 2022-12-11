@@ -1,8 +1,9 @@
 #pragma once
 
-#include <Windows.h>   // for GetModuleHandleA, LPVOID
-#include <cstddef>     // for size_t, byte, NULL
-#include <cstdint>     // for int32_t, int64_t, uint32_t, uint64_t, uint8_t
+#include <Windows.h> // for GetModuleHandleA, LPVOID
+#include <cstddef>   // for size_t, byte, NULL
+#include <cstdint>   // for int32_t, int64_t, uint32_t, uint64_t, uint8_t
+#include <filesystem>
 #include <memory>      // for unique_ptr
 #include <string>      // for string, string_literals
 #include <string_view> // for string_view
@@ -52,7 +53,7 @@ struct Memory
     {
         static Memory mem{[]()
                           {
-                              auto exe = (size_t)GetModuleHandleA("Spel2.exe");
+                              auto exe = (size_t)GetModuleHandleA(NULL);
 
                               // Skipping bundle for faster memory search
                               auto after_bundle_ = find_after_bundle(exe);

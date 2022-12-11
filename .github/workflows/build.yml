@@ -46,8 +46,8 @@ jobs:
       - name: Create artifacts
         run: |
           mkdir Overlunky
-          move build\bin\Release\injected.dll Overlunky\injected.dll
-          move build\bin\Release\injector.exe Overlunky\Overlunky.exe
+          move build\bin\Release\Overlunky.dll Overlunky\Overlunky.dll
+          move build\bin\Release\Overlunky.exe Overlunky\Overlunky.exe
           move README.md Overlunky\README.txt
           move examples Overlunky\Scripts
           7z a Overlunky_${{ steps.get_version.outputs.VERSION }}.zip Overlunky\

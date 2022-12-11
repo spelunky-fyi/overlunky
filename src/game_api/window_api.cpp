@@ -13,6 +13,17 @@
 #include "logger.h"
 #include "memory.hpp"
 
+bool detect_wine()
+{
+    static const HMODULE hntdll = GetModuleHandle("ntdll.dll");
+    if (!hntdll)
+        return false;
+    static const void* wgv = GetProcAddress(hntdll, "wine_get_version");
+    if (!wgv)
+        return false;
+    return true;
+}
+
 IDXGISwapChain* g_SwapChain{nullptr};
 ID3D11Device* g_Device{nullptr};
 ID3D11DeviceContext* g_Context{nullptr};
@@ -311,7 +322,7 @@ void hook_steam_overlay()
     // Update 2 days later: They immediately changed for the first time in years
     // const size_t present_offset = 0x88E30;
     // const size_t resize_offset = 0x890F0;
-    if (steam_overlay == nullptr)
+    if (steam_overlay == nullptr || detect_wine())
     {
         // Steam overlay is not loaded, so we're probably running on steam emu
         // Just do the old vtable hook and call it a day
