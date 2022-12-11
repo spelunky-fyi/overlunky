@@ -401,8 +401,8 @@ std::array g_community_tile_codes{
         {
             Entity* slidingwall = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
             // hook the function that dereferences the top part of the trap (which is nullptr right now)
-            hook_vtable<void(Entity*, Entity*)>(
-                slidingwall, [](Entity*, Entity*, void (*)(Entity*, Entity*)) {}, 26);
+            hook_vtable<void(Entity*, Entity*), 26>(
+                slidingwall, [](Entity*, Entity*, void (*)(Entity*, Entity*)) {});
         },
     },
     CommunityTileCode{"spikeball_trap", "ENT_TYPE_FLOOR_SPIKEBALL_CEILING"},
@@ -1750,7 +1750,7 @@ void LevelGenSystem::init()
     for (ThemeInfo* theme : themes)
     {
         using PopulateLevelFun = void(ThemeInfo * self, uint64_t param_2, uint64_t param_3, uint64_t param_4);
-        hook_vtable<PopulateLevelFun>(
+        hook_vtable<PopulateLevelFun, 0xd>(
             theme, [](ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)
             {
                 post_room_generation();
@@ -1764,10 +1764,9 @@ void LevelGenSystem::init()
                     }
                 }
 
-                original(self, param_2, param_3, param_4); },
-            0xd);
+                original(self, param_2, param_3, param_4); });
         using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
-        hook_vtable<DoProceduralSpawnFun>(
+        hook_vtable<DoProceduralSpawnFun, 0x33>(
             theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
             {
                 push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
@@ -1778,8 +1777,7 @@ void LevelGenSystem::init()
                 {
                     return;
                 }
-                original(self, spawn_info); },
-            0x33);
+                original(self, spawn_info); });
     }
 }
 

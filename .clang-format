@@ -1,5 +1,5 @@
 Language: Cpp
-Standard: c++17
+Standard: c++20
 Cpp11BracedListStyle: true
 IndentWidth: 4
 BreakBeforeBraces: Allman
@@ -12,3 +12,5 @@ AllowAllArgumentsOnNextLine: true
 AllowShortBlocksOnASingleLine: Always
 AllowShortFunctionsOnASingleLine: None
 PointerAlignment: Left
+RequiresClausePosition: OwnLine
+IndentRequiresClause: false

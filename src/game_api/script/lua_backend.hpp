@@ -24,11 +24,12 @@
 #include <variant>       // for variant
 #include <vector>        // for vector
 
-#include "aliases.hpp"   // for IMAGE, JournalPageType, SPAWN_TYPE
-#include "level_api.hpp" // IWYU pragma: keep
-#include "logger.h"      // for DEBUG
-#include "script.hpp"    // for ScriptMessage, ScriptImage (ptr only), Scri...
-#include "util.hpp"      // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
+#include "aliases.hpp"      // for IMAGE, JournalPageType, SPAWN_TYPE
+#include "hook_handler.hpp" // for HookHandler
+#include "level_api.hpp"    // IWYU pragma: keep
+#include "logger.h"         // for DEBUG
+#include "script.hpp"       // for ScriptMessage, ScriptImage (ptr only), Scri...
+#include "util.hpp"         // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
 
 extern std::recursive_mutex global_lua_lock;
 
@@ -183,20 +184,19 @@ struct EntitySpawnCallback
     sol::function func;
 };
 
-using TimerCallback = std::variant<IntervalCallback, TimeoutCallback>; // NoAlias
-
-enum class CallbackType
+struct EntityInstagibCallback
 {
-    None,
-    Normal,
-    Entity,
-    Screen
+    int id;
+    int uid;
+    sol::function func;
 };
+
+using TimerCallback = std::variant<IntervalCallback, TimeoutCallback>; // NoAlias
 
 struct CurrentCallback
 {
-    int uid;
-    int id;
+    int32_t aux_id;
+    int32_t id;
     CallbackType type;
 };
 
@@ -227,7 +227,7 @@ struct ScriptState
 struct UserData
 {
     sol::object data;
-    std::uint32_t hook_id;
+    std::uint32_t dtor_hook_id;
 };
 
 struct SavedUserData
@@ -241,8 +241,11 @@ struct SavedUserData
 struct StateMemory;
 class SoundManager;
 class LuaConsole;
+struct RenderInfo;
 
 class LuaBackend
+    : public HookHandler<Entity, CallbackType::Entity>,
+      public HookHandler<RenderInfo, CallbackType::Entity>
 {
   public:
     using ProtectedBackend = GlobalMutexProtectedResource<LuaBackend*, &global_lua_lock>;
@@ -258,7 +261,7 @@ class LuaBackend
     ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;
-    CurrentCallback current_cb = {-1, 0, CallbackType::None};
+    CurrentCallback current_cb = {0, 0, CallbackType::None};
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
@@ -271,12 +274,10 @@ class LuaBackend
     std::vector<LevelGenCallback> post_tile_code_callbacks;
     std::vector<EntitySpawnCallback> pre_entity_spawn_callbacks;
     std::vector<EntitySpawnCallback> post_entity_spawn_callbacks;
+    std::vector<EntityInstagibCallback> pre_entity_instagib_callbacks;
     std::vector<std::uint32_t> chance_callbacks;
     std::vector<std::uint32_t> extra_spawn_callbacks;
     std::vector<int> clear_callbacks;
-    std::vector<std::pair<int, std::uint32_t>> entity_hooks;
-    std::vector<std::pair<int, std::uint32_t>> clear_entity_hooks;
-    std::vector<std::pair<int, std::uint32_t>> entity_dtor_hooks;
     std::vector<std::pair<int, std::uint32_t>> screen_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<CustomMovableBehaviorStorage> custom_movable_behaviors;
@@ -300,11 +301,6 @@ class LuaBackend
 
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();
-
-    template <class... Args>
-    bool handle_function(sol::function func, Args&&... args);
-    template <class Ret, class... Args>
-    std::optional<Ret> handle_function_with_return(sol::function func, Args&&... args);
 
     void clear();
     void clear_all_callbacks();
@@ -342,9 +338,8 @@ class LuaBackend
     void draw(ImDrawList* dl);
     void render_options();
 
-    bool is_callback_cleared(int32_t callback_id);
-    bool is_entity_callback_cleared(std::pair<int, uint32_t> callback_id);
-    bool is_screen_callback_cleared(std::pair<int, uint32_t> callback_id);
+    bool is_callback_cleared(int32_t callback_id) const;
+    bool is_screen_callback_cleared(std::pair<int32_t, uint32_t> callback_id) const;
 
     bool pre_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
@@ -370,8 +365,7 @@ class LuaBackend
     Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
     void post_entity_spawn(Entity* entity, int spawn_type_flags);
 
-    void hook_entity_dtor(Entity* entity);
-    void pre_entity_destroyed(Entity* entity);
+    bool pre_entity_instagib(Entity* victim);
 
     void process_vanilla_render_callbacks(ON event);
     void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
@@ -384,8 +378,10 @@ class LuaBackend
     std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages);
 
     CurrentCallback get_current_callback();
-    void set_current_callback(int uid, int id, CallbackType type);
+    void set_current_callback(int32_t aux_id, int32_t id, CallbackType type);
     void clear_current_callback();
+
+    void set_error(std::string err);
 
     static void for_each_backend(std::function<bool(LockedBackend)> fun);
     static LockedBackend get_backend(std::string_view id);
@@ -398,60 +394,6 @@ class LuaBackend
     static void push_calling_backend(LuaBackend*);
     static void pop_calling_backend(LuaBackend*);
 };
-
-template <class... Args>
-bool LuaBackend::handle_function(sol::function func, Args&&... args)
-{
-    return handle_function_with_return<std::monostate>(std::move(func), std::forward<Args>(args)...) != std::nullopt;
-}
-template <class Ret, class... Args>
-std::optional<Ret> LuaBackend::handle_function_with_return(sol::function func, Args&&... args)
-{
-    LuaBackend::push_calling_backend(this);
-    ON_SCOPE_EXIT(LuaBackend::pop_calling_backend(this));
-
-    auto lua_result = func(std::forward<Args>(args)...);
-    if (!lua_result.valid())
-    {
-        sol::error e = lua_result;
-        result = e.what();
-#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-        std::istringstream errors(result);
-        while (!errors.eof())
-        {
-            std::string eline;
-            getline(errors, eline);
-            messages.push_back({eline, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
-            DEBUG("{}", result);
-            if (messages.size() > 30)
-                messages.pop_front();
-        }
-#endif
-        return std::nullopt;
-    }
-    if constexpr (std::is_same_v<Ret, std::monostate>)
-    {
-        return std::optional{std::monostate{}};
-    }
-    else
-    {
-        try
-        {
-            auto return_type = lua_result.get_type();
-            if (return_type == sol::type::none || return_type == sol::type::nil)
-            {
-                return std::optional<Ret>{};
-            }
-            Ret return_value = lua_result;
-            return return_value;
-        }
-        catch (...)
-        {
-            result = "Unexpected return type from function.";
-            return std::nullopt;
-        }
-    }
-}
 
 template <class Inheriting>
 class LockableLuaBackend : public LuaBackend

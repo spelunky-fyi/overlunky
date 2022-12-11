@@ -1,9 +1,8 @@
 #pragma once
 
-#include <Windows.h> // for GetModuleHandleA, LPVOID
-#include <cstddef>   // for size_t, byte, NULL
-#include <cstdint>   // for int32_t, int64_t, uint32_t, uint64_t, uint8_t
-#include <filesystem>
+#include <Windows.h>   // for GetModuleHandleA, LPVOID
+#include <cstddef>     // for size_t, byte, NULL
+#include <cstdint>     // for int32_t, int64_t, uint32_t, uint64_t, uint8_t
 #include <memory>      // for unique_ptr
 #include <string>      // for string, string_literals
 #include <string_view> // for string_view
@@ -99,23 +98,26 @@ void recover_mem(std::string name, size_t addr = NULL);
 
 template <typename T>
 requires std::is_trivially_copyable_v<T>
-    std::string_view to_le_bytes(const T& payload)
+std::string_view to_le_bytes(const T& payload)
 {
     return std::string_view{reinterpret_cast<const char*>(&payload), sizeof(payload)};
 }
 
 template <class T>
-requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_recoverable(std::string name, size_t addr, const T& payload, bool prot)
+requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>)
+void write_mem_recoverable(std::string name, size_t addr, const T& payload, bool prot)
 {
     write_mem_recoverable(name, addr, to_le_bytes(payload), prot);
 }
 template <class T>
-requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_prot(size_t addr, const T& payload, bool prot)
+requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>)
+void write_mem_prot(size_t addr, const T& payload, bool prot)
 {
     write_mem_prot(addr, to_le_bytes(payload), prot);
 }
 template <class T>
-requires std::is_trivially_copyable_v<T> void write_mem_prot(void* addr, const T& payload, bool prot)
+requires std::is_trivially_copyable_v<T>
+void write_mem_prot(void* addr, const T& payload, bool prot)
 {
     write_mem_prot((size_t)addr, to_le_bytes(payload), prot);
 }

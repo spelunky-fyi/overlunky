@@ -18,11 +18,12 @@
 #include <unordered_map> // for unordered_map
 #include <utility>       // for max, min
 
-#include "logger.h"               // for DEBUG
-#include "lua_vm.hpp"             // for execute_lua, get_lua_vm
-#include "script/lua_backend.hpp" // for LuaBackend, ON, ON::SCRIPT_DISABLE
-#include "script_util.hpp"        // for sanitize
-#include "state.hpp"              // for State
+#include "logger.h"                       // for DEBUG
+#include "lua_vm.hpp"                     // for execute_lua, get_lua_vm
+#include "script/handle_lua_function.hpp" // for handle_function
+#include "script/lua_backend.hpp"         // for LuaBackend, ON, ON::SCRIPT_DISABLE
+#include "script_util.hpp"                // for sanitize
+#include "state.hpp"                      // for State
 
 class LuaConsole;
 class SoundManager;
@@ -190,7 +191,7 @@ void ScriptImpl::set_enabled(bool enbl)
         {
             if (callback.screen == cb_type)
             {
-                handle_function(callback.func);
+                handle_function<void>(this, callback.func);
                 callback.lastRan = now;
             }
         }
