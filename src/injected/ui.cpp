@@ -19,7 +19,6 @@
 #include <iomanip>
 #include <locale>
 #include <map>
-#include <regex>
 #include <string>
 
 #pragma warning(push, 0)
@@ -55,6 +54,9 @@
 #include "decode_audio_file.hpp"
 
 #pragma warning(disable : 4366)
+
+using cvt_type = std::codecvt_utf8<wchar_t>;
+std::wstring_convert<cvt_type, wchar_t> cvt;
 
 template <class T>
 concept Script = std::is_same_v<T, SpelunkyConsole> || std::is_same_v<T, SpelunkyScript>;
@@ -544,9 +546,20 @@ void load_script(std::string file, bool enable = true)
     if (!data.fail())
     {
         buf << data.rdbuf();
-        /*size_t slash = file.find_last_of("/\\");
-        if (slash != std::string::npos)
-            file = file.substr(slash + 1);*/
+        SpelunkyScript* script = new SpelunkyScript(buf.str(), file, g_SoundManager.get(), g_Console.get(), enable);
+        g_scripts[script->get_file()] = std::unique_ptr<SpelunkyScript>{script};
+        data.close();
+    }
+}
+
+void load_script(std::wstring wfile, bool enable = true)
+{
+    std::string file(cvt.to_bytes(wfile));
+    std::ifstream data(wfile.c_str(), std::ios::in | std::ios::binary);
+    std::ostringstream buf;
+    if (!data.fail())
+    {
+        buf << data.rdbuf();
         SpelunkyScript* script = new SpelunkyScript(buf.str(), file, g_SoundManager.get(), g_Console.get(), enable);
         g_scripts[script->get_file()] = std::unique_ptr<SpelunkyScript>{script};
         data.close();
@@ -631,14 +644,12 @@ bool SliderByte(const char* label, char* value, char min = 0, char max = 0, cons
 
 void refresh_script_files()
 {
-    std::regex luareg("\\.lua$", std::regex_constants::icase);
-    std::regex mainluareg("^main\\.lua$", std::regex_constants::icase);
     g_script_files.clear();
     if (load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
         for (const auto& file : std::filesystem::directory_iterator(scriptpath))
         {
-            if (std::regex_search(file.path().string(), luareg))
+            if (file.path().extension().wstring() == L".lua")
             {
                 g_script_files.push_back(file.path());
             }
@@ -666,7 +677,7 @@ void refresh_script_files()
     {
         for (const auto& file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
         {
-            if (std::regex_search(file.path().filename().string(), mainluareg))
+            if (file.path().filename().wstring() == L"main.lua")
             {
                 g_script_files.push_back(file.path());
             }
@@ -692,7 +703,7 @@ void refresh_script_files()
 
     for (auto file : g_script_files)
     {
-        load_script(file.string(), false);
+        load_script(file.wstring(), false);
     }
 }
 
@@ -4957,10 +4968,13 @@ void render_script_files()
     for (auto file : g_script_files)
     {
         ImGui::PushID(num++);
-        std::string buttstr = file.parent_path().filename().string() + "/" + file.filename().string();
+        auto buttpath = file.parent_path().filename() / file.filename();
+        std::wstring wbuttstr = buttpath.wstring();
+        std::string buttstr(cvt.to_bytes(wbuttstr));
+
         if (ImGui::Button(buttstr.c_str()))
         {
-            load_script(file.string().c_str(), false);
+            load_script(file.wstring(), false);
         }
         ImGui::PopID();
     }
@@ -6894,9 +6908,6 @@ void load_font()
 
     if (SHGetKnownFolderPath(FOLDERID_Fonts, 0, NULL, &fontdir) == S_OK)
     {
-        using cvt_type = std::codecvt_utf8<wchar_t>;
-        std::wstring_convert<cvt_type, wchar_t> cvt;
-
         std::string fontpath_jp(cvt.to_bytes(fontdir) + "\\YuGothB.ttc");
         if (GetFileAttributesA(fontpath_jp.c_str()) != INVALID_FILE_ATTRIBUTES)
             font_jp = fontpath_jp;
