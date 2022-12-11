@@ -213,7 +213,6 @@ struct CustomMovableBehaviorStorage
 
 struct ScriptState
 {
-    Player* player;
     uint32_t screen;
     uint32_t time_level;
     uint32_t time_total;
@@ -255,7 +254,7 @@ class LuaBackend
     std::unordered_set<std::string> loaded_modules;
 
     std::string result;
-    ScriptState state = {nullptr, 0, 0, 0, 0, 0, 0, 0, 0};
+    ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;
     CurrentCallback current_cb = {-1, 0, CallbackType::None};
