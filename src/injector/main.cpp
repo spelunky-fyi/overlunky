@@ -155,6 +155,9 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
         if (answer == IDNO)
             return true;
 
+        remove("Overlunky.dll.old");
+        rename("Overlunky.dll", "Overlunky.dll.old");
+
         INFO("AutoUpdate: Downloading {}...", sSaveFilename);
 
         // Open file to write
@@ -257,8 +260,8 @@ bool update_launcher(const char* sURL, const char* sSaveFilename)
             return false;
         }
 
-        remove("Overlunky.old");
-        rename("Overlunky.exe", "Overlunky.old");
+        remove("Overlunky.exe.old");
+        rename("Overlunky.exe", "Overlunky.exe.old");
 
         INFO("AutoUpdate: Downloading {}...", sSaveFilename);
 
