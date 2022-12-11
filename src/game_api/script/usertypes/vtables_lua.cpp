@@ -6,6 +6,7 @@
 #include "movable.hpp"                             // for Movable
 #include "render_api.hpp"                          // for RenderInfo
 #include "script/usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
+#include "state.hpp"                               // for State
 
 namespace NVTables
 {
