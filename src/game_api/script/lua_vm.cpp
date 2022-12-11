@@ -43,6 +43,7 @@
 #include "lua_libs/lua_libs.hpp"                   // for require_format_lua
 #include "lua_require.hpp"                         // for register_custom_r...
 #include "math.hpp"                                // for AABB
+#include "memory.hpp"                              // for Memory
 #include "movable.hpp"                             // for Movable
 #include "online.hpp"                              // for get_online
 #include "overloaded.hpp"                          // for overloaded
@@ -1687,7 +1688,7 @@ end
     /// Get the rva for a pattern name
     lua["get_rva"] = [](std::string_view address_name) -> size_t
     {
-        return get_address(address_name) - (size_t)GetModuleHandleA("Spel2.exe"); // shouldn't this be  - Memory::get().at_exe(0) ?
+        return get_address(address_name) - Memory::get().at_exe(0);
     };
 
     /// Log to spelunky.log

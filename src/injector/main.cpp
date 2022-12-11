@@ -34,6 +34,7 @@
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 bool g_console = false;
+std::string g_exe = "Spel2.exe";
 
 fs::path get_dll_path(const char* rel_path)
 {
@@ -313,19 +314,12 @@ void wait()
     {
         while (true)
         {
-            if (auto res = find_process("Spel2.exe"))
+            if (auto res = find_process(g_exe))
                 std::this_thread::sleep_for(1s);
             else
                 break;
         }
     }
-}
-
-void inject_proc(fs::path overlunky_path, Process proc)
-{
-    inject_dll(proc, overlunky_path.string());
-    INFO("DLL injected");
-    wait();
 }
 
 bool inject_search(fs::path overlunky_path)
@@ -362,6 +356,7 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
 {
     auto exe_dir = fs::canonical(exe_path).parent_path();
     auto cwd = fs::current_path();
+    g_exe = exe_path.filename().string();
 
     char dll_path[MAX_PATH] = {};
     sprintf_s(dll_path, MAX_PATH, "%s", overlunky_path.string().c_str());
@@ -406,9 +401,11 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
     }
     else if (CreateProcess((LPSTR)exe_path.string().c_str(), NULL, NULL, NULL, TRUE, 0, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi))
     {
-        auto proc = Process{pi.hProcess, {"Spel2.exe", pi.dwProcessId}};
+        auto proc = Process{pi.hProcess, {g_exe, pi.dwProcessId}};
         INFO("Game launched, injecting DLL...");
-        inject_proc(overlunky_path, proc);
+        inject_dll(proc, overlunky_path.string());
+        INFO("DLL injected");
+        wait();
         CloseHandle(pi.hThread);
         return false;
     }
