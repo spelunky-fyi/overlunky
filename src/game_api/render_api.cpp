@@ -304,21 +304,6 @@ bool& get_journal_enabled()
     return g_journal_enabled;
 }
 
-void RenderAPI::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
-{
-    TextRenderingInfo tri{};
-    tri.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
-
-    static size_t text_rendering_func2_offset = get_address("draw_text"sv);
-
-    if (text_rendering_func2_offset != 0)
-    {
-        typedef void func2(const TextRenderingInfo*, Color* color);
-        static func2* f2 = (func2*)(text_rendering_func2_offset);
-        f2(&tri, &color);
-    }
-}
-
 void RenderAPI::draw_text(const TextRenderingInfo* tri, Color color)
 {
     static size_t text_rendering_func2_offset = get_address("draw_text"sv);

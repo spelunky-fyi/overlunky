@@ -185,7 +185,6 @@ struct RenderAPI
     void set_lut(TEXTURE texture_id, uint8_t layer);
     void reset_lut(uint8_t layer);
 
-    void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
     void draw_text(const TextRenderingInfo* tri, Color color);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
     void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color);

@@ -15,12 +15,14 @@
 
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
-    RenderAPI::get().draw_text(text, x, y, scale_x, scale_y, color, alignment, fontstyle);
+    TextRenderingInfo tri{};
+    tri.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
+    RenderAPI::get().draw_text(&tri, std::move(color));
 }
 
 void VanillaRenderContext::draw_text(const TextRenderingInfo* tri, Color color)
 {
-    RenderAPI::get().draw_text(tri, color);
+    RenderAPI::get().draw_text(tri, std::move(color));
 }
 
 std::pair<float, float> VanillaRenderContext::draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
