@@ -147,6 +147,7 @@ std::map<std::string, int64_t> keys{
     {"camera_up", OL_KEY_SHIFT | 'I'},
     {"camera_right", OL_KEY_SHIFT | 'L'},
     {"camera_down", OL_KEY_SHIFT | 'K'},
+    {"camera_reset", OL_KEY_SHIFT | 'U'},
     {"coordinate_left", 0x0},
     {"coordinate_up", 0x0},
     {"coordinate_right", 0x0},
@@ -1492,7 +1493,8 @@ void force_lights()
 
 void set_camera_bounds(bool enabled)
 {
-    if (enabled)
+    enable_camera_bounds = enabled;
+    if (enabled && g_state->theme != 10)
     {
         g_state->camera->bounds_left = 0.5f;
         g_state->camera->bounds_right = g_state->w * 10.0f + 4.5f;
@@ -1510,6 +1512,7 @@ void set_camera_bounds(bool enabled)
 
 void force_zoom()
 {
+    set_camera_bounds(g_state->camera->bounds_top == 124.5f);
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
         set_zoom();
@@ -2412,39 +2415,61 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("camera_left", wParam))
     {
-        enable_camera_bounds = false;
-        set_camera_bounds(enable_camera_bounds);
         g_state->camera->focused_entity_uid = -1;
-        g_state->camera->focus_x -= 0.5f;
+        if (enable_camera_bounds)
+        {
+            g_state->camera->focus_x = g_state->camera->adjusted_focus_x;
+            g_state->camera->focus_y = g_state->camera->adjusted_focus_y;
+        }
+        set_camera_bounds(false);
+        g_state->camera->focus_x -= g_camera_speed;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
     }
     else if (pressed("camera_right", wParam))
     {
-        enable_camera_bounds = false;
-        set_camera_bounds(enable_camera_bounds);
         g_state->camera->focused_entity_uid = -1;
-        g_state->camera->focus_x += 0.5f;
+        if (enable_camera_bounds)
+        {
+            g_state->camera->focus_x = g_state->camera->adjusted_focus_x;
+            g_state->camera->focus_y = g_state->camera->adjusted_focus_y;
+        }
+        set_camera_bounds(false);
+        g_state->camera->focus_x += g_camera_speed;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
     }
     else if (pressed("camera_up", wParam))
     {
-        enable_camera_bounds = false;
-        set_camera_bounds(enable_camera_bounds);
         g_state->camera->focused_entity_uid = -1;
-        g_state->camera->focus_y += 0.5f;
+        if (enable_camera_bounds)
+        {
+            g_state->camera->focus_x = g_state->camera->adjusted_focus_x;
+            g_state->camera->focus_y = g_state->camera->adjusted_focus_y;
+        }
+        set_camera_bounds(false);
+        g_state->camera->focus_y += g_camera_speed;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
     }
     else if (pressed("camera_down", wParam))
     {
-        enable_camera_bounds = false;
-        set_camera_bounds(enable_camera_bounds);
         g_state->camera->focused_entity_uid = -1;
-        g_state->camera->focus_y -= 0.5f;
+        if (enable_camera_bounds)
+        {
+            g_state->camera->focus_x = g_state->camera->adjusted_focus_x;
+            g_state->camera->focus_y = g_state->camera->adjusted_focus_y;
+        }
+        set_camera_bounds(false);
+        g_state->camera->focus_y -= g_camera_speed;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
+    }
+    else if (pressed("camera_reset", wParam))
+    {
+        set_camera_bounds(true);
+        if (g_players.size() > 0)
+            g_state->camera->focused_entity_uid = g_players.at(0)->uid;
     }
     else if (pressed("coordinate_left", wParam))
     {
@@ -2788,12 +2813,12 @@ void endmenu()
         ImGui::EndMenu();
 }
 
-void render_uid(int uid, const char* section, bool rembtn = false)
+bool render_uid(int uid, const char* section, bool rembtn = false)
 {
     std::string uidc = std::to_string(uid);
     auto ptype = UI::get_entity_type(uid);
     if (ptype == 0 || ptype == UINT32_MAX)
-        return;
+        return false;
     std::string typec = std::to_string(ptype);
     std::string pname = entity_names[ptype];
     ImGui::PushID(section);
@@ -2815,6 +2840,7 @@ void render_uid(int uid, const char* section, bool rembtn = false)
         ImGui::PopID();
     }
     ImGui::PopID();
+    return true;
 }
 
 void render_light(const char* name, LightParams* light)
@@ -3409,26 +3435,32 @@ void render_camera()
         set_zoom();
     }
     tooltip("Automatically fit level width to screen.", "zoom_auto");
-    render_uid(g_state->camera->focused_entity_uid, "FocusedEntity");
+    ImGui::Text("Focus:");
     ImGui::SameLine();
-    if (ImGui::Button("!X"))
-        g_state->camera->focused_entity_uid = -1;
-    tooltip("Remove camera focus.");
-    ImGui::SameLine();
-    if (ImGui::Button("Focus player"))
+    if (render_uid(g_state->camera->focused_entity_uid, "FocusedEntity"))
     {
-        if (!g_players.empty())
+        ImGui::SameLine();
+        if (ImGui::Button("Unfocus"))
+            g_state->camera->focused_entity_uid = -1;
+        tooltip("Remove camera focus. Drag to move the camera around.", "mouse_camera_drag");
+    }
+    if (!g_players.empty())
+    {
+        if (g_state->camera->focused_entity_uid != g_players.at(0)->uid)
         {
-            g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+            ImGui::SameLine();
+            if (ImGui::Button("Player"))
+                g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+            tooltip("Focus the player.", "camera_reset");
         }
     }
-    tooltip("Doubleclick to return camera to player. Hold to drag camera around.", "mouse_camera_drag");
-    ImGui::SameLine();
-    if (ImGui::Button("Focus Selected"))
+    if (g_last_id != -1 && g_state->camera->focused_entity_uid != g_last_id)
     {
-        g_state->camera->focused_entity_uid = g_last_id;
+        ImGui::SameLine();
+        if (ImGui::Button("Selected"))
+            g_state->camera->focused_entity_uid = g_last_id;
+        tooltip("Focus the selected entity");
     }
-    tooltip("Click to focus other entities. Hold to move camera around.", "mouse_camera_drag");
     ImGui::InputFloat("Camera Focus X##CameraFocusX", &g_state->camera->focus_x, 0.2f, 1.0f);
     ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2f, 1.0f);
     ImGui::InputFloat("Camera Real X##CameraRealX", &g_state->camera->adjusted_focus_x, 0.2f, 1.0f);
@@ -3443,7 +3475,7 @@ void render_camera()
         {
             set_camera_bounds(enable_camera_bounds);
         }
-        tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.");
+        tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.", "camera_reset");
         if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
         {
             UI::set_camp_camera_bounds_enabled(enable_camp_camera);
