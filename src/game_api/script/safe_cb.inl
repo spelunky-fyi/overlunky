@@ -223,6 +223,13 @@ static auto make_safe_clearable_cb(
             [=](const LuaBackend& backend)
             { return !backend.HookHandler<Entity, CallbackType::Entity>::is_hook_cleared(id, aux_id); });
     }
+    else if constexpr (CbType == CallbackType::Theme)
+    {
+        return detail::make_safe_cb_impl<FunT>::build(
+            COMMON_ARGS,
+            [=](const LuaBackend& backend)
+            { return !backend.HookHandler<ThemeInfo, CallbackType::Theme>::is_hook_cleared(id, aux_id); });
+    }
     else if constexpr (CbType == CallbackType::Screen)
     {
         return detail::make_safe_cb_impl<FunT>::build(

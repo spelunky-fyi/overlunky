@@ -183,7 +183,7 @@ class ThemeInfo
     {
     }
 
-    virtual bool get_unknown1() = 0;
+    virtual void reset_theme_flags() = 0;
 
     /// dwelling,tidepool: unset levelgen.flags.flag12
     /// jungle,volcana.olmec,icecaves,neobab,cog,duat,abzu,tiamat,eggplant,hundun,basecamp,arena: nop
@@ -198,9 +198,9 @@ class ThemeInfo
     virtual void init_level() = 0;
 
     /// most themes call the same function, some check whether they are in CO
-    virtual void unknown_v4() = 0;
+    virtual void init_rooms() = 0;
 
-    virtual void unknown_v5() = 0;
+    virtual void generate_path() = 0;
 
     /// dwelling: does stuff when level == 4 or udjat present
     /// jungle: when black market present
@@ -209,23 +209,18 @@ class ThemeInfo
     // ???
     virtual void add_special_rooms() = 0;
 
-    /// can't trigger, dwelling (quillback) and abzu do something special (arena just returns)
-    virtual void unknown_v7() = 0;
+    virtual void add_player_coffin() = 0;
 
-    /// does something depending on levelgen.data.unknown7
-    virtual void unknown_v8() = 0;
+    virtual void add_dirk_coffin() = 0;
 
-    // ???
+    virtual void add_idol() = 0;
+
     virtual void add_vault() = 0;
 
-    // ???
     virtual void add_coffin() = 0;
 
     /// metal clanking and air of oppression
     virtual void add_special_feeling() = 0;
-
-    // Note: Inserted somewhere between init_flags and spawn_level
-    virtual bool unknown_v12() = 0;
 
     /// spawns all floor etc tiles based on the room layout
     /// disable this and only the player is spawned in the level
@@ -305,13 +300,13 @@ class ThemeInfo
     virtual uint32_t get_floor_spreading_type2() = 0;
 
     /// all return false, except olmec, temple, neobab, cog, duat
-    virtual bool unknown_v30() = 0;
+    virtual bool get_transition_styled_floor() = 0;
 
     /// determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme
     /// returns 85 by default, except for: olmec: 15, cog: 23
-    virtual uint32_t get_transition_block_modifier() = 0;
+    virtual uint32_t get_transition_floor_modifier() = 0;
 
-    virtual uint32_t unknown_v32() = 0;
+    virtual uint32_t get_transition_styled_floor_type() = 0;
 
     /// always returns 778 ENT_TYPE_BG_LEVEL_BACKWALL
     virtual uint32_t get_backwall_type() = 0;
@@ -334,7 +329,7 @@ class ThemeInfo
     virtual bool get_player_damage() = 0;
 
     /// returns true by default, except CO, duat (these also have no bg, but don't know if related)
-    virtual bool unknown_v38() = 0;
+    virtual bool get_explosion_soot() = 0;
 
     /// returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
     virtual uint32_t get_backlayer_lut() = 0;
@@ -354,7 +349,7 @@ class ThemeInfo
     virtual uint8_t get_vault_level() = 0;
 
     /// index == 0 ? return unknown1 : return unknown2
-    virtual bool get_unknown_1_or_2(uint8_t index) = 0;
+    virtual bool get_theme_flag(uint8_t index) = 0;
 
     // e.g. for dwelling:
     // texture_id == -4 -> returns 122 BG_CAVE_0
@@ -376,10 +371,10 @@ class ThemeInfo
 
     /// default = return state.h - 1
     /// for special levels (black market, vlad, ...) fixed heights are returned
-    virtual uint32_t get_level_height() = 0;
+    virtual uint32_t get_exit_room_y_level() = 0;
 
     /// returns a value that appears to affect room generation and is based on current world,level
-    virtual uint32_t unknown_v47() = 0;
+    virtual uint32_t get_shop_chance() = 0;
 
     /// used e.g. in Vlad's castle to insert the big banner in the center with the two demon statues
     /// also implemented for neobab (i think in the zoos)
@@ -399,6 +394,18 @@ class ThemeInfo
     virtual void spawn_extra() = 0;
 
     virtual void unknown_v51() = 0;
+
+    // Themes don't seem to know their real THEME, so LevelGenSystem::init tells them
+    // I'm sure this is a brilliant place to store it
+    void set_aux_id(uint32_t id)
+    {
+        padding3 = id;
+    }
+
+    uint32_t get_aux_id()
+    {
+        return padding3;
+    }
 };
 static_assert(sizeof(ThemeInfo) == 0x20);
 
@@ -576,18 +583,18 @@ enum class DYNAMIC_TEXTURE : int32_t
 enum class THEME_OVERRIDE : uint8_t
 {
     BASE,
-    UNKNOWN_V1,
+    RESET_THEME_FLAGS,
     INIT_FLAGS,
     INIT_LEVEL,
-    UNKNOWN_V4,
-    UNKNOWN_V5,
+    INIT_ROOMS,
+    GENERATE_PATH,
     SPECIAL_ROOMS,
-    UNKNOWN_V7,
-    UNKNOWN_V8,
+    PLAYER_COFFIN,
+    DIRK_COFFIN,
+    IDOL,
     VAULT,
     COFFIN,
     FEELING,
-    UNKNOWN_V12,
     SPAWN_LEVEL,
     SPAWN_BORDER,
     POST_PROCESS_LEVEL,
@@ -605,24 +612,24 @@ enum class THEME_OVERRIDE : uint8_t
     BASE_ID,
     ENT_FLOOR_SPREADING,
     ENT_FLOOR_SPREADING2,
-    UNKNOWN_V30,
+    TRANSITION_STYLED_FLOOR,
     TRANSITION_MODIFIER,
-    UNKNOWN_V32,
+    ENT_TRANSITION_STYLED_FLOOR,
     ENT_BACKWALL,
     ENT_BORDER,
     ENT_CRITTER,
     GRAVITY,
     PLAYER_DAMAGE,
-    UNKNOWN_V38,
+    SOOT,
     TEXTURE_BACKLAYER_LUT,
     BACKLAYER_LIGHT_LEVEL,
     LOOP,
     VAULT_LEVEL,
-    GET_UNKNOWN1_OR_2,
+    THEME_FLAG,
     TEXTURE_DYNAMIC,
     PRE_TRANSITION,
-    LEVEL_HEIGHT,
-    UNKNOWN_V47,
+    EXIT_ROOM_Y_LEVEL,
+    SHOP_CHANCE,
     SPAWN_DECORATION,
     SPAWN_DECORATION2,
     SPAWN_EXTRA,

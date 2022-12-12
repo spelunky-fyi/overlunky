@@ -245,7 +245,8 @@ struct RenderInfo;
 
 class LuaBackend
     : public HookHandler<Entity, CallbackType::Entity>,
-      public HookHandler<RenderInfo, CallbackType::Entity>
+      public HookHandler<RenderInfo, CallbackType::Entity>,
+      public HookHandler<ThemeInfo, CallbackType::Theme>
 {
   public:
     using ProtectedBackend = GlobalMutexProtectedResource<LuaBackend*, &global_lua_lock>;

@@ -1747,8 +1747,11 @@ void LevelGenSystem::init()
 {
     data->init();
 
+    uint32_t real_id = 0;
     for (ThemeInfo* theme : themes)
     {
+        theme->set_aux_id(++real_id);
+
         using PopulateLevelFun = void(ThemeInfo * self, uint64_t param_2, uint64_t param_3, uint64_t param_4);
         hook_vtable<PopulateLevelFun, 0xd>(
             theme, [](ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)

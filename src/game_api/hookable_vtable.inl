@@ -411,9 +411,9 @@ struct HookableVTable
     }
 
     // clang-format off
-    using MyHookInfos = VTableHookInfos<SelfT, 
+    using MyHookInfos = VTableHookInfos<SelfT,
         VTableHooksSignature<
-            typename VTableEntryImpl<VTableEntries, SelfT, CbType>::FreeSignature, 
+            typename VTableEntryImpl<VTableEntries, SelfT, CbType>::FreeSignature,
             VTableEntries::MyDoHooks
         >...>;
     // clang-format on
