@@ -126,18 +126,20 @@ class Ghost : public Monster
   public:
     /// for SMALL_HAPPY this is also the sequence timer of its various states
     uint16_t split_timer;
-    uint8_t unknown1_timer;
+    uint8_t wobble_timer;
     uint8_t unknown2;
     float velocity_multiplier;
-    uint16_t unknown3; // layer change related
+    uint16_t pace_timer; // Controls ghost pacing when all players are dead.
     GHOST_BEHAVIOR ghost_behaviour;
-    uint8_t unknown6;
-    bool unknown7;
+    bool blown_by_player;
+    bool happy_dancing_clockwise; // Randomly set at the start of happy's dance phase to determine the dance rotation direction.
     uint8_t unknown8;
     uint8_t unknown9;
     uint8_t unknown10;
     Illumination* emitted_light;
     Entity* linked_ghost;
+    float target_dist_visibility_factor; // Value from 0.5 to 1, based on the distance to the ghost's target, multiplied by the target_layer_visibility_factor to set the transparency and illumination of the ghost.
+    float target_layer_visibility_factor; // Value from 0 to 1, based on how long the ghost has been in the same layer as its target, multiplied by the target_dist_visibility_factor to set the transparency and illumination of the ghost.
     SoundMeta* sound;
 };
 
