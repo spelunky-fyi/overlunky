@@ -328,6 +328,8 @@ void register_usertypes(sol::state& lua)
         &TextRenderingInfo::width,
         "height",
         &TextRenderingInfo::height,
+        "special_texture_id",
+        &TextRenderingInfo::special_texture_id,
         "font",
         &TextRenderingInfo::font,
         "get_dest",

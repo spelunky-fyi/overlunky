@@ -154,10 +154,12 @@ struct TextRenderingInfo
     // 6 * wcslen(input_text), just numbers in order 0, 1, 2 ... have some strage effect if you change them
     uint16_t* unknown6{nullptr};
 
-    uint16_t special_character; // changes texture used to the `special_texture_id`, only from the last character, so setting 2 will change the last two characters
-                                // setting higher value than the `text_length` will crash
-    uint16_t unknown8;          // padding probably
-    int32_t special_texture_id; // default -1 wich is the buttons texture
+    uint16_t nof_special_character; // number of special characters, still not sure how the game known which ones are the special ones?
+                                    // setting higher value than the `text_length` will crash
+    uint16_t unknown8;              // padding probably
+
+    /// Used to draw buttons default is -1 wich is the buttons texture
+    int32_t special_texture_id;
 
     uint8_t shader; // ? changing it can change the text color, or make the text all rectangles?
     uint8_t padding1[3];
