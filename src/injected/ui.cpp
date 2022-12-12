@@ -5640,20 +5640,7 @@ void render_entity_finder()
         search_entity_layer = -1;
 
     static int search_entity_depth[2] = {0, 52};
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.25f);
-    if (ImGui::SliderInt("##EntitySearchDepthMin", &search_entity_depth[0], 0, 52, "%d", ImGuiSliderFlags_AlwaysClamp))
-    {
-        if (search_entity_depth[1] < search_entity_depth[0])
-            search_entity_depth[1] = search_entity_depth[0];
-    }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.25f);
-    if (ImGui::SliderInt("Draw depth##EntitySearchDepthMax", &search_entity_depth[1], 0, 52, "%d", ImGuiSliderFlags_AlwaysClamp))
-    {
-        if (search_entity_depth[0] > search_entity_depth[1])
-            search_entity_depth[0] = search_entity_depth[1];
-    }
-    ImGui::PopItemWidth();
-    // ImGui::DragIntRange2("Draw depth##EntitySearchDepth", &search_entity_depth[0], &search_entity_depth[1], 1.0f, 0, 52);
+    ImGui::SliderInt2("Draw depth##EntitySearchDepth", search_entity_depth, 0, 52, "%d", ImGuiSliderFlags_AlwaysClamp);
 
     static int search_entity_mask = 0;
     if (submenu("Mask##EntitySearchMask"))
