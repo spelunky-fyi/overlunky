@@ -307,6 +307,10 @@ void register_usertypes(sol::state& lua)
         &Letter::bottom,
         "top",
         &Letter::top,
+        "get_quad",
+        &Letter::get_quad,
+        "set_quad",
+        &Letter::set_quad,
         "center",
         &Letter::center);
 

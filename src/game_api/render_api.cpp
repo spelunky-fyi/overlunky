@@ -585,7 +585,7 @@ void TextureRenderingInfo::set_destination(const AABB& bbox)
     destination_bottom_right_y = -half_h;
 }
 
-Quad TextureRenderingInfo::dest_get_quad()
+Quad TextureRenderingInfo::dest_get_quad() const
 {
     return Quad{destination_bottom_left_x, destination_bottom_left_y, destination_bottom_right_x, destination_bottom_right_y, destination_top_right_x, destination_top_right_y, destination_top_left_x, destination_top_left_y};
 }
@@ -600,7 +600,7 @@ void TextureRenderingInfo::dest_set_quad(const Quad& quad)
     destination_top_left_x = quad.top_left_x;
     destination_top_left_y = quad.top_left_y;
 }
-Quad TextureRenderingInfo::source_get_quad()
+Quad TextureRenderingInfo::source_get_quad() const
 {
     return Quad{source_bottom_left_x, source_bottom_left_y, source_bottom_right_x, source_bottom_right_y, source_top_right_x, source_top_right_y, source_top_left_x, source_top_left_y};
 }

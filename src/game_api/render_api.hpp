@@ -63,15 +63,45 @@ enum class WorldShader : std::uint8_t
 
 struct Letter
 {
-    Vec2 center()
+    /// Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
+    Vec2 center() const
     {
         // there is probably better way of doing this?
+        // could also just assume that the coordinates are correct and calculate the center using just the edges?
         auto right = std::max({bottom.A.x, bottom.B.x, bottom.C.x, top.A.x, top.B.x, top.C.x});
         auto left = std::min({bottom.A.x, bottom.B.x, bottom.C.x, top.A.x, top.B.x, top.C.x});
         auto _top = std::max({bottom.A.y, bottom.B.y, bottom.C.y, top.A.y, top.B.y, top.C.y});
         auto _bottom = std::min({bottom.A.y, bottom.B.y, bottom.C.y, top.A.y, top.B.y, top.C.y});
         return AABB{left, _bottom, right, _top}.center();
     }
+
+    /// Get the Quad of a letter (easier to work with compared to the two triangles)
+    /// This assumes that the triangles are in the correct 'touching each other' position
+    /// if the positions were altered the results may not end up as expected
+    Quad get_quad() const
+    {
+        return {bottom.A, bottom.B, bottom.C, top.C};
+    }
+    /// Inverse of the get_quad
+    void set_quad(Quad quad)
+    {
+        // bottom_left, bottom_right, top_right, top_left
+        std::tuple<Vec2, Vec2, Vec2, Vec2> vectors = quad;
+        bottom.A = std::get<0>(vectors);
+        bottom.B = top.B = std::get<1>(vectors);
+        top.C = std::get<2>(vectors);
+        bottom.C = top.A = std::get<3>(vectors);
+    }
+
+    // b - bottom, t - top
+    //
+    // bC    tA===tC
+    // ||\    \   ||
+    // || \    \  ||
+    // ||  \    \ ||
+    // ||   \    \||
+    // bA===bB    tB
+
     Triangle bottom;
     Triangle top;
 };
@@ -163,9 +193,9 @@ struct TextureRenderingInfo
     float source_top_right_y;
 
     void set_destination(const AABB& bbox);
-    Quad dest_get_quad();
+    Quad dest_get_quad() const;
     void dest_set_quad(const Quad& quad);
-    Quad source_get_quad();
+    Quad source_get_quad() const;
     void source_set_quad(const Quad& quad);
 };
 
