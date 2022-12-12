@@ -428,7 +428,7 @@ class CustomTheme : public ThemeInfo
     }
     bool get_unknown1()
     {
-        return unknown1;
+        return allow_beehive;
     }
     void init_flags()
     {
@@ -883,7 +883,7 @@ class CustomTheme : public ThemeInfo
     bool get_unknown_1_or_2(uint8_t index)
     {
         if (index == 0)
-            return unknown1;
+            return allow_beehive;
         return unknown2;
     }
 
@@ -1248,7 +1248,7 @@ void register_usertypes(sol::state& lua)
     customtheme_type["override"] = theme_override;
     customtheme_type["pre"] = &CustomTheme::pre;
     customtheme_type["post"] = &CustomTheme::post;
-    customtheme_type["unknown1"] = &CustomTheme::unknown1;
+    customtheme_type["allow_beehive"] = &CustomTheme::allow_beehive;
     customtheme_type["unknown2"] = &CustomTheme::unknown2;
     customtheme_type["unknown3"] = &CustomTheme::unknown3;
     customtheme_type["unknown4"] = &CustomTheme::unknown4;
