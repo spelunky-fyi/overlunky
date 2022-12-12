@@ -536,6 +536,7 @@ void set_colors()
     style.WindowBorderSize = 0;
     style.FrameBorderSize = 0;
     style.PopupBorderSize = 0;
+    style.ChildBorderSize = 0;
     style.DisplaySafeAreaPadding = {0, 0};
 }
 
