@@ -277,6 +277,7 @@ void register_usertypes(sol::state& lua)
     statememory_type["force_current_theme"] = &StateMemory::force_current_theme;
     statememory_type["shoppie_aggro"] = &StateMemory::shoppie_aggro;
     statememory_type["shoppie_aggro_next"] = &StateMemory::shoppie_aggro_levels;
+    statememory_type["outposts_spawned"] = &StateMemory::outposts_spawned;
     statememory_type["merchant_aggro"] = &StateMemory::merchant_aggro;
     statememory_type["kills_npc"] = &StateMemory::kills_npc;
     statememory_type["level_count"] = &StateMemory::level_count;

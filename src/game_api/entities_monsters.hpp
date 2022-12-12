@@ -230,7 +230,7 @@ class Shopkeeper : public RoomOwner
     /// will drop key after stun/kill
     bool has_key;
     bool shop_owner;
-    bool unknown5a; // use 1.0 instead of entityDB->animations->max_load_factor ???
+    bool is_ear;
     uint8_t padding11;
     uint8_t padding21;
     uint8_t padding31;

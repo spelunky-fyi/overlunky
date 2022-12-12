@@ -56,7 +56,7 @@ struct EntityDB
         CollisionInfo default_collision_info;
     };
     int32_t collision2_mask;
-    int32_t field_40;
+    int32_t collision_mask;
     int32_t field_44;
     int32_t default_flags;
     int32_t default_more_flags;
@@ -86,7 +86,7 @@ struct EntityDB
     int32_t tile_y;
     uint8_t damage;
     uint8_t life;
-    uint8_t field_96;
+    uint8_t sacrifice_value;
     uint8_t blood_content;
     bool leaves_corpse_behind;
     uint8_t field_99;

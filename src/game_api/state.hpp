@@ -78,7 +78,7 @@ struct StateMemory
     int8_t kali_altars_destroyed;
     /// 0 - none, 1 - item, 3 - kapala
     int8_t kali_gifts;
-    int32_t i50;              // kali related?
+    int32_t outposts_spawned;
     int32_t money_shop_total; // total $ spent at shops, persists between levels, number will be negative
     uint8_t world_start;
     uint8_t level_start;

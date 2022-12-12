@@ -170,7 +170,7 @@ struct DoorCoords
 class ThemeInfo
 {
   public:
-    bool unknown1; // gets set to false for the jungle and temple theme in the cosmic ocean
+    bool allow_beehive;
     bool unknown2;
     uint8_t padding1;
     uint8_t padding2;
@@ -498,8 +498,8 @@ struct LevelGenSystem
         };
     };
     uint8_t flags;
-    uint8_t unknown39; // also flags?
-    uint8_t unknown40; // also flags?
+    uint8_t flags2;
+    uint8_t flags3;
     union
     {
         ShopType shop_types[2];

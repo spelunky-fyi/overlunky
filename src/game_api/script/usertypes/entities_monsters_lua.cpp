@@ -290,6 +290,8 @@ void register_usertypes(sol::state& lua)
         &Shopkeeper::shotgun_attack_delay,
         "has_key",
         &Shopkeeper::has_key,
+        "is_ear",
+        &Shopkeeper::is_ear,
         "shop_owner",
         &Shopkeeper::shop_owner,
         sol::base_classes,

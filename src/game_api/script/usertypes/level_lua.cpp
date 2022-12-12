@@ -1168,6 +1168,7 @@ void register_usertypes(sol::state& lua)
     lua["load_screen"] = do_load_screen;
 
     auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
+    themeinfo_type["allow_beehive"] = &ThemeInfo::allow_beehive;
     themeinfo_type["sub_theme"] = &ThemeInfo::sub_theme;
     themeinfo_type["get_unknown1"] = &ThemeInfo::get_unknown1;
     themeinfo_type["init_flags"] = &ThemeInfo::init_flags;
@@ -1386,7 +1387,11 @@ void register_usertypes(sol::state& lua)
         sol::property([](LevelGenSystem& lgs)
                       { return std::ref(lgs.themes); }),
         "flags",
-        &LevelGenSystem::flags);
+        &LevelGenSystem::flags,
+        "flags2",
+        &LevelGenSystem::flags2,
+        "flags3",
+        &LevelGenSystem::flags3);
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.
