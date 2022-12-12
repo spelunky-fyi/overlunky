@@ -1512,7 +1512,7 @@ void set_camera_bounds(bool enabled)
 
 void force_zoom()
 {
-    set_camera_bounds(g_state->camera->bounds_top == 124.5f);
+    set_camera_bounds(enable_camera_bounds);
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
         set_zoom();
@@ -4305,22 +4305,9 @@ void render_clickhandler()
         }
         else if (dblclicked("mouse_grab") || dblclicked("mouse_grab_unsafe"))
         {
-            startpos = mouse_pos();
-            set_pos(startpos);
-            unsigned int mask = safe_entity_mask;
-            if (held("mouse_grab_unsafe"))
-            {
-                mask = unsafe_entity_mask;
-            }
-            g_held_entity = UI::get_entity_at(g_x, g_y, true, 2, mask);
-            if (g_held_entity)
-            {
-                g_held_id = g_held_entity->uid;
-                g_held_flags = g_held_entity->flags;
-                g_last_type = g_held_entity->type->id;
-            }
+            g_selected_ids.clear();
             if (!lock_entity)
-                g_last_id = g_held_id;
+                g_last_id = -1;
             g_current_item = 0;
             update_filter("");
         }
