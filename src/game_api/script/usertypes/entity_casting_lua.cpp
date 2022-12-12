@@ -353,9 +353,9 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][350] = lua["Entity"]["as_climbablerope"];          // ITEM_CLIMBABLE_ROPE
     lua["TYPE_MAP"][351] = lua["Entity"]["as_climbablerope"];          // ITEM_UNROLLED_ROPE
     lua["TYPE_MAP"][352] = lua["Entity"]["as_movable"];                // ITEM_BLOOD
-    lua["TYPE_MAP"][353] = lua["Entity"]["as_movable"];                // ITEM_EGGSHIP
-    lua["TYPE_MAP"][354] = lua["Entity"]["as_movable"];                // ITEM_PARENTSSHIP
-    lua["TYPE_MAP"][355] = lua["Entity"]["as_movable"];                // ITEM_OLMECSHIP
+    lua["TYPE_MAP"][353] = lua["Entity"]["as_olmecship"];              // ITEM_EGGSHIP
+    lua["TYPE_MAP"][354] = lua["Entity"]["as_olmecship"];              // ITEM_PARENTSSHIP
+    lua["TYPE_MAP"][355] = lua["Entity"]["as_olmecship"];              // ITEM_OLMECSHIP
     lua["TYPE_MAP"][356] = lua["Entity"]["as_idol"];                   // ITEM_IDOL
     lua["TYPE_MAP"][357] = lua["Entity"]["as_idol"];                   // ITEM_MADAMETUSK_IDOL
     lua["TYPE_MAP"][358] = lua["Entity"]["as_movable"];                // ITEM_MADAMETUSK_IDOLNOTE

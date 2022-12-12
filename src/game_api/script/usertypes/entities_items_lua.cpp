@@ -99,6 +99,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_empressgrave"] = &Entity::as<EmpressGrave>;
     lua["Entity"]["as_tentacle"] = &Entity::as<Tentacle>;
     lua["Entity"]["as_minigameship"] = &Entity::as<MiniGameShip>;
+    lua["Entity"]["as_olmecship"] = &Entity::as<OlmecShip>;
     lua["Entity"]["as_minigameasteroid"] = &Entity::as<MiniGameAsteroid>;
     lua["Entity"]["as_pot"] = &Entity::as<Pot>;
     lua["Entity"]["as_cursedpot"] = &Entity::as<CursedPot>;
@@ -816,6 +817,21 @@ void register_usertypes(sol::state& lua)
         &MiniGameShip::swing,
         "up_down_normal",
         &MiniGameShip::up_down_normal,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<OlmecShip>(
+        "OlmecShip",
+        "sound",
+        &OlmecShip::sound,
+        "door_fx",
+        &OlmecShip::door_fx,
+        "smoke",
+        &OlmecShip::smoke,
+        "flight_time",
+        &OlmecShip::flight_time,
+        "has_spawned_jetflames",
+        &OlmecShip::has_spawned_jetflames,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 

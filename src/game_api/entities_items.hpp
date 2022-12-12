@@ -677,6 +677,18 @@ class MiniGameShip : public Movable
     float up_down_normal;
 };
 
+class OlmecShip : public Movable
+{
+  public:
+    SoundMeta* sound;
+    int32_t unknown138;
+    Entity* door_fx;
+    ParticleEmitterInfo* smoke;
+    uint16_t flight_time;
+    int16_t unknown152;
+    bool has_spawned_jetflames;
+};
+
 class MiniGameAsteroid : public Movable
 {
   public:
