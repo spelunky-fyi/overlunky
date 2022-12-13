@@ -62,8 +62,8 @@ struct StateMemory
     /// 1: Menu: Pauses the level timer and engine. Can't set, controller by the menu.
     /// 2: Fade/Loading: Pauses all timers and engine.
     /// 4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.
-    /// 8: Unknown: Pauses total/level time and engine.
-    /// 16: Unknown: Pauses total/level time and engine.
+    /// 8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.
+    /// 16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.
     /// 32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
     PAUSE pause;
     uint8_t pause_related1;

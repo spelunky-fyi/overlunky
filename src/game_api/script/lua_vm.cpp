@@ -2093,10 +2093,10 @@ end
     // Fade/Loading: Pauses all timers and engine.
     // CUTSCENE
     // Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.
-    // FLAG4:
-    // Unknown purpose: Pauses total/level time and engine. Might change this later!
-    // FLAG5:
-    // Unknown purpose: Pauses total/level time and engine. Might change this later!
+    // FLAG4
+    // Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs. Might change this later!
+    // FLAG5
+    // Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs. Might change this later!
     // ANKH
     // Ankh: Pauses all timers, physics and music, but not camera. Used by the ankh cutscene.
     */

@@ -102,7 +102,7 @@ prinspect(savegame.time_best)
 
 > Search script examples for [savegame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=savegame)
 
-Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) or manually with [save_progress](#save_progress)
+Provides access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) Use [save_progress](#save_progress) to save to savegame.sav.
 ### options
 
 
