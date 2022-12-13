@@ -899,48 +899,7 @@ function set_pre_render_screen(screen_id, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_post_render_screen(screen_id, fun) end
----Clears a callback that is specific to an entity.
----@param uid integer
----@param cb_id CallbackId
----@return nil
-function clear_entity_callback(uid, cb_id) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----`uid` has to be the uid of a `Movable` or else stuff will break.
----Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is bool statemachine(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_statemachine(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----`uid` has to be the uid of a `Movable` or else stuff will break.
----Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is nil statemachine(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_post_statemachine(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil on_destroy(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_destroy(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when an entity is eradicated, before the game applies any side effects.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil on_kill(Entity self, Entity killer)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_kill(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Returns unique id for the callback to be used in [clear_callback](#clear_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
 ---The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
 ---This is so that when the entity dies (from other causes), the death screen still gets shown.
@@ -950,77 +909,6 @@ function set_on_kill(uid, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_on_player_instagib(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
----Note that damage_dealer can be nil ! (long fall, ...)
----DO NOT CALL `self:damage()` in the callback !
----Use this only when no other approach works, this call can be expensive if overused.
----The entity has to be of a [Movable](#Movable) type.
----<br/>The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float vel_x, float vel_y, int stun_amount, int iframes)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_damage(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is bool pre_floor_update(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_floor_update(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after a floor is updated (by killed neighbor).
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil post_floor_update(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_post_floor_update(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is nil on_open(Entity entity_self, Entity opener)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_open(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_collision1(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_collision2(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after the entity is rendered.
----Return `true` to skip the original rendering function and all later pre_render callbacks.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_render(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after the entity is rendered.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_post_render(uid, fun) end
 ---Raise a signal and probably crash the game
 ---@return nil
 function raise() end
@@ -1577,6 +1465,7 @@ function toggle_journal() end
 ---@return nil
 function show_journal(chapter, page) end
 ---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
+---The server will be closed once the handle is released.
 ---@param host string
 ---@param port in_port_t
 ---@param cb fun(): any
@@ -1787,7 +1676,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field screen_next integer
     ---@field ingame integer
     ---@field playing integer
-    ---@field pause integer
+    ---@field pause PAUSE
     ---@field width integer
     ---@field height integer
     ---@field kali_favor integer
@@ -2111,6 +2000,7 @@ local function PRNG_random(self, min, max) end
     ---@field tileh number
     ---@field facing_left boolean
     ---@field render_inactive boolean
+    ---@field get_entity fun(self): class Entity
 
 ---@class Entity
     ---@field type EntityDB
@@ -5597,6 +5487,20 @@ DYNAMIC_TEXTURE = {
   KALI_STATUE = -9
 }
 ---@alias DYNAMIC_TEXTURE integer
+ENTITY_OVERRIDE = {
+  COLLISION1 = 4,
+  COLLISION2 = 26,
+  DAMAGE = 48,
+  DESTROY = 5,
+  DTOR = 0,
+  FLOOR_UPDATE = 38,
+  GET_HELD_ENTITY = 22,
+  KILL = 3,
+  RENDER = 3,
+  TRIGGER_ACTION = 24,
+  UPDATE_STATE_MACHINE = 2
+}
+---@alias ENTITY_OVERRIDE integer
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
   CLIMBABLE = 9,
@@ -7428,6 +7332,15 @@ PARTICLEEMITTER = {
   YETIQUEEN_LANDING_SNOWDUST = 183
 }
 ---@alias PARTICLEEMITTER integer
+PAUSE = {
+  ANKH = 32,
+  CUTSCENE = 4,
+  FADE = 2,
+  FLAG4 = 8,
+  FLAG5 = 16,
+  MENU = 1
+}
+---@alias PAUSE integer
 PAUSEUI_VISIBILITY = {
   INVISIBLE = 0,
   SLIDING_DOWN = 1,
@@ -7435,6 +7348,15 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
+PAUSE_FLAG = {
+  ANKH = 6,
+  CUTSCENE = 3,
+  FADE = 2,
+  FLAG4 = 4,
+  FLAG5 = 5,
+  MENU = 1
+}
+---@alias PAUSE_FLAG integer
 POS_TYPE = {
   AIR = 4,
   ALCOVE = 16,
