@@ -43,7 +43,7 @@ ScreenHooksInfo& Screen::get_hooks()
 
 void hook_screen_render(Screen* self)
 {
-    hook_vtable_no_dtor<void(Screen*)>(
+    hook_vtable_no_dtor<void(Screen*), 0x3>(
         self,
         [](Screen* lmbd_self, void (*original)(Screen*))
         {
@@ -67,8 +67,7 @@ void hook_screen_render(Screen* self)
             {
                 post(lmbd_self);
             }
-        },
-        0x3);
+        });
 }
 
 std::uint32_t Screen::reserve_callback_id()

@@ -19,11 +19,12 @@
 #include <utility>       // for max, min, pair, get, make_pair
 #include <xinput.h>      // for XINPUT_STATE, XINPUT_CAPABILITIES
 
-#include "file_api.hpp"           // for create_d3d11_texture_from_file
-#include "script.hpp"             // for ScriptMessage, ScriptImage
-#include "script/lua_backend.hpp" // for LuaBackend
-#include "script/script_util.hpp" // for screenify_fix, screenify, normalize
-#include "window_api.hpp"         // for hide_cursor, show_cursor
+#include "file_api.hpp"                   // for create_d3d11_texture_from_file
+#include "script.hpp"                     // for ScriptMessage, ScriptImage
+#include "script/handle_lua_function.hpp" // for handle_function
+#include "script/lua_backend.hpp"         // for LuaBackend
+#include "script/script_util.hpp"         // for screenify_fix, screenify, normalize
+#include "window_api.hpp"                 // for hide_cursor, show_cursor
 
 typedef DWORD(WINAPI* PFN_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*);
 typedef DWORD(WINAPI* PFN_XInputGetState)(DWORD, XINPUT_STATE*);
@@ -257,7 +258,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     flag |= ImGuiWindowFlags_NoDocking;
     ImGui::Begin(title.c_str(), &win_open, flag);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() / 2);
-    backend->handle_function(callback, this);
+    handle_function<void>(backend, callback, this);
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
@@ -374,7 +375,7 @@ void GuiDrawContext::win_image(IMAGE image, int width, int height)
 void GuiDrawContext::win_section(std::string title, sol::function callback)
 {
     if (ImGui::CollapsingHeader(title.c_str()))
-        backend->handle_function(callback);
+        handle_function<void>(backend, callback);
 };
 void GuiDrawContext::win_indent(float width)
 {

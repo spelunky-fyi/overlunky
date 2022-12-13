@@ -13,6 +13,17 @@
 #include "logger.h"
 #include "memory.hpp"
 
+bool detect_wine()
+{
+    static const HMODULE hntdll = GetModuleHandle("ntdll.dll");
+    if (!hntdll)
+        return false;
+    static const void* wgv = GetProcAddress(hntdll, "wine_get_version");
+    if (!wgv)
+        return false;
+    return true;
+}
+
 IDXGISwapChain* g_SwapChain{nullptr};
 ID3D11Device* g_Device{nullptr};
 ID3D11DeviceContext* g_Context{nullptr};
@@ -187,6 +198,15 @@ void cleanup_render_target()
     }
 }
 
+// This is for Wine, it doesn't seem to use rawinput or the wndproc
+HHOOK g_kbHook{NULL};
+LRESULT CALLBACK hkKeyboard(const int code, const WPARAM wParam, const LPARAM lParam)
+{
+    if (wParam == WM_KEYDOWN && ImGui::GetIO().WantCaptureKeyboard)
+        return 0;
+    return CallNextHookEx(g_kbHook, code, wParam, lParam);
+}
+
 static bool skip_hkPresent = false;
 HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
@@ -203,6 +223,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
             pSwapChain->GetDesc(&sd);
             g_Window = sd.OutputWindow;
             g_OrigWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_Window, GWLP_WNDPROC, LONG_PTR(hkWndProc)));
+            g_kbHook = SetWindowsHookEx(WH_KEYBOARD_LL, hkKeyboard, NULL, 0);
             create_render_target();
             init_imgui();
             init = true;
@@ -311,7 +332,7 @@ void hook_steam_overlay()
     // Update 2 days later: They immediately changed for the first time in years
     // const size_t present_offset = 0x88E30;
     // const size_t resize_offset = 0x890F0;
-    if (steam_overlay == nullptr)
+    if (steam_overlay == nullptr || detect_wine())
     {
         // Steam overlay is not loaded, so we're probably running on steam emu
         // Just do the old vtable hook and call it a day

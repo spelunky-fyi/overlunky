@@ -325,6 +325,12 @@ struct RenderInfo
     virtual void update() = 0;
     virtual void draw(size_t) = 0;
     virtual bool unknown_3() = 0; // init? sets darkness to 1.0 at the start, then does some other stuff
+
+    // gets the entity owning this RenderInfo
+    class Entity* get_entity() const;
+
+    // for supporting HookableVTable
+    uint32_t get_aux_id() const;
 };
 
 void init_render_api_hooks();

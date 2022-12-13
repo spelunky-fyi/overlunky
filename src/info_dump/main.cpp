@@ -1077,14 +1077,14 @@ void to_json(float_json& j, const Texture& tex)
 
 using namespace std::chrono_literals;
 
-extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
+void run()
 {
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
     while (true)
     {
         auto entities = list_entities();
-        if (entities.size() >= 850)
+        if (entities.size() >= 876)
         {
             DEBUG("Found {} entities, that's enough", entities.size());
             std::this_thread::sleep_for(100ms);
@@ -1356,4 +1356,15 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
     get_vtables();
 
     std::exit(0);
+}
+
+BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinst, DWORD dwReason, [[maybe_unused]] LPVOID reserved)
+{
+    if (dwReason == DLL_PROCESS_ATTACH)
+    {
+        DisableThreadLibraryCalls(hinst);
+        std::thread thr(run);
+        thr.detach();
+    }
+    return TRUE;
 }

@@ -21,3 +21,5 @@ if(MSVC)
 endif()
 
 target_compile_definitions(imgui PUBLIC IMGUI_USE_WCHAR32)
+
+set_target_properties(injected PROPERTIES OUTPUT_NAME Overlunky)

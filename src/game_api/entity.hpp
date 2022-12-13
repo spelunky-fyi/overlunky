@@ -180,9 +180,6 @@ class Entity
     /// Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     bool set_texture(TEXTURE texture_id);
 
-    void unhook(std::uint32_t id);
-    struct EntityHooksInfo& get_hooks();
-
     bool is_player();
     bool is_movable();
     bool is_liquid();
@@ -191,18 +188,22 @@ class Entity
         return more_flags & 0x4000;
     };
 
-    std::uint32_t set_on_dtor(std::function<void(Entity*)> cb);
-    std::uint32_t reserve_callback_id();
-    void set_on_destroy(std::uint32_t reserved_callback_id, std::function<void(Entity*)> on_destroy);
-    void set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill);
-    void set_on_player_instagib(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> on_instagib);
-    void set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage);
-    void set_pre_floor_update(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> pre_update);
-    void set_post_floor_update(std::uint32_t reserved_callback_id, std::function<void(Entity*)> post_update);
-    void set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1);
-    void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
-    void set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render);
-    void set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render);
+    // for supporting HookableVTable
+    uint32_t get_aux_id() const
+    {
+        return uid;
+    }
+
+    // Needed despite HookableVTable for cleanup of arbitrary entity related data
+    std::uint32_t set_on_dtor(std::function<void(Entity*)> cb)
+    {
+        return hook_dtor_impl(this, std::move(cb));
+    }
+    void clean_on_dtor(std::uint32_t dtor_cb_id)
+    {
+        clear_dtor_impl(this, dtor_cb_id);
+    }
+
     void set_enable_turning(bool enabled);
 
     std::span<uint32_t> get_items();
@@ -212,6 +213,16 @@ class Entity
     {
         return static_cast<T*>(this);
     }
+
+    static void set_hook_dtor_impl(
+        std::function<std::uint32_t(Entity*, std::function<void(Entity*)>)> hook_fun,
+        std::function<void(Entity*, std::uint32_t)> clear_fun)
+    {
+        hook_dtor_impl = std::move(hook_fun);
+        clear_dtor_impl = std::move(clear_fun);
+    }
+    inline static std::function<std::uint32_t(Entity*, std::function<void(Entity*)>)> hook_dtor_impl{};
+    inline static std::function<void(Entity*, std::uint32_t)> clear_dtor_impl{};
 
     virtual ~Entity() = 0; // vritual 0
     virtual void create_rendering_info() = 0;

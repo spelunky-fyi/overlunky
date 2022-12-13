@@ -26,7 +26,9 @@
 #include "level_api.hpp"                     // for THEME_OVERRIDE, ThemeInfo
 #include "math.hpp"                          // for AABB
 #include "savedata.hpp"                      // for SaveData, Constellation...
+#include "script/handle_lua_function.hpp"    // for handle_function
 #include "script/lua_backend.hpp"            // for LuaBackend, LevelGenCal...
+#include "script/safe_cb.hpp"                // for make_safe_cb
 #include "state.hpp"                         // for State, StateMemory, enu...
 #include "state_structs.hpp"                 // for QuestsInfo, Camera, Que...
 
@@ -349,7 +351,7 @@ class CustomTheme : public ThemeInfo
         if (overrides.find(index) != overrides.end() && get_override_func_enabled(index))
         {
             auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<Ret>(overrides[index]->func.value(), std::forward<Args>(args)...);
+            return handle_function<Ret>(backend.get(), overrides[index]->func.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
     }
@@ -360,7 +362,7 @@ class CustomTheme : public ThemeInfo
         if (overrides.find(index) != overrides.end() && get_pre_func_enabled(index))
         {
             auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<Ret>(overrides[index]->pre.value(), std::forward<Args>(args)...);
+            return handle_function<Ret>(backend.get(), overrides[index]->pre.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
     }
@@ -371,7 +373,7 @@ class CustomTheme : public ThemeInfo
         if (overrides.find(index) != overrides.end() && get_post_func_enabled(index))
         {
             auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<Ret>(overrides[index]->post.value(), std::forward<Args>(args)...);
+            return handle_function<Ret>(backend.get(), overrides[index]->post.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
     }
@@ -1034,22 +1036,14 @@ void register_usertypes(sol::state& lua)
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
     lua["define_procedural_spawn"] = [](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid) -> PROCEDURAL_CHANCE
     {
-        auto backend_id = LuaBackend::get_calling_backend_id();
         std::function<bool(float, float, int)> is_valid_call{nullptr};
         if (is_valid)
         {
-            is_valid_call = [backend_id, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
-            {
-                auto backend = LuaBackend::get_backend(backend_id);
-                return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
-            };
+            is_valid_call = make_safe_cb<bool(float, float, int)>(std::move(is_valid));
         }
-        std::function<void(float, float, int)> do_spawn_call = [backend_id, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
-        {
-            auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
-        };
-        auto backend = LuaBackend::get_backend(backend_id);
+        std::function<void(float, float, int)> do_spawn_call = make_safe_cb<void(float, float, int)>(std::move(do_spawn));
+
+        auto backend = LuaBackend::get_calling_backend();
         LevelGenData* data = backend->g_state->level_gen->data;
         uint32_t chance = data->define_chance(std::move(procedural_spawn));
         std::uint32_t id = data->register_chance_logic_provider(chance, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
@@ -1066,22 +1060,14 @@ void register_usertypes(sol::state& lua)
     /// No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
     lua["define_extra_spawn"] = [](sol::function do_spawn, sol::function is_valid, std::uint32_t num_spawns_frontlayer, std::uint32_t num_spawns_backlayer) -> std::uint32_t
     {
-        auto backend_id = LuaBackend::get_calling_backend_id();
         std::function<bool(float, float, int)> is_valid_call{nullptr};
         if (is_valid)
         {
-            is_valid_call = [backend_id, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
-            {
-                auto backend = LuaBackend::get_backend(backend_id);
-                return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
-            };
+            is_valid_call = make_safe_cb<bool(float, float, int)>(std::move(is_valid));
         }
-        std::function<void(float, float, int)> do_spawn_call = [backend_id, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
-        {
-            auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
-        };
-        auto backend = LuaBackend::get_backend(backend_id);
+        std::function<void(float, float, int)> do_spawn_call = make_safe_cb<void(float, float, int)>(std::move(do_spawn));
+
+        auto backend = LuaBackend::get_calling_backend();
         LevelGenData* data = backend->g_state->level_gen->data;
         std::uint32_t extra_spawn_id = data->define_extra_spawn(num_spawns_frontlayer, num_spawns_backlayer, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
         backend->extra_spawn_callbacks.push_back(extra_spawn_id);
