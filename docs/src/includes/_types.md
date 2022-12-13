@@ -573,7 +573,9 @@ Type | Name | Description
 ---- | ---- | -----------
 [Triangle](#Triangle) | [bottom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom) | 
 [Triangle](#Triangle) | [top](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top) | 
-[Vec2](#Vec2) | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | 
+[Quad](#Quad) | [get_quad()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_quad) | Get the [Quad](#Quad) of a letter (easier to work with compared to the two triangles)<br/>This assumes that the triangles are in the correct 'touching each other' position<br/>if the positions were altered the results may not end up as expected
+nil | [set_quad(Quad quad)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_quad) | Inverse of the get_quad
+[Vec2](#Vec2) | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
 
 ### MovableBehavior
 
@@ -628,7 +630,7 @@ Type | Name | Description
 ---- | ---- | -----------
 [Quad](#Quad) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(Quad)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
-[Quad](#Quad) | [new(Vec2& bottom_left_, Vec2& bottom_right_, Vec2& top_right_, Vec2& top_left_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
+[Quad](#Quad) | [new(Vec2 bottom_left_, Vec2 bottom_right_, Vec2 top_right_, Vec2 top_left_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(AABB aabb)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 float | [bottom_left_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_left_x) | 
@@ -688,6 +690,7 @@ Type | Name | Description
 [Triangle](#Triangle)& | [offset(const Vec2& off)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | 
 [Triangle](#Triangle)& | [offset(float x, float y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset) | 
 [Triangle](#Triangle)& | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | 
+[Vec2](#Vec2) | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Also known as centroid
 tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corners
 
 ### Vec2
@@ -2458,6 +2461,7 @@ float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) |
 int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) | You can also just use `#` operator on the whole object to get the text lenght
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
+int | [special_texture_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_texture_id) | Used to draw buttons default is -1 wich is the buttons texture
 Texture | [font](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=font) | 
 array&lt;[Letter](#Letter)&gt; | [get_dest()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dest) | Returns refrence to the letter coordinates relative to the x,y position
 array&lt;[Letter](#Letter)&gt; | [get_source()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_source) | Returns refrence to the letter coordinates in the texture

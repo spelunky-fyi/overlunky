@@ -252,58 +252,6 @@ end, 60)
 Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
 Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
 
-### set_on_damage
-
-
-> Search script examples for [set_on_damage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_damage)
-
-#### optional&lt;[CallbackId](#Aliases)&gt; set_on_damage(int uid, function fun)
-
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
-Note that damage_dealer can be nil ! (long fall, ...)
-DO NOT CALL `self:damage()` in the callback !
-Use this only when no other approach works, this call can be expensive if overused.
-The entity has to be of a [Movable](#Movable) type.
-<br/>The callback signature is bool on_damage([Entity](#Entity) self, [Entity](#Entity) damage_dealer, int damage_amount, float vel_x, float vel_y, int stun_amount, int iframes)
-
-### set_on_destroy
-
-
-> Search script examples for [set_on_destroy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_destroy)
-
-#### optional&lt;[CallbackId](#Aliases)&gt; set_on_destroy(int uid, function fun)
-
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
-Use this only when no other approach works, this call can be expensive if overused.
-<br/>The callback signature is nil on_destroy([Entity](#Entity) self)
-
-### set_on_kill
-
-
-> Search script examples for [set_on_kill](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_kill)
-
-#### optional&lt;[CallbackId](#Aliases)&gt; set_on_kill(int uid, function fun)
-
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-Sets a callback that is called right when an entity is eradicated, before the game applies any side effects.
-Use this only when no other approach works, this call can be expensive if overused.
-<br/>The callback signature is nil on_kill([Entity](#Entity) self, [Entity](#Entity) killer)
-
-### set_on_open
-
-
-> Search script examples for [set_on_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_on_open)
-
-#### optional&lt;[CallbackId](#Aliases)&gt; set_on_open(int uid, function fun)
-
-Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-Sets a callback that is called right when a container is opened by the player (up+whip)
-Use this only when no other approach works, this call can be expensive if overused.
-Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
-<br/>The callback signature is nil on_open([Entity](#Entity) entity_self, [Entity](#Entity) opener)
-
 ### set_on_player_instagib
 
 
@@ -3312,7 +3260,7 @@ Use this only when no other approach works, this call can be expensive if overus
 `optional<CallbackId> set_on_open(int uid, function fun)`<br/>
 Use `entity:set_pre_trigger_action` instead.
 Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+Sets a callback that is called right when a container is opened by the player (up+whip)
 Use this only when no other approach works, this call can be expensive if overused.
 Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
 <br/>The callback signature is nil on_open([Entity](#Entity) entity_self, [Entity](#Entity) opener)

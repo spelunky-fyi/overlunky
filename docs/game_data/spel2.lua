@@ -909,77 +909,6 @@ function set_post_render_screen(screen_id, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_on_player_instagib(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
----Note that damage_dealer can be nil ! (long fall, ...)
----DO NOT CALL `self:damage()` in the callback !
----Use this only when no other approach works, this call can be expensive if overused.
----The entity has to be of a [Movable](#Movable) type.
----<br/>The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float vel_x, float vel_y, int stun_amount, int iframes)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_damage(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is bool pre_floor_update(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_floor_update(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after a floor is updated (by killed neighbor).
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil post_floor_update(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_post_floor_update(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when a container is opened by the player (up+whip)
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is nil on_open(Entity entity_self, Entity opener)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_open(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_collision1(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_collision2(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after the entity is rendered.
----Return `true` to skip the original rendering function and all later pre_render callbacks.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_render(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after the entity is rendered.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_post_render(uid, fun) end
 ---Raise a signal and probably crash the game
 ---@return nil
 function raise() end
@@ -4439,6 +4368,8 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
 ---@class Letter
     ---@field bottom Triangle
     ---@field top Triangle
+    ---@field get_quad fun(self): Quad
+    ---@field set_quad fun(self, quad: Quad): nil
     ---@field center fun(self): Vec2
 
 ---@class TextRenderingInfo
@@ -4448,6 +4379,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field text_length integer
     ---@field width number
     ---@field height number
+    ---@field special_texture_id integer
     ---@field font Texture
     ---@field get_dest fun(self): Letter[]
     ---@field get_source fun(self): Letter[]
@@ -4499,6 +4431,7 @@ local function AABB_extrude(self, amount_x, amount_y) end
     ---@field C Vec2
     ---@field offset Triangle_offset
     ---@field rotate fun(self, angle: number, px: number, py: number): Triangle
+    ---@field center fun(self): Vec2
     ---@field split fun(self): Vec2, Vec2, Vec2
 
 ---@class Triangle_offset
