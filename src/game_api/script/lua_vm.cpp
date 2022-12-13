@@ -241,7 +241,7 @@ end
         }
         return nullptr;
     };
-    /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) or manually with [save_progress](#save_progress)
+    /// Provides access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) Use [save_progress](#save_progress) to save to savegame.sav.
     lua["savegame"] = State::get().savedata();
 
     /// Standard lua print function, prints directly to the terminal but not to the game
