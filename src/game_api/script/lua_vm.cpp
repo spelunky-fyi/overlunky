@@ -2082,6 +2082,24 @@ end
                        { return (unsigned char)std::toupper(c); });
         lua["GAME_SETTING"][std::move(setting_name)] = setting_index;
     }
+
+    /// Used in state.pause
+    lua.create_named_table("PAUSE", "MENU", 0x01, "FADE", 0x02, "CUTSCENE", 0x04, "FLAG4", 0x08, "FLAG5", 0x10, "ANKH", 0x20);
+    lua.create_named_table("PAUSE_FLAG", "MENU", 1, "FADE", 2, "CUTSCENE", 3, "FLAG4", 4, "FLAG5", 5, "ANKH", 6);
+    /* PAUSE
+    // MENU
+    // Menu: Pauses the level timer and engine. Can't set, controller by the menu.
+    // FADE
+    // Fade/Loading: Pauses all timers and engine.
+    // CUTSCENE
+    // Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.
+    // FLAG4:
+    // Unknown purpose: Pauses total/level time and engine. Might change this later!
+    // FLAG5:
+    // Unknown purpose: Pauses total/level time and engine. Might change this later!
+    // ANKH
+    // Ankh: Pauses all timers, physics and music, but not camera. Used by the ankh cutscene.
+    */
 }
 
 std::recursive_mutex global_lua_lock;
