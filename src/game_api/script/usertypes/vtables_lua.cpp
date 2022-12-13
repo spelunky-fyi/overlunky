@@ -36,7 +36,7 @@ void register_usertypes(sol::state& lua)
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"floor_update", 0x26, void(Movable*)>>;
+        VTableEntry<"floor_update", 0x26, void()>>;
     static FloorVTable floor_vtable(lua, lua["Floor"], "ENTITY_OVERRIDE");
 
     using RenderInfoVTable = HookableVTable<
