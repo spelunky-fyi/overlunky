@@ -71,7 +71,7 @@ std::map<std::string, std::unique_ptr<SpelunkyScript>> g_ui_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
 
-std::map<std::string, int64_t> keys{
+std::map<std::string, int64_t> default_keys{
     {"enter", VK_RETURN},
     {"escape", VK_ESCAPE},
     {"move_left", VK_LEFT},
@@ -138,20 +138,11 @@ std::map<std::string, int64_t> keys{
     {"zoom_4x", OL_KEY_CTRL | '4'},
     {"zoom_5x", OL_KEY_CTRL | '5'},
     {"zoom_auto", OL_KEY_CTRL | '0'},
-    {"teleport", 0x0},
-    {"teleport_left", 0x0},
-    {"teleport_up", 0x0},
-    {"teleport_right", 0x0},
-    {"teleport_down", 0x0},
     {"camera_left", OL_KEY_SHIFT | 'J'},
     {"camera_up", OL_KEY_SHIFT | 'I'},
     {"camera_right", OL_KEY_SHIFT | 'L'},
     {"camera_down", OL_KEY_SHIFT | 'K'},
     {"camera_reset", OL_KEY_SHIFT | 'U'},
-    {"coordinate_left", 0x0},
-    {"coordinate_up", 0x0},
-    {"coordinate_right", 0x0},
-    {"coordinate_down", 0x0},
     {"mouse_spawn", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_throw", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_over", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x01},
@@ -201,6 +192,8 @@ std::map<std::string, int64_t> keys{
     {"speedhack_slow", VK_NEXT},
     //{ "", 0x },
 };
+
+auto keys = default_keys;
 
 struct Window
 {
@@ -2394,29 +2387,9 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
         UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
     }
-    else if (pressed("teleport_left", wParam))
-    {
-        UI::teleport(-3, 0, false, 0, 0, options["snap_to_grid"]);
-    }
-    else if (pressed("teleport_right", wParam))
-    {
-        UI::teleport(3, 0, false, 0, 0, options["snap_to_grid"]);
-    }
-    else if (pressed("teleport_up", wParam))
-    {
-        UI::teleport(0, 3, false, 0, 0, options["snap_to_grid"]);
-    }
-    else if (pressed("teleport_down", wParam))
-    {
-        UI::teleport(0, -3, false, 0, 0, options["snap_to_grid"]);
-    }
     else if (pressed("spawn_layer_door", wParam))
     {
         UI::spawn_backdoor(0.0, 0.0);
-    }
-    else if (pressed("teleport", wParam))
-    {
-        UI::teleport(g_x, g_y, false, 0, 0, options["snap_to_grid"]);
     }
     else if (pressed("camera_left", wParam))
     {
@@ -2475,22 +2448,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         set_camera_bounds(true);
         if (g_players.size() > 0)
             g_state->camera->focused_entity_uid = g_players.at(0)->uid;
-    }
-    else if (pressed("coordinate_left", wParam))
-    {
-        g_x -= 1;
-    }
-    else if (pressed("coordinate_right", wParam))
-    {
-        g_x += 1;
-    }
-    else if (pressed("coordinate_up", wParam))
-    {
-        g_y += 1;
-    }
-    else if (pressed("coordinate_down", wParam))
-    {
-        g_y -= 1;
     }
     else if (pressed("spawn_entity", wParam))
     {
@@ -4792,10 +4749,15 @@ void render_style_editor()
 void render_keyconfig()
 {
     ImGui::PushID("keyconfig");
+    if (ImGui::Button("Reset all keys to defaults##ResetKeys"))
+    {
+        keys = default_keys;
+        save_config(cfgfile);
+    }
     ImGui::BeginTable("##keyconfig", 4);
     ImGui::TableSetupColumn("Tool");
     ImGui::TableSetupColumn("Keys");
-    ImGui::TableSetupColumn("Keycode");
+    ImGui::TableSetupColumn("Hex keycode");
     ImGui::TableSetupColumn("");
     ImGui::TableHeadersRow();
     for (const auto& kv : keys)
@@ -4807,16 +4769,24 @@ void render_keyconfig()
         ImGui::TableNextColumn();
         ImGui::Text("%s", key_string(keys[kv.first]).c_str());
         ImGui::TableNextColumn();
-        ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "0x%X", ImGuiInputTextFlags_CharsHexadecimal);
+        ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "%X", ImGuiInputTextFlags_CharsHexadecimal);
         ImGui::TableNextColumn();
-        if (ImGui::Button("Capture"))
+        if (ImGui::Button("Set"))
         {
             g_change_key = kv.first;
+            save_config(cfgfile);
         }
         ImGui::SameLine();
-        if (ImGui::Button("Disable"))
+        if (ImGui::Button("Unset"))
         {
             keys[kv.first] = 0;
+            save_config(cfgfile);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Reset"))
+        {
+            keys[kv.first] = default_keys[kv.first];
+            save_config(cfgfile);
         }
         ImGui::PopID();
     }
