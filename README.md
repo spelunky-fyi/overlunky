@@ -17,10 +17,8 @@ You are strongly discouraged from using any modding tools in your actual online 
 **Steam achievements and game saves are disabled by default while running Overlunky though.**
 
 ## Installation and usage
-**[YouTube tutorial](https://youtu.be/Zzba4cV9f2c) for kids who can't read good and who wanna learn to do other stuff good too.**
-
-  - **[Download the latest WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip)** or a [stable release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract to your game folder, keeping the folder structure.
-    + You can also use [Modlunky2](https://github.com/spelunky-fyi/modlunky2/) to install and launch Overlunky
+  - ### Just use [Modlunky2](https://github.com/spelunky-fyi/modlunky2/releases/latest/) but please read this page too
+  - **[Download the latest WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip)** or a [stable release](https://github.com/spelunky-fyi/overlunky/releases/latest) and extract to your game folder, keeping the folder structure.
   - Run the program, leave it running and then start your game, or the other way around!
     + It won't automatically start your game, so don't hold your breath waiting for it
     + You can press ENTER in the launcher to try launch the game from the parent folder
@@ -53,7 +51,7 @@ Current features and their *default* keyboard shortcuts.
       + **Ctrl+Mouse left**: Spawn overlay on hovered entity (drag to offset position) / Spawn or throw single liquid blob
       + **Alt+Mouse left**: Hold to draw floors or other entities on grid
       + **Mouse right**: Teleport to mouse cursor (drag to set velocity)
-      + **Mouse middle**: Select or drag safe entities around
+      + **Mouse middle**: Select or drag safe entities around (doubleclick to clear selection)
       + **Alt+Mouse middle**: Select multiple entities in the finder
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
@@ -78,8 +76,8 @@ Current features and their *default* keyboard shortcuts.
       + **Ctrl+0**: Auto fit level width to screen
       + **Ctrl+2345**: Zoom to X level width
       + **Shift+IJKL**: Move camera in desired direction
-      + **Mouse 4**: Drag camera around or focus on an entity
-      + **Mouse 4 longpress**: Reset camera focus to player
+      + **Shift+U**: Reset camera focus and bounds
+      + **Mouse 4**: Drag camera around or focus on an entity. Hold to reset.
       + **Mouse 4+Wheel**: Zoom
       + **Ctrl+Wheel**: Zoom
   - **F4**: Entity properties
@@ -131,8 +129,9 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
 ## Troubleshooting
   - If you're running **Linux**
     + Check the [command line switches](#command-line-switches) to mitigate issues that come with injecting.
-    + The game and OL should run fine with Wine 7 if you install DXVK and the steam emu. Without DXVK the game colors are probably messed up, and Overlunky might mess them up even more. These are probably Wine bugs and not Overlunky bugs.
+    + The game and OL should run fine with Wine 7 if you install DXVK (and the Steam emulator?). Without DXVK the game colors are probably messed up, and Overlunky might mess them up even more. These are probably Wine bugs and not Overlunky bugs.
     + Also works with **Proton Experimental** or maybe Proton 7 using the [command line switch](#command-line-switches) `--launch_game` for a non-Steam game shortcut. Just make sure the game and the OL shortcut are set to use the same Proton version under compatibility.
+    + Modlunky2 should work just fine under Wine and Proton too, if you add it as a non-Steam game.
     + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:
     + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either. The latest somewhat tested version can be found at the top if this document.
@@ -170,7 +169,7 @@ cd build
 cmake ..
 cmake --build . --config Release --target ALL_BUILD
 ```
-The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode. Set `OL_DEBUG=1` in the *game environment* to enable logging to console. (Run `setx OL_DEBUG 1` to do this system-wide.)
+The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode.
 
 ## Command line switches
 
@@ -185,4 +184,4 @@ The binaries will be in `build/bin/Release/`. You can also try the scripts in `.
 --version               show version information
 ```
 
-Without `--launch_game` the launcher will try to find a running instance of Spel2.exe and inject to it. `--launch_game` can be used with Steam, also on Linux, by adding `Overlunky.exe` as a non-Steam game and adding it to **launch options under properties**. If Overlunky is installed in the default location under `Spelunky 2/Overlunky`, a simple `--launch_game` should work. If you want to use **Overlunky with Playlunky** on Steam, you can use launch `playlunky_launcher.exe` with the `-overlunky` launch option.
+Without arguments the launcher will try to find a running instance of Spel2.exe and inject to it. `--launch_game` can be used with Steam, also on Linux, by adding `Overlunky.exe` as a non-Steam game and adding it to **launch options under properties**. If Overlunky is installed in the default location under `Spelunky 2/Overlunky`, a simple `--launch_game` should work. If you want to use **Overlunky with Playlunky** on Steam, you can use launch `playlunky_launcher.exe` with the `--overlunky` launch option.

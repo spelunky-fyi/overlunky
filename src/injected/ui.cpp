@@ -4563,22 +4563,16 @@ void render_clickhandler()
 
         else if (dblclicked("mouse_camera_drag"))
         {
-            if (!g_players.empty())
-            {
+            set_camera_bounds(true);
+            if (g_players.size() > 0)
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
-            }
-            enable_camera_bounds = true;
-            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.5f)
         {
-            if (!g_players.empty())
-            {
+            set_camera_bounds(true);
+            if (g_players.size() > 0)
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
-            }
-            enable_camera_bounds = true;
-            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (released("mouse_camera_drag") && !dblclicked("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 3.0f && held_duration_last("mouse_camera_drag") < 0.2f)
