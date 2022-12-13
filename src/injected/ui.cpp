@@ -1512,7 +1512,8 @@ void set_camera_bounds(bool enabled)
 
 void force_zoom()
 {
-    set_camera_bounds(enable_camera_bounds);
+    if (g_state->screen == 12)
+        set_camera_bounds(enable_camera_bounds);
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
         set_zoom();
@@ -2328,6 +2329,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("toggle_grid", wParam))
     {
         options["draw_grid"] = !options["draw_grid"];
+    }
+    else if (pressed("toggle_path", wParam))
+    {
+        options["draw_path"] = !options["draw_path"];
     }
     else if (pressed("toggle_mouse", wParam))
     {
@@ -3657,6 +3662,170 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     }
 }
 
+bool is_entrance_room(unsigned int x, unsigned int y)
+{
+    static const uint16_t rooms[] = {5, 6};
+    auto room_temp = UI::get_room_template(x, y, 0);
+    if (room_temp.has_value())
+    {
+        return std::find(std::begin(rooms), std::end(rooms), room_temp.value()) != std::end(rooms);
+    }
+    return false;
+}
+
+bool is_exit_room(unsigned int x, unsigned int y)
+{
+    static const uint16_t rooms[] = {7, 8, 129};
+    auto room_temp = UI::get_room_template(x, y, 0);
+    if (room_temp.has_value())
+    {
+        return std::find(std::begin(rooms), std::end(rooms), room_temp.value()) != std::end(rooms);
+    }
+    return false;
+}
+
+bool is_path_room(unsigned int x, unsigned int y)
+{
+    static const uint16_t rooms[] = {1, 2, 3, 4, 5, 6, 7, 8, 47, 48, 102, 107, 109, 129, 130, 131};
+    auto room_temp = UI::get_room_template(x, y, 0);
+    if (room_temp.has_value())
+    {
+        return std::find(std::begin(rooms), std::end(rooms), room_temp.value()) != std::end(rooms);
+    }
+    return false;
+}
+
+bool is_lake_room(unsigned int x, unsigned int y)
+{
+    static const uint16_t rooms[] = {129, 130, 131};
+    auto room_temp = UI::get_room_template(x, y, 0);
+    if (room_temp.has_value())
+    {
+        return std::find(std::begin(rooms), std::end(rooms), room_temp.value()) != std::end(rooms);
+    }
+    return false;
+}
+
+std::optional<std::pair<unsigned int, unsigned int>> get_entrance()
+{
+    for (unsigned int x = 0; x < g_state->w; ++x)
+    {
+        for (unsigned int y = 0; y < g_state->h; ++y)
+        {
+            if (is_entrance_room(x, y))
+                return {{x, y}};
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<std::pair<unsigned int, unsigned int>> get_exit()
+{
+    for (unsigned int x = 0; x < g_state->w; ++x)
+    {
+        for (unsigned int y = 0; y < g_state->h; ++y)
+        {
+            if (is_exit_room(x, y))
+                return {{x, y}};
+        }
+    }
+    return std::nullopt;
+}
+
+bool is_visited(unsigned int x, unsigned int y, std::vector<std::pair<unsigned int, unsigned int>>& path)
+{
+    for (auto [vx, vy] : path)
+    {
+        if (x == vx && y == vy)
+            return true;
+    }
+    return false;
+}
+
+bool get_next_room(unsigned int& x, unsigned int& y, int dy, std::vector<std::pair<unsigned int, unsigned int>>& path)
+{
+    auto exit = get_exit();
+    auto dx = -1;
+    if (exit.has_value())
+    {
+        auto [ex, ey] = exit.value();
+        if (ex > x)
+            dx = 1;
+    }
+    if (!is_visited(x + dx, y, path) && is_path_room(x + dx, y))
+    {
+        x += dx;
+        return true;
+    }
+    dx *= -1;
+    if (!is_visited(x + dx, y, path) && is_path_room(x + dx, y))
+    {
+        x += dx;
+        return true;
+    }
+    if (!is_visited(x, y + dy, path) && is_path_room(x, y + dy))
+    {
+        y += dy;
+        return true;
+    }
+    return false;
+}
+
+void render_path()
+{
+    if (g_state == 0 || (g_state->screen < 11 || g_state->screen > 13))
+        return;
+    auto base = ImGui::GetMainViewport();
+    ImVec2 res = base->Size;
+    auto* draw_list = ImGui::GetWindowDrawList();
+    std::vector<std::pair<unsigned int, unsigned int>> path;
+    int dy = 1;
+    if (g_state->theme == 9)
+        dy = -1;
+    auto room = get_entrance();
+    if (!room.has_value())
+        return;
+    auto [x, y] = room.value();
+    // DEBUG("entrance {} {}", x, y);
+    path.push_back({x, y});
+    while (get_next_room(x, y, dy, path))
+    {
+        path.push_back({x, y});
+        if (is_exit_room(x, y))
+            break;
+        // DEBUG("path {} {}", x, y);
+    }
+
+    draw_list->PathClear();
+    for (auto [px, py] : path)
+    {
+        auto room_pos = UI::get_room_pos(px, py);
+        auto pos = UI::screen_position(room_pos.first + 5.0f, room_pos.second - 4.0f);
+        ImVec2 spos = screenify({pos.first, pos.second});
+        draw_list->PathLineTo(fix_pos(spos));
+    }
+    auto thick = screenify(UI::screen_distance(4.0f));
+    draw_list->PathStroke(ImColor(0.0f, 1.0f, 0.0f, 0.2f), ImDrawFlags_RoundCornersAll, thick);
+
+    /*
+    for (unsigned int lx = 0; lx < g_state->w; ++lx)
+    {
+        for (unsigned int ly = 0; ly < g_state->h; ++ly)
+        {
+            if (is_lake_room(lx, ly))
+            {
+                auto room_pos = UI::get_room_pos(lx, ly);
+                auto pos = UI::screen_position(room_pos.first, room_pos.second);
+                ImVec2 spos = screenify({pos.first, pos.second});
+                auto pos2 = UI::screen_position(room_pos.first + 10.0f, room_pos.second - 8.0f);
+                ImVec2 spos2 = screenify({pos2.first, pos2.second});
+                draw_list->AddRectFilled(fix_pos(spos), fix_pos(spos2), ImColor(0.0f, 1.0f, 0.0f, 0.2f));
+            }
+        }
+    }
+    */
+}
+
 void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
 {
     const auto type = ent->type->id;
@@ -3978,10 +4147,10 @@ void render_clickhandler()
             set_zoom();
         }
     }
+    if (options["draw_path"])
+        render_path();
     if (options["draw_grid"])
-    {
         render_grid();
-    }
     if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
@@ -4147,7 +4316,7 @@ void render_clickhandler()
         dl->AddText(
             hugefont,
             144.0,
-            ImVec2(io.DisplaySize.x / 2 - warningsize.x / 2, io.DisplaySize.y / 2 - warningsize.y / 2),
+            fix_pos(ImVec2(io.DisplaySize.x / 2 - warningsize.x / 2, io.DisplaySize.y / 2 - warningsize.y / 2)),
             ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             warningtext);
         const char* subtext = "Probably... Some things might, but don't just expect a random script to work.";
@@ -4155,7 +4324,7 @@ void render_clickhandler()
         dl->AddText(
             font,
             18.0,
-            ImVec2(io.DisplaySize.x / 2 - subsize.x / 2, io.DisplaySize.y / 2 + warningsize.y / 2 + 20),
+            fix_pos(ImVec2(io.DisplaySize.x / 2 - subsize.x / 2, io.DisplaySize.y / 2 + warningsize.y / 2 + 20)),
             ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             subtext);
     }
@@ -4840,6 +5009,8 @@ void render_options()
         tooltip("Faster camera movement when dragging.");
         ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
         tooltip("Show outlines of tiles and rooms, with roomtypes.", "toggle_grid");
+        ImGui::Checkbox("Draw path##DrawTileGrid", &options["draw_path"]);
+        tooltip("Show path rooms.", "toggle_path");
         ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
         tooltip("Show enabled cheats and random\ninteresting state variables on screen.", "toggle_hud");
         if (ImGui::Checkbox("Drag windows outside the game window", &options["multi_viewports"]))
