@@ -3686,7 +3686,7 @@ bool is_exit_room(unsigned int x, unsigned int y)
 
 bool is_path_room(unsigned int x, unsigned int y)
 {
-    static const uint16_t rooms[] = {1, 2, 3, 4, 5, 6, 7, 8, 47, 48, 102, 107, 109, 129, 130, 131};
+    static const uint16_t rooms[] = {1, 2, 3, 4, 5, 6, 7, 8, 47, 48, 53, 102, 107, 109, 129, 130, 131};
     auto room_temp = UI::get_room_template(x, y, 0);
     if (room_temp.has_value())
     {
@@ -3752,6 +3752,11 @@ bool get_next_room(unsigned int& x, unsigned int& y, int dy, std::vector<std::pa
         if (ex > x)
             dx = 1;
     }
+    if (g_state->theme == 16 && y == 9 && !is_visited(x, y + dy, path) && is_path_room(x, y + dy) && !is_path_room(2, y))
+    {
+        y += dy;
+        return true;
+    }
     if (!is_visited(x + dx, y, path) && is_path_room(x + dx, y))
     {
         x += dx;
@@ -3773,57 +3778,52 @@ bool get_next_room(unsigned int& x, unsigned int& y, int dy, std::vector<std::pa
 
 void render_path()
 {
-    if (g_state == 0 || (g_state->screen < 11 || g_state->screen > 13))
+    if (g_state == 0 || g_state->screen != 12 || g_state->theme == 10)
         return;
-    auto base = ImGui::GetMainViewport();
-    ImVec2 res = base->Size;
     auto* draw_list = ImGui::GetWindowDrawList();
     std::vector<std::pair<unsigned int, unsigned int>> path;
     int dy = 1;
-    if (g_state->theme == 9)
+    if (g_state->theme == 9 || g_state->theme == 16)
         dy = -1;
     auto room = get_entrance();
     if (!room.has_value())
         return;
     auto [x, y] = room.value();
-    // DEBUG("entrance {} {}", x, y);
     path.push_back({x, y});
     while (get_next_room(x, y, dy, path))
     {
         path.push_back({x, y});
         if (is_exit_room(x, y))
             break;
-        // DEBUG("path {} {}", x, y);
     }
+    if (path.size() < 2)
+        return;
 
-    draw_list->PathClear();
+    std::vector<ImVec2> points;
     for (auto [px, py] : path)
     {
         auto room_pos = UI::get_room_pos(px, py);
         auto pos = UI::screen_position(room_pos.first + 5.0f, room_pos.second - 4.0f);
         ImVec2 spos = screenify({pos.first, pos.second});
-        draw_list->PathLineTo(fix_pos(spos));
+        points.push_back(spos);
     }
-    auto thick = screenify(UI::screen_distance(4.0f));
-    draw_list->PathStroke(ImColor(0.0f, 1.0f, 0.0f, 0.2f), ImDrawFlags_RoundCornersAll, thick);
 
-    /*
-    for (unsigned int lx = 0; lx < g_state->w; ++lx)
+    std::vector<ImVec2> midpoints;
+    for (size_t i = 1; i < points.size(); ++i)
     {
-        for (unsigned int ly = 0; ly < g_state->h; ++ly)
-        {
-            if (is_lake_room(lx, ly))
-            {
-                auto room_pos = UI::get_room_pos(lx, ly);
-                auto pos = UI::screen_position(room_pos.first, room_pos.second);
-                ImVec2 spos = screenify({pos.first, pos.second});
-                auto pos2 = UI::screen_position(room_pos.first + 10.0f, room_pos.second - 8.0f);
-                ImVec2 spos2 = screenify({pos2.first, pos2.second});
-                draw_list->AddRectFilled(fix_pos(spos), fix_pos(spos2), ImColor(0.0f, 1.0f, 0.0f, 0.2f));
-            }
-        }
+        midpoints.push_back({(points.at(i).x + points.at(i - 1).x) / 2.0f, (points.at(i).y + points.at(i - 1).y) / 2.0f});
     }
-    */
+
+    auto color = ImColor(0.0f, 1.0f, 0.0f, 0.2f);
+    draw_list->PathClear();
+    draw_list->PathLineTo(fix_pos(points.at(0)));
+    for (size_t i = 0; i < midpoints.size(); ++i)
+    {
+        draw_list->PathBezierQuadraticCurveTo(fix_pos(points.at(i)), fix_pos(midpoints.at(i)));
+    }
+    draw_list->PathLineTo(fix_pos(points.at(points.size() - 1)));
+    auto thick = screenify(UI::screen_distance(2.0f));
+    draw_list->PathStroke(color, 0, thick);
 }
 
 void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
