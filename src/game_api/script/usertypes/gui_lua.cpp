@@ -59,7 +59,7 @@ Gamepad get_gamepad(unsigned int index = 1)
     return Gamepad{{0}};
 }
 
-const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
+[[maybe_unused]] const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
 
 [[maybe_unused]] static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
 {
