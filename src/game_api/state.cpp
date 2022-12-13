@@ -331,7 +331,7 @@ float State::get_zoom_level()
         {
             return 13.5;
         }
-        offset = addr;
+        offset = addr - 4;
     }
     return memory_read<float>(offset);
 }
