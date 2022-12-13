@@ -4874,16 +4874,6 @@ void render_options()
     {
         if (ImGui::MenuItem("Switch to windowed UI", key_string(keys["switch_ui"]).c_str()))
             options["menu_ui"] = false;
-        if (ImGui::BeginMenu("Style"))
-        {
-            render_style_editor();
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Keys"))
-        {
-            render_keyconfig();
-            ImGui::EndMenu();
-        }
     }
     if (submenu("Game cheats"))
     {
@@ -5036,6 +5026,17 @@ void render_options()
         endmenu();
     }
 
+    if (submenu("Window style"))
+    {
+        render_style_editor();
+        endmenu();
+    }
+    if (submenu("Shortcut keys"))
+    {
+        render_keyconfig();
+        endmenu();
+    }
+
     if (options["menu_ui"])
     {
         if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
@@ -5045,17 +5046,6 @@ void render_options()
         return;
     }
 
-    if (ImGui::Button("Edit style"))
-    {
-        toggle("tool_style");
-    }
-    tooltip("Edit the colors and fonts of Overlunky windows,\nor adjust the global scale if things are looking too big for you.", "tool_style");
-    ImGui::SameLine();
-    if (ImGui::Button("Edit keys"))
-    {
-        toggle("tool_keys");
-    }
-    tooltip("Edit the hotkeys for all the tools.", "tool_keys");
     if (ImGui::Button("Save options"))
     {
         ImGui::SaveIniSettingsToDisk(inifile);
