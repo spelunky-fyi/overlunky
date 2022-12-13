@@ -1017,7 +1017,16 @@ Set the visibility of a feat
 
 #### [Flags](#Aliases) clr_flag([Flags](#Aliases) flags, int bit)
 
-Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+Clears the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+
+### flip_flag
+
+
+> Search script examples for [flip_flag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_flag)
+
+#### [Flags](#Aliases) flip_flag([Flags](#Aliases) flags, int bit)
+
+Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 
 ### get_entity_flags
 
@@ -1071,7 +1080,7 @@ Set the `more_flags` field from entity by uid
 
 #### [Flags](#Aliases) set_flag([Flags](#Aliases) flags, int bit)
 
-Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 
 ### set_level_flags
 
@@ -1089,7 +1098,7 @@ Set `state.level_flags`
 
 #### bool test_flag([Flags](#Aliases) flags, int bit)
 
-Returns true if a bit is set in the flags
+Returns true if the nth bit is set in the number.
 
 ## Generic functions
 
@@ -1102,6 +1111,15 @@ Returns true if a bit is set in the flags
 #### nil change_poison_timer(int frames)
 
 Change the amount of frames after the damage from poison is applied
+
+### clr_mask
+
+
+> Search script examples for [clr_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_mask)
+
+#### [Flags](#Aliases) clr_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Clears a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 
 ### create_image
 
@@ -1121,6 +1139,15 @@ Depending on the image size, this can take a moment, preferably don't create the
 #### bool disable_floor_embeds(bool disable)
 
 Disable all crust item spawns, returns whether they were already disabled before the call
+
+### flip_mask
+
+
+> Search script examples for [flip_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_mask)
+
+#### [Flags](#Aliases) flip_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 
 ### force_journal
 
@@ -1423,6 +1450,15 @@ Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0
 
 Enables or disables the journal
 
+### set_mask
+
+
+> Search script examples for [set_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_mask)
+
+#### [Flags](#Aliases) set_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Set a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+
 ### set_seed
 
 
@@ -1493,6 +1529,15 @@ Set layer to search for storage items on
 #### nil show_journal([JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) chapter, int page)
 
 Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
+
+### test_mask
+
+
+> Search script examples for [test_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_mask)
+
+#### bool test_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Returns true if a bitmask is set in the number.
 
 ### toggle_journal
 
