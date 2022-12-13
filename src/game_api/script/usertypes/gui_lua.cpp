@@ -551,37 +551,37 @@ void register_usertypes(sol::state& lua)
     auto keydown = sol::overload(
         [](int keycode)
         {
-            return ImGui::IsKeyDown(keycode);
+            return ImGui::IsKeyDown((ImGuiKey)keycode);
         },
         [](char key)
         {
-            return ImGui::IsKeyDown((int)key);
+            return ImGui::IsKeyDown((ImGuiKey)(int)key);
         });
     auto keypressed = sol::overload(
         [](int keycode)
         {
-            return ImGui::IsKeyPressed(keycode, false);
+            return ImGui::IsKeyPressed((ImGuiKey)keycode, false);
         },
         [](int keycode, bool repeat)
         {
-            return ImGui::IsKeyPressed(keycode, repeat);
+            return ImGui::IsKeyPressed((ImGuiKey)keycode, repeat);
         },
         [](char key)
         {
-            return ImGui::IsKeyPressed((int)key, false);
+            return ImGui::IsKeyPressed((ImGuiKey)(int)key, false);
         },
         [](char key, bool repeat)
         {
-            return ImGui::IsKeyPressed((int)key, repeat);
+            return ImGui::IsKeyPressed((ImGuiKey)(int)key, repeat);
         });
     auto keyreleased = sol::overload(
         [](int keycode)
         {
-            return ImGui::IsKeyReleased(keycode);
+            return ImGui::IsKeyReleased((ImGuiKey)keycode);
         },
         [](char key)
         {
-            return ImGui::IsKeyReleased((int)key);
+            return ImGui::IsKeyReleased((ImGuiKey)(int)key);
         });
     /// Used in [get_io](#get_io)
     lua.new_usertype<ImGuiIO>(
