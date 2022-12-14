@@ -138,7 +138,7 @@ class Ghost : public Monster
     uint8_t unknown10;
     Illumination* emitted_light;
     Entity* linked_ghost;
-    float target_dist_visibility_factor; // Value from 0.5 to 1, based on the distance to the ghost's target, multiplied by the target_layer_visibility_factor to set the transparency and illumination of the ghost.
+    float target_dist_visibility_factor;  // Value from 0.5 to 1, based on the distance to the ghost's target, multiplied by the target_layer_visibility_factor to set the transparency and illumination of the ghost.
     float target_layer_visibility_factor; // Value from 0 to 1, based on how long the ghost has been in the same layer as its target, multiplied by the target_dist_visibility_factor to set the transparency and illumination of the ghost.
     SoundMeta* sound;
 };
