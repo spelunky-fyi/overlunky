@@ -100,6 +100,8 @@ class GuiDrawContext
     void win_section(std::string title, sol::function callback);
     /// Indent contents, or unindent if negative
     void win_indent(float width);
+    /// Draw on top of UI windows
+    void draw_foreground(bool enable);
 
   private:
     class LuaBackend* backend;

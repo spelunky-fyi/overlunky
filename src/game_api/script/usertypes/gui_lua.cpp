@@ -384,6 +384,13 @@ void GuiDrawContext::win_indent(float width)
     else if (width < 0)
         ImGui::Unindent(-width);
 }
+void GuiDrawContext::draw_foreground(bool enable)
+{
+    if (enable)
+        backend->draw_list = ImGui::GetForegroundDrawList();
+    else
+        backend->draw_list = ImGui::GetBackgroundDrawList();
+}
 
 namespace NGui
 {
@@ -435,6 +442,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["draw_text"] = &GuiDrawContext::draw_text;
     guidrawcontext_type["draw_image"] = draw_image;
     guidrawcontext_type["draw_image_rotated"] = draw_image_rotated;
+    guidrawcontext_type["draw_foreground"] = &GuiDrawContext::draw_foreground;
     guidrawcontext_type["window"] = &GuiDrawContext::window;
     guidrawcontext_type["win_text"] = &GuiDrawContext::win_text;
     guidrawcontext_type["win_separator"] = &GuiDrawContext::win_separator;
@@ -634,7 +642,9 @@ void register_usertypes(sol::state& lua)
         {
             g_WantUpdateHasGamepad = true;
             return get_gamepad(index) /**/;
-        });
+        },
+        "showcursor",
+        &ImGuiIO::MouseDrawCursor);
 
     /* ImGuiIO
     // keydown
