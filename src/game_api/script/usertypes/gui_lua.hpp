@@ -7,6 +7,13 @@
 #include "aliases.hpp" // for uColor, IMAGE
 #include "math.hpp"    // for Vec2, AABB (ptr only)
 
+enum class DRAW_LAYER
+{
+    BACKGROUND,
+    FOREGROUND,
+    WINDOW
+};
+
 struct ImGuiContext;
 
 namespace sol
@@ -55,8 +62,8 @@ class GuiDrawContext
     void draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py);
     /// Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
     void draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py);
-    /// Draw on top of UI windows, including platform windows that may be outside the game area
-    void draw_foreground(bool enable);
+    /// Draw on top of UI windows, including platform windows that may be outside the game area, or only in current widget window. Defaults to main viewport background.
+    void draw_layer(DRAW_LAYER layer);
 
     /// Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
     /// [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
@@ -107,7 +114,7 @@ class GuiDrawContext
 
   private:
     class LuaBackend* backend;
-    bool foreground;
+    DRAW_LAYER drawlist;
     ImGuiContext& g;
 };
 

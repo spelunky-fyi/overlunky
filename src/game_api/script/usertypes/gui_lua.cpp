@@ -81,13 +81,14 @@ void GuiDrawContext::draw_line(float x1, float y1, float x2, float y2, float thi
 {
     ImVec2 a = screenify_fix({x1, y1});
     ImVec2 b = screenify_fix({x2, y2});
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddLine(a, b, color, thickness);
         return;
     }
-    backend->draw_list->AddLine(a, b, color, thickness);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddLine(a, b, color, thickness);
 };
 void GuiDrawContext::draw_rect(float left, float top, float right, float bottom, float thickness, float rounding, uColor color)
 {
@@ -101,13 +102,14 @@ void GuiDrawContext::draw_rect(float left, float top, float right, float bottom,
     }
     ImVec2 a = screenify_fix({left, top});
     ImVec2 b = screenify_fix({right, bottom});
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
         return;
     }
-    backend->draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
 };
 void GuiDrawContext::draw_rect(AABB rect, float thickness, float rounding, uColor color)
 {
@@ -125,13 +127,14 @@ void GuiDrawContext::draw_rect_filled(float left, float top, float right, float 
     }
     ImVec2 a = screenify_fix({left, top});
     ImVec2 b = screenify_fix({right, bottom});
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
         return;
     }
-    backend->draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
 };
 void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
 {
@@ -149,13 +152,14 @@ void GuiDrawContext::draw_poly(std::vector<Vec2> points, float thickness, uColor
         }
         dl->PathStroke(color, 0, thickness);
     };
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             draw(ImGui::GetForegroundDrawList(vp));
         return;
     }
-    draw(backend->draw_list);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    draw(list);
 }
 void GuiDrawContext::draw_poly_filled(std::vector<Vec2> points, uColor color)
 {
@@ -169,13 +173,14 @@ void GuiDrawContext::draw_poly_filled(std::vector<Vec2> points, uColor color)
         }
         dl->PathFillConvex(color);
     };
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             draw(ImGui::GetForegroundDrawList(vp));
         return;
     }
-    draw(backend->draw_list);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    draw(list);
 }
 void GuiDrawContext::draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float thickness, uColor color)
 {
@@ -183,52 +188,56 @@ void GuiDrawContext::draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
     ImVec2 d = screenify_fix({p4.x, p4.y});
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddBezierCubic(a, b, c, d, color, thickness);
         return;
     }
-    backend->draw_list->AddBezierCubic(a, b, c, d, color, thickness);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddBezierCubic(a, b, c, d, color, thickness);
 }
 void GuiDrawContext::draw_bezier_quadratic(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
 {
     ImVec2 a = screenify_fix({p1.x, p1.y});
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddBezierQuadratic(a, b, c, color, thickness);
         return;
     }
-    backend->draw_list->AddBezierQuadratic(a, b, c, color, thickness);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddBezierQuadratic(a, b, c, color, thickness);
 }
 void GuiDrawContext::draw_triangle(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
 {
     ImVec2 a = screenify_fix({p1.x, p1.y});
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddTriangle(a, b, c, color, thickness);
         return;
     }
-    backend->draw_list->AddTriangle(a, b, c, color, thickness);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddTriangle(a, b, c, color, thickness);
 }
 void GuiDrawContext::draw_triangle_filled(Vec2 p1, Vec2 p2, Vec2 p3, uColor color)
 {
     ImVec2 a = screenify_fix({p1.x, p1.y});
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddTriangleFilled(a, b, c, color);
         return;
     }
-    backend->draw_list->AddTriangleFilled(a, b, c, color);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddTriangleFilled(a, b, c, color);
 }
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
 {
@@ -242,25 +251,27 @@ void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness
 #endif
         return;
     }
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddCircle(a, r, color, 0, thickness);
         return;
     }
-    backend->draw_list->AddCircle(a, r, color, 0, thickness);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddCircle(a, r, color, 0, thickness);
 };
 void GuiDrawContext::draw_circle_filled(float x, float y, float radius, uColor color)
 {
     ImVec2 a = screenify_fix({x, y});
     float r = screenify(radius);
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddCircleFilled(a, r, color, 0);
         return;
     }
-    backend->draw_list->AddCircleFilled(a, r, color, 0);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddCircleFilled(a, r, color, 0);
 };
 void GuiDrawContext::draw_text(float x, float y, float size, std::string text, uColor color)
 {
@@ -275,13 +286,14 @@ void GuiDrawContext::draw_text(float x, float y, float size, std::string text, u
             break;
         }
     }
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddText(font, size, a, color, text.c_str());
         return;
     }
-    backend->draw_list->AddText(font, size, a, color, text.c_str());
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddText(font, size, a, color, text.c_str());
 };
 void GuiDrawContext::draw_image(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
 {
@@ -291,13 +303,14 @@ void GuiDrawContext::draw_image(IMAGE image, float left, float top, float right,
     ImVec2 b = screenify_fix({right, bottom});
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             ImGui::GetForegroundDrawList(vp)->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
         return;
     }
-    backend->draw_list->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
 };
 void GuiDrawContext::draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)
 {
@@ -312,13 +325,14 @@ void GuiDrawContext::draw_image_rotated(IMAGE image, float left, float top, floa
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     ImVec2 pivot = {screenify(px), screenify(py)};
-    if (foreground)
+    if (drawlist == DRAW_LAYER::FOREGROUND)
     {
         for (auto vp : g.Viewports)
             AddImageRotated(ImGui::GetForegroundDrawList(vp), backend->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
         return;
     }
-    AddImageRotated(backend->draw_list, backend->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    AddImageRotated(list, backend->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
 };
 void GuiDrawContext::draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)
 {
@@ -351,7 +365,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     flag |= ImGuiWindowFlags_NoDocking;
     ImGui::Begin(title.c_str(), &win_open, flag);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() / 2);
-    handle_function<void>(backend, callback, this, ImGui::GetWindowPos(), ImGui::GetWindowSize());
+    handle_function<void>(backend, callback, this, normalize(ImGui::GetWindowPos()), normalize(ImGui::GetWindowSize()));
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
@@ -477,9 +491,9 @@ void GuiDrawContext::win_indent(float width)
     else if (width < 0)
         ImGui::Unindent(-width);
 }
-void GuiDrawContext::draw_foreground(bool enable)
+void GuiDrawContext::draw_layer(DRAW_LAYER layer)
 {
-    foreground = enable;
+    drawlist = layer;
 }
 
 namespace NGui
@@ -532,7 +546,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["draw_text"] = &GuiDrawContext::draw_text;
     guidrawcontext_type["draw_image"] = draw_image;
     guidrawcontext_type["draw_image_rotated"] = draw_image_rotated;
-    guidrawcontext_type["draw_foreground"] = &GuiDrawContext::draw_foreground;
+    guidrawcontext_type["draw_layer"] = &GuiDrawContext::draw_layer;
     guidrawcontext_type["window"] = &GuiDrawContext::window;
     guidrawcontext_type["win_text"] = &GuiDrawContext::win_text;
     guidrawcontext_type["win_separator"] = &GuiDrawContext::win_separator;
@@ -765,6 +779,9 @@ void register_usertypes(sol::state& lua)
     /// - Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
     // lua["get_io"] = []() -> ImGuiIO
     lua["get_io"] = ImGui::GetIO;
+
+    lua.create_named_table("DRAW_LAYER", "BACKGROUND", DRAW_LAYER::BACKGROUND, "FOREGROUND", DRAW_LAYER::FOREGROUND, "WINDOW", DRAW_LAYER::WINDOW);
+
     /// Deprecated
     /// Use [GuiDrawContext](#GuiDrawContext)`.draw_line` instead
     lua["draw_line"] = [](float x1, float y1, float x2, float y2, float thickness, uColor color)

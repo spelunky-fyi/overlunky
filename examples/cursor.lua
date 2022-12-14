@@ -22,7 +22,7 @@ if cursor >= 0 then
         if mx ~= last_mx or my ~= last_my then last_ms = get_ms() end
 
         -- draw on top of UI windows, including all platform windows outside the game
-        ctx:draw_foreground(true)
+        ctx:draw_layer(DRAW_LAYER.FOREGROUND)
 
         -- check for recent movement
         if get_ms() - last_ms < 2000 then

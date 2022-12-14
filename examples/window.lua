@@ -38,7 +38,9 @@ set_callback(function(draw_ctx)
     if widgetopen then
         -- create a new window and test most of the widgets
         -- we'll put this one top center and make it movable, with no titlebar
-        widgetopen = draw_ctx:window('##TestWindow', -0.2, 1, 0.4, 0.5, true, function()
+        widgetopen = draw_ctx:window('##TestWindow', -0.2, 1, 0.4, 0.5, true, function(ctx, pos, size)
+            draw_ctx:win_text(string.format("Geometry: %f,%f %f x %f", pos.x, pos.y, size.x, size.y))
+
             -- open another window from this window
             if draw_ctx:win_button('Open seed dialog') then
                 widgetopen2 = true
@@ -93,6 +95,16 @@ set_callback(function(draw_ctx)
             end
 
             closebutton = draw_ctx:win_button('Close window')
+
+            -- circle the player, but only inside this window
+            if #players > 0 then
+                local x, y, l = get_position(players[1].uid)
+                local sx, sy = screen_position(x, y)
+                radius = screen_distance(1) -- one tile
+                draw_ctx:draw_layer(DRAW_LAYER.WINDOW)
+                draw_ctx:draw_circle(sx, sy, radius, 3, rgba(255, 0, 0, 255))
+            end
+
         end)
         if not widgetopen then
             message('Window was closed from the X')
