@@ -166,6 +166,27 @@ Name | Data | Description
 [KALI_STATUE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DYNAMIC_TEXTURE.KALI_STATUE) | DYNAMIC_TEXTURE::KALI_STATUE | 
 [COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DYNAMIC_TEXTURE.COFFIN) | DYNAMIC_TEXTURE::COFFIN | 
 
+## ENTITY_OVERRIDE
+
+
+> Search script examples for [ENTITY_OVERRIDE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DTOR) | 0 | 
+[UPDATE_STATE_MACHINE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.UPDATE_STATE_MACHINE) | 2 | 
+[KILL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.KILL) | 3 | 
+[ON_COLLISION1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION1) | 4 | 
+[DESTROY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DESTROY) | 5 | 
+[GET_HELD_ENTITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GET_HELD_ENTITY) | 22 | 
+[TRIGGER_ACTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.TRIGGER_ACTION) | 24 | 
+[ON_COLLISION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION2) | 26 | 
+[DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DAMAGE) | 48 | 
+[FLOOR_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLOOR_UPDATE) | 38 | 
+[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DTOR) | 0 | 
+[RENDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.RENDER) | 3 | 
+
 ## ENT_FLAG
 
 

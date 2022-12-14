@@ -2002,6 +2002,13 @@ local function PRNG_random(self, min, max) end
     ---@field facing_left boolean
     ---@field render_inactive boolean
     ---@field get_entity fun(self): class Entity
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
+    ---@field set_pre_dtor fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_dtor fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_render fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_render fun(self, fun: fun(): any): CallbackId
 
 ---@class Entity
     ---@field type EntityDB
@@ -2053,6 +2060,25 @@ local function PRNG_random(self, min, max) end
     ---@field get_items fun(self): integer[]
     ---@field is_in_liquid fun(self): boolean
     ---@field is_cursed fun(self): boolean
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
+    ---@field set_pre_dtor fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_dtor fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_update_state_machine fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_update_state_machine fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_kill fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_kill fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_on_collision1 fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_on_collision1 fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_destroy fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_destroy fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_get_held_entity fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_get_held_entity fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_trigger_action fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_trigger_action fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_on_collision2 fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_on_collision2 fun(self, fun: fun(): any): CallbackId
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -2119,6 +2145,11 @@ local function Entity_overlaps_with(self, other) end
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil
     ---@field clear_behaviors fun(self): nil
     ---@field generic_update_world Movable_generic_update_world
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
+    ---@field set_pre_damage fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_damage fun(self, fun: fun(): any): CallbackId
 
 ---@class Movable_generic_update_world
 ---@param move Vec2
@@ -2208,6 +2239,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil
     ---@field decorate_internal fun(self): nil
     ---@field get_floor_type fun(self): ENT_TYPE
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
+    ---@field set_pre_floor_update fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_floor_update fun(self, fun: fun(): any): CallbackId
 
 ---@class Door : Floor
     ---@field counter integer
