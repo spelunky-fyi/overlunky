@@ -1,23 +1,24 @@
 #include "gui_lua.hpp"
 
-#include <Windows.h>     // for GetProcAddress, DWORD, LoadLibraryA
-#include <algorithm>     // for max
-#include <chrono>        // for system_clock
-#include <cmath>         // for isnan, floor
-#include <cstddef>       // for NULL
-#include <deque>         // for deque
-#include <exception>     // for exception
-#include <filesystem>    // for operator/, path
-#include <fmt/format.h>  // for check_format_string, format, vformat
-#include <imgui.h>       // for ImVec2, ImGuiIO, ImDrawList, GetIO
-#include <map>           // for map
-#include <new>           // for operator new
-#include <sol/sol.hpp>   // for proxy_key_t, data_t, state, property
-#include <tuple>         // for get, tuple, make_tuple
-#include <type_traits>   // for move, declval, reference_wrapper, ref
-#include <unordered_set> // for unordered_set
-#include <utility>       // for max, min, pair, get, make_pair
-#include <xinput.h>      // for XINPUT_STATE, XINPUT_CAPABILITIES
+#include <Windows.h>        // for GetProcAddress, DWORD, LoadLibraryA
+#include <algorithm>        // for max
+#include <chrono>           // for system_clock
+#include <cmath>            // for isnan, floor
+#include <cstddef>          // for NULL
+#include <deque>            // for deque
+#include <exception>        // for exception
+#include <filesystem>       // for operator/, path
+#include <fmt/format.h>     // for check_format_string, format, vformat
+#include <imgui.h>          // for ImVec2, ImGuiIO, ImDrawList, GetIO
+#include <imgui_internal.h> // for GImGui
+#include <map>              // for map
+#include <new>              // for operator new
+#include <sol/sol.hpp>      // for proxy_key_t, data_t, state, property
+#include <tuple>            // for get, tuple, make_tuple
+#include <type_traits>      // for move, declval, reference_wrapper, ref
+#include <unordered_set>    // for unordered_set
+#include <utility>          // for max, min, pair, get, make_pair
+#include <xinput.h>         // for XINPUT_STATE, XINPUT_CAPABILITIES
 
 #include "file_api.hpp"                   // for create_d3d11_texture_from_file
 #include "script.hpp"                     // for ScriptMessage, ScriptImage
@@ -72,7 +73,7 @@ Gamepad get_gamepad(unsigned int index = 1)
 }
 
 GuiDrawContext::GuiDrawContext(LuaBackend* _backend)
-    : backend(_backend)
+    : backend(_backend), g(*GImGui)
 {
 }
 
@@ -80,6 +81,12 @@ void GuiDrawContext::draw_line(float x1, float y1, float x2, float y2, float thi
 {
     ImVec2 a = screenify_fix({x1, y1});
     ImVec2 b = screenify_fix({x2, y2});
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddLine(a, b, color, thickness);
+        return;
+    }
     backend->draw_list->AddLine(a, b, color, thickness);
 };
 void GuiDrawContext::draw_rect(float left, float top, float right, float bottom, float thickness, float rounding, uColor color)
@@ -94,6 +101,12 @@ void GuiDrawContext::draw_rect(float left, float top, float right, float bottom,
     }
     ImVec2 a = screenify_fix({left, top});
     ImVec2 b = screenify_fix({right, bottom});
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
+        return;
+    }
     backend->draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
 };
 void GuiDrawContext::draw_rect(AABB rect, float thickness, float rounding, uColor color)
@@ -102,6 +115,7 @@ void GuiDrawContext::draw_rect(AABB rect, float thickness, float rounding, uColo
 }
 void GuiDrawContext::draw_rect_filled(float left, float top, float right, float bottom, float rounding, uColor color)
 {
+    // check for nan in the vectors because this will cause a crash in ImGui
     if (isnan(left) || isnan(top) || isnan(right) || isnan(bottom))
     {
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
@@ -111,7 +125,12 @@ void GuiDrawContext::draw_rect_filled(float left, float top, float right, float 
     }
     ImVec2 a = screenify_fix({left, top});
     ImVec2 b = screenify_fix({right, bottom});
-    // check for nan in the vectors because this will cause a crash in ImGui
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
+        return;
+    }
     backend->draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
 };
 void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
@@ -120,23 +139,43 @@ void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
 }
 void GuiDrawContext::draw_poly(std::vector<Vec2> points, float thickness, uColor color)
 {
-    backend->draw_list->PathClear();
-    for (auto point : points)
+    auto draw = [&](ImDrawList* dl)
     {
-        ImVec2 a = screenify_fix({point.x, point.y});
-        backend->draw_list->PathLineToMergeDuplicate(a);
+        dl->PathClear();
+        for (auto point : points)
+        {
+            ImVec2 a = screenify_fix({point.x, point.y});
+            dl->PathLineToMergeDuplicate(a);
+        }
+        dl->PathStroke(color, 0, thickness);
+    };
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            draw(ImGui::GetForegroundDrawList(vp));
+        return;
     }
-    backend->draw_list->PathStroke(color, 0, thickness);
+    draw(backend->draw_list);
 }
 void GuiDrawContext::draw_poly_filled(std::vector<Vec2> points, uColor color)
 {
-    backend->draw_list->PathClear();
-    for (auto point : points)
+    auto draw = [&](ImDrawList* dl)
     {
-        ImVec2 a = screenify_fix({point.x, point.y});
-        backend->draw_list->PathLineToMergeDuplicate(a);
+        dl->PathClear();
+        for (auto point : points)
+        {
+            ImVec2 a = screenify_fix({point.x, point.y});
+            dl->PathLineToMergeDuplicate(a);
+        }
+        dl->PathFillConvex(color);
+    };
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            draw(ImGui::GetForegroundDrawList(vp));
+        return;
     }
-    backend->draw_list->PathFillConvex(color);
+    draw(backend->draw_list);
 }
 void GuiDrawContext::draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float thickness, uColor color)
 {
@@ -144,6 +183,12 @@ void GuiDrawContext::draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
     ImVec2 d = screenify_fix({p4.x, p4.y});
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddBezierCubic(a, b, c, d, color, thickness);
+        return;
+    }
     backend->draw_list->AddBezierCubic(a, b, c, d, color, thickness);
 }
 void GuiDrawContext::draw_bezier_quadratic(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
@@ -151,6 +196,12 @@ void GuiDrawContext::draw_bezier_quadratic(Vec2 p1, Vec2 p2, Vec2 p3, float thic
     ImVec2 a = screenify_fix({p1.x, p1.y});
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddBezierQuadratic(a, b, c, color, thickness);
+        return;
+    }
     backend->draw_list->AddBezierQuadratic(a, b, c, color, thickness);
 }
 void GuiDrawContext::draw_triangle(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
@@ -158,6 +209,12 @@ void GuiDrawContext::draw_triangle(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, u
     ImVec2 a = screenify_fix({p1.x, p1.y});
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddTriangle(a, b, c, color, thickness);
+        return;
+    }
     backend->draw_list->AddTriangle(a, b, c, color, thickness);
 }
 void GuiDrawContext::draw_triangle_filled(Vec2 p1, Vec2 p2, Vec2 p3, uColor color)
@@ -165,6 +222,12 @@ void GuiDrawContext::draw_triangle_filled(Vec2 p1, Vec2 p2, Vec2 p3, uColor colo
     ImVec2 a = screenify_fix({p1.x, p1.y});
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddTriangleFilled(a, b, c, color);
+        return;
+    }
     backend->draw_list->AddTriangleFilled(a, b, c, color);
 }
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
@@ -179,12 +242,24 @@ void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness
 #endif
         return;
     }
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddCircle(a, r, color, 0, thickness);
+        return;
+    }
     backend->draw_list->AddCircle(a, r, color, 0, thickness);
 };
 void GuiDrawContext::draw_circle_filled(float x, float y, float radius, uColor color)
 {
     ImVec2 a = screenify_fix({x, y});
     float r = screenify(radius);
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddCircleFilled(a, r, color, 0);
+        return;
+    }
     backend->draw_list->AddCircleFilled(a, r, color, 0);
 };
 void GuiDrawContext::draw_text(float x, float y, float size, std::string text, uColor color)
@@ -200,6 +275,12 @@ void GuiDrawContext::draw_text(float x, float y, float size, std::string text, u
             break;
         }
     }
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddText(font, size, a, color, text.c_str());
+        return;
+    }
     backend->draw_list->AddText(font, size, a, color, text.c_str());
 };
 void GuiDrawContext::draw_image(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
@@ -210,6 +291,12 @@ void GuiDrawContext::draw_image(IMAGE image, float left, float top, float right,
     ImVec2 b = screenify_fix({right, bottom});
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
+        return;
+    }
     backend->draw_list->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
 };
 void GuiDrawContext::draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)
@@ -225,6 +312,12 @@ void GuiDrawContext::draw_image_rotated(IMAGE image, float left, float top, floa
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     ImVec2 pivot = {screenify(px), screenify(py)};
+    if (foreground)
+    {
+        for (auto vp : g.Viewports)
+            AddImageRotated(ImGui::GetForegroundDrawList(vp), backend->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
+        return;
+    }
     AddImageRotated(backend->draw_list, backend->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
 };
 void GuiDrawContext::draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)
@@ -386,10 +479,7 @@ void GuiDrawContext::win_indent(float width)
 }
 void GuiDrawContext::draw_foreground(bool enable)
 {
-    if (enable)
-        backend->draw_list = ImGui::GetForegroundDrawList();
-    else
-        backend->draw_list = ImGui::GetBackgroundDrawList();
+    foreground = enable;
 }
 
 namespace NGui

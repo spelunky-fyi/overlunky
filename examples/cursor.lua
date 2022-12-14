@@ -18,8 +18,10 @@ if cursor >= 0 then
     set_callback(function(ctx)
         local mx, my = mouse_position()
 
+        -- update cursor hiding timer
         if mx ~= last_mx or my ~= last_my then last_ms = get_ms() end
-        -- draw on top of UI windows
+
+        -- draw on top of UI windows, including all platform windows outside the game
         ctx:draw_foreground(true)
 
         -- check for recent movement
@@ -28,10 +30,8 @@ if cursor >= 0 then
             ctx:draw_image(cursor, mx, my, mx + 0.05, my - 0.05 / 9 * 16, 0, 0, 1, 1, 0xffffffff)
         end
 
-        -- hide normal cursor if inside the game window
-        if iio.showcursor and mx > -1 and mx < 1 and my > -1 and my < 1 then
-            iio.showcursor = false
-        end
+        -- hide normal cursor
+        iio.showcursor = false
 
         last_mx, last_my = mx, my
     end, ON.GUIFRAME)
