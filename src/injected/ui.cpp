@@ -317,7 +317,8 @@ std::map<std::string, bool> options = {
     {"show_tooltips", true},
     {"smooth_camera", true},
     {"multi_viewports", true},
-    {"menu_ui", true}};
+    {"menu_ui", true},
+    {"hd_cursor", false}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -4942,6 +4943,14 @@ void render_options()
 
     if (submenu("User interface"))
     {
+        if (g_ui_scripts.find("cursor") != g_ui_scripts.end())
+        {
+            if (ImGui::Checkbox("HD cursor", &options["hd_cursor"]))
+            {
+                g_ui_scripts["cursor"]->set_enabled(options["hd_cursor"]);
+            }
+            tooltip("Enable the Spelunky HD cursor :)");
+        }
         ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
         tooltip("Enables to spawn entities, teleport and pick entities with mouse.\nDisable for scripts that require mouse clicking.", "toggle_mouse");
         ImGui::Checkbox("Keyboard controls##keyevents", &options["keyboard_control"]);
@@ -7230,6 +7239,23 @@ void imgui_init(ImGuiContext*)
             g_Console.get(),
             false);
         g_ui_scripts["light"] = std::unique_ptr<SpelunkyScript>(script);
+    }
+    if (g_ui_scripts.find("cursor") == g_ui_scripts.end())
+    {
+        if (std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+        {
+            std::string cursorpath = scriptpath + "/cursor.lua";
+            std::ifstream data(cursorpath);
+            if (!data.fail())
+            {
+                std::ostringstream buf;
+                buf << data.rdbuf();
+                SpelunkyScript* script = new SpelunkyScript(buf.str(), cursorpath, g_SoundManager.get(), g_Console.get(), options["hd_cursor"]);
+                g_ui_scripts[script->get_file()] = std::unique_ptr<SpelunkyScript>{script};
+                data.close();
+                g_ui_scripts["cursor"] = std::unique_ptr<SpelunkyScript>(script);
+            }
+        }
     }
 }
 
