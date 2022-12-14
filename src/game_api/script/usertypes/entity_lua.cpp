@@ -274,7 +274,6 @@ void register_usertypes(sol::state& lua)
     movable_type["onfire_effect_timer"] = &Movable::onfire_effect_timer;
     movable_type["exit_invincibility_timer"] = &Movable::exit_invincibility_timer;
     movable_type["invincibility_frames_timer"] = &Movable::invincibility_frames_timer;
-    movable_type["damage_iframe_power"] = &Movable::damage_iframe_power;
     movable_type["frozen_timer"] = &Movable::frozen_timer;
     movable_type["is_button_pressed"] = &Movable::is_button_pressed;
     movable_type["is_button_held"] = &Movable::is_button_held;
