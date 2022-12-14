@@ -139,6 +139,8 @@ void register_usertypes(sol::state& lua)
         &Backpack::explosion_trigger,
         "explosion_timer",
         &Backpack::explosion_timer,
+        "trigger_explosion",
+        &Backpack::trigger_explosion,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -580,6 +582,8 @@ void register_usertypes(sol::state& lua)
         "PunishBall",
         "attached_to_uid",
         &PunishBall::attached_to_uid,
+        "timer",
+        &PunishBall::timer,
         "x_pos",
         &PunishBall::x_pos,
         "y_pos",

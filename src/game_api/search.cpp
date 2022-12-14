@@ -149,7 +149,7 @@ std::string application_versions()
 
 std::string get_error_information()
 {
-    return fmt::format("\n\nRunning Spelunky 2: {}\nSupported Spelunky 2: 1.27\n\n{}", current_spelunky_version(), application_versions());
+    return fmt::format("\n\nRunning Spelunky 2: {}\nSupported Spelunky 2: 1.28\n\n{}", current_spelunky_version(), application_versions());
 }
 
 size_t find_inst(const char* exe, std::string_view needle, size_t start, std::optional<size_t> end, std::string_view pattern_name, bool is_required)
@@ -572,6 +572,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        // Find reference to SetWindowPos or SetWindowLongA, below one of the references you should see a few instructions like:
+        // mov rcx,qword ptr ds:[rsi+80FD0]
         "render_api_offset"sv,
         PatternCommandBuffer{}
             .find_inst("\xBA\xF0\xFF\xFF\xFF\x41\xB8\x00\x00\x00\x90"sv)
@@ -1024,7 +1026,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "zoom_level_offset"sv,
         // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
-        // That instruction contains the offset
+        // That instruction contains the offset, the memory is: {current_zoom, target_zoom} and both offset will be present
+        // current solution uses the target_zoom offset
         PatternCommandBuffer{}
             .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
             .decode_imm(4),
@@ -1196,9 +1199,10 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "insta_gib"sv,
+        // This should be just called/jumped to at the end of kill virtual fror the CHAR_* entity
         // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
         // Or write bp on Movable::health, the next function after setting it to 0 should be this one
-        // then place yourself in Quillback's path
+        // then die to a ghost
         PatternCommandBuffer{}
             .find_inst("80 79 19 00 74 04"_gh)
             .at_exe()
@@ -1223,12 +1227,29 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "show_journal"sv,
-        // aka render_journal
+        // aka render_journal / open journal chapter
         // Break on GameManager.journal_ui.state, open the journal
         PatternCommandBuffer{}
             .find_inst("88 5F 04 80 FB 0B 0F"_gh)
             .at_exe()
             .function_start(),
+    },
+    {
+        "toggle_journal"sv,
+        // Break on GameManager.journal_ui.state, open the journal when a popup is on
+        // Also calls show_journal
+        PatternCommandBuffer{}
+            .find_inst("89 4e 38 89 4e 3c 48 8b 40 08"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "journal_popup_open"sv,
+        // A jump that checks if JournalPopupUI is open in toggle_journal
+        PatternCommandBuffer{}
+            .find_inst("89 4e 38 89 4e 3c 48 8b 40 08"_gh)
+            .offset(-0x37)
+            .at_exe(),
     },
     {
         "generate_world_particles"sv,
@@ -1533,7 +1554,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(0xff),
     },
     {
-        "construct_soundposition_ptr"sv,
+        "construct_soundmeta"sv,
         // Put a write bp on ACTIVEFLOOR_DRILL sound_pos1 and release the drill
         PatternCommandBuffer{}
             .find_inst("\xE8****\x49\x89\x84\x24\x30\x01\x00\x00"sv)
@@ -1875,6 +1896,41 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put write bp on savedata.characters
         PatternCommandBuffer{}
             .find_after_inst("d1 48 85 c0 48 0f 44 d0 f6 42 38 40 75 5d 31 f6"_gh)
+            .at_exe(),
+    },
+    {
+        // Caller of the show_journal when selecting element from menu (like places, people etc.)
+        "journal_menu_select"sv,
+        PatternCommandBuffer{}
+            .find_inst("48 8B 88 18 01 00 00 41 B0 01"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        // It's the hardcoded mask (0xfc007e18) right after the call to get_feat
+        "get_feat_hidden"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh)
+            .offset(25) // or .find_next_inst("\xE8****\xB8") .offset(0x6)
+            .at_exe(),
+    },
+    {
+        // It's the function that calls ISteamUserStats::GetAchievement virtual when viewing the Feats page
+        "get_feat"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh) // Same as ^ btw
+            .find_next_inst("\xE8"sv)
+            .decode_call()
+            .at_exe(),
+    },
+    {
+        // It's the function that calls ISteamUserStats::SetAchievement virtual when performing feats
+        "set_feat"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("FF 90 B0 00 00 00 F6 46 32 08"_gh)
+            .find_next_inst("B1 01 E8"_gh)
+            .offset(0x2)
+            .decode_call()
             .at_exe(),
     },
 };

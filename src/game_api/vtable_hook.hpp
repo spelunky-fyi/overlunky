@@ -3,10 +3,12 @@
 #include <cstddef>       // for size_t
 #include <functional>    // for equal_to, function, _Func_class
 #include <new>           // for operator new
-#include <type_traits>   // for hash, forward
+#include <type_traits>   // for forward
 #include <unordered_map> // for unordered_map, _Umap_traits<>::allocator_type
 #include <utility>       // for min, max
 #include <vector>        // for vector, _Vector_iterator, allocator, _Vecto...
+
+#include "util.hpp" // for function_signature
 
 void* register_hook_function(void*** vtable, size_t index, void* hook_function);
 void unregister_hook_function(void*** vtable, size_t index);
@@ -34,11 +36,11 @@ struct VDestructorDetour
     inline static std::unordered_map<void*, std::vector<DtorTaskT>> s_Tasks{};
 };
 
-template <class VFunT>
-requires std::is_function_v<VFunT> struct VTableDetour;
+template <function_signature VFunT, size_t Index>
+struct VTableDetour;
 
-template <class RetT, class ClassT, class... ArgsT>
-struct VTableDetour<RetT(ClassT*, ArgsT...)>
+template <class RetT, class ClassT, class... ArgsT, std::size_t Index>
+struct VTableDetour<RetT(ClassT*, ArgsT...), Index>
 {
     using VFunT = RetT(ClassT*, ArgsT...);
     using DetourFunT = std::function<RetT(ClassT*, ArgsT..., VFunT*)>;
@@ -82,31 +84,47 @@ void hook_dtor(void* obj, HookFunT&& hook_fun, std::size_t dtor_index = 0)
     DestructorDetourT::s_Tasks[obj].push_back(std::forward<HookFunT>(hook_fun));
 }
 
-template <class VTableFunT, class T, class HookFunT>
-void hook_vtable(T* obj, HookFunT&& hook_fun, std::size_t vtable_index, std::size_t dtor_index = 0)
+template <class VTableFunT, std::size_t VTableIndex, class T, class HookFunT>
+void hook_vtable_no_dtor(T* obj, HookFunT&& hook_fun)
 {
-    using DetourT = VTableDetour<VTableFunT>;
+    using DetourT = VTableDetour<VTableFunT, VTableIndex>;
     void*** vtable = (void***)obj;
-    if (!get_hook_function(vtable, vtable_index))
+    if (!get_hook_function(vtable, VTableIndex))
     {
-        DetourT::s_Originals[*vtable] = (VTableFunT*)register_hook_function(vtable, vtable_index, (void*)&DetourT::detour);
+        DetourT::s_Originals[*vtable] = (VTableFunT*)register_hook_function(vtable, VTableIndex, (void*)&DetourT::detour);
     }
-    DetourT::s_Functions[obj] = hook_fun;
-
-    hook_dtor(
-        obj, [](void* self)
-        { DetourT::s_Functions.erase((T*)self); },
-        dtor_index);
+    DetourT::s_Functions[obj] = std::forward<HookFunT>(hook_fun);
 }
 
-template <class VTableFunT, class T, class HookFunT>
-void hook_vtable_no_dtor(T* obj, HookFunT&& hook_fun, std::size_t vtable_index)
+template <class VTableFunT, std::size_t VTableIndex, class T, class HookFunT>
+void hook_vtable(T* obj, HookFunT&& hook_fun, std::size_t dtor_index = 0)
 {
-    using DetourT = VTableDetour<VTableFunT>;
-    void*** vtable = (void***)obj;
-    if (!get_hook_function(vtable, vtable_index))
+    if constexpr (std::is_same_v<VTableFunT, void(T*)>)
     {
-        DetourT::s_Originals[*vtable] = (VTableFunT*)register_hook_function(vtable, vtable_index, (void*)&DetourT::detour);
+        if (VTableIndex == dtor_index)
+        {
+            // Just throw this directly into the dtor
+            hook_dtor(
+                obj,
+                [hook_fun = std::forward<HookFunT>(hook_fun)](void* self)
+                {
+                    // Pass a nullop as the original, it's not okay to skip dtors
+                    hook_fun((T*)self, [](T*) {});
+                },
+                dtor_index);
+            return;
+        }
     }
-    DetourT::s_Functions[obj] = hook_fun;
+
+    hook_vtable_no_dtor<VTableFunT, VTableIndex>(obj, std::forward<HookFunT>(hook_fun));
+
+    // Unhook in dtor
+    hook_dtor(
+        obj,
+        [](void* self)
+        {
+            using DetourT = VTableDetour<VTableFunT, VTableIndex>;
+            DetourT::s_Functions.erase((T*)self);
+        },
+        dtor_index);
 }

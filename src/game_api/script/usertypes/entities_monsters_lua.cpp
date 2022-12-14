@@ -339,6 +339,8 @@ void register_usertypes(sol::state& lua)
         &Pet::func_timer,
         "active_state",
         &Pet::active_state,
+        "petted_counter",
+        &Pet::petted_counter,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -528,6 +530,8 @@ void register_usertypes(sol::state& lua)
         "VanHorsing",
         "show_text",
         &VanHorsing::show_text,
+        "special_message_shown",
+        &VanHorsing::special_message_shown,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, NPC>());
 
@@ -1217,6 +1221,8 @@ void register_usertypes(sol::state& lua)
         &CritterCrab::walk_pause_timer,
         "walking_left",
         &CritterCrab::walking_left,
+        "unfriendly",
+        &CritterCrab::unfriendly,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
@@ -1304,6 +1310,8 @@ void register_usertypes(sol::state& lua)
         &CritterDrone::applied_hor_momentum,
         "applied_ver_momentum",
         &CritterDrone::applied_ver_momentum,
+        "unfriendly",
+        &CritterDrone::unfriendly,
         "move_timer",
         &CritterDrone::move_timer,
         sol::base_classes,

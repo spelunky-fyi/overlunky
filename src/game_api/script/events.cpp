@@ -177,6 +177,18 @@ void post_entity_spawn(Entity* entity, int spawn_type_flags)
         });
 }
 
+bool pre_entity_instagib(Entity* victim)
+{
+    bool skip{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            skip |= backend->pre_entity_instagib(victim);
+            return true;
+        });
+    return skip;
+}
+
 void trigger_vanilla_render_callbacks(ON event)
 {
     LuaBackend::for_each_backend(
@@ -271,4 +283,67 @@ bool pre_state_update()
             return true;
         });
     return return_val;
+}
+
+bool pre_load_journal_chapter(uint8_t chapter)
+{
+    bool return_value = false;
+    LuaBackend::for_each_backend(
+        [=, &chapter, &return_value](LuaBackend::LockedBackend backend)
+        {
+            return_value = backend->pre_load_journal_chapter(chapter);
+            if (return_value)
+                return false;
+
+            return true;
+        });
+
+    return return_value;
+}
+
+std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages)
+{
+    std::vector<uint32_t> new_pages;
+    LuaBackend::for_each_backend(
+        [=, &new_pages, &pages](LuaBackend::LockedBackend backend)
+        {
+            auto returned_pages = backend->post_load_journal_chapter(chapter, pages);
+            if (!returned_pages.empty())
+            {
+                new_pages = std::move(returned_pages);
+            }
+            return true;
+        });
+
+    return new_pages;
+}
+
+std::optional<bool> pre_get_feat(FEAT feat)
+{
+    std::optional<bool> got;
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            std::optional<bool> ret = backend->pre_get_feat(feat);
+            if (ret.has_value())
+            {
+                block = true;
+                got = ret;
+            }
+            return !block;
+        });
+    return got;
+}
+
+bool pre_set_feat(FEAT feat)
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_set_feat(feat);
+            return !block;
+        });
+    return block;
 }

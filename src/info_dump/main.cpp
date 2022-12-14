@@ -1043,7 +1043,7 @@ void to_json(float_json& j, const EntityDB& ent)
         {"max_speed", ent.max_speed},
         {"sprint_factor", ent.sprint_factor},
         {"jump", ent.jump},
-        {"texture", ent.texture},
+        {"texture", ent.texture_id},
         {"technique", ent.technique},
         {"tile_x", ent.tile_x},
         {"tile_y", ent.tile_y},
@@ -1077,14 +1077,14 @@ void to_json(float_json& j, const Texture& tex)
 
 using namespace std::chrono_literals;
 
-extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
+void run()
 {
     DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
     while (true)
     {
         auto entities = list_entities();
-        if (entities.size() >= 850)
+        if (entities.size() >= 876)
         {
             DEBUG("Found {} entities, that's enough", entities.size());
             std::this_thread::sleep_for(100ms);
@@ -1157,7 +1157,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
 
             entities[ent.name] = float_json{
                 {"id", ent.id},
-                {"texture", db->texture},
+                {"texture", db->texture_id},
                 {"animations", get_animations_as_string_map(*db)}};
         }
 
@@ -1282,7 +1282,7 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
         // file << "---@diagnostic disable: lowercase-global,deprecated" << std::endl;
     }
 
-    auto* state = State::get().ptr();
+    auto state = State::get().ptr_main();
 
     if (auto file = std::ofstream("game_data/tile_codes.txt"))
     {
@@ -1356,4 +1356,15 @@ extern "C" __declspec(dllexport) void run([[maybe_unused]] DWORD pid)
     get_vtables();
 
     std::exit(0);
+}
+
+BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinst, DWORD dwReason, [[maybe_unused]] LPVOID reserved)
+{
+    if (dwReason == DLL_PROCESS_ATTACH)
+    {
+        DisableThreadLibraryCalls(hinst);
+        std::thread thr(run);
+        thr.detach();
+    }
+    return TRUE;
 }

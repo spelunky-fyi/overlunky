@@ -65,7 +65,7 @@ struct StateMemory
     uint8_t correct_ushabti; // correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
     uint8_t padding2[3];
     /// Who administers the tutorial speedrun in base camp
-    ENT_TYPE speedrun_character;      
+    ENT_TYPE speedrun_character;
     bool speedrun_activation_trigger; // must transition from true to false to activate it
     uint8_t padding3[3];
     /// level width in rooms (number of rooms horizontally)
@@ -147,8 +147,8 @@ struct StateMemory
     uint8_t padding12;
     ENT_TYPE cause_of_death_entity_type;
     int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
-    OnScreenMessage* toast;
-    OnScreenMessage* speechbubble;
+    MultiLineTextRendering* toast;
+    MultiLineTextRendering* speechbubble;
     uint32_t speechbubble_timer;
     uint32_t toast_timer;
     int32_t speechbubble_owner;

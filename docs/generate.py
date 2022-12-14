@@ -352,6 +352,10 @@ for func in ps.funcs:
         for subs in ["get_address", "get_rva", "raise", "dump_network"]
     ):
         cat = "Debug functions"
+    elif any(subs in func["name"] for subs in ["_option"]):
+        cat = "Option functions"
+    elif any(subs in func["name"] for subs in ["feat"]):
+        cat = "Feat functions"
     elif any(subs in func["name"] for subs in ["tile_code"]):
         cat = "Tile code functions"
     elif any(
@@ -405,8 +409,6 @@ for func in ps.funcs:
         cat = "Theme functions"
     elif any(subs in func["name"] for subs in ["_lut", "_texture"]):
         cat = "Texture functions"
-    elif any(subs in func["name"] for subs in ["_option"]):
-        cat = "Option functions"
     elif any(subs in func["name"] for subs in ["_input", "_io", "mouse_"]):
         cat = "Input functions"
     elif any(
@@ -686,7 +688,7 @@ print(
 
 When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
 
-To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md).
+To figure out what type of entity you get back, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md).
 
 You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks
 

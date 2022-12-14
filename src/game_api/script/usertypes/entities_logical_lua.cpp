@@ -343,6 +343,16 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<DMAlienBlast>(
         "DMAlienBlast",
+        "owner_uid",
+        &DMAlienBlast::owner_uid,
+        "timer",
+        &DMAlienBlast::timer,
+        "sound",
+        &DMAlienBlast::sound,
+        "reticule_internal",
+        &DMAlienBlast::fx_internal_reticule,
+        "reticule_external",
+        &DMAlienBlast::fx_external_reticule,
         sol::base_classes,
         sol::bases<Entity>());
 }

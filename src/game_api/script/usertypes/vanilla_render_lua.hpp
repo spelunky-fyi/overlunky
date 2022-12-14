@@ -13,12 +13,15 @@ namespace sol
 class state;
 } // namespace sol
 
+struct TextRenderingInfo;
+
 class VanillaRenderContext
 {
   public:
     /// Draw text using the built-in renderer
     /// Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
     void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
+    void draw_text(const TextRenderingInfo* tri, Color color);
 
     /// Measure the provided text using the built-in renderer
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);

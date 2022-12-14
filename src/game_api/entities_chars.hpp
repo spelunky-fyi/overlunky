@@ -93,8 +93,10 @@ class Player : public PowerupCapable
   public:
     Inventory* inventory_ptr;
     Illumination* emitted_light;
-    int32_t linked_companion_child;  // entity uid
-    int32_t linked_companion_parent; // entity uid
+    /// entity uid
+    int32_t linked_companion_child;
+    /// entity uid
+    int32_t linked_companion_parent;
     Ai* ai;
     PlayerSlot* input_ptr;
     /// Used in base camp to talk with the NPC's
@@ -103,7 +105,8 @@ class Player : public PowerupCapable
     int32_t i16c;
     float y_pos; // not sure why, seams to be the same as abs_y
     uint8_t jump_flags_a;
-    uint8_t jump_flags_b;
+    /// can jump while airborne if greater than 0
+    int8_t coyote_timer;
     uint8_t jump_flags_c;
     uint8_t jump_flags_d;
     uint8_t timer_since_last_jump; // something different happens before or after 6

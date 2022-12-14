@@ -121,7 +121,7 @@ std::vector<std::pair<std::string_view, GAME_SETTING>> get_settings_names_and_in
     [[maybe_unused]] std::unordered_set<GAME_SETTING> indices;
 
     {
-        auto* settings_map = (std::map<GAME_SETTING, SettingData>*)get_address("graphics_settings_map");
+        static auto* settings_map = (std::map<GAME_SETTING, SettingData>*)get_address("graphics_settings_map");
         for (auto& [setting, data] : *settings_map)
         {
             names_and_indices.push_back({data.setting_name, setting});
@@ -130,7 +130,7 @@ std::vector<std::pair<std::string_view, GAME_SETTING>> get_settings_names_and_in
     }
 
     {
-        auto* settings_map = (std::map<GAME_SETTING, SettingData>*)get_address("settings_map");
+        static auto* settings_map = (std::map<GAME_SETTING, SettingData>*)get_address("settings_map");
         for (auto& [setting, data] : *settings_map)
         {
             if (strstr(data.setting_name, "damsel"))

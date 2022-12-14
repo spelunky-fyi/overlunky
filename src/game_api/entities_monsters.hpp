@@ -285,6 +285,8 @@ class Pet : public Monster
     int16_t func_timer;
     /// -1 = sitting and yelling, 0 = either running, dead or picked up
     int8_t active_state;
+    /// number of times petted in the camp
+    uint8_t petted_counter;
 };
 
 class Caveman : public WalkingMonster
@@ -378,7 +380,7 @@ class Lavamander : public Monster
     uint16_t jump_pause_timer; // jump pause when cool; runs continuously when hot
     uint8_t lava_detection_timer;
     bool is_hot;
-    /// 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava | probably used so he won't spit imminently after seeing the player
+    /// 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
     uint8_t player_detect_state;
     uint8_t padding2;
 };
@@ -447,6 +449,8 @@ class VanHorsing : public NPC
   public:
     /// if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
     bool show_text;
+    /// one way door message has been shown
+    bool special_message_shown;
 };
 
 class WitchDoctor : public WalkingMonster
@@ -934,7 +938,7 @@ class MegaJellyfish : public Monster
     Entity* flipper1;
     Entity* flipper2;
     SoundMeta* sound;
-    /// the closest orb, does not gets updated
+    /// game checks if this uid, and two following exist, if not, the Jellyfish starts chasing player
     int32_t orb_uid;
     int32_t tail_bg_uid;
     float applied_velocity;
@@ -1031,6 +1035,8 @@ class CritterCrab : public Critter
   public:
     uint8_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     bool walking_left;
+    /// moves away from its target instead of towards it
+    bool unfriendly;
 };
 
 class CritterButterfly : public Critter
@@ -1101,7 +1107,8 @@ class CritterDrone : public Critter
     SoundMeta* sound;
     float applied_hor_momentum;
     float applied_ver_momentum;
-    bool unknown1;
+    /// moves away from its target instead of towards it
+    bool unfriendly;
     uint8_t move_timer;
 };
 

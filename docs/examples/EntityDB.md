@@ -1,5 +1,3 @@
-Used to store static common data for an ENT_TYPE. You can also clone entity types with the copy constructor to create new custom entities with different common properties. [This tool](https://dregu.github.io/Spelunky2ls/animation.html) can be helpful when messing with the animations. The default values are also listed in [entities.json](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json).
-
 > When cloning an entity type, remember to save it in the script for as long as you need it. Otherwise the memory will be freed immediately, which eventually leads to a crash when used or overwritten by other stuff:
 
 ```lua

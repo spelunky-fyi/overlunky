@@ -15,6 +15,8 @@
 #include "math.hpp"    // for Quad, AABB (ptr only)
 #include "texture.hpp" // for Texture
 
+struct JournalUI;
+
 enum JOURNAL_VFTABLE
 {
     // to get those offsets, find "vftable_JournalPages" then go to each page in journal, then to it's first vtable function address
@@ -59,6 +61,146 @@ enum class WorldShader : std::uint8_t
     DeferredTextureColor_EmissiveColorizedGlow_Saturation = 0x18,
 };
 
+struct Letter
+{
+    /// Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
+    Vec2 center() const
+    {
+        // there is probably better way of doing this?
+        // could also just assume that the coordinates are correct and calculate the center using just the edges?
+        auto right = std::max({bottom.A.x, bottom.B.x, bottom.C.x, top.A.x, top.B.x, top.C.x});
+        auto left = std::min({bottom.A.x, bottom.B.x, bottom.C.x, top.A.x, top.B.x, top.C.x});
+        auto _top = std::max({bottom.A.y, bottom.B.y, bottom.C.y, top.A.y, top.B.y, top.C.y});
+        auto _bottom = std::min({bottom.A.y, bottom.B.y, bottom.C.y, top.A.y, top.B.y, top.C.y});
+        return AABB{left, _bottom, right, _top}.center();
+    }
+
+    /// Get the Quad of a letter (easier to work with compared to the two triangles)
+    /// This assumes that the triangles are in the correct 'touching each other' position
+    /// if the positions were altered the results may not end up as expected
+    Quad get_quad() const
+    {
+        return {bottom.A, bottom.B, bottom.C, top.C};
+    }
+    /// Inverse of the get_quad
+    void set_quad(Quad quad)
+    {
+        // bottom_left, bottom_right, top_right, top_left
+        std::tuple<Vec2, Vec2, Vec2, Vec2> vectors = quad;
+        bottom.A = std::get<0>(vectors);
+        bottom.B = top.B = std::get<1>(vectors);
+        top.C = std::get<2>(vectors);
+        bottom.C = top.A = std::get<3>(vectors);
+    }
+
+    // b - bottom, t - top
+    //
+    // bC    tA===tC
+    // ||\    \   ||
+    // || \    \  ||
+    // ||  \    \ ||
+    // ||   \    \||
+    // bA===bB    tB
+
+    Triangle bottom;
+    Triangle top;
+};
+
+struct TextRenderingInfo
+{
+    TextRenderingInfo() = default;
+    TextRenderingInfo(TextRenderingInfo&) = delete;
+    ~TextRenderingInfo();
+
+    /// Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
+    void set_textx(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+
+    void set_text(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+    void set_text(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+
+    /// Returns refrence to the letter coordinates relative to the x,y position
+    std::span<Letter> get_dest()
+    {
+        return {dest, (dest + text_length)};
+    }
+    /// Returns refrence to the letter coordinates in the texture
+    std::span<Letter> get_source()
+    {
+        return {source, (source + text_length)};
+    }
+
+    /// {width, height}, is only updated when you set/change the text
+    std::pair<float, float> text_size() const
+    {
+        return {width, height};
+    }
+    uint32_t size() const
+    {
+        return text_length;
+    }
+    /// Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
+    void rotate(float angle, std::optional<float> px, std::optional<float> py);
+
+    float x;
+    float y;
+    /// You can also just use `#` operator on the whole object to get the text lenght
+    uint32_t text_length;
+    float width;
+    float height;
+    uint32_t unknown3; // padding probably
+
+    Letter* dest{nullptr};
+    Letter* source{nullptr};
+    // 6 * wcslen(input_text), just numbers in order 0, 1, 2 ... have some strage effect if you change them
+    uint16_t* unknown6{nullptr};
+
+    uint16_t nof_special_character; // number of special characters, still not sure how the game known which ones are the special ones?
+                                    // setting higher value than the `text_length` will crash
+    uint16_t unknown8;              // padding probably
+
+    /// Used to draw buttons default is -1 wich is the buttons texture
+    int32_t special_texture_id;
+
+    uint8_t shader; // ? changing it can change the text color, or make the text all rectangles?
+    uint8_t padding1[3];
+    uint32_t padding2;
+    Texture* font;
+    size_t unknown13; // probably garbage
+};
+
+struct TextureRenderingInfo
+{
+    // where to draw on the screen:
+    float x;
+    float y;
+
+    // destination is relative to the x,y centerpoint
+    float destination_bottom_left_x;
+    float destination_bottom_left_y;
+    float destination_bottom_right_x;
+    float destination_bottom_right_y;
+    float destination_top_left_x;
+    float destination_top_left_y;
+    float destination_top_right_x;
+    float destination_top_right_y;
+
+    // source rectangle in the texture to render
+    float source_bottom_left_x;
+    float source_bottom_left_y;
+    float source_bottom_right_x;
+    float source_bottom_right_y;
+    float source_top_left_x;
+    float source_top_left_y;
+    float source_top_right_x;
+    float source_top_right_y;
+
+    void set_destination(const AABB& bbox);
+    Quad dest_get_quad() const;
+    void dest_set_quad(const Quad& quad);
+    Quad source_get_quad() const;
+    void source_set_quad(const Quad& quad);
+};
+
 struct RenderAPI
 {
     const size_t* api;
@@ -75,7 +217,7 @@ struct RenderAPI
     void set_lut(TEXTURE texture_id, uint8_t layer);
     void reset_lut(uint8_t layer);
 
-    void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
+    void draw_text(const TextRenderingInfo* tri, Color color);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
     void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color);
     void draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader);
@@ -183,67 +325,14 @@ struct RenderInfo
     virtual void update() = 0;
     virtual void draw(size_t) = 0;
     virtual bool unknown_3() = 0; // init? sets darkness to 1.0 at the start, then does some other stuff
-};
 
-struct TextRenderingInfo
-{
-    float x;
-    float y;
-    uint32_t text_length;
-    float width;
-    float height;
-    uint32_t unknown3;      // padding probably
-    size_t unknown4;        // unknown4 + letter_textures + unknown5 is most likely a vector
-    size_t letter_textures; // a bunch of float representing the matrix transformations (?) of the individual letters of the text
-    size_t unknown5;
-    uint16_t unknown7;
-    uint16_t unknown8; // padding probably
-    int32_t unknown9;
-    uint8_t shader;
-    uint8_t padding1[3];
-    uint32_t padding2;
-    Texture* font;
-    float unknown13;
-    uint16_t unknown14;
-    uint16_t unknown15;
-    float unknown16;
-    float unknown17;
-    uint32_t unknown18;
-    float unknown19;
-    float unknown20;
-};
+    // gets the entity owning this RenderInfo
+    class Entity* get_entity() const;
 
-struct TextureRenderingInfo
-{
-    // where to draw on the screen:
-    float x;
-    float y;
-
-    // destination is relative to the x,y centerpoint
-    float destination_bottom_left_x;
-    float destination_bottom_left_y;
-    float destination_bottom_right_x;
-    float destination_bottom_right_y;
-    float destination_top_left_x;
-    float destination_top_left_y;
-    float destination_top_right_x;
-    float destination_top_right_y;
-
-    // source rectangle in the texture to render
-    float source_bottom_left_x;
-    float source_bottom_left_y;
-    float source_bottom_right_x;
-    float source_bottom_right_y;
-    float source_top_left_x;
-    float source_top_left_y;
-    float source_top_right_x;
-    float source_top_right_y;
-
-    void set_destination(const AABB& bbox);
-    Quad dest_get_quad();
-    void dest_set_quad(const Quad& quad);
-    Quad source_get_quad();
-    void source_set_quad(const Quad& quad);
+    // for supporting HookableVTable
+    uint32_t get_aux_id() const;
 };
 
 void init_render_api_hooks();
+bool& get_journal_enabled();
+void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);

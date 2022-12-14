@@ -11,26 +11,6 @@
 #include <type_traits>             // for move
 #include <utility>                 // for min, max, _Adl_verify_range
 
-#include "search.hpp" // for get_address
-
-Toast get_toast()
-{
-    static Toast toast = (Toast)get_address("toast");
-    return toast;
-}
-
-Say get_say()
-{
-    static Say say = (Say)get_address("speech_bubble_fun");
-    return say;
-}
-
-size_t get_say_context()
-{
-    static size_t say_context = get_address("say_context");
-    return say_context;
-}
-
 float screenify(float dis)
 {
     ImGuiIO& io = ImGui::GetIO();

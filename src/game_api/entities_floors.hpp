@@ -203,9 +203,19 @@ class LaserTrap : public Floor
 {
   public:
     Illumination* emitted_light;
-    /// after triggering counts from 0 to 255, changes the 'phase_2' then counts from 0 to 104
-    uint8_t reset_timer;
-    bool phase_2;
+    union
+    {
+        /// counts up from 0 after triggering, cannot shoot again until 360
+        uint16_t timer;
+        // Deprecated
+        struct
+        {
+            /// NoDoc
+            uint8_t reset_timer;
+            /// NoDoc
+            bool phase_2;
+        };
+    };
     /// The uid must be movable entity for ownership transfers
     void trigger(int32_t who_uid)
     {
@@ -234,7 +244,7 @@ class SpikeballTrap : public Floor
     SoundMeta* sound;
     Entity* chain;
     Entity* end_piece;
-    /// 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause | going_up is only right when timer is 0, otherwise it just sits at the bottom
+    /// 0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause; going_up is only right when timer is 0, otherwise it just sits at the bottom
     int8_t state;
     /// for the start and retract
     uint8_t timer;

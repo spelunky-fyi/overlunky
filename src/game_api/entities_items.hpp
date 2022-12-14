@@ -31,8 +31,8 @@ class Backpack : public Movable
     virtual void v95() = 0; // just return
     virtual void on_putting_on(Entity* who) = 0;
     virtual void on_putting_off(Entity* who) = 0;
-    virtual bool is_active() = 0;          // for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack, hoverpack.is_on, teleporter and powerpack return false
-    virtual void play_warning_sound() = 0; // plays the warning sound before explosion for jet, teleporter, hover and power pack
+    virtual bool is_active() = 0;         // for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack, hoverpack.is_on, teleporter and powerpack return false
+    virtual void trigger_explosion() = 0; // Causes the backpack to play its warning sound and triggers the explosion
 };
 
 class Jetpack : public Backpack
@@ -152,7 +152,7 @@ class Flame : public Movable
 class FlameSize : public Flame
 {
   public:
-    /// if changed, gradually goes down |0.03 per frame| to the default size
+    /// if changed, gradually goes down (0.03 per frame) to the default size
     float flame_size;
 };
 
@@ -297,15 +297,15 @@ class Spark : public Flame
     float size;
     /// 0.0 when not on screen
     float size_multiply;
-    /// width and height will be set to this value * size_multiply next frame
+    /// width and height will be set to `next_size * size_multiply` next frame
     float next_size;
     /// very short timer before next size change, giving a pulsing effect
     uint8_t size_change_timer;
     uint8_t extra_padding[3];
 
-    /// This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+    /// This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     float speed;
-    /// This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+    /// This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     float distance;
 };
 
@@ -487,7 +487,8 @@ class PunishBall : public Movable
 {
   public:
     int32_t attached_to_uid;
-    uint8_t unknown_state; /* unsure */
+    /// counts down from 20 while the ball is eligible to break a floor and tries to break it at 0
+    uint8_t timer;
     uint8_t unused1;
     uint16_t unused2;
     float x_pos;
@@ -505,8 +506,6 @@ class Container : public Movable
 {
   public:
     ENT_TYPE inside;
-
-    void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
 
 class Present : public Purchasable
@@ -624,7 +623,7 @@ class SkullDropTrap : public Movable
     uint8_t left_skull_drop_time;
     uint8_t middle_skull_drop_time;
     uint8_t right_skull_drop_time;
-    /// counts from 60 3 times, the last time dropping the skulls, then random longer timer for reset
+    /// counts from 60 to 0, 3 times, the last time dropping the skulls, then random longer timer for reset
     uint8_t timer;
 };
 

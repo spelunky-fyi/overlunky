@@ -453,8 +453,8 @@ class LogicDiceShop : public Logic
     uint32_t bet_machine; // entity uid
     uint32_t die1;        // entity uid
     uint32_t die2;        // entity uid
-    uint8_t die_1_value;
-    uint8_t die_2_value;
+    int8_t die_1_value;
+    int8_t die_2_value;
     uint16_t unknown8;
     uint32_t prize_dispenser; // entity uid
     uint32_t prize;           // entity uid
@@ -467,7 +467,7 @@ class LogicDiceShop : public Logic
     uint8_t unknown14;
     uint8_t unknown15;
     uint8_t unknown16;
-    uint32_t balance; // cash balance of all the games
+    int32_t balance; // cash balance of all the games
 
     virtual ~LogicDiceShop() = 0;
 };
@@ -806,7 +806,7 @@ struct LiquidPhysics
     size_t unknown1; // MysteryLiquidPointer1 in plugin, collision with floors/activefloors related
     union
     {
-        LiquidPool pools[5];
+        std::array<LiquidPool, 5> pools;
         struct
         {
             LiquidPhysicsParams water_physics_defaults;
@@ -980,10 +980,10 @@ struct ShopsInfo
     std::vector<ShopOwnerDetails> shop_owners;
 };
 
-struct OnScreenMessage
+struct MultiLineTextRendering
 {
-    uint32_t* timer;                       // it's some struct, game increments this value and one at +0x40, touching just one freezes the game
+    size_t* timer;                         // some struct? game increments this value and one at +0x40, seam to be related to rendering, touching just the first one freezes the game
     std::vector<TextRenderingInfo*> lines; // each line is separete TextRenderingInfo
-    float x;
-    float z;
+    float x;                               // center of the text box?
+    float z;                               // center of the text box?
 };

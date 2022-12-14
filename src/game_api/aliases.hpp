@@ -21,6 +21,7 @@ using IMAGE = int64_t;                        // NoAlias
 using WORLD_SHADER = uint8_t;                 // NoAlias
 using SHORT_TILE_CODE = uint8_t;
 using STRINGID = uint32_t;
+using FEAT = uint8_t;
 
 inline constexpr uint8_t MAX_PLAYERS = 4;
 

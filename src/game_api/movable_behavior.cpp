@@ -34,7 +34,7 @@ CustomMovableBehavior::~CustomMovableBehavior()
         // whole state machine can not possibly be valid anymore
         clear_behaviors(movable);
         movable->apply_db();
-        movable->unhook(hook);
+        movable->clean_on_dtor(hook);
     }
 }
 
@@ -222,7 +222,7 @@ void set_entity_turning(class Entity* entity, bool enabled)
         auto it = std::find_if(g_entities_disabled_turning.begin(), g_entities_disabled_turning.end(), find_entity_pred);
         if (it == g_entities_disabled_turning.end())
         {
-            entity->unhook(it->dtor_hook);
+            entity->clean_on_dtor(it->dtor_hook);
             g_entities_disabled_turning.erase(it);
         }
     }

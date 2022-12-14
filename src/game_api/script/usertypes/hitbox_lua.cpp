@@ -58,13 +58,14 @@ void register_usertypes(sol::state& lua)
         return AABB{sx1, sy1, sx2, sy2};
     };
 
+    /// Simple object to hold pair of coordinates
     lua.new_usertype<Vec2>(
         "Vec2",
         sol::constructors<Vec2(), Vec2(const Vec2&), Vec2(float, float)>{},
         sol::meta_function::addition,
         &Vec2::operator+,
         sol::meta_function::subtraction,
-        &Vec2::operator-,
+        static_cast<Vec2 (Vec2::*)(const Vec2&) const>(&Vec2::operator-),
         sol::meta_function::equal_to,
         &Vec2::operator==,
         sol::meta_function::multiplication,
@@ -78,6 +79,7 @@ void register_usertypes(sol::state& lua)
         "rotate",
         &Vec2::rotate,
         "split",
+        // &Vec2::split); // for the autodoc
         &Vec2::operator std::pair<float, float>);
 
     const auto extrude = sol::overload(
@@ -111,7 +113,33 @@ void register_usertypes(sol::state& lua)
         "width",
         &AABB::width,
         "height",
-        &AABB::height);
+        &AABB::height,
+        "split",
+        // &Vec2::split); // for the autodoc
+        &AABB::operator std::tuple<float, float, float, float>);
+
+    auto offset = sol::overload(
+        static_cast<Triangle& (Triangle::*)(const Vec2&)>(&Triangle::offset),
+        static_cast<Triangle& (Triangle::*)(float, float)>(&Triangle::offset));
+
+    lua.new_usertype<Triangle>(
+        "Triangle",
+        sol::constructors<Triangle(), Triangle(const Triangle&), Triangle(Vec2&, Vec2&, Vec2&), Triangle(float, float, float, float, float, float)>{},
+        "A",
+        &Triangle::A,
+        "B",
+        &Triangle::B,
+        "C",
+        &Triangle::C,
+        "offset",
+        offset,
+        "rotate",
+        &Triangle::rotate,
+        "center",
+        &Triangle::center,
+        "split",
+        // &Triangle::split); // for the autodoc
+        &Triangle::operator std::tuple<Vec2, Vec2, Vec2>);
 
     lua.new_usertype<Quad>(
         "Quad",
@@ -143,6 +171,7 @@ void register_usertypes(sol::state& lua)
         "flip_vertically",
         &Quad::flip_vertically,
         "split",
-        &Quad::split);
+        // &Quad::split); // for the autodoc
+        &Quad::operator std::tuple<Vec2, Vec2, Vec2, Vec2>);
 }
 } // namespace NHitbox
