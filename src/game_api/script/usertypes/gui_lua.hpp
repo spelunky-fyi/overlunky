@@ -64,7 +64,7 @@ class GuiDrawContext
     /// **Important: Keep all your labels unique!** If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
     /// give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...
     /// Returns false if the window was closed from the X.
-    /// <br/>The callback signature is nil win(GuiDrawContext ctx)
+    /// <br/>The callback signature is nil win(GuiDrawContext ctx, ImVec2 pos, ImVec2 size)
     bool window(std::string title, float x, float y, float w, float h, bool movable, sol::function callback);
     /// Add some text to window, automatically wrapped
     void win_text(std::string text);

@@ -351,7 +351,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     flag |= ImGuiWindowFlags_NoDocking;
     ImGui::Begin(title.c_str(), &win_open, flag);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() / 2);
-    handle_function<void>(backend, callback, this);
+    handle_function<void>(backend, callback, this, ImGui::GetWindowPos(), ImGui::GetWindowSize());
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
