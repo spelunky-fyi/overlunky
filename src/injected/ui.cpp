@@ -70,6 +70,7 @@ std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_ui_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
+ScriptImage g_cursor;
 
 std::map<std::string, int64_t> default_keys{
     {"enter", VK_RETURN},
@@ -318,7 +319,7 @@ std::map<std::string, bool> options = {
     {"smooth_camera", true},
     {"multi_viewports", true},
     {"menu_ui", true},
-    {"hd_cursor", false}};
+    {"hd_cursor", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -533,6 +534,31 @@ void set_colors()
     style.PopupBorderSize = 0;
     style.ChildBorderSize = 0;
     style.DisplaySafeAreaPadding = {0, 0};
+}
+
+void load_cursor()
+{
+    if (g_cursor.texture == nullptr)
+        create_d3d11_texture_from_memory(cursor_png, cursor_size, &g_cursor.texture, &g_cursor.width, &g_cursor.height);
+}
+
+void render_cursor()
+{
+    ImGuiContext& g = *GImGui;
+    if (g_cursor.texture == nullptr || !g.IO.MouseDrawCursor || g.MouseCursor != ImGuiMouseCursor_Arrow)
+        return;
+    g.MouseCursor = ImGuiMouseCursor_None;
+    const float scale = 0.8f;
+    for (int n = 0; n < g.Viewports.Size; n++)
+    {
+        ImGuiViewportP* viewport = g.Viewports[n];
+        const ImVec2 pos = g.IO.MousePos;
+        ImDrawList* draw_list = ImGui::GetForegroundDrawList(viewport);
+        ImTextureID tex_id = g_cursor.texture;
+        draw_list->PushTextureID(tex_id);
+        draw_list->AddImage(tex_id, pos, {pos.x + g_cursor.width * scale, pos.y + g_cursor.height * scale}, {0.0f, 0.0f}, {1.0f, 1.0f}, 0xffffffff);
+        draw_list->PopTextureID();
+    }
 }
 
 void load_script(std::string file, bool enable = true)
@@ -4943,14 +4969,8 @@ void render_options()
 
     if (submenu("User interface"))
     {
-        if (g_ui_scripts.find("cursor") != g_ui_scripts.end())
-        {
-            if (ImGui::Checkbox("HD cursor", &options["hd_cursor"]))
-            {
-                g_ui_scripts["cursor"]->set_enabled(options["hd_cursor"]);
-            }
-            tooltip("Enable the Spelunky HD cursor :)");
-        }
+        ImGui::Checkbox("HD cursor", &options["hd_cursor"]);
+        tooltip("Enable the Spelunky HD cursor :)");
         ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
         tooltip("Enables to spawn entities, teleport and pick entities with mouse.\nDisable for scripts that require mouse clicking.", "toggle_mouse");
         ImGui::Checkbox("Keyboard controls##keyevents", &options["keyboard_control"]);
@@ -7204,6 +7224,7 @@ void imgui_init(ImGuiContext*)
     show_cursor();
     load_config(cfgfile);
     load_font();
+    load_cursor();
     refresh_script_files();
     autorun_scripts();
     set_colors();
@@ -7239,23 +7260,6 @@ void imgui_init(ImGuiContext*)
             g_Console.get(),
             false);
         g_ui_scripts["light"] = std::unique_ptr<SpelunkyScript>(script);
-    }
-    if (g_ui_scripts.find("cursor") == g_ui_scripts.end())
-    {
-        if (std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
-        {
-            std::string cursorpath = scriptpath + "/cursor.lua";
-            std::ifstream data(cursorpath);
-            if (!data.fail())
-            {
-                std::ostringstream buf;
-                buf << data.rdbuf();
-                SpelunkyScript* script = new SpelunkyScript(buf.str(), cursorpath, g_SoundManager.get(), g_Console.get(), options["hd_cursor"]);
-                g_ui_scripts[script->get_file()] = std::unique_ptr<SpelunkyScript>{script};
-                data.close();
-                g_ui_scripts["cursor"] = std::unique_ptr<SpelunkyScript>(script);
-            }
-        }
     }
 }
 
@@ -7489,6 +7493,9 @@ void imgui_draw()
         else
             ++it;
     }
+
+    if (options["hd_cursor"])
+        render_cursor();
 }
 
 void check_focus()

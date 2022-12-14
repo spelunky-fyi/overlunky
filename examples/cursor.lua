@@ -1,10 +1,11 @@
 meta.name = "HD Cursor"
-meta.description = "Replace the cursor with the HD cursor!"
+meta.description = [[Replace the cursor with the HD cursor!
+
+Note: The feature is enabled by default natively in Overlunky
+and doesn't need these files, this is just an example how to do it with lua
+]]
 meta.version = "1.0"
 meta.author = "Dregu"
-
--- this script is enabled by default in overlunky user interface options
--- if it's installed in the default script directory
 
 iio = get_io()
 
