@@ -427,6 +427,13 @@ void register_usertypes(sol::state& lua)
         "OnlineLobby",
         "code",
         &OnlineLobby::code,
+        "local_player_slot",
+        sol::property([](OnlineLobby& ol) // -> uint8_t
+                      { return ol.local_player_slot + 1; },
+                      [](OnlineLobby& ol, int8_t val)
+                      {
+                          ol.local_player_slot = val - 1;
+                      }),
         "get_code",
         &OnlineLobby::get_code);
     /// Used in StateMemory

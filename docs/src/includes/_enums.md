@@ -546,11 +546,11 @@ Name | Data | Description
 [FLOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.FLOOR) | 0x100 | All FLOOR_* and FLOORSTYLED_* entities<br/>Various types, all `Floor`<br/>
 [DECORATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.DECORATION) | 0x200 | All DECORATION_* entities except: DECORATION_CHAINANDBLOCKS_CHAINDECORATION, DECORATION_SLIDINGWALL_CHAINDECORATION, DECORATION_PALACE_PORTRAIT<br/>Also includes: EMBED_GOLD, ENT_TYPE_EMBED_GOLD_BIG<br/>Various types, all `Entity`<br/>
 [BG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.BG) | 0x400 | All MIDBG* entities and most of the BG_* entities<br/>does not include: a lot .. check [default_flags_more_flags.txt](internal/entity.type.default_flags_more_flags.txt) for full list<br/>Also includes: DECORATION_PALACE_PORTRAIT<br/>Various types, all `Entity`<br/>
-[SHADOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.SHADOW) | 0x800 | All the BG_* entities excluded from `BG` (MASK.BG &#124 MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above<br/>Various types, all `Entity`<br/>
+[SHADOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.SHADOW) | 0x800 | All the BG_* entities excluded from `BG` (MASK.BG &#124; MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above<br/>Various types, all `Entity`<br/>
 [LOGICAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LOGICAL) | 0x1000 | All LOGICAL_* entities<br/>Also includes: ITEM_POWERUP_*, FX_COMPASS, FX_SPECIALCOMPASS, FX_LEADER_FLAG, FX_PLAYERINDICATOR, FX_PLAYERINDICATORPORTRAIT<br/>Various types, all `Entity`<br/>
 [WATER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.WATER) | 0x2000 | Only: LIQUID_WATER, LIQUID_COARSE_WATER, LIQUID_IMPOSTOR_LAKE<br/>Various types, all `Entity`<br/>
 [LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) | 0x4000 | Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA<br/>Various types, all `Entity`<br/>
-[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for ([MASK](#MASK).WATER &#124 [MASK](#MASK).LAVA)<br/>
+[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for ([MASK](#MASK).WATER &#124; [MASK](#MASK).LAVA)<br/>
 [ANY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ANY) | 0x0 | Value of 0, treated by all the functions as ANY mask<br/>
 
 ## ON

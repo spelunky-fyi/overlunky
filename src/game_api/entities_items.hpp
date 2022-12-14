@@ -297,15 +297,15 @@ class Spark : public Flame
     float size;
     /// 0.0 when not on screen
     float size_multiply;
-    /// width and height will be set to this value * size_multiply next frame
+    /// width and height will be set to `next_size * size_multiply` next frame
     float next_size;
     /// very short timer before next size change, giving a pulsing effect
     uint8_t size_change_timer;
     uint8_t extra_padding[3];
 
-    /// This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+    /// This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     float speed;
-    /// This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+    /// This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     float distance;
 };
 
@@ -623,7 +623,7 @@ class SkullDropTrap : public Movable
     uint8_t left_skull_drop_time;
     uint8_t middle_skull_drop_time;
     uint8_t right_skull_drop_time;
-    /// counts from 60 3 times, the last time dropping the skulls, then random longer timer for reset
+    /// counts from 60 to 0, 3 times, the last time dropping the skulls, then random longer timer for reset
     uint8_t timer;
 };
 

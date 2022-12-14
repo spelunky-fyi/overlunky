@@ -90,7 +90,7 @@ void register_usertypes(sol::state& lua)
     entitydb_type["damage"] = &EntityDB::damage;
     entitydb_type["life"] = &EntityDB::life;
     entitydb_type["blood_content"] = &EntityDB::blood_content;
-    entitydb_type["texture"] = &EntityDB::texture;
+    entitydb_type["texture"] = &EntityDB::texture_id;
     entitydb_type["animations"] = &EntityDB::animations;
     entitydb_type["properties_flags"] = &EntityDB::properties_flags;
     entitydb_type["default_flags"] = &EntityDB::default_flags;
@@ -225,6 +225,7 @@ void register_usertypes(sol::state& lua)
     entity_type["set_invisible"] = &Entity::set_invisible;
     entity_type["get_items"] = &Entity::get_items;
     entity_type["is_in_liquid"] = &Entity::is_in_liquid;
+    entity_type["is_cursed"] = &Entity::is_cursed;
     /* Entity
     // user_data
     // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LEVEL_GENERATION.
@@ -263,6 +264,7 @@ void register_usertypes(sol::state& lua)
     movable_type["some_state"] = &Movable::some_state;
     movable_type["wet_effect_timer"] = &Movable::wet_effect_timer;
     movable_type["poison_tick_timer"] = &Movable::poison_tick_timer;
+    /// NoDoc
     movable_type["airtime"] = &Movable::falling_timer;
     movable_type["falling_timer"] = &Movable::falling_timer;
     movable_type["is_poisoned"] = &Movable::is_poisoned;
@@ -387,7 +389,7 @@ void register_usertypes(sol::state& lua)
     // Also includes: DECORATION_PALACE_PORTRAIT
     // Various types, all `Entity`
     // SHADOW
-    // All the BG_* entities excluded from `BG` (MASK.BG &#124 MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above
+    // All the BG_* entities excluded from `BG` (MASK.BG &#124; MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above
     // Various types, all `Entity`
     // LOGICAL
     // All LOGICAL_* entities
@@ -400,7 +402,7 @@ void register_usertypes(sol::state& lua)
     // Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA
     // Various types, all `Entity`
     // LIQUID
-    // Short for (MASK.WATER &#124 MASK.LAVA)
+    // Short for (MASK.WATER &#124; MASK.LAVA)
     // ANY
     // Value of 0, treated by all the functions as ANY mask
     */

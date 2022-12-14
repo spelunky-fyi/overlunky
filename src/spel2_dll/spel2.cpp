@@ -445,7 +445,9 @@ Spelunky_TextSize Spelunky_DrawTextSize(const char* text, float scale_x, float s
 }
 void Spelunky_DrawText(const char* text, float x, float y, float scale_x, float scale_y, const float (&color)[4], uint32_t alignment, uint32_t fontstyle)
 {
-    RenderAPI::get().draw_text(text, x, y, scale_x, scale_y, Color{color}, alignment, fontstyle);
+    TextRenderingInfo tri{};
+    tri.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
+    RenderAPI::get().draw_text(&tri, Color{color});
 }
 
 void Spelunky_EnabledAdvancedHud()

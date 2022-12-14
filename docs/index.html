@@ -1550,6 +1550,9 @@
                             <a href="#ImVec2" class="toc-h3 toc-link" data-title="ImVec2">ImVec2</a>
                           </li>
                           <li>
+                            <a href="#Letter" class="toc-h3 toc-link" data-title="Letter">Letter</a>
+                          </li>
+                          <li>
                             <a href="#MovableBehavior" class="toc-h3 toc-link" data-title="MovableBehavior">MovableBehavior</a>
                           </li>
                           <li>
@@ -1563,6 +1566,9 @@
                           </li>
                           <li>
                             <a href="#ShortTileCodeDef" class="toc-h3 toc-link" data-title="ShortTileCodeDef">ShortTileCodeDef</a>
+                          </li>
+                          <li>
+                            <a href="#Triangle" class="toc-h3 toc-link" data-title="Triangle">Triangle</a>
                           </li>
                           <li>
                             <a href="#Vec2" class="toc-h3 toc-link" data-title="Vec2">Vec2</a>
@@ -5513,7 +5519,7 @@ Use this only when no other approach works, this call can be expensive if overus
 <p><code>optional&lt;CallbackId&gt; set_on_open(int uid, function fun)</code><br/>
 Use <code>entity:set_pre_trigger_action</code> instead.
 Returns unique id for the callback to be used in <a href="#clear_entity_callback">clear_entity_callback</a> or <code>nil</code> if uid is not valid.
-Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+Sets a callback that is called right when a container is opened by the player (up+whip)
 Use this only when no other approach works, this call can be expensive if overused.
 Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">here</a> to see whether you can use this callback on the entity type you intend to.
 <br/>The callback signature is nil on_open(<a href="#Entity">Entity</a> entity_self, <a href="#Entity">Entity</a> opener)</p>
@@ -6771,6 +6777,11 @@ Future calls to this will override the save</p>
 <td>Draw text using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.</td>
 </tr>
 <tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text(const TextRenderingInfo tri, Color color)</a></td>
+<td></td>
+</tr>
+<tr>
 <td>tuple&lt;float, float&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text_size">draw_text_size(const string&amp; text, float scale_x, float scale_y, int fontstyle)</a></td>
 <td>Measure the provided text using the built-in renderer</td>
@@ -7684,6 +7695,40 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 </tbody></table>
+<h3 id='Letter'>Letter</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#Triangle">Triangle</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bottom">bottom</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Triangle">Triangle</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=top">top</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Quad">Quad</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_quad">get_quad()</a></td>
+<td>Get the <a href="#Quad">Quad</a> of a letter (easier to work with compared to the two triangles)<br/>This assumes that the triangles are in the correct &#39;touching each other&#39; position<br/>if the positions were altered the results may not end up as expected</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_quad">set_quad(Quad quad)</a></td>
+<td>Inverse of the get_quad</td>
+</tr>
+<tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=center">center()</a></td>
+<td>Get&#39;s approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values</td>
+</tr>
+</tbody></table>
 <h3 id='MovableBehavior'>MovableBehavior</h3>
 <p>Opaque handle to a movable behavior used in some <a href="#Movable">Movable</a> functions</p>
 
@@ -7789,7 +7834,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td><a href="#Quad">Quad</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Quad">new(Vec2&amp; bottom_left_, Vec2&amp; bottom_right_, Vec2&amp; top_right_, Vec2&amp; top_left_)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Quad">new(Vec2 bottom_left_, Vec2 bottom_right_, Vec2 top_right_, Vec2 top_left_)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -7960,7 +8005,78 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td>Alternative tile code, ignored if <code>chance == 100</code>. Defaults to 0.</td>
 </tr>
 </tbody></table>
+<h3 id='Triangle'>Triangle</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#Triangle">Triangle</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Triangle">new()</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Triangle">Triangle</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Triangle">new(Triangle)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Triangle">Triangle</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Triangle">new(Vec2&amp; _a, Vec2&amp; _b, Vec2&amp; _c)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Triangle">Triangle</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Triangle">new(float ax, float ay, float bx, float by, float cx, float cy)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=A">A</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=B">B</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=C">C</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Triangle">Triangle</a>&amp;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(const Vec2&amp; off)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Triangle">Triangle</a>&amp;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(float x, float y)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Triangle">Triangle</a>&amp;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, float px, float py)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=center">center()</a></td>
+<td>Also known as centroid</td>
+</tr>
+<tr>
+<td>tuple&lt;<a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split()</a></td>
+<td>Returns the corners</td>
+</tr>
+</tbody></table>
 <h3 id='Vec2'>Vec2</h3>
+<p>Simple object to hold pair of coordinates</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -7981,11 +8097,6 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td><a href="#Vec2">Vec2</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Vec2">new(float x_, float y_)</a></td>
-<td></td>
-</tr>
-<tr>
-<td><a href="#Vec2">Vec2</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Vec2">new(tuple<float, float> p)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -9349,7 +9460,7 @@ Derived from <a href="#Logic">Logic</a></p>
 <td></td>
 </tr>
 <tr>
-<td>OnlinePlayerShort</td>
+<td><a href="#OnlinePlayer">OnlinePlayer</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=local_player">local_player</a></td>
 <td></td>
 </tr>
@@ -9372,6 +9483,11 @@ Derived from <a href="#Logic">Logic</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=code">code</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=local_player_slot">local_player_slot</a></td>
 <td></td>
 </tr>
 <tr>
@@ -13977,6 +14093,11 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </thead><tbody>
 <tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=new">new</a></td>
+<td><a href="#TextRenderingInfo">TextRenderingInfo</a>:new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)<br/>Creates new <a href="#TextRenderingInfo">TextRenderingInfo</a> that can be used in <a href="#VanillaRenderContext">VanillaRenderContext</a> draw_text<br/>For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you<br/></td>
+</tr>
+<tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
 <td></td>
@@ -13989,7 +14110,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_length">text_length</a></td>
-<td></td>
+<td>You can also just use <code>#</code> operator on the whole object to get the text lenght</td>
 </tr>
 <tr>
 <td>float</td>
@@ -14002,9 +14123,39 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=special_texture_id">special_texture_id</a></td>
+<td>Used to draw buttons default is -1 wich is the buttons texture</td>
+</tr>
+<tr>
 <td>Texture</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=font">font</a></td>
 <td></td>
+</tr>
+<tr>
+<td>array&lt;<a href="#Letter">Letter</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dest">get_dest()</a></td>
+<td>Returns refrence to the letter coordinates relative to the x,y position</td>
+</tr>
+<tr>
+<td>array&lt;<a href="#Letter">Letter</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_source">get_source()</a></td>
+<td>Returns refrence to the letter coordinates in the texture</td>
+</tr>
+<tr>
+<td>tuple&lt;float, float&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_size">text_size()</a></td>
+<td>{width, height}, is only updated when you set/change the text</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, optional<float> px, optional<float> py)</a></td>
+<td>Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_text">set_text(const string text, float scale_x, float scale_y, int alignment, int fontstyle)</a></td>
+<td>Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters</td>
 </tr>
 </tbody></table>
 <h3 id='TextureDefinition'>TextureDefinition</h3>
@@ -16326,7 +16477,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#EntityDB">EntityDB</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=type">type</a></td>
-<td></td>
+<td>Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the <a href="#EntityDB">EntityDB</a></td>
 </tr>
 <tr>
 <td><a href="#Entity">Entity</a></td>
@@ -16334,74 +16485,74 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_FLAG">ENT_FLAG</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flags">flags</a></td>
-<td></td>
+<td>see <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp">flags.hpp</a> entity_flags</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_MORE_FLAG">ENT_MORE_FLAG</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=more_flags">more_flags</a></td>
-<td></td>
+<td>see <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp">flags.hpp</a> more_flags</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=uid">uid</a></td>
-<td></td>
+<td>Unique id of the entity, save it to variable to check this entity later (don&#39;t use the whole <a href="#Entity">Entity</a> type as it will be replaced with a different one when this is destroyed)</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=animation_frame">animation_frame</a></td>
-<td></td>
+<td>Number (id) of the sprite in the texture</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_depth">draw_depth</a></td>
-<td>Don&#39;t edit this directly, use <code>set_draw_depth</code></td>
+<td>Depth level that this entity is drawn on.<br/>Don&#39;t edit this directly, use <code>set_draw_depth</code> function</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
-<td></td>
+<td>Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use <a href="#get_position">get_position</a> to get accurate position in the game world</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
-<td></td>
+<td>Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use <a href="#get_position">get_position</a> to get accurate position in the game world</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=layer">layer</a></td>
-<td></td>
+<td>Use <code>set_layer</code> to change</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=width">width</a></td>
-<td></td>
+<td>Width of the sprite</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=height">height</a></td>
-<td></td>
+<td>Height of the sprite</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=special_offsetx">special_offsetx</a></td>
-<td></td>
+<td>Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=special_offsety">special_offsety</a></td>
-<td></td>
+<td>Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tile_width">tile_width</a></td>
-<td></td>
+<td>Size of the sprite in the texture</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tile_height">tile_height</a></td>
-<td></td>
+<td>Size of the sprite in the texture</td>
 </tr>
 <tr>
 <td>float</td>
@@ -16416,12 +16567,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=hitboxx">hitboxx</a></td>
-<td></td>
+<td>Half of the width of the hitbox</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=hitboxy">hitboxy</a></td>
-<td></td>
+<td>Half of the height of the hitbox</td>
 </tr>
 <tr>
 <td><a href="#SHAPE">SHAPE</a></td>
@@ -16436,12 +16587,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offsetx">offsetx</a></td>
-<td></td>
+<td>Offset of the hitbox in relation to the entity position</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offsety">offsety</a></td>
-<td></td>
+<td>Offset of the hitbox in relation to the entity position</td>
 </tr>
 <tr>
 <td><a href="#RenderInfo">RenderInfo</a></td>
@@ -16549,9 +16700,9 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>Triggers weapons and other held items like teleportter, mattock etc. You can check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">virtual-availability.md</a>, if entity has <code>open</code> in the <code>on_open</code> you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)</td>
 </tr>
 <tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_metadata">get_metadata</a></td>
-<td></td>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_metadata">get_metadata()</a></td>
+<td>e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -16572,6 +16723,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_in_liquid">is_in_liquid()</a></td>
 <td>Returns true if entity is in water/lava</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_cursed">is_cursed()</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h3 id='IceSlidingSound'>IceSlidingSound</h3>
@@ -17041,7 +17197,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=min_empty_distance">min_empty_distance</a></td>
-<td>Used in bigspeartrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles</td>
+<td>Used in <a href="#BigSpearTrap">BigSpearTrap</a> when it has to have minimum 2 free spaces to be able to trigger, value in tiles</td>
 </tr>
 <tr>
 <td>int</td>
@@ -18849,7 +19005,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=orb_uid">orb_uid</a></td>
-<td>the closest orb, does not gets updated</td>
+<td>game checks if this uid, and two following exist, if not, the Jellyfish starts chasing player</td>
 </tr>
 <tr>
 <td>int</td>
@@ -19338,12 +19494,12 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=linked_companion_parent">linked_companion_parent</a></td>
-<td></td>
+<td>entity uid</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=linked_companion_child">linked_companion_child</a></td>
-<td></td>
+<td>entity uid</td>
 </tr>
 <tr>
 <td><a href="#Ai">Ai</a></td>
@@ -21137,7 +21293,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
-<td>puase timer, counts down 60 to 0</td>
+<td>pause timer, counts down 60 to 0</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -22512,17 +22668,17 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="#Vec2">Vec2</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move">move</a></td>
-<td></td>
+<td>{movex, movey}</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=movex">movex</a></td>
-<td></td>
+<td>Move directions (-1.0 to 1.0) that represent in whit direction the entity want&#39;s to move</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=movey">movey</a></td>
-<td></td>
+<td>Move directions (-1.0 to 1.0) that represent in whit direction the entity want&#39;s to move</td>
 </tr>
 <tr>
 <td><a href="#BUTTON">BUTTON</a></td>
@@ -22542,7 +22698,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=jump_height_multiplier">jump_height_multiplier</a></td>
-<td></td>
+<td><a href="#EntityDB">EntityDB</a>.jump gets multiplied by this to get the jump</td>
 </tr>
 <tr>
 <td>int</td>
@@ -22572,12 +22728,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=velocityx">velocityx</a></td>
-<td></td>
+<td>speed, can be relative to the platform you standing on (pushblocks, elevators), use <a href="#get_velocity">get_velocity</a> to get accurate speed in the game world</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=velocityy">velocityy</a></td>
-<td></td>
+<td>speed, can be relative to the platform you standing on (pushblocks, elevators), use <a href="#get_velocity">get_velocity</a> to get accurate speed in the game world</td>
 </tr>
 <tr>
 <td>int</td>
@@ -22627,17 +22783,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=poison_tick_timer">poison_tick_timer</a></td>
-<td></td>
-</tr>
-<tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=airtime">airtime</a></td>
-<td>airtime = falling_timer</td>
+<td>Used to apply damage from poison, can be set to -1 to cure poison, to set poison use <a href="#poison_entity">poison_entity</a></td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=falling_timer">falling_timer</a></td>
-<td>airtime = falling_timer</td>
+<td></td>
 </tr>
 <tr>
 <td>bool</td>
@@ -23319,7 +23470,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
-<td>counts from 60 3 times, the last time dropping the skulls, then random longer timer for reset</td>
+<td>counts from 60 to 0, 3 times, the last time dropping the skulls, then random longer timer for reset</td>
 </tr>
 </tbody></table>
 <h3 id='SleepBubble'>SleepBubble</h3>
@@ -23423,7 +23574,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=next_size">next_size</a></td>
-<td>width and height will be set to this value  size_multiply next frame</td>
+<td>width and height will be set to <code>next_size  size_multiply</code> next frame</td>
 </tr>
 <tr>
 <td>int</td>
@@ -23433,12 +23584,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=speed">speed</a></td>
-<td>This is cusome variable, you need to use <code>activate_sparktraps_hack</code> to use it</td>
+<td>This is cusome variable, you need <a href="#activate_sparktraps_hack">activate_sparktraps_hack</a> to use it</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance">distance</a></td>
-<td>This is cusome variable, you need to use <code>activate_sparktraps_hack</code> to use it</td>
+<td>This is cusome variable, you need <a href="#activate_sparktraps_hack">activate_sparktraps_hack</a> to use it</td>
 </tr>
 </tbody></table>
 <h3 id='Spear'>Spear</h3>
@@ -25659,7 +25810,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.SHADOW">SHADOW</a></td>
 <td>0x800</td>
-<td>All the BG_* entities excluded from <code>BG</code> (MASK.BG &amp;#124 MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above<br/>Various types, all <code>Entity</code><br/></td>
+<td>All the BG_* entities excluded from <code>BG</code> (MASK.BG &#124; MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above<br/>Various types, all <code>Entity</code><br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.LOGICAL">LOGICAL</a></td>
@@ -25679,7 +25830,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.LIQUID">LIQUID</a></td>
 <td>0x6000</td>
-<td>Short for (<a href="#MASK">MASK</a>.WATER &amp;#124 <a href="#MASK">MASK</a>.LAVA)<br/></td>
+<td>Short for (<a href="#MASK">MASK</a>.WATER &#124; <a href="#MASK">MASK</a>.LAVA)<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.ANY">ANY</a></td>

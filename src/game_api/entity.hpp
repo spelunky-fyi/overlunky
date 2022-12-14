@@ -27,36 +27,54 @@ class Entity;
 class Movable;
 
 struct EntityHooksInfo;
+using ENT_FLAG = uint32_t;
+using ENT_MORE_FLAG = uint32_t;
 
 class Entity
 {
   public:
+    /// Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the EntityDB
     EntityDB* type;
     Entity* overlay;
     EntityList items;
-    uint32_t flags;
-    uint32_t more_flags;
+    /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) entity_flags
+    ENT_FLAG flags;
+    /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) more_flags
+    ENT_MORE_FLAG more_flags;
+    /// Unique id of the entity, save it to variable to check this entity later (don't use the whole Entity type as it will be replaced with a different one when this is destroyed)
     int32_t uid;
+    /// Number (id) of the sprite in the texture
     uint16_t animation_frame;
-    /// Don't edit this directly, use `set_draw_depth`
+    /// Depth level that this entity is drawn on.
+    /// Don't edit this directly, use `set_draw_depth` function
     uint8_t draw_depth;
     uint8_t b3f; // depth related, changed when going thru doors etc.
+    /// Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
     float x;
+    /// Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
     float y;
     float abs_x; // only for movable entities, or entities that can be spawned without overlay, for the rest it's FLOAT_MIN?
     float abs_y;
+    /// Width of the sprite
     float w;
+    /// Height of the sprite
     float h;
+    /// Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
     float special_offsetx;
+    /// Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
     float special_offsety;
     Color color;
     union
     {
         struct
         {
+            /// Offset of the hitbox in relation to the entity position
             float offsetx;
+            /// Offset of the hitbox in relation to the entity position
             float offsety;
+            /// Half of the width of the hitbox
             float hitboxx;
+            /// Half of the height of the hitbox
             float hitboxy;
             SHAPE shape;         // 1 = rectangle, 2 = circle
             bool hitbox_enabled; // probably, off for bg, deco, logical etc
@@ -68,8 +86,11 @@ class Entity
     float angle;
     RenderInfo* rendering_info;
     Texture* texture;
+    /// Size of the sprite in the texture
     float tilew;
+    /// Size of the sprite in the texture
     float tileh;
+    /// Use `set_layer` to change
     uint8_t layer;
     uint8_t b99; // this looks like FLOORSTYLED post-processing
     uint8_t b9a;
@@ -162,6 +183,10 @@ class Entity
     bool is_player();
     bool is_movable();
     bool is_liquid();
+    bool is_cursed()
+    {
+        return more_flags & 0x4000;
+    };
 
     // for supporting HookableVTable
     uint32_t get_aux_id() const
@@ -236,7 +261,9 @@ class Entity
     virtual void activate(Entity* activator) = 0;
 
     virtual void on_collision2(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision1, maybe this is on_hitbox_overlap as it works for logical tiggers
-    virtual uint16_t get_metadata() = 0;                  // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+
+    /// e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+    virtual uint16_t get_metadata() = 0;
     virtual void apply_metadata(uint16_t metadata) = 0;
     virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
     virtual void on_walked_off_by(Entity* walker) = 0; // appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item_ptr

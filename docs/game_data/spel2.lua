@@ -1818,7 +1818,7 @@ function change_feat(feat, hidden, name, description) end
 
 ---@class Online
     ---@field online_players OnlinePlayer[]
-    ---@field local_player OnlinePlayerShort
+    ---@field local_player OnlinePlayer
     ---@field lobby OnlineLobby
 
 ---@class OnlinePlayer
@@ -1828,6 +1828,7 @@ function change_feat(feat, hidden, name, description) end
 
 ---@class OnlineLobby
     ---@field code integer
+    ---@field local_player_slot integer
     ---@field get_code fun(self): string
 
 ---@class LogicList
@@ -2005,8 +2006,8 @@ local function PRNG_random(self, min, max) end
 ---@class Entity
     ---@field type EntityDB
     ---@field overlay Entity
-    ---@field flags integer
-    ---@field more_flags integer
+    ---@field flags ENT_FLAG
+    ---@field more_flags ENT_MORE_FLAG
     ---@field uid integer
     ---@field animation_frame integer
     ---@field draw_depth integer
@@ -2046,11 +2047,12 @@ local function PRNG_random(self, min, max) end
     ---@field activate fun(self, activator: Entity): nil
     ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil
     ---@field trigger_action fun(self, user: Entity): boolean
-    ---@field get_metadata any @&Entity::get_metadata
+    ---@field get_metadata fun(self): integer
     ---@field apply_metadata fun(self, metadata: integer): nil
     ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self): integer[]
     ---@field is_in_liquid fun(self): boolean
+    ---@field is_cursed fun(self): boolean
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -2084,7 +2086,6 @@ local function Entity_overlaps_with(self, other) end
     ---@field some_state integer
     ---@field wet_effect_timer integer
     ---@field poison_tick_timer integer
-    ---@field airtime integer
     ---@field falling_timer integer
     ---@field is_poisoned fun(self): boolean
     ---@field poison fun(self, frames: integer): nil
@@ -4304,10 +4305,16 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
 
 ---@class VanillaRenderContext
-    ---@field draw_text fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
+    ---@field draw_text VanillaRenderContext_draw_text
     ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number
     ---@field draw_screen_texture VanillaRenderContext_draw_screen_texture
     ---@field draw_world_texture VanillaRenderContext_draw_world_texture
+
+---@class VanillaRenderContext_draw_text
+---@param tri TextRenderingInfo
+---@param color Color
+---@overload fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
+local function VanillaRenderContext_draw_text(self, tri, color) end
 
 ---@class VanillaRenderContext_draw_screen_texture
 ---@param texture_id TEXTURE
@@ -4358,13 +4365,27 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field source_get_quad fun(self): Quad
     ---@field source_set_quad fun(self, quad: Quad): nil
 
+---@class Letter
+    ---@field bottom Triangle
+    ---@field top Triangle
+    ---@field get_quad fun(self): Quad
+    ---@field set_quad fun(self, quad: Quad): nil
+    ---@field center fun(self): Vec2
+
 ---@class TextRenderingInfo
+    ---@field new any @sol::initializers(&TextRenderingInfo_ctor)
     ---@field x number
     ---@field y number
     ---@field text_length integer
     ---@field width number
     ---@field height number
+    ---@field special_texture_id integer
     ---@field font Texture
+    ---@field get_dest fun(self): Letter[]
+    ---@field get_source fun(self): Letter[]
+    ---@field text_size fun(self): number, number
+    ---@field rotate fun(self, angle: number, px: number?, py: number?): nil
+    ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil
 
 ---@class TextureDefinition
     ---@field texture_path string
@@ -4403,6 +4424,21 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
 ---@param amount_y number
 ---@overload fun(self, amount: number): AABB
 local function AABB_extrude(self, amount_x, amount_y) end
+
+---@class Triangle
+    ---@field A Vec2
+    ---@field B Vec2
+    ---@field C Vec2
+    ---@field offset Triangle_offset
+    ---@field rotate fun(self, angle: number, px: number, py: number): Triangle
+    ---@field center fun(self): Vec2
+    ---@field split fun(self): Vec2, Vec2, Vec2
+
+---@class Triangle_offset
+---@param x number
+---@param y number
+---@overload fun(self, off: Vec2): Triangle
+local function Triangle_offset(self, x, y) end
 
 ---@class Quad
     ---@field bottom_left_x number
@@ -5134,6 +5170,7 @@ function Vec2.new(self, vec2) end
 ---@param y_ number
 ---@return Vec2
 function Vec2.new(self, x_, y_) end
+---NoDoc
 ---@param number> p tuple<number,
 ---@return Vec2
 function Vec2.new(self, number> p) end
@@ -5158,6 +5195,26 @@ function AABB.new(self, number, number> tuple) end
 ---@param bottom_ number
 ---@return AABB
 function AABB.new(self, left_, top_, right_, bottom_) end
+
+Triangle = nil
+---@return Triangle
+function Triangle.new(self) end
+---@param triangle Triangle
+---@return Triangle
+function Triangle.new(self, triangle) end
+---@param _a Vec2
+---@param _b Vec2
+---@param _c Vec2
+---@return Triangle
+function Triangle.new(self, _a, _b, _c) end
+---@param ax number
+---@param ay number
+---@param bx number
+---@param by number
+---@param cx number
+---@param cy number
+---@return Triangle
+function Triangle.new(self, ax, ay, bx, by, cx, cy) end
 
 Quad = nil
 ---@return Quad

@@ -1026,7 +1026,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "zoom_level_offset"sv,
         // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
-        // That instruction contains the offset
+        // That instruction contains the offset, the memory is: {current_zoom, target_zoom} and both offset will be present
+        // current solution uses the target_zoom offset
         PatternCommandBuffer{}
             .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
             .decode_imm(4),
