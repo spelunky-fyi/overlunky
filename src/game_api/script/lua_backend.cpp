@@ -41,12 +41,6 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     : lua{get_lua_vm(sound_mgr), sol::create}, vm{acquire_lua_vm(sound_mgr)}, sound_manager{sound_mgr}, console{con}
 {
     g_state = State::get().ptr_main();
-
-    auto players = get_players(g_state);
-    if (!players.empty())
-        state.player = players.at(0);
-    else
-        state.player = nullptr;
     state.screen = g_state->screen;
     state.time_level = g_state->time_level;
     state.time_total = g_state->time_total;
@@ -251,8 +245,7 @@ bool LuaBackend::update()
 
         // ==========
 
-        std::vector<Player*> players = get_players(g_state);
-        lua["players"] = players;
+        lua["players"] = get_players(g_state);
 
         /*moved to pre_load_screen
         if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen_next != (int)ON::OPTIONS && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
@@ -524,10 +517,6 @@ bool LuaBackend::update()
             }
         }
 
-        if (!players.empty())
-            state.player = players.at(0);
-        else
-            state.player = nullptr;
         state.screen = g_state->screen;
         state.time_level = g_state->time_level;
         state.time_total = g_state->time_total;

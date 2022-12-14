@@ -128,7 +128,7 @@ class Elevator : public Movable
 {
   public:
     Illumination* emitted_light;
-    /// puase timer, counts down 60 to 0
+    /// pause timer, counts down 60 to 0
     uint32_t timer;
     bool moving_up;
 };

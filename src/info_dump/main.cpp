@@ -1043,7 +1043,7 @@ void to_json(float_json& j, const EntityDB& ent)
         {"max_speed", ent.max_speed},
         {"sprint_factor", ent.sprint_factor},
         {"jump", ent.jump},
-        {"texture", ent.texture},
+        {"texture", ent.texture_id},
         {"technique", ent.technique},
         {"tile_x", ent.tile_x},
         {"tile_y", ent.tile_y},
@@ -1157,7 +1157,7 @@ void run()
 
             entities[ent.name] = float_json{
                 {"id", ent.id},
-                {"texture", db->texture},
+                {"texture", db->texture_id},
                 {"animations", get_animations_as_string_map(*db)}};
         }
 

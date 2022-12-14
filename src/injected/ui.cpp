@@ -1663,7 +1663,7 @@ void frame_advance()
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
     static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-    const auto ana_texture = get_type(ana_spelunky)->texture;
+    const auto ana_texture = get_type(ana_spelunky)->texture_id;
 
     g_state->items->player_select_slots[0].activated = true;
     g_state->items->player_select_slots[0].character = g_save->players[0] + ana_spelunky;
@@ -7415,16 +7415,22 @@ void init_ui()
 
     auto& render_api = RenderAPI::get();
     render_api.set_advanced_hud();
+
+    const std::string version_string = fmt::format("Overlunky {}", get_version());
+    const float scale{0.00035f};
+
+    static TextRenderingInfo tri{};
+    tri.set_text(version_string, 0, 0, scale, scale, 1, 0);
+
+    const auto [w, h] = tri.text_size();
+    tri.y = -1.0f + std::abs(h) / 2.0f;
+
     render_api.set_post_render_game(
         []()
         {
-            const std::string version_string = fmt::format("Overlunky {}", get_version());
-            const float color[4]{1.0f, 1.0f, 1.0f, 0.3f};
-            const float scale{0.00035f};
-
             auto& render_api_l = RenderAPI::get();
-            const auto [w, h] = render_api_l.draw_text_size(version_string, scale, scale, 0);
-            render_api_l.draw_text(version_string, 0.0f, -1.0f + std::abs(h) / 2.0f, scale, scale, color, 1, 0);
+            static const float color[4]{1.0f, 1.0f, 1.0f, 0.3f};
+            render_api_l.draw_text(&tri, color);
         });
 }
 

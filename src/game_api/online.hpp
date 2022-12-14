@@ -6,6 +6,8 @@
 
 struct OnlinePlayer
 {
+    uint8_t unknown39;
+    uint8_t padding[3];
     uint32_t unknown1;
     uint32_t unknown2;
     uint32_t unknown3;
@@ -13,19 +15,7 @@ struct OnlinePlayer
     uint8_t unknown5;
     uint8_t ready_state;
     uint8_t character;
-    char player_name[37];
-};
-
-struct OnlinePlayerShort
-{
-    uint32_t unknown1;
-    uint32_t unknown2;
-    uint32_t unknown3;
-    uint32_t unknown4;
-    uint8_t unknown5;
-    uint8_t ready_state;
-    uint8_t character;
-    char player_name[33]; // this smells fishy... why fewer chars available for local name, but leave at 37 for the player structs?
+    char player_name[33]; // could be 32 actually?
 };
 
 struct OnlineLobby
@@ -34,7 +24,7 @@ struct OnlineLobby
     uint32_t unknown1;
     uint32_t keys_pressed;
     uint32_t keys_pressed_sync;
-    uint8_t unknown2;
+    uint8_t local_player_slot;
     uint8_t unknown3;
     int8_t unknown4;
     int8_t unknown5;
@@ -105,9 +95,8 @@ class Online
     uint32_t unknown36;
     uint32_t unknown37;
     uint32_t unknown38;
-    uint32_t unknown39;
     std::array<OnlinePlayer, 4> online_players;
-    OnlinePlayerShort local_player;
+    OnlinePlayer local_player;
     OnlineLobby lobby;
     OnlineLobby lobby_dupe;
     // some more stuff

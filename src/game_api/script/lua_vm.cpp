@@ -527,17 +527,17 @@ end
     lua["read_prng"] = []() -> std::vector<int64_t>
     { return read_prng(); };
 
-    using Toast = void(wchar_t*);
-    using Say = void(size_t, Entity*, wchar_t*, int, bool);
+    using Toast = void(const char16_t*);
+    using Say = void(size_t, Entity*, const char16_t*, int, bool);
 
     /// Show a message that looks like a level feeling.
-    lua["toast"] = [](std::wstring message)
+    lua["toast"] = [](std::u16string message)
     {
         static Toast* toast_fun = (Toast*)get_address("toast");
-        toast_fun(message.data());
+        toast_fun(message.c_str());
     };
     /// Show a message coming from an entity
-    lua["say"] = [](uint32_t entity_uid, std::wstring message, int sound_type, bool top)
+    lua["say"] = [](uint32_t entity_uid, std::u16string message, int sound_type, bool top)
     {
         static auto say = (Say*)get_address("speech_bubble_fun");
         static const auto say_context = get_address("say_context");
@@ -547,7 +547,7 @@ end
         if (entity == nullptr)
             return;
 
-        say(say_context, entity, message.data(), sound_type, top);
+        say(say_context, entity, message.c_str(), sound_type, top);
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
@@ -1440,7 +1440,7 @@ end
     /// Deprecated
     /// Use `entity:set_pre_trigger_action` instead.
     /// Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
-    /// Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
+    /// Sets a callback that is called right when a container is opened by the player (up+whip)
     /// Use this only when no other approach works, this call can be expensive if overused.
     /// Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
     /// <br/>The callback signature is nil on_open(Entity entity_self, Entity opener)

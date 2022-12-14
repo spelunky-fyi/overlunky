@@ -767,7 +767,7 @@ int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
     if (player_ghost_entity)
     {
         player_ghost_entity->player_inputs = &dummy_player_controls;
-        player_ghost_entity->set_texture(get_type(char_type)->texture);
+        player_ghost_entity->set_texture(get_type(char_type)->texture_id);
         return player_ghost_entity->uid;
     }
     return -1;

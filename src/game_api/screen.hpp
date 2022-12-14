@@ -123,14 +123,14 @@ class ScreenMenu : public Screen // ID: 4
     uint32_t unknown16a;
     uint32_t unknown16b;
     SoundMeta* cthulhu_sound;
-    size_t unknown16e;
-    size_t unknown16f;
+    size_t unknown16e; // std::list ?
+    size_t unknown16f; //
     float unknown16g;
     float unknown16h;
     float unknown16i;
     float unknown16j;
     size_t unknown16k;
-    std::vector<size_t> unknown17;   // pointers
+    std::vector<size_t> unknown17;   // pointers, vector of vectors? menu options?
     std::vector<uint32_t> unknown20; // unsure what's inside
     size_t buttons;
     uint32_t unknown23;
@@ -159,12 +159,8 @@ class ScreenMenu : public Screen // ID: 4
 class ScreenOptions : public Screen // ID: 5
 {
   public:
-    size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
-    size_t unknown7;
-    size_t unknown8;
-    size_t unknown9;
+    std::vector<void*> unknown4;    // menu options?
+    std::vector<uint32_t> unknown7; // dunno
 
     uint32_t selected_menu_index;
     uint16_t key_press_timer; // might be two separate values
