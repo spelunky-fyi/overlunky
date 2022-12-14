@@ -884,7 +884,7 @@ class CustomTheme : public ThemeInfo
     {
         if (index == 0)
             return allow_beehive;
-        return unknown2;
+        return allow_leprechaun;
     }
 
     /// Add TEXTUREs to `textures` to override different dynamic textures easily.
@@ -1169,6 +1169,7 @@ void register_usertypes(sol::state& lua)
 
     auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
     themeinfo_type["allow_beehive"] = &ThemeInfo::allow_beehive;
+    themeinfo_type["allow_leprechaun"] = &ThemeInfo::allow_leprechaun;
     themeinfo_type["sub_theme"] = &ThemeInfo::sub_theme;
     themeinfo_type["get_unknown1"] = &ThemeInfo::get_unknown1;
     themeinfo_type["init_flags"] = &ThemeInfo::init_flags;
@@ -1249,7 +1250,7 @@ void register_usertypes(sol::state& lua)
     customtheme_type["pre"] = &CustomTheme::pre;
     customtheme_type["post"] = &CustomTheme::post;
     customtheme_type["allow_beehive"] = &CustomTheme::allow_beehive;
-    customtheme_type["unknown2"] = &CustomTheme::unknown2;
+    customtheme_type["allow_leprechaun"] = &CustomTheme::allow_leprechaun;
     customtheme_type["unknown3"] = &CustomTheme::unknown3;
     customtheme_type["unknown4"] = &CustomTheme::unknown4;
     customtheme_type["get_unknown1"] = &CustomTheme::get_unknown1;
@@ -1371,6 +1372,10 @@ void register_usertypes(sol::state& lua)
         &LevelGenSystem::shop_type,
         "backlayer_shop_type",
         &LevelGenSystem::backlayer_shop_type,
+        "shop_music",
+        &LevelGenSystem::frontlayer_shop_music,
+        "backlayer_shop_music",
+        &LevelGenSystem::backlayer_shop_music,
         "spawn_x",
         &LevelGenSystem::spawn_x,
         "spawn_y",

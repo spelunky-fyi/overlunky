@@ -942,6 +942,10 @@ void register_usertypes(sol::state& lua)
         sol::readonly(&ParachutePowerup::deployed),
         "deploy",
         &ParachutePowerup::deploy,
+        "gold_timer",
+        &ParachutePowerup::gold_timer,
+        "gold_spawning_time",
+        &ParachutePowerup::gold_spawning_time,
         sol::base_classes,
         sol::bases<Entity, Movable, Powerup>());
 

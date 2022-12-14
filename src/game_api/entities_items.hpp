@@ -770,8 +770,8 @@ class ParachutePowerup : public Powerup
     /// this gets compared with entity's falling_timer
     uint8_t falltime_deploy;
     uint8_t unknown1;
-    uint16_t unknown2;
-    uint16_t unknown3;
+    uint16_t gold_timer;            // A gold nugget will spawn when this reaches 0, then it is set to 30.
+    uint16_t gold_spawning_time;    // Once this reaches 0, gold will stop spawning.
     bool deployed;                  // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
     bool deployed2;                 /* unsure */
     bool after_deploy; /* unsure */ // if set to true before deploying, parachute will drop imminently after deploy, not sure if it's even a bool
