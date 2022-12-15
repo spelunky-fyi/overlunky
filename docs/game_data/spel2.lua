@@ -2002,8 +2002,8 @@ local function PRNG_random(self, min, max) end
     ---@field facing_left boolean
     ---@field render_inactive boolean
     ---@field get_entity fun(self): class Entity
-    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
-    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: fun(): any): CallbackId
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil
     ---@field set_pre_dtor fun(self, fun: fun(): any): CallbackId
     ---@field set_post_dtor fun(self, fun: fun(): any): CallbackId

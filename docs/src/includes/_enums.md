@@ -184,8 +184,6 @@ Name | Data | Description
 [ON_COLLISION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION2) | 26 | 
 [DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DAMAGE) | 48 | 
 [FLOOR_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLOOR_UPDATE) | 38 | 
-[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DTOR) | 0 | 
-[RENDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.RENDER) | 3 | 
 
 ## ENT_FLAG
 
@@ -723,6 +721,17 @@ Name | Data | Description
 ---- | ---- | -----------
 [ARROWTRAP_CHANCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PROCEDURAL_CHANCE.ARROWTRAP_CHANCE) | 0 | 
 ...check [spawn_chances.txt](game_data/spawn_chances.txt)... |  | 
+
+## RENDER_INFO_OVERRIDE
+
+
+> Search script examples for [RENDER_INFO_OVERRIDE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE.DTOR) | 0 | 
+[RENDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE.RENDER) | 3 | 
 
 ## REPEAT_TYPE
 
