@@ -632,11 +632,11 @@ class Bee : public Monster
     uint16_t padding2;
     uint32_t padding3;
     SoundMeta* sound;
-    uint16_t fly_hang_timer; // alternates between hanging/sitting on the wall and flying every time it reaches zero
-    uint8_t ai_state;
-    uint8_t targeting_timer; // counts when bee takes off and hasn't spotted a target yet
-    uint8_t unknown_rand1;   // looks to be a random number being put in here
-    uint8_t unknown_rand2;   // looks to be a random number being put in here, something related to other bees in a level?
+    uint16_t fly_hang_timer; // When standing or clinging to a wall, controls the time before flying off. When flying, controls the time before changing direction.
+    uint8_t wobble_timer;    // 4-frame timer to choose another random wobble.
+    uint8_t targeting_timer; // Timer while flying before the bee can land.
+    uint8_t walk_start_time; // While in the standing state, will start walking when the fly_hang_timer gets down to this value.
+    uint8_t walk_end_time;   // While in the standing state, will stop walking when the fly_hang_timer gets down to this value.
     uint8_t padding4;
     uint8_t padding5; // padding? quite a lot of unused memory in this entity, maybe this is more the one type?
     float wobble_x;   // maybe the positional offset to make it look like it's buzzing
