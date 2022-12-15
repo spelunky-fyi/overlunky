@@ -1,7 +1,7 @@
 # Overlunky
 ![Continuous Integration](https://github.com/spelunky-fyi/overlunky/workflows/Continuous%20Integration/badge.svg)
 
-An overlay for Spelunky 2 to help you with modding, exploring the depths of the game and practicing with tools like spawning arbitrary items, warping to levels and teleporting made by the cool people from the Spelunky Community Discord.
+An overlay for Spelunky 2 to help you with modding, exploring the depths of the game and practicing with tools like spawning arbitrary items, warping to levels and teleporting made by the cool people from the [Spelunky Community Discord](https://discord.gg/spelunky-community).
 
 **Please read the [![open issues](https://img.shields.io/github/issues-raw/spelunky-fyi/overlunky)](https://github.com/spelunky-fyi/overlunky/issues) before complaining about them in the discord.**
 
@@ -134,6 +134,7 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + Modlunky2 should work just fine under Wine and Proton too, if you add it as a non-Steam game.
     + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:
+    + Try all the different launching methods from [command line ](#command-line-switches) or in Modlunky2.
     + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either. The latest somewhat tested version can be found at the top if this document.
     + Make sure your antivirus is not blocking it. **This is very likely if you're using one.** Overlunky is very hacky and acts like malware. It isn't, but you can audit the source code and build it yourself if you want.
     + Try deleting `Spelunky 2/overlunky.ini` or `Spelunky 2/imgui.ini`.
@@ -141,15 +142,18 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
   - If your game **crashes** when actually trying to use the tools:
     + See previous section.
     + Some entities just crash the game, try to avoid them next time.
-    + Some scripts just crash the game too, the api is not very safe.
+    + Some script mods just crash the game too. Complain to the author of the mod.
   - If you have proglems with **Modlunky2 or Playlunky**:
     + While we try to keep all the modding tools compatible, some things may break sometimes.
-    + Check the [open issues](https://github.com/spelunky-fyi/overlunky/issues) for known compatibility problems with other tools.
+    + Because PL and OL are using the same scripting API, one might inadvertently undo the change you did in the other. Don't expect perfection when using both.
   - If you're **missing** some overlay **windows** or tabs:
+    + Hit F12 to change the window mode.
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
+    + The tools can be moved outside the game window. Maybe they're on a different monitor for some reason?
     + Maybe the overlay is just really tiny or collapsed? You can resize it. Just try your magic with the mouse.
   - If you mess up your **keyboard shortcuts** or UI:
-    + Delete `Spelunky 2/overlunky.ini`.
+    + You can reset keyboard shortcuts in the options.
+    + Delete `Spelunky 2/overlunky.ini` and `Spelunky 2/imgui.ini` to reset everything.
   - If stuff just don't work and you're running **Windows 7** or a machine not designed to play games
     + You're on your own here. We don't test on or make this for ancient software/hardware.
   - If you have problems with **OBS**
@@ -157,7 +161,11 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + Try toggling the *Capture third-party overlays* option in *Game Capture*. It's possible to hide OL if running the game through Steam.
     + If you have lag or crashes, check previous question.
   - If you **don't have scripts** in the Scripts tab
-    + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts).
+    + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts) or use Modlunky2.
+  - If it still doesn't work
+    + Stop by #s2-modding-help on the [community Discord](https://discord.gg/spelunky-community) or [submit an issue](https://github.com/spelunky-fyi/overlunky/issues)
+    + We want to know your OS version, are you using the game on Steam, what you have tried, what tools you are using, how you are using them and all the versions. These can be found in the terminal output or ingame overlays. ("Latest" or WHIP is not a version, but 7f0bc94 or 0.6.1 is.)
+
 
 ## Development
 If you'd rather build it yourself or help with development, clone the repository, get some C++ build tools and run this to get started:
