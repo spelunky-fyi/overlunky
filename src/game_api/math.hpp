@@ -225,7 +225,7 @@ struct AABB
     std::tuple<float, float, float, float> split()
     {} // just for the autodoc
     */
-    operator std::tuple<float, float, float, float>()
+    operator std::tuple<float, float, float, float>() const
     {
         return {left, top, right, bottom};
     }
@@ -240,7 +240,7 @@ struct Triangle
 {
     Triangle() = default;
     Triangle(const Triangle&) = default;
-    Triangle(Vec2& _a, Vec2& _b, Vec2& _c)
+    Triangle(const Vec2& _a, const Vec2& _b, const Vec2& _c)
         : A(_a), B(_b), C(_c){};
     Triangle(float ax, float ay, float bx, float by, float cx, float cy)
         : A(ax, ay), B(bx, by), C(cx, cy){};
@@ -276,7 +276,7 @@ struct Triangle
         return *this;
     }
     /// Also known as centroid
-    Vec2 center()
+    Vec2 center() const
     {
         return {(A.x + B.x + C.x) / 3, (A.y + B.y + C.y) / 3};
     }
@@ -288,7 +288,7 @@ struct Triangle
     */
 
     /// Returns the corners
-    operator std::tuple<Vec2, Vec2, Vec2>()
+    operator std::tuple<Vec2, Vec2, Vec2>() const
     {
         return {A, B, C};
     }
@@ -405,7 +405,7 @@ struct Quad
     */
 
     /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
-    operator std::tuple<Vec2, Vec2, Vec2, Vec2>()
+    operator std::tuple<Vec2, Vec2, Vec2, Vec2>() const
     {
         return {{bottom_left_x, bottom_left_y}, {bottom_right_x, bottom_right_y}, {top_right_x, top_right_y}, {top_left_x, top_left_y}};
     }
