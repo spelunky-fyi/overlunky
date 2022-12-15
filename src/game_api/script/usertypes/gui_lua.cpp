@@ -21,6 +21,7 @@
 #include <xinput.h>         // for XINPUT_STATE, XINPUT_CAPABILITIES
 
 #include "file_api.hpp"                   // for create_d3d11_texture_from_file
+#include "math.hpp"                       // for Vec2
 #include "script.hpp"                     // for ScriptMessage, ScriptImage
 #include "script/handle_lua_function.hpp" // for handle_function
 #include "script/lua_backend.hpp"         // for LuaBackend
@@ -34,6 +35,9 @@ static bool g_WantUpdateHasGamepad = false;
 static HMODULE g_XInputDLL = NULL;
 static PFN_XInputGetCapabilities g_XInputGetCapabilities = NULL;
 static PFN_XInputGetState g_XInputGetState = NULL;
+
+Vec2::Vec2(const ImVec2& p)
+    : x(p.x), y(p.y){};
 
 struct Gamepad : XINPUT_GAMEPAD
 {
@@ -369,7 +373,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     size.x += 1.0f;
     size.y -= 1.0f;
     size.y *= -1.0f;
-    handle_function<void>(backend, callback, this, normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos), size);
+    handle_function<void>(backend, callback, this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size));
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
@@ -631,13 +635,6 @@ void register_usertypes(sol::state& lua)
         return std::make_pair(pos.x, pos.y);
     };
 
-    lua.new_usertype<ImVec2>(
-        "ImVec2",
-        "x",
-        &ImVec2::x,
-        "y",
-        &ImVec2::y);
-
     /// Used in ImGuiIO
     lua.new_usertype<Gamepad>(
         "Gamepad",
@@ -703,7 +700,8 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<ImGuiIO>(
         "ImGuiIO",
         "displaysize",
-        &ImGuiIO::DisplaySize,
+        sol::property([](ImGuiIO& io)
+                      { return Vec2(io.DisplaySize); }),
         "framerate",
         &ImGuiIO::Framerate,
         "wantkeyboard",
@@ -728,7 +726,8 @@ void register_usertypes(sol::state& lua)
         "wantmouse",
         &ImGuiIO::WantCaptureMouse,
         "mousepos",
-        &ImGuiIO::MousePos,
+        sol::property([](ImGuiIO& io)
+                      { return Vec2(io.MousePos); }),
         "mousedown",
         sol::property([](ImGuiIO& io)
                       { return std::ref(io.MouseDown) /**/; }),
@@ -743,8 +742,8 @@ void register_usertypes(sol::state& lua)
         "gamepad",
         sol::property([]() -> Gamepad
                       {
-                          g_WantUpdateHasGamepad = true;
-                          return get_gamepad(1) /**/; }),
+        g_WantUpdateHasGamepad = true;
+        return get_gamepad(1) /**/; }),
         "gamepads",
         [](unsigned int index)
         {
