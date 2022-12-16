@@ -55,9 +55,9 @@ struct EntityDB
         };
         CollisionInfo default_collision_info;
     };
-    // MASK, will only call collision2 when colliding with entities that match this mask.
+    /// MASK, will only call collision2 when colliding with entities that match this mask.
     int32_t collision2_mask;
-    // MASK used for collision with floors.
+    /// MASK used for collision with floors.
     int32_t collision_mask;
     int32_t field_44;
     int32_t default_flags;
@@ -88,7 +88,8 @@ struct EntityDB
     int32_t tile_y;
     uint8_t damage;
     uint8_t life;
-    uint8_t sacrifice_value; // Favor for sacrificing alive. Halved when dead (health == 0).
+    /// Favor for sacrificing alive. Halved when dead (health == 0).
+    uint8_t sacrifice_value;
     uint8_t blood_content;
     bool leaves_corpse_behind;
     uint8_t field_99;
