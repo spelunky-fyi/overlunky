@@ -244,7 +244,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -4116,6 +4116,7 @@ void render_clickhandler()
     {
         if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
         {
+            zooming = true;
             if (g_zoom == 0.0f)
                 g_zoom = UI::get_zoom_level();
             g_zoom += g_zoom / 13.5f;
@@ -4123,6 +4124,7 @@ void render_clickhandler()
         }
         else if (clicked("mouse_zoom_in") || (held("mouse_camera_drag") && io.MouseWheel > 0))
         {
+            zooming = true;
             if (g_zoom == 0.0f)
                 g_zoom = UI::get_zoom_level();
             g_zoom -= g_zoom / 13.5f;
@@ -4593,7 +4595,7 @@ void render_clickhandler()
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
         }
 
-        else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.5f)
+        else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.8f && !zooming)
         {
             set_camera_bounds(true);
             if (g_players.size() > 0)
@@ -4613,6 +4615,7 @@ void render_clickhandler()
 
         else if (clicked("mouse_camera_drag"))
         {
+            zooming = false;
             if (ImGui::IsMousePosValid())
             {
                 startpos = normalize(mouse_pos());
