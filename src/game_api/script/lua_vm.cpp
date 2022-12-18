@@ -241,7 +241,7 @@ end
         }
         return nullptr;
     };
-    /// Provides a read-only access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) or manually with [save_progress](#save_progress)
+    /// Provides access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) Use [save_progress](#save_progress) to save to savegame.sav.
     lua["savegame"] = State::get().savedata();
 
     /// Standard lua print function, prints directly to the terminal but not to the game
@@ -1116,21 +1116,37 @@ end
     /// this doesn't actually work at all. See State -> Camera the for proper camera handling
     lua["set_camera_position"] = set_camera_position;
 
-    /// Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+    /// Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
     lua["set_flag"] = [](Flags flags, int bit) -> Flags
     { return flags | (1U << (bit - 1)); };
     /// Deprecated
     lua["setflag"] = lua["set_flag"];
-    /// Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+    /// Clears the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
     lua["clr_flag"] = [](Flags flags, int bit) -> Flags
     { return flags & ~(1U << (bit - 1)); };
     /// Deprecated
     lua["clrflag"] = lua["clr_flag"];
-    /// Returns true if a bit is set in the flags
+    /// Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+    lua["flip_flag"] = [](Flags flags, int bit) -> Flags
+    { return flags ^ (1U << (bit - 1)); };
+    /// Returns true if the nth bit is set in the number.
     lua["test_flag"] = [](Flags flags, int bit) -> bool
     { return (flags & (1U << (bit - 1))) > 0; };
     /// Deprecated
     lua["testflag"] = lua["test_flag"];
+
+    /// Set a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+    lua["set_mask"] = [](Flags flags, Flags mask) -> Flags
+    { return (flags | mask); };
+    /// Clears a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+    lua["clr_mask"] = [](Flags flags, Flags mask) -> Flags
+    { return (flags & ~mask); };
+    /// Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+    lua["flip_mask"] = [](Flags flags, Flags mask) -> Flags
+    { return (flags ^ mask); };
+    /// Returns true if a bitmask is set in the number.
+    lua["test_mask"] = [](Flags flags, Flags mask) -> bool
+    { return (flags & mask) > 0; };
 
     /// Gets the resolution (width and height) of the screen
     lua["get_window_size"] = []() -> std::tuple<int, int>
@@ -2082,6 +2098,23 @@ end
                        { return (unsigned char)std::toupper(c); });
         lua["GAME_SETTING"][std::move(setting_name)] = setting_index;
     }
+
+    /// 8bit bitmask used in state.pause
+    lua.create_named_table("PAUSE", "MENU", 0x01, "FADE", 0x02, "CUTSCENE", 0x04, "FLAG4", 0x08, "FLAG5", 0x10, "ANKH", 0x20);
+    /* PAUSE
+    // MENU
+    // Menu: Pauses the level timer and engine. Can't set, controller by the menu.
+    // FADE
+    // Fade/Loading: Pauses all timers and engine.
+    // CUTSCENE
+    // Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.
+    // FLAG4
+    // Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!
+    // FLAG5
+    // Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!
+    // ANKH
+    // Ankh: Pauses all timers, physics and music, but not camera. Used by the ankh cutscene.
+    */
 }
 
 std::recursive_mutex global_lua_lock;

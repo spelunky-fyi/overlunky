@@ -3,6 +3,8 @@
 #include <cmath>
 #include <tuple>
 
+struct ImVec2;
+
 struct Vec2
 {
     Vec2() = default;
@@ -15,6 +17,9 @@ struct Vec2
     /// NoDoc
     Vec2(std::pair<float, float> p)
         : x(p.first), y(p.second){};
+
+    /// NoDoc
+    Vec2(const ImVec2&);
 
     Vec2& rotate(float angle, float px, float py)
     {

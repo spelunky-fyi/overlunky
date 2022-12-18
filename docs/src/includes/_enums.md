@@ -657,6 +657,22 @@ Name | Data | Description
 ...check [particle_emitters.txt](game_data/particle_emitters.txt)... |  | 
 [MINIGAME_BROKENASTEROID_SMOKE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) | 219 | 
 
+## PAUSE
+
+
+> Search script examples for [PAUSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE)
+
+8bit bitmask used in state.pause
+
+Name | Data | Description
+---- | ---- | -----------
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.MENU) | 0x01 | Menu: Pauses the level timer and engine. Can't set, controller by the menu.<br/>
+[FADE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.FADE) | 0x02 | Fade/Loading: Pauses all timers and engine.<br/>
+[CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.CUTSCENE) | 0x04 | Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>
+[FLAG4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.FLAG4) | 0x08 | Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!<br/>
+[FLAG5](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.FLAG5) | 0x10 | Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!<br/>
+[ANKH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.ANKH) | 0x20 | Ankh: Pauses all timers, physics and music, but not camera. Used by the ankh cutscene.<br/>
+
 ## PAUSEUI_VISIBILITY
 
 

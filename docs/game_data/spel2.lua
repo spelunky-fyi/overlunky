@@ -1676,7 +1676,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field screen_next integer
     ---@field ingame integer
     ---@field playing integer
-    ---@field pause integer
+    ---@field pause PAUSE
     ---@field width integer
     ---@field height integer
     ---@field kali_favor integer
@@ -5580,6 +5580,20 @@ DYNAMIC_TEXTURE = {
   KALI_STATUE = -9
 }
 ---@alias DYNAMIC_TEXTURE integer
+ENTITY_OVERRIDE = {
+  COLLISION1 = 4,
+  COLLISION2 = 26,
+  DAMAGE = 48,
+  DESTROY = 5,
+  DTOR = 0,
+  FLOOR_UPDATE = 38,
+  GET_HELD_ENTITY = 22,
+  KILL = 3,
+  RENDER = 3,
+  TRIGGER_ACTION = 24,
+  UPDATE_STATE_MACHINE = 2
+}
+---@alias ENTITY_OVERRIDE integer
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
   CLIMBABLE = 9,
@@ -7411,6 +7425,15 @@ PARTICLEEMITTER = {
   YETIQUEEN_LANDING_SNOWDUST = 183
 }
 ---@alias PARTICLEEMITTER integer
+PAUSE = {
+  ANKH = 32,
+  CUTSCENE = 4,
+  FADE = 2,
+  FLAG4 = 8,
+  FLAG5 = 16,
+  MENU = 1
+}
+---@alias PAUSE integer
 PAUSEUI_VISIBILITY = {
   INVISIBLE = 0,
   SLIDING_DOWN = 1,
@@ -7418,6 +7441,15 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
+PAUSE_FLAG = {
+  ANKH = 6,
+  CUTSCENE = 3,
+  FADE = 2,
+  FLAG4 = 4,
+  FLAG5 = 5,
+  MENU = 1
+}
+---@alias PAUSE_FLAG integer
 POS_TYPE = {
   AIR = 4,
   ALCOVE = 16,
