@@ -124,6 +124,19 @@ Name | Data | Description
 [NEO_BABYLON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NEO_BABYLON) | 6 | 
 [SUNKEN_CITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKEN_CITY) | 7 | 
 
+## DRAW_LAYER
+
+
+> Search script examples for [DRAW_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER.BACKGROUND) | DRAW_LAYER::BACKGROUND | 
+[FOREGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER.FOREGROUND) | DRAW_LAYER::FOREGROUND | 
+[WINDOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER.WINDOW) | DRAW_LAYER::WINDOW | 
+
 ## DROP
 
 
