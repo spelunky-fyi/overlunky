@@ -855,3 +855,11 @@ class Bow : public Purchasable
     // When lain on the ground
     virtual float get_arrow_special_offset() = 0;
 };
+
+class Web : public Movable
+{
+  public:
+    /// Is subtracted from the color alpha every frame after the `stand_counter` is more than 300.
+    /// Entity automatically dies when the alpha is less than 0.1
+    float decay_rate;
+};

@@ -1026,5 +1026,12 @@ void register_usertypes(sol::state& lua)
         &PrizeDispenser::prizes_spawned,
         sol::base_classes,
         sol::bases<Entity, Movable>());
+
+    lua.new_usertype<Web>(
+        "Web",
+        "decay_rate",
+        &Web::decay_rate,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
 }
 } // namespace NEntitiesItems
