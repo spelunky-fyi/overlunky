@@ -414,7 +414,7 @@ struct LevelGenRoomsMeta
 
 class SpecialLevelGeneration
 {
-    public:
+  public:
     virtual ~SpecialLevelGeneration()
     {
     }
