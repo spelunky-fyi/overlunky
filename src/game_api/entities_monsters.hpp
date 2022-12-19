@@ -129,7 +129,8 @@ class Ghost : public Monster
     uint8_t wobble_timer;
     uint8_t unknown2;
     float velocity_multiplier;
-    uint16_t pace_timer; // Controls ghost pacing when all players are dead.
+    /// Controls ghost pacing when all players are dead.
+    uint16_t pace_timer;
     GHOST_BEHAVIOR ghost_behaviour;
     bool blown_by_player;
     bool happy_dancing_clockwise; // Randomly set at the start of happy's dance phase to determine the dance rotation direction.
