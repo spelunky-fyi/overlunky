@@ -237,6 +237,7 @@ LuaConsole::LuaConsole(SoundManager* soundmanager)
             {"Ushabti", "as_movable"},
             {"VladsCape", "as_cape"},
             {"FlameSize", "as_flame"},
+            {"Web", "as_movable"},
             {"WebShot", "as_projectile"},
             {"Lava", "as_liquid"},
             {"Liquid", "as_entity"},

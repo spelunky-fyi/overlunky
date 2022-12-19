@@ -352,7 +352,7 @@ The list below shows the type hierarchy for each entity in the game. This makes 
 - 363 ITEM_LION_SPEAR = [Entity](https://spelunky-fyi.github.io/overlunky/#Entity) > [Movable](https://spelunky-fyi.github.io/overlunky/#Movable) > [Spear](https://spelunky-fyi.github.io/overlunky/#Spear)
 - 364 ITEM_BIG_SPEAR = [Entity](https://spelunky-fyi.github.io/overlunky/#Entity) > [Movable](https://spelunky-fyi.github.io/overlunky/#Movable) > [Spear](https://spelunky-fyi.github.io/overlunky/#Spear)
 - 365 ITEM_ROCK = [Entity](https://spelunky-fyi.github.io/overlunky/#Entity) > [Movable](https://spelunky-fyi.github.io/overlunky/#Movable) > [Purchasable](https://spelunky-fyi.github.io/overlunky/#Purchasable)
-- 366 ITEM_WEB = [Entity](https://spelunky-fyi.github.io/overlunky/#Entity) > [Movable](https://spelunky-fyi.github.io/overlunky/#Movable)
+- 366 ITEM_WEB = [Entity](https://spelunky-fyi.github.io/overlunky/#Entity) > [Movable](https://spelunky-fyi.github.io/overlunky/#Movable) > [Web](https://spelunky-fyi.github.io/overlunky/#Web)
 - 367 ITEM_WEBSHOT = [Entity](https://spelunky-fyi.github.io/overlunky/#Entity) > [Movable](https://spelunky-fyi.github.io/overlunky/#Movable) > [Projectile](https://spelunky-fyi.github.io/overlunky/#Projectile) > [WebShot](https://spelunky-fyi.github.io/overlunky/#WebShot)
 - 368 ITEM_GIANTSPIDER_WEBSHOT = [Entity](https://spelunky-fyi.github.io/overlunky/#Entity) > [Movable](https://spelunky-fyi.github.io/overlunky/#Movable) > [Projectile](https://spelunky-fyi.github.io/overlunky/#Projectile)
 - 369 ITEM_HANGSTRAND = [Entity](https://spelunky-fyi.github.io/overlunky/#Entity) > [Movable](https://spelunky-fyi.github.io/overlunky/#Movable) > [HangStrand](https://spelunky-fyi.github.io/overlunky/#HangStrand)

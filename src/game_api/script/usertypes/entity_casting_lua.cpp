@@ -366,7 +366,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][363] = lua["Entity"]["as_spear"];                  // ITEM_LION_SPEAR
     lua["TYPE_MAP"][364] = lua["Entity"]["as_spear"];                  // ITEM_BIG_SPEAR
     lua["TYPE_MAP"][365] = lua["Entity"]["as_purchasable"];            // ITEM_ROCK
-    lua["TYPE_MAP"][366] = lua["Entity"]["as_movable"];                // ITEM_WEB
+    lua["TYPE_MAP"][366] = lua["Entity"]["as_web"];                    // ITEM_WEB
     lua["TYPE_MAP"][367] = lua["Entity"]["as_webshot"];                // ITEM_WEBSHOT
     lua["TYPE_MAP"][368] = lua["Entity"]["as_projectile"];             // ITEM_GIANTSPIDER_WEBSHOT
     lua["TYPE_MAP"][369] = lua["Entity"]["as_hangstrand"];             // ITEM_HANGSTRAND

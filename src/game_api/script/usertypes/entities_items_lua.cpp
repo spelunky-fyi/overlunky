@@ -37,6 +37,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_kapalapowerup"] = &Entity::as<KapalaPowerup>;
     lua["Entity"]["as_mattock"] = &Entity::as<Mattock>;
     lua["Entity"]["as_gun"] = &Entity::as<Gun>;
+    lua["Entity"]["as_web"] = &Entity::as<Web>;
     lua["Entity"]["as_webgun"] = &Entity::as<WebGun>;
     lua["Entity"]["as_flame"] = &Entity::as<Flame>;
     lua["Entity"]["as_flamesize"] = &Entity::as<FlameSize>;
