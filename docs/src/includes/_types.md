@@ -645,8 +645,8 @@ class [Entity](#Entity) | [get_entity()](https://github.com/spelunky-fyi/overlun
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
 [CallbackId](#Aliases) | [set_pre_dtor(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_dtor) | Hooks before the virtual function.<br/>The callback signature is `nil dtor()`
 [CallbackId](#Aliases) | [set_post_dtor(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_dtor) | Hooks after the virtual function.<br/>The callback signature is `nil dtor()`
-[CallbackId](#Aliases) | [set_pre_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render) | Hooks before the virtual function.<br/>The callback signature is `optional<> render(VanillaRenderContext)`
-[CallbackId](#Aliases) | [set_post_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render) | Hooks after the virtual function.<br/>The callback signature is `nil render(VanillaRenderContext)`
+[CallbackId](#Aliases) | [set_pre_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render) | Hooks before the virtual function.<br/>The callback signature is `bool render(float float, VanillaRenderContext vanilla_render_context)`
+[CallbackId](#Aliases) | [set_post_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render) | Hooks after the virtual function.<br/>The callback signature is `nil render(float float, VanillaRenderContext vanilla_render_context)`
 
 ### ShortTileCodeDef
 
