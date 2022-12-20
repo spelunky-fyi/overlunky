@@ -43,7 +43,7 @@ void register_usertypes(sol::state& lua)
         RenderInfo,
         CallbackType::Entity,
         VTableEntry<"dtor", 0x0, void()>,
-        VTableEntry<"render", 0x3, void(), BackBinder<VanillaRenderContext>>>;
+        VTableEntry<"render", 0x3, void(float*), BackBinder<VanillaRenderContext>>>;
     static RenderInfoVTable render_info_vtable(lua, lua["RenderInfo"], "RENDER_INFO_OVERRIDE");
 
     // Define the implementations for the LuaBackend handlers

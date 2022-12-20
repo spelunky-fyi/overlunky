@@ -1521,7 +1521,7 @@ end
             auto backend_id = LuaBackend::get_calling_backend_id();
             return lua["RenderInfo"]["set_pre_render"](
                 ent->rendering_info,
-                [backend_id, fun = std::move(fun)](RenderInfo* ri, VanillaRenderContext render_ctx)
+                [backend_id, fun = std::move(fun)](RenderInfo* ri, float*, VanillaRenderContext render_ctx)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     return handle_function<bool>(
@@ -1546,7 +1546,7 @@ end
             auto backend_id = LuaBackend::get_calling_backend_id();
             return lua["RenderInfo"]["set_post_render"](
                 ent->rendering_info,
-                [backend_id, fun = std::move(fun)](RenderInfo* ri, VanillaRenderContext render_ctx)
+                [backend_id, fun = std::move(fun)](RenderInfo* ri, float*, VanillaRenderContext render_ctx)
                 {
                     auto backend = LuaBackend::get_backend(backend_id);
                     return handle_function<bool>(
