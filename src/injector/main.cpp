@@ -528,7 +528,10 @@ int main(int argc, char** argv)
     if (fs::exists(exe))
     {
         if (launch(exe, overlunky_path, do_inject))
+        {
+            FreeConsole();
             return 0;
+        }
     }
     else
     {
@@ -537,5 +540,6 @@ int main(int argc, char** argv)
             launch(fs::canonical("../Spel2.exe"), overlunky_path, do_inject);
         }
     }
+    FreeConsole();
     return 0;
 }
