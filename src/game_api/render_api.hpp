@@ -129,7 +129,7 @@ struct TextRenderingInfo
         return {source, (source + text_length)};
     }
 
-    /// {width, height}, is only updated when you set/change the text
+    /// {width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
     std::pair<float, float> text_size() const
     {
         return {width, height};
@@ -154,11 +154,11 @@ struct TextRenderingInfo
     // 6 * wcslen(input_text), just numbers in order 0, 1, 2 ... have some strage effect if you change them
     uint16_t* unknown6{nullptr};
 
-    uint16_t nof_special_character; // number of special characters, still not sure how the game known which ones are the special ones?
+    uint16_t nof_special_character; // number of special characters, still not sure how the game knowns which ones are the special ones?
                                     // setting higher value than the `text_length` will crash
     uint16_t unknown8;              // padding probably
 
-    /// Used to draw buttons default is -1 wich is the buttons texture
+    /// Used to draw buttons and stuff, default is -1 wich uses the buttons texture
     int32_t special_texture_id;
 
     uint8_t shader; // ? changing it can change the text color, or make the text all rectangles?
@@ -219,7 +219,7 @@ struct RenderAPI
 
     void draw_text(const TextRenderingInfo* tri, Color color);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
-    void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color);
+    void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color, uint8_t shader);
     void draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader);
 
     void set_post_render_game(void (*post_render_game)());
@@ -259,7 +259,7 @@ struct RenderInfo
     bool unknown17;
     bool unknown18;
     uint32_t unknown19;
-    uint8_t shader; // 0 - 36, game crash at around 55
+    WORLD_SHADER shader; // 0 - 36, game crash at around 55
     uint8_t unknown20a;
     uint8_t unknown20b;
     uint8_t unknown20c;

@@ -46,6 +46,25 @@ class VanillaRenderContext
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     void draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color);
 
+    /// Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer.
+    /// `thickness` is only used when `filled = false`, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_rect(const AABB& rect, Color color, bool filled, float thickness, float angle, float px, float py);
+
+    /// Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer.
+    /// `thickness` is only used when `filled = false`
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_rect(const Quad& dest, Color color, bool filled, float thickness);
+
+    /// Draw triangle in screen coordinates using the built-in renderer.
+    /// `thickness` is only used when `filled = false`
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_triangle(const Triangle& triangle, Color color, bool filled, float thickness);
+
+    /// Draws a line on screen using the built-in renderer from point `A` to point `B`.
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_line(const Vec2& A, const Vec2& B, Color color, float thickness);
+
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
     /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
     /// For more control use the version taking a Quad instead

@@ -21,13 +21,13 @@ struct Vec2
         const float sin_a{std::sin(angle)};
         const float cos_a{std::cos(angle)};
         const Vec2 p{px, py};
-        const Vec2 mp{-px, -py};
 
-        *this += mp;
+        *this -= p;
         const Vec2 copy = *this;
         this->x = copy.x * cos_a - copy.y * sin_a;
         this->y = copy.y * cos_a + copy.x * sin_a;
-        return *this += p;
+        *this += p;
+        return *this;
     }
 
     Vec2 operator+(const Vec2& a) const
@@ -45,6 +45,10 @@ struct Vec2
     Vec2 operator*(const Vec2& a) const
     {
         return Vec2{x * a.x, y * a.y};
+    }
+    Vec2 operator*(float a) const
+    {
+        return Vec2{x * a, y * a};
     }
     Vec2 operator/(const Vec2& a) const
     {
@@ -126,6 +130,9 @@ struct AABB
         right = std::get<2>(tuple);
         bottom = std::get<3>(tuple);
     };
+
+    AABB(const Vec2& top_left, const Vec2& bottom_right)
+        : left(top_left.x), top(top_left.y), right(bottom_right.x), bottom(bottom_right.y){};
 
     /// Create a new axis aligned bounding box by specifying its values
     AABB(float left_, float top_, float right_, float bottom_)
@@ -268,17 +275,51 @@ struct Triangle
         new_triangle.offset(-a);
         return new_triangle;
     }
+    /// Rotate triangle by an angle, the px/py are just coordinates, not offset from the center
     Triangle& rotate(float angle, float px, float py)
     {
-        A.rotate(angle, px, py);
-        B.rotate(angle, px, py);
-        C.rotate(angle, px, py);
+        const float sin_a{std::sin(angle)};
+        const float cos_a{std::cos(angle)};
+        const Vec2 p{px, py};
+
+        auto rotate_around_pivot = [=](Vec2 in) -> Vec2
+        {
+            in -= p;
+            const Vec2 old = in;
+            in.x = old.x * cos_a - old.y * sin_a;
+            in.y = old.y * cos_a + old.x * sin_a;
+            in += p;
+            return in;
+        };
+
+        A = rotate_around_pivot(A);
+        B = rotate_around_pivot(B);
+        C = rotate_around_pivot(C);
         return *this;
     }
     /// Also known as centroid
     Vec2 center() const
     {
         return {(A.x + B.x + C.x) / 3, (A.y + B.y + C.y) / 3};
+    }
+    /// Returns ABC, BCA, CAB angles in radians
+    std::tuple<float, float, float> get_angles() const
+    {
+        Vec2 ab = B - A;
+        Vec2 ac = C - A;
+        Vec2 bc = C - B;
+        float a_abc = std::abs(std::atan2(bc.y * ab.x - bc.x * ab.y, bc.x * ab.x + bc.y * ab.y));
+        float a_bca = std::abs(std::atan2(ac.y * bc.x - ac.x * bc.y, ac.x * bc.x + ac.y * bc.y));
+        float a_cab = std::abs(std::atan2(ab.y * ac.x - ab.x * ac.y, ab.x * ac.x + ab.y * ac.y));
+        return {a_abc, a_cab, a_bca};
+    }
+    Triangle& scale(float scale)
+    {
+        Vec2 centroid = center();
+        A = (A - centroid) * scale + centroid;
+        B = (B - centroid) * scale + centroid;
+        C = (C - centroid) * scale + centroid;
+        return *this;
     }
 
     /*
@@ -357,13 +398,11 @@ struct Quad
     {
         const float sin_a{std::sin(angle)};
         const float cos_a{std::cos(angle)};
-
         const Vec2 p{px, py};
-        const Vec2 mp{-px, -py};
 
         auto rotate_around_pivot = [=](Vec2 in) -> Vec2
         {
-            in += mp;
+            in -= p;
             const Vec2 old = in;
             in.x = old.x * cos_a - old.y * sin_a;
             in.y = old.y * cos_a + old.x * sin_a;

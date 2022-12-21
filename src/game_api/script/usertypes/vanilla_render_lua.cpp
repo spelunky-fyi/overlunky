@@ -32,12 +32,12 @@ std::pair<float, float> VanillaRenderContext::draw_text_size(const std::string& 
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    draw_screen_texture(texture_id, row, column, Quad(AABB(left, top, right, bottom)), color);
+    draw_screen_texture(texture_id, row, column, Quad(AABB(left, top, right, bottom)), std::move(color));
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
 {
-    draw_screen_texture(texture_id, row, column, Quad(rect), color);
+    draw_screen_texture(texture_id, row, column, Quad(rect), std::move(color));
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle, float px, float py)
@@ -65,7 +65,7 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
         dest.top_left_x *= inverse_ratio;
         dest.top_right_x *= inverse_ratio;
     }
-    draw_screen_texture(texture_id, row, column, dest, color);
+    draw_screen_texture(texture_id, row, column, dest, std::move(color));
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color)
@@ -94,7 +94,7 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
         uv_left,
         uv_top);
 
-    RenderAPI::get().draw_screen_texture(texture, source, dest, color);
+    RenderAPI::get().draw_screen_texture(texture, source, dest, std::move(color), 0x29);
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& quad, Color color)
@@ -104,17 +104,83 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, const Quad& s
     {
         return;
     }
-    RenderAPI::get().draw_screen_texture(texture, source, quad, color);
+    RenderAPI::get().draw_screen_texture(texture, source, quad, std::move(color), 0x29);
+}
+
+void VanillaRenderContext::draw_screen_rect(const AABB& rect, Color color, bool filled, float thickness, float angle, float px, float py)
+{
+    Quad dest{rect};
+    if (angle != 0)
+    {
+        constexpr float ratio = 16.0f / 9.0f;
+        constexpr float inverse_ratio = 9.0f / 16.0f;
+
+        // fix ratio to 1/1 to properly rotate the coordinates
+        const AABB new_rect{rect.left * ratio, rect.top, rect.right * ratio, rect.bottom};
+        dest = Quad{new_rect};
+        auto pivot = new_rect.center();
+        if (px != 0 || py != 0)
+        {
+            pivot.first += abs(pivot.first - new_rect.left) * px;
+            pivot.second += abs(pivot.second - new_rect.bottom) * py;
+        }
+
+        dest.rotate(angle, pivot.first, pivot.second);
+        // bring back to the 16/9
+        dest.bottom_left_x *= inverse_ratio;
+        dest.bottom_right_x *= inverse_ratio;
+        dest.top_left_x *= inverse_ratio;
+        dest.top_right_x *= inverse_ratio;
+    }
+    draw_screen_rect(dest, std::move(color), filled, thickness);
+}
+
+void VanillaRenderContext::draw_screen_rect(const Quad& dest, Color color, bool filled, float thickness)
+{
+    auto texture = get_texture(0);                               // any texture that doesn't have transparency works
+    auto src = Quad{0, 0, 0, 0, 0.001f, 0.001f, 0.001f, 0.001f}; // dunno, doesn't need much
+    if (filled)
+    {
+        RenderAPI::get().draw_screen_texture(texture, src, dest, std::move(color), 0x27); // funky shader, 2C also works
+    }
+    else if (thickness)
+    {
+        // bottom_left, bottom_right, top_right, top_left
+        std::tuple<Vec2, Vec2, Vec2, Vec2> corners = dest;
+        draw_screen_line(std::get<0>(corners), std::get<1>(corners), std::move(color), thickness);
+        draw_screen_line(std::get<1>(corners), std::get<2>(corners), std::move(color), thickness);
+        draw_screen_line(std::get<2>(corners), std::get<3>(corners), std::move(color), thickness);
+        draw_screen_line(std::get<3>(corners), std::get<0>(corners), std::move(color), thickness);
+    }
+}
+
+void VanillaRenderContext::draw_screen_triangle(const Triangle& triangle, Color color, bool filled, float thickness)
+{
+    if (filled)
+    {
+        draw_screen_rect(Quad{triangle.A, triangle.B, triangle.C, triangle.C}, std::move(color), filled, .0f);
+    }
+    else if (thickness)
+    {
+        draw_screen_line(triangle.A, triangle.B, std::move(color), thickness);
+        draw_screen_line(triangle.B, triangle.C, std::move(color), thickness);
+        draw_screen_line(triangle.C, triangle.A, std::move(color), thickness);
+    }
+}
+
+void VanillaRenderContext::draw_screen_line([[maybe_unused]] const Vec2& A, [[maybe_unused]] const Vec2& B, [[maybe_unused]] Color color, [[maybe_unused]] float thickness)
+{
+    // TODO, draw_screen_rectangle
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    draw_world_texture(texture_id, row, column, Quad{AABB{left, top, right, bottom}}, color);
+    draw_world_texture(texture_id, row, column, Quad{AABB{left, top, right, bottom}}, std::move(color));
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
 {
-    draw_world_texture(texture_id, row, column, Quad{rect}, color);
+    draw_world_texture(texture_id, row, column, Quad{rect}, std::move(color));
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle, float px, float py)
@@ -134,7 +200,7 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
         }
         new_quad.rotate(angle, center.first, center.second);
     }
-    draw_world_texture(texture_id, row, column, new_quad, color);
+    draw_world_texture(texture_id, row, column, new_quad, std::move(color));
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color, WORLD_SHADER shader)
@@ -164,12 +230,12 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
         uv_left,
         uv_top,
     };
-    RenderAPI::get().draw_world_texture(texture, source, dest, color, (WorldShader)shader);
+    RenderAPI::get().draw_world_texture(texture, source, dest, std::move(color), (WorldShader)shader);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color)
 {
-    draw_world_texture(texture_id, row, column, dest, color, (WORLD_SHADER)WorldShader::TextureColor);
+    draw_world_texture(texture_id, row, column, dest, std::move(color), (WORLD_SHADER)WorldShader::TextureColor);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color, WORLD_SHADER shader)
@@ -179,12 +245,12 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& so
     {
         return;
     }
-    RenderAPI::get().draw_world_texture(texture, source, dest, color, (WorldShader)shader);
+    RenderAPI::get().draw_world_texture(texture, source, dest, std::move(color), (WorldShader)shader);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)
 {
-    draw_world_texture(texture_id, source, dest, color, (WORLD_SHADER)WorldShader::TextureColor);
+    draw_world_texture(texture_id, source, dest, std::move(color), (WORLD_SHADER)WorldShader::TextureColor);
 }
 
 // For the custom constructor
@@ -263,6 +329,9 @@ void register_usertypes(sol::state& lua)
     auto draw_text = sol::overload(
         static_cast<void (VanillaRenderContext::*)(const std::string&, float, float, float, float, Color, uint32_t, uint32_t)>(&VanillaRenderContext::draw_text),
         static_cast<void (VanillaRenderContext::*)(const TextRenderingInfo*, Color)>(&VanillaRenderContext::draw_text));
+    auto draw_screen_rect = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const AABB&, Color, bool, float, float, float, float)>(&VanillaRenderContext::draw_screen_rect),
+        static_cast<void (VanillaRenderContext::*)(const Quad&, Color, bool, float)>(&VanillaRenderContext::draw_screen_rect));
 
     /// Used in [set_callback](#set_callback) ON.RENDER_* callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
     lua.new_usertype<VanillaRenderContext>(
@@ -273,6 +342,12 @@ void register_usertypes(sol::state& lua)
         &VanillaRenderContext::draw_text_size,
         "draw_screen_texture",
         draw_screen_texture,
+        "draw_screen_rect",
+        draw_screen_rect,
+        "draw_screen_triangle",
+        &VanillaRenderContext::draw_screen_triangle,
+        "draw_screen_line",
+        &VanillaRenderContext::draw_screen_line,
         "draw_world_texture",
         draw_world_texture);
 
