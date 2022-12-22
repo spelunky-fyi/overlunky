@@ -2783,7 +2783,11 @@ void tooltip(const char* tip)
         return;
     if (ImGui::IsItemHovered())
     {
+        ImGuiContext& g = *GImGui;
+        if (options["hd_cursor"])
+            g.Style.MouseCursorScale = 1.5f;
         ImGui::SetTooltip("%s", tip);
+        g.Style.MouseCursorScale = 1.0f;
     }
 }
 
@@ -2793,6 +2797,9 @@ void tooltip(const char* tip, const char* key)
         return;
     if (ImGui::IsItemHovered())
     {
+        ImGuiContext& g = *GImGui;
+        if (options["hd_cursor"])
+            g.Style.MouseCursorScale = 1.5f;
         if (key && keys[key])
         {
             ImGui::SetTooltip("(%s) %s", key_string(keys[key]).c_str(), tip);
@@ -2801,6 +2808,7 @@ void tooltip(const char* tip, const char* key)
         {
             ImGui::SetTooltip("%s", tip);
         }
+        g.Style.MouseCursorScale = 1.0f;
     }
 }
 
