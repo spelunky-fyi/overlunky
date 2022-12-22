@@ -2782,11 +2782,11 @@ void update_filter(std::string s)
     scroll_top = true;
 }
 
-void tooltip(const char* tip)
+void tooltip(const char* tip, bool force = false)
 {
-    if (!options["show_tooltips"])
+    if (!options["show_tooltips"] && !force)
         return;
-    if (ImGui::IsItemHovered())
+    if (ImGui::IsItemHovered() || force)
     {
         ImGuiContext& g = *GImGui;
         if (options["hd_cursor"])
@@ -4260,13 +4260,7 @@ void render_clickhandler()
         {
             ImVec2 mpos = normalize(mouse_pos());
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
-            // std::pair<float, float> campos = get_camera_position();
-            ImDrawList* dl = ImGui::GetBackgroundDrawList();
-            std::string buf = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
-            // char buf2[32];
-            // sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
-            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
-            // dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
+            std::string coords = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
             unsigned int mask = safe_entity_mask;
             if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier from mouse_destroy_unsafe
             {
@@ -4276,9 +4270,11 @@ void render_clickhandler()
             if (hovered != nullptr)
             {
                 render_hitbox(hovered, true, ImColor(50, 50, 255, 200));
-                std::string buf3 = fmt::format("{}, {}", hovered->uid, entity_names[hovered->type->id]);
-                dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3.c_str());
+                coords += fmt::format("\n{}, {}", hovered->uid, entity_names[hovered->type->id]);
             }
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
+            tooltip(coords.c_str(), true);
+            ImGui::PopStyleVar(ImGuiStyleVar_WindowPadding);
         }
     }
 
