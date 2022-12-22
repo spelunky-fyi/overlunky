@@ -1352,7 +1352,10 @@ void spawn_kit(Kit* kit)
             auto spawned_mount = get_entity_ptr(spawned)->as<Mount>();
             spawned_mount->tame(true);
             if (!g_players.at(0)->overlay)
+            {
+                g_players.at(0)->standing_on_uid = -1;
                 spawned_mount->carry(g_players.at(0));
+            }
         }
         else if (g_players.at(0)->holding_uid == -1 && test_flag(spawned_ent->flags, 18))
         {
