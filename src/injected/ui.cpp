@@ -321,7 +321,7 @@ std::map<std::string, bool> options = {
     {"menu_ui", true},
     {"hd_cursor", true},
     {"inverted", false},
-    {"borders", true}};
+    {"borders", false}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -562,7 +562,7 @@ void set_colors()
     style.ScrollbarRounding = 0;
 
     float bordersize = options["borders"] ? 1.0f : 0;
-    style.WindowBorderSize = bordersize;
+    style.WindowBorderSize = 0; // meh
     style.FrameBorderSize = bordersize;
     style.PopupBorderSize = bordersize;
     style.ChildBorderSize = bordersize;
