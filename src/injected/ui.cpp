@@ -320,7 +320,8 @@ std::map<std::string, bool> options = {
     {"multi_viewports", true},
     {"menu_ui", true},
     {"hd_cursor", true},
-    {"inverted", false}};
+    {"inverted", false},
+    {"borders", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -494,14 +495,14 @@ void set_colors()
     colors[ImGuiCol_WindowBg] = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
     colors[ImGuiCol_ChildBg] = ImVec4(col_back.x, col_back.x, col_back.x, 0.00f);
     colors[ImGuiCol_PopupBg] = ImVec4(col_back.x, col_back.y, col_back.z, 0.98f);
-    colors[ImGuiCol_Border] = ImVec4(col_text.x, col_text.y, col_text.z, 0.30f);
+    colors[ImGuiCol_Border] = ImVec4(col_text.x, col_text.y, col_text.z, 0.40f);
     colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     colors[ImGuiCol_FrameBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
     colors[ImGuiCol_FrameBgHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.68f);
     colors[ImGuiCol_FrameBgActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    colors[ImGuiCol_TitleBg] = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
-    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
-    colors[ImGuiCol_TitleBgActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
+    colors[ImGuiCol_TitleBg] = ImVec4(col_back.x, col_back.y, col_back.z, 0.80f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(col_back.x, col_back.y, col_back.z, 0.80f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(col_area.x, col_area.y, col_area.z, 0.80f);
     colors[ImGuiCol_MenuBarBg] = ImVec4(col_area.x, col_area.y, col_area.z, 0.57f);
     colors[ImGuiCol_ScrollbarBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
     colors[ImGuiCol_ScrollbarGrab] = ImVec4(col_main.x, col_main.y, col_main.z, 0.31f);
@@ -538,9 +539,9 @@ void set_colors()
     colors[ImGuiCol_PlotLinesHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
     colors[ImGuiCol_PlotHistogram] = ImVec4(col_main.x, col_main.y, col_main.z, 0.63f);
     colors[ImGuiCol_PlotHistogramHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    colors[ImGuiCol_TableHeaderBg] = ImVec4(col_back.x, col_back.x, col_back.x, 1.00f);
-    colors[ImGuiCol_TableBorderStrong] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    colors[ImGuiCol_TableBorderLight] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_TableHeaderBg] = ImVec4(col_back.x, col_back.x, col_back.x, 0.40f);
+    colors[ImGuiCol_TableBorderStrong] = ImVec4(col_main.x, col_main.y, col_main.z, 0.40f);
+    colors[ImGuiCol_TableBorderLight] = ImVec4(col_main.x, col_main.y, col_main.z, 0.40f);
     colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
     colors[ImGuiCol_TableRowBgAlt] = ImVec4(0.30f, 0.30f, 0.30f, 0.09f);
     colors[ImGuiCol_TextSelectedBg] = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
@@ -550,18 +551,22 @@ void set_colors()
     colors[ImGuiCol_NavWindowingDimBg] = ImVec4(col_back.x, col_back.y, col_back.z, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg] = ImVec4(col_back.x, col_back.y, col_back.z, 0.35f);
 
+    style.DisplaySafeAreaPadding = {0, 0};
     style.WindowPadding = {4, 4};
+
     style.WindowRounding = 0;
     style.FrameRounding = 0;
     style.PopupRounding = 0;
     style.GrabRounding = 0;
     style.TabRounding = 0;
     style.ScrollbarRounding = 0;
-    style.WindowBorderSize = 0;
-    style.FrameBorderSize = 0;
-    style.PopupBorderSize = 0;
-    style.ChildBorderSize = 0;
-    style.DisplaySafeAreaPadding = {0, 0};
+
+    float bordersize = options["borders"] ? 1.0f : 0;
+    style.WindowBorderSize = bordersize;
+    style.FrameBorderSize = bordersize;
+    style.PopupBorderSize = bordersize;
+    style.ChildBorderSize = bordersize;
+    style.TabBorderSize = bordersize;
 }
 
 void load_cursor()
@@ -4780,6 +4785,7 @@ void render_style_editor()
     ImGui::DragFloat("Large print##FontLarge", &fontsize[2], 0.1f, 24.0f, 96.0f);
     ImGui::Separator();
     ImGui::Checkbox("Inverted (black on light colors)##StyleInvert", &options["inverted"]);
+    ImGui::Checkbox("Borders##StyleBorder", &options["borders"]);
     ImGui::DragFloat("Hue##StyleHue", &g_hue, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Saturation##StyleSaturation", &g_sat, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01f, 0.0f, 1.0f);
