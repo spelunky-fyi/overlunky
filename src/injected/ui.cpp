@@ -1693,7 +1693,7 @@ void force_cheats()
 
 void force_kits()
 {
-    if (g_state->screen == 12 && g_state->time_total == 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
+    if (g_state->screen == 12 && g_state->time_total <= 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
     {
         for (auto kit : kits)
         {
