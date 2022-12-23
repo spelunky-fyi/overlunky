@@ -137,11 +137,11 @@ void VanillaRenderContext::draw_screen_rect(const AABB& rect, Color color, bool 
 
 void VanillaRenderContext::draw_screen_rect(const Quad& dest, Color color, bool filled, float thickness)
 {
-    auto texture = get_texture(0);                               // any texture that doesn't have transparency works
-    auto src = Quad{0, 0, 0, 0, 0.001f, 0.001f, 0.001f, 0.001f}; // dunno, doesn't need much
     if (filled)
     {
-        RenderAPI::get().draw_screen_texture(texture, src, dest, std::move(color), 0x27); // funky shader, 2C also works
+        auto texture = get_texture(0);                                                    // any texture works
+        Quad src = Quad{0, 0, 0, 0, 0, 0, 0, 0};                                          // dunno, doesn't need much
+        RenderAPI::get().draw_screen_texture(texture, src, dest, std::move(color), 0x27); // 0x27 funky shader, 2C also works
     }
     else if (thickness)
     {
@@ -168,9 +168,17 @@ void VanillaRenderContext::draw_screen_triangle(const Triangle& triangle, Color 
     }
 }
 
-void VanillaRenderContext::draw_screen_line([[maybe_unused]] const Vec2& A, [[maybe_unused]] const Vec2& B, [[maybe_unused]] Color color, [[maybe_unused]] float thickness)
+void VanillaRenderContext::draw_screen_line(const Vec2& A, const Vec2& B, Color color, float thickness)
 {
-    // TODO, draw_screen_rectangle
+    constexpr float ratio = 16.0f / 9.0f;
+    constexpr float inverse_ratio = 9.0f / 16.0f;
+
+    Vec2 new_A{A.x * ratio, A.y};
+    Vec2 new_B{B.x * ratio, B.y};
+    float hypotenuse = (float)std::sqrt(std::pow(new_B.x - new_A.x, 2) + std::pow(new_B.y - new_A.y, 2));
+    float axis_AB_angle = std::atan2((new_B.y - new_A.y), (new_B.x - new_A.x));
+
+    draw_screen_rect(AABB{A.x, A.y + thickness / 2, A.x + hypotenuse * inverse_ratio, A.y - thickness / 2}, color, true, .0f, axis_AB_angle, -1.0, .0f);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
