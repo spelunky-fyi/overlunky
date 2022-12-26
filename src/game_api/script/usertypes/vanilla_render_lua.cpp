@@ -140,22 +140,64 @@ Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D)
         return {};
     return Vec2{(b1 * c - b * c1) / det, (a * c1 - a1 * c) / det};
 }
-// get a Quad to out fill the corner between two
-Quad get_corner_quad(const Quad& line1, const Quad& line2, const Vec2 inner_corner)
+bool is_on_line(const Vec2 point, const std::pair<Vec2, Vec2> line)
 {
-    // TODO: would probably be better if it calculated the inner corner as well
-    // then decide which one is the inner and which the outer, maybe even merge this with the fix_overlap
+    if (line.first.x < line.second.x)
+    {
+        if (line.first.x > point.x || point.x > line.second.x)
+            return false;
+    }
+    else
+    {
+        if (line.second.x > point.x || point.x > line.first.x)
+            return false;
+    }
+    if (line.first.y < line.second.y)
+    {
+        if (line.first.y > point.y || point.y > line.second.y)
+            return false;
+    }
+    else
+    {
+        if (line.second.y > point.y || point.y > line.first.y)
+            return false;
+    }
+    return true;
+}
 
-    // assumes to use `bottom` to get the outer corner
-    Vec2 A{line1.bottom_left_x, line1.bottom_left_y};
-    Vec2 B{line1.bottom_right_x, line1.bottom_right_y};
+// get a Quad to out fill the corner between two lines and fix overlap
+Quad get_corner_quad(Quad& line1, Quad& line2)
+{
+    Vec2 A{line1.top_left_x, line1.top_left_y};
+    Vec2 B{line1.top_right_x, line1.top_right_y};
 
-    Vec2 C{line2.bottom_right_x, line2.bottom_right_y};
-    Vec2 D{line2.bottom_left_x, line2.bottom_left_y};
+    Vec2 C{line2.top_right_x, line2.top_right_y};
+    Vec2 D{line2.top_left_x, line2.top_left_y};
+    Vec2 corner1 = intersection(A, B, C, D);
 
-    Vec2 outer_corner = intersection(A, B, C, D);
+    Vec2 E{line1.bottom_left_x, line1.bottom_left_y};
+    Vec2 F{line1.bottom_right_x, line1.bottom_right_y};
 
-    return Quad{B, inner_corner, D, outer_corner};
+    Vec2 G{line2.bottom_right_x, line2.bottom_right_y};
+    Vec2 H{line2.bottom_left_x, line2.bottom_left_y};
+    Vec2 corner2 = intersection(E, F, G, H);
+
+    if (!is_on_line(corner1, {A, B})) // check which one is the inner and which outer corner
+    {
+        line1.bottom_right_x = corner2.x;
+        line1.bottom_right_y = corner2.y;
+        line2.bottom_left_x = corner2.x;
+        line2.bottom_left_y = corner2.y;
+        return Quad{B, corner2, D, corner1};
+    }
+    else
+    {
+        line1.top_right_x = corner1.x;
+        line1.top_right_y = corner1.y;
+        line2.top_left_x = corner1.x;
+        line2.top_left_y = corner1.y;
+        return Quad{F, corner1, H, corner2};
+    }
 };
 // convert two points into Quad (rectangle) with given `thickness` (height)
 Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness)
@@ -169,24 +211,6 @@ Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness)
     dest.rotate(axis_AB_angle, A.x, A.y);
     return dest;
 };
-// removes the overlap of two lines (very specific use case when the lines are guaranteed to overlap)
-Vec2 fix_overlap(Quad& line1, Quad& line2)
-{
-    // assumes to use `top` to get the inner corner
-    Vec2 A{line1.top_right_x, line1.top_right_y};
-    Vec2 B{line1.top_left_x, line1.top_left_y};
-
-    Vec2 C{line2.top_right_x, line2.top_right_y};
-    Vec2 D{line2.top_left_x, line2.top_left_y};
-
-    Vec2 cross_point = intersection(A, B, C, D);
-
-    line1.top_right_x = cross_point.x;
-    line1.top_right_y = cross_point.y;
-    line2.top_left_x = cross_point.x;
-    line2.top_left_y = cross_point.y;
-    return cross_point;
-}
 
 void VanillaRenderContext::draw_screen_rect(const AABB& rect, Color color, bool filled, float thickness, float angle, float px, float py)
 {
@@ -228,15 +252,10 @@ void VanillaRenderContext::draw_screen_rect(const Quad& dest, Color color, bool 
         Quad line_cd = get_line_quad(std::get<2>(corners), std::get<3>(corners), thickness);
         Quad line_da = get_line_quad(std::get<3>(corners), std::get<0>(corners), thickness);
 
-        Vec2 cross_point1 = fix_overlap(line_ab, line_bc);
-        Vec2 cross_point2 = fix_overlap(line_bc, line_cd);
-        Vec2 cross_point3 = fix_overlap(line_cd, line_da);
-        Vec2 cross_point4 = fix_overlap(line_da, line_ab);
-
-        Quad corner_abc = get_corner_quad(line_ab, line_bc, cross_point1);
-        Quad corner_bcd = get_corner_quad(line_bc, line_cd, cross_point2);
-        Quad corner_cda = get_corner_quad(line_cd, line_da, cross_point3);
-        Quad corner_dac = get_corner_quad(line_da, line_ab, cross_point4);
+        Quad corner_abc = get_corner_quad(line_ab, line_bc);
+        Quad corner_bcd = get_corner_quad(line_bc, line_cd);
+        Quad corner_cda = get_corner_quad(line_cd, line_da);
+        Quad corner_dac = get_corner_quad(line_da, line_ab);
 
         draw_screen_rect(convert_ratio(line_ab, true), color, true, .0f);
         draw_screen_rect(convert_ratio(line_bc, true), color, true, .0f);
@@ -266,13 +285,9 @@ void VanillaRenderContext::draw_screen_triangle(const Triangle& triangle, Color 
         Quad line_bc = get_line_quad(new_triangle.B, new_triangle.C, thickness);
         Quad line_ca = get_line_quad(new_triangle.C, new_triangle.A, thickness);
 
-        Vec2 cross_point1 = fix_overlap(line_ab, line_bc);
-        Vec2 cross_point2 = fix_overlap(line_bc, line_ca);
-        Vec2 cross_point3 = fix_overlap(line_ca, line_ab);
-
-        Quad corner_abc = get_corner_quad(line_ab, line_bc, cross_point1);
-        Quad corner_bca = get_corner_quad(line_bc, line_ca, cross_point2);
-        Quad corner_cab = get_corner_quad(line_ca, line_ab, cross_point3);
+        Quad corner_abc = get_corner_quad(line_ab, line_bc);
+        Quad corner_bca = get_corner_quad(line_bc, line_ca);
+        Quad corner_cab = get_corner_quad(line_ca, line_ab);
 
         draw_screen_rect(convert_ratio(line_ab, true), color, true, .0f);
         draw_screen_rect(convert_ratio(line_bc, true), color, true, .0f);
