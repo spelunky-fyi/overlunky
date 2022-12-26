@@ -88,7 +88,11 @@ std::optional<std::int64_t> PRNG::internal_random_int(std::int64_t min, std::int
 
 bool PRNG::random_chance(std::int64_t inverse_chance, PRNG_CLASS type)
 {
-    return random_int(0, inverse_chance, type) == 0;
+    if (inverse_chance <= 0ll)
+        return false;
+    if (inverse_chance == 1)
+        return true;
+    return random_int(0, inverse_chance - 1, type) == 0;
 }
 
 float PRNG::random_float(PRNG_CLASS type)

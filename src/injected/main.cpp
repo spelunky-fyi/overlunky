@@ -104,6 +104,7 @@ void attach_stdout(DWORD pid)
 
 void run()
 {
+    std::this_thread::sleep_for(2s);
     Process proc;
     if (auto res = find_process("Overlunky.exe"))
     {

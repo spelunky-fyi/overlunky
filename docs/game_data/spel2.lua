@@ -849,21 +849,46 @@ function get_aabb_bounds() end
 ---Gets the current camera position in the level
 ---@return number, number
 function get_camera_position() end
----Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+---Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
 ---@return Flags
 function set_flag(flags, bit) end
----Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+---Clears the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
 ---@return Flags
 function clr_flag(flags, bit) end
----Returns true if a bit is set in the flags
+---Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param bit integer
+---@return Flags
+function flip_flag(flags, bit) end
+---Returns true if the nth bit is set in the number.
 ---@param flags Flags
 ---@param bit integer
 ---@return boolean
 function test_flag(flags, bit) end
+---Set a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param mask Flags
+---@return Flags
+function set_mask(flags, mask) end
+---Clears a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param mask Flags
+---@return Flags
+function clr_mask(flags, mask) end
+---Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param mask Flags
+---@return Flags
+function flip_mask(flags, mask) end
+---Returns true if a bitmask is set in the number.
+---@param flags Flags
+---@param mask Flags
+---@return boolean
+function test_mask(flags, mask) end
 ---Gets the resolution (width and height) of the screen
 ---@return integer, integer
 function get_window_size() end
@@ -1676,7 +1701,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field screen_next integer
     ---@field ingame integer
     ---@field playing integer
-    ---@field pause integer
+    ---@field pause PAUSE
     ---@field width integer
     ---@field height integer
     ---@field kali_favor integer
@@ -2002,8 +2027,8 @@ local function PRNG_random(self, min, max) end
     ---@field facing_left boolean
     ---@field render_inactive boolean
     ---@field get_entity fun(self): class Entity
-    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
-    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: fun(): any): CallbackId
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil
     ---@field set_pre_dtor fun(self, fun: fun(): any): CallbackId
     ---@field set_post_dtor fun(self, fun: fun(): any): CallbackId
@@ -4250,6 +4275,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil
     ---@field draw_image GuiDrawContext_draw_image
     ---@field draw_image_rotated GuiDrawContext_draw_image_rotated
+    ---@field draw_layer fun(self, layer: DRAW_LAYER): nil
     ---@field window any @&GuiDrawContext::window
     ---@field win_text fun(self, text: string): nil
     ---@field win_separator fun(self): nil
@@ -4305,10 +4331,6 @@ local function GuiDrawContext_draw_image(self, image, rect, uv_rect, color) end
 ---@overload fun(self, image: IMAGE, left: number, top: number, right: number, bottom: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number, color: uColor, angle: number, px: number, py: number): nil
 local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, color, angle, px, py) end
 
----@class ImVec2
-    ---@field x number
-    ---@field y number
-
 ---@class Gamepad
     ---@field enabled boolean
     ---@field buttons GAMEPAD
@@ -4321,24 +4343,6 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
 
 ---@class ImGuiIO
     ---@field displaysize ImVec2
-    ---@field framerate number
-    ---@field wantkeyboard boolean
-    ---@field keysdown boolean       [] @size: 512. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
-    ---@field keydown fun(key: number | string): boolean
-    ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
-    ---@field keyreleased fun(key: number | string): boolean
-    ---@field keyctrl boolean
-    ---@field keyshift boolean
-    ---@field keyalt boolean
-    ---@field keysuper boolean
-    ---@field wantmouse boolean
-    ---@field mousepos ImVec2
-    ---@field mousedown boolean       [] @size: 5
-    ---@field mouseclicked boolean       [] @size: 5
-    ---@field mousedoubleclicked boolean       [] @size: 5
-    ---@field mousewheel number
-    ---@field gamepad Gamepad
-    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
 
 ---@class VanillaRenderContext
     ---@field draw_text VanillaRenderContext_draw_text
@@ -5210,6 +5214,10 @@ function Vec2.new(self, x_, y_) end
 ---@param number> p tuple<number,
 ---@return Vec2
 function Vec2.new(self, number> p) end
+---NoDoc
+---@param imvec2 ImVec2
+---@return Vec2
+function Vec2.new(self, imvec2) end
 
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
@@ -5580,6 +5588,20 @@ DYNAMIC_TEXTURE = {
   KALI_STATUE = -9
 }
 ---@alias DYNAMIC_TEXTURE integer
+ENTITY_OVERRIDE = {
+  COLLISION1 = 4,
+  COLLISION2 = 26,
+  DAMAGE = 48,
+  DESTROY = 5,
+  DTOR = 0,
+  FLOOR_UPDATE = 38,
+  GET_HELD_ENTITY = 22,
+  KILL = 3,
+  RENDER = 3,
+  TRIGGER_ACTION = 24,
+  UPDATE_STATE_MACHINE = 2
+}
+---@alias ENTITY_OVERRIDE integer
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
   CLIMBABLE = 9,
@@ -7411,6 +7433,15 @@ PARTICLEEMITTER = {
   YETIQUEEN_LANDING_SNOWDUST = 183
 }
 ---@alias PARTICLEEMITTER integer
+PAUSE = {
+  ANKH = 32,
+  CUTSCENE = 4,
+  FADE = 2,
+  FLAG4 = 8,
+  FLAG5 = 16,
+  MENU = 1
+}
+---@alias PAUSE integer
 PAUSEUI_VISIBILITY = {
   INVISIBLE = 0,
   SLIDING_DOWN = 1,
@@ -7418,6 +7449,15 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
+PAUSE_FLAG = {
+  ANKH = 6,
+  CUTSCENE = 3,
+  FADE = 2,
+  FLAG4 = 4,
+  FLAG5 = 5,
+  MENU = 1
+}
+---@alias PAUSE_FLAG integer
 POS_TYPE = {
   AIR = 4,
   ALCOVE = 16,

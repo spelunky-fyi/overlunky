@@ -1,7 +1,7 @@
 # Overlunky
 ![Continuous Integration](https://github.com/spelunky-fyi/overlunky/workflows/Continuous%20Integration/badge.svg)
 
-An overlay for Spelunky 2 to help you with modding, exploring the depths of the game and practicing with tools like spawning arbitrary items, warping to levels and teleporting made by the cool people from the Spelunky Community Discord.
+An overlay for Spelunky 2 to help you with modding, exploring the depths of the game and practicing with tools like spawning arbitrary items, warping to levels and teleporting made by the cool people from the [Spelunky Community Discord](https://discord.gg/spelunky-community).
 
 **Please read the [![open issues](https://img.shields.io/github/issues-raw/spelunky-fyi/overlunky)](https://github.com/spelunky-fyi/overlunky/issues) before complaining about them in the discord.**
 
@@ -17,10 +17,8 @@ You are strongly discouraged from using any modding tools in your actual online 
 **Steam achievements and game saves are disabled by default while running Overlunky though.**
 
 ## Installation and usage
-**[YouTube tutorial](https://youtu.be/Zzba4cV9f2c) for kids who can't read good and who wanna learn to do other stuff good too.**
-
-  - **[Download the latest WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip)** or a [stable release](https://github.com/spelunky-fyi/overlunky/releases/latest)** and extract to your game folder, keeping the folder structure.
-    + You can also use [Modlunky2](https://github.com/spelunky-fyi/modlunky2/) to install and launch Overlunky
+  - ### Just use [Modlunky2](https://github.com/spelunky-fyi/modlunky2/releases/latest/) but please read this page too
+  - **[Download the latest WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip)** or a [stable release](https://github.com/spelunky-fyi/overlunky/releases/latest) and extract to your game folder, keeping the folder structure.
   - Run the program, leave it running and then start your game, or the other way around!
     + It won't automatically start your game, so don't hold your breath waiting for it
     + You can press ENTER in the launcher to try launch the game from the parent folder
@@ -53,7 +51,7 @@ Current features and their *default* keyboard shortcuts.
       + **Ctrl+Mouse left**: Spawn overlay on hovered entity (drag to offset position) / Spawn or throw single liquid blob
       + **Alt+Mouse left**: Hold to draw floors or other entities on grid
       + **Mouse right**: Teleport to mouse cursor (drag to set velocity)
-      + **Mouse middle**: Select or drag safe entities around
+      + **Mouse middle**: Select or drag safe entities around (doubleclick to clear selection)
       + **Alt+Mouse middle**: Select multiple entities in the finder
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
       + **Ctrl+Mouse middle**: Launch dragged entity with velocity
@@ -78,8 +76,8 @@ Current features and their *default* keyboard shortcuts.
       + **Ctrl+0**: Auto fit level width to screen
       + **Ctrl+2345**: Zoom to X level width
       + **Shift+IJKL**: Move camera in desired direction
-      + **Mouse 4**: Drag camera around or focus on an entity
-      + **Mouse 4 longpress**: Reset camera focus to player
+      + **Shift+U**: Reset camera focus and bounds
+      + **Mouse 4**: Drag camera around or focus on an entity. Hold to reset.
       + **Mouse 4+Wheel**: Zoom
       + **Ctrl+Wheel**: Zoom
   - **F4**: Entity properties
@@ -131,10 +129,12 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
 ## Troubleshooting
   - If you're running **Linux**
     + Check the [command line switches](#command-line-switches) to mitigate issues that come with injecting.
-    + The game and OL should run fine with Wine 7 if you install DXVK and the steam emu. Without DXVK the game colors are probably messed up, and Overlunky might mess them up even more. These are probably Wine bugs and not Overlunky bugs.
+    + The game and OL should run fine with Wine 7 if you install DXVK (and the Steam emulator?). Without DXVK the game colors are probably messed up, and Overlunky might mess them up even more. These are probably Wine bugs and not Overlunky bugs.
     + Also works with **Proton Experimental** or maybe Proton 7 using the [command line switch](#command-line-switches) `--launch_game` for a non-Steam game shortcut. Just make sure the game and the OL shortcut are set to use the same Proton version under compatibility.
+    + Modlunky2 should work just fine under Wine and Proton too, if you add it as a non-Steam game.
     + You're still mostly on your own here, this is a Windows 10 program for a Windows 10 game.
   - If your game **crashes** when launching Overlunky or it just closes and you **don't see the overlay** in game:
+    + Try all the different launching methods from [command line ](#command-line-switches) or in Modlunky2.
     + Make sure you are running the latest version of each. We don't support old game versions and sometimes not the too recent ones either. The latest somewhat tested version can be found at the top if this document.
     + Make sure your antivirus is not blocking it. **This is very likely if you're using one.** Overlunky is very hacky and acts like malware. It isn't, but you can audit the source code and build it yourself if you want.
     + Try deleting `Spelunky 2/overlunky.ini` or `Spelunky 2/imgui.ini`.
@@ -142,15 +142,18 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
   - If your game **crashes** when actually trying to use the tools:
     + See previous section.
     + Some entities just crash the game, try to avoid them next time.
-    + Some scripts just crash the game too, the api is not very safe.
+    + Some script mods just crash the game too. Complain to the author of the mod.
   - If you have proglems with **Modlunky2 or Playlunky**:
     + While we try to keep all the modding tools compatible, some things may break sometimes.
-    + Check the [open issues](https://github.com/spelunky-fyi/overlunky/issues) for known compatibility problems with other tools.
+    + Because PL and OL are using the same scripting API, one might inadvertently undo the change you did in the other. Don't expect perfection when using both.
   - If you're **missing** some overlay **windows** or tabs:
+    + Hit F12 to change the window mode.
     + Delete `Spelunky 2/imgui.ini` to reset tool window positions that might be outside the screen region for whatever reason.
+    + The tools can be moved outside the game window. Maybe they're on a different monitor for some reason?
     + Maybe the overlay is just really tiny or collapsed? You can resize it. Just try your magic with the mouse.
   - If you mess up your **keyboard shortcuts** or UI:
-    + Delete `Spelunky 2/overlunky.ini`.
+    + You can reset keyboard shortcuts in the options.
+    + Delete `Spelunky 2/overlunky.ini` and `Spelunky 2/imgui.ini` to reset everything.
   - If stuff just don't work and you're running **Windows 7** or a machine not designed to play games
     + You're on your own here. We don't test on or make this for ancient software/hardware.
   - If you have problems with **OBS**
@@ -158,7 +161,11 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + Try toggling the *Capture third-party overlays* option in *Game Capture*. It's possible to hide OL if running the game through Steam.
     + If you have lag or crashes, check previous question.
   - If you **don't have scripts** in the Scripts tab
-    + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts).
+    + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts) or use Modlunky2.
+  - If it still doesn't work
+    + Stop by #s2-modding-help on the [community Discord](https://discord.gg/spelunky-community) or [submit an issue](https://github.com/spelunky-fyi/overlunky/issues)
+    + We want to know your OS version, are you using the game on Steam, what you have tried, what tools you are using, how you are using them and all the versions. These can be found in the terminal output or ingame overlays. ("Latest" or WHIP is not a version, but 7f0bc94 or 0.6.1 is.)
+
 
 ## Development
 If you'd rather build it yourself or help with development, clone the repository, get some C++ build tools and run this to get started:
@@ -170,7 +177,7 @@ cd build
 cmake ..
 cmake --build . --config Release --target ALL_BUILD
 ```
-The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode. Set `OL_DEBUG=1` in the *game environment* to enable logging to console. (Run `setx OL_DEBUG 1` to do this system-wide.)
+The binaries will be in `build/bin/Release/`. You can also try the scripts in `.vscode` with VSCode.
 
 ## Command line switches
 
@@ -185,4 +192,4 @@ The binaries will be in `build/bin/Release/`. You can also try the scripts in `.
 --version               show version information
 ```
 
-Without `--launch_game` the launcher will try to find a running instance of Spel2.exe and inject to it. `--launch_game` can be used with Steam, also on Linux, by adding `Overlunky.exe` as a non-Steam game and adding it to **launch options under properties**. If Overlunky is installed in the default location under `Spelunky 2/Overlunky`, a simple `--launch_game` should work. If you want to use **Overlunky with Playlunky** on Steam, you can use launch `playlunky_launcher.exe` with the `-overlunky` launch option.
+Without arguments the launcher will try to find a running instance of Spel2.exe and inject to it. `--launch_game` can be used with Steam, also on Linux, by adding `Overlunky.exe` as a non-Steam game and adding it to **launch options under properties**. If Overlunky is installed in the default location under `Spelunky 2/Overlunky`, a simple `--launch_game` should work. If you want to use **Overlunky with Playlunky** on Steam, you can use launch `playlunky_launcher.exe` with the `--overlunky` launch option.

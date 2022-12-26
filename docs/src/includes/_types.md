@@ -190,7 +190,8 @@ nil | [draw_image(IMAGE image, float left, float top, float right, float bottom,
 nil | [draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image) | Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 nil | [draw_image_rotated(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) | Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 nil | [draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated) | Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
-bool | [window(string title, float x, float y, float w, float h, bool movable, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) | Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx)
+nil | [draw_layer(DRAW_LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_layer) | Draw on top of UI windows, including platform windows that may be outside the game area, or only in current widget window. Defaults to main viewport background.
+bool | [window(string title, float x, float y, float w, float h, bool movable, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) | Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
 nil | [win_text(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text) | Add some text to window, automatically wrapped
 nil | [win_separator()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator) | Add a separator line to window
 nil | [win_inline()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline) | Add next thing on the same line. This is same as `win_sameline(0, -1)`
@@ -558,14 +559,6 @@ tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/o
 [uColor](#Aliases) | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
 [Color](#Color)& | [set_ucolor(const uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ucolor) | Changes color based on given [uColor](#Aliases)
 
-### ImVec2
-
-
-Type | Name | Description
----- | ---- | -----------
-float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
-float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
-
 ### Letter
 
 
@@ -647,13 +640,13 @@ float | [tileh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tileh) 
 bool | [facing_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=facing_left) | 
 bool | [render_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_inactive) | 
 class [Entity](#Entity) | [get_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity) | 
-[CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
-[CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
+[CallbackId](#Aliases) | [set_pre_virtual(RENDER_INFO_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
+[CallbackId](#Aliases) | [set_post_virtual(RENDER_INFO_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
 [CallbackId](#Aliases) | [set_pre_dtor(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_dtor) | Hooks before the virtual function.<br/>The callback signature is `nil dtor()`
 [CallbackId](#Aliases) | [set_post_dtor(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_dtor) | Hooks after the virtual function.<br/>The callback signature is `nil dtor()`
-[CallbackId](#Aliases) | [set_pre_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render) | Hooks before the virtual function.<br/>The callback signature is `optional<> render(VanillaRenderContext)`
-[CallbackId](#Aliases) | [set_post_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render) | Hooks after the virtual function.<br/>The callback signature is `nil render(VanillaRenderContext)`
+[CallbackId](#Aliases) | [set_pre_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render) | Hooks before the virtual function.<br/>The callback signature is `bool render(float float, VanillaRenderContext vanilla_render_context)`
+[CallbackId](#Aliases) | [set_post_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render) | Hooks after the virtual function.<br/>The callback signature is `nil render(float float, VanillaRenderContext vanilla_render_context)`
 
 ### ShortTileCodeDef
 
@@ -721,25 +714,7 @@ Used in [get_io](#get_io)
 
 Type | Name | Description
 ---- | ---- | -----------
-[ImVec2](#ImVec2)      | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
-float       | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
-bool        | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
-bool        | [keysdown[512]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
- | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | bool keydown(int keycode)<br/>bool keydown(char key)<br/> 
- | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | bool keypressed(int keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
- | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | bool keyreleased(int keycode)<br/>bool keyreleased(char key)<br/> 
-bool        | [keyctrl](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyctrl) | 
-bool        | [keyshift](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyshift) | 
-bool        | [keyalt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) | 
-bool        | [keysuper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) | 
-bool        | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | 
-[ImVec2](#ImVec2)      | [mousepos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) | 
-bool        | [mousedown[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
-bool        | [mouseclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
-bool        | [mousedoubleclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
-float       | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) | 
-[Gamepad](#Gamepad) | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
- | [gamepads](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepads) | [Gamepad](#Gamepad) gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/> 
+ImVec2      | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
 
 ### InputMapping
 
@@ -2331,7 +2306,7 @@ int | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) 
 int | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | 
 int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
 int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
-int | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
+[PAUSE](#PAUSE) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | 8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controller by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
 int | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | level width in rooms (number of rooms horizontally)
 int | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | level height in rooms (number of rooms vertically)
 int | [kali_favor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_favor) | 

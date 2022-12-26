@@ -658,6 +658,9 @@
                             <a href="#clr_flag" class="toc-h3 toc-link" data-title="clr_flag">clr_flag</a>
                           </li>
                           <li>
+                            <a href="#flip_flag" class="toc-h3 toc-link" data-title="flip_flag">flip_flag</a>
+                          </li>
+                          <li>
                             <a href="#get_entity_flags" class="toc-h3 toc-link" data-title="get_entity_flags">get_entity_flags</a>
                           </li>
                           <li>
@@ -690,10 +693,16 @@
                             <a href="#change_poison_timer" class="toc-h3 toc-link" data-title="change_poison_timer">change_poison_timer</a>
                           </li>
                           <li>
+                            <a href="#clr_mask" class="toc-h3 toc-link" data-title="clr_mask">clr_mask</a>
+                          </li>
+                          <li>
                             <a href="#create_image" class="toc-h3 toc-link" data-title="create_image">create_image</a>
                           </li>
                           <li>
                             <a href="#disable_floor_embeds" class="toc-h3 toc-link" data-title="disable_floor_embeds">disable_floor_embeds</a>
+                          </li>
+                          <li>
+                            <a href="#flip_mask" class="toc-h3 toc-link" data-title="flip_mask">flip_mask</a>
                           </li>
                           <li>
                             <a href="#force_journal" class="toc-h3 toc-link" data-title="force_journal">force_journal</a>
@@ -786,6 +795,9 @@
                             <a href="#set_journal_enabled" class="toc-h3 toc-link" data-title="set_journal_enabled">set_journal_enabled</a>
                           </li>
                           <li>
+                            <a href="#set_mask" class="toc-h3 toc-link" data-title="set_mask">set_mask</a>
+                          </li>
+                          <li>
                             <a href="#set_seed" class="toc-h3 toc-link" data-title="set_seed">set_seed</a>
                           </li>
                           <li>
@@ -793,6 +805,9 @@
                           </li>
                           <li>
                             <a href="#show_journal" class="toc-h3 toc-link" data-title="show_journal">show_journal</a>
+                          </li>
+                          <li>
+                            <a href="#test_mask" class="toc-h3 toc-link" data-title="test_mask">test_mask</a>
                           </li>
                           <li>
                             <a href="#toggle_journal" class="toc-h3 toc-link" data-title="toggle_journal">toggle_journal</a>
@@ -1545,9 +1560,6 @@
                           </li>
                           <li>
                             <a href="#Color" class="toc-h3 toc-link" data-title="Color">Color</a>
-                          </li>
-                          <li>
-                            <a href="#ImVec2" class="toc-h3 toc-link" data-title="ImVec2">ImVec2</a>
                           </li>
                           <li>
                             <a href="#Letter" class="toc-h3 toc-link" data-title="Letter">Letter</a>
@@ -3026,6 +3038,9 @@
                     <a href="#COSUBTHEME" class="toc-h2 toc-link" data-title="COSUBTHEME">COSUBTHEME</a>
                   </li>
                   <li>
+                    <a href="#DRAW_LAYER" class="toc-h2 toc-link" data-title="DRAW_LAYER">DRAW_LAYER</a>
+                  </li>
+                  <li>
                     <a href="#DROP" class="toc-h2 toc-link" data-title="DROP">DROP</a>
                   </li>
                   <li>
@@ -3101,6 +3116,9 @@
                     <a href="#PARTICLEEMITTER" class="toc-h2 toc-link" data-title="PARTICLEEMITTER">PARTICLEEMITTER</a>
                   </li>
                   <li>
+                    <a href="#PAUSE" class="toc-h2 toc-link" data-title="PAUSE">PAUSE</a>
+                  </li>
+                  <li>
                     <a href="#PAUSEUI_VISIBILITY" class="toc-h2 toc-link" data-title="PAUSEUI_VISIBILITY">PAUSEUI_VISIBILITY</a>
                   </li>
                   <li>
@@ -3111,6 +3129,9 @@
                   </li>
                   <li>
                     <a href="#PROCEDURAL_CHANCE" class="toc-h2 toc-link" data-title="PROCEDURAL_CHANCE">PROCEDURAL_CHANCE</a>
+                  </li>
+                  <li>
+                    <a href="#RENDER_INFO_OVERRIDE" class="toc-h2 toc-link" data-title="RENDER_INFO_OVERRIDE">RENDER_INFO_OVERRIDE</a>
                   </li>
                   <li>
                     <a href="#REPEAT_TYPE" class="toc-h2 toc-link" data-title="REPEAT_TYPE">REPEAT_TYPE</a>
@@ -3375,7 +3396,7 @@
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=savegame">savegame</a></p>
 </blockquote>
 
-<p>Provides a read-only access to the save data, updated as soon as something changes (i.e. before it&#39;s written to savegame.sav.) or manually with <a href="#save_progress">save_progress</a></p>
+<p>Provides access to the save data, updated as soon as something changes (i.e. before it&#39;s written to savegame.sav.) Use <a href="#save_progress">save_progress</a> to save to savegame.sav.</p>
 <h3 id='options'>options</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">register_option_bool</span><span class="p">(</span><span class="s2">"bomb_bag"</span><span class="p">,</span> <span class="s2">"BombBag"</span><span class="p">,</span> <span class="s2">"Spawn bomb bag at the start of every level"</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
 
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -3991,7 +4012,13 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clr_flag">clr_flag</a></p>
 </blockquote>
 <h4 id='Flags-clr_flag-Flags-flags-int-bit'><a href="#Aliases">Flags</a> clr_flag(<a href="#Aliases">Flags</a> flags, int bit)</h4>
-<p>Clears a bit in a number. This doesn&#39;t actually change the bit in the entity you pass it, it just returns the new value you can use.</p>
+<p>Clears the nth bit in a number. This doesn&#39;t actually change the variable you pass, it just returns the new value you can use.</p>
+<h3 id='flip_flag'>flip_flag</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flip_flag">flip_flag</a></p>
+</blockquote>
+<h4 id='Flags-flip_flag-Flags-flags-int-bit'><a href="#Aliases">Flags</a> flip_flag(<a href="#Aliases">Flags</a> flags, int bit)</h4>
+<p>Flips the nth bit in a number. This doesn&#39;t actually change the variable you pass, it just returns the new value you can use.</p>
 <h3 id='get_entity_flags'>get_entity_flags</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_flags">get_entity_flags</a></p>
@@ -4027,7 +4054,7 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_flag">set_flag</a></p>
 </blockquote>
 <h4 id='Flags-set_flag-Flags-flags-int-bit'><a href="#Aliases">Flags</a> set_flag(<a href="#Aliases">Flags</a> flags, int bit)</h4>
-<p>Set a bit in a number. This doesn&#39;t actually change the bit in the entity you pass it, it just returns the new value you can use.</p>
+<p>Set the nth bit in a number. This doesn&#39;t actually change the variable you pass, it just returns the new value you can use.</p>
 <h3 id='set_level_flags'>set_level_flags</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_level_flags">set_level_flags</a></p>
@@ -4039,13 +4066,19 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=test_flag">test_flag</a></p>
 </blockquote>
 <h4 id='bool-test_flag-Flags-flags-int-bit'>bool test_flag(<a href="#Aliases">Flags</a> flags, int bit)</h4>
-<p>Returns true if a bit is set in the flags</p>
+<p>Returns true if the nth bit is set in the number.</p>
 <h2 id='Generic-functions'>Generic functions</h2><h3 id='change_poison_timer'>change_poison_timer</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_poison_timer">change_poison_timer</a></p>
 </blockquote>
 <h4 id='nil-change_poison_timer-int-frames'>nil change_poison_timer(int frames)</h4>
 <p>Change the amount of frames after the damage from poison is applied</p>
+<h3 id='clr_mask'>clr_mask</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clr_mask">clr_mask</a></p>
+</blockquote>
+<h4 id='Flags-clr_mask-Flags-flags-Flags-mask'><a href="#Aliases">Flags</a> clr_mask(<a href="#Aliases">Flags</a> flags, <a href="#Aliases">Flags</a> mask)</h4>
+<p>Clears a bitmask in a number. This doesn&#39;t actually change the variable you pass, it just returns the new value you can use.</p>
 <h3 id='create_image'>create_image</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_image">create_image</a></p>
@@ -4059,6 +4092,12 @@ Depending on the image size, this can take a moment, preferably don&#39;t create
 </blockquote>
 <h4 id='bool-disable_floor_embeds-bool-disable'>bool disable_floor_embeds(bool disable)</h4>
 <p>Disable all crust item spawns, returns whether they were already disabled before the call</p>
+<h3 id='flip_mask'>flip_mask</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flip_mask">flip_mask</a></p>
+</blockquote>
+<h4 id='Flags-flip_mask-Flags-flags-Flags-mask'><a href="#Aliases">Flags</a> flip_mask(<a href="#Aliases">Flags</a> flags, <a href="#Aliases">Flags</a> mask)</h4>
+<p>Flips the nth bit in a number. This doesn&#39;t actually change the variable you pass, it just returns the new value you can use.</p>
 <h3 id='force_journal'>force_journal</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_journal">force_journal</a></p>
@@ -4262,6 +4301,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_journal_enabled-bool-b'>nil set_journal_enabled(bool b)</h4>
 <p>Enables or disables the journal</p>
+<h3 id='set_mask'>set_mask</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_mask">set_mask</a></p>
+</blockquote>
+<h4 id='Flags-set_mask-Flags-flags-Flags-mask'><a href="#Aliases">Flags</a> set_mask(<a href="#Aliases">Flags</a> flags, <a href="#Aliases">Flags</a> mask)</h4>
+<p>Set a bitmask in a number. This doesn&#39;t actually change the variable you pass, it just returns the new value you can use.</p>
 <h3 id='set_seed'>set_seed</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_seed">set_seed</a></p>
@@ -4320,6 +4365,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-show_journal-JOURNALUI_PAGE_SHOWN-chapter-int-page'>nil show_journal(<a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, int page)</h4>
 <p>Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.</p>
+<h3 id='test_mask'>test_mask</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=test_mask">test_mask</a></p>
+</blockquote>
+<h4 id='bool-test_mask-Flags-flags-Flags-mask'>bool test_mask(<a href="#Aliases">Flags</a> flags, <a href="#Aliases">Flags</a> mask)</h4>
+<p>Returns true if a bitmask is set in the number.</p>
 <h3 id='toggle_journal'>toggle_journal</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=toggle_journal">toggle_journal</a></p>
@@ -6504,9 +6555,14 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 <td>Same as <code>draw_image</code> but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning <code>px=py=0</code> rotates around the center)</td>
 </tr>
 <tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_layer">draw_layer(DRAW_LAYER layer)</a></td>
+<td>Draw on top of UI windows, including platform windows that may be outside the game area, or only in current widget window. Defaults to main viewport background.</td>
+</tr>
+<tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=window">window(string title, float x, float y, float w, float h, bool movable, function callback)</a></td>
-<td>Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/><a href="https://github.com/ocornut/imgui/">ImGui</a> widgets, so read more about them there. Use screen position and distance, or <code>0, 0, 0, 0</code> to<br/>autosize in center. Use just a <code>##Label</code> as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add <code>##SomeUniqueLabel</code> after the text, or use pushid to<br/>give things unique ids. ImGui doesn&#39;t know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx)</td>
+<td>Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/><a href="https://github.com/ocornut/imgui/">ImGui</a> widgets, so read more about them there. Use screen position and distance, or <code>0, 0, 0, 0</code> to<br/>autosize in center. Use just a <code>##Label</code> as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add <code>##SomeUniqueLabel</code> after the text, or use pushid to<br/>give things unique ids. ImGui doesn&#39;t know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -7679,25 +7735,6 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>Changes color based on given <a href="#Aliases">uColor</a></td>
 </tr>
 </tbody></table>
-<h3 id='ImVec2'>ImVec2</h3>
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
-<td></td>
-</tr>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
-<td></td>
-</tr>
-</tbody></table>
 <h3 id='Letter'>Letter</h3>
 <table><thead>
 <tr>
@@ -7983,12 +8020,12 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_virtual">set_pre_virtual(ENTITY_OVERRIDE entry, function fun)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_virtual">set_pre_virtual(RENDER_INFO_OVERRIDE entry, function fun)</a></td>
 <td>Hooks before the virtual function at index <code>entry</code>.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_virtual">set_post_virtual(ENTITY_OVERRIDE entry, function fun)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_virtual">set_post_virtual(RENDER_INFO_OVERRIDE entry, function fun)</a></td>
 <td>Hooks after the virtual function at index <code>entry</code>.</td>
 </tr>
 <tr>
@@ -8009,12 +8046,12 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_render">set_pre_render(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;&gt; render(VanillaRenderContext)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool render(float float, VanillaRenderContext vanilla_render_context)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_render">set_post_render(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil render(VanillaRenderContext)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil render(float float, VanillaRenderContext vanilla_render_context)</code></td>
 </tr>
 </tbody></table>
 <h3 id='ShortTileCodeDef'>ShortTileCodeDef</h3>
@@ -8220,99 +8257,9 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 </thead><tbody>
 <tr>
-<td><a href="#ImVec2">ImVec2</a></td>
+<td>ImVec2</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=displaysize">displaysize</a></td>
 <td></td>
-</tr>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=framerate">framerate</a></td>
-<td></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=wantkeyboard">wantkeyboard</a></td>
-<td></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keysdown">keysdown[512]</a></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keydown">keydown</a></td>
-<td>bool keydown(int keycode)<br/>bool keydown(char key)<br/></td>
-</tr>
-<tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keypressed">keypressed</a></td>
-<td>bool keypressed(int keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/></td>
-</tr>
-<tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyreleased">keyreleased</a></td>
-<td>bool keyreleased(int keycode)<br/>bool keyreleased(char key)<br/></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyctrl">keyctrl</a></td>
-<td></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyshift">keyshift</a></td>
-<td></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyalt">keyalt</a></td>
-<td></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keysuper">keysuper</a></td>
-<td></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=wantmouse">wantmouse</a></td>
-<td></td>
-</tr>
-<tr>
-<td><a href="#ImVec2">ImVec2</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousepos">mousepos</a></td>
-<td></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousedown">mousedown[5]</a></td>
-<td></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mouseclicked">mouseclicked[5]</a></td>
-<td></td>
-</tr>
-<tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousedoubleclicked">mousedoubleclicked[5]</a></td>
-<td></td>
-</tr>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousewheel">mousewheel</a></td>
-<td></td>
-</tr>
-<tr>
-<td><a href="#Gamepad">Gamepad</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=gamepad">gamepad</a></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=gamepads">gamepads</a></td>
-<td><a href="#Gamepad">Gamepad</a> gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/></td>
 </tr>
 </tbody></table>
 <h3 id='InputMapping'>InputMapping</h3>
@@ -13657,9 +13604,9 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don&#39;t trust it</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#PAUSE">PAUSE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></td>
-<td><code>state.pause == 2</code> will pause the game but that won&#39;t run any callback, <code>state.pause == 16</code> will do the same but <code>set_global_interval</code> will still work</td>
+<td>8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can&#39;t set, controller by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.</td>
 </tr>
 <tr>
 <td>int</td>
@@ -24666,6 +24613,34 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 </tbody></table>
+<h2 id='DRAW_LAYER'>DRAW_LAYER</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DRAW_LAYER">DRAW_LAYER</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DRAW_LAYER.BACKGROUND">BACKGROUND</a></td>
+<td>DRAW_LAYER::BACKGROUND</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DRAW_LAYER.FOREGROUND">FOREGROUND</a></td>
+<td>DRAW_LAYER::FOREGROUND</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DRAW_LAYER.WINDOW">WINDOW</a></td>
+<td>DRAW_LAYER::WINDOW</td>
+<td></td>
+</tr>
+</tbody></table>
 <h2 id='DROP'>DROP</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DROP">DROP</a></p>
@@ -24835,16 +24810,6 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ENTITY_OVERRIDE.FLOOR_UPDATE">FLOOR_UPDATE</a></td>
 <td>38</td>
-<td></td>
-</tr>
-<tr>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ENTITY_OVERRIDE.DTOR">DTOR</a></td>
-<td>0</td>
-<td></td>
-</tr>
-<tr>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ENTITY_OVERRIDE.RENDER">RENDER</a></td>
-<td>3</td>
 <td></td>
 </tr>
 </tbody></table>
@@ -26450,6 +26415,51 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 </tbody></table>
+<h2 id='PAUSE'>PAUSE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE">PAUSE</a></p>
+</blockquote>
+
+<p>8bit bitmask used in state.pause</p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE.MENU">MENU</a></td>
+<td>0x01</td>
+<td>Menu: Pauses the level timer and engine. Can&#39;t set, controller by the menu.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE.FADE">FADE</a></td>
+<td>0x02</td>
+<td>Fade/Loading: Pauses all timers and engine.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE.CUTSCENE">CUTSCENE</a></td>
+<td>0x04</td>
+<td>Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE.FLAG4">FLAG4</a></td>
+<td>0x08</td>
+<td>Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so <a href="#set_global_interval">set_global_interval</a> timers still run. Might change this later!<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE.FLAG5">FLAG5</a></td>
+<td>0x10</td>
+<td>Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so <a href="#set_global_interval">set_global_interval</a> timers still run. Might change this later!<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE.ANKH">ANKH</a></td>
+<td>0x20</td>
+<td>Ankh: Pauses all timers, physics and music, but not camera. Used by the ankh cutscene.<br/></td>
+</tr>
+</tbody></table>
 <h2 id='PAUSEUI_VISIBILITY'>PAUSEUI_VISIBILITY</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSEUI_VISIBILITY">PAUSEUI_VISIBILITY</a></p>
@@ -26631,6 +26641,29 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>...check <a href="game_data/spawn_chances.txt">spawn_chances.txt</a>...</td>
 <td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='RENDER_INFO_OVERRIDE'>RENDER_INFO_OVERRIDE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RENDER_INFO_OVERRIDE">RENDER_INFO_OVERRIDE</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RENDER_INFO_OVERRIDE.DTOR">DTOR</a></td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RENDER_INFO_OVERRIDE.RENDER">RENDER</a></td>
+<td>3</td>
 <td></td>
 </tr>
 </tbody></table>

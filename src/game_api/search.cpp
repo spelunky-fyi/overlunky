@@ -375,13 +375,13 @@ class PatternCommandBuffer
                 break;
             case CommandType::DecodePC:
                 offset = std::apply([=](auto... args)
-                                    { return ::decode_pc(exe, offset, args...); },
-                                    data.decode_pc_args.as_tuple());
+                { return ::decode_pc(exe, offset, args...); },
+                    data.decode_pc_args.as_tuple());
                 break;
             case CommandType::DecodeIMM:
                 offset = std::apply([=](auto... args)
-                                    { return ::decode_imm(exe, offset, args...); },
-                                    data.decode_imm_args.as_tuple());
+                { return ::decode_imm(exe, offset, args...); },
+                    data.decode_imm_args.as_tuple());
                 break;
             case CommandType::DecodeCall:
                 offset = mem.decode_call(offset);
@@ -407,7 +407,7 @@ class PatternCommandBuffer
         return offset;
     }
 
-  private:
+private:
     struct DecodePcArgs
     {
         uint8_t opcode_offset;
@@ -416,7 +416,7 @@ class PatternCommandBuffer
 
         std::tuple<uint8_t, uint8_t, uint8_t> as_tuple() const
         {
-            return {opcode_offset, opcode_suffix_offset, opcode_addr_size};
+            return { opcode_offset, opcode_suffix_offset, opcode_addr_size };
         }
     };
     struct DecodeImmArgs
@@ -426,7 +426,7 @@ class PatternCommandBuffer
 
         std::tuple<uint8_t, uint8_t> as_tuple() const
         {
-            return {opcode_offset, value_size};
+            return { opcode_offset, value_size };
         }
     };
     struct FindInstArgs
@@ -508,6 +508,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x49\x89\xcd\x49\x83\xe5\xf8\x4e\x8d\x0c\x2f"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "malloc_base"sv,
+        PatternCommandBuffer{}
+            .find_inst("48 8b 45 e0 48 8b 30"_gh)
+            .find_next_inst("48 8b 45 e0 48 8b 30"_gh)
+            .offset(-0x40)
+            .find_after_inst_in_range("48 8b 04 c1 48 8b 80 20 01 00 00"_gh, 0x40)
+            .decode_pc()
+            .at_exe(),
     },
     {
         "read_encrypted_file"sv,
