@@ -154,7 +154,7 @@ struct TextRenderingInfo
     // 6 * wcslen(input_text), just numbers in order 0, 1, 2 ... have some strage effect if you change them
     uint16_t* unknown6{nullptr};
 
-    uint16_t nof_special_character; // number of special characters, still not sure how the game knowns which ones are the special ones?
+    uint16_t nof_special_character; // number of special characters, still not sure how the game knows which ones are the special ones?
                                     // setting higher value than the `text_length` will crash
     uint16_t unknown8;              // padding probably
 

@@ -167,7 +167,7 @@ Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness)
     // make it straight and then rotate because i'm stupid
     Quad dest{AABB{A.x, A.y + thickness * 0.5f, (A.x + hypotenuse), A.y - thickness * 0.5f}};
     dest.rotate(axis_AB_angle, A.x, A.y);
-    return std::move(dest);
+    return dest;
 };
 // removes the overlap of two lines (very specific use case when the lines are guaranteed to overlap)
 Vec2 fix_overlap(Quad& line1, Quad& line2)
