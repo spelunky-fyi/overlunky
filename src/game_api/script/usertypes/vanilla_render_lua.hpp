@@ -24,6 +24,9 @@ class VanillaRenderContext
     void draw_text(const TextRenderingInfo* tri, Color color);
 
     /// Measure the provided text using the built-in renderer
+    /// If you can, consider creating your own TextureRenderingInfo instead
+    /// You can then use `:text_size()` and `draw_text` with that one object
+    /// `draw_text_size` works by creating new TextureRenderingInfo just to call `:text_size()`, which is not very optimal
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
 
     /// Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
@@ -51,10 +54,10 @@ class VanillaRenderContext
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     void draw_screen_rect(const AABB& rect, Color color, bool filled, float thickness, float angle, float px, float py);
 
-    /// Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer.
+    /// Draw quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.
     /// `thickness` is only used when `filled = false`
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    void draw_screen_rect(const Quad& dest, Color color, bool filled, float thickness);
+    void draw_screen_quad(const Quad& dest, Color color, bool filled, float thickness);
 
     /// Draw triangle in screen coordinates using the built-in renderer.
     /// `thickness` is only used when `filled = false`
@@ -64,6 +67,10 @@ class VanillaRenderContext
     /// Draws a line on screen using the built-in renderer from point `A` to point `B`.
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     void draw_screen_line(const Vec2& A, const Vec2& B, Color color, float thickness);
+
+    /// Draw a line on screen from points using the built-in renderer
+    /// Draws from the first to the last point, use `closed` to connect first and last as well
+    void draw_screen_line(std::vector<Vec2> points, Color color, float thickness, bool closed);
 
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
     /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event

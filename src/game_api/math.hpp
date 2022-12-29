@@ -397,6 +397,11 @@ struct Quad
         new_quad.offset(-a.x, -a.y);
         return new_quad;
     }
+    bool is_null() const
+    {
+        return bottom_left_x == 0 && bottom_left_y == 0 && bottom_right_x == 0 && bottom_right_y == 0 /**/
+               && top_left_x == 0 && top_left_y == 0 && top_right_x == 0 && top_right_y == 0;
+    }
 
     /// Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
     Quad& rotate(float angle, float px, float py)

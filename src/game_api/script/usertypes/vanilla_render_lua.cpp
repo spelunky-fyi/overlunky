@@ -137,32 +137,9 @@ Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D)
     float det = a * b1 - a1 * b;
 
     if (det == 0)
-        return {};
+        return {INFINITY, INFINITY};
+
     return Vec2{(b1 * c - b * c1) / det, (a * c1 - a1 * c) / det};
-}
-bool is_on_line(const Vec2 point, const std::pair<Vec2, Vec2> line)
-{
-    if (line.first.x < line.second.x)
-    {
-        if (line.first.x > point.x || point.x > line.second.x)
-            return false;
-    }
-    else
-    {
-        if (line.second.x > point.x || point.x > line.first.x)
-            return false;
-    }
-    if (line.first.y < line.second.y)
-    {
-        if (line.first.y > point.y || point.y > line.second.y)
-            return false;
-    }
-    else
-    {
-        if (line.second.y > point.y || point.y > line.first.y)
-            return false;
-    }
-    return true;
 }
 
 // get a Quad to out fill the corner between two lines and fix overlap
@@ -174,6 +151,8 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
     Vec2 C{line2.top_right_x, line2.top_right_y};
     Vec2 D{line2.top_left_x, line2.top_left_y};
     Vec2 corner1 = intersection(A, B, C, D);
+    if (corner1.x == INFINITY || corner1.y == INFINITY)
+        return {};
 
     Vec2 E{line1.bottom_left_x, line1.bottom_left_y};
     Vec2 F{line1.bottom_right_x, line1.bottom_right_y};
@@ -181,9 +160,33 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
     Vec2 G{line2.bottom_right_x, line2.bottom_right_y};
     Vec2 H{line2.bottom_left_x, line2.bottom_left_y};
     Vec2 corner2 = intersection(E, F, G, H);
+    if (corner2.x == INFINITY || corner2.y == INFINITY)
+        return {};
 
-    if (!is_on_line(corner1, {A, B})) // check which one is the inner and which outer corner
+    auto get_angle = [](const Vec2 A, Vec2& B, const Vec2 C) -> float
     {
+        Vec2 ab = B - A;
+        Vec2 bc = C - B;
+        float angle = std::abs(std::atan((bc.y * ab.x - bc.x * ab.y) / (bc.x * ab.x + bc.y * ab.y)));
+        return angle;
+    };
+    auto get_true_angle = [](const Vec2 A, Vec2& B, const Vec2 C) -> float
+    {
+        Vec2 ab = B - A;
+        Vec2 bc = C - B;
+        float angle = std::atan2((bc.y * ab.x - bc.x * ab.y), (bc.x * ab.x + bc.y * ab.y));
+        return angle;
+    };
+
+    if (get_true_angle(B, corner1, D) < 0) // check which one is the inner and which outer corner
+    {
+        // test angle for the outer corner
+        float angle = get_angle(B, corner1, D);
+        if (angle < 0.1f) // too small angle is problematic, and it get's worse when the lines almost overlap generating the corner in wrong spot
+            return {};
+        else if (angle < 0.3f)
+            corner1 = D; // cut the corner flat
+
         line1.bottom_right_x = corner2.x;
         line1.bottom_right_y = corner2.y;
         line2.bottom_left_x = corner2.x;
@@ -192,6 +195,13 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
     }
     else
     {
+        // test angle for the outer corner, same as above
+        float angle = get_angle(F, corner2, H);
+        if (angle < 0.1f)
+            return {};
+        else if (angle < 0.5f)
+            corner2 = H;
+
         line1.top_right_x = corner1.x;
         line1.top_right_y = corner1.y;
         line2.top_left_x = corner1.x;
@@ -231,10 +241,10 @@ void VanillaRenderContext::draw_screen_rect(const AABB& rect, Color color, bool 
         dest.rotate(angle, pivot.first, pivot.second);
         convert_ratio(dest, true);
     }
-    draw_screen_rect(dest, std::move(color), filled, thickness);
+    draw_screen_quad(dest, std::move(color), filled, thickness);
 }
 
-void VanillaRenderContext::draw_screen_rect(const Quad& dest, Color color, bool filled, float thickness)
+void VanillaRenderContext::draw_screen_quad(const Quad& dest, Color color, bool filled, float thickness)
 {
     if (filled)
     {
@@ -243,29 +253,9 @@ void VanillaRenderContext::draw_screen_rect(const Quad& dest, Color color, bool 
     }
     else if (thickness)
     {
-        Quad copy{dest};
-        // bottom_left, bottom_right, top_right, top_left
-        std::tuple<Vec2, Vec2, Vec2, Vec2> corners = convert_ratio(copy, false);
 
-        Quad line_ab = get_line_quad(std::get<0>(corners), std::get<1>(corners), thickness);
-        Quad line_bc = get_line_quad(std::get<1>(corners), std::get<2>(corners), thickness);
-        Quad line_cd = get_line_quad(std::get<2>(corners), std::get<3>(corners), thickness);
-        Quad line_da = get_line_quad(std::get<3>(corners), std::get<0>(corners), thickness);
-
-        Quad corner_abc = get_corner_quad(line_ab, line_bc);
-        Quad corner_bcd = get_corner_quad(line_bc, line_cd);
-        Quad corner_cda = get_corner_quad(line_cd, line_da);
-        Quad corner_dac = get_corner_quad(line_da, line_ab);
-
-        draw_screen_rect(convert_ratio(line_ab, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(line_bc, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(line_cd, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(line_da, true), color, true, .0f);
-
-        draw_screen_rect(convert_ratio(corner_abc, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(corner_bcd, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(corner_cda, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(corner_dac, true), color, true, .0f);
+        auto [A, B, C, D] = dest.operator std::tuple<Vec2, Vec2, Vec2, Vec2>();
+        draw_screen_line({A, B, C, D}, color, thickness, true);
     }
 }
 
@@ -273,29 +263,11 @@ void VanillaRenderContext::draw_screen_triangle(const Triangle& triangle, Color 
 {
     if (filled)
     {
-        draw_screen_rect(Quad{triangle.A, triangle.B, triangle.C, triangle.C}, std::move(color), filled, .0f);
+        draw_screen_quad(Quad{triangle.A, triangle.B, triangle.C, triangle.C}, std::move(color), filled, .0f);
     }
     else if (thickness)
     {
-        constexpr float ratio = 16.0f / 9.0f;
-
-        Triangle new_triangle{triangle.A.x * ratio, triangle.A.y, triangle.B.x * ratio, triangle.B.y, triangle.C.x * ratio, triangle.C.y};
-
-        Quad line_ab = get_line_quad(new_triangle.A, new_triangle.B, thickness);
-        Quad line_bc = get_line_quad(new_triangle.B, new_triangle.C, thickness);
-        Quad line_ca = get_line_quad(new_triangle.C, new_triangle.A, thickness);
-
-        Quad corner_abc = get_corner_quad(line_ab, line_bc);
-        Quad corner_bca = get_corner_quad(line_bc, line_ca);
-        Quad corner_cab = get_corner_quad(line_ca, line_ab);
-
-        draw_screen_rect(convert_ratio(line_ab, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(line_bc, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(line_ca, true), color, true, .0f);
-
-        draw_screen_rect(convert_ratio(corner_abc, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(corner_bca, true), color, true, .0f);
-        draw_screen_rect(convert_ratio(corner_cab, true), color, true, .0f);
+        draw_screen_line({triangle.A, triangle.B, triangle.C}, color, thickness, true);
     }
 }
 
@@ -306,7 +278,50 @@ void VanillaRenderContext::draw_screen_line(const Vec2& A, const Vec2& B, Color 
     Vec2 new_A{A.x * ratio, A.y};
     Vec2 new_B{B.x * ratio, B.y};
     Quad line = get_line_quad(new_A, new_B, thickness);
-    draw_screen_rect(convert_ratio(line, true), color, true, .0f);
+    draw_screen_quad(convert_ratio(line, true), color, true, .0f);
+}
+
+void VanillaRenderContext::draw_screen_line(std::vector<Vec2> points, Color color, float thickness, bool closed)
+{
+    constexpr float ratio = 16.0f / 9.0f;
+
+    if (points.size() < 2)
+        return;
+
+    std::vector<Quad> draw_list;
+    draw_list.reserve(points.size());
+    Vec2 last_point{points[0].x * ratio, points[0].y};
+
+    if (closed)
+    {
+        Vec2 end = points.back();
+        end.x *= ratio;
+        draw_list.push_back(get_line_quad(end, last_point, thickness));
+    }
+
+    for (int i = 1; i < points.size(); ++i)
+    {
+        Vec2 new_B{points[i].x * ratio, points[i].y};
+        Quad line = get_line_quad(last_point, new_B, thickness);
+        if (!draw_list.empty())
+        {
+            Quad corner = get_corner_quad(draw_list.back(), line);
+            if (!corner.is_null())
+                draw_screen_quad(convert_ratio(corner, true), color, true, .0f);
+        }
+        draw_list.push_back(line);
+        last_point = new_B;
+    }
+    if (closed)
+    {
+        Quad corner = get_corner_quad(draw_list.back(), draw_list.front());
+        if (!corner.is_null())
+            draw_screen_quad(convert_ratio(corner, true), color, true, .0f);
+    }
+    for (auto line : draw_list)
+    {
+        draw_screen_quad(convert_ratio(line, true), color, true, .0f);
+    }
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
@@ -465,9 +480,9 @@ void register_usertypes(sol::state& lua)
     auto draw_text = sol::overload(
         static_cast<void (VanillaRenderContext::*)(const std::string&, float, float, float, float, Color, uint32_t, uint32_t)>(&VanillaRenderContext::draw_text),
         static_cast<void (VanillaRenderContext::*)(const TextRenderingInfo*, Color)>(&VanillaRenderContext::draw_text));
-    auto draw_screen_rect = sol::overload(
-        static_cast<void (VanillaRenderContext::*)(const AABB&, Color, bool, float, float, float, float)>(&VanillaRenderContext::draw_screen_rect),
-        static_cast<void (VanillaRenderContext::*)(const Quad&, Color, bool, float)>(&VanillaRenderContext::draw_screen_rect));
+    auto draw_screen_line = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const Vec2&, const Vec2&, Color, float)>(&VanillaRenderContext::draw_screen_line),
+        static_cast<void (VanillaRenderContext::*)(std::vector<Vec2>, Color, float, bool)>(&VanillaRenderContext::draw_screen_line));
 
     /// Used in [set_callback](#set_callback) ON.RENDER_* callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
     lua.new_usertype<VanillaRenderContext>(
@@ -479,11 +494,13 @@ void register_usertypes(sol::state& lua)
         "draw_screen_texture",
         draw_screen_texture,
         "draw_screen_rect",
-        draw_screen_rect,
+        &VanillaRenderContext::draw_screen_rect,
+        "draw_screen_quad",
+        &VanillaRenderContext::draw_screen_quad,
         "draw_screen_triangle",
         &VanillaRenderContext::draw_screen_triangle,
         "draw_screen_line",
-        &VanillaRenderContext::draw_screen_line,
+        draw_screen_line,
         "draw_world_texture",
         draw_world_texture);
 
