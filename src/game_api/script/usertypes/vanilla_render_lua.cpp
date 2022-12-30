@@ -163,29 +163,29 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
     if (corner2.x == INFINITY || corner2.y == INFINITY)
         return {};
 
-    auto get_angle = [](const Vec2 A, Vec2& B, const Vec2 C) -> float
+    auto get_angle = [](const Vec2 a, Vec2& b, const Vec2 c) -> float
     {
-        Vec2 ab = B - A;
-        Vec2 bc = C - B;
+        Vec2 ab = b - a;
+        Vec2 bc = c - b;
         float angle = std::abs(std::atan((bc.y * ab.x - bc.x * ab.y) / (bc.x * ab.x + bc.y * ab.y)));
         return angle;
     };
-    auto get_true_angle = [](const Vec2 A, Vec2& B, const Vec2 C) -> float
-    {
-        Vec2 ab = B - A;
-        Vec2 bc = C - B;
-        float angle = std::atan2((bc.y * ab.x - bc.x * ab.y), (bc.x * ab.x + bc.y * ab.y));
-        return angle;
-    };
 
-    if (get_true_angle(B, corner1, D) < 0) // check which one is the inner and which outer corner
+    Vec2 ab = corner1 - B;
+    Vec2 bc = D - corner1;
+    float true_angle = std::atan2((bc.y * ab.x - bc.x * ab.y), (bc.x * ab.x + bc.y * ab.y));
+
+    if (true_angle < 0) // check which one is the inner and which outer corner
     {
-        // test angle for the outer corner
-        float angle = get_angle(B, corner1, D);
-        if (angle < 0.1f) // too small angle is problematic, and it get's worse when the lines almost overlap generating the corner in wrong spot
-            return {};
-        else if (angle < 0.3f)
-            corner1 = D; // cut the corner flat
+        if (true_angle < -1) // only do the test for one quadrant (could probably return {} when close to 0)
+        {
+            // test angle for the outer corner
+            float angle = get_angle(B, corner1, D);
+            if (angle < 0.1f) // too small angle is problematic, and it get's worse when the lines almost overlap generating the corner in wrong spot
+                return {};
+            else if (angle < 0.3f)
+                corner1 = D; // cut the corner flat
+        }
 
         line1.bottom_right_x = corner2.x;
         line1.bottom_right_y = corner2.y;
@@ -195,12 +195,15 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
     }
     else
     {
-        // test angle for the outer corner, same as above
-        float angle = get_angle(F, corner2, H);
-        if (angle < 0.1f)
-            return {};
-        else if (angle < 0.5f)
-            corner2 = H;
+        // same as above
+        if (true_angle > 1)
+        {
+            float angle = get_angle(F, corner2, H);
+            if (angle < 0.1f)
+                return {};
+            else if (angle < 0.5f)
+                corner2 = H;
+        }
 
         line1.top_right_x = corner1.x;
         line1.top_right_y = corner1.y;
@@ -217,7 +220,7 @@ Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness)
     float hypotenuse = (float)std::sqrt(std::pow(B.x - A.x, 2) + std::pow(B.y - A.y, 2));
 
     // make it straight and then rotate because i'm stupid
-    Quad dest{AABB{A.x, A.y + thickness * 0.5f, (A.x + hypotenuse), A.y - thickness * 0.5f}};
+    Quad dest{AABB{A.x, A.y + thickness / 2, (A.x + hypotenuse), A.y - thickness / 2}};
     dest.rotate(axis_AB_angle, A.x, A.y);
     return dest;
 };
