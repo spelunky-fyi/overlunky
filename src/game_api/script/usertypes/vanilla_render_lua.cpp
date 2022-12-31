@@ -142,7 +142,7 @@ Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D)
     return Vec2{(b1 * c - b * c1) / det, (a * c1 - a1 * c) / det};
 }
 
-// get a Quad to out fill the corner between two lines and fix overlap
+// get a Quad to fill out the corner between two lines and fix their overlap
 Quad get_corner_quad(Quad& line1, Quad& line2)
 {
     Vec2 A{line1.top_left_x, line1.top_left_y};
@@ -215,7 +215,7 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
 // convert two points into Quad (rectangle) with given `thickness` (height)
 Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness)
 {
-    thickness *= .001f;
+    thickness *= .001f; // scale it to use more of a whole values
     float axis_AB_angle = std::atan2((B.y - A.y), (B.x) - (A.x));
     float hypotenuse = (float)std::sqrt(std::pow(B.x - A.x, 2) + std::pow(B.y - A.y, 2));
 
@@ -258,7 +258,7 @@ void VanillaRenderContext::draw_screen_quad(const Quad& dest, Color color, bool 
     {
 
         auto [A, B, C, D] = dest.operator std::tuple<Vec2, Vec2, Vec2, Vec2>();
-        draw_screen_line({A, B, C, D}, color, thickness, true);
+        draw_screen_polyline({A, B, C, D}, color, thickness, true);
     }
 }
 
@@ -270,7 +270,7 @@ void VanillaRenderContext::draw_screen_triangle(const Triangle& triangle, Color 
     }
     else if (thickness)
     {
-        draw_screen_line({triangle.A, triangle.B, triangle.C}, color, thickness, true);
+        draw_screen_polyline({triangle.A, triangle.B, triangle.C}, color, thickness, true);
     }
 }
 
@@ -284,7 +284,7 @@ void VanillaRenderContext::draw_screen_line(const Vec2& A, const Vec2& B, Color 
     draw_screen_quad(convert_ratio(line, true), color, true, .0f);
 }
 
-void VanillaRenderContext::draw_screen_line(std::vector<Vec2> points, Color color, float thickness, bool closed)
+void VanillaRenderContext::draw_screen_polyline(std::vector<Vec2> points, Color color, float thickness, bool closed)
 {
     constexpr float ratio = 16.0f / 9.0f;
 
@@ -324,6 +324,25 @@ void VanillaRenderContext::draw_screen_line(std::vector<Vec2> points, Color colo
     for (auto line : draw_list)
     {
         draw_screen_quad(convert_ratio(line, true), color, true, .0f);
+    }
+}
+
+void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, Color color)
+{
+    if (points.size() < 3)
+        return;
+
+    Vec2 temp = points[1];
+    unsigned int i = 3;
+    for (; i < points.size(); i += 2)
+    {
+
+        draw_screen_quad(Quad{points[0], temp, points[i - 1], points[i]}, color, true, .0f);
+        temp = points[i]; // always repeat the last "line" drawn
+    }
+    if (points.size() % 2 != 0) // not even number of points so the last pice is triangle
+    {
+        draw_screen_quad(Quad{points[0], temp, points[i - 1], points[i - 1]}, color, true, .0f);
     }
 }
 
@@ -483,9 +502,6 @@ void register_usertypes(sol::state& lua)
     auto draw_text = sol::overload(
         static_cast<void (VanillaRenderContext::*)(const std::string&, float, float, float, float, Color, uint32_t, uint32_t)>(&VanillaRenderContext::draw_text),
         static_cast<void (VanillaRenderContext::*)(const TextRenderingInfo*, Color)>(&VanillaRenderContext::draw_text));
-    auto draw_screen_line = sol::overload(
-        static_cast<void (VanillaRenderContext::*)(const Vec2&, const Vec2&, Color, float)>(&VanillaRenderContext::draw_screen_line),
-        static_cast<void (VanillaRenderContext::*)(std::vector<Vec2>, Color, float, bool)>(&VanillaRenderContext::draw_screen_line));
 
     /// Used in [set_callback](#set_callback) ON.RENDER_* callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
     lua.new_usertype<VanillaRenderContext>(
@@ -503,7 +519,11 @@ void register_usertypes(sol::state& lua)
         "draw_screen_triangle",
         &VanillaRenderContext::draw_screen_triangle,
         "draw_screen_line",
-        draw_screen_line,
+        &VanillaRenderContext::draw_screen_line,
+        "draw_screen_polyline",
+        &VanillaRenderContext::draw_screen_polyline,
+        "draw_screen_poly",
+        &VanillaRenderContext::draw_screen_poly,
         "draw_world_texture",
         draw_world_texture);
 
