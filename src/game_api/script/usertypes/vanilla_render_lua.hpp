@@ -70,10 +70,12 @@ class VanillaRenderContext
 
     /// Draw a polyline on screen from points using the built-in renderer
     /// Draws from the first to the last point, use `closed` to connect first and last as well
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     void draw_screen_polyline(std::vector<Vec2> points, Color color, float thickness, bool closed);
 
     /// Draw a convex polygon on screen from points using the built-in renderer
-    /// Use `closed` to connect first and last as well
+    /// Can probably draw almost any polygon, but the convex one is guaranteed to look correct
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     void draw_screen_poly(std::vector<Vec2> points, Color color);
 
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
