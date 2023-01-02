@@ -342,7 +342,7 @@ void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, Color colo
     }
     if (points.size() % 2 != 0) // not even number of points so the last pice is triangle
     {
-        draw_screen_quad(Quad{points[0], temp, points[i - 1], points[i - 1]}, color, true, .0f);
+        draw_screen_quad(Quad{points[0], temp, points.back(), points.back()}, color, true, .0f);
     }
 }
 
