@@ -1568,8 +1568,6 @@ void set_camera_bounds(bool enabled)
 
 void force_zoom()
 {
-    if (g_state->screen == 12)
-        set_camera_bounds(enable_camera_bounds);
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
         set_zoom();
