@@ -1556,6 +1556,8 @@ void set_camera_bounds(bool enabled)
         g_state->camera->bounds_right = g_state->w * 10.0f + 4.5f;
         g_state->camera->bounds_top = 124.5f;
         g_state->camera->bounds_bottom = 120.5f - g_state->h * 8.0f;
+        if (g_state->logic && g_state->logic->black_market) // if this pointer exists, so does an undiscovered black market, I hope
+            g_state->camera->bounds_bottom += 32.0f;
     }
     else
     {
@@ -1568,7 +1570,7 @@ void set_camera_bounds(bool enabled)
 
 void force_zoom()
 {
-    if (g_state->screen == 12)
+    if (g_state->screen == 12 && !enable_camera_bounds)
         set_camera_bounds(enable_camera_bounds);
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
