@@ -388,6 +388,8 @@ void register_usertypes(sol::state& lua)
     camera_type["bounds_right"] = &Camera::bounds_right;
     camera_type["bounds_bottom"] = &Camera::bounds_bottom;
     camera_type["bounds_top"] = &Camera::bounds_top;
+    camera_type["calculated_focus_x"] = &Camera::calculated_focus_x;
+    camera_type["calculated_focus_y"] = &Camera::calculated_focus_y;
     camera_type["adjusted_focus_x"] = &Camera::adjusted_focus_x;
     camera_type["adjusted_focus_y"] = &Camera::adjusted_focus_y;
     camera_type["focus_offset_x"] = &Camera::focus_offset_x;

@@ -114,6 +114,9 @@ class Movable : public Entity
     /// Get the current behavior id
     uint32_t get_behavior();
 
+    /// Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
+    void set_position(float to_x, float to_y);
+
     virtual bool can_jump() = 0;
     virtual void get_collision_info(CollisionInfo*) = 0;
     virtual float sprint_factor() = 0;

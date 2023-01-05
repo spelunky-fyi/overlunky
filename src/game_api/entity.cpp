@@ -441,3 +441,35 @@ void Movable::reset_gravity()
 {
     unregister_hook_function((void***)this, 0x53);
 }
+
+void Movable::set_position(float to_x, float to_y)
+{
+    if (overlay)
+        return;
+    auto dx = to_x - x;
+    auto dy = to_y - y;
+    x = to_x;
+    y = to_y;
+    if (rendering_info)
+    {
+        rendering_info->x += dx;
+        rendering_info->y += dy;
+        rendering_info->x_dupe1 += dx;
+        rendering_info->y_dupe1 += dy;
+        rendering_info->x_dupe2 += dx;
+        rendering_info->y_dupe2 += dy;
+        rendering_info->x_dupe3 += dx;
+        rendering_info->y_dupe3 += dy;
+        rendering_info->x_dupe4 += dx;
+        rendering_info->y_dupe4 += dy;
+    }
+    if (State::get().ptr()->camera->focused_entity_uid == uid)
+    {
+        State::get().ptr()->camera->focus_x += dx;
+        State::get().ptr()->camera->focus_y += dy;
+        State::get().ptr()->camera->adjusted_focus_x += dx;
+        State::get().ptr()->camera->adjusted_focus_y += dy;
+        State::get().ptr()->camera->calculated_focus_x += dx;
+        State::get().ptr()->camera->calculated_focus_y += dy;
+    }
+}
