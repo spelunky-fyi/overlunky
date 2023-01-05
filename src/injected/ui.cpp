@@ -7363,12 +7363,6 @@ void imgui_draw()
                     {
                         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
                         active_tab = tab;
-                        if (ImGui::BeginDragDropSource())
-                        {
-                            ImGui::SetDragDropPayload("TAB", NULL, 0);
-                            ImGui::Text("Drag outside the menu\nto detach %s", windows[tab]->name.c_str());
-                            ImGui::EndDragDropSource();
-                        }
                         ImGui::GetIO().WantCaptureKeyboard = true;
                         render_tool(tab);
                         ImGui::PopStyleVar();
@@ -7377,6 +7371,8 @@ void imgui_draw()
                         else
                             ImGui::EndPopup();
                     }
+                    if (ImGui::GetIO().MouseClicked[1] && mouse_pos().y < ImGui::GetTextLineHeight() && ImGui::IsItemHovered())
+                        detach(tab);
                 }
                 ImGui::EndMainMenuBar();
             }

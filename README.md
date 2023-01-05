@@ -115,6 +115,7 @@ Current features and their *default* keyboard shortcuts.
   - **Ctrl+Shift+S**: Save options, hotkeys and UI colors
   - **Ctrl+Shift+L**: Load options, hotkeys and UI colors
   - **Ctrl+Shift+D**: Detach active tab in tabbed interface
+  - **Mouse right**: Detach hovered tab in menu UI
   - **Enter**: Run active tool
   - **Escape**: Return focus to game from an input
   - **Q**: Quick start from the intro or menu
