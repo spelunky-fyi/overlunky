@@ -36,3 +36,4 @@ void register_make_save_path(MakeSavePathCallback make_save_path_callback);
 std::string get_image_file_path(std::string root_path, std::string relative_path);
 
 bool create_d3d11_texture_from_file(const char* filename, struct ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height);
+bool create_d3d11_texture_from_memory(const unsigned char* buf, const unsigned int buf_size, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height);

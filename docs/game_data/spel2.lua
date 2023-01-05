@@ -849,21 +849,46 @@ function get_aabb_bounds() end
 ---Gets the current camera position in the level
 ---@return number, number
 function get_camera_position() end
----Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+---Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
 ---@return Flags
 function set_flag(flags, bit) end
----Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+---Clears the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
 ---@return Flags
 function clr_flag(flags, bit) end
----Returns true if a bit is set in the flags
+---Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param bit integer
+---@return Flags
+function flip_flag(flags, bit) end
+---Returns true if the nth bit is set in the number.
 ---@param flags Flags
 ---@param bit integer
 ---@return boolean
 function test_flag(flags, bit) end
+---Set a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param mask Flags
+---@return Flags
+function set_mask(flags, mask) end
+---Clears a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param mask Flags
+---@return Flags
+function clr_mask(flags, mask) end
+---Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param mask Flags
+---@return Flags
+function flip_mask(flags, mask) end
+---Returns true if a bitmask is set in the number.
+---@param flags Flags
+---@param mask Flags
+---@return boolean
+function test_mask(flags, mask) end
 ---Gets the resolution (width and height) of the screen
 ---@return integer, integer
 function get_window_size() end
@@ -899,48 +924,7 @@ function set_pre_render_screen(screen_id, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_post_render_screen(screen_id, fun) end
----Clears a callback that is specific to an entity.
----@param uid integer
----@param cb_id CallbackId
----@return nil
-function clear_entity_callback(uid, cb_id) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----`uid` has to be the uid of a `Movable` or else stuff will break.
----Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is bool statemachine(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_statemachine(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----`uid` has to be the uid of a `Movable` or else stuff will break.
----Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is nil statemachine(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_post_statemachine(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil on_destroy(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_destroy(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when an entity is eradicated, before the game applies any side effects.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil on_kill(Entity self, Entity killer)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_kill(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
+---Returns unique id for the callback to be used in [clear_callback](#clear_callback) or `nil` if uid is not valid.
 ---Sets a callback that is called right when an player/hired hand is crushed/insta-gibbed, return `true` to skip the game's crush handling.
 ---The game's instagib function will be forcibly executed (regardless of whatever you return in the callback) when the entity's health is zero.
 ---This is so that when the entity dies (from other causes), the death screen still gets shown.
@@ -950,77 +934,6 @@ function set_on_kill(uid, fun) end
 ---@param fun fun(): any
 ---@return CallbackId?
 function set_on_player_instagib(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
----Note that damage_dealer can be nil ! (long fall, ...)
----DO NOT CALL `self:damage()` in the callback !
----Use this only when no other approach works, this call can be expensive if overused.
----The entity has to be of a [Movable](#Movable) type.
----<br/>The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float vel_x, float vel_y, int stun_amount, int iframes)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_damage(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is bool pre_floor_update(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_floor_update(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after a floor is updated (by killed neighbor).
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil post_floor_update(Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_post_floor_update(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right when a container is opened via up+door, or weapon is shot.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is nil on_open(Entity entity_self, Entity opener)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_on_open(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_collision1(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
----Use this only when no other approach works, this call can be expensive if overused.
----Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
----<br/>The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_collision2(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after the entity is rendered.
----Return `true` to skip the original rendering function and all later pre_render callbacks.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_pre_render(uid, fun) end
----Returns unique id for the callback to be used in [clear_entity_callback](#clear_entity_callback) or `nil` if uid is not valid.
----Sets a callback that is called right after the entity is rendered.
----Use this only when no other approach works, this call can be expensive if overused.
----<br/>The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
----@param uid integer
----@param fun fun(): any
----@return CallbackId?
-function set_post_render(uid, fun) end
 ---Raise a signal and probably crash the game
 ---@return nil
 function raise() end
@@ -1577,6 +1490,7 @@ function toggle_journal() end
 ---@return nil
 function show_journal(chapter, page) end
 ---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
+---The server will be closed once the handle is released.
 ---@param host string
 ---@param port in_port_t
 ---@param cb fun(): any
@@ -1787,7 +1701,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field screen_next integer
     ---@field ingame integer
     ---@field playing integer
-    ---@field pause integer
+    ---@field pause PAUSE
     ---@field width integer
     ---@field height integer
     ---@field kali_favor integer
@@ -1929,7 +1843,7 @@ function change_feat(feat, hidden, name, description) end
 
 ---@class Online
     ---@field online_players OnlinePlayer[]
-    ---@field local_player OnlinePlayerShort
+    ---@field local_player OnlinePlayer
     ---@field lobby OnlineLobby
 
 ---@class OnlinePlayer
@@ -1939,6 +1853,7 @@ function change_feat(feat, hidden, name, description) end
 
 ---@class OnlineLobby
     ---@field code integer
+    ---@field local_player_slot integer
     ---@field get_code fun(self): string
 
 ---@class LogicList
@@ -2111,12 +2026,20 @@ local function PRNG_random(self, min, max) end
     ---@field tileh number
     ---@field facing_left boolean
     ---@field render_inactive boolean
+    ---@field get_entity fun(self): class Entity
+    ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
+    ---@field set_pre_dtor fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_dtor fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_render fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_render fun(self, fun: fun(): any): CallbackId
 
 ---@class Entity
     ---@field type EntityDB
     ---@field overlay Entity
-    ---@field flags integer
-    ---@field more_flags integer
+    ---@field flags ENT_FLAG
+    ---@field more_flags ENT_MORE_FLAG
     ---@field uid integer
     ---@field animation_frame integer
     ---@field draw_depth integer
@@ -2156,11 +2079,31 @@ local function PRNG_random(self, min, max) end
     ---@field activate fun(self, activator: Entity): nil
     ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil
     ---@field trigger_action fun(self, user: Entity): boolean
-    ---@field get_metadata any @&Entity::get_metadata
+    ---@field get_metadata fun(self): integer
     ---@field apply_metadata fun(self, metadata: integer): nil
     ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self): integer[]
     ---@field is_in_liquid fun(self): boolean
+    ---@field is_cursed fun(self): boolean
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
+    ---@field set_pre_dtor fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_dtor fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_update_state_machine fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_update_state_machine fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_kill fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_kill fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_on_collision1 fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_on_collision1 fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_destroy fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_destroy fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_get_held_entity fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_get_held_entity fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_trigger_action fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_trigger_action fun(self, fun: fun(): any): CallbackId
+    ---@field set_pre_on_collision2 fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_on_collision2 fun(self, fun: fun(): any): CallbackId
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -2194,7 +2137,6 @@ local function Entity_overlaps_with(self, other) end
     ---@field some_state integer
     ---@field wet_effect_timer integer
     ---@field poison_tick_timer integer
-    ---@field airtime integer
     ---@field falling_timer integer
     ---@field is_poisoned fun(self): boolean
     ---@field poison fun(self, frames: integer): nil
@@ -2228,6 +2170,11 @@ local function Entity_overlaps_with(self, other) end
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil
     ---@field clear_behaviors fun(self): nil
     ---@field generic_update_world Movable_generic_update_world
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
+    ---@field set_pre_damage fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_damage fun(self, fun: fun(): any): CallbackId
 
 ---@class Movable_generic_update_world
 ---@param move Vec2
@@ -2317,6 +2264,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil
     ---@field decorate_internal fun(self): nil
     ---@field get_floor_type fun(self): ENT_TYPE
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
+    ---@field set_pre_floor_update fun(self, fun: fun(): any): CallbackId
+    ---@field set_post_floor_update fun(self, fun: fun(): any): CallbackId
 
 ---@class Door : Floor
     ---@field counter integer
@@ -4323,6 +4275,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil
     ---@field draw_image GuiDrawContext_draw_image
     ---@field draw_image_rotated GuiDrawContext_draw_image_rotated
+    ---@field draw_layer fun(self, layer: DRAW_LAYER): nil
     ---@field window any @&GuiDrawContext::window
     ---@field win_text fun(self, text: string): nil
     ---@field win_separator fun(self): nil
@@ -4378,10 +4331,6 @@ local function GuiDrawContext_draw_image(self, image, rect, uv_rect, color) end
 ---@overload fun(self, image: IMAGE, left: number, top: number, right: number, bottom: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number, color: uColor, angle: number, px: number, py: number): nil
 local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, color, angle, px, py) end
 
----@class ImVec2
-    ---@field x number
-    ---@field y number
-
 ---@class Gamepad
     ---@field enabled boolean
     ---@field buttons GAMEPAD
@@ -4394,30 +4343,18 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
 
 ---@class ImGuiIO
     ---@field displaysize ImVec2
-    ---@field framerate number
-    ---@field wantkeyboard boolean
-    ---@field keysdown boolean       [] @size: 512. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
-    ---@field keydown fun(key: number | string): boolean
-    ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
-    ---@field keyreleased fun(key: number | string): boolean
-    ---@field keyctrl boolean
-    ---@field keyshift boolean
-    ---@field keyalt boolean
-    ---@field keysuper boolean
-    ---@field wantmouse boolean
-    ---@field mousepos ImVec2
-    ---@field mousedown boolean       [] @size: 5
-    ---@field mouseclicked boolean       [] @size: 5
-    ---@field mousedoubleclicked boolean       [] @size: 5
-    ---@field mousewheel number
-    ---@field gamepad Gamepad
-    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
 
 ---@class VanillaRenderContext
-    ---@field draw_text fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
+    ---@field draw_text VanillaRenderContext_draw_text
     ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number
     ---@field draw_screen_texture VanillaRenderContext_draw_screen_texture
     ---@field draw_world_texture VanillaRenderContext_draw_world_texture
+
+---@class VanillaRenderContext_draw_text
+---@param tri TextRenderingInfo
+---@param color Color
+---@overload fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
+local function VanillaRenderContext_draw_text(self, tri, color) end
 
 ---@class VanillaRenderContext_draw_screen_texture
 ---@param texture_id TEXTURE
@@ -4468,13 +4405,27 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field source_get_quad fun(self): Quad
     ---@field source_set_quad fun(self, quad: Quad): nil
 
+---@class Letter
+    ---@field bottom Triangle
+    ---@field top Triangle
+    ---@field get_quad fun(self): Quad
+    ---@field set_quad fun(self, quad: Quad): nil
+    ---@field center fun(self): Vec2
+
 ---@class TextRenderingInfo
+    ---@field new any @sol::initializers(&TextRenderingInfo_ctor)
     ---@field x number
     ---@field y number
     ---@field text_length integer
     ---@field width number
     ---@field height number
+    ---@field special_texture_id integer
     ---@field font Texture
+    ---@field get_dest fun(self): Letter[]
+    ---@field get_source fun(self): Letter[]
+    ---@field text_size fun(self): number, number
+    ---@field rotate fun(self, angle: number, px: number?, py: number?): nil
+    ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil
 
 ---@class TextureDefinition
     ---@field texture_path string
@@ -4513,6 +4464,21 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
 ---@param amount_y number
 ---@overload fun(self, amount: number): AABB
 local function AABB_extrude(self, amount_x, amount_y) end
+
+---@class Triangle
+    ---@field A Vec2
+    ---@field B Vec2
+    ---@field C Vec2
+    ---@field offset Triangle_offset
+    ---@field rotate fun(self, angle: number, px: number, py: number): Triangle
+    ---@field center fun(self): Vec2
+    ---@field split fun(self): Vec2, Vec2, Vec2
+
+---@class Triangle_offset
+---@param x number
+---@param y number
+---@overload fun(self, off: Vec2): Triangle
+local function Triangle_offset(self, x, y) end
 
 ---@class Quad
     ---@field bottom_left_x number
@@ -5244,9 +5210,14 @@ function Vec2.new(self, vec2) end
 ---@param y_ number
 ---@return Vec2
 function Vec2.new(self, x_, y_) end
+---NoDoc
 ---@param number> p tuple<number,
 ---@return Vec2
 function Vec2.new(self, number> p) end
+---NoDoc
+---@param imvec2 ImVec2
+---@return Vec2
+function Vec2.new(self, imvec2) end
 
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
@@ -5268,6 +5239,26 @@ function AABB.new(self, number, number> tuple) end
 ---@param bottom_ number
 ---@return AABB
 function AABB.new(self, left_, top_, right_, bottom_) end
+
+Triangle = nil
+---@return Triangle
+function Triangle.new(self) end
+---@param triangle Triangle
+---@return Triangle
+function Triangle.new(self, triangle) end
+---@param _a Vec2
+---@param _b Vec2
+---@param _c Vec2
+---@return Triangle
+function Triangle.new(self, _a, _b, _c) end
+---@param ax number
+---@param ay number
+---@param bx number
+---@param by number
+---@param cx number
+---@param cy number
+---@return Triangle
+function Triangle.new(self, ax, ay, bx, by, cx, cy) end
 
 Quad = nil
 ---@return Quad
@@ -5597,6 +5588,20 @@ DYNAMIC_TEXTURE = {
   KALI_STATUE = -9
 }
 ---@alias DYNAMIC_TEXTURE integer
+ENTITY_OVERRIDE = {
+  COLLISION1 = 4,
+  COLLISION2 = 26,
+  DAMAGE = 48,
+  DESTROY = 5,
+  DTOR = 0,
+  FLOOR_UPDATE = 38,
+  GET_HELD_ENTITY = 22,
+  KILL = 3,
+  RENDER = 3,
+  TRIGGER_ACTION = 24,
+  UPDATE_STATE_MACHINE = 2
+}
+---@alias ENTITY_OVERRIDE integer
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
   CLIMBABLE = 9,
@@ -7428,6 +7433,15 @@ PARTICLEEMITTER = {
   YETIQUEEN_LANDING_SNOWDUST = 183
 }
 ---@alias PARTICLEEMITTER integer
+PAUSE = {
+  ANKH = 32,
+  CUTSCENE = 4,
+  FADE = 2,
+  FLAG4 = 8,
+  FLAG5 = 16,
+  MENU = 1
+}
+---@alias PAUSE integer
 PAUSEUI_VISIBILITY = {
   INVISIBLE = 0,
   SLIDING_DOWN = 1,
@@ -7435,6 +7449,15 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
+PAUSE_FLAG = {
+  ANKH = 6,
+  CUTSCENE = 3,
+  FADE = 2,
+  FLAG4 = 4,
+  FLAG5 = 5,
+  MENU = 1
+}
+---@alias PAUSE_FLAG integer
 POS_TYPE = {
   AIR = 4,
   ALCOVE = 16,

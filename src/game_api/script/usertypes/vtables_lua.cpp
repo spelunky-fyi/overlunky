@@ -20,11 +20,11 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"dtor", 0x0, void()>,
         VTableEntry<"update_state_machine", 0x2, void()>,
         VTableEntry<"kill", 0x3, void(bool, Entity*)>,
-        VTableEntry<"collision1", 0x4, void(Entity*)>,
+        VTableEntry<"on_collision1", 0x4, void(Entity*)>,
         VTableEntry<"destroy", 0x5, void()>,
         VTableEntry<"get_held_entity", 0x16, Entity*()>,
         VTableEntry<"trigger_action", 0x18, void(Entity*)>,
-        VTableEntry<"collision2", 0x1a, void(Entity*)>>;
+        VTableEntry<"on_collision2", 0x1a, void(Entity*)>>;
     static EntityVTable entity_vtable(lua, lua["Entity"], "ENTITY_OVERRIDE");
 
     using MovableVTable = HookableVTable<
@@ -38,15 +38,15 @@ void register_usertypes(sol::state& lua)
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"floor_update", 0x26, void(Movable*)>>;
+        VTableEntry<"floor_update", 0x26, void()>>;
     static FloorVTable floor_vtable(lua, lua["Floor"], "ENTITY_OVERRIDE");
 
     using RenderInfoVTable = HookableVTable<
         RenderInfo,
         CallbackType::Entity,
         VTableEntry<"dtor", 0x0, void()>,
-        VTableEntry<"render", 0x3, void(), BackBinder<VanillaRenderContext>>>;
-    static RenderInfoVTable render_info_vtable(lua, lua["RenderInfo"], "ENTITY_OVERRIDE");
+        VTableEntry<"render", 0x3, void(float*), BackBinder<VanillaRenderContext>>>;
+    static RenderInfoVTable render_info_vtable(lua, lua["RenderInfo"], "RENDER_INFO_OVERRIDE");
 
     using ThemeVTable = HookableVTable<
         ThemeInfo,

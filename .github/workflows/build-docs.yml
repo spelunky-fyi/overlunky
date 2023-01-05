@@ -37,7 +37,7 @@ jobs:
         cd docs
         chmod +x generate_all.sh
         chmod +x generate_slate.sh
-        ./generate_all.sh
+        ./generate_all.sh || true
 
     - name: Push changes
       uses: ad-m/github-push-action@master

@@ -124,6 +124,19 @@ Name | Data | Description
 [NEO_BABYLON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NEO_BABYLON) | 6 | 
 [SUNKEN_CITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKEN_CITY) | 7 | 
 
+## DRAW_LAYER
+
+
+> Search script examples for [DRAW_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER.BACKGROUND) | DRAW_LAYER::BACKGROUND | 
+[FOREGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER.FOREGROUND) | DRAW_LAYER::FOREGROUND | 
+[WINDOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER.WINDOW) | DRAW_LAYER::WINDOW | 
+
 ## DROP
 
 
@@ -165,6 +178,25 @@ Name | Data | Description
 [BACKGROUND_DECORATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DYNAMIC_TEXTURE.BACKGROUND_DECORATION) | DYNAMIC_TEXTURE::BACKGROUND_DECORATION | 
 [KALI_STATUE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DYNAMIC_TEXTURE.KALI_STATUE) | DYNAMIC_TEXTURE::KALI_STATUE | 
 [COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DYNAMIC_TEXTURE.COFFIN) | DYNAMIC_TEXTURE::COFFIN | 
+
+## ENTITY_OVERRIDE
+
+
+> Search script examples for [ENTITY_OVERRIDE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DTOR) | 0 | 
+[UPDATE_STATE_MACHINE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.UPDATE_STATE_MACHINE) | 2 | 
+[KILL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.KILL) | 3 | 
+[ON_COLLISION1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION1) | 4 | 
+[DESTROY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DESTROY) | 5 | 
+[GET_HELD_ENTITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GET_HELD_ENTITY) | 22 | 
+[TRIGGER_ACTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.TRIGGER_ACTION) | 24 | 
+[ON_COLLISION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION2) | 26 | 
+[DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DAMAGE) | 48 | 
+[FLOOR_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLOOR_UPDATE) | 38 | 
 
 ## ENT_FLAG
 
@@ -546,11 +578,11 @@ Name | Data | Description
 [FLOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.FLOOR) | 0x100 | All FLOOR_* and FLOORSTYLED_* entities<br/>Various types, all `Floor`<br/>
 [DECORATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.DECORATION) | 0x200 | All DECORATION_* entities except: DECORATION_CHAINANDBLOCKS_CHAINDECORATION, DECORATION_SLIDINGWALL_CHAINDECORATION, DECORATION_PALACE_PORTRAIT<br/>Also includes: EMBED_GOLD, ENT_TYPE_EMBED_GOLD_BIG<br/>Various types, all `Entity`<br/>
 [BG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.BG) | 0x400 | All MIDBG* entities and most of the BG_* entities<br/>does not include: a lot .. check [default_flags_more_flags.txt](internal/entity.type.default_flags_more_flags.txt) for full list<br/>Also includes: DECORATION_PALACE_PORTRAIT<br/>Various types, all `Entity`<br/>
-[SHADOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.SHADOW) | 0x800 | All the BG_* entities excluded from `BG` (MASK.BG &#124 MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above<br/>Various types, all `Entity`<br/>
+[SHADOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.SHADOW) | 0x800 | All the BG_* entities excluded from `BG` (MASK.BG &#124; MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above<br/>Various types, all `Entity`<br/>
 [LOGICAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LOGICAL) | 0x1000 | All LOGICAL_* entities<br/>Also includes: ITEM_POWERUP_*, FX_COMPASS, FX_SPECIALCOMPASS, FX_LEADER_FLAG, FX_PLAYERINDICATOR, FX_PLAYERINDICATORPORTRAIT<br/>Various types, all `Entity`<br/>
 [WATER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.WATER) | 0x2000 | Only: LIQUID_WATER, LIQUID_COARSE_WATER, LIQUID_IMPOSTOR_LAKE<br/>Various types, all `Entity`<br/>
 [LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) | 0x4000 | Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA<br/>Various types, all `Entity`<br/>
-[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for ([MASK](#MASK).WATER &#124 [MASK](#MASK).LAVA)<br/>
+[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for ([MASK](#MASK).WATER &#124; [MASK](#MASK).LAVA)<br/>
 [ANY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ANY) | 0x0 | Value of 0, treated by all the functions as ANY mask<br/>
 
 ## ON
@@ -638,6 +670,22 @@ Name | Data | Description
 ...check [particle_emitters.txt](game_data/particle_emitters.txt)... |  | 
 [MINIGAME_BROKENASTEROID_SMOKE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) | 219 | 
 
+## PAUSE
+
+
+> Search script examples for [PAUSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE)
+
+8bit bitmask used in state.pause
+
+Name | Data | Description
+---- | ---- | -----------
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.MENU) | 0x01 | Menu: Pauses the level timer and engine. Can't set, controller by the menu.<br/>
+[FADE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.FADE) | 0x02 | Fade/Loading: Pauses all timers and engine.<br/>
+[CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.CUTSCENE) | 0x04 | Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>
+[FLAG4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.FLAG4) | 0x08 | Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!<br/>
+[FLAG5](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.FLAG5) | 0x10 | Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!<br/>
+[ANKH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.ANKH) | 0x20 | Ankh: Pauses all timers, physics and music, but not camera. Used by the ankh cutscene.<br/>
+
 ## PAUSEUI_VISIBILITY
 
 
@@ -702,6 +750,17 @@ Name | Data | Description
 ---- | ---- | -----------
 [ARROWTRAP_CHANCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PROCEDURAL_CHANCE.ARROWTRAP_CHANCE) | 0 | 
 ...check [spawn_chances.txt](game_data/spawn_chances.txt)... |  | 
+
+## RENDER_INFO_OVERRIDE
+
+
+> Search script examples for [RENDER_INFO_OVERRIDE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE.DTOR) | 0 | 
+[RENDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE.RENDER) | 3 | 
 
 ## REPEAT_TYPE
 

@@ -3,6 +3,8 @@
 #include <cmath>
 #include <tuple>
 
+struct ImVec2;
+
 struct Vec2
 {
     Vec2() = default;
@@ -12,8 +14,12 @@ struct Vec2
     Vec2(float x_, float y_)
         : x(x_), y(y_){};
 
+    /// NoDoc
     Vec2(std::pair<float, float> p)
         : x(p.first), y(p.second){};
+
+    /// NoDoc
+    Vec2(const ImVec2&);
 
     Vec2& rotate(float angle, float px, float py)
     {
@@ -36,6 +42,10 @@ struct Vec2
     Vec2 operator-(const Vec2& a) const
     {
         return Vec2{x - a.x, y - a.y};
+    }
+    Vec2 operator-() const
+    {
+        return {-x, -y};
     }
     Vec2 operator*(const Vec2& a) const
     {
@@ -231,13 +241,75 @@ struct AABB
     float bottom{0};
 };
 
+struct Triangle
+{
+    Triangle() = default;
+    Triangle(const Triangle&) = default;
+    Triangle(Vec2& _a, Vec2& _b, Vec2& _c)
+        : A(_a), B(_b), C(_c){};
+    Triangle(float ax, float ay, float bx, float by, float cx, float cy)
+        : A(ax, ay), B(bx, by), C(cx, cy){};
+
+    Triangle& offset(const Vec2& off)
+    {
+        A += off;
+        B += off;
+        C += off;
+        return *this;
+    }
+    Triangle& offset(float x, float y)
+    {
+        return offset({x, y});
+    }
+    Triangle operator+(const Vec2& a) const
+    {
+        Triangle new_triangle{*this};
+        new_triangle.offset(a);
+        return new_triangle;
+    }
+    Triangle operator-(const Vec2& a) const
+    {
+        Triangle new_triangle{*this};
+        new_triangle.offset(-a);
+        return new_triangle;
+    }
+    Triangle& rotate(float angle, float px, float py)
+    {
+        A.rotate(angle, px, py);
+        B.rotate(angle, px, py);
+        C.rotate(angle, px, py);
+        return *this;
+    }
+    /// Also known as centroid
+    Vec2 center()
+    {
+        return {(A.x + B.x + C.x) / 3, (A.y + B.y + C.y) / 3};
+    }
+
+    /*
+    /// Returns the corners
+    std::tuple<Vec2, Vec2, Vec2> split()
+    {} // just for the autodoc
+    */
+
+    /// Returns the corners
+    operator std::tuple<Vec2, Vec2, Vec2>()
+    {
+        return {A, B, C};
+    }
+
+    Vec2 A;
+    Vec2 B;
+    Vec2 C;
+};
+
 struct Quad
 {
     Quad() = default;
 
     Quad(const Quad&) = default;
 
-    Quad(Vec2& bottom_left_, Vec2& bottom_right_, Vec2& top_right_, Vec2& top_left_)
+    Quad(const Vec2& bottom_left_, const Vec2& bottom_right_, const Vec2& top_right_, const Vec2& top_left_)
         : bottom_left_x(bottom_left_.x), bottom_left_y(bottom_left_.y), bottom_right_x(bottom_right_.x), bottom_right_y(bottom_right_.y), top_right_x(top_right_.x), top_right_y(top_right_.y), top_left_x(top_left_.x), top_left_y(top_left_.y){};
 
     Quad(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)

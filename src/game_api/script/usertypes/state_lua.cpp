@@ -388,6 +388,8 @@ void register_usertypes(sol::state& lua)
     camera_type["bounds_right"] = &Camera::bounds_right;
     camera_type["bounds_bottom"] = &Camera::bounds_bottom;
     camera_type["bounds_top"] = &Camera::bounds_top;
+    camera_type["calculated_focus_x"] = &Camera::calculated_focus_x;
+    camera_type["calculated_focus_y"] = &Camera::calculated_focus_y;
     camera_type["adjusted_focus_x"] = &Camera::adjusted_focus_x;
     camera_type["adjusted_focus_y"] = &Camera::adjusted_focus_y;
     camera_type["focus_offset_x"] = &Camera::focus_offset_x;
@@ -427,6 +429,13 @@ void register_usertypes(sol::state& lua)
         "OnlineLobby",
         "code",
         &OnlineLobby::code,
+        "local_player_slot",
+        sol::property([](OnlineLobby& ol) // -> uint8_t
+                      { return ol.local_player_slot + 1; },
+                      [](OnlineLobby& ol, int8_t val)
+                      {
+                          ol.local_player_slot = val - 1;
+                      }),
         "get_code",
         &OnlineLobby::get_code);
     /// Used in StateMemory

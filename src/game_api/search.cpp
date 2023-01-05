@@ -510,6 +510,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        "malloc_base"sv,
+        PatternCommandBuffer{}
+            .find_inst("48 8b 45 e0 48 8b 30"_gh)
+            .find_next_inst("48 8b 45 e0 48 8b 30"_gh)
+            .offset(-0x40)
+            .find_after_inst_in_range("48 8b 04 c1 48 8b 80 20 01 00 00"_gh, 0x40)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
         "read_encrypted_file"sv,
         PatternCommandBuffer{}
             .find_inst("\x41\xb8\x50\x46\x00\x00"sv)
@@ -1026,7 +1036,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "zoom_level_offset"sv,
         // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
-        // That instruction contains the offset
+        // That instruction contains the offset, the memory is: {current_zoom, target_zoom} and both offset will be present
+        // current solution uses the target_zoom offset
         PatternCommandBuffer{}
             .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
             .decode_imm(4),

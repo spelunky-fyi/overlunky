@@ -134,7 +134,7 @@ void SpelunkyConsole::set_selected_uid(uint32_t uid)
     auto impl = m_Impl->Lock();
     impl->lua["U"] = uid;
     impl->lua["E"] = impl->lua["get_entity"](uid);
-    impl->lua["P"] = impl->lua["players"];
+    impl->lua["P"] = impl->lua["get_player"](1);
 }
 
 unsigned int SpelunkyConsole::get_input_lines()
