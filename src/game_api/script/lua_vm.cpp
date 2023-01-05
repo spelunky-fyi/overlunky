@@ -1488,7 +1488,7 @@ end
     {
         if (Entity* ent = get_entity_ptr(uid))
         {
-            return lua["Entity"]["set_pre_collision1"](ent, std::move(fun));
+            return lua["Entity"]["set_pre_on_collision1"](ent, std::move(fun));
         }
         return sol::nullopt;
     };
@@ -1503,7 +1503,7 @@ end
     {
         if (Entity* ent = get_entity_ptr(uid))
         {
-            return lua["Entity"]["set_pre_collision2"](ent, std::move(fun));
+            return lua["Entity"]["set_pre_on_collision2"](ent, std::move(fun));
         }
         return sol::nullopt;
     };
