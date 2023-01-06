@@ -428,7 +428,7 @@ class CustomTheme : public ThemeInfo
     }
     bool get_unknown1()
     {
-        return unknown1;
+        return allow_beehive;
     }
     void init_flags()
     {
@@ -883,8 +883,8 @@ class CustomTheme : public ThemeInfo
     bool get_unknown_1_or_2(uint8_t index)
     {
         if (index == 0)
-            return unknown1;
-        return unknown2;
+            return allow_beehive;
+        return allow_leprechaun;
     }
 
     /// Add TEXTUREs to `textures` to override different dynamic textures easily.
@@ -1168,6 +1168,8 @@ void register_usertypes(sol::state& lua)
     lua["load_screen"] = do_load_screen;
 
     auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
+    themeinfo_type["allow_beehive"] = &ThemeInfo::allow_beehive;
+    themeinfo_type["allow_leprechaun"] = &ThemeInfo::allow_leprechaun;
     themeinfo_type["sub_theme"] = &ThemeInfo::sub_theme;
     themeinfo_type["get_unknown1"] = &ThemeInfo::get_unknown1;
     themeinfo_type["init_flags"] = &ThemeInfo::init_flags;
@@ -1247,8 +1249,8 @@ void register_usertypes(sol::state& lua)
     customtheme_type["override"] = theme_override;
     customtheme_type["pre"] = &CustomTheme::pre;
     customtheme_type["post"] = &CustomTheme::post;
-    customtheme_type["unknown1"] = &CustomTheme::unknown1;
-    customtheme_type["unknown2"] = &CustomTheme::unknown2;
+    customtheme_type["allow_beehive"] = &CustomTheme::allow_beehive;
+    customtheme_type["allow_leprechaun"] = &CustomTheme::allow_leprechaun;
     customtheme_type["unknown3"] = &CustomTheme::unknown3;
     customtheme_type["unknown4"] = &CustomTheme::unknown4;
     customtheme_type["get_unknown1"] = &CustomTheme::get_unknown1;
@@ -1370,6 +1372,10 @@ void register_usertypes(sol::state& lua)
         &LevelGenSystem::shop_type,
         "backlayer_shop_type",
         &LevelGenSystem::backlayer_shop_type,
+        "shop_music",
+        &LevelGenSystem::frontlayer_shop_music,
+        "backlayer_shop_music",
+        &LevelGenSystem::backlayer_shop_music,
         "spawn_x",
         &LevelGenSystem::spawn_x,
         "spawn_y",
@@ -1386,7 +1392,11 @@ void register_usertypes(sol::state& lua)
         sol::property([](LevelGenSystem& lgs)
                       { return std::ref(lgs.themes); }),
         "flags",
-        &LevelGenSystem::flags);
+        &LevelGenSystem::flags,
+        "flags2",
+        &LevelGenSystem::flags2,
+        "flags3",
+        &LevelGenSystem::flags3);
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.
@@ -1473,43 +1483,43 @@ void register_usertypes(sol::state& lua)
         &QuestsInfo::beg_state);
 
     auto savedata_type = lua.new_usertype<SaveData>("SaveData");
-    savedata_type["places"] = sol::readonly(&SaveData::places);
-    savedata_type["bestiary"] = sol::readonly(&SaveData::bestiary);
-    savedata_type["people"] = sol::readonly(&SaveData::people);
-    savedata_type["items"] = sol::readonly(&SaveData::items);
-    savedata_type["traps"] = sol::readonly(&SaveData::traps);
-    savedata_type["last_daily"] = sol::readonly(&SaveData::last_daily);
-    savedata_type["characters"] = sol::readonly(&SaveData::characters);
-    savedata_type["shortcuts"] = sol::readonly(&SaveData::shortcuts);
-    savedata_type["bestiary_killed"] = sol::readonly(&SaveData::bestiary_killed);
-    savedata_type["bestiary_killed_by"] = sol::readonly(&SaveData::bestiary_killed_by);
-    savedata_type["people_killed"] = sol::readonly(&SaveData::people_killed);
-    savedata_type["people_killed_by"] = sol::readonly(&SaveData::people_killed_by);
-    savedata_type["plays"] = sol::readonly(&SaveData::plays);
-    savedata_type["deaths"] = sol::readonly(&SaveData::deaths);
-    savedata_type["wins_normal"] = sol::readonly(&SaveData::wins_normal);
-    savedata_type["wins_hard"] = sol::readonly(&SaveData::wins_hard);
-    savedata_type["wins_special"] = sol::readonly(&SaveData::wins_special);
-    savedata_type["score_total"] = sol::readonly(&SaveData::score_total);
-    savedata_type["score_top"] = sol::readonly(&SaveData::score_top);
-    savedata_type["deepest_area"] = sol::readonly(&SaveData::deepest_area);
-    savedata_type["deepest_level"] = sol::readonly(&SaveData::deepest_level);
-    savedata_type["time_best"] = sol::readonly(&SaveData::time_best);
-    savedata_type["time_total"] = sol::readonly(&SaveData::time_total);
-    savedata_type["time_tutorial"] = sol::readonly(&SaveData::time_tutorial);
-    savedata_type["character_deaths"] = sol::readonly(&SaveData::character_deaths);
-    savedata_type["pets_rescued"] = sol::readonly(&SaveData::pets_rescued);
-    savedata_type["completed_normal"] = sol::readonly(&SaveData::completed_normal);
-    savedata_type["completed_ironman"] = sol::readonly(&SaveData::completed_ironman);
-    savedata_type["completed_hard"] = sol::readonly(&SaveData::completed_hard);
-    savedata_type["profile_seen"] = sol::readonly(&SaveData::profile_seen);
-    savedata_type["seeded_unlocked"] = sol::readonly(&SaveData::seeded_unlocked);
-    savedata_type["world_last"] = sol::readonly(&SaveData::world_last);
-    savedata_type["level_last"] = sol::readonly(&SaveData::level_last);
-    savedata_type["score_last"] = sol::readonly(&SaveData::score_last);
-    savedata_type["time_last"] = sol::readonly(&SaveData::time_last);
-    savedata_type["stickers"] = sol::readonly(&SaveData::stickers);
-    savedata_type["players"] = sol::readonly(&SaveData::players);
+    savedata_type["places"] = &SaveData::places;
+    savedata_type["bestiary"] = &SaveData::bestiary;
+    savedata_type["people"] = &SaveData::people;
+    savedata_type["items"] = &SaveData::items;
+    savedata_type["traps"] = &SaveData::traps;
+    savedata_type["last_daily"] = &SaveData::last_daily;
+    savedata_type["characters"] = &SaveData::characters;
+    savedata_type["shortcuts"] = &SaveData::shortcuts;
+    savedata_type["bestiary_killed"] = &SaveData::bestiary_killed;
+    savedata_type["bestiary_killed_by"] = &SaveData::bestiary_killed_by;
+    savedata_type["people_killed"] = &SaveData::people_killed;
+    savedata_type["people_killed_by"] = &SaveData::people_killed_by;
+    savedata_type["plays"] = &SaveData::plays;
+    savedata_type["deaths"] = &SaveData::deaths;
+    savedata_type["wins_normal"] = &SaveData::wins_normal;
+    savedata_type["wins_hard"] = &SaveData::wins_hard;
+    savedata_type["wins_special"] = &SaveData::wins_special;
+    savedata_type["score_total"] = &SaveData::score_total;
+    savedata_type["score_top"] = &SaveData::score_top;
+    savedata_type["deepest_area"] = &SaveData::deepest_area;
+    savedata_type["deepest_level"] = &SaveData::deepest_level;
+    savedata_type["time_best"] = &SaveData::time_best;
+    savedata_type["time_total"] = &SaveData::time_total;
+    savedata_type["time_tutorial"] = &SaveData::time_tutorial;
+    savedata_type["character_deaths"] = &SaveData::character_deaths;
+    savedata_type["pets_rescued"] = &SaveData::pets_rescued;
+    savedata_type["completed_normal"] = &SaveData::completed_normal;
+    savedata_type["completed_ironman"] = &SaveData::completed_ironman;
+    savedata_type["completed_hard"] = &SaveData::completed_hard;
+    savedata_type["profile_seen"] = &SaveData::profile_seen;
+    savedata_type["seeded_unlocked"] = &SaveData::seeded_unlocked;
+    savedata_type["world_last"] = &SaveData::world_last;
+    savedata_type["level_last"] = &SaveData::level_last;
+    savedata_type["score_last"] = &SaveData::score_last;
+    savedata_type["time_last"] = &SaveData::time_last;
+    savedata_type["stickers"] = &SaveData::stickers;
+    savedata_type["players"] = &SaveData::players;
     savedata_type["constellation"] = &SaveData::constellation;
 
     lua.new_usertype<Constellation>(

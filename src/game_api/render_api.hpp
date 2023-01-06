@@ -323,7 +323,7 @@ struct RenderInfo
     virtual ~RenderInfo() = 0;
     virtual void unknown_v2() = 0;
     virtual void update() = 0;
-    virtual void draw(size_t) = 0;
+    virtual void render(float*) = 0;
     virtual bool unknown_3() = 0; // init? sets darkness to 1.0 at the start, then does some other stuff
 
     // gets the entity owning this RenderInfo

@@ -124,6 +124,19 @@ Name | Data | Description
 [NEO_BABYLON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NEO_BABYLON) | 6 | 
 [SUNKEN_CITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKEN_CITY) | 7 | 
 
+## DRAW_LAYER
+
+
+> Search script examples for [DRAW_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER.BACKGROUND) | DRAW_LAYER::BACKGROUND | 
+[FOREGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER.FOREGROUND) | DRAW_LAYER::FOREGROUND | 
+[WINDOW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DRAW_LAYER.WINDOW) | DRAW_LAYER::WINDOW | 
+
 ## DROP
 
 
@@ -184,8 +197,6 @@ Name | Data | Description
 [ON_COLLISION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION2) | 26 | 
 [DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DAMAGE) | 48 | 
 [FLOOR_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLOOR_UPDATE) | 38 | 
-[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DTOR) | 0 | 
-[RENDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.RENDER) | 3 | 
 
 ## ENT_FLAG
 
@@ -659,6 +670,22 @@ Name | Data | Description
 ...check [particle_emitters.txt](game_data/particle_emitters.txt)... |  | 
 [MINIGAME_BROKENASTEROID_SMOKE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PARTICLEEMITTER.MINIGAME_BROKENASTEROID_SMOKE) | 219 | 
 
+## PAUSE
+
+
+> Search script examples for [PAUSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE)
+
+8bit bitmask used in state.pause
+
+Name | Data | Description
+---- | ---- | -----------
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.MENU) | 0x01 | Menu: Pauses the level timer and engine. Can't set, controller by the menu.<br/>
+[FADE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.FADE) | 0x02 | Fade/Loading: Pauses all timers and engine.<br/>
+[CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.CUTSCENE) | 0x04 | Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>
+[FLAG4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.FLAG4) | 0x08 | Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!<br/>
+[FLAG5](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.FLAG5) | 0x10 | Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!<br/>
+[ANKH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE.ANKH) | 0x20 | Ankh: Pauses all timers, physics and music, but not camera. Used by the ankh cutscene.<br/>
+
 ## PAUSEUI_VISIBILITY
 
 
@@ -723,6 +750,17 @@ Name | Data | Description
 ---- | ---- | -----------
 [ARROWTRAP_CHANCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PROCEDURAL_CHANCE.ARROWTRAP_CHANCE) | 0 | 
 ...check [spawn_chances.txt](game_data/spawn_chances.txt)... |  | 
+
+## RENDER_INFO_OVERRIDE
+
+
+> Search script examples for [RENDER_INFO_OVERRIDE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE.DTOR) | 0 | 
+[RENDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE.RENDER) | 3 | 
 
 ## REPEAT_TYPE
 

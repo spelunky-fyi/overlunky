@@ -849,21 +849,46 @@ function get_aabb_bounds() end
 ---Gets the current camera position in the level
 ---@return number, number
 function get_camera_position() end
----Set a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+---Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
 ---@return Flags
 function set_flag(flags, bit) end
----Clears a bit in a number. This doesn't actually change the bit in the entity you pass it, it just returns the new value you can use.
+---Clears the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
 ---@return Flags
 function clr_flag(flags, bit) end
----Returns true if a bit is set in the flags
+---Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param bit integer
+---@return Flags
+function flip_flag(flags, bit) end
+---Returns true if the nth bit is set in the number.
 ---@param flags Flags
 ---@param bit integer
 ---@return boolean
 function test_flag(flags, bit) end
+---Set a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param mask Flags
+---@return Flags
+function set_mask(flags, mask) end
+---Clears a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param mask Flags
+---@return Flags
+function clr_mask(flags, mask) end
+---Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+---@param flags Flags
+---@param mask Flags
+---@return Flags
+function flip_mask(flags, mask) end
+---Returns true if a bitmask is set in the number.
+---@param flags Flags
+---@param mask Flags
+---@return boolean
+function test_mask(flags, mask) end
 ---Gets the resolution (width and height) of the screen
 ---@return integer, integer
 function get_window_size() end
@@ -1676,7 +1701,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field screen_next integer
     ---@field ingame integer
     ---@field playing integer
-    ---@field pause integer
+    ---@field pause PAUSE
     ---@field width integer
     ---@field height integer
     ---@field kali_favor integer
@@ -1697,6 +1722,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field force_current_theme fun(self, t: integer): nil
     ---@field shoppie_aggro integer
     ---@field shoppie_aggro_next integer
+    ---@field outposts_spawned integer
     ---@field merchant_aggro integer
     ---@field kills_npc integer
     ---@field level_count integer
@@ -1965,6 +1991,8 @@ local function PRNG_random(self, min, max) end
     ---@field hitboxx number
     ---@field hitboxy number
     ---@field draw_depth integer
+    ---@field collision2_mask integer
+    ---@field collision_mask integer
     ---@field friction number
     ---@field elasticity number
     ---@field weight number
@@ -1978,6 +2006,7 @@ local function PRNG_random(self, min, max) end
     ---@field glow_alpha number
     ---@field damage integer
     ---@field life integer
+    ---@field sacrifice_value integer
     ---@field blood_content integer
     ---@field texture integer
     ---@field animations table<integer, Animation>
@@ -2002,8 +2031,8 @@ local function PRNG_random(self, min, max) end
     ---@field facing_left boolean
     ---@field render_inactive boolean
     ---@field get_entity fun(self): class Entity
-    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
-    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: fun(): any): CallbackId
+    ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: fun(): any): CallbackId
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil
     ---@field set_pre_dtor fun(self, fun: fun(): any): CallbackId
     ---@field set_post_dtor fun(self, fun: fun(): any): CallbackId
@@ -2218,7 +2247,10 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field ai Ai
     ---@field input PlayerSlot
     ---@field basecamp_button_entity Entity
+    ---@field jump_lock_timer integer
     ---@field coyote_timer integer
+    ---@field swim_timer integer
+    ---@field hired_hand_name integer
     ---@field set_jetpack_fuel fun(self, fuel: integer): nil
     ---@field kapala_blood_amount fun(self): integer
     ---@field get_name fun(self): string
@@ -2533,11 +2565,17 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class Ghost : Monster
     ---@field split_timer integer
+    ---@field wobble_timer integer
+    ---@field pace_timer integer
     ---@field velocity_multiplier number
     ---@field ghost_behaviour GHOST_BEHAVIOR
     ---@field emitted_light Illumination
     ---@field linked_ghost Entity
     ---@field sound SoundMeta
+    ---@field blown_by_player boolean
+    ---@field happy_dancing_clockwise boolean
+    ---@field target_dist_visibility_factor number
+    ---@field target_layer_visibility_factor number
 
 ---@class Bat : Monster
     ---@field spawn_x number
@@ -2585,6 +2623,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field name integer
     ---@field shotgun_attack_delay integer
     ---@field has_key boolean
+    ---@field is_ear boolean
     ---@field shop_owner boolean
 
 ---@class Yang : RoomOwner
@@ -2795,6 +2834,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sound SoundMeta
     ---@field fly_hang_timer integer
     ---@field targeting_timer integer
+    ---@field walk_start_time integer
+    ---@field walk_end_time integer
     ---@field wobble_x number
     ---@field wobble_y number
 
@@ -3389,6 +3430,13 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field swing number
     ---@field up_down_normal number
 
+---@class OlmecShip : Movable
+    ---@field sound SoundMeta
+    ---@field door_fx Entity
+    ---@field smoke ParticleEmitterInfo
+    ---@field flight_time integer
+    ---@field has_spawned_jetflames boolean
+
 ---@class MiniGameAsteroid : Movable
     ---@field spin_speed number
 
@@ -3435,6 +3483,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field falltime_deploy integer
     ---@field deployed boolean
     ---@field deploy fun(self): nil
+    ---@field gold_timer integer
+    ---@field gold_spawning_time integer
 
 ---@class TrueCrownPowerup : Powerup
     ---@field timer integer
@@ -3470,6 +3520,9 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class PrizeDispenser : Movable
     ---@field item_ids integer[]
     ---@field prizes_spawned integer
+
+---@class Web : Movable
+    ---@field decay_rate number
 
 ---@class LiquidSurface : Movable
     ---@field glow_radius number
@@ -3921,6 +3974,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field max_lifetime integer
 
 ---@class ThemeInfo
+    ---@field allow_beehive boolean
+    ---@field allow_leprechaun boolean
     ---@field sub_theme ThemeInfo
     ---@field get_unknown1 fun(self): boolean
     ---@field init_flags fun(self): nil
@@ -3983,8 +4038,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field override any @theme_override
     ---@field pre any @&CustomTheme::pre
     ---@field post any @&CustomTheme::post
-    ---@field unknown1 any @&CustomTheme::unknown1
-    ---@field unknown2 any @&CustomTheme::unknown2
+    ---@field allow_beehive any @&CustomTheme::allow_beehive
+    ---@field allow_leprechaun any @&CustomTheme::allow_leprechaun
     ---@field unknown3 any @&CustomTheme::unknown3
     ---@field unknown4 any @&CustomTheme::unknown4
     ---@field get_unknown1 fun(self): boolean
@@ -4052,6 +4107,8 @@ local function MovableBehavior_get_state_id(self) end
 ---@class LevelGenSystem
     ---@field shop_type SHOP_TYPE
     ---@field backlayer_shop_type SHOP_TYPE
+    ---@field shop_music integer
+    ---@field backlayer_shop_music integer
     ---@field spawn_x number
     ---@field spawn_y number
     ---@field spawn_room_x integer
@@ -4250,6 +4307,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil
     ---@field draw_image GuiDrawContext_draw_image
     ---@field draw_image_rotated GuiDrawContext_draw_image_rotated
+    ---@field draw_layer fun(self, layer: DRAW_LAYER): nil
     ---@field window any @&GuiDrawContext::window
     ---@field win_text fun(self, text: string): nil
     ---@field win_separator fun(self): nil
@@ -4305,10 +4363,6 @@ local function GuiDrawContext_draw_image(self, image, rect, uv_rect, color) end
 ---@overload fun(self, image: IMAGE, left: number, top: number, right: number, bottom: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number, color: uColor, angle: number, px: number, py: number): nil
 local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, color, angle, px, py) end
 
----@class ImVec2
-    ---@field x number
-    ---@field y number
-
 ---@class Gamepad
     ---@field enabled boolean
     ---@field buttons GAMEPAD
@@ -4321,24 +4375,6 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
 
 ---@class ImGuiIO
     ---@field displaysize ImVec2
-    ---@field framerate number
-    ---@field wantkeyboard boolean
-    ---@field keysdown boolean       [] @size: 512. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
-    ---@field keydown fun(key: number | string): boolean
-    ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
-    ---@field keyreleased fun(key: number | string): boolean
-    ---@field keyctrl boolean
-    ---@field keyshift boolean
-    ---@field keyalt boolean
-    ---@field keysuper boolean
-    ---@field wantmouse boolean
-    ---@field mousepos ImVec2
-    ---@field mousedown boolean       [] @size: 5
-    ---@field mouseclicked boolean       [] @size: 5
-    ---@field mousedoubleclicked boolean       [] @size: 5
-    ---@field mousewheel number
-    ---@field gamepad Gamepad
-    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
 
 ---@class VanillaRenderContext
     ---@field draw_text VanillaRenderContext_draw_text
@@ -4507,6 +4543,9 @@ local function Triangle_offset(self, x, y) end
     ---@field line1 STRINGID
     ---@field line2 STRINGID
     ---@field line3 STRINGID
+    ---@field line1_alpha number
+    ---@field line2_alpha number
+    ---@field line3_alpha number
 
 ---@class ScreenTitle : Screen
     ---@field logo_spelunky2 TextureRenderingInfo
@@ -5210,6 +5249,10 @@ function Vec2.new(self, x_, y_) end
 ---@param number> p tuple<number,
 ---@return Vec2
 function Vec2.new(self, number> p) end
+---NoDoc
+---@param imvec2 ImVec2
+---@return Vec2
+function Vec2.new(self, imvec2) end
 
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
@@ -5580,6 +5623,20 @@ DYNAMIC_TEXTURE = {
   KALI_STATUE = -9
 }
 ---@alias DYNAMIC_TEXTURE integer
+ENTITY_OVERRIDE = {
+  COLLISION1 = 4,
+  COLLISION2 = 26,
+  DAMAGE = 48,
+  DESTROY = 5,
+  DTOR = 0,
+  FLOOR_UPDATE = 38,
+  GET_HELD_ENTITY = 22,
+  KILL = 3,
+  RENDER = 3,
+  TRIGGER_ACTION = 24,
+  UPDATE_STATE_MACHINE = 2
+}
+---@alias ENTITY_OVERRIDE integer
 ENT_FLAG = {
   CAN_BE_STOMPED = 15,
   CLIMBABLE = 9,
@@ -7411,6 +7468,15 @@ PARTICLEEMITTER = {
   YETIQUEEN_LANDING_SNOWDUST = 183
 }
 ---@alias PARTICLEEMITTER integer
+PAUSE = {
+  ANKH = 32,
+  CUTSCENE = 4,
+  FADE = 2,
+  FLAG4 = 8,
+  FLAG5 = 16,
+  MENU = 1
+}
+---@alias PAUSE integer
 PAUSEUI_VISIBILITY = {
   INVISIBLE = 0,
   SLIDING_DOWN = 1,
@@ -7418,6 +7484,15 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
+PAUSE_FLAG = {
+  ANKH = 6,
+  CUTSCENE = 3,
+  FADE = 2,
+  FLAG4 = 4,
+  FLAG5 = 5,
+  MENU = 1
+}
+---@alias PAUSE_FLAG integer
 POS_TYPE = {
   AIR = 4,
   ALCOVE = 16,

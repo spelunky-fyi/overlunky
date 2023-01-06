@@ -70,8 +70,9 @@ std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_ui_scripts;
 std::vector<std::filesystem::path> g_script_files;
 std::vector<std::string> g_script_autorun;
+ScriptImage g_cursor;
 
-std::map<std::string, int64_t> keys{
+std::map<std::string, int64_t> default_keys{
     {"enter", VK_RETURN},
     {"escape", VK_ESCAPE},
     {"move_left", VK_LEFT},
@@ -138,19 +139,11 @@ std::map<std::string, int64_t> keys{
     {"zoom_4x", OL_KEY_CTRL | '4'},
     {"zoom_5x", OL_KEY_CTRL | '5'},
     {"zoom_auto", OL_KEY_CTRL | '0'},
-    {"teleport", 0x0},
-    {"teleport_left", 0x0},
-    {"teleport_up", 0x0},
-    {"teleport_right", 0x0},
-    {"teleport_down", 0x0},
     {"camera_left", OL_KEY_SHIFT | 'J'},
     {"camera_up", OL_KEY_SHIFT | 'I'},
     {"camera_right", OL_KEY_SHIFT | 'L'},
     {"camera_down", OL_KEY_SHIFT | 'K'},
-    {"coordinate_left", 0x0},
-    {"coordinate_up", 0x0},
-    {"coordinate_right", 0x0},
-    {"coordinate_down", 0x0},
+    {"camera_reset", OL_KEY_SHIFT | 'U'},
     {"mouse_spawn", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_throw", OL_BUTTON_MOUSE | 0x01},
     {"mouse_spawn_over", OL_BUTTON_MOUSE | OL_KEY_CTRL | 0x01},
@@ -201,6 +194,8 @@ std::map<std::string, int64_t> keys{
     //{ "", 0x },
 };
 
+auto keys = default_keys;
+
 struct Window
 {
     std::string name;
@@ -249,7 +244,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -323,7 +318,10 @@ std::map<std::string, bool> options = {
     {"show_tooltips", true},
     {"smooth_camera", true},
     {"multi_viewports", true},
-    {"menu_ui", true}};
+    {"menu_ui", true},
+    {"hd_cursor", true},
+    {"inverted", false},
+    {"borders", false}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -469,74 +467,131 @@ ImVec4 hue_shift(ImVec4 in, float hue) // unused
 
 void set_colors()
 {
-    float col_main_sat = g_sat;
-    float col_main_val = g_val;
-    float col_area_sat = g_sat * 0.77f;
-    float col_area_val = g_val * 0.60f;
-    float col_back_sat = g_sat * 0.33f;
-    float col_back_val = g_val * 0.20f;
+    if (options["inverted"])
+        ImGui::StyleColorsLight();
+    else
+        ImGui::StyleColorsDark();
 
     ImGuiStyle& style = ImGui::GetStyle();
+    ImVec4* colors = ImGui::GetStyle().Colors;
 
-    ImVec4 col_text = ImColor::HSV(g_hue, 15.f / 255.f, 245.f / 255.f);
+    if (style.Alpha < 0.2f)
+        style.Alpha = 0.2f;
+
+    float col_main_sat = g_sat;
+    float col_main_val = options["inverted"] ? 1.0f - g_val : g_val;
+    float col_area_sat = g_sat * 0.77f;
+    float col_area_val = options["inverted"] ? 1.0f - g_val * 0.60f : g_val * 0.60f;
+    float col_back_sat = g_sat * 0.33f;
+    float col_back_val = options["inverted"] ? 1.0f - g_val * 0.20f : g_val * 0.20f;
+
+    ImVec4 col_text = ImColor::HSV(g_hue, options["inverted"] ? 1.0f - 15.f / 255.f : 15.f / 255.f, options["inverted"] ? 1.0f - 245.f / 255.f : 245.f / 255.f);
     ImVec4 col_main = ImColor::HSV(g_hue, col_main_sat, col_main_val);
     ImVec4 col_back = ImColor::HSV(g_hue, col_back_sat, col_back_val);
     ImVec4 col_area = ImColor::HSV(g_hue, col_area_sat, col_area_val);
 
-    style.Colors[ImGuiCol_Text] = ImVec4(col_text.x, col_text.y, col_text.z, 1.00f);
-    style.Colors[ImGuiCol_TextDisabled] = ImVec4(col_text.x, col_text.y, col_text.z, 0.58f);
-    style.Colors[ImGuiCol_WindowBg] = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
-    style.Colors[ImGuiCol_Border] = ImVec4(col_text.x, col_text.y, col_text.z, 0.30f);
-    style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-    style.Colors[ImGuiCol_FrameBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
-    style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.68f);
-    style.Colors[ImGuiCol_FrameBgActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_TitleBg] = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
-    style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
-    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
-    style.Colors[ImGuiCol_MenuBarBg] = ImVec4(col_area.x, col_area.y, col_area.z, 0.57f);
-    style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
-    style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(col_main.x, col_main.y, col_main.z, 0.31f);
-    style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
-    style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_CheckMark] = ImVec4(col_main.x, col_main.y, col_main.z, 0.80f);
-    style.Colors[ImGuiCol_SliderGrab] = ImVec4(col_main.x, col_main.y, col_main.z, 0.24f);
-    style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_Button] = ImVec4(col_main.x, col_main.y, col_main.z, 0.44f);
-    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
-    style.Colors[ImGuiCol_ButtonActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_Header] = ImVec4(col_main.x, col_main.y, col_main.z, 0.76f);
-    style.Colors[ImGuiCol_HeaderHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
-    style.Colors[ImGuiCol_HeaderActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_ResizeGrip] = ImVec4(col_main.x, col_main.y, col_main.z, 0.20f);
-    style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
-    style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_PlotLines] = ImVec4(col_text.x, col_text.y, col_text.z, 0.63f);
-    style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_PlotHistogram] = ImVec4(col_text.x, col_text.y, col_text.z, 0.63f);
-    style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
-    style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0, 0, 0, 0);
-    style.Colors[ImGuiCol_Separator] = ImVec4(col_main.x, col_main.y, col_main.z, 0.50f);
-    style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
-    style.Colors[ImGuiCol_SeparatorActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_Tab] = ImVec4(col_back.x, col_back.y, col_back.z, 0.86f);
-    style.Colors[ImGuiCol_TabHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    style.Colors[ImGuiCol_TabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.80f);
-    style.Colors[ImGuiCol_TabUnfocused] = ImVec4(col_area.x, col_area.y, col_area.z, 0.60f);
-    style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(col_area.x, col_area.y, col_area.z, 0.80f);
-    style.Colors[ImGuiCol_DockingPreview] = ImVec4(col_area.x, col_area.y, col_area.z, 0.6f);
-    style.WindowPadding = ImVec2(4, 4);
+    colors[ImGuiCol_Text] = ImVec4(col_text.x, col_text.y, col_text.z, 1.00f);
+    colors[ImGuiCol_TextDisabled] = ImVec4(col_text.x, col_text.y, col_text.z, 0.58f);
+    colors[ImGuiCol_WindowBg] = ImVec4(col_back.x, col_back.y, col_back.z, 1.00f);
+    colors[ImGuiCol_ChildBg] = ImVec4(col_back.x, col_back.x, col_back.x, 0.00f);
+    colors[ImGuiCol_PopupBg] = ImVec4(col_back.x, col_back.y, col_back.z, 0.98f);
+    colors[ImGuiCol_Border] = ImVec4(col_text.x, col_text.y, col_text.z, 0.40f);
+    colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_FrameBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
+    colors[ImGuiCol_FrameBgHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.68f);
+    colors[ImGuiCol_FrameBgActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_TitleBg] = ImVec4(col_back.x, col_back.y, col_back.z, 0.80f);
+    colors[ImGuiCol_TitleBgCollapsed] = ImVec4(col_back.x, col_back.y, col_back.z, 0.80f);
+    colors[ImGuiCol_TitleBgActive] = ImVec4(col_area.x, col_area.y, col_area.z, 0.80f);
+    colors[ImGuiCol_MenuBarBg] = ImVec4(col_area.x, col_area.y, col_area.z, 0.57f);
+    colors[ImGuiCol_ScrollbarBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
+    colors[ImGuiCol_ScrollbarGrab] = ImVec4(col_main.x, col_main.y, col_main.z, 0.31f);
+    colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
+    colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_CheckMark] = ImVec4(col_text.x, col_text.y, col_text.z, 0.80f);
+    colors[ImGuiCol_SliderGrab] = ImVec4(col_main.x, col_main.y, col_main.z, 0.24f);
+    colors[ImGuiCol_SliderGrabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_Button] = ImVec4(col_main.x, col_main.y, col_main.z, 0.44f);
+    colors[ImGuiCol_ButtonHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
+    colors[ImGuiCol_ButtonActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(col_main.x, col_main.y, col_main.z, 0.76f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_Separator] = ImVec4(col_main.x, col_main.y, col_main.z, 0.50f);
+    colors[ImGuiCol_SeparatorHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
+    colors[ImGuiCol_SeparatorActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_ResizeGrip] = ImVec4(col_main.x, col_main.y, col_main.z, 0.20f);
+    colors[ImGuiCol_ResizeGripHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
+    colors[ImGuiCol_ResizeGripActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_PlotLines] = ImVec4(col_text.x, col_text.y, col_text.z, 0.63f);
+    colors[ImGuiCol_PlotLinesHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_PlotHistogram] = ImVec4(col_text.x, col_text.y, col_text.z, 0.63f);
+    colors[ImGuiCol_PlotHistogramHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_TextSelectedBg] = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
+    colors[ImGuiCol_Tab] = ImVec4(col_back.x, col_back.y, col_back.z, 0.86f);
+    colors[ImGuiCol_TabHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_TabActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.80f);
+    colors[ImGuiCol_TabUnfocused] = ImVec4(col_area.x, col_area.y, col_area.z, 0.60f);
+    colors[ImGuiCol_TabUnfocusedActive] = ImVec4(col_area.x, col_area.y, col_area.z, 0.80f);
+    colors[ImGuiCol_DockingPreview] = ImVec4(col_area.x, col_area.y, col_area.z, 0.6f);
+    colors[ImGuiCol_DockingEmptyBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
+    colors[ImGuiCol_PlotLines] = ImVec4(col_main.x, col_main.y, col_main.z, 0.63f);
+    colors[ImGuiCol_PlotLinesHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_PlotHistogram] = ImVec4(col_main.x, col_main.y, col_main.z, 0.63f);
+    colors[ImGuiCol_PlotHistogramHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_TableHeaderBg] = ImVec4(col_back.x, col_back.x, col_back.x, 0.40f);
+    colors[ImGuiCol_TableBorderStrong] = ImVec4(col_main.x, col_main.y, col_main.z, 0.40f);
+    colors[ImGuiCol_TableBorderLight] = ImVec4(col_main.x, col_main.y, col_main.z, 0.40f);
+    colors[ImGuiCol_TableRowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+    colors[ImGuiCol_TableRowBgAlt] = ImVec4(0.30f, 0.30f, 0.30f, 0.09f);
+    colors[ImGuiCol_TextSelectedBg] = ImVec4(col_main.x, col_main.y, col_main.z, 0.43f);
+    colors[ImGuiCol_DragDropTarget] = ImVec4(col_main.x, col_main.y, col_main.z, 0.95f);
+    colors[ImGuiCol_NavHighlight] = ImVec4(col_main.x, col_main.y, col_main.z, 0.80f);
+    colors[ImGuiCol_NavWindowingHighlight] = ImVec4(col_main.x, col_main.y, col_main.z, 0.70f);
+    colors[ImGuiCol_NavWindowingDimBg] = ImVec4(col_back.x, col_back.y, col_back.z, 0.20f);
+    colors[ImGuiCol_ModalWindowDimBg] = ImVec4(col_back.x, col_back.y, col_back.z, 0.35f);
+
+    style.DisplaySafeAreaPadding = {0, 0};
+    style.WindowPadding = {4, 4};
+
     style.WindowRounding = 0;
     style.FrameRounding = 0;
     style.PopupRounding = 0;
     style.GrabRounding = 0;
     style.TabRounding = 0;
     style.ScrollbarRounding = 0;
-    style.WindowBorderSize = 0;
-    style.FrameBorderSize = 0;
-    style.PopupBorderSize = 0;
-    style.DisplaySafeAreaPadding = {0, 0};
+
+    float bordersize = options["borders"] ? 1.0f : 0;
+    style.WindowBorderSize = 0; // meh
+    style.FrameBorderSize = bordersize;
+    style.PopupBorderSize = bordersize;
+    style.ChildBorderSize = bordersize;
+    style.TabBorderSize = bordersize;
+}
+
+void load_cursor()
+{
+    if (g_cursor.texture == nullptr)
+        create_d3d11_texture_from_memory(cursor_png, cursor_size, &g_cursor.texture, &g_cursor.width, &g_cursor.height);
+}
+
+void render_cursor()
+{
+    ImGuiContext& g = *GImGui;
+    if (g_cursor.texture == nullptr || !g.IO.MouseDrawCursor || g.MouseCursor != ImGuiMouseCursor_Arrow)
+        return;
+    g.MouseCursor = ImGuiMouseCursor_None;
+    const float scale = 0.8f;
+    for (int n = 0; n < g.Viewports.Size; n++)
+    {
+        ImGuiViewportP* viewport = g.Viewports[n];
+        const ImVec2 pos = g.IO.MousePos;
+        ImDrawList* draw_list = ImGui::GetForegroundDrawList(viewport);
+        ImTextureID tex_id = g_cursor.texture;
+        draw_list->PushTextureID(tex_id);
+        draw_list->AddImage(tex_id, pos, {pos.x + g_cursor.width * scale, pos.y + g_cursor.height * scale}, {0.0f, 0.0f}, {1.0f, 1.0f}, 0xffffffff);
+        draw_list->PopTextureID();
+    }
 }
 
 void load_script(std::string file, bool enable = true)
@@ -1302,7 +1357,10 @@ void spawn_kit(Kit* kit)
             auto spawned_mount = get_entity_ptr(spawned)->as<Mount>();
             spawned_mount->tame(true);
             if (!g_players.at(0)->overlay)
+            {
+                g_players.at(0)->standing_on_uid = -1;
                 spawned_mount->carry(g_players.at(0));
+            }
         }
         else if (g_players.at(0)->holding_uid == -1 && test_flag(spawned_ent->flags, 18))
         {
@@ -1491,12 +1549,15 @@ void force_lights()
 
 void set_camera_bounds(bool enabled)
 {
-    if (enabled)
+    enable_camera_bounds = enabled;
+    if (enabled && g_state->theme != 10)
     {
         g_state->camera->bounds_left = 0.5f;
         g_state->camera->bounds_right = g_state->w * 10.0f + 4.5f;
         g_state->camera->bounds_top = 124.5f;
         g_state->camera->bounds_bottom = 120.5f - g_state->h * 8.0f;
+        if (g_state->logic && g_state->logic->black_market) // if this pointer exists, so does an undiscovered black market, I hope
+            g_state->camera->bounds_bottom += 32.0f;
     }
     else
     {
@@ -1509,6 +1570,8 @@ void set_camera_bounds(bool enabled)
 
 void force_zoom()
 {
+    if (g_state->screen == 12 && !enable_camera_bounds)
+        set_camera_bounds(enable_camera_bounds);
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
         set_zoom();
@@ -1640,7 +1703,7 @@ void force_cheats()
 
 void force_kits()
 {
-    if (g_state->screen == 12 && g_state->time_total == 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
+    if (g_state->screen == 12 && g_state->time_total <= 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
     {
         for (auto kit : kits)
         {
@@ -2325,6 +2388,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["draw_grid"] = !options["draw_grid"];
     }
+    else if (pressed("toggle_path", wParam))
+    {
+        options["draw_path"] = !options["draw_path"];
+    }
     else if (pressed("toggle_mouse", wParam))
     {
         options["mouse_control"] = !options["mouse_control"];
@@ -2385,81 +2452,67 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
         UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
     }
-    else if (pressed("teleport_left", wParam))
-    {
-        UI::teleport(-3, 0, false, 0, 0, options["snap_to_grid"]);
-    }
-    else if (pressed("teleport_right", wParam))
-    {
-        UI::teleport(3, 0, false, 0, 0, options["snap_to_grid"]);
-    }
-    else if (pressed("teleport_up", wParam))
-    {
-        UI::teleport(0, 3, false, 0, 0, options["snap_to_grid"]);
-    }
-    else if (pressed("teleport_down", wParam))
-    {
-        UI::teleport(0, -3, false, 0, 0, options["snap_to_grid"]);
-    }
     else if (pressed("spawn_layer_door", wParam))
     {
         UI::spawn_backdoor(0.0, 0.0);
     }
-    else if (pressed("teleport", wParam))
-    {
-        UI::teleport(g_x, g_y, false, 0, 0, options["snap_to_grid"]);
-    }
     else if (pressed("camera_left", wParam))
     {
-        enable_camera_bounds = false;
-        set_camera_bounds(enable_camera_bounds);
         g_state->camera->focused_entity_uid = -1;
-        g_state->camera->focus_x -= 0.5f;
+        if (enable_camera_bounds)
+        {
+            g_state->camera->focus_x = g_state->camera->adjusted_focus_x;
+            g_state->camera->focus_y = g_state->camera->adjusted_focus_y;
+        }
+        set_camera_bounds(false);
+        g_state->camera->focus_x -= g_camera_speed;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
     }
     else if (pressed("camera_right", wParam))
     {
-        enable_camera_bounds = false;
-        set_camera_bounds(enable_camera_bounds);
         g_state->camera->focused_entity_uid = -1;
-        g_state->camera->focus_x += 0.5f;
+        if (enable_camera_bounds)
+        {
+            g_state->camera->focus_x = g_state->camera->adjusted_focus_x;
+            g_state->camera->focus_y = g_state->camera->adjusted_focus_y;
+        }
+        set_camera_bounds(false);
+        g_state->camera->focus_x += g_camera_speed;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
     }
     else if (pressed("camera_up", wParam))
     {
-        enable_camera_bounds = false;
-        set_camera_bounds(enable_camera_bounds);
         g_state->camera->focused_entity_uid = -1;
-        g_state->camera->focus_y += 0.5f;
+        if (enable_camera_bounds)
+        {
+            g_state->camera->focus_x = g_state->camera->adjusted_focus_x;
+            g_state->camera->focus_y = g_state->camera->adjusted_focus_y;
+        }
+        set_camera_bounds(false);
+        g_state->camera->focus_y += g_camera_speed;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
     }
     else if (pressed("camera_down", wParam))
     {
-        enable_camera_bounds = false;
-        set_camera_bounds(enable_camera_bounds);
         g_state->camera->focused_entity_uid = -1;
-        g_state->camera->focus_y -= 0.5f;
+        if (enable_camera_bounds)
+        {
+            g_state->camera->focus_x = g_state->camera->adjusted_focus_x;
+            g_state->camera->focus_y = g_state->camera->adjusted_focus_y;
+        }
+        set_camera_bounds(false);
+        g_state->camera->focus_y -= g_camera_speed;
         if (g_state->pause != 0 || !options["smooth_camera"])
             g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
     }
-    else if (pressed("coordinate_left", wParam))
+    else if (pressed("camera_reset", wParam))
     {
-        g_x -= 1;
-    }
-    else if (pressed("coordinate_right", wParam))
-    {
-        g_x += 1;
-    }
-    else if (pressed("coordinate_up", wParam))
-    {
-        g_y += 1;
-    }
-    else if (pressed("coordinate_down", wParam))
-    {
-        g_y -= 1;
+        set_camera_bounds(true);
+        if (g_players.size() > 0)
+            g_state->camera->focused_entity_uid = g_players.at(0)->uid;
     }
     else if (pressed("spawn_entity", wParam))
     {
@@ -2731,13 +2784,17 @@ void update_filter(std::string s)
     scroll_top = true;
 }
 
-void tooltip(const char* tip)
+void tooltip(const char* tip, bool force = false)
 {
-    if (!options["show_tooltips"])
+    if (!options["show_tooltips"] && !force)
         return;
-    if (ImGui::IsItemHovered())
+    if (ImGui::IsItemHovered() || force)
     {
+        ImGuiContext& g = *GImGui;
+        if (options["hd_cursor"])
+            g.Style.MouseCursorScale = 1.5f;
         ImGui::SetTooltip("%s", tip);
+        g.Style.MouseCursorScale = 1.0f;
     }
 }
 
@@ -2747,6 +2804,9 @@ void tooltip(const char* tip, const char* key)
         return;
     if (ImGui::IsItemHovered())
     {
+        ImGuiContext& g = *GImGui;
+        if (options["hd_cursor"])
+            g.Style.MouseCursorScale = 1.5f;
         if (key && keys[key])
         {
             ImGui::SetTooltip("(%s) %s", key_string(keys[key]).c_str(), tip);
@@ -2755,6 +2815,7 @@ void tooltip(const char* tip, const char* key)
         {
             ImGui::SetTooltip("%s", tip);
         }
+        g.Style.MouseCursorScale = 1.0f;
     }
 }
 
@@ -2787,12 +2848,12 @@ void endmenu()
         ImGui::EndMenu();
 }
 
-void render_uid(int uid, const char* section, bool rembtn = false)
+bool render_uid(int uid, const char* section, bool rembtn = false)
 {
     std::string uidc = std::to_string(uid);
     auto ptype = UI::get_entity_type(uid);
     if (ptype == 0 || ptype == UINT32_MAX)
-        return;
+        return false;
     std::string typec = std::to_string(ptype);
     std::string pname = entity_names[ptype];
     ImGui::PushID(section);
@@ -2814,6 +2875,7 @@ void render_uid(int uid, const char* section, bool rembtn = false)
         ImGui::PopID();
     }
     ImGui::PopID();
+    return true;
 }
 
 void render_light(const char* name, LightParams* light)
@@ -3408,26 +3470,32 @@ void render_camera()
         set_zoom();
     }
     tooltip("Automatically fit level width to screen.", "zoom_auto");
-    render_uid(g_state->camera->focused_entity_uid, "FocusedEntity");
+    ImGui::Text("Focus:");
     ImGui::SameLine();
-    if (ImGui::Button("!X"))
-        g_state->camera->focused_entity_uid = -1;
-    tooltip("Remove camera focus.");
-    ImGui::SameLine();
-    if (ImGui::Button("Focus player"))
+    if (render_uid(g_state->camera->focused_entity_uid, "FocusedEntity"))
     {
-        if (!g_players.empty())
+        ImGui::SameLine();
+        if (ImGui::Button("Unfocus"))
+            g_state->camera->focused_entity_uid = -1;
+        tooltip("Remove camera focus. Drag to move the camera around.", "mouse_camera_drag");
+    }
+    if (!g_players.empty())
+    {
+        if (g_state->camera->focused_entity_uid != g_players.at(0)->uid)
         {
-            g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+            ImGui::SameLine();
+            if (ImGui::Button("Player"))
+                g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+            tooltip("Focus the player.", "camera_reset");
         }
     }
-    tooltip("Doubleclick to return camera to player. Hold to drag camera around.", "mouse_camera_drag");
-    ImGui::SameLine();
-    if (ImGui::Button("Focus Selected"))
+    if (g_last_id != -1 && g_state->camera->focused_entity_uid != g_last_id)
     {
-        g_state->camera->focused_entity_uid = g_last_id;
+        ImGui::SameLine();
+        if (ImGui::Button("Selected"))
+            g_state->camera->focused_entity_uid = g_last_id;
+        tooltip("Focus the selected entity");
     }
-    tooltip("Click to focus other entities. Hold to move camera around.", "mouse_camera_drag");
     ImGui::InputFloat("Camera Focus X##CameraFocusX", &g_state->camera->focus_x, 0.2f, 1.0f);
     ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2f, 1.0f);
     ImGui::InputFloat("Camera Real X##CameraRealX", &g_state->camera->adjusted_focus_x, 0.2f, 1.0f);
@@ -3442,7 +3510,7 @@ void render_camera()
         {
             set_camera_bounds(enable_camera_bounds);
         }
-        tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.");
+        tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.", "camera_reset");
         if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
         {
             UI::set_camp_camera_bounds_enabled(enable_camp_camera);
@@ -3622,6 +3690,170 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
             }
         }
     }
+}
+
+bool is_entrance_room(unsigned int x, unsigned int y)
+{
+    static const uint16_t rooms[] = {5, 6};
+    auto room_temp = UI::get_room_template(x, y, 0);
+    if (room_temp.has_value())
+    {
+        return std::find(std::begin(rooms), std::end(rooms), room_temp.value()) != std::end(rooms);
+    }
+    return false;
+}
+
+bool is_exit_room(unsigned int x, unsigned int y)
+{
+    static const uint16_t rooms[] = {7, 8, 129};
+    auto room_temp = UI::get_room_template(x, y, 0);
+    if (room_temp.has_value())
+    {
+        return std::find(std::begin(rooms), std::end(rooms), room_temp.value()) != std::end(rooms);
+    }
+    return false;
+}
+
+bool is_path_room(unsigned int x, unsigned int y)
+{
+    static const uint16_t rooms[] = {1, 2, 3, 4, 5, 6, 7, 8, 47, 48, 53, 102, 107, 109, 129, 130, 131};
+    auto room_temp = UI::get_room_template(x, y, 0);
+    if (room_temp.has_value())
+    {
+        return std::find(std::begin(rooms), std::end(rooms), room_temp.value()) != std::end(rooms);
+    }
+    return false;
+}
+
+bool is_lake_room(unsigned int x, unsigned int y)
+{
+    static const uint16_t rooms[] = {129, 130, 131};
+    auto room_temp = UI::get_room_template(x, y, 0);
+    if (room_temp.has_value())
+    {
+        return std::find(std::begin(rooms), std::end(rooms), room_temp.value()) != std::end(rooms);
+    }
+    return false;
+}
+
+std::optional<std::pair<unsigned int, unsigned int>> get_entrance()
+{
+    for (unsigned int x = 0; x < g_state->w; ++x)
+    {
+        for (unsigned int y = 0; y < g_state->h; ++y)
+        {
+            if (is_entrance_room(x, y))
+                return {{x, y}};
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<std::pair<unsigned int, unsigned int>> get_exit()
+{
+    for (unsigned int x = 0; x < g_state->w; ++x)
+    {
+        for (unsigned int y = 0; y < g_state->h; ++y)
+        {
+            if (is_exit_room(x, y))
+                return {{x, y}};
+        }
+    }
+    return std::nullopt;
+}
+
+bool is_visited(unsigned int x, unsigned int y, std::vector<std::pair<unsigned int, unsigned int>>& path)
+{
+    for (auto [vx, vy] : path)
+    {
+        if (x == vx && y == vy)
+            return true;
+    }
+    return false;
+}
+
+bool get_next_room(unsigned int& x, unsigned int& y, int dy, std::vector<std::pair<unsigned int, unsigned int>>& path)
+{
+    auto exit = get_exit();
+    auto dx = -1;
+    if (exit.has_value())
+    {
+        auto [ex, ey] = exit.value();
+        if (ex > x)
+            dx = 1;
+    }
+    if (g_state->theme == 16 && y == 9 && !is_visited(x, y + dy, path) && is_path_room(x, y + dy) && !is_path_room(2, y))
+    {
+        y += dy;
+        return true;
+    }
+    if (!is_visited(x + dx, y, path) && is_path_room(x + dx, y))
+    {
+        x += dx;
+        return true;
+    }
+    dx *= -1;
+    if (!is_visited(x + dx, y, path) && is_path_room(x + dx, y))
+    {
+        x += dx;
+        return true;
+    }
+    if (!is_visited(x, y + dy, path) && is_path_room(x, y + dy))
+    {
+        y += dy;
+        return true;
+    }
+    return false;
+}
+
+void render_path()
+{
+    if (g_state == 0 || g_state->screen != 12 || g_state->theme == 10)
+        return;
+    auto* draw_list = ImGui::GetWindowDrawList();
+    std::vector<std::pair<unsigned int, unsigned int>> path;
+    int dy = 1;
+    if (g_state->theme == 9 || g_state->theme == 16)
+        dy = -1;
+    auto room = get_entrance();
+    if (!room.has_value())
+        return;
+    auto [x, y] = room.value();
+    path.push_back({x, y});
+    while (get_next_room(x, y, dy, path))
+    {
+        path.push_back({x, y});
+        if (is_exit_room(x, y))
+            break;
+    }
+    if (path.size() < 2)
+        return;
+
+    std::vector<ImVec2> points;
+    for (auto [px, py] : path)
+    {
+        auto room_pos = UI::get_room_pos(px, py);
+        auto pos = UI::screen_position(room_pos.first + 5.0f, room_pos.second - 4.0f);
+        ImVec2 spos = screenify({pos.first, pos.second});
+        points.push_back(spos);
+    }
+
+    std::vector<ImVec2> midpoints;
+    for (size_t i = 1; i < points.size(); ++i)
+    {
+        midpoints.push_back({(points.at(i).x + points.at(i - 1).x) / 2.0f, (points.at(i).y + points.at(i - 1).y) / 2.0f});
+    }
+
+    auto color = ImColor(0.0f, 1.0f, 0.0f, 0.2f);
+    draw_list->PathClear();
+    draw_list->PathLineTo(fix_pos(points.at(0)));
+    for (size_t i = 0; i < midpoints.size(); ++i)
+    {
+        draw_list->PathBezierQuadraticCurveTo(fix_pos(points.at(i)), fix_pos(midpoints.at(i)));
+    }
+    draw_list->PathLineTo(fix_pos(points.at(points.size() - 1)));
+    auto thick = screenify(UI::screen_distance(2.0f));
+    draw_list->PathStroke(color, 0, thick);
 }
 
 void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
@@ -3858,9 +4090,7 @@ void render_messages()
     ImGui::Begin(
         "Messages",
         NULL,
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
+        ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
 
     if (ImGui::IsWindowHovered())
         io.WantCaptureMouse = options["mouse_control"];
@@ -3925,6 +4155,7 @@ void render_clickhandler()
     {
         if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
         {
+            zooming = true;
             if (g_zoom == 0.0f)
                 g_zoom = UI::get_zoom_level();
             g_zoom += g_zoom / 13.5f;
@@ -3932,16 +4163,17 @@ void render_clickhandler()
         }
         else if (clicked("mouse_zoom_in") || (held("mouse_camera_drag") && io.MouseWheel > 0))
         {
+            zooming = true;
             if (g_zoom == 0.0f)
                 g_zoom = UI::get_zoom_level();
             g_zoom -= g_zoom / 13.5f;
             set_zoom();
         }
     }
+    if (options["draw_path"])
+        render_path();
     if (options["draw_grid"])
-    {
         render_grid();
-    }
     if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
@@ -4023,13 +4255,7 @@ void render_clickhandler()
         {
             ImVec2 mpos = normalize(mouse_pos());
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
-            // std::pair<float, float> campos = get_camera_position();
-            ImDrawList* dl = ImGui::GetBackgroundDrawList();
-            std::string buf = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
-            // char buf2[32];
-            // sprintf(buf2, "Camera: %0.2f, %0.2f", campos.first, campos.second);
-            dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf.c_str());
-            // dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf2);
+            std::string coords = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
             unsigned int mask = safe_entity_mask;
             if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier from mouse_destroy_unsafe
             {
@@ -4039,9 +4265,11 @@ void render_clickhandler()
             if (hovered != nullptr)
             {
                 render_hitbox(hovered, true, ImColor(50, 50, 255, 200));
-                std::string buf3 = fmt::format("{}, {}", hovered->uid, entity_names[hovered->type->id]);
-                dl->AddText(ImVec2(io.MousePos.x + 16, io.MousePos.y + 16), ImColor(1.0f, 1.0f, 1.0f, 1.0f), buf3.c_str());
+                coords += fmt::format("\n{}, {}", hovered->uid, entity_names[hovered->type->id]);
             }
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
+            tooltip(coords.c_str(), true);
+            ImGui::PopStyleVar(ImGuiStyleVar_WindowPadding);
         }
     }
 
@@ -4098,7 +4326,7 @@ void render_clickhandler()
         dl->AddText(
             hugefont,
             144.0,
-            ImVec2(io.DisplaySize.x / 2 - warningsize.x / 2, io.DisplaySize.y / 2 - warningsize.y / 2),
+            fix_pos(ImVec2(io.DisplaySize.x / 2 - warningsize.x / 2, io.DisplaySize.y / 2 - warningsize.y / 2)),
             ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             warningtext);
         const char* subtext = "Probably... Some things might, but don't just expect a random script to work.";
@@ -4106,7 +4334,7 @@ void render_clickhandler()
         dl->AddText(
             font,
             18.0,
-            ImVec2(io.DisplaySize.x / 2 - subsize.x / 2, io.DisplaySize.y / 2 + warningsize.y / 2 + 20),
+            fix_pos(ImVec2(io.DisplaySize.x / 2 - subsize.x / 2, io.DisplaySize.y / 2 + warningsize.y / 2 + 20)),
             ImColor(1.0f, 1.0f, 1.0f, 0.4f),
             subtext);
     }
@@ -4256,22 +4484,9 @@ void render_clickhandler()
         }
         else if (dblclicked("mouse_grab") || dblclicked("mouse_grab_unsafe"))
         {
-            startpos = mouse_pos();
-            set_pos(startpos);
-            unsigned int mask = safe_entity_mask;
-            if (held("mouse_grab_unsafe"))
-            {
-                mask = unsafe_entity_mask;
-            }
-            g_held_entity = UI::get_entity_at(g_x, g_y, true, 2, mask);
-            if (g_held_entity)
-            {
-                g_held_id = g_held_entity->uid;
-                g_held_flags = g_held_entity->flags;
-                g_last_type = g_held_entity->type->id;
-            }
+            g_selected_ids.clear();
             if (!lock_entity)
-                g_last_id = g_held_id;
+                g_last_id = -1;
             g_current_item = 0;
             update_filter("");
         }
@@ -4401,22 +4616,16 @@ void render_clickhandler()
 
         else if (dblclicked("mouse_camera_drag"))
         {
-            if (!g_players.empty())
-            {
+            set_camera_bounds(true);
+            if (g_players.size() > 0)
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
-            }
-            enable_camera_bounds = true;
-            set_camera_bounds(enable_camera_bounds);
         }
 
-        else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.5f)
+        else if (held("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 10.0f && held_duration("mouse_camera_drag") > 0.8f && !zooming)
         {
-            if (!g_players.empty())
-            {
+            set_camera_bounds(true);
+            if (g_players.size() > 0)
                 g_state->camera->focused_entity_uid = g_players.at(0)->uid;
-            }
-            enable_camera_bounds = true;
-            set_camera_bounds(enable_camera_bounds);
         }
 
         else if (released("mouse_camera_drag") && !dblclicked("mouse_camera_drag") && drag_delta("mouse_camera_drag") < 3.0f && held_duration_last("mouse_camera_drag") < 0.2f)
@@ -4432,6 +4641,7 @@ void render_clickhandler()
 
         else if (clicked("mouse_camera_drag"))
         {
+            zooming = false;
             if (ImGui::IsMousePosValid())
             {
                 startpos = normalize(mouse_pos());
@@ -4541,6 +4751,7 @@ void render_style_editor()
     {
         if (ImGui::MenuItem("Randomize"))
         {
+            options["inverted"] = (float)rand() / RAND_MAX < 0.5f;
             g_hue = (float)rand() / RAND_MAX;
             g_sat = (float)rand() / RAND_MAX;
             g_val = (float)rand() / RAND_MAX;
@@ -4555,6 +4766,8 @@ void render_style_editor()
     ImGui::DragFloat("Medium print##FontMedium", &fontsize[1], 0.1f, 16.0f, 48.0f);
     ImGui::DragFloat("Large print##FontLarge", &fontsize[2], 0.1f, 24.0f, 96.0f);
     ImGui::Separator();
+    ImGui::Checkbox("Inverted (black on light colors)##StyleInvert", &options["inverted"]);
+    ImGui::Checkbox("Borders##StyleBorder", &options["borders"]);
     ImGui::DragFloat("Hue##StyleHue", &g_hue, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Saturation##StyleSaturation", &g_sat, 0.01f, 0.0f, 1.0f);
     ImGui::DragFloat("Lightness##StyleLightness", &g_val, 0.01f, 0.0f, 1.0f);
@@ -4564,6 +4777,7 @@ void render_style_editor()
     {
         if (ImGui::Button("Randomize##StyleRandomize"))
         {
+            options["inverted"] = (float)rand() / RAND_MAX < 0.5f;
             g_hue = (float)rand() / RAND_MAX;
             g_sat = (float)rand() / RAND_MAX;
             g_val = (float)rand() / RAND_MAX;
@@ -4587,10 +4801,15 @@ void render_style_editor()
 void render_keyconfig()
 {
     ImGui::PushID("keyconfig");
+    if (ImGui::Button("Reset all keys to defaults##ResetKeys"))
+    {
+        keys = default_keys;
+        save_config(cfgfile);
+    }
     ImGui::BeginTable("##keyconfig", 4);
     ImGui::TableSetupColumn("Tool");
     ImGui::TableSetupColumn("Keys");
-    ImGui::TableSetupColumn("Keycode");
+    ImGui::TableSetupColumn("Hex keycode");
     ImGui::TableSetupColumn("");
     ImGui::TableHeadersRow();
     for (const auto& kv : keys)
@@ -4602,16 +4821,24 @@ void render_keyconfig()
         ImGui::TableNextColumn();
         ImGui::Text("%s", key_string(keys[kv.first]).c_str());
         ImGui::TableNextColumn();
-        ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "0x%X", ImGuiInputTextFlags_CharsHexadecimal);
+        ImGui::InputScalar("##keycode", ImGuiDataType_S64, &keys[kv.first], 0, 0, "%X", ImGuiInputTextFlags_CharsHexadecimal);
         ImGui::TableNextColumn();
-        if (ImGui::Button("Capture"))
+        if (ImGui::Button("Set"))
         {
             g_change_key = kv.first;
+            save_config(cfgfile);
         }
         ImGui::SameLine();
-        if (ImGui::Button("Disable"))
+        if (ImGui::Button("Unset"))
         {
             keys[kv.first] = 0;
+            save_config(cfgfile);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Reset"))
+        {
+            keys[kv.first] = default_keys[kv.first];
+            save_config(cfgfile);
         }
         ImGui::PopID();
     }
@@ -4699,16 +4926,6 @@ void render_options()
     {
         if (ImGui::MenuItem("Switch to windowed UI", key_string(keys["switch_ui"]).c_str()))
             options["menu_ui"] = false;
-        if (ImGui::BeginMenu("Style"))
-        {
-            render_style_editor();
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Keys"))
-        {
-            render_keyconfig();
-            ImGui::EndMenu();
-        }
     }
     if (submenu("Game cheats"))
     {
@@ -4785,6 +5002,8 @@ void render_options()
 
     if (submenu("User interface"))
     {
+        ImGui::Checkbox("HD cursor", &options["hd_cursor"]);
+        tooltip("Enable the Spelunky HD cursor :)");
         ImGui::Checkbox("Mouse controls##clickevents", &options["mouse_control"]);
         tooltip("Enables to spawn entities, teleport and pick entities with mouse.\nDisable for scripts that require mouse clicking.", "toggle_mouse");
         ImGui::Checkbox("Keyboard controls##keyevents", &options["keyboard_control"]);
@@ -4804,6 +5023,8 @@ void render_options()
         tooltip("Faster camera movement when dragging.");
         ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
         tooltip("Show outlines of tiles and rooms, with roomtypes.", "toggle_grid");
+        ImGui::Checkbox("Draw path##DrawTileGrid", &options["draw_path"]);
+        tooltip("Show path rooms.", "toggle_path");
         ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
         tooltip("Show enabled cheats and random\ninteresting state variables on screen.", "toggle_hud");
         if (ImGui::Checkbox("Drag windows outside the game window", &options["multi_viewports"]))
@@ -4859,6 +5080,17 @@ void render_options()
         endmenu();
     }
 
+    if (submenu("Window style"))
+    {
+        render_style_editor();
+        endmenu();
+    }
+    if (submenu("Shortcut keys"))
+    {
+        render_keyconfig();
+        endmenu();
+    }
+
     if (options["menu_ui"])
     {
         if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
@@ -4868,17 +5100,6 @@ void render_options()
         return;
     }
 
-    if (ImGui::Button("Edit style"))
-    {
-        toggle("tool_style");
-    }
-    tooltip("Edit the colors and fonts of Overlunky windows,\nor adjust the global scale if things are looking too big for you.", "tool_style");
-    ImGui::SameLine();
-    if (ImGui::Button("Edit keys"))
-    {
-        toggle("tool_keys");
-    }
-    tooltip("Edit the hotkeys for all the tools.", "tool_keys");
     if (ImGui::Button("Save options"))
     {
         ImGui::SaveIniSettingsToDisk(inifile);
@@ -5623,20 +5844,7 @@ void render_entity_finder()
         search_entity_layer = -1;
 
     static int search_entity_depth[2] = {0, 52};
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.25f);
-    if (ImGui::SliderInt("##EntitySearchDepthMin", &search_entity_depth[0], 0, 52, "%d", ImGuiSliderFlags_AlwaysClamp))
-    {
-        if (search_entity_depth[1] < search_entity_depth[0])
-            search_entity_depth[1] = search_entity_depth[0];
-    }
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.25f);
-    if (ImGui::SliderInt("Draw depth##EntitySearchDepthMax", &search_entity_depth[1], 0, 52, "%d", ImGuiSliderFlags_AlwaysClamp))
-    {
-        if (search_entity_depth[0] > search_entity_depth[1])
-            search_entity_depth[0] = search_entity_depth[1];
-    }
-    ImGui::PopItemWidth();
-    // ImGui::DragIntRange2("Draw depth##EntitySearchDepth", &search_entity_depth[0], &search_entity_depth[1], 1.0f, 0, 52);
+    ImGui::SliderInt2("Draw depth##EntitySearchDepth", search_entity_depth, 0, 52, "%d", ImGuiSliderFlags_AlwaysClamp);
 
     static int search_entity_mask = 0;
     if (submenu("Mask##EntitySearchMask"))
@@ -7049,6 +7257,7 @@ void imgui_init(ImGuiContext*)
     show_cursor();
     load_config(cfgfile);
     load_font();
+    load_cursor();
     refresh_script_files();
     autorun_scripts();
     set_colors();
@@ -7138,12 +7347,6 @@ void imgui_draw()
                     {
                         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
                         active_tab = tab;
-                        if (ImGui::BeginDragDropSource())
-                        {
-                            ImGui::SetDragDropPayload("TAB", NULL, 0);
-                            ImGui::Text("Drag outside the menu\nto detach %s", windows[tab]->name.c_str());
-                            ImGui::EndDragDropSource();
-                        }
                         ImGui::GetIO().WantCaptureKeyboard = true;
                         render_tool(tab);
                         ImGui::PopStyleVar();
@@ -7152,6 +7355,8 @@ void imgui_draw()
                         else
                             ImGui::EndPopup();
                     }
+                    if (ImGui::GetIO().MouseClicked[1] && mouse_pos().y < ImGui::GetTextLineHeight() && ImGui::IsItemHovered())
+                        detach(tab);
                 }
                 ImGui::EndMainMenuBar();
             }
@@ -7317,6 +7522,9 @@ void imgui_draw()
         else
             ++it;
     }
+
+    if (options["hd_cursor"])
+        render_cursor();
 }
 
 void check_focus()

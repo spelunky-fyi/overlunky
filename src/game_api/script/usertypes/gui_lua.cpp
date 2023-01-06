@@ -1,25 +1,27 @@
 #include "gui_lua.hpp"
 
-#include <Windows.h>     // for GetProcAddress, DWORD, LoadLibraryA
-#include <algorithm>     // for max
-#include <chrono>        // for system_clock
-#include <cmath>         // for isnan, floor
-#include <cstddef>       // for NULL
-#include <deque>         // for deque
-#include <exception>     // for exception
-#include <filesystem>    // for operator/, path
-#include <fmt/format.h>  // for check_format_string, format, vformat
-#include <imgui.h>       // for ImVec2, ImGuiIO, ImDrawList, GetIO
-#include <map>           // for map
-#include <new>           // for operator new
-#include <sol/sol.hpp>   // for proxy_key_t, data_t, state, property
-#include <tuple>         // for get, tuple, make_tuple
-#include <type_traits>   // for move, declval, reference_wrapper, ref
-#include <unordered_set> // for unordered_set
-#include <utility>       // for max, min, pair, get, make_pair
-#include <xinput.h>      // for XINPUT_STATE, XINPUT_CAPABILITIES
+#include <Windows.h>        // for GetProcAddress, DWORD, LoadLibraryA
+#include <algorithm>        // for max
+#include <chrono>           // for system_clock
+#include <cmath>            // for isnan, floor
+#include <cstddef>          // for NULL
+#include <deque>            // for deque
+#include <exception>        // for exception
+#include <filesystem>       // for operator/, path
+#include <fmt/format.h>     // for check_format_string, format, vformat
+#include <imgui.h>          // for ImVec2, ImGuiIO, ImDrawList, GetIO
+#include <imgui_internal.h> // for GImGui
+#include <map>              // for map
+#include <new>              // for operator new
+#include <sol/sol.hpp>      // for proxy_key_t, data_t, state, property
+#include <tuple>            // for get, tuple, make_tuple
+#include <type_traits>      // for move, declval, reference_wrapper, ref
+#include <unordered_set>    // for unordered_set
+#include <utility>          // for max, min, pair, get, make_pair
+#include <xinput.h>         // for XINPUT_STATE, XINPUT_CAPABILITIES
 
 #include "file_api.hpp"                   // for create_d3d11_texture_from_file
+#include "math.hpp"                       // for Vec2
 #include "script.hpp"                     // for ScriptMessage, ScriptImage
 #include "script/handle_lua_function.hpp" // for handle_function
 #include "script/lua_backend.hpp"         // for LuaBackend
@@ -33,6 +35,9 @@ static bool g_WantUpdateHasGamepad = false;
 static HMODULE g_XInputDLL = NULL;
 static PFN_XInputGetCapabilities g_XInputGetCapabilities = NULL;
 static PFN_XInputGetState g_XInputGetState = NULL;
+
+Vec2::Vec2(const ImVec2& p)
+    : x(p.x), y(p.y){};
 
 struct Gamepad : XINPUT_GAMEPAD
 {
@@ -59,7 +64,7 @@ Gamepad get_gamepad(unsigned int index = 1)
     return Gamepad{{0}};
 }
 
-const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
+[[maybe_unused]] const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
 
 [[maybe_unused]] static inline ImVec2 operator+(const ImVec2& lhs, const ImVec2& rhs)
 {
@@ -72,7 +77,7 @@ const ImVec4 error_color{1.0f, 0.2f, 0.2f, 1.0f};
 }
 
 GuiDrawContext::GuiDrawContext(LuaBackend* _backend)
-    : backend(_backend)
+    : backend(_backend), g(*GImGui)
 {
 }
 
@@ -80,7 +85,14 @@ void GuiDrawContext::draw_line(float x1, float y1, float x2, float y2, float thi
 {
     ImVec2 a = screenify_fix({x1, y1});
     ImVec2 b = screenify_fix({x2, y2});
-    backend->draw_list->AddLine(a, b, color, thickness);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddLine(a, b, color, thickness);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddLine(a, b, color, thickness);
 };
 void GuiDrawContext::draw_rect(float left, float top, float right, float bottom, float thickness, float rounding, uColor color)
 {
@@ -94,7 +106,14 @@ void GuiDrawContext::draw_rect(float left, float top, float right, float bottom,
     }
     ImVec2 a = screenify_fix({left, top});
     ImVec2 b = screenify_fix({right, bottom});
-    backend->draw_list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddRect(a, b, color, rounding, ImDrawCornerFlags_All, thickness);
 };
 void GuiDrawContext::draw_rect(AABB rect, float thickness, float rounding, uColor color)
 {
@@ -102,6 +121,7 @@ void GuiDrawContext::draw_rect(AABB rect, float thickness, float rounding, uColo
 }
 void GuiDrawContext::draw_rect_filled(float left, float top, float right, float bottom, float rounding, uColor color)
 {
+    // check for nan in the vectors because this will cause a crash in ImGui
     if (isnan(left) || isnan(top) || isnan(right) || isnan(bottom))
     {
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
@@ -111,8 +131,14 @@ void GuiDrawContext::draw_rect_filled(float left, float top, float right, float 
     }
     ImVec2 a = screenify_fix({left, top});
     ImVec2 b = screenify_fix({right, bottom});
-    // check for nan in the vectors because this will cause a crash in ImGui
-    backend->draw_list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddRectFilled(a, b, color, rounding, ImDrawCornerFlags_All);
 };
 void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
 {
@@ -120,23 +146,45 @@ void GuiDrawContext::draw_rect_filled(AABB rect, float rounding, uColor color)
 }
 void GuiDrawContext::draw_poly(std::vector<Vec2> points, float thickness, uColor color)
 {
-    backend->draw_list->PathClear();
-    for (auto point : points)
+    auto draw = [&](ImDrawList* dl)
     {
-        ImVec2 a = screenify_fix({point.x, point.y});
-        backend->draw_list->PathLineToMergeDuplicate(a);
+        dl->PathClear();
+        for (auto point : points)
+        {
+            ImVec2 a = screenify_fix({point.x, point.y});
+            dl->PathLineToMergeDuplicate(a);
+        }
+        dl->PathStroke(color, 0, thickness);
+    };
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            draw(ImGui::GetForegroundDrawList(vp));
+        return;
     }
-    backend->draw_list->PathStroke(color, 0, thickness);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    draw(list);
 }
 void GuiDrawContext::draw_poly_filled(std::vector<Vec2> points, uColor color)
 {
-    backend->draw_list->PathClear();
-    for (auto point : points)
+    auto draw = [&](ImDrawList* dl)
     {
-        ImVec2 a = screenify_fix({point.x, point.y});
-        backend->draw_list->PathLineToMergeDuplicate(a);
+        dl->PathClear();
+        for (auto point : points)
+        {
+            ImVec2 a = screenify_fix({point.x, point.y});
+            dl->PathLineToMergeDuplicate(a);
+        }
+        dl->PathFillConvex(color);
+    };
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            draw(ImGui::GetForegroundDrawList(vp));
+        return;
     }
-    backend->draw_list->PathFillConvex(color);
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    draw(list);
 }
 void GuiDrawContext::draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float thickness, uColor color)
 {
@@ -144,28 +192,56 @@ void GuiDrawContext::draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
     ImVec2 d = screenify_fix({p4.x, p4.y});
-    backend->draw_list->AddBezierCubic(a, b, c, d, color, thickness);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddBezierCubic(a, b, c, d, color, thickness);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddBezierCubic(a, b, c, d, color, thickness);
 }
 void GuiDrawContext::draw_bezier_quadratic(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
 {
     ImVec2 a = screenify_fix({p1.x, p1.y});
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
-    backend->draw_list->AddBezierQuadratic(a, b, c, color, thickness);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddBezierQuadratic(a, b, c, color, thickness);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddBezierQuadratic(a, b, c, color, thickness);
 }
 void GuiDrawContext::draw_triangle(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)
 {
     ImVec2 a = screenify_fix({p1.x, p1.y});
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
-    backend->draw_list->AddTriangle(a, b, c, color, thickness);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddTriangle(a, b, c, color, thickness);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddTriangle(a, b, c, color, thickness);
 }
 void GuiDrawContext::draw_triangle_filled(Vec2 p1, Vec2 p2, Vec2 p3, uColor color)
 {
     ImVec2 a = screenify_fix({p1.x, p1.y});
     ImVec2 b = screenify_fix({p2.x, p2.y});
     ImVec2 c = screenify_fix({p3.x, p3.y});
-    backend->draw_list->AddTriangleFilled(a, b, c, color);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddTriangleFilled(a, b, c, color);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddTriangleFilled(a, b, c, color);
 }
 void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness, uColor color)
 {
@@ -179,13 +255,27 @@ void GuiDrawContext::draw_circle(float x, float y, float radius, float thickness
 #endif
         return;
     }
-    backend->draw_list->AddCircle(a, r, color, 0, thickness);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddCircle(a, r, color, 0, thickness);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddCircle(a, r, color, 0, thickness);
 };
 void GuiDrawContext::draw_circle_filled(float x, float y, float radius, uColor color)
 {
     ImVec2 a = screenify_fix({x, y});
     float r = screenify(radius);
-    backend->draw_list->AddCircleFilled(a, r, color, 0);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddCircleFilled(a, r, color, 0);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddCircleFilled(a, r, color, 0);
 };
 void GuiDrawContext::draw_text(float x, float y, float size, std::string text, uColor color)
 {
@@ -200,7 +290,14 @@ void GuiDrawContext::draw_text(float x, float y, float size, std::string text, u
             break;
         }
     }
-    backend->draw_list->AddText(font, size, a, color, text.c_str());
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddText(font, size, a, color, text.c_str());
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddText(font, size, a, color, text.c_str());
 };
 void GuiDrawContext::draw_image(IMAGE image, float left, float top, float right, float bottom, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)
 {
@@ -210,7 +307,14 @@ void GuiDrawContext::draw_image(IMAGE image, float left, float top, float right,
     ImVec2 b = screenify_fix({right, bottom});
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
-    backend->draw_list->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            ImGui::GetForegroundDrawList(vp)->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    list->AddImage(backend->images[image]->texture, a, b, uva, uvb, color);
 };
 void GuiDrawContext::draw_image(IMAGE image, AABB rect, AABB uv_rect, uColor color)
 {
@@ -225,7 +329,14 @@ void GuiDrawContext::draw_image_rotated(IMAGE image, float left, float top, floa
     ImVec2 uva = ImVec2(uvx1, uvy1);
     ImVec2 uvb = ImVec2(uvx2, uvy2);
     ImVec2 pivot = {screenify(px), screenify(py)};
-    AddImageRotated(backend->draw_list, backend->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
+    if (drawlist == DRAW_LAYER::FOREGROUND)
+    {
+        for (auto vp : g.Viewports)
+            AddImageRotated(ImGui::GetForegroundDrawList(vp), backend->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
+        return;
+    }
+    auto list = drawlist == DRAW_LAYER::WINDOW ? ImGui::GetWindowDrawList() : backend->draw_list;
+    AddImageRotated(list, backend->images[image]->texture, a, b, uva, uvb, color, angle, pivot);
 };
 void GuiDrawContext::draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py)
 {
@@ -258,7 +369,11 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     flag |= ImGuiWindowFlags_NoDocking;
     ImGui::Begin(title.c_str(), &win_open, flag);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() / 2);
-    handle_function<void>(backend, callback, this);
+    auto size = normalize(ImGui::GetWindowSize());
+    size.x += 1.0f;
+    size.y -= 1.0f;
+    size.y *= -1.0f;
+    handle_function<void>(backend, callback, this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size));
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
@@ -384,6 +499,10 @@ void GuiDrawContext::win_indent(float width)
     else if (width < 0)
         ImGui::Unindent(-width);
 }
+void GuiDrawContext::draw_layer(DRAW_LAYER layer)
+{
+    drawlist = layer;
+}
 
 namespace NGui
 {
@@ -435,6 +554,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["draw_text"] = &GuiDrawContext::draw_text;
     guidrawcontext_type["draw_image"] = draw_image;
     guidrawcontext_type["draw_image_rotated"] = draw_image_rotated;
+    guidrawcontext_type["draw_layer"] = &GuiDrawContext::draw_layer;
     guidrawcontext_type["window"] = &GuiDrawContext::window;
     guidrawcontext_type["win_text"] = &GuiDrawContext::win_text;
     guidrawcontext_type["win_separator"] = &GuiDrawContext::win_separator;
@@ -515,13 +635,6 @@ void register_usertypes(sol::state& lua)
         return std::make_pair(pos.x, pos.y);
     };
 
-    lua.new_usertype<ImVec2>(
-        "ImVec2",
-        "x",
-        &ImVec2::x,
-        "y",
-        &ImVec2::y);
-
     /// Used in ImGuiIO
     lua.new_usertype<Gamepad>(
         "Gamepad",
@@ -551,43 +664,44 @@ void register_usertypes(sol::state& lua)
     auto keydown = sol::overload(
         [](int keycode)
         {
-            return ImGui::IsKeyDown(keycode);
+            return ImGui::IsKeyDown((ImGuiKey)keycode);
         },
         [](char key)
         {
-            return ImGui::IsKeyDown((int)key);
+            return ImGui::IsKeyDown((ImGuiKey)(int)key);
         });
     auto keypressed = sol::overload(
         [](int keycode)
         {
-            return ImGui::IsKeyPressed(keycode, false);
+            return ImGui::IsKeyPressed((ImGuiKey)keycode, false);
         },
         [](int keycode, bool repeat)
         {
-            return ImGui::IsKeyPressed(keycode, repeat);
+            return ImGui::IsKeyPressed((ImGuiKey)keycode, repeat);
         },
         [](char key)
         {
-            return ImGui::IsKeyPressed((int)key, false);
+            return ImGui::IsKeyPressed((ImGuiKey)(int)key, false);
         },
         [](char key, bool repeat)
         {
-            return ImGui::IsKeyPressed((int)key, repeat);
+            return ImGui::IsKeyPressed((ImGuiKey)(int)key, repeat);
         });
     auto keyreleased = sol::overload(
         [](int keycode)
         {
-            return ImGui::IsKeyReleased(keycode);
+            return ImGui::IsKeyReleased((ImGuiKey)keycode);
         },
         [](char key)
         {
-            return ImGui::IsKeyReleased((int)key);
+            return ImGui::IsKeyReleased((ImGuiKey)(int)key);
         });
     /// Used in [get_io](#get_io)
     lua.new_usertype<ImGuiIO>(
         "ImGuiIO",
         "displaysize",
-        &ImGuiIO::DisplaySize,
+        sol::property([](ImGuiIO& io)
+                      { return Vec2(io.DisplaySize); }),
         "framerate",
         &ImGuiIO::Framerate,
         "wantkeyboard",
@@ -612,7 +726,8 @@ void register_usertypes(sol::state& lua)
         "wantmouse",
         &ImGuiIO::WantCaptureMouse,
         "mousepos",
-        &ImGuiIO::MousePos,
+        sol::property([](ImGuiIO& io)
+                      { return Vec2(io.MousePos); }),
         "mousedown",
         sol::property([](ImGuiIO& io)
                       { return std::ref(io.MouseDown) /**/; }),
@@ -627,14 +742,16 @@ void register_usertypes(sol::state& lua)
         "gamepad",
         sol::property([]() -> Gamepad
                       {
-                          g_WantUpdateHasGamepad = true;
-                          return get_gamepad(1) /**/; }),
+        g_WantUpdateHasGamepad = true;
+        return get_gamepad(1) /**/; }),
         "gamepads",
         [](unsigned int index)
         {
             g_WantUpdateHasGamepad = true;
             return get_gamepad(index) /**/;
-        });
+        },
+        "showcursor",
+        &ImGuiIO::MouseDrawCursor);
 
     /* ImGuiIO
     // keydown
@@ -665,6 +782,9 @@ void register_usertypes(sol::state& lua)
     /// - Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
     // lua["get_io"] = []() -> ImGuiIO
     lua["get_io"] = ImGui::GetIO;
+
+    lua.create_named_table("DRAW_LAYER", "BACKGROUND", DRAW_LAYER::BACKGROUND, "FOREGROUND", DRAW_LAYER::FOREGROUND, "WINDOW", DRAW_LAYER::WINDOW);
+
     /// Deprecated
     /// Use [GuiDrawContext](#GuiDrawContext)`.draw_line` instead
     lua["draw_line"] = [](float x1, float y1, float x2, float y2, float thickness, uColor color)

@@ -435,21 +435,7 @@ int main(int argc, char** argv)
 
     bool info_dump = GetCmdLineParam<bool>(cmd_line_parser, "info_dump", false);
     auto overlunky_path = get_dll_path(info_dump ? "\\info_dump.dll" : "\\Overlunky.dll");
-
-    std::string version(get_version());
-    INFO("Overlunky EXE version: {}", version);
-    if (fs::exists(overlunky_path))
-    {
-        std::string dllversion(get_dll_version(overlunky_path));
-        INFO("Overlunky DLL version: {}", dllversion);
-    }
-    else
-    {
-        INFO("Overlunky DLL version: MISSING");
-    }
-    if (GetCmdLineParam<bool>(cmd_line_parser, "version", false))
-        return 0;
-
+    bool version_info = GetCmdLineParam<bool>(cmd_line_parser, "version", false);
     bool help = GetCmdLineParam<bool>(cmd_line_parser, "help", false);
     if (help)
     {
@@ -468,6 +454,21 @@ int main(int argc, char** argv)
         return 0;
     }
 
+    std::string version(get_version());
+    INFO("Overlunky EXE version: {}", version);
+    if (version_info)
+    {
+        if (fs::exists(overlunky_path))
+        {
+            std::string dllversion(get_dll_version(overlunky_path));
+            INFO("Overlunky DLL version: {}", dllversion);
+        }
+        else
+        {
+            INFO("Overlunky DLL version: MISSING");
+        }
+        return 0;
+    }
     bool do_update = GetCmdLineParam<bool>(cmd_line_parser, "update", false);
     bool do_update_launcher = GetCmdLineParam<bool>(cmd_line_parser, "update_launcher", false);
 
@@ -479,14 +480,7 @@ int main(int argc, char** argv)
         bool updated = false;
         auto_update("https://github.com/spelunky-fyi/overlunky/releases/download/whip/Overlunky.dll", "Overlunky.dll", updated);
         if (updated)
-        {
-            if (fs::exists(overlunky_path))
-            {
-                std::string dllversion(get_dll_version(overlunky_path));
-                INFO("Overlunky DLL version: {}", dllversion);
-            }
             do_update_launcher = true;
-        }
     }
     else if (!do_update)
     {
@@ -501,6 +495,11 @@ int main(int argc, char** argv)
     if (!fs::exists(overlunky_path))
     {
         PANIC("DLL not found! {}", overlunky_path.string().data());
+    }
+    else
+    {
+        std::string dllversion(get_dll_version(overlunky_path));
+        INFO("Overlunky DLL version: {}", dllversion);
     }
 
     auto launch_game_default = GetCmdLineParam<bool>(cmd_line_parser, "launch_game", false);
@@ -529,7 +528,10 @@ int main(int argc, char** argv)
     if (fs::exists(exe))
     {
         if (launch(exe, overlunky_path, do_inject))
+        {
+            FreeConsole();
             return 0;
+        }
     }
     else
     {
@@ -538,5 +540,6 @@ int main(int argc, char** argv)
             launch(fs::canonical("../Spel2.exe"), overlunky_path, do_inject);
         }
     }
+    FreeConsole();
     return 0;
 }

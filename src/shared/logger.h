@@ -75,8 +75,14 @@ struct fmt::formatter<ByteStr>
 #define PANIC(format, ...)                              \
     do                                                  \
     {                                                   \
-        COMMON_FORMATTER("error", format, __VA_ARGS__); \
+        COMMON_FORMATTER("panic", format, __VA_ARGS__); \
         std::exit(-1);                                  \
+    } while (false)
+
+#define ERR(format, ...)                                \
+    do                                                  \
+    {                                                   \
+        COMMON_FORMATTER("error", format, __VA_ARGS__); \
     } while (false)
 
 #define DEBUG(format, ...)                              \

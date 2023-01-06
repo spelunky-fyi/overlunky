@@ -31,6 +31,8 @@ struct ParticleEmitterInfo;
 
 const float ZF = 0.737f;
 
+using PAUSE = uint8_t;
+
 struct SaveData;
 struct Layer;
 struct LevelGenSystem;
@@ -56,8 +58,14 @@ struct StateMemory
     uint8_t ingame;
     /// Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
     uint8_t playing;
-    /// `state.pause == 2` will pause the game but that won't run any callback, `state.pause == 16` will do the same but `set_global_interval` will still work
-    uint8_t pause;
+    /// 8bit flags, multiple might be active at the same time
+    /// 1: Menu: Pauses the level timer and engine. Can't set, controller by the menu.
+    /// 2: Fade/Loading: Pauses all timers and engine.
+    /// 4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.
+    /// 8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.
+    /// 16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.
+    /// 32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
+    PAUSE pause;
     uint8_t pause_related1;
     uint8_t pause_related2;
     uint8_t padding1[3];
@@ -78,7 +86,7 @@ struct StateMemory
     int8_t kali_altars_destroyed;
     /// 0 - none, 1 - item, 3 - kapala
     int8_t kali_gifts;
-    int32_t i50;              // kali related?
+    int32_t outposts_spawned;
     int32_t money_shop_total; // total $ spent at shops, persists between levels, number will be negative
     uint8_t world_start;
     uint8_t level_start;
