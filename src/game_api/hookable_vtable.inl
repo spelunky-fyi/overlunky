@@ -385,8 +385,9 @@ struct HookableVTable
                 }
                 return sol::nullopt;
             };
-            lua_type["clear_virtual"] = [](std::int32_t aux_id, std::uint32_t callback_id)
+            lua_type["clear_virtual"] = [](SelfT* self, std::uint32_t callback_id)
             {
+                std::uint32_t aux_id = self->get_aux_id();
                 auto backend = LuaBackend::get_calling_backend();
                 backend->MyHookHandler::clear_hook(callback_id, aux_id);
             };
@@ -411,9 +412,9 @@ struct HookableVTable
     }
 
     // clang-format off
-    using MyHookInfos = VTableHookInfos<SelfT, 
+    using MyHookInfos = VTableHookInfos<SelfT,
         VTableHooksSignature<
-            typename VTableEntryImpl<VTableEntries, SelfT, CbType>::FreeSignature, 
+            typename VTableEntryImpl<VTableEntries, SelfT, CbType>::FreeSignature,
             VTableEntries::MyDoHooks
         >...>;
     // clang-format on

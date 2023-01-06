@@ -375,13 +375,13 @@ class PatternCommandBuffer
                 break;
             case CommandType::DecodePC:
                 offset = std::apply([=](auto... args)
-                { return ::decode_pc(exe, offset, args...); },
-                    data.decode_pc_args.as_tuple());
+                                    { return ::decode_pc(exe, offset, args...); },
+                                    data.decode_pc_args.as_tuple());
                 break;
             case CommandType::DecodeIMM:
                 offset = std::apply([=](auto... args)
-                { return ::decode_imm(exe, offset, args...); },
-                    data.decode_imm_args.as_tuple());
+                                    { return ::decode_imm(exe, offset, args...); },
+                                    data.decode_imm_args.as_tuple());
                 break;
             case CommandType::DecodeCall:
                 offset = mem.decode_call(offset);
@@ -407,7 +407,7 @@ class PatternCommandBuffer
         return offset;
     }
 
-private:
+  private:
     struct DecodePcArgs
     {
         uint8_t opcode_offset;
@@ -416,7 +416,7 @@ private:
 
         std::tuple<uint8_t, uint8_t, uint8_t> as_tuple() const
         {
-            return { opcode_offset, opcode_suffix_offset, opcode_addr_size };
+            return {opcode_offset, opcode_suffix_offset, opcode_addr_size};
         }
     };
     struct DecodeImmArgs
@@ -426,7 +426,7 @@ private:
 
         std::tuple<uint8_t, uint8_t> as_tuple() const
         {
-            return { opcode_offset, value_size };
+            return {opcode_offset, value_size};
         }
     };
     struct FindInstArgs

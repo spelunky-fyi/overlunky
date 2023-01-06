@@ -1556,6 +1556,8 @@ void set_camera_bounds(bool enabled)
         g_state->camera->bounds_right = g_state->w * 10.0f + 4.5f;
         g_state->camera->bounds_top = 124.5f;
         g_state->camera->bounds_bottom = 120.5f - g_state->h * 8.0f;
+        if (g_state->logic && g_state->logic->black_market) // if this pointer exists, so does an undiscovered black market, I hope
+            g_state->camera->bounds_bottom += 32.0f;
     }
     else
     {
@@ -1568,7 +1570,7 @@ void set_camera_bounds(bool enabled)
 
 void force_zoom()
 {
-    if (g_state->screen == 12)
+    if (g_state->screen == 12 && !enable_camera_bounds)
         set_camera_bounds(enable_camera_bounds);
     if (g_zoom == 0.0f && g_state != 0 && (g_state->w != g_level_width) && (g_state->screen == 11 || g_state->screen == 12))
     {
@@ -7361,12 +7363,6 @@ void imgui_draw()
                     {
                         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
                         active_tab = tab;
-                        if (ImGui::BeginDragDropSource())
-                        {
-                            ImGui::SetDragDropPayload("TAB", NULL, 0);
-                            ImGui::Text("Drag outside the menu\nto detach %s", windows[tab]->name.c_str());
-                            ImGui::EndDragDropSource();
-                        }
                         ImGui::GetIO().WantCaptureKeyboard = true;
                         render_tool(tab);
                         ImGui::PopStyleVar();
@@ -7375,6 +7371,8 @@ void imgui_draw()
                         else
                             ImGui::EndPopup();
                     }
+                    if (ImGui::GetIO().MouseClicked[1] && mouse_pos().y < ImGui::GetTextLineHeight() && ImGui::IsItemHovered())
+                        detach(tab);
                 }
                 ImGui::EndMainMenuBar();
             }

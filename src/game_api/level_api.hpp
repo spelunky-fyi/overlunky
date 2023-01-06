@@ -170,8 +170,8 @@ struct DoorCoords
 class ThemeInfo
 {
   public:
-    bool unknown1; // gets set to false for the jungle and temple theme in the cosmic ocean
-    bool unknown2;
+    bool allow_beehive;
+    bool allow_leprechaun;
     uint8_t padding1;
     uint8_t padding2;
     uint32_t padding3;
@@ -412,6 +412,24 @@ struct LevelGenRoomsMeta
     std::array<bool, 8 * 16> rooms;
 };
 
+class SpecialLevelGeneration
+{
+  public:
+    virtual ~SpecialLevelGeneration()
+    {
+    }
+
+    // For bees, sets rooms to be behive rooms.
+    virtual void set_rooms() = 0;
+
+    // For bees, spawns the hive background and midbgs.
+    virtual void spawn_backgrounds() = 0;
+
+    // For bees, spawns bees and honey.
+    // For leprechauns, spawns leprechaun, pot of gold, and rainbow.
+    virtual void procedual_spawns() = 0;
+};
+
 enum class ShopType : uint8_t
 {
     General,
@@ -462,8 +480,8 @@ struct LevelGenSystem
         };
     };
     uint64_t unknown21;
-    void* unknown22; // MysteryPointer1
-    void* unknown23; // MysteryPointer1
+    SpecialLevelGeneration* bee_gen;
+    SpecialLevelGeneration* leprechaun_gen;
     union
     {
         LevelGenRooms* rooms[2];
@@ -498,8 +516,8 @@ struct LevelGenSystem
         };
     };
     uint8_t flags;
-    uint8_t unknown39; // also flags?
-    uint8_t unknown40; // also flags?
+    uint8_t flags2;
+    uint8_t flags3;
     union
     {
         ShopType shop_types[2];
@@ -509,8 +527,8 @@ struct LevelGenSystem
             ShopType backlayer_shop_type;
         };
     };
-    uint8_t unknown43;
-    uint8_t unknown44;
+    uint8_t frontlayer_shop_music;
+    uint8_t backlayer_shop_music;
     uint8_t unknown45;
     uint8_t unknown46;
     uint8_t unknown47;

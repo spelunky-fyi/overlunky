@@ -126,18 +126,21 @@ class Ghost : public Monster
   public:
     /// for SMALL_HAPPY this is also the sequence timer of its various states
     uint16_t split_timer;
-    uint8_t unknown1_timer;
+    uint8_t wobble_timer;
     uint8_t unknown2;
     float velocity_multiplier;
-    uint16_t unknown3; // layer change related
+    /// Controls ghost pacing when all players are dead.
+    uint16_t pace_timer;
     GHOST_BEHAVIOR ghost_behaviour;
-    uint8_t unknown6;
-    bool unknown7;
+    bool blown_by_player;
+    bool happy_dancing_clockwise; // Randomly set at the start of happy's dance phase to determine the dance rotation direction.
     uint8_t unknown8;
     uint8_t unknown9;
     uint8_t unknown10;
     Illumination* emitted_light;
     Entity* linked_ghost;
+    float target_dist_visibility_factor;  // Value from 0.5 to 1, based on the distance to the ghost's target, multiplied by the target_layer_visibility_factor to set the transparency and illumination of the ghost.
+    float target_layer_visibility_factor; // Value from 0 to 1, based on how long the ghost has been in the same layer as its target, multiplied by the target_dist_visibility_factor to set the transparency and illumination of the ghost.
     SoundMeta* sound;
 };
 
@@ -230,7 +233,7 @@ class Shopkeeper : public RoomOwner
     /// will drop key after stun/kill
     bool has_key;
     bool shop_owner;
-    bool unknown5a; // use 1.0 instead of entityDB->animations->max_load_factor ???
+    bool is_ear;
     uint8_t padding11;
     uint8_t padding21;
     uint8_t padding31;
@@ -629,11 +632,11 @@ class Bee : public Monster
     uint16_t padding2;
     uint32_t padding3;
     SoundMeta* sound;
-    uint16_t fly_hang_timer; // alternates between hanging/sitting on the wall and flying every time it reaches zero
-    uint8_t ai_state;
-    uint8_t targeting_timer; // counts when bee takes off and hasn't spotted a target yet
-    uint8_t unknown_rand1;   // looks to be a random number being put in here
-    uint8_t unknown_rand2;   // looks to be a random number being put in here, something related to other bees in a level?
+    uint16_t fly_hang_timer; // When standing or clinging to a wall, controls the time before flying off. When flying, controls the time before changing direction.
+    uint8_t wobble_timer;    // 4-frame timer to choose another random wobble.
+    uint8_t targeting_timer; // Timer while flying before the bee can land.
+    uint8_t walk_start_time; // While in the standing state, will start walking when the fly_hang_timer gets down to this value.
+    uint8_t walk_end_time;   // While in the standing state, will stop walking when the fly_hang_timer gets down to this value.
     uint8_t padding4;
     uint8_t padding5; // padding? quite a lot of unused memory in this entity, maybe this is more the one type?
     float wobble_x;   // maybe the positional offset to make it look like it's buzzing
