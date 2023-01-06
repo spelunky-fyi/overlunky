@@ -435,7 +435,7 @@ bool LuaBackend::update()
                 }
                 case ON::POST_UPDATE:
                 {
-                    handle_function(callback.func);
+                    handle_function<void>(this, callback.func);
                     callback.lastRan = now;
                     break;
                 }
@@ -1530,7 +1530,7 @@ bool LuaBackend::on_pre_state_update()
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            if (handle_function_with_return<bool>(callback.func).value_or(false))
+            if (handle_function<bool>(this, callback.func).value_or(false))
             {
                 clear_current_callback();
                 return true;
