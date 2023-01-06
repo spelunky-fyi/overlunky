@@ -887,8 +887,8 @@ class CustomTheme : public ThemeInfo
     bool get_theme_flag(uint8_t index)
     {
         if (index == 0)
-            return unknown1;
-        return unknown2;
+            return allow_beehive;
+        return allow_leprechaun;
     }
 
     /// Add TEXTUREs to `textures` to override different dynamic textures easily.
@@ -1172,11 +1172,11 @@ void register_usertypes(sol::state& lua)
     lua["load_screen"] = do_load_screen;
 
     auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
-    themeinfo_type["unknown1"] = &ThemeInfo::unknown1;
-    themeinfo_type["unknown2"] = &ThemeInfo::unknown2;
     themeinfo_type["unknown3"] = &ThemeInfo::unknown3;
     themeinfo_type["unknown4"] = &ThemeInfo::unknown4;
     themeinfo_type["theme"] = &ThemeInfo::padding3; // this is totally not a real thing, but there was space to store it for vtable hooks
+    themeinfo_type["allow_beehive"] = &ThemeInfo::allow_beehive;
+    themeinfo_type["allow_leprechaun"] = &ThemeInfo::allow_leprechaun;
     themeinfo_type["sub_theme"] = &ThemeInfo::sub_theme;
     themeinfo_type["reset_theme_flags"] = &ThemeInfo::reset_theme_flags;
     themeinfo_type["init_flags"] = &ThemeInfo::init_flags;
@@ -1377,6 +1377,10 @@ void register_usertypes(sol::state& lua)
         &LevelGenSystem::shop_type,
         "backlayer_shop_type",
         &LevelGenSystem::backlayer_shop_type,
+        "shop_music",
+        &LevelGenSystem::frontlayer_shop_music,
+        "backlayer_shop_music",
+        &LevelGenSystem::backlayer_shop_music,
         "spawn_x",
         &LevelGenSystem::spawn_x,
         "spawn_y",
@@ -1393,7 +1397,11 @@ void register_usertypes(sol::state& lua)
         sol::property([](LevelGenSystem& lgs)
                       { return std::ref(lgs.themes); }),
         "flags",
-        &LevelGenSystem::flags);
+        &LevelGenSystem::flags,
+        "flags2",
+        &LevelGenSystem::flags2,
+        "flags3",
+        &LevelGenSystem::flags3);
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.

@@ -76,6 +76,8 @@ void register_usertypes(sol::state& lua)
     entitydb_type["hitboxx"] = &EntityDB::default_hitboxx;
     entitydb_type["hitboxy"] = &EntityDB::default_hitboxy;
     entitydb_type["draw_depth"] = &EntityDB::draw_depth;
+    entitydb_type["collision2_mask"] = &EntityDB::collision2_mask;
+    entitydb_type["collision_mask"] = &EntityDB::collision_mask;
     entitydb_type["friction"] = &EntityDB::friction;
     entitydb_type["elasticity"] = &EntityDB::elasticity;
     entitydb_type["weight"] = &EntityDB::weight;
@@ -89,6 +91,7 @@ void register_usertypes(sol::state& lua)
     entitydb_type["glow_alpha"] = &EntityDB::glow_alpha;
     entitydb_type["damage"] = &EntityDB::damage;
     entitydb_type["life"] = &EntityDB::life;
+    entitydb_type["sacrifice_value"] = &EntityDB::sacrifice_value;
     entitydb_type["blood_content"] = &EntityDB::blood_content;
     entitydb_type["texture"] = &EntityDB::texture_id;
     entitydb_type["animations"] = &EntityDB::animations;

@@ -64,6 +64,9 @@ class ScreenPrologue : public Screen // ID: 2
     STRINGID line1; // Strings table ID
     STRINGID line2; // Strings table ID
     STRINGID line3; // Strings table ID
+    float line1_alpha;
+    float line2_alpha;
+    float line3_alpha;
 };
 
 class ScreenTitle : public Screen // ID: 3
