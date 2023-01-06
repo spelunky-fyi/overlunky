@@ -1878,253 +1878,252 @@ end
         "PRE_GET_FEAT",
         ON::PRE_GET_FEAT,
         "PRE_SET_FEAT",
-        ON::PRE_SET_FEAT);
-        ON::DEATH_MESSAGE,
+        ON::PRE_SET_FEAT,
         "PRE_UPDATE",
         ON::PRE_UPDATE,
         "POST_UPDATE",
         ON::POST_UPDATE);
-        /* ON
-        // GUIFRAME
-        // Params: GuiDrawContext draw_ctx
-        // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a GuiDrawContext
-        // FRAME
-        // Runs while playing the game while the player is controllable, not in the base camp or the arena mode
-        // GAMEFRAME
-        // Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen
-        // SCREEN
-        // Runs whenever state.screen changes
-        // START
-        // Runs on the first ON.SCREEN of a run
-        // RESET
-        // Runs when resetting a run
-        // PRE_LOAD_LEVEL_FILES
-        // Params: PreLoadLevelFilesContext load_level_ctx
-        // Runs right before level files would be loaded
-        // PRE_LEVEL_GENERATION
-        // Runs before any level generation, no entities should exist at this point
-        // POST_ROOM_GENERATION
-        // Params: PostRoomGenerationContext room_gen_ctx
-        // Runs right after all rooms are generated before entities are spawned
-        // POST_LEVEL_GENERATION
-        // Runs right after level generation is done, before any entities are updated
-        // LOADING
-        // Runs whenever state.loading changes and is > 0. Prefer PRE/POST_LOAD_SCREEN instead though.
-        // PRE_LOAD_SCREEN
-        // Runs right before loading a new screen based on screen_next. Return true from callback to block the screen from loading.
-        // POST_LOAD_SCREEN
-        // Runs right after a screen is loaded, before rendering anything
-        // PRE_GET_RANDOM_ROOM
-        // Params: int x, int y, LAYER layer, ROOM_TEMPLATE room_template
-        // Return: `string room_data`
-        // Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.
-        // If the size of the string returned does not match with the room templates expected size the room is discarded.
-        // White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.
-        // PRE_HANDLE_ROOM_TILES
-        // Params: int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx
-        // Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this
-        // Runs after a random room was selected and right before it would spawn entities for each tile code
-        // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
-        // SAVE
-        // Params: SaveContext save_ctx
-        // Runs at the same times as ON.SCREEN, but receives the save_ctx
-        // LOAD
-        // Params: LoadContext load_ctx
-        // Runs as soon as your script is loaded, including reloads, then never again
-        // RENDER_PRE_HUD
-        // Params: VanillaRenderContext render_ctx
-        // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
-        // RENDER_POST_HUD
-        // Params: VanillaRenderContext render_ctx
-        // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
-        // RENDER_PRE_PAUSE_MENU
-        // Params: VanillaRenderContext render_ctx
-        // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
-        // RENDER_POST_PAUSE_MENU
-        // Params: VanillaRenderContext render_ctx
-        // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
-        // RENDER_PRE_DRAW_DEPTH
-        // Params: VanillaRenderContext render_ctx, int draw_depth
-        // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
-        // RENDER_POST_DRAW_DEPTH
-        // Params: VanillaRenderContext render_ctx, int draw_depth
-        // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
-        // RENDER_POST_JOURNAL_PAGE
-        // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
-        // Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the VanillaRenderContext
-        // The JournalPage parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:
-        // `page:as_journal_page_progress()`
-        // `page:as_journal_page_journalmenu()`
-        // `page:as_journal_page_places()`
-        // `page:as_journal_page_people()`
-        // `page:as_journal_page_bestiary()`
-        // `page:as_journal_page_items()`
-        // `page:as_journal_page_traps()`
-        // `page:as_journal_page_story()`
-        // `page:as_journal_page_feats()`
-        // `page:as_journal_page_deathcause()`
-        // `page:as_journal_page_deathmenu()`
-        // `page:as_journal_page_recap()`
-        // `page:as_journal_page_playerprofile()`
-        // `page:as_journal_page_lastgameplayed()`
-        // SPEECH_BUBBLE
-        // Params: Entity speaking_entity, string text
-        // Runs before any speech bubble is created, even the one using [say](#say) function
-        // Return: if you don't return anything it will execute the speech bubble function normally with default message
-        // if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original
-        // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
-        // TOAST
-        // Params: string text
-        // Runs before any toast is created, even the one using [toast](#toast) function
-        // Return: if you don't return anything it will execute the toast function normally with default message
-        // if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
-        // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
-        // DEATH_MESSAGE
-        // Params: STRINGID id
-        // Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.
-        // PRE_LOAD_JOURNAL_CHAPTER
-        // Params: JOURNALUI_PAGE_SHOWN chapter
-        // Runs before the journal or any of it's chapter is opened
-        // Return: return true to not load the chapter (or journal as a whole)
-        // POST_LOAD_JOURNAL_CHAPTER
-        // Params: JOURNALUI_PAGE_SHOWN chapter, array:int pages
-        // Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it
-        // All new pages will be created as [JournalPageStory](#JournalPageStory), any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
-        // Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
-        // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
-        // PRE_GET_FEAT
-        // Runs before getting performed status for a FEAT when rendering the Feats page in journal.
-        // Return: true to override the vanilla feat with your own. Defaults to Steam GetAchievement.
-        // PRE_SET_FEAT
-        // Runs before the game sets a vanilla feat performed.
-        // Return: true to block the default behaviour of calling Steam SetAchievement.
-        // PRE_UPDATE
-        // Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
-        // Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
-        // POST_UPDATE
-        // Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
-        */
+    /* ON
+    // GUIFRAME
+    // Params: GuiDrawContext draw_ctx
+    // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a GuiDrawContext
+    // FRAME
+    // Runs while playing the game while the player is controllable, not in the base camp or the arena mode
+    // GAMEFRAME
+    // Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen
+    // SCREEN
+    // Runs whenever state.screen changes
+    // START
+    // Runs on the first ON.SCREEN of a run
+    // RESET
+    // Runs when resetting a run
+    // PRE_LOAD_LEVEL_FILES
+    // Params: PreLoadLevelFilesContext load_level_ctx
+    // Runs right before level files would be loaded
+    // PRE_LEVEL_GENERATION
+    // Runs before any level generation, no entities should exist at this point
+    // POST_ROOM_GENERATION
+    // Params: PostRoomGenerationContext room_gen_ctx
+    // Runs right after all rooms are generated before entities are spawned
+    // POST_LEVEL_GENERATION
+    // Runs right after level generation is done, before any entities are updated
+    // LOADING
+    // Runs whenever state.loading changes and is > 0. Prefer PRE/POST_LOAD_SCREEN instead though.
+    // PRE_LOAD_SCREEN
+    // Runs right before loading a new screen based on screen_next. Return true from callback to block the screen from loading.
+    // POST_LOAD_SCREEN
+    // Runs right after a screen is loaded, before rendering anything
+    // PRE_GET_RANDOM_ROOM
+    // Params: int x, int y, LAYER layer, ROOM_TEMPLATE room_template
+    // Return: `string room_data`
+    // Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.
+    // If the size of the string returned does not match with the room templates expected size the room is discarded.
+    // White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.
+    // PRE_HANDLE_ROOM_TILES
+    // Params: int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx
+    // Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this
+    // Runs after a random room was selected and right before it would spawn entities for each tile code
+    // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
+    // SAVE
+    // Params: SaveContext save_ctx
+    // Runs at the same times as ON.SCREEN, but receives the save_ctx
+    // LOAD
+    // Params: LoadContext load_ctx
+    // Runs as soon as your script is loaded, including reloads, then never again
+    // RENDER_PRE_HUD
+    // Params: VanillaRenderContext render_ctx
+    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_POST_HUD
+    // Params: VanillaRenderContext render_ctx
+    // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_PRE_PAUSE_MENU
+    // Params: VanillaRenderContext render_ctx
+    // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_POST_PAUSE_MENU
+    // Params: VanillaRenderContext render_ctx
+    // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_PRE_DRAW_DEPTH
+    // Params: VanillaRenderContext render_ctx, int draw_depth
+    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_POST_DRAW_DEPTH
+    // Params: VanillaRenderContext render_ctx, int draw_depth
+    // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_POST_JOURNAL_PAGE
+    // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
+    // Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the VanillaRenderContext
+    // The JournalPage parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:
+    // `page:as_journal_page_progress()`
+    // `page:as_journal_page_journalmenu()`
+    // `page:as_journal_page_places()`
+    // `page:as_journal_page_people()`
+    // `page:as_journal_page_bestiary()`
+    // `page:as_journal_page_items()`
+    // `page:as_journal_page_traps()`
+    // `page:as_journal_page_story()`
+    // `page:as_journal_page_feats()`
+    // `page:as_journal_page_deathcause()`
+    // `page:as_journal_page_deathmenu()`
+    // `page:as_journal_page_recap()`
+    // `page:as_journal_page_playerprofile()`
+    // `page:as_journal_page_lastgameplayed()`
+    // SPEECH_BUBBLE
+    // Params: Entity speaking_entity, string text
+    // Runs before any speech bubble is created, even the one using [say](#say) function
+    // Return: if you don't return anything it will execute the speech bubble function normally with default message
+    // if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original
+    // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
+    // TOAST
+    // Params: string text
+    // Runs before any toast is created, even the one using [toast](#toast) function
+    // Return: if you don't return anything it will execute the toast function normally with default message
+    // if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message
+    // The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter
+    // DEATH_MESSAGE
+    // Params: STRINGID id
+    // Runs once after death when the death message journal page is shown. The parameter is the STRINGID of the title, like 1221 for BLOWN UP.
+    // PRE_LOAD_JOURNAL_CHAPTER
+    // Params: JOURNALUI_PAGE_SHOWN chapter
+    // Runs before the journal or any of it's chapter is opened
+    // Return: return true to not load the chapter (or journal as a whole)
+    // POST_LOAD_JOURNAL_CHAPTER
+    // Params: JOURNALUI_PAGE_SHOWN chapter, array:int pages
+    // Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it
+    // All new pages will be created as [JournalPageStory](#JournalPageStory), any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
+    // Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
+    // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
+    // PRE_GET_FEAT
+    // Runs before getting performed status for a FEAT when rendering the Feats page in journal.
+    // Return: true to override the vanilla feat with your own. Defaults to Steam GetAchievement.
+    // PRE_SET_FEAT
+    // Runs before the game sets a vanilla feat performed.
+    // Return: true to block the default behaviour of calling Steam SetAchievement.
+    // PRE_UPDATE
+    // Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
+    // Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
+    // POST_UPDATE
+    // Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
+    */
 
-        lua.create_named_table(
-            "SPAWN_TYPE",
-            "LEVEL_GEN",
-            SPAWN_TYPE_LEVEL_GEN,
-            "LEVEL_GEN_TILE_CODE",
-            SPAWN_TYPE_LEVEL_GEN_TILE_CODE,
-            "LEVEL_GEN_PROCEDURAL",
-            SPAWN_TYPE_LEVEL_GEN_PROCEDURAL,
-            "LEVEL_GEN_FLOOR_SPREADING",
-            SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING,
-            "LEVEL_GEN_GENERAL",
-            SPAWN_TYPE_LEVEL_GEN_GENERAL,
-            "SCRIPT",
-            SPAWN_TYPE_SCRIPT,
-            "SYSTEMIC",
-            SPAWN_TYPE_SYSTEMIC,
-            "ANY",
-            SPAWN_TYPE_ANY);
-        /* SPAWN_TYPE
-        // LEVEL_GEN
-        // For any spawn happening during level generation, even if the call happened from the Lua API during a tile code callback.
-        // LEVEL_GEN_TILE_CODE
-        // Similar to LEVEL_GEN but only triggers on tile code spawns.
-        // LEVEL_GEN_PROCEDURAL
-        // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
-        // LEVEL_GEN_FLOOR_SPREADING
-        // Only procs during floor spreading, both horizontal and vertical
-        // LEVEL_GEN_GENERAL
-        // Covers all spawns during level gen that are not covered by the other two.
-        // SCRIPT
-        // Runs for any spawn happening through a call from the Lua API, also during level generation.
-        // SYSTEMIC
-        // Covers all other spawns, such as items from crates or the player throwing bombs.
-        // ANY
-        // Covers all of the above.
-        */
-        /// Some arbitrary constants of the engine
-        lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8, "MAX_TILES_VERT", g_level_max_y, "MAX_TILES_HORIZ", g_level_max_x, "NOF_DRAW_DEPTHS", 53, "MAX_PLAYERS", 4);
-        /* CONST
-        // ENGINE_FPS
-        // The framerate at which the engine updates, e.g. at which `ON.GAMEFRAME` and similar are called.
-        // Independent of rendering framerate, so it does not correlate with the call rate of `ON.GUIFRAME` and similar.
-        // ROOM_WIDTH
-        // Width of a 1x1 room, both in world coordinates and in tiles.
-        // ROOM_HEIGHT
-        // Height of a 1x1 room, both in world coordinates and in tiles.
-        // MAX_TILES_VERT
-        // Maximum number of working floor tiles in vertical axis, 126 (0-125 coordinates)
-        // Floors spawned above or below will not have any collision
-        // MAX_TILES_HORIZ
-        // Maximum number of working floor tiles in horizontal axis, 86 (0-85 coordinates)
-        // Floors spawned above or below will not have any collision
-        // NOF_DRAW_DEPTHS
-        // Number of draw_depths, 53 (0-52)
-        // MAX_PLAYERS
-        // Just the max number of players in multiplayer
-        */
-        /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
-        lua.create_named_table(
-            "WIN_STATE",
-            "NO_WIN",
-            0,
-            "TIAMAT_WIN",
-            1,
-            "HUNDUN_WIN",
-            2,
-            "COSMIC_OCEAN_WIN",
-            3);
+    lua.create_named_table(
+        "SPAWN_TYPE",
+        "LEVEL_GEN",
+        SPAWN_TYPE_LEVEL_GEN,
+        "LEVEL_GEN_TILE_CODE",
+        SPAWN_TYPE_LEVEL_GEN_TILE_CODE,
+        "LEVEL_GEN_PROCEDURAL",
+        SPAWN_TYPE_LEVEL_GEN_PROCEDURAL,
+        "LEVEL_GEN_FLOOR_SPREADING",
+        SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING,
+        "LEVEL_GEN_GENERAL",
+        SPAWN_TYPE_LEVEL_GEN_GENERAL,
+        "SCRIPT",
+        SPAWN_TYPE_SCRIPT,
+        "SYSTEMIC",
+        SPAWN_TYPE_SYSTEMIC,
+        "ANY",
+        SPAWN_TYPE_ANY);
+    /* SPAWN_TYPE
+    // LEVEL_GEN
+    // For any spawn happening during level generation, even if the call happened from the Lua API during a tile code callback.
+    // LEVEL_GEN_TILE_CODE
+    // Similar to LEVEL_GEN but only triggers on tile code spawns.
+    // LEVEL_GEN_PROCEDURAL
+    // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
+    // LEVEL_GEN_FLOOR_SPREADING
+    // Only procs during floor spreading, both horizontal and vertical
+    // LEVEL_GEN_GENERAL
+    // Covers all spawns during level gen that are not covered by the other two.
+    // SCRIPT
+    // Runs for any spawn happening through a call from the Lua API, also during level generation.
+    // SYSTEMIC
+    // Covers all other spawns, such as items from crates or the player throwing bombs.
+    // ANY
+    // Covers all of the above.
+    */
+    /// Some arbitrary constants of the engine
+    lua.create_named_table("CONST", "ENGINE_FPS", 60, "ROOM_WIDTH", 10, "ROOM_HEIGHT", 8, "MAX_TILES_VERT", g_level_max_y, "MAX_TILES_HORIZ", g_level_max_x, "NOF_DRAW_DEPTHS", 53, "MAX_PLAYERS", 4);
+    /* CONST
+    // ENGINE_FPS
+    // The framerate at which the engine updates, e.g. at which `ON.GAMEFRAME` and similar are called.
+    // Independent of rendering framerate, so it does not correlate with the call rate of `ON.GUIFRAME` and similar.
+    // ROOM_WIDTH
+    // Width of a 1x1 room, both in world coordinates and in tiles.
+    // ROOM_HEIGHT
+    // Height of a 1x1 room, both in world coordinates and in tiles.
+    // MAX_TILES_VERT
+    // Maximum number of working floor tiles in vertical axis, 126 (0-125 coordinates)
+    // Floors spawned above or below will not have any collision
+    // MAX_TILES_HORIZ
+    // Maximum number of working floor tiles in horizontal axis, 86 (0-85 coordinates)
+    // Floors spawned above or below will not have any collision
+    // NOF_DRAW_DEPTHS
+    // Number of draw_depths, 53 (0-52)
+    // MAX_PLAYERS
+    // Just the max number of players in multiplayer
+    */
+    /// After setting the WIN_STATE, the exit door on the current level will lead to the chosen ending
+    lua.create_named_table(
+        "WIN_STATE",
+        "NO_WIN",
+        0,
+        "TIAMAT_WIN",
+        1,
+        "HUNDUN_WIN",
+        2,
+        "COSMIC_OCEAN_WIN",
+        3);
 
-        /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
-        lua.create_named_table(
-            "VANILLA_TEXT_ALIGNMENT",
-            "LEFT",
-            0,
-            "CENTER",
-            1,
-            "RIGHT",
-            2);
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+    lua.create_named_table(
+        "VANILLA_TEXT_ALIGNMENT",
+        "LEFT",
+        0,
+        "CENTER",
+        1,
+        "RIGHT",
+        2);
 
-        /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
-        /// There are more styles, we just didn't name them all
-        lua.create_named_table(
-            "VANILLA_FONT_STYLE",
-            "NORMAL",
-            0,
-            "ITALIC",
-            1,
-            "BOLD",
-            2);
+    /// Used in the `render_ctx:draw_text` and `render_ctx:draw_text_size` functions of the ON.RENDER_PRE/POST_xxx event
+    /// There are more styles, we just didn't name them all
+    lua.create_named_table(
+        "VANILLA_FONT_STYLE",
+        "NORMAL",
+        0,
+        "ITALIC",
+        1,
+        "BOLD",
+        2);
 
-        /// Paramater to `get_setting()`
-        lua.create_named_table("GAME_SETTING"
-                               //, "DAMSEL_STYLE", 0
-                               //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
-                               //, "CROSSPROGRESS_AUTOSYNC", 47
-        );
-        for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
-        {
-            std::string setting_name{setting_name_view};
-            std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)
-                           { return (unsigned char)std::toupper(c); });
-            lua["GAME_SETTING"][std::move(setting_name)] = setting_index;
-        }
+    /// Paramater to `get_setting()`
+    lua.create_named_table("GAME_SETTING"
+                           //, "DAMSEL_STYLE", 0
+                           //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
+                           //, "CROSSPROGRESS_AUTOSYNC", 47
+    );
+    for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
+    {
+        std::string setting_name{setting_name_view};
+        std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)
+                       { return (unsigned char)std::toupper(c); });
+        lua["GAME_SETTING"][std::move(setting_name)] = setting_index;
+    }
 
-        /// 8bit bitmask used in state.pause
-        lua.create_named_table("PAUSE", "MENU", 0x01, "FADE", 0x02, "CUTSCENE", 0x04, "FLAG4", 0x08, "FLAG5", 0x10, "ANKH", 0x20);
-        /* PAUSE
-        // MENU
-        // Menu: Pauses the level timer and engine. Can't set, controller by the menu.
-        // FADE
-        // Fade/Loading: Pauses all timers and engine.
-        // CUTSCENE
-        // Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.
-        // FLAG4
-        // Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!
-        // FLAG5
-        // Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!
-        // ANKH
-        // Ankh: Pauses all timers, physics and music, but not camera. Used by the ankh cutscene.
-        */
+    /// 8bit bitmask used in state.pause
+    lua.create_named_table("PAUSE", "MENU", 0x01, "FADE", 0x02, "CUTSCENE", 0x04, "FLAG4", 0x08, "FLAG5", 0x10, "ANKH", 0x20);
+    /* PAUSE
+    // MENU
+    // Menu: Pauses the level timer and engine. Can't set, controller by the menu.
+    // FADE
+    // Fade/Loading: Pauses all timers and engine.
+    // CUTSCENE
+    // Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.
+    // FLAG4
+    // Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!
+    // FLAG5
+    // Unknown purpose: Pauses total/level time and engine. Does not pause the global counter so [set_global_interval](#set_global_interval) timers still run. Might change this later!
+    // ANKH
+    // Ankh: Pauses all timers, physics and music, but not camera. Used by the ankh cutscene.
+    */
 }
 
 std::recursive_mutex global_lua_lock;
@@ -2134,78 +2133,78 @@ std::vector<std::string> unsafe_fields{};
 
 std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
 {
-        static std::shared_ptr<sol::state> global_vm = [sound_manager]()
+    static std::shared_ptr<sol::state> global_vm = [sound_manager]()
+    {
+        std::unique_lock lock{global_lua_lock};
+        std::shared_ptr<sol::state> global_vms = std::make_shared<sol::state>();
+        sol::state& lua_vm = *global_vms;
+        load_libraries(lua_vm);
+        populate_lua_state(lua_vm, sound_manager);
+
+        for (auto& [k, v] : lua_vm["_G"].get<sol::table>())
         {
-            std::unique_lock lock{global_lua_lock};
-            std::shared_ptr<sol::state> global_vms = std::make_shared<sol::state>();
-            sol::state& lua_vm = *global_vms;
-            load_libraries(lua_vm);
-            populate_lua_state(lua_vm, sound_manager);
-
-            for (auto& [k, v] : lua_vm["_G"].get<sol::table>())
+            if (k.get_type() == sol::type::string)
             {
-                if (k.get_type() == sol::type::string)
+                std::string_view key = k.as<std::string_view>();
+                if (key != "debug" && key != "package")
                 {
-                    std::string_view key = k.as<std::string_view>();
-                    if (key != "debug" && key != "package")
-                    {
-                        safe_fields.push_back(std::string{key});
-                    }
+                    safe_fields.push_back(std::string{key});
                 }
             }
+        }
 
-            load_unsafe_libraries(lua_vm);
+        load_unsafe_libraries(lua_vm);
 
-            for (auto& [k, v] : lua_vm["_G"].get<sol::table>())
+        for (auto& [k, v] : lua_vm["_G"].get<sol::table>())
+        {
+            if (k.get_type() == sol::type::string)
             {
-                if (k.get_type() == sol::type::string)
+                std::string_view key = k.as<std::string_view>();
+                auto it = std::find(safe_fields.begin(), safe_fields.end(), key);
+                if (it == safe_fields.end())
                 {
-                    std::string_view key = k.as<std::string_view>();
-                    auto it = std::find(safe_fields.begin(), safe_fields.end(), key);
-                    if (it == safe_fields.end())
-                    {
-                        unsafe_fields.push_back(std::string{key});
-                    }
+                    unsafe_fields.push_back(std::string{key});
                 }
             }
+        }
 
-            return global_vms;
-        }();
-        return global_vm;
+        return global_vms;
+    }();
+    return global_vm;
 }
 sol::state& get_lua_vm(SoundManager* sound_manager)
 {
-        static sol::state& global_vm = *acquire_lua_vm(sound_manager);
-        return global_vm;
+    static sol::state& global_vm = *acquire_lua_vm(sound_manager);
+    return global_vm;
 }
 
 sol::protected_function_result execute_lua(sol::environment& env, std::string_view code)
 {
-        static sol::state& global_vm = get_lua_vm();
-        return global_vm.safe_script(code, env);
+    static sol::state& global_vm = get_lua_vm();
+    return global_vm.safe_script(code, env);
 }
 
 void populate_lua_env(sol::environment& env)
 {
-        static const sol::state& global_vm = get_lua_vm();
-        for (auto& field : safe_fields)
-        {
-            env[field] = global_vm["_G"][field];
-        }
-        env["_G"] = env;
+    static const sol::state& global_vm = get_lua_vm();
+    for (auto& field : safe_fields)
+    {
+        env[field] = global_vm["_G"][field];
+    }
+    env["_G"] = env;
 }
 void hide_unsafe_libraries(sol::environment& env)
 {
-        for (auto& field : unsafe_fields)
-        {
-            env[field] = sol::nil;
-        }
+    for (auto& field : unsafe_fields)
+    {
+        env[field] = sol::nil;
+    }
 }
 void expose_unsafe_libraries(sol::environment& env)
 {
-        static const sol::state& global_vm = get_lua_vm();
-        for (auto& field : unsafe_fields)
-        {
-            env[field] = global_vm["_G"][field];
-        }
+    static const sol::state& global_vm = get_lua_vm();
+    for (auto& field : unsafe_fields)
+    {
+        env[field] = global_vm["_G"][field];
+    }
 }
