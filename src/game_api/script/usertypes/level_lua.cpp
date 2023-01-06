@@ -428,7 +428,7 @@ class CustomTheme : public ThemeInfo
     }
     bool get_unknown1()
     {
-        return unknown1;
+        return allow_beehive;
     }
     void init_flags()
     {
@@ -883,8 +883,8 @@ class CustomTheme : public ThemeInfo
     bool get_unknown_1_or_2(uint8_t index)
     {
         if (index == 0)
-            return unknown1;
-        return unknown2;
+            return allow_beehive;
+        return allow_leprechaun;
     }
 
     /// Add TEXTUREs to `textures` to override different dynamic textures easily.
@@ -1168,6 +1168,8 @@ void register_usertypes(sol::state& lua)
     lua["load_screen"] = do_load_screen;
 
     auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
+    themeinfo_type["allow_beehive"] = &ThemeInfo::allow_beehive;
+    themeinfo_type["allow_leprechaun"] = &ThemeInfo::allow_leprechaun;
     themeinfo_type["sub_theme"] = &ThemeInfo::sub_theme;
     themeinfo_type["get_unknown1"] = &ThemeInfo::get_unknown1;
     themeinfo_type["init_flags"] = &ThemeInfo::init_flags;
@@ -1247,8 +1249,8 @@ void register_usertypes(sol::state& lua)
     customtheme_type["override"] = theme_override;
     customtheme_type["pre"] = &CustomTheme::pre;
     customtheme_type["post"] = &CustomTheme::post;
-    customtheme_type["unknown1"] = &CustomTheme::unknown1;
-    customtheme_type["unknown2"] = &CustomTheme::unknown2;
+    customtheme_type["allow_beehive"] = &CustomTheme::allow_beehive;
+    customtheme_type["allow_leprechaun"] = &CustomTheme::allow_leprechaun;
     customtheme_type["unknown3"] = &CustomTheme::unknown3;
     customtheme_type["unknown4"] = &CustomTheme::unknown4;
     customtheme_type["get_unknown1"] = &CustomTheme::get_unknown1;
@@ -1370,6 +1372,10 @@ void register_usertypes(sol::state& lua)
         &LevelGenSystem::shop_type,
         "backlayer_shop_type",
         &LevelGenSystem::backlayer_shop_type,
+        "shop_music",
+        &LevelGenSystem::frontlayer_shop_music,
+        "backlayer_shop_music",
+        &LevelGenSystem::backlayer_shop_music,
         "spawn_x",
         &LevelGenSystem::spawn_x,
         "spawn_y",
@@ -1386,7 +1392,11 @@ void register_usertypes(sol::state& lua)
         sol::property([](LevelGenSystem& lgs)
                       { return std::ref(lgs.themes); }),
         "flags",
-        &LevelGenSystem::flags);
+        &LevelGenSystem::flags,
+        "flags2",
+        &LevelGenSystem::flags2,
+        "flags3",
+        &LevelGenSystem::flags3);
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.

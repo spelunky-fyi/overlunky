@@ -92,6 +92,12 @@ void register_usertypes(sol::state& lua)
         &ScreenPrologue::line2,
         "line3",
         &ScreenPrologue::line3,
+        "line1_alpha",
+        &ScreenPrologue::line1_alpha,
+        "line2_alpha",
+        &ScreenPrologue::line2_alpha,
+        "line3_alpha",
+        &ScreenPrologue::line3_alpha,
         sol::base_classes,
         sol::bases<Screen>());
 

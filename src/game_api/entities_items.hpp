@@ -677,6 +677,18 @@ class MiniGameShip : public Movable
     float up_down_normal;
 };
 
+class OlmecShip : public Movable
+{
+  public:
+    SoundMeta* sound;
+    int32_t unknown138;
+    Entity* door_fx;
+    ParticleEmitterInfo* smoke;
+    uint16_t flight_time;
+    int16_t unknown152;
+    bool has_spawned_jetflames;
+};
+
 class MiniGameAsteroid : public Movable
 {
   public:
@@ -758,8 +770,10 @@ class ParachutePowerup : public Powerup
     /// this gets compared with entity's falling_timer
     uint8_t falltime_deploy;
     uint8_t unknown1;
-    uint16_t unknown2;
-    uint16_t unknown3;
+    /// Timer for spawning a single gold nugget.
+    uint16_t gold_timer; // A gold nugget will spawn when this reaches 0, then it is set to 30.
+    /// Time until gold nuggets stop spawning.
+    uint16_t gold_spawning_time;    // Once this reaches 0, gold will stop spawning.
     bool deployed;                  // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
     bool deployed2;                 /* unsure */
     bool after_deploy; /* unsure */ // if set to true before deploying, parachute will drop imminently after deploy, not sure if it's even a bool
@@ -840,4 +854,12 @@ class Bow : public Purchasable
   public:
     // When lain on the ground
     virtual float get_arrow_special_offset() = 0;
+};
+
+class Web : public Movable
+{
+  public:
+    /// Is subtracted from the color alpha every frame after the `stand_counter` is more than 300.
+    /// Entity automatically dies when the alpha is less than 0.1
+    float decay_rate;
 };
