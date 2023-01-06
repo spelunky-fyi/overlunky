@@ -285,8 +285,8 @@ struct RenderInfo
     float tileh;
     float x_dupe3;
     float y_dupe3;
-    float x_dupe4;
-    float y_dupe4;
+    float x_dupe4; // this will be writen into x next refresh
+    float y_dupe4; // this will be writen into y next refresh
     float angle1;
     float angle2;
     float angle_related;
