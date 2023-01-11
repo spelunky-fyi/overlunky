@@ -2197,6 +2197,8 @@ float | [bounds_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=b
 float | [bounds_right](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounds_right) | 
 float | [bounds_bottom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounds_bottom) | 
 float | [bounds_top](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounds_top) | 
+float | [calculated_focus_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=calculated_focus_x) | 
+float | [calculated_focus_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=calculated_focus_y) | 
 float | [adjusted_focus_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=adjusted_focus_x) | 
 float | [adjusted_focus_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=adjusted_focus_y) | 
 float | [focus_offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focus_offset_x) | 
@@ -5973,6 +5975,7 @@ bool | [set_behavior(int behavior_id)](https://github.com/spelunky-fyi/overlunky
 int | [get_behavior()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_behavior) | Get the current behavior id
 nil | [set_gravity(float gravity)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_gravity) | Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
 nil | [reset_gravity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_gravity) | Remove the gravity hook and reset to defaults
+nil | [set_position(float to_x, float to_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_position) | Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
 [VanillaMovableBehavior](#VanillaMovableBehavior) | [get_base_behavior(int state_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_behavior) | Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
 nil | [add_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_behavior) | Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
 nil | [clear_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_behavior) | Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
