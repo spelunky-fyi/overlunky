@@ -177,6 +177,18 @@ void post_entity_spawn(Entity* entity, int spawn_type_flags)
         });
 }
 
+bool pre_entity_instagib(Entity* victim)
+{
+    bool skip{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            skip |= backend->pre_entity_instagib(victim);
+            return true;
+        });
+    return skip;
+}
+
 void trigger_vanilla_render_callbacks(ON event)
 {
     LuaBackend::for_each_backend(

@@ -126,18 +126,21 @@ class Ghost : public Monster
   public:
     /// for SMALL_HAPPY this is also the sequence timer of its various states
     uint16_t split_timer;
-    uint8_t unknown1_timer;
+    uint8_t wobble_timer;
     uint8_t unknown2;
     float velocity_multiplier;
-    uint16_t unknown3; // layer change related
+    /// Controls ghost pacing when all players are dead.
+    uint16_t pace_timer;
     GHOST_BEHAVIOR ghost_behaviour;
-    uint8_t unknown6;
-    bool unknown7;
+    bool blown_by_player;
+    bool happy_dancing_clockwise; // Randomly set at the start of happy's dance phase to determine the dance rotation direction.
     uint8_t unknown8;
     uint8_t unknown9;
     uint8_t unknown10;
     Illumination* emitted_light;
     Entity* linked_ghost;
+    float target_dist_visibility_factor;  // Value from 0.5 to 1, based on the distance to the ghost's target, multiplied by the target_layer_visibility_factor to set the transparency and illumination of the ghost.
+    float target_layer_visibility_factor; // Value from 0 to 1, based on how long the ghost has been in the same layer as its target, multiplied by the target_dist_visibility_factor to set the transparency and illumination of the ghost.
     SoundMeta* sound;
 };
 
@@ -230,7 +233,7 @@ class Shopkeeper : public RoomOwner
     /// will drop key after stun/kill
     bool has_key;
     bool shop_owner;
-    bool unknown5a; // use 1.0 instead of entityDB->animations->max_load_factor ???
+    bool is_ear;
     uint8_t padding11;
     uint8_t padding21;
     uint8_t padding31;
@@ -285,6 +288,8 @@ class Pet : public Monster
     int16_t func_timer;
     /// -1 = sitting and yelling, 0 = either running, dead or picked up
     int8_t active_state;
+    /// number of times petted in the camp
+    uint8_t petted_counter;
 };
 
 class Caveman : public WalkingMonster
@@ -378,7 +383,7 @@ class Lavamander : public Monster
     uint16_t jump_pause_timer; // jump pause when cool; runs continuously when hot
     uint8_t lava_detection_timer;
     bool is_hot;
-    /// 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava | probably used so he won't spit imminently after seeing the player
+    /// 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
     uint8_t player_detect_state;
     uint8_t padding2;
 };
@@ -447,6 +452,8 @@ class VanHorsing : public NPC
   public:
     /// if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
     bool show_text;
+    /// one way door message has been shown
+    bool special_message_shown;
 };
 
 class WitchDoctor : public WalkingMonster
@@ -625,11 +632,11 @@ class Bee : public Monster
     uint16_t padding2;
     uint32_t padding3;
     SoundMeta* sound;
-    uint16_t fly_hang_timer; // alternates between hanging/sitting on the wall and flying every time it reaches zero
-    uint8_t ai_state;
-    uint8_t targeting_timer; // counts when bee takes off and hasn't spotted a target yet
-    uint8_t unknown_rand1;   // looks to be a random number being put in here
-    uint8_t unknown_rand2;   // looks to be a random number being put in here, something related to other bees in a level?
+    uint16_t fly_hang_timer; // When standing or clinging to a wall, controls the time before flying off. When flying, controls the time before changing direction.
+    uint8_t wobble_timer;    // 4-frame timer to choose another random wobble.
+    uint8_t targeting_timer; // Timer while flying before the bee can land.
+    uint8_t walk_start_time; // While in the standing state, will start walking when the fly_hang_timer gets down to this value.
+    uint8_t walk_end_time;   // While in the standing state, will stop walking when the fly_hang_timer gets down to this value.
     uint8_t padding4;
     uint8_t padding5; // padding? quite a lot of unused memory in this entity, maybe this is more the one type?
     float wobble_x;   // maybe the positional offset to make it look like it's buzzing
@@ -934,7 +941,7 @@ class MegaJellyfish : public Monster
     Entity* flipper1;
     Entity* flipper2;
     SoundMeta* sound;
-    /// the closest orb, does not gets updated
+    /// game checks if this uid, and two following exist, if not, the Jellyfish starts chasing player
     int32_t orb_uid;
     int32_t tail_bg_uid;
     float applied_velocity;
@@ -1031,6 +1038,8 @@ class CritterCrab : public Critter
   public:
     uint8_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     bool walking_left;
+    /// moves away from its target instead of towards it
+    bool unfriendly;
 };
 
 class CritterButterfly : public Critter
@@ -1101,7 +1110,8 @@ class CritterDrone : public Critter
     SoundMeta* sound;
     float applied_hor_momentum;
     float applied_ver_momentum;
-    bool unknown1;
+    /// moves away from its target instead of towards it
+    bool unfriendly;
     uint8_t move_timer;
 };
 

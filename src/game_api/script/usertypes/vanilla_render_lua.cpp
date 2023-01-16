@@ -15,7 +15,14 @@
 
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
 {
-    RenderAPI::get().draw_text(text, x, y, scale_x, scale_y, color, alignment, fontstyle);
+    TextRenderingInfo tri{};
+    tri.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
+    RenderAPI::get().draw_text(&tri, std::move(color));
+}
+
+void VanillaRenderContext::draw_text(const TextRenderingInfo* tri, Color color)
+{
+    RenderAPI::get().draw_text(tri, std::move(color));
 }
 
 std::pair<float, float> VanillaRenderContext::draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
@@ -180,6 +187,13 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& so
     draw_world_texture(texture_id, source, dest, color, (WORLD_SHADER)WorldShader::TextureColor);
 }
 
+// For the custom constructor
+void TextRenderingInfo_ctor(TextRenderingInfo& uninitialized_memory, const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    new (&uninitialized_memory) TextRenderingInfo{};
+    uninitialized_memory.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
+}
+
 namespace NVanillaRender
 {
 void register_usertypes(sol::state& lua)
@@ -214,7 +228,7 @@ void register_usertypes(sol::state& lua)
         }
     };
 
-    /// Force the LUT texture for the given layer (or both) until it is reset
+    /// Force the LUT texture for the given layer (or both) until it is reset.
     /// Pass `nil` in the first parameter to reset
     lua["set_lut"] = [](sol::optional<TEXTURE> texture_id, LAYER layer)
     {
@@ -246,10 +260,15 @@ void register_usertypes(sol::state& lua)
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color, WORLD_SHADER)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color, WORLD_SHADER)>(&VanillaRenderContext::draw_world_texture));
+    auto draw_text = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const std::string&, float, float, float, float, Color, uint32_t, uint32_t)>(&VanillaRenderContext::draw_text),
+        static_cast<void (VanillaRenderContext::*)(const TextRenderingInfo*, Color)>(&VanillaRenderContext::draw_text));
+
+    /// Used in [set_callback](#set_callback) ON.RENDER_* callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
     lua.new_usertype<VanillaRenderContext>(
         "VanillaRenderContext",
         "draw_text",
-        &VanillaRenderContext::draw_text,
+        draw_text,
         "draw_text_size",
         &VanillaRenderContext::draw_text_size,
         "draw_screen_texture",
@@ -282,8 +301,23 @@ void register_usertypes(sol::state& lua)
     texturerenderinginfo_type["source_get_quad"] = &TextureRenderingInfo::source_get_quad;
     texturerenderinginfo_type["source_set_quad"] = &TextureRenderingInfo::source_set_quad;
 
+    lua.new_usertype<Letter>(
+        "Letter",
+        "bottom",
+        &Letter::bottom,
+        "top",
+        &Letter::top,
+        "get_quad",
+        &Letter::get_quad,
+        "set_quad",
+        &Letter::set_quad,
+        "center",
+        &Letter::center);
+
     lua.new_usertype<TextRenderingInfo>(
         "TextRenderingInfo",
+        "new",
+        sol::initializers(&TextRenderingInfo_ctor),
         "x",
         &TextRenderingInfo::x,
         "y",
@@ -294,8 +328,26 @@ void register_usertypes(sol::state& lua)
         &TextRenderingInfo::width,
         "height",
         &TextRenderingInfo::height,
+        "special_texture_id",
+        &TextRenderingInfo::special_texture_id,
         "font",
-        &TextRenderingInfo::font);
+        &TextRenderingInfo::font,
+        "get_dest",
+        &TextRenderingInfo::get_dest,
+        "get_source",
+        &TextRenderingInfo::get_source,
+        "text_size",
+        &TextRenderingInfo::text_size,
+        "rotate",
+        &TextRenderingInfo::rotate,
+        "set_text",
+        &TextRenderingInfo::set_textx);
+    /* TextRenderingInfo
+    // new
+    // TextRenderingInfo:new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)
+    // Creates new TextRenderingInfo that can be used in VanillaRenderContext draw_text
+    // For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you
+    */
 
     lua.create_named_table(
         "WORLD_SHADER",

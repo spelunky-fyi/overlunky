@@ -152,7 +152,7 @@ class Flame : public Movable
 class FlameSize : public Flame
 {
   public:
-    /// if changed, gradually goes down |0.03 per frame| to the default size
+    /// if changed, gradually goes down (0.03 per frame) to the default size
     float flame_size;
 };
 
@@ -297,15 +297,15 @@ class Spark : public Flame
     float size;
     /// 0.0 when not on screen
     float size_multiply;
-    /// width and height will be set to this value * size_multiply next frame
+    /// width and height will be set to `next_size * size_multiply` next frame
     float next_size;
     /// very short timer before next size change, giving a pulsing effect
     uint8_t size_change_timer;
     uint8_t extra_padding[3];
 
-    /// This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+    /// This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     float speed;
-    /// This is cusome variable, you need to use `activate_sparktraps_hack` to use it
+    /// This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     float distance;
 };
 
@@ -487,7 +487,8 @@ class PunishBall : public Movable
 {
   public:
     int32_t attached_to_uid;
-    uint8_t unknown_state; /* unsure */
+    /// counts down from 20 while the ball is eligible to break a floor and tries to break it at 0
+    uint8_t timer;
     uint8_t unused1;
     uint16_t unused2;
     float x_pos;
@@ -505,8 +506,6 @@ class Container : public Movable
 {
   public:
     ENT_TYPE inside;
-
-    void set_on_open(std::uint32_t reserved_callback_id, std::function<void(Container*, Movable*)> on_open);
 };
 
 class Present : public Purchasable
@@ -624,7 +623,7 @@ class SkullDropTrap : public Movable
     uint8_t left_skull_drop_time;
     uint8_t middle_skull_drop_time;
     uint8_t right_skull_drop_time;
-    /// counts from 60 3 times, the last time dropping the skulls, then random longer timer for reset
+    /// counts from 60 to 0, 3 times, the last time dropping the skulls, then random longer timer for reset
     uint8_t timer;
 };
 
@@ -676,6 +675,18 @@ class MiniGameShip : public Movable
     float swing; // angle change?
     /// 0.0 - down, 1.0 - up, 0.5 - idle
     float up_down_normal;
+};
+
+class OlmecShip : public Movable
+{
+  public:
+    SoundMeta* sound;
+    int32_t unknown138;
+    Entity* door_fx;
+    ParticleEmitterInfo* smoke;
+    uint16_t flight_time;
+    int16_t unknown152;
+    bool has_spawned_jetflames;
 };
 
 class MiniGameAsteroid : public Movable
@@ -759,8 +770,10 @@ class ParachutePowerup : public Powerup
     /// this gets compared with entity's falling_timer
     uint8_t falltime_deploy;
     uint8_t unknown1;
-    uint16_t unknown2;
-    uint16_t unknown3;
+    /// Timer for spawning a single gold nugget.
+    uint16_t gold_timer; // A gold nugget will spawn when this reaches 0, then it is set to 30.
+    /// Time until gold nuggets stop spawning.
+    uint16_t gold_spawning_time;    // Once this reaches 0, gold will stop spawning.
     bool deployed;                  // if you set only this one it will crash the game after a while, also won't add new parachute to inventory
     bool deployed2;                 /* unsure */
     bool after_deploy; /* unsure */ // if set to true before deploying, parachute will drop imminently after deploy, not sure if it's even a bool
@@ -841,4 +854,12 @@ class Bow : public Purchasable
   public:
     // When lain on the ground
     virtual float get_arrow_special_offset() = 0;
+};
+
+class Web : public Movable
+{
+  public:
+    /// Is subtracted from the color alpha every frame after the `stand_counter` is more than 300.
+    /// Entity automatically dies when the alpha is less than 0.1
+    float decay_rate;
 };

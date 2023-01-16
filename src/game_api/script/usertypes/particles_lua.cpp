@@ -43,6 +43,7 @@ void register_usertypes(sol::state& lua)
     /// Use `generate_world_particles`
     lua["generate_particles"] = generate_world_particles;
 
+    /// Used in ParticleDB, [get_particle_type](#get_particle_type)
     auto particledb_type = lua.new_usertype<ParticleDB>("ParticleDB");
     particledb_type["id"] = &ParticleDB::id;
     particledb_type["spawn_count_min"] = &ParticleDB::spawn_count_min;
@@ -75,6 +76,8 @@ void register_usertypes(sol::state& lua)
     particledb_type["get_texture"] = &ParticleDB::get_texture;
     particledb_type["set_texture"] = &ParticleDB::set_texture;
 
+    /// Generic type for creating particles in the game, you can make your own with [generate_world_particles](#generate_world_particles) or [generate_screen_particles](#generate_screen_particles)<br/>
+    /// Used in ScreenCharacterSelect, ScreenTitle, CursedEffect, OnFireEffect, PoisonedEffect ...
     lua.new_usertype<ParticleEmitterInfo>(
         "ParticleEmitterInfo",
         "particle_type",
@@ -100,6 +103,7 @@ void register_usertypes(sol::state& lua)
         "emitted_particles_back_layer",
         &ParticleEmitterInfo::emitted_particles_back_layer);
 
+    /// Used in ParticleEmitterInfo
     lua.new_usertype<Particle>(
         "Particle",
         "x",

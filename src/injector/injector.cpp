@@ -12,6 +12,8 @@
 
 #include "logger.h" // for PANIC, DEBUG
 
+using namespace std::chrono_literals;
+
 std::vector<MemoryMap> memory_map(const Process& proc)
 {
     std::vector<MemoryMap> result;
@@ -48,7 +50,8 @@ size_t find_base(Process proc, std::string name)
             return item.addr;
     }
 
-    PANIC("Cannot find library in the target process: {}", name);
+    ERR("Cannot find library in the target process: {}", name);
+    return 0;
 }
 
 LPVOID alloc(Process proc, size_t size)
@@ -58,7 +61,7 @@ LPVOID alloc(Process proc, size_t size)
     {
         PANIC("Allocation failed: {:#x}", GetLastError());
     }
-    DEBUG("Allocated memory: {}", res);
+    // DEBUG("Allocated memory: {}", res);
     return res;
 }
 
@@ -80,26 +83,32 @@ LPTHREAD_START_ROUTINE find_function(const Process& proc, const std::string& lib
 
     if (library_ptr == 0)
     {
-        PANIC("Cannot find the address of the library in current process: {}", library.data());
+        ERR("Cannot find the address of the library in current process: {}", library.data());
+        return nullptr;
     }
 
     auto addr = (size_t)GetProcAddress((HMODULE)library_ptr, function.data());
 
     if (addr == 0)
     {
-        PANIC(
+        ERR(
             "Cannot find the address of the function in current process: {} :: "
             "{}",
             library.data(),
             function.data());
+        return nullptr;
     }
 
-    return reinterpret_cast<LPTHREAD_START_ROUTINE>(addr - library_ptr + find_base(proc, library));
+    auto base = find_base(proc, library);
+    if (base == 0)
+        return nullptr;
+
+    return reinterpret_cast<LPTHREAD_START_ROUTINE>(addr - library_ptr + base);
 }
 
 void call(const Process& proc, LPTHREAD_START_ROUTINE addr, LPVOID args)
 {
-    DEBUG("Calling: {}", (void*)addr);
+    // DEBUG("Calling: {}", (void*)addr);
     auto handle = CreateRemoteThread(proc.handle, nullptr, 0, addr, args, 0, nullptr);
     WaitForSingleObject(handle, INFINITE);
 }
@@ -107,8 +116,24 @@ void call(const Process& proc, LPTHREAD_START_ROUTINE addr, LPVOID args)
 void inject_dll(const Process& proc, const std::string& name)
 {
     auto str = alloc_str(proc, name);
-    DEBUG("Injecting DLL into process... {}", name);
-    call(proc, find_function(proc, "KERNEL32.DLL", "LoadLibraryA"), str);
+    INFO("Injecting DLL into process... {}", name);
+    int tries = 1;
+    LPTHREAD_START_ROUTINE func;
+    do
+    {
+        func = find_function(proc, "KERNEL32.DLL", "LoadLibraryA");
+        if (func == nullptr)
+        {
+            if (tries < 4)
+            {
+                INFO("Retrying in a jiffy...");
+                std::this_thread::sleep_for(tries * 1s);
+            }
+        }
+    } while (func == nullptr && ++tries < 5);
+    if (func == nullptr)
+        PANIC("Injecting failed, maybe you should try --launch_game instead...");
+    call(proc, func, str);
 }
 
 std::vector<ProcessInfo> get_processes()

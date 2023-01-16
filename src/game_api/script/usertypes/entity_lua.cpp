@@ -50,6 +50,7 @@ void register_usertypes(sol::state& lua)
     color_type["get_ucolor"] = &Color::get_ucolor;
     color_type["set_ucolor"] = &Color::set_ucolor;
 
+    /// Used in EntityDB
     lua.new_usertype<Animation>(
         "Animation",
         "id",
@@ -63,6 +64,8 @@ void register_usertypes(sol::state& lua)
         "repeat_mode",
         &Animation::repeat);
 
+    /// Used in Entity and [get_type](#get_type)<br/>
+    /// Stores static common data for an ENT_TYPE. You can also clone entity types with the copy constructor to create new custom entities with different common properties. [This tool](https://dregu.github.io/Spelunky2ls/animation.html) can be helpful when messing with the animations. The default values are also listed in [entities.json](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/entities.json).
     auto entitydb_type = lua.new_usertype<EntityDB>("EntityDB", sol::constructors<EntityDB(EntityDB&), EntityDB(ENT_TYPE)>{});
     entitydb_type["id"] = &EntityDB::id;
     entitydb_type["search_flags"] = &EntityDB::search_flags;
@@ -73,6 +76,8 @@ void register_usertypes(sol::state& lua)
     entitydb_type["hitboxx"] = &EntityDB::default_hitboxx;
     entitydb_type["hitboxy"] = &EntityDB::default_hitboxy;
     entitydb_type["draw_depth"] = &EntityDB::draw_depth;
+    entitydb_type["collision2_mask"] = &EntityDB::collision2_mask;
+    entitydb_type["collision_mask"] = &EntityDB::collision_mask;
     entitydb_type["friction"] = &EntityDB::friction;
     entitydb_type["elasticity"] = &EntityDB::elasticity;
     entitydb_type["weight"] = &EntityDB::weight;
@@ -86,8 +91,9 @@ void register_usertypes(sol::state& lua)
     entitydb_type["glow_alpha"] = &EntityDB::glow_alpha;
     entitydb_type["damage"] = &EntityDB::damage;
     entitydb_type["life"] = &EntityDB::life;
+    entitydb_type["sacrifice_value"] = &EntityDB::sacrifice_value;
     entitydb_type["blood_content"] = &EntityDB::blood_content;
-    entitydb_type["texture"] = &EntityDB::texture;
+    entitydb_type["texture"] = &EntityDB::texture_id;
     entitydb_type["animations"] = &EntityDB::animations;
     entitydb_type["properties_flags"] = &EntityDB::properties_flags;
     entitydb_type["default_flags"] = &EntityDB::default_flags;
@@ -99,7 +105,7 @@ void register_usertypes(sol::state& lua)
     entitydb_type["tilex"] = &EntityDB::tile_x;
     entitydb_type["tiley"] = &EntityDB::tile_y;
 
-    /// Some information used to render the entity, can not be changed
+    /// Some information used to render the entity, can not be changed, used in Entity
     lua.new_usertype<RenderInfo>(
         "RenderInfo",
         "x",
@@ -111,17 +117,18 @@ void register_usertypes(sol::state& lua)
         "source",
         &RenderInfo::source,
         "destination",
-        sol::property([](const RenderInfo& ri) -> Quad
-                      { return Quad{
-                            ri.destination_bottom_left_x,
-                            ri.destination_bottom_left_y,
-                            ri.destination_bottom_right_x,
-                            ri.destination_bottom_right_y,
-                            ri.destination_top_right_x,
-                            ri.destination_top_right_y,
-                            ri.destination_top_left_x,
-                            ri.destination_top_left_y,
-                        }; }),
+        sol::property(
+            [](const RenderInfo& ri) -> Quad
+            { return Quad{
+                  ri.destination_bottom_left_x,
+                  ri.destination_bottom_left_y,
+                  ri.destination_bottom_right_x,
+                  ri.destination_bottom_right_y,
+                  ri.destination_top_right_x,
+                  ri.destination_top_right_y,
+                  ri.destination_top_left_x,
+                  ri.destination_top_left_y,
+              }; }),
         "tilew",
         &RenderInfo::tilew,
         "tileh",
@@ -129,7 +136,9 @@ void register_usertypes(sol::state& lua)
         "facing_left",
         &RenderInfo::flip_horizontal,
         "render_inactive",
-        &RenderInfo::render_inactive);
+        &RenderInfo::render_inactive,
+        "get_entity",
+        &RenderInfo::get_entity);
 
     auto get_overlay = [&lua](Entity& entity)
     {
@@ -219,6 +228,7 @@ void register_usertypes(sol::state& lua)
     entity_type["set_invisible"] = &Entity::set_invisible;
     entity_type["get_items"] = &Entity::get_items;
     entity_type["is_in_liquid"] = &Entity::is_in_liquid;
+    entity_type["is_cursed"] = &Entity::is_cursed;
     /* Entity
     // user_data
     // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LEVEL_GENERATION.
@@ -257,6 +267,7 @@ void register_usertypes(sol::state& lua)
     movable_type["some_state"] = &Movable::some_state;
     movable_type["wet_effect_timer"] = &Movable::wet_effect_timer;
     movable_type["poison_tick_timer"] = &Movable::poison_tick_timer;
+    /// NoDoc
     movable_type["airtime"] = &Movable::falling_timer;
     movable_type["falling_timer"] = &Movable::falling_timer;
     movable_type["is_poisoned"] = &Movable::is_poisoned;
@@ -286,6 +297,7 @@ void register_usertypes(sol::state& lua)
     movable_type["get_behavior"] = &Movable::get_behavior;
     movable_type["set_gravity"] = &Movable::set_gravity;
     movable_type["reset_gravity"] = &Movable::reset_gravity;
+    movable_type["set_position"] = &Movable::set_position;
 
     lua["Entity"]["as_entity"] = &Entity::as<Entity>;
     lua["Entity"]["as_movable"] = &Entity::as<Movable>;
@@ -381,7 +393,7 @@ void register_usertypes(sol::state& lua)
     // Also includes: DECORATION_PALACE_PORTRAIT
     // Various types, all `Entity`
     // SHADOW
-    // All the BG_* entities excluded from `BG` (MASK.BG | MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above
+    // All the BG_* entities excluded from `BG` (MASK.BG &#124; MASK.SHADOW) will get you all BG_* entities plus one extra decoration mentioned above
     // Various types, all `Entity`
     // LOGICAL
     // All LOGICAL_* entities
@@ -394,7 +406,7 @@ void register_usertypes(sol::state& lua)
     // Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA
     // Various types, all `Entity`
     // LIQUID
-    // Short for (MASK.WATER | MASK.LAVA)
+    // Short for (MASK.WATER &#124; MASK.LAVA)
     // ANY
     // Value of 0, treated by all the functions as ANY mask
     */

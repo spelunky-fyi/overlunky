@@ -52,7 +52,7 @@ struct Memory
     {
         static Memory mem{[]()
                           {
-                              auto exe = (size_t)GetModuleHandleA("Spel2.exe");
+                              auto exe = (size_t)GetModuleHandleA(NULL);
 
                               // Skipping bundle for faster memory search
                               auto after_bundle_ = find_after_bundle(exe);
@@ -98,44 +98,35 @@ void recover_mem(std::string name, size_t addr = NULL);
 
 template <typename T>
 requires std::is_trivially_copyable_v<T>
-    std::string_view to_le_bytes(const T& payload)
+std::string_view to_le_bytes(const T& payload)
 {
     return std::string_view{reinterpret_cast<const char*>(&payload), sizeof(payload)};
 }
 
 template <class T>
-requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_recoverable(std::string name, size_t addr, const T& payload, bool prot)
+requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>)
+void write_mem_recoverable(std::string name, size_t addr, const T& payload, bool prot)
 {
     write_mem_recoverable(name, addr, to_le_bytes(payload), prot);
 }
 template <class T>
-requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>) void write_mem_prot(size_t addr, const T& payload, bool prot)
+requires(std::is_trivially_copyable_v<T> && !std::is_same_v<T, std::string_view>)
+void write_mem_prot(size_t addr, const T& payload, bool prot)
 {
     write_mem_prot(addr, to_le_bytes(payload), prot);
 }
 template <class T>
-requires std::is_trivially_copyable_v<T> void write_mem_prot(void* addr, const T& payload, bool prot)
+requires std::is_trivially_copyable_v<T>
+void write_mem_prot(void* addr, const T& payload, bool prot)
 {
     write_mem_prot((size_t)addr, to_le_bytes(payload), prot);
 }
 
-#define DEFINE_ACCESSOR(name, type)                       \
-    [[maybe_unused]] inline type read_##name(size_t addr) \
-    {                                                     \
-        return *(type*)(addr);                            \
-    }
-
-DEFINE_ACCESSOR(u8, uint8_t);
-
-DEFINE_ACCESSOR(u32, uint32_t);
-
-DEFINE_ACCESSOR(u64, uint64_t);
-
-DEFINE_ACCESSOR(i32, int32_t);
-
-DEFINE_ACCESSOR(i64, int64_t);
-
-DEFINE_ACCESSOR(f32, float);
+template <typename T>
+inline T memory_read(size_t addr)
+{
+    return *(T*)(addr);
+}
 
 template <class FunT, typename T>
 FunT* vtable_find(T* obj, size_t index)

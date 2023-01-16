@@ -27,36 +27,54 @@ class Entity;
 class Movable;
 
 struct EntityHooksInfo;
+using ENT_FLAG = uint32_t;
+using ENT_MORE_FLAG = uint32_t;
 
 class Entity
 {
   public:
+    /// Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the EntityDB
     EntityDB* type;
     Entity* overlay;
     EntityList items;
-    uint32_t flags;
-    uint32_t more_flags;
+    /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) entity_flags
+    ENT_FLAG flags;
+    /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) more_flags
+    ENT_MORE_FLAG more_flags;
+    /// Unique id of the entity, save it to variable to check this entity later (don't use the whole Entity type as it will be replaced with a different one when this is destroyed)
     int32_t uid;
+    /// Number (id) of the sprite in the texture
     uint16_t animation_frame;
-    /// Don't edit this directly, use `set_draw_depth`
+    /// Depth level that this entity is drawn on.
+    /// Don't edit this directly, use `set_draw_depth` function
     uint8_t draw_depth;
     uint8_t b3f; // depth related, changed when going thru doors etc.
+    /// Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
     float x;
+    /// Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
     float y;
     float abs_x; // only for movable entities, or entities that can be spawned without overlay, for the rest it's FLOAT_MIN?
     float abs_y;
+    /// Width of the sprite
     float w;
+    /// Height of the sprite
     float h;
+    /// Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
     float special_offsetx;
+    /// Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
     float special_offsety;
     Color color;
     union
     {
         struct
         {
+            /// Offset of the hitbox in relation to the entity position
             float offsetx;
+            /// Offset of the hitbox in relation to the entity position
             float offsety;
+            /// Half of the width of the hitbox
             float hitboxx;
+            /// Half of the height of the hitbox
             float hitboxy;
             SHAPE shape;         // 1 = rectangle, 2 = circle
             bool hitbox_enabled; // probably, off for bg, deco, logical etc
@@ -68,13 +86,19 @@ class Entity
     float angle;
     RenderInfo* rendering_info;
     Texture* texture;
+    /// Size of the sprite in the texture
     float tilew;
+    /// Size of the sprite in the texture
     float tileh;
+    /// Use `set_layer` to change
     uint8_t layer;
     uint8_t b99; // this looks like FLOORSTYLED post-processing
     uint8_t b9a;
     uint8_t b9b;
     uint32_t i9c;
+    /* for the autodoc
+    any user_data;
+    */
 
     size_t pointer()
     {
@@ -156,25 +180,30 @@ class Entity
     /// Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     bool set_texture(TEXTURE texture_id);
 
-    void unhook(std::uint32_t id);
-    struct EntityHooksInfo& get_hooks();
-
     bool is_player();
     bool is_movable();
     bool is_liquid();
+    bool is_cursed()
+    {
+        return more_flags & 0x4000;
+    };
 
-    std::uint32_t set_on_dtor(std::function<void(Entity*)> cb);
-    std::uint32_t reserve_callback_id();
-    void set_on_destroy(std::uint32_t reserved_callback_id, std::function<void(Entity*)> on_destroy);
-    void set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill);
-    void set_on_player_instagib(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> on_instagib);
-    void set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage);
-    void set_pre_floor_update(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> pre_update);
-    void set_post_floor_update(std::uint32_t reserved_callback_id, std::function<void(Entity*)> post_update);
-    void set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1);
-    void set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2);
-    void set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render);
-    void set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render);
+    // for supporting HookableVTable
+    uint32_t get_aux_id() const
+    {
+        return uid;
+    }
+
+    // Needed despite HookableVTable for cleanup of arbitrary entity related data
+    std::uint32_t set_on_dtor(std::function<void(Entity*)> cb)
+    {
+        return hook_dtor_impl(this, std::move(cb));
+    }
+    void clean_on_dtor(std::uint32_t dtor_cb_id)
+    {
+        clear_dtor_impl(this, dtor_cb_id);
+    }
+
     void set_enable_turning(bool enabled);
 
     std::span<uint32_t> get_items();
@@ -184,6 +213,16 @@ class Entity
     {
         return static_cast<T*>(this);
     }
+
+    static void set_hook_dtor_impl(
+        std::function<std::uint32_t(Entity*, std::function<void(Entity*)>)> hook_fun,
+        std::function<void(Entity*, std::uint32_t)> clear_fun)
+    {
+        hook_dtor_impl = std::move(hook_fun);
+        clear_dtor_impl = std::move(clear_fun);
+    }
+    inline static std::function<std::uint32_t(Entity*, std::function<void(Entity*)>)> hook_dtor_impl{};
+    inline static std::function<void(Entity*, std::uint32_t)> clear_dtor_impl{};
 
     virtual ~Entity() = 0; // vritual 0
     virtual void create_rendering_info() = 0;
@@ -222,7 +261,9 @@ class Entity
     virtual void activate(Entity* activator) = 0;
 
     virtual void on_collision2(Entity* other_entity) = 0; // needs investigating, difference between this and on_collision1, maybe this is on_hitbox_overlap as it works for logical tiggers
-    virtual uint16_t get_metadata() = 0;                  // e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+
+    /// e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+    virtual uint16_t get_metadata() = 0;
     virtual void apply_metadata(uint16_t metadata) = 0;
     virtual void on_walked_on_by(Entity* walker) = 0;  // hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
     virtual void on_walked_off_by(Entity* walker) = 0; // appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item_ptr

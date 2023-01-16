@@ -1,5 +1,6 @@
 import re
 import os
+from ast import literal_eval
 
 from generate_util import *
 from parse_cache import *
@@ -104,6 +105,9 @@ api_files = [
     "../src/game_api/script/usertypes/socket_lua.cpp",
     "../src/game_api/script/usertypes/steam_lua.cpp",
 ]
+vtable_api_files = [
+    "../src/game_api/script/usertypes/vtables_lua.cpp",
+]
 rpc = []
 classes = []
 events = []
@@ -144,6 +148,10 @@ def get_cb_signature(text):
             "param": signature_m[3],
         }
     return None
+
+
+def camel_case_to_snake_case(name):
+    return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
 
 
 def fix_constructor_param(params_text):
@@ -458,6 +466,78 @@ def run_parse():
             if c:
                 comment.append(c.group(1))
 
+    print_collecting_info("vtables")
+    vtables_by_usertype = {}
+    vtable_override_tables = {}
+    for file in vtable_api_files:
+        data = open(file, "r").read().split("\n")
+        vtables = {}
+        vtable_name = None
+        for line in data:
+            if vtable_def := re.search(
+                r'static (\w*) \w*\(lua, lua\["(.*)"\](, "(.*)")?\)', line
+            ):
+                vtable_name = vtable_def.group(1)
+                usertype = vtable_def.group(2)
+                table_name = vtable_def.group(4)
+                vtable_decl = vtables[vtable_name]
+                vtable_decl["usertype"] = usertype
+                vtable_decl["override_table"] = table_name
+
+                if table_name not in vtable_override_tables:
+                    vtable_override_tables[table_name] = []
+                override_table = vtable_override_tables[table_name]
+                for entry in vtable_decl["entries"].values():
+                    override_table.append(
+                        {"name": entry["name"].upper(), "type": str(entry["index"])}
+                    )
+
+                vtable_name = None
+            elif vtable_name == None and "HookableVTable<" in line:
+                vtable_name = line.split()[1]
+                vtable_entries = {}
+            elif vtable_name != None:
+                if entry_math := re.search(r"VTableEntry<(.*)>", line):
+                    [name, index, signature_and_binder] = entry_math.group(1).split(
+                        ",", 2
+                    )
+                    name = name.strip('" ')
+                    index = literal_eval(index.strip())
+                    if binds := re.search(r"BackBinder<([^>]*)>", signature_and_binder):
+                        binds = binds.group(1)
+                        binds = replace_fun(
+                            "{} {}".format(binds, camel_case_to_snake_case(binds))
+                        )
+                    else:
+                        binds = None
+                    signature = re.sub(
+                        r"\), BackBinder<([^>]*)>", r", \g<1>)", signature_and_binder
+                    ).replace("(, ", "(")
+                    signature = re.search(
+                        r"([_a-zA-Z][_a-zA-Z0-9]*.*)\((.*)\)", signature
+                    )
+                    ret = replace_fun(signature.group(1).strip())
+                    args = [
+                        replace_fun(t.strip()) for t in signature.group(2).split(",")
+                    ]
+                    vtable_entries[name] = {
+                        "name": name,
+                        "index": index,
+                        "ret": ret,
+                        "args": args,
+                        "binds": binds,
+                    }
+                    if ">>;" in line:
+                        vtables[vtable_name] = {
+                            "name": vtable_name,
+                            "entries": vtable_entries,
+                        }
+                        vtable_name = None
+                        vtable_entries = None
+
+        for vtable_decl in vtables.values():
+            vtables_by_usertype[vtable_decl["usertype"]] = vtable_decl
+
     print_collecting_info("usertypes")
     for file in api_files:
         data = open(file, "r").read()
@@ -628,6 +708,95 @@ def run_parse():
                             )
                         else:
                             vars.append({"name": var_name, "type": cpp})
+
+            if name in vtables_by_usertype:
+                vtable = vtables_by_usertype[name]
+                override_table = vtable["override_table"]
+                vars.append(
+                    {
+                        "name": "set_pre_virtual",
+                        "signature": f"CallbackId set_pre_virtual({override_table} entry, function fun)",
+                        "comment": [
+                            "Hooks before the virtual function at index `entry`."
+                        ],
+                        "function": True,
+                    }
+                )
+                vars.append(
+                    {
+                        "name": "set_post_virtual",
+                        "signature": f"CallbackId set_post_virtual({override_table} entry, function fun)",
+                        "comment": [
+                            "Hooks after the virtual function at index `entry`."
+                        ],
+                        "function": True,
+                    }
+                )
+                vars.append(
+                    {
+                        "name": "clear_virtual",
+                        "signature": f"nil clear_virtual(CallbackId callback_id)",
+                        "comment": [
+                            "Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook."
+                        ],
+                        "function": True,
+                    }
+                )
+
+                for entry in vtable["entries"].values():
+                    entry_name = entry["name"]
+
+                    pre_signature = None
+                    post_signature = None
+                    cpp_comment = []
+                    if entry_name in underlying_cpp_type["member_funs"]:
+                        for fun in underlying_cpp_type["member_funs"][entry_name]:
+                            ret = fun["return"]
+                            ret = f"optional<{ret}>" if ret else "bool"
+                            ret = ret if entry_name != "dtor" else "nil"
+                            param = fun["param"]
+                            binds = entry["binds"]
+                            if binds:
+                                param = f"{param}, {binds}"
+                            pre_signature = f"{ret} {entry_name}({param})"
+                            post_signature = f"nil {entry_name}({param})"
+                            cpp_comment = fun["comment"]
+                            if cpp_comment:
+                                cpp_comment = ["Virtual function docs:"] + cpp_comment
+                            break
+                    else:
+                        ret = entry["ret"]
+                        ret = f"optional<{ret}>" if ret != "nil" else "bool"
+                        ret = ret if entry_name != "dtor" else "nil"
+                        args = " ".join(entry["args"])
+                        pre_signature = f"{ret} {entry_name}({args})"
+                        post_signature = f"nil {entry_name}({args})"
+
+                    vars.append(
+                        {
+                            "name": f"set_pre_{entry_name}",
+                            "signature": f"CallbackId set_pre_{entry_name}(function fun)",
+                            "comment": [
+                                "Hooks before the virtual function.",
+                                f"The callback signature is `{pre_signature}`",
+                            ]
+                            + cpp_comment,
+                            "function": True,
+                        }
+                    )
+                    vars.append(
+                        {
+                            "name": f"set_post_{entry_name}",
+                            "signature": f"CallbackId set_post_{entry_name}(function fun)",
+                            "comment": [
+                                "Hooks after the virtual function.",
+                                f"The callback signature is `{post_signature}`",
+                            ]
+                            + cpp_comment,
+                            "function": True,
+                        }
+                    )
+
             types.append({"name": name, "vars": vars, "base": base})
 
     print_collecting_info("entities")
@@ -684,6 +853,9 @@ def run_parse():
                 var[1] = var[1].replace("\\]", ")")
                 vars.append({"name": var[0], "type": var[1]})
             enums.append({"name": name, "vars": vars})
+
+    for name, values in vtable_override_tables.items():
+        enums.append({"name": name, "vars": values})
 
     for file in api_files:
         data = open(file, "r").read()

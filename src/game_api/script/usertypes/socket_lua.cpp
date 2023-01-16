@@ -16,27 +16,36 @@
 #include <winsock2.h>            // for sockaddr_in, SOCKET
 #include <ws2tcpip.h>            // for inet_ntop
 
-#include "logger.h" // for DEBUG, ByteStr
+#include "logger.h"               // for DEBUG, ByteStr
+#include "script/lua_backend.hpp" // for LuaBackend
+#include "script/safe_cb.hpp"     // for make_safe_cb
 
 void udp_data(sockpp::udp_socket socket, UdpServer* server)
 {
     ssize_t n;
     char buf[500];
     sockpp::inet_address src;
-    while ((n = socket.recv_from(buf, sizeof(buf), &src)) > 0)
+    while (server->kill_thr.test(std::memory_order_acquire) && (n = socket.recv_from(buf, sizeof(buf), &src)) > 0)
     {
-        sol::optional<std::string> ret = server->cb(std::string(buf, n));
+        std::optional<std::string> ret = server->cb(std::string(buf, n));
         if (ret)
+        {
             socket.send_to(ret.value(), src);
+        }
     }
 }
 
-UdpServer::UdpServer(std::string host_, in_port_t port_, sol::function cb_)
+UdpServer::UdpServer(std::string host_, in_port_t port_, std::function<SocketCb> cb_)
     : host(host_), port(port_), cb(cb_)
 {
     sock.bind(sockpp::inet_address(host, port));
-    std::thread thr(udp_data, std::move(sock), this);
-    thr.detach();
+    kill_thr.test_and_set();
+    thr = std::thread(udp_data, std::move(sock), this);
+}
+UdpServer::~UdpServer()
+{
+    kill_thr.clear(std::memory_order_release);
+    thr.join();
 }
 
 using NetFun = int(SOCKET, char*, int, int, sockaddr_in*, int*);
@@ -65,9 +74,10 @@ namespace NSocket
 void register_usertypes(sol::state& lua)
 {
     /// Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
+    /// The server will be closed once the handle is released.
     lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) -> UdpServer*
     {
-        UdpServer* server = new UdpServer(std::move(host), std::move(port), std::move(cb));
+        UdpServer* server = new UdpServer(std::move(host), std::move(port), make_safe_cb<UdpServer::SocketCb>(std::move(cb)));
         return server;
     };
 

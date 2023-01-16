@@ -28,8 +28,6 @@
 
 using namespace std::chrono_literals;
 
-std::vector<EntityHooksInfo> g_entity_hooks;
-
 void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
 {
     if (overlay)
@@ -183,13 +181,8 @@ void Entity::remove_item(uint32_t item_uid)
 
 void Movable::poison(int16_t frames)
 {
-    static size_t offset_first = 0;
-    static size_t offset_subsequent = 0;
-    if (offset_first == 0)
-    {
-        offset_first = get_address("first_poison_tick_timer_default");
-        offset_subsequent = get_address("subsequent_poison_tick_timer_default");
-    }
+    static const size_t offset_first = get_address("first_poison_tick_timer_default");
+    static const size_t offset_subsequent = get_address("subsequent_poison_tick_timer_default");
     poison_tick_timer = frames;
 
     if (frames == -1)
@@ -239,54 +232,6 @@ bool Movable::is_button_held(BUTTON button)
 bool Movable::is_button_released(BUTTON button)
 {
     return (buttons & button) == 0 && (buttons_previous & button) == button;
-}
-
-void hook_movable_state_machine(Movable* _self)
-{
-    hook_vtable<void(Movable*)>(
-        _self,
-        [](Movable* self, void (*original)(Movable*))
-        {
-            EntityHooksInfo& hook_info = self->get_hooks();
-
-            bool skip_orig = false;
-            for (auto& [id, pre] : hook_info.pre_statemachine)
-            {
-                if (pre(self))
-                {
-                    skip_orig = true;
-                }
-            }
-
-            if (!skip_orig)
-            {
-                original(self);
-            }
-
-            for (auto& [id, post] : hook_info.post_statemachine)
-            {
-                post(self);
-            }
-        },
-        0x2);
-}
-void Movable::set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_statemachine.empty() && hook_info.post_statemachine.empty())
-    {
-        hook_movable_state_machine(this);
-    }
-    hook_info.pre_statemachine.push_back({reserved_callback_id, std::move(pre_state_machine)});
-}
-void Movable::set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_statemachine.empty() && hook_info.post_statemachine.empty())
-    {
-        hook_movable_state_machine(this);
-    }
-    hook_info.post_statemachine.push_back({reserved_callback_id, std::move(post_state_machine)});
 }
 
 std::tuple<float, float, uint8_t> get_position(uint32_t uid)
@@ -372,208 +317,6 @@ bool Entity::set_texture(TEXTURE texture_id)
     return false;
 }
 
-void Entity::unhook(std::uint32_t id)
-{
-    auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [this](auto& hook)
-                           { return hook.entity == uid; });
-    if (it != g_entity_hooks.end())
-    {
-        std::erase_if(it->on_dtor, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->on_destroy, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->on_kill, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->on_player_instagib, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->on_damage, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->pre_floor_update, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->post_floor_update, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->pre_statemachine, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->post_statemachine, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->on_open, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->pre_collision1, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->pre_collision2, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->pre_render, [id](auto& hook)
-                      { return hook.id == id; });
-        std::erase_if(it->post_render, [id](auto& hook)
-                      { return hook.id == id; });
-    }
-}
-EntityHooksInfo& Entity::get_hooks()
-{
-    auto it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [this](auto& hook)
-                           { return hook.entity == uid; });
-    if (it == g_entity_hooks.end())
-    {
-        hook_dtor(this, [](void* self)
-                  {
-                      auto _it = std::find_if(g_entity_hooks.begin(), g_entity_hooks.end(), [self](auto& hook)
-                                              { return hook.entity == ((Entity*)self)->uid; });
-                      if (_it != g_entity_hooks.end())
-                      {
-                          for (auto& cb : _it->on_dtor)
-                          {
-                              cb.fun((Entity*)self);
-                          }
-                          g_entity_hooks.erase(_it);
-                      } });
-        g_entity_hooks.push_back({uid});
-        return g_entity_hooks.back();
-    }
-    return *it;
-}
-
-std::uint32_t Entity::set_on_dtor(std::function<void(Entity*)> cb)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    hook_info.on_dtor.push_back({hook_info.cbcount++, std::move(cb)});
-    return hook_info.on_dtor.back().id;
-}
-std::uint32_t Entity::reserve_callback_id()
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    return hook_info.cbcount++;
-}
-void Entity::set_on_destroy(std::uint32_t reserved_callback_id, std::function<void(Entity*)> on_destroy)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.on_destroy.empty())
-    {
-        hook_vtable<void(Entity*)>(
-            this,
-            [](Entity* self, void (*original)(Entity*))
-            {
-                EntityHooksInfo& _hook_info = self->get_hooks();
-                for (auto& [id, _on_destroy] : _hook_info.on_destroy)
-                {
-                    _on_destroy(self);
-                }
-                original(self);
-            },
-            0x5);
-    }
-    hook_info.on_destroy.push_back({reserved_callback_id, std::move(on_destroy)});
-}
-void Entity::set_on_kill(std::uint32_t reserved_callback_id, std::function<void(Entity*, Entity*)> on_kill)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.on_kill.empty())
-    {
-        hook_vtable<void(Entity*, bool, Entity*)>(
-            this,
-            [](Entity* self, bool _some_bool, Entity* from, void (*original)(Entity*, bool, Entity*))
-            {
-                EntityHooksInfo& _hook_info = self->get_hooks();
-                for (auto& [id, _on_kill] : _hook_info.on_kill)
-                {
-                    _on_kill(self, from);
-                }
-                original(self, _some_bool, from);
-            },
-            0x3);
-    }
-    hook_info.on_kill.push_back({reserved_callback_id, std::move(on_kill)});
-}
-
-void Entity::set_on_player_instagib(std::uint32_t reserved_callback_id, std::function<bool(Entity*)> on_instagib)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    // no hooking here, because the instagib function is hooked in rpc.cpp
-    hook_info.on_player_instagib.push_back({reserved_callback_id, std::move(on_instagib)});
-}
-
-void Entity::set_on_damage(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*, int8_t, float, float, uint16_t, uint8_t)> on_damage)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.on_damage.empty())
-    {
-        if ((this->type->search_flags & 0x1) == 0x1)
-        {
-            // Can't hook player::on_damage here, because this is permanently hooked for the god function.
-            // The god function takes care of calling the script hooks in rpc.cpp
-        }
-        else
-        {
-            hook_vtable<void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t)>(
-                this,
-                [](Entity* self, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint16_t stun_amount, uint8_t iframes, void (*original)(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t))
-                {
-                    EntityHooksInfo& _hook_info = self->get_hooks();
-                    bool skip_orig = false;
-                    for (auto& [id, _on_damage] : _hook_info.on_damage)
-                    {
-                        if (_on_damage(self, damage_dealer, damage_amount, velocities[0], velocities[1], stun_amount, iframes))
-                        {
-                            skip_orig = true;
-                        }
-                    }
-
-                    if (!skip_orig)
-                    {
-                        original(self, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
-                    }
-                },
-                0x30);
-        }
-    }
-    hook_info.on_damage.push_back({reserved_callback_id, std::move(on_damage)});
-}
-
-auto hook_update_callback(Entity* self)
-{
-    hook_vtable<void(Entity*)>(
-        self,
-        [](Entity* entity, void (*original)(Entity*))
-        {
-            EntityHooksInfo& _hook_info = entity->get_hooks();
-            bool skip_original{false};
-            for (auto& [id, pre] : _hook_info.pre_floor_update)
-            {
-                if (pre(entity))
-                {
-                    skip_original = true;
-                    break;
-                }
-            }
-            if (!skip_original)
-            {
-                original(entity);
-            }
-            for (auto& [id, post] : _hook_info.post_floor_update)
-            {
-                post(entity);
-            }
-        },
-        0x26);
-}
-void Entity::set_pre_floor_update(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_update)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_floor_update.empty() && hook_info.post_floor_update.empty())
-    {
-        hook_update_callback(this);
-    }
-    hook_info.pre_floor_update.push_back({reserved_callback_id, std::move(pre_update)});
-}
-void Entity::set_post_floor_update(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_update)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_floor_update.empty() && hook_info.post_floor_update.empty())
-    {
-        hook_update_callback(this);
-    }
-    hook_info.post_floor_update.push_back({reserved_callback_id, std::move(post_update)});
-}
-
 bool Entity::is_player()
 {
     if (type->search_flags & 1)
@@ -610,112 +353,6 @@ bool Entity::is_liquid()
     return false;
 }
 
-void Entity::set_pre_collision1(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision1)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_collision1.empty())
-    {
-        hook_vtable<void(Entity*, Entity*)>(
-            this,
-            [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
-            {
-                EntityHooksInfo& _hook_info = self->get_hooks();
-
-                bool skip_orig = false;
-                for (auto& [id, pre] : _hook_info.pre_collision1)
-                {
-                    if (pre(self, collision_entity))
-                    {
-                        skip_orig = true;
-                    }
-                }
-
-                if (!skip_orig)
-                {
-                    original(self, collision_entity);
-                }
-            },
-            0x4);
-    }
-    hook_info.pre_collision1.push_back({reserved_callback_id, std::move(pre_collision1)});
-}
-
-void Entity::set_pre_collision2(std::uint32_t reserved_callback_id, std::function<bool(Entity*, Entity*)> pre_collision2)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_collision2.empty())
-    {
-        hook_vtable<void(Entity*, Entity*)>(
-            this,
-            [](Entity* self, Entity* collision_entity, void (*original)(Entity*, Entity*))
-            {
-                EntityHooksInfo& _hook_info = self->get_hooks();
-
-                bool skip_orig = false;
-                for (auto& [id, pre] : _hook_info.pre_collision2)
-                {
-                    if (pre(self, collision_entity))
-                    {
-                        skip_orig = true;
-                    }
-                }
-
-                if (!skip_orig)
-                {
-                    original(self, collision_entity);
-                }
-            },
-            0x1A);
-    }
-    hook_info.pre_collision2.push_back({reserved_callback_id, std::move(pre_collision2)});
-}
-
-auto hook_render_callback(Entity* self, RenderInfo* self_rendering_info)
-{
-    hook_vtable<void(RenderInfo*, float*)>(
-        self_rendering_info,
-        [uid = self->uid](RenderInfo* render_info, float* floats, void (*original)(RenderInfo*, float* floats))
-        {
-            Entity* entity = get_entity_ptr_local(uid);
-            EntityHooksInfo& _hook_info = entity->get_hooks();
-            bool skip_original{false};
-            for (auto& [id, pre] : _hook_info.pre_render)
-            {
-                if (pre(entity))
-                {
-                    skip_original = true;
-                    break;
-                }
-            }
-            if (!skip_original)
-            {
-                original(render_info, floats);
-            }
-            for (auto& [id, post] : _hook_info.post_render)
-            {
-                post(entity);
-            }
-        },
-        0x3);
-}
-void Entity::set_pre_render(std::uint32_t reserved_callback_id, std::function<bool(Entity* self)> pre_render)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_render.empty() && hook_info.post_render.empty())
-    {
-        hook_render_callback(this, rendering_info);
-    }
-    hook_info.pre_render.push_back({reserved_callback_id, std::move(pre_render)});
-}
-void Entity::set_post_render(std::uint32_t reserved_callback_id, std::function<void(Entity* self)> post_render)
-{
-    EntityHooksInfo& hook_info = get_hooks();
-    if (hook_info.pre_render.empty() && hook_info.post_render.empty())
-    {
-        hook_render_callback(this, rendering_info);
-    }
-    hook_info.post_render.push_back({reserved_callback_id, std::move(post_render)});
-}
 void Entity::set_enable_turning(bool enabled)
 {
     set_entity_turning(this, enabled);
@@ -792,16 +429,47 @@ uint32_t Movable::get_behavior()
 
 void Movable::set_gravity(float gravity)
 {
-    hook_vtable<void(Movable*, float)>(
+    hook_vtable<void(Movable*, float), 0x53>(
         this,
         [gravity](Movable* ent, [[maybe_unused]] float _gravity, void (*original)(Movable*, float))
         {
             original(ent, gravity);
-        },
-        0x53);
+        });
 }
 
 void Movable::reset_gravity()
 {
     unregister_hook_function((void***)this, 0x53);
+}
+
+void Movable::set_position(float to_x, float to_y)
+{
+    if (overlay)
+        return;
+    auto dx = to_x - x;
+    auto dy = to_y - y;
+    x = to_x;
+    y = to_y;
+    if (rendering_info)
+    {
+        rendering_info->x += dx;
+        rendering_info->y += dy;
+        rendering_info->x_dupe1 += dx;
+        rendering_info->y_dupe1 += dy;
+        rendering_info->x_dupe2 += dx;
+        rendering_info->y_dupe2 += dy;
+        rendering_info->x_dupe3 += dx;
+        rendering_info->y_dupe3 += dy;
+        rendering_info->x_dupe4 += dx;
+        rendering_info->y_dupe4 += dy;
+    }
+    if (State::get().ptr()->camera->focused_entity_uid == uid)
+    {
+        State::get().ptr()->camera->focus_x += dx;
+        State::get().ptr()->camera->focus_y += dy;
+        State::get().ptr()->camera->adjusted_focus_x += dx;
+        State::get().ptr()->camera->adjusted_focus_y += dy;
+        State::get().ptr()->camera->calculated_focus_x += dx;
+        State::get().ptr()->camera->calculated_focus_y += dy;
+    }
 }

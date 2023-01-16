@@ -93,8 +93,10 @@ class Player : public PowerupCapable
   public:
     Inventory* inventory_ptr;
     Illumination* emitted_light;
-    int32_t linked_companion_child;  // entity uid
-    int32_t linked_companion_parent; // entity uid
+    /// entity uid
+    int32_t linked_companion_child;
+    /// entity uid
+    int32_t linked_companion_parent;
     Ai* ai;
     PlayerSlot* input_ptr;
     /// Used in base camp to talk with the NPC's
@@ -102,10 +104,15 @@ class Player : public PowerupCapable
     int32_t i168;
     int32_t i16c;
     float y_pos; // not sure why, seams to be the same as abs_y
-    uint8_t jump_flags_a;
-    uint8_t jump_flags_b;
-    uint8_t jump_flags_c;
-    uint8_t jump_flags_d;
+    /// Increases when holding jump button in the air, set to max while jumping. If this isn't 0, a jump will only be
+    /// registered if the jump button was not held on the previous frame.
+    uint8_t jump_lock_timer;
+    /// can jump while airborne if greater than 0
+    int8_t coyote_timer;
+    /// 0-25 alphabetical index of hired hand names.
+    uint8_t hired_hand_name;
+    /// Timer between strokes when holding jump button in water.
+    uint8_t swim_timer;
     uint8_t timer_since_last_jump; // something different happens before or after 6
     uint8_t can_use;               // is compared with bit numbers, so probably flags
 

@@ -61,7 +61,7 @@ class LogicalLiquidStreamSound : public LogicalStaticSound
 class LogicalTrapTrigger : public Entity
 {
   public:
-    /// Used in bigspeartrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles
+    /// Used in BigSpearTrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles
     int32_t min_empty_distance;
     /// Value in tiles
     int32_t trigger_distance;

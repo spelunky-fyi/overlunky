@@ -4,6 +4,8 @@
 
 #include <Windows.h>
 
+bool detect_wine();
+
 bool init_hooks(void* swap_chain_ptr);
 
 using OnInputCallback = bool (*)(UINT, WPARAM, LPARAM);

@@ -3,7 +3,7 @@
 
 When using `get_entity()` the returned entity will automatically be of the correct type. It is not necessary to use the `as_<typename>` functions.
 
-To figure out what type of entity you get back, consult the [entity hierarchy list](entities-hierarchy.md).
+To figure out what type of entity you get back, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md).
 
 You can also use the types (uppercase `<typename>`) as `ENT_TYPE.<typename>` in `get_entities` functions and `pre/post spawn` callbacks
 
@@ -243,6 +243,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_olmec
 - as_olmeccannon
 - as_olmecfloater
+- as_olmecship
 - as_olmite
 - as_onfireeffect
 - as_orb
@@ -340,6 +341,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_waddler
 - as_walkingmonster
 - as_walltorch
+- as_web
 - as_webgun
 - as_webshot
 - as_weteffect

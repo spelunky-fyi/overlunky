@@ -26,7 +26,9 @@
 #include "level_api.hpp"                     // for THEME_OVERRIDE, ThemeInfo
 #include "math.hpp"                          // for AABB
 #include "savedata.hpp"                      // for SaveData, Constellation...
+#include "script/handle_lua_function.hpp"    // for handle_function
 #include "script/lua_backend.hpp"            // for LuaBackend, LevelGenCal...
+#include "script/safe_cb.hpp"                // for make_safe_cb
 #include "state.hpp"                         // for State, StateMemory, enu...
 #include "state_structs.hpp"                 // for QuestsInfo, Camera, Que...
 
@@ -349,7 +351,7 @@ class CustomTheme : public ThemeInfo
         if (overrides.find(index) != overrides.end() && get_override_func_enabled(index))
         {
             auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<Ret>(overrides[index]->func.value(), std::forward<Args>(args)...);
+            return handle_function<Ret>(backend.get(), overrides[index]->func.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
     }
@@ -360,7 +362,7 @@ class CustomTheme : public ThemeInfo
         if (overrides.find(index) != overrides.end() && get_pre_func_enabled(index))
         {
             auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<Ret>(overrides[index]->pre.value(), std::forward<Args>(args)...);
+            return handle_function<Ret>(backend.get(), overrides[index]->pre.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
     }
@@ -371,7 +373,7 @@ class CustomTheme : public ThemeInfo
         if (overrides.find(index) != overrides.end() && get_post_func_enabled(index))
         {
             auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<Ret>(overrides[index]->post.value(), std::forward<Args>(args)...);
+            return handle_function<Ret>(backend.get(), overrides[index]->post.value(), std::forward<Args>(args)...);
         }
         return std::nullopt;
     }
@@ -426,7 +428,7 @@ class CustomTheme : public ThemeInfo
     }
     bool get_unknown1()
     {
-        return unknown1;
+        return allow_beehive;
     }
     void init_flags()
     {
@@ -881,8 +883,8 @@ class CustomTheme : public ThemeInfo
     bool get_unknown_1_or_2(uint8_t index)
     {
         if (index == 0)
-            return unknown1;
-        return unknown2;
+            return allow_beehive;
+        return allow_leprechaun;
     }
 
     /// Add TEXTUREs to `textures` to override different dynamic textures easily.
@@ -991,7 +993,7 @@ void register_usertypes(sol::state& lua)
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
     /// Return true in order to stop the game or scripts loaded after this script from handling this tile code.
     /// For example, when returning true in this callback set for `"floor"` then no floor will spawn in the game (unless you spawn it yourself)
-    /// The callback signature is bool pre_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
+    /// <br/>The callback signature is bool pre_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
     lua["set_pre_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
@@ -1001,14 +1003,14 @@ void register_usertypes(sol::state& lua)
     /// Add a callback for a specific tile code that is called after the game handles the tile code.
     /// Use this to affect what the game or other scripts spawned in this position.
     /// This is received even if a previous pre-tile-code-callback has returned true
-    /// The callback signature is nil post_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
+    /// <br/>The callback signature is nil post_tile_code(float x, float y, int layer, ROOM_TEMPLATE room_template)
     lua["set_post_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
         backend->post_tile_code_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
         return backend->cbcount++;
     };
-    /// Define a new tile code, to make this tile code do anything you have to use either `set_pre_tile_code_callback` or `set_post_tile_code_callback`.
+    /// Define a new tile code, to make this tile code do anything you have to use either [set_pre_tile_code_callback](#set_pre_tile_code_callback) or [set_post_tile_code_callback](#set_post_tile_code_callback).
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
     lua["define_tile_code"] = [](std::string tile_code) -> TILE_CODE
     {
@@ -1034,22 +1036,14 @@ void register_usertypes(sol::state& lua)
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
     lua["define_procedural_spawn"] = [](std::string procedural_spawn, sol::function do_spawn, sol::function is_valid) -> PROCEDURAL_CHANCE
     {
-        auto backend_id = LuaBackend::get_calling_backend_id();
         std::function<bool(float, float, int)> is_valid_call{nullptr};
         if (is_valid)
         {
-            is_valid_call = [backend_id, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
-            {
-                auto backend = LuaBackend::get_backend(backend_id);
-                return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
-            };
+            is_valid_call = make_safe_cb<bool(float, float, int)>(std::move(is_valid));
         }
-        std::function<void(float, float, int)> do_spawn_call = [backend_id, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
-        {
-            auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
-        };
-        auto backend = LuaBackend::get_backend(backend_id);
+        std::function<void(float, float, int)> do_spawn_call = make_safe_cb<void(float, float, int)>(std::move(do_spawn));
+
+        auto backend = LuaBackend::get_calling_backend();
         LevelGenData* data = backend->g_state->level_gen->data;
         uint32_t chance = data->define_chance(std::move(procedural_spawn));
         std::uint32_t id = data->register_chance_logic_provider(chance, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
@@ -1062,26 +1056,18 @@ void register_usertypes(sol::state& lua)
     /// The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
     /// Use for example when you can spawn only on the ceiling, under water or inside a shop.
     /// Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
-    /// To change the number of spawns use `PostRoomGenerationContext::set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
+    /// To change the number of spawns use `PostRoomGenerationContext:set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
     /// No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
     lua["define_extra_spawn"] = [](sol::function do_spawn, sol::function is_valid, std::uint32_t num_spawns_frontlayer, std::uint32_t num_spawns_backlayer) -> std::uint32_t
     {
-        auto backend_id = LuaBackend::get_calling_backend_id();
         std::function<bool(float, float, int)> is_valid_call{nullptr};
         if (is_valid)
         {
-            is_valid_call = [backend_id, is_valid_lua = std::move(is_valid)](float x, float y, int layer)
-            {
-                auto backend = LuaBackend::get_backend(backend_id);
-                return backend->handle_function_with_return<bool>(is_valid_lua, x, y, layer).value_or(false);
-            };
+            is_valid_call = make_safe_cb<bool(float, float, int)>(std::move(is_valid));
         }
-        std::function<void(float, float, int)> do_spawn_call = [backend_id, do_spawn_lua = std::move(do_spawn)](float x, float y, int layer)
-        {
-            auto backend = LuaBackend::get_backend(backend_id);
-            return backend->handle_function_with_return<bool>(do_spawn_lua, x, y, layer).value_or(false);
-        };
-        auto backend = LuaBackend::get_backend(backend_id);
+        std::function<void(float, float, int)> do_spawn_call = make_safe_cb<void(float, float, int)>(std::move(do_spawn));
+
+        auto backend = LuaBackend::get_calling_backend();
         LevelGenData* data = backend->g_state->level_gen->data;
         std::uint32_t extra_spawn_id = data->define_extra_spawn(num_spawns_frontlayer, num_spawns_backlayer, SpawnLogicProvider{std::move(is_valid_call), std::move(do_spawn_call)});
         backend->extra_spawn_callbacks.push_back(extra_spawn_id);
@@ -1127,7 +1113,7 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->get_room_template_name(room_template);
     };
 
-    /// Define a new room remplate to use with `set_room_template`
+    /// Define a new room template to use with `set_room_template`
     lua["define_room_template"] = [](std::string room_template, ROOM_TEMPLATE_TYPE type) -> uint16_t
     {
         return State::get().ptr_local()->level_gen->data->define_room_template(std::move(room_template), static_cast<RoomTemplateType>(type));
@@ -1145,9 +1131,9 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->get_procedural_spawn_chance(chance_id);
     };
 
-    /// Gets the sub theme of the current cosmic ocean level, returns `COSUBTHEME.NONE` if the current level is not a CO level.
+    /// Gets the sub theme of the current cosmic ocean level, returns COSUBTHEME.NONE if the current level is not a CO level.
     lua["get_co_subtheme"] = get_co_subtheme;
-    /// Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use `COSUBTHEME.RESET` to reset to default random behaviour)
+    /// Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use COSUBTHEME.RESET to reset to default random behaviour)
     lua["force_co_subtheme"] = force_co_subtheme;
 
     /// Gets the value for the specified config
@@ -1174,14 +1160,16 @@ void register_usertypes(sol::state& lua)
         static_cast<bool (*)(uint32_t, uint32_t)>(::grow_chain_and_blocks),
         static_cast<bool (*)()>(::grow_chain_and_blocks));
 
-    /// Grow chains from `CHAIN_CEILING` and chain with blocks on it from `CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level
-    /// To limit it use the parameters, so if you set x to 10, it will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
+    /// Grow chains from `ENT_TYPE_FLOOR_CHAIN_CEILING` and chain with blocks on it from `ENT_TYPE_FLOOR_CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level.
+    /// To limit it use the parameters, so x = 10 will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
     lua["grow_chainandblocks"] = grow_chain_and_blocks;
 
-    /// Immediately load a screen based on state.screen_next and stuff
+    /// Immediately load a screen based on [state](#state).screen_next and stuff
     lua["load_screen"] = do_load_screen;
 
     auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
+    themeinfo_type["allow_beehive"] = &ThemeInfo::allow_beehive;
+    themeinfo_type["allow_leprechaun"] = &ThemeInfo::allow_leprechaun;
     themeinfo_type["sub_theme"] = &ThemeInfo::sub_theme;
     themeinfo_type["get_unknown1"] = &ThemeInfo::get_unknown1;
     themeinfo_type["init_flags"] = &ThemeInfo::init_flags;
@@ -1261,8 +1249,8 @@ void register_usertypes(sol::state& lua)
     customtheme_type["override"] = theme_override;
     customtheme_type["pre"] = &CustomTheme::pre;
     customtheme_type["post"] = &CustomTheme::post;
-    customtheme_type["unknown1"] = &CustomTheme::unknown1;
-    customtheme_type["unknown2"] = &CustomTheme::unknown2;
+    customtheme_type["allow_beehive"] = &CustomTheme::allow_beehive;
+    customtheme_type["allow_leprechaun"] = &CustomTheme::allow_leprechaun;
     customtheme_type["unknown3"] = &CustomTheme::unknown3;
     customtheme_type["unknown4"] = &CustomTheme::unknown4;
     customtheme_type["get_unknown1"] = &CustomTheme::get_unknown1;
@@ -1330,6 +1318,7 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("THEME_OVERRIDE", "BASE", THEME_OVERRIDE::BASE, "UNKNOWN_V1", THEME_OVERRIDE::UNKNOWN_V1, "INIT_FLAGS", THEME_OVERRIDE::INIT_FLAGS, "INIT_LEVEL", THEME_OVERRIDE::INIT_LEVEL, "UNKNOWN_V4", THEME_OVERRIDE::UNKNOWN_V4, "UNKNOWN_V5", THEME_OVERRIDE::UNKNOWN_V5, "SPECIAL_ROOMS", THEME_OVERRIDE::SPECIAL_ROOMS, "UNKNOWN_V7", THEME_OVERRIDE::UNKNOWN_V7, "UNKNOWN_V8", THEME_OVERRIDE::UNKNOWN_V8, "VAULT", THEME_OVERRIDE::VAULT, "COFFIN", THEME_OVERRIDE::COFFIN, "FEELING", THEME_OVERRIDE::FEELING, "UNKNOWN_V12", THEME_OVERRIDE::UNKNOWN_V12, "SPAWN_LEVEL", THEME_OVERRIDE::SPAWN_LEVEL, "SPAWN_BORDER", THEME_OVERRIDE::SPAWN_BORDER, "POST_PROCESS_LEVEL", THEME_OVERRIDE::POST_PROCESS_LEVEL, "SPAWN_TRAPS", THEME_OVERRIDE::SPAWN_TRAPS, "POST_PROCESS_ENTITIES", THEME_OVERRIDE::POST_PROCESS_ENTITIES, "SPAWN_PROCEDURAL", THEME_OVERRIDE::SPAWN_PROCEDURAL, "SPAWN_BACKGROUND", THEME_OVERRIDE::SPAWN_BACKGROUND, "SPAWN_LIGHTS", THEME_OVERRIDE::SPAWN_LIGHTS, "SPAWN_TRANSITION", THEME_OVERRIDE::SPAWN_TRANSITION, "POST_TRANSITION", THEME_OVERRIDE::POST_TRANSITION, "SPAWN_PLAYERS", THEME_OVERRIDE::SPAWN_PLAYERS, "SPAWN_EFFECTS", THEME_OVERRIDE::SPAWN_EFFECTS, "LVL_FILE", THEME_OVERRIDE::LVL_FILE, "THEME_ID", THEME_OVERRIDE::THEME_ID, "BASE_ID", THEME_OVERRIDE::BASE_ID, "ENT_FLOOR_SPREADING", THEME_OVERRIDE::ENT_FLOOR_SPREADING, "ENT_FLOOR_SPREADING2", THEME_OVERRIDE::ENT_FLOOR_SPREADING2, "UNKNOWN_V30", THEME_OVERRIDE::UNKNOWN_V30, "TRANSITION_MODIFIER", THEME_OVERRIDE::TRANSITION_MODIFIER, "UNKNOWN_V32", THEME_OVERRIDE::UNKNOWN_V32, "ENT_BACKWALL", THEME_OVERRIDE::ENT_BACKWALL, "ENT_BORDER", THEME_OVERRIDE::ENT_BORDER, "ENT_CRITTER", THEME_OVERRIDE::ENT_CRITTER, "GRAVITY", THEME_OVERRIDE::GRAVITY, "PLAYER_DAMAGE", THEME_OVERRIDE::PLAYER_DAMAGE, "UNKNOWN_V38", THEME_OVERRIDE::UNKNOWN_V38, "TEXTURE_BACKLAYER_LUT", THEME_OVERRIDE::TEXTURE_BACKLAYER_LUT, "BACKLAYER_LIGHT_LEVEL", THEME_OVERRIDE::BACKLAYER_LIGHT_LEVEL, "LOOP", THEME_OVERRIDE::LOOP, "VAULT_LEVEL", THEME_OVERRIDE::VAULT_LEVEL, "GET_UNKNOWN1_OR_2", THEME_OVERRIDE::GET_UNKNOWN1_OR_2, "TEXTURE_DYNAMIC", THEME_OVERRIDE::TEXTURE_DYNAMIC, "PRE_TRANSITION", THEME_OVERRIDE::PRE_TRANSITION, "LEVEL_HEIGHT", THEME_OVERRIDE::LEVEL_HEIGHT, "UNKNOWN_V47", THEME_OVERRIDE::UNKNOWN_V47, "SPAWN_DECORATION", THEME_OVERRIDE::SPAWN_DECORATION, "SPAWN_DECORATION2", THEME_OVERRIDE::SPAWN_DECORATION2, "SPAWN_EXTRA", THEME_OVERRIDE::SPAWN_EXTRA, "UNKNOWN_V51", THEME_OVERRIDE::UNKNOWN_V51);
 
     /// Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
+    // lua["force_custom_theme"] = [](* customtheme)
     lua["force_custom_theme"] = sol::overload(
         [](CustomTheme* customtheme)
         {
@@ -1346,6 +1335,7 @@ void register_usertypes(sol::state& lua)
         });
 
     /// Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.
+    // lua["force_custom_subtheme"] = [](* customtheme)
     lua["force_custom_subtheme"] = sol::overload(
         [](CustomTheme* customtheme)
         {
@@ -1361,7 +1351,7 @@ void register_usertypes(sol::state& lua)
                 State::get().ptr()->level_gen->theme_cosmicocean->sub_theme = State::get().ptr()->level_gen->themes[customtheme - 1];
         });
 
-    // Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
+    /// Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
     lua.new_usertype<PreLoadLevelFilesContext>(
         "PreLoadLevelFilesContext",
         sol::no_constructor,
@@ -1370,9 +1360,11 @@ void register_usertypes(sol::state& lua)
         "add_level_files",
         &PreLoadLevelFilesContext::add_level_files);
 
+    /// Deprecated
+    ///  kept for backward compatibility, don't use, check LevelGenSystem.exit_doors
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
-    // Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect
+    /// Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect, used in StateMemory
     lua.new_usertype<LevelGenSystem>(
         "LevelGenSystem",
         sol::no_constructor,
@@ -1380,6 +1372,10 @@ void register_usertypes(sol::state& lua)
         &LevelGenSystem::shop_type,
         "backlayer_shop_type",
         &LevelGenSystem::backlayer_shop_type,
+        "shop_music",
+        &LevelGenSystem::frontlayer_shop_music,
+        "backlayer_shop_music",
+        &LevelGenSystem::backlayer_shop_music,
         "spawn_x",
         &LevelGenSystem::spawn_x,
         "spawn_y",
@@ -1396,10 +1392,14 @@ void register_usertypes(sol::state& lua)
         sol::property([](LevelGenSystem& lgs)
                       { return std::ref(lgs.themes); }),
         "flags",
-        &LevelGenSystem::flags);
+        &LevelGenSystem::flags,
+        "flags2",
+        &LevelGenSystem::flags2,
+        "flags3",
+        &LevelGenSystem::flags3);
 
-    // Context received in ON.POST_ROOM_GENERATION.
-    // Used to change the room templates in the level and other shenanigans that affect level gen.
+    /// Context received in ON.POST_ROOM_GENERATION.
+    /// Used to change the room templates in the level and other shenanigans that affect level gen.
     lua.new_usertype<PostRoomGenerationContext>(
         "PostRoomGenerationContext",
         "set_room_template",
@@ -1437,8 +1437,8 @@ void register_usertypes(sol::state& lua)
         return positions_converted;
     };
 
-    // Context received in ON.PRE_HANDLE_ROOM_TILES.
-    // Used to change the room data as well as add a backlayer room if none is set yet.
+    /// Context received in ON.PRE_HANDLE_ROOM_TILES.
+    /// Used to change the room data as well as add a backlayer room if none is set yet.
     lua.new_usertype<PreHandleRoomTilesContext>(
         "PreHandleRoomTilesContext",
         sol::no_constructor,
@@ -1457,6 +1457,7 @@ void register_usertypes(sol::state& lua)
         "add_copied_back_layer",
         &PreHandleRoomTilesContext::add_copied_back_layer);
 
+    /// Used in [get_short_tile_code](#get_short_tile_code), [get_short_tile_code_definition](#get_short_tile_code_definition) and PostRoomGenerationContext
     lua.new_usertype<ShortTileCodeDef>(
         "ShortTileCodeDef",
         "tile_code",
@@ -1482,43 +1483,43 @@ void register_usertypes(sol::state& lua)
         &QuestsInfo::beg_state);
 
     auto savedata_type = lua.new_usertype<SaveData>("SaveData");
-    savedata_type["places"] = sol::readonly(&SaveData::places);
-    savedata_type["bestiary"] = sol::readonly(&SaveData::bestiary);
-    savedata_type["people"] = sol::readonly(&SaveData::people);
-    savedata_type["items"] = sol::readonly(&SaveData::items);
-    savedata_type["traps"] = sol::readonly(&SaveData::traps);
-    savedata_type["last_daily"] = sol::readonly(&SaveData::last_daily);
-    savedata_type["characters"] = sol::readonly(&SaveData::characters);
-    savedata_type["shortcuts"] = sol::readonly(&SaveData::shortcuts);
-    savedata_type["bestiary_killed"] = sol::readonly(&SaveData::bestiary_killed);
-    savedata_type["bestiary_killed_by"] = sol::readonly(&SaveData::bestiary_killed_by);
-    savedata_type["people_killed"] = sol::readonly(&SaveData::people_killed);
-    savedata_type["people_killed_by"] = sol::readonly(&SaveData::people_killed_by);
-    savedata_type["plays"] = sol::readonly(&SaveData::plays);
-    savedata_type["deaths"] = sol::readonly(&SaveData::deaths);
-    savedata_type["wins_normal"] = sol::readonly(&SaveData::wins_normal);
-    savedata_type["wins_hard"] = sol::readonly(&SaveData::wins_hard);
-    savedata_type["wins_special"] = sol::readonly(&SaveData::wins_special);
-    savedata_type["score_total"] = sol::readonly(&SaveData::score_total);
-    savedata_type["score_top"] = sol::readonly(&SaveData::score_top);
-    savedata_type["deepest_area"] = sol::readonly(&SaveData::deepest_area);
-    savedata_type["deepest_level"] = sol::readonly(&SaveData::deepest_level);
-    savedata_type["time_best"] = sol::readonly(&SaveData::time_best);
-    savedata_type["time_total"] = sol::readonly(&SaveData::time_total);
-    savedata_type["time_tutorial"] = sol::readonly(&SaveData::time_tutorial);
-    savedata_type["character_deaths"] = sol::readonly(&SaveData::character_deaths);
-    savedata_type["pets_rescued"] = sol::readonly(&SaveData::pets_rescued);
-    savedata_type["completed_normal"] = sol::readonly(&SaveData::completed_normal);
-    savedata_type["completed_ironman"] = sol::readonly(&SaveData::completed_ironman);
-    savedata_type["completed_hard"] = sol::readonly(&SaveData::completed_hard);
-    savedata_type["profile_seen"] = sol::readonly(&SaveData::profile_seen);
-    savedata_type["seeded_unlocked"] = sol::readonly(&SaveData::seeded_unlocked);
-    savedata_type["world_last"] = sol::readonly(&SaveData::world_last);
-    savedata_type["level_last"] = sol::readonly(&SaveData::level_last);
-    savedata_type["score_last"] = sol::readonly(&SaveData::score_last);
-    savedata_type["time_last"] = sol::readonly(&SaveData::time_last);
-    savedata_type["stickers"] = sol::readonly(&SaveData::stickers);
-    savedata_type["players"] = sol::readonly(&SaveData::players);
+    savedata_type["places"] = &SaveData::places;
+    savedata_type["bestiary"] = &SaveData::bestiary;
+    savedata_type["people"] = &SaveData::people;
+    savedata_type["items"] = &SaveData::items;
+    savedata_type["traps"] = &SaveData::traps;
+    savedata_type["last_daily"] = &SaveData::last_daily;
+    savedata_type["characters"] = &SaveData::characters;
+    savedata_type["shortcuts"] = &SaveData::shortcuts;
+    savedata_type["bestiary_killed"] = &SaveData::bestiary_killed;
+    savedata_type["bestiary_killed_by"] = &SaveData::bestiary_killed_by;
+    savedata_type["people_killed"] = &SaveData::people_killed;
+    savedata_type["people_killed_by"] = &SaveData::people_killed_by;
+    savedata_type["plays"] = &SaveData::plays;
+    savedata_type["deaths"] = &SaveData::deaths;
+    savedata_type["wins_normal"] = &SaveData::wins_normal;
+    savedata_type["wins_hard"] = &SaveData::wins_hard;
+    savedata_type["wins_special"] = &SaveData::wins_special;
+    savedata_type["score_total"] = &SaveData::score_total;
+    savedata_type["score_top"] = &SaveData::score_top;
+    savedata_type["deepest_area"] = &SaveData::deepest_area;
+    savedata_type["deepest_level"] = &SaveData::deepest_level;
+    savedata_type["time_best"] = &SaveData::time_best;
+    savedata_type["time_total"] = &SaveData::time_total;
+    savedata_type["time_tutorial"] = &SaveData::time_tutorial;
+    savedata_type["character_deaths"] = &SaveData::character_deaths;
+    savedata_type["pets_rescued"] = &SaveData::pets_rescued;
+    savedata_type["completed_normal"] = &SaveData::completed_normal;
+    savedata_type["completed_ironman"] = &SaveData::completed_ironman;
+    savedata_type["completed_hard"] = &SaveData::completed_hard;
+    savedata_type["profile_seen"] = &SaveData::profile_seen;
+    savedata_type["seeded_unlocked"] = &SaveData::seeded_unlocked;
+    savedata_type["world_last"] = &SaveData::world_last;
+    savedata_type["level_last"] = &SaveData::level_last;
+    savedata_type["score_last"] = &SaveData::score_last;
+    savedata_type["time_last"] = &SaveData::time_last;
+    savedata_type["stickers"] = &SaveData::stickers;
+    savedata_type["players"] = &SaveData::players;
     savedata_type["constellation"] = &SaveData::constellation;
 
     lua.new_usertype<Constellation>(
@@ -1627,7 +1628,7 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("VANHORSING", "QUEST_NOT_STARTED", 0, "JAILCELL_SPAWNED", 1, "FIRST_ENCOUNTER_DIAMOND_THROWN", 2, "SPAWNED_IN_VLADS_CASTLE", 3, "SHOT_VLAD", 4, "TEMPLE_HIDEOUT_SPAWNED", 5, "SECOND_ENCOUNTER_COMPASS_THROWN", 6, "TUSK_CELLAR", 7);
 
     /// Sparrow quest states
-    lua.create_named_table("SPARROW", "QUEST_NOT_STARTED", 0, "THIEF_STATUS", 1, "FINISHED_LEVEL_WITH_THIEF_STATUS", 2, "FIRST_HIDEOUT_SPAWNED_ROPE_THROW", 3, "FIRST_ENCOUNTER_ROPES_THROWN", 4, "TUSK_IDOL_STOLEN", 5, "SECOND_HIDEOUT_SPAWNED_NEOBAB", 6, "SECOND_ENCOUNTER_INTERACTED", 7, "MEETING_AT_TUSK_BASEMENT", 8);
+    lua.create_named_table("SPARROW", "ANGRY", -2, "DEAD", -1, "QUEST_NOT_STARTED", 0, "THIEF_STATUS", 1, "FINISHED_LEVEL_WITH_THIEF_STATUS", 2, "FIRST_HIDEOUT_SPAWNED_ROPE_THROW", 3, "FIRST_ENCOUNTER_ROPES_THROWN", 4, "TUSK_IDOL_STOLEN", 5, "SECOND_HIDEOUT_SPAWNED_NEOBAB", 6, "SECOND_ENCOUNTER_INTERACTED", 7, "MEETING_AT_TUSK_BASEMENT", 8, "FINAL_REWARD_THROWN", 9);
 
     /// Madame Tusk quest states
     lua.create_named_table("TUSK", "ANGRY", -2, "DEAD", -1, "QUEST_NOT_STARTED", 0, "DICE_HOUSE_SPAWNED", 1, "HIGH_ROLLER_STATUS", 2, "PALACE_WELCOME_MESSAGE", 3);

@@ -149,7 +149,7 @@ std::string application_versions()
 
 std::string get_error_information()
 {
-    return fmt::format("\n\nRunning Spelunky 2: {}\nSupported Spelunky 2: 1.27\n\n{}", current_spelunky_version(), application_versions());
+    return fmt::format("\n\nRunning Spelunky 2: {}\nSupported Spelunky 2: 1.28\n\n{}", current_spelunky_version(), application_versions());
 }
 
 size_t find_inst(const char* exe, std::string_view needle, size_t start, std::optional<size_t> end, std::string_view pattern_name, bool is_required)
@@ -508,6 +508,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x49\x89\xcd\x49\x83\xe5\xf8\x4e\x8d\x0c\x2f"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        "malloc_base"sv,
+        PatternCommandBuffer{}
+            .find_inst("48 8b 45 e0 48 8b 30"_gh)
+            .find_next_inst("48 8b 45 e0 48 8b 30"_gh)
+            .offset(-0x40)
+            .find_after_inst_in_range("48 8b 04 c1 48 8b 80 20 01 00 00"_gh, 0x40)
+            .decode_pc()
+            .at_exe(),
     },
     {
         "read_encrypted_file"sv,
@@ -1026,7 +1036,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "zoom_level_offset"sv,
         // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
-        // That instruction contains the offset
+        // That instruction contains the offset, the memory is: {current_zoom, target_zoom} and both offset will be present
+        // current solution uses the target_zoom offset
         PatternCommandBuffer{}
             .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
             .decode_imm(4),
@@ -1198,9 +1209,10 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "insta_gib"sv,
+        // This should be just called/jumped to at the end of kill virtual fror the CHAR_* entity
         // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
         // Or write bp on Movable::health, the next function after setting it to 0 should be this one
-        // then place yourself in Quillback's path
+        // then die to a ghost
         PatternCommandBuffer{}
             .find_inst("80 79 19 00 74 04"_gh)
             .at_exe()
@@ -1901,7 +1913,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "get_feat_hidden"sv,
         PatternCommandBuffer{}
             .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh)
-            .offset(25)
+            .offset(25) // or .find_next_inst("\xE8****\xB8") .offset(0x6)
             .at_exe(),
     },
     {
@@ -1909,7 +1921,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "get_feat"sv,
         PatternCommandBuffer{}
             .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh) // Same as ^ btw
-            .offset(0x7)
+            .find_next_inst("\xE8"sv)
             .decode_call()
             .at_exe(),
     },
@@ -1917,9 +1929,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // It's the function that calls ISteamUserStats::SetAchievement virtual when performing feats
         "set_feat"sv,
         PatternCommandBuffer{}
-            .find_inst("8b 05 4f a0 12 00 65 48 8b 0c 25 58 00 00 00"_gh)
-            .at_exe()
-            .function_start(),
+            .find_after_inst("FF 90 B0 00 00 00 F6 46 32 08"_gh)
+            .find_next_inst("B1 01 E8"_gh)
+            .offset(0x2)
+            .decode_call()
+            .at_exe(),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

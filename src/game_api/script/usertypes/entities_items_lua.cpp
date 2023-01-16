@@ -37,6 +37,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_kapalapowerup"] = &Entity::as<KapalaPowerup>;
     lua["Entity"]["as_mattock"] = &Entity::as<Mattock>;
     lua["Entity"]["as_gun"] = &Entity::as<Gun>;
+    lua["Entity"]["as_web"] = &Entity::as<Web>;
     lua["Entity"]["as_webgun"] = &Entity::as<WebGun>;
     lua["Entity"]["as_flame"] = &Entity::as<Flame>;
     lua["Entity"]["as_flamesize"] = &Entity::as<FlameSize>;
@@ -99,6 +100,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_empressgrave"] = &Entity::as<EmpressGrave>;
     lua["Entity"]["as_tentacle"] = &Entity::as<Tentacle>;
     lua["Entity"]["as_minigameship"] = &Entity::as<MiniGameShip>;
+    lua["Entity"]["as_olmecship"] = &Entity::as<OlmecShip>;
     lua["Entity"]["as_minigameasteroid"] = &Entity::as<MiniGameAsteroid>;
     lua["Entity"]["as_pot"] = &Entity::as<Pot>;
     lua["Entity"]["as_cursedpot"] = &Entity::as<CursedPot>;
@@ -582,6 +584,8 @@ void register_usertypes(sol::state& lua)
         "PunishBall",
         "attached_to_uid",
         &PunishBall::attached_to_uid,
+        "timer",
+        &PunishBall::timer,
         "x_pos",
         &PunishBall::x_pos,
         "y_pos",
@@ -817,6 +821,21 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
+    lua.new_usertype<OlmecShip>(
+        "OlmecShip",
+        "sound",
+        &OlmecShip::sound,
+        "door_fx",
+        &OlmecShip::door_fx,
+        "smoke",
+        &OlmecShip::smoke,
+        "flight_time",
+        &OlmecShip::flight_time,
+        "has_spawned_jetflames",
+        &OlmecShip::has_spawned_jetflames,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
     lua.new_usertype<MiniGameAsteroid>(
         "MiniGameAsteroid",
         "spin_speed",
@@ -924,6 +943,10 @@ void register_usertypes(sol::state& lua)
         sol::readonly(&ParachutePowerup::deployed),
         "deploy",
         &ParachutePowerup::deploy,
+        "gold_timer",
+        &ParachutePowerup::gold_timer,
+        "gold_spawning_time",
+        &ParachutePowerup::gold_spawning_time,
         sol::base_classes,
         sol::bases<Entity, Movable, Powerup>());
 
@@ -1002,6 +1025,13 @@ void register_usertypes(sol::state& lua)
         &PrizeDispenser::item_ids,
         "prizes_spawned",
         &PrizeDispenser::prizes_spawned,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<Web>(
+        "Web",
+        "decay_rate",
+        &Web::decay_rate,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 }

@@ -563,7 +563,7 @@ class LogicApepTrigger : public Logic
   public:
     uint32_t spawn_cooldown;
     bool cooling_down;
-    bool unknown4b;
+    bool apep_journal_entry_logged;
     uint32_t unknown4c;
     uint32_t unknown4d;
     uint32_t unknown5;
@@ -584,6 +584,14 @@ class LogicDuatBossesTrigger : public Logic
 {
   public:
     virtual ~LogicDuatBossesTrigger() = 0;
+};
+
+class LogicTiamatBubbles : public Logic
+{
+  public:
+    uint8_t bubble_spawn_timer;
+
+    virtual ~LogicTiamatBubbles() = 0;
 };
 
 class LogicTuskPleasurePalace : public Logic
@@ -642,7 +650,7 @@ struct LogicList
     LogicApepTrigger* apep_trigger;
     LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
     LogicDuatBossesTrigger* duat_bosses_trigger;
-    Logic* tiamat;
+    LogicTiamatBubbles* tiamat;
     LogicTuskPleasurePalace* tusk_pleasure_palace;
     Logic* discovery_info; // black market, vlad, wet fur discovery; shows the toast
     Logic* black_market;
@@ -806,7 +814,7 @@ struct LiquidPhysics
     size_t unknown1; // MysteryLiquidPointer1 in plugin, collision with floors/activefloors related
     union
     {
-        LiquidPool pools[5];
+        std::array<LiquidPool, 5> pools;
         struct
         {
             LiquidPhysicsParams water_physics_defaults;

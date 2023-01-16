@@ -6,7 +6,7 @@
 #include <wtypesbase.h> // for ULONG
 
 #include "logger.h"   // for DEBUG
-#include "memory.hpp" // for read_u64
+#include "memory.hpp" // for memory_read
 
 HANDLE get_main_thread()
 {
@@ -60,7 +60,7 @@ size_t* get_thread_heap_base(HANDLE thread)
         OUT PULONG ReturnLength OPTIONAL);
     static const auto NtQueryInformationThread_ptr = reinterpret_cast<FuncPtr>(GetProcAddress(GetModuleHandle("ntdll.dll"), "NtQueryInformationThread"));
     NtQueryInformationThread_ptr(thread, (_THREADINFOCLASS)0, (&tib), sizeof(THREAD_BASIC_INFORMATION), nullptr);
-    return (size_t*)(read_u64(((uint64_t*)tib.TebBaseAddress)[11]) + 0x120);
+    return (size_t*)(memory_read<uint64_t>(((uint64_t*)tib.TebBaseAddress)[11]) + 0x120);
 }
 
 size_t heap_base()

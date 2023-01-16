@@ -178,6 +178,10 @@ void register_usertypes(sol::state& lua)
         "Ghost",
         "split_timer",
         &Ghost::split_timer,
+        "wobble_timer",
+        &Ghost::wobble_timer,
+        "pace_timer",
+        &Ghost::pace_timer,
         "velocity_multiplier",
         &Ghost::velocity_multiplier,
         "ghost_behaviour",
@@ -188,6 +192,14 @@ void register_usertypes(sol::state& lua)
         &Ghost::linked_ghost,
         "sound",
         &Ghost::sound,
+        "blown_by_player",
+        &Ghost::blown_by_player,
+        "happy_dancing_clockwise",
+        &Ghost::happy_dancing_clockwise,
+        "target_dist_visibility_factor",
+        &Ghost::target_dist_visibility_factor,
+        "target_layer_visibility_factor",
+        &Ghost::target_layer_visibility_factor,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -290,6 +302,8 @@ void register_usertypes(sol::state& lua)
         &Shopkeeper::shotgun_attack_delay,
         "has_key",
         &Shopkeeper::has_key,
+        "is_ear",
+        &Shopkeeper::is_ear,
         "shop_owner",
         &Shopkeeper::shop_owner,
         sol::base_classes,
@@ -339,6 +353,8 @@ void register_usertypes(sol::state& lua)
         &Pet::func_timer,
         "active_state",
         &Pet::active_state,
+        "petted_counter",
+        &Pet::petted_counter,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -528,6 +544,8 @@ void register_usertypes(sol::state& lua)
         "VanHorsing",
         "show_text",
         &VanHorsing::show_text,
+        "special_message_shown",
+        &VanHorsing::special_message_shown,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, NPC>());
 
@@ -744,6 +762,10 @@ void register_usertypes(sol::state& lua)
         &Bee::fly_hang_timer,
         "targeting_timer",
         &Bee::targeting_timer,
+        "walk_start_time",
+        &Bee::walk_start_time,
+        "walk_end_time",
+        &Bee::walk_end_time,
         "wobble_x",
         &Bee::wobble_x,
         "wobble_y",
@@ -1217,6 +1239,8 @@ void register_usertypes(sol::state& lua)
         &CritterCrab::walk_pause_timer,
         "walking_left",
         &CritterCrab::walking_left,
+        "unfriendly",
+        &CritterCrab::unfriendly,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, Critter>());
 
@@ -1304,6 +1328,8 @@ void register_usertypes(sol::state& lua)
         &CritterDrone::applied_hor_momentum,
         "applied_ver_momentum",
         &CritterDrone::applied_ver_momentum,
+        "unfriendly",
+        &CritterDrone::unfriendly,
         "move_timer",
         &CritterDrone::move_timer,
         sol::base_classes,

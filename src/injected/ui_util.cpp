@@ -93,6 +93,12 @@ std::pair<float, float> UI::screen_position(float x, float y)
 {
     return State::screen_position(x, y);
 }
+float UI::screen_distance(float x)
+{
+    auto a = State::screen_position(0, 0);
+    auto b = State::screen_position(x, 0);
+    return b.first - a.first;
+}
 Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
     auto state = State::get();
@@ -232,7 +238,7 @@ bool UI::has_active_render(Entity* ent)
 float UI::get_spark_distance(SparkTrap* ent)
 {
     const static auto offset = get_address("sparktrap_angle_increment") + 4;
-    if (read_u8(offset - 1) == 0x89) // check if sparktraps_hack is active
+    if (memory_read<uint8_t>(offset - 1) == 0x89) // check if sparktraps_hack is active
     {
         auto spark = get_entity_ptr(ent->spark_uid)->as<Spark>();
         return spark->distance;
@@ -339,6 +345,26 @@ int32_t UI::destroy_entity_items(Entity* ent)
         it++;
     }
     return last_uid;
+}
+bool UI::destroy_entity_item_type(Entity* ent, ENT_TYPE type)
+{
+    auto items = entity_get_items_by(ent->uid, 0, 0);
+    if (items.size() == 0)
+        return false;
+    auto destroyed = false;
+    std::vector<uint32_t>::reverse_iterator it = items.rbegin();
+    while (it != items.rend())
+    {
+        auto item = get_entity_ptr(*it);
+        if (item && item->type->id == type)
+        {
+            UI::destroy_entity_items(item);
+            UI::safe_destroy(item, false, false);
+            destroyed = true;
+        }
+        it++;
+    }
+    return destroyed;
 }
 void UI::destroy_entity_overlay(Entity* ent)
 {

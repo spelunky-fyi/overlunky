@@ -184,9 +184,11 @@ void register_usertypes(sol::state& lua)
         "LaserTrap",
         "emitted_light",
         &LaserTrap::emitted_light,
-        "reset_timer",
+        "timer",
+        &LaserTrap::timer,
+        "reset_timer", // Deprecated
         &LaserTrap::reset_timer,
-        "phase_2",
+        "phase_2", // Deprecated
         &LaserTrap::phase_2,
         "trigger",
         &LaserTrap::trigger,

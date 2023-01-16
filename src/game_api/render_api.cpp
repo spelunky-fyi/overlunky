@@ -14,7 +14,7 @@
 #include "entity.hpp"             // for Entity, EntityDB
 #include "level_api.hpp"          // for ThemeInfo
 #include "logger.h"               // for DEBUG
-#include "memory.hpp"             // for read_u64, to_le_bytes, write_mem_prot
+#include "memory.hpp"             // for memory_read, to_le_bytes, write_mem_prot
 #include "screen.hpp"             //
 #include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
 #include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
@@ -22,6 +22,7 @@
 #include "state.hpp"              // for State, StateMemory
 #include "strings.hpp"            //
 #include "texture.hpp"            // for Texture, get_textures, get_texture
+#include "thread_utils.hpp"       // for OnHeapPointer
 
 class JournalPage;
 struct Camera;
@@ -39,12 +40,12 @@ RenderAPI& RenderAPI::get()
 
 size_t RenderAPI::renderer() const
 {
-    return read_u64(*api + 0x10);
+    return memory_read<uint64_t>(*api + 0x10);
 }
 
 size_t RenderAPI::swap_chain() const
 {
-    return read_u64(renderer() + swap_chain_off);
+    return memory_read<uint64_t>(renderer() + swap_chain_off);
 }
 
 void (*g_post_render_game)(){nullptr};
@@ -212,8 +213,9 @@ bool g_selecting_from_menu_scope = false;
 void on_select_from_journal(void* unknown, uint8_t index)
 {
     g_selecting_from_menu_scope = true;
-    if (pre_load_journal_chapter(index + 3))
+    if (pre_load_journal_chapter(index + 3)) // convert from menu index to chapter
     {
+        g_selecting_from_menu_scope = false;
         return;
     }
     g_on_select_from_journal_menu_trampoline(unknown, index);
@@ -303,82 +305,23 @@ bool& get_journal_enabled()
     return g_journal_enabled;
 }
 
-bool prepare_text_for_rendering(TextRenderingInfo* info, const std::string& text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+void RenderAPI::draw_text(const TextRenderingInfo* tri, Color color)
 {
-    static size_t text_rendering_func1_offset = 0;
-    if (text_rendering_func1_offset == 0)
-    {
-        text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
-    }
-
-    if (text_rendering_func1_offset != 0)
-    {
-        auto convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), nullptr, 0);
-        if (convert_result <= 0)
-        {
-            return false;
-        }
-        std::wstring wide_text;
-        wide_text.resize(convert_result + 10);
-        convert_result = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), static_cast<int>(text.size()), &wide_text[0], static_cast<int>(wide_text.size()));
-
-        typedef void func1(uint32_t fontstyle, void* text_to_draw, uint32_t, float x, float y, TextRenderingInfo*, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t);
-        static func1* f1 = (func1*)(text_rendering_func1_offset);
-        f1(fontstyle, wide_text.data(), 2, x, y, info, scale_x, scale_y, alignment, 2, 0);
-        return true;
-    }
-    return false;
-}
-void free_text_post_rendering(TextRenderingInfo* info)
-{
-    if (info->unknown4 != nullptr)
-    {
-        game_free(info->unknown4);
-    }
-    if (info->letter_textures != nullptr)
-    {
-        game_free(info->letter_textures);
-    }
-    if (info->unknown6 != nullptr)
-    {
-        game_free(info->unknown6);
-    }
-}
-
-void RenderAPI::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
-{
-    TextRenderingInfo tri{};
-    ON_SCOPE_EXIT(free_text_post_rendering(&tri));
-
-    if (!prepare_text_for_rendering(&tri, text, x, y, scale_x, scale_y, alignment, fontstyle))
-    {
-        return;
-    }
-
-    static size_t text_rendering_func2_offset = 0;
-    if (text_rendering_func2_offset == 0)
-    {
-        text_rendering_func2_offset = get_address("draw_text"sv);
-    }
+    static size_t text_rendering_func2_offset = get_address("draw_text"sv);
 
     if (text_rendering_func2_offset != 0)
     {
-        typedef void func2(TextRenderingInfo*, Color * color);
+        typedef void func2(const TextRenderingInfo*, Color* color);
         static func2* f2 = (func2*)(text_rendering_func2_offset);
-        f2(&tri, &color);
+        f2(tri, &color);
     }
 }
 
 std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle)
 {
     TextRenderingInfo tri{};
-    ON_SCOPE_EXIT(free_text_post_rendering(&tri));
-
-    if (!prepare_text_for_rendering(&tri, text, 0, 0, scale_x, scale_y, 1 /*center*/, fontstyle))
-    {
-        return std::make_pair(0.0f, 0.0f);
-    }
-    return std::make_pair(tri.width, tri.height);
+    tri.set_text(text, 0, 0, scale_x, scale_y, 1 /*center*/, fontstyle);
+    return tri.text_size();
 }
 
 void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color)
@@ -420,13 +363,8 @@ void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Co
 
 void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader)
 {
-    static size_t func_offset = 0;
-    static size_t param_7 = 0;
-    if (func_offset == 0)
-    {
-        func_offset = get_address("draw_world_texture"sv);
-        param_7 = get_address("draw_world_texture_param_7"sv);
-    }
+    static const size_t func_offset = get_address("draw_world_texture"sv);
+    static const size_t param_7 = get_address("draw_world_texture_param_7"sv);
 
     if (func_offset != 0)
     {
@@ -470,7 +408,7 @@ void RenderAPI::set_advanced_hud()
 void RenderAPI::reload_shaders()
 {
     using ReloadShadersFun = void(size_t);
-    ReloadShadersFun* reload_shaders_impl = (ReloadShadersFun*)get_address("reload_shaders"sv);
+    static ReloadShadersFun* reload_shaders_impl = (ReloadShadersFun*)get_address("reload_shaders"sv);
     reload_shaders_impl(renderer());
 }
 
@@ -510,9 +448,9 @@ void fetch_texture(Entity* entity, int32_t texture_id)
     }
 }
 
-using PrepareTextFun = void(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11);
+using PrepareTextFun = void(uint32_t fontstyle, const char16_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11);
 PrepareTextFun* g_prepare_text_trampoline{nullptr};
-void prepare_text(uint32_t fontstyle, const wchar_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11)
+void prepare_text(uint32_t fontstyle, const char16_t* text, uint32_t a3, float x, float y, TextRenderingInfo* a6, float scale_x, float scale_y, uint32_t alignment, uint32_t unknown_baseline_shift, int8_t a11)
 {
     static const STRINGID first_death = hash_to_stringid(0x5a52a061);
     static const STRINGID last_death = hash_to_stringid(0x5c9b2332);
@@ -628,6 +566,16 @@ void init_render_api_hooks()
     }
 }
 
+Entity* RenderInfo::get_entity() const
+{
+    return OnHeapPointer<Entity>{entity_offset}.decode_local();
+}
+
+uint32_t RenderInfo::get_aux_id() const
+{
+    return get_entity()->uid;
+}
+
 void TextureRenderingInfo::set_destination(const AABB& bbox)
 {
     auto w = bbox.width();
@@ -648,7 +596,7 @@ void TextureRenderingInfo::set_destination(const AABB& bbox)
     destination_bottom_right_y = -half_h;
 }
 
-Quad TextureRenderingInfo::dest_get_quad()
+Quad TextureRenderingInfo::dest_get_quad() const
 {
     return Quad{destination_bottom_left_x, destination_bottom_left_y, destination_bottom_right_x, destination_bottom_right_y, destination_top_right_x, destination_top_right_y, destination_top_left_x, destination_top_left_y};
 }
@@ -663,7 +611,7 @@ void TextureRenderingInfo::dest_set_quad(const Quad& quad)
     destination_top_left_x = quad.top_left_x;
     destination_top_left_y = quad.top_left_y;
 }
-Quad TextureRenderingInfo::source_get_quad()
+Quad TextureRenderingInfo::source_get_quad() const
 {
     return Quad{source_bottom_left_x, source_bottom_left_y, source_bottom_right_x, source_bottom_right_y, source_top_right_x, source_top_right_y, source_top_left_x, source_top_left_y};
 }
@@ -677,4 +625,105 @@ void TextureRenderingInfo::source_set_quad(const Quad& quad)
     source_top_right_y = quad.top_right_y;
     source_top_left_x = quad.top_left_x;
     source_top_left_y = quad.top_left_y;
+}
+
+void TextRenderingInfo::set_text(const std::u16string text, float _x, float _y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    static size_t text_rendering_func1_offset = get_address("prepare_text_for_rendering"sv);
+    if (text_rendering_func1_offset != 0)
+    {
+        if (dest != nullptr)
+        {
+            game_free(dest);
+            dest = nullptr;
+        }
+        if (source != nullptr)
+        {
+            game_free(source);
+            source = nullptr;
+        }
+        if (unknown6 != nullptr)
+        {
+            game_free(unknown6);
+            unknown6 = nullptr;
+        }
+
+        typedef void func1(uint32_t, const char16_t*, uint32_t, float, float, TextRenderingInfo*, float, float, uint32_t, uint32_t, int8_t);
+        static auto f1 = (func1*)(text_rendering_func1_offset);
+        f1(fontstyle, text.c_str(), 2, _x, _y, this, scale_x, scale_y, alignment, 2, 0);
+    }
+}
+void TextRenderingInfo::set_textx(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
+}
+void TextRenderingInfo::set_text(const std::string text, float _x, float _y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+
+    std::u16string wide_text;
+    wide_text.resize(text.size());
+    wide_text = convert.from_bytes(text);
+    set_text(wide_text, _x, _y, scale_x, scale_y, alignment, fontstyle);
+}
+TextRenderingInfo::~TextRenderingInfo()
+{
+    if (dest != nullptr)
+    {
+        game_free(dest);
+    }
+    if (source != nullptr)
+    {
+        game_free(source);
+    }
+    if (unknown6 != nullptr)
+    {
+        game_free(unknown6);
+    }
+}
+void TextRenderingInfo::rotate(float angle, std::optional<float> px, std::optional<float> py)
+{
+    constexpr float ratio = 16.0f / 9.0f;
+    constexpr float inverse_ratio = 9.0f / 16.0f;
+
+    const float sin_a{std::sin(angle)};
+    const float cos_a{std::cos(angle)};
+
+    const Vec2 p{px.value_or(0.f), py.value_or(0.f)};
+    const Vec2 mp{-px.value_or(0.f), -py.value_or(0.f)};
+
+    auto rotate_around_pivot = [=](Vec2 in) -> Vec2
+    {
+        in += mp;
+        const Vec2 old = in;
+        in.x = old.x * cos_a - old.y * sin_a;
+        in.y = old.y * cos_a + old.x * sin_a;
+        in += p;
+        return in;
+    };
+
+    for (uint32_t i = 0; i < size(); ++i)
+    {
+        auto letter = (dest + i);
+        letter->bottom.A.x *= ratio;
+        letter->bottom.B.x *= ratio;
+        letter->bottom.C.x *= ratio;
+        letter->top.A.x *= ratio;
+        letter->top.B.x *= ratio;
+        letter->top.C.x *= ratio;
+
+        letter->bottom.A = rotate_around_pivot(letter->bottom.A);
+        letter->bottom.B = rotate_around_pivot(letter->bottom.B);
+        letter->bottom.C = rotate_around_pivot(letter->bottom.C);
+        letter->top.A = rotate_around_pivot(letter->top.A);
+        letter->top.B = rotate_around_pivot(letter->top.B);
+        letter->top.C = rotate_around_pivot(letter->top.C);
+
+        letter->bottom.A.x *= inverse_ratio;
+        letter->bottom.B.x *= inverse_ratio;
+        letter->bottom.C.x *= inverse_ratio;
+        letter->top.A.x *= inverse_ratio;
+        letter->top.B.x *= inverse_ratio;
+        letter->top.C.x *= inverse_ratio;
+    }
 }

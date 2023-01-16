@@ -1,4 +1,6 @@
-#include <Windows.h>    // for AttachConsole, DWORD, FreeConsole, SetCons...
+#include <Windows.h> // for AttachConsole, DWORD, FreeConsole, SetCons...
+
+#include <TlHelp32.h>   // for PROCESSENTRY32, CreateToolhelp32Snapshot, Pro...
 #include <chrono>       // for operator<=>, operator-, operator+, operato...
 #include <compare>      // for operator<, operator<=, operator>
 #include <cstdio>       // for freopen_s, fclose, fopen_s, fputs, FILE, NULL
@@ -23,6 +25,55 @@
 
 using namespace std::chrono_literals;
 
+struct ProcessInfo
+{
+    std::string name;
+    DWORD pid;
+};
+
+struct Process
+{
+    HANDLE handle;
+    ProcessInfo info;
+};
+
+std::vector<ProcessInfo> get_processes()
+{
+    // No unicode
+#undef Process32First
+#undef Process32Next
+#undef PROCESSENTRY32
+    std::vector<ProcessInfo> res;
+    auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == nullptr)
+        return {};
+
+    PROCESSENTRY32 ppe = {sizeof(ppe)};
+    auto proc = Process32First(snapshot, &ppe);
+
+    while (proc)
+    {
+        auto name = ppe.szExeFile;
+        if (auto delim = strrchr(name, '\\'))
+            name = delim;
+        res.push_back({name, ppe.th32ProcessID});
+        proc = Process32Next(snapshot, &ppe);
+    }
+    return res;
+}
+
+std::optional<Process> find_process(std::string name)
+{
+    for (auto& proc : get_processes())
+    {
+        if (proc.name == name)
+        {
+            return Process{OpenProcess(PROCESS_ALL_ACCESS, 0, proc.pid), proc};
+        }
+    }
+    return {};
+}
+
 BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 {
     switch (ctrl_type)
@@ -41,31 +92,25 @@ BOOL WINAPI ctrl_handler(DWORD ctrl_type)
 
 void attach_stdout(DWORD pid)
 {
-    size_t env_var_size;
-    getenv_s(&env_var_size, NULL, 0, "OL_DEBUG");
-    if (env_var_size > 0)
-    {
-        AttachConsole(pid);
-        SetConsoleCtrlHandler(ctrl_handler, 1);
+    AttachConsole(pid);
+    SetConsoleCtrlHandler(ctrl_handler, 1);
 
-        FILE* stream;
-        freopen_s(&stream, "CONOUT$", "w", stdout);
-        freopen_s(&stream, "CONOUT$", "w", stderr);
-        freopen_s(&stream, "CONIN$", "r", stdin);
-    }
+    FILE* stream;
+    freopen_s(&stream, "CONOUT$", "w", stdout);
+    freopen_s(&stream, "CONOUT$", "w", stderr);
+    // freopen_s(&stream, "CONIN$", "r", stdin);
+    INFO("Press Ctrl+C to detach this window from the process.");
 }
 
-extern "C" __declspec(dllexport) void run(DWORD pid)
+void run()
 {
-    attach_stdout(pid);
-    FILE* fp;
-    auto err = fopen_s(&fp, "spelunky.log", "a");
-    if (err == 0)
+    std::this_thread::sleep_for(2s);
+    Process proc;
+    if (auto res = find_process("Overlunky.exe"))
     {
-        fputs("Overlunky loaded\n", fp);
-        fclose(fp);
+        proc = res.value();
+        attach_stdout(proc.info.pid);
     }
-    DEBUG("Game injected! Press Ctrl+C to detach this window from the process.");
 
     register_application_version(fmt::format("Overlunky {}", get_version()));
     preload_addresses();
@@ -73,7 +118,7 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     while (true)
     {
         auto entities = list_entities();
-        if (entities.size() >= 850)
+        if (entities.size() >= 876)
         {
             DEBUG("Found {} entities, that's enough", entities.size());
             std::this_thread::sleep_for(100ms);
@@ -91,19 +136,20 @@ extern "C" __declspec(dllexport) void run(DWORD pid)
     auto& api = RenderAPI::get();
     init_ui();
     init_hooks((void*)api.swap_chain());
-    size_t env_var_size;
-    getenv_s(&env_var_size, NULL, 0, "OL_DEBUG");
-    if (env_var_size > 0)
+}
+
+extern "C" __declspec(dllexport) const char* dll_version()
+{
+    return get_version_cstr();
+}
+
+BOOL WINAPI DllMain([[maybe_unused]] HINSTANCE hinst, DWORD dwReason, [[maybe_unused]] LPVOID reserved)
+{
+    if (dwReason == DLL_PROCESS_ATTACH)
     {
-        DEBUG("Running in debug mode.");
-        do
-        {
-            std::string line;
-            std::getline(std::cin, line);
-            if (std::cin.fail() || std::cin.eof())
-            {
-                std::cin.clear();
-            }
-        } while (true);
+        DisableThreadLibraryCalls(hinst);
+        std::thread thr(run);
+        thr.detach();
     }
+    return TRUE;
 }
