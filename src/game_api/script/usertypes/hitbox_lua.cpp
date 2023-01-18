@@ -23,9 +23,9 @@ void register_usertypes(sol::state& lua)
         if (extrude)
         {
             sx1 -= extrude.value();
-            sy1 -= extrude.value();
+            sy1 += extrude.value();
             sx2 += extrude.value();
-            sy2 += extrude.value();
+            sy2 -= extrude.value();
         }
         if (offsetx)
         {
