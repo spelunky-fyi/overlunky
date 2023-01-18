@@ -19,8 +19,7 @@ void register_usertypes(sol::state& lua)
 {
     static auto fixup_hitbox = [](AABB hitbox, sol::optional<float> extrude, sol::optional<float> offsetx, sol::optional<float> offsety)
     {
-        auto [sx1, sy1, sx2, sy2] = hitbox;
-        if (extrude)
+\        if (extrude)
         {
             hitbox.extrude(extrude.value());
         }
