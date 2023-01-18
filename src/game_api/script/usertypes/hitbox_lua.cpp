@@ -22,22 +22,10 @@ void register_usertypes(sol::state& lua)
         auto [sx1, sy1, sx2, sy2] = hitbox;
         if (extrude)
         {
-            sx1 -= extrude.value();
-            sy1 += extrude.value();
-            sx2 += extrude.value();
-            sy2 -= extrude.value();
+            hitbox.extrude(extrude.value());
         }
-        if (offsetx)
-        {
-            sx1 += offsetx.value();
-            sx2 += offsetx.value();
-        }
-        if (offsety)
-        {
-            sy1 += offsety.value();
-            sy2 += offsety.value();
-        }
-        return AABB{sx1, sy1, sx2, sy2};
+        hitbox.offset(offsetx.value_or(0), offsety.value_or(0));
+        return hitbox;
     };
     /// Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
     lua["get_hitbox"] = [](uint32_t uid, sol::optional<float> extrude, sol::optional<float> offsetx, sol::optional<float> offsety) -> AABB
