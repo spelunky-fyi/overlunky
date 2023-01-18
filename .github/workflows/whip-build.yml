@@ -45,7 +45,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "whip"
-          prerelease: true
+          prerelease: false
           title: "WHIP Build"
           files: |
             Overlunky_WHIP.zip
