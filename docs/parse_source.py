@@ -734,7 +734,8 @@ def run_parse():
                             ret = fun["return"]
                             ret = f"optional<{ret}>" if ret else "bool"
                             ret = ret if entry_name != "dtor" else "nil"
-                            param = fun["param"]
+                            param = fun["param"].strip()
+                            param = f"{name} self, {param}" if param else f"{name} self"
                             binds = entry["binds"]
                             if binds:
                                 param = f"{param}, {binds}"
@@ -749,6 +750,7 @@ def run_parse():
                         ret = f"optional<{ret}>" if ret != "nil" else "bool"
                         ret = ret if entry_name != "dtor" else "nil"
                         args = " ".join(entry["args"])
+                        args = f"{name} self, {args}" if args else f"{name} self"
                         pre_signature = f"{ret} {entry_name}({args})"
                         post_signature = f"nil {entry_name}({args})"
 
