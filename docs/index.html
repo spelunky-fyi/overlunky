@@ -26584,6 +26584,16 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td>ON::PRE_SET_FEAT</td>
 <td>Runs before the game sets a vanilla feat performed.<br/>Return: true to block the default behaviour of calling Steam SetAchievement.<br/></td>
 </tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_UPDATE">PRE_UPDATE</a></td>
+<td>ON::PRE_UPDATE</td>
+<td>Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/>Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don&#39;t update the state (this will essentially freeze the game engine)<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_UPDATE">POST_UPDATE</a></td>
+<td>ON::POST_UPDATE</td>
+<td>Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/></td>
+</tr>
 </tbody></table>
 <h2 id='PARTICLEEMITTER'>PARTICLEEMITTER</h2>
 <blockquote>
