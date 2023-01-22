@@ -233,6 +233,7 @@ State& State::get()
             init_achievement_hooks();
             hook_godmode_functions();
             strings_init();
+            init_state_update_hook();
         }
 
         get_is_init() = true;
@@ -580,6 +581,31 @@ std::vector<int64_t> State::read_prng() const
         prng.push_back(memory_read<int64_t>((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
     }
     return prng;
+}
+
+using OnStateUpdate = void(StateMemory*);
+OnStateUpdate* g_state_update_trampoline{nullptr};
+void StateUpdate(StateMemory* s)
+{
+    if (!pre_state_update())
+    {
+        g_state_update_trampoline(s);
+    }
+    update_backends();
+}
+
+void init_state_update_hook()
+{
+    g_state_update_trampoline = (OnStateUpdate*)get_address("state_refresh");
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach((void**)&g_state_update_trampoline, &StateUpdate);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        DEBUG("Failed hooking state_refresh stuff: {}\n", error);
+    }
 }
 
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position)

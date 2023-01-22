@@ -220,10 +220,6 @@ void SpelunkyScript_SetEnabled(SpelunkyScript* script, bool enabled)
     script->set_enabled(enabled);
 }
 
-void SpelunkyScript_Update(SpelunkyScript* script)
-{
-    script->run();
-}
 void SpelunkyScript_Draw(SpelunkyScript* script, struct ImDrawList* draw_list)
 {
     script->draw(draw_list);
@@ -285,10 +281,6 @@ void FreeConsole(SpelunkyConsole* console)
     delete console;
 }
 
-void SpelunkyConsole_Update(SpelunkyConsole* console)
-{
-    console->run();
-}
 void SpelunkyConsole_Draw(SpelunkyConsole* console, struct ImDrawList* draw_list)
 {
     console->draw(draw_list);

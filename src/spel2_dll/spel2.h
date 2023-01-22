@@ -97,7 +97,6 @@ void SpelunkyScript_ReloadScript(SpelunkyScript* script, const char* file_path);
 bool SpelunkyScript_IsEnabled(SpelunkyScript* script);
 void SpelunkyScript_SetEnabled(SpelunkyScript* script, bool enabled);
 
-void SpelunkyScript_Update(SpelunkyScript* script);
 void SpelunkyScript_Draw(SpelunkyScript* script, struct ImDrawList* draw_list);
 void SpelunkyScript_DrawOptions(SpelunkyScript* script);
 void SpelunkyScript_GetResult(SpelunkyScript* script, char* out_buffer, size_t out_buffer_size);
@@ -129,7 +128,6 @@ void SpelunkyScript_GetMeta(SpelunkyScript* script, SpelunkyScript_MetaFun meta_
 SpelunkyConsole* CreateConsole();
 void FreeConsole(SpelunkyConsole* console);
 
-void SpelunkyConsole_Update(SpelunkyConsole* console);
 void SpelunkyConsole_Draw(SpelunkyConsole* console, struct ImDrawList* draw_list);
 void SpelunkyConsole_DrawOptions(SpelunkyConsole* console);
 bool SpelunkyConsole_IsToggled(SpelunkyConsole* console);
