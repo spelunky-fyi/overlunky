@@ -682,6 +682,14 @@ end
         }
     };
 
+    /// Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
+    lua["unregister_option"] = [](std::string name)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->options.erase(name);
+        backend->lua["options"][name] = sol::nil;
+    };
+
     auto spawn_liquid = sol::overload(
         static_cast<void (*)(ENT_TYPE, float, float)>(::spawn_liquid),
         static_cast<void (*)(ENT_TYPE, float, float, float, float, uint32_t, uint32_t)>(::spawn_liquid_ex),
