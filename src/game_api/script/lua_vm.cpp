@@ -1756,6 +1756,18 @@ end
     /// Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
     lua["set_ending_unlock"] = set_ending_unlock;
 
+    /// Get the thread-local version of state
+    lua["get_local_state"] = []()
+    {
+        return State::get().ptr_local();
+    };
+
+    /// Get the thread-local version of players
+    lua["get_local_players"] = []()
+    {
+        return get_players(State::get().ptr_local());
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

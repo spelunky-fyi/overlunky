@@ -50,6 +50,12 @@ void register_usertypes(sol::state& lua)
     /// The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
     lua["prng"] = &PRNG::get();
 
+    /// Get the thread-local version of prng
+    lua["get_local_prng"] = []()
+    {
+        return &PRNG::get_local();
+    };
+
     /// Determines what class of prng is used, which in turn determines which parts of the game's future prng is affected. See more info at [PRNG](#PRNG)
     /// For example when choosing `PRNG_CLASS.PROCEDURAL_SPAWNS` to generate a random number, random Tiamat spawns will not be affected.
     /// Any integer in the range [0, 9] is a valid class, some are however not documented because of missing information.
