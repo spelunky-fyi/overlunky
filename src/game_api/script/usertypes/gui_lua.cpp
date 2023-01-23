@@ -487,6 +487,22 @@ void GuiDrawContext::win_image(IMAGE image, int width, int height)
         height = image_ptr->height;
     ImGui::Image(image_ptr->texture, ImVec2(static_cast<float>(width), static_cast<float>(height)));
 };
+bool GuiDrawContext::win_imagebutton(std::string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2)
+{
+    if (!backend->images.contains(image))
+        return false;
+
+    auto& image_ptr = backend->images[image];
+
+    ImVec2 im_size = ImVec2(width, height);
+
+    if (im_size.x < 1)
+        im_size.x = static_cast<float>(image_ptr->width);
+    if (im_size.y < 1)
+        im_size.y = static_cast<float>(image_ptr->height);
+
+    return ImGui::ImageButton(label.c_str(), image_ptr->texture, im_size, ImVec2(uvx1, uvy1), ImVec2(uvx2, uvy2));
+};
 void GuiDrawContext::win_section(std::string title, sol::function callback)
 {
     if (ImGui::CollapsingHeader(title.c_str()))
@@ -573,6 +589,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_pushid"] = &GuiDrawContext::win_pushid;
     guidrawcontext_type["win_popid"] = &GuiDrawContext::win_popid;
     guidrawcontext_type["win_image"] = &GuiDrawContext::win_image;
+    guidrawcontext_type["win_imagebutton"] = &GuiDrawContext::win_imagebutton;
     guidrawcontext_type["win_section"] = &GuiDrawContext::win_section;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
 
