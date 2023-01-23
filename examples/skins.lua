@@ -7,17 +7,9 @@ meta = {
 
 DIR = "skins/"
 texture_def = get_texture_definition(TEXTURE.DATA_TEXTURES_CHAR_YELLOW_0)
+skins = {}
 
-function set_skin(id)
-    skin = id
-    if #players == 0 then return end
-    if skin then
-        players[1]:set_texture(skin)
-    else
-        players[1]:set_texture(players[1].type.texture)
-    end
-end
-
+-- create a custom skin texture that supports _full sheets too
 function create_skin(path, w, h)
     texture_def.texture_path = path
     texture_def.width = w
@@ -25,9 +17,10 @@ function create_skin(path, w, h)
     texture_def.sub_image_width = w
     texture_def.sub_image_height = w
     local skin_id = define_texture(texture_def)
-    set_skin(skin_id)
+    return skin_id
 end
 
+-- get all installed char mods or png files in the skins folder and create option buttons for them
 function get_skins()
     images = {}
     for i,v in pairs(list_char_mods()) do
@@ -47,7 +40,8 @@ function get_skins()
             local uvx = 1/16
             local uvy = uvx*img.w/img.h
             if ctx:win_imagebutton(img.name, img.texture, 48, 48, 0, 0, uvx, uvy) then
-                create_skin(img.name, img.w, img.h)
+                skins[1] = create_skin(img.name, img.w, img.h)
+                if players[1] then hook_skin(players[1]) end
             end
             if i % 5 ~= 0 and i < #images then
                 ctx:win_sameline(0, 4)
@@ -57,27 +51,43 @@ function get_skins()
 end
 
 register_option_button("_reload", "Reload skins", "", get_skins)
-register_option_button("_reset", "Reset skin", "", set_skin)
+register_option_button("_reset", "Reset skin", "", function() skins = {} end)
 
 get_skins()
 
 function hook_skin(ent)
+    if not ent then return end
     ent:set_post_update_state_machine(function(ent)
-        if skin and ent.inventory.player_slot == 1 then
-            ent:set_texture(skin)
-        else
-            ent:set_texture(ent.type.texture)
+        if skins and skins[ent.inventory.player_slot] then
+            ent:set_texture(skins[ent.inventory.player_slot])
+        elseif ent.inventory.player_slot > 0 then
+            ent:set_texture(state.items.player_select[ent.inventory.player_slot].texture)
         end
     end)
 end
 
-set_post_entity_spawn(function(ent)
-    hook_skin(ent)
-end, SPAWN_TYPE.ANY, MASK.PLAYER)
+-- hook the current and future players
+set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.LEVEL_GEN, MASK.PLAYER)
+set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.SYSTEMIC | SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, ENT_TYPE.ITEM_PLAYERGHOST)
+hook_skin(get_player(1, true))
 
-if #players > 0 then
-    hook_skin(players[1])
-end
+-- apparently playerbags and ghosts with custom texture crash the game, maybe this will fix it
+set_pre_entity_spawn(function(type, x, y, l)
+    for i,p in pairs(players) do
+        p:set_texture(p.type.texture)
+    end
+    local uid = spawn_critical(type, x, y, l, 0, 0)
+    if type == ENT_TYPE.ITEM_PICKUP_PLAYERBAG then
+        get_entity(uid):set_post_update_state_machine(function(ent)
+            if skins[1] then
+                ent:set_texture(skins[1])
+            end
+            clear_callback()
+        end)
+    end
+    return uid
+end, SPAWN_TYPE.SYSTEMIC | SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, {ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_PLAYERGHOST})
+
 
 
 -- wip ui stuff here
