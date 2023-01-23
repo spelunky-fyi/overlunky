@@ -16,22 +16,29 @@ function create_skin(path, w, h)
     texture_def.height = h
     texture_def.sub_image_width = w
     texture_def.sub_image_height = w
+    texture_def.tile_width = math.floor(w/16)
+    texture_def.tile_height = math.floor(w/16)
     local skin_id = define_texture(texture_def)
     return skin_id
+end
+
+function create_thumbnail(path)
+    local w, h = get_image_size(path)
+    local ts = math.floor(w/16)
+    local texture = create_image_crop(path, 0, 0, ts, ts)
+    images[#images+1] = {name=path, texture=texture, w=w, h=h}
 end
 
 -- get all installed char mods or png files in the skins folder and create option buttons for them
 function get_skins()
     images = {}
     for i,v in pairs(list_char_mods()) do
-        local texture_id, w, h = create_image(v)
-        images[#images+1] = {name=v, texture=texture_id, w=w, h=h}
+        create_thumbnail(v)
     end
 
     for i,v in pairs(list_dir(DIR)) do
         if string.match(v, ".png") then
-            local texture_id, w, h = create_image(v)
-            images[#images+1] = {name=v, texture=texture_id, w=w, h=h}
+            create_thumbnail(v)
         end
     end
 
@@ -39,7 +46,7 @@ function get_skins()
         for i,img in pairs(images) do
             local uvx = 1/16
             local uvy = uvx*img.w/img.h
-            if ctx:win_imagebutton(img.name, img.texture, 48, 48, 0, 0, uvx, uvy) then
+            if ctx:win_imagebutton(img.name, img.texture, 48, 48, 0, 0, 1, 1) then
                 skins[1] = create_skin(img.name, img.w, img.h)
                 if players[1] then hook_skin(players[1]) end
             end
@@ -67,8 +74,8 @@ function hook_skin(ent)
 end
 
 -- hook the current and future players
-set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.LEVEL_GEN, MASK.PLAYER)
-set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.SYSTEMIC | SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, ENT_TYPE.ITEM_PLAYERGHOST)
+set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.ANY, MASK.PLAYER)
+set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.ANY, MASK.ITEM, ENT_TYPE.ITEM_PLAYERGHOST)
 hook_skin(get_player(1, true))
 
 -- apparently playerbags and ghosts with custom texture crash the game, maybe this will fix it

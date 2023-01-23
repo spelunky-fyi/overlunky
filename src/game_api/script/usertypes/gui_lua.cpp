@@ -651,6 +651,31 @@ void register_usertypes(sol::state& lua)
         return std::make_tuple((IMAGE)-1, -1, -1);
     };
 
+    /// Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
+    /// Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
+    lua["create_image_crop"] = [](std::string path, int x, int y, int w, int h) -> std::tuple<IMAGE, int, int>
+    {
+        ScriptImage* image = new ScriptImage;
+        image->width = 0;
+        image->height = 0;
+        image->texture = NULL;
+
+        auto backend = LuaBackend::get_calling_backend();
+        std::string real_path;
+        if (path.starts_with("/"))
+            real_path = (std::filesystem::absolute(".") / path.substr(1)).string();
+        else
+            real_path = (std::filesystem::path(backend->get_root_path()) / path).string();
+
+        if (create_d3d11_texture_from_file(real_path.c_str(), &image->texture, &image->width, &image->height, x, y, w, h))
+        {
+            IMAGE id = static_cast<IMAGE>(backend->images.size());
+            backend->images[id] = image;
+            return std::make_tuple(id, image->width, image->height);
+        }
+        return std::make_tuple((IMAGE)-1, -1, -1);
+    };
+
     /// Get image size from file. Returns a tuple containing width and height.
     lua["get_image_size"] = [](std::string path) -> std::tuple<int, int>
     {

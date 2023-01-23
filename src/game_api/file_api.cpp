@@ -272,7 +272,7 @@ std::string get_image_file_path(std::string root_path, std::string relative_path
     return root_path + '/' + relative_path;
 }
 
-bool create_d3d11_texture_from_file(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height)
+bool create_d3d11_texture_from_file(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height, int crop_x, int crop_y, int crop_w, int crop_h)
 {
     // Load from disk into a raw RGBA buffer
     int image_width = 0;
@@ -280,6 +280,30 @@ bool create_d3d11_texture_from_file(const char* filename, ID3D11ShaderResourceVi
     unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
     if (image_data == NULL)
         return false;
+
+    if (crop_w > 0 && crop_h > 0)
+    {
+        unsigned int i = 0;
+        for (int y = 0; y < image_height; ++y)
+        {
+            for (int x = 0; x < image_width; ++x)
+            {
+                if (x >= crop_x && x < crop_x + crop_w && y >= crop_y && y < crop_y + crop_h)
+                {
+                    auto p = (y * image_width + x) * 4;
+                    image_data[i] = image_data[p];
+                    image_data[i + 1] = image_data[p + 1];
+                    image_data[i + 2] = image_data[p + 2];
+                    image_data[i + 3] = image_data[p + 3];
+                    i += 4;
+                }
+            }
+            if (y >= crop_y + crop_h)
+                break;
+        }
+        image_width = crop_w;
+        image_height = crop_h;
+    }
 
     /*
     // multiply alpha
