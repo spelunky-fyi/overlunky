@@ -1768,6 +1768,32 @@ end
         return get_players(State::get().ptr_local());
     };
 
+    /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
+    lua["list_dir"] = [&lua](std::string dir)
+    {
+        std::vector<std::string> files;
+        auto backend = LuaBackend::get_calling_backend();
+        auto base = backend->get_root_path();
+        auto path = base / std::filesystem::path(dir);
+        if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+            return sol::make_object(lua, sol::lua_nil);
+        auto base_check = std::filesystem::relative(path, base).string();
+        if (base_check.starts_with("..") && !backend->get_unsafe())
+        {
+            luaL_error(lua, "Tried to list parent directory without unsafe mode.");
+            return sol::make_object(lua, sol::lua_nil);
+        }
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            auto str = std::filesystem::relative(file.path(), base).string();
+            std::replace(str.begin(), str.end(), '\\', '/');
+            if (std::filesystem::is_directory(file.path()))
+                str = str + "/";
+            files.push_back(str);
+        }
+        return sol::make_object(lua, sol::as_table(files));
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

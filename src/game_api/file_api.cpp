@@ -352,3 +352,19 @@ bool create_d3d11_texture_from_memory(const unsigned char* buf, const unsigned i
 
     return true;
 }
+
+bool get_image_size_from_file(const char* filename, int* out_width, int* out_height)
+{
+    // Load from disk into a raw RGBA buffer
+    int image_width = 0;
+    int image_height = 0;
+    unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
+    if (image_data == NULL)
+        return false;
+
+    *out_width = image_width;
+    *out_height = image_height;
+    stbi_image_free(image_data);
+
+    return true;
+}

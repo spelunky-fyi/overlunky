@@ -627,6 +627,18 @@ void register_usertypes(sol::state& lua)
         }
         return std::make_tuple((IMAGE)-1, -1, -1);
     };
+
+    /// Get image size from file. Returns a tuple containing width and height.
+    lua["get_image_size"] = [](std::string path) -> std::tuple<int, int>
+    {
+        int width = 0;
+        int height = 0;
+        auto backend = LuaBackend::get_calling_backend();
+        if (get_image_size_from_file((std::filesystem::path{backend->get_root_path()} / path).string().data(), &width, &height))
+            return std::make_tuple(width, height);
+        return std::make_tuple(-1, -1);
+    };
+
     /// Current mouse cursor position in screen coordinates.
     lua["mouse_position"] = []() -> std::pair<float, float>
     {
