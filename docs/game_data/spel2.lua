@@ -2036,10 +2036,10 @@ local function PRNG_random(self, min, max) end
     ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId
     ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil
-    ---@field set_pre_dtor fun(self, fun: function): CallbackId
-    ---@field set_post_dtor fun(self, fun: function): CallbackId
-    ---@field set_pre_render fun(self, fun: function): CallbackId
-    ---@field set_post_render fun(self, fun: function): CallbackId
+    ---@field set_pre_dtor fun(self, fun: fun(self: RenderInfo): nil): nil
+    ---@field set_post_dtor fun(self, fun: fun(self: RenderInfo): nil): nil
+    ---@field set_pre_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): boolean
+    ---@field set_post_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): boolean
 
 ---@class Entity
     ---@field type EntityDB
@@ -2094,22 +2094,22 @@ local function PRNG_random(self, min, max) end
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil
-    ---@field set_pre_dtor fun(self, fun: function): CallbackId
-    ---@field set_post_dtor fun(self, fun: function): CallbackId
-    ---@field set_pre_update_state_machine fun(self, fun: function): CallbackId
-    ---@field set_post_update_state_machine fun(self, fun: function): CallbackId
-    ---@field set_pre_kill fun(self, fun: function): CallbackId
-    ---@field set_post_kill fun(self, fun: function): CallbackId
-    ---@field set_pre_on_collision1 fun(self, fun: function): CallbackId
-    ---@field set_post_on_collision1 fun(self, fun: function): CallbackId
-    ---@field set_pre_destroy fun(self, fun: function): CallbackId
-    ---@field set_post_destroy fun(self, fun: function): CallbackId
-    ---@field set_pre_get_held_entity fun(self, fun: function): CallbackId
-    ---@field set_post_get_held_entity fun(self, fun: function): CallbackId
-    ---@field set_pre_trigger_action fun(self, fun: function): CallbackId
-    ---@field set_post_trigger_action fun(self, fun: function): CallbackId
-    ---@field set_pre_on_collision2 fun(self, fun: function): CallbackId
-    ---@field set_post_on_collision2 fun(self, fun: function): CallbackId
+    ---@field set_pre_dtor fun(self, fun: fun(self: Entity): nil): nil
+    ---@field set_post_dtor fun(self, fun: fun(self: Entity): nil): nil
+    ---@field set_pre_update_state_machine fun(self, fun: fun(self: Entity): boolean): boolean
+    ---@field set_post_update_state_machine fun(self, fun: fun(self: Entity): boolean): boolean
+    ---@field set_pre_kill fun(self, fun: fun(self: Entity, destroy_corpse: boolean, responsible: Entity): boolean): boolean
+    ---@field set_post_kill fun(self, fun: fun(self: Entity, destroy_corpse: boolean, responsible: Entity): boolean): boolean
+    ---@field set_pre_on_collision1 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): boolean
+    ---@field set_post_on_collision1 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): boolean
+    ---@field set_pre_destroy fun(self, fun: fun(self: Entity): boolean): boolean
+    ---@field set_post_destroy fun(self, fun: fun(self: Entity): boolean): boolean
+    ---@field set_pre_get_held_entity fun(self, fun: fun(self: Entity): Entity?): Entity?
+    ---@field set_post_get_held_entity fun(self, fun: fun(self: Entity): Entity?): Entity?
+    ---@field set_pre_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): boolean?
+    ---@field set_post_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): boolean?
+    ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): boolean
+    ---@field set_post_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): boolean
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -2180,8 +2180,8 @@ local function Entity_overlaps_with(self, other) end
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil
-    ---@field set_pre_damage fun(self, fun: function): CallbackId
-    ---@field set_post_damage fun(self, fun: function): CallbackId
+    ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean): boolean
+    ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean): boolean
 
 ---@class Movable_generic_update_world
 ---@param move Vec2
@@ -2277,8 +2277,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil
-    ---@field set_pre_floor_update fun(self, fun: function): CallbackId
-    ---@field set_post_floor_update fun(self, fun: function): CallbackId
+    ---@field set_pre_floor_update fun(self, fun: fun(self: Floor): boolean): boolean
+    ---@field set_post_floor_update fun(self, fun: fun(self: Floor): boolean): boolean
 
 ---@class Door : Floor
     ---@field counter integer
@@ -3914,12 +3914,12 @@ local function MovableBehavior_get_state_id(self) end
 
 ---@class CustomMovableBehavior : MovableBehavior
     ---@field base_behavior VanillaMovableBehavior
-    ---@field set_force_state fun(self, force_state: function): nil
-    ---@field set_on_enter fun(self, on_enter: function): nil
-    ---@field set_on_exit fun(self, on_exit: function): nil
-    ---@field set_update_logic fun(self, update_logic: function): nil
-    ---@field set_update_world fun(self, update_world: function): nil
-    ---@field set_get_next_state_id fun(self, get_next_state_id: function): nil
+    ---@field set_force_state fun(self, force_state: fun(movable: Movable, base_fun: function): boolean): boolean
+    ---@field set_on_enter fun(self, on_enter: fun(movable: Movable, base_fun: function): nil): nil
+    ---@field set_on_exit fun(self, on_exit: fun(movable: Movable, base_fun: function): nil): nil
+    ---@field set_update_logic fun(self, update_logic: fun(movable: Movable, base_fun: function): nil): nil
+    ---@field set_update_world fun(self, update_world: fun(movable: Movable, base_fun: function): nil): nil
+    ---@field set_get_next_state_id fun(self, get_next_state_id: fun(movable: Movable, base_fun: function): integer): integer
 
 ---@class ParticleDB
     ---@field id integer
@@ -4311,7 +4311,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_image GuiDrawContext_draw_image
     ---@field draw_image_rotated GuiDrawContext_draw_image_rotated
     ---@field draw_layer fun(self, layer: DRAW_LAYER): nil
-    ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: function): boolean
+    ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: fun(ctx: GuiDrawContext, pos: Vec2, size: Vec2): nil): nil
     ---@field win_text fun(self, text: string): nil
     ---@field win_separator fun(self): nil
     ---@field win_inline fun(self): nil

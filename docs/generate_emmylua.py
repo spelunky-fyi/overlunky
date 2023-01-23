@@ -281,11 +281,11 @@ for type in ps.types:
                     index += 1
                     continue
                 elif params:
-                    # if "cb_signature" in var and var["cb_signature"] and "function" in params:
-                    #    cb_signature = var["cb_signature"]
-                    #    cb_params = cpp_params_to_emmy_lua_fun(cb_signature["param"])
-                    #    ret = replace_all(cb_signature["return"])
-                    #    params = params.replace("function", f"fun({cb_params}): {ret}")
+                    if "cb_signature" in var and var["cb_signature"] and "function" in params:
+                        cb_signature = var["cb_signature"]
+                        cb_params = cpp_params_to_emmy_lua_fun(cb_signature["param"])
+                        ret = replace_all(cb_signature["return"])
+                        params = params.replace("function", f"fun({cb_params}): {ret}")
                     signature = f"---@field {name} fun(self, {params}): {ret}"
                 else:
                     signature = f"---@field {name} fun(self): {ret}"
