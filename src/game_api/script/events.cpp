@@ -259,6 +259,32 @@ std::u16string pre_toast(char16_t* buffer)
     return return_empty_str ? u"" : new_string;
 }
 
+void update_backends()
+{
+    LuaBackend::for_each_backend(
+        [=](LuaBackend::LockedBackend backend)
+        {
+            backend->update();
+            return true;
+        });
+}
+
+bool pre_state_update()
+{
+    bool return_val = false;
+    LuaBackend::for_each_backend(
+        [=, &return_val](LuaBackend::LockedBackend backend)
+        {
+            if (backend->on_pre_state_update())
+            {
+                return_val = true;
+                return false;
+            }
+            return true;
+        });
+    return return_val;
+}
+
 bool pre_load_journal_chapter(uint8_t chapter)
 {
     bool return_value = false;
