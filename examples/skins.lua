@@ -23,8 +23,15 @@ function create_skin(path, w, h)
 end
 
 function create_thumbnail(path)
-    local texture, w, h = create_image(path)
-    images[#images+1] = {name=path, texture=texture, w=w, h=h}
+    if options.animate then
+        local texture, w, h = create_image(path)
+        images[#images+1] = {name=path, texture=texture, w=w, h=h}
+    else
+        local w, h = get_image_size(path)
+        local ts = math.floor(w/16)
+        local texture = create_image_crop(path, 0, 0, ts, ts)
+        images[#images+1] = {name=path, texture=texture, w=w, h=h}
+    end
 end
 
 -- get all installed char mods or png files in the skins folder and create option buttons for them
@@ -43,22 +50,25 @@ function get_skins()
     register_option_callback("skin", 0, function(ctx)
         for i,img in pairs(images) do
             local uvax, uvay = 0, 0
-            local uvbx, uvby = 1/16, 1/16
-            if players[1] then
-                local af = players[1].animation_frame
-                local x = af % 16
-                local y = math.floor(af / 16)
-                local ts = img.w/16
-                uvax = x*ts/img.w
-                uvay = y*ts/img.w
-                uvbx = (x*ts+ts)/img.w
-                uvby = (y*ts+ts)/img.w
-                if test_flag(players[1].flags, ENT_FLAG.FACING_LEFT) then
-                    uvax, uvbx = uvbx, uvax
+            local uvbx, uvby = 1, 1
+            if options.animate then
+                uvbx, uvby = 1/16, 1/16
+                if players[1] then
+                    local af = players[1].animation_frame
+                    local x = af % 16
+                    local y = math.floor(af / 16)
+                    local ts = img.w/16
+                    uvax = x*ts/img.w
+                    uvay = y*ts/img.w
+                    uvbx = (x*ts+ts)/img.w
+                    uvby = (y*ts+ts)/img.w
+                    if test_flag(players[1].flags, ENT_FLAG.FACING_LEFT) then
+                        uvax, uvbx = uvbx, uvax
+                    end
                 end
+                uvay = uvay*img.w/img.h
+                uvby = uvby*img.w/img.h
             end
-            uvay = uvay*img.w/img.h
-            uvby = uvby*img.w/img.h
             if ctx:win_imagebutton(img.name, img.texture, 48, 48, uvax, uvay, uvbx, uvby) then
                 skins[1] = create_skin(img.name, img.w, img.h)
                 if players[1] then hook_skin(players[1]) end
@@ -72,12 +82,14 @@ end
 
 register_option_button("_reload", "Reload skins", "", get_skins)
 register_option_button("_reset", "Reset skin", "", function() skins = {} end)
+register_option_bool("animate", "Fancy animated buttons (needs reload)", false)
 
 get_skins()
 
 function hook_skin(ent)
     if not ent then return end
     ent:set_post_update_state_machine(function(ent)
+        if not ent.inventory then return end
         if skins and skins[ent.inventory.player_slot] then
             ent:set_texture(skins[ent.inventory.player_slot])
         elseif ent.inventory.player_slot > 0 then
