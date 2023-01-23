@@ -7254,6 +7254,11 @@ void imgui_pre_init(ImGuiContext*)
 
 void imgui_init(ImGuiContext*)
 {
+    if (std::setlocale(LC_CTYPE, ".UTF-8") == nullptr)
+    {
+        ERR("Can not set code-page to utf-8, some scripts may cause a crash...");
+    }
+
     show_cursor();
     load_config(cfgfile);
     load_font();

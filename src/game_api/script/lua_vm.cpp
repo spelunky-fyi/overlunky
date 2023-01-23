@@ -1794,6 +1794,27 @@ end
         return sol::make_object(lua, sol::as_table(files));
     };
 
+    /// List all char*.png files recursively from Mods/Packs. Returns table of file paths.
+    lua["list_char_mods"] = [&lua]()
+    {
+        std::vector<std::string> files;
+        auto backend = LuaBackend::get_calling_backend();
+        auto path = std::filesystem::path("Mods/Packs");
+        auto base = std::filesystem::path(".");
+        if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+            return sol::make_object(lua, sol::lua_nil);
+        for (const auto& file : std::filesystem::recursive_directory_iterator(path))
+        {
+            auto str = std::filesystem::relative(file.path(), base).string();
+            std::replace(str.begin(), str.end(), '\\', '/');
+            if (str.find("/.db") != std::string::npos || str.find("char_") == std::string::npos || !str.ends_with(".png") || str.ends_with("_col.png") || str.ends_with("_lumin.png"))
+                continue;
+            str = "/" + str;
+            files.push_back(str);
+        }
+        return sol::make_object(lua, sol::as_table(files));
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

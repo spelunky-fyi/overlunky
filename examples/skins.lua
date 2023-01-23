@@ -1,7 +1,7 @@
 meta = {
 	name = "Too Many Skins",
 	version = "WIP",
-	description = "Load extra character mods from the skins subfolder.",
+	description = "Load extra character mods from all available packs or the skins subfolder.",
 	author = "Dregu"
 }
 
@@ -30,13 +30,18 @@ end
 
 function get_skins()
     images = {}
-    skins = {}
+    for i,v in pairs(list_char_mods()) do
+        local texture_id, w, h = create_image(v)
+        images[#images+1] = {name=v, texture=texture_id, w=w, h=h}
+    end
+
     for i,v in pairs(list_dir(DIR)) do
         if string.match(v, ".png") then
             local texture_id, w, h = create_image(v)
             images[#images+1] = {name=v, texture=texture_id, w=w, h=h}
         end
     end
+
     register_option_callback("skin", 0, function(ctx)
         for i,img in pairs(images) do
             local uvx = 1/16
@@ -45,14 +50,15 @@ function get_skins()
                 create_skin(img.name, img.w, img.h)
             end
             if i % 5 ~= 0 and i < #images then
-                ctx:win_inline()
+                ctx:win_sameline(0, 4)
             end
         end
     end)
-    prinspect(skins)
 end
 
-register_option_button("zrefresh", "Refresh skins", "", get_skins)
+register_option_button("_reload", "Reload skins", "", get_skins)
+register_option_button("_reset", "Reset skin", "", set_skin)
+
 get_skins()
 
 function hook_skin(ent)

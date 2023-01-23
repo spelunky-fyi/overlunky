@@ -34,21 +34,45 @@ void register_usertypes(sol::state& lua)
     lua["define_texture"] = [](TextureDefinition texture_data) -> TEXTURE
     {
         auto backend = LuaBackend::get_calling_backend();
-        texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
+        if (texture_data.texture_path.starts_with("/"))
+        {
+            texture_data.texture_path = texture_data.texture_path.substr(1);
+            texture_data.texture_path = get_image_file_path(std::filesystem::absolute(".").string().c_str(), std::move(texture_data.texture_path));
+        }
+        else
+        {
+            texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
+        }
         return define_texture(std::move(texture_data));
     };
     /// Gets a texture with the same definition as the given, if none exists returns `nil`
     lua["get_texture"] = [](TextureDefinition texture_data) -> std::optional<TEXTURE>
     {
         auto backend = LuaBackend::get_calling_backend();
-        texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
+        if (texture_data.texture_path.starts_with("/"))
+        {
+            texture_data.texture_path = texture_data.texture_path.substr(1);
+            texture_data.texture_path = get_image_file_path(std::filesystem::absolute(".").string().c_str(), std::move(texture_data.texture_path));
+        }
+        else
+        {
+            texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
+        }
         return get_texture(std::move(texture_data));
     };
     /// Gets the first texture with the matching path, if none exists returns `nil`
     lua["get_texture"] = [](std::string texture_path) -> std::optional<TEXTURE>
     {
         auto backend = LuaBackend::get_calling_backend();
-        texture_path = get_image_file_path(backend->get_root(), std::move(texture_path));
+        if (texture_path.starts_with("/"))
+        {
+            texture_path = texture_path.substr(1);
+            texture_path = get_image_file_path(std::filesystem::absolute(".").string().c_str(), std::move(texture_path));
+        }
+        else
+        {
+            texture_path = get_image_file_path(backend->get_root(), std::move(texture_path));
+        }
         return get_texture(texture_path);
     };
     /// Reloads a texture from disk, use this only as a development tool for example in the console
@@ -56,7 +80,15 @@ void register_usertypes(sol::state& lua)
     lua["reload_texture"] = [](std::string texture_path)
     {
         auto backend = LuaBackend::get_calling_backend();
-        texture_path = get_image_file_path(backend->get_root(), std::move(texture_path));
+        if (texture_path.starts_with("/"))
+        {
+            texture_path = texture_path.substr(1);
+            texture_path = get_image_file_path(std::filesystem::absolute(".").string().c_str(), std::move(texture_path));
+        }
+        else
+        {
+            texture_path = get_image_file_path(backend->get_root(), std::move(texture_path));
+        }
         return reload_texture(texture_path.c_str());
     };
 

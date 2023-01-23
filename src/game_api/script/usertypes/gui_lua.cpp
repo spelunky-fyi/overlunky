@@ -636,7 +636,13 @@ void register_usertypes(sol::state& lua)
         image->texture = NULL;
 
         auto backend = LuaBackend::get_calling_backend();
-        if (create_d3d11_texture_from_file((std::filesystem::path{backend->get_root_path()} / path).string().data(), &image->texture, &image->width, &image->height))
+        std::string real_path;
+        if (path.starts_with("/"))
+            real_path = (std::filesystem::absolute(".") / path.substr(1)).string();
+        else
+            real_path = (std::filesystem::path(backend->get_root_path()) / path).string();
+
+        if (create_d3d11_texture_from_file(real_path.c_str(), &image->texture, &image->width, &image->height))
         {
             IMAGE id = static_cast<IMAGE>(backend->images.size());
             backend->images[id] = image;
@@ -650,8 +656,15 @@ void register_usertypes(sol::state& lua)
     {
         int width = 0;
         int height = 0;
+
         auto backend = LuaBackend::get_calling_backend();
-        if (get_image_size_from_file((std::filesystem::path{backend->get_root_path()} / path).string().data(), &width, &height))
+        std::string real_path;
+        if (path.starts_with("/"))
+            real_path = (std::filesystem::absolute(".") / path.substr(1)).string();
+        else
+            real_path = (std::filesystem::path(backend->get_root_path()) / path).string();
+
+        if (get_image_size_from_file(real_path.c_str(), &width, &height))
             return std::make_tuple(width, height);
         return std::make_tuple(-1, -1);
     };
