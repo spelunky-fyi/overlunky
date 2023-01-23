@@ -57,8 +57,8 @@ get_skins()
 
 function hook_skin(ent)
     ent:set_post_update_state_machine(function(ent)
-        if options.skin > 1 and ent.inventory.player_slot == 1 then
-            ent:set_texture(skin_ids[options.skin-1])
+        if skin and ent.inventory.player_slot == 1 then
+            ent:set_texture(skin)
         else
             ent:set_texture(ent.type.texture)
         end

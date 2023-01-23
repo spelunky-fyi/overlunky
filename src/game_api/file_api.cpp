@@ -97,6 +97,17 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
             };
 
             auto image_data_size = image_width * image_height * 4;
+
+            // multiply alpha
+            for (int i = 0; i < image_data_size; i += 4)
+            {
+                uint8_t* p = (uint8_t*)&image_data[i];
+                float alpha = (float)p[3] / 255.0f;
+                p[0] = (uint8_t)((float)p[0] * alpha);
+                p[1] = (uint8_t)((float)p[1] * alpha);
+                p[2] = (uint8_t)((float)p[2] * alpha);
+            }
+
             int data_size = 4 + sizeof(DDS_HEADER) + image_data_size;
             auto allocation_size = sizeof(FileInfo) + data_size;
             auto file_buffer = (char*)alloc_fun(allocation_size);
@@ -269,6 +280,19 @@ bool create_d3d11_texture_from_file(const char* filename, ID3D11ShaderResourceVi
     unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
     if (image_data == NULL)
         return false;
+
+    /*
+    // multiply alpha
+    int pixel_count = image_width * image_height * 4;
+    for (int i = 0; i < pixel_count; i += 4)
+    {
+        uint8_t* p = (uint8_t*)&image_data[i];
+        float alpha = (float)p[3] / 255.0f;
+        p[0] = (uint8_t)((float)p[0] * alpha);
+        p[1] = (uint8_t)((float)p[1] * alpha);
+        p[2] = (uint8_t)((float)p[2] * alpha);
+    }
+    */
 
     // Create texture
     D3D11_TEXTURE2D_DESC desc;
