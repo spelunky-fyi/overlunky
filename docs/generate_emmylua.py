@@ -47,7 +47,7 @@ reInt = re.compile(r"\bint\b")
 reOptional = re.compile(r"optional<(.+?)>")
 reBool = re.compile(r"bool\b")
 reMap = re.compile(r"\bmap<")
-reArr = re.compile(r"(\bArray<(?:(\w+<.+>)|(\w+(?:<.+>)?))(?:, )?.*>)")
+reArr = re.compile(r"(\bArray<(?:(\w+<.+>)|(\w+(?:<.+>)?))(?:, )? ?(.*)>)")
 
 
 def replace_all(text):
@@ -293,8 +293,12 @@ for type in ps.types:
             print("    " + signature)
         elif "signature" in var:
             [var_type, var_name] = var["signature"].rsplit(" ", 1)
+            arr_m = reArr.match(var_type)
+            arr_size = arr_m[4] if arr_m else None
             var_type = replace_all(var_type)
-            if var_name.endswith("]"):
+            if arr_size:
+                var_type = f"{var_type} @size: {arr_size}"
+            elif var_name.endswith("]"):
                 if var_type == "char":
                     var_type = "string"
                 else:

@@ -1630,17 +1630,17 @@ function change_feat(feat, hidden, name, description) end
 
 ---@class ArenaState
     ---@field current_arena integer
-    ---@field player_teams integer[]
+    ---@field player_teams integer[] @size: 4
     ---@field format integer
     ---@field ruleset integer
-    ---@field player_lives integer[]
-    ---@field player_totalwins integer[]
-    ---@field player_won boolean[]
+    ---@field player_lives integer[] @size: 4
+    ---@field player_totalwins integer[] @size: 4
+    ---@field player_won boolean[] @size: 4
     ---@field timer integer
     ---@field timer_ending integer
     ---@field wins integer
     ---@field lives integer
-    ---@field player_idolheld_countdown integer[]
+    ---@field player_idolheld_countdown integer[] @size: 4
     ---@field health integer
     ---@field bombs integer
     ---@field ropes integer
@@ -1668,11 +1668,11 @@ function change_feat(feat, hidden, name, description) end
 ---@class Items
     ---@field player_count integer
     ---@field saved_pets_count integer
-    ---@field saved_pets ENT_TYPE[]
-    ---@field is_pet_cursed boolean[]
-    ---@field is_pet_poisoned boolean[]
-    ---@field player_inventory Inventory[]
-    ---@field player_select SelectPlayerSlot[]
+    ---@field saved_pets ENT_TYPE[] @size: 4
+    ---@field is_pet_cursed boolean[] @size: 4
+    ---@field is_pet_poisoned boolean[] @size: 4
+    ---@field player_inventory Inventory[] @size: MAX_PLAYERS
+    ---@field player_select SelectPlayerSlot[] @size: MAX_PLAYERS
 
 ---@class LiquidPhysicsEngine
     ---@field pause boolean
@@ -1693,7 +1693,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field engine LiquidPhysicsEngine
 
 ---@class LiquidPhysics
-    ---@field pools LiquidPool[]
+    ---@field pools LiquidPool[] @size: 5
 
 ---@class StateMemory
     ---@field screen_last integer
@@ -1790,8 +1790,8 @@ function change_feat(feat, hidden, name, description) end
     ---@field screen_change_counter integer
     ---@field time_startup integer
     ---@field storage_uid integer
-    ---@field waddler_storage ENT_TYPE[]
-    ---@field waddler_metadata integer[]
+    ---@field waddler_storage ENT_TYPE[] @size: 99
+    ---@field waddler_metadata integer[] @size: 99
     ---@field theme_info ThemeInfo
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
@@ -1803,7 +1803,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field size number
 
 ---@class Illumination
-    ---@field lights LightParams[]
+    ---@field lights LightParams[] @size: 4
     ---@field light1 LightParams
     ---@field light2 LightParams
     ---@field light3 LightParams
@@ -1845,7 +1845,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field inertia number
 
 ---@class Online
-    ---@field online_players OnlinePlayer[]
+    ---@field online_players OnlinePlayer[] @size: 4
     ---@field local_player OnlinePlayer
     ---@field lobby OnlineLobby
 
@@ -2219,18 +2219,18 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field kills_total integer
     ---@field collected_money_total integer
     ---@field collected_money_count integer
-    ---@field collected_money ENT_TYPE[]
-    ---@field collected_money_values integer[]
-    ---@field killed_enemies ENT_TYPE[]
+    ---@field collected_money ENT_TYPE[] @size: 512
+    ---@field collected_money_values integer[] @size: 512
+    ---@field killed_enemies ENT_TYPE[] @size: 256
     ---@field companion_count integer
-    ---@field companions ENT_TYPE[]
-    ---@field companion_held_items ENT_TYPE[]
-    ---@field companion_held_item_metadatas integer[]
-    ---@field companion_trust integer[]
-    ---@field companion_health integer[]
-    ---@field companion_poison_tick_timers integer[]
-    ---@field is_companion_cursed boolean[]
-    ---@field acquired_powerups ENT_TYPE[]
+    ---@field companions ENT_TYPE[] @size: 8
+    ---@field companion_held_items ENT_TYPE[] @size: 8
+    ---@field companion_held_item_metadatas integer[] @size: 8
+    ---@field companion_trust integer[] @size: 8
+    ---@field companion_health integer[] @size: 8
+    ---@field companion_poison_tick_timers integer[] @size: 8
+    ---@field is_companion_cursed boolean[] @size: 8
+    ---@field acquired_powerups ENT_TYPE[] @size: 30
 
 ---@class Ai
     ---@field target Entity
@@ -2384,17 +2384,17 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
 
 ---@class MotherStatue : Floor
-    ---@field players_standing boolean[]
+    ---@field players_standing boolean[] @size: 4
     ---@field player1_standing boolean
     ---@field player2_standing boolean
     ---@field player3_standing boolean
     ---@field player4_standing boolean
-    ---@field players_health_received boolean[]
+    ---@field players_health_received boolean[] @size: 4
     ---@field player1_health_received boolean
     ---@field player2_health_received boolean
     ---@field player3_health_received boolean
     ---@field player4_health_received boolean
-    ---@field players_health_timer integer[]
+    ---@field players_health_timer integer[] @size: 4
     ---@field player1_health_timer integer
     ---@field player2_health_timer integer
     ---@field player3_health_timer integer
@@ -3521,7 +3521,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field shake number
 
 ---@class PrizeDispenser : Movable
-    ---@field item_ids integer[]
+    ---@field item_ids integer[] @size: 6
     ---@field prizes_spawned integer
 
 ---@class Web : Movable
@@ -4154,18 +4154,18 @@ local function MovableBehavior_get_state_id(self) end
     ---@field beg_state integer
 
 ---@class SaveData
-    ---@field places boolean[]
-    ---@field bestiary boolean[]
-    ---@field people boolean[]
-    ---@field items boolean[]
-    ---@field traps boolean[]
+    ---@field places boolean[] @size: 16
+    ---@field bestiary boolean[] @size: 78
+    ---@field people boolean[] @size: 38
+    ---@field items boolean[] @size: 54
+    ---@field traps boolean[] @size: 24
     ---@field last_daily string
     ---@field characters integer
     ---@field shortcuts integer
-    ---@field bestiary_killed integer[]
-    ---@field bestiary_killed_by integer[]
-    ---@field people_killed integer[]
-    ---@field people_killed_by integer[]
+    ---@field bestiary_killed integer[] @size: 78
+    ---@field bestiary_killed_by integer[] @size: 78
+    ---@field people_killed integer[] @size: 38
+    ---@field people_killed_by integer[] @size: 38
     ---@field plays integer
     ---@field deaths integer
     ---@field wins_normal integer
@@ -4178,8 +4178,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field time_best integer
     ---@field time_total integer
     ---@field time_tutorial integer
-    ---@field character_deaths integer[]
-    ---@field pets_rescued integer[]
+    ---@field character_deaths integer[] @size: 20
+    ---@field pets_rescued integer[] @size: 3
     ---@field completed_normal boolean
     ---@field completed_ironman boolean
     ---@field completed_hard boolean
@@ -4189,16 +4189,16 @@ local function MovableBehavior_get_state_id(self) end
     ---@field level_last integer
     ---@field score_last integer
     ---@field time_last integer
-    ---@field stickers ENT_TYPE[]
-    ---@field players integer[]
+    ---@field stickers ENT_TYPE[] @size: 20
+    ---@field players integer[] @size: 4
     ---@field constellation Constellation
 
 ---@class Constellation
     ---@field star_count integer
-    ---@field stars ConstellationStar[]
+    ---@field stars ConstellationStar[] @size: 45
     ---@field scale number
     ---@field line_count integer
-    ---@field lines ConstellationLine[]
+    ---@field lines ConstellationLine[] @size: 90
     ---@field line_red_intensity number
 
 ---@class ConstellationStar
@@ -4249,8 +4249,8 @@ local function CustomSound_play(self, paused, sound_type) end
 ---@class SoundMeta
     ---@field x number
     ---@field y number
-    ---@field left_channel number[]
-    ---@field right_channel number[]
+    ---@field left_channel number[] @size: 38
+    ---@field right_channel number[] @size: 38
     ---@field start_over boolean
     ---@field playing boolean
 
@@ -4284,12 +4284,12 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field down integer
 
 ---@class PlayerInputs
-    ---@field player_slots PlayerSlot[]
+    ---@field player_slots PlayerSlot[] @size: MAX_PLAYERS
     ---@field player_slot_1 PlayerSlot
     ---@field player_slot_2 PlayerSlot
     ---@field player_slot_3 PlayerSlot
     ---@field player_slot_4 PlayerSlot
-    ---@field player_settings PlayerSlotSettings[]
+    ---@field player_settings PlayerSlotSettings[] @size: MAX_PLAYERS
     ---@field player_slot_1_settings PlayerSlotSettings
     ---@field player_slot_2_settings PlayerSlotSettings
     ---@field player_slot_3_settings PlayerSlotSettings
@@ -4586,8 +4586,8 @@ local function Triangle_offset(self, x, y) end
     ---@field cthulhu_timer number
     ---@field selected_menu_index integer
 ---@field menu_text_opacity number
-    ---@field spear_position number[]
-    ---@field spear_dangler SpearDanglerAnimFrames[]
+    ---@field spear_position number[] @size: 6
+    ---@field spear_dangler SpearDanglerAnimFrames[] @size: 6
     ---@field play_scroll_descend_timer number
     ---@field scroll_text STRINGID
 
@@ -4679,15 +4679,15 @@ local function Triangle_offset(self, x, y) end
     ---@field quick_select_panel TextureRenderingInfo
     ---@field quick_select_selected_char_background TextureRenderingInfo
     ---@field quick_select_panel_related TextureRenderingInfo
-    ---@field player_shutter_timer number[]
-    ---@field player_x number[]
-    ---@field player_y number[]
-    ---@field player_arrow_slidein_timer number[][]
-    ---@field player_facing_left boolean[]
-    ---@field player_quickselect_shown boolean[]
-    ---@field player_quickselect_fadein_timer number[]
-    ---@field player_quickselect_coords number[][]
-    ---@field player_quickselect_wiggle_angle number[]
+    ---@field player_shutter_timer number[] @size: MAX_PLAYERS
+    ---@field player_x number[] @size: MAX_PLAYERS
+    ---@field player_y number[] @size: MAX_PLAYERS
+    ---@field player_arrow_slidein_timer number[][] @size: MAX_PLAYERS
+    ---@field player_facing_left boolean[] @size: MAX_PLAYERS
+    ---@field player_quickselect_shown boolean[] @size: MAX_PLAYERS
+    ---@field player_quickselect_fadein_timer number[] @size: MAX_PLAYERS
+    ---@field player_quickselect_coords number[][] @size: MAX_PLAYERS
+    ---@field player_quickselect_wiggle_angle number[] @size: MAX_PLAYERS
     ---@field topleft_woodpanel_esc_slidein_timer number
     ---@field start_panel_slidein_timer number
     ---@field action_buttons_keycap_size number
@@ -4698,7 +4698,7 @@ local function Triangle_offset(self, x, y) end
     ---@field opacity number
     ---@field start_pressed boolean
     ---@field transition_to_game_started boolean
-    ---@field flying_things FlyingThing[]
+    ---@field flying_things FlyingThing[] @size: 6
     ---@field flying_thing_countdown integer
     ---@field particle_ceilingdust_smoke ParticleEmitterInfo
     ---@field particle_ceilingdust_rubble ParticleEmitterInfo
@@ -4785,11 +4785,11 @@ local function Triangle_offset(self, x, y) end
     ---@field woodpanel_cutout_big_money3 TextureRenderingInfo
     ---@field big_dollar_sign TextureRenderingInfo
     ---@field unknown26 TextureRenderingInfo
-    ---@field player_stats_scroll_numeric_value integer[]
-    ---@field player_secondary_icon TextureRenderingInfo[]
-    ---@field player_icon TextureRenderingInfo[]
-    ---@field player_secondary_icon_type integer[]
-    ---@field player_icon_index integer[]
+    ---@field player_stats_scroll_numeric_value integer[] @size: MAX_PLAYERS
+    ---@field player_secondary_icon TextureRenderingInfo[] @size: MAX_PLAYERS
+    ---@field player_icon TextureRenderingInfo[] @size: MAX_PLAYERS
+    ---@field player_secondary_icon_type integer[] @size: MAX_PLAYERS
+    ---@field player_icon_index integer[] @size: MAX_PLAYERS
     ---@field hourglasses TextureRenderingInfo
     ---@field small_dollar_signs TextureRenderingInfo
     ---@field this_level_money_color Color
@@ -4841,7 +4841,7 @@ local function Triangle_offset(self, x, y) end
     ---@field woodpanel_top_visible boolean
     ---@field woodpanel_bottom_visible boolean
     ---@field toggle_panels_slidein boolean
-    ---@field players OnlineLobbyScreenPlayer[]
+    ---@field players OnlineLobbyScreenPlayer[] @size: 4
     ---@field background_image TextureRenderingInfo
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field topleft_woodpanel_esc_slidein_timer number
@@ -5009,7 +5009,7 @@ local function Triangle_offset(self, x, y) end
     ---@field time_text_info TextRenderingInfo
     ---@field time_value_text_info TextRenderingInfo
     ---@field sticker_count integer
-    ---@field stickers TextureRenderingInfo[]
+    ---@field stickers TextureRenderingInfo[] @size: 20
 
 ---@class ScreenArenaMenu : Screen
     ---@field brick_background_animation ScreenZoomAnimation
@@ -5181,16 +5181,16 @@ local function Triangle_offset(self, x, y) end
     ---@field score_counter TextureRenderingInfo
     ---@field unknown27 TextureRenderingInfo
     ---@field lava_bubbles TextureRenderingInfo
-    ---@field player_won boolean[]
+    ---@field player_won boolean[] @size: MAX_PLAYERS
     ---@field victory_jump_y_pos number
     ---@field victory_jump_velocity number
     ---@field animation_frame integer
     ---@field squash_and_celebrate boolean
-    ---@field player_ready boolean[]
+    ---@field player_ready boolean[] @size: MAX_PLAYERS
     ---@field next_transition_timer integer
-    ---@field player_bottom_pillar_offset number[]
-    ---@field player_crushing_pillar_height number[]
-    ---@field player_create_giblets boolean[]
+    ---@field player_bottom_pillar_offset number[] @size: MAX_PLAYERS
+    ---@field player_crushing_pillar_height number[] @size: MAX_PLAYERS
+    ---@field player_create_giblets boolean[] @size: MAX_PLAYERS
     ---@field next_sidepanel_slidein_timer number
 
 
