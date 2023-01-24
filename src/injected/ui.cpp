@@ -5294,6 +5294,19 @@ void render_scripts()
                     {
                         ++i;
                     }
+                    if (script->get_path() != "" && !script->get_path().starts_with("Mods/Packs"))
+                    {
+                        ImGui::SameLine();
+                        bool autorun = std::find(g_script_autorun.begin(), g_script_autorun.end(), filename) != g_script_autorun.end();
+                        if (ImGui::Checkbox("Autorun##AutorunScript", &autorun))
+                        {
+                            if (!autorun)
+                                g_script_autorun.erase(std::remove(g_script_autorun.begin(), g_script_autorun.end(), filename), g_script_autorun.end());
+                            else if (std::find(g_script_autorun.begin(), g_script_autorun.end(), filename) == g_script_autorun.end())
+                                g_script_autorun.push_back(filename);
+                            save_config(cfgfile);
+                        }
+                    }
                     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
                     ImGui::Separator();
                     script->render_options();
