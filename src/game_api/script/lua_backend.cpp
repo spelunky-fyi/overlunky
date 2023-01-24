@@ -851,9 +851,12 @@ bool LuaBackend::pre_load_screen()
         }
     }
 
-    level_timers.clear();
-    script_input.clear();
-    clear_custom_shopitem_names();
+    if ((ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
+    {
+        level_timers.clear();
+        script_input.clear();
+        clear_custom_shopitem_names();
+    }
 
     return false;
 }
