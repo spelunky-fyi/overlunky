@@ -877,6 +877,7 @@ bool LuaConsole::pre_draw()
                         if (results.starts_with("sol:"))
                         {
                             color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+                            set_error(results);
                         }
                         result_message.push_back({std::move(results), {}, color});
                     }

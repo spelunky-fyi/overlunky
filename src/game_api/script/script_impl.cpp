@@ -103,19 +103,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     }
     catch (const sol::error& e)
     {
-        result = e.what();
-#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-        std::istringstream errors(result);
-        while (!errors.eof())
-        {
-            std::string eline;
-            getline(errors, eline);
-            messages.push_back({eline, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
-            DEBUG("{}", result);
-            if (messages.size() > 30)
-                messages.pop_front();
-        }
-#endif
+        set_error(e.what());
     }
 }
 
@@ -151,19 +139,7 @@ bool ScriptImpl::reset()
     }
     catch (const sol::error& e)
     {
-        result = e.what();
-#ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-        std::istringstream errors(result);
-        while (!errors.eof())
-        {
-            std::string eline;
-            getline(errors, eline);
-            messages.push_back({eline, std::chrono::system_clock::now(), ImVec4(1.0f, 0.2f, 0.2f, 1.0f)});
-            DEBUG("{}", result);
-            if (messages.size() > 30)
-                messages.pop_front();
-        }
-#endif
+        set_error(e.what());
         return false;
     }
 }
