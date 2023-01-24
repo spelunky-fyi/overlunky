@@ -1722,6 +1722,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field force_current_theme fun(self, t: integer): nil
     ---@field shoppie_aggro integer
     ---@field shoppie_aggro_next integer
+    ---@field outposts_spawned integer
     ---@field merchant_aggro integer
     ---@field kills_npc integer
     ---@field level_count integer
@@ -1825,6 +1826,8 @@ function change_feat(feat, hidden, name, description) end
     ---@field bounds_right number
     ---@field bounds_bottom number
     ---@field bounds_top number
+    ---@field calculated_focus_x number
+    ---@field calculated_focus_y number
     ---@field adjusted_focus_x number
     ---@field adjusted_focus_y number
     ---@field focus_offset_x number
@@ -1990,6 +1993,8 @@ local function PRNG_random(self, min, max) end
     ---@field hitboxx number
     ---@field hitboxy number
     ---@field draw_depth integer
+    ---@field collision2_mask integer
+    ---@field collision_mask integer
     ---@field friction number
     ---@field elasticity number
     ---@field weight number
@@ -2003,6 +2008,7 @@ local function PRNG_random(self, min, max) end
     ---@field glow_alpha number
     ---@field damage integer
     ---@field life integer
+    ---@field sacrifice_value integer
     ---@field blood_content integer
     ---@field texture integer
     ---@field animations table<integer, Animation>
@@ -2165,6 +2171,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field get_behavior fun(self): integer
     ---@field set_gravity fun(self, gravity: number): nil
     ---@field reset_gravity fun(self): nil
+    ---@field set_position fun(self, to_x: number, to_y: number): nil
     ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil
@@ -2243,7 +2250,10 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field ai Ai
     ---@field input PlayerSlot
     ---@field basecamp_button_entity Entity
+    ---@field jump_lock_timer integer
     ---@field coyote_timer integer
+    ---@field swim_timer integer
+    ---@field hired_hand_name integer
     ---@field set_jetpack_fuel fun(self, fuel: integer): nil
     ---@field kapala_blood_amount fun(self): integer
     ---@field get_name fun(self): string
@@ -2558,11 +2568,17 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class Ghost : Monster
     ---@field split_timer integer
+    ---@field wobble_timer integer
+    ---@field pace_timer integer
     ---@field velocity_multiplier number
     ---@field ghost_behaviour GHOST_BEHAVIOR
     ---@field emitted_light Illumination
     ---@field linked_ghost Entity
     ---@field sound SoundMeta
+    ---@field blown_by_player boolean
+    ---@field happy_dancing_clockwise boolean
+    ---@field target_dist_visibility_factor number
+    ---@field target_layer_visibility_factor number
 
 ---@class Bat : Monster
     ---@field spawn_x number
@@ -2610,6 +2626,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field name integer
     ---@field shotgun_attack_delay integer
     ---@field has_key boolean
+    ---@field is_ear boolean
     ---@field shop_owner boolean
 
 ---@class Yang : RoomOwner
@@ -2820,6 +2837,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sound SoundMeta
     ---@field fly_hang_timer integer
     ---@field targeting_timer integer
+    ---@field walk_start_time integer
+    ---@field walk_end_time integer
     ---@field wobble_x number
     ---@field wobble_y number
 
@@ -3414,6 +3433,13 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field swing number
     ---@field up_down_normal number
 
+---@class OlmecShip : Movable
+    ---@field sound SoundMeta
+    ---@field door_fx Entity
+    ---@field smoke ParticleEmitterInfo
+    ---@field flight_time integer
+    ---@field has_spawned_jetflames boolean
+
 ---@class MiniGameAsteroid : Movable
     ---@field spin_speed number
 
@@ -3460,6 +3486,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field falltime_deploy integer
     ---@field deployed boolean
     ---@field deploy fun(self): nil
+    ---@field gold_timer integer
+    ---@field gold_spawning_time integer
 
 ---@class TrueCrownPowerup : Powerup
     ---@field timer integer
@@ -3495,6 +3523,9 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class PrizeDispenser : Movable
     ---@field item_ids integer[]
     ---@field prizes_spawned integer
+
+---@class Web : Movable
+    ---@field decay_rate number
 
 ---@class LiquidSurface : Movable
     ---@field glow_radius number
@@ -3946,6 +3977,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field max_lifetime integer
 
 ---@class ThemeInfo
+    ---@field allow_beehive boolean
+    ---@field allow_leprechaun boolean
     ---@field sub_theme ThemeInfo
     ---@field get_unknown1 fun(self): boolean
     ---@field init_flags fun(self): nil
@@ -4008,8 +4041,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field override any @theme_override
     ---@field pre any @&CustomTheme::pre
     ---@field post any @&CustomTheme::post
-    ---@field unknown1 any @&CustomTheme::unknown1
-    ---@field unknown2 any @&CustomTheme::unknown2
+    ---@field allow_beehive any @&CustomTheme::allow_beehive
+    ---@field allow_leprechaun any @&CustomTheme::allow_leprechaun
     ---@field unknown3 any @&CustomTheme::unknown3
     ---@field unknown4 any @&CustomTheme::unknown4
     ---@field get_unknown1 fun(self): boolean
@@ -4077,6 +4110,8 @@ local function MovableBehavior_get_state_id(self) end
 ---@class LevelGenSystem
     ---@field shop_type SHOP_TYPE
     ---@field backlayer_shop_type SHOP_TYPE
+    ---@field shop_music integer
+    ---@field backlayer_shop_music integer
     ---@field spawn_x number
     ---@field spawn_y number
     ---@field spawn_room_x integer
@@ -4511,6 +4546,9 @@ local function Triangle_offset(self, x, y) end
     ---@field line1 STRINGID
     ---@field line2 STRINGID
     ---@field line3 STRINGID
+    ---@field line1_alpha number
+    ---@field line2_alpha number
+    ---@field line3_alpha number
 
 ---@class ScreenTitle : Screen
     ---@field logo_spelunky2 TextureRenderingInfo

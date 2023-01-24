@@ -243,6 +243,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_olmec
 - as_olmeccannon
 - as_olmecfloater
+- as_olmecship
 - as_olmite
 - as_onfireeffect
 - as_orb
@@ -340,6 +341,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_waddler
 - as_walkingmonster
 - as_walltorch
+- as_web
 - as_webgun
 - as_webshot
 - as_weteffect

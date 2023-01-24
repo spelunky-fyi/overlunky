@@ -46,12 +46,6 @@ bool SpelunkyConsole::is_toggled()
     return m_Impl->Lock()->enabled;
 }
 
-bool SpelunkyConsole::run()
-{
-    auto impl = m_Impl->Lock();
-    impl->lua["P"] = impl->lua["get_player"](1);
-    return impl->update();
-}
 void SpelunkyConsole::draw(ImDrawList* dl)
 {
     m_Impl->Lock()->draw(dl);

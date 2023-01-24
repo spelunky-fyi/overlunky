@@ -263,29 +263,27 @@ struct VTableHookInfos : UniquePreHookInfos<Signatures...>,
         unhook_post_impl<UniquePostSignatures>::call(*this, callback_id);
     }
 
-    struct Hook
+    std::vector<std::uint32_t> hooks;
+    bool is_hooked(std::uint32_t index) const
     {
-        void*** vtable;
-        std::uint32_t index;
-
-        bool operator==(const Hook&) const = default;
-    };
-    std::vector<Hook> hooks;
-    bool is_hooked(void*** vtable, std::uint32_t index)
-    {
-        return std::find(hooks.begin(), hooks.end(), Hook{vtable, index}) != hooks.end();
+        return std::find(hooks.begin(), hooks.end(), index) != hooks.end();
     }
-    void set_hooked(void*** vtable, std::uint32_t index, std::uint32_t dtor_index)
+    void set_hooked(std::uint32_t index)
     {
-        if (!is_hooked(vtable, index))
+        if (!is_hooked(index))
         {
-            hooks.push_back(Hook{vtable, index});
-            hook_dtor(
-                (SelfT*)vtable, [this](void* obj)
-                { std::erase_if(hooks, [vtable = (void***)obj](Hook hook)
-                                { return hook.vtable == vtable; }); },
-                dtor_index);
+            hooks.push_back(index);
         }
+    }
+
+    bool dtor_hooked{false};
+    bool is_dtor_hooked() const
+    {
+        return dtor_hooked;
+    }
+    void set_dtor_hooked()
+    {
+        dtor_hooked = true;
     }
 
   private:
@@ -426,6 +424,24 @@ struct HookableVTable
     {
         return my_hooks[obj];
     }
+    void remove_hooks(SelfT* obj)
+    {
+        my_hooks.erase(obj);
+    }
+    void hook_dtor_for_hook_info_cleanup(SelfT* obj, MyHookInfos& hook_info)
+    {
+        if (!hook_info.is_dtor_hooked())
+        {
+            hook_dtor(
+                obj,
+                [this](void* obj_inner)
+                {
+                    remove_hooks((SelfT*)obj_inner);
+                },
+                dtor_index);
+            hook_info.set_dtor_hooked();
+        }
+    }
     std::uint32_t reserve_callback_id(SelfT* obj)
     {
         MyHookInfos& hook_info = get_hooks(obj);
@@ -436,10 +452,11 @@ struct HookableVTable
     {
         // Note: Not using get_hook_function, we assume no one else hooks this (R.I.P. whoever is using this before us)
         MyHookInfos& hook_info = get_hooks(obj);
-        if (!hook_info.is_hooked((void***)obj, Index))
+        hook_dtor_for_hook_info_cleanup(obj, hook_info);
+        if (!hook_info.is_hooked(Index))
         {
             hook_vtable_impl<Signature, Index>::call(*this, obj);
-            hook_info.set_hooked((void***)obj, Index, dtor_index);
+            hook_info.set_hooked(Index);
         }
         hook_info.template get_pre<Signature>()[Index].push_back({callback_id, std::move(pre_fun)});
     }
@@ -448,10 +465,11 @@ struct HookableVTable
     {
         // Note: Not using get_hook_function, we assume no one else hooks this (R.I.P. whoever is using this before us)
         MyHookInfos& hook_info = get_hooks(obj);
-        if (!hook_info.is_hooked((void***)obj, Index))
+        hook_dtor_for_hook_info_cleanup(obj, hook_info);
+        if (!hook_info.is_hooked(Index))
         {
             hook_vtable_impl<Signature, Index>::call(*this, obj);
-            hook_info.set_hooked((void***)obj, Index, dtor_index);
+            hook_info.set_hooked(Index);
         }
         hook_info.template get_post<Signature>()[Index].push_back({callback_id, std::move(post_fun)});
     }

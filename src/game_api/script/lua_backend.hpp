@@ -106,6 +106,8 @@ enum class ON
     POST_LOAD_JOURNAL_CHAPTER,
     PRE_GET_FEAT,
     PRE_SET_FEAT,
+    PRE_UPDATE,
+    POST_UPDATE,
 };
 
 struct IntOption
@@ -304,6 +306,7 @@ class LuaBackend
 
     void clear();
     void clear_all_callbacks();
+    bool update();
 
     virtual bool reset();
     virtual bool pre_draw()
@@ -334,7 +337,6 @@ class LuaBackend
     void set_user_data(uint32_t uid, sol::object user_data);
     void set_user_data(Entity& entity, sol::object user_data);
 
-    bool update();
     void draw(ImDrawList* dl);
     void render_options();
 
@@ -393,6 +395,7 @@ class LuaBackend
     static std::string get_calling_backend_id();
     static void push_calling_backend(LuaBackend*);
     static void pop_calling_backend(LuaBackend*);
+    bool on_pre_state_update();
 };
 
 template <class Inheriting>

@@ -1881,7 +1881,11 @@ end
         "PRE_GET_FEAT",
         ON::PRE_GET_FEAT,
         "PRE_SET_FEAT",
-        ON::PRE_SET_FEAT);
+        ON::PRE_SET_FEAT,
+        "PRE_UPDATE",
+        ON::PRE_UPDATE,
+        "POST_UPDATE",
+        ON::POST_UPDATE);
     /* ON
     // GUIFRAME
     // Params: GuiDrawContext draw_ctx
@@ -1996,6 +2000,11 @@ end
     // PRE_SET_FEAT
     // Runs before the game sets a vanilla feat performed.
     // Return: true to block the default behaviour of calling Steam SetAchievement.
+    // PRE_UPDATE
+    // Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
+    // Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
+    // POST_UPDATE
+    // Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
     */
 
     lua.create_named_table(

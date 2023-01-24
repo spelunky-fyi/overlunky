@@ -5,9 +5,7 @@ An overlay for Spelunky 2 to help you with modding, exploring the depths of the 
 
 **Please read the [![open issues](https://img.shields.io/github/issues-raw/spelunky-fyi/overlunky)](https://github.com/spelunky-fyi/overlunky/issues) before complaining about them in the discord.**
 
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/latest) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.25.2-green) (Steam version)
-
-[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (latest prerelease build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.28-green) (Steam version)
+[![Overlunky](https://img.shields.io/github/v/release/spelunky-fyi/overlunky?include_prereleases&label=Overlunky)](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) (latest auto build) is compatible with ![Spelunky](https://img.shields.io/badge/Spelunky2-1.28-green) (Steam version)
 
 **Overlunky (or any other modding tool for that matter) does not support the GamePass/Xbox version**, but it might be considered in the future.
 
@@ -17,8 +15,8 @@ You are strongly discouraged from using any modding tools in your actual online 
 **Steam achievements and game saves are disabled by default while running Overlunky though.**
 
 ## Installation and usage
-  - ### Just use [Modlunky2](https://github.com/spelunky-fyi/modlunky2/releases/latest/) but please read this page too
-  - **[Download the latest WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip)** or a [stable release](https://github.com/spelunky-fyi/overlunky/releases/latest) and extract to your game folder, keeping the folder structure.
+  - ### Just use [Modlunky2](https://github.com/spelunky-fyi/modlunky2/releases/latest/) Overlunky tab to download and update OL, but please read the rest of the documentation too!
+  - **[Download the latest WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip)** and extract to your game folder, keeping the folder structure.
   - Run the program, leave it running and then start your game, or the other way around!
     + It won't automatically start your game, so don't hold your breath waiting for it
     + You can press ENTER in the launcher to try launch the game from the parent folder
@@ -29,14 +27,9 @@ You are strongly discouraged from using any modding tools in your actual online 
 
 ## WHIP build and automatic updates
 
-[WHIP builds](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) are whipped together automatically from the latest changes and are not tested or documented at all. They are mainly to keep up with the ever changing scripting api and usually contain bugfixes for that. Use at your own discretion, but if you want to use the latest scripting features, get this.
+[WHIP builds](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) are whipped together automatically from the latest changes and may not be very well tested or documented. This is usually the release to use with the latest version of the game. Numbered releases are made for legacy purposes when a new, incompatible game version comes out.
 
-**WHIP also has an auto-update system to check for a new version on every launch. This won't update the bundled scripts though, so you might want to do a manual update from time to time.** So:
-
-  - If you just want Overlunky for the tools, get the EXE and it will download the DLL and keep it updated for you
-  - If you want the bundled scripts, get the ZIP or use [Modlunky2](https://github.com/spelunky-fyi/modlunky2/) to update everything
-
-![WHIP commits](https://img.shields.io/github/commits-since/spelunky-fyi/overlunky/latest)
+**WHIP also has an auto-update system to check for a new version on every launch. This won't update the bundled scripts though, so you might want to do a manual update from time to time with the download button in Modlunky2.**
 
 ## Features
 
