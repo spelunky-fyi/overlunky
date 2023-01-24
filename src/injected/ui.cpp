@@ -2631,6 +2631,14 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             if (g_players.at(0)->layer == 0)
                 layer_to = LAYER::BACK;
             g_players.at(0)->set_layer(layer_to);
+            if (layer_to == LAYER::BACK || !g_state->illumination)
+            {
+                g_players.at(0)->emitted_light->enabled = true;
+            }
+            else
+            {
+                g_players.at(0)->emitted_light->enabled = false;
+            }
         }
     }
     else if (pressed("quick_start", wParam))
