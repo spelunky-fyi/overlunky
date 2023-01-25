@@ -206,6 +206,10 @@ function register_option_button(name, desc, long_desc, on_click) end
 ---@param on_render fun(): any
 ---@return nil
 function register_option_callback(name, value, on_render) end
+---Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
+---@param name string
+---@return nil
+function unregister_option(name) end
 ---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
 ---Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 ---`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
@@ -1123,6 +1127,19 @@ function set_level_string(str) end
 ---@param type ENT_TYPE
 ---@return nil
 function set_ending_unlock(type) end
+---Get the thread-local version of state
+---@return nil
+function get_local_state() end
+---Get the thread-local version of players
+---@return nil
+function get_local_players() end
+---List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
+---@param dir string
+---@return nil
+function list_dir(dir) end
+---List all char.png files recursively from Mods/Packs. Returns table of file paths.
+---@return nil
+function list_char_mods() end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1135,6 +1152,9 @@ function cancel_speechbubble() end
 ---@param seed integer
 ---@return nil
 function seed_prng(seed) end
+---Get the thread-local version of prng
+---@return nil
+function get_local_prng() end
 ---Same as `Player.get_name`
 ---@param type_id ENT_TYPE
 ---@return string
@@ -1407,6 +1427,19 @@ function draw_text_size(size, text) end
 ---@param path string
 ---@return IMAGE, integer, integer
 function create_image(path) end
+---Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
+---Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
+---@param path string
+---@param x integer
+---@param y integer
+---@param w integer
+---@param h integer
+---@return IMAGE, integer, integer
+function create_image_crop(path, x, y, w, h) end
+---Get image size from file. Returns a tuple containing width and height.
+---@param path string
+---@return integer, integer
+function get_image_size(path) end
 ---Current mouse cursor position in screen coordinates.
 ---@return number, number
 function mouse_position() end
@@ -4329,6 +4362,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field win_pushid fun(self, id: integer): nil
     ---@field win_popid fun(self): nil
     ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil
+    ---@field win_imagebutton fun(self, label: string, image: IMAGE, width: number, height: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number): boolean
     ---@field win_section any @&GuiDrawContext::win_section
     ---@field win_indent fun(self, width: number): nil
 

@@ -534,6 +534,9 @@
                             <a href="#get_grid_entity_at" class="toc-h3 toc-link" data-title="get_grid_entity_at">get_grid_entity_at</a>
                           </li>
                           <li>
+                            <a href="#get_local_players" class="toc-h3 toc-link" data-title="get_local_players">get_local_players</a>
+                          </li>
+                          <li>
                             <a href="#get_player" class="toc-h3 toc-link" data-title="get_player">get_player</a>
                           </li>
                           <li>
@@ -699,6 +702,9 @@
                             <a href="#create_image" class="toc-h3 toc-link" data-title="create_image">create_image</a>
                           </li>
                           <li>
+                            <a href="#create_image_crop" class="toc-h3 toc-link" data-title="create_image_crop">create_image_crop</a>
+                          </li>
+                          <li>
                             <a href="#disable_floor_embeds" class="toc-h3 toc-link" data-title="disable_floor_embeds">disable_floor_embeds</a>
                           </li>
                           <li>
@@ -721,6 +727,12 @@
                           </li>
                           <li>
                             <a href="#get_level_config" class="toc-h3 toc-link" data-title="get_level_config">get_level_config</a>
+                          </li>
+                          <li>
+                            <a href="#get_local_prng" class="toc-h3 toc-link" data-title="get_local_prng">get_local_prng</a>
+                          </li>
+                          <li>
+                            <a href="#get_local_state" class="toc-h3 toc-link" data-title="get_local_state">get_local_state</a>
                           </li>
                           <li>
                             <a href="#get_ms" class="toc-h3 toc-link" data-title="get_ms">get_ms</a>
@@ -748,6 +760,12 @@
                           </li>
                           <li>
                             <a href="#is_character_female" class="toc-h3 toc-link" data-title="is_character_female">is_character_female</a>
+                          </li>
+                          <li>
+                            <a href="#list_char_mods" class="toc-h3 toc-link" data-title="list_char_mods">list_char_mods</a>
+                          </li>
+                          <li>
+                            <a href="#list_dir" class="toc-h3 toc-link" data-title="list_dir">list_dir</a>
                           </li>
                           <li>
                             <a href="#load_death_screen" class="toc-h3 toc-link" data-title="load_death_screen">load_death_screen</a>
@@ -941,6 +959,9 @@
                           <li>
                             <a href="#register_option_string" class="toc-h3 toc-link" data-title="register_option_string">register_option_string</a>
                           </li>
+                          <li>
+                            <a href="#unregister_option" class="toc-h3 toc-link" data-title="unregister_option">unregister_option</a>
+                          </li>
                       </ul>
                   </li>
                   <li>
@@ -992,6 +1013,9 @@
                           </li>
                           <li>
                             <a href="#get_hitbox" class="toc-h3 toc-link" data-title="get_hitbox">get_hitbox</a>
+                          </li>
+                          <li>
+                            <a href="#get_image_size" class="toc-h3 toc-link" data-title="get_image_size">get_image_size</a>
                           </li>
                           <li>
                             <a href="#get_position" class="toc-h3 toc-link" data-title="get_position">get_position</a>
@@ -3780,6 +3804,12 @@ if the entity has no localized name</p>
 </blockquote>
 <h4 id='int-get_grid_entity_at-float-x-float-y-LAYER-layer'>int get_grid_entity_at(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
 <p>Gets a grid entity, such as floor or spikes, at the given position and layer.</p>
+<h3 id='get_local_players'>get_local_players</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_players">get_local_players</a></p>
+</blockquote>
+<h4 id='nil-get_local_players'>nil get_local_players()</h4>
+<p>Get the thread-local version of players</p>
 <h3 id='get_player'>get_player</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_player">get_player</a></p>
@@ -4092,6 +4122,13 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <h4 id='tuple-lt-IMAGE-int-int-gt-create_image-string-path'>tuple&lt;IMAGE, int, int&gt; create_image(string path)</h4>
 <p>Create image from file. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don&#39;t create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts</p>
+<h3 id='create_image_crop'>create_image_crop</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_image_crop">create_image_crop</a></p>
+</blockquote>
+<h4 id='tuple-lt-IMAGE-int-int-gt-create_image_crop-string-path-int-x-int-y-int-w-int-h'>tuple&lt;IMAGE, int, int&gt; create_image_crop(string path, int x, int y, int w, int h)</h4>
+<p>Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
+Depending on the image size, this can take a moment, preferably don&#39;t create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts</p>
 <h3 id='disable_floor_embeds'>disable_floor_embeds</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=disable_floor_embeds">disable_floor_embeds</a></p>
@@ -4140,6 +4177,18 @@ Depending on the image size, this can take a moment, preferably don&#39;t create
 </blockquote>
 <h4 id='int-get_level_config-LEVEL_CONFIG-config'>int get_level_config(<a href="#LEVEL_CONFIG">LEVEL_CONFIG</a> config)</h4>
 <p>Gets the value for the specified config</p>
+<h3 id='get_local_prng'>get_local_prng</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_prng">get_local_prng</a></p>
+</blockquote>
+<h4 id='nil-get_local_prng'>nil get_local_prng()</h4>
+<p>Get the thread-local version of prng</p>
+<h3 id='get_local_state'>get_local_state</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_state">get_local_state</a></p>
+</blockquote>
+<h4 id='nil-get_local_state'>nil get_local_state()</h4>
+<p>Get the thread-local version of state</p>
 <h3 id='get_ms'>get_ms</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_ms">get_ms</a></p>
@@ -4202,6 +4251,18 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 </blockquote>
 <h4 id='bool-is_character_female-ENT_TYPE-type_id'>bool is_character_female(<a href="#ENT_TYPE">ENT_TYPE</a> type_id)</h4>
 <p>Same as <code>Player.is_female</code></p>
+<h3 id='list_char_mods'>list_char_mods</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=list_char_mods">list_char_mods</a></p>
+</blockquote>
+<h4 id='nil-list_char_mods'>nil list_char_mods()</h4>
+<p>List all char.png files recursively from Mods/Packs. Returns table of file paths.</p>
+<h3 id='list_dir'>list_dir</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=list_dir">list_dir</a></p>
+</blockquote>
+<h4 id='nil-list_dir-string-dir'>nil list_dir(string dir)</h4>
+<p>List files in directory relative to the script root. Returns table of file/directory names or nil if not found.</p>
 <h3 id='load_death_screen'>load_death_screen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_death_screen">load_death_screen</a></p>
@@ -4604,6 +4665,12 @@ limits, you can override them in the UI with double click.</p>
 </blockquote>
 <h4 id='nil-register_option_string-string-name-string-desc-string-long_desc-string-value'>nil register_option_string(string name, string desc, string long_desc, string value)</h4>
 <p>Add a string option that the user can change in the UI. Read with <code>options.name</code>, <code>value</code> is the default.</p>
+<h3 id='unregister_option'>unregister_option</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unregister_option">unregister_option</a></p>
+</blockquote>
+<h4 id='nil-unregister_option-string-name'>nil unregister_option(string name)</h4>
+<p>Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.</p>
 <h2 id='Particle-functions'>Particle functions</h2><h3 id='advance_screen_particles'>advance_screen_particles</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=advance_screen_particles">advance_screen_particles</a></p>
@@ -4713,6 +4780,12 @@ inside these boundaries. The order is: left x, top y, right x, bottom y</p>
 </blockquote>
 <h4 id='AABB-get_hitbox-int-uid-optional-extrude-optional-offsetx-optional-offsety'><a href="#AABB">AABB</a> get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)</h4>
 <p>Gets the hitbox of an entity, use <code>extrude</code> to make the hitbox bigger/smaller in all directions and <code>offset</code> to offset the hitbox in a given direction</p>
+<h3 id='get_image_size'>get_image_size</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_image_size">get_image_size</a></p>
+</blockquote>
+<h4 id='tuple-lt-int-int-gt-get_image_size-string-path'>tuple&lt;int, int&gt; get_image_size(string path)</h4>
+<p>Get image size from file. Returns a tuple containing width and height.</p>
 <h3 id='get_position'>get_position</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_position">get_position</a></p>
@@ -6654,6 +6727,11 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_image">win_image(IMAGE image, int width, int height)</a></td>
 <td>Draw image to window.</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_imagebutton">win_imagebutton(string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2)</a></td>
+<td>Draw imagebutton to window.</td>
 </tr>
 <tr>
 <td>nil</td>

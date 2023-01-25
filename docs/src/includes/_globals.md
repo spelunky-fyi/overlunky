@@ -654,6 +654,15 @@ Get the [ENT_TYPE](#ENT_TYPE)... of the entity by uid
 
 Gets a grid entity, such as floor or spikes, at the given position and layer.
 
+### get_local_players
+
+
+> Search script examples for [get_local_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_players)
+
+#### nil get_local_players()
+
+Get the thread-local version of players
+
 ### get_player
 
 
@@ -1131,6 +1140,16 @@ Clears a bitmask in a number. This doesn't actually change the variable you pass
 Create image from file. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
 
+### create_image_crop
+
+
+> Search script examples for [create_image_crop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image_crop)
+
+#### tuple&lt;IMAGE, int, int&gt; create_image_crop(string path, int x, int y, int w, int h)
+
+Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
+Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
+
 ### disable_floor_embeds
 
 
@@ -1202,6 +1221,24 @@ Get your sanitized script id to be used in import.
 #### int get_level_config([LEVEL_CONFIG](#LEVEL_CONFIG) config)
 
 Gets the value for the specified config
+
+### get_local_prng
+
+
+> Search script examples for [get_local_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_prng)
+
+#### nil get_local_prng()
+
+Get the thread-local version of prng
+
+### get_local_state
+
+
+> Search script examples for [get_local_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_state)
+
+#### nil get_local_state()
+
+Get the thread-local version of state
 
 ### get_ms
 
@@ -1295,6 +1332,24 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 #### bool is_character_female([ENT_TYPE](#ENT_TYPE) type_id)
 
 Same as `Player.is_female`
+
+### list_char_mods
+
+
+> Search script examples for [list_char_mods](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_char_mods)
+
+#### nil list_char_mods()
+
+List all char.png files recursively from Mods/Packs. Returns table of file paths.
+
+### list_dir
+
+
+> Search script examples for [list_dir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_dir)
+
+#### nil list_dir(string dir)
+
+List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 
 ### load_death_screen
 
@@ -1898,6 +1953,15 @@ limits, you can override them in the UI with double click.
 
 Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
 
+### unregister_option
+
+
+> Search script examples for [unregister_option](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unregister_option)
+
+#### nil unregister_option(string name)
+
+Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
+
 ## Particle functions
 
 
@@ -2066,6 +2130,15 @@ Gets the current camera position in the level
 #### [AABB](#AABB) get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)
 
 Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
+
+### get_image_size
+
+
+> Search script examples for [get_image_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_image_size)
+
+#### tuple&lt;int, int&gt; get_image_size(string path)
+
+Get image size from file. Returns a tuple containing width and height.
 
 ### get_position
 
