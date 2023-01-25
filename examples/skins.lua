@@ -10,8 +10,16 @@ CUSTOM_SKIN_TEXT = "\u{84} Too Many Skins"
 
 texture_def = get_texture_definition(TEXTURE.DATA_TEXTURES_CHAR_YELLOW_0)
 skins = {}
+images = {}
 draw_select = false
 selected_skin = 0
+
+function exists(path)
+    for i,img in pairs(images) do
+        if img.path == path then return true end
+    end
+    return false
+end
 
 function clean_name(name)
     name = name:gsub("/Mods/Packs/", "")
@@ -36,47 +44,33 @@ function create_skin(path, w, h)
     return skin_id
 end
 
-function create_thumbnail(path)
-    if options.animate then
-        local texture, w, h = create_image(path)
-        images[#images+1] = {path=path, name=clean_name(path), texture=texture, w=w, h=h}
-    else
-        local w, h = get_image_size(path)
-        local ts = math.floor(w/16)
-        local texture = create_image_crop(path, 0, 0, ts, ts)
-        images[#images+1] = {path=path, name=clean_name(path), texture=texture, w=w, h=h}
-    end
-end
-
-test = { name = "Data/Textures/char_yellow.DDS", texture = 285, 2048, 2048 }
-
-
--- get all installed char mods or png files in the skins folder and create option buttons for them
+-- get all installed char mods or png files in the skins folder
 function get_skins()
-    images = {}
-
-    for i,path in pairs(list_char_mods()) do
-        --create_thumbnail(v)
-        local w, h = get_image_size(path)
-        create_skin(path, w, h)
-        --images[#images+1] = test
+    -- vanilla or enabled mods' skins
+    for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
+        local tex = get_type(i).texture
+        local def = get_texture_definition(tex)
+        if not exists(def.texture_path) then
+            images[#images+1] = { path=def.texture_path, name=get_character_name(i), texture=tex }
+        end
     end
 
-    for i,path in pairs(list_dir(DIR)) do
-        if string.match(path, ".png") then
+    -- all installed char mods
+    for i,path in pairs(list_char_mods()) do
+        if not exists(path) then
             local w, h = get_image_size(path)
             create_skin(path, w, h)
         end
     end
 
-    for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
-        images[#images+1] = { path="", name=get_character_name(i), texture=get_type(i).texture }
+    -- skins subfolder
+    for i,path in pairs(list_dir(DIR)) do
+        if string.match(path, ".png") and not exists(path) then
+            local w, h = get_image_size(path)
+            create_skin(path, w, h)
+        end
     end
 end
-
-register_option_button("_reload", "Reload skins", "", get_skins)
-register_option_button("_reset", "Reset skin", "", function() skins = {} end)
---register_option_bool("animate", "Fancy animated buttons (needs reload)", false)
 
 get_skins()
 
@@ -136,14 +130,14 @@ set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
     end
 end)
 
-N = 5
+N = 8
 F = 1.96
 AX = -0.7
 AY = 0.675
 ANG = 0
 
 repeat
-    F = F - 0.01
+    F = F - 0.005
     W = -AX/(N/F)
     H = W/9*16
     XP = W / 20
@@ -180,13 +174,39 @@ end
 
 function draw_name(ctx)
     if draw_select then
-        ctx:draw_text("\u{83} "..images[selected_skin + 1].name.."   \u{85} Cancel", 0, -0.8, 0.001, 0.001, Color:white(),
-            VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
+        local color = Color:new(0.25, 0.2, 0.2, 1)
+        ctx:draw_text("\u{83} "..images[selected_skin + 1].name.."   \u{85} Reset   \u{88} Refresh", 0.68, -0.68, 0.001, 0.001, color,
+            VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.NORMAL)
     elseif game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE then
         local color = Color:white()
         color.a = game_manager.pause_ui.menu_slidein_progress
         ctx:draw_text(CUSTOM_SKIN_TEXT, 0, -0.8, 0.001, 0.001, color, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
     end
+end
+
+function draw_sticker(ctx)
+    if state.screen ~= SCREEN.CHARACTER_SELECT then return end
+    local color = Color:white()
+    color.r = 1 - state.screen_character_select.opacity
+    color.g = 1 - state.screen_character_select.opacity
+    color.b = 1 - state.screen_character_select.opacity
+    local src = Quad:new(AABB:new(0.13, 0.03125, 0.2183, 0.2168))
+    local x = -0.49
+    local y = 0.27
+    local w = 0.16
+    local h = w/9*16
+
+    local bg_aabb = AABB:new(x - 0.0225, y + 0.06, x + w + 0.0225, y - h - 0.02)
+    local bg_dest = Quad:new(bg_aabb)
+    local bg_x, bg_y = bg_dest:get_AABB():center()
+    bg_dest:rotate(ANG, bg_x, bg_y)
+
+    local dest_aabb = AABB:new(x, y, x + w, y - h)
+    --local dest = Quad:new(dest_aabb)
+    --local d_x, d_y = dest:get_AABB():center()
+    --dest:rotate(ANG, d_x, d_y)
+    ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_PROFILE_0, src, bg_dest, color)
+    ctx:draw_screen_texture(skins[1], 0, 0, dest_aabb, color, ANG, 0, 0)
 end
 
 function draw_selector(ctx)
@@ -197,23 +217,7 @@ function draw_selector(ctx)
         ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_MAIN_0, src, dest, Color:white())
         draw_skins(ctx)
     elseif state.items.player_select[1].activated and skins[1] and state.screen == SCREEN.CHARACTER_SELECT then
-        local src = Quad:new(AABB:new(0.13, 0.03125, 0.2183, 0.2168)) --275,32,447,222
-        local x = -0.49
-        local y = 0.27
-        local w = 0.16
-        local h = w/9*16
-
-        local bg_aabb = AABB:new(x - 0.0225, y + 0.06, x + w + 0.0225, y - h - 0.02)
-        local bg_dest = Quad:new(bg_aabb)
-        local bg_x, bg_y = bg_dest:get_AABB():center()
-        bg_dest:rotate(ANG, bg_x, bg_y)
-
-        local dest_aabb = AABB:new(x, y, x + w, y - h)
-        --local dest = Quad:new(dest_aabb)
-        --local d_x, d_y = dest:get_AABB():center()
-        --dest:rotate(ANG, d_x, d_y)
-        ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_PROFILE_0, src, bg_dest, Color:white())
-        ctx:draw_screen_texture(skins[1], 0, 0, dest_aabb, Color:white(), ANG, 0, 0)
+        draw_sticker(ctx)
     end
 end
 
@@ -286,6 +290,9 @@ set_callback(function()
             game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
         end
         return was_open
+    end
+    if pressed(0x20) then --refresh
+        get_skins()
     end
     buttons_prev = game_manager.game_props.buttons
     return draw_select
