@@ -59,15 +59,15 @@ function get_skins()
     end
 
     -- all installed char mods
-    for i,path in pairs(list_char_mods()) do
+    for i,path in pairs(list_char_mods() or {}) do
         if not exists(path) then
             local w, h = get_image_size(path)
             create_skin(path, w, h)
         end
     end
 
-    -- skins subfolder
-    for i,path in pairs(list_dir(DIR)) do
+    -- png files from skins subfolder
+    for i,path in pairs(list_dir(DIR) or {}) do
         if string.match(path, ".png") and not exists(path) then
             local w, h = get_image_size(path)
             create_skin(path, w, h)
