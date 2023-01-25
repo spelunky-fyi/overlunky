@@ -120,10 +120,6 @@ void SpelunkyScript::set_changed(bool changed)
     m_Impl->Lock()->changed = changed;
 }
 
-bool SpelunkyScript::run()
-{
-    return m_Impl->Lock()->update();
-}
 void SpelunkyScript::draw(ImDrawList* dl)
 {
     m_Impl->Lock()->draw(dl);

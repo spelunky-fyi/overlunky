@@ -247,6 +247,12 @@ bool LuaBackend::update()
 
         lua["players"] = get_players(g_state);
 
+        if (LuaConsole* is_console = dynamic_cast<LuaConsole*>(this))
+        {
+            /// NoDoc
+            lua["P"] = lua["get_player"](1);
+        }
+
         /*moved to pre_load_screen
         if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen_next != (int)ON::OPTIONS && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
         {
@@ -425,6 +431,12 @@ bool LuaBackend::update()
                         handle_function<void>(this, callback.func);
                         callback.lastRan = now;
                     }
+                    break;
+                }
+                case ON::POST_UPDATE:
+                {
+                    handle_function<void>(this, callback.func);
+                    callback.lastRan = now;
                     break;
                 }
                 case ON::SCREEN:
@@ -1500,3 +1512,31 @@ void LuaBackend::pop_calling_backend([[maybe_unused]] LuaBackend* calling_backen
 /**
  * static functions end
  */
+
+bool LuaBackend::on_pre_state_update()
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+    std::lock_guard lock{global_lua_lock};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_UPDATE)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            if (handle_function<bool>(this, callback.func).value_or(false))
+            {
+                clear_current_callback();
+                return true;
+            }
+            clear_current_callback();
+        }
+    }
+    return false;
+}
