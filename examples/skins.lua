@@ -27,6 +27,8 @@ function clean_name(name)
     name = name:gsub("Entities/", "")
     name = name:gsub("fyi.", "")
     name = name:gsub("skins/", "")
+    name = name:gsub("_full.png", "")
+    name = name:gsub("char_", "")
     name = name:gsub(".png", "")
     return name
 end
@@ -118,16 +120,24 @@ function pressed(key)
     return false
 end
 
+function released(key)
+    if not test_mask(game_manager.game_props.buttons, key) and test_mask(buttons_prev, key) then
+        return true
+    end
+    return false
+end
+
 -- show custom message on bottom right
 change_string(hash_to_stringid(0xcd07f25b), CUSTOM_SKIN_TEXT)
 set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
     if state.items.player_select[1].activated then
         state.screen_character_select.right_button_text_id = hash_to_stringid(0xcd07f25b)
-        if skins[1] then
-            state.screen_character_select.player_y[1] = -5 --hide default char, TODO: something else
-        elseif state.screen_character_select.player_y[1] == -5 then
-            state.screen_character_select.player_y[1] = 0
+        if skins[1] and state.screen_character_select.start_pressed then
+            state.screen_character_select.player_y[1] = -2 --hide default char, TODO: something else
         end
+    end
+    if state.screen_character_select.player_quickselect_shown[1] then
+        skins[1] = nil
     end
 end)
 
@@ -243,69 +253,57 @@ end, ON.PRE_LOAD_SCREEN)
 -- disable inputs to underlaying char select screen when skin select is open
 set_callback(function()
     if state.screen ~= SCREEN.CHARACTER_SELECT and #players == 0 then return end
+    local ret = false
     if state.items.player_select[1].activated and
         (state.screen == SCREEN.CHARACTER_SELECT or game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or draw_select) and pressed(0x4) then
         game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.INVISIBLE
         draw_select = not draw_select
-        buttons_prev = game_manager.game_props.buttons
         if #players > 0 and not draw_select then
             game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
-            return true
+            ret = true
         end
     end
     if draw_select then
         if pressed(0x10000) and selected_skin > 0 then --left
             selected_skin = selected_skin - 1
-        end
-        if pressed(0x20000) and selected_skin < #images-1 then --right
+        elseif pressed(0x20000) and selected_skin < #images-1 then --right
             selected_skin = selected_skin + 1
-        end
-        if pressed(0x40000) and selected_skin >= N then --up
+        elseif pressed(0x40000) and selected_skin >= N then --up
             selected_skin = selected_skin - N
-        end
-        if pressed(0x80000) and selected_skin + N < #images then --down
+        elseif pressed(0x80000) and selected_skin + N < #images then --down
             selected_skin = selected_skin + N
-        end
-        if pressed(0x1) then --select
+        elseif pressed(0x1) then --select
             skins[1] = images[selected_skin + 1].texture
             draw_select = false
-            ANG = (math.random() - 0.5) / 20 * math.pi
-            buttons_prev = game_manager.game_props.buttons
+            ANG = (prng:random() - 0.5) / 20 * math.pi
             if #players > 0 then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
-                return true
+                ret = true
             end
-        end
-        if pressed(0x2) then --cancel
+        elseif pressed(0x2) then --cancel
             skins[1] = nil
-            local was_open = draw_select
             draw_select = false
-            buttons_prev = game_manager.game_props.buttons
             if #players > 0 then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
             end
-            return was_open
-        end
-        if pressed(0x8) then --random
+            ret = true
+        elseif released(0x8) then --random
             selected_skin = prng:random_index(#images, 0) - 1
             skins[1] = images[selected_skin + 1].texture
-            local was_open = draw_select
             draw_select = false
-            buttons_prev = game_manager.game_props.buttons
+            ANG = (prng:random() - 0.5) / 20 * math.pi
             if #players > 0 then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
             end
-            return was_open
-        end
-        if pressed(0x20) then --refresh
+            ret = true
+        elseif pressed(0x20) then --refresh
             get_skins()
-        end
-        if pressed(0x800) and #players > 0 then --start
+        elseif pressed(0x800) and #players > 0 then --start
             draw_select = false
             game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
-            return true
+            ret = true
         end
     end
     buttons_prev = game_manager.game_props.buttons
-    return draw_select
+    return ret or draw_select
 end, ON.PRE_UPDATE)
