@@ -6,10 +6,21 @@ meta = {
 }
 
 DIR = "skins/"
+CUSTOM_SKIN_TEXT = "\u{84} Too Many Skins"
+
 texture_def = get_texture_definition(TEXTURE.DATA_TEXTURES_CHAR_YELLOW_0)
 skins = {}
 draw_select = false
 selected_skin = 0
+
+function clean_name(name)
+    name = name:gsub("/Mods/Packs/", "")
+    name = name:gsub("Data/Textures/", "")
+    name = name:gsub("Entities/", "")
+    name = name:gsub("fyi.", "")
+    name = name:gsub("skins/", "")
+    return name
+end
 
 -- create a custom skin texture that supports _full sheets too
 function create_skin(path, w, h)
@@ -21,19 +32,19 @@ function create_skin(path, w, h)
     texture_def.tile_width = math.floor(w/16)
     texture_def.tile_height = math.floor(w/16)
     local skin_id = define_texture(texture_def)
-    images[#images+1] = {name=path, texture=skin_id, w=w, h=h}
+    images[#images+1] = {path=path, name=clean_name(path), texture=skin_id, w=w, h=h}
     return skin_id
 end
 
 function create_thumbnail(path)
     if options.animate then
         local texture, w, h = create_image(path)
-        images[#images+1] = {name=path, texture=texture, w=w, h=h}
+        images[#images+1] = {path=path, name=clean_name(path), texture=texture, w=w, h=h}
     else
         local w, h = get_image_size(path)
         local ts = math.floor(w/16)
         local texture = create_image_crop(path, 0, 0, ts, ts)
-        images[#images+1] = {name=path, texture=texture, w=w, h=h}
+        images[#images+1] = {path=path, name=clean_name(path), texture=texture, w=w, h=h}
     end
 end
 
@@ -56,6 +67,10 @@ function get_skins()
             local w, h = get_image_size(path)
             create_skin(path, w, h)
         end
+    end
+
+    for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
+        images[#images+1] = { path="", name=get_character_name(i), texture=get_type(i).texture }
     end
 end
 
@@ -109,12 +124,12 @@ function pressed(key)
 end
 
 -- show custom message on bottom right
-change_string(hash_to_stringid(0xcd07f25b), "\u{8A} Select From Installed Mods")
+change_string(hash_to_stringid(0xcd07f25b), CUSTOM_SKIN_TEXT)
 set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
     if state.items.player_select[1].activated then
         state.screen_character_select.right_button_text_id = hash_to_stringid(0xcd07f25b)
         if skins[1] then
-            state.screen_character_select.player_y[1] = -5 --hide default char
+            state.screen_character_select.player_y[1] = -5 --hide default char, TODO: something else
         elseif state.screen_character_select.player_y[1] == -5 then
             state.screen_character_select.player_y[1] = 0
         end
@@ -163,36 +178,55 @@ function draw_skins(ctx)
     end
 end
 
--- draw huge quick select and skins
-set_post_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
+function draw_name(ctx)
+    if draw_select then
+        ctx:draw_text("\u{83} "..images[selected_skin + 1].name.."   \u{85} Cancel", 0, -0.8, 0.001, 0.001, Color:white(),
+            VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
+    elseif game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE then
+        local color = Color:white()
+        color.a = game_manager.pause_ui.menu_slidein_progress
+        ctx:draw_text(CUSTOM_SKIN_TEXT, 0, -0.8, 0.001, 0.001, color, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
+    end
+end
+
+function draw_selector(ctx)
     if draw_select then
         local src = Quad:new(AABB:new(0.525, 0.21, 0.86, 0.93))
         local dest = Quad:new(AABB:new(-1, 0.84, 1, -0.84))
         dest:rotate(math.pi/2, 0, 0)
         ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_MAIN_0, src, dest, Color:white())
         draw_skins(ctx)
-    else
+    elseif state.items.player_select[1].activated and skins[1] and state.screen == SCREEN.CHARACTER_SELECT then
         local src = Quad:new(AABB:new(0.13, 0.03125, 0.2183, 0.2168)) --275,32,447,222
-        if state.items.player_select[1].activated and skins[1] then
-            local x = -0.49
-            local y = 0.27
-            local w = 0.16
-            local h = w/9*16
+        local x = -0.49
+        local y = 0.27
+        local w = 0.16
+        local h = w/9*16
 
-            local bg_aabb = AABB:new(x - 0.0225, y + 0.06, x + w + 0.0225, y - h - 0.02)
-            local bg_dest = Quad:new(bg_aabb)
-            local bg_x, bg_y = bg_dest:get_AABB():center()
-            bg_dest:rotate(ANG, bg_x, bg_y)
+        local bg_aabb = AABB:new(x - 0.0225, y + 0.06, x + w + 0.0225, y - h - 0.02)
+        local bg_dest = Quad:new(bg_aabb)
+        local bg_x, bg_y = bg_dest:get_AABB():center()
+        bg_dest:rotate(ANG, bg_x, bg_y)
 
-            local dest_aabb = AABB:new(x, y, x + w, y - h)
-            --local dest = Quad:new(dest_aabb)
-            --local d_x, d_y = dest:get_AABB():center()
-            --dest:rotate(ANG, d_x, d_y)
-            ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_PROFILE_0, src, bg_dest, Color:white())
-            ctx:draw_screen_texture(skins[1], 0, 0, dest_aabb, Color:white(), ANG, 0, 0)
-        end
+        local dest_aabb = AABB:new(x, y, x + w, y - h)
+        --local dest = Quad:new(dest_aabb)
+        --local d_x, d_y = dest:get_AABB():center()
+        --dest:rotate(ANG, d_x, d_y)
+        ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_PROFILE_0, src, bg_dest, Color:white())
+        ctx:draw_screen_texture(skins[1], 0, 0, dest_aabb, Color:white(), ANG, 0, 0)
     end
+end
+
+-- draw huge quick select and skins
+set_post_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
+    draw_selector(ctx)
+    draw_name(ctx)
 end)
+
+set_callback(function(ctx)
+    draw_selector(ctx)
+    draw_name(ctx)
+end, ON.RENDER_POST_PAUSE_MENU)
 
 -- clear custom skin selection
 set_callback(function()
@@ -203,9 +237,16 @@ end, ON.PRE_LOAD_SCREEN)
 
 -- disable inputs to underlaying char select screen when skin select is open
 set_callback(function()
-    if state.screen ~= SCREEN.CHARACTER_SELECT then return end
-    if state.items.player_select[1].activated and pressed(0x1000) then
+    if state.screen ~= SCREEN.CHARACTER_SELECT and #players == 0 then return end
+    if state.items.player_select[1].activated and
+        (state.screen == SCREEN.CHARACTER_SELECT or game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or draw_select) and pressed(0x4) then
+        game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.INVISIBLE
         draw_select = not draw_select
+        buttons_prev = game_manager.game_props.buttons
+        if #players > 0 and not draw_select then
+            game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
+            return true
+        end
     end
     if draw_select then
         if pressed(0x10000) and selected_skin > 0 then --left
@@ -223,16 +264,27 @@ set_callback(function()
         if pressed(0x1) then --select
             skins[1] = images[selected_skin + 1].texture
             draw_select = false
-            ANG = (math.random()-0.5)/20*math.pi
+            ANG = (math.random() - 0.5) / 20 * math.pi
+            buttons_prev = game_manager.game_props.buttons
+            if #players > 0 then
+                game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
+                return true
+            end
         end
     end
-    if selected_skin > #images-1 then
-        selected_skin = #images-1
+    if pressed(0x800) and #players > 0 and draw_select then --start
+        draw_select = false
+        game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
+        return true
     end
     if pressed(0x2) then --cancel
         skins[1] = nil
         local was_open = draw_select
         draw_select = false
+        buttons_prev = game_manager.game_props.buttons
+        if #players > 0 then
+            game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
+        end
         return was_open
     end
     buttons_prev = game_manager.game_props.buttons
