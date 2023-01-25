@@ -27,6 +27,7 @@ function clean_name(name)
     name = name:gsub("Entities/", "")
     name = name:gsub("fyi.", "")
     name = name:gsub("skins/", "")
+    name = name:gsub(".png", "")
     return name
 end
 
@@ -175,7 +176,7 @@ end
 function draw_name(ctx)
     if draw_select then
         local color = Color:new(0.25, 0.2, 0.2, 1)
-        ctx:draw_text("\u{83} "..images[selected_skin + 1].name.."   \u{85} Reset   \u{88} Refresh", 0.68, -0.68, 0.001, 0.001, color,
+        ctx:draw_text("\u{83} "..images[selected_skin + 1].name.."   \u{86} Random   \u{85} Reset   \u{88} Refresh", 0.68, -0.68, 0.001, 0.001, color,
             VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.NORMAL)
     elseif game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE then
         local color = Color:white()
@@ -277,6 +278,17 @@ set_callback(function()
         end
         if pressed(0x2) then --cancel
             skins[1] = nil
+            local was_open = draw_select
+            draw_select = false
+            buttons_prev = game_manager.game_props.buttons
+            if #players > 0 then
+                game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
+            end
+            return was_open
+        end
+        if pressed(0x8) then --random
+            selected_skin = prng:random_index(#images, 0) - 1
+            skins[1] = images[selected_skin + 1].texture
             local was_open = draw_select
             draw_select = false
             buttons_prev = game_manager.game_props.buttons
