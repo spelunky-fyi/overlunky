@@ -275,24 +275,24 @@ set_callback(function()
                 return true
             end
         end
-    end
-    if pressed(0x800) and #players > 0 and draw_select then --start
-        draw_select = false
-        game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
-        return true
-    end
-    if pressed(0x2) then --cancel
-        skins[1] = nil
-        local was_open = draw_select
-        draw_select = false
-        buttons_prev = game_manager.game_props.buttons
-        if #players > 0 then
-            game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
+        if pressed(0x2) then --cancel
+            skins[1] = nil
+            local was_open = draw_select
+            draw_select = false
+            buttons_prev = game_manager.game_props.buttons
+            if #players > 0 then
+                game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
+            end
+            return was_open
         end
-        return was_open
-    end
-    if pressed(0x20) then --refresh
-        get_skins()
+        if pressed(0x20) then --refresh
+            get_skins()
+        end
+        if pressed(0x800) and #players > 0 then --start
+            draw_select = false
+            game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
+            return true
+        end
     end
     buttons_prev = game_manager.game_props.buttons
     return draw_select
