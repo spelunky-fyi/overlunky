@@ -73,6 +73,21 @@ function get_skins()
             create_skin(path, w, h)
         end
     end
+
+    -- calculate icon sizes that hopefully fit the dialog with any number of skins
+    N = 7
+    F = 1.98
+    AX = -0.7
+    AY = 0.675
+    ANG = 0
+    repeat
+        F = F - 0.002
+        W = -AX/(N/F)
+        H = W/9*16
+        XP = W / 20
+        YP = H / 20
+        N = math.floor(-2*AX / W)
+    until math.ceil(#images/N)*H < 2*AY
 end
 
 get_skins()
@@ -142,21 +157,6 @@ set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
         skins[1] = nil
     end
 end)
-
-N = 8
-F = 1.96
-AX = -0.7
-AY = 0.675
-ANG = 0
-
-repeat
-    F = F - 0.005
-    W = -AX/(N/F)
-    H = W/9*16
-    XP = W / 20
-    YP = H / 20
-    N = math.floor(-2*AX / W)
-until math.ceil(#images/N)*H < 2*AY
 
 function draw_skins(ctx)
     local sx = selected_skin % N
