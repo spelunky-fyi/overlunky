@@ -131,7 +131,9 @@ end
 change_string(hash_to_stringid(0xcd07f25b), CUSTOM_SKIN_TEXT)
 set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
     if state.items.player_select[1].activated then
-        state.screen_character_select.right_button_text_id = hash_to_stringid(0xcd07f25b)
+        if state.screen_character_select.player_y[1] == 0 then
+            state.screen_character_select.right_button_text_id = hash_to_stringid(0xcd07f25b)
+        end
         if skins[1] and state.screen_character_select.start_pressed then
             state.screen_character_select.player_y[1] = -2 --hide default char, TODO: something else
         end
@@ -259,7 +261,7 @@ set_callback(function()
     if state.screen ~= SCREEN.CHARACTER_SELECT and #players == 0 then return end
     local ret = false
     if state.items.player_select[1].activated and
-        (state.screen == SCREEN.CHARACTER_SELECT or game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or draw_select) and pressed(0x4) then
+        ((state.screen == SCREEN.CHARACTER_SELECT and state.screen_character_select.player_y[1] == 0) or game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or draw_select) and pressed(0x4) then
         game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.INVISIBLE
         draw_select = not draw_select
         if #players > 0 and not draw_select then
@@ -284,22 +286,15 @@ set_callback(function()
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
                 ret = true
             end
-        elseif pressed(0x2) then --cancel
+        elseif released(0x2) then --cancel
             skins[1] = nil
             draw_select = false
             if #players > 0 then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
             end
             ret = true
-        elseif released(0x8) then --random
+        elseif pressed(0x8) then --random
             selected_skin = prng:random_index(#images, 0) - 1
-            skins[1] = images[selected_skin + 1].texture
-            draw_select = false
-            ANG = (prng:random() - 0.5) / 20 * math.pi
-            if #players > 0 then
-                game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
-            end
-            ret = true
         elseif pressed(0x20) then --refresh
             get_skins()
         elseif pressed(0x800) and #players > 0 then --start
