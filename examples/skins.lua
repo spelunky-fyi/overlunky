@@ -222,6 +222,10 @@ end
 
 function draw_selector(ctx)
     if draw_select then
+        if state.pause == PAUSE.MENU then
+            draw_select = false
+            return
+        end
         local src = Quad:new(AABB:new(0.525, 0.21, 0.86, 0.93))
         local dest = Quad:new(AABB:new(-1, 0.84, 1, -0.84))
         dest:rotate(math.pi/2, 0, 0)
