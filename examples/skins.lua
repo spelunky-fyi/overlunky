@@ -8,6 +8,8 @@ meta = {
 DIR = "skins/"
 texture_def = get_texture_definition(TEXTURE.DATA_TEXTURES_CHAR_YELLOW_0)
 skins = {}
+draw_select = false
+selected_skin = 0
 
 -- create a custom skin texture that supports _full sheets too
 function create_skin(path, w, h)
@@ -19,6 +21,7 @@ function create_skin(path, w, h)
     texture_def.tile_width = math.floor(w/16)
     texture_def.tile_height = math.floor(w/16)
     local skin_id = define_texture(texture_def)
+    images[#images+1] = {name=path, texture=skin_id, w=w, h=h}
     return skin_id
 end
 
@@ -34,55 +37,31 @@ function create_thumbnail(path)
     end
 end
 
+test = { name = "Data/Textures/char_yellow.DDS", texture = 285, 2048, 2048 }
+
+
 -- get all installed char mods or png files in the skins folder and create option buttons for them
 function get_skins()
     images = {}
-    for i,v in pairs(list_char_mods()) do
-        create_thumbnail(v)
+
+    for i,path in pairs(list_char_mods()) do
+        --create_thumbnail(v)
+        local w, h = get_image_size(path)
+        create_skin(path, w, h)
+        --images[#images+1] = test
     end
 
-    for i,v in pairs(list_dir(DIR)) do
-        if string.match(v, ".png") then
-            create_thumbnail(v)
+    for i,path in pairs(list_dir(DIR)) do
+        if string.match(path, ".png") then
+            local w, h = get_image_size(path)
+            create_skin(path, w, h)
         end
     end
-
-    register_option_callback("skin", 0, function(ctx)
-        for i,img in pairs(images) do
-            local uvax, uvay = 0, 0
-            local uvbx, uvby = 1, 1
-            if options.animate then
-                uvbx, uvby = 1/16, 1/16
-                if players[1] then
-                    local af = players[1].animation_frame
-                    local x = af % 16
-                    local y = math.floor(af / 16)
-                    local ts = img.w/16
-                    uvax = x*ts/img.w
-                    uvay = y*ts/img.w
-                    uvbx = (x*ts+ts)/img.w
-                    uvby = (y*ts+ts)/img.w
-                    if test_flag(players[1].flags, ENT_FLAG.FACING_LEFT) then
-                        uvax, uvbx = uvbx, uvax
-                    end
-                end
-                uvay = uvay*img.w/img.h
-                uvby = uvby*img.w/img.h
-            end
-            if ctx:win_imagebutton(img.name, img.texture, 48, 48, uvax, uvay, uvbx, uvby) then
-                skins[1] = create_skin(img.name, img.w, img.h)
-                if players[1] then hook_skin(players[1]) end
-            end
-            if i % 5 ~= 0 and i < #images then
-                ctx:win_sameline(0, 4)
-            end
-        end
-    end)
 end
 
 register_option_button("_reload", "Reload skins", "", get_skins)
 register_option_button("_reset", "Reset skin", "", function() skins = {} end)
-register_option_bool("animate", "Fancy animated buttons (needs reload)", false)
+--register_option_bool("animate", "Fancy animated buttons (needs reload)", false)
 
 get_skins()
 
@@ -120,55 +99,142 @@ set_pre_entity_spawn(function(type, x, y, l)
     return uid
 end, SPAWN_TYPE.SYSTEMIC | SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, {ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_PLAYERGHOST})
 
-
-
--- wip ui stuff here
-
+-- vanilla ui stuff
 buttons_prev = 0
-function pressed_tab()
-    if test_mask(game_manager.game_props.buttons, 4096) and not test_mask(buttons_prev, 4096) then
-        buttons_prev = game_manager.game_props.buttons
+function pressed(key)
+    if test_mask(game_manager.game_props.buttons, key) and not test_mask(buttons_prev, key) then
         return true
-    else
-        buttons_prev = game_manager.game_props.buttons
-        return false
     end
+    return false
 end
 
--- clear some journal pages for character select
-set_callback(function(chapter, pages)
-    if state.screen == SCREEN.CHARACTER_SELECT then
-        table.remove(pages, 1)
-        table.insert(pages, 1, 101)
-        table.remove(pages, 2)
-        table.insert(pages, 2, 102)
-        return pages
-    end
-end, ON.POST_LOAD_JOURNAL_CHAPTER)
-
 -- show custom message on bottom right
-change_string(hash_to_stringid(0xcd07f25b), "\u{8A} Select custom skin")
+change_string(hash_to_stringid(0xcd07f25b), "\u{8A} Select From Installed Mods")
 set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
     if state.items.player_select[1].activated then
         state.screen_character_select.right_button_text_id = hash_to_stringid(0xcd07f25b)
+        if skins[1] then
+            state.screen_character_select.player_y[1] = -5 --hide default char
+        elseif state.screen_character_select.player_y[1] == -5 then
+            state.screen_character_select.player_y[1] = 0
+        end
     end
 end)
 
--- disable inputs to underlaying char select screen when journal is open
+N = 5
+F = 1.96
+AX = -0.7
+AY = 0.675
+ANG = 0
+
+repeat
+    F = F - 0.01
+    W = -AX/(N/F)
+    H = W/9*16
+    XP = W / 20
+    YP = H / 20
+    N = math.floor(-2*AX / W)
+until math.ceil(#images/N)*H < 2*AY
+
+function draw_skins(ctx)
+    local sx = selected_skin % N
+    local sy = math.floor(selected_skin / N)
+    local sdest = AABB:new(
+        AX + sx * W + XP,
+        AY - sy * H - YP,
+        AX + sx * W + W - XP,
+        AY - sy * H - H + YP
+    )
+    ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_STICKERS_0, 2, 7, sdest, Color:white())
+    local x = AX
+    local y = AY
+    for i, img in pairs(images) do
+        local dest = AABB:new()
+        local af = 0
+        if i == selected_skin + 1 then
+            af = math.floor (get_frame() % 24 / 3) + 1
+        end
+        ctx:draw_screen_texture(img.texture, 0, af, x + XP, y - YP, x + W - XP, y - H + YP, Color:white())
+        x = x + W
+        if x > -AX-W then
+            x = AX
+            y = y - H
+        end
+    end
+end
+
+-- draw huge quick select and skins
+set_post_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
+    if draw_select then
+        local src = Quad:new(AABB:new(0.525, 0.21, 0.86, 0.93))
+        local dest = Quad:new(AABB:new(-1, 0.84, 1, -0.84))
+        dest:rotate(math.pi/2, 0, 0)
+        ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_MAIN_0, src, dest, Color:white())
+        draw_skins(ctx)
+    else
+        local src = Quad:new(AABB:new(0.13, 0.03125, 0.2183, 0.2168)) --275,32,447,222
+        if state.items.player_select[1].activated and skins[1] then
+            local x = -0.49
+            local y = 0.27
+            local w = 0.16
+            local h = w/9*16
+
+            local bg_aabb = AABB:new(x - 0.0225, y + 0.06, x + w + 0.0225, y - h - 0.02)
+            local bg_dest = Quad:new(bg_aabb)
+            local bg_x, bg_y = bg_dest:get_AABB():center()
+            bg_dest:rotate(ANG, bg_x, bg_y)
+
+            local dest_aabb = AABB:new(x, y, x + w, y - h)
+            --local dest = Quad:new(dest_aabb)
+            --local d_x, d_y = dest:get_AABB():center()
+            --dest:rotate(ANG, d_x, d_y)
+            ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_PROFILE_0, src, bg_dest, Color:white())
+            ctx:draw_screen_texture(skins[1], 0, 0, dest_aabb, Color:white(), ANG, 0, 0)
+        end
+    end
+end)
+
+-- clear custom skin selection
+set_callback(function()
+    if state.screen_next == SCREEN.CHARACTER_SELECT then
+        skins = {}
+    end
+end, ON.PRE_LOAD_SCREEN)
+
+-- disable inputs to underlaying char select screen when skin select is open
 set_callback(function()
     if state.screen ~= SCREEN.CHARACTER_SELECT then return end
-    if state.items.player_select[1].activated and pressed_tab() then
-        if game_manager.journal_ui.state == JOURNALUI_STATE.INVISIBLE then
-            show_journal(0, 0)
-            game_manager.journal_ui.max_page_count = 1
-        else
-            toggle_journal()
+    if state.items.player_select[1].activated and pressed(0x1000) then
+        draw_select = not draw_select
+    end
+    if draw_select then
+        if pressed(0x10000) and selected_skin > 0 then --left
+            selected_skin = selected_skin - 1
+        end
+        if pressed(0x20000) and selected_skin < #images-1 then --right
+            selected_skin = selected_skin + 1
+        end
+        if pressed(0x40000) and selected_skin >= N then --up
+            selected_skin = selected_skin - N
+        end
+        if pressed(0x80000) and selected_skin + N < #images then --down
+            selected_skin = selected_skin + N
+        end
+        if pressed(0x1) then --select
+            skins[1] = images[selected_skin + 1].texture
+            draw_select = false
+            ANG = (math.random()-0.5)/20*math.pi
         end
     end
-    if game_manager.journal_ui.state > 0 then
-        if game_manager.journal_ui.flipping_to_page ~= 2 then
-            --toggle_journal()
-        end
-        return true
+    if selected_skin > #images-1 then
+        selected_skin = #images-1
     end
+    if pressed(0x2) then --cancel
+        skins[1] = nil
+        local was_open = draw_select
+        draw_select = false
+        return was_open
+    end
+    buttons_prev = game_manager.game_props.buttons
+    return draw_select
 end, ON.PRE_UPDATE)
