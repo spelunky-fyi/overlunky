@@ -851,9 +851,12 @@ bool LuaBackend::pre_load_screen()
         }
     }
 
-    level_timers.clear();
-    script_input.clear();
-    clear_custom_shopitem_names();
+    if ((ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
+    {
+        level_timers.clear();
+        script_input.clear();
+        clear_custom_shopitem_names();
+    }
 
     return false;
 }
@@ -1391,8 +1394,6 @@ void LuaBackend::set_error(std::string err)
     result = std::move(err);
 
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-    DEBUG("{}", result);
-
     std::istringstream errors{result};
     const auto now{std::chrono::system_clock::now()};
     while (!errors.eof())
@@ -1404,6 +1405,8 @@ void LuaBackend::set_error(std::string err)
         {
             messages.pop_front();
         }
+        std::replace(err_line.begin(), err_line.end(), '\r', ' ');
+        DEBUG("[{}] {}", get_name(), err_line);
     }
 #endif
 }

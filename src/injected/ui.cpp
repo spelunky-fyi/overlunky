@@ -241,10 +241,10 @@ std::vector<std::string> saved_entities;
 std::vector<Kit*> kits;
 std::vector<Player*> g_players;
 std::vector<uint32_t> g_selected_ids;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
+bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -253,7 +253,7 @@ SaveData* g_save = 0;
 GameManager* g_game_manager = 0;
 std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
-std::string active_tab = "", activate_tab = "", detach_tab = "";
+std::string active_tab = "", activate_tab = "", detach_tab = "", focused_tool = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 std::vector<std::string> tab_order_main = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options"};
 std::vector<std::string> tabs_open = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"};
@@ -1041,19 +1041,22 @@ bool toggle(std::string tool)
     }
 }
 
+bool focused(std::string window)
+{
+    return focused_tool == window;
+}
+
 bool active(std::string window)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* current = g.NavWindow;
     if (current == NULL)
         return false;
-    // while (current->ParentWindow != NULL)
-    //     current = current->ParentWindow;
     if (detached(window))
     {
         if (windows.find(window) == windows.end())
             return false;
-        return current == ImGui::FindWindowByName(windows[window]->name.c_str());
+        return current == ImGui::FindWindowByName(windows[window]->name.c_str()) || window == active_tab;
     }
     else if (options["menu_ui"])
     {
@@ -2236,7 +2239,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("tool_entity_properties", wParam))
     {
-        toggle("tool_entity_properties");
+        if (toggle("tool_entity_properties"))
+        {
+            set_focus_uid = true;
+        }
     }
     else if (pressed("tool_game_properties", wParam))
     {
@@ -2295,29 +2301,37 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_current_item = std::min(std::max(g_current_item + page, 0), g_filtered_count - 1);
         scroll_to_entity = true;
     }
-    else if (pressed("enter", wParam) && active("tool_entity") && io.WantCaptureKeyboard)
+    else if (pressed("enter", wParam) && focused("tool_entity"))
     {
         spawn_entities(false);
         return true;
     }
-    else if (pressed("enter", wParam) && active("tool_finder") && io.WantCaptureKeyboard)
+    else if (pressed("move_up", wParam) && focused("tool_entity_properties"))
+    {
+        g_last_id++;
+        edit_last_id = true;
+    }
+    else if (pressed("move_down", wParam) && focused("tool_entity_properties"))
+    {
+        g_last_id--;
+        edit_last_id = true;
+    }
+    else if (pressed("enter", wParam) && focused("tool_finder"))
     {
         run_finder = true;
         return true;
     }
-    else if (pressed("move_up", wParam) && active("tool_door") && io.WantCaptureKeyboard)
+    else if (pressed("move_up", wParam) && focused("tool_door"))
     {
         g_to = static_cast<uint8_t>(std::min(std::max(g_to - 1, 0), 15));
     }
-    else if (pressed("move_down", wParam) && active("tool_door") && io.WantCaptureKeyboard)
+    else if (pressed("move_down", wParam) && focused("tool_door"))
     {
         g_to = static_cast<uint8_t>(std::min(std::max(g_to + 1, 0), 15));
     }
-    else if (pressed("enter", wParam) && active("tool_door") && io.WantCaptureKeyboard)
+    else if (pressed("enter", wParam) && focused("tool_door"))
     {
-        int spawned = UI::spawn_door(0.0, 0.0, g_world, g_level, g_to + 1);
-        if (!lock_entity)
-            g_last_id = spawned;
+        warp_inc(g_world, g_level, g_to + 1);
     }
 
     if (io.WantCaptureKeyboard)
@@ -2617,6 +2631,14 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             if (g_players.at(0)->layer == 0)
                 layer_to = LAYER::BACK;
             g_players.at(0)->set_layer(layer_to);
+            if (layer_to == LAYER::BACK || !g_state->illumination)
+            {
+                g_players.at(0)->emitted_light->enabled = true;
+            }
+            else
+            {
+                g_players.at(0)->emitted_light->enabled = false;
+            }
         }
     }
     else if (pressed("quick_start", wParam))
@@ -3097,6 +3119,8 @@ void render_input()
     {
         update_filter(text);
     }
+    if (ImGui::IsItemFocused())
+        focused_tool = "tool_entity";
     tooltip("Search for entities to spawn. Hit TAB to add the selected id to list.");
     ImGui::PopItemWidth();
     ImGui::SameLine();
@@ -3394,7 +3418,11 @@ void render_narnia()
         set_focus_world = false;
     }
     if (ImGui::DragScalar("World##WarpWorld", ImGuiDataType_U8, &g_world, 0.1f, &u8_one, &u8_seven)) {}
+    if (ImGui::IsItemFocused())
+        focused_tool = "tool_door";
     if (ImGui::DragScalar("Level##WarpLevel", ImGuiDataType_U8, &g_level, 0.1f, &u8_one, &u8_four)) {}
+    if (ImGui::IsItemFocused())
+        focused_tool = "tool_door";
     render_themes();
     ImGui::PopItemWidth();
     if (ImGui::Button("Instant warp##InstantWarp"))
@@ -4507,7 +4535,10 @@ void render_clickhandler()
                 g_last_type = g_held_entity->type->id;
             }
             if (!lock_entity)
+            {
                 g_last_id = g_held_id;
+                edit_last_id = true;
+            }
         }
         else if (clicked("mouse_select") || clicked("mouse_select_unsafe"))
         {
@@ -5294,6 +5325,19 @@ void render_scripts()
                     {
                         ++i;
                     }
+                    if (script->get_path() != "" && !script->get_path().starts_with("Mods/Packs"))
+                    {
+                        ImGui::SameLine();
+                        bool autorun = std::find(g_script_autorun.begin(), g_script_autorun.end(), filename) != g_script_autorun.end();
+                        if (ImGui::Checkbox("Autorun##AutorunScript", &autorun))
+                        {
+                            if (!autorun)
+                                g_script_autorun.erase(std::remove(g_script_autorun.begin(), g_script_autorun.end(), filename), g_script_autorun.end());
+                            else if (std::find(g_script_autorun.begin(), g_script_autorun.end(), filename) == g_script_autorun.end())
+                                g_script_autorun.push_back(filename);
+                            save_config(cfgfile);
+                        }
+                    }
                     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
                     ImGui::Separator();
                     script->render_options();
@@ -5817,17 +5861,22 @@ void render_entity_finder()
         set_focus_finder = false;
     }
     ImGui::InputText("Text filter##EntitySearchName", &search_entity_name, ImGuiInputTextFlags_AutoSelectAll);
-
+    if (ImGui::IsItemFocused())
+        focused_tool = "tool_finder";
     static uint32_t search_entity_type = 0;
     ImGui::InputScalar("##EntityType", ImGuiDataType_U32, &search_entity_type, &u32_one);
     ImGui::SameLine();
     if (search_entity_type > 0)
     {
         ImGui::Text("%s", entity_names[search_entity_type].c_str());
+        if (ImGui::IsItemFocused())
+            focused_tool = "tool_finder";
     }
     else
     {
         ImGui::Text("ENT_TYPE");
+        if (ImGui::IsItemFocused())
+            focused_tool = "tool_finder";
     }
 
     static int search_entity_layer = -128;
@@ -6136,7 +6185,15 @@ void render_entity_props(int uid, bool detached = false)
                 g_last_id = g_players.at(0)->uid;
             }
         }
-        ImGui::InputInt("UID", &g_last_id);
+        if (set_focus_uid)
+        {
+            ImGui::SetKeyboardFocusHere();
+            set_focus_uid = false;
+        }
+        ImGui::InputInt("UID", &g_last_id, 1, 100, edit_last_id ? ImGuiInputTextFlags_ReadOnly : 0);
+        edit_last_id = false;
+        if (ImGui::IsItemFocused())
+            focused_tool = "tool_entity_properties";
         tooltip("Use mouse to easily select or move entities around.", "mouse_grab");
         ImGui::SameLine();
         ImGui::Checkbox("Sticky", &lock_entity);
@@ -6694,6 +6751,7 @@ void force_time()
     {
         g_selected_ids.clear();
         g_last_id = -1;
+        edit_last_id = true;
         g_entity = nullptr;
     }
 }
@@ -7206,6 +7264,7 @@ void render_prohud()
 
 void render_tool(std::string tool)
 {
+    active_tab = tool;
     if (tool == "tool_entity")
         render_spawner();
     else if (tool == "tool_door")
@@ -7254,6 +7313,11 @@ void imgui_pre_init(ImGuiContext*)
 
 void imgui_init(ImGuiContext*)
 {
+    if (std::setlocale(LC_CTYPE, ".UTF-8") == nullptr)
+    {
+        ERR("Can not set code-page to utf-8, some scripts may cause a crash...");
+    }
+
     show_cursor();
     load_config(cfgfile);
     load_font();
@@ -7318,6 +7382,8 @@ void imgui_draw()
     if (options["draw_script_messages"])
         render_messages();
 
+    focused_tool = "";
+
     float toolwidth = 0.12f * ImGui::GetIO().DisplaySize.x * ImGui::GetIO().FontGlobalScale;
     if (!hide_ui)
     {
@@ -7346,7 +7412,6 @@ void imgui_draw()
                     if ((ImGui::BeginMenu(windows[tab]->name.c_str(), true) && (ismenu = true) == true) || ImGui::BeginPopup(windows[tab]->name.c_str()))
                     {
                         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
-                        active_tab = tab;
                         ImGui::GetIO().WantCaptureKeyboard = true;
                         render_tool(tab);
                         ImGui::PopStyleVar();
@@ -7444,7 +7509,6 @@ void imgui_draw()
                             ImGui::Text("Drag outside main window\nto detach %s", windows[tab]->name.c_str());
                             ImGui::EndDragDropSource();
                         }
-                        active_tab = tab;
                         ImGui::BeginChild("ScrollableTool");
                         render_tool(tab);
                         ImGui::EndChild();

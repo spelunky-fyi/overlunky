@@ -59,6 +59,7 @@ struct fmt::formatter<ByteStr>
 #define COMMON_FORMATTER(name, format, ...)                 \
     try                                                     \
     {                                                       \
+        fflush(stdout);                                     \
         fmt::print("[" name "] " format "\n", __VA_ARGS__); \
         fflush(stdout);                                     \
     }                                                       \

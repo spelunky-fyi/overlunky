@@ -97,6 +97,17 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
             };
 
             auto image_data_size = image_width * image_height * 4;
+
+            // multiply alpha
+            for (int i = 0; i < image_data_size; i += 4)
+            {
+                uint8_t* p = (uint8_t*)&image_data[i];
+                float alpha = (float)p[3] / 255.0f;
+                p[0] = (uint8_t)((float)p[0] * alpha);
+                p[1] = (uint8_t)((float)p[1] * alpha);
+                p[2] = (uint8_t)((float)p[2] * alpha);
+            }
+
             int data_size = 4 + sizeof(DDS_HEADER) + image_data_size;
             auto allocation_size = sizeof(FileInfo) + data_size;
             auto file_buffer = (char*)alloc_fun(allocation_size);
@@ -261,7 +272,7 @@ std::string get_image_file_path(std::string root_path, std::string relative_path
     return root_path + '/' + relative_path;
 }
 
-bool create_d3d11_texture_from_file(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height)
+bool create_d3d11_texture_from_file(const char* filename, ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height, int crop_x, int crop_y, int crop_w, int crop_h)
 {
     // Load from disk into a raw RGBA buffer
     int image_width = 0;
@@ -269,6 +280,43 @@ bool create_d3d11_texture_from_file(const char* filename, ID3D11ShaderResourceVi
     unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
     if (image_data == NULL)
         return false;
+
+    if (crop_w > 0 && crop_h > 0)
+    {
+        unsigned int i = 0;
+        for (int y = 0; y < image_height; ++y)
+        {
+            for (int x = 0; x < image_width; ++x)
+            {
+                if (x >= crop_x && x < crop_x + crop_w && y >= crop_y && y < crop_y + crop_h)
+                {
+                    auto p = (y * image_width + x) * 4;
+                    image_data[i] = image_data[p];
+                    image_data[i + 1] = image_data[p + 1];
+                    image_data[i + 2] = image_data[p + 2];
+                    image_data[i + 3] = image_data[p + 3];
+                    i += 4;
+                }
+            }
+            if (y >= crop_y + crop_h)
+                break;
+        }
+        image_width = crop_w;
+        image_height = crop_h;
+    }
+
+    /*
+    // multiply alpha
+    int pixel_count = image_width * image_height * 4;
+    for (int i = 0; i < pixel_count; i += 4)
+    {
+        uint8_t* p = (uint8_t*)&image_data[i];
+        float alpha = (float)p[3] / 255.0f;
+        p[0] = (uint8_t)((float)p[0] * alpha);
+        p[1] = (uint8_t)((float)p[1] * alpha);
+        p[2] = (uint8_t)((float)p[2] * alpha);
+    }
+    */
 
     // Create texture
     D3D11_TEXTURE2D_DESC desc;
@@ -345,6 +393,22 @@ bool create_d3d11_texture_from_memory(const unsigned char* buf, const unsigned i
     srvDesc.Texture2D.MostDetailedMip = 0;
     get_device()->CreateShaderResourceView(pTexture, &srvDesc, out_srv);
     pTexture->Release();
+
+    *out_width = image_width;
+    *out_height = image_height;
+    stbi_image_free(image_data);
+
+    return true;
+}
+
+bool get_image_size_from_file(const char* filename, int* out_width, int* out_height)
+{
+    // Load from disk into a raw RGBA buffer
+    int image_width = 0;
+    int image_height = 0;
+    unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
+    if (image_data == NULL)
+        return false;
 
     *out_width = image_width;
     *out_height = image_height;

@@ -389,6 +389,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     TextureRenderingInfo quick_select_panel;
     TextureRenderingInfo quick_select_selected_char_background;
     TextureRenderingInfo quick_select_panel_related;
+    TextureRenderingInfo unknown56;
 
     std::array<float, MAX_PLAYERS> player_shutter_timer;
     std::array<float, MAX_PLAYERS> player_x;
