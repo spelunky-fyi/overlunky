@@ -767,8 +767,8 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<ImGuiIO>(
         "ImGuiIO",
         "displaysize",
-        sol::property([](ImGuiIO& io)
-                      { return Vec2(io.DisplaySize); }),
+        sol::property([](ImGuiIO& io) -> Vec2
+                      { return Vec2(io.DisplaySize) /**/; }),
         "framerate",
         &ImGuiIO::Framerate,
         "wantkeyboard",
@@ -793,8 +793,8 @@ void register_usertypes(sol::state& lua)
         "wantmouse",
         &ImGuiIO::WantCaptureMouse,
         "mousepos",
-        sol::property([](ImGuiIO& io)
-                      { return Vec2(io.MousePos); }),
+        sol::property([](ImGuiIO& io) -> Vec2
+                      { return Vec2(io.MousePos) /**/; }),
         "mousedown",
         sol::property([](ImGuiIO& io)
                       { return std::ref(io.MouseDown) /**/; }),
