@@ -4412,6 +4412,25 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
 
 ---@class ImGuiIO
     ---@field displaysize ImVec2
+    ---@field framerate number
+    ---@field wantkeyboard boolean
+    ---@field keysdown boolean       [] @size: ImGuiKey_COUNT
+    ---@field keydown any @keydown
+    ---@field keypressed any @keypressed
+    ---@field keyreleased any @keyreleased
+    ---@field keyctrl boolean
+    ---@field keyshift boolean
+    ---@field keyalt boolean
+    ---@field keysuper boolean
+    ---@field wantmouse boolean
+    ---@field mousepos ImVec2
+    ---@field mousedown boolean       [] @size: 5
+    ---@field mouseclicked boolean       [] @size: 5
+    ---@field mousedoubleclicked boolean       [] @size: 5
+    ---@field mousewheel number
+    ---@field gamepad Gamepad
+    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
+    ---@field showcursor boolean
 
 ---@class VanillaRenderContext
     ---@field draw_text VanillaRenderContext_draw_text
