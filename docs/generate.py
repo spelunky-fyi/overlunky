@@ -37,6 +37,7 @@ replace_table = {
     "static": "",
     "variadic_args va": "int, int...",
     "EmittedParticlesInfo": "array<Particle>",
+    "ImVec2": "Vec2",
 }
 
 

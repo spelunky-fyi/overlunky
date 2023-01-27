@@ -4411,7 +4411,7 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field ry number
 
 ---@class ImGuiIO
-    ---@field displaysize ImVec2
+    ---@field displaysize Vec2
     ---@field framerate number
     ---@field wantkeyboard boolean
     ---@field keysdown boolean       [] @size: ImGuiKey_COUNT
@@ -4423,7 +4423,7 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field keyalt boolean
     ---@field keysuper boolean
     ---@field wantmouse boolean
-    ---@field mousepos ImVec2
+    ---@field mousepos Vec2
     ---@field mousedown boolean       [] @size: 5
     ---@field mouseclicked boolean       [] @size: 5
     ---@field mousedoubleclicked boolean       [] @size: 5
@@ -5306,7 +5306,7 @@ function Vec2.new(self, x_, y_) end
 ---@return Vec2
 function Vec2.new(self, number> p) end
 ---NoDoc
----@param imvec2 ImVec2
+---@param imvec2 Vec2
 ---@return Vec2
 function Vec2.new(self, imvec2) end
 
