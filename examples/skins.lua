@@ -109,6 +109,17 @@ set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.ANY, MASK.PLA
 set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.ANY, MASK.ITEM, ENT_TYPE.ITEM_PLAYERGHOST)
 hook_skin(get_player(1, true))
 
+-- hook the wanted poster
+set_post_entity_spawn(function(ent)
+    local uid = ent.uid
+    set_timeout(function()
+        local poster = get_entity(uid)
+        if poster and skins and skins[1] then
+            poster:set_texture(skins[1])
+        end
+    end, 1)
+end, SPAWN_TYPE.ANY, MASK.BG, ENT_TYPE.BG_SHOPWANTEDPORTRAIT)
+
 -- apparently playerbags and ghosts with custom texture crash the game, maybe this will fix it
 set_pre_entity_spawn(function(type, x, y, l)
     for i,p in pairs(players) do
