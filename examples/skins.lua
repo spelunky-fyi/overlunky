@@ -1,6 +1,6 @@
 meta = {
 	name = "Too Many Skins",
-	version = "WIP",
+	version = "1.0",
 	description = "Load extra character mods from all available packs or the skins subfolder.",
 	author = "Dregu"
 }
@@ -12,7 +12,7 @@ texture_def = get_texture_definition(TEXTURE.DATA_TEXTURES_CHAR_YELLOW_0)
 skins = {}
 images = {}
 draw_select = false
-selected_skin = 0
+selected_skin = { 0, 1, 2, 3 }
 
 -- get vanilla or enabled mods' skins
 for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
@@ -20,10 +20,6 @@ for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
     local def = get_texture_definition(tex)
     images[#images+1] = { path=def.texture_path, name=get_character_name(i), texture=tex }
 end
-
--- I guess you can test these too if you want to
-images[#images+1] = { path="/Data/Textures/char_hired.DDS", name="Hired Hand", texture=TEXTURE.DATA_TEXTURES_CHAR_HIRED_0 }
-images[#images+1] = { path="/Data/Textures/char_eggchild.DDS", name="Eggplant Child", texture=TEXTURE.DATA_TEXTURES_CHAR_EGGCHILD_0 }
 
 function exists(path)
     for i,img in pairs(images) do
@@ -106,15 +102,29 @@ end
 get_skins()
 
 -- check for global inputs
-buttons_prev = 0
+buttons_prev = { 0, 0, 0, 0 }
 function pressed(key)
-    if test_mask(game_manager.game_props.buttons, key) and not test_mask(buttons_prev, key) then
+    if test_mask(game_manager.game_props.buttons, key) and not test_mask(buttons_prev[1], key) then
         return true
     end
     return false
 end
 function released(key)
-    if not test_mask(game_manager.game_props.buttons, key) and test_mask(buttons_prev, key) then
+    if not test_mask(game_manager.game_props.buttons, key) and test_mask(buttons_prev[1], key) then
+        return true
+    end
+    return false
+end
+
+-- check for player specific inputs
+function pressed_alt(i, key)
+    if test_mask(state.player_inputs.player_slots[i].buttons, key) and not test_mask(buttons_prev[i], key) then
+        return true
+    end
+    return false
+end
+function released_alt(i, key)
+    if not test_mask(state.player_inputs.player_slots[i].buttons, key) and test_mask(buttons_prev[i], key) then
         return true
     end
     return false
@@ -164,24 +174,38 @@ set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
     end
 end)
 
+function active_players()
+    local n = 0
+    for i,p in pairs(state.items.player_select) do
+        if p.activated then n = n + 1 end
+    end
+    return n
+end
+
 -- draw the skin previews and cursor
 function draw_skins(ctx)
-    local sx = selected_skin % N
-    local sy = math.floor(selected_skin / N)
-    local sdest = AABB:new(
-        AX + sx * W + XP,
-        AY - sy * H - YP,
-        AX + sx * W + W - XP,
-        AY - sy * H - H + YP
-    )
-    ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_STICKERS_0, 2, 7, sdest, Color:white())
+    for i=1,active_players() do
+        local sx = selected_skin[i] % N
+        local sy = math.floor(selected_skin[i] / N)
+        local sdest = AABB:new(
+            AX + sx * W + XP,
+            AY - sy * H - YP,
+            AX + sx * W + W - XP,
+            AY - sy * H - H + YP
+        )
+        local color = get_character_heart_color(state.items.player_select[i].character)
+        color.a = 0.75
+        ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_STICKERS_0, 2, 7, sdest, color)
+    end
     local x = AX
     local y = AY
     for i, img in pairs(images) do
         local dest = AABB:new()
         local af = 0
-        if i == selected_skin + 1 then
-            af = math.floor (get_frame() % 24 / 3) + 1
+        for j=1,active_players() do
+            if i == selected_skin[j] + 1 then
+                af = math.floor(get_frame() % 24 / 3) + 1
+            end
         end
         ctx:draw_screen_texture(img.texture, 0, af, x + XP, y - YP, x + W - XP, y - H + YP, Color:white())
         x = x + W
@@ -197,10 +221,10 @@ function draw_name(ctx)
     if draw_select then
         local color = Color:new(0.25, 0.2, 0.2, 1)
         local reset = ""
-        if images[selected_skin + 1].texture == state.items.player_select[1].texture and skins[1] then
+        if images[selected_skin[1] + 1].texture == state.items.player_select[1].texture and skins[1] then
             reset = "(Reset) "
         end
-        ctx:draw_text("\u{83} "..reset..images[selected_skin + 1].name.."   \u{86} Random   \u{85} Reset   \u{88} Refresh", 0.68, -0.68, 0.001, 0.001, color,
+        ctx:draw_text("\u{83} "..reset..images[selected_skin[1] + 1].name.."   \u{86} Random   \u{85} Reset   \u{88} Refresh", 0.68, -0.68, 0.001, 0.001, color,
             VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.NORMAL)
     elseif game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE then
         local color = Color:white()
@@ -211,8 +235,10 @@ end
 
 -- draw the selector background
 function draw_selector(ctx)
-    if selected_skin > #images-1 then
-        selected_skin = #images-1
+    for i=1,4 do
+        if selected_skin[i] > #images-1 then
+            selected_skin[i] = #images-1
+        end
     end
     if draw_select then
         if state.pause == PAUSE.MENU or game_manager.pause_ui.visibility == PAUSEUI_VISIBILITY.VISIBLE then
@@ -228,6 +254,7 @@ function draw_selector(ctx)
 end
 
 function draw_everything(ctx)
+    if online.lobby.code ~= 0 then return end
     draw_selector(ctx)
     draw_name(ctx)
 end
@@ -242,9 +269,25 @@ set_callback(function(ctx)
     draw_everything(ctx)
 end, ON.RENDER_POST_PAUSE_MENU)
 
+-- don't allow same character
+function resolve_characters()
+    local used = {[state.items.player_select[1].character] = true}
+    for i=2,active_players() do
+        while used[state.items.player_select[i].character] do
+            state.items.player_select[i].character = state.items.player_select[i].character + 1
+            if state.items.player_select[i].character > ENT_TYPE.CHAR_CLASSIC_GUY then
+                state.items.player_select[i].character = ENT_TYPE.CHAR_ANA_SPELUNKY
+            end
+        end
+        state.items.player_select[i].texture = get_type(state.items.player_select[i].character).texture
+        used[state.items.player_select[i].character] = true
+    end
+end
+
 -- disable inputs to underlaying char select screen when skin select is open and handle input
 set_callback(function()
     if state.screen ~= SCREEN.CHARACTER_SELECT and #players == 0 then return end
+    if online.lobby.code ~= 0 then return end
     local ret = false
     if state.items.player_select[1].activated and
         ((state.screen == SCREEN.CHARACTER_SELECT and state.screen_character_select.player_y[1] == 0) or game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or draw_select) and pressed(0x4) then
@@ -254,23 +297,25 @@ set_callback(function()
             game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
             ret = true
         end
+        if active_players() > 1 and draw_select and state.screen == SCREEN.CHARACTER_SELECT then
+            resolve_characters()
+        end
     end
-    local old_skin = skins[1]
     if draw_select then
         if state.screen == SCREEN.CHARACTER_SELECT then
             state.screen_character_select.player_quickselect_shown[1] = false
             state.screen_character_select.player_quickselect_fadein_timer[1] = 0
         end
-        if pressed(0x10000) and selected_skin > 0 then --left
-            selected_skin = selected_skin - 1
-        elseif pressed(0x20000) and selected_skin < #images-1 then --right
-            selected_skin = selected_skin + 1
-        elseif pressed(0x40000) and selected_skin >= N then --up
-            selected_skin = selected_skin - N
-        elseif pressed(0x80000) and selected_skin + N < #images then --down
-            selected_skin = selected_skin + N
+        if pressed(0x10000) and selected_skin[1] > 0 then --left
+            selected_skin[1] = selected_skin[1] - 1
+        elseif pressed(0x20000) and selected_skin[1] < #images-1 then --right
+            selected_skin[1] = selected_skin[1] + 1
+        elseif pressed(0x40000) and selected_skin[1] >= N then --up
+            selected_skin[1] = selected_skin[1] - N
+        elseif pressed(0x80000) and selected_skin[1] + N < #images then --down
+            selected_skin[1] = selected_skin[1] + N
         elseif pressed(0x1) then --select
-            skins[1] = images[selected_skin + 1].texture
+            skins[1] = images[selected_skin[1] + 1].texture
             replace_skin()
             draw_select = false
             if #players > 0 then
@@ -286,7 +331,7 @@ set_callback(function()
             end
             ret = true
         elseif pressed(0x8) then --random
-            selected_skin = prng:random_index(#images, 0) - 1
+            selected_skin[1] = prng:random_index(#images, 0) - 1
         elseif pressed(0x20) then --refresh
             get_skins()
         elseif pressed(0x800) and #players > 0 then --start
@@ -294,7 +339,29 @@ set_callback(function()
             game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
             ret = true
         end
+        for i=2,active_players() do
+            if pressed_alt(i, INPUTS.LEFT) and selected_skin[i] > 0 then --left
+                selected_skin[i] = selected_skin[i] - 1
+            elseif pressed_alt(i, INPUTS.RIGHT) and selected_skin[i] < #images-1 then --right
+                selected_skin[i] = selected_skin[i] + 1
+            elseif pressed_alt(i, INPUTS.UP) and selected_skin[i] >= N then --up
+                selected_skin[i] = selected_skin[i] - N
+            elseif pressed_alt(i, INPUTS.DOWN) and selected_skin[i] + N < #images then --down
+                selected_skin[i] = selected_skin[i] + N
+            elseif pressed_alt(i, INPUTS.JUMP) then --select
+                skins[i] = images[selected_skin[i] + 1].texture
+                replace_skin()
+            elseif released_alt(i, INPUTS.BOMB) then --cancel
+                skins[i] = nil
+                replace_skin()
+            elseif pressed_alt(i, INPUTS.ROPE) then --random
+                selected_skin[i] = prng:random_index(#images, 0) - 1
+            end
+        end
     end
-    buttons_prev = game_manager.game_props.buttons
+    buttons_prev[1] = game_manager.game_props.buttons
+    for i=2,4 do
+        buttons_prev[i] = state.player_inputs.player_slots[i].buttons
+    end
     return ret or draw_select
 end, ON.PRE_UPDATE)
