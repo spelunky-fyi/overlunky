@@ -5306,9 +5306,9 @@ function Vec2.new(self, x_, y_) end
 ---@return Vec2
 function Vec2.new(self, number> p) end
 ---NoDoc
----@param imvec2 Vec2
+---@param vec2 Vec2
 ---@return Vec2
-function Vec2.new(self, imvec2) end
+function Vec2.new(self, vec2) end
 
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
