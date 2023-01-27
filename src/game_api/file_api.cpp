@@ -411,6 +411,36 @@ bool create_d3d11_texture_from_memory(const unsigned char* buf, const unsigned i
 
 bool get_image_size_from_file(const char* filename, int* out_width, int* out_height)
 {
+    FILE* f{nullptr};
+    auto error = fopen_s(&f, filename, "rb");
+    if (error != 0 || f == nullptr)
+        return false;
+    fseek(f, 0, SEEK_END);
+    long len = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if (len < 24)
+    {
+        fclose(f);
+        return false;
+    }
+
+    unsigned char buf[24];
+    fread(buf, 1, 24, f);
+    fclose(f);
+
+    if (buf[0] == 0x89 && buf[1] == 'P' && buf[2] == 'N' && buf[3] == 'G' && buf[4] == 0x0D && buf[5] == 0x0A && buf[6] == 0x1A && buf[7] == 0x0A && buf[12] == 'I' && buf[13] == 'H' && buf[14] == 'D' && buf[15] == 'R')
+    {
+        *out_width = (buf[16] << 24) + (buf[17] << 16) + (buf[18] << 8) + (buf[19] << 0);
+        *out_height = (buf[20] << 24) + (buf[21] << 16) + (buf[22] << 8) + (buf[23] << 0);
+        return true;
+    }
+
+    return false;
+}
+
+/* decoding the whole image is slow af
+bool get_image_size_from_file(const char* filename, int* out_width, int* out_height)
+{
     // Load from disk into a raw RGBA buffer
     int image_width = 0;
     int image_height = 0;
@@ -424,3 +454,4 @@ bool get_image_size_from_file(const char* filename, int* out_width, int* out_hei
 
     return true;
 }
+*/
