@@ -48,6 +48,7 @@
 #include "settings_api.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"
+#include "steam_api.hpp"
 #include "version.hpp"
 #include "window_api.hpp"
 
@@ -244,7 +245,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -5412,11 +5413,11 @@ void render_savegame()
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
     if (options["disable_savegame"])
     {
-        ImGui::TextWrapped("Note: You have blocked game saves in the options, all changes will be temporary unless you click the big button below...");
+        ImGui::TextWrapped("Warning: You have blocked game saves in the options, all changes to the save file will be temporary unless you click the big button below...");
     }
     else
     {
-        ImGui::TextWrapped("Note: Changes are not saved to file automatically, you have to click the big button below...");
+        ImGui::TextWrapped("Warning: Changes to the game save are not saved to file automatically, you have to click the big button below...");
     }
     ImGui::PopStyleColor(1);
 
@@ -5659,6 +5660,49 @@ void render_savegame()
         ImGui::SliderScalar("Rescued hamsters", ImGuiDataType_U8, &g_save->pets_rescued[2], &u8_min, &u8_max);
         ImGui::InputText("Last daily", g_save->last_daily, sizeof(g_save->last_daily) + 1, 0);
         endmenu();
+    }
+    ImGui::PopID();
+
+    ImGui::PushID("Feats");
+    if (submenu("Steam Achievements"))
+    {
+        ImGui::Checkbox("I know what I'm doing, unlock editing!##EditAchiecements", &edit_achievements);
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
+        ImGui::TextWrapped("Warning: Touching anything in here will edit your real Steam Achievements directly. If you're using the Steam emulator, this only affects the achievements saved in the emulator.");
+        if (options["disable_achievements"])
+        {
+            ImGui::TextWrapped("Warning: You have blocked getting Steam Achievements in the options, but you can still reset them individually here.");
+        }
+        ImGui::PopStyleColor();
+        ImGui::Separator();
+        ImGui::BeginDisabled(!edit_achievements);
+        for (size_t i = 0; i < g_AllAchievements.size(); ++i)
+        {
+            ImGui::PushID(g_AllAchievements[i]);
+            bool achieved;
+            bool found = get_steam_achievement(g_AllAchievements[i], &achieved);
+            if (found)
+            {
+                if (ImGui::Checkbox(g_AchievementNames[i], &achieved))
+                {
+                    set_steam_achievement(g_AllAchievements[i], achieved);
+                }
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndDisabled();
+        ImGui::Text(" ");
+        ImGui::BeginDisabled(!edit_achievements || options["disable_achievements"]);
+        if (ImGui::Button("Reset all Steam Achievements!"))
+        {
+            reset_all_steam_achievements();
+        }
+        ImGui::EndDisabled();
+        endmenu();
+    }
+    else
+    {
+        edit_achievements = false;
     }
     ImGui::PopID();
 
