@@ -9,6 +9,7 @@
 #include "containers/game_allocator.hpp"
 
 #include "memory.hpp"
+#include "render_api.hpp"
 #include "util.hpp"
 #include "window_api.hpp"
 
@@ -98,7 +99,9 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 
             auto image_data_size = image_width * image_height * 4;
 
-            // multiply alpha
+            // multiply alpha and extract player indicator color for heart
+            auto& render = RenderAPI::get();
+            const int magic_pixel = (int)(5888.875f * (float)image_width);
             for (int i = 0; i < image_data_size; i += 4)
             {
                 uint8_t* p = (uint8_t*)&image_data[i];
@@ -106,6 +109,11 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
                 p[0] = (uint8_t)((float)p[0] * alpha);
                 p[1] = (uint8_t)((float)p[1] * alpha);
                 p[2] = (uint8_t)((float)p[2] * alpha);
+                // extract player indicator color
+                if (i == magic_pixel && p[3] > 10)
+                {
+                    render.texture_colors[std::string(file_path)] = Color((float)p[0] / 255.0f, (float)p[1] / 255.0f, (float)p[2] / 255.0f, (float)p[3] / 255.0f);
+                }
             }
 
             int data_size = 4 + sizeof(DDS_HEADER) + image_data_size;

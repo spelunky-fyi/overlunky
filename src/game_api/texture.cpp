@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "character_def.hpp"
 #include "memory.hpp"
 #include "render_api.hpp"
 #include "search.hpp"
@@ -276,6 +277,34 @@ void reload_texture(const char** texture_name)
     load_texture(renderer_ptr, texture_name);
 }
 
+void set_heart_color_from_texture(TEXTURE vanilla_id, TEXTURE custom_id)
+{
+    uint32_t char_index = (uint32_t)vanilla_id - 285;
+    if (char_index >= 0 && char_index <= 19)
+    {
+        auto def = get_texture_definition(vanilla_id);
+        auto& render = RenderAPI::get();
+        if (render.texture_colors.contains(def.texture_path))
+        {
+            if (!render.original_colors.contains(vanilla_id))
+            {
+                render.original_colors[vanilla_id] = NCharacterDB::get_character_heart_color(char_index);
+            }
+            NCharacterDB::set_character_heart_color(char_index, render.texture_colors[def.texture_path]);
+        }
+        else if (render.original_colors.contains(vanilla_id) && vanilla_id == custom_id)
+        {
+            NCharacterDB::set_character_heart_color(char_index, render.original_colors[vanilla_id]);
+        }
+        else if (custom_id >= 285 && custom_id <= 304)
+        {
+            uint32_t custom_index = (uint32_t)custom_id - 285;
+            auto color = NCharacterDB::get_character_heart_color(custom_index);
+            NCharacterDB::set_character_heart_color(char_index, color);
+        }
+    }
+}
+
 bool replace_texture(TEXTURE vanilla_id, TEXTURE custom_id)
 {
     auto* textures = get_textures();
@@ -285,17 +314,17 @@ bool replace_texture(TEXTURE vanilla_id, TEXTURE custom_id)
 
     if (vanilla_id >= 0 && vanilla_id < 0x192)
     {
-        if (vanilla_id != custom_id && render.original_textures.find(vanilla_id) == render.original_textures.end())
+        if (vanilla_id != custom_id && !render.original_textures.contains(vanilla_id))
         {
             render.original_textures[vanilla_id] = textures->textures[vanilla_id];
         }
-        if (vanilla_id == custom_id && render.original_textures.find(vanilla_id) != render.original_textures.end())
+        if (vanilla_id == custom_id && render.original_textures.contains(vanilla_id))
         {
             textures->textures[vanilla_id] = render.original_textures[custom_id];
             reload_texture(textures->textures[vanilla_id].name);
             return true;
         }
-        else if (render.custom_textures.find(custom_id) != render.custom_textures.end())
+        else if (render.custom_textures.contains(custom_id))
         {
             textures->textures[vanilla_id] = render.custom_textures[custom_id];
             textures->textures[vanilla_id].id = vanilla_id;
@@ -312,6 +341,14 @@ bool replace_texture(TEXTURE vanilla_id, TEXTURE custom_id)
     }
 
     return false;
+}
+
+bool replace_texture_and_heart_color(TEXTURE vanilla_id, TEXTURE custom_id)
+{
+    auto ret = replace_texture(vanilla_id, custom_id);
+    if (ret)
+        set_heart_color_from_texture(vanilla_id, custom_id);
+    return ret;
 }
 
 void reset_texture(TEXTURE vanilla_id)

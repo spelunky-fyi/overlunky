@@ -149,10 +149,10 @@ function replace_skin()
     local replaced = {}
     for i=1,4 do
         if skins[i] then
-            replace_texture(state.items.player_select[i].texture, skins[i])
+            replace_texture_and_heart_color(state.items.player_select[i].texture, skins[i])
             replaced[state.items.player_select[i].texture] = true
         elseif state.items.player_select[i].activated and not replaced[state.items.player_select[i].texture] then
-            reset_texture(state.items.player_select[i].texture)
+            replace_texture_and_heart_color(state.items.player_select[i].texture, state.items.player_select[i].texture)
         end
     end
     set_textures()
