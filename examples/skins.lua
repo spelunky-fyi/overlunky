@@ -6,7 +6,7 @@ meta = {
 }
 
 DIR = "skins/"
-CUSTOM_SKIN_TEXT = "\u{84} Too Many Skins"
+CUSTOM_SKIN_TEXT = "\u{88} Too Many Skins"
 
 texture_def = get_texture_definition(TEXTURE.DATA_TEXTURES_CHAR_YELLOW_0)
 skins = {}
@@ -224,12 +224,13 @@ function draw_name(ctx)
         if images[selected_skin[1] + 1].texture == state.items.player_select[1].texture and skins[1] then
             reset = "(Reset) "
         end
-        ctx:draw_text("\u{83} "..reset..images[selected_skin[1] + 1].name.."   \u{86} Random   \u{85} Reset   \u{88} Refresh", 0.68, -0.68, 0.001, 0.001, color,
+        ctx:draw_text("\u{83} "..reset..images[selected_skin[1] + 1].name.."   \u{86} Random   \u{85} Reset   \u{87} Refresh", 0.68, -0.68, 0.001, 0.001, color,
             VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.NORMAL)
-    elseif game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE then
+    end
+    if game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or (draw_select and state.screen ~= SCREEN.CHARACTER_SELECT) then
         local color = Color:white()
         color.a = game_manager.pause_ui.menu_slidein_progress
-        ctx:draw_text(CUSTOM_SKIN_TEXT, 0, -0.8, 0.001, 0.001, color, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
+        ctx:draw_text(CUSTOM_SKIN_TEXT, 0, -0.85, 0.001, 0.001, color, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
     end
 end
 
@@ -246,7 +247,7 @@ function draw_selector(ctx)
             return
         end
         local src = Quad:new(AABB:new(0.525, 0.21, 0.86, 0.93))
-        local dest = Quad:new(AABB:new(-1, 0.84, 1, -0.84))
+        local dest = Quad:new(AABB:new(-1, 0.83, 1, -0.85))
         dest:rotate(math.pi/2, 0, 0)
         ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_MAIN_0, src, dest, Color:white())
         draw_skins(ctx)
@@ -286,14 +287,13 @@ end
 
 -- disable inputs to underlaying char select screen when skin select is open and handle input
 set_callback(function()
-    if state.screen ~= SCREEN.CHARACTER_SELECT and #players == 0 then return end
     if online.lobby.code ~= 0 then return end
     local ret = false
     if state.items.player_select[1].activated and
-        ((state.screen == SCREEN.CHARACTER_SELECT and state.screen_character_select.player_y[1] == 0) or game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or draw_select) and pressed(0x4) then
+        ((state.screen == SCREEN.CHARACTER_SELECT and state.screen_character_select.player_y[1] == 0) or game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or draw_select) and pressed(0x20) then
         game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.INVISIBLE
         draw_select = not draw_select
-        if #players > 0 and not draw_select then
+        if state.screen == SCREEN.LEVEL and not draw_select then
             game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
             ret = true
         end
@@ -318,7 +318,7 @@ set_callback(function()
             skins[1] = images[selected_skin[1] + 1].texture
             replace_skin()
             draw_select = false
-            if #players > 0 then
+            if state.screen == SCREEN.LEVEL then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
                 ret = true
             end
@@ -326,15 +326,15 @@ set_callback(function()
             skins[1] = nil
             replace_skin()
             draw_select = false
-            if #players > 0 then
+            if state.screen == SCREEN.LEVEL then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
             end
             ret = true
         elseif pressed(0x8) then --random
             selected_skin[1] = prng:random_index(#images, 0) - 1
-        elseif pressed(0x20) then --refresh
+        elseif pressed(0x80) then --refresh
             get_skins()
-        elseif pressed(0x800) and #players > 0 then --start
+        elseif pressed(0x800) and state.screen == SCREEN.LEVEL then --start
             draw_select = false
             game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
             ret = true
