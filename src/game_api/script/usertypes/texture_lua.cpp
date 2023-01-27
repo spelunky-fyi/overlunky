@@ -91,6 +91,10 @@ void register_usertypes(sol::state& lua)
         }
         return reload_texture(texture_path.c_str());
     };
+    /// Replace a vanilla texture definition with a custom texture definition and reload the texture.
+    lua["replace_texture"] = replace_texture;
+    /// Reset a replaced vanilla texture to the original and reload the texture.
+    lua["reset_texture"] = reset_texture;
 
     /// Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
     /// `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.

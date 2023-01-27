@@ -54,3 +54,5 @@ std::optional<TEXTURE> get_texture(TextureDefinition data);
 std::optional<TEXTURE> get_texture(std::string_view texture_name);
 void reload_texture(const char* texture_name);  // Does a lookup for the right texture to reload
 void reload_texture(const char** texture_name); // Reloads the texture directly
+bool replace_texture(TEXTURE vanilla_id, TEXTURE custom_id);
+void reset_texture(TEXTURE vanilla_id);

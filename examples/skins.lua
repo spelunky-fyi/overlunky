@@ -14,6 +14,17 @@ images = {}
 draw_select = false
 selected_skin = 0
 
+-- get vanilla or enabled mods' skins
+for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
+    local tex = get_type(i).texture
+    local def = get_texture_definition(tex)
+    images[#images+1] = { path=def.texture_path, name=get_character_name(i), texture=tex }
+end
+
+-- I guess you can test these too if you want to
+images[#images+1] = { path="/Data/Textures/char_hired.DDS", name="Hired Hand", texture=TEXTURE.DATA_TEXTURES_CHAR_HIRED_0 }
+images[#images+1] = { path="/Data/Textures/char_eggchild.DDS", name="Eggplant Child", texture=TEXTURE.DATA_TEXTURES_CHAR_EGGCHILD_0 }
+
 function exists(path)
     for i,img in pairs(images) do
         if img.path == path then return true end
@@ -49,14 +60,7 @@ end
 
 -- get all installed char mods or png files in the skins folder
 function get_skins()
-    -- vanilla or enabled mods' skins
-    for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
-        local tex = get_type(i).texture
-        local def = get_texture_definition(tex)
-        if not exists(def.texture_path) then
-            images[#images+1] = { path=def.texture_path, name=get_character_name(i), texture=tex }
-        end
-    end
+    local added = {}
 
     -- all installed char mods
     for i,path in pairs(list_char_mods() or {}) do
@@ -64,6 +68,7 @@ function get_skins()
             local w, h = get_image_size(path)
             create_skin(path, w, h)
         end
+        added[path] = true
     end
 
     -- png files from skins subfolder
@@ -72,6 +77,14 @@ function get_skins()
             local w, h = get_image_size(path)
             create_skin(path, w, h)
         end
+        added[path] = true
+    end
+
+    -- remove skins that were deleted since they were loaded
+    for i=#images,1,-1 do
+        if not added[images[i].path] and images[i].texture > TEXTURE.DATA_TEXTURES_CHAR_EGGCHILD_0 then
+            table.remove(images, i)
+        end
     end
 
     -- calculate icon sizes that hopefully fit the dialog with any number of skins
@@ -79,7 +92,6 @@ function get_skins()
     F = 1.98
     AX = -0.7
     AY = 0.675
-    ANG = 0
     repeat
         F = F - 0.002
         W = -AX/(N/F)
@@ -90,54 +102,10 @@ function get_skins()
     until math.ceil(#images/N)*H < 2*AY
 end
 
+-- load all skins on load
 get_skins()
 
-function hook_skin(ent)
-    if not ent then return end
-    ent:set_post_update_state_machine(function(ent)
-        if not ent.inventory then return end
-        if skins and skins[ent.inventory.player_slot] then
-            ent:set_texture(skins[ent.inventory.player_slot])
-        elseif ent.inventory.player_slot > 0 then
-            ent:set_texture(state.items.player_select[ent.inventory.player_slot].texture)
-        end
-    end)
-end
-
--- hook the current and future players
-set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.ANY, MASK.PLAYER)
-set_post_entity_spawn(function(ent) hook_skin(ent) end, SPAWN_TYPE.ANY, MASK.ITEM, ENT_TYPE.ITEM_PLAYERGHOST)
-hook_skin(get_player(1, true))
-
--- hook the wanted poster
-set_post_entity_spawn(function(ent)
-    local uid = ent.uid
-    set_timeout(function()
-        local poster = get_entity(uid)
-        if poster and skins and skins[1] then
-            poster:set_texture(skins[1])
-        end
-    end, 1)
-end, SPAWN_TYPE.ANY, MASK.BG, ENT_TYPE.BG_SHOPWANTEDPORTRAIT)
-
--- apparently playerbags and ghosts with custom texture crash the game, maybe this will fix it
-set_pre_entity_spawn(function(type, x, y, l)
-    for i,p in pairs(players) do
-        p:set_texture(p.type.texture)
-    end
-    local uid = spawn_critical(type, x, y, l, 0, 0)
-    if type == ENT_TYPE.ITEM_PICKUP_PLAYERBAG then
-        get_entity(uid):set_post_update_state_machine(function(ent)
-            if skins[1] then
-                ent:set_texture(skins[1])
-            end
-            clear_callback()
-        end)
-    end
-    return uid
-end, SPAWN_TYPE.SYSTEMIC | SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, {ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_PLAYERGHOST})
-
--- vanilla ui stuff
+-- check for global inputs
 buttons_prev = 0
 function pressed(key)
     if test_mask(game_manager.game_props.buttons, key) and not test_mask(buttons_prev, key) then
@@ -145,7 +113,6 @@ function pressed(key)
     end
     return false
 end
-
 function released(key)
     if not test_mask(game_manager.game_props.buttons, key) and test_mask(buttons_prev, key) then
         return true
@@ -153,22 +120,51 @@ function released(key)
     return false
 end
 
--- show custom message on bottom right
+-- refresh textures of existing entities
+function set_textures()
+    for i=1,4 do
+        local ent = get_player(i)
+        if ent then ent:set_texture(ent:get_texture()) end
+        local ghost = get_playerghost(i)
+        if ghost then ghost:set_texture(ghost:get_texture()) end
+    end
+    for i,v in pairs(get_entities_by({ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_CLIMBABLE_ROPE, ENT_TYPE.ITEM_UNROLLED_ROPE, ENT_TYPE.BG_SHOPWANTEDPORTRAIT, ENT_TYPE.ITEM_WHIP}, MASK.ANY, LAYER.BOTH)) do
+        local ent = get_entity(v)
+        ent:set_texture(ent:get_texture())
+    end
+end
+
+-- replace or reset character textures
+function replace_skin()
+    local replaced = {}
+    for i=1,4 do
+        if skins[i] then
+            replace_texture(state.items.player_select[i].texture, skins[i])
+            replaced[state.items.player_select[i].texture] = true
+        elseif state.items.player_select[i].activated and not replaced[state.items.player_select[i].texture] then
+            reset_texture(state.items.player_select[i].texture)
+        end
+    end
+    set_textures()
+end
+
+-- show custom message on bottom right of character select wood panel
 change_string(hash_to_stringid(0xcd07f25b), CUSTOM_SKIN_TEXT)
 set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
     if state.items.player_select[1].activated then
         if state.screen_character_select.player_y[1] == 0 then
             state.screen_character_select.right_button_text_id = hash_to_stringid(0xcd07f25b)
         end
-        if skins[1] and state.screen_character_select.start_pressed then
-            state.screen_character_select.player_y[1] = -2 --hide default char, TODO: something else
-        end
     end
     if state.screen_character_select.player_quickselect_shown[1] then
-        skins[1] = nil
+        if skins[1] then
+            skins[1] = nil
+            replace_skin()
+        end
     end
 end)
 
+-- draw the skin previews and cursor
 function draw_skins(ctx)
     local sx = selected_skin % N
     local sy = math.floor(selected_skin / N)
@@ -196,10 +192,15 @@ function draw_skins(ctx)
     end
 end
 
+-- draw the TooManySkins prompt or skin name and buttons inside the selector
 function draw_name(ctx)
     if draw_select then
         local color = Color:new(0.25, 0.2, 0.2, 1)
-        ctx:draw_text("\u{83} "..images[selected_skin + 1].name.."   \u{86} Random   \u{85} Reset   \u{88} Refresh", 0.68, -0.68, 0.001, 0.001, color,
+        local reset = ""
+        if images[selected_skin + 1].texture == state.items.player_select[1].texture and skins[1] then
+            reset = "(Reset) "
+        end
+        ctx:draw_text("\u{83} "..reset..images[selected_skin + 1].name.."   \u{86} Random   \u{85} Reset   \u{88} Refresh", 0.68, -0.68, 0.001, 0.001, color,
             VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.NORMAL)
     elseif game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE then
         local color = Color:white()
@@ -208,34 +209,13 @@ function draw_name(ctx)
     end
 end
 
-function draw_sticker(ctx)
-    if state.screen ~= SCREEN.CHARACTER_SELECT then return end
-    local color = Color:white()
-    color.r = 1 - state.screen_character_select.opacity
-    color.g = 1 - state.screen_character_select.opacity
-    color.b = 1 - state.screen_character_select.opacity
-    local src = Quad:new(AABB:new(0.13, 0.03125, 0.2183, 0.2168))
-    local x = -0.49
-    local y = 0.27
-    local w = 0.16
-    local h = w/9*16
-
-    local bg_aabb = AABB:new(x - 0.0225, y + 0.06, x + w + 0.0225, y - h - 0.02)
-    local bg_dest = Quad:new(bg_aabb)
-    local bg_x, bg_y = bg_dest:get_AABB():center()
-    bg_dest:rotate(ANG, bg_x, bg_y)
-
-    local dest_aabb = AABB:new(x, y, x + w, y - h)
-    --local dest = Quad:new(dest_aabb)
-    --local d_x, d_y = dest:get_AABB():center()
-    --dest:rotate(ANG, d_x, d_y)
-    ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_PROFILE_0, src, bg_dest, color)
-    ctx:draw_screen_texture(skins[1], 0, 0, dest_aabb, color, ANG, 0, 0)
-end
-
+-- draw the selector background
 function draw_selector(ctx)
+    if selected_skin > #images-1 then
+        selected_skin = #images-1
+    end
     if draw_select then
-        if state.pause == PAUSE.MENU then
+        if state.pause == PAUSE.MENU or game_manager.pause_ui.visibility == PAUSEUI_VISIBILITY.VISIBLE then
             draw_select = false
             return
         end
@@ -244,30 +224,25 @@ function draw_selector(ctx)
         dest:rotate(math.pi/2, 0, 0)
         ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_MAIN_0, src, dest, Color:white())
         draw_skins(ctx)
-    elseif state.items.player_select[1].activated and skins[1] and state.screen == SCREEN.CHARACTER_SELECT then
-        draw_sticker(ctx)
     end
 end
 
--- draw huge quick select and skins
-set_post_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
+function draw_everything(ctx)
     draw_selector(ctx)
     draw_name(ctx)
+end
+
+-- draw on top of character select screen
+set_post_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
+    draw_everything(ctx)
 end)
 
+-- draw on top of the pause menu
 set_callback(function(ctx)
-    draw_selector(ctx)
-    draw_name(ctx)
+    draw_everything(ctx)
 end, ON.RENDER_POST_PAUSE_MENU)
 
--- clear custom skin selection
-set_callback(function()
-    if state.screen_next == SCREEN.CHARACTER_SELECT then
-        skins = {}
-    end
-end, ON.PRE_LOAD_SCREEN)
-
--- disable inputs to underlaying char select screen when skin select is open
+-- disable inputs to underlaying char select screen when skin select is open and handle input
 set_callback(function()
     if state.screen ~= SCREEN.CHARACTER_SELECT and #players == 0 then return end
     local ret = false
@@ -280,7 +255,12 @@ set_callback(function()
             ret = true
         end
     end
+    local old_skin = skins[1]
     if draw_select then
+        if state.screen == SCREEN.CHARACTER_SELECT then
+            state.screen_character_select.player_quickselect_shown[1] = false
+            state.screen_character_select.player_quickselect_fadein_timer[1] = 0
+        end
         if pressed(0x10000) and selected_skin > 0 then --left
             selected_skin = selected_skin - 1
         elseif pressed(0x20000) and selected_skin < #images-1 then --right
@@ -291,14 +271,15 @@ set_callback(function()
             selected_skin = selected_skin + N
         elseif pressed(0x1) then --select
             skins[1] = images[selected_skin + 1].texture
+            replace_skin()
             draw_select = false
-            ANG = (prng:random() - 0.5) / 20 * math.pi
             if #players > 0 then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
                 ret = true
             end
         elseif released(0x2) then --cancel
             skins[1] = nil
+            replace_skin()
             draw_select = false
             if #players > 0 then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP

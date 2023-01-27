@@ -275,3 +275,46 @@ void reload_texture(const char** texture_name)
     auto load_texture = *vtable_find<LoadTextureFunT*>(renderer_ptr, c_LoadTextureVirtualIndex);
     load_texture(renderer_ptr, texture_name);
 }
+
+bool replace_texture(TEXTURE vanilla_id, TEXTURE custom_id)
+{
+    auto* textures = get_textures();
+    auto& render = RenderAPI::get();
+
+    std::lock_guard lock{render.custom_textures_lock};
+
+    if (vanilla_id >= 0 && vanilla_id < 0x192)
+    {
+        if (vanilla_id != custom_id && render.original_textures.find(vanilla_id) == render.original_textures.end())
+        {
+            render.original_textures[vanilla_id] = textures->textures[vanilla_id];
+        }
+        if (vanilla_id == custom_id && render.original_textures.find(vanilla_id) != render.original_textures.end())
+        {
+            textures->textures[vanilla_id] = render.original_textures[custom_id];
+            reload_texture(textures->textures[vanilla_id].name);
+            return true;
+        }
+        else if (render.custom_textures.find(custom_id) != render.custom_textures.end())
+        {
+            textures->textures[vanilla_id] = render.custom_textures[custom_id];
+            textures->textures[vanilla_id].id = vanilla_id;
+            reload_texture(textures->textures[vanilla_id].name);
+            return true;
+        }
+        else if (custom_id >= 0 && custom_id < 0x192)
+        {
+            textures->textures[vanilla_id] = textures->textures[custom_id];
+            textures->textures[vanilla_id].id = vanilla_id;
+            reload_texture(textures->textures[vanilla_id].name);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void reset_texture(TEXTURE vanilla_id)
+{
+    replace_texture(vanilla_id, vanilla_id);
+}
