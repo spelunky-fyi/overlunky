@@ -138,7 +138,7 @@ function set_textures()
         local ghost = get_playerghost(i)
         if ghost then ghost:set_texture(ghost:get_texture()) end
     end
-    for i,v in pairs(get_entities_by({ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_CLIMBABLE_ROPE, ENT_TYPE.ITEM_UNROLLED_ROPE, ENT_TYPE.BG_SHOPWANTEDPORTRAIT, ENT_TYPE.ITEM_WHIP}, MASK.ANY, LAYER.BOTH)) do
+    for i,v in pairs(get_entities_by({ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_CLIMBABLE_ROPE, ENT_TYPE.ITEM_UNROLLED_ROPE, ENT_TYPE.BG_SHOPWANTEDPORTRAIT, ENT_TYPE.ITEM_WHIP, ENT_TYPE.FX_PLAYERINDICATOR, ENT_TYPE.FX_PLAYERINDICATORPORTRAIT}, MASK.ANY, LAYER.BOTH)) do
         local ent = get_entity(v)
         ent:set_texture(ent:get_texture())
     end
@@ -293,7 +293,7 @@ set_callback(function()
         ((state.screen == SCREEN.CHARACTER_SELECT and state.screen_character_select.player_y[1] == 0) or game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or draw_select) and pressed(0x20) then
         game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.INVISIBLE
         draw_select = not draw_select
-        if state.screen == SCREEN.LEVEL and not draw_select then
+        if (state.screen == SCREEN.LEVEL or state.screen == SCREEN.CAMP or state.screen == SCREEN.TRANSITION) and not draw_select then
             game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
             ret = true
         end
@@ -318,7 +318,7 @@ set_callback(function()
             skins[1] = images[selected_skin[1] + 1].texture
             replace_skin()
             draw_select = false
-            if state.screen == SCREEN.LEVEL then
+            if (state.screen == SCREEN.LEVEL or state.screen == SCREEN.CAMP or state.screen == SCREEN.TRANSITION) then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
                 ret = true
             end
@@ -326,7 +326,7 @@ set_callback(function()
             skins[1] = nil
             replace_skin()
             draw_select = false
-            if state.screen == SCREEN.LEVEL then
+            if (state.screen == SCREEN.LEVEL or state.screen == SCREEN.CAMP or state.screen == SCREEN.TRANSITION) then
                 game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
             end
             ret = true
@@ -334,9 +334,9 @@ set_callback(function()
             selected_skin[1] = prng:random_index(#images, 0) - 1
         elseif pressed(0x80) then --refresh
             get_skins()
-        elseif pressed(0x800) and state.screen == SCREEN.LEVEL then --start
+        elseif pressed(0x800) and (state.screen == SCREEN.LEVEL or state.screen == SCREEN.CAMP or state.screen == SCREEN.TRANSITION) then --start
             draw_select = false
-            game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.VISIBLE
+            game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP
             ret = true
         end
         for i=2,active_players() do
