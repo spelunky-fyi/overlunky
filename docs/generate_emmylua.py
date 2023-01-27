@@ -39,6 +39,7 @@ replace_table = {
     "const ": "",
     "ShopType": "SHOP_TYPE",
     "EmittedParticlesInfo": "Array<Particle>",
+    "ImVec2": "Vec2",
 }
 
 reFloat = re.compile(r"\bfloat\b")
