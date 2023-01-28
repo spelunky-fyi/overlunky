@@ -1,7 +1,7 @@
 meta = {
 	name = "Too Many Skins",
 	version = "1.0",
-	description = "Load extra character mods from all available packs or the skins subfolder.",
+	description = "Load extra character mods from all available packs or the skins subfolder and change skins on the fly from the pause menu.",
 	author = "Dregu"
 }
 
