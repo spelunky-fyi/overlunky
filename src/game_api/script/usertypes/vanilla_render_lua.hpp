@@ -49,34 +49,42 @@ class VanillaRenderContext
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     void draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color);
 
-    /// Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer.
-    /// `thickness` is only used when `filled = false`, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
-    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    void draw_screen_rect(const AABB& rect, Color color, bool filled, float thickness, float angle, float px, float py);
-
-    /// Draw quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.
-    /// `thickness` is only used when `filled = false`
-    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    void draw_screen_quad(const Quad& dest, Color color, bool filled, float thickness);
-
-    /// Draw triangle in screen coordinates using the built-in renderer.
-    /// `thickness` is only used when `filled = false`
-    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    void draw_screen_triangle(const Triangle& triangle, Color color, bool filled, float thickness);
-
     /// Draws a line on screen using the built-in renderer from point `A` to point `B`.
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    void draw_screen_line(const Vec2& A, const Vec2& B, Color color, float thickness);
+    void draw_screen_line(const Vec2& A, const Vec2& B, float thickness, Color color);
+
+    /// Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.
+    /// `px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_rect(const AABB& rect, float thickness, Color color, sol::optional<float> angle, sol::optional<float> px, sol::optional<float> py);
+
+    void draw_screen_rect_filled(const AABB& rect, Color color, sol::optional<float> angle, sol::optional<float> px, sol::optional<float> py);
+
+    /// Draw triangle in screen coordinates using the built-in renderer.
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_triangle(const Triangle& triangle, float thickness, Color color);
+
+    /// Draw filled triangle in screen coordinates using the built-in renderer.
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_triangle_filled(const Triangle& triangle, Color color);
 
     /// Draw a polyline on screen from points using the built-in renderer
     /// Draws from the first to the last point, use `closed` to connect first and last as well
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    void draw_screen_polyline(std::vector<Vec2> points, Color color, float thickness, bool closed);
+    void draw_screen_poly(std::vector<Vec2> points, float thickness, Color color, bool closed);
+
+    /// Draw quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_poly(const Quad& points, float thickness, Color color, bool closed);
 
     /// Draw a convex polygon on screen from points using the built-in renderer
     /// Can probably draw almost any polygon, but the convex one is guaranteed to look correct
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    void draw_screen_poly(std::vector<Vec2> points, Color color);
+    void draw_screen_poly_filled(std::vector<Vec2> points, Color color);
+
+    /// Draw filled quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_poly_filled(const Quad& points, Color color);
 
     /// Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
     /// Use in combination with ON.RENDER_PRE_DRAW_DEPTH event

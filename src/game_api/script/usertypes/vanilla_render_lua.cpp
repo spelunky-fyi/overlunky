@@ -225,10 +225,10 @@ Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness)
     return dest;
 };
 
-void VanillaRenderContext::draw_screen_rect(const AABB& rect, Color color, bool filled, float thickness, float angle, float px, float py)
+void VanillaRenderContext::draw_screen_rect(const AABB& rect, float thickness, Color color, sol::optional<float> angle, sol::optional<float> px, sol::optional<float> py)
 {
     Quad dest{rect};
-    if (angle != 0)
+    if (angle.has_value())
     {
         constexpr float ratio = 16.0f / 9.0f;
 
@@ -236,55 +236,71 @@ void VanillaRenderContext::draw_screen_rect(const AABB& rect, Color color, bool 
         const AABB new_rect{rect.left * ratio, rect.top, rect.right * ratio, rect.bottom};
         dest = Quad{new_rect};
         auto pivot = new_rect.center();
-        if (px != 0 || py != 0)
+        if (px.has_value() || py.has_value())
         {
-            pivot.first += std::abs(pivot.first - new_rect.left) * px;
-            pivot.second += std::abs(pivot.second - new_rect.bottom) * py;
+            pivot.first += std::abs(pivot.first - new_rect.left) * px.value_or(0);
+            pivot.second += std::abs(pivot.second - new_rect.bottom) * py.value_or(0);
         }
-        dest.rotate(angle, pivot.first, pivot.second);
+        dest.rotate(angle.value(), pivot.first, pivot.second);
         convert_ratio(dest, true);
     }
-    draw_screen_quad(dest, std::move(color), filled, thickness);
+    draw_screen_poly(dest, thickness, std::move(color), true);
 }
-
-void VanillaRenderContext::draw_screen_quad(const Quad& dest, Color color, bool filled, float thickness)
+void VanillaRenderContext::draw_screen_rect_filled(const AABB& rect, Color color, sol::optional<float> angle, sol::optional<float> px, sol::optional<float> py)
 {
-    if (filled)
+    Quad dest{rect};
+    if (angle.has_value())
     {
-        auto texture = get_texture(0);                                                       // any texture works
-        RenderAPI::get().draw_screen_texture(texture, Quad{}, dest, std::move(color), 0x27); // 0x27 funky shader, 2C also works
-    }
-    else if (thickness)
-    {
+        constexpr float ratio = 16.0f / 9.0f;
 
-        auto [A, B, C, D] = dest.operator std::tuple<Vec2, Vec2, Vec2, Vec2>();
-        draw_screen_polyline({A, B, C, D}, color, thickness, true);
+        // fix ratio to 1/1 to properly rotate the coordinates
+        const AABB new_rect{rect.left * ratio, rect.top, rect.right * ratio, rect.bottom};
+        dest = Quad{new_rect};
+        auto pivot = new_rect.center();
+        if (px.has_value() || py.has_value())
+        {
+            pivot.first += std::abs(pivot.first - new_rect.left) * px.value_or(0);
+            pivot.second += std::abs(pivot.second - new_rect.bottom) * py.value_or(0);
+        }
+        dest.rotate(angle.value(), pivot.first, pivot.second);
+        convert_ratio(dest, true);
     }
+    draw_screen_poly_filled(dest, std::move(color));
 }
 
-void VanillaRenderContext::draw_screen_triangle(const Triangle& triangle, Color color, bool filled, float thickness)
+void VanillaRenderContext::draw_screen_poly_filled(const Quad& dest, Color color)
 {
-    if (filled)
-    {
-        draw_screen_quad(Quad{triangle.A, triangle.B, triangle.C, triangle.C}, std::move(color), filled, .0f);
-    }
-    else if (thickness)
-    {
-        draw_screen_polyline({triangle.A, triangle.B, triangle.C}, color, thickness, true);
-    }
+    auto texture = get_texture(0);                                                       // any texture works
+    RenderAPI::get().draw_screen_texture(texture, Quad{}, dest, std::move(color), 0x27); // 0x27 funky shader, 2C also works
 }
 
-void VanillaRenderContext::draw_screen_line(const Vec2& A, const Vec2& B, Color color, float thickness)
+void VanillaRenderContext::draw_screen_triangle(const Triangle& triangle, float thickness, Color color)
+{
+
+    draw_screen_poly({triangle.A, triangle.B, triangle.C}, thickness, std::move(color), true);
+}
+void VanillaRenderContext::draw_screen_triangle_filled(const Triangle& triangle, Color color)
+{
+    draw_screen_poly_filled({triangle.A, triangle.B, triangle.C}, std::move(color));
+}
+
+void VanillaRenderContext::draw_screen_line(const Vec2& A, const Vec2& B, float thickness, Color color)
 {
     constexpr float ratio = 16.0f / 9.0f;
 
     Vec2 new_A{A.x * ratio, A.y};
     Vec2 new_B{B.x * ratio, B.y};
     Quad line = get_line_quad(new_A, new_B, thickness);
-    draw_screen_quad(convert_ratio(line, true), color, true, .0f);
+    draw_screen_poly_filled(convert_ratio(line, true), std::move(color));
 }
 
-void VanillaRenderContext::draw_screen_polyline(std::vector<Vec2> points, Color color, float thickness, bool closed)
+void VanillaRenderContext::draw_screen_poly(const Quad& points, float thickness, Color color, bool closed)
+{
+    auto [A, B, C, D] = points.operator std::tuple<Vec2, Vec2, Vec2, Vec2>();
+    draw_screen_poly(std::initializer_list{A, B, C, D}, thickness, color, closed);
+}
+
+void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, float thickness, Color color, bool closed)
 {
     constexpr float ratio = 16.0f / 9.0f;
 
@@ -310,7 +326,7 @@ void VanillaRenderContext::draw_screen_polyline(std::vector<Vec2> points, Color 
         {
             Quad corner = get_corner_quad(draw_list.back(), line);
             if (!corner.is_null())
-                draw_screen_quad(convert_ratio(corner, true), color, true, .0f);
+                draw_screen_poly_filled(convert_ratio(corner, true), std::move(color));
         }
         draw_list.push_back(line);
         last_point = new_B;
@@ -319,15 +335,15 @@ void VanillaRenderContext::draw_screen_polyline(std::vector<Vec2> points, Color 
     {
         Quad corner = get_corner_quad(draw_list.back(), draw_list.front());
         if (!corner.is_null())
-            draw_screen_quad(convert_ratio(corner, true), color, true, .0f);
+            draw_screen_poly_filled(convert_ratio(corner, true), std::move(color));
     }
     for (auto line : draw_list)
     {
-        draw_screen_quad(convert_ratio(line, true), color, true, .0f);
+        draw_screen_poly_filled(convert_ratio(line, true), std::move(color));
     }
 }
 
-void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, Color color)
+void VanillaRenderContext::draw_screen_poly_filled(std::vector<Vec2> points, Color color)
 {
     if (points.size() < 3)
         return;
@@ -337,12 +353,12 @@ void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, Color colo
     for (; i < points.size(); i += 2)
     {
 
-        draw_screen_quad(Quad{points[0], temp, points[i - 1], points[i]}, color, true, .0f);
+        draw_screen_poly_filled(Quad{points[0], temp, points[i - 1], points[i]}, std::move(color));
         temp = points[i]; // always repeat the last "line" drawn
     }
     if (points.size() % 2 != 0) // not even number of points so the last pice is triangle
     {
-        draw_screen_quad(Quad{points[0], temp, points.back(), points.back()}, color, true, .0f);
+        draw_screen_poly_filled(Quad{points[0], temp, points.back(), points.back()}, std::move(color));
     }
 }
 
@@ -502,6 +518,12 @@ void register_usertypes(sol::state& lua)
     auto draw_text = sol::overload(
         static_cast<void (VanillaRenderContext::*)(const std::string&, float, float, float, float, Color, uint32_t, uint32_t)>(&VanillaRenderContext::draw_text),
         static_cast<void (VanillaRenderContext::*)(const TextRenderingInfo*, Color)>(&VanillaRenderContext::draw_text));
+    auto draw_screen_poly = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const Quad&, float, Color, bool)>(&VanillaRenderContext::draw_screen_poly),
+        static_cast<void (VanillaRenderContext::*)(const std::vector<Vec2>, float, Color, bool)>(&VanillaRenderContext::draw_screen_poly));
+    auto draw_screen_poly_filled = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const Quad&, Color)>(&VanillaRenderContext::draw_screen_poly_filled),
+        static_cast<void (VanillaRenderContext::*)(const std::vector<Vec2>, Color)>(&VanillaRenderContext::draw_screen_poly_filled));
 
     /// Used in [set_callback](#set_callback) ON.RENDER_* callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
     lua.new_usertype<VanillaRenderContext>(
@@ -512,18 +534,20 @@ void register_usertypes(sol::state& lua)
         &VanillaRenderContext::draw_text_size,
         "draw_screen_texture",
         draw_screen_texture,
-        "draw_screen_rect",
-        &VanillaRenderContext::draw_screen_rect,
-        "draw_screen_quad",
-        &VanillaRenderContext::draw_screen_quad,
-        "draw_screen_triangle",
-        &VanillaRenderContext::draw_screen_triangle,
         "draw_screen_line",
         &VanillaRenderContext::draw_screen_line,
-        "draw_screen_polyline",
-        &VanillaRenderContext::draw_screen_polyline,
+        "draw_screen_rect",
+        &VanillaRenderContext::draw_screen_rect,
+        "draw_screen_rect_filled",
+        &VanillaRenderContext::draw_screen_rect_filled,
+        "draw_screen_triangle",
+        &VanillaRenderContext::draw_screen_triangle,
+        "draw_screen_triangle_filled",
+        &VanillaRenderContext::draw_screen_triangle_filled,
         "draw_screen_poly",
-        &VanillaRenderContext::draw_screen_poly,
+        draw_screen_poly,
+        "draw_screen_poly_filled",
+        draw_screen_poly_filled,
         "draw_world_texture",
         draw_world_texture);
 
