@@ -268,15 +268,8 @@ void VanillaRenderContext::draw_screen_rect_filled(const AABB& rect, Color color
     draw_screen_poly_filled(dest, std::move(color));
 }
 
-void VanillaRenderContext::draw_screen_poly_filled(const Quad& dest, Color color)
-{
-    auto texture = get_texture(0);                                                       // any texture works
-    RenderAPI::get().draw_screen_texture(texture, Quad{}, dest, std::move(color), 0x27); // 0x27 funky shader, 2C also works
-}
-
 void VanillaRenderContext::draw_screen_triangle(const Triangle& triangle, float thickness, Color color)
 {
-
     draw_screen_poly({triangle.A, triangle.B, triangle.C}, thickness, std::move(color), true);
 }
 void VanillaRenderContext::draw_screen_triangle_filled(const Triangle& triangle, Color color)
@@ -297,9 +290,8 @@ void VanillaRenderContext::draw_screen_line(const Vec2& A, const Vec2& B, float 
 void VanillaRenderContext::draw_screen_poly(const Quad& points, float thickness, Color color, bool closed)
 {
     auto [A, B, C, D] = points.operator std::tuple<Vec2, Vec2, Vec2, Vec2>();
-    draw_screen_poly(std::initializer_list{A, B, C, D}, thickness, color, closed);
+    draw_screen_poly(std::vector<Vec2>{A, B, C, D}, thickness, color, closed);
 }
-
 void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, float thickness, Color color, bool closed)
 {
     constexpr float ratio = 16.0f / 9.0f;
@@ -342,7 +334,11 @@ void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, float thic
         draw_screen_poly_filled(convert_ratio(line, true), std::move(color));
     }
 }
-
+void VanillaRenderContext::draw_screen_poly_filled(const Quad& dest, Color color)
+{
+    auto texture = get_texture(0);                                                       // any texture works
+    RenderAPI::get().draw_screen_texture(texture, Quad{}, dest, std::move(color), 0x27); // 0x27 funky shader, 2C also works
+}
 void VanillaRenderContext::draw_screen_poly_filled(std::vector<Vec2> points, Color color)
 {
     if (points.size() < 3)
