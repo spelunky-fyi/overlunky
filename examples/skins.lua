@@ -138,7 +138,7 @@ function set_textures()
         local ghost = get_playerghost(i)
         if ghost then ghost:set_texture(ghost:get_texture()) end
     end
-    for i,v in pairs(get_entities_by({ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_CLIMBABLE_ROPE, ENT_TYPE.ITEM_UNROLLED_ROPE, ENT_TYPE.BG_SHOPWANTEDPORTRAIT, ENT_TYPE.ITEM_WHIP, ENT_TYPE.FX_PLAYERINDICATOR, ENT_TYPE.FX_PLAYERINDICATORPORTRAIT}, MASK.ANY, LAYER.BOTH)) do
+    for i,v in pairs(get_entities_by({ENT_TYPE.ITEM_PICKUP_PLAYERBAG, ENT_TYPE.ITEM_CLIMBABLE_ROPE, ENT_TYPE.ITEM_UNROLLED_ROPE, ENT_TYPE.BG_SHOPWANTEDPORTRAIT, ENT_TYPE.ITEM_WHIP, ENT_TYPE.FX_PLAYERINDICATOR, ENT_TYPE.FX_PLAYERINDICATORPORTRAIT, ENT_TYPE.FX_BIRDIES}, MASK.ANY, LAYER.BOTH)) do
         local ent = get_entity(v)
         ent:set_texture(ent:get_texture())
     end
