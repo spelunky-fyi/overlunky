@@ -92,8 +92,8 @@ function get_skins()
         F = F - 0.002
         W = -AX/(N/F)
         H = W/9*16
-        XP = W / 20
-        YP = H / 20
+        XP = W / 11
+        YP = H / 11
         N = math.floor(-2*AX / W)
     until math.ceil(#images/N)*H < 2*AY
 end
@@ -200,7 +200,6 @@ function draw_skins(ctx)
     local x = AX
     local y = AY
     for i, img in pairs(images) do
-        local dest = AABB:new()
         local af = 0
         for j=1,active_players() do
             if i == selected_skin[j] + 1 then
@@ -208,6 +207,12 @@ function draw_skins(ctx)
             end
         end
         ctx:draw_screen_texture(img.texture, 0, af, x + XP, y - YP, x + W - XP, y - H + YP, Color:white())
+        for j=1,active_players() do
+            if img.texture == get_type(state.items.player_select[j].character).texture then
+                local color = get_character_heart_color(state.items.player_select[j].character)
+                ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_MENU_DEATHMATCH2_0, 0, 7, x, y, x + W, y - H, color)
+            end
+        end
         x = x + W
         if x > -AX-W then
             x = AX
@@ -219,18 +224,26 @@ end
 -- draw the TooManySkins prompt or skin name and buttons inside the selector
 function draw_name(ctx)
     if draw_select then
+        local scale = 0.001
         local color = Color:new(0.25, 0.2, 0.2, 1)
         local reset = ""
         if images[selected_skin[1] + 1].texture == state.items.player_select[1].texture and skins[1] then
             reset = "(Reset) "
         end
-        ctx:draw_text("\u{83} "..reset..images[selected_skin[1] + 1].name.."   \u{86} Random   \u{85} Reset   \u{87} Refresh", 0.68, -0.68, 0.001, 0.001, color,
+        local name = images[selected_skin[1] + 1].name
+        local line = "\u{83} "..reset..name.."   \u{86} Random   \u{85} Reset   \u{87} Refresh"
+        while ctx:draw_text_size(line, scale, scale, VANILLA_FONT_STYLE.NORMAL) > -2*AX do
+            scale = scale * 0.99
+            line = "\u{83} "..reset..name.."   \u{86} Random   \u{85} Reset   \u{87} Refresh"
+        end
+        ctx:draw_text(line, 0.68, -0.68, scale, scale, color,
             VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.NORMAL)
     end
     if game_manager.pause_ui.visibility > PAUSEUI_VISIBILITY.INVISIBLE or (draw_select and state.screen ~= SCREEN.CHARACTER_SELECT) then
+        local scale = 0.001
         local color = Color:white()
         color.a = game_manager.pause_ui.menu_slidein_progress
-        ctx:draw_text(CUSTOM_SKIN_TEXT, 0, -0.85, 0.001, 0.001, color, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
+        ctx:draw_text(CUSTOM_SKIN_TEXT, 0, -0.85, scale, scale, color, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
     end
 end
 
