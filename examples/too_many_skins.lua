@@ -1,8 +1,9 @@
 meta = {
-	name = "Too Many Skins",
-	version = "1.0",
-	description = "Load extra character mods from all available packs or the skins subfolder and change skins on the fly from the pause menu.",
-	author = "Dregu"
+    name = "Too Many Skins",
+    version = "1.0",
+    description = "Load extra character mods from all available packs or the skins subfolder and change skins on the fly from the pause menu.",
+    author = "Dregu",
+    unsafe = true -- for the time being
 }
 
 DIR = "skins/"
@@ -51,7 +52,72 @@ function exists(path)
     return false
 end
 
+-- just to demo the results I want, playlunky could probably handle this with the linked files
+-- this whole concept is kinda weird to add in overlunky
+function get_char_json(path)
+    path = path:gsub("/Data/Textures/Entities", "")
+    path = path:gsub("/Data/Textures", "")
+    path = path:gsub("_full.png$", "")
+    path = path:gsub(".png$", "")
+    path = path:gsub("^/", "")
+    local data = {}
+    local f = io.open(path..".json", "r")
+    if f then
+        data = json.decode(f:read("*all"))
+        io.close(f)
+    end
+    if data.color then
+        local color = Color:new()
+        if type(data.color) == "string" then
+            data.color = data.color:gsub("^#", "")
+            data.color = data.color:gsub("^0x", "")
+            data.color = data.color:sub(5,6)..data.color:sub(3,4)..data.color:sub(1,2)
+            color:set_ucolor(tonumber("0x"..data.color))
+        elseif type(data.color) == "table" then
+            if data.color[1] then
+                color.r, color.g, color.b = data.color[1], data.color[2], data.color[3]
+            elseif data.color.red then
+                color.r, color.g, color.b = data.color.red, data.color.green, data.color.blue
+            end
+        end
+        data.color = color
+    else
+        local c = io.open(path..".color", "r")
+        if c then
+            local cdata = c:read("*all")
+            io.close(c)
+            local col = {}
+            for tok in cdata:gmatch("[^%s]+") do
+                col[#col+1] = tonumber(tok)
+            end
+            data.color = Color:new(col[1], col[2], col[3], 1)
+        end
+    end
+    if not data.full_name then
+        local n = io.open(path..".name", "r")
+        if n then
+            local ndata = n:read("*all")
+            io.close(n)
+            local col = {}
+            for tok in ndata:gmatch("[^\r\n]+") do
+                col[#col+1] = tok:gsub("^.-: (.-)$", "%1")
+            end
+            if col[1] then
+                data.full_name = col[1]
+            end
+            if col[2] then
+                data.short_name = col[2]
+            end
+        end
+    end
+    return data
+end
+
 function clean_name(name)
+    local data = get_char_json(name)
+    if data and data.full_name then
+        return data.full_name
+    end
     name = name:gsub("/Mods/Packs/", "")
     name = name:gsub("Data/Textures/", "")
     name = name:gsub("Entities/", "")
@@ -206,7 +272,27 @@ function replace_strings()
         if tex then
             local name, path = get_name(tex)
             local full_id, short_id = texture_to_stringid(state.items.player_select[i].texture)
-            if tex > 0x192 then
+            local data = get_char_json(path)
+            if data then
+                if data.full_name then
+                    change_string(full_id, data.full_name)
+                else
+                    change_string(full_id, name)
+                end
+                if data.short_name then
+                    change_string(short_id, data.short_name)
+                else
+                    change_string(short_id, name)
+                end
+                if data.color then
+                    set_character_heart_color(state.items.player_select[i].character, data.color)
+                end
+                if stupid_story[state.items.player_select[i].texture] then
+                    change_string(full_id+1, stupid_story[state.items.player_select[i].texture].." replaced with "..clean_path(path).."\nby Too Many Skins.")
+                else
+                    change_string(full_id+1, "Replaced with "..clean_path(path).."\nby Too Many Skins.")
+                end
+            elseif tex > 0x192 then
                 change_string(full_id, name)
                 if stupid_story[state.items.player_select[i].texture] then
                     change_string(full_id+1, stupid_story[state.items.player_select[i].texture].." replaced with "..clean_path(path).."\nby Too Many Skins.")
