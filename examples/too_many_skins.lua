@@ -13,6 +13,7 @@ skins = {}
 images = {}
 draw_select = false
 selected_skin = { 0, 1, 2, 3 }
+skin_def = {}
 
 -- get vanilla or enabled mods' skins
 for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
@@ -147,8 +148,10 @@ end
 -- replace or reset character textures
 function replace_skin()
     local replaced = {}
+    skin_def = {}
     for i=1,4 do
         if skins[i] then
+            skin_def[i] = get_texture_definition(skins[i])
             replace_texture_and_heart_color(state.items.player_select[i].texture, skins[i])
             replaced[state.items.player_select[i].texture] = true
         elseif state.items.player_select[i].activated and not replaced[state.items.player_select[i].texture] then
@@ -310,6 +313,32 @@ function resolve_characters()
         used[state.items.player_select[i].character] = true
     end
 end
+
+-- fix journal portrait coordinates from _full sheets
+set_callback(function(ctx, type, page)
+    if type ~= JOURNAL_PAGE_TYPE.PEOPLE then return end
+    page = page:as_journal_page_people()
+    local page_id = page.page_number + TEXTURE.DATA_TEXTURES_CHAR_YELLOW_0 - 2
+    if page_id > TEXTURE.DATA_TEXTURES_CHAR_ORANGE_0 then return end
+    local num = page.page_number - 1
+    if skins[num] and skin_def[num] then
+        local f = skin_def[num].width/skin_def[num].height
+        page.character_drawing.source_top_left_y = 0.0625 * f
+        page.character_drawing.source_top_right_y = 0.0625 * f
+        page.character_drawing.source_bottom_left_y = 0.437 * f
+        page.character_drawing.source_bottom_right_y = 0.437 * f
+        local bg_source = page.character_background:source_get_quad()
+        local bg_dest = page.character_background:dest_get_quad():offset(page.character_background.x, page.character_background.y)
+        ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_ENTRY_BG_0, bg_source, bg_dest, Color:white())
+        local dest = page.character_icon:dest_get_quad():offset(page.character_icon.x, page.character_icon.y)
+        ctx:draw_screen_texture(page_id, 0, 0, dest, Color:white())
+    else
+        page.character_drawing.source_top_left_y = 0.0625
+        page.character_drawing.source_top_right_y = 0.0625
+        page.character_drawing.source_bottom_left_y = 0.437
+        page.character_drawing.source_bottom_right_y = 0.437
+    end
+  end, ON.RENDER_POST_JOURNAL_PAGE)
 
 -- disable inputs to underlaying char select screen when skin select is open and handle input
 set_callback(function()
