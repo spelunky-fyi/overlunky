@@ -174,12 +174,26 @@ set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
     end
 end)
 
+-- get number of active players
 function active_players()
     local n = 0
     for i,p in pairs(state.items.player_select) do
         if p.activated then n = n + 1 end
     end
     return n
+end
+
+-- discover new files and reload active skins from disk
+function refresh()
+    for i,skin in pairs(skins) do
+        if skin and skin > 0x192 then
+            local def = get_texture_definition(skin)
+            print(def.texture_path)
+            clear_cache(def.texture_path)
+        end
+    end
+    get_skins()
+    replace_skin()
 end
 
 -- draw the skin previews and cursor
@@ -346,7 +360,7 @@ set_callback(function()
         elseif pressed(0x8) then --random
             selected_skin[1] = prng:random_index(#images, 0) - 1
         elseif pressed(0x80) then --refresh
-            get_skins()
+            refresh()
         elseif pressed(0x800) and (state.screen == SCREEN.LEVEL or state.screen == SCREEN.CAMP or state.screen == SCREEN.TRANSITION) then --start
             draw_select = false
             game_manager.pause_ui.visibility = PAUSEUI_VISIBILITY.SLIDING_UP

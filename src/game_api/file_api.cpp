@@ -16,11 +16,105 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#define CACHE_DIR "Mods\\Cache"
+
 LoadFileCallback* g_OnLoadFile{nullptr};
 ReadFromFileCallback* g_ReadFromFile{nullptr};
 WriteToFileCallback* g_WriteToFile{nullptr};
 GetImageFilePathCallback* g_GetImageFilePath{nullptr};
 MakeSavePathCallback g_MakeSavePathCallback{nullptr};
+
+std::string hash_path(std::string_view path)
+{
+    auto abs_path = std::filesystem::absolute(path).make_preferred();
+    auto abs_path_str = abs_path.string().c_str();
+    uint64_t res = 10000019;
+    int i = 0;
+    do
+    {
+        uint64_t merge = std::toupper(abs_path_str[i]) * 65536 + std::toupper(abs_path_str[i + 1]);
+        res = res * 8191 + merge;
+        i++;
+    } while (abs_path_str[i] != 0);
+    std::ostringstream ss;
+    ss << std::hex << res << res;
+    DEBUG("Hashed '{}' to '{}'", abs_path.string(), ss.str());
+    return ss.str();
+}
+
+std::filesystem::path get_cache_path(std::string_view path)
+{
+    return std::filesystem::path(CACHE_DIR) / std::filesystem::path(hash_path(path) + ".DDS");
+}
+
+void clear_cache(std::string_view file_path)
+{
+    auto path = std::string_view(file_path);
+    static const auto prefix = "Data/Textures/../../"sv;
+    if (path.size() > prefix.size() && path.substr(0, prefix.size()) == prefix)
+    {
+        path = path.substr(prefix.size());
+    }
+
+    auto cache_dir = std::filesystem::path(CACHE_DIR);
+    if (!std::filesystem::exists(cache_dir))
+        return;
+    if (path == "")
+    {
+        DEBUG("Removing {}", cache_dir.string());
+        std::filesystem::remove_all(cache_dir);
+    }
+    else
+    {
+        auto cache_file = get_cache_path(path);
+        DEBUG("Removing {}", cache_file.string());
+        if (std::filesystem::exists(cache_file))
+        {
+            std::filesystem::remove(cache_file);
+        }
+    }
+}
+
+FileInfo* read_file_from_disk(const char* filepath, void* (*allocator)(std::size_t))
+{
+    FILE* file{nullptr};
+    auto error = fopen_s(&file, filepath, "rb");
+    if (error == 0 && file != nullptr)
+    {
+        auto close_file = OnScopeExit{[file]()
+                                      { fclose(file); }};
+
+        fseek(file, 0, SEEK_END);
+        const std::size_t file_size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        if (allocator == nullptr)
+        {
+            allocator = malloc;
+        }
+
+        const std::size_t allocation_size = file_size + sizeof(FileInfo);
+        if (void* buf = allocator(allocation_size))
+        {
+            void* data = static_cast<void*>(reinterpret_cast<char*>(buf) + 24);
+            const auto size_read = fread(data, 1, file_size, file);
+            if (size_read != file_size)
+            {
+                DEBUG("Could not read file {}, this will either crash or cause glitches...", filepath);
+            }
+
+            FileInfo* file_info = new (buf) FileInfo();
+            *file_info = {
+                .Data = data,
+                .DataSize = static_cast<int>(file_size),
+                .AllocationSize = static_cast<int>(allocation_size)};
+
+            return file_info;
+        }
+    }
+
+    return nullptr;
+}
 
 FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 {
@@ -32,7 +126,16 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
         path = path.substr(prefix.size());
     }
     auto ext = path.substr(path.find_last_of('.'));
-    if (ext == ".png"sv || ext == ".jpeg"sv || ext == ".bmp"sv || ext == ".tga"sv)
+
+    std::filesystem::create_directories(CACHE_DIR);
+    std::filesystem::path cache_path = get_cache_path(path);
+
+    if (std::filesystem::exists(cache_path))
+    {
+        DEBUG("Loading '{}' from cache '{}'", path, cache_path.string());
+        return read_file_from_disk(cache_path.string().c_str(), alloc_fun);
+    }
+    else if (ext == ".png"sv || ext == ".jpeg"sv || ext == ".bmp"sv || ext == ".tga"sv)
     {
         int image_width = 0;
         int image_height = 0;
@@ -132,51 +235,24 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 
             stbi_image_free(image_data);
 
+            FILE* cache_file;
+            errno_t err;
+            if ((err = fopen_s(&cache_file, cache_path.string().c_str(), "wb")) == 0)
+            {
+                fwrite(file_info->Data, sizeof(char), file_info->DataSize, cache_file);
+                DEBUG("Cached '{}' to '{}'", path, cache_path.string());
+            }
+            else
+            {
+                DEBUG("Couldn't cache '{}' to '{}'", path, cache_path.string());
+            }
+            fclose(cache_file);
+
             return file_info;
         }
     }
     else
     {
-        auto read_file_from_disk = [](const char* filepath, void* (*allocator)(std::size_t)) -> FileInfo*
-        {
-            FILE* file{nullptr};
-            auto error = fopen_s(&file, filepath, "rb");
-            if (error == 0 && file != nullptr)
-            {
-                auto close_file = OnScopeExit{[file]()
-                                              { fclose(file); }};
-
-                fseek(file, 0, SEEK_END);
-                const std::size_t file_size = ftell(file);
-                fseek(file, 0, SEEK_SET);
-
-                if (allocator == nullptr)
-                {
-                    allocator = malloc;
-                }
-
-                const std::size_t allocation_size = file_size + sizeof(FileInfo);
-                if (void* buf = allocator(allocation_size))
-                {
-                    void* data = static_cast<void*>(reinterpret_cast<char*>(buf) + 24);
-                    const auto size_read = fread(data, 1, file_size, file);
-                    if (size_read != file_size)
-                    {
-                        DEBUG("Could not read file {}, this will either crash or cause glitches...", filepath);
-                    }
-
-                    FileInfo* file_info = new (buf) FileInfo();
-                    *file_info = {
-                        .Data = data,
-                        .DataSize = static_cast<int>(file_size),
-                        .AllocationSize = static_cast<int>(allocation_size)};
-
-                    return file_info;
-                }
-            }
-
-            return nullptr;
-        };
         return read_file_from_disk(file_path, alloc_fun);
     }
     return nullptr;
