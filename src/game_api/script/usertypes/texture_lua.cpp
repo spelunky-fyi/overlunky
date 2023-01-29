@@ -85,10 +85,14 @@ void register_usertypes(sol::state& lua)
     lua["clear_cache"] = sol::overload(
         []()
         {
-            clear_cache();
+            auto backend = LuaBackend::get_calling_backend();
+            if (backend->get_unsafe())
+                clear_cache();
         },
         [](std::string path)
         {
+            if (path == "")
+                return;
             resolve_path(path);
             clear_cache(path);
         });

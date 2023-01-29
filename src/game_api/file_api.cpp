@@ -18,6 +18,36 @@
 
 #define CACHE_DIR "Mods\\Cache"
 
+// https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
+struct DDS_PIXELFORMAT
+{
+    DWORD dwSize;
+    DWORD dwFlags;
+    DWORD dwFourCC;
+    DWORD dwRGBBitCount;
+    DWORD dwRBitMask;
+    DWORD dwGBitMask;
+    DWORD dwBBitMask;
+    DWORD dwABitMask;
+};
+typedef struct
+{
+    DWORD dwSize;
+    DWORD dwFlags;
+    DWORD dwHeight;
+    DWORD dwWidth;
+    DWORD dwPitchOrLinearSize;
+    DWORD dwDepth;
+    DWORD dwMipMapCount;
+    DWORD dwReserved1[11];
+    DDS_PIXELFORMAT ddspf;
+    DWORD dwCaps;
+    DWORD dwCaps2;
+    DWORD dwCaps3;
+    DWORD dwCaps4;
+    DWORD dwReserved2;
+} DDS_HEADER;
+
 LoadFileCallback* g_OnLoadFile{nullptr};
 ReadFromFileCallback* g_ReadFromFile{nullptr};
 WriteToFileCallback* g_WriteToFile{nullptr};
@@ -38,7 +68,6 @@ std::string hash_path(std::string_view path)
     } while (abs_path_str[i] != 0);
     std::ostringstream ss;
     ss << std::hex << res << res;
-    DEBUG("Hashed '{}' to '{}'", abs_path.string(), ss.str());
     return ss.str();
 }
 
@@ -61,13 +90,13 @@ void clear_cache(std::string_view file_path)
         return;
     if (path == "")
     {
-        DEBUG("Removing {}", cache_dir.string());
+        // DEBUG("Removing {}", cache_dir.string());
         std::filesystem::remove_all(cache_dir);
     }
     else
     {
         auto cache_file = get_cache_path(path);
-        DEBUG("Removing {}", cache_file.string());
+        // DEBUG("Removing {}", cache_file.string());
         if (std::filesystem::exists(cache_file))
         {
             std::filesystem::remove(cache_file);
@@ -116,6 +145,27 @@ FileInfo* read_file_from_disk(const char* filepath, void* (*allocator)(std::size
     return nullptr;
 }
 
+void set_heart_color_for_texture(std::string file_path, Color color)
+{
+    if (color.a < 0.5f)
+        return;
+    auto& render = RenderAPI::get();
+    render.texture_colors[std::string(file_path)] = color;
+}
+
+void get_heart_color_from_dds(const char* file_path, FileInfo* file)
+{
+    auto header = reinterpret_cast<DDS_HEADER*>(reinterpret_cast<char*>(file->Data) + 4);
+    auto image_data = reinterpret_cast<uint8_t*>(file->Data);
+    auto image_width = header->dwWidth;
+    int image_data_size = file->DataSize;
+    const int magic_pixel = (int)(5888.875f * (float)image_width) + sizeof(DDS_HEADER) + 4;
+    if (magic_pixel + 3 < image_data_size && image_data[magic_pixel + 3] > 10)
+    {
+        set_heart_color_for_texture(std::string(file_path), Color((float)image_data[magic_pixel] / 255.0f, (float)image_data[magic_pixel + 1] / 255.0f, (float)image_data[magic_pixel + 2] / 255.0f, (float)image_data[magic_pixel + 3] / 255.0f));
+    }
+}
+
 FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 {
     using namespace std::string_view_literals;
@@ -133,7 +183,9 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
     if (std::filesystem::exists(cache_path))
     {
         DEBUG("Loading '{}' from cache '{}'", path, cache_path.string());
-        return read_file_from_disk(cache_path.string().c_str(), alloc_fun);
+        auto file = read_file_from_disk(cache_path.string().c_str(), alloc_fun);
+        get_heart_color_from_dds(file_path, file);
+        return file;
     }
     else if (ext == ".png"sv || ext == ".jpeg"sv || ext == ".bmp"sv || ext == ".tga"sv)
     {
@@ -142,36 +194,6 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
         unsigned char* image_data = stbi_load(path.data(), &image_width, &image_height, NULL, 4);
         if (image_data != nullptr)
         {
-            // https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
-            struct DDS_PIXELFORMAT
-            {
-                DWORD dwSize;
-                DWORD dwFlags;
-                DWORD dwFourCC;
-                DWORD dwRGBBitCount;
-                DWORD dwRBitMask;
-                DWORD dwGBitMask;
-                DWORD dwBBitMask;
-                DWORD dwABitMask;
-            };
-            typedef struct
-            {
-                DWORD dwSize;
-                DWORD dwFlags;
-                DWORD dwHeight;
-                DWORD dwWidth;
-                DWORD dwPitchOrLinearSize;
-                DWORD dwDepth;
-                DWORD dwMipMapCount;
-                DWORD dwReserved1[11];
-                DDS_PIXELFORMAT ddspf;
-                DWORD dwCaps;
-                DWORD dwCaps2;
-                DWORD dwCaps3;
-                DWORD dwCaps4;
-                DWORD dwReserved2;
-            } DDS_HEADER;
-
             DDS_HEADER header{
                 124,        // hardcoded
                 0x0002100F, // required flags + pitch + mipmapped
@@ -203,7 +225,6 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
             auto image_data_size = image_width * image_height * 4;
 
             // multiply alpha and extract player indicator color for heart
-            auto& render = RenderAPI::get();
             const int magic_pixel = (int)(5888.875f * (float)image_width);
             for (int i = 0; i < image_data_size; i += 4)
             {
@@ -213,10 +234,8 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
                 p[1] = (uint8_t)((float)p[1] * alpha);
                 p[2] = (uint8_t)((float)p[2] * alpha);
                 // extract player indicator color
-                if (i == magic_pixel && p[3] > 10)
-                {
-                    render.texture_colors[std::string(file_path)] = Color((float)p[0] / 255.0f, (float)p[1] / 255.0f, (float)p[2] / 255.0f, (float)p[3] / 255.0f);
-                }
+                if (i == magic_pixel)
+                    set_heart_color_for_texture(std::string(file_path), Color((float)p[0] / 255.0f, (float)p[1] / 255.0f, (float)p[2] / 255.0f, (float)p[3] / 255.0f));
             }
 
             int data_size = 4 + sizeof(DDS_HEADER) + image_data_size;

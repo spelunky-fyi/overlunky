@@ -188,7 +188,6 @@ function refresh()
     for i,skin in pairs(skins) do
         if skin and skin > 0x192 then
             local def = get_texture_definition(skin)
-            print(def.texture_path)
             clear_cache(def.texture_path)
         end
     end
