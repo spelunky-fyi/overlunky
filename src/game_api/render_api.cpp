@@ -153,6 +153,7 @@ void render_journal_page_place(JournalPage* page)
 }
 void render_journal_page_people(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::People, page);
     g_render_journal_page_people_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::People, page);
 }
