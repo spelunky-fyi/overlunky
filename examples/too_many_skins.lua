@@ -14,6 +14,22 @@ images = {}
 draw_select = false
 selected_skin = { 0, 1, 2, 3 }
 skin_def = {}
+vanilla_strings = {}
+
+stupid_story = {
+    [TEXTURE.DATA_TEXTURES_CHAR_YELLOW_0] = "She's come to the Moon to find her mom and dad, but was",
+    [TEXTURE.DATA_TEXTURES_CHAR_MAGENTA_0] = "A fascination with the ocean led her to be",
+    [TEXTURE.DATA_TEXTURES_CHAR_CYAN_0] = "An inquisitive artist and engineer who's been",
+    [TEXTURE.DATA_TEXTURES_CHAR_BLACK_0] = "He had a lot of deep thoughts, but was"
+}
+
+-- get stringids of character names
+function texture_to_stringid(tex)
+    local i = tex - 285
+    local full = hash_to_stringid(0x4cffb84e) + 2*i
+    local short = hash_to_stringid(0x3ff7e9c4) + i
+    return full, short
+end
 
 -- get vanilla or enabled mods' skins
 for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
@@ -21,6 +37,11 @@ for i = ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY do
     local def = get_texture_definition(tex)
     skin_def[tex] = def
     images[#images+1] = { path=def.texture_path, name=get_character_name(i), texture=tex }
+    local full_id, short_id = texture_to_stringid(tex)
+    local full = get_string(full_id)
+    local short = get_string(short_id)
+    local bio = get_string(full_id+1)
+    vanilla_strings[tex] = { full=full, short=short, bio=bio }
 end
 
 function exists(path)
@@ -39,6 +60,17 @@ function clean_name(name)
     name = name:gsub("_full.png", "")
     name = name:gsub("char_", "")
     name = name:gsub(".png", "")
+    name = name:gsub("/.*/", "/")
+    return name
+end
+
+function clean_path(name)
+    name = name:gsub("/Mods/Packs/", "")
+    name = name:gsub("Data/Textures/", "")
+    name = name:gsub("Entities/", "")
+    if #name > 36 then
+        name = name:gsub("/", "/\n")
+    end
     return name
 end
 
@@ -81,6 +113,12 @@ function get_skins()
     -- remove skins that were deleted since they were loaded
     for i=#images,1,-1 do
         if not added[images[i].path] and images[i].texture > TEXTURE.DATA_TEXTURES_CHAR_EGGCHILD_0 then
+            for j=1,4 do
+                if skins[j] == images[i].texture then
+                    skins[j] = nil
+                end
+                replace_texture_and_heart_color(state.items.player_select[j].texture, state.items.player_select[j].texture)
+            end
             table.remove(images, i)
         end
     end
@@ -146,6 +184,45 @@ function set_textures()
     end
 end
 
+function get_name(tex)
+    for _,img in pairs(images) do
+        if img.texture == tex then
+            return img.name, img.path
+        end
+    end
+    return "Too Many Skins", "something"
+end
+
+-- replace the character names
+function replace_strings()
+    for tex,def in pairs(skin_def) do
+        local full_id, short_id = texture_to_stringid(tex)
+        change_string(full_id, vanilla_strings[tex].full)
+        change_string(full_id+1, vanilla_strings[tex].bio)
+        change_string(short_id, vanilla_strings[tex].short)
+    end
+    for i=1,active_players() do
+        local tex = skins[i]
+        if tex then
+            local name, path = get_name(tex)
+            local full_id, short_id = texture_to_stringid(state.items.player_select[i].texture)
+            if tex > 0x192 then
+                change_string(full_id, name)
+                if stupid_story[state.items.player_select[i].texture] then
+                    change_string(full_id+1, stupid_story[state.items.player_select[i].texture].." replaced with "..clean_path(path).."\nby Too Many Skins.")
+                else
+                    change_string(full_id+1, "Replaced with "..clean_path(path).."\nby Too Many Skins.")
+                end
+                change_string(short_id, name)
+            else
+                change_string(full_id, "Fake "..vanilla_strings[tex].full)
+                change_string(full_id+1, vanilla_strings[tex].bio)
+                change_string(short_id, "Fake "..vanilla_strings[tex].short)
+            end
+        end
+    end
+end
+
 -- replace or reset character textures
 function replace_skin()
     local replaced = {}
@@ -158,6 +235,7 @@ function replace_skin()
         end
         skin_def[state.items.player_select[i].texture] = get_texture_definition(state.items.player_select[i].texture)
     end
+    replace_strings()
     set_textures()
 end
 
@@ -188,13 +266,13 @@ end
 
 -- discover new files and reload active skins from disk
 function refresh()
+    get_skins()
     for i,skin in pairs(skins) do
         if skin and skin > 0x192 then
             local def = get_texture_definition(skin)
             clear_cache(def.texture_path)
         end
     end
-    get_skins()
     replace_skin()
 end
 
