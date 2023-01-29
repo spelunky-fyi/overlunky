@@ -57,7 +57,7 @@ MakeSavePathCallback g_MakeSavePathCallback{nullptr};
 std::string hash_path(std::string_view path)
 {
     auto abs_path = std::filesystem::absolute(path).make_preferred();
-    auto abs_path_str = abs_path.string().c_str();
+    auto abs_path_str = abs_path.string();
     uint64_t res = 10000019;
     int i = 0;
     do
@@ -65,7 +65,7 @@ std::string hash_path(std::string_view path)
         uint64_t merge = std::toupper(abs_path_str[i]) * 65536 + std::toupper(abs_path_str[i + 1]);
         res = res * 8191 + merge;
         i++;
-    } while (abs_path_str[i] != 0);
+    } while (i < abs_path_str.length());
     std::ostringstream ss;
     ss << std::hex << res << res;
     return ss.str();
