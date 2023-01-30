@@ -548,7 +548,7 @@ bool LuaBackend::update()
         if (manual_save)
         {
             manual_save = false;
-            last_save = g_state->time_startup;
+            last_save = get_frame_count();
         }
     }
     catch (const sol::error& e)

@@ -1740,7 +1740,7 @@ end
     lua["save_script"] = []() -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (backend->last_save <= State::get().ptr()->time_startup - 120)
+        if (backend->last_save <= get_frame_count() - 120)
         {
             backend->manual_save = true;
             return true;
