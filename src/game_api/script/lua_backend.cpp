@@ -97,6 +97,8 @@ void LuaBackend::clear_all_callbacks()
     {
         sound_manager->clear_callback(id);
     }
+    load_callbacks.clear();
+    save_callbacks.clear();
     vanilla_sound_callbacks.clear();
     pre_tile_code_callbacks.clear();
     post_tile_code_callbacks.clear();
@@ -306,6 +308,7 @@ bool LuaBackend::update()
             global_timers.erase(id);
             callbacks.erase(id);
             load_callbacks.erase(id);
+            save_callbacks.erase(id);
 
             std::erase_if(pre_tile_code_callbacks, [id](auto& cb)
                           { return cb.id == id; });
@@ -475,15 +478,6 @@ bool LuaBackend::update()
                     }
                     break;
                 }
-                case ON::SAVE:
-                {
-                    if ((g_state->loading != state.loading && g_state->loading == 1) || manual_save)
-                    {
-                        handle_function<void>(this, callback.func, SaveContext{get_root(), get_name()});
-                        callback.lastRan = now;
-                    }
-                    break;
-                }
                 default:
                     break;
                 }
@@ -527,6 +521,19 @@ bool LuaBackend::update()
             {
                 ++it;
             }
+        }
+
+        // Save callbacks have to run after all other callbacks or manual saves that happen after
+        // will be skipped.
+        for (auto& [id, callback] : save_callbacks)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            if ((g_state->loading != state.loading && g_state->loading == 1) || manual_save)
+            {
+                handle_function<void>(this, callback.func, SaveContext{get_root(), get_name()});
+                callback.lastRan = now;
+            }
+            clear_current_callback();
         }
 
         state.screen = g_state->screen;
