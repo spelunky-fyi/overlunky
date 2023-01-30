@@ -271,6 +271,7 @@ class LuaBackend
     std::unordered_map<int, TimerCallback> global_timers;
     std::unordered_map<int, ScreenCallback> callbacks;
     std::unordered_map<int, ScreenCallback> load_callbacks;
+    std::unordered_map<int, ScreenCallback> save_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_tile_code_callbacks;
     std::vector<LevelGenCallback> post_tile_code_callbacks;

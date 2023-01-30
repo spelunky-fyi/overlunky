@@ -365,6 +365,8 @@ end
         auto luaCb = ScreenCallback{cb, event, -1};
         if (luaCb.screen == ON::LOAD)
             backend->load_callbacks[backend->cbcount] = luaCb; // Make sure load always runs before other callbacks
+        else if (luaCb.screen == ON::SAVE)
+            backend->save_callbacks[backend->cbcount] = luaCb; // Make sure save always runs after other callbacks
         else
             backend->callbacks[backend->cbcount] = luaCb;
         return backend->cbcount++;
