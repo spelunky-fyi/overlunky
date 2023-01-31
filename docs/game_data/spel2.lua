@@ -101,7 +101,7 @@ function set_global_interval(cb, frames) end
 ---@return CallbackId
 function set_global_timeout(cb, frames) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
----Add global callback function to be called on an [event](#ON).
+---Add global callback function to be called on an [event](#Events).
 ---@param cb fun(): any
 ---@param event ON
 ---@return CallbackId
@@ -1749,9 +1749,10 @@ function change_feat(feat, hidden, name, description) end
     ---@field level integer
     ---@field level_next integer
     ---@field level_start integer
-    ---@field theme integer
-    ---@field theme_next integer
+    ---@field theme THEME
+    ---@field theme_next THEME
     ---@field theme_start integer
+    ---@field current_theme ThemeInfo
     ---@field force_current_theme fun(self, t: integer): nil
     ---@field shoppie_aggro integer
     ---@field shoppie_aggro_next integer
@@ -1760,13 +1761,13 @@ function change_feat(feat, hidden, name, description) end
     ---@field kills_npc integer
     ---@field level_count integer
     ---@field damage_taken integer
-    ---@field journal_flags integer
+    ---@field journal_flags JOURNAL_FLAG
     ---@field time_last_level integer
     ---@field time_level integer
     ---@field level_flags integer
     ---@field loading integer
-    ---@field quest_flags integer
-    ---@field presence_flags integer
+    ---@field quest_flags QUEST_FLAG
+    ---@field presence_flags PRESENCE_FLAG
     ---@field fadevalue number
     ---@field fadeout integer
     ---@field fadein integer
@@ -1782,7 +1783,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field quests QuestsInfo
     ---@field camera Camera
     ---@field special_visibility_flags integer
-    ---@field cause_of_death integer
+    ---@field cause_of_death CAUSE_OF_DEATH
     ---@field cause_of_death_entity_type ENT_TYPE
     ---@field toast_timer integer
     ---@field speechbubble_timer integer
@@ -1828,6 +1829,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field theme_info ThemeInfo
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
+    ---@field next_entity_uid integer
 
 ---@class LightParams
     ---@field red number
@@ -5441,6 +5443,12 @@ COSUBTHEME = {
   VOLCANA = 2
 }
 ---@alias COSUBTHEME integer
+DRAW_LAYER = {
+  BACKGROUND = 0,
+  FOREGROUND = 1,
+  WINDOW = 2
+}
+---@alias DRAW_LAYER integer
 DROP = {
   ALIENQUEEN_ALIENBLAST = 184,
   ALIENQUEEN_ALIENBLAST_RE = 186,
@@ -5680,15 +5688,14 @@ DYNAMIC_TEXTURE = {
 }
 ---@alias DYNAMIC_TEXTURE integer
 ENTITY_OVERRIDE = {
-  COLLISION1 = 4,
-  COLLISION2 = 26,
   DAMAGE = 48,
   DESTROY = 5,
   DTOR = 0,
   FLOOR_UPDATE = 38,
   GET_HELD_ENTITY = 22,
   KILL = 3,
-  RENDER = 3,
+  ON_COLLISION1 = 4,
+  ON_COLLISION2 = 26,
   TRIGGER_ACTION = 24,
   UPDATE_STATE_MACHINE = 2
 }
@@ -7150,6 +7157,30 @@ JOURNALUI_STATE = {
   STABLE = 2
 }
 ---@alias JOURNALUI_STATE integer
+JOURNAL_FLAG = {
+  ANKH = 15,
+  COSMOS = 20,
+  CRIME_LORD = 6,
+  DIED = 21,
+  EGGPLANT = 10,
+  FOOL = 9,
+  HUNDUN = 19,
+  KING = 7,
+  KINGU = 16,
+  LIKED_PETS = 12,
+  LOVED_PETS = 13,
+  NO_GOLD = 11,
+  OSIRIS = 17,
+  PACIFIST = 1,
+  PETTY_CRIMINAL = 4,
+  QUEEN = 8,
+  TIAMAT = 18,
+  TOOK_DAMAGE = 14,
+  VEGAN = 2,
+  VEGETARIAN = 3,
+  WANTED_CRIMINAL = 5
+}
+---@alias JOURNAL_FLAG integer
 JOURNAL_PAGE_TYPE = {
   BESTIARY = 4,
   DEATH_CAUSE = 9,
@@ -7267,6 +7298,7 @@ ON = {
   POST_LOAD_JOURNAL_CHAPTER = 130,
   POST_LOAD_SCREEN = 127,
   POST_ROOM_GENERATION = 111,
+  POST_UPDATE = 134,
   PRE_GET_FEAT = 131,
   PRE_GET_RANDOM_ROOM = 113,
   PRE_HANDLE_ROOM_TILES = 114,
@@ -7275,6 +7307,7 @@ ON = {
   PRE_LOAD_LEVEL_FILES = 109,
   PRE_LOAD_SCREEN = 126,
   PRE_SET_FEAT = 132,
+  PRE_UPDATE = 133,
   PROLOGUE = 2,
   RECAP = 20,
   RENDER_POST_DRAW_DEPTH = 122,
@@ -7540,15 +7573,6 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
-PAUSE_FLAG = {
-  ANKH = 6,
-  CUTSCENE = 3,
-  FADE = 2,
-  FLAG4 = 4,
-  FLAG5 = 5,
-  MENU = 1
-}
----@alias PAUSE_FLAG integer
 POS_TYPE = {
   AIR = 4,
   ALCOVE = 16,
@@ -7567,6 +7591,16 @@ POS_TYPE = {
   WATER = 128
 }
 ---@alias POS_TYPE integer
+PRESENCE_FLAG = {
+  BLACK_MARKET = 2,
+  DRILL = 3,
+  MOON_CHALLENGE = 9,
+  STAR_CHALLENGE = 10,
+  SUN_CHALLENGE = 11,
+  UDJAT_EYE = 1,
+  VLADS_CASTLE = 3
+}
+---@alias PRESENCE_FLAG integer
 PRNG_CLASS = {
   ENTITY_VARIATION = 3,
   EXTRA_SPAWNS = 5,
@@ -7657,6 +7691,31 @@ PROCEDURAL_CHANCE = {
   YETI = 268
 }
 ---@alias PROCEDURAL_CHANCE integer
+QUEST_FLAG = {
+  BLACK_MARKET_SPAWNED = 18,
+  CAVEMAN_SHOPPIE_AGGROED = 9,
+  DAILY = 8,
+  DARK_LEVEL_SPAWNED = 2,
+  DRILL_SPAWNED = 19,
+  EGGPLANT_CROWN_PICKED_UP = 12,
+  MOON_CHALLENGE_SPAWNED = 25,
+  RESET = 1,
+  SEEDED = 7,
+  SHOP_SPAWNED = 5,
+  SHORTCUT_USED = 6,
+  SPAWN_OUTPOST = 4,
+  STAR_CHALLENGE_SPAWNED = 26,
+  SUN_CHALLENGE_SPAWNED = 27,
+  UDJAT_EYE_SPAWNED = 17,
+  VAULT_SPAWNED = 3,
+  WADDLER_AGGROED = 10
+}
+---@alias QUEST_FLAG integer
+RENDER_INFO_OVERRIDE = {
+  DTOR = 0,
+  RENDER = 3
+}
+---@alias RENDER_INFO_OVERRIDE integer
 REPEAT_TYPE = {
   BACK_AND_FORTH = 2,
   LINEAR = 1,
