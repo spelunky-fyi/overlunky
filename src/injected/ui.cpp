@@ -6438,9 +6438,11 @@ void render_entity_props(int uid, bool detached = false)
             break;
         }
         ImGui::InputFloat("Position X##EntityPositionX", &entity->x, 0.2f, 1.0f);
-        ImGui::InputFloat("Position Y##EntityPositionX", &entity->y, 0.2f, 1.0f);
+        ImGui::InputFloat("Position Y##EntityPositionY", &entity->y, 0.2f, 1.0f);
         if (is_movable)
         {
+            ImGui::InputFloat("Absolute X##EntityAbsoluteX", &entity->abs_x, 0.2f, 1.0f);
+            ImGui::InputFloat("Absolute Y##EntityAbsoluteY", &entity->abs_y, 0.2f, 1.0f);
             ImGui::InputFloat("Velocity X##EntityVelocityX", &movable->velocityx, 0.2f, 1.0f);
             ImGui::InputFloat("Velocity y##EntityVelocityY", &movable->velocityy, 0.2f, 1.0f);
         }
@@ -7074,6 +7076,45 @@ void render_game_props()
     }
     if (submenu("Players"))
     {
+        ImGui::TextWrapped("New players spawned here can't be controlled, but can be used to test some things that require multiple players.");
+        if (ImGui::SliderScalar("Number of players##SetNumPlayers", ImGuiDataType_U8, &g_state->items->player_count, &u8_one, &u8_four, "%d", ImGuiSliderFlags_AlwaysClamp))
+        {
+            std::array<bool, 4> active_players{false, false, false, false};
+            for (int i = 0; i < 4; ++i)
+            {
+                g_state->items->player_select_slots[i].activated = g_state->items->player_count >= i + 1;
+                for (auto player : g_players)
+                {
+                    if (player->input_ptr->player_slot == i && g_state->items->player_count < i + 1)
+                        player->kill(true, nullptr);
+                    else if (player->input_ptr->player_slot >= 0)
+                        active_players[player->input_ptr->player_slot] = true;
+                }
+                for (auto uid : UI::get_entities_by({to_id("ENT_TYPE_ITEM_PLAYERGHOST")}, 0x8, LAYER::BOTH))
+                {
+                    auto ghost = get_entity_ptr(uid)->as<PlayerGhost>();
+                    if (ghost->player_inputs && ghost->player_inputs->player_slot == i && g_state->items->player_count < i + 1)
+                        ghost->destroy();
+                }
+            }
+            auto [spawn_x, spawn_y] = UI::spawn_position();
+            if (g_players.size() > 0)
+            {
+                spawn_x = g_players.at(0)->abs_x;
+                spawn_y = g_players.at(0)->abs_y;
+            }
+            for (uint8_t i = 0; i < g_state->items->player_count; ++i)
+            {
+                if (!active_players[i])
+                {
+                    g_state->items->player_inventories[i].health = 4;
+                    auto uid = g_state->next_entity_uid;
+                    UI::spawn_player(i, spawn_x, spawn_y);
+                    auto player = get_entity_ptr(uid)->as<Player>();
+                    player->set_position(spawn_x, spawn_y);
+                }
+            }
+        }
         render_players();
         endmenu();
     }
