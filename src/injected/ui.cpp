@@ -597,6 +597,7 @@ void render_cursor()
 
 void load_script(std::string file, bool enable = true)
 {
+    std::replace(file.begin(), file.end(), '\\', '/');
     std::ifstream data(file);
     std::ostringstream buf;
     if (!data.fail())
@@ -610,6 +611,7 @@ void load_script(std::string file, bool enable = true)
 
 void load_script(std::wstring wfile, bool enable = true)
 {
+    std::replace(wfile.begin(), wfile.end(), '\\', '/');
     std::string file(cvt.to_bytes(wfile));
     std::ifstream data(wfile.c_str(), std::ios::in | std::ios::binary);
     std::ostringstream buf;
@@ -5229,19 +5231,6 @@ void render_script_files()
     {
         refresh_script_files();
     }
-    if (ImGui::Button("Create new quick script"))
-    {
-        std::string name = gen_random(16);
-        SpelunkyScript* script = new SpelunkyScript(
-            "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
-            "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
-            "end\nend, 60)",
-            name,
-            g_SoundManager.get(),
-            g_Console.get(),
-            true);
-        g_scripts[name] = std::unique_ptr<SpelunkyScript>(script);
-    }
     ImGui::PopID();
 }
 
@@ -5257,15 +5246,36 @@ void render_scripts()
         refresh_script_files();
     if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
         refresh_script_files();
+    if (ImGui::Button("Create new quick script"))
+    {
+        std::string name = "_" + gen_random(16);
+        SpelunkyScript* script = new SpelunkyScript(
+            "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'This script will not be saved anywhere but can be used to test things quickly!'\nmeta.author = 'You'\n\ncount = 0\nid = "
+            "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
+            "end\nend, 60)",
+            name,
+            g_SoundManager.get(),
+            g_Console.get(),
+            true);
+        g_scripts[name] = std::unique_ptr<SpelunkyScript>(script);
+    }
+    ImGui::SameLine();
+    static bool enabled_only{false};
+    ImGui::Checkbox("Hide disabled##EnabledScriptsOnly", &enabled_only);
     ImGui::PushItemWidth(-1);
     int i = 0;
     std::vector<std::string> unload_scripts;
     ImVec4 origcolor = ImGui::GetStyle().Colors[ImGuiCol_Header];
+    ImVec4 origtextcolor = ImGui::GetStyle().Colors[ImGuiCol_Text];
     float gray = (origcolor.x + origcolor.y + origcolor.z) / 3.0f;
     ImVec4 disabledcolor = ImVec4(gray, gray, gray, 0.5f);
+    ImGui::Separator();
     for (auto& [script_name, script] : g_scripts)
     {
+        if (enabled_only && !script->is_enabled())
+            continue;
         ImGui::PushID(i);
+        ImGui::PushID(script_name.c_str());
         std::string filename;
         size_t slash = script->get_file().find_last_of("/\\");
         if (slash != std::string::npos)
@@ -5274,14 +5284,17 @@ void render_scripts()
         if (!script->is_enabled())
         {
             ImGui::PushStyleColor(ImGuiCol_Header, disabledcolor);
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
         }
         else
         {
             ImGui::PushStyleColor(ImGuiCol_Header, origcolor);
+            ImGui::PushStyleColor(ImGuiCol_Text, origtextcolor);
         }
         if (submenu(name.c_str()))
         {
-            ImGui::Text(
+            ImGui::PopStyleColor();
+            ImGui::TextWrapped(
                 "%s %s by %s (%s)",
                 script->get_name().c_str(),
                 script->get_version().c_str(),
@@ -5291,8 +5304,9 @@ void render_scripts()
             if (!script->get_unsafe() || options["enable_unsafe_scripts"])
             {
                 static bool run_unsafe = false;
-                if (script->get_unsafe())
+                if (script->get_unsafe() && !script->is_enabled())
                 {
+                    ImGui::Separator();
                     ImGui::PushTextWrapPos(0.0f);
                     ImGui::TextColored(
                         ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
@@ -5300,32 +5314,13 @@ void render_scripts()
                         "you trust the author, have read the whole script or made it yourself.");
                     ImGui::PopTextWrapPos();
                     ImGui::Checkbox("I understand the risks.", &run_unsafe);
+                    ImGui::Separator();
                 }
-                if (!script->get_unsafe() || run_unsafe)
+                if (!script->get_unsafe() || run_unsafe || script->is_enabled())
                 {
-                    if (script->is_enabled() && ImGui::Button("Disable##DisableScript"))
-                    {
-                        script->set_enabled(false);
-                    }
-                    else if (!script->is_enabled() && ImGui::Button("Enable##EnableScript"))
-                    {
-                        script->set_enabled(true);
-                        script->set_changed(true);
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Unload##UnloadScript"))
-                    {
-                        unload_scripts.push_back(script->get_file());
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Reload##ReloadScript"))
-                    {
-                        load_script(script->get_file(), script->is_enabled());
-                    }
-                    else
-                    {
-                        ++i;
-                    }
+                    bool enabled = script->is_enabled();
+                    if (ImGui::Checkbox("Enabled##EnabledScript", &enabled))
+                        script->set_enabled(enabled);
                     if (script->get_path() != "" && !script->get_path().starts_with("Mods/Packs"))
                     {
                         ImGui::SameLine();
@@ -5338,6 +5333,20 @@ void render_scripts()
                                 g_script_autorun.push_back(filename);
                             save_config(cfgfile);
                         }
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Reload##ReloadScript"))
+                    {
+                        load_script(script->get_file(), script->is_enabled());
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Unload##UnloadScript"))
+                    {
+                        unload_scripts.push_back(script->get_file());
+                    }
+                    else
+                    {
+                        ++i;
                     }
                     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
                     ImGui::Separator();
@@ -5360,9 +5369,11 @@ void render_scripts()
         }
         else
         {
+            ImGui::PopStyleColor();
             ++i;
         }
         ImGui::PopStyleColor();
+        ImGui::PopID();
         ImGui::PopID();
     }
     for (auto id : unload_scripts)
