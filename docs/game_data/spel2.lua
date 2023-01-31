@@ -101,7 +101,7 @@ function set_global_interval(cb, frames) end
 ---@return CallbackId
 function set_global_timeout(cb, frames) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
----Add global callback function to be called on an [event](#ON).
+---Add global callback function to be called on an [event](#Events).
 ---@param cb fun(): any
 ---@param event ON
 ---@return CallbackId
@@ -1749,9 +1749,10 @@ function change_feat(feat, hidden, name, description) end
     ---@field level integer
     ---@field level_next integer
     ---@field level_start integer
-    ---@field theme integer
-    ---@field theme_next integer
+    ---@field theme THEME
+    ---@field theme_next THEME
     ---@field theme_start integer
+    ---@field current_theme ThemeInfo
     ---@field force_current_theme fun(self, t: integer): nil
     ---@field shoppie_aggro integer
     ---@field shoppie_aggro_next integer
@@ -1760,13 +1761,13 @@ function change_feat(feat, hidden, name, description) end
     ---@field kills_npc integer
     ---@field level_count integer
     ---@field damage_taken integer
-    ---@field journal_flags integer
+    ---@field journal_flags JOURNAL_FLAG
     ---@field time_last_level integer
     ---@field time_level integer
     ---@field level_flags integer
     ---@field loading integer
-    ---@field quest_flags integer
-    ---@field presence_flags integer
+    ---@field quest_flags QUEST_FLAG
+    ---@field presence_flags PRESENCE_FLAG
     ---@field fadevalue number
     ---@field fadeout integer
     ---@field fadein integer
@@ -1782,7 +1783,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field quests QuestsInfo
     ---@field camera Camera
     ---@field special_visibility_flags integer
-    ---@field cause_of_death integer
+    ---@field cause_of_death CAUSE_OF_DEATH
     ---@field cause_of_death_entity_type ENT_TYPE
     ---@field toast_timer integer
     ---@field speechbubble_timer integer
@@ -1828,6 +1829,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field theme_info ThemeInfo
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
+    ---@field next_entity_uid integer
 
 ---@class LightParams
     ---@field red number
