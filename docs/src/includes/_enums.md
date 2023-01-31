@@ -458,6 +458,37 @@ Name | Data | Description
 [FLIPPING_RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.FLIPPING_RIGHT) | 4 | 
 [FADING_OUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.FADING_OUT) | 5 | 
 
+## JOURNAL_FLAG
+
+
+> Search script examples for [JOURNAL_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[PACIFIST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.PACIFIST) | 1 | 
+[VEGAN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.VEGAN) | 2 | 
+[VEGETARIAN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.VEGETARIAN) | 3 | 
+[PETTY_CRIMINAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.PETTY_CRIMINAL) | 4 | 
+[WANTED_CRIMINAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.WANTED_CRIMINAL) | 5 | 
+[CRIME_LORD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.CRIME_LORD) | 6 | 
+[KING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.KING) | 7 | 
+[QUEEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.QUEEN) | 8 | 
+[FOOL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.FOOL) | 9 | 
+[EGGPLANT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.EGGPLANT) | 10 | 
+[NO_GOLD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.NO_GOLD) | 11 | 
+[LIKED_PETS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.LIKED_PETS) | 12 | 
+[LOVED_PETS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.LOVED_PETS) | 13 | 
+[TOOK_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.TOOK_DAMAGE) | 14 | 
+[ANKH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.ANKH) | 15 | 
+[KINGU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.KINGU) | 16 | 
+[OSIRIS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.OSIRIS) | 17 | 
+[TIAMAT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.TIAMAT) | 18 | 
+[HUNDUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.HUNDUN) | 19 | 
+[COSMOS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.COSMOS) | 20 | 
+[DIED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.DIED) | 21 | 
+
 ## JOURNAL_PAGE_TYPE
 
 
@@ -727,6 +758,23 @@ Name | Data | Description
 [WALL_LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL_LEFT) | POS_TYPE::WALL_LEFT | Next to a wall on the left<br/>
 [WALL_RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL_RIGHT) | POS_TYPE::WALL_RIGHT | Next to a wall on the right<br/>
 
+## PRESENCE_FLAG
+
+
+> Search script examples for [PRESENCE_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[UDJAT_EYE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.UDJAT_EYE) | 1 | 
+[BLACK_MARKET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.BLACK_MARKET) | 2 | 
+[VLADS_CASTLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.VLADS_CASTLE) | 3 | 
+[DRILL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.DRILL) | 3 | 
+[MOON_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.MOON_CHALLENGE) | 9 | 
+[STAR_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.STAR_CHALLENGE) | 10 | 
+[SUN_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.SUN_CHALLENGE) | 11 | 
+
 ## PRNG_CLASS
 
 
@@ -752,6 +800,33 @@ Name | Data | Description
 ---- | ---- | -----------
 [ARROWTRAP_CHANCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PROCEDURAL_CHANCE.ARROWTRAP_CHANCE) | 0 | 
 ...check [spawn_chances.txt](game_data/spawn_chances.txt)... |  | 
+
+## QUEST_FLAG
+
+
+> Search script examples for [QUEST_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[RESET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.RESET) | 1 | 
+[DARK_LEVEL_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.DARK_LEVEL_SPAWNED) | 2 | 
+[VAULT_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.VAULT_SPAWNED) | 3 | 
+[SPAWN_OUTPOST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SPAWN_OUTPOST) | 4 | 
+[SHOP_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SHOP_SPAWNED) | 5 | 
+[SHORTCUT_USED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SHORTCUT_USED) | 6 | 
+[SEEDED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SEEDED) | 7 | 
+[DAILY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.DAILY) | 8 | 
+[CAVEMAN_SHOPPIE_AGGROED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.CAVEMAN_SHOPPIE_AGGROED) | 9 | 
+[WADDLER_AGGROED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.WADDLER_AGGROED) | 10 | 
+[EGGPLANT_CROWN_PICKED_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.EGGPLANT_CROWN_PICKED_UP) | 12 | 
+[UDJAT_EYE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.UDJAT_EYE_SPAWNED) | 17 | 
+[BLACK_MARKET_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.BLACK_MARKET_SPAWNED) | 18 | 
+[DRILL_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.DRILL_SPAWNED) | 19 | 
+[MOON_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.MOON_CHALLENGE_SPAWNED) | 25 | 
+[STAR_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.STAR_CHALLENGE_SPAWNED) | 26 | 
+[SUN_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SUN_CHALLENGE_SPAWNED) | 27 | 
 
 ## RENDER_INFO_OVERRIDE
 

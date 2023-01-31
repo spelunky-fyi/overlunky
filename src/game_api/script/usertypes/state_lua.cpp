@@ -274,6 +274,7 @@ void register_usertypes(sol::state& lua)
     statememory_type["theme"] = &StateMemory::theme;
     statememory_type["theme_next"] = &StateMemory::theme_next;
     statememory_type["theme_start"] = &StateMemory::theme_start;
+    statememory_type["current_theme"] = &StateMemory::current_theme;
     statememory_type["force_current_theme"] = &StateMemory::force_current_theme;
     statememory_type["shoppie_aggro"] = &StateMemory::shoppie_aggro;
     statememory_type["shoppie_aggro_next"] = &StateMemory::shoppie_aggro_levels;
@@ -300,7 +301,7 @@ void register_usertypes(sol::state& lua)
     statememory_type["illumination"] = &StateMemory::illumination;
     statememory_type["money_last_levels"] = &StateMemory::money_last_levels;
     statememory_type["money_shop_total"] = &StateMemory::money_shop_total;
-    statememory_type["player_inputs"] = sol::readonly(&StateMemory::player_inputs);
+    statememory_type["player_inputs"] = &StateMemory::player_inputs;
     statememory_type["quests"] = &StateMemory::quests;
     statememory_type["camera"] = &StateMemory::camera;
     statememory_type["special_visibility_flags"] = &StateMemory::special_visibility_flags;
@@ -350,6 +351,13 @@ void register_usertypes(sol::state& lua)
     statememory_type["theme_info"] = &StateMemory::current_theme;
     statememory_type["logic"] = &StateMemory::logic;
     statememory_type["liquid"] = &StateMemory::liquid_physics;
+    statememory_type["next_entity_uid"] = &StateMemory::next_entity_uid;
+
+    lua.create_named_table("QUEST_FLAG", "RESET", 1, "DARK_LEVEL_SPAWNED", 2, "VAULT_SPAWNED", 3, "SPAWN_OUTPOST", 4, "SHOP_SPAWNED", 5, "SHORTCUT_USED", 6, "SEEDED", 7, "DAILY", 8, "CAVEMAN_SHOPPIE_AGGROED", 9, "WADDLER_AGGROED", 10, "EGGPLANT_CROWN_PICKED_UP", 12, "UDJAT_EYE_SPAWNED", 17, "BLACK_MARKET_SPAWNED", 18, "DRILL_SPAWNED", 19, "MOON_CHALLENGE_SPAWNED", 25, "STAR_CHALLENGE_SPAWNED", 26, "SUN_CHALLENGE_SPAWNED", 27);
+
+    lua.create_named_table("PRESENCE_FLAG", "UDJAT_EYE", 1, "BLACK_MARKET", 2, "VLADS_CASTLE", 3, "DRILL", 3, "MOON_CHALLENGE", 9, "STAR_CHALLENGE", 10, "SUN_CHALLENGE", 11);
+
+    lua.create_named_table("JOURNAL_FLAG", "PACIFIST", 1, "VEGAN", 2, "VEGETARIAN", 3, "PETTY_CRIMINAL", 4, "WANTED_CRIMINAL", 5, "CRIME_LORD", 6, "KING", 7, "QUEEN", 8, "FOOL", 9, "EGGPLANT", 10, "NO_GOLD", 11, "LIKED_PETS", 12, "LOVED_PETS", 13, "TOOK_DAMAGE", 14, "ANKH", 15, "KINGU", 16, "OSIRIS", 17, "TIAMAT", 18, "HUNDUN", 19, "COSMOS", 20, "DIED", 21);
 
     /// Used in Illumination
     lua.new_usertype<LightParams>(
