@@ -594,36 +594,36 @@ Name | Data | Description
 
 Name | Data | Description
 ---- | ---- | -----------
-[LOGO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOGO) | ON::LOGO | 
-[INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.INTRO) | ON::INTRO | 
-[PROLOGUE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PROLOGUE) | ON::PROLOGUE | 
-[TITLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TITLE) | ON::TITLE | 
-[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.MENU) | ON::MENU | 
-[OPTIONS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.OPTIONS) | ON::OPTIONS | 
-[PLAYER_PROFILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PLAYER_PROFILE) | ON::PLAYER_PROFILE | 
-[LEADERBOARD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LEADERBOARD) | ON::LEADERBOARD | 
-[SEED_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SEED_INPUT) | ON::SEED_INPUT | 
-[CHARACTER_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CHARACTER_SELECT) | ON::CHARACTER_SELECT | 
-[TEAM_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TEAM_SELECT) | ON::TEAM_SELECT | 
-[CAMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CAMP) | ON::CAMP | 
-[LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LEVEL) | ON::LEVEL | 
-[TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TRANSITION) | ON::TRANSITION | 
-[DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH) | ON::DEATH | 
-[SPACESHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPACESHIP) | ON::SPACESHIP | 
-[WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.WIN) | ON::WIN | 
-[CREDITS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CREDITS) | ON::CREDITS | 
-[SCORES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCORES) | ON::SCORES | 
-[CONSTELLATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CONSTELLATION) | ON::CONSTELLATION | 
-[RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RECAP) | ON::RECAP | 
-[ARENA_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MENU) | ON::ARENA_MENU | 
-[ARENA_STAGES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_STAGES) | ON::ARENA_STAGES | 
-[ARENA_ITEMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_ITEMS) | ON::ARENA_ITEMS | 
+[LOGO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOGO) | ON::LOGO | Runs when entering the the mossmouth logo screen.<br/>
+[INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.INTRO) | ON::INTRO | Runs when entering the intro cutscene.<br/>
+[PROLOGUE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PROLOGUE) | ON::PROLOGUE | Runs when entering the prologue / poem.<br/>
+[TITLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TITLE) | ON::TITLE | Runs when entering the title screen.<br/>
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.MENU) | ON::MENU | Runs when entering the main menu.<br/>
+[OPTIONS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.OPTIONS) | ON::OPTIONS | Runs when entering the options menu.<br/>
+[PLAYER_PROFILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PLAYER_PROFILE) | ON::PLAYER_PROFILE | Runs when entering the player profile screen.<br/>
+[LEADERBOARD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LEADERBOARD) | ON::LEADERBOARD | Runs when entering the leaderboard screen.<br/>
+[SEED_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SEED_INPUT) | ON::SEED_INPUT | Runs when entering the seed input screen of a seeded run.<br/>
+[CHARACTER_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CHARACTER_SELECT) | ON::CHARACTER_SELECT | Runs when entering the character select screen.<br/>
+[TEAM_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TEAM_SELECT) | ON::TEAM_SELECT | Runs when entering the team select screen of arena mode.<br/>
+[CAMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CAMP) | ON::CAMP | Runs when entering the camp, after all entities have spawned, on the first level frame.<br/>
+[LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LEVEL) | ON::LEVEL | Runs when entering any level, after all entities have spawned, on the first level frame.<br/>
+[TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TRANSITION) | ON::TRANSITION | Runs when entering the transition screen, after all entities have spawned.<br/>
+[DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH) | ON::DEATH | Runs when entering the death screen.<br/>
+[SPACESHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPACESHIP) | ON::SPACESHIP | Runs when entering the olmecship cutscene after [Tiamat](#Tiamat).<br/>
+[WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.WIN) | ON::WIN | Runs when entering any winning cutscene, including the constellation.<br/>
+[CREDITS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CREDITS) | ON::CREDITS | Runs when entering the credits.<br/>
+[SCORES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCORES) | ON::SCORES | Runs when entering the final score celebration screen of a normal or hard ending.<br/>
+[CONSTELLATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CONSTELLATION) | ON::CONSTELLATION | Runs when entering the turning into constellation cutscene after cosmic ocean.<br/>
+[RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RECAP) | ON::RECAP | Runs when entering the Dear Journal screen after final scores.<br/>
+[ARENA_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MENU) | ON::ARENA_MENU | Runs when entering the main arena rules menu screen.<br/>
+[ARENA_STAGES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_STAGES) | ON::ARENA_STAGES | Runs when entering the arena stage selection screen.<br/>
+[ARENA_ITEMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_ITEMS) | ON::ARENA_ITEMS | Runs when entering the arena item config screen.<br/>
 [ARENA_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_SELECT) | ON::ARENA_SELECT | 
-[ARENA_INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_INTRO) | ON::ARENA_INTRO | 
-[ARENA_MATCH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MATCH) | ON::ARENA_MATCH | 
-[ARENA_SCORE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_SCORE) | ON::ARENA_SCORE | 
-[ONLINE_LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOADING) | ON::ONLINE_LOADING | 
-[ONLINE_LOBBY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOBBY) | ON::ONLINE_LOBBY | 
+[ARENA_INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_INTRO) | ON::ARENA_INTRO | Runs when entering the arena VS intro screen.<br/>
+[ARENA_MATCH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MATCH) | ON::ARENA_MATCH | Runs when entering the arena level screen, after all entities have spawned, on the first level frame, before the get ready go scene.<br/>
+[ARENA_SCORE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_SCORE) | ON::ARENA_SCORE | Runs when entering the arena scores screen.<br/>
+[ONLINE_LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOADING) | ON::ONLINE_LOADING | Runs when entering the online loading screen.<br/>
+[ONLINE_LOBBY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOBBY) | ON::ONLINE_LOBBY | Runs when entering the online lobby screen.<br/>
 [GUIFRAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GUIFRAME) | ON::GUIFRAME | Params: [GuiDrawContext](#GuiDrawContext) draw_ctx<br/>Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a [GuiDrawContext](#GuiDrawContext)<br/>
 [FRAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.FRAME) | ON::FRAME | Runs while playing the game while the player is controllable, not in the base camp or the arena mode<br/>
 [GAMEFRAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GAMEFRAME) | ON::GAMEFRAME | Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen<br/>
@@ -641,8 +641,8 @@ Name | Data | Description
 [POST_LOAD_SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_SCREEN) | ON::POST_LOAD_SCREEN | Runs right after a screen is loaded, before rendering anything<br/>
 [PRE_GET_RANDOM_ROOM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GET_RANDOM_ROOM) | ON::PRE_GET_RANDOM_ROOM | Params: int x, int y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template<br/>Return: `string room_data`<br/>Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.<br/>If the size of the string returned does not match with the room templates expected size the room is discarded.<br/>White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.<br/>
 [PRE_HANDLE_ROOM_TILES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_HANDLE_ROOM_TILES) | ON::PRE_HANDLE_ROOM_TILES | Params: int x, int y, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template, [PreHandleRoomTilesContext](#PreHandleRoomTilesContext) room_ctx<br/>Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this<br/>Runs after a random room was selected and right before it would spawn entities for each tile code<br/>Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant<br/>
-[SCRIPT_ENABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) | ON::SCRIPT_ENABLE | 
-[SCRIPT_DISABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) | ON::SCRIPT_DISABLE | 
+[SCRIPT_ENABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) | ON::SCRIPT_ENABLE | Runs when the script is enabled from the UI or when imported by another script while disabled, but not on load.<br/>
+[SCRIPT_DISABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) | ON::SCRIPT_DISABLE | Runs when the script is disabled from the UI and also right before unloading/reloading.<br/>
 [RENDER_PRE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) | ON::RENDER_PRE_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
 [RENDER_POST_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_HUD) | ON::RENDER_POST_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
 [RENDER_PRE_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU) | ON::RENDER_PRE_PAUSE_MENU | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
