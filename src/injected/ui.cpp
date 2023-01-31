@@ -4286,7 +4286,7 @@ void render_clickhandler()
         {
             ImVec2 mpos = normalize(mouse_pos());
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
-            std::string coords = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
+            std::string coords = fmt::format("{:.2f}, {:.2f} ({:.2f}, {:.2f})", cpos.first, cpos.second, mpos.x, mpos.y);
             unsigned int mask = safe_entity_mask;
             if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier from mouse_destroy_unsafe
             {
@@ -6813,16 +6813,8 @@ void force_time()
 
 void render_timer()
 {
-    int frames = g_state->time_total;
-    time_t secs = frames / 60;
-    struct tm newtime;
-    char time[10];
-    gmtime_s(&newtime, &secs);
-    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
-    std::stringstream ss;
-    ss << "Total: " << time << "." << std::setfill('0') << std::setw(3) << floor((frames % 60) * (1000.0 / 60.0));
     ImGui::PushFont(bigfont);
-    ImGui::Text("%s", ss.str().c_str());
+    ImGui::Text("%s", format_time(g_state->time_total).c_str());
     ImGui::PopFont();
 }
 
@@ -7295,6 +7287,44 @@ void render_spawner()
     render_list();
 }
 
+std::string hud_input(int buttons)
+{
+    std::wstring input = L"JWBRSDMT";
+    for (int i = 0; i < 8; ++i)
+    {
+        if (!(buttons & (int)std::pow(2, i)))
+            input[i] = ' ';
+    }
+    if (buttons & 0x100)
+        input += L"←";
+    else if (buttons & 0x200)
+        input += L"→";
+    if (buttons & 0x400)
+        input += L"↑";
+    else if (buttons & 0x800)
+        input += L"↓";
+    return std::string(cvt.to_bytes(input));
+}
+
+AABB player_hud_position(int p = 0)
+{
+    float ax = -0.98f;
+    float f = 1.0f;
+    uint32_t hs = get_setting(GAME_SETTING::HUD_SIZE).value_or(0);
+    if (hs == 0 || g_state->items->player_count > 3)
+        f = 1.0f;
+    else if (hs == 1 || g_state->items->player_count > 2)
+        f = 1.15f;
+    else
+        f = 1.3f;
+    float w = 0.32f * f;
+
+    float ay = 0.94f - (1.0f - f) * 0.1f;
+    float h = 0.2f * f;
+
+    return AABB(ax + p * w + 0.02f * f, ay, ax + p * w + w - 0.02f * f, ay - h);
+}
+
 void render_prohud()
 {
     auto io = ImGui::GetIO();
@@ -7303,7 +7333,7 @@ void render_prohud()
     auto topmargin = 0.0f;
     if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
-    std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
+    std::string buf = fmt::format("TIMER:{}/{} FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", format_time(g_state->time_level), format_time(g_state->time_total), UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
@@ -7315,6 +7345,30 @@ void render_prohud()
     buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}", type)));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+
+    static std::array<int, 4> inputs{0};
+    static uint32_t last_input_frame = 0;
+    if (g_state->time_level != last_input_frame)
+    {
+        for (int i = 0; i < g_state->items->player_count; ++i)
+            inputs[i] = (int)g_state->player_inputs->player_slots[i].buttons_gameplay;
+        last_input_frame = g_state->time_level;
+    }
+    for (int i = 0; i < g_state->items->player_count; ++i)
+    {
+        auto pos = player_hud_position(i);
+        auto w = (pos.right - pos.left) / 20.f;
+        auto pw = screenify(w);
+        auto [ax, ay] = fix_pos(screenify({pos.left, pos.top}));
+        auto [bx, by] = fix_pos(screenify({pos.right, pos.bottom}));
+        buf = hud_input((int)g_state->player_inputs->player_slots[i].buttons_gameplay);
+        textsize = ImGui::CalcTextSize(buf.c_str());
+        dl->AddText({ax + pw, by}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+
+        buf = hud_input(inputs[i]);
+        textsize = ImGui::CalcTextSize(buf.c_str());
+        dl->AddText({ax + pw, by + textsize.y}, ImColor(0.5f, 1.0f, 0.5f, .5f), buf.c_str());
+    }
 }
 
 void render_tool(std::string tool)
