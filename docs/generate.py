@@ -272,13 +272,15 @@ print("\n# Modules")
 print(
     """You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
 
-Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules."""
+Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules.
+
+You can also [import](#import) other loaded script mods to your own mod if they have `exports`."""
 )
 
 print("\n# Aliases\n")
 print(
     """
-We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
+Used to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
 
 Name | Type
 ---- | ----"""
@@ -293,13 +295,13 @@ for alias in ps.aliases:
 gu.setup_stdout("src/includes/_globals.md")
 
 global_types = {
-    "meta": "array<string>",
+    "meta": "array<mixed>",
     "state": "StateMemory",
     "game_manager": "GameManager",
     "online": "Online",
     "players": "array<Player>",
     "savegame": "SaveData",
-    "options": "array<mixed>",
+    "options": "optional<array<mixed>>",
     "prng": "PRNG",
 }
 
