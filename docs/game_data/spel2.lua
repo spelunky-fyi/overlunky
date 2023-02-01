@@ -1491,6 +1491,23 @@ function get_texture(texture_data) end
 ---@param texture_path string
 ---@return nil
 function reload_texture(texture_path) end
+---Replace a vanilla texture definition with a custom texture definition and reload the texture.
+---@param vanilla_id TEXTURE
+---@param custom_id TEXTURE
+---@return boolean
+function replace_texture(vanilla_id, custom_id) end
+---Reset a replaced vanilla texture to the original and reload the texture.
+---@param vanilla_id TEXTURE
+---@return nil
+function reset_texture(vanilla_id) end
+---Replace a vanilla texture definition with a custom texture definition and reload the texture. Set corresponding character heart color to the pixel in the center of the player indicator arrow in that texture. (448,1472)
+---@param vanilla_id TEXTURE
+---@param custom_id TEXTURE
+---@return boolean
+function replace_texture_and_heart_color(vanilla_id, custom_id) end
+---Clear cache for a file path or the whole directory
+---@return nil
+function clear_cache() end
 ---Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
 ---@param uid integer
 ---@param extrude number?

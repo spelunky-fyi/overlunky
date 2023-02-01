@@ -696,6 +696,9 @@
                             <a href="#change_poison_timer" class="toc-h3 toc-link" data-title="change_poison_timer">change_poison_timer</a>
                           </li>
                           <li>
+                            <a href="#clear_cache" class="toc-h3 toc-link" data-title="clear_cache">clear_cache</a>
+                          </li>
+                          <li>
                             <a href="#clr_mask" class="toc-h3 toc-link" data-title="clr_mask">clr_mask</a>
                           </li>
                           <li>
@@ -1264,7 +1267,16 @@
                             <a href="#reload_texture" class="toc-h3 toc-link" data-title="reload_texture">reload_texture</a>
                           </li>
                           <li>
+                            <a href="#replace_texture" class="toc-h3 toc-link" data-title="replace_texture">replace_texture</a>
+                          </li>
+                          <li>
+                            <a href="#replace_texture_and_heart_color" class="toc-h3 toc-link" data-title="replace_texture_and_heart_color">replace_texture_and_heart_color</a>
+                          </li>
+                          <li>
                             <a href="#reset_lut" class="toc-h3 toc-link" data-title="reset_lut">reset_lut</a>
+                          </li>
+                          <li>
+                            <a href="#reset_texture" class="toc-h3 toc-link" data-title="reset_texture">reset_texture</a>
                           </li>
                           <li>
                             <a href="#set_lut" class="toc-h3 toc-link" data-title="set_lut">set_lut</a>
@@ -3215,6 +3227,9 @@
                     <a href="#ON-RENDER_POST_DRAW_DEPTH" class="toc-h2 toc-link" data-title="ON.RENDER_POST_DRAW_DEPTH">ON.RENDER_POST_DRAW_DEPTH</a>
                   </li>
                   <li>
+                    <a href="#ON-RENDER_PRE_JOURNAL_PAGE" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_JOURNAL_PAGE">ON.RENDER_PRE_JOURNAL_PAGE</a>
+                  </li>
+                  <li>
                     <a href="#ON-RENDER_POST_JOURNAL_PAGE" class="toc-h2 toc-link" data-title="ON.RENDER_POST_JOURNAL_PAGE">ON.RENDER_POST_JOURNAL_PAGE</a>
                   </li>
                   <li>
@@ -4320,6 +4335,12 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='nil-change_poison_timer-int-frames'>nil change_poison_timer(int frames)</h4>
 <p>Change the amount of frames after the damage from poison is applied</p>
+<h3 id='clear_cache'>clear_cache</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clear_cache">clear_cache</a></p>
+</blockquote>
+<h4 id='nil-clear_cache'>nil clear_cache()</h4>
+<p>Clear cache for a file path or the whole directory</p>
 <h3 id='clr_mask'>clr_mask</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clr_mask">clr_mask</a></p>
@@ -5531,12 +5552,30 @@ If a texture with the same definition already exists the texture will be reloade
 <h4 id='nil-reload_texture-string-texture_path'>nil reload_texture(string texture_path)</h4>
 <p>Reloads a texture from disk, use this only as a development tool for example in the console
 Note that <a href="#define_texture">define_texture</a> will also reload the texture if it already exists</p>
+<h3 id='replace_texture'>replace_texture</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=replace_texture">replace_texture</a></p>
+</blockquote>
+<h4 id='bool-replace_texture-TEXTURE-vanilla_id-TEXTURE-custom_id'>bool replace_texture(<a href="#TEXTURE">TEXTURE</a> vanilla_id, <a href="#TEXTURE">TEXTURE</a> custom_id)</h4>
+<p>Replace a vanilla texture definition with a custom texture definition and reload the texture.</p>
+<h3 id='replace_texture_and_heart_color'>replace_texture_and_heart_color</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=replace_texture_and_heart_color">replace_texture_and_heart_color</a></p>
+</blockquote>
+<h4 id='bool-replace_texture_and_heart_color-TEXTURE-vanilla_id-TEXTURE-custom_id'>bool replace_texture_and_heart_color(<a href="#TEXTURE">TEXTURE</a> vanilla_id, <a href="#TEXTURE">TEXTURE</a> custom_id)</h4>
+<p>Replace a vanilla texture definition with a custom texture definition and reload the texture. Set corresponding character heart color to the pixel in the center of the player indicator arrow in that texture. (448,1472)</p>
 <h3 id='reset_lut'>reset_lut</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=reset_lut">reset_lut</a></p>
 </blockquote>
 <h4 id='nil-reset_lut-LAYER-layer'>nil reset_lut(<a href="#LAYER">LAYER</a> layer)</h4>
 <p>Same as <code>set_lut(nil, layer)</code></p>
+<h3 id='reset_texture'>reset_texture</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=reset_texture">reset_texture</a></p>
+</blockquote>
+<h4 id='nil-reset_texture-TEXTURE-vanilla_id'>nil reset_texture(<a href="#TEXTURE">TEXTURE</a> vanilla_id)</h4>
+<p>Reset a replaced vanilla texture to the original and reload the texture.</p>
 <h3 id='set_lut'>set_lut</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_lut">set_lut</a></p>
@@ -17077,7 +17116,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>any</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=user_data">user_data</a></td>
-<td>You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before <a href="#ON">ON</a>.PRE_LOAD_SCREEN from a level and loaded right before <a href="#ON">ON</a>.POST_LEVEL_GENERATION.<br/></td>
+<td>You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before <a href="#ON">ON</a>.PRE_LOAD_SCREEN from a level and loaded right before <a href="#ON">ON</a>.POST_LOAD_SCREEN to a level or transition. It is not available yet in post_entity_spawn, but that is a good place to initialize it for new custom entities. See example for more.<br/></td>
 </tr>
 <tr>
 <td><a href="#Entity">Entity</a></td>
@@ -25187,6 +25226,10 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </blockquote>
 
 <p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx<br/></p>
+<h2 id='ON-RENDER_PRE_JOURNAL_PAGE'>ON.RENDER_PRE_JOURNAL_PAGE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_JOURNAL_PAGE">ON.RENDER_PRE_JOURNAL_PAGE</a></p>
+</blockquote>
 <h2 id='ON-RENDER_POST_JOURNAL_PAGE'>ON.RENDER_POST_JOURNAL_PAGE</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_JOURNAL_PAGE">ON.RENDER_POST_JOURNAL_PAGE</a></p>
@@ -27449,6 +27492,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_DRAW_DEPTH">RENDER_POST_DRAW_DEPTH</a></td>
 <td>ON::RENDER_POST_DRAW_DEPTH</td>
 <td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_JOURNAL_PAGE">RENDER_PRE_JOURNAL_PAGE</a></td>
+<td>ON::RENDER_PRE_JOURNAL_PAGE</td>
+<td></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_JOURNAL_PAGE">RENDER_POST_JOURNAL_PAGE</a></td>

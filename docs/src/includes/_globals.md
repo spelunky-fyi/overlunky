@@ -1121,6 +1121,15 @@ Returns true if the nth bit is set in the number.
 
 Change the amount of frames after the damage from poison is applied
 
+### clear_cache
+
+
+> Search script examples for [clear_cache](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_cache)
+
+#### nil clear_cache()
+
+Clear cache for a file path or the whole directory
+
 ### clr_mask
 
 
@@ -2937,6 +2946,24 @@ Gets a `TextureDefinition` for equivalent to the one used to define the texture 
 Reloads a texture from disk, use this only as a development tool for example in the console
 Note that [define_texture](#define_texture) will also reload the texture if it already exists
 
+### replace_texture
+
+
+> Search script examples for [replace_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_texture)
+
+#### bool replace_texture([TEXTURE](#TEXTURE) vanilla_id, [TEXTURE](#TEXTURE) custom_id)
+
+Replace a vanilla texture definition with a custom texture definition and reload the texture.
+
+### replace_texture_and_heart_color
+
+
+> Search script examples for [replace_texture_and_heart_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_texture_and_heart_color)
+
+#### bool replace_texture_and_heart_color([TEXTURE](#TEXTURE) vanilla_id, [TEXTURE](#TEXTURE) custom_id)
+
+Replace a vanilla texture definition with a custom texture definition and reload the texture. Set corresponding character heart color to the pixel in the center of the player indicator arrow in that texture. (448,1472)
+
 ### reset_lut
 
 
@@ -2945,6 +2972,15 @@ Note that [define_texture](#define_texture) will also reload the texture if it a
 #### nil reset_lut([LAYER](#LAYER) layer)
 
 Same as `set_lut(nil, layer)`
+
+### reset_texture
+
+
+> Search script examples for [reset_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_texture)
+
+#### nil reset_texture([TEXTURE](#TEXTURE) vanilla_id)
+
+Reset a replaced vanilla texture to the original and reload the texture.
 
 ### set_lut
 
