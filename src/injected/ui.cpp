@@ -6813,12 +6813,12 @@ void render_texture_viewer()
     auto pos = ImGui::GetWindowPos();
     auto size = ImGui::GetWindowSize();
     auto base = ImGui::GetMainViewport();
-    // fill fake background
     auto dl = ImGui::GetBackgroundDrawList();
-    dl->AddRectFilled({pos.x, pos.y}, {pos.x + size.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y}, ImGui::GetColorU32(ImGuiCol_WindowBg));
-
     if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture"))
+    {
+        dl->AddRectFilled({pos.x, pos.y}, {pos.x + size.x, pos.y + size.y}, ImGui::GetColorU32(ImGuiCol_WindowBg));
         return;
+    }
     auto def = get_texture_definition(texture_viewer.id);
     std::string name = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, {}) or 'UNKNOWN'", texture_viewer.id));
     name = "TEXTURE." + name.substr(1, name.length() - 2);
@@ -6848,7 +6848,7 @@ void render_texture_viewer()
     size = ImGui::GetWindowSize();
     base = ImGui::GetMainViewport();
     auto f = (sb.x - sa.x) / def.width;
-    if (draw_animations && ent)
+    if (draw_animations && ent && ent->get_texture() == texture_viewer.id)
     {
         std::map<std::tuple<uint32_t, uint32_t, bool>, int> overlap;
         for (auto [id, anim] : ent->type->animations)
@@ -6907,6 +6907,7 @@ void render_texture_viewer()
             ++i;
         }
     }
+    dl->AddRectFilled({pos.x, pos.y}, {pos.x + size.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y}, ImGui::GetColorU32(ImGuiCol_WindowBg));
 }
 
 void force_time()
