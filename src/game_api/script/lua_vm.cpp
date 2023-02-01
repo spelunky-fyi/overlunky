@@ -11,6 +11,7 @@
 #include <cstdint>       // for uint32_t, int8_t
 #include <deque>         // for deque
 #include <exception>     // for exception
+#include <fmt/chrono.h>  // for format_time
 #include <fmt/format.h>  // for format_error
 #include <functional>    // for _Func_impl_no_all...
 #include <imgui.h>       // for GetIO, ImVec4
@@ -256,17 +257,18 @@ end
         backend->lua["lua_print"](message);
     };
 
-    /// Print a log message to console.
+    /// Print a log message to ingame console.
     lua["console_print"] = [](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
-        backend->console->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
-        if (backend->console->messages.size() > 20)
-            backend->console->messages.pop_front();
-        backend->lua["lua_print"](message);
+        auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        std::tm time_buf;
+        localtime_s(&time_buf, &in_time_t);
+        std::vector<ScriptMessage> messages{{message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)}};
+        backend->console->push_history(fmt::format("--- [{}] at {:%Y-%m-%d %X}", backend->get_id(), time_buf), std::move(messages));
     };
 
-    /// Prinspect to console
+    /// Prinspect to ingame console.
     lua["console_prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
         if (objects.size() > 0)
