@@ -9,17 +9,162 @@
 #include "containers/game_allocator.hpp"
 
 #include "memory.hpp"
+#include "render_api.hpp"
 #include "util.hpp"
 #include "window_api.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#define CACHE_DIR "Mods\\Cache"
+
+// https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
+struct DDS_PIXELFORMAT
+{
+    DWORD dwSize;
+    DWORD dwFlags;
+    DWORD dwFourCC;
+    DWORD dwRGBBitCount;
+    DWORD dwRBitMask;
+    DWORD dwGBitMask;
+    DWORD dwBBitMask;
+    DWORD dwABitMask;
+};
+typedef struct
+{
+    DWORD dwSize;
+    DWORD dwFlags;
+    DWORD dwHeight;
+    DWORD dwWidth;
+    DWORD dwPitchOrLinearSize;
+    DWORD dwDepth;
+    DWORD dwMipMapCount;
+    DWORD dwReserved1[11];
+    DDS_PIXELFORMAT ddspf;
+    DWORD dwCaps;
+    DWORD dwCaps2;
+    DWORD dwCaps3;
+    DWORD dwCaps4;
+    DWORD dwReserved2;
+} DDS_HEADER;
+
 LoadFileCallback* g_OnLoadFile{nullptr};
 ReadFromFileCallback* g_ReadFromFile{nullptr};
 WriteToFileCallback* g_WriteToFile{nullptr};
 GetImageFilePathCallback* g_GetImageFilePath{nullptr};
 MakeSavePathCallback g_MakeSavePathCallback{nullptr};
+
+std::string hash_path(std::string_view path)
+{
+    auto abs_path = std::filesystem::absolute(path).make_preferred();
+    auto abs_path_str = abs_path.string();
+    uint64_t res = 10000019;
+    int i = 0;
+    do
+    {
+        uint64_t merge = std::toupper(abs_path_str[i]) * 65536 + std::toupper(abs_path_str[i + 1]);
+        res = res * 8191 + merge;
+        i++;
+    } while (i < abs_path_str.length());
+    std::ostringstream ss;
+    ss << std::hex << res << res;
+    return ss.str();
+}
+
+std::filesystem::path get_cache_path(std::string_view path)
+{
+    return std::filesystem::path(CACHE_DIR) / std::filesystem::path(hash_path(path) + ".DDS");
+}
+
+void clear_cache(std::string_view file_path)
+{
+    auto path = std::string_view(file_path);
+    static const auto prefix = "Data/Textures/../../"sv;
+    if (path.size() > prefix.size() && path.substr(0, prefix.size()) == prefix)
+    {
+        path = path.substr(prefix.size());
+    }
+
+    auto cache_dir = std::filesystem::path(CACHE_DIR);
+    if (!std::filesystem::exists(cache_dir))
+        return;
+    if (path == "")
+    {
+        // DEBUG("Removing {}", cache_dir.string());
+        std::filesystem::remove_all(cache_dir);
+    }
+    else
+    {
+        auto cache_file = get_cache_path(path);
+        // DEBUG("Removing {}", cache_file.string());
+        if (std::filesystem::exists(cache_file))
+        {
+            std::filesystem::remove(cache_file);
+        }
+    }
+}
+
+FileInfo* read_file_from_disk(const char* filepath, void* (*allocator)(std::size_t))
+{
+    FILE* file{nullptr};
+    auto error = fopen_s(&file, filepath, "rb");
+    if (error == 0 && file != nullptr)
+    {
+        auto close_file = OnScopeExit{[file]()
+                                      { fclose(file); }};
+
+        fseek(file, 0, SEEK_END);
+        const std::size_t file_size = ftell(file);
+        fseek(file, 0, SEEK_SET);
+
+        if (allocator == nullptr)
+        {
+            allocator = malloc;
+        }
+
+        const std::size_t allocation_size = file_size + sizeof(FileInfo);
+        if (void* buf = allocator(allocation_size))
+        {
+            void* data = static_cast<void*>(reinterpret_cast<char*>(buf) + 24);
+            const auto size_read = fread(data, 1, file_size, file);
+            if (size_read != file_size)
+            {
+                DEBUG("Could not read file {}, this will either crash or cause glitches...", filepath);
+            }
+
+            FileInfo* file_info = new (buf) FileInfo();
+            *file_info = {
+                .Data = data,
+                .DataSize = static_cast<int>(file_size),
+                .AllocationSize = static_cast<int>(allocation_size)};
+
+            return file_info;
+        }
+    }
+
+    return nullptr;
+}
+
+void set_heart_color_for_texture(std::string file_path, Color color)
+{
+    if (color.a < 0.5f)
+        return;
+    auto& render = RenderAPI::get();
+    render.texture_colors[std::string(file_path)] = color;
+}
+
+void get_heart_color_from_dds(const char* file_path, FileInfo* file)
+{
+    auto header = reinterpret_cast<DDS_HEADER*>(reinterpret_cast<char*>(file->Data) + 4);
+    auto image_data = reinterpret_cast<uint8_t*>(file->Data);
+    auto image_width = header->dwWidth;
+    int image_data_size = file->DataSize;
+    const int magic_pixel = (int)(5888.875f * (float)image_width) + sizeof(DDS_HEADER) + 4;
+    if (magic_pixel + 3 < image_data_size && image_data[magic_pixel + 3] > 10)
+    {
+        set_heart_color_for_texture(std::string(file_path), Color((float)image_data[magic_pixel] / 255.0f, (float)image_data[magic_pixel + 1] / 255.0f, (float)image_data[magic_pixel + 2] / 255.0f, (float)image_data[magic_pixel + 3] / 255.0f));
+    }
+}
 
 FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 {
@@ -31,43 +176,24 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
         path = path.substr(prefix.size());
     }
     auto ext = path.substr(path.find_last_of('.'));
-    if (ext == ".png"sv || ext == ".jpeg"sv || ext == ".bmp"sv || ext == ".tga"sv)
+
+    std::filesystem::create_directories(CACHE_DIR);
+    std::filesystem::path cache_path = get_cache_path(path);
+
+    if (std::filesystem::exists(cache_path))
+    {
+        DEBUG("Loading '{}' from cache '{}'", path, cache_path.string());
+        auto file = read_file_from_disk(cache_path.string().c_str(), alloc_fun);
+        get_heart_color_from_dds(file_path, file);
+        return file;
+    }
+    else if (ext == ".png"sv || ext == ".jpeg"sv || ext == ".bmp"sv || ext == ".tga"sv)
     {
         int image_width = 0;
         int image_height = 0;
         unsigned char* image_data = stbi_load(path.data(), &image_width, &image_height, NULL, 4);
         if (image_data != nullptr)
         {
-            // https://docs.microsoft.com/en-us/windows/win32/direct3ddds/dds-header
-            struct DDS_PIXELFORMAT
-            {
-                DWORD dwSize;
-                DWORD dwFlags;
-                DWORD dwFourCC;
-                DWORD dwRGBBitCount;
-                DWORD dwRBitMask;
-                DWORD dwGBitMask;
-                DWORD dwBBitMask;
-                DWORD dwABitMask;
-            };
-            typedef struct
-            {
-                DWORD dwSize;
-                DWORD dwFlags;
-                DWORD dwHeight;
-                DWORD dwWidth;
-                DWORD dwPitchOrLinearSize;
-                DWORD dwDepth;
-                DWORD dwMipMapCount;
-                DWORD dwReserved1[11];
-                DDS_PIXELFORMAT ddspf;
-                DWORD dwCaps;
-                DWORD dwCaps2;
-                DWORD dwCaps3;
-                DWORD dwCaps4;
-                DWORD dwReserved2;
-            } DDS_HEADER;
-
             DDS_HEADER header{
                 124,        // hardcoded
                 0x0002100F, // required flags + pitch + mipmapped
@@ -98,7 +224,8 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 
             auto image_data_size = image_width * image_height * 4;
 
-            // multiply alpha
+            // multiply alpha and extract player indicator color for heart
+            const int magic_pixel = (int)(5888.875f * (float)image_width);
             for (int i = 0; i < image_data_size; i += 4)
             {
                 uint8_t* p = (uint8_t*)&image_data[i];
@@ -106,6 +233,9 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
                 p[0] = (uint8_t)((float)p[0] * alpha);
                 p[1] = (uint8_t)((float)p[1] * alpha);
                 p[2] = (uint8_t)((float)p[2] * alpha);
+                // extract player indicator color
+                if (i == magic_pixel)
+                    set_heart_color_for_texture(std::string(file_path), Color((float)p[0] / 255.0f, (float)p[1] / 255.0f, (float)p[2] / 255.0f, (float)p[3] / 255.0f));
             }
 
             int data_size = 4 + sizeof(DDS_HEADER) + image_data_size;
@@ -124,51 +254,24 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
 
             stbi_image_free(image_data);
 
+            FILE* cache_file;
+            errno_t err;
+            if ((err = fopen_s(&cache_file, cache_path.string().c_str(), "wb")) == 0)
+            {
+                fwrite(file_info->Data, sizeof(char), file_info->DataSize, cache_file);
+                DEBUG("Cached '{}' to '{}'", path, cache_path.string());
+            }
+            else
+            {
+                DEBUG("Couldn't cache '{}' to '{}'", path, cache_path.string());
+            }
+            fclose(cache_file);
+
             return file_info;
         }
     }
     else
     {
-        auto read_file_from_disk = [](const char* filepath, void* (*allocator)(std::size_t)) -> FileInfo*
-        {
-            FILE* file{nullptr};
-            auto error = fopen_s(&file, filepath, "rb");
-            if (error == 0 && file != nullptr)
-            {
-                auto close_file = OnScopeExit{[file]()
-                                              { fclose(file); }};
-
-                fseek(file, 0, SEEK_END);
-                const std::size_t file_size = ftell(file);
-                fseek(file, 0, SEEK_SET);
-
-                if (allocator == nullptr)
-                {
-                    allocator = malloc;
-                }
-
-                const std::size_t allocation_size = file_size + sizeof(FileInfo);
-                if (void* buf = allocator(allocation_size))
-                {
-                    void* data = static_cast<void*>(reinterpret_cast<char*>(buf) + 24);
-                    const auto size_read = fread(data, 1, file_size, file);
-                    if (size_read != file_size)
-                    {
-                        DEBUG("Could not read file {}, this will either crash or cause glitches...", filepath);
-                    }
-
-                    FileInfo* file_info = new (buf) FileInfo();
-                    *file_info = {
-                        .Data = data,
-                        .DataSize = static_cast<int>(file_size),
-                        .AllocationSize = static_cast<int>(allocation_size)};
-
-                    return file_info;
-                }
-            }
-
-            return nullptr;
-        };
         return read_file_from_disk(file_path, alloc_fun);
     }
     return nullptr;
@@ -403,6 +506,36 @@ bool create_d3d11_texture_from_memory(const unsigned char* buf, const unsigned i
 
 bool get_image_size_from_file(const char* filename, int* out_width, int* out_height)
 {
+    FILE* f{nullptr};
+    auto error = fopen_s(&f, filename, "rb");
+    if (error != 0 || f == nullptr)
+        return false;
+    fseek(f, 0, SEEK_END);
+    long len = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if (len < 24)
+    {
+        fclose(f);
+        return false;
+    }
+
+    unsigned char buf[24];
+    fread(buf, 1, 24, f);
+    fclose(f);
+
+    if (buf[0] == 0x89 && buf[1] == 'P' && buf[2] == 'N' && buf[3] == 'G' && buf[4] == 0x0D && buf[5] == 0x0A && buf[6] == 0x1A && buf[7] == 0x0A && buf[12] == 'I' && buf[13] == 'H' && buf[14] == 'D' && buf[15] == 'R')
+    {
+        *out_width = (buf[16] << 24) + (buf[17] << 16) + (buf[18] << 8) + (buf[19] << 0);
+        *out_height = (buf[20] << 24) + (buf[21] << 16) + (buf[22] << 8) + (buf[23] << 0);
+        return true;
+    }
+
+    return false;
+}
+
+/* decoding the whole image is slow af
+bool get_image_size_from_file(const char* filename, int* out_width, int* out_height)
+{
     // Load from disk into a raw RGBA buffer
     int image_width = 0;
     int image_height = 0;
@@ -416,3 +549,4 @@ bool get_image_size_from_file(const char* filename, int* out_width, int* out_hei
 
     return true;
 }
+*/

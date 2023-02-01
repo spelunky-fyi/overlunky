@@ -5074,6 +5074,9 @@ void render_options()
         }
         tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
 
+        ImGui::Checkbox("Enable unsafe scripts", &options["enable_unsafe_scripts"]);
+        tooltip("Allow using unsafe Lua libraries in scripts.");
+
         ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
         tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.", "switch_ui");
 
@@ -6840,7 +6843,7 @@ void render_texture_viewer()
     texture_viewer.src = Quad(AABB(0, 0, 1, 1));
     ImGui::SetWindowSize({ImGui::GetWindowSize().x, ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y + ImGui::GetWindowSize().x / def.width * def.height});
     ImVec2 sa{pos.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y};
-    ImVec2 sb{pos.x + size.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y + def.height / def.width * size.x};
+    ImVec2 sb{pos.x + size.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y + (float)def.height / (float)def.width * size.x};
     auto a = normalize(sa);
     auto b = normalize(sb);
     texture_viewer.dest = Quad(AABB(a.x, a.y, b.x, b.y));
