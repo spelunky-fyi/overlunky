@@ -958,6 +958,48 @@ void LuaBackend::post_load_screen()
     if (!get_enabled())
         return;
 
+    auto state_ptr = State::get().ptr();
+    if ((ON)state_ptr->screen == ON::TRANSITION)
+    {
+        for (auto uid : get_entities_by_mask(1))
+        {
+            auto ent = get_entity_ptr(uid)->as<Player>();
+            int slot = ent->inventory_ptr->player_slot;
+            if (slot == -1 && ent->linked_companion_parent == -1)
+                continue;
+            if (slot == -1 && ent->linked_companion_parent != -1)
+            {
+                Player* parent = ent;
+                while (true)
+                {
+                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                    slot++;
+                    if (parent->linked_companion_parent == -1)
+                    {
+                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        break;
+                    }
+                }
+            }
+            if (slot < 0)
+                continue;
+            if (saved_user_datas.contains(slot))
+            {
+                set_user_data(*ent, saved_user_datas[slot].self.value_or(sol::nil));
+                if (ent->holding_uid != -1)
+                    set_user_data(ent->holding_uid, saved_user_datas[slot].held.value_or(sol::nil));
+                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0)
+                    set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value_or(sol::nil));
+                for (auto [type, powerup] : ent->powerups)
+                {
+                    if (saved_user_datas[slot].powerups.contains(type))
+                        set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
+                }
+            }
+        }
+        // saved_user_datas.clear();
+    }
+
     auto now = get_frame_count();
 
     for (auto& [id, callback] : callbacks)
