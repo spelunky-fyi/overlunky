@@ -54,6 +54,9 @@
 
 #include "decode_audio_file.hpp"
 
+#include "render_api.hpp"
+#include "script/usertypes/vanilla_render_lua.hpp"
+
 #pragma warning(disable : 4366)
 
 using cvt_type = std::codecvt_utf8<wchar_t>;
@@ -255,8 +258,9 @@ GameManager* g_game_manager = 0;
 std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "", detach_tab = "", focused_tool = "";
-std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
+std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_texture", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 std::vector<std::string> tab_order_main = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options"};
+std::vector<std::string> tab_order_extra = {"tool_texture", "tool_debug"};
 std::vector<std::string> tabs_open = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"};
 std::vector<std::string> tabs_detached = {};
 
@@ -5127,6 +5131,15 @@ void render_options()
 
     if (options["menu_ui"])
     {
+        if (ImGui::BeginMenu("Help"))
+        {
+            if (ImGui::MenuItem("README"))
+                ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
+            if (ImGui::MenuItem("API Documentation"))
+                ShellExecuteA(NULL, "open", "https://spelunky-fyi.github.io/overlunky/", NULL, NULL, SW_SHOWNORMAL);
+            ImGui::EndMenu();
+        }
+
         if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
             save_config(cfgfile);
         if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
@@ -6737,6 +6750,61 @@ void render_entity_props(int uid, bool detached = false)
     ImGui::PopItemWidth();
 }
 
+struct TextureViewer
+{
+    TEXTURE id;
+    Quad src;
+    Quad dest;
+};
+
+static TextureViewer texture_viewer{-1};
+void render_vanilla_stuff()
+{
+    auto& render = RenderAPI::get();
+    auto* textures = get_textures();
+    if (texture_viewer.id < 0 || texture_viewer.id > 0x192)
+        return;
+    render.draw_screen_texture(textures->texture_map[texture_viewer.id], texture_viewer.src, texture_viewer.dest, Color::white());
+}
+
+void render_texture_viewer()
+{
+    static std::map<TEXTURE, std::string> items;
+    if (items.empty())
+    {
+        for (TEXTURE i = 0; i < 0x192; ++i)
+        {
+            auto def = get_texture_definition(i);
+            items[i] = fmt::format("{:03d}: {}, {}, {}x{}", i, def.texture_path, def.tile_width, def.width, def.height);
+        }
+    }
+    static TEXTURE current = 0;
+    const char* preview = items[current].c_str();
+    if (ImGui::BeginCombo("Texture##PickTexture", preview))
+    {
+        for (TEXTURE i = 0; i < 0x192; ++i)
+        {
+            const bool selected = (current == i);
+            if (ImGui::Selectable(items[i].c_str(), selected))
+                current = i;
+
+            if (selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+    auto def = get_texture_definition(current);
+    ImGui::Text("%s", def.texture_path.c_str());
+    texture_viewer.id = current;
+    texture_viewer.src = Quad(AABB(0, 0, 1, 1));
+    auto pos = ImGui::GetWindowPos();
+    auto size = ImGui::GetWindowSize();
+    auto base = ImGui::GetMainViewport();
+    auto a = normalize({pos.x - base->Pos.x, pos.y + size.y - base->Pos.y});
+    auto b = normalize({pos.x + size.x - base->Pos.x, pos.y + size.y - base->Pos.y + def.height / def.width * size.x});
+    texture_viewer.dest = Quad(AABB(a.x, a.y, b.x, b.y));
+}
+
 void force_time()
 {
     if (g_state == 0)
@@ -7439,6 +7507,8 @@ void render_tool(std::string tool)
         render_keyconfig();
     else if (tool == "tool_finder")
         render_entity_finder();
+    else if (tool == "tool_texture")
+        render_texture_viewer();
 }
 
 bool is_tab_open(std::string name)
@@ -7487,6 +7557,7 @@ void imgui_init(ImGuiContext*)
     windows["tool_save"] = new Window({"Savegame", is_tab_detached("tool_save"), is_tab_open("tool_save")});
     windows["tool_keys"] = new Window({"Keys", is_tab_detached("tool_keys"), is_tab_open("tool_keys")});
     windows["tool_finder"] = new Window({"Finder", is_tab_detached("tool_finder"), is_tab_open("tool_finder")});
+    windows["tool_texture"] = new Window({"Texture browser", is_tab_detached("tool_texture"), is_tab_open("tool_texture")});
 
     if (g_ui_scripts.find("dark") == g_ui_scripts.end())
     {
@@ -7573,6 +7644,16 @@ void imgui_draw()
                     if (ImGui::GetIO().MouseClicked[1] && mouse_pos().y < ImGui::GetTextLineHeight() && ImGui::IsItemHovered())
                         detach(tab);
                 }
+                if (ImGui::BeginMenu("Extra"))
+                {
+                    for (size_t i = 0; i < tab_order_extra.size(); ++i)
+                    {
+                        auto tab = tab_order_extra[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str()))
+                            detach(tab);
+                    }
+                    ImGui::EndMenu();
+                }
                 ImGui::EndMainMenuBar();
             }
             ImGui::PopID();
@@ -7585,9 +7666,17 @@ void imgui_draw()
             {
                 if (ImGui::BeginMenu("Tools"))
                 {
-                    for (size_t i = 0; i < tab_order.size() - 4; ++i)
+                    for (size_t i = 0; i < tab_order.size() - 5; ++i)
                     {
                         auto tab = tab_order[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
+                        {
+                            toggle(tab);
+                        }
+                    }
+                    for (size_t i = 0; i < tab_order_extra.size(); ++i)
+                    {
+                        auto tab = tab_order_extra[i];
                         if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
                         {
                             toggle(tab);
@@ -7836,6 +7925,7 @@ void init_ui()
         {
             auto& render_api_l = RenderAPI::get();
             static const float color[4]{1.0f, 1.0f, 1.0f, 0.3f};
+            render_vanilla_stuff();
             render_api_l.draw_text(&tri, color);
         });
 }
