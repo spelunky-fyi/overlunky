@@ -5074,6 +5074,9 @@ void render_options()
         }
         tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
 
+        ImGui::Checkbox("Enable unsafe scripts", &options["enable_unsafe_scripts"]);
+        tooltip("Allow using unsafe Lua libraries in scripts.");
+
         ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
         tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.", "switch_ui");
 
