@@ -39,15 +39,16 @@ set_post_entity_spawn(function(ent)
     -- for new entities this will be what we just wrote
     -- for carried entities saved data will be loaded before the first update
     ent:set_post_update_state_machine(function(ent)
-        prinspect(ent.uid, "first update")
         apply_userdata(ent)
         -- no need to keep doing it again
         clear_callback()
     end)
-end, SPAWN_TYPE.LEVEL_GEN, MASK.ITEM, {ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_SKULL})
 
--- apply color to items with user_data after screen load to transition
--- you could use this for levels too, but the thing above might be better if you don't need cosmetic changes in the transition
+    -- SPAWN_TYPE.LEVEL_GEN won't trigger in transitions
+end, SPAWN_TYPE.ANY, MASK.ITEM, {ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_SKULL})
+
+-- this would also work
+--[[
 set_callback(function()
     if state.screen == SCREEN.TRANSITION then
         for i,v in pairs(get_entities_by({ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_SKULL}, MASK.ITEM, LAYER.FRONT)) do
@@ -55,3 +56,4 @@ set_callback(function()
         end
     end
 end, ON.POST_LOAD_SCREEN)
+]]
