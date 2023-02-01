@@ -54,6 +54,9 @@
 
 #include "decode_audio_file.hpp"
 
+#include "render_api.hpp"
+#include "script/usertypes/vanilla_render_lua.hpp"
+
 #pragma warning(disable : 4366)
 
 using cvt_type = std::codecvt_utf8<wchar_t>;
@@ -255,8 +258,9 @@ GameManager* g_game_manager = 0;
 std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "", detach_tab = "", focused_tool = "";
-std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options", "tool_style", "tool_keys", "tool_debug"};
+std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_texture", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 std::vector<std::string> tab_order_main = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options"};
+std::vector<std::string> tab_order_extra = {"tool_texture"};
 std::vector<std::string> tabs_open = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"};
 std::vector<std::string> tabs_detached = {};
 
@@ -597,6 +601,7 @@ void render_cursor()
 
 void load_script(std::string file, bool enable = true)
 {
+    std::replace(file.begin(), file.end(), '\\', '/');
     std::ifstream data(file);
     std::ostringstream buf;
     if (!data.fail())
@@ -610,6 +615,7 @@ void load_script(std::string file, bool enable = true)
 
 void load_script(std::wstring wfile, bool enable = true)
 {
+    std::replace(wfile.begin(), wfile.end(), '\\', '/');
     std::string file(cvt.to_bytes(wfile));
     std::ifstream data(wfile.c_str(), std::ios::in | std::ios::binary);
     std::ostringstream buf;
@@ -4284,7 +4290,7 @@ void render_clickhandler()
         {
             ImVec2 mpos = normalize(mouse_pos());
             std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
-            std::string coords = fmt::format("{:.2f}, {:.2f}", cpos.first, cpos.second);
+            std::string coords = fmt::format("{:.2f}, {:.2f} ({:.2f}, {:.2f})", cpos.first, cpos.second, mpos.x, mpos.y);
             unsigned int mask = safe_entity_mask;
             if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier from mouse_destroy_unsafe
             {
@@ -5125,6 +5131,15 @@ void render_options()
 
     if (options["menu_ui"])
     {
+        if (ImGui::BeginMenu("Help"))
+        {
+            if (ImGui::MenuItem("README"))
+                ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
+            if (ImGui::MenuItem("API Documentation"))
+                ShellExecuteA(NULL, "open", "https://spelunky-fyi.github.io/overlunky/", NULL, NULL, SW_SHOWNORMAL);
+            ImGui::EndMenu();
+        }
+
         if (ImGui::MenuItem("Save options", key_string(keys["save_settings"]).c_str()))
             save_config(cfgfile);
         if (ImGui::MenuItem("Load options", key_string(keys["load_settings"]).c_str()))
@@ -5229,19 +5244,6 @@ void render_script_files()
     {
         refresh_script_files();
     }
-    if (ImGui::Button("Create new quick script"))
-    {
-        std::string name = gen_random(16);
-        SpelunkyScript* script = new SpelunkyScript(
-            "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'Shiny new script'\nmeta.author = 'You'\n\ncount = 0\nid = "
-            "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
-            "end\nend, 60)",
-            name,
-            g_SoundManager.get(),
-            g_Console.get(),
-            true);
-        g_scripts[name] = std::unique_ptr<SpelunkyScript>(script);
-    }
     ImGui::PopID();
 }
 
@@ -5257,15 +5259,36 @@ void render_scripts()
         refresh_script_files();
     if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
         refresh_script_files();
+    if (ImGui::Button("Create new quick script"))
+    {
+        std::string name = "_" + gen_random(16);
+        SpelunkyScript* script = new SpelunkyScript(
+            "meta.name = 'Script'\nmeta.version = '0.1'\nmeta.description = 'This script will not be saved anywhere but can be used to test things quickly!'\nmeta.author = 'You'\n\ncount = 0\nid = "
+            "set_interval(function()\n  count = count + 1\n  message('Hello from your shiny new script')\n  if count > 4 then clear_callback(id) "
+            "end\nend, 60)",
+            name,
+            g_SoundManager.get(),
+            g_Console.get(),
+            true);
+        g_scripts[name] = std::unique_ptr<SpelunkyScript>(script);
+    }
+    ImGui::SameLine();
+    static bool enabled_only{false};
+    ImGui::Checkbox("Hide disabled##EnabledScriptsOnly", &enabled_only);
     ImGui::PushItemWidth(-1);
     int i = 0;
     std::vector<std::string> unload_scripts;
     ImVec4 origcolor = ImGui::GetStyle().Colors[ImGuiCol_Header];
+    ImVec4 origtextcolor = ImGui::GetStyle().Colors[ImGuiCol_Text];
     float gray = (origcolor.x + origcolor.y + origcolor.z) / 3.0f;
     ImVec4 disabledcolor = ImVec4(gray, gray, gray, 0.5f);
+    ImGui::Separator();
     for (auto& [script_name, script] : g_scripts)
     {
+        if (enabled_only && !script->is_enabled())
+            continue;
         ImGui::PushID(i);
+        ImGui::PushID(script_name.c_str());
         std::string filename;
         size_t slash = script->get_file().find_last_of("/\\");
         if (slash != std::string::npos)
@@ -5274,14 +5297,17 @@ void render_scripts()
         if (!script->is_enabled())
         {
             ImGui::PushStyleColor(ImGuiCol_Header, disabledcolor);
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
         }
         else
         {
             ImGui::PushStyleColor(ImGuiCol_Header, origcolor);
+            ImGui::PushStyleColor(ImGuiCol_Text, origtextcolor);
         }
         if (submenu(name.c_str()))
         {
-            ImGui::Text(
+            ImGui::PopStyleColor();
+            ImGui::TextWrapped(
                 "%s %s by %s (%s)",
                 script->get_name().c_str(),
                 script->get_version().c_str(),
@@ -5291,8 +5317,9 @@ void render_scripts()
             if (!script->get_unsafe() || options["enable_unsafe_scripts"])
             {
                 static bool run_unsafe = false;
-                if (script->get_unsafe())
+                if (script->get_unsafe() && !script->is_enabled())
                 {
+                    ImGui::Separator();
                     ImGui::PushTextWrapPos(0.0f);
                     ImGui::TextColored(
                         ImVec4(1.0f, 0.3f, 0.3f, 1.0f),
@@ -5300,32 +5327,13 @@ void render_scripts()
                         "you trust the author, have read the whole script or made it yourself.");
                     ImGui::PopTextWrapPos();
                     ImGui::Checkbox("I understand the risks.", &run_unsafe);
+                    ImGui::Separator();
                 }
-                if (!script->get_unsafe() || run_unsafe)
+                if (!script->get_unsafe() || run_unsafe || script->is_enabled())
                 {
-                    if (script->is_enabled() && ImGui::Button("Disable##DisableScript"))
-                    {
-                        script->set_enabled(false);
-                    }
-                    else if (!script->is_enabled() && ImGui::Button("Enable##EnableScript"))
-                    {
-                        script->set_enabled(true);
-                        script->set_changed(true);
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Unload##UnloadScript"))
-                    {
-                        unload_scripts.push_back(script->get_file());
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Reload##ReloadScript"))
-                    {
-                        load_script(script->get_file(), script->is_enabled());
-                    }
-                    else
-                    {
-                        ++i;
-                    }
+                    bool enabled = script->is_enabled();
+                    if (ImGui::Checkbox("Enabled##EnabledScript", &enabled))
+                        script->set_enabled(enabled);
                     if (script->get_path() != "" && !script->get_path().starts_with("Mods/Packs"))
                     {
                         ImGui::SameLine();
@@ -5338,6 +5346,20 @@ void render_scripts()
                                 g_script_autorun.push_back(filename);
                             save_config(cfgfile);
                         }
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Reload##ReloadScript"))
+                    {
+                        load_script(script->get_file(), script->is_enabled());
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Unload##UnloadScript"))
+                    {
+                        unload_scripts.push_back(script->get_file());
+                    }
+                    else
+                    {
+                        ++i;
                     }
                     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
                     ImGui::Separator();
@@ -5360,9 +5382,11 @@ void render_scripts()
         }
         else
         {
+            ImGui::PopStyleColor();
             ++i;
         }
         ImGui::PopStyleColor();
+        ImGui::PopID();
         ImGui::PopID();
     }
     for (auto id : unload_scripts)
@@ -6427,9 +6451,11 @@ void render_entity_props(int uid, bool detached = false)
             break;
         }
         ImGui::InputFloat("Position X##EntityPositionX", &entity->x, 0.2f, 1.0f);
-        ImGui::InputFloat("Position Y##EntityPositionX", &entity->y, 0.2f, 1.0f);
+        ImGui::InputFloat("Position Y##EntityPositionY", &entity->y, 0.2f, 1.0f);
         if (is_movable)
         {
+            ImGui::InputFloat("Absolute X##EntityAbsoluteX", &entity->abs_x, 0.2f, 1.0f);
+            ImGui::InputFloat("Absolute Y##EntityAbsoluteY", &entity->abs_y, 0.2f, 1.0f);
             ImGui::InputFloat("Velocity X##EntityVelocityX", &movable->velocityx, 0.2f, 1.0f);
             ImGui::InputFloat("Velocity y##EntityVelocityY", &movable->velocityy, 0.2f, 1.0f);
         }
@@ -6643,7 +6669,7 @@ void render_entity_props(int uid, bool detached = false)
         auto textureid = entity->get_texture();
         std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid));
         // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid));
-        texture = texture.substr(1, texture.length() - 2);
+        texture = "TEXTURE." + texture.substr(1, texture.length() - 2);
         // texturepath = texturepath.substr(1, texturepath.length() - 2);
         ImGui::ColorEdit4("Color", (float*)&entity->color);
         ImGui::DragFloat("Width##EntityWidth", &entity->w, 0.5f, 0.0, 10.0, "%.3f");
@@ -6724,6 +6750,166 @@ void render_entity_props(int uid, bool detached = false)
     ImGui::PopItemWidth();
 }
 
+struct TextureViewer
+{
+    TEXTURE id;
+    int32_t uid;
+    Quad src;
+    Quad dest;
+};
+
+static TextureViewer texture_viewer{0, -1};
+void render_vanilla_stuff()
+{
+    auto& render = RenderAPI::get();
+    auto* textures = get_textures();
+    if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture") || (options["menu_ui"] && !detached("tool_texture")))
+        return;
+    // black bg hack
+    render.draw_screen_texture(textures->texture_map[0], texture_viewer.src, texture_viewer.dest, Color::black());
+    // draw vanilla texture right under the gui window
+    render.draw_screen_texture(textures->texture_map[texture_viewer.id], texture_viewer.src, texture_viewer.dest, Color::white());
+}
+
+void render_texture_viewer()
+{
+    static std::map<TEXTURE, std::string> items;
+    if (items.empty())
+    {
+        for (TEXTURE i = 0; i < 0x192; ++i)
+        {
+            auto def = get_texture_definition(i);
+            auto slash = def.texture_path.find_last_of("/\\") + 1;
+            std::string path = def.texture_path.substr(slash, def.texture_path.length() - slash);
+            if (i > 0)
+                path = path.substr(0, path.length() - 4);
+            if (def.width > 0)
+                items[i] = fmt::format("{:03d}: {}", i, path);
+        }
+    }
+    const char* preview = items.contains(texture_viewer.id) ? items[texture_viewer.id].c_str() : "No texture selected";
+    if (ImGui::BeginCombo("Texture##PickTexture", preview))
+    {
+        for (TEXTURE i = 0; i < 0x192; ++i)
+        {
+            const bool selected = (texture_viewer.id == i);
+            if (items.contains(i) && ImGui::Selectable(items[i].c_str(), selected))
+                texture_viewer.id = i;
+
+            if (selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+    if (texture_viewer.uid != g_last_id)
+    {
+        Entity* ent = get_entity_ptr(g_last_id);
+        if (ent)
+            texture_viewer.id = ent->get_texture();
+        texture_viewer.uid = g_last_id;
+    }
+    Entity* ent = get_entity_ptr(texture_viewer.uid);
+
+    auto pos = ImGui::GetWindowPos();
+    auto size = ImGui::GetWindowSize();
+    auto base = ImGui::GetMainViewport();
+    auto dl = ImGui::GetBackgroundDrawList();
+    if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture"))
+    {
+        dl->AddRectFilled({pos.x, pos.y}, {pos.x + size.x, pos.y + size.y}, ImGui::GetColorU32(ImGuiCol_WindowBg));
+        return;
+    }
+    auto def = get_texture_definition(texture_viewer.id);
+    std::string name = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, {}) or 'UNKNOWN'", texture_viewer.id));
+    name = "TEXTURE." + name.substr(1, name.length() - 2);
+    ImGui::InputText("ID", &name, ImGuiInputTextFlags_ReadOnly);
+    ImGui::LabelText("Path", "%s", def.texture_path.c_str());
+    ImGui::LabelText("Size", "%dx%d", def.width, def.height);
+    ImGui::LabelText("Tile Size", "%dx%d", def.tile_width, def.tile_height);
+    ImGui::LabelText("Offset", "%d,%d", def.sub_image_offset_x, def.sub_image_offset_y);
+    ImGui::LabelText("Sub Image Size", "%dx%d", def.sub_image_width, def.sub_image_height);
+    static bool draw_frames = true;
+    static bool draw_grid = true;
+    static bool draw_animations = true;
+    ImGui::Checkbox("Draw tiles", &draw_grid);
+    ImGui::SameLine();
+    ImGui::Checkbox("Draw frames", &draw_frames);
+    ImGui::SameLine();
+    ImGui::Checkbox("Draw entity animations", &draw_animations);
+    // end of real window contents
+    texture_viewer.src = Quad(AABB(0, 0, 1, 1));
+    ImGui::SetWindowSize({ImGui::GetWindowSize().x, ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y + ImGui::GetWindowSize().x / def.width * def.height});
+    ImVec2 sa{pos.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y};
+    ImVec2 sb{pos.x + size.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y + def.height / def.width * size.x};
+    auto a = normalize(sa);
+    auto b = normalize(sb);
+    texture_viewer.dest = Quad(AABB(a.x, a.y, b.x, b.y));
+    pos = ImGui::GetWindowPos();
+    size = ImGui::GetWindowSize();
+    base = ImGui::GetMainViewport();
+    auto f = (sb.x - sa.x) / def.width;
+    if (draw_animations && ent && ent->get_texture() == texture_viewer.id)
+    {
+        std::map<std::tuple<uint32_t, uint32_t, bool>, int> overlap;
+        for (auto [id, anim] : ent->type->animations)
+        {
+            uint32_t x = def.sub_image_offset_x + def.tile_width * (anim.texture % (def.sub_image_width / def.tile_width));
+            uint32_t y = def.sub_image_offset_y + def.tile_height * (uint32_t)floor(anim.texture / (def.sub_image_height / def.tile_height));
+            bool rev = anim.count < 0;
+            auto key = std::make_tuple(x, y, rev);
+            float tx = 0;
+            if (rev)
+            {
+                tx = -20.0f * overlap[key] - 20.0f;
+                x += def.tile_width;
+            }
+            else
+            {
+                tx = 20.0f * overlap[key] + 6.0f;
+            }
+            auto ax = sa.x + f * x;
+            auto ay = sa.y + f * y;
+            auto bx = sa.x + f * x + f * def.tile_width * anim.count;
+            auto by = sa.y + f * y + f * def.tile_height;
+            int border = 0xbbbb66ff;
+            float thick = 2.0f;
+            if (rev)
+                dl->AddRect({ax - 3, ay + 3}, {bx + 3, by - 3}, border, 0, 0, thick);
+            else
+                dl->AddRect({ax + 3, ay + 3}, {bx - 3, by - 3}, border, 0, 0, thick);
+            dl->AddText({ax + tx, ay + f * def.tile_height - ImGui::GetTextLineHeight() - 4}, 0xffffffff, fmt::format("{}", anim.key).c_str());
+            overlap[key]++;
+        }
+    }
+
+    int i = 0;
+    for (uint32_t y = def.sub_image_offset_y; y < std::min(def.height, def.sub_image_height + def.sub_image_offset_y); y += def.tile_height)
+    {
+        for (uint32_t x = def.sub_image_offset_x; x < std::min(def.width, def.sub_image_width + def.sub_image_offset_x); x += def.tile_width)
+        {
+            int border = 0x55ffffff;
+            float thick = 1.0f;
+            bool current = false;
+            if (ent && ent->animation_frame == i && ent->get_texture() == texture_viewer.id)
+            {
+                border = 0xff00ff00;
+                thick = 3.0f;
+                current = true;
+            }
+            auto ax = sa.x + f * x;
+            auto ay = sa.y + f * y;
+            auto bx = sa.x + f * x + f * def.tile_width;
+            auto by = sa.y + f * y + f * def.tile_height;
+            if (draw_grid || current)
+                dl->AddRect({ax, ay}, {bx, by}, border, 0, 0, thick);
+            if (draw_frames)
+                dl->AddText({ax + 3, ay + 1}, 0xffffffff, fmt::format("{}", i).c_str());
+            ++i;
+        }
+    }
+    dl->AddRectFilled({pos.x, pos.y}, {pos.x + size.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y}, ImGui::GetColorU32(ImGuiCol_WindowBg));
+}
+
 void force_time()
 {
     if (g_state == 0)
@@ -6802,16 +6988,8 @@ void force_time()
 
 void render_timer()
 {
-    int frames = g_state->time_total;
-    time_t secs = frames / 60;
-    struct tm newtime;
-    char time[10];
-    gmtime_s(&newtime, &secs);
-    std::strftime(time, sizeof(time), "%H:%M:%S", &newtime);
-    std::stringstream ss;
-    ss << "Total: " << time << "." << std::setfill('0') << std::setw(3) << floor((frames % 60) * (1000.0 / 60.0));
     ImGui::PushFont(bigfont);
-    ImGui::Text("%s", ss.str().c_str());
+    ImGui::Text("%s", format_time(g_state->time_total).c_str());
     ImGui::PopFont();
 }
 
@@ -7071,6 +7249,45 @@ void render_game_props()
     }
     if (submenu("Players"))
     {
+        ImGui::TextWrapped("New players spawned here can't be controlled, but can be used to test some things that require multiple players.");
+        if (ImGui::SliderScalar("Number of players##SetNumPlayers", ImGuiDataType_U8, &g_state->items->player_count, &u8_one, &u8_four, "%d", ImGuiSliderFlags_AlwaysClamp))
+        {
+            std::array<bool, 4> active_players{false, false, false, false};
+            for (int i = 0; i < 4; ++i)
+            {
+                g_state->items->player_select_slots[i].activated = g_state->items->player_count >= i + 1;
+                for (auto player : g_players)
+                {
+                    if (player->input_ptr->player_slot == i && g_state->items->player_count < i + 1)
+                        player->kill(true, nullptr);
+                    else if (player->input_ptr->player_slot >= 0)
+                        active_players[player->input_ptr->player_slot] = true;
+                }
+                for (auto uid : UI::get_entities_by({to_id("ENT_TYPE_ITEM_PLAYERGHOST")}, 0x8, LAYER::BOTH))
+                {
+                    auto ghost = get_entity_ptr(uid)->as<PlayerGhost>();
+                    if (ghost->player_inputs && ghost->player_inputs->player_slot == i && g_state->items->player_count < i + 1)
+                        ghost->destroy();
+                }
+            }
+            auto [spawn_x, spawn_y] = UI::spawn_position();
+            if (g_players.size() > 0)
+            {
+                spawn_x = g_players.at(0)->abs_x;
+                spawn_y = g_players.at(0)->abs_y;
+            }
+            for (uint8_t i = 0; i < g_state->items->player_count; ++i)
+            {
+                if (!active_players[i])
+                {
+                    g_state->items->player_inventories[i].health = 4;
+                    auto uid = g_state->next_entity_uid;
+                    UI::spawn_player(i, spawn_x, spawn_y);
+                    auto player = get_entity_ptr(uid)->as<Player>();
+                    player->set_position(spawn_x, spawn_y);
+                }
+            }
+        }
         render_players();
         endmenu();
     }
@@ -7284,6 +7501,44 @@ void render_spawner()
     render_list();
 }
 
+std::string hud_input(int buttons)
+{
+    std::wstring input = L"JWBRSDMT";
+    for (int i = 0; i < 8; ++i)
+    {
+        if (!(buttons & (int)std::pow(2, i)))
+            input[i] = ' ';
+    }
+    if (buttons & 0x100)
+        input += L"←";
+    else if (buttons & 0x200)
+        input += L"→";
+    if (buttons & 0x400)
+        input += L"↑";
+    else if (buttons & 0x800)
+        input += L"↓";
+    return std::string(cvt.to_bytes(input));
+}
+
+AABB player_hud_position(int p = 0)
+{
+    float ax = -0.98f;
+    float f = 1.0f;
+    uint32_t hs = get_setting(GAME_SETTING::HUD_SIZE).value_or(0);
+    if (hs == 0 || g_state->items->player_count > 3)
+        f = 1.0f;
+    else if (hs == 1 || g_state->items->player_count > 2)
+        f = 1.15f;
+    else
+        f = 1.3f;
+    float w = 0.32f * f;
+
+    float ay = 0.94f - (1.0f - f) * 0.1f;
+    float h = 0.2f * f;
+
+    return AABB(ax + p * w + 0.02f * f, ay, ax + p * w + w - 0.02f * f, ay - h);
+}
+
 void render_prohud()
 {
     auto io = ImGui::GetIO();
@@ -7292,7 +7547,7 @@ void render_prohud()
     auto topmargin = 0.0f;
     if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
-    std::string buf = fmt::format("FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
+    std::string buf = fmt::format("TIMER:{}/{} FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", format_time(g_state->time_level), format_time(g_state->time_total), UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
@@ -7304,6 +7559,30 @@ void render_prohud()
     buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}", type)));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+
+    static std::array<int, 4> inputs{0};
+    static uint32_t last_input_frame = 0;
+    if (g_state->time_level != last_input_frame)
+    {
+        for (int i = 0; i < g_state->items->player_count; ++i)
+            inputs[i] = (int)g_state->player_inputs->player_slots[i].buttons_gameplay;
+        last_input_frame = g_state->time_level;
+    }
+    for (int i = 0; i < g_state->items->player_count; ++i)
+    {
+        auto pos = player_hud_position(i);
+        auto w = (pos.right - pos.left) / 20.f;
+        auto pw = screenify(w);
+        auto [ax, ay] = fix_pos(screenify({pos.left, pos.top}));
+        auto [bx, by] = fix_pos(screenify({pos.right, pos.bottom}));
+        buf = hud_input((int)g_state->player_inputs->player_slots[i].buttons_gameplay);
+        textsize = ImGui::CalcTextSize(buf.c_str());
+        dl->AddText({ax + pw, by}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+
+        buf = hud_input(inputs[i]);
+        textsize = ImGui::CalcTextSize(buf.c_str());
+        dl->AddText({ax + pw, by + textsize.y}, ImColor(0.5f, 1.0f, 0.5f, .5f), buf.c_str());
+    }
 }
 
 void render_tool(std::string tool)
@@ -7333,6 +7612,8 @@ void render_tool(std::string tool)
         render_keyconfig();
     else if (tool == "tool_finder")
         render_entity_finder();
+    else if (tool == "tool_texture")
+        render_texture_viewer();
 }
 
 bool is_tab_open(std::string name)
@@ -7381,6 +7662,8 @@ void imgui_init(ImGuiContext*)
     windows["tool_save"] = new Window({"Savegame", is_tab_detached("tool_save"), is_tab_open("tool_save")});
     windows["tool_keys"] = new Window({"Keys", is_tab_detached("tool_keys"), is_tab_open("tool_keys")});
     windows["tool_finder"] = new Window({"Finder", is_tab_detached("tool_finder"), is_tab_open("tool_finder")});
+    windows["tool_texture"] = new Window({"Texture viewer", is_tab_detached("tool_texture"), is_tab_open("tool_texture")});
+    // windows["tool_sound"] = new Window({"Sound player", is_tab_detached("tool_sound"), is_tab_open("tool_sound")});
 
     if (g_ui_scripts.find("dark") == g_ui_scripts.end())
     {
@@ -7467,6 +7750,16 @@ void imgui_draw()
                     if (ImGui::GetIO().MouseClicked[1] && mouse_pos().y < ImGui::GetTextLineHeight() && ImGui::IsItemHovered())
                         detach(tab);
                 }
+                if (ImGui::BeginMenu("Assets"))
+                {
+                    for (size_t i = 0; i < tab_order_extra.size(); ++i)
+                    {
+                        auto tab = tab_order_extra[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str()))
+                            detach(tab);
+                    }
+                    ImGui::EndMenu();
+                }
                 ImGui::EndMainMenuBar();
             }
             ImGui::PopID();
@@ -7479,9 +7772,17 @@ void imgui_draw()
             {
                 if (ImGui::BeginMenu("Tools"))
                 {
-                    for (size_t i = 0; i < tab_order.size() - 4; ++i)
+                    for (size_t i = 0; i < tab_order.size() - 5; ++i)
                     {
                         auto tab = tab_order[i];
+                        if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
+                        {
+                            toggle(tab);
+                        }
+                    }
+                    for (size_t i = 0; i < tab_order_extra.size(); ++i)
+                    {
+                        auto tab = tab_order_extra[i];
                         if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
                         {
                             toggle(tab);
@@ -7585,11 +7886,19 @@ void imgui_draw()
             if (!tab.second->detached)
                 continue;
             ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
-            ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, ImGuiViewportFlags_NoTaskBarIcon);
+            int flags = ImGuiViewportFlags_NoTaskBarIcon;
+            if (tab.first == "tool_texture")
+            {
+                ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
+                flags |= ImGuiWindowFlags_NoBackground;
+            }
+            ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, flags);
             ImGui::PushID(tab.second->name.c_str());
-            ImGui::BeginChild("ScrollableTool");
+            if (tab.first != "tool_texture")
+                ImGui::BeginChild("ScrollableTool");
             render_tool(tab.first);
-            ImGui::EndChild();
+            if (tab.first != "tool_texture")
+                ImGui::EndChild();
             ImGui::PopID();
             ImGui::End();
         }
@@ -7730,6 +8039,7 @@ void init_ui()
         {
             auto& render_api_l = RenderAPI::get();
             static const float color[4]{1.0f, 1.0f, 1.0f, 0.3f};
+            render_vanilla_stuff();
             render_api_l.draw_text(&tri, color);
         });
 }

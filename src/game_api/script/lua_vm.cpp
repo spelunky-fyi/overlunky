@@ -11,6 +11,7 @@
 #include <cstdint>       // for uint32_t, int8_t
 #include <deque>         // for deque
 #include <exception>     // for exception
+#include <fmt/chrono.h>  // for format_time
 #include <fmt/format.h>  // for format_error
 #include <functional>    // for _Func_impl_no_all...
 #include <imgui.h>       // for GetIO, ImVec4
@@ -256,17 +257,18 @@ end
         backend->lua["lua_print"](message);
     };
 
-    /// Print a log message to console.
+    /// Print a log message to ingame console.
     lua["console_print"] = [](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
-        backend->console->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
-        if (backend->console->messages.size() > 20)
-            backend->console->messages.pop_front();
-        backend->lua["lua_print"](message);
+        auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        std::tm time_buf;
+        localtime_s(&time_buf, &in_time_t);
+        std::vector<ScriptMessage> messages{{message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)}};
+        backend->console->push_history(fmt::format("--- [{}] at {:%Y-%m-%d %X}", backend->get_id(), time_buf), std::move(messages));
     };
 
-    /// Prinspect to console
+    /// Prinspect to ingame console.
     lua["console_prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
         if (objects.size() > 0)
@@ -358,7 +360,7 @@ end
         return backend->cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add global callback function to be called on an [event](#ON).
+    /// Add global callback function to be called on an [event](#Events).
     lua["set_callback"] = [](sol::function cb, ON event) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
@@ -401,7 +403,7 @@ end
             }
         });
 
-    /// Table of options set in the UI, added with the [register_option_functions](#Option-functions). You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
+    /// Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
     // lua["options"] = lua.create_named_table("options");
 
     /// Load another script by id "author/name" and import its `exports` table. Returns:
@@ -1955,6 +1957,64 @@ end
         "POST_UPDATE",
         ON::POST_UPDATE);
     /* ON
+    // LOGO
+    // Runs when entering the the mossmouth logo screen.
+    // INTRO
+    // Runs when entering the intro cutscene.
+    // PROLOGUE
+    // Runs when entering the prologue / poem.
+    // TITLE
+    // Runs when entering the title screen.
+    // MENU
+    // Runs when entering the main menu.
+    // OPTIONS
+    // Runs when entering the options menu.
+    // PLAYER_PROFILE
+    // Runs when entering the player profile screen.
+    // LEADERBOARD
+    // Runs when entering the leaderboard screen.
+    // SEED_INPUT
+    // Runs when entering the seed input screen of a seeded run.
+    // CHARACTER_SELECT
+    // Runs when entering the character select screen.
+    // TEAM_SELECT
+    // Runs when entering the team select screen of arena mode.
+    // CAMP
+    // Runs when entering the camp, after all entities have spawned, on the first level frame.
+    // LEVEL
+    // Runs when entering any level, after all entities have spawned, on the first level frame.
+    // TRANSITION
+    // Runs when entering the transition screen, after all entities have spawned.
+    // DEATH
+    // Runs when entering the death screen.
+    // SPACESHIP
+    // Runs when entering the olmecship cutscene after Tiamat.
+    // WIN
+    // Runs when entering any winning cutscene, including the constellation.
+    // CREDITS
+    // Runs when entering the credits.
+    // SCORES
+    // Runs when entering the final score celebration screen of a normal or hard ending.
+    // CONSTELLATION
+    // Runs when entering the turning into constellation cutscene after cosmic ocean.
+    // RECAP
+    // Runs when entering the Dear Journal screen after final scores.
+    // ARENA_MENU
+    // Runs when entering the main arena rules menu screen.
+    // ARENA_STAGES
+    // Runs when entering the arena stage selection screen.
+    // ARENA_ITEMS
+    // Runs when entering the arena item config screen.
+    // ARENA_INTRO
+    // Runs when entering the arena VS intro screen.
+    // ARENA_MATCH
+    // Runs when entering the arena level screen, after all entities have spawned, on the first level frame, before the get ready go scene.
+    // ARENA_SCORE
+    // Runs when entering the arena scores screen.
+    // ONLINE_LOADING
+    // Runs when entering the online loading screen.
+    // ONLINE_LOBBY
+    // Runs when entering the online lobby screen.
     // GUIFRAME
     // Params: GuiDrawContext draw_ctx
     // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a GuiDrawContext
@@ -2073,6 +2133,10 @@ end
     // Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
     // POST_UPDATE
     // Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
+    // SCRIPT_ENABLE
+    // Runs when the script is enabled from the UI or when imported by another script while disabled, but not on load.
+    // SCRIPT_DISABLE
+    // Runs when the script is disabled from the UI and also right before unloading/reloading.
     */
 
     lua.create_named_table(

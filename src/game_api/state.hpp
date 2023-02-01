@@ -32,6 +32,11 @@ struct ParticleEmitterInfo;
 const float ZF = 0.737f;
 
 using PAUSE = uint8_t;
+using THEME = uint8_t;
+using QUEST_FLAG = uint32_t;
+using PRESENCE_FLAG = uint32_t;
+using JOURNAL_FLAG = uint32_t;
+using CAUSE_OF_DEATH = uint8_t;
 
 struct SaveData;
 struct Layer;
@@ -45,15 +50,24 @@ void fix_liquid_out_of_bounds();
 struct StateMemory
 {
     size_t p00;
+    /// Previous SCREEN, used to check where we're coming from when loading another SCREEN
     uint32_t screen_last;
+    /// Current SCREEN, generally read-only or weird things will happen
     uint32_t screen;
+    /// Next SCREEN, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
     uint32_t screen_next;
+    /// Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to `screen_next`.
     uint32_t loading;
+    /// The global level illumination, very big and bright.
     Illumination* illumination;
-    float fadevalue; // 0.0 = all visible; 1.0 = all black
+    /// Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
+    float fadevalue;
+    /// Amount of frames the fadeout should last when loading
     uint32_t fadeout;
+    /// Amount of frames the fadein should last when loading
     uint32_t fadein;
-    uint32_t loading_black_screen_timer; // if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
+    /// if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
+    uint32_t loading_black_screen_timer;
     /// Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
     uint8_t ingame;
     /// Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
@@ -69,12 +83,15 @@ struct StateMemory
     uint8_t pause_related1;
     uint8_t pause_related2;
     uint8_t padding1[3];
-    uint32_t quest_flags;
-    uint8_t correct_ushabti; // correct_ushabti = anim_frame - (2 * floor(anim_frame/12))
+    /// 32bit flags, can be written to trigger a run reset on next level load etc.
+    QUEST_FLAG quest_flags;
+    /// See `get_correct_ushabti`. == anim_frame - (2 * floor(anim_frame/12))
+    uint8_t correct_ushabti;
     uint8_t padding2[3];
     /// Who administers the tutorial speedrun in base camp
     ENT_TYPE speedrun_character;
-    bool speedrun_activation_trigger; // must transition from true to false to activate it
+    /// must transition from true to false to activate it
+    bool speedrun_activation_trigger;
     uint8_t padding3[3];
     /// level width in rooms (number of rooms horizontally)
     uint32_t w;
@@ -87,33 +104,51 @@ struct StateMemory
     /// 0 - none, 1 - item, 3 - kapala
     int8_t kali_gifts;
     int32_t outposts_spawned;
-    int32_t money_shop_total; // total $ spent at shops, persists between levels, number will be negative
+    /// Total negative amount spent in shops during the run<br>
+    /// The total money currently available (in single player) is `players[1].inventory.money + players[1].inventory.collected_money_total + state.money_shop_total`
+    int32_t money_shop_total;
+    /// World number to start new runs in
     uint8_t world_start;
+    /// Level number to start new runs in
     uint8_t level_start;
+    /// THEME to start new runs in
     uint8_t theme_start;
     uint8_t b5f;
+    /// Current seed in seeded mode, just set to a funny value and does nothing in adventure mode
     uint32_t seed;
+    /// Total frames of current run, equal to the final game time on win
     uint32_t time_total;
+    /// Current world number, shown in hud and used by some game logic like choosing the next level on transition
     uint8_t world;
+    /// Next world number, used when loading a new level or transition
     uint8_t world_next;
+    /// Current level number, shown in hud and used by some game logic like choosing the next level on transition
     uint8_t level;
+    /// Next level number, used when loading a new level or transition
     uint8_t level_next;
+    /// Points to the current ThemeInfo
     ThemeInfo* current_theme;
-    uint8_t theme;
-    uint8_t theme_next;
+    /// Current THEME number, used to pick the music and by some game logic like choosing the next level on transition
+    THEME theme;
+    /// Next THEME number, used when loading a new level or transition
+    THEME theme_next;
     /// 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     uint8_t win_state;
     uint8_t b73; // padding probably
     /// Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
     ENT_TYPE end_spaceship_character;
+    /// Current shoppie aggro
     uint8_t shoppie_aggro;
+    /// Shoppie aggro to use in the next level
     uint8_t shoppie_aggro_levels;
+    /// Tun aggro
     uint8_t merchant_aggro;
     /// Run totals
     uint8_t saved_dogs;
     uint8_t saved_cats;
     uint8_t saved_hamsters;
     uint8_t kills_npc;
+    /// Current zero-based level count, or number of levels completed
     uint8_t level_count;
     /// Total amount of damage taken, excluding cause of death
     uint16_t damage_taken;
@@ -136,25 +171,29 @@ struct StateMemory
     uint8_t unknown5c;
     uint8_t unknown5d;
     ArenaState arena;
-    uint32_t journal_flags;
+    JOURNAL_FLAG journal_flags;
     ENT_TYPE first_damage_cause; // entity type that caused first damage, for the journal
     int8_t first_damage_world;
     int8_t first_damage_level;
     uint8_t i9f4c;
     uint8_t i9f4d;
+    /// Level time of previous level in frames, used by game logic to decide dark levels etc
     uint32_t time_last_level;
+    /// Level time of current level in frames, show on the hud
     uint32_t time_level;
     uint32_t time_speedrun;
     uint32_t money_last_levels;
     int32_t level_flags;
-    uint32_t presence_flags;
-    ENT_TYPE coffin_contents; // entity type - the contents of the coffin that will be spawned (during levelgen)
-    uint8_t cause_of_death;
+    PRESENCE_FLAG presence_flags;
+    /// the contents of the special coffin that will be spawned during levelgen
+    ENT_TYPE coffin_contents;
+    CAUSE_OF_DEATH cause_of_death;
     uint8_t padding10;
     uint8_t padding11;
     uint8_t padding12;
     ENT_TYPE cause_of_death_entity_type;
-    int32_t waddler_floor_storage; // entity uid of the first floor_storage entity
+    /// entity uid of the first floor_storage entity
+    int32_t waddler_floor_storage;
     MultiLineTextRendering* toast;
     MultiLineTextRendering* speechbubble;
     uint32_t speechbubble_timer;
@@ -186,15 +225,20 @@ struct StateMemory
     size_t unknown_screen_online_loading; // potentially ScreenOnlineLoading, available in GameManager
     size_t unknown_screen_online_lobby;   // potentially ScreenOnlineLobby, available in GameManager
 
+    /// Next entity spawned will have this uid
     uint32_t next_entity_uid;
     uint16_t unknown20;
     uint16_t screen_change_counter; // increments every time screen changes; used in online sync together with next_entity_uid and unknown20 as a 64bit number
+    /// Access the player inputs even when no player entities are available
     PlayerInputs* player_inputs;
-
+    /// Has the current player count, player inventories and character selections
     Items* items;
+    /// Entrance and exit coordinates, shop types and all themes
     LevelGenSystem* level_gen;
     Layer* layers[2];
+    /// Level logic like dice game and cutscenes
     LogicList* logic;
+    /// NPC quest states
     QuestsInfo* quests;
     AITarget* ai_targets; // e.g. hired hand uid -> snake uid
     LiquidPhysics* liquid_physics;
@@ -209,13 +253,16 @@ struct StateMemory
 
     custom_vector<std::pair<Entity*, uint8_t>> backlayer_player_related1; // inside vector: player and destination layer?
     uint32_t layer_transition_effect_timer;
+    /// The currently drawn layer, can't be changed
     uint8_t camera_layer;
     uint8_t unknown31a; // padding probably
     uint8_t unknown31b;
     uint8_t unknown31c;
     ShopsInfo shops;
+    /// Number of frames since the game was launched
     uint32_t time_startup;
     uint32_t special_visibility_flags;
+    /// Camera bounds and position
     Camera* camera;
     uint8_t unknown40;
     int8_t unknown41; // other character related (hired hand, basecamp characters)

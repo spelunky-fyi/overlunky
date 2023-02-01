@@ -19,7 +19,7 @@ meta.description = [[
 
 ```
 
-#### array&lt;string&gt; meta
+#### array&lt;mixed&gt; meta
 
 > Search script examples for [meta](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=meta)
 
@@ -118,11 +118,11 @@ end, ON.LEVEL)
 
 ```
 
-#### array&lt;mixed&gt; options
+#### optional&lt;array&lt;mixed&gt;&gt; options
 
 > Search script examples for [options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 
-Table of options set in the UI, added with the [register_option_functions](#Option-functions). You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
+Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
 ### prng
 
 
@@ -164,7 +164,7 @@ set_interval(function()
   count = count + 1
   spawn(ENT_TYPE.FX_EXPLOSION, 0, 0, LAYER.FRONT, 0, 0)
   if count >= 3 then
-    -- calling this without parameters clears the fallback that's calling it
+    -- calling this without parameters clears the callback that's calling it
     clear_callback()
   end
 end, 60)
@@ -204,7 +204,7 @@ Clears a previously set callback
 #### [CallbackId](#Aliases) set_callback(function cb, [ON](#ON) event)
 
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
-Add global callback function to be called on an [event](#ON).
+Add global callback function to be called on an [event](#Events).
 
 ### set_global_interval
 
@@ -1723,7 +1723,7 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out
 
 #### nil console_prinspect(variadic_args objects)
 
-Prinspect to console
+Prinspect to ingame console.
 
 ### console_print
 
@@ -1732,7 +1732,7 @@ Prinspect to console
 
 #### nil console_print(string message)
 
-Print a log message to console.
+Print a log message to ingame console.
 
 ### log_print
 
