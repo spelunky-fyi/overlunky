@@ -260,7 +260,7 @@ std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "", detach_tab = "", focused_tool = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_texture", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 std::vector<std::string> tab_order_main = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options"};
-std::vector<std::string> tab_order_extra = {"tool_texture", "tool_debug"};
+std::vector<std::string> tab_order_extra = {"tool_texture"};
 std::vector<std::string> tabs_open = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"};
 std::vector<std::string> tabs_detached = {};
 
@@ -6779,9 +6779,12 @@ void render_texture_viewer()
         for (TEXTURE i = 0; i < 0x192; ++i)
         {
             auto def = get_texture_definition(i);
-            std::string path = def.texture_path.substr(0, def.texture_path.length() - 4);
+            auto slash = def.texture_path.find_last_of("/\\") + 1;
+            std::string path = def.texture_path.substr(slash, def.texture_path.length() - slash);
+            if (i > 0)
+                path = path.substr(0, path.length() - 4);
             if (def.width > 0)
-                items[i] = fmt::format("{:03d}: {}", i, i > 0 ? path : def.texture_path);
+                items[i] = fmt::format("{:03d}: {}", i, path);
         }
     }
     const char* preview = items.contains(texture_viewer.id) ? items[texture_viewer.id].c_str() : "No texture selected";
@@ -6807,6 +6810,13 @@ void render_texture_viewer()
     }
     Entity* ent = get_entity_ptr(texture_viewer.uid);
 
+    auto pos = ImGui::GetWindowPos();
+    auto size = ImGui::GetWindowSize();
+    auto base = ImGui::GetMainViewport();
+    // fill fake background
+    auto dl = ImGui::GetBackgroundDrawList();
+    dl->AddRectFilled({pos.x, pos.y}, {pos.x + size.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y}, ImGui::GetColorU32(ImGuiCol_WindowBg));
+
     if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture"))
         return;
     auto def = get_texture_definition(texture_viewer.id);
@@ -6818,42 +6828,82 @@ void render_texture_viewer()
     ImGui::LabelText("Tile Size", "%dx%d", def.tile_width, def.tile_height);
     ImGui::LabelText("Offset", "%d,%d", def.sub_image_offset_x, def.sub_image_offset_y);
     ImGui::LabelText("Sub Image Size", "%dx%d", def.sub_image_width, def.sub_image_height);
+    static bool draw_frames = true;
+    static bool draw_grid = true;
+    static bool draw_animations = true;
+    ImGui::Checkbox("Draw tiles", &draw_grid);
+    ImGui::SameLine();
+    ImGui::Checkbox("Draw frames", &draw_frames);
+    ImGui::SameLine();
+    ImGui::Checkbox("Draw entity animations", &draw_animations);
     // end of real window contents
     texture_viewer.src = Quad(AABB(0, 0, 1, 1));
     ImGui::SetWindowSize({ImGui::GetWindowSize().x, ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y + ImGui::GetWindowSize().x / def.width * def.height});
-    auto pos = ImGui::GetWindowPos();
-    auto size = ImGui::GetWindowSize();
-    auto base = ImGui::GetMainViewport();
     ImVec2 sa{pos.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y};
     ImVec2 sb{pos.x + size.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y + def.height / def.width * size.x};
     auto a = normalize(sa);
     auto b = normalize(sb);
     texture_viewer.dest = Quad(AABB(a.x, a.y, b.x, b.y));
-
-    // fill fake background
-    auto dl = ImGui::GetBackgroundDrawList();
-    dl->AddRectFilled({pos.x, pos.y}, {pos.x + size.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y}, ImGui::GetColorU32(ImGuiCol_WindowBg));
-
+    pos = ImGui::GetWindowPos();
+    size = ImGui::GetWindowSize();
+    base = ImGui::GetMainViewport();
     auto f = (sb.x - sa.x) / def.width;
+    if (draw_animations && ent)
+    {
+        std::map<std::tuple<uint32_t, uint32_t, bool>, int> overlap;
+        for (auto [id, anim] : ent->type->animations)
+        {
+            uint32_t x = def.sub_image_offset_x + def.tile_width * (anim.texture % (def.sub_image_width / def.tile_width));
+            uint32_t y = def.sub_image_offset_y + def.tile_height * (uint32_t)floor(anim.texture / (def.sub_image_height / def.tile_height));
+            bool rev = anim.count < 0;
+            auto key = std::make_tuple(x, y, rev);
+            float tx = 0;
+            if (rev)
+            {
+                tx = -20.0f * overlap[key] - 20.0f;
+                x += def.tile_width;
+            }
+            else
+            {
+                tx = 20.0f * overlap[key] + 6.0f;
+            }
+            auto ax = sa.x + f * x;
+            auto ay = sa.y + f * y;
+            auto bx = sa.x + f * x + f * def.tile_width * anim.count;
+            auto by = sa.y + f * y + f * def.tile_height;
+            int border = 0xbbbb66ff;
+            float thick = 2.0f;
+            if (rev)
+                dl->AddRect({ax - 3, ay + 3}, {bx + 3, by - 3}, border, 0, 0, thick);
+            else
+                dl->AddRect({ax + 3, ay + 3}, {bx - 3, by - 3}, border, 0, 0, thick);
+            dl->AddText({ax + tx, ay + f * def.tile_height - ImGui::GetTextLineHeight() - 4}, 0xffffffff, fmt::format("{}", anim.key).c_str());
+            overlap[key]++;
+        }
+    }
 
     int i = 0;
     for (uint32_t y = def.sub_image_offset_y; y < std::min(def.height, def.sub_image_height + def.sub_image_offset_y); y += def.tile_height)
     {
         for (uint32_t x = def.sub_image_offset_x; x < std::min(def.width, def.sub_image_width + def.sub_image_offset_x); x += def.tile_width)
         {
-            int border = 0xff0000ff;
+            int border = 0x55ffffff;
             float thick = 1.0f;
+            bool current = false;
             if (ent && ent->animation_frame == i && ent->get_texture() == texture_viewer.id)
             {
                 border = 0xff00ff00;
                 thick = 3.0f;
+                current = true;
             }
             auto ax = sa.x + f * x;
             auto ay = sa.y + f * y;
             auto bx = sa.x + f * x + f * def.tile_width;
             auto by = sa.y + f * y + f * def.tile_height;
-            dl->AddRect({ax, ay}, {bx, by}, border, 0, 0, thick);
-            dl->AddText({ax + 3, ay + 1}, 0xffffffff, fmt::format("{}", i).c_str());
+            if (draw_grid || current)
+                dl->AddRect({ax, ay}, {bx, by}, border, 0, 0, thick);
+            if (draw_frames)
+                dl->AddText({ax + 3, ay + 1}, 0xffffffff, fmt::format("{}", i).c_str());
             ++i;
         }
     }
@@ -7611,7 +7661,8 @@ void imgui_init(ImGuiContext*)
     windows["tool_save"] = new Window({"Savegame", is_tab_detached("tool_save"), is_tab_open("tool_save")});
     windows["tool_keys"] = new Window({"Keys", is_tab_detached("tool_keys"), is_tab_open("tool_keys")});
     windows["tool_finder"] = new Window({"Finder", is_tab_detached("tool_finder"), is_tab_open("tool_finder")});
-    windows["tool_texture"] = new Window({"Texture browser", is_tab_detached("tool_texture"), is_tab_open("tool_texture")});
+    windows["tool_texture"] = new Window({"Texture viewer", is_tab_detached("tool_texture"), is_tab_open("tool_texture")});
+    // windows["tool_sound"] = new Window({"Sound player", is_tab_detached("tool_sound"), is_tab_open("tool_sound")});
 
     if (g_ui_scripts.find("dark") == g_ui_scripts.end())
     {
@@ -7698,7 +7749,7 @@ void imgui_draw()
                     if (ImGui::GetIO().MouseClicked[1] && mouse_pos().y < ImGui::GetTextLineHeight() && ImGui::IsItemHovered())
                         detach(tab);
                 }
-                if (ImGui::BeginMenu("Extra"))
+                if (ImGui::BeginMenu("Assets"))
                 {
                     for (size_t i = 0; i < tab_order_extra.size(); ++i)
                     {
@@ -7836,7 +7887,10 @@ void imgui_draw()
             ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
             int flags = ImGuiViewportFlags_NoTaskBarIcon;
             if (tab.first == "tool_texture")
+            {
+                ImGui::SetNextWindowViewport(ImGui::GetMainViewport()->ID);
                 flags |= ImGuiWindowFlags_NoBackground;
+            }
             ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, flags);
             ImGui::PushID(tab.second->name.c_str());
             if (tab.first != "tool_texture")
