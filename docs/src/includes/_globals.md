@@ -1723,7 +1723,7 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out
 
 #### nil console_prinspect(variadic_args objects)
 
-Prinspect to console
+Prinspect to ingame console.
 
 ### console_print
 
@@ -1732,7 +1732,7 @@ Prinspect to console
 
 #### nil console_print(string message)
 
-Print a log message to console.
+Print a log message to ingame console.
 
 ### log_print
 

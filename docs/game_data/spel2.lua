@@ -51,11 +51,11 @@ function lua_print() end
 ---@param message string
 ---@return nil
 function print(message) end
----Print a log message to console.
+---Print a log message to ingame console.
 ---@param message string
 ---@return nil
 function console_print(message) end
----Prinspect to console
+---Prinspect to ingame console.
 ---@vararg any
 ---@return nil
 function console_prinspect(...) end
