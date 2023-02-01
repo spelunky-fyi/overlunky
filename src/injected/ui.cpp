@@ -6669,7 +6669,7 @@ void render_entity_props(int uid, bool detached = false)
         auto textureid = entity->get_texture();
         std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid));
         // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid));
-        texture = texture.substr(1, texture.length() - 2);
+        texture = "TEXTURE." + texture.substr(1, texture.length() - 2);
         // texturepath = texturepath.substr(1, texturepath.length() - 2);
         ImGui::ColorEdit4("Color", (float*)&entity->color);
         ImGui::DragFloat("Width##EntityWidth", &entity->w, 0.5f, 0.0, 10.0, "%.3f");
@@ -6753,17 +6753,21 @@ void render_entity_props(int uid, bool detached = false)
 struct TextureViewer
 {
     TEXTURE id;
+    int32_t uid;
     Quad src;
     Quad dest;
 };
 
-static TextureViewer texture_viewer{-1};
+static TextureViewer texture_viewer{0, -1};
 void render_vanilla_stuff()
 {
     auto& render = RenderAPI::get();
     auto* textures = get_textures();
-    if (texture_viewer.id < 0 || texture_viewer.id > 0x192)
+    if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture") || (options["menu_ui"] && !detached("tool_texture")))
         return;
+    // black bg hack
+    render.draw_screen_texture(textures->texture_map[0], texture_viewer.src, texture_viewer.dest, Color::black());
+    // draw vanilla texture right under the gui window
     render.draw_screen_texture(textures->texture_map[texture_viewer.id], texture_viewer.src, texture_viewer.dest, Color::white());
 }
 
@@ -6775,34 +6779,84 @@ void render_texture_viewer()
         for (TEXTURE i = 0; i < 0x192; ++i)
         {
             auto def = get_texture_definition(i);
-            items[i] = fmt::format("{:03d}: {}, {}, {}x{}", i, def.texture_path, def.tile_width, def.width, def.height);
+            std::string path = def.texture_path.substr(0, def.texture_path.length() - 4);
+            if (def.width > 0)
+                items[i] = fmt::format("{:03d}: {}", i, i > 0 ? path : def.texture_path);
         }
     }
-    static TEXTURE current = 0;
-    const char* preview = items[current].c_str();
+    const char* preview = items.contains(texture_viewer.id) ? items[texture_viewer.id].c_str() : "No texture selected";
     if (ImGui::BeginCombo("Texture##PickTexture", preview))
     {
         for (TEXTURE i = 0; i < 0x192; ++i)
         {
-            const bool selected = (current == i);
-            if (ImGui::Selectable(items[i].c_str(), selected))
-                current = i;
+            const bool selected = (texture_viewer.id == i);
+            if (items.contains(i) && ImGui::Selectable(items[i].c_str(), selected))
+                texture_viewer.id = i;
 
             if (selected)
                 ImGui::SetItemDefaultFocus();
         }
         ImGui::EndCombo();
     }
-    auto def = get_texture_definition(current);
-    ImGui::Text("%s", def.texture_path.c_str());
-    texture_viewer.id = current;
+    if (texture_viewer.uid != g_last_id)
+    {
+        Entity* ent = get_entity_ptr(g_last_id);
+        if (ent)
+            texture_viewer.id = ent->get_texture();
+        texture_viewer.uid = g_last_id;
+    }
+    Entity* ent = get_entity_ptr(texture_viewer.uid);
+
+    if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture"))
+        return;
+    auto def = get_texture_definition(texture_viewer.id);
+    std::string name = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, {}) or 'UNKNOWN'", texture_viewer.id));
+    name = "TEXTURE." + name.substr(1, name.length() - 2);
+    ImGui::InputText("ID", &name, ImGuiInputTextFlags_ReadOnly);
+    ImGui::LabelText("Path", "%s", def.texture_path.c_str());
+    ImGui::LabelText("Size", "%dx%d", def.width, def.height);
+    ImGui::LabelText("Tile Size", "%dx%d", def.tile_width, def.tile_height);
+    ImGui::LabelText("Offset", "%d,%d", def.sub_image_offset_x, def.sub_image_offset_y);
+    ImGui::LabelText("Sub Image Size", "%dx%d", def.sub_image_width, def.sub_image_height);
+    // end of real window contents
     texture_viewer.src = Quad(AABB(0, 0, 1, 1));
+    ImGui::SetWindowSize({ImGui::GetWindowSize().x, ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y + ImGui::GetWindowSize().x / def.width * def.height});
     auto pos = ImGui::GetWindowPos();
     auto size = ImGui::GetWindowSize();
     auto base = ImGui::GetMainViewport();
-    auto a = normalize({pos.x - base->Pos.x, pos.y + size.y - base->Pos.y});
-    auto b = normalize({pos.x + size.x - base->Pos.x, pos.y + size.y - base->Pos.y + def.height / def.width * size.x});
+    ImVec2 sa{pos.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y};
+    ImVec2 sb{pos.x + size.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y + def.height / def.width * size.x};
+    auto a = normalize(sa);
+    auto b = normalize(sb);
     texture_viewer.dest = Quad(AABB(a.x, a.y, b.x, b.y));
+
+    // fill fake background
+    auto dl = ImGui::GetBackgroundDrawList();
+    dl->AddRectFilled({pos.x, pos.y}, {pos.x + size.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y}, ImGui::GetColorU32(ImGuiCol_WindowBg));
+
+    auto f = (sb.x - sa.x) / def.width;
+
+    int i = 0;
+    for (uint32_t y = def.sub_image_offset_y; y < std::min(def.height, def.sub_image_height + def.sub_image_offset_y); y += def.tile_height)
+    {
+        for (uint32_t x = def.sub_image_offset_x; x < std::min(def.width, def.sub_image_width + def.sub_image_offset_x); x += def.tile_width)
+        {
+            int border = 0xff0000ff;
+            float thick = 1.0f;
+            if (ent && ent->animation_frame == i && ent->get_texture() == texture_viewer.id)
+            {
+                border = 0xff00ff00;
+                thick = 3.0f;
+            }
+            auto ax = sa.x + f * x;
+            auto ay = sa.y + f * y;
+            auto bx = sa.x + f * x + f * def.tile_width;
+            auto by = sa.y + f * y + f * def.tile_height;
+            dl->AddRect({ax, ay}, {bx, by}, border, 0, 0, thick);
+            dl->AddText({ax + 3, ay + 1}, 0xffffffff, fmt::format("{}", i).c_str());
+            ++i;
+        }
+    }
 }
 
 void force_time()
@@ -7780,11 +7834,16 @@ void imgui_draw()
             if (!tab.second->detached)
                 continue;
             ImGui::SetNextWindowSize({toolwidth, toolwidth}, ImGuiCond_Once);
-            ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, ImGuiViewportFlags_NoTaskBarIcon);
+            int flags = ImGuiViewportFlags_NoTaskBarIcon;
+            if (tab.first == "tool_texture")
+                flags |= ImGuiWindowFlags_NoBackground;
+            ImGui::Begin(tab.second->name.c_str(), &tab.second->detached, flags);
             ImGui::PushID(tab.second->name.c_str());
-            ImGui::BeginChild("ScrollableTool");
+            if (tab.first != "tool_texture")
+                ImGui::BeginChild("ScrollableTool");
             render_tool(tab.first);
-            ImGui::EndChild();
+            if (tab.first != "tool_texture")
+                ImGui::EndChild();
             ImGui::PopID();
             ImGui::End();
         }
