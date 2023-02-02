@@ -6766,7 +6766,7 @@ void render_vanilla_stuff()
 {
     auto& render = RenderAPI::get();
     auto* textures = get_textures();
-    if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture") || (options["menu_ui"] && !detached("tool_texture")))
+    if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture") || (options["menu_ui"] && !detached("tool_texture")) || hide_ui)
         return;
     // black bg hack
     render.draw_screen_texture(textures->texture_map[0], texture_viewer.src, texture_viewer.dest, Color::black());
