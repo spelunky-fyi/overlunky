@@ -390,6 +390,12 @@ Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth
 
 Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth<br/>Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx<br/>
 
+## ON.RENDER_PRE_JOURNAL_PAGE
+
+
+> Search script examples for [ON.RENDER_PRE_JOURNAL_PAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_JOURNAL_PAGE)
+
+
 ## ON.RENDER_POST_JOURNAL_PAGE
 
 
