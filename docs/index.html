@@ -3259,6 +3259,9 @@
                   <li>
                     <a href="#ON-POST_UPDATE" class="toc-h2 toc-link" data-title="ON.POST_UPDATE">ON.POST_UPDATE</a>
                   </li>
+                  <li>
+                    <a href="#ON-USER_DATA" class="toc-h2 toc-link" data-title="ON.USER_DATA">ON.USER_DATA</a>
+                  </li>
               </ul>
           </li>
           <li>
@@ -25290,6 +25293,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </blockquote>
 
 <p>Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/></p>
+<h2 id='ON-USER_DATA'>ON.USER_DATA</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.USER_DATA">ON.USER_DATA</a></p>
+</blockquote>
+
+<p>Params: <a href="#Entity">Entity</a> ent<br/>Runs on all changes to <a href="#Entity">Entity</a>.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won&#39;t be saved to bother you on future levels.<br/></p>
 <h1 id='Enums'>Enums</h1>
 <p>Enums are like numbers but in text that&#39;s easier to remember.</p>
 <div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -27547,6 +27556,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_UPDATE">POST_UPDATE</a></td>
 <td>ON::POST_UPDATE</td>
 <td>Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.USER_DATA">USER_DATA</a></td>
+<td>ON::USER_DATA</td>
+<td>Params: <a href="#Entity">Entity</a> ent<br/>Runs on all changes to <a href="#Entity">Entity</a>.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won&#39;t be saved to bother you on future levels.<br/></td>
 </tr>
 </tbody></table>
 <h2 id='PARTICLEEMITTER'>PARTICLEEMITTER</h2>
