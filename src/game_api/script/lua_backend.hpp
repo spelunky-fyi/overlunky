@@ -109,6 +109,7 @@ enum class ON
     PRE_SET_FEAT,
     PRE_UPDATE,
     POST_UPDATE,
+    USER_DATA
 };
 
 struct IntOption
@@ -397,6 +398,8 @@ class LuaBackend
     static void push_calling_backend(LuaBackend*);
     static void pop_calling_backend(LuaBackend*);
     bool on_pre_state_update();
+    void on_set_user_data(Entity* ent);
+    void load_user_data();
 };
 
 template <class Inheriting>

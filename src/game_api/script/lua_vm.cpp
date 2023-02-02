@@ -1955,7 +1955,9 @@ end
         "PRE_UPDATE",
         ON::PRE_UPDATE,
         "POST_UPDATE",
-        ON::POST_UPDATE);
+        ON::POST_UPDATE,
+        "USER_DATA",
+        ON::USER_DATA);
     /* ON
     // LOGO
     // Runs when entering the the mossmouth logo screen.
@@ -2137,6 +2139,9 @@ end
     // Runs when the script is enabled from the UI or when imported by another script while disabled, but not on load.
     // SCRIPT_DISABLE
     // Runs when the script is disabled from the UI and also right before unloading/reloading.
+    // USER_DATA
+    // Params: Entity ent
+    // Runs on all changes to Entity.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.
     */
 
     lua.create_named_table(

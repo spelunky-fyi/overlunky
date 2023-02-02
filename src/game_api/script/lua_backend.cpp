@@ -206,7 +206,11 @@ void LuaBackend::set_user_data(Entity& entity, sol::object user_data)
             });
         user_datas[entity.uid].dtor_hook_id = dtor_hook_id;
     }
-    user_datas[entity.uid].data = user_data;
+    if (user_data == sol::nil)
+        user_datas.erase(entity.uid);
+    else
+        user_datas[entity.uid].data = user_data;
+    on_set_user_data(&entity);
 }
 void LuaBackend::set_user_data(uint32_t uid, sol::object user_data)
 {
@@ -888,6 +892,48 @@ void LuaBackend::post_room_generation()
         }
     }
 }
+
+void LuaBackend::load_user_data()
+{
+    for (auto uid : get_entities_by_mask(1))
+    {
+        auto ent = get_entity_ptr(uid)->as<Player>();
+        int slot = ent->inventory_ptr->player_slot;
+        if (slot == -1 && ent->linked_companion_parent == -1)
+            continue;
+        if (slot == -1 && ent->linked_companion_parent != -1)
+        {
+            Player* parent = ent;
+            while (true)
+            {
+                parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                slot++;
+                if (parent->linked_companion_parent == -1)
+                {
+                    slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                    break;
+                }
+            }
+        }
+        if (slot < 0)
+            continue;
+        if (saved_user_datas.contains(slot))
+        {
+            if (saved_user_datas[slot].self.has_value())
+                set_user_data(*ent, saved_user_datas[slot].self.value());
+            if (ent->holding_uid != -1 && saved_user_datas[slot].held.has_value())
+                set_user_data(ent->holding_uid, saved_user_datas[slot].held.value());
+            if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && saved_user_datas[slot].mount.has_value())
+                set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value());
+            for (auto [type, powerup] : ent->powerups)
+            {
+                if (saved_user_datas[slot].powerups.contains(type))
+                    set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
+            }
+        }
+    }
+}
+
 void LuaBackend::post_level_generation()
 {
     if (!get_enabled())
@@ -900,42 +946,7 @@ void LuaBackend::post_level_generation()
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::LEVEL)
     {
-        for (auto uid : get_entities_by_mask(1))
-        {
-            auto ent = get_entity_ptr(uid)->as<Player>();
-            int slot = ent->inventory_ptr->player_slot;
-            if (slot == -1 && ent->linked_companion_parent == -1)
-                continue;
-            if (slot == -1 && ent->linked_companion_parent != -1)
-            {
-                Player* parent = ent;
-                while (true)
-                {
-                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
-                    slot++;
-                    if (parent->linked_companion_parent == -1)
-                    {
-                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
-                        break;
-                    }
-                }
-            }
-            if (slot < 0)
-                continue;
-            if (saved_user_datas.contains(slot))
-            {
-                set_user_data(*ent, saved_user_datas[slot].self.value_or(sol::nil));
-                if (ent->holding_uid != -1)
-                    set_user_data(ent->holding_uid, saved_user_datas[slot].held.value_or(sol::nil));
-                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0)
-                    set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value_or(sol::nil));
-                for (auto [type, powerup] : ent->powerups)
-                {
-                    if (saved_user_datas[slot].powerups.contains(type))
-                        set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
-                }
-            }
-        }
+        load_user_data();
         saved_user_datas.clear();
     }
 
@@ -961,43 +972,7 @@ void LuaBackend::post_load_screen()
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::TRANSITION)
     {
-        for (auto uid : get_entities_by_mask(1))
-        {
-            auto ent = get_entity_ptr(uid)->as<Player>();
-            int slot = ent->inventory_ptr->player_slot;
-            if (slot == -1 && ent->linked_companion_parent == -1)
-                continue;
-            if (slot == -1 && ent->linked_companion_parent != -1)
-            {
-                Player* parent = ent;
-                while (true)
-                {
-                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
-                    slot++;
-                    if (parent->linked_companion_parent == -1)
-                    {
-                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
-                        break;
-                    }
-                }
-            }
-            if (slot < 0)
-                continue;
-            if (saved_user_datas.contains(slot))
-            {
-                set_user_data(*ent, saved_user_datas[slot].self.value_or(sol::nil));
-                if (ent->holding_uid != -1)
-                    set_user_data(ent->holding_uid, saved_user_datas[slot].held.value_or(sol::nil));
-                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0)
-                    set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value_or(sol::nil));
-                for (auto [type, powerup] : ent->powerups)
-                {
-                    if (saved_user_datas[slot].powerups.contains(type))
-                        set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
-                }
-            }
-        }
-        // saved_user_datas.clear();
+        load_user_data();
     }
 
     auto now = get_frame_count();
@@ -1591,4 +1566,25 @@ bool LuaBackend::on_pre_state_update()
         }
     }
     return false;
+}
+
+void LuaBackend::on_set_user_data(Entity* ent)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::USER_DATA)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, ent);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
 }
