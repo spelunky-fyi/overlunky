@@ -6844,6 +6844,8 @@ void render_texture_viewer()
     ImGui::SetWindowSize({ImGui::GetWindowSize().x, ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y + ImGui::GetWindowSize().x / def.width * def.height});
     ImVec2 sa{pos.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y};
     ImVec2 sb{pos.x + size.x - base->Pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y - base->Pos.y + (float)def.height / (float)def.width * size.x};
+    ImVec2 ga{pos.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y};
+    ImVec2 gb{pos.x + size.x, pos.y + ImGui::GetStyle().FramePadding.y * 2 + ImGui::GetStyle().WindowPadding.y * 2 + ImGui::GetTextLineHeight() + ImGui::GetCurrentWindow()->ContentSize.y + (float)def.height / (float)def.width * size.x};
     auto a = normalize(sa);
     auto b = normalize(sb);
     texture_viewer.dest = Quad(AABB(a.x, a.y, b.x, b.y));
@@ -6870,10 +6872,10 @@ void render_texture_viewer()
             {
                 tx = 20.0f * overlap[key] + 6.0f;
             }
-            auto ax = sa.x + f * x;
-            auto ay = sa.y + f * y;
-            auto bx = sa.x + f * x + f * def.tile_width * anim.count;
-            auto by = sa.y + f * y + f * def.tile_height;
+            auto ax = ga.x + f * x;
+            auto ay = ga.y + f * y;
+            auto bx = ga.x + f * x + f * def.tile_width * anim.count;
+            auto by = ga.y + f * y + f * def.tile_height;
             int border = 0xbbbb66ff;
             float thick = 2.0f;
             if (rev)
@@ -6899,10 +6901,10 @@ void render_texture_viewer()
                 thick = 3.0f;
                 current = true;
             }
-            auto ax = sa.x + f * x;
-            auto ay = sa.y + f * y;
-            auto bx = sa.x + f * x + f * def.tile_width;
-            auto by = sa.y + f * y + f * def.tile_height;
+            auto ax = ga.x + f * x;
+            auto ay = ga.y + f * y;
+            auto bx = ga.x + f * x + f * def.tile_width;
+            auto by = ga.y + f * y + f * def.tile_height;
             if (draw_grid || current)
                 dl->AddRect({ax, ay}, {bx, by}, border, 0, 0, thick);
             if (draw_frames)
