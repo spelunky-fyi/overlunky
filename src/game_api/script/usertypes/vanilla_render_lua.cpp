@@ -142,6 +142,15 @@ Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D)
     return Vec2{(b1 * c - b * c1) / det, (a * c1 - a1 * c) / det};
 }
 
+enum class CORNER_FINISH
+{
+    CUT,
+    ADAPTIVE,
+    REAL,
+};
+
+auto g_angle_style = CORNER_FINISH::ADAPTIVE;
+
 // get a Quad to fill out the corner between two lines and fix their overlap
 Quad get_corner_quad(Quad& line1, Quad& line2)
 {
@@ -177,15 +186,22 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
 
     if (true_angle < 0) // check which one is the inner and which outer corner
     {
-        if (true_angle < -1) // only do the test for one quadrant (could probably return {} when close to 0)
+        if (true_angle < -1) // only do the test for one quadrant
         {
             // test angle for the outer corner
             float angle = get_angle(B, corner1, D);
-            if (angle < 0.1f) // too small angle is problematic, and it get's worse when the lines almost overlap generating the corner in wrong spot
+            if (angle < 0.09f) // too small angle is problematic, and it get's worse when the lines almost overlap generating the corner in wrong spot
                 return {};
-            else if (angle < 0.3f)
-                corner1 = D; // cut the corner flat
+
+            if (g_angle_style == CORNER_FINISH::ADAPTIVE && angle < 1)
+            {
+                auto offset = corner1 - corner2;
+                offset = offset * angle;
+                corner1 -= offset;
+            }
         }
+        if (g_angle_style == CORNER_FINISH::CUT)
+            corner1 = D;
 
         line1.bottom_right_x = corner2.x;
         line1.bottom_right_y = corner2.y;
@@ -199,11 +215,18 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
         if (true_angle > 1)
         {
             float angle = get_angle(F, corner2, H);
-            if (angle < 0.1f)
+            if (angle < 0.09f)
                 return {};
-            else if (angle < 0.5f)
-                corner2 = H;
+
+            if (g_angle_style == CORNER_FINISH::ADAPTIVE && angle < 1)
+            {
+                auto offset = corner2 - corner1;
+                offset = offset * angle;
+                corner2 -= offset;
+            }
         }
+        if (g_angle_style == CORNER_FINISH::CUT)
+            corner2 = H;
 
         line1.top_right_x = corner1.x;
         line1.top_right_y = corner1.y;
