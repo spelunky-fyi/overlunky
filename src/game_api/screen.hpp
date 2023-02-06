@@ -815,6 +815,8 @@ struct PauseUI
     uint32_t visibility;
 };
 
+using JOURNAL_PAGE_TYPE = JournalPageType;
+
 class JournalPage
 {
   public:
@@ -831,6 +833,7 @@ class JournalPage
     /// background.x < 0
     bool is_right_side_page();
     void set_page_background_side(bool right);
+    JOURNAL_PAGE_TYPE get_type();
 
     virtual ~JournalPage() = 0;
     virtual void v1() = 0;

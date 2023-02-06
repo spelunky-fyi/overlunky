@@ -588,7 +588,9 @@ void register_usertypes(sol::state& lua)
         "page_number",
         &JournalPage::page_number,
         "is_right_side_page",
-        &JournalPage::is_right_side_page);
+        &JournalPage::is_right_side_page,
+        "get_type",
+        &JournalPage::get_type);
 
     lua["JournalPage"]["as_journal_page_progress"] = &JournalPage::as<JournalPageProgress>;
     lua["JournalPage"]["as_journal_page_journalmenu"] = &JournalPage::as<JournalPageJournalMenu>;

@@ -310,6 +310,43 @@ void JournalPage::set_page_background_side(bool right)
         this->background.source_set_quad(Quad(AABB(0.1125f, 0, 0.5f, 1.0f)));
     }
 }
+JOURNAL_PAGE_TYPE JournalPage::get_type()
+{
+    static const size_t journal_vftable = get_address("vftable_JournalPages"sv);
+    switch (*(size_t*)this - journal_vftable)
+    {
+    case JOURNAL_VFTABLE::PROGRESS:
+        return JournalPageType::Progress;
+    case JOURNAL_VFTABLE::MENU:
+        return JournalPageType::JournalMenu;
+    case JOURNAL_VFTABLE::PLACES:
+        return JournalPageType::Places;
+    case JOURNAL_VFTABLE::PEOPLE:
+        return JournalPageType::People;
+    case JOURNAL_VFTABLE::BESTIARY:
+        return JournalPageType::Bestiary;
+    case JOURNAL_VFTABLE::ITEMS:
+        return JournalPageType::Items;
+    case JOURNAL_VFTABLE::TRAPS:
+        return JournalPageType::Traps;
+    case JOURNAL_VFTABLE::STORY:
+        return JournalPageType::Story;
+    case JOURNAL_VFTABLE::FEATS:
+        return JournalPageType::Feats;
+    case JOURNAL_VFTABLE::DEATH_CAUSE:
+        return JournalPageType::DeathCause;
+    case JOURNAL_VFTABLE::DEATH_MENU:
+        return JournalPageType::DeathMenu;
+    case JOURNAL_VFTABLE::RECAP:
+        return JournalPageType::Recap;
+    case JOURNAL_VFTABLE::PLAYER_PROFILE:
+        return JournalPageType::PlayerProfile;
+    case JOURNAL_VFTABLE::LAST_GAME_PLAYED:
+        return JournalPageType::LastGamePlayed;
+    default:
+        return (JournalPageType)(-1);
+    }
+}
 
 void force_journal(uint32_t chapter, uint32_t entry)
 {
