@@ -40,6 +40,7 @@ replace_table = {
     "ShopType": "SHOP_TYPE",
     "EmittedParticlesInfo": "Array<Particle>",
     "object": "any",
+    "ImVec2": "Vec2",
 }
 
 reFloat = re.compile(r"\bfloat\b")

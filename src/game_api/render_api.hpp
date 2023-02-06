@@ -208,6 +208,9 @@ struct RenderAPI
 
     mutable std::mutex custom_textures_lock;
     std::unordered_map<TEXTURE, Texture> custom_textures;
+    std::unordered_map<TEXTURE, Texture> original_textures;
+    std::unordered_map<std::string, Color> texture_colors;
+    std::unordered_map<TEXTURE, Color> original_colors;
 
     static RenderAPI& get();
 

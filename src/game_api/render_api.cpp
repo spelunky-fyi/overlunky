@@ -138,71 +138,85 @@ VanillaRenderJournalPageFun* g_render_journal_page_player_profile_trampoline{nul
 VanillaRenderJournalPageFun* g_render_journal_page_last_game_played_trampoline{nullptr};
 void render_journal_page_journalmenu(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::JournalMenu, page);
     g_render_journal_page_journalmenu_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::JournalMenu, page);
 }
 void render_journal_page_progress(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Progress, page);
     g_render_journal_page_progress_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Progress, page);
 }
 void render_journal_page_place(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Places, page);
     g_render_journal_page_place_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Places, page);
 }
 void render_journal_page_people(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::People, page);
     g_render_journal_page_people_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::People, page);
 }
 void render_journal_page_bestiary(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Bestiary, page);
     g_render_journal_page_bestiary_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Bestiary, page);
 }
 void render_journal_page_items(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Items, page);
     g_render_journal_page_items_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Items, page);
 }
 void render_journal_page_traps(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Traps, page);
     g_render_journal_page_traps_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Traps, page);
 }
 void render_journal_page_story(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Story, page);
     g_render_journal_page_story_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Story, page);
 }
 void render_journal_page_feats(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Feats, page);
     g_render_journal_page_feats_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Feats, page);
 }
 void render_journal_page_deathcause(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::DeathCause, page);
     g_render_journal_page_deathcause_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::DeathCause, page);
 }
 void render_journal_page_deathmenu(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::DeathMenu, page);
     g_render_journal_page_deathmenu_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::DeathMenu, page);
 }
 void render_journal_page_recap(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Recap, page);
     g_render_journal_page_recap_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Recap, page);
 }
 void render_journal_page_player_profile(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::PlayerProfile, page);
     g_render_journal_page_player_profile_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::PlayerProfile, page);
 }
 void render_journal_page_last_game_played(JournalPage* page)
 {
+    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::LastGamePlayed, page);
     g_render_journal_page_last_game_played_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::LastGamePlayed, page);
 }

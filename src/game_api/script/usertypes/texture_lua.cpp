@@ -1,15 +1,16 @@
 #include "texture_lua.hpp"
 
-#include <algorithm>     // for max, replace, transform
-#include <array>         // for _Array_iterator, array, _Array_con...
-#include <cctype>        // for toupper
-#include <cstddef>       // for size_t
-#include <cstdint>       // for uint32_t
-#include <functional>    // for equal_to
-#include <new>           // for operator new
-#include <optional>      // for optional
-#include <sol/sol.hpp>   // for global_table, proxy_key_t, data_t
-#include <string>        // for string, allocator, hash, operator==
+#include <algorithm>   // for max, replace, transform
+#include <array>       // for _Array_iterator, array, _Array_con...
+#include <cctype>      // for toupper
+#include <cstddef>     // for size_t
+#include <cstdint>     // for uint32_t
+#include <functional>  // for equal_to
+#include <new>         // for operator new
+#include <optional>    // for optional
+#include <sol/sol.hpp> // for global_table, proxy_key_t, data_t
+#include <string>      // for string, allocator, hash, operator==
+#include <string_view>
 #include <tuple>         // for get
 #include <type_traits>   // for move, declval
 #include <unordered_map> // for _Umap_traits<>::allocator_type
@@ -22,6 +23,25 @@
 
 namespace NTexture
 {
+void resolve_path(std::string& path)
+{
+    auto backend = LuaBackend::get_calling_backend();
+    static const std::string prefix = "Data/Textures/../../";
+    if (path.size() > prefix.size() && path.substr(0, prefix.size()) == prefix)
+    {
+        path = path.substr(prefix.size());
+    }
+    if (path.starts_with("/"))
+    {
+        path = path.substr(1);
+        path = get_image_file_path(std::filesystem::absolute(".").string().c_str(), std::move(path));
+    }
+    else if (path[1] != ':')
+    {
+        path = get_image_file_path(backend->get_root(), std::move(path));
+    }
+}
+
 void register_usertypes(sol::state& lua)
 {
     /// Gets a `TextureDefinition` for equivalent to the one used to define the texture with `id`
@@ -33,32 +53,49 @@ void register_usertypes(sol::state& lua)
     /// If a texture with the same definition already exists the texture will be reloaded from disk.
     lua["define_texture"] = [](TextureDefinition texture_data) -> TEXTURE
     {
-        auto backend = LuaBackend::get_calling_backend();
-        texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
+        resolve_path(texture_data.texture_path);
         return define_texture(std::move(texture_data));
     };
     /// Gets a texture with the same definition as the given, if none exists returns `nil`
     lua["get_texture"] = [](TextureDefinition texture_data) -> std::optional<TEXTURE>
     {
-        auto backend = LuaBackend::get_calling_backend();
-        texture_data.texture_path = get_image_file_path(backend->get_root(), std::move(texture_data.texture_path));
+        resolve_path(texture_data.texture_path);
         return get_texture(std::move(texture_data));
     };
     /// Gets the first texture with the matching path, if none exists returns `nil`
     lua["get_texture"] = [](std::string texture_path) -> std::optional<TEXTURE>
     {
-        auto backend = LuaBackend::get_calling_backend();
-        texture_path = get_image_file_path(backend->get_root(), std::move(texture_path));
+        resolve_path(texture_path);
         return get_texture(texture_path);
     };
     /// Reloads a texture from disk, use this only as a development tool for example in the console
     /// Note that [define_texture](#define_texture) will also reload the texture if it already exists
     lua["reload_texture"] = [](std::string texture_path)
     {
-        auto backend = LuaBackend::get_calling_backend();
-        texture_path = get_image_file_path(backend->get_root(), std::move(texture_path));
+        resolve_path(texture_path);
         return reload_texture(texture_path.c_str());
     };
+    /// Replace a vanilla texture definition with a custom texture definition and reload the texture.
+    lua["replace_texture"] = replace_texture;
+    /// Reset a replaced vanilla texture to the original and reload the texture.
+    lua["reset_texture"] = reset_texture;
+    /// Replace a vanilla texture definition with a custom texture definition and reload the texture. Set corresponding character heart color to the pixel in the center of the player indicator arrow in that texture. (448,1472)
+    lua["replace_texture_and_heart_color"] = replace_texture_and_heart_color;
+    /// Clear cache for a file path or the whole directory
+    lua["clear_cache"] = sol::overload(
+        []()
+        {
+            auto backend = LuaBackend::get_calling_backend();
+            if (backend->get_unsafe())
+                clear_cache();
+        },
+        [](std::string path)
+        {
+            if (path == "")
+                return;
+            resolve_path(path);
+            clear_cache(path);
+        });
 
     /// Use `TextureDefinition.new()` to get a new instance to this and pass it to define_entity_texture.
     /// `width` and `height` always have to be the size of the image file. They should be divisible by `tile_width` and `tile_height` respectively.

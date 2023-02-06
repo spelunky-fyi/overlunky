@@ -5,6 +5,7 @@ includes:
   - home
   - globals
   - types
+  - events
   - enums
   - casting
 

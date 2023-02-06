@@ -51,11 +51,11 @@ function lua_print() end
 ---@param message string
 ---@return nil
 function print(message) end
----Print a log message to console.
+---Print a log message to ingame console.
 ---@param message string
 ---@return nil
 function console_print(message) end
----Prinspect to console
+---Prinspect to ingame console.
 ---@vararg any
 ---@return nil
 function console_prinspect(...) end
@@ -101,7 +101,7 @@ function set_global_interval(cb, frames) end
 ---@return CallbackId
 function set_global_timeout(cb, frames) end
 ---Returns unique id for the callback to be used in [clear_callback](#clear_callback).
----Add global callback function to be called on an [event](#ON).
+---Add global callback function to be called on an [event](#Events).
 ---@param cb function
 ---@param event ON
 ---@return CallbackId
@@ -206,6 +206,10 @@ function register_option_button(name, desc, long_desc, on_click) end
 ---@param on_render fun(draw_ctx: GuiDrawContext): any?
 ---@return nil
 function register_option_callback(name, value, on_render) end
+---Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
+---@param name string
+---@return nil
+function unregister_option(name) end
 ---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
 ---Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
 ---`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
@@ -1123,6 +1127,19 @@ function set_level_string(str) end
 ---@param type ENT_TYPE
 ---@return nil
 function set_ending_unlock(type) end
+---Get the thread-local version of state
+---@return nil
+function get_local_state() end
+---Get the thread-local version of players
+---@return nil
+function get_local_players() end
+---List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
+---@param dir string
+---@return nil
+function list_dir(dir) end
+---List all char.png files recursively from Mods/Packs. Returns table of file paths.
+---@return nil
+function list_char_mods() end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1135,6 +1152,9 @@ function cancel_speechbubble() end
 ---@param seed integer
 ---@return nil
 function seed_prng(seed) end
+---Get the thread-local version of prng
+---@return nil
+function get_local_prng() end
 ---Same as `Player.get_name`
 ---@param type_id ENT_TYPE
 ---@return string
@@ -1407,6 +1427,19 @@ function draw_text_size(size, text) end
 ---@param path string
 ---@return IMAGE, integer, integer
 function create_image(path) end
+---Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
+---Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
+---@param path string
+---@param x integer
+---@param y integer
+---@param w integer
+---@param h integer
+---@return IMAGE, integer, integer
+function create_image_crop(path, x, y, w, h) end
+---Get image size from file. Returns a tuple containing width and height.
+---@param path string
+---@return integer, integer
+function get_image_size(path) end
 ---Current mouse cursor position in screen coordinates.
 ---@return number, number
 function mouse_position() end
@@ -1458,6 +1491,23 @@ function get_texture(texture_data) end
 ---@param texture_path string
 ---@return nil
 function reload_texture(texture_path) end
+---Replace a vanilla texture definition with a custom texture definition and reload the texture.
+---@param vanilla_id TEXTURE
+---@param custom_id TEXTURE
+---@return boolean
+function replace_texture(vanilla_id, custom_id) end
+---Reset a replaced vanilla texture to the original and reload the texture.
+---@param vanilla_id TEXTURE
+---@return nil
+function reset_texture(vanilla_id) end
+---Replace a vanilla texture definition with a custom texture definition and reload the texture. Set corresponding character heart color to the pixel in the center of the player indicator arrow in that texture. (448,1472)
+---@param vanilla_id TEXTURE
+---@param custom_id TEXTURE
+---@return boolean
+function replace_texture_and_heart_color(vanilla_id, custom_id) end
+---Clear cache for a file path or the whole directory
+---@return nil
+function clear_cache() end
 ---Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
 ---@param uid integer
 ---@param extrude number?
@@ -1716,9 +1766,10 @@ function change_feat(feat, hidden, name, description) end
     ---@field level integer
     ---@field level_next integer
     ---@field level_start integer
-    ---@field theme integer
-    ---@field theme_next integer
+    ---@field theme THEME
+    ---@field theme_next THEME
     ---@field theme_start integer
+    ---@field current_theme ThemeInfo
     ---@field force_current_theme fun(self, t: integer): nil
     ---@field shoppie_aggro integer
     ---@field shoppie_aggro_next integer
@@ -1727,13 +1778,13 @@ function change_feat(feat, hidden, name, description) end
     ---@field kills_npc integer
     ---@field level_count integer
     ---@field damage_taken integer
-    ---@field journal_flags integer
+    ---@field journal_flags JOURNAL_FLAG
     ---@field time_last_level integer
     ---@field time_level integer
     ---@field level_flags integer
     ---@field loading integer
-    ---@field quest_flags integer
-    ---@field presence_flags integer
+    ---@field quest_flags QUEST_FLAG
+    ---@field presence_flags PRESENCE_FLAG
     ---@field fadevalue number
     ---@field fadeout integer
     ---@field fadein integer
@@ -1749,7 +1800,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field quests QuestsInfo
     ---@field camera Camera
     ---@field special_visibility_flags integer
-    ---@field cause_of_death integer
+    ---@field cause_of_death CAUSE_OF_DEATH
     ---@field cause_of_death_entity_type ENT_TYPE
     ---@field toast_timer integer
     ---@field speechbubble_timer integer
@@ -1795,6 +1846,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field theme_info ThemeInfo
     ---@field logic LogicList
     ---@field liquid LiquidPhysics
+    ---@field next_entity_uid integer
 
 ---@class LightParams
     ---@field red number
@@ -4329,6 +4381,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field win_pushid fun(self, id: integer): nil
     ---@field win_popid fun(self): nil
     ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil
+    ---@field win_imagebutton fun(self, label: string, image: IMAGE, width: number, height: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number): boolean
     ---@field win_section fun(self, title: string, callback: function): nil
     ---@field win_indent fun(self, width: number): nil
 
@@ -4377,7 +4430,26 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field ry number
 
 ---@class ImGuiIO
-    ---@field displaysize ImVec2
+    ---@field displaysize Vec2
+    ---@field framerate number
+    ---@field wantkeyboard boolean
+    ---@field keysdown boolean       [] @size: ImGuiKey_COUNT
+    ---@field keydown any @keydown
+    ---@field keypressed any @keypressed
+    ---@field keyreleased any @keyreleased
+    ---@field keyctrl boolean
+    ---@field keyshift boolean
+    ---@field keyalt boolean
+    ---@field keysuper boolean
+    ---@field wantmouse boolean
+    ---@field mousepos Vec2
+    ---@field mousedown boolean       [] @size: 5
+    ---@field mouseclicked boolean       [] @size: 5
+    ---@field mousedoubleclicked boolean       [] @size: 5
+    ---@field mousewheel number
+    ---@field gamepad Gamepad
+    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
+    ---@field showcursor boolean
 
 ---@class VanillaRenderContext
     ---@field draw_text VanillaRenderContext_draw_text
@@ -5251,9 +5323,9 @@ function Vec2.new(self, x_, y_) end
 ---NoDoc
 
 ---NoDoc
----@param imvec2 ImVec2
+---@param vec2 Vec2
 ---@return Vec2
-function Vec2.new(self, imvec2) end
+function Vec2.new(self, vec2) end
 
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
@@ -5386,6 +5458,12 @@ COSUBTHEME = {
   VOLCANA = 2
 }
 ---@alias COSUBTHEME integer
+DRAW_LAYER = {
+  BACKGROUND = 0,
+  FOREGROUND = 1,
+  WINDOW = 2
+}
+---@alias DRAW_LAYER integer
 DROP = {
   ALIENQUEEN_ALIENBLAST = 184,
   ALIENQUEEN_ALIENBLAST_RE = 186,
@@ -5625,15 +5703,14 @@ DYNAMIC_TEXTURE = {
 }
 ---@alias DYNAMIC_TEXTURE integer
 ENTITY_OVERRIDE = {
-  COLLISION1 = 4,
-  COLLISION2 = 26,
   DAMAGE = 48,
   DESTROY = 5,
   DTOR = 0,
   FLOOR_UPDATE = 38,
   GET_HELD_ENTITY = 22,
   KILL = 3,
-  RENDER = 3,
+  ON_COLLISION1 = 4,
+  ON_COLLISION2 = 26,
   TRIGGER_ACTION = 24,
   UPDATE_STATE_MACHINE = 2
 }
@@ -7095,6 +7172,30 @@ JOURNALUI_STATE = {
   STABLE = 2
 }
 ---@alias JOURNALUI_STATE integer
+JOURNAL_FLAG = {
+  ANKH = 15,
+  COSMOS = 20,
+  CRIME_LORD = 6,
+  DIED = 21,
+  EGGPLANT = 10,
+  FOOL = 9,
+  HUNDUN = 19,
+  KING = 7,
+  KINGU = 16,
+  LIKED_PETS = 12,
+  LOVED_PETS = 13,
+  NO_GOLD = 11,
+  OSIRIS = 17,
+  PACIFIST = 1,
+  PETTY_CRIMINAL = 4,
+  QUEEN = 8,
+  TIAMAT = 18,
+  TOOK_DAMAGE = 14,
+  VEGAN = 2,
+  VEGETARIAN = 3,
+  WANTED_CRIMINAL = 5
+}
+---@alias JOURNAL_FLAG integer
 JOURNAL_PAGE_TYPE = {
   BESTIARY = 4,
   DEATH_CAUSE = 9,
@@ -7193,7 +7294,7 @@ ON = {
   CONSTELLATION = 19,
   CREDITS = 17,
   DEATH = 14,
-  DEATH_MESSAGE = 128,
+  DEATH_MESSAGE = 129,
   FRAME = 101,
   GAMEFRAME = 108,
   GUIFRAME = 100,
@@ -7209,25 +7310,28 @@ ON = {
   OPTIONS = 5,
   PLAYER_PROFILE = 6,
   POST_LEVEL_GENERATION = 112,
-  POST_LOAD_JOURNAL_CHAPTER = 130,
-  POST_LOAD_SCREEN = 127,
+  POST_LOAD_JOURNAL_CHAPTER = 131,
+  POST_LOAD_SCREEN = 128,
   POST_ROOM_GENERATION = 111,
-  PRE_GET_FEAT = 131,
+  POST_UPDATE = 135,
+  PRE_GET_FEAT = 132,
   PRE_GET_RANDOM_ROOM = 113,
   PRE_HANDLE_ROOM_TILES = 114,
   PRE_LEVEL_GENERATION = 110,
-  PRE_LOAD_JOURNAL_CHAPTER = 129,
+  PRE_LOAD_JOURNAL_CHAPTER = 130,
   PRE_LOAD_LEVEL_FILES = 109,
-  PRE_LOAD_SCREEN = 126,
-  PRE_SET_FEAT = 132,
+  PRE_LOAD_SCREEN = 127,
+  PRE_SET_FEAT = 133,
+  PRE_UPDATE = 134,
   PROLOGUE = 2,
   RECAP = 20,
   RENDER_POST_DRAW_DEPTH = 122,
   RENDER_POST_HUD = 118,
-  RENDER_POST_JOURNAL_PAGE = 123,
+  RENDER_POST_JOURNAL_PAGE = 124,
   RENDER_POST_PAUSE_MENU = 120,
   RENDER_PRE_DRAW_DEPTH = 121,
   RENDER_PRE_HUD = 117,
+  RENDER_PRE_JOURNAL_PAGE = 123,
   RENDER_PRE_PAUSE_MENU = 119,
   RESET = 105,
   SAVE = 106,
@@ -7237,12 +7341,13 @@ ON = {
   SCRIPT_ENABLE = 115,
   SEED_INPUT = 8,
   SPACESHIP = 15,
-  SPEECH_BUBBLE = 124,
+  SPEECH_BUBBLE = 125,
   START = 103,
   TEAM_SELECT = 10,
   TITLE = 3,
-  TOAST = 125,
+  TOAST = 126,
   TRANSITION = 13,
+  USER_DATA = 136,
   WIN = 16
 }
 ---@alias ON integer
@@ -7485,15 +7590,6 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
-PAUSE_FLAG = {
-  ANKH = 6,
-  CUTSCENE = 3,
-  FADE = 2,
-  FLAG4 = 4,
-  FLAG5 = 5,
-  MENU = 1
-}
----@alias PAUSE_FLAG integer
 POS_TYPE = {
   AIR = 4,
   ALCOVE = 16,
@@ -7512,6 +7608,16 @@ POS_TYPE = {
   WATER = 128
 }
 ---@alias POS_TYPE integer
+PRESENCE_FLAG = {
+  BLACK_MARKET = 2,
+  DRILL = 3,
+  MOON_CHALLENGE = 9,
+  STAR_CHALLENGE = 10,
+  SUN_CHALLENGE = 11,
+  UDJAT_EYE = 1,
+  VLADS_CASTLE = 3
+}
+---@alias PRESENCE_FLAG integer
 PRNG_CLASS = {
   ENTITY_VARIATION = 3,
   EXTRA_SPAWNS = 5,
@@ -7602,6 +7708,31 @@ PROCEDURAL_CHANCE = {
   YETI = 268
 }
 ---@alias PROCEDURAL_CHANCE integer
+QUEST_FLAG = {
+  BLACK_MARKET_SPAWNED = 18,
+  CAVEMAN_SHOPPIE_AGGROED = 9,
+  DAILY = 8,
+  DARK_LEVEL_SPAWNED = 2,
+  DRILL_SPAWNED = 19,
+  EGGPLANT_CROWN_PICKED_UP = 12,
+  MOON_CHALLENGE_SPAWNED = 25,
+  RESET = 1,
+  SEEDED = 7,
+  SHOP_SPAWNED = 5,
+  SHORTCUT_USED = 6,
+  SPAWN_OUTPOST = 4,
+  STAR_CHALLENGE_SPAWNED = 26,
+  SUN_CHALLENGE_SPAWNED = 27,
+  UDJAT_EYE_SPAWNED = 17,
+  VAULT_SPAWNED = 3,
+  WADDLER_AGGROED = 10
+}
+---@alias QUEST_FLAG integer
+RENDER_INFO_OVERRIDE = {
+  DTOR = 0,
+  RENDER = 3
+}
+---@alias RENDER_INFO_OVERRIDE integer
 REPEAT_TYPE = {
   BACK_AND_FORTH = 2,
   LINEAR = 1,

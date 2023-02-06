@@ -98,10 +98,12 @@ You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put
 
 Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules.
 
+You can also [import](#import) other loaded script mods to your own mod if they have `exports`.
+
 # Aliases
 
 
-We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
+Used to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
 
 Name | Type
 ---- | ----
