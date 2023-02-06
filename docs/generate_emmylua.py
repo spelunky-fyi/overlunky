@@ -145,10 +145,12 @@ def print_func(name, params, ret, typed_params):
     fun = f"{typed_params}\n---@return {ret}\nfunction {name}({params}) end".strip()
     print(fun)
 
-
+reMarkdownLink = re.compile(r"(\[\w+\])\((#\w+?)\)")
 def print_comment(lf):
     if lf["comment"]:
         for com in lf["comment"]:
+            com = com.replace("<br/>", "")
+            com = reMarkdownLink.sub(r"\1(https://spelunky-fyi.github.io/overlunky/\2)", com)
             print(f"---{com}")
 
 
