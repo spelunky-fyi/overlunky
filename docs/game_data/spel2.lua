@@ -4980,11 +4980,13 @@ local function Triangle_offset(self, x, y) end
     ---@field entire_book TextureRenderingInfo
     ---@field page_timer integer
     ---@field fade_timer integer
+    ---@field pages custom_Array<JournalPage>
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo
     ---@field page_number integer
     ---@field is_right_side_page fun(self): boolean
+    ---@field get_type fun(self): JOURNAL_PAGE_TYPE
 
 ---@class JournalPageProgress : JournalPage
     ---@field coffeestain_top TextureRenderingInfo
