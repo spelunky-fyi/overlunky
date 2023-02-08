@@ -2069,7 +2069,7 @@ void force_co_subtheme(COSUBTHEME subtheme)
     if (subtheme >= 0 && subtheme <= 7)
     {
         uint8_t replacement[] = {0x41, 0xB8, (uint8_t)subtheme, 0x00, 0x00, 0x00, 0xEB, 0x1F, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90};
-        write_mem_recoverable("force_co_subtheme",  offset, replacement, true);
+        write_mem_recoverable("force_co_subtheme", offset, replacement, true);
     }
     else if (subtheme == -1)
     {
