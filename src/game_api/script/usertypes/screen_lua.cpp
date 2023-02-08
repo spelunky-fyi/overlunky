@@ -578,7 +578,9 @@ void register_usertypes(sol::state& lua)
         "page_timer",
         &JournalUI::page_timer,
         "fade_timer",
-        &JournalUI::fade_timer);
+        &JournalUI::fade_timer,
+        "pages",
+        sol::readonly(&JournalUI::pages));
 
     /// Used in [set_callback](#set_callback) with ON.RENDER_POST_JOURNAL_PAGE
     lua.new_usertype<JournalPage>(
