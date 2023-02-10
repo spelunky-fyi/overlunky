@@ -4433,10 +4433,10 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field displaysize Vec2
     ---@field framerate number
     ---@field wantkeyboard boolean
-    ---@field keysdown boolean       [] @size: ImGuiKey_COUNT
-    ---@field keydown any @keydown
-    ---@field keypressed any @keypressed
-    ---@field keyreleased any @keyreleased
+    ---@field keysdown boolean[] @size: ImGuiKey_COUNT. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+    ---@field keydown fun(key: number | string): boolean
+    ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
+    ---@field keyreleased fun(key: number | string): boolean
     ---@field keyctrl boolean
     ---@field keyshift boolean
     ---@field keyalt boolean
