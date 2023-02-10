@@ -92,8 +92,20 @@ reGetParam = re.compile(r"(?!const)(\b[^ ]+) *([^,]+),?")
 reRemoveDefault = re.compile(r" = .*")
 reHandleConst = re.compile(r"const (\w+) (\w+)")
 
+def add_callback_signature(params, cb_signatures):
+    if len(cb_signatures) == 1:
+        cb_signature = next(iter(cb_signatures.values()))
+        cb_params = cpp_params_to_emmy_lua_fun(cb_signature["param"])
+        ret = replace_all(cb_signature["return"])
+        params = params.replace("function", f"fun({cb_params}): {ret}")
+    else:
+        for name, cb_signature in cb_signatures.items():
+            cb_params = cpp_params_to_emmy_lua_fun(cb_signature["param"])
+            ret = replace_all(cb_signature["return"])
+            params = params.replace(f"function {name}", f"fun({cb_params}): {ret}")
+    return params
 
-def cpp_params_to_emmy_lua(params_text, func_signature=None):
+def cpp_params_to_emmy_lua(params_text, cb_signatures=None):
     return_typed = ""
     return_normal = ""
     params_iterator = reGetParam.finditer(params_text)
@@ -107,10 +119,17 @@ def cpp_params_to_emmy_lua(params_text, func_signature=None):
             if m := reHandleConst.match(p_name):
                 p_type = m.group(1)
                 p_name = m.group(2)
-            if func_signature and "function" in p_type:
-                params = cpp_params_to_emmy_lua_fun(func_signature["param"])
-                ret = replace_all(func_signature["return"])
-                p_type = p_type.replace("function", f"fun({params}): {ret}")
+            if cb_signatures and p_type == "function":
+                if len(cb_signatures) == 1:
+                    cb_signature = next(iter(cb_signatures.values()))
+                    params = cpp_params_to_emmy_lua_fun(cb_signature["param"])
+                    ret = replace_all(cb_signature["return"])
+                    p_type = f"fun({params}): {ret}"
+                elif p_name in cb_signatures:
+                    cb_signature = cb_signatures[p_name]
+                    params = cpp_params_to_emmy_lua_fun(cb_signature["param"])
+                    ret = replace_all(cb_signature["return"])
+                    p_type = f"fun({params}): {ret}"
             return_typed += f"\n---@param {p_name} {p_type}"
             return_normal += p_name
         return_normal += ", "
@@ -285,10 +304,7 @@ for type in ps.types:
                     continue
                 elif params:
                     if "cb_signature" in var and var["cb_signature"] and "function" in params:
-                        cb_signature = var["cb_signature"]
-                        cb_params = cpp_params_to_emmy_lua_fun(cb_signature["param"])
-                        ret = replace_all(cb_signature["return"])
-                        params = params.replace("function", f"fun({cb_params}): {ret}")
+                        params = add_callback_signature(params, var["cb_signature"])
                     signature = f"---@field {name} fun(self, {params}): {ret}"
                 else:
                     signature = f"---@field {name} fun(self): {ret}"

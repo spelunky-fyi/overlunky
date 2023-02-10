@@ -136,24 +136,25 @@ not_functions = [
 replace_fun = None
 
 reConstructorFix = re.compile(r"const (\w+)(?: \w+)?(&&|&)?")
-reSignature = re.compile(r"\bsignature\b.*is `?([\S]*) (\w*?)\((.*?)\)")
+reSignature = re.compile(r"(?:\bsignature\b.*is|function) `?([\S]*) (\w*?)\((.*?)\)")
 
 
-def cb_signature_dict(ret, name, param):
+def cb_signature_dict(ret, param):
     return {
         "return": ret,
-        "name": name,
         "param": param,
     }
 
 
 def get_cb_signature(text):
-    signature_m = reSignature.search(text)
-    return (
-        cb_signature_dict(signature_m[1], signature_m[2], signature_m[3])
-        if signature_m
-        else None
-    )
+    signature_ms = reSignature.findall(text)
+    if not signature_ms:
+        return None
+    
+    cb_signatures = {}
+    for m in signature_ms:
+        cb_signatures[m[1]] = cb_signature_dict(m[0], m[2])
+    return cb_signatures
 
 
 def camel_case_to_snake_case(name):
@@ -795,7 +796,7 @@ def run_parse():
                             ]
                             + cpp_comment,
                             "function": True,
-                            "cb_signature": cb_signature_dict(ret, "fun", args),
+                            "cb_signature": {"fun": cb_signature_dict(ret, args)},
                         }
                     )
                     vars.append(
@@ -808,7 +809,7 @@ def run_parse():
                             ]
                             + cpp_comment,
                             "function": True,
-                            "cb_signature": cb_signature_dict(ret, "fun", args),
+                            "cb_signature": {"fun": cb_signature_dict(ret, args)},
                         }
                     )
 
