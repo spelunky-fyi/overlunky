@@ -236,7 +236,7 @@ void register_usertypes(sol::state& lua)
 
     auto damage = sol::overload(
         static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
-        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint16_t)>(&Movable::damage));
+        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint8_t)>(&Movable::damage));
     auto light_on_fire = sol::overload(
         static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));

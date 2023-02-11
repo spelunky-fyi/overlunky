@@ -134,9 +134,9 @@ bool is_active_player(Entity* e)
     return false;
 }
 
-using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t);
+using OnDamageFun = void(Entity*, Entity*, int8_t, uint32_t, float*, uint8_t, uint16_t, uint8_t);
 OnDamageFun* g_on_damage_trampoline{nullptr};
-void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, float* unknown2, uint16_t stun_amount, uint8_t iframes)
+void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown_flags, float* velocities, uint8_t unknown2, uint16_t stun_amount, uint8_t iframes)
 {
     if (g_godmode_player_active && is_active_player(victim))
     {
@@ -147,7 +147,7 @@ void on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
         return;
     }
 
-    g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes);
+    g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown_flags, velocities, unknown2, stun_amount, iframes);
 }
 
 using OnInstaGibFun = void(Entity*, bool, size_t);
