@@ -251,8 +251,6 @@ bool LuaBackend::update()
 
         // ==========
 
-        lua["players"] = get_players(g_state);
-
         if (LuaConsole* is_console = dynamic_cast<LuaConsole*>(this))
         {
             /// NoDoc
@@ -762,8 +760,6 @@ void LuaBackend::pre_level_generation()
 
     auto now = get_frame_count();
 
-    lua["players"] = get_players(g_state);
-
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -940,8 +936,6 @@ void LuaBackend::post_level_generation()
         return;
 
     auto now = get_frame_count();
-
-    lua["players"] = get_players(g_state);
 
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::LEVEL)
