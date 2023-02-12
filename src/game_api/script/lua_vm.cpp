@@ -103,8 +103,8 @@ struct Players
     // but i couldn't find better solution for the global players to be always correct
     // (not return reference to non existing entity when in between screens etc. like in draw callback)
 
-    using value_type = typename Player*;
-    using iterator = typename std::vector<Player*>::iterator;
+    using value_type = Player*;
+    using iterator = std::vector<Player*>::iterator;
 
     std::vector<Player*> p;
     Players()
