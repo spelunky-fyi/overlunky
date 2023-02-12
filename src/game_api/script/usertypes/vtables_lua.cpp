@@ -4,7 +4,7 @@
 #include "entity.hpp"          // for Entity
 #include "hookable_vtable.hpp" // for HookableVTable
 
-#pragma optimize("", off) // fix some wierd bug, should be followed up by turning it back on later, but that makes it not work, i don't know
+// #pragma optimize("", off) // fix some wierd bug, should be followed up by turning it back on later, but that makes it not work, i don't know
 
 #include "movable.hpp"                             // for Movable
 #include "render_api.hpp"                          // for RenderInfo
