@@ -11,6 +11,7 @@
 #include <cstdint>       // for uint32_t, int8_t
 #include <deque>         // for deque
 #include <exception>     // for exception
+#include <fmt/chrono.h>  // for format_time
 #include <fmt/format.h>  // for format_error
 #include <functional>    // for _Func_impl_no_all...
 #include <imgui.h>       // for GetIO, ImVec4
@@ -256,17 +257,18 @@ end
         backend->lua["lua_print"](message);
     };
 
-    /// Print a log message to console.
+    /// Print a log message to ingame console.
     lua["console_print"] = [](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
-        backend->console->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
-        if (backend->console->messages.size() > 20)
-            backend->console->messages.pop_front();
-        backend->lua["lua_print"](message);
+        auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        std::tm time_buf;
+        localtime_s(&time_buf, &in_time_t);
+        std::vector<ScriptMessage> messages{{message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)}};
+        backend->console->push_history(fmt::format("--- [{}] at {:%Y-%m-%d %X}", backend->get_id(), time_buf), std::move(messages));
     };
 
-    /// Prinspect to console
+    /// Prinspect to ingame console.
     lua["console_prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
         if (objects.size() > 0)
@@ -358,13 +360,15 @@ end
         return backend->cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add global callback function to be called on an [event](#ON).
+    /// Add global callback function to be called on an [event](#Events).
     lua["set_callback"] = [](sol::function cb, ON event) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
         auto luaCb = ScreenCallback{cb, event, -1};
         if (luaCb.screen == ON::LOAD)
             backend->load_callbacks[backend->cbcount] = luaCb; // Make sure load always runs before other callbacks
+        else if (luaCb.screen == ON::SAVE)
+            backend->save_callbacks[backend->cbcount] = luaCb; // Make sure save always runs after other callbacks
         else
             backend->callbacks[backend->cbcount] = luaCb;
         return backend->cbcount++;
@@ -402,7 +406,7 @@ end
             }
         });
 
-    /// Table of options set in the UI, added with the [register_option_functions](#Option-functions). You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
+    /// Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
     // lua["options"] = lua.create_named_table("options");
 
     /// Load another script by id "author/name" and import its `exports` table. Returns:
@@ -683,6 +687,14 @@ end
             else
                 backend->lua[sol::create_if_nil]["options"] = value;
         }
+    };
+
+    /// Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
+    lua["unregister_option"] = [](std::string name)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->options.erase(name);
+        backend->lua["options"][name] = sol::nil;
     };
 
     auto spawn_liquid = sol::overload(
@@ -1733,7 +1745,7 @@ end
     lua["save_script"] = []() -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (backend->last_save <= State::get().ptr()->time_startup - 120)
+        if (backend->last_save <= get_frame_count() - 120)
         {
             backend->manual_save = true;
             return true;
@@ -1750,6 +1762,65 @@ end
 
     /// Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
     lua["set_ending_unlock"] = set_ending_unlock;
+
+    /// Get the thread-local version of state
+    lua["get_local_state"] = []()
+    {
+        return State::get().ptr_local();
+    };
+
+    /// Get the thread-local version of players
+    lua["get_local_players"] = []()
+    {
+        return get_players(State::get().ptr_local());
+    };
+
+    /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
+    lua["list_dir"] = [&lua](std::string dir)
+    {
+        std::vector<std::string> files;
+        auto backend = LuaBackend::get_calling_backend();
+        auto base = backend->get_root_path();
+        auto path = base / std::filesystem::path(dir);
+        if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+            return sol::make_object(lua, sol::lua_nil);
+        auto base_check = std::filesystem::relative(path, base).string();
+        if (base_check.starts_with("..") && !backend->get_unsafe())
+        {
+            luaL_error(lua, "Tried to list parent directory without unsafe mode.");
+            return sol::make_object(lua, sol::lua_nil);
+        }
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            auto str = std::filesystem::relative(file.path(), base).string();
+            std::replace(str.begin(), str.end(), '\\', '/');
+            if (std::filesystem::is_directory(file.path()))
+                str = str + "/";
+            files.push_back(str);
+        }
+        return sol::make_object(lua, sol::as_table(files));
+    };
+
+    /// List all char*.png files recursively from Mods/Packs. Returns table of file paths.
+    lua["list_char_mods"] = [&lua]()
+    {
+        std::vector<std::string> files;
+        auto backend = LuaBackend::get_calling_backend();
+        auto path = std::filesystem::path("Mods/Packs");
+        auto base = std::filesystem::path(".");
+        if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+            return sol::make_object(lua, sol::lua_nil);
+        for (const auto& file : std::filesystem::recursive_directory_iterator(path))
+        {
+            auto str = std::filesystem::relative(file.path(), base).string();
+            std::replace(str.begin(), str.end(), '\\', '/');
+            if (str.find("/.db") != std::string::npos || str.find("char_") == std::string::npos || !str.ends_with(".png") || str.ends_with("_col.png") || str.ends_with("_lumin.png"))
+                continue;
+            str = "/" + str;
+            files.push_back(str);
+        }
+        return sol::make_object(lua, sol::as_table(files));
+    };
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
@@ -1866,6 +1937,8 @@ end
         ON::RENDER_PRE_DRAW_DEPTH,
         "RENDER_POST_DRAW_DEPTH",
         ON::RENDER_POST_DRAW_DEPTH,
+        "RENDER_PRE_JOURNAL_PAGE",
+        ON::RENDER_PRE_JOURNAL_PAGE,
         "RENDER_POST_JOURNAL_PAGE",
         ON::RENDER_POST_JOURNAL_PAGE,
         "SPEECH_BUBBLE",
@@ -1885,8 +1958,68 @@ end
         "PRE_UPDATE",
         ON::PRE_UPDATE,
         "POST_UPDATE",
-        ON::POST_UPDATE);
+        ON::POST_UPDATE,
+        "USER_DATA",
+        ON::USER_DATA);
     /* ON
+    // LOGO
+    // Runs when entering the the mossmouth logo screen.
+    // INTRO
+    // Runs when entering the intro cutscene.
+    // PROLOGUE
+    // Runs when entering the prologue / poem.
+    // TITLE
+    // Runs when entering the title screen.
+    // MENU
+    // Runs when entering the main menu.
+    // OPTIONS
+    // Runs when entering the options menu.
+    // PLAYER_PROFILE
+    // Runs when entering the player profile screen.
+    // LEADERBOARD
+    // Runs when entering the leaderboard screen.
+    // SEED_INPUT
+    // Runs when entering the seed input screen of a seeded run.
+    // CHARACTER_SELECT
+    // Runs when entering the character select screen.
+    // TEAM_SELECT
+    // Runs when entering the team select screen of arena mode.
+    // CAMP
+    // Runs when entering the camp, after all entities have spawned, on the first level frame.
+    // LEVEL
+    // Runs when entering any level, after all entities have spawned, on the first level frame.
+    // TRANSITION
+    // Runs when entering the transition screen, after all entities have spawned.
+    // DEATH
+    // Runs when entering the death screen.
+    // SPACESHIP
+    // Runs when entering the olmecship cutscene after Tiamat.
+    // WIN
+    // Runs when entering any winning cutscene, including the constellation.
+    // CREDITS
+    // Runs when entering the credits.
+    // SCORES
+    // Runs when entering the final score celebration screen of a normal or hard ending.
+    // CONSTELLATION
+    // Runs when entering the turning into constellation cutscene after cosmic ocean.
+    // RECAP
+    // Runs when entering the Dear Journal screen after final scores.
+    // ARENA_MENU
+    // Runs when entering the main arena rules menu screen.
+    // ARENA_STAGES
+    // Runs when entering the arena stage selection screen.
+    // ARENA_ITEMS
+    // Runs when entering the arena item config screen.
+    // ARENA_INTRO
+    // Runs when entering the arena VS intro screen.
+    // ARENA_MATCH
+    // Runs when entering the arena level screen, after all entities have spawned, on the first level frame, before the get ready go scene.
+    // ARENA_SCORE
+    // Runs when entering the arena scores screen.
+    // ONLINE_LOADING
+    // Runs when entering the online loading screen.
+    // ONLINE_LOBBY
+    // Runs when entering the online lobby screen.
     // GUIFRAME
     // Params: GuiDrawContext draw_ctx
     // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a GuiDrawContext
@@ -2005,6 +2138,13 @@ end
     // Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
     // POST_UPDATE
     // Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
+    // SCRIPT_ENABLE
+    // Runs when the script is enabled from the UI or when imported by another script while disabled, but not on load.
+    // SCRIPT_DISABLE
+    // Runs when the script is disabled from the UI and also right before unloading/reloading.
+    // USER_DATA
+    // Params: Entity ent
+    // Runs on all changes to Entity.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.
     */
 
     lua.create_named_table(

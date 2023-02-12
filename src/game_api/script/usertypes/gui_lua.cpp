@@ -487,6 +487,22 @@ void GuiDrawContext::win_image(IMAGE image, int width, int height)
         height = image_ptr->height;
     ImGui::Image(image_ptr->texture, ImVec2(static_cast<float>(width), static_cast<float>(height)));
 };
+bool GuiDrawContext::win_imagebutton(std::string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2)
+{
+    if (!backend->images.contains(image))
+        return false;
+
+    auto& image_ptr = backend->images[image];
+
+    ImVec2 im_size = ImVec2(width, height);
+
+    if (im_size.x < 1)
+        im_size.x = static_cast<float>(image_ptr->width);
+    if (im_size.y < 1)
+        im_size.y = static_cast<float>(image_ptr->height);
+
+    return ImGui::ImageButton(label.c_str(), image_ptr->texture, im_size, ImVec2(uvx1, uvy1), ImVec2(uvx2, uvy2));
+};
 void GuiDrawContext::win_section(std::string title, sol::function callback)
 {
     if (ImGui::CollapsingHeader(title.c_str()))
@@ -573,6 +589,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_pushid"] = &GuiDrawContext::win_pushid;
     guidrawcontext_type["win_popid"] = &GuiDrawContext::win_popid;
     guidrawcontext_type["win_image"] = &GuiDrawContext::win_image;
+    guidrawcontext_type["win_imagebutton"] = &GuiDrawContext::win_imagebutton;
     guidrawcontext_type["win_section"] = &GuiDrawContext::win_section;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
 
@@ -619,7 +636,13 @@ void register_usertypes(sol::state& lua)
         image->texture = NULL;
 
         auto backend = LuaBackend::get_calling_backend();
-        if (create_d3d11_texture_from_file((std::filesystem::path{backend->get_root_path()} / path).string().data(), &image->texture, &image->width, &image->height))
+        std::string real_path;
+        if (path.starts_with("/"))
+            real_path = (std::filesystem::absolute(".") / path.substr(1)).string();
+        else
+            real_path = (std::filesystem::path(backend->get_root_path()) / path).string();
+
+        if (create_d3d11_texture_from_file(real_path.c_str(), &image->texture, &image->width, &image->height))
         {
             IMAGE id = static_cast<IMAGE>(backend->images.size());
             backend->images[id] = image;
@@ -627,6 +650,50 @@ void register_usertypes(sol::state& lua)
         }
         return std::make_tuple((IMAGE)-1, -1, -1);
     };
+
+    /// Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
+    /// Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
+    lua["create_image_crop"] = [](std::string path, int x, int y, int w, int h) -> std::tuple<IMAGE, int, int>
+    {
+        ScriptImage* image = new ScriptImage;
+        image->width = 0;
+        image->height = 0;
+        image->texture = NULL;
+
+        auto backend = LuaBackend::get_calling_backend();
+        std::string real_path;
+        if (path.starts_with("/"))
+            real_path = (std::filesystem::absolute(".") / path.substr(1)).string();
+        else
+            real_path = (std::filesystem::path(backend->get_root_path()) / path).string();
+
+        if (create_d3d11_texture_from_file(real_path.c_str(), &image->texture, &image->width, &image->height, x, y, w, h))
+        {
+            IMAGE id = static_cast<IMAGE>(backend->images.size());
+            backend->images[id] = image;
+            return std::make_tuple(id, image->width, image->height);
+        }
+        return std::make_tuple((IMAGE)-1, -1, -1);
+    };
+
+    /// Get image size from file. Returns a tuple containing width and height.
+    lua["get_image_size"] = [](std::string path) -> std::tuple<int, int>
+    {
+        int width = 0;
+        int height = 0;
+
+        auto backend = LuaBackend::get_calling_backend();
+        std::string real_path;
+        if (path.starts_with("/"))
+            real_path = (std::filesystem::absolute(".") / path.substr(1)).string();
+        else
+            real_path = (std::filesystem::path(backend->get_root_path()) / path).string();
+
+        if (get_image_size_from_file(real_path.c_str(), &width, &height))
+            return std::make_tuple(width, height);
+        return std::make_tuple(-1, -1);
+    };
+
     /// Current mouse cursor position in screen coordinates.
     lua["mouse_position"] = []() -> std::pair<float, float>
     {
@@ -700,8 +767,8 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<ImGuiIO>(
         "ImGuiIO",
         "displaysize",
-        sol::property([](ImGuiIO& io)
-                      { return Vec2(io.DisplaySize); }),
+        sol::property([](ImGuiIO& io) -> Vec2
+                      { return Vec2(io.DisplaySize) /**/; }),
         "framerate",
         &ImGuiIO::Framerate,
         "wantkeyboard",
@@ -726,8 +793,8 @@ void register_usertypes(sol::state& lua)
         "wantmouse",
         &ImGuiIO::WantCaptureMouse,
         "mousepos",
-        sol::property([](ImGuiIO& io)
-                      { return Vec2(io.MousePos); }),
+        sol::property([](ImGuiIO& io) -> Vec2
+                      { return Vec2(io.MousePos) /**/; }),
         "mousedown",
         sol::property([](ImGuiIO& io)
                       { return std::ref(io.MouseDown) /**/; }),

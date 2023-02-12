@@ -37,6 +37,7 @@ replace_table = {
     "static": "",
     "variadic_args va": "int, int...",
     "EmittedParticlesInfo": "array<Particle>",
+    "ImVec2": "Vec2",
 }
 
 
@@ -271,13 +272,15 @@ print("\n# Modules")
 print(
     """You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.
 
-Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules."""
+Check the [Lua tutorial](http://lua-users.org/wiki/ModulesTutorial) or examples how to actually make modules.
+
+You can also [import](#import) other loaded script mods to your own mod if they have `exports`."""
 )
 
 print("\n# Aliases\n")
 print(
     """
-We use those to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
+Used to clarify what kind of values can be passed and returned from a function, even if the underlying type is really just an integer or a string. This should help to avoid bugs where one would for example just pass a random integer to a function expecting a callback id.
 
 Name | Type
 ---- | ----"""
@@ -292,13 +295,13 @@ for alias in ps.aliases:
 gu.setup_stdout("src/includes/_globals.md")
 
 global_types = {
-    "meta": "array<string>",
+    "meta": "array<mixed>",
     "state": "StateMemory",
     "game_manager": "GameManager",
     "online": "Online",
     "players": "array<Player>",
     "savegame": "SaveData",
-    "options": "array<mixed>",
+    "options": "optional<array<mixed>>",
     "prng": "PRNG",
 }
 
@@ -746,3 +749,27 @@ Name | Data | Description
             print(link_custom_type(var["docs"]))
         else:
             print("")
+
+
+gu.setup_stdout("src/includes/_events.md")
+
+print("\n# Events\n")
+include_example("set_callback")
+search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback"
+print(f"\n> Search script examples for [set_callback]({search_link})\n")
+print(
+    """These events are used in [set_callback](#set_callback) to call your callback function before or after something happens in the game. The named events related to game screens generally run on the first engine update when changing to said screen. Coming back from the options screen does not fire the parent screen event though (OPTIONS to LEVEL for example). If you need more fine-grained control over the screen events, use `SCREEN`, `PRE_LOAD_SCREEN` and `POST_LOAD_SCREEN` with the help of the `state.screen` variables."""
+)
+
+for type in sorted(ps.enums, key=lambda x: x["name"]):
+    if type["name"] != "ON":
+        continue
+    for var in type["vars"]:
+        print("\n## ON." + var["name"] + "\n")
+        include_example("ON." + var["name"])
+        search_link = (
+            "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON." + var["name"]
+        )
+        print(f"\n> Search script examples for [ON.{var['name']}]({search_link})\n")
+        if "docs" in var:
+            print(link_custom_type(var["docs"]))

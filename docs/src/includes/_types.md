@@ -209,6 +209,7 @@ int | [win_combo(string label, int selected, string opts)](https://github.com/sp
 nil | [win_pushid(int id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) | Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 nil | [win_popid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) | Pop unique identifier from the stack. Put after the input.
 nil | [win_image(IMAGE image, int width, int height)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) | Draw image to window.
+bool | [win_imagebutton(string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_imagebutton) | Draw imagebutton to window.
 nil | [win_section(string title, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_section) | Add a collapsing accordion section, put contents in the callback function.
 nil | [win_indent(float width)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_indent) | Indent contents, or unindent if negative
 
@@ -717,7 +718,26 @@ Used in [get_io](#get_io)
 
 Type | Name | Description
 ---- | ---- | -----------
-ImVec2      | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
+[Vec2](#Vec2)      | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
+float       | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
+bool        | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
+bool        | [keysdown[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
+ | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | bool keydown(int keycode)<br/>bool keydown(char key)<br/> 
+ | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | bool keypressed(int keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
+ | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | bool keyreleased(int keycode)<br/>bool keyreleased(char key)<br/> 
+bool        | [keyctrl](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyctrl) | 
+bool        | [keyshift](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyshift) | 
+bool        | [keyalt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) | 
+bool        | [keysuper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) | 
+bool        | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | 
+[Vec2](#Vec2)      | [mousepos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) | 
+bool        | [mousedown[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
+bool        | [mouseclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
+bool        | [mousedoubleclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
+float       | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) | 
+[Gamepad](#Gamepad) | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
+ | [gamepads](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepads) | [Gamepad](#Gamepad) gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/> 
+bool        | [showcursor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=showcursor) | 
 
 ### InputMapping
 
@@ -2311,9 +2331,9 @@ Can be accessed via global [state](#state)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [screen_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) | 
-int | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) | 
-int | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | 
+int | [screen_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) | Previous [SCREEN](#SCREEN), used to check where we're coming from when loading another [SCREEN](#SCREEN)
+int | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) | Current [SCREEN](#SCREEN), generally read-only or weird things will happen
+int | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | Next [SCREEN](#SCREEN), used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
 int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
 int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
 [PAUSE](#PAUSE) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | 8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controller by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
@@ -2323,56 +2343,57 @@ int | [kali_favor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali
 int | [kali_status](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_status) | 
 int | [kali_altars_destroyed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_altars_destroyed) | Also affects if the player has punish ball, if the punish ball is destroyed it is set to -1
 int | [kali_gifts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_gifts) | 0 - none, 1 - item, 3 - kapala
-int | [seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed) | 
-int | [time_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_total) | 
-int | [world](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) | 
-int | [world_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_next) | 
-int | [world_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_start) | 
-int | [level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) | 
-int | [level_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_next) | 
-int | [level_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_start) | 
-int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
-int | [theme_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_next) | 
-int | [theme_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_start) | 
+int | [seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed) | Current seed in seeded mode, just set to a funny value and does nothing in adventure mode
+int | [time_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_total) | Total frames of current run, equal to the final game time on win
+int | [world](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) | Current world number, shown in hud and used by some game logic like choosing the next level on transition
+int | [world_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_next) | Next world number, used when loading a new level or transition
+int | [world_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_start) | World number to start new runs in
+int | [level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) | Current level number, shown in hud and used by some game logic like choosing the next level on transition
+int | [level_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_next) | Next level number, used when loading a new level or transition
+int | [level_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_start) | Level number to start new runs in
+[THEME](#THEME) | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | Current [THEME](#THEME) number, used to pick the music and by some game logic like choosing the next level on transition
+[THEME](#THEME) | [theme_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_next) | Next [THEME](#THEME) number, used when loading a new level or transition
+int | [theme_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_start) | [THEME](#THEME) to start new runs in
+[ThemeInfo](#ThemeInfo) | [current_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_theme) | Points to the current [ThemeInfo](#ThemeInfo)
 nil | [force_current_theme(int t)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_current_theme) | This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
-int | [shoppie_aggro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro) | 
-int | [shoppie_aggro_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro_next) | 
+int | [shoppie_aggro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro) | Current shoppie aggro
+int | [shoppie_aggro_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro_next) | Shoppie aggro to use in the next level
 int | [outposts_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=outposts_spawned) | 
-int | [merchant_aggro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=merchant_aggro) | 
+int | [merchant_aggro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=merchant_aggro) | [Tun](#Tun) aggro
 int | [kills_npc](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kills_npc) | 
-int | [level_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_count) | 
+int | [level_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_count) | Current zero-based level count, or number of levels completed
 int | [damage_taken](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage_taken) | Total amount of damage taken, excluding cause of death
-int | [journal_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_flags) | 
-int | [time_last_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last_level) | 
-int | [time_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) | 
+[JOURNAL_FLAG](#JOURNAL_FLAG) | [journal_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_flags) | 
+int | [time_last_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last_level) | Level time of previous level in frames, used by game logic to decide dark levels etc
+int | [time_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) | Level time of current level in frames, show on the hud
 int | [level_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_flags) | 
-int | [loading](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) | 
-int | [quest_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_flags) | 
-int | [presence_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=presence_flags) | 
-float | [fadevalue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadevalue) | 
-int | [fadeout](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadeout) | 
-int | [fadein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadein) | 
-int | [loading_black_screen_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading_black_screen_timer) | 
+int | [loading](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) | Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to `screen_next`.
+[QUEST_FLAG](#QUEST_FLAG) | [quest_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_flags) | 32bit flags, can be written to trigger a run reset on next level load etc.
+[PRESENCE_FLAG](#PRESENCE_FLAG) | [presence_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=presence_flags) | 
+float | [fadevalue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadevalue) | Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
+int | [fadeout](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadeout) | Amount of frames the fadeout should last when loading
+int | [fadein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadein) | Amount of frames the fadein should last when loading
+int | [loading_black_screen_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading_black_screen_timer) | if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
 int | [saved_dogs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_dogs) | Run totals
 int | [saved_cats](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_cats) | 
 int | [saved_hamsters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_hamsters) | 
 int | [win_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_state) | 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
-[Illumination](#Illumination) | [illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) | 
+[Illumination](#Illumination) | [illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) | The global level illumination, very big and bright.
 int | [money_last_levels](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_last_levels) | 
-int | [money_shop_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) | 
-[PlayerInputs](#PlayerInputs) | [player_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) | 
-[QuestsInfo](#QuestsInfo) | [quests](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quests) | 
-[Camera](#Camera) | [camera](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera) | 
+int | [money_shop_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) | Total negative amount spent in shops during the run<br><br/>The total money currently available (in single player) is `players[1].inventory.money + players[1].inventory.collected_money_total + state.money_shop_total`
+[PlayerInputs](#PlayerInputs) | [player_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) | Access the player inputs even when no player entities are available
+[QuestsInfo](#QuestsInfo) | [quests](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quests) | [NPC](#NPC) quest states
+[Camera](#Camera) | [camera](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera) | [Camera](#Camera) bounds and position
 int | [special_visibility_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_visibility_flags) | 
-int | [cause_of_death](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cause_of_death) | 
+[CAUSE_OF_DEATH](#CAUSE_OF_DEATH) | [cause_of_death](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cause_of_death) | 
 [ENT_TYPE](#ENT_TYPE) | [cause_of_death_entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cause_of_death_entity_type) | 
 int | [toast_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_timer) | 
 int | [speechbubble_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_timer) | 
 int | [speechbubble_owner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speechbubble_owner) | 
-[LevelGenSystem](#LevelGenSystem) | [level_gen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gen) | 
-int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | 
-[Items](#Items) | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | 
-int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | 
+[LevelGenSystem](#LevelGenSystem) | [level_gen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gen) | Entrance and exit coordinates, shop types and all themes
+int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | See `get_correct_ushabti`. == anim_frame - (2  floor(anim_frame/12))
+[Items](#Items) | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | Has the current player count, player inventories and character selections
+int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | The currently drawn layer, can't be changed
 [ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
 [ScreenCharacterSelect](#ScreenCharacterSelect) | [screen_character_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) | 
 [ScreenTransition](#ScreenTransition) | [screen_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) | 
@@ -2392,7 +2413,7 @@ int | [get_correct_ushabti()](https://github.com/spelunky-fyi/overlunky/search?l
 nil | [set_correct_ushabti(int animation_frame)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_correct_ushabti) | 
 [ArenaState](#ArenaState) | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | 
 [ENT_TYPE](#ENT_TYPE) | [speedrun_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_character) | Who administers the tutorial speedrun in base camp
-bool | [speedrun_activation_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_activation_trigger) | 
+bool | [speedrun_activation_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speedrun_activation_trigger) | must transition from true to false to activate it
 [ENT_TYPE](#ENT_TYPE) | [end_spaceship_character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=end_spaceship_character) | Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
 bool | [world2_coffin_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world2_coffin_spawned) | 
 bool | [world4_coffin_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world4_coffin_spawned) | 
@@ -2401,15 +2422,16 @@ bool | [world6_coffin_spawned](https://github.com/spelunky-fyi/overlunky/search?
 int | [first_damage_world](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_world) | 
 int | [first_damage_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_damage_level) | 
 int | [time_speedrun](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_speedrun) | 
-[ENT_TYPE](#ENT_TYPE) | [coffin_contents](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffin_contents) | 
+[ENT_TYPE](#ENT_TYPE) | [coffin_contents](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coffin_contents) | the contents of the special coffin that will be spawned during levelgen
 int | [screen_change_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_change_counter) | 
-int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) | 
-int | [storage_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=storage_uid) | 
+int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_startup) | Number of frames since the game was launched
+int | [storage_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=storage_uid) | entity uid of the first floor_storage entity
 array&lt;[ENT_TYPE](#ENT_TYPE), 99&gt; | [waddler_storage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_storage) | 
 array&lt;int, 99&gt; | [waddler_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_metadata) | 
-[ThemeInfo](#ThemeInfo) | [theme_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_info) | 
-[LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | 
+[ThemeInfo](#ThemeInfo) | [theme_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_info) | Points to the current [ThemeInfo](#ThemeInfo)
+[LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | Level logic like dice game and cutscenes
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
+int | [next_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_entity_uid) | Next entity spawned will have this uid
 
 ## Texture types
 
@@ -3336,7 +3358,7 @@ bool | [hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | Offset of the hitbox in relation to the entity position
 float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | Offset of the hitbox in relation to the entity position
 [RenderInfo](#RenderInfo) | [rendering_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rendering_info) | 
-any | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before [ON](#ON).PRE_LOAD_SCREEN from a level and loaded right before [ON](#ON).POST_LEVEL_GENERATION.<br/> 
+any | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before [ON](#ON).PRE_LOAD_SCREEN from a level and loaded right before [ON](#ON).POST_LOAD_SCREEN to a level or transition. It is not available yet in post_entity_spawn, but that is a good place to initialize it for new custom entities. See example for more.<br/> 
 [Entity](#Entity) | [topmost()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) | 
 [Entity](#Entity) | [topmost_mount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) | 
 bool | [overlaps_with(AABB hitbox)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 

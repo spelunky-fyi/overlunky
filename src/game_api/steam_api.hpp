@@ -81,3 +81,5 @@ std::tuple<bool, bool, const char16_t*, const char16_t*> get_feat(FEAT feat);
 bool get_feat_hidden(FEAT feat);
 void set_feat_hidden(FEAT feat, bool hidden);
 void init_achievement_hooks();
+bool get_steam_achievement(const char* achievement_id, bool* achieved);
+bool set_steam_achievement(const char* achievement_id, bool achieved);

@@ -107,6 +107,8 @@ class GuiDrawContext
     void win_popid();
     /// Draw image to window.
     void win_image(IMAGE image, int width, int height);
+    /// Draw imagebutton to window.
+    bool win_imagebutton(std::string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2);
     /// Add a collapsing accordion section, put contents in the callback function.
     void win_section(std::string title, sol::function callback);
     /// Indent contents, or unindent if negative

@@ -48,6 +48,38 @@ void disable_steam_achievements()
     }
 }
 
+bool get_steam_achievement(const char* achievement_id, bool* achieved)
+{
+    ISteamUserStats* steam_user_stats = get_steam_user_stats();
+    if (steam_user_stats != nullptr)
+    {
+        using ISteamUserStats_GetAchievement = bool(ISteamUserStats*, const char*, bool*);
+        ISteamUserStats_GetAchievement* get_achievement = *vtable_find<ISteamUserStats_GetAchievement*>(steam_user_stats, 0x6);
+        return get_achievement(steam_user_stats, achievement_id, achieved);
+    }
+    return false;
+}
+
+bool set_steam_achievement(const char* achievement_id, bool achieved)
+{
+    ISteamUserStats* steam_user_stats = get_steam_user_stats();
+    if (steam_user_stats != nullptr)
+    {
+        if (achieved)
+        {
+            using ISteamUserStats_SetAchievement = bool(ISteamUserStats*, const char*);
+            ISteamUserStats_SetAchievement* set_achievement = *vtable_find<ISteamUserStats_SetAchievement*>(steam_user_stats, 0x7);
+            return set_achievement(steam_user_stats, achievement_id);
+        }
+        else
+        {
+            using ISteamUserStats_ResetAchievement = bool(ISteamUserStats*, const char*);
+            ISteamUserStats_ResetAchievement* reset_achievement = *vtable_find<ISteamUserStats_ResetAchievement*>(steam_user_stats, 0x8);
+            return reset_achievement(steam_user_stats, achievement_id);
+        }
+    }
+    return false;
+}
 void reset_all_steam_achievements()
 {
     ISteamUserStats* steam_user_stats = get_steam_user_stats();

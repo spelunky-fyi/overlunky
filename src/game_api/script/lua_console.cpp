@@ -658,7 +658,23 @@ bool LuaConsole::pre_draw()
         auto& style = ImGui::GetStyle();
         auto base = ImGui::GetMainViewport();
 
-        ImGui::SetNextWindowSize(size.x != 0 ? size : base->Size);
+        if (!options.empty())
+        {
+            auto width = (size.x != 0 ? size.x : base->Size.x) - 300.0f;
+            auto opos = pos.x + width;
+            ImGui::SetNextWindowSize({300, size.y != 0 ? size.y : base->Size.y});
+            ImGui::SetNextWindowPos({opos, pos.y});
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(4, 4));
+            ImGui::Begin("Console Options", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDecoration);
+            render_options();
+            ImGui::End();
+            ImGui::PopStyleVar();
+            ImGui::SetNextWindowSize((size.x != 0 ? ImVec2(width, size.y) : base->Size));
+        }
+        else
+        {
+            ImGui::SetNextWindowSize(size.x != 0 ? size : base->Size);
+        }
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowViewport(base->ID);
         ImGui::Begin(
@@ -877,6 +893,7 @@ bool LuaConsole::pre_draw()
                         if (results.starts_with("sol:"))
                         {
                             color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
+                            set_error(results);
                         }
                         result_message.push_back({std::move(results), {}, color});
                     }

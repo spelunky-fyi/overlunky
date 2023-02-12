@@ -735,3 +735,13 @@ int32_t UI::spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer,
     ent->velocityy = vy;
     return uid;
 }
+
+void UI::spawn_player(uint8_t player_slot, float x, float y)
+{
+    ::spawn_player(player_slot + 1, x, y);
+}
+
+std::pair<float, float> UI::spawn_position()
+{
+    return {State::get().ptr()->level_gen->spawn_x, State::get().ptr()->level_gen->spawn_y};
+}

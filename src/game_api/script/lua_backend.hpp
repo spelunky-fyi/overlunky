@@ -96,6 +96,7 @@ enum class ON
     RENDER_POST_PAUSE_MENU,
     RENDER_PRE_DRAW_DEPTH,
     RENDER_POST_DRAW_DEPTH,
+    RENDER_PRE_JOURNAL_PAGE,
     RENDER_POST_JOURNAL_PAGE,
     SPEECH_BUBBLE,
     TOAST,
@@ -108,6 +109,7 @@ enum class ON
     PRE_SET_FEAT,
     PRE_UPDATE,
     POST_UPDATE,
+    USER_DATA
 };
 
 struct IntOption
@@ -271,6 +273,7 @@ class LuaBackend
     std::unordered_map<int, TimerCallback> global_timers;
     std::unordered_map<int, ScreenCallback> callbacks;
     std::unordered_map<int, ScreenCallback> load_callbacks;
+    std::unordered_map<int, ScreenCallback> save_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_tile_code_callbacks;
     std::vector<LevelGenCallback> post_tile_code_callbacks;
@@ -396,6 +399,8 @@ class LuaBackend
     static void push_calling_backend(LuaBackend*);
     static void pop_calling_backend(LuaBackend*);
     bool on_pre_state_update();
+    void on_set_user_data(Entity* ent);
+    void load_user_data();
 };
 
 template <class Inheriting>

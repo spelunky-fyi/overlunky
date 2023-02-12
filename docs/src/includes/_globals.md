@@ -19,7 +19,7 @@ meta.description = [[
 
 ```
 
-#### array&lt;string&gt; meta
+#### array&lt;mixed&gt; meta
 
 > Search script examples for [meta](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=meta)
 
@@ -118,11 +118,11 @@ end, ON.LEVEL)
 
 ```
 
-#### array&lt;mixed&gt; options
+#### optional&lt;array&lt;mixed&gt;&gt; options
 
 > Search script examples for [options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 
-Table of options set in the UI, added with the [register_option_functions](#Option-functions). You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
+Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
 ### prng
 
 
@@ -164,7 +164,7 @@ set_interval(function()
   count = count + 1
   spawn(ENT_TYPE.FX_EXPLOSION, 0, 0, LAYER.FRONT, 0, 0)
   if count >= 3 then
-    -- calling this without parameters clears the fallback that's calling it
+    -- calling this without parameters clears the callback that's calling it
     clear_callback()
   end
 end, 60)
@@ -204,7 +204,7 @@ Clears a previously set callback
 #### [CallbackId](#Aliases) set_callback(function cb, [ON](#ON) event)
 
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
-Add global callback function to be called on an [event](#ON).
+Add global callback function to be called on an [event](#Events).
 
 ### set_global_interval
 
@@ -653,6 +653,15 @@ Get the [ENT_TYPE](#ENT_TYPE)... of the entity by uid
 #### int get_grid_entity_at(float x, float y, [LAYER](#LAYER) layer)
 
 Gets a grid entity, such as floor or spikes, at the given position and layer.
+
+### get_local_players
+
+
+> Search script examples for [get_local_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_players)
+
+#### nil get_local_players()
+
+Get the thread-local version of players
 
 ### get_player
 
@@ -1112,6 +1121,15 @@ Returns true if the nth bit is set in the number.
 
 Change the amount of frames after the damage from poison is applied
 
+### clear_cache
+
+
+> Search script examples for [clear_cache](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_cache)
+
+#### nil clear_cache()
+
+Clear cache for a file path or the whole directory
+
 ### clr_mask
 
 
@@ -1129,6 +1147,16 @@ Clears a bitmask in a number. This doesn't actually change the variable you pass
 #### tuple&lt;IMAGE, int, int&gt; create_image(string path)
 
 Create image from file. Returns a tuple containing id, width and height.
+Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
+
+### create_image_crop
+
+
+> Search script examples for [create_image_crop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image_crop)
+
+#### tuple&lt;IMAGE, int, int&gt; create_image_crop(string path, int x, int y, int w, int h)
+
+Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
 
 ### disable_floor_embeds
@@ -1202,6 +1230,24 @@ Get your sanitized script id to be used in import.
 #### int get_level_config([LEVEL_CONFIG](#LEVEL_CONFIG) config)
 
 Gets the value for the specified config
+
+### get_local_prng
+
+
+> Search script examples for [get_local_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_prng)
+
+#### nil get_local_prng()
+
+Get the thread-local version of prng
+
+### get_local_state
+
+
+> Search script examples for [get_local_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_state)
+
+#### nil get_local_state()
+
+Get the thread-local version of state
 
 ### get_ms
 
@@ -1295,6 +1341,24 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 #### bool is_character_female([ENT_TYPE](#ENT_TYPE) type_id)
 
 Same as `Player.is_female`
+
+### list_char_mods
+
+
+> Search script examples for [list_char_mods](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_char_mods)
+
+#### nil list_char_mods()
+
+List all char.png files recursively from Mods/Packs. Returns table of file paths.
+
+### list_dir
+
+
+> Search script examples for [list_dir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_dir)
+
+#### nil list_dir(string dir)
+
+List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 
 ### load_death_screen
 
@@ -1668,7 +1732,7 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out
 
 #### nil console_prinspect(variadic_args objects)
 
-Prinspect to console
+Prinspect to ingame console.
 
 ### console_print
 
@@ -1677,7 +1741,7 @@ Prinspect to console
 
 #### nil console_print(string message)
 
-Print a log message to console.
+Print a log message to ingame console.
 
 ### log_print
 
@@ -1898,6 +1962,15 @@ limits, you can override them in the UI with double click.
 
 Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
 
+### unregister_option
+
+
+> Search script examples for [unregister_option](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unregister_option)
+
+#### nil unregister_option(string name)
+
+Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
+
 ## Particle functions
 
 
@@ -2066,6 +2139,15 @@ Gets the current camera position in the level
 #### [AABB](#AABB) get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)
 
 Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
+
+### get_image_size
+
+
+> Search script examples for [get_image_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_image_size)
+
+#### tuple&lt;int, int&gt; get_image_size(string path)
+
+Get image size from file. Returns a tuple containing width and height.
 
 ### get_position
 
@@ -2864,6 +2946,24 @@ Gets a `TextureDefinition` for equivalent to the one used to define the texture 
 Reloads a texture from disk, use this only as a development tool for example in the console
 Note that [define_texture](#define_texture) will also reload the texture if it already exists
 
+### replace_texture
+
+
+> Search script examples for [replace_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_texture)
+
+#### bool replace_texture([TEXTURE](#TEXTURE) vanilla_id, [TEXTURE](#TEXTURE) custom_id)
+
+Replace a vanilla texture definition with a custom texture definition and reload the texture.
+
+### replace_texture_and_heart_color
+
+
+> Search script examples for [replace_texture_and_heart_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_texture_and_heart_color)
+
+#### bool replace_texture_and_heart_color([TEXTURE](#TEXTURE) vanilla_id, [TEXTURE](#TEXTURE) custom_id)
+
+Replace a vanilla texture definition with a custom texture definition and reload the texture. Set corresponding character heart color to the pixel in the center of the player indicator arrow in that texture. (448,1472)
+
 ### reset_lut
 
 
@@ -2872,6 +2972,15 @@ Note that [define_texture](#define_texture) will also reload the texture if it a
 #### nil reset_lut([LAYER](#LAYER) layer)
 
 Same as `set_lut(nil, layer)`
+
+### reset_texture
+
+
+> Search script examples for [reset_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_texture)
+
+#### nil reset_texture([TEXTURE](#TEXTURE) vanilla_id)
+
+Reset a replaced vanilla texture to the original and reload the texture.
 
 ### set_lut
 
