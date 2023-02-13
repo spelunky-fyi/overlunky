@@ -168,7 +168,7 @@ struct Players
         // the key and the value
         // the state is left alone
         auto r = std::make_tuple(
-            sol::object(l, sol::in_place, it - it_state.begin),
+            sol::object(l, sol::in_place, it - it_state.begin + 1),
             sol::object(l, sol::in_place, *it));
         // the iterator must be moved forward one before we return
         std::advance(it, 1);
