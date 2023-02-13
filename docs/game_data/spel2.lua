@@ -1686,7 +1686,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field player_lives integer[] @size: 4
     ---@field player_totalwins integer[] @size: 4
     ---@field player_won boolean[] @size: 4
-    ---@field timer integer
+    ---@field timer integer @The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 10 minutes and 20 == infinite. Can go higher, although this will glitch the menu text. Actual time (seconds) = (state.arena.timer + 1) x 30
     ---@field timer_ending integer
     ---@field wins integer
     ---@field lives integer
@@ -1718,7 +1718,7 @@ function change_feat(feat, hidden, name, description) end
 ---@class Items
     ---@field player_count integer
     ---@field saved_pets_count integer
-    ---@field saved_pets ENT_TYPE[] @size: 4
+    ---@field saved_pets ENT_TYPE[] @size: 4 @Pet information for level transition
     ---@field is_pet_cursed boolean[] @size: 4
     ---@field is_pet_poisoned boolean[] @size: 4
     ---@field player_inventory Inventory[] @size: MAX_PLAYERS
@@ -1746,69 +1746,69 @@ function change_feat(feat, hidden, name, description) end
     ---@field pools LiquidPool[] @size: 5
 
 ---@class StateMemory
-    ---@field screen_last integer
-    ---@field screen integer
-    ---@field screen_next integer
-    ---@field ingame integer
-    ---@field playing integer
-    ---@field pause PAUSE
-    ---@field width integer
-    ---@field height integer
+    ---@field screen_last integer @Previous SCREEN, used to check where we're coming from when loading another SCREEN
+    ---@field screen integer @Current SCREEN, generally read-only or weird things will happen
+    ---@field screen_next integer @Next SCREEN, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
+    ---@field ingame integer @Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
+    ---@field playing integer @Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
+    ---@field pause PAUSE @8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controller by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
+    ---@field width integer @level width in rooms (number of rooms horizontally)
+    ---@field height integer @level height in rooms (number of rooms vertically)
     ---@field kali_favor integer
     ---@field kali_status integer
-    ---@field kali_altars_destroyed integer
-    ---@field kali_gifts integer
-    ---@field seed integer
-    ---@field time_total integer
-    ---@field world integer
-    ---@field world_next integer
-    ---@field world_start integer
-    ---@field level integer
-    ---@field level_next integer
-    ---@field level_start integer
-    ---@field theme THEME
-    ---@field theme_next THEME
-    ---@field theme_start integer
-    ---@field current_theme ThemeInfo
-    ---@field force_current_theme fun(self, t: integer): nil
-    ---@field shoppie_aggro integer
-    ---@field shoppie_aggro_next integer
+    ---@field kali_altars_destroyed integer @Also affects if the player has punish ball, if the punish ball is destroyed it is set to -1
+    ---@field kali_gifts integer @0 - none, 1 - item, 3 - kapala
+    ---@field seed integer @Current seed in seeded mode, just set to a funny value and does nothing in adventure mode
+    ---@field time_total integer @Total frames of current run, equal to the final game time on win
+    ---@field world integer @Current world number, shown in hud and used by some game logic like choosing the next level on transition
+    ---@field world_next integer @Next world number, used when loading a new level or transition
+    ---@field world_start integer @World number to start new runs in
+    ---@field level integer @Current level number, shown in hud and used by some game logic like choosing the next level on transition
+    ---@field level_next integer @Next level number, used when loading a new level or transition
+    ---@field level_start integer @Level number to start new runs in
+    ---@field theme THEME @Current THEME number, used to pick the music and by some game logic like choosing the next level on transition
+    ---@field theme_next THEME @Next THEME number, used when loading a new level or transition
+    ---@field theme_start integer @THEME to start new runs in
+    ---@field current_theme ThemeInfo @Points to the current ThemeInfo
+    ---@field force_current_theme fun(self, t: integer): nil @This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
+    ---@field shoppie_aggro integer @Current shoppie aggro
+    ---@field shoppie_aggro_next integer @Shoppie aggro to use in the next level
     ---@field outposts_spawned integer
-    ---@field merchant_aggro integer
+    ---@field merchant_aggro integer @Tun aggro
     ---@field kills_npc integer
-    ---@field level_count integer
-    ---@field damage_taken integer
+    ---@field level_count integer @Current zero-based level count, or number of levels completed
+    ---@field damage_taken integer @Total amount of damage taken, excluding cause of death
     ---@field journal_flags JOURNAL_FLAG
-    ---@field time_last_level integer
-    ---@field time_level integer
+    ---@field time_last_level integer @Level time of previous level in frames, used by game logic to decide dark levels etc
+    ---@field time_level integer @Level time of current level in frames, show on the hud
     ---@field level_flags integer
-    ---@field loading integer
-    ---@field quest_flags QUEST_FLAG
+    ---@field loading integer @Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to `screen_next`.
+    ---@field quest_flags QUEST_FLAG @32bit flags, can be written to trigger a run reset on next level load etc.
     ---@field presence_flags PRESENCE_FLAG
-    ---@field fadevalue number
-    ---@field fadeout integer
-    ---@field fadein integer
-    ---@field loading_black_screen_timer integer
-    ---@field saved_dogs integer
+    ---@field fadevalue number @Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
+    ---@field fadeout integer @Amount of frames the fadeout should last when loading
+    ---@field fadein integer @Amount of frames the fadein should last when loading
+    ---@field loading_black_screen_timer integer @if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
+    ---@field saved_dogs integer @Run totals
     ---@field saved_cats integer
     ---@field saved_hamsters integer
-    ---@field win_state integer
-    ---@field illumination Illumination
+    ---@field win_state integer @0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
+    ---@field illumination Illumination @The global level illumination, very big and bright.
     ---@field money_last_levels integer
-    ---@field money_shop_total integer
-    ---@field player_inputs PlayerInputs
-    ---@field quests QuestsInfo
-    ---@field camera Camera
+    ---@field money_shop_total integer @Total negative amount spent in shops during the run<br><br/>The total money currently available (in single player) is `players[1].inventory.money + players[1].inventory.collected_money_total + state.money_shop_total`
+    ---@field player_inputs PlayerInputs @Access the player inputs even when no player entities are available
+    ---@field quests QuestsInfo @NPC quest states
+    ---@field camera Camera @Camera bounds and position
     ---@field special_visibility_flags integer
     ---@field cause_of_death CAUSE_OF_DEATH
     ---@field cause_of_death_entity_type ENT_TYPE
     ---@field toast_timer integer
     ---@field speechbubble_timer integer
     ---@field speechbubble_owner integer
-    ---@field level_gen LevelGenSystem
-    ---@field correct_ushabti integer
-    ---@field items Items
-    ---@field camera_layer integer
+    ---@field level_gen LevelGenSystem @Entrance and exit coordinates, shop types and all themes
+    ---@field correct_ushabti integer @See `get_correct_ushabti`. == anim_frame - (2  floor(anim_frame/12))
+    ---@field items Items @Has the current player count, player inventories and character selections
+    ---@field camera_layer integer @The currently drawn layer, can't be changed
     ---@field screen_team_select ScreenTeamSelect
     ---@field screen_character_select ScreenCharacterSelect
     ---@field screen_transition ScreenTransition
@@ -1824,12 +1824,12 @@ function change_feat(feat, hidden, name, description) end
     ---@field screen_arena_score ScreenArenaScore
     ---@field screen_arena_menu ScreenArenaMenu
     ---@field screen_arena_items ScreenArenaItems
-    ---@field get_correct_ushabti fun(self): integer
+    ---@field get_correct_ushabti fun(self): integer @Returns animation_frame of the correct ushabti
     ---@field set_correct_ushabti fun(self, animation_frame: integer): nil
     ---@field arena ArenaState
-    ---@field speedrun_character ENT_TYPE
-    ---@field speedrun_activation_trigger boolean
-    ---@field end_spaceship_character ENT_TYPE
+    ---@field speedrun_character ENT_TYPE @Who administers the tutorial speedrun in base camp
+    ---@field speedrun_activation_trigger boolean @must transition from true to false to activate it
+    ---@field end_spaceship_character ENT_TYPE @Who pops out the spaceship for a tiamat/hundun win, this is set upon the spaceship door open
     ---@field world2_coffin_spawned boolean
     ---@field world4_coffin_spawned boolean
     ---@field world6_coffin_spawned boolean
@@ -1837,16 +1837,16 @@ function change_feat(feat, hidden, name, description) end
     ---@field first_damage_world integer
     ---@field first_damage_level integer
     ---@field time_speedrun integer
-    ---@field coffin_contents ENT_TYPE
+    ---@field coffin_contents ENT_TYPE @the contents of the special coffin that will be spawned during levelgen
     ---@field screen_change_counter integer
-    ---@field time_startup integer
-    ---@field storage_uid integer
+    ---@field time_startup integer @Number of frames since the game was launched
+    ---@field storage_uid integer @entity uid of the first floor_storage entity
     ---@field waddler_storage ENT_TYPE[] @size: 99
     ---@field waddler_metadata integer[] @size: 99
-    ---@field theme_info ThemeInfo
-    ---@field logic LogicList
+    ---@field theme_info ThemeInfo @Points to the current ThemeInfo
+    ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
-    ---@field next_entity_uid integer
+    ---@field next_entity_uid integer @Next entity spawned will have this uid
 
 ---@class LightParams
     ---@field red number
@@ -1855,11 +1855,11 @@ function change_feat(feat, hidden, name, description) end
     ---@field size number
 
 ---@class Illumination
-    ---@field lights LightParams[] @size: 4
+    ---@field lights LightParams[] @size: 4 @Table of light1, light2, ... etc.
     ---@field light1 LightParams
     ---@field light2 LightParams
     ---@field light3 LightParams
-    ---@field light4 LightParams
+    ---@field light4 LightParams @It's rendered on anys around, not as an actual bright spot
     ---@field brightness number
     ---@field brightness_multiplier number
     ---@field light_pos_x number
@@ -1868,8 +1868,8 @@ function change_feat(feat, hidden, name, description) end
     ---@field offset_y number
     ---@field distortion number
     ---@field entity_uid integer
-    ---@field flags integer
-    ---@field type_flags integer
+    ---@field flags integer @see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
+    ---@field type_flags integer @Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
     ---@field enabled boolean
     ---@field layer integer
 
@@ -1909,7 +1909,7 @@ function change_feat(feat, hidden, name, description) end
 ---@class OnlineLobby
     ---@field code integer
     ---@field local_player_slot integer
-    ---@field get_code fun(self): string
+    ---@field get_code fun(self): string @Gets the string equivalent of the code
 
 ---@class LogicList
     ---@field olmec_cutscene LogicOlmecCutscene
@@ -2002,12 +2002,12 @@ function change_feat(feat, hidden, name, description) end
     ---@field game_has_focus boolean
 
 ---@class PRNG
-    ---@field seed fun(self, seed: integer): nil
-    ---@field random_float fun(self, type: PRNG_CLASS): number
-    ---@field random_chance fun(self, inverse_chance: integer, type: PRNG_CLASS): boolean
-    ---@field random_index fun(self, i: integer, type: PRNG_CLASS): integer?
-    ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer?
-    ---@field random PRNG_random
+    ---@field seed fun(self, seed: integer): nil @Same as `seed_prng`
+    ---@field random_float fun(self, type: PRNG_CLASS): number @Generate a random floating point number in the range `[0, 1)`
+    ---@field random_chance fun(self, inverse_chance: integer, type: PRNG_CLASS): boolean @Returns true with a chance of `1/inverse_chance`
+    ---@field random_index fun(self, i: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
+    ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[min, max]` or `nil` if `max < min`
+    ---@field random PRNG_random @Drop-in replacement for `math.random()`
     ---@field get_pair any @&PRNG::get_pair
     ---@field set_pair any @&PRNG::set_pair
 
@@ -2023,10 +2023,10 @@ local function PRNG_random(self, min, max) end
     ---@field g number
     ---@field b number
     ---@field a number
-    ---@field get_rgba fun(self): integer, integer, integer, integer
-    ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color
-    ---@field get_ucolor fun(self): uColor
-    ---@field set_ucolor fun(self, color: uColor): Color
+    ---@field get_rgba fun(self): integer, integer, integer, integer @Returns RGBA colors in 0..255 range
+    ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color @Changes color based on given RGBA colors in 0..255 range
+    ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
+    ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
 
 ---@class Animation
     ---@field id integer
@@ -2037,7 +2037,7 @@ local function PRNG_random(self, min, max) end
 
 ---@class EntityDB
     ---@field id ENT_TYPE
-    ---@field search_flags integer
+    ---@field search_flags integer @MASK
     ---@field width number
     ---@field height number
     ---@field offsetx number
@@ -2045,8 +2045,8 @@ local function PRNG_random(self, min, max) end
     ---@field hitboxx number
     ---@field hitboxy number
     ---@field draw_depth integer
-    ---@field collision2_mask integer
-    ---@field collision_mask integer
+    ---@field collision2_mask integer @MASK, will only call collision2 when colliding with entities that match this mask.
+    ---@field collision_mask integer @MASK used for collision with floors.
     ---@field friction number
     ---@field elasticity number
     ---@field weight number
@@ -2060,7 +2060,7 @@ local function PRNG_random(self, min, max) end
     ---@field glow_alpha number
     ---@field damage integer
     ---@field life integer
-    ---@field sacrifice_value integer
+    ---@field sacrifice_value integer @Favor for sacrificing alive. Halved when dead (health == 0).
     ---@field blood_content integer
     ---@field texture integer
     ---@field animations table<integer, Animation>
@@ -2085,83 +2085,83 @@ local function PRNG_random(self, min, max) end
     ---@field facing_left boolean
     ---@field render_inactive boolean
     ---@field get_entity fun(self): class Entity
-    ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId
-    ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId
-    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
-    ---@field set_pre_dtor fun(self, fun: fun(self: RenderInfo): nil): CallbackId
-    ---@field set_post_dtor fun(self, fun: fun(self: RenderInfo): nil): CallbackId
-    ---@field set_pre_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId
-    ---@field set_post_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId
+    ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
+    ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
+    ---@field set_pre_dtor fun(self, fun: fun(self: RenderInfo): nil): CallbackId @Hooks before the virtual function.<br/>The callback signature is `nil dtor(RenderInfo self)`
+    ---@field set_post_dtor fun(self, fun: fun(self: RenderInfo): nil): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil dtor(RenderInfo self)`
+    ---@field set_pre_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool render(RenderInfo self, number number, VanillaRenderContext vanilla_render_context)`
+    ---@field set_post_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil render(RenderInfo self, number number, VanillaRenderContext vanilla_render_context)`
 
 ---@class Entity
-    ---@field type EntityDB
+    ---@field type EntityDB @Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the EntityDB
     ---@field overlay Entity
-    ---@field flags ENT_FLAG
-    ---@field more_flags ENT_MORE_FLAG
-    ---@field uid integer
-    ---@field animation_frame integer
-    ---@field draw_depth integer
-    ---@field x number
-    ---@field y number
-    ---@field layer integer
-    ---@field width number
-    ---@field height number
-    ---@field special_offsetx number
-    ---@field special_offsety number
-    ---@field tile_width number
-    ---@field tile_height number
+    ---@field flags ENT_FLAG @see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) entity_flags
+    ---@field more_flags ENT_MORE_FLAG @see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) more_flags
+    ---@field uid integer @Unique id of the entity, save it to variable to check this entity later (don't use the whole Entity type as it will be replaced with a different one when this is destroyed)
+    ---@field animation_frame integer @Number (id) of the sprite in the texture
+    ---@field draw_depth integer @Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
+    ---@field x number @Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
+    ---@field y number @Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
+    ---@field layer integer @Use `set_layer` to change
+    ---@field width number @Width of the sprite
+    ---@field height number @Height of the sprite
+    ---@field special_offsetx number @Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
+    ---@field special_offsety number @Special offset used for entities attached to others (or picked by others) that need to flip to the other side when the parent flips sides
+    ---@field tile_width number @Size of the sprite in the texture
+    ---@field tile_height number @Size of the sprite in the texture
     ---@field angle number
     ---@field color Color
-    ---@field hitboxx number
-    ---@field hitboxy number
+    ---@field hitboxx number @Half of the width of the hitbox
+    ---@field hitboxy number @Half of the height of the hitbox
     ---@field shape SHAPE
     ---@field hitbox_enabled boolean
-    ---@field offsetx number
-    ---@field offsety number
+    ---@field offsetx number @Offset of the hitbox in relation to the entity position
+    ---@field offsety number @Offset of the hitbox in relation to the entity position
     ---@field rendering_info RenderInfo
     ---@field user_data any
     ---@field topmost fun(self): Entity
     ---@field topmost_mount fun(self): Entity
     ---@field overlaps_with Entity_overlaps_with
     ---@field get_texture fun(self): TEXTURE
-    ---@field set_texture fun(self, texture_id: TEXTURE): boolean
+    ---@field set_texture fun(self, texture_id: TEXTURE): boolean @Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     ---@field set_draw_depth fun(self, draw_depth: integer): nil
     ---@field set_enable_turning fun(self, enabled: boolean): nil
     ---@field liberate_from_shop fun(self): nil
     ---@field get_held_entity fun(self): Entity
-    ---@field set_layer fun(self, layer: LAYER): nil
-    ---@field remove fun(self): nil
-    ---@field respawn fun(self, layer: LAYER): nil
-    ---@field kill fun(self, destroy_corpse: boolean, responsible: Entity): nil
-    ---@field destroy fun(self): nil
-    ---@field activate fun(self, activator: Entity): nil
-    ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil
-    ---@field trigger_action fun(self, user: Entity): boolean
-    ---@field get_metadata fun(self): integer
+    ---@field set_layer fun(self, layer: LAYER): nil @Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
+    ---@field remove fun(self): nil @Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
+    ---@field respawn fun(self, layer: LAYER): nil @Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
+    ---@field kill fun(self, destroy_corpse: boolean, responsible: Entity): nil @Kills the entity, you can set responsible to `nil` to ignore it
+    ---@field destroy fun(self): nil @Completely removes the entity from existence
+    ---@field activate fun(self, activator: Entity): nil @Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
+    ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil @Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
+    ---@field trigger_action fun(self, user: Entity): boolean @Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    ---@field get_metadata fun(self): integer @e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     ---@field apply_metadata fun(self, metadata: integer): nil
     ---@field set_invisible fun(self, value: boolean): nil
     ---@field get_items fun(self): integer[]
-    ---@field is_in_liquid fun(self): boolean
+    ---@field is_in_liquid fun(self): boolean @Returns true if entity is in water/lava
     ---@field is_cursed fun(self): boolean
-    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
-    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
-    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
-    ---@field set_pre_dtor fun(self, fun: fun(self: Entity): nil): CallbackId
-    ---@field set_post_dtor fun(self, fun: fun(self: Entity): nil): CallbackId
-    ---@field set_pre_update_state_machine fun(self, fun: fun(self: Entity): boolean): CallbackId
-    ---@field set_post_update_state_machine fun(self, fun: fun(self: Entity): boolean): CallbackId
-    ---@field set_pre_kill fun(self, fun: fun(self: Entity, destroy_corpse: boolean, responsible: Entity): boolean): CallbackId
-    ---@field set_post_kill fun(self, fun: fun(self: Entity, destroy_corpse: boolean, responsible: Entity): boolean): CallbackId
-    ---@field set_pre_on_collision1 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId
-    ---@field set_post_on_collision1 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId
-    ---@field set_pre_destroy fun(self, fun: fun(self: Entity): boolean): CallbackId
-    ---@field set_post_destroy fun(self, fun: fun(self: Entity): boolean): CallbackId
-    ---@field set_pre_get_held_entity fun(self, fun: fun(self: Entity): Entity?): CallbackId
-    ---@field set_post_get_held_entity fun(self, fun: fun(self: Entity): Entity?): CallbackId
-    ---@field set_pre_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId
-    ---@field set_post_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId
-    ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId
-    ---@field set_post_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
+    ---@field set_pre_dtor fun(self, fun: fun(self: Entity): nil): CallbackId @Hooks before the virtual function.<br/>The callback signature is `nil dtor(Entity self)`
+    ---@field set_post_dtor fun(self, fun: fun(self: Entity): nil): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil dtor(Entity self)`
+    ---@field set_pre_update_state_machine fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool update_state_machine(Entity self)`
+    ---@field set_post_update_state_machine fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil update_state_machine(Entity self)`
+    ---@field set_pre_kill fun(self, fun: fun(self: Entity, destroy_corpse: boolean, responsible: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool kill(Entity self, boolean destroy_corpse, Entity responsible)`<br/>Virtual function docs:<br/>Kills the entity, you can set responsible to `nil` to ignore it
+    ---@field set_post_kill fun(self, fun: fun(self: Entity, destroy_corpse: boolean, responsible: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil kill(Entity self, boolean destroy_corpse, Entity responsible)`<br/>Virtual function docs:<br/>Kills the entity, you can set responsible to `nil` to ignore it
+    ---@field set_pre_on_collision1 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_collision1(Entity self, Entity other_entity)`
+    ---@field set_post_on_collision1 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_collision1(Entity self, Entity other_entity)`
+    ---@field set_pre_destroy fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool destroy(Entity self)`<br/>Virtual function docs:<br/>Completely removes the entity from existence
+    ---@field set_post_destroy fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil destroy(Entity self)`<br/>Virtual function docs:<br/>Completely removes the entity from existence
+    ---@field set_pre_get_held_entity fun(self, fun: fun(self: Entity): Entity?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<Entity> get_held_entity(Entity self)`
+    ---@field set_post_get_held_entity fun(self, fun: fun(self: Entity): Entity?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil get_held_entity(Entity self)`
+    ---@field set_pre_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    ---@field set_post_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_collision2(Entity self, Entity other_entity)`
+    ---@field set_post_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_collision2(Entity self, Entity other_entity)`
 
 ---@class Entity_overlaps_with
 ---@param other Entity
@@ -2170,20 +2170,20 @@ local function PRNG_random(self, min, max) end
 local function Entity_overlaps_with(self, other) end
 
 ---@class Movable : Entity
-    ---@field move Vec2
-    ---@field movex number
-    ---@field movey number
+    ---@field move Vec2 @{movex, movey}
+    ---@field movex number @Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
+    ---@field movey number @Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
     ---@field buttons BUTTON
     ---@field buttons_previous BUTTON
     ---@field stand_counter integer
-    ---@field jump_height_multiplier number
+    ---@field jump_height_multiplier number @EntityDB.jump gets multiplied by this to get the jump
     ---@field owner_uid integer
     ---@field last_owner_uid integer
     ---@field current_animation Animation
     ---@field idle_counter integer
     ---@field standing_on_uid integer
-    ---@field velocityx number
-    ---@field velocityy number
+    ---@field velocityx number @speed, can be relative to the platform you standing on (pushblocks, elevators), use [get_velocity](#get_velocity) to get accurate speed in the game world
+    ---@field velocityy number @speed, can be relative to the platform you standing on (pushblocks, elevators), use [get_velocity](#get_velocity) to get accurate speed in the game world
     ---@field holding_uid integer
     ---@field state integer
     ---@field last_state integer
@@ -2191,13 +2191,11 @@ local function Entity_overlaps_with(self, other) end
     ---@field health integer
     ---@field stun_timer integer
     ---@field stun_state integer
-    ---@field lock_input_timer integer
-    ---@field some_state integer
+    ---@field lock_input_timer integer @Related to taking damage, also drops you from ladder/rope, can't be set while on the ground unless you're on a mount
     ---@field wet_effect_timer integer
-    ---@field poison_tick_timer integer
+    ---@field poison_tick_timer integer @Used to apply damage from poison, can be set to -1 to cure poison, to set poison use [poison_entity](#poison_entity)
     ---@field falling_timer integer
-    ---@field is_poisoned fun(self): boolean
-    ---@field poison fun(self, frames: integer): nil
+    ---@field is_poisoned Movable_is_poisoned
     ---@field dark_shadow_timer integer
     ---@field onfire_effect_timer integer
     ---@field exit_invincibility_timer integer
@@ -2209,139 +2207,143 @@ local function Entity_overlaps_with(self, other) end
     ---@field price integer
     ---@field stun fun(self, framecount: integer): nil
     ---@field freeze fun(self, framecount: integer): nil
-    ---@field light_on_fire fun(self, time: integer): nil
+    ---@field light_on_fire fun(self, time: integer): nil @Does not damage entity
     ---@field set_cursed fun(self, b: boolean): nil
     ---@field drop fun(self, entity_to_drop: Entity): nil
     ---@field pick_up fun(self, entity_to_pick_up: Entity): nil
     ---@field can_jump fun(self): boolean
     ---@field standing_on fun(self): Entity
-    ---@field add_money fun(self, money: integer): nil
+    ---@field add_money fun(self, money: integer): nil @Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
     ---@field is_on_fire fun(self): boolean
-    ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil
-    ---@field get_all_behaviors fun(self): integer[]
-    ---@field set_behavior fun(self, behavior_id: integer): boolean
-    ---@field get_behavior fun(self): integer
-    ---@field set_gravity fun(self, gravity: number): nil
-    ---@field reset_gravity fun(self): nil
-    ---@field set_position fun(self, to_x: number, to_y: number): nil
-    ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior
-    ---@field add_behavior fun(self, behavior: MovableBehavior): nil
-    ---@field clear_behavior fun(self, behavior: MovableBehavior): nil
-    ---@field clear_behaviors fun(self): nil
-    ---@field generic_update_world Movable_generic_update_world
-    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
-    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
-    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
-    ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean): CallbackId
-    ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean): CallbackId
+    ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): nil @Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+    ---@field get_all_behaviors fun(self): integer[] @Get all avaible behavior ids
+    ---@field set_behavior fun(self, behavior_id: integer): boolean @Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity<br/>Returns false if entity doesn't have this behavior id
+    ---@field get_behavior fun(self): integer @Get the current behavior id
+    ---@field set_gravity fun(self, gravity: number): nil @Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
+    ---@field reset_gravity fun(self): nil @Remove the gravity hook and reset to defaults
+    ---@field set_position fun(self, to_x: number, to_y: number): nil @Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
+    ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior @Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
+    ---@field add_behavior fun(self, behavior: MovableBehavior): nil @Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
+    ---@field clear_behavior fun(self, behavior: MovableBehavior): nil @Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
+    ---@field clear_behaviors fun(self): nil @Clears all behaviors of this movable, need to call `add_behavior` to avoid crashing
+    ---@field generic_update_world fun(self): nil @Move a movable according to its velocity, update physics, gravity, etc.<br/>Will also update `movable.animation_frame` and various timers and counters
+    ---@field generic_update_world Movable_generic_update_world @Move a movable according to its velocity, can disable gravity<br/>Will also update `movable.animation_frame` and various timers and counters
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
+    ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+    ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+
+---@class Movable_is_poisoned
+
+local function Movable_is_poisoned(self) end
 
 ---@class Movable_generic_update_world
 ---@param move Vec2
 ---@param sprint_factor number
 ---@param disable_gravity boolean
 ---@param on_rope boolean
----@overload fun(self): nil
 ---@overload fun(self, disable_gravity: boolean): nil
 local function Movable_generic_update_world(self, move, sprint_factor, disable_gravity, on_rope) end
 
 ---@class PowerupCapable : Movable
-    ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil
-    ---@field give_powerup fun(self, powerup_type: ENT_TYPE): nil
-    ---@field has_powerup fun(self, powerup_type: ENT_TYPE): boolean
-    ---@field get_powerups fun(self): ENT_TYPE[]
-    ---@field unequip_backitem fun(self): nil
-    ---@field worn_backitem fun(self): integer
+    ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil @Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
+    ---@field give_powerup fun(self, powerup_type: ENT_TYPE): nil @Gives the player/monster the specified powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Giving true crown to a monster crashes the game.
+    ---@field has_powerup fun(self, powerup_type: ENT_TYPE): boolean @Checks whether the player/monster has a certain powerup
+    ---@field get_powerups fun(self): ENT_TYPE[] @Return all powerups that the entity has
+    ---@field unequip_backitem fun(self): nil @Unequips the currently worn backitem
+    ---@field worn_backitem fun(self): integer @Returns the uid of the currently worn backitem, or -1 if wearing nothing
 
 ---@class Inventory
-    ---@field money integer
+    ---@field money integer @Sum of the money collected in current level
     ---@field bombs integer
     ---@field ropes integer
     ---@field player_slot integer
-    ---@field poison_tick_timer integer
-    ---@field cursed boolean
-    ---@field elixir_buff boolean
-    ---@field health integer
-    ---@field kapala_blood_amount integer
-    ---@field time_of_death integer
-    ---@field held_item ENT_TYPE
-    ---@field held_item_metadata integer
-    ---@field mount_type ENT_TYPE
-    ---@field mount_metadata integer
+    ---@field poison_tick_timer integer @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field cursed boolean @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field elixir_buff boolean @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field health integer @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field kapala_blood_amount integer @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field time_of_death integer @Is set to state.time_total when player dies in coop (to determinate who should be first to re-spawn from coffin)
+    ---@field held_item ENT_TYPE @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field held_item_metadata integer @Metadata of the held item (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field mount_type ENT_TYPE @Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field mount_metadata integer @Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field kills_level integer
     ---@field kills_total integer
-    ---@field collected_money_total integer
-    ---@field collected_money_count integer
-    ---@field collected_money ENT_TYPE[] @size: 512
-    ---@field collected_money_values integer[] @size: 512
-    ---@field killed_enemies ENT_TYPE[] @size: 256
-    ---@field companion_count integer
-    ---@field companions ENT_TYPE[] @size: 8
-    ---@field companion_held_items ENT_TYPE[] @size: 8
-    ---@field companion_held_item_metadatas integer[] @size: 8
-    ---@field companion_trust integer[] @size: 8
-    ---@field companion_health integer[] @size: 8
-    ---@field companion_poison_tick_timers integer[] @size: 8
-    ---@field is_companion_cursed boolean[] @size: 8
-    ---@field acquired_powerups ENT_TYPE[] @size: 30
+    ---@field collected_money_total integer @Total money collected during previous levels (so excluding the current one)
+    ---@field collected_money_count integer @Count/size for the `collected_money` Arrays
+    ---@field collected_money ENT_TYPE[] @size: 512 @Types of gold/gems collected during this level, used later to display during the transition
+    ---@field collected_money_values integer[] @size: 512 @Values of gold/gems collected during this level, used later to display during the transition
+    ---@field killed_enemies ENT_TYPE[] @size: 256 @Types of enemies killed during this level, used later to display during the transition
+    ---@field companion_count integer @Number of companions, it will determinate how many companions will be transfered to next level<br/>Increments when player acquires new companion, decrements when one of them dies
+    ---@field companions ENT_TYPE[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_held_items ENT_TYPE[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_held_item_metadatas integer[] @size: 8 @Metadata of items held by companions (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_trust integer[] @size: 8 @(0..3) Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_health integer[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_poison_tick_timers integer[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field is_companion_cursed boolean[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field acquired_powerups ENT_TYPE[] @size: 30 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 
 ---@class Ai
     ---@field target Entity
     ---@field target_uid integer
     ---@field timer integer
-    ---@field state integer
+    ---@field state integer @AI state (patrol, sleep, attack, aggro...)
     ---@field last_state integer
-    ---@field trust integer
-    ---@field whipped integer
-    ---@field walk_pause_timer integer
+    ---@field trust integer @Levels completed with, 0..3
+    ---@field whipped integer @Number of times whipped by player
+    ---@field walk_pause_timer integer @positive: walking, negative: wating/idle
 
 ---@class Player : PowerupCapable
     ---@field inventory Inventory
     ---@field emitted_light Illumination
-    ---@field linked_companion_parent integer
-    ---@field linked_companion_child integer
+    ---@field linked_companion_parent integer @entity uid
+    ---@field linked_companion_child integer @entity uid
     ---@field ai Ai
     ---@field input PlayerSlot
-    ---@field basecamp_button_entity Entity
-    ---@field jump_lock_timer integer
-    ---@field coyote_timer integer
-    ---@field swim_timer integer
-    ---@field hired_hand_name integer
+    ---@field basecamp_button_entity Entity @Used in base camp to talk with the NPC's
+    ---@field jump_lock_timer integer @Increases when holding jump button in the air, set to max while jumping. If this isn't 0, a jump will only be<br/>registered if the jump button was not held on the previous frame.
+    ---@field coyote_timer integer @can jump while airborne if greater than 0
+    ---@field swim_timer integer @Timer between strokes when holding jump button in water.
+    ---@field hired_hand_name integer @0-25 alphabetical index of hired hand names.
     ---@field set_jetpack_fuel fun(self, fuel: integer): nil
     ---@field kapala_blood_amount fun(self): integer
-    ---@field get_name fun(self): string
-    ---@field get_short_name fun(self): string
-    ---@field get_heart_color fun(self): Color
-    ---@field is_female fun(self): boolean
-    ---@field set_heart_color fun(self, hcolor: Color): nil
-    ---@field let_go fun(self): nil
+    ---@field get_name fun(self): string @Get the full name of the character, this will be the modded name not only the vanilla name.
+    ---@field get_short_name fun(self): string @Get the short name of the character, this will be the modded name not only the vanilla name.
+    ---@field get_heart_color fun(self): Color @Get the heart color of the character, this will be the modded heart color not only the vanilla heart color.
+    ---@field is_female fun(self): boolean @Check whether the character is female, will be `true` if the character was modded to be female as well.
+    ---@field set_heart_color fun(self, hcolor: Color): nil @Set the heart color the character.
+    ---@field let_go fun(self): nil @Drops from ladders, ropes and ledge grabs
 
 ---@class Floor : Entity
     ---@field deco_top integer
     ---@field deco_bottom integer
     ---@field deco_left integer
     ---@field deco_right integer
-    ---@field fix_border_tile_animation fun(self): nil
-    ---@field fix_decorations fun(self, fix_also_neighbors: boolean, fix_styled_floor: boolean): nil
-    ---@field add_decoration fun(self, side: FLOOR_SIDE): nil
-    ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil
+    ---@field fix_border_tile_animation fun(self): nil @Sets `animation_frame` of the floor for types `FLOOR_BORDERTILE`, `FLOOR_BORDERTILE_METAL` and `FLOOR_BORDERTILE_OCTOPUS`.
+    ---@field fix_decorations fun(self, fix_also_neighbors: boolean, fix_styled_floor: boolean): nil @Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set `fix_also_neighbours` to `true` to fix the neighbouring floor tile decorations on the border of the two tiles.<br/>Set `fix_styled_floor` to `true` to fix decorations on `FLOORSTYLED_` entities, those usually only have decorations when broken.
+    ---@field add_decoration fun(self, side: FLOOR_SIDE): nil @Explicitly add a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
+    ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil @Explicitly remove a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
     ---@field decorate_internal fun(self): nil
-    ---@field get_floor_type fun(self): ENT_TYPE
-    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
-    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId
-    ---@field clear_virtual fun(self, callback_id: CallbackId): nil
-    ---@field set_pre_floor_update fun(self, fun: fun(self: Floor): boolean): CallbackId
-    ---@field set_post_floor_update fun(self, fun: fun(self: Floor): boolean): CallbackId
+    ---@field get_floor_type fun(self): ENT_TYPE @Returns it's ENT_TYPE except for FLOOR_PEN (returns FLOORSTYLED_MINEWOOD) and FLOOR_QUICKSAND, FLOOR_TOMB, FLOOR_EMPRESS_GRAVE which return FLOOR_GENERIC
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
+    ---@field set_pre_floor_update fun(self, fun: fun(self: Floor): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool floor_update(Floor self)`
+    ---@field set_post_floor_update fun(self, fun: fun(self: Floor): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil floor_update(Floor self)`
 
 ---@class Door : Floor
     ---@field counter integer
     ---@field fx_button Entity
     ---@field enter fun(self, who: Entity): integer
-    ---@field is_unlocked fun(self): boolean
-    ---@field unlock fun(self, unlock: boolean): nil
+    ---@field is_unlocked fun(self): boolean @Will alwyas return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
+    ---@field unlock fun(self, unlock: boolean): nil @Lock/Unlock doors
 
 ---@class ExitDoor : Door
-    ---@field entered boolean
-    ---@field special_door boolean
+    ---@field entered boolean @if true entering it does not load the transition
+    ---@field special_door boolean @use provided world/level/theme
     ---@field level integer
     ---@field timer integer
     ---@field world integer
@@ -2358,7 +2360,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class MainExit : ExitDoor
     ---@field sound SoundMeta
-    ---@field door_blocker Entity
+    ---@field door_blocker Entity @Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
 
 ---@class EggShipDoor : Door
     ---@field timer integer
@@ -2369,55 +2371,53 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class Arrowtrap : Floor
     ---@field arrow_shot boolean
     ---@field rearm fun(self): nil
-    ---@field trigger fun(self, who_uid: integer): nil
+    ---@field trigger fun(self, who_uid: integer): nil @The uid must be movable entity for ownership transfers
 
 ---@class TotemTrap : Floor
     ---@field spawn_entity_type ENT_TYPE
     ---@field first_sound_id integer
-    ---@field trigger fun(self, who_uid: integer, left: boolean): nil
+    ---@field trigger fun(self, who_uid: integer, left: boolean): nil @The uid must be movable entity for ownership transfers
 
 ---@class LaserTrap : Floor
     ---@field emitted_light Illumination
-    ---@field timer integer
-    ---@field reset_timer integer
-    ---@field phase_2 boolean
-    ---@field trigger fun(self, who_uid: integer): nil
+    ---@field timer integer @counts up from 0 after triggering, cannot shoot again until 360
+    ---@field trigger fun(self, who_uid: integer): nil @The uid must be movable entity for ownership transfers
 
 ---@class SparkTrap : Floor
     ---@field emitted_light Illumination
     ---@field spark_uid integer
 
 ---@class Altar : Floor
-    ---@field timer integer
+    ---@field timer integer @for normal altar: counts from 0 to 20 then 0, then 1 then 0 and sacrifice happens
 
 ---@class SpikeballTrap : Floor
     ---@field sound SoundMeta
     ---@field chain Entity
     ---@field end_piece Entity
-    ---@field state integer
-    ---@field timer integer
+    ---@field state integer @0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause; going_up is only right when timer is 0, otherwise it just sits at the bottom
+    ---@field timer integer @for the start and retract
 
 ---@class TransferFloor : Floor
-    ---@field transferred_entities table<integer, integer>
+    ---@field transferred_entities table<integer, integer> @Index is the uid, value is frame the entity entered the floor (time_level), use `pairs` to loop thru
 
 ---@class ConveyorBelt : TransferFloor
     ---@field timer integer
 
 ---@class Pipe : Floor
-    ---@field direction_type integer
+    ---@field direction_type integer @3 - straight_horizontal, 4 - blocked, 5 - down_left_turn, 6 - down_right_turn, 8 - blocked, 9 - up_left_turn, 10 - up_right_turn, 12 - straight_vertical
     ---@field end_pipe boolean
 
 ---@class Generator : Floor
     ---@field spawned_uid integer
     ---@field set_timer integer
     ---@field timer integer
-    ---@field start_counter integer
-    ---@field on_off boolean
+    ---@field start_counter integer @works only for star challenge
+    ---@field on_off boolean @works only for star challenge
 
 ---@class SlidingWallCeiling : Floor
     ---@field attached_piece Entity
     ---@field active_floor_part_uid integer
-    ---@field state integer
+    ---@field state integer @1 - going up / is at the top, 2 - pause
     ---@field ball_rise SoundMeta
     ---@field ball_drop SoundMeta
 
@@ -2425,28 +2425,28 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class BigSpearTrap : Floor
     ---@field spear_uid integer
-    ---@field left_part boolean
-    ---@field trigger fun(self, who_uid: integer, left: boolean): nil
+    ---@field left_part boolean @setting the left part to 0 or right part to 1 destroys the trap
+    ---@field trigger fun(self, who_uid: integer, left: boolean): nil @The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,
 
 ---@class StickyTrap : Floor
     ---@field sound SoundMeta
     ---@field attached_piece_uid integer
     ---@field ball_uid integer
-    ---@field state integer
+    ---@field state integer @0 - none, 1 - start, 2 - going down, 3 - is at the bottom, 4 - going up, 5 - pause
     ---@field timer integer
 
 ---@class MotherStatue : Floor
-    ---@field players_standing boolean[] @size: 4
+    ---@field players_standing boolean[] @size: 4 @Table of player1_standing, player2_standing, ... etc.
     ---@field player1_standing boolean
     ---@field player2_standing boolean
     ---@field player3_standing boolean
     ---@field player4_standing boolean
-    ---@field players_health_received boolean[] @size: 4
+    ---@field players_health_received boolean[] @size: 4 @Table of player1_health_received, player2_health_received, ... etc.
     ---@field player1_health_received boolean
     ---@field player2_health_received boolean
     ---@field player3_health_received boolean
     ---@field player4_health_received boolean
-    ---@field players_health_timer integer[] @size: 4
+    ---@field players_health_timer integer[] @size: 4 @Table of player1_health_timer, player2_health_timer, ... etc.
     ---@field player1_health_timer integer
     ---@field player2_health_timer integer
     ---@field player3_health_timer integer
@@ -2455,7 +2455,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field eggplantchild_detected boolean
 
 ---@class TeleportingBorder : Floor
-    ---@field direction integer
+    ---@field direction integer @0 - right, 1 - left, 2 - bottom, 3 - top, 4 - disable
 
 ---@class ForceField : Floor
     ---@field first_item_beam Entity
@@ -2479,28 +2479,28 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class TentacleBottom : Floor
     ---@field attached_piece_uid integer
     ---@field tentacle_uid integer
-    ---@field state integer
+    ---@field state integer @0 - none, 1 - start, 2 - moving up, 3 - at the top, 4 - moving down 5 - pause
 
 ---@class PoleDeco : Floor
     ---@field deco_up integer
     ---@field deco_down integer
 
 ---@class JungleSpearTrap : Floor
-    ---@field trigger fun(self, who_uid: integer, direction: integer): nil
+    ---@field trigger fun(self, who_uid: integer, direction: integer): nil @The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right, 3 = up, 4 = down
 
 ---@class Crushtrap : Movable
     ---@field dirx number
     ---@field diry number
-    ---@field timer integer
-    ---@field bounce_back_timer integer
+    ---@field timer integer @counts from 30 to 0 before moving, after it stops, counts from 60 to 0 before it can be triggered again
+    ---@field bounce_back_timer integer @counts from 7 to 0 after it hits the wall and moves away until the timer hits 0, then moves back and counts from 255 until it hits the wall again, if needed it will start the counter again for another bounce
 
 ---@class Olmec : Movable
     ---@field sound SoundMeta
     ---@field target_uid integer
-    ---@field attack_phase integer
-    ---@field attack_timer integer
-    ---@field ai_timer integer
-    ---@field move_direction integer
+    ---@field attack_phase integer @0 = stomp, 1 = bombs, 2 = stomp+ufos, 3 = in lava
+    ---@field attack_timer integer @in phase 0/2: time spent looking for player, in phase 1: time between bomb salvo
+    ---@field ai_timer integer @general timer that counts down whenever olmec is active
+    ---@field move_direction integer @-1 = left, 0 = down, 1 = right, phase 0/2: depends on target, phase 1: travel direction
     ---@field jump_timer integer
     ---@field phase1_amount_of_bomb_salvos integer
     ---@field unknown_attack_state integer
@@ -2512,7 +2512,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field falling_speed number
 
 ---@class Boulder : Movable
-    ---@field is_rolling integer
+    ---@field is_rolling integer @is set to 1 when the boulder first hits the ground
 
 ---@class PushBlock : Movable
     ---@field sound SoundMeta
@@ -2542,11 +2542,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field trigger fun(self): nil
 
 ---@class ThinIce : Movable
-    ---@field strength integer
+    ---@field strength integer @counts down when standing on, maximum is 134 as based of this value it changes animation_frame, and above that value it changes to wrong sprite
 
 ---@class Elevator : Movable
     ---@field emitted_light Illumination
-    ---@field timer integer
+    ---@field timer integer @pause timer, counts down 60 to 0
     ---@field moving_up boolean
 
 ---@class ClamBase : Movable
@@ -2560,7 +2560,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field on_breaking boolean
 
 ---@class TimedPowderkeg : PushBlock
-    ---@field timer integer
+    ---@field timer integer @timer till explosion, -1 = pause, counts down
 
 ---@class Mount : PowerupCapable
     ---@field rider_uid integer
@@ -2602,26 +2602,26 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field ai_state integer
     ---@field patrol_timer integer
     ---@field lose_interest_timer integer
-    ---@field countdown_timer integer
+    ---@field countdown_timer integer @can't shot when the timer is running
     ---@field is_patrolling boolean
-    ---@field aggro_trigger boolean
-    ---@field was_hurt boolean
+    ---@field aggro_trigger boolean @setting this makes him angry, if it's shopkeeper you get 2 agrro points
+    ---@field was_hurt boolean @also is set true if you set aggro to true, get's trigger even when whiping
 
 ---@class WalkingMonster : Monster
     ---@field chatting_to_uid integer
-    ---@field walk_pause_timer integer
-    ---@field cooldown_timer integer
+    ---@field walk_pause_timer integer @alternates between walking and pausing every time it reaches zero
+    ---@field cooldown_timer integer @used for chatting with other monsters, attack cooldowns etc.
 
 ---@class NPC : Monster
     ---@field climb_direction number
     ---@field target_in_sight_timer integer
     ---@field ai_state integer
-    ---@field aggro boolean
+    ---@field aggro boolean @for bodyguard and shopkeeperclone it spawns a weapon as well
 
 ---@class Ghost : Monster
-    ---@field split_timer integer
+    ---@field split_timer integer @for SMALL_HAPPY this is also the sequence timer of its various states
     ---@field wobble_timer integer
-    ---@field pace_timer integer
+    ---@field pace_timer integer @Controls ghost pacing when all players are dead.
     ---@field velocity_multiplier number
     ---@field ghost_behaviour GHOST_BEHAVIOR
     ---@field emitted_light Illumination
@@ -2637,9 +2637,9 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field spawn_y number
 
 ---@class Jiangshi : Monster
-    ---@field wait_timer integer
-    ---@field jump_counter integer
-    ---@field on_ceiling boolean
+    ---@field wait_timer integer @wait time between jumps
+    ---@field jump_counter integer @only female aka assassin: when 0 will jump up into ceiling
+    ---@field on_ceiling boolean @only female aka assassin
 
 ---@class Monkey : Monster
     ---@field sound SoundMeta
@@ -2657,17 +2657,17 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field burrowing_particle ParticleEmitterInfo
     ---@field burrow_dir_x number
     ---@field burrow_dir_y number
-    ---@field burrowing_in_uid integer
+    ---@field burrowing_in_uid integer @stores the last uid as well
     ---@field counter_burrowing integer
     ---@field counter_nonburrowing integer
     ---@field countdown_for_appearing integer
-    ---@field digging_state integer
+    ---@field digging_state integer @0 - non_burrowed, 1 - unknown, 2 - burrowed, 3 - state_change
 
 ---@class Spider : Monster
     ---@field ceiling_pos_x number
     ---@field ceiling_pos_y number
-    ---@field jump_timer integer
-    ---@field trigger_distance number
+    ---@field jump_timer integer @For the giant spider, some times he shot web instead of jumping
+    ---@field trigger_distance number @only in the x coord
 
 ---@class HangSpider : Monster
     ---@field dangle_jump_timer integer
@@ -2675,48 +2675,48 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field ceiling_pos_y number
 
 ---@class Shopkeeper : RoomOwner
-    ---@field name integer
-    ---@field shotgun_attack_delay integer
-    ---@field has_key boolean
+    ---@field name integer @0 - Ali, 1 - Bob, 2 - Comso ... and so one, anything above 28 is just random string, can crash the game
+    ---@field shotgun_attack_delay integer @can't shot when the timer is running
+    ---@field has_key boolean @will drop key after stun/kill
     ---@field is_ear boolean
     ---@field shop_owner boolean
 
 ---@class Yang : RoomOwner
-    ---@field turkeys_in_den integer[]
-    ---@field first_message_shown boolean
-    ---@field quest_incomplete boolean
-    ---@field special_message_shown boolean
+    ---@field turkeys_in_den integer[] @Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
+    ---@field first_message_shown boolean @I'm looking for turkeys, wanna help?
+    ---@field quest_incomplete boolean @Is set to false when the quest is over (Yang dead or second turkey delivered)
+    ---@field special_message_shown boolean @Tusk palace/black market/one way door - message shown
 
 ---@class Tun : RoomOwner
     ---@field arrows_left integer
-    ---@field reload_timer integer
-    ---@field challenge_fee_paid boolean
-    ---@field congrats_challenge boolean
+    ---@field reload_timer integer @when 0, a new arrow is loaded into the bow; resets when she finds an arrow on the ground
+    ---@field challenge_fee_paid boolean @affect only the speech bubble
+    ---@field congrats_challenge boolean @congrats message shown after exiting a challenge
     ---@field murdered boolean
     ---@field shop_entered boolean
-    ---@field tiamat_encounter boolean
+    ---@field tiamat_encounter boolean @if set to false, greets you with 'you've done well to reach this place'
 
 ---@class Pet : Monster
     ---@field fx_button Entity
-    ---@field petting_by_uid integer
-    ---@field yell_counter integer
-    ---@field func_timer integer
-    ---@field active_state integer
-    ---@field petted_counter integer
+    ---@field petting_by_uid integer @person whos petting it, only in the camp
+    ---@field yell_counter integer @counts up to 400 (6.6 sec), when 0 the pet yells out
+    ---@field func_timer integer @used when free running in the camp
+    ---@field active_state integer @-1 = sitting and yelling, 0 = either running, dead or picked up
+    ---@field petted_counter integer @number of times petted in the camp
 
 ---@class Caveman : WalkingMonster
     ---@field wake_up_timer integer
-    ---@field can_pick_up_timer integer
-    ---@field aggro_timer integer
+    ---@field can_pick_up_timer integer @0 = can pick something up, when holding forced to 179, after tripping and regaining consciousness counts down to 0
+    ---@field aggro_timer integer @keeps resetting when angry and a player is nearby
 
 ---@class CavemanShopkeeper : WalkingMonster
     ---@field tripping boolean
     ---@field shop_entered boolean
 
 ---@class HornedLizard : Monster
-    ---@field eaten_uid integer
-    ---@field walk_pause_timer integer
-    ---@field attack_cooldown_timer integer
+    ---@field eaten_uid integer @dungbeetle being eaten
+    ---@field walk_pause_timer integer @alternates between walking and pausing when timer reaches zero
+    ---@field attack_cooldown_timer integer @won't attack until timer reaches zero
     ---@field blood_squirt_timer integer
     ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
@@ -2730,16 +2730,16 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
 
 ---@class Mantrap : Monster
-    ---@field walk_pause_timer integer
-    ---@field eaten_uid integer
+    ---@field walk_pause_timer integer @alternates between walking and pausing every time it reaches zero
+    ---@field eaten_uid integer @the uid of the entity the mantrap has eaten, in case it can break out, like a shopkeeper
 
 ---@class Skeleton : Monster
-    ---@field explosion_timer integer
+    ---@field explosion_timer integer @-1 = never explodes
 
 ---@class Scarab : Monster
     ---@field sound SoundMeta
     ---@field emitted_light Illumination
-    ---@field timer integer
+    ---@field timer integer @how long to stay in current position
 
 ---@class Imp : Monster
     ---@field carrying_uid integer
@@ -2747,11 +2747,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class Lavamander : Monster
     ---@field emitted_light Illumination
-    ---@field shoot_lava_timer integer
+    ---@field shoot_lava_timer integer @when this timer reaches zero, it appears on the surface/shoots lava, triggers on player proximity
     ---@field jump_pause_timer integer
     ---@field lava_detection_timer integer
     ---@field is_hot boolean
-    ---@field player_detect_state integer
+    ---@field player_detect_state integer @0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
 
 ---@class Firebug : Monster
     ---@field sound SoundMeta
@@ -2778,7 +2778,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sound SoundMeta
     ---@field hump_timer integer
     ---@field target_in_sight_timer integer
-    ---@field gold integer
+    ---@field gold integer @amount of gold he picked up, will be drooped on death
     ---@field timer_after_humping integer
 
 ---@class Crocman : WalkingMonster
@@ -2788,8 +2788,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field walk_pause_timer integer
 
 ---@class VanHorsing : NPC
-    ---@field show_text boolean
-    ---@field special_message_shown boolean
+    ---@field show_text boolean @if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
+    ---@field special_message_shown boolean @one way door message has been shown
 
 ---@class WitchDoctor : WalkingMonster
     ---@field sound SoundMeta
@@ -2812,8 +2812,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field walk_pause_timer integer
 
 ---@class Vlad : Vampire
-    ---@field teleport_timer integer
-    ---@field aggro boolean
+    ---@field teleport_timer integer @triggers when Vlad teleports, when timer running he can't teleport and will stun when hit
+    ---@field aggro boolean @or is awake
 
 ---@class Waddler : RoomOwner
     ---@field player_detected boolean
@@ -2823,7 +2823,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class Octopus : WalkingMonster
 
 ---@class Bodyguard : NPC
-    ---@field position_state integer
+    ---@field position_state integer @0 - none, 1 - Tusk dice shop, 2 - Entrence to pleasure palace, 3 - Basement entrance to pleasure palace
     ---@field message_shown boolean
 
 ---@class Fish : Monster
@@ -2831,8 +2831,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class GiantFish : Monster
     ---@field sound SoundMeta
-    ---@field change_direction_timer integer
-    ---@field lose_interest_timer integer
+    ---@field change_direction_timer integer @when bouncing into a wall
+    ---@field lose_interest_timer integer @delay in-between attacks
 
 ---@class Crabman : Monster
     ---@field walk_pause_timer integer
@@ -2842,14 +2842,14 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field at_maximum_attack boolean
 
 ---@class Kingu : Monster
-    ---@field sound1 SoundMeta
-    ---@field sound2 SoundMeta
+    ---@field sound1 SoundMeta @initialized when breaking the shell (sliding down sound maybe?)
+    ---@field sound2 SoundMeta @Turning into stone sound
     ---@field climb_direction_x number
     ---@field climb_direction_y number
     ---@field climb_pause_timer integer
     ---@field shell_invincibility_timer integer
     ---@field monster_spawn_timer integer
-    ---@field initial_shell_health integer
+    ---@field initial_shell_health integer @excalibur wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip
     ---@field player_seen_by_kingu boolean
 
 ---@class Anubis : Monster
@@ -2901,7 +2901,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class ApepPart : Monster
     ---@field y_pos number
     ---@field sine_angle number
-    ---@field sync_timer integer
+    ---@field sync_timer integer @or pause timer, used to sync the body parts moving up and down
 
 ---@class ApepHead : ApepPart
     ---@field sound1 SoundMeta
@@ -2912,7 +2912,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field fx_mouthpiece2_uid integer
 
 ---@class OsirisHead : Monster
-    ---@field right_hand_uid integer
+    ---@field right_hand_uid integer @right from his perspective
     ---@field left_hand_uid integer
     ---@field moving_left boolean
     ---@field targeting_timer integer
@@ -2957,14 +2957,14 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class Olmite : WalkingMonster
     ---@field armor_on boolean
-    ---@field in_stack boolean
-    ---@field in_stack2 boolean
+    ---@field in_stack boolean @disables the attack, stun, lock's looking left flag between stack
+    ---@field in_stack2 boolean @is set to false couple frame after being detached from stack
     ---@field on_top_uid integer
     ---@field y_offset number
     ---@field attack_cooldown_timer integer
 
 ---@class Tiamat : Monster
-    ---@field sound SoundMeta
+    ---@field sound SoundMeta @Turning into stone sound
     ---@field fx_tiamat_head integer
     ---@field fx_tiamat_arm_right1 integer
     ---@field fx_tiamat_arm_right2 integer
@@ -2984,7 +2984,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field frogs_ejected_in_cycle integer
     ---@field invincibility_timer integer
     ---@field mouth_close_timer integer
-    ---@field mouth_open_trigger boolean
+    ---@field mouth_open_trigger boolean @opens the mouth and starts mouth_close_timer, used when detecting grub in the mouth area
 
 ---@class Frog : Monster
     ---@field grub_being_eaten_uid integer
@@ -2997,7 +2997,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class Grub : Monster
     ---@field rotation_delta number
     ---@field drop boolean
-    ---@field looking_for_new_direction_timer integer
+    ---@field looking_for_new_direction_timer integer @used when he touches floor/wall/ceiling
     ---@field walk_pause_timer integer
     ---@field turn_into_fly_timer integer
     ---@field particle ParticleEmitterInfo
@@ -3045,25 +3045,25 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field fireball_timer integer
     ---@field birdhead_defeated boolean
     ---@field snakehead_defeated boolean
-    ---@field hundun_flags integer
+    ---@field hundun_flags integer @1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs
 
 ---@class HundunHead : Monster
-    ---@field attack_position_x number
+    ---@field attack_position_x number @Posiotion where the head will move on attack
     ---@field attack_position_y number
     ---@field egg_crack_effect_uid integer
     ---@field targeted_player_uid integer
-    ---@field looking_for_target_timer integer
+    ---@field looking_for_target_timer integer @also cooldown before attack
     ---@field invincibility_timer integer
 
 ---@class MegaJellyfish : Monster
     ---@field flipper1 Entity
     ---@field flipper2 Entity
     ---@field sound SoundMeta
-    ---@field orb_uid integer
+    ---@field orb_uid integer @game checks if this uid, and two following exist, if not, the Jellyfish starts chasing player
     ---@field tail_bg_uid integer
     ---@field applied_velocity number
     ---@field wagging_tail_counter number
-    ---@field flipper_distance integer
+    ---@field flipper_distance integer @only applies to door-blocking one
     ---@field velocity_application_timer integer
 
 ---@class Scorpion : Monster
@@ -3074,9 +3074,9 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field carried_entity_type ENT_TYPE
     ---@field carried_entity_uid integer
     ---@field walk_spit_timer integer
-    ---@field is_active boolean
+    ---@field is_active boolean @whether it is hidden behind the carried block or not, if true you can damage him
     ---@field is_inactive boolean
-    ---@field spawn_new_carried_item boolean
+    ---@field spawn_new_carried_item boolean @defaults to true, when toggled to false, a new carried item spawns
 
 ---@class Necromancer : WalkingMonster
     ---@field sound SoundMeta
@@ -3086,9 +3086,9 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field resurrection_timer integer
 
 ---@class ProtoShopkeeper : Monster
-    ---@field movement_state integer
+    ---@field movement_state integer @1: "Headpulse/explosion related, 2: Walking, 3: Headpulse/explosion related, 4: Crawling, 6: Headpulse/explosion related
     ---@field walk_pause_explode_timer integer
-    ---@field walking_speed integer
+    ---@field walking_speed integer @0 = slow, 4 = fast
 
 ---@class Beg : NPC
     ---@field walk_pause_timer integer
@@ -3104,12 +3104,12 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field holding_state integer
 
 ---@class CritterBeetle : Critter
-    ---@field pause boolean
+    ---@field pause boolean @used when he's getting eaten
 
 ---@class CritterCrab : Critter
     ---@field walk_pause_timer integer
     ---@field walking_left boolean
-    ---@field unfriendly boolean
+    ---@field unfriendly boolean @moves away from its target instead of towards it
 
 ---@class CritterButterfly : Critter
     ---@field change_direction_timer integer
@@ -3150,7 +3150,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sound SoundMeta
     ---@field applied_hor_momentum number
     ---@field applied_ver_momentum number
-    ---@field unfriendly boolean
+    ---@field unfriendly boolean @moves away from its target instead of towards it
     ---@field move_timer integer
 
 ---@class CritterSlime : Critter
@@ -3166,12 +3166,12 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class Bomb : Movable
     ---@field sound SoundMeta
-    ---@field scale_hor number
+    ---@field scale_hor number @1.25 = default regular bomb, 1.875 = default giant bomb, > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
     ---@field scale_ver number
-    ---@field is_big_bomb boolean
+    ---@field is_big_bomb boolean @is bomb from powerpack
 
 ---@class Backpack : Movable
-    ---@field explosion_trigger boolean
+    ---@field explosion_trigger boolean @More like on fire trigger, the explosion happens when the timer reaches > 29
     ---@field explosion_timer integer
     ---@field trigger_explosion fun(self): nil
 
@@ -3209,27 +3209,27 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class Gun : Purchasable
     ---@field cooldown integer
-    ---@field shots integer
-    ---@field shots2 integer
-    ---@field in_chamber integer
+    ---@field shots integer @used only for webgun
+    ---@field shots2 integer @used only for clonegun
+    ---@field in_chamber integer @Only for webgun, uid of the webshot entity
 
 ---@class Flame : Movable
     ---@field sound SoundMeta
     ---@field emitted_light Illumination
 
 ---@class FlameSize : Flame
-    ---@field flame_size number
+    ---@field flame_size number @if changed, gradually goes down (0.03 per frame) to the default size
 
 ---@class ClimbableRope : Movable
     ---@field segment_nr_inverse integer
-    ---@field burn_timer integer
+    ---@field burn_timer integer @entity is killed after 20
     ---@field above_part Entity
     ---@field below_part Entity
     ---@field segment_nr integer
 
 ---@class Idol : Movable
-    ---@field trap_triggered boolean
-    ---@field touch integer
+    ---@field trap_triggered boolean @if you set it to true for the ice caves or volcano idol, the trap won't trigger
+    ---@field touch integer @changes to 0 when first picked up by player and back to -1 if HH picks it up
     ---@field spawn_x number
     ---@field spawn_y number
 
@@ -3241,7 +3241,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field move_y number
 
 ---@class WebShot : Projectile
-    ---@field shot boolean
+    ---@field shot boolean @if false, it's attached to the gun
 
 ---@class HangStrand : Movable
     ---@field start_pos_y number
@@ -3269,7 +3269,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class ScepterShot : LightEmitter
     ---@field sound SoundMeta
     ---@field speed number
-    ---@field idle_timer integer
+    ---@field idle_timer integer @short timer before it goes after target
 
 ---@class SpecialShot : LightEmitter
     ---@field target_x number
@@ -3284,12 +3284,12 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field rotation_center_x number
     ---@field rotation_center_y number
     ---@field rotation_angle number
-    ---@field size number
-    ---@field size_multiply number
-    ---@field next_size number
-    ---@field size_change_timer integer
-    ---@field speed number
-    ---@field distance number
+    ---@field size number @slowly goes down to default 1.0, is 0.0 when not on screen
+    ---@field size_multiply number @0.0 when not on screen
+    ---@field next_size number @width and height will be set to `next_size  size_multiply` next frame
+    ---@field size_change_timer integer @very short timer before next size change, giving a pulsing effect
+    ---@field speed number @This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
+    ---@field distance number @This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
 
 ---@class TiamatShot : LightEmitter
     ---@field sound SoundMeta
@@ -3298,7 +3298,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field particle ParticleEmitterInfo
 
 ---@class Leaf : Movable
-    ---@field fade_away_counter number
+    ---@field fade_away_counter number @counts to 100.0 then the leaf fades away
     ---@field swing_direction integer
     ---@field fade_away_trigger boolean
 
@@ -3321,10 +3321,10 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class Chest : Movable
     ---@field leprechaun boolean
-    ---@field bomb boolean
+    ---@field bomb boolean @size of the bomb is random, if set both true only leprechaun spawns
 
 ---@class Treasure : Movable
-    ---@field cashed boolean
+    ---@field cashed boolean @spawns a dust effect and adds money for the total
 
 ---@class HundunChest : Treasure
     ---@field timer integer
@@ -3352,12 +3352,12 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class Torch : Movable
     ---@field flame_uid integer
-    ---@field is_lit boolean
+    ---@field is_lit boolean @It's used just to check, to light/extinguish use `light_up` function
     ---@field light_up fun(self, lit: boolean): nil
     ---@field get_flame_type fun(self): ENT_TYPE
 
 ---@class WallTorch : Torch
-    ---@field dropped_gold boolean
+    ---@field dropped_gold boolean @if false, it will drop gold when light up
 
 ---@class TorchFlame : Flame
     ---@field smoke_particle ParticleEmitterInfo
@@ -3379,7 +3379,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class PunishBall : Movable
     ---@field attached_to_uid integer
-    ---@field timer integer
+    ---@field timer integer @counts down from 20 while the ball is eligible to break a floor and tries to break it at 0
     ---@field x_pos number
     ---@field y_pos number
 
@@ -3403,7 +3403,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field bombs_left integer
 
 ---@class Landmine : LightEmitter
-    ---@field timer integer
+    ---@field timer integer @explodes at 57, if you set it to 58 will count to overflow
 
 ---@class UdjatSocket : Movable
     ---@field fx_button Entity
@@ -3424,7 +3424,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field player_inputs PlayerSlot
     ---@field inventory Inventory
     ---@field sound SoundMeta
-    ---@field body_uid integer
+    ---@field body_uid integer @Is not set to -1 when crushed
     ---@field shake_timer integer
     ---@field boost_timer integer
 
@@ -3457,7 +3457,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field left_skull_drop_time integer
     ---@field middle_skull_drop_time integer
     ---@field right_skull_drop_time integer
-    ---@field timer integer
+    ---@field timer integer @counts from 60 to 0, 3 times, the last time dropping the skulls, then random longer timer for reset
 
 ---@class FrozenLiquid : Movable
 
@@ -3483,7 +3483,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field velocity_x number
     ---@field velocity_y number
     ---@field swing number
-    ---@field up_down_normal number
+    ---@field up_down_normal number @0.0 - down, 1.0 - up, 0.5 - idle
 
 ---@class OlmecShip : Movable
     ---@field sound SoundMeta
@@ -3535,11 +3535,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field amount_of_blood integer
 
 ---@class ParachutePowerup : Powerup
-    ---@field falltime_deploy integer
+    ---@field falltime_deploy integer @this gets compared with entity's falling_timer
     ---@field deployed boolean
     ---@field deploy fun(self): nil
-    ---@field gold_timer integer
-    ---@field gold_spawning_time integer
+    ---@field gold_timer integer @Timer for spawning a single gold nugget.
+    ---@field gold_spawning_time integer @Time until gold nuggets stop spawning.
 
 ---@class TrueCrownPowerup : Powerup
     ---@field timer integer
@@ -3573,11 +3573,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field shake number
 
 ---@class PrizeDispenser : Movable
-    ---@field item_ids integer[] @size: 6
+    ---@field item_ids integer[] @size: 6 @Id's of the items (not types), by default 0-24, look at [change_diceshop_prizes](#change_diceshop_prizes) for the list of default prizes<br/>so for example: id 0 equals ITEM_PICKUP_BOMBBAG, id 1 equals ITEM_PICKUP_BOMBBOX etc. Game generates 6 but uses max 5 for Tusk dice shop
     ---@field prizes_spawned integer
 
 ---@class Web : Movable
-    ---@field decay_rate number
+    ---@field decay_rate number @Is subtracted from the color alpha every frame after the `stand_counter` is more than 300.<br/>Entity automatically dies when the alpha is less than 0.1
 
 ---@class LiquidSurface : Movable
     ---@field glow_radius number
@@ -3597,21 +3597,21 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class MiniGameShipOffset : Movable
     ---@field offset_x number
     ---@field offset_y number
-    ---@field normal_y_offset number
+    ---@field normal_y_offset number @Is added to offset_y
 
 ---@class Button : Movable
-    ---@field button_sprite integer
+    ---@field button_sprite integer @Only one can be set:<br/>1 - pad: A, key: Z<br/>2 - pad: X, key: X<br/>4 - pad: B, key: C<br/>8 - pad: Y, key: D<br/>16 - pad: LB, key: L Shift<br/>32 - pad: RB, key: A<br/>64 - pad: menu?, key: (none)<br/>128 - pad: copy?, key: Tab
     ---@field visibility number
-    ---@field is_visible boolean
-    ---@field player_trigger boolean
-    ---@field seen integer
+    ---@field is_visible boolean @It's false for selldialog used in shops
+    ---@field player_trigger boolean @It's set true even if player does not see the button, like the drill or COG door
+    ---@field seen integer @<br/>-1 - hasn't been seen<br/>0 - last seen by player 1<br/>1 - last seen by player 2<br/>2 - last seen by player 3<br/>3 - last seen by player 4
 
 ---@class FxTornJournalPage : Movable
-    ---@field page_number integer
+    ---@field page_number integer @Only in tutorial
 
 ---@class FxMainExitDoor : Movable
     ---@field emitted_light Illumination
-    ---@field timer integer
+    ---@field timer integer @When breaking open in tutorial
 
 ---@class Birdies : Movable
 
@@ -3628,22 +3628,22 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class Rubble : Movable
 
 ---@class FxCompass : Movable
-    ---@field sine_angle number
+    ---@field sine_angle number @Counts form 0 to 2pi, responsible for moving back and forth
     ---@field visibility number
-    ---@field is_active boolean
+    ---@field is_active boolean @Player has compass
 
 ---@class SleepBubble : Movable
     ---@field show_hide_timer integer
 
 ---@class MovingIcon : Movable
-    ---@field movement_timer integer
+    ---@field movement_timer integer @Used to move it up and down in sync with others
 
 ---@class FxSaleContainer : Movable
     ---@field fx_value Entity
     ---@field fx_icon Entity
     ---@field fx_button Entity
-    ---@field shake_amplitude number
-    ---@field sound_trigger boolean
+    ---@field shake_amplitude number @For effect when you don't have enough money
+    ---@field sound_trigger boolean @Also sound_played, keeps re-triggering from time to time
     ---@field pop_in_out_procentage integer
 
 ---@class FxPickupEffect : Movable
@@ -3677,8 +3677,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class FxUnderwaterBubble : Movable
     ---@field bubble_source_uid integer
-    ---@field direction integer
-    ---@field pop boolean
+    ---@field direction integer @1 / -1
+    ---@field pop boolean @Setting it true makes it disappear/fade away
     ---@field inverted boolean
 
 ---@class FxWaterDrop : Movable
@@ -3698,10 +3698,10 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 
 ---@class FxTiamatTorso : Movable
     ---@field timer integer
-    ---@field torso_target_size number
+    ---@field torso_target_size number @Slowly increases/decreases to the given value
 
 ---@class FxTiamatTail : Movable
-    ---@field angle_two number
+    ---@field angle_two number @Added _two just to not shadow angle in entity, it's angle but the pivot point is at the edge
     ---@field x_pos number
     ---@field y_pos number
 
@@ -3709,7 +3709,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field max_y number
 
 ---@class FxHundunNeckPiece : Movable
-    ---@field kill_timer integer
+    ---@field kill_timer integer @Short timer after the head is dead
 
 ---@class FxJellyfishStar : Movable
     ---@field rotation_angle number
@@ -3727,7 +3727,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class FxFireflyLight : Movable
     ---@field illumination Illumination
     ---@field light_timer integer
-    ---@field cooldown_timer integer
+    ---@field cooldown_timer integer @Timer between light flashes
 
 ---@class FxEmpress : Movable
     ---@field sine_angle number
@@ -3735,7 +3735,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class FxAnkhRotatingSpark : Movable
     ---@field radius number
     ---@field inclination number
-    ---@field speed number
+    ---@field speed number @0 - 1.0
     ---@field sine_angle number
     ---@field size number
 
@@ -3779,7 +3779,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field player_in boolean
 
 ---@class BGMovingStar : BGSurfaceStar
-    ---@field falling_speed number
+    ---@field falling_speed number @Can make it rise if set to negative
 
 ---@class BGTutorialSign : Entity
     ---@field is_shown boolean
@@ -3789,13 +3789,13 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field y_increment number
     ---@field timer integer
     ---@field max_timer integer
-    ---@field size number
+    ---@field size number @Gets smaller as the timer gets close to the max_timer
 
 ---@class BGShopEntrence : Entity
     ---@field on_entering boolean
 
 ---@class BGFloatingDebris : BGSurfaceLayer
-    ---@field distance number
+    ---@field distance number @Distance it travels up and down from spawn position
     ---@field speed number
     ---@field sine_angle number
 
@@ -3813,7 +3813,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class DestructibleBG : Entity
 
 ---@class PalaceSign : Entity
-    ---@field sound SoundMeta
+    ---@field sound SoundMeta @The neon buzz sound
     ---@field illumination Illumination
     ---@field arrow_illumination Illumination
     ---@field arrow_change_timer integer
@@ -3835,7 +3835,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field door_type ENT_TYPE
     ---@field platform_type ENT_TYPE
     ---@field visible boolean
-    ---@field platform_spawned boolean
+    ---@field platform_spawned boolean @Is set true when you bomb the door, no matter what door, can't be reset
 
 ---@class LogicalSound : Entity
     ---@field sound SoundMeta
@@ -3845,8 +3845,8 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class LogicalLiquidStreamSound : LogicalStaticSound
 
 ---@class LogicalTrapTrigger : Entity
-    ---@field min_empty_distance integer
-    ---@field trigger_distance integer
+    ---@field min_empty_distance integer @Used in BigSpearTrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles
+    ---@field trigger_distance integer @Value in tiles
     ---@field vertical boolean
 
 ---@class JungleTrapTrigger : LogicalTrapTrigger
@@ -3863,7 +3863,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field particle_burst ParticleEmitterInfo
     ---@field particle_base ParticleEmitterInfo
     ---@field burst_timer integer
-    ---@field burst_active boolean
+    ---@field burst_active boolean @If forced to false, it will not play the sound or spawn burst particles
 
 ---@class CursedEffect : Entity
     ---@field particle ParticleEmitterInfo
@@ -3876,12 +3876,12 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field velocity_y number
 
 ---@class OuroboroCameraZoomin : Entity
-    ---@field zoomin_level number
+    ---@field zoomin_level number @Can be set to negative, seams to trigger the warp at some value
 
 ---@class CinematicAnchor : Entity
     ---@field blackbar_top Entity
     ---@field blackbar_bottom Entity
-    ---@field roll_in number
+    ---@field roll_in number @0.0 to 1.0
 
 ---@class BurningRopeEffect : Entity
     ---@field illumination Illumination
@@ -3905,13 +3905,13 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class LogicalConveyorbeltSound : LogicalSound
 
 ---@class LogicalAnchovyFlock : Entity
-    ---@field current_speed number
+    ---@field current_speed number @Increases until max_speed reached
     ---@field max_speed number
     ---@field timer integer
 
 ---@class MummyFliesSound : LogicalSound
     ---@field mummy_uid integer
-    ---@field flies integer
+    ---@field flies integer @Numbers of flies spawned
 
 ---@class QuickSandSound : LogicalSound
 
@@ -3921,14 +3921,14 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
 
 ---@class BoulderSpawner : Entity
-    ---@field timer integer
+    ---@field timer integer @Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
     ---@field sound SoundMeta
 
 ---@class PipeTravelerSound : LogicalSound
     ---@field enter_exit boolean
 
 ---@class LogicalDrain : Entity
-    ---@field timer integer
+    ---@field timer integer @Little delay between pulling blob of liquid thru
 
 ---@class LogicalRegeneratingBlock : Entity
     ---@field timer integer
@@ -3939,7 +3939,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
 ---@class EggplantThrower : Entity
 
 ---@class LogicalMiniGame : Entity
-    ---@field timer integer
+    ---@field timer integer @Delay between spwning ufo
 
 ---@class DMSpawning : Entity
     ---@field spawn_x number
@@ -3966,12 +3966,12 @@ local function MovableBehavior_get_state_id(self) end
 
 ---@class CustomMovableBehavior : MovableBehavior
     ---@field base_behavior VanillaMovableBehavior
-    ---@field set_force_state fun(self, force_state: fun(movable: Movable, base_fun: function): boolean): nil
-    ---@field set_on_enter fun(self, on_enter: fun(movable: Movable, base_fun: function): nil): nil
-    ---@field set_on_exit fun(self, on_exit: fun(movable: Movable, base_fun: function): nil): nil
-    ---@field set_update_logic fun(self, update_logic: fun(movable: Movable, base_fun: function): nil): nil
-    ---@field set_update_world fun(self, update_world: fun(movable: Movable, base_fun: function): nil): nil
-    ---@field set_get_next_state_id fun(self, get_next_state_id: fun(movable: Movable, base_fun: function): integer): nil
+    ---@field set_force_state fun(self, force_state: fun(movable: Movable, base_fun: function): boolean): nil @Set the `force_state` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `force_state` is already set it will be overridden. The signature<br/>of the function is `bool force_state(Movable movable, function base_fun)`, when the function returns `true` the movable will<br/>enter this behavior. If no base behavior is set `base_fun` will be `nil`.
+    ---@field set_on_enter fun(self, on_enter: fun(movable: Movable, base_fun: function): nil): nil @Set the `on_enter` function of a `CustomMovableBehavior`, this will be called when the movable<br/>enters the state. If an `on_enter` is already set it will be overridden. The signature of the<br/>function is `nil on_enter(Movable movable, function base_fun))`. If no base behavior is set `base_fun` will be `nil`.
+    ---@field set_on_exit fun(self, on_exit: fun(movable: Movable, base_fun: function): nil): nil @Set the `on_exit` function of a `CustomMovableBehavior`, this will be called when the movable<br/>leaves the state. If an `on_exit` is already set it will be overridden. The signature of the<br/>function is `nil on_exit(Movable movable, function base_fun))`. If no base behavior is set `base_fun` will be `nil`.
+    ---@field set_update_logic fun(self, update_logic: fun(movable: Movable, base_fun: function): nil): nil @Set the `update_logic` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_logic` is already set it will be overridden. The signature<br/>of the function is `nil update_logic(Movable movable, function base_fun))`, use it to change the color, texture,<br/>some timers, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
+    ---@field set_update_world fun(self, update_world: fun(movable: Movable, base_fun: function): nil): nil @Set the `update_world` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_world` is already set it will be overridden. The signature<br/>of the function is `nil update_world(Movable movable, function base_fun))`, use this to update the move, velocity,<br/>current_animation, etc. of the movable, then call `mov:generic_update_world` to update the movable. If no<br/>base behavior is set `base_fun` will be `nil`.
+    ---@field set_get_next_state_id fun(self, get_next_state_id: fun(movable: Movable, base_fun: function): integer): nil @Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature<br/>of the function is `int get_next_state_id(Movable movable, function base_fun))`, use this to move to another state, return `nil`.<br/>or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
 
 ---@class ParticleDB
     ---@field id integer
@@ -4033,66 +4033,66 @@ local function MovableBehavior_get_state_id(self) end
     ---@field allow_leprechaun boolean
     ---@field sub_theme ThemeInfo
     ---@field get_unknown1 fun(self): boolean
-    ---@field init_flags fun(self): nil
-    ---@field init_level fun(self): nil
-    ---@field unknown_v4 fun(self): nil
+    ---@field init_flags fun(self): nil @dwelling,tidepool: unset levelgen.flags.flag12<br/>jungle,volcana.olmec,icecaves,neobab,cog,duat,abzu,tiamat,eggplant,hundun,basecamp,arena: nop<br/>temple: unset levelgen.flags.flag10 + calculate chance of grasshopper critter spawn<br/>sunken: unset levelgen.flags.flag9, 10, 17, 18 + if state.level == 1 -> unset flag 11<br/>cosmic: calls same virtual on its sub_theme
+    ---@field init_level fun(self): nil @does random calculations and calls function to determine the start room in most themes
+    ---@field unknown_v4 fun(self): nil @most themes call the same function, some check whether they are in CO
     ---@field unknown_v5 fun(self): nil
-    ---@field add_special_rooms fun(self): nil
-    ---@field unknown_v7 fun(self): nil
-    ---@field unknown_v8 fun(self): nil
+    ---@field add_special_rooms fun(self): nil @dwelling: does stuff when level == 4 or udjat present<br/>jungle: when black market present<br/>volcana: when drill present<br/>touches the rooms and sometimes the meta info about the rooms
+    ---@field unknown_v7 fun(self): nil @can't trigger, dwelling (quillback) and abzu do something special (arena just returns)
+    ---@field unknown_v8 fun(self): nil @does something depending on levelgen.data.unknown7
     ---@field add_vault fun(self): nil
     ---@field add_coffin fun(self): nil
-    ---@field add_special_feeling fun(self): nil
+    ---@field add_special_feeling fun(self): nil @metal clanking and air of oppression
     ---@field unknown_v12 fun(self): boolean
-    ---@field spawn_level fun(self): nil
-    ---@field spawn_border fun(self): nil
-    ---@field post_process_level fun(self): nil
-    ---@field spawn_traps fun(self): nil
-    ---@field post_process_entities fun(self): nil
-    ---@field spawn_procedural fun(self): nil
-    ---@field spawn_background fun(self): nil
-    ---@field spawn_lights fun(self): nil
-    ---@field spawn_transition fun(self): nil
-    ---@field post_transition fun(self): nil
-    ---@field spawn_players fun(self): nil
-    ---@field spawn_effects fun(self): nil
-    ---@field get_level_file fun(self): string
-    ---@field get_theme_id fun(self): integer
-    ---@field get_base_id fun(self): integer
-    ---@field get_floor_spreading_type fun(self): integer
-    ---@field get_floor_spreading_type2 fun(self): integer
-    ---@field unknown_v30 fun(self): boolean
-    ---@field get_transition_block_modifier fun(self): integer
+    ---@field spawn_level fun(self): nil @spawns all floor etc tiles based on the room layout<br/>disable this and only the player is spawned in the level
+    ---@field spawn_border fun(self): nil @spawns CO: teleportingborder / Duat: dust / theme specific border tiles around the level
+    ---@field post_process_level fun(self): nil @volcana: checks if state.coffin_contents = cocovondiamonds -> chooses one of the four coffins in vlad's castle at random to put her in<br/>tidepool: spawns impostor lake, some door and a litwalltorch, ...<br/>neobab: assigns the correct animation_frame to all the ushabtis<br/>co, arena: forwards to the same virtual of the sub_theme<br/>abzu, tiamat: spawns impostor lake
+    ---@field spawn_traps fun(self): nil @adds theme specific random traps and pushblocks
+    ---@field post_process_entities fun(self): nil @pleasure palace: applies correct texture to ladders and ladder platforms<br/>sunken city: randomly adds ENT_TYPE_DECORATION_SUNKEN_BRIDGE between entities (the slimy bridges)<br/>hundun: calls sunken city virtual, so has slimy bridges
+    ---@field spawn_procedural fun(self): nil @adds legs under platforms, random pots, goldbars, procedural spawns, compass indicator...
+    ---@field spawn_background fun(self): nil @adds a background, e.g. CO stars / Duat moon / Plain backwall for other themes
+    ---@field spawn_lights fun(self): nil @adds extra light where needed, e.g. in the udjat chest room, or the top layer of the black market: spawns ENT_TYPE_LOGICAL_ROOM_LIGHT
+    ---@field spawn_transition fun(self): nil @spawns a transition tunnel to the level
+    ---@field post_transition fun(self): nil @unsets flag 1 (Reset) of state.quest_flags<br/>sets the correct state.screen (0xC)<br/>sets state.ingame to true, adjust fade values and starts loading
+    ---@field spawn_players fun(self): nil @spawns the player(s) in the world, along with what they were holding
+    ---@field spawn_effects fun(self): nil @when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail<br/>this actually also sets the camera bounds and various theme specific special effects<br/>also spawns / sets the conditions for osiris, jelly, orbs...<br/>also makes curse pots spawn the ghost
+    ---@field get_level_file fun(self): string @the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
+    ---@field get_theme_id fun(self): integer @for co: returns sub_theme->get_theme_id()
+    ---@field get_base_id fun(self): integer @whereas get_theme_id() returns a unique id for all ThemeInfo's, this function returns the id of the theme it logically belongs to<br/>e.g. theme_abzu->get_base_id() = 5 (tide_pool) as opposed to theme_abzu->get_theme_id() = 13 (abzu)
+    ---@field get_floor_spreading_type fun(self): integer @all themes return 4 (ENT_TYPE_FLOOR_GENERIC), except:<br/>temple: 104 (ENT_TYPE_FLOORSTYLED_TEMPLE)<br/>neobab: 106 (ENT_TYPE_FLOORSTYLED_BABYLON)<br/>sunken: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)<br/>cog: 110 (ENT_TYPE_FLOORSTYLED_COG)<br/>duat: 112 (ENT_TYPE_FLOORSTYLED_DUAT)<br/>hundun: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
+    ---@field get_floor_spreading_type2 fun(self): integer @similar to get_floor_spreading_type(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE)
+    ---@field unknown_v30 fun(self): boolean @all return false, except olmec, temple, neobab, cog, duat
+    ---@field get_transition_block_modifier fun(self): integer @determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme<br/>returns 85 by default, except for: olmec: 15, cog: 23
     ---@field unknown_v32 fun(self): integer
-    ---@field get_backwall_type fun(self): integer
-    ---@field get_border_type fun(self): integer
+    ---@field get_backwall_type fun(self): integer @always returns 778 ENT_TYPE_BG_LEVEL_BACKWALL
+    ---@field get_border_type fun(self): integer @returns ENT_TYPE_FLOOR_BORDERTILE by default, except:<br/>neobab ENT_TYPE_FLOOR_BORDERTILE_METAL<br/>sunken ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS<br/>duat ENT_TYPE_FLOOR_DUSTWALL<br/>tiamat ENT_TYPE_FLOOR_BORDERTILE_METAL<br/>hundun ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS
     ---@field get_critter_type fun(self): integer
-    ---@field get_liquid_gravity fun(self): number
-    ---@field get_player_damage fun(self): boolean
-    ---@field unknown_v38 fun(self): boolean
-    ---@field get_backlayer_lut fun(self): integer
-    ---@field get_backlayer_light_level fun(self): number
-    ---@field get_loop fun(self): boolean
-    ---@field get_vault_level fun(self): integer
-    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
-    ---@field get_dynamic_texture fun(self, texture_id: integer): integer
-    ---@field pre_transition fun(self): nil
-    ---@field get_level_height fun(self): integer
-    ---@field unknown_v47 fun(self): integer
-    ---@field spawn_decoration fun(self): nil
-    ---@field spawn_decoration2 fun(self): nil
-    ---@field spawn_extra fun(self): nil
+    ---@field get_liquid_gravity fun(self): number @returns -1.0 (downwards) by default, except for sunken/hundun 1.0 (upwards); applies to both lava and water
+    ---@field get_player_damage fun(self): boolean @used to make the player invincible in basecamp (but does an OOB check)<br/>if you return false in other themes you are invincible except for crushing deaths, and you do still experience knockback and stun
+    ---@field unknown_v38 fun(self): boolean @returns true by default, except CO, duat (these also have no bg, but don't know if related)
+    ---@field get_backlayer_lut fun(self): integer @returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
+    ---@field get_backlayer_light_level fun(self): number @a value between 0.0 (default) and 1.0 used to illuminate (backlayer) locations<br/>depending on camera level (thus player y-level), the brightness is increased gradually<br/>used in black market, vlad's castle, ice caves backlayer, pleasure palace<br/>for tiamat: the value is always 1.0 for full backlayer global illumination (ship)
+    ---@field get_loop fun(self): boolean @this is used for CO (checks that player is in the level, not in the transition)<br/>if enabled in another theme, it adds an extra border and if you zoom out, you see the level loop if you move to the side
+    ---@field get_vault_level fun(self): integer @not 100% sure, this is used in a random calculation that determines whether a vault spawns<br/>looks to be the highest level a vault can spawn; it's mostly 3 or 4, but for neobab it's 1, which makes sense
+    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean @index == 0 ? return unknown1 : return unknown2
+    ---@field get_dynamic_texture fun(self, texture_id: integer): integer @the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number<br/>that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)
+    ---@field pre_transition fun(self): nil @manipulates state.level_next, world_next and theme_next; triggers when exiting a level<br/>for dwelling, it just increments level_next because the world/theme choice is made by which door you pick<br/>for jungle/volcana, it checks whether it's on the fourth level, if so, sets theme_next (4), world_next (3) and level_next (1) correctly for olmec<br/>for CO it checks whether the next level is 99, and set state.win_state to 3 to finish the game
+    ---@field get_level_height fun(self): integer @default = return state.h - 1<br/>for special levels (black market, vlad, ...) fixed heights are returned
+    ---@field unknown_v47 fun(self): integer @returns a value that appears to affect room generation and is based on current world,level
+    ---@field spawn_decoration fun(self): nil @used e.g. in Vlad's castle to insert the big banner in the center with the two demon statues<br/>also implemented for neobab (i think in the zoos)<br/>might do other things as well
+    ---@field spawn_decoration2 fun(self): nil @dwelling: adds the decal above the udjat chest<br/>jungle: adds the colorful jungle flowers on top of the blocks<br/>does lots of other things as well, not sure about difference between this and spawn_decoration
+    ---@field spawn_extra fun(self): nil @dwelling udjat level: adds the key in random place<br/>vlad's castle: adds decorative banners<br/>tidepool: adds hanging seaweed, red lanterns, ...<br/>temple: adds temple sand deco, ...<br/>neobab: adds neon signs, hanging wires, ...
     ---@field unknown_v51 fun(self): nil
 
 ---@class CustomTheme
-    ---@field level_file string
-    ---@field theme integer
-    ---@field base_theme integer
+    ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
+    ---@field theme integer @Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
+    ---@field base_theme integer @Base THEME to load enabled functions from, when no other theme is specified.
     ---@field sub_theme any @&CustomTheme::sub_theme
-    ---@field textures table<DYNAMIC_TEXTURE, integer>
+    ---@field textures table<DYNAMIC_TEXTURE, integer> @Add TEXTUREs here to override different dynamic textures.
     ---@field override any @theme_override
-    ---@field pre fun(self, index: THEME_OVERRIDE, func_: function): nil
-    ---@field post fun(self, index: THEME_OVERRIDE, func_: function): nil
+    ---@field pre fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called before this theme function.
+    ---@field post fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called after this theme function, to fix some changes it did for example.
     ---@field allow_beehive any @&CustomTheme::allow_beehive
     ---@field allow_leprechaun any @&CustomTheme::allow_leprechaun
     ---@field unknown3 any @&CustomTheme::unknown3
@@ -4140,7 +4140,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field get_loop fun(self): boolean
     ---@field get_vault_level fun(self): integer
     ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
-    ---@field get_dynamic_texture fun(self, texture_id: integer): integer
+    ---@field get_dynamic_texture fun(self, texture_id: integer): integer @Add TEXTUREs to `textures` to override different dynamic textures easily.
     ---@field pre_transition fun(self): nil
     ---@field get_level_height fun(self): integer
     ---@field unknown_v47 fun(self): integer
@@ -4150,13 +4150,13 @@ local function MovableBehavior_get_state_id(self) end
     ---@field unknown_v51 fun(self): nil
 
 ---@class PreLoadLevelFilesContext
-    ---@field override_level_files fun(self, levels: string[]): nil
-    ---@field add_level_files fun(self, levels: string[]): nil
+    ---@field override_level_files fun(self, levels: string[]): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
+    ---@field add_level_files fun(self, levels: string[]): nil @Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
 
 ---@class DoorCoords
     ---@field door1_x number
     ---@field door1_y number
-    ---@field door2_x number
+    ---@field door2_x number @door2 only valid when there are two in the level, like Volcana drill, Olmec, ...
     ---@field door2_y number
 
 ---@class LevelGenSystem
@@ -4168,34 +4168,33 @@ local function MovableBehavior_get_state_id(self) end
     ---@field spawn_y number
     ---@field spawn_room_x integer
     ---@field spawn_room_y integer
-    ---@field exits DoorCoords
     ---@field exit_doors Vec2[]
     ---@field themes ThemeInfo[] @size: 18
 
 ---@class PostRoomGenerationContext
-    ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean
-    ---@field mark_as_machine_room_origin fun(self, x: integer, y: integer, layer: LAYER): boolean
-    ---@field mark_as_set_room fun(self, x: integer, y: integer, layer: LAYER): boolean
-    ---@field unmark_as_set_room fun(self, x: integer, y: integer, layer: LAYER): boolean
-    ---@field set_shop_type fun(self, x: integer, y: integer, layer: LAYER, shop_type: integer): boolean
-    ---@field set_procedural_spawn_chance fun(self, chance_id: PROCEDURAL_CHANCE, inverse_chance: integer): boolean
-    ---@field set_num_extra_spawns fun(self, extra_spawn_id: integer, num_spawns_front_layer: integer, num_spawns_back_layer: integer): nil
-    ---@field define_short_tile_code fun(self, short_tile_code_def: ShortTileCodeDef): SHORT_TILE_CODE?
-    ---@field change_short_tile_code fun(self, short_tile_code: SHORT_TILE_CODE, short_tile_code_def: ShortTileCodeDef): nil
+    ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.
+    ---@field mark_as_machine_room_origin fun(self, x: integer, y: integer, layer: LAYER): boolean @Marks the room as the origin of a machine room, should be the top-left corner of the machine room<br/>Run this after setting the room template for the room, otherwise the machine room will not spawn correctly
+    ---@field mark_as_set_room fun(self, x: integer, y: integer, layer: LAYER): boolean @Marks the room as a set-room, a corresponding `setroomy-x` template must be loaded, else the game will crash
+    ---@field unmark_as_set_room fun(self, x: integer, y: integer, layer: LAYER): boolean @Unmarks the room as a set-room
+    ---@field set_shop_type fun(self, x: integer, y: integer, layer: LAYER, shop_type: integer): boolean @Set the shop type for a specific room, does nothing if the room is not a shop
+    ---@field set_procedural_spawn_chance fun(self, chance_id: PROCEDURAL_CHANCE, inverse_chance: integer): boolean @Force a spawn chance for this level, has the same restrictions as specifying the spawn chance in the .lvl file.<br/>Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.<br/>Returns `false` if the given chance is not defined.
+    ---@field set_num_extra_spawns fun(self, extra_spawn_id: integer, num_spawns_front_layer: integer, num_spawns_back_layer: integer): nil @Change the amount of extra spawns for the given `extra_spawn_id`.
+    ---@field define_short_tile_code fun(self, short_tile_code_def: ShortTileCodeDef): SHORT_TILE_CODE? @Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match<br/>Returns `nil` if all possible short tile codes are already in use
+    ---@field change_short_tile_code fun(self, short_tile_code: SHORT_TILE_CODE, short_tile_code_def: ShortTileCodeDef): nil @Overrides a specific short tile code, this means it will change for the whole level
 
 ---@class PreHandleRoomTilesContext
-    ---@field get_short_tile_code fun(self, tx: integer, ty: integer, layer: LAYER): SHORT_TILE_CODE?
-    ---@field set_short_tile_code fun(self, tx: integer, ty: integer, layer: LAYER, short_tile_code: SHORT_TILE_CODE): boolean
-    ---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): integer[][]
-    ---@field replace_short_tile_code fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE, replacement_short_tile_code: SHORT_TILE_CODE): boolean
-    ---@field has_back_layer fun(self): boolean
-    ---@field add_empty_back_layer fun(self): nil
-    ---@field add_copied_back_layer fun(self): nil
+    ---@field get_short_tile_code fun(self, tx: integer, ty: integer, layer: LAYER): SHORT_TILE_CODE? @Gets the tile code at the specified tile coordinate<br/>Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK}`<br/>Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
+    ---@field set_short_tile_code fun(self, tx: integer, ty: integer, layer: LAYER, short_tile_code: SHORT_TILE_CODE): boolean @Sets the tile code at the specified tile coordinate<br/>Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
+    ---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): integer[][] @Finds all places a short tile code is used in the room, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Returns an empty list if `layer == LAYER.BACK` and the room does not have a back layer
+    ---@field replace_short_tile_code fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE, replacement_short_tile_code: SHORT_TILE_CODE): boolean @Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
+    ---@field has_back_layer fun(self): boolean @Check whether the room has a back layer
+    ---@field add_empty_back_layer fun(self): nil @Add a back layer filled with all `0` if there is no back layer yet<br/>Does nothing if there already is a backlayer
+    ---@field add_copied_back_layer fun(self): nil @Add a back layer that is a copy of the front layer<br/>Does nothing if there already is a backlayer
 
 ---@class ShortTileCodeDef
-    ---@field tile_code TILE_CODE
-    ---@field chance integer
-    ---@field alt_tile_code TILE_CODE
+    ---@field tile_code TILE_CODE @Tile code that is used by default when this short tile code is encountered. Defaults to 0.
+    ---@field chance integer @Chance in percent to pick `tile_code` over `alt_tile_code`, ignored if `chance == 0`. Defaults to 100.
+    ---@field alt_tile_code TILE_CODE @Alternative tile code, ignored if `chance == 100`. Defaults to 0.
 
 ---@class QuestsInfo
     ---@field yang_state integer
@@ -4303,8 +4302,8 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field y number
     ---@field left_channel number[] @size: 38
     ---@field right_channel number[] @size: 38
-    ---@field start_over boolean
-    ---@field playing boolean
+    ---@field start_over boolean @when false, current track starts from the beginning, is immediately set back to true
+    ---@field playing boolean @set to false to turn off
 
 ---@class BackgroundSound : SoundMeta
 
@@ -4348,42 +4347,42 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field player_slot_4_settings PlayerSlotSettings
 
 ---@class GuiDrawContext
-    ---@field draw_line fun(self, x1: number, y1: number, x2: number, y2: number, thickness: number, color: uColor): nil
-    ---@field draw_rect GuiDrawContext_draw_rect
-    ---@field draw_rect_filled GuiDrawContext_draw_rect_filled
-    ---@field draw_triangle fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil
-    ---@field draw_triangle_filled fun(self, p1: Vec2, p2: Vec2, p3: Vec2, color: uColor): nil
-    ---@field draw_poly fun(self, points: Vec2[], thickness: number, color: uColor): nil
-    ---@field draw_poly_filled fun(self, points: Vec2[], color: uColor): nil
-    ---@field draw_bezier_cubic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2, thickness: number, color: uColor): nil
-    ---@field draw_bezier_quadratic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil
-    ---@field draw_circle fun(self, x: number, y: number, radius: number, thickness: number, color: uColor): nil
-    ---@field draw_circle_filled fun(self, x: number, y: number, radius: number, color: uColor): nil
-    ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil
-    ---@field draw_image GuiDrawContext_draw_image
-    ---@field draw_image_rotated GuiDrawContext_draw_image_rotated
-    ---@field draw_layer fun(self, layer: DRAW_LAYER): nil
-    ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: fun(ctx: GuiDrawContext, pos: Vec2, size: Vec2): nil): boolean
-    ---@field win_text fun(self, text: string): nil
-    ---@field win_separator fun(self): nil
-    ---@field win_inline fun(self): nil
-    ---@field win_sameline fun(self, offset: number, spacing: number): nil
-    ---@field win_button fun(self, text: string): boolean
-    ---@field win_input_text fun(self, label: string, value: string): string
-    ---@field win_input_int fun(self, label: string, value: integer): integer
-    ---@field win_input_float fun(self, label: string, value: number): number
-    ---@field win_slider_int fun(self, label: string, value: integer, min: integer, max: integer): integer
-    ---@field win_drag_int fun(self, label: string, value: integer, min: integer, max: integer): integer
-    ---@field win_slider_float fun(self, label: string, value: number, min: number, max: number): number
-    ---@field win_drag_float fun(self, label: string, value: number, min: number, max: number): number
-    ---@field win_check fun(self, label: string, value: boolean): boolean
-    ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer
-    ---@field win_pushid fun(self, id: integer): nil
-    ---@field win_popid fun(self): nil
-    ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil
-    ---@field win_imagebutton fun(self, label: string, image: IMAGE, width: number, height: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number): boolean
-    ---@field win_section fun(self, title: string, callback: function): nil
-    ---@field win_indent fun(self, width: number): nil
+    ---@field draw_line fun(self, x1: number, y1: number, x2: number, y2: number, thickness: number, color: uColor): nil @Draws a line on screen
+    ---@field draw_rect GuiDrawContext_draw_rect @Draws a rectangle on screen from top-left to bottom-right.
+    ---@field draw_rect_filled GuiDrawContext_draw_rect_filled @Draws a filled rectangle on screen from top-left to bottom-right.
+    ---@field draw_triangle fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil @Draws a triangle on screen.
+    ---@field draw_triangle_filled fun(self, p1: Vec2, p2: Vec2, p3: Vec2, color: uColor): nil @Draws a filled triangle on screen.
+    ---@field draw_poly fun(self, points: Vec2[], thickness: number, color: uColor): nil @Draws a polyline on screen.
+    ---@field draw_poly_filled fun(self, points: Vec2[], color: uColor): nil @Draws a filled convex polyline on screen.
+    ---@field draw_bezier_cubic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2, thickness: number, color: uColor): nil @Draws a cubic bezier curve on screen.
+    ---@field draw_bezier_quadratic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil @Draws a quadratic bezier curve on screen.
+    ---@field draw_circle fun(self, x: number, y: number, radius: number, thickness: number, color: uColor): nil @Draws a circle on screen
+    ---@field draw_circle_filled fun(self, x: number, y: number, radius: number, color: uColor): nil @Draws a filled circle on screen
+    ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil @Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
+    ---@field draw_image GuiDrawContext_draw_image @Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+    ---@field draw_image_rotated GuiDrawContext_draw_image_rotated @Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
+    ---@field draw_layer fun(self, layer: DRAW_LAYER): nil @Draw on top of UI windows, including platform windows that may be outside the game area, or only in current widget window. Defaults to main viewport background.
+    ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: fun(ctx: GuiDrawContext, pos: Vec2, size: Vec2): nil): boolean @Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
+    ---@field win_text fun(self, text: string): nil @Add some text to window, automatically wrapped
+    ---@field win_separator fun(self): nil @Add a separator line to window
+    ---@field win_inline fun(self): nil @Add next thing on the same line. This is same as `win_sameline(0, -1)`
+    ---@field win_sameline fun(self, offset: number, spacing: number): nil @Add next thing on the same line, with an offset
+    ---@field win_button fun(self, text: string): boolean @Add a button
+    ---@field win_input_text fun(self, label: string, value: string): string @Add a text field
+    ---@field win_input_int fun(self, label: string, value: integer): integer @Add an integer field
+    ---@field win_input_float fun(self, label: string, value: number): number @Add a number field
+    ---@field win_slider_int fun(self, label: string, value: integer, min: integer, max: integer): integer @Add an integer slider
+    ---@field win_drag_int fun(self, label: string, value: integer, min: integer, max: integer): integer @Add an integer dragfield
+    ---@field win_slider_float fun(self, label: string, value: number, min: number, max: number): number @Add an number slider
+    ---@field win_drag_float fun(self, label: string, value: number, min: number, max: number): number @Add an number dragfield
+    ---@field win_check fun(self, label: string, value: boolean): boolean @Add a checkbox
+    ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer @Add a combo box
+    ---@field win_pushid fun(self, id: integer): nil @Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
+    ---@field win_popid fun(self): nil @Pop unique identifier from the stack. Put after the input.
+    ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil @Draw image to window.
+    ---@field win_imagebutton fun(self, label: string, image: IMAGE, width: number, height: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number): boolean @Draw imagebutton to window.
+    ---@field win_section fun(self, title: string, callback: function): nil @Add a collapsing accordion section, put contents in the callback function.
+    ---@field win_indent fun(self, width: number): nil @Indent contents, or unindent if negative
 
 ---@class GuiDrawContext_draw_rect
 ---@param rect AABB
@@ -4452,10 +4451,10 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field showcursor boolean
 
 ---@class VanillaRenderContext
-    ---@field draw_text VanillaRenderContext_draw_text
-    ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number
-    ---@field draw_screen_texture VanillaRenderContext_draw_screen_texture
-    ---@field draw_world_texture VanillaRenderContext_draw_world_texture
+    ---@field draw_text VanillaRenderContext_draw_text @Draw text using the built-in renderer<br/>Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
+    ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer
+    ---@field draw_screen_texture VanillaRenderContext_draw_screen_texture @Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    ---@field draw_world_texture VanillaRenderContext_draw_world_texture @Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a Quad instead
 
 ---@class VanillaRenderContext_draw_text
 ---@param tri TextRenderingInfo
@@ -4515,24 +4514,24 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
 ---@class Letter
     ---@field bottom Triangle
     ---@field top Triangle
-    ---@field get_quad fun(self): Quad
-    ---@field set_quad fun(self, quad: Quad): nil
-    ---@field center fun(self): Vec2
+    ---@field get_quad fun(self): Quad @Get the Quad of a letter (easier to work with compared to the two triangles)<br/>This assumes that the triangles are in the correct 'touching each other' position<br/>if the positions were altered the results may not end up as expected
+    ---@field set_quad fun(self, quad: Quad): nil @Inverse of the get_quad
+    ---@field center fun(self): Vec2 @Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
 
 ---@class TextRenderingInfo
     ---@field new any @sol::initializers(&TextRenderingInfo_ctor)
     ---@field x number
     ---@field y number
-    ---@field text_length integer
+    ---@field text_length integer @You can also just use `#` operator on the whole any to get the text lenght
     ---@field width number
     ---@field height number
-    ---@field special_texture_id integer
+    ---@field special_texture_id integer @Used to draw buttons default is -1 wich is the buttons texture
     ---@field font Texture
-    ---@field get_dest fun(self): Letter[]
-    ---@field get_source fun(self): Letter[]
-    ---@field text_size fun(self): number, number
-    ---@field rotate fun(self, angle: number, px: number?, py: number?): nil
-    ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil
+    ---@field get_dest fun(self): Letter[] @Returns refrence to the letter coordinates relative to the x,y position
+    ---@field get_source fun(self): Letter[] @Returns refrence to the letter coordinates in the texture
+    ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text
+    ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
+    ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
 
 ---@class TextureDefinition
     ---@field texture_path string
@@ -4557,13 +4556,13 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field right number
     ---@field top number
     ---@field overlaps_with fun(self, other: AABB): boolean
-    ---@field abs fun(self): AABB
-    ---@field extrude AABB_extrude
-    ---@field offset fun(self, off_x: number, off_y: number): AABB
-    ---@field area fun(self): number
-    ---@field center fun(self): number, number
-    ---@field width fun(self): number
-    ---@field height fun(self): number
+    ---@field abs fun(self): AABB @Fixes the AABB if any of the sides have negative length
+    ---@field extrude AABB_extrude @Grows or shrinks the AABB by the given amount in all directions.<br/>If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
+    ---@field offset fun(self, off_x: number, off_y: number): AABB @Offsets the AABB by the given offset.
+    ---@field area fun(self): number @Compute area of the AABB, can be zero if one dimension is zero or negative if one dimension is inverted.
+    ---@field center fun(self): number, number @Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
+    ---@field width fun(self): number @Short for `aabb.right - aabb.left`.
+    ---@field height fun(self): number @Short for `aabb.top - aabb.bottom`.
     ---@field split fun(self): number, number, number, number
 
 ---@class AABB_extrude
@@ -4578,8 +4577,8 @@ local function AABB_extrude(self, amount_x, amount_y) end
     ---@field C Vec2
     ---@field offset Triangle_offset
     ---@field rotate fun(self, angle: number, px: number, py: number): Triangle
-    ---@field center fun(self): Vec2
-    ---@field split fun(self): Vec2, Vec2, Vec2
+    ---@field center fun(self): Vec2 @Also known as centroid
+    ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corners
 
 ---@class Triangle_offset
 ---@param x number
@@ -4596,12 +4595,12 @@ local function Triangle_offset(self, x, y) end
     ---@field top_right_y number
     ---@field top_left_x number
     ---@field top_left_y number
-    ---@field get_AABB fun(self): AABB
+    ---@field get_AABB fun(self): AABB @Returns the max/min values of the Quad
     ---@field offset fun(self, off_x: number, off_y: number): Quad
-    ---@field rotate fun(self, angle: number, px: number, py: number): Quad
+    ---@field rotate fun(self, angle: number, px: number, py: number): Quad @Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
-    ---@field split fun(self): Vec2, Vec2, Vec2, Vec2
+    ---@field split fun(self): Vec2, Vec2, Vec2, Vec2 @Returns the corners in order: bottom_left, bottom_right, top_right, top_left
 
 ---@class Screen
     ---@field render_timer number
@@ -4984,7 +4983,7 @@ local function Triangle_offset(self, x, y) end
 ---@class JournalPage
     ---@field background TextureRenderingInfo
     ---@field page_number integer
-    ---@field is_right_side_page fun(self): boolean
+    ---@field is_right_side_page fun(self): boolean @background.x < 0
 
 ---@class JournalPageProgress : JournalPage
     ---@field coffeestain_top TextureRenderingInfo
@@ -5320,12 +5319,6 @@ function Vec2.new(self, vec2) end
 ---@param y_ number
 ---@return Vec2
 function Vec2.new(self, x_, y_) end
----NoDoc
-
----NoDoc
----@param vec2 Vec2
----@return Vec2
-function Vec2.new(self, vec2) end
 
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
@@ -5335,11 +5328,6 @@ function AABB.new(self) end
 ---@param aabb AABB
 ---@return AABB
 function AABB.new(self, aabb) end
----NoDoc
----@param number tuple<number,
----@param number> tuple number,
----@return AABB
-function AABB.new(self, number, number> tuple) end
 ---Create a new axis aligned bounding box by specifying its values
 ---@param left_ number
 ---@param top_ number

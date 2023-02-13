@@ -92,10 +92,12 @@ reGetParam = re.compile(r"(?!const)(\b[^ ]+) *([^,]+),?")
 reRemoveDefault = re.compile(r" = .*")
 reHandleConst = re.compile(r"const (\w+) (\w+)")
 
+
 def get_emmylua_signature(cb_signature):
     params = cpp_params_to_emmy_lua_fun(cb_signature["param"])
     ret = replace_all(cb_signature["return"])
     return f"fun({params}): {ret}"
+
 
 def cpp_params_to_emmy_lua(params_text, cb_signatures=None):
     return_typed = ""
@@ -151,12 +153,17 @@ def print_func(name, params, ret, typed_params):
     fun = f"{typed_params}\n---@return {ret}\nfunction {name}({params}) end".strip()
     print(fun)
 
+
 reMarkdownLink = re.compile(r"(\[\w+\])\((#\w+?)\)")
+
+
 def print_comment(lf):
     if lf["comment"]:
         for com in lf["comment"]:
             com = com.replace("<br/>", "")
-            com = reMarkdownLink.sub(r"\1(https://spelunky-fyi.github.io/overlunky/\2)", com)
+            com = reMarkdownLink.sub(
+                r"\1(https://spelunky-fyi.github.io/overlunky/\2)", com
+            )
             print(f"---{com}")
 
 
@@ -170,6 +177,7 @@ def print_af(lf, af):
     typed_params = replace_all(typed_params)
     print_comment(lf if lf["comment"] else af)
     print_func(name, params, ret, typed_params)
+
 
 def main():
     gu.setup_stdout("game_data/spel2.lua")
@@ -239,7 +247,6 @@ function F(f_string) end
             print_comment(lf)
             print_func(name, params, ret, typed_params)
 
-
     print("\n--## Types\n")
     for type in ps.types:
         print("---@class " + type["name"], end="")
@@ -249,6 +256,13 @@ function F(f_string) end
         print()
         index = 0
         for var in type["vars"]:
+            if "comment" in var and var["comment"] and "NoDoc" in var["comment"][0]:
+                continue
+            comment_str = (
+                (" @" + "<br/>".join(var["comment"]))
+                if "comment" in var and var["comment"]
+                else ""
+            )
             if "function" in var and var["function"]:
                 # if var["name"] == "clear_behaviors":
                 #    gu.breakpoint()
@@ -286,23 +300,34 @@ function F(f_string) end
                                 "orig_params": var["signature"],
                             }
                         ]
-                        print(f"    ---@field {name} {type['name']}_{name}")
+                        print(
+                            f"    ---@field {name} {type['name']}_{name}{comment_str}"
+                        )
                         index += 1
                         continue
                     elif params:
-                        if "cb_signature" in var and var["cb_signature"] and "function" in params:
+                        if (
+                            "cb_signature" in var
+                            and var["cb_signature"]
+                            and "function" in params
+                        ):
                             cb_signatures = var["cb_signature"]
                             if len(cb_signatures) == 1:
                                 cb_signature = next(iter(cb_signatures.values()))
-                                params = params.replace("function", get_emmylua_signature(cb_signature))
+                                params = params.replace(
+                                    "function", get_emmylua_signature(cb_signature)
+                                )
                             else:
                                 for cb_name, cb_signature in cb_signatures.items():
-                                    params = params.replace(f"{cb_name}: function", f"{cb_name}: {get_emmylua_signature(cb_signature)}")
+                                    params = params.replace(
+                                        f"{cb_name}: function",
+                                        f"{cb_name}: {get_emmylua_signature(cb_signature)}",
+                                    )
                         signature = f"---@field {name} fun(self, {params}): {ret}"
                     else:
                         signature = f"---@field {name} fun(self): {ret}"
                 signature = signature.strip()
-                print("    " + signature)
+                print("    " + signature + comment_str)
             elif "signature" in var:
                 [var_type, var_name] = var["signature"].rsplit(" ", 1)
                 arr_m = reArr.match(var_type)
@@ -317,11 +342,11 @@ function F(f_string) end
                         arr_size = var_name[var_name.find("[") + 1 : -1]
                         var_type = f"{var_type}[] @size: {arr_size}"
                     var_name = var_name.split("[")[0]
-                print(f"    ---@field {var_name} {var_type.strip()}")
+                print(f"    ---@field {var_name} {var_type.strip()}{comment_str}")
             else:
                 var_name = var["name"]
                 var_cpp_type = var["type"]
-                print(f"    ---@field {var_name} any @{var_cpp_type}")
+                print(f"    ---@field {var_name} any @{var_cpp_type}{comment_str}")
             index += 1
         print()
         if "overloads" in type:
@@ -350,6 +375,8 @@ function F(f_string) end
     for name, overloads in ps.constructors.items():
         print(f"\n{name} = nil")
         for ctor in overloads:
+            if "comment" in ctor and ctor["comment"] and "NoDoc" in ctor["comment"][0]:
+                continue
             typed_params, params = cpp_params_to_emmy_lua(ctor["signature"])
             typed_params.strip()
             typed_params = replace_all(typed_params)
@@ -359,7 +386,6 @@ function F(f_string) end
 
             print_comment(ctor)
             print_func(new_name, params, name, typed_params)
-
 
     print("\n--## Enums\n")
     enumStr = ""
@@ -393,9 +419,7 @@ function F(f_string) end
         type = alias["type"]
         print(f"---@alias {name} {type}")
 
-
     gu.cleanup_stdout()
-
 
     # Replace some things
     final_replace_stuff = {
@@ -420,4 +444,6 @@ function Vec2.new(self, number> p) end""": "",
 
     with open("./game_data/spel2.lua", "w") as file:
         file.write(declarations_text)
+
+
 main()
