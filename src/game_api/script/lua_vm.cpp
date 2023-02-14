@@ -106,7 +106,6 @@ struct Players
     using value_type = Player*;
     using iterator = std::vector<Player*>::iterator;
 
-    std::vector<Player*> p;
     Players()
     {
         update();
@@ -134,6 +133,8 @@ struct Players
     }
 
   private:
+    std::vector<Player*> p;
+
     void update()
     {
         StateMemory* main_state = State::get().ptr_main();
