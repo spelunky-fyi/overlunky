@@ -4029,21 +4029,24 @@ local function MovableBehavior_get_state_id(self) end
     ---@field max_lifetime integer
 
 ---@class ThemeInfo
+    ---@field unknown3 integer
+    ---@field unknown4 integer
+    ---@field theme integer
     ---@field allow_beehive boolean
     ---@field allow_leprechaun boolean
     ---@field sub_theme ThemeInfo
-    ---@field get_unknown1 fun(self): boolean
+    ---@field reset_theme_flags fun(self): nil
     ---@field init_flags fun(self): nil
     ---@field init_level fun(self): nil
-    ---@field unknown_v4 fun(self): nil
-    ---@field unknown_v5 fun(self): nil
+    ---@field init_rooms fun(self): nil
+    ---@field generate_path fun(self, reset: boolean): nil
     ---@field add_special_rooms fun(self): nil
-    ---@field unknown_v7 fun(self): nil
-    ---@field unknown_v8 fun(self): nil
+    ---@field add_player_coffin fun(self): nil
+    ---@field add_dirk_coffin fun(self): nil
+    ---@field add_idol fun(self): nil
     ---@field add_vault fun(self): nil
     ---@field add_coffin fun(self): nil
     ---@field add_special_feeling fun(self): nil
-    ---@field unknown_v12 fun(self): boolean
     ---@field spawn_level fun(self): nil
     ---@field spawn_border fun(self): nil
     ---@field post_process_level fun(self): nil
@@ -4061,54 +4064,49 @@ local function MovableBehavior_get_state_id(self) end
     ---@field get_base_id fun(self): integer
     ---@field get_floor_spreading_type fun(self): integer
     ---@field get_floor_spreading_type2 fun(self): integer
-    ---@field unknown_v30 fun(self): boolean
-    ---@field get_transition_block_modifier fun(self): integer
-    ---@field unknown_v32 fun(self): integer
+    ---@field get_transition_styled_floor fun(self): boolean
+    ---@field get_transition_floor_modifier fun(self): integer
+    ---@field get_transition_styled_floor_type fun(self): integer
     ---@field get_backwall_type fun(self): integer
     ---@field get_border_type fun(self): integer
     ---@field get_critter_type fun(self): integer
     ---@field get_liquid_gravity fun(self): number
     ---@field get_player_damage fun(self): boolean
-    ---@field unknown_v38 fun(self): boolean
+    ---@field get_explosion_soot fun(self): boolean
     ---@field get_backlayer_lut fun(self): integer
     ---@field get_backlayer_light_level fun(self): number
     ---@field get_loop fun(self): boolean
     ---@field get_vault_level fun(self): integer
-    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
+    ---@field get_theme_flag fun(self, index: integer): boolean
     ---@field get_dynamic_texture fun(self, texture_id: integer): integer
     ---@field pre_transition fun(self): nil
-    ---@field get_level_height fun(self): integer
-    ---@field unknown_v47 fun(self): integer
+    ---@field get_exit_room_y_level fun(self): integer
+    ---@field get_shop_chance fun(self): integer
     ---@field spawn_decoration fun(self): nil
     ---@field spawn_decoration2 fun(self): nil
     ---@field spawn_extra fun(self): nil
-    ---@field unknown_v51 fun(self): nil
+    ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil
 
----@class CustomTheme
+---@class CustomTheme : ThemeInfo
     ---@field level_file string
     ---@field theme integer
     ---@field base_theme integer
-    ---@field sub_theme any @&CustomTheme::sub_theme
     ---@field textures table<DYNAMIC_TEXTURE, integer>
     ---@field override any @theme_override
     ---@field pre any @&CustomTheme::pre
     ---@field post any @&CustomTheme::post
-    ---@field allow_beehive any @&CustomTheme::allow_beehive
-    ---@field allow_leprechaun any @&CustomTheme::allow_leprechaun
-    ---@field unknown3 any @&CustomTheme::unknown3
-    ---@field unknown4 any @&CustomTheme::unknown4
-    ---@field get_unknown1 fun(self): boolean
+    ---@field reset_theme_flags fun(self): nil
     ---@field init_flags fun(self): nil
     ---@field init_level fun(self): nil
-    ---@field unknown_v4 fun(self): nil
-    ---@field unknown_v5 fun(self): nil
+    ---@field init_rooms fun(self): nil
+    ---@field generate_path fun(self, reset: boolean): nil
     ---@field add_special_rooms fun(self): nil
-    ---@field unknown_v7 fun(self): nil
-    ---@field unknown_v8 fun(self): nil
+    ---@field add_player_coffin fun(self): nil
+    ---@field add_dirk_coffin fun(self): nil
+    ---@field add_idol fun(self): nil
     ---@field add_vault fun(self): nil
     ---@field add_coffin fun(self): nil
-    ---@field add_special_feeling fun(self): nil
-    ---@field unknown_v12 fun(self): boolean
+    ---@field add_feeling any @&CustomTheme::add_feeling
     ---@field spawn_level fun(self): nil
     ---@field spawn_border fun(self): nil
     ---@field post_process_level fun(self): nil
@@ -4126,28 +4124,28 @@ local function MovableBehavior_get_state_id(self) end
     ---@field get_base_id fun(self): integer
     ---@field get_floor_spreading_type fun(self): integer
     ---@field get_floor_spreading_type2 fun(self): integer
-    ---@field unknown_v30 fun(self): boolean
-    ---@field get_transition_block_modifier fun(self): integer
-    ---@field unknown_v32 fun(self): integer
+    ---@field get_transition_styled_floor fun(self): boolean
+    ---@field get_transition_floor_modifier fun(self): integer
+    ---@field get_transition_styled_floor_type fun(self): integer
     ---@field get_backwall_type fun(self): integer
     ---@field get_border_type fun(self): integer
     ---@field get_critter_type fun(self): integer
     ---@field get_liquid_gravity fun(self): number
     ---@field get_player_damage fun(self): boolean
-    ---@field unknown_v38 fun(self): boolean
+    ---@field get_explosion_soot fun(self): boolean
     ---@field get_backlayer_lut fun(self): integer
     ---@field get_backlayer_light_level fun(self): number
     ---@field get_loop fun(self): boolean
     ---@field get_vault_level fun(self): integer
-    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
+    ---@field get_theme_flag fun(self, index: integer): boolean
     ---@field get_dynamic_texture fun(self, texture_id: integer): integer
     ---@field pre_transition fun(self): nil
-    ---@field get_level_height fun(self): integer
-    ---@field unknown_v47 fun(self): integer
+    ---@field get_exit_room_y_level fun(self): integer
+    ---@field get_shop_chance fun(self): integer
     ---@field spawn_decoration fun(self): nil
     ---@field spawn_decoration2 fun(self): nil
     ---@field spawn_extra fun(self): nil
-    ---@field unknown_v51 fun(self): nil
+    ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil
 
 ---@class PreLoadLevelFilesContext
     ---@field override_level_files fun(self, levels: string[]): nil
