@@ -413,17 +413,20 @@ void register_usertypes(sol::state& lua)
     // Value of 0, treated by all the functions as ANY mask
     */
 
+    /// 16bit bitmask used in Movable::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
     lua.create_named_table(
         "DAMAGE_TYPE",
         "GENERIC",
         0x1,
         "WHIP",
         0x2,
-        "PROJECTILE",
+        "THROW",
         0x4,
         "ARROW",
         0x8,
-        "FIRE", // TODO: 0x10?
+        "SWORD",
+        0x10,
+        "FIRE",
         0x20,
         "POISON",
         0x40,
@@ -445,19 +448,19 @@ void register_usertypes(sol::state& lua)
         0x4000);
     /* DAMAGE_TYPE
     // GENERIC
-    // enemy contact, rope hit, spikes(-1 damage), anubisshot, forcefield, laser(dagger shot), spear trap...
-    // PROJECTILE
-    // rock, bullet, monkey, but not arrows
+    // enemy contact, rope hit, spikes(-1 damage), anubisshot, forcefield, dagger shot, spear trap...
+    // THROW
+    // rock, bullet, monkey, yeti
     // FIRE
     // fire, fireball, lava
     // POISONED
-    // applies the status effect, no damage
+    // applies the status effect, not damage
     // POISON_TICK
-    // actual damage from poison
+    // actual damage from being poisoned for a while
     // CURSED
-    // catmummy, witchskull
+    // witchskull, catmummy directly, but not cloud
     // LASER
-    // laser trap, not dagger
+    // laser trap, ufo, not dagger
     // ICE_BREAK
     // damage or fall when frozen
     // EXPLOSION
