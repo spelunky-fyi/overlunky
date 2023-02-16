@@ -2513,8 +2513,8 @@ Default function in spawn definitions to check whether a spawn is valid or not
 #### int define_extra_spawn(function do_spawn, function is_valid, int num_spawns_frontlayer, int num_spawns_backlayer)
 
 Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.
-The function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
-The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+The function `nil do_spawn(float x, float y, LAYER layer)` contains your code to spawn the thing, whatever it is.
+The function `bool is_valid(float x, float y, LAYER layer)` determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 To change the number of spawns use `PostRoomGenerationContext:set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
@@ -2527,8 +2527,8 @@ No name is attached to the extra spawn since it is not modified from level files
 
 #### [PROCEDURAL_CHANCE](#PROCEDURAL_CHANCE) define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)
 
-Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
-The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+Define a new procedural spawn, the function `nil do_spawn(float x, float y, LAYER layer)` contains your code to spawn the thing, whatever it is.
+The function `bool is_valid(float x, float y, LAYER layer)` determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
