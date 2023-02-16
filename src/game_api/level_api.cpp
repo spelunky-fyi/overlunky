@@ -1743,11 +1743,11 @@ uint32_t ThemeInfo::get_aux_id()
     {
         if (level_gen_system->themes[i] == this)
         {
-            return uint32_t(i);
+            return uint32_t(i + 1);
         }
     }
 
-    return uint32_t(~1);
+    return 0;
 }
 
 void LevelGenSystem::init()
