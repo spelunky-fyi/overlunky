@@ -5266,8 +5266,8 @@ Use empty table as argument to reset to the game default</p>
 </blockquote>
 <h4 id='int-define_extra_spawn-function-do_spawn-function-is_valid-int-num_spawns_frontlayer-int-num_spawns_backlayer'>int define_extra_spawn(function do_spawn, function is_valid, int num_spawns_frontlayer, int num_spawns_backlayer)</h4>
 <p>Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.
-The function <code>nil do_spawn(x, y, layer)</code> contains your code to spawn the thing, whatever it is.
-The function <code>bool is_valid(x, y, layer)</code> determines whether the spawn is legal in the given position and layer.
+The function <code>nil do_spawn(float x, float y, LAYER layer)</code> contains your code to spawn the thing, whatever it is.
+The function <code>bool is_valid(float x, float y, LAYER layer)</code> determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set <code>is_valid</code> to <code>nil</code> in order to use the default rule (aka. on top of floor and not obstructed).
 To change the number of spawns use <code>PostRoomGenerationContext:set_num_extra_spawns</code> during <code>ON.POST_ROOM_GENERATION</code>
@@ -5277,8 +5277,8 @@ No name is attached to the extra spawn since it is not modified from level files
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_procedural_spawn">define_procedural_spawn</a></p>
 </blockquote>
 <h4 id='PROCEDURAL_CHANCE-define_procedural_spawn-string-procedural_spawn-function-do_spawn-function-is_valid'><a href="#PROCEDURAL_CHANCE">PROCEDURAL_CHANCE</a> define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)</h4>
-<p>Define a new procedural spawn, the function <code>nil do_spawn(x, y, layer)</code> contains your code to spawn the thing, whatever it is.
-The function <code>bool is_valid(x, y, layer)</code> determines whether the spawn is legal in the given position and layer.
+<p>Define a new procedural spawn, the function <code>nil do_spawn(float x, float y, LAYER layer)</code> contains your code to spawn the thing, whatever it is.
+The function <code>bool is_valid(float x, float y, LAYER layer)</code> determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set <code>is_valid</code> to <code>nil</code> in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.</p>
@@ -16201,7 +16201,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_floor_update">set_pre_floor_update(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;&gt; floor_update(Floor self)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool floor_update(Floor self)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -17274,7 +17274,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_update_state_machine">set_pre_update_state_machine(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;&gt; update_state_machine(Entity self)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool update_state_machine(Entity self)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -21830,32 +21830,32 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_force_state">set_force_state(function force_state)</a></td>
-<td>Set the <code>force_state</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>force_state</code> is already set it will be overridden. The signature<br/>of the function is <code>bool force_state(movable, base_fun)</code>, when the function returns <code>true</code> the movable will<br/>enter this behavior. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+<td>Set the <code>force_state</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>force_state</code> is already set it will be overridden. The signature<br/>of the function is <code>bool force_state(Movable movable, function base_fun)</code>, when the function returns <code>true</code> the movable will<br/>enter this behavior. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
 </tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_enter">set_on_enter(function on_enter)</a></td>
-<td>Set the <code>on_enter</code> function of a <code>CustomMovableBehavior</code>, this will be called when the movable<br/>enters the state. If an <code>on_enter</code> is already set it will be overridden. The signature of the<br/>function is <code>nil on_enter(movable, base_fun))</code>. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+<td>Set the <code>on_enter</code> function of a <code>CustomMovableBehavior</code>, this will be called when the movable<br/>enters the state. If an <code>on_enter</code> is already set it will be overridden. The signature of the<br/>function is <code>nil on_enter(Movable movable, function base_fun))</code>. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
 </tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_exit">set_on_exit(function on_exit)</a></td>
-<td>Set the <code>on_exit</code> function of a <code>CustomMovableBehavior</code>, this will be called when the movable<br/>leaves the state. If an <code>on_exit</code> is already set it will be overridden. The signature of the<br/>function is <code>nil on_exit(movable, base_fun))</code>. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+<td>Set the <code>on_exit</code> function of a <code>CustomMovableBehavior</code>, this will be called when the movable<br/>leaves the state. If an <code>on_exit</code> is already set it will be overridden. The signature of the<br/>function is <code>nil on_exit(Movable movable, function base_fun))</code>. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
 </tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_update_logic">set_update_logic(function update_logic)</a></td>
-<td>Set the <code>update_logic</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>update_logic</code> is already set it will be overridden. The signature<br/>of the function is <code>nil update_logic(movable, base_fun))</code>, use it to change the color, texture,<br/>some timers, etc. of the movable. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+<td>Set the <code>update_logic</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>update_logic</code> is already set it will be overridden. The signature<br/>of the function is <code>nil update_logic(Movable movable, function base_fun))</code>, use it to change the color, texture,<br/>some timers, etc. of the movable. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
 </tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_update_world">set_update_world(function update_world)</a></td>
-<td>Set the <code>update_world</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>update_world</code> is already set it will be overridden. The signature<br/>of the function is <code>nil update_world(movable, base_fun))</code>, use this to update the move, velocity,<br/>current_animation, etc. of the movable, then call <code>mov:generic_update_world</code> to update the movable. If no<br/>base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+<td>Set the <code>update_world</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>update_world</code> is already set it will be overridden. The signature<br/>of the function is <code>nil update_world(Movable movable, function base_fun))</code>, use this to update the move, velocity,<br/>current_animation, etc. of the movable, then call <code>mov:generic_update_world</code> to update the movable. If no<br/>base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
 </tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_get_next_state_id">set_get_next_state_id(function get_next_state_id)</a></td>
-<td>Set the <code>get_next_state_id</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>get_next_state_id</code> is already set it will be overridden. The signature<br/>of the function is <code>int get_next_state_id(movable, base_fun))</code>, use this to move to another state, return <code>nil</code>.<br/>or this behaviors <code>state_id</code> to remain in this behavior. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
+<td>Set the <code>get_next_state_id</code> function of a <code>CustomMovableBehavior</code>, this will be called every frame when<br/>the movable is updated. If an <code>get_next_state_id</code> is already set it will be overridden. The signature<br/>of the function is <code>int get_next_state_id(Movable movable, function base_fun))</code>, use this to move to another state, return <code>nil</code>.<br/>or this behaviors <code>state_id</code> to remain in this behavior. If no base behavior is set <code>base_fun</code> will be <code>nil</code>.</td>
 </tr>
 </tbody></table>
 <h3 id='Drill'>Drill</h3>

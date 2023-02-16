@@ -77,7 +77,7 @@ void register_usertypes(sol::state& lua)
 
     /// Set the `force_state` function of a `CustomMovableBehavior`, this will be called every frame when
     /// the movable is updated. If an `force_state` is already set it will be overridden. The signature
-    /// of the function is `bool force_state(movable, base_fun)`, when the function returns `true` the movable will
+    /// of the function is `bool force_state(Movable movable, function base_fun)`, when the function returns `true` the movable will
     /// enter this behavior. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_force_state"] = [](CustomMovableBehavior* behavior, sol::function force_state) -> void
     {
@@ -90,7 +90,7 @@ void register_usertypes(sol::state& lua)
     };
     /// Set the `on_enter` function of a `CustomMovableBehavior`, this will be called when the movable
     /// enters the state. If an `on_enter` is already set it will be overridden. The signature of the
-    /// function is `nil on_enter(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
+    /// function is `nil on_enter(Movable movable, function base_fun))`. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_on_enter"] = [](CustomMovableBehavior* behavior, sol::function on_enter) -> void
     {
         auto backend_id = LuaBackend::get_calling_backend_id();
@@ -102,7 +102,7 @@ void register_usertypes(sol::state& lua)
     };
     /// Set the `on_exit` function of a `CustomMovableBehavior`, this will be called when the movable
     /// leaves the state. If an `on_exit` is already set it will be overridden. The signature of the
-    /// function is `nil on_exit(movable, base_fun))`. If no base behavior is set `base_fun` will be `nil`.
+    /// function is `nil on_exit(Movable movable, function base_fun))`. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_on_exit"] = [](CustomMovableBehavior* behavior, sol::function on_exit) -> void
     {
         auto backend_id = LuaBackend::get_calling_backend_id();
@@ -114,7 +114,7 @@ void register_usertypes(sol::state& lua)
     };
     /// Set the `update_logic` function of a `CustomMovableBehavior`, this will be called every frame when
     /// the movable is updated. If an `update_logic` is already set it will be overridden. The signature
-    /// of the function is `nil update_logic(movable, base_fun))`, use it to change the color, texture,
+    /// of the function is `nil update_logic(Movable movable, function base_fun))`, use it to change the color, texture,
     /// some timers, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_update_logic"] = [](CustomMovableBehavior* behavior, sol::function update_logic) -> void
     {
@@ -127,7 +127,7 @@ void register_usertypes(sol::state& lua)
     };
     /// Set the `update_world` function of a `CustomMovableBehavior`, this will be called every frame when
     /// the movable is updated. If an `update_world` is already set it will be overridden. The signature
-    /// of the function is `nil update_world(movable, base_fun))`, use this to update the move, velocity,
+    /// of the function is `nil update_world(Movable movable, function base_fun))`, use this to update the move, velocity,
     /// current_animation, etc. of the movable, then call `mov:generic_update_world` to update the movable. If no
     /// base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_update_world"] = [](CustomMovableBehavior* behavior, sol::function update_world) -> void
@@ -141,7 +141,7 @@ void register_usertypes(sol::state& lua)
     };
     /// Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when
     /// the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature
-    /// of the function is `int get_next_state_id(movable, base_fun))`, use this to move to another state, return `nil`.
+    /// of the function is `int get_next_state_id(Movable movable, function base_fun))`, use this to move to another state, return `nil`.
     /// or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
     lua["CustomMovableBehavior"]["set_get_next_state_id"] = [](CustomMovableBehavior* behavior, sol::function get_next_state_id) -> void
     {
