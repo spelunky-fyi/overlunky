@@ -20,7 +20,7 @@ using ThemeVTable = HookableVTable<
     VTableEntry<"init_flags", 2, void()>,
     VTableEntry<"init_level", 3, void()>,
     VTableEntry<"init_rooms", 4, void()>,
-    VTableEntry<"generate_path", 5, void()>,
+    VTableEntry<"generate_path", 5, void(bool)>,
     VTableEntry<"special_rooms", 6, void()>,
     VTableEntry<"player_coffin", 7, void()>,
     VTableEntry<"dirk_coffin", 8, void()>,
