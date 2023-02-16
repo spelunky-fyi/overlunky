@@ -462,8 +462,8 @@ struct LevelGenSystem
     {
         for (ThemeInfo* theme : themes)
         {
-            hook_impl.hook<PopulateLevelFun, 0xd>(theme, &populate_level_hook);
-            hook_impl.hook<DoProceduralSpawnFun, 0x33>(theme, &do_procedural_spawn_hook);
+            hook_impl.template hook<PopulateLevelFun, 0xd>(theme, &populate_level_hook);
+            hook_impl.template hook<DoProceduralSpawnFun, 0x33>(theme, &do_procedural_spawn_hook);
         }
     }
 
