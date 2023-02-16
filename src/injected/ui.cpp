@@ -55,7 +55,6 @@
 #include "decode_audio_file.hpp"
 
 #include "render_api.hpp"
-#include "script/lua_vm.hpp"
 #include "script/usertypes/vanilla_render_lua.hpp"
 
 #pragma warning(disable : 4366)
@@ -8011,7 +8010,6 @@ void init_ui()
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
     State::init();
-    get_lua_vm(g_SoundManager.get());
     State::post_init();
 
     g_state = State::get().ptr_main();
