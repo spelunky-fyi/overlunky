@@ -395,17 +395,7 @@ class ThemeInfo
 
     virtual void unknown_v51() = 0;
 
-    // Themes don't seem to know their real THEME, so LevelGenSystem::init tells them
-    // I'm sure this is a brilliant place to store it
-    void set_aux_id(uint32_t id)
-    {
-        padding3 = id;
-    }
-
-    uint32_t get_aux_id()
-    {
-        return padding3;
-    }
+    uint32_t get_aux_id();
 };
 static_assert(sizeof(ThemeInfo) == 0x20);
 
@@ -437,6 +427,14 @@ class SpecialLevelGeneration
     virtual void procedual_spawns() = 0;
 };
 
+struct SpawnInfo
+{
+    void* ptr0;
+    void* ptr1;
+    float x;
+    float y;
+};
+
 enum class ShopType : uint8_t
 {
     General,
@@ -458,6 +456,22 @@ enum class ShopType : uint8_t
 struct LevelGenSystem
 {
     void init();
+
+    template <class HookImplT>
+    void hook_themes(HookImplT hook_impl)
+    {
+        for (ThemeInfo* theme : themes)
+        {
+            hook_impl.hook<PopulateLevelFun, 0xd>(theme, &populate_level_hook);
+            hook_impl.hook<DoProceduralSpawnFun, 0x33>(theme, &do_procedural_spawn_hook);
+        }
+    }
+
+    using PopulateLevelFun = void(ThemeInfo*, uint64_t, uint64_t, uint64_t);
+    static void populate_level_hook(ThemeInfo*, uint64_t, uint64_t, uint64_t, PopulateLevelFun*);
+
+    using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
+    static void do_procedural_spawn_hook(ThemeInfo*, SpawnInfo*, DoProceduralSpawnFun*);
 
     LevelGenData* data;
     uint64_t unknown2;
