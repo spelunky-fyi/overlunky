@@ -29,7 +29,7 @@ void register_usertypes(sol::state& lua)
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"damage", 0x30, void(Entity*, int8_t, uint32_t, Vec2*, uint8_t, uint16_t, uint8_t, bool)>>;
+        VTableEntry<"damage", 0x30, uint32_t(Entity*, int8_t, uint32_t, Vec2*, uint8_t, uint16_t, uint8_t, bool)>>;
     static MovableVTable movable_vtable(lua, lua["Movable"], "ENTITY_OVERRIDE");
 
     using FloorVTable = HookableVTable<
