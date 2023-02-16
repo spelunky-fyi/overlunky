@@ -216,9 +216,10 @@ void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t 
         return;
     }
 
-    float velocities[] = {velocity_x, velocity_y};
-    float unknown[] = {0.0f, 0.0f};
-    on_regular_damage(dealer, damage_amount, 0x1000, velocities, unknown, stun_time, iframes);
+    Vec2 velocity{velocity_x, velocity_y};
+    uint8_t unknown1{0};
+    bool unknown2{true};
+    on_regular_damage(dealer, damage_amount, 0x1000, &velocity, unknown1, stun_time, (uint8_t)iframes, unknown2);
 }
 
 bool Movable::is_button_pressed(BUTTON button)
