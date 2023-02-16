@@ -128,9 +128,9 @@ class Movable : public Entity
     virtual bool is_on_fire() = 0;
     virtual void v46() = 0;
     virtual void v47() = 0;
-    // virtual void on_flying_object_collision(Entity* victim) = 0;                                                                                                  // stuff like flying rocks, broken arrows hitting the player
-    virtual uint32_t on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint32_t damage_flags, Vec2* velocity, uint8_t unknown1, uint16_t stun_amount, uint8_t iframes, bool unkown2) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost)
-    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                                                            // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
+    /// Returns: DAMAGE_TYPE flags that we should still apply for status effects?
+    virtual uint16_t on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint16_t damage_flags, Vec2* velocity, uint8_t unknown1, uint16_t stun_amount, uint8_t iframes, bool unknown2) = 0; // disable for regular damage invincibility; does not handle crush deaths (boulder, quillback, ghost)
+    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                                                             // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
     virtual void v50() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;

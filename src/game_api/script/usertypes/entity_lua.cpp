@@ -299,6 +299,8 @@ void register_usertypes(sol::state& lua)
     movable_type["reset_gravity"] = &Movable::reset_gravity;
     movable_type["set_position"] = &Movable::set_position;
 
+    movable_type["regular_damage"] = &Movable::on_regular_damage;
+
     lua["Entity"]["as_entity"] = &Entity::as<Entity>;
     lua["Entity"]["as_movable"] = &Entity::as<Movable>;
 
