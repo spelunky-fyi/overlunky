@@ -199,7 +199,7 @@ void trigger_vanilla_render_callbacks(ON event)
         });
 }
 
-bool trigger_vanilla_render_hud_callbacks(ON event, HudRenderContext* ctx)
+bool trigger_vanilla_render_hud_callbacks(ON event, Hud* ctx)
 {
     bool skip{false};
     LuaBackend::for_each_backend(

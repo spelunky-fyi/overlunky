@@ -340,22 +340,61 @@ void init_render_api_hooks();
 bool& get_journal_enabled();
 void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);
 
-struct HudPlayer
+struct HudInventory
 {
-    uint8_t index;
+    bool enabled;
     uint8_t health;
     uint8_t bombs;
     uint8_t ropes;
+    uint8_t skip[176 - 4]; // TODO: individual item icon bools in some stupid order
+};
+static_assert(sizeof(HudInventory) == 176);
+
+struct HudPart
+{
+    bool dim;
+    float opacity;
+    uint32_t bg;
+};
+
+struct HudPlayer : HudPart
+{
+    int16_t health;
+    int16_t bombs;
+    int16_t ropes;
+    int32_t idunno;
+};
+static_assert(sizeof(HudPlayer) == 24);
+
+struct HudMoney : HudPart
+{
+    int32_t total;
+    int32_t counter;
+    int32_t timer;
 };
 
 struct HudData
 {
-    std::array<HudPlayer, 1> players;
-    uint8_t skip[0x948];
-    float opacity_main;
+    std::array<HudInventory, MAX_PLAYERS> inventory;
+    bool udjat;
+    int32_t money_total;
+    int32_t money_counter;
+    uint32_t time_total;
+    uint32_t time_level;
+    uint8_t world_num;
+    uint8_t level_num;
+    uint32_t seed;
+    uint8_t skip[1644]; // TODO: probably rendering coordinates all the way down
+    std::array<HudPlayer, MAX_PLAYERS> players;
+    HudMoney money;
+    size_t p9c0;
+    HudPart timer;
+    HudPart level;
+    // there's a few pointers and some timer missing, doesn't seem important
 };
+// static_assert(sizeof(HudData) <= 0xa00);
 
-struct HudRenderContext
+struct Hud
 {
     float y;
     float opacity;

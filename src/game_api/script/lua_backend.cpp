@@ -1166,7 +1166,7 @@ void LuaBackend::process_vanilla_render_callbacks(ON event)
     }
 }
 
-bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, HudRenderContext* ctx)
+bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, Hud* ctx)
 {
     bool skip{false};
     if (!get_enabled())

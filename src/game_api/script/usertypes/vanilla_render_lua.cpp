@@ -432,19 +432,45 @@ void register_usertypes(sol::state& lua)
     // Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW but renders texture as solid color
     */
 
-    auto hudplayer_type = lua.new_usertype<HudPlayer>("HudPlayer");
-    hudplayer_type["index"] = &HudPlayer::index;
+    auto hudinventory_type = lua.new_usertype<HudInventory>("HudInventory");
+    hudinventory_type["enabled"] = &HudInventory::enabled;
+    hudinventory_type["health"] = &HudInventory::health;
+    hudinventory_type["bombs"] = &HudInventory::bombs;
+    hudinventory_type["ropes"] = &HudInventory::ropes;
+
+    auto hudpart_type = lua.new_usertype<HudPart>("HudPart");
+    hudpart_type["dim"] = &HudPart::dim;
+    hudpart_type["opacity"] = &HudPart::opacity;
+    hudpart_type["bg"] = &HudPart::bg;
+
+    auto hudplayer_type = lua.new_usertype<HudPlayer>("HudPlayer", sol::base_classes, sol::bases<HudPart>());
     hudplayer_type["health"] = &HudPlayer::health;
     hudplayer_type["bombs"] = &HudPlayer::bombs;
     hudplayer_type["ropes"] = &HudPlayer::ropes;
 
-    auto huddata_type = lua.new_usertype<HudData>("HudData");
-    huddata_type["players"] = &HudData::players;
-    huddata_type["opacity_main"] = &HudData::opacity_main;
+    auto hudmoney_type = lua.new_usertype<HudMoney>("HudMoney", sol::base_classes, sol::bases<HudPart>());
+    hudmoney_type["total"] = &HudMoney::total;
+    hudmoney_type["counter"] = &HudMoney::counter;
+    hudmoney_type["timer"] = &HudMoney::timer;
 
-    auto hudrendercontext_type = lua.new_usertype<HudRenderContext>("HudRenderContext");
-    hudrendercontext_type["y"] = &HudRenderContext::y;
-    hudrendercontext_type["opacity"] = &HudRenderContext::opacity;
-    hudrendercontext_type["data"] = &HudRenderContext::data;
+    auto huddata_type = lua.new_usertype<HudData>("HudData");
+    huddata_type["inventory"] = &HudData::inventory;
+    huddata_type["udjat"] = &HudData::udjat;
+    huddata_type["money_total"] = &HudData::money_total;
+    huddata_type["money_counter"] = &HudData::money_counter;
+    huddata_type["time_total"] = &HudData::time_total;
+    huddata_type["time_level"] = &HudData::time_level;
+    huddata_type["world_num"] = &HudData::world_num;
+    huddata_type["level_num"] = &HudData::level_num;
+    huddata_type["seed"] = &HudData::seed;
+    huddata_type["players"] = &HudData::players;
+    huddata_type["money"] = &HudData::money;
+    huddata_type["timer"] = &HudData::timer;
+    huddata_type["level"] = &HudData::level;
+
+    auto hud_type = lua.new_usertype<Hud>("Hud");
+    hud_type["y"] = &Hud::y;
+    hud_type["opacity"] = &Hud::opacity;
+    hud_type["data"] = &Hud::data;
 };
 } // namespace NVanillaRender

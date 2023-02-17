@@ -39,7 +39,7 @@ class Entity;
 struct LevelGenRoomData;
 struct AABB;
 struct HudData;
-struct HudRenderContext;
+struct Hud;
 
 enum class ON
 {
@@ -374,7 +374,7 @@ class LuaBackend
     bool pre_entity_instagib(Entity* victim);
 
     void process_vanilla_render_callbacks(ON event);
-    bool process_vanilla_render_hud_callbacks(ON event, HudRenderContext* ctx);
+    bool process_vanilla_render_hud_callbacks(ON event, Hud* ctx);
     void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
     void process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
 
