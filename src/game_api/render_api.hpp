@@ -339,3 +339,25 @@ struct RenderInfo
 void init_render_api_hooks();
 bool& get_journal_enabled();
 void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);
+
+struct HudPlayer
+{
+    uint8_t index;
+    uint8_t health;
+    uint8_t bombs;
+    uint8_t ropes;
+};
+
+struct HudData
+{
+    std::array<HudPlayer, 1> players;
+    uint8_t skip[0x948];
+    float opacity_main;
+};
+
+struct HudRenderContext
+{
+    float y;
+    float opacity;
+    HudData* data;
+};

@@ -431,5 +431,20 @@ void register_usertypes(sol::state& lua)
     // DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION
     // Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW but renders texture as solid color
     */
+
+    auto hudplayer_type = lua.new_usertype<HudPlayer>("HudPlayer");
+    hudplayer_type["index"] = &HudPlayer::index;
+    hudplayer_type["health"] = &HudPlayer::health;
+    hudplayer_type["bombs"] = &HudPlayer::bombs;
+    hudplayer_type["ropes"] = &HudPlayer::ropes;
+
+    auto huddata_type = lua.new_usertype<HudData>("HudData");
+    huddata_type["players"] = &HudData::players;
+    huddata_type["opacity_main"] = &HudData::opacity_main;
+
+    auto hudrendercontext_type = lua.new_usertype<HudRenderContext>("HudRenderContext");
+    hudrendercontext_type["y"] = &HudRenderContext::y;
+    hudrendercontext_type["opacity"] = &HudRenderContext::opacity;
+    hudrendercontext_type["data"] = &HudRenderContext::data;
 };
 } // namespace NVanillaRender

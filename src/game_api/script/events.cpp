@@ -199,6 +199,18 @@ void trigger_vanilla_render_callbacks(ON event)
         });
 }
 
+bool trigger_vanilla_render_hud_callbacks(ON event, HudRenderContext* ctx)
+{
+    bool skip{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            skip |= backend->process_vanilla_render_hud_callbacks(event, ctx);
+            return true;
+        });
+    return skip;
+}
+
 void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
 {
     LuaBackend::for_each_backend(

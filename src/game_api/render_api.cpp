@@ -98,9 +98,14 @@ VanillaRenderHudFun* g_render_hud_trampoline{nullptr};
 void render_hud(size_t hud_data, float y, float opacity, size_t hud_data2)
 {
     // hud_data and hud_data2 are the same pointer, but the second one is actually used (displays garbage if not passed)
-    trigger_vanilla_render_callbacks(ON::RENDER_PRE_HUD);
-    g_render_hud_trampoline(hud_data, y - g_advanced_hud * 0.004f, opacity, hud_data2);
-    trigger_vanilla_render_callbacks(ON::RENDER_POST_HUD);
+
+    // auto inv_opacity = (float*)(hud_data + 0x94c);
+    // DEBUG("{} {} {} {}", y, opacity, *inv_opacity, (void*)hud_data);
+    HudRenderContext ctx{y, opacity, (HudData*)hud_data};
+    if (trigger_vanilla_render_hud_callbacks(ON::RENDER_PRE_HUD, &ctx))
+        return;
+    g_render_hud_trampoline(hud_data, ctx.y - g_advanced_hud * 0.004f, ctx.opacity, hud_data2);
+    trigger_vanilla_render_hud_callbacks(ON::RENDER_POST_HUD, &ctx);
 }
 
 using VanillaRenderPauseMenuFun = void(float*);
