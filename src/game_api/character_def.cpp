@@ -72,15 +72,6 @@ std::span<CharacterDB> GetCharacterDefinitions()
             KnownCharacter{.full_name{u"Classic Guy"}, .short_name{u"Classic Guy"}},
         };
 
-        [[maybe_unused]] const auto string_table = get_strings_table();
-        for (size_t i = 0; i < 20; i++)
-        {
-            [[maybe_unused]] const CharacterDB& character = character_table[i];
-            [[maybe_unused]] const KnownCharacter& known_name = known_tables[i];
-            assert(memcmp(string_table[character.full_name_string_id], known_name.full_name.data(), known_name.full_name.size()) == 0);
-            assert(memcmp(string_table[character.short_name_string_id], known_name.short_name.data(), known_name.short_name.size()) == 0);
-        }
-
         return character_table;
     }();
     return static_character_table;

@@ -8009,6 +8009,9 @@ void init_ui()
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
+    State::init();
+    State::post_init();
+
     g_state = State::get().ptr_main();
     g_save = UI::savedata();
     g_game_manager = get_game_manager();

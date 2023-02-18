@@ -28,6 +28,14 @@ void Spelunky_SetWriteLoadOptimization(bool write_load_opt)
 {
     State::set_write_load_opt(write_load_opt);
 }
+void Spelunky_InitState()
+{
+    State::init();
+}
+void Spelunky_PostInitState()
+{
+    State::post_init();
+}
 
 void Spelunky_RegisterApplicationVersion(const char* version)
 {

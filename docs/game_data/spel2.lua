@@ -4029,86 +4029,24 @@ local function MovableBehavior_get_state_id(self) end
     ---@field max_lifetime integer
 
 ---@class ThemeInfo
+    ---@field unknown3 integer
+    ---@field unknown4 integer
+    ---@field theme integer
     ---@field allow_beehive boolean
     ---@field allow_leprechaun boolean
     ---@field sub_theme ThemeInfo
-    ---@field get_unknown1 fun(self): boolean
-    ---@field init_flags fun(self): nil @dwelling,tidepool: unset levelgen.flags.flag12<br/>jungle,volcana.olmec,icecaves,neobab,cog,duat,abzu,tiamat,eggplant,hundun,basecamp,arena: nop<br/>temple: unset levelgen.flags.flag10 + calculate chance of grasshopper critter spawn<br/>sunken: unset levelgen.flags.flag9, 10, 17, 18 + if state.level == 1 -> unset flag 11<br/>cosmic: calls same virtual on its sub_theme
-    ---@field init_level fun(self): nil @does random calculations and calls function to determine the start room in most themes
-    ---@field unknown_v4 fun(self): nil @most themes call the same function, some check whether they are in CO
-    ---@field unknown_v5 fun(self): nil
-    ---@field add_special_rooms fun(self): nil @dwelling: does stuff when level == 4 or udjat present<br/>jungle: when black market present<br/>volcana: when drill present<br/>touches the rooms and sometimes the meta info about the rooms
-    ---@field unknown_v7 fun(self): nil @can't trigger, dwelling (quillback) and abzu do something special (arena just returns)
-    ---@field unknown_v8 fun(self): nil @does something depending on levelgen.data.unknown7
-    ---@field add_vault fun(self): nil
-    ---@field add_coffin fun(self): nil
-    ---@field add_special_feeling fun(self): nil @metal clanking and air of oppression
-    ---@field unknown_v12 fun(self): boolean
-    ---@field spawn_level fun(self): nil @spawns all floor etc tiles based on the room layout<br/>disable this and only the player is spawned in the level
-    ---@field spawn_border fun(self): nil @spawns CO: teleportingborder / Duat: dust / theme specific border tiles around the level
-    ---@field post_process_level fun(self): nil @volcana: checks if state.coffin_contents = cocovondiamonds -> chooses one of the four coffins in vlad's castle at random to put her in<br/>tidepool: spawns impostor lake, some door and a litwalltorch, ...<br/>neobab: assigns the correct animation_frame to all the ushabtis<br/>co, arena: forwards to the same virtual of the sub_theme<br/>abzu, tiamat: spawns impostor lake
-    ---@field spawn_traps fun(self): nil @adds theme specific random traps and pushblocks
-    ---@field post_process_entities fun(self): nil @pleasure palace: applies correct texture to ladders and ladder platforms<br/>sunken city: randomly adds ENT_TYPE_DECORATION_SUNKEN_BRIDGE between entities (the slimy bridges)<br/>hundun: calls sunken city virtual, so has slimy bridges
-    ---@field spawn_procedural fun(self): nil @adds legs under platforms, random pots, goldbars, procedural spawns, compass indicator...
-    ---@field spawn_background fun(self): nil @adds a background, e.g. CO stars / Duat moon / Plain backwall for other themes
-    ---@field spawn_lights fun(self): nil @adds extra light where needed, e.g. in the udjat chest room, or the top layer of the black market: spawns ENT_TYPE_LOGICAL_ROOM_LIGHT
-    ---@field spawn_transition fun(self): nil @spawns a transition tunnel to the level
-    ---@field post_transition fun(self): nil @unsets flag 1 (Reset) of state.quest_flags<br/>sets the correct state.screen (0xC)<br/>sets state.ingame to true, adjust fade values and starts loading
-    ---@field spawn_players fun(self): nil @spawns the player(s) in the world, along with what they were holding
-    ---@field spawn_effects fun(self): nil @when disabled, during multiplayer the camera is not focused; also responsible for spawning the leader flag; not looked at in detail<br/>this actually also sets the camera bounds and various theme specific special effects<br/>also spawns / sets the conditions for osiris, jelly, orbs...<br/>also makes curse pots spawn the ghost
-    ---@field get_level_file fun(self): string @the .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
-    ---@field get_theme_id fun(self): integer @for co: returns sub_theme->get_theme_id()
-    ---@field get_base_id fun(self): integer @whereas get_theme_id() returns a unique id for all ThemeInfo's, this function returns the id of the theme it logically belongs to<br/>e.g. theme_abzu->get_base_id() = 5 (tide_pool) as opposed to theme_abzu->get_theme_id() = 13 (abzu)
-    ---@field get_floor_spreading_type fun(self): integer @all themes return 4 (ENT_TYPE_FLOOR_GENERIC), except:<br/>temple: 104 (ENT_TYPE_FLOORSTYLED_TEMPLE)<br/>neobab: 106 (ENT_TYPE_FLOORSTYLED_BABYLON)<br/>sunken: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)<br/>cog: 110 (ENT_TYPE_FLOORSTYLED_COG)<br/>duat: 112 (ENT_TYPE_FLOORSTYLED_DUAT)<br/>hundun: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
-    ---@field get_floor_spreading_type2 fun(self): integer @similar to get_floor_spreading_type(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE)
-    ---@field unknown_v30 fun(self): boolean @all return false, except olmec, temple, neobab, cog, duat
-    ---@field get_transition_block_modifier fun(self): integer @determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to) for this theme<br/>returns 85 by default, except for: olmec: 15, cog: 23
-    ---@field unknown_v32 fun(self): integer
-    ---@field get_backwall_type fun(self): integer @always returns 778 ENT_TYPE_BG_LEVEL_BACKWALL
-    ---@field get_border_type fun(self): integer @returns ENT_TYPE_FLOOR_BORDERTILE by default, except:<br/>neobab ENT_TYPE_FLOOR_BORDERTILE_METAL<br/>sunken ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS<br/>duat ENT_TYPE_FLOOR_DUSTWALL<br/>tiamat ENT_TYPE_FLOOR_BORDERTILE_METAL<br/>hundun ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS
-    ---@field get_critter_type fun(self): integer
-    ---@field get_liquid_gravity fun(self): number @returns -1.0 (downwards) by default, except for sunken/hundun 1.0 (upwards); applies to both lava and water
-    ---@field get_player_damage fun(self): boolean @used to make the player invincible in basecamp (but does an OOB check)<br/>if you return false in other themes you are invincible except for crushing deaths, and you do still experience knockback and stun
-    ---@field unknown_v38 fun(self): boolean @returns true by default, except CO, duat (these also have no bg, but don't know if related)
-    ---@field get_backlayer_lut fun(self): integer @returns the texture ID for the LUT to be applied to the special back layer, e.g. vlad's castle for the volcana theme
-    ---@field get_backlayer_light_level fun(self): number @a value between 0.0 (default) and 1.0 used to illuminate (backlayer) locations<br/>depending on camera level (thus player y-level), the brightness is increased gradually<br/>used in black market, vlad's castle, ice caves backlayer, pleasure palace<br/>for tiamat: the value is always 1.0 for full backlayer global illumination (ship)
-    ---@field get_loop fun(self): boolean @this is used for CO (checks that player is in the level, not in the transition)<br/>if enabled in another theme, it adds an extra border and if you zoom out, you see the level loop if you move to the side
-    ---@field get_vault_level fun(self): integer @not 100% sure, this is used in a random calculation that determines whether a vault spawns<br/>looks to be the highest level a vault can spawn; it's mostly 3 or 4, but for neobab it's 1, which makes sense
-    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean @index == 0 ? return unknown1 : return unknown2
-    ---@field get_dynamic_texture fun(self, texture_id: integer): integer @the texture_id parameter comes from the entitydb.texture field, for some entities the texture is not a valid texture ID but a negative number<br/>that number is passed here and mapped into this dynamic per-theme list (see entitydb[4].texture)
-    ---@field pre_transition fun(self): nil @manipulates state.level_next, world_next and theme_next; triggers when exiting a level<br/>for dwelling, it just increments level_next because the world/theme choice is made by which door you pick<br/>for jungle/volcana, it checks whether it's on the fourth level, if so, sets theme_next (4), world_next (3) and level_next (1) correctly for olmec<br/>for CO it checks whether the next level is 99, and set state.win_state to 3 to finish the game
-    ---@field get_level_height fun(self): integer @default = return state.h - 1<br/>for special levels (black market, vlad, ...) fixed heights are returned
-    ---@field unknown_v47 fun(self): integer @returns a value that appears to affect room generation and is based on current world,level
-    ---@field spawn_decoration fun(self): nil @used e.g. in Vlad's castle to insert the big banner in the center with the two demon statues<br/>also implemented for neobab (i think in the zoos)<br/>might do other things as well
-    ---@field spawn_decoration2 fun(self): nil @dwelling: adds the decal above the udjat chest<br/>jungle: adds the colorful jungle flowers on top of the blocks<br/>does lots of other things as well, not sure about difference between this and spawn_decoration
-    ---@field spawn_extra fun(self): nil @dwelling udjat level: adds the key in random place<br/>vlad's castle: adds decorative banners<br/>tidepool: adds hanging seaweed, red lanterns, ...<br/>temple: adds temple sand deco, ...<br/>neobab: adds neon signs, hanging wires, ...
-    ---@field unknown_v51 fun(self): nil
-
----@class CustomTheme
-    ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
-    ---@field theme integer @Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
-    ---@field base_theme integer @Base THEME to load enabled functions from, when no other theme is specified.
-    ---@field sub_theme any @&CustomTheme::sub_theme
-    ---@field textures table<DYNAMIC_TEXTURE, integer> @Add TEXTUREs here to override different dynamic textures.
-    ---@field override any @theme_override
-    ---@field pre fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called before this theme function.
-    ---@field post fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called after this theme function, to fix some changes it did for example.
-    ---@field allow_beehive any @&CustomTheme::allow_beehive
-    ---@field allow_leprechaun any @&CustomTheme::allow_leprechaun
-    ---@field unknown3 any @&CustomTheme::unknown3
-    ---@field unknown4 any @&CustomTheme::unknown4
-    ---@field get_unknown1 fun(self): boolean
+    ---@field reset_theme_flags fun(self): nil
     ---@field init_flags fun(self): nil
     ---@field init_level fun(self): nil
-    ---@field unknown_v4 fun(self): nil
-    ---@field unknown_v5 fun(self): nil
+    ---@field init_rooms fun(self): nil
+    ---@field generate_path fun(self, reset: boolean): nil
     ---@field add_special_rooms fun(self): nil
-    ---@field unknown_v7 fun(self): nil
-    ---@field unknown_v8 fun(self): nil
+    ---@field add_player_coffin fun(self): nil
+    ---@field add_dirk_coffin fun(self): nil
+    ---@field add_idol fun(self): nil
     ---@field add_vault fun(self): nil
     ---@field add_coffin fun(self): nil
     ---@field add_special_feeling fun(self): nil
-    ---@field unknown_v12 fun(self): boolean
     ---@field spawn_level fun(self): nil
     ---@field spawn_border fun(self): nil
     ---@field post_process_level fun(self): nil
@@ -4126,28 +4064,88 @@ local function MovableBehavior_get_state_id(self) end
     ---@field get_base_id fun(self): integer
     ---@field get_floor_spreading_type fun(self): integer
     ---@field get_floor_spreading_type2 fun(self): integer
-    ---@field unknown_v30 fun(self): boolean
-    ---@field get_transition_block_modifier fun(self): integer
-    ---@field unknown_v32 fun(self): integer
+    ---@field get_transition_styled_floor fun(self): boolean
+    ---@field get_transition_floor_modifier fun(self): integer
+    ---@field get_transition_styled_floor_type fun(self): integer
     ---@field get_backwall_type fun(self): integer
     ---@field get_border_type fun(self): integer
     ---@field get_critter_type fun(self): integer
     ---@field get_liquid_gravity fun(self): number
     ---@field get_player_damage fun(self): boolean
-    ---@field unknown_v38 fun(self): boolean
+    ---@field get_explosion_soot fun(self): boolean
     ---@field get_backlayer_lut fun(self): integer
     ---@field get_backlayer_light_level fun(self): number
     ---@field get_loop fun(self): boolean
     ---@field get_vault_level fun(self): integer
-    ---@field get_unknown_1_or_2 fun(self, index: integer): boolean
-    ---@field get_dynamic_texture fun(self, texture_id: integer): integer @Add TEXTUREs to `textures` to override different dynamic textures easily.
+    ---@field get_theme_flag fun(self, index: integer): boolean
+    ---@field get_dynamic_texture fun(self, texture_id: integer): integer
     ---@field pre_transition fun(self): nil
-    ---@field get_level_height fun(self): integer
-    ---@field unknown_v47 fun(self): integer
+    ---@field get_exit_room_y_level fun(self): integer
+    ---@field get_shop_chance fun(self): integer
     ---@field spawn_decoration fun(self): nil
     ---@field spawn_decoration2 fun(self): nil
     ---@field spawn_extra fun(self): nil
-    ---@field unknown_v51 fun(self): nil
+    ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil
+
+---@class CustomTheme : ThemeInfo
+    ---@field level_file string
+    ---@field theme integer
+    ---@field base_theme integer
+    ---@field textures table<DYNAMIC_TEXTURE, integer>
+    ---@field override any @theme_override
+    ---@field pre any @&CustomTheme::pre
+    ---@field post any @&CustomTheme::post
+    ---@field reset_theme_flags fun(self): nil
+    ---@field init_flags fun(self): nil
+    ---@field init_level fun(self): nil
+    ---@field init_rooms fun(self): nil
+    ---@field generate_path fun(self, reset: boolean): nil
+    ---@field add_special_rooms fun(self): nil
+    ---@field add_player_coffin fun(self): nil
+    ---@field add_dirk_coffin fun(self): nil
+    ---@field add_idol fun(self): nil
+    ---@field add_vault fun(self): nil
+    ---@field add_coffin fun(self): nil
+    ---@field add_feeling any @&CustomTheme::add_feeling
+    ---@field spawn_level fun(self): nil
+    ---@field spawn_border fun(self): nil
+    ---@field post_process_level fun(self): nil
+    ---@field spawn_traps fun(self): nil
+    ---@field post_process_entities fun(self): nil
+    ---@field spawn_procedural fun(self): nil
+    ---@field spawn_background fun(self): nil
+    ---@field spawn_lights fun(self): nil
+    ---@field spawn_transition fun(self): nil
+    ---@field post_transition fun(self): nil
+    ---@field spawn_players fun(self): nil
+    ---@field spawn_effects fun(self): nil
+    ---@field get_level_file fun(self): string
+    ---@field get_theme_id fun(self): integer
+    ---@field get_base_id fun(self): integer
+    ---@field get_floor_spreading_type fun(self): integer
+    ---@field get_floor_spreading_type2 fun(self): integer
+    ---@field get_transition_styled_floor fun(self): boolean
+    ---@field get_transition_floor_modifier fun(self): integer
+    ---@field get_transition_styled_floor_type fun(self): integer
+    ---@field get_backwall_type fun(self): integer
+    ---@field get_border_type fun(self): integer
+    ---@field get_critter_type fun(self): integer
+    ---@field get_liquid_gravity fun(self): number
+    ---@field get_player_damage fun(self): boolean
+    ---@field get_explosion_soot fun(self): boolean
+    ---@field get_backlayer_lut fun(self): integer
+    ---@field get_backlayer_light_level fun(self): number
+    ---@field get_loop fun(self): boolean
+    ---@field get_vault_level fun(self): integer
+    ---@field get_theme_flag fun(self, index: integer): boolean
+    ---@field get_dynamic_texture fun(self, texture_id: integer): integer
+    ---@field pre_transition fun(self): nil
+    ---@field get_exit_room_y_level fun(self): integer
+    ---@field get_shop_chance fun(self): integer
+    ---@field spawn_decoration fun(self): nil
+    ---@field spawn_decoration2 fun(self): nil
+    ---@field spawn_extra fun(self): nil
+    ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil
 
 ---@class PreLoadLevelFilesContext
     ---@field override_level_files fun(self, levels: string[]): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.

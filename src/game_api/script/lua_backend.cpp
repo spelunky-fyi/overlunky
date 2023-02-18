@@ -118,6 +118,7 @@ void LuaBackend::clear_all_callbacks()
 
     HookHandler<Entity, CallbackType::Entity>::clear_all_hooks();
     HookHandler<RenderInfo, CallbackType::Entity>::clear_all_hooks();
+    HookHandler<ThemeInfo, CallbackType::Theme>::clear_all_hooks();
 
     for (auto& [screen_id, id] : screen_hooks)
     {
@@ -329,6 +330,7 @@ bool LuaBackend::update()
 
         HookHandler<Entity, CallbackType::Entity>::clear_pending();
         HookHandler<RenderInfo, CallbackType::Entity>::clear_pending();
+        HookHandler<ThemeInfo, CallbackType::Theme>::clear_pending();
 
         for (auto& [screen_id, id] : clear_screen_hooks)
         {

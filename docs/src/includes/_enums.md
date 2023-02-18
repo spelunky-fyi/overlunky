@@ -1121,7 +1121,7 @@ Name | Data | Description
 [SPAWN_DECORATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION) | THEME_OVERRIDE::SPAWN_DECORATION | 
 [SPAWN_DECORATION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION2) | THEME_OVERRIDE::SPAWN_DECORATION2 | 
 [SPAWN_EXTRA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_EXTRA) | THEME_OVERRIDE::SPAWN_EXTRA | 
-[UNKNOWN_V51](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V51) | THEME_OVERRIDE::UNKNOWN_V51 | 
+[DO_PROCEDURAL_SPAWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.DO_PROCEDURAL_SPAWN) | THEME_OVERRIDE::DO_PROCEDURAL_SPAWN | 
 
 ## TILE_CODE
 
