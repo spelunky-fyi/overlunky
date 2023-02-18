@@ -66,5 +66,6 @@ using ThemeVTable = HookableVTable<
     VTableEntry<"spawn_decoration2", 49, void()>,
     VTableEntry<"spawn_extra", 50, void()>,
     VTableEntry<"do_procedural_spawn", 51, void(SpawnInfo*)>>;
+// static ThemeVTable theme_vtable(lua, lua["ThemeInfo"], "THEME_OVERRIDE");
 ThemeVTable& get_theme_info_vtable(sol::state& lua);
 }; // namespace NThemeVTables

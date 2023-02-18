@@ -1070,6 +1070,66 @@ Overrides for different [CustomTheme](#CustomTheme) functions. Warning: We WILL 
 
 Name | Data | Description
 ---- | ---- | -----------
+[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.DTOR) | 0 | 
+[RESET_THEME_FLAGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.RESET_THEME_FLAGS) | 1 | 
+[INIT_FLAGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_FLAGS) | 2 | 
+[INIT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_LEVEL) | 3 | 
+[INIT_ROOMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_ROOMS) | 4 | 
+[GENERATE_PATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.GENERATE_PATH) | 5 | 
+[SPECIAL_ROOMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPECIAL_ROOMS) | 6 | 
+[PLAYER_COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PLAYER_COFFIN) | 7 | 
+[DIRK_COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.DIRK_COFFIN) | 8 | 
+[IDOL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.IDOL) | 9 | 
+[VAULT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.VAULT) | 10 | 
+[COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.COFFIN) | 11 | 
+[FEELING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.FEELING) | 12 | 
+[SPAWN_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_LEVEL) | 13 | 
+[SPAWN_BORDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_BORDER) | 14 | 
+[POST_PROCESS_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_LEVEL) | 15 | 
+[SPAWN_TRAPS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_TRAPS) | 16 | 
+[POST_PROCESS_ENTITIES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_ENTITIES) | 17 | 
+[SPAWN_PROCEDURAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_PROCEDURAL) | 18 | 
+[SPAWN_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_BACKGROUND) | 19 | 
+[SPAWN_LIGHTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_LIGHTS) | 20 | 
+[SPAWN_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_TRANSITION) | 21 | 
+[POST_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_TRANSITION) | 22 | 
+[SPAWN_PLAYERS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_PLAYERS) | 23 | 
+[SPAWN_EFFECTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_EFFECTS) | 24 | 
+[THEME_ID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.THEME_ID) | 26 | 
+[BASE_ID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BASE_ID) | 27 | 
+[ENT_FLOOR_SPREADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_FLOOR_SPREADING) | 28 | 
+[ENT_FLOOR_SPREADING2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_FLOOR_SPREADING2) | 29 | 
+[TRANSITION_STYLED_FLOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TRANSITION_STYLED_FLOOR) | 30 | 
+[TRANSITION_MODIFIER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TRANSITION_MODIFIER) | 31 | 
+[ENT_TRANSITION_STYLED_FLOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_TRANSITION_STYLED_FLOOR) | 32 | 
+[ENT_BACKWALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_BACKWALL) | 33 | 
+[ENT_BORDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_BORDER) | 34 | 
+[ENT_CRITTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_CRITTER) | 35 | 
+[GRAVITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.GRAVITY) | 36 | 
+[PLAYER_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PLAYER_DAMAGE) | 37 | 
+[SOOT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SOOT) | 38 | 
+[TEXTURE_BACKLAYER_LUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TEXTURE_BACKLAYER_LUT) | 39 | 
+[BACKLAYER_LIGHT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BACKLAYER_LIGHT_LEVEL) | 40 | 
+[LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.LOOP) | 41 | 
+[VAULT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.VAULT_LEVEL) | 42 | 
+[THEME_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.THEME_FLAG) | 43 | 
+[TEXTURE_DYNAMIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TEXTURE_DYNAMIC) | 44 | 
+[PRE_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PRE_TRANSITION) | 45 | 
+[EXIT_ROOM_Y_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.EXIT_ROOM_Y_LEVEL) | 46 | 
+[SHOP_CHANCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SHOP_CHANCE) | 47 | 
+[SPAWN_DECORATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION) | 48 | 
+[SPAWN_DECORATION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION2) | 49 | 
+[SPAWN_EXTRA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_EXTRA) | 50 | 
+[DO_PROCEDURAL_SPAWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.DO_PROCEDURAL_SPAWN) | 51 | 
+
+## THEME_OVERRIDE
+
+
+> Search script examples for [THEME_OVERRIDE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE)
+
+
+Name | Data | Description
+---- | ---- | -----------
 [BASE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BASE) | THEME_OVERRIDE::BASE | 
 [UNKNOWN_V1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V1) | THEME_OVERRIDE::UNKNOWN_V1 | 
 [INIT_FLAGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_FLAGS) | THEME_OVERRIDE::INIT_FLAGS | 
