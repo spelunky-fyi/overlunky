@@ -8,6 +8,7 @@
 #include <functional>
 
 struct MovableBehavior;
+using DAMAGE_TYPE = uint16_t;
 
 class Movable : public Entity
 {
@@ -84,9 +85,10 @@ class Movable : public Entity
     bool is_poisoned();
 
     /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
-    void damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint8_t iframes);
+    /// Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
+    bool damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint8_t iframes);
     // the original damage function was added to the API without the iframes param, but for backwards compatibility we preserve the broken one
-    void broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
+    bool broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
 
     bool is_button_pressed(BUTTON button);
     bool is_button_held(BUTTON button);
@@ -128,9 +130,9 @@ class Movable : public Entity
     virtual bool is_on_fire() = 0;
     virtual void v46() = 0;
     virtual void v47() = 0;
-    /// Returns: DAMAGE_TYPE 16bit flags we should actually apply, for status effects, after immunities?
-    virtual uint16_t on_regular_damage(Entity* damage_dealer, int8_t damage_amount, uint16_t damage_flags, Vec2* velocity, uint8_t unknown1, uint16_t stun_amount, uint8_t iframes, bool unknown2) = 0; // disable for regular damage invincibility; does not handle ghost
-    virtual void on_stun_damage(Entity* damage_dealer) = 0;                                                                                                                                             // triggers for broken arrow hit, calls handle_regular_damage with 0 damage; unsure about functionality and name
+    virtual bool on_damage(Entity* damage_dealer, int8_t damage_amount, DAMAGE_TYPE damage_flags, Vec2* velocity, uint8_t unknown_damage_phase, uint16_t stun_amount, uint8_t iframes, bool unknown_is_final) = 0;
+    /// Hit by broken arrows etc that don't deal damage, calls on_damage with 0 damage.
+    virtual void on_hit(Entity* damage_dealer) = 0;
     virtual void v50() = 0;
     virtual void stun(uint16_t framecount) = 0;
     virtual void freeze(uint8_t framecount) = 0;

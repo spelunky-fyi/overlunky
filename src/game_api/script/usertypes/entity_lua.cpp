@@ -235,8 +235,9 @@ void register_usertypes(sol::state& lua)
     */
 
     auto damage = sol::overload(
-        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
-        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint8_t)>(&Movable::damage));
+        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
+        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint8_t)>(&Movable::damage),
+        &Movable::on_damage);
     auto light_on_fire = sol::overload(
         static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
@@ -298,8 +299,6 @@ void register_usertypes(sol::state& lua)
     movable_type["set_gravity"] = &Movable::set_gravity;
     movable_type["reset_gravity"] = &Movable::reset_gravity;
     movable_type["set_position"] = &Movable::set_position;
-
-    movable_type["regular_damage"] = &Movable::on_regular_damage;
 
     lua["Entity"]["as_entity"] = &Entity::as<Entity>;
     lua["Entity"]["as_movable"] = &Entity::as<Movable>;
@@ -453,11 +452,11 @@ void register_usertypes(sol::state& lua)
     // rock, bullet, monkey, yeti
     // FIRE
     // fire, fireball, lava
-    // POISONED
+    // POISON
     // applies the status effect, not damage
     // POISON_TICK
     // actual damage from being poisoned for a while
-    // CURSED
+    // CURSE
     // witchskull, catmummy directly, but not cloud
     // LASER
     // laser trap, ufo, not dagger
