@@ -37,7 +37,7 @@ void post_entity_spawn(Entity* entity, int spawn_type_flags);
 bool pre_entity_instagib(Entity* victim);
 
 void trigger_vanilla_render_callbacks(ON event);
-bool trigger_vanilla_render_hud_callbacks(ON event, Hud* ctx);
+bool trigger_vanilla_render_hud_callbacks(ON event, Hud* hud);
 void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
 void trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
 

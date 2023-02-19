@@ -199,13 +199,13 @@ void trigger_vanilla_render_callbacks(ON event)
         });
 }
 
-bool trigger_vanilla_render_hud_callbacks(ON event, Hud* ctx)
+bool trigger_vanilla_render_hud_callbacks(ON event, Hud* hud)
 {
     bool skip{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            skip |= backend->process_vanilla_render_hud_callbacks(event, ctx);
+            skip |= backend->process_vanilla_render_hud_callbacks(event, hud);
             return true;
         });
     return skip;

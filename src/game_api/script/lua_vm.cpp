@@ -1824,6 +1824,27 @@ end
         return sol::make_object(lua, sol::as_table(files));
     };
 
+    /// Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count
+    lua["get_hud_position"] = [](int index) -> AABB
+    {
+        index--;
+        float ax = -0.98f;
+        float f = 1.0f;
+        uint32_t hs = get_setting(GAME_SETTING::HUD_SIZE).value_or(0);
+        if (hs == 0 || State::get().ptr()->items->player_count > 3)
+            f = 1.0f;
+        else if (hs == 1 || State::get().ptr()->items->player_count > 2)
+            f = 1.15f;
+        else
+            f = 1.3f;
+        float w = 0.32f * f;
+
+        float ay = 0.94f - (1.0f - f) * 0.1f;
+        float h = 0.2f * f;
+
+        return AABB(ax + index * w + 0.02f * f, ay, ax + index * w + w - 0.02f * f, ay - h);
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

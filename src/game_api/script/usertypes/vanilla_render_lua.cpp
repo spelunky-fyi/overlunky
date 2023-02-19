@@ -443,19 +443,20 @@ void register_usertypes(sol::state& lua)
     hudinventory_type["poison"] = &HudInventory::poison;
     hudinventory_type["curse"] = &HudInventory::curse;
     hudinventory_type["elixir"] = &HudInventory::elixir;
+    hudinventory_type["crown"] = &HudInventory::crown;
     hudinventory_type["item_count"] = &HudInventory::item_count;
 
-    auto hudpart_type = lua.new_usertype<HudPart>("HudPart");
-    hudpart_type["dim"] = &HudPart::dim;
-    hudpart_type["opacity"] = &HudPart::opacity;
-    hudpart_type["bg"] = &HudPart::bg;
+    auto hudelement_type = lua.new_usertype<HudElement>("HudElement");
+    hudelement_type["dim"] = &HudElement::dim;
+    hudelement_type["opacity"] = &HudElement::opacity;
+    hudelement_type["time_dim"] = &HudElement::time_dim;
 
-    auto hudplayer_type = lua.new_usertype<HudPlayer>("HudPlayer", sol::base_classes, sol::bases<HudPart>());
+    auto hudplayer_type = lua.new_usertype<HudPlayer>("HudPlayer", sol::base_classes, sol::bases<HudElement>());
     hudplayer_type["health"] = &HudPlayer::health;
     hudplayer_type["bombs"] = &HudPlayer::bombs;
     hudplayer_type["ropes"] = &HudPlayer::ropes;
 
-    auto hudmoney_type = lua.new_usertype<HudMoney>("HudMoney", sol::base_classes, sol::bases<HudPart>());
+    auto hudmoney_type = lua.new_usertype<HudMoney>("HudMoney", sol::base_classes, sol::bases<HudElement>());
     hudmoney_type["total"] = &HudMoney::total;
     hudmoney_type["counter"] = &HudMoney::counter;
     hudmoney_type["timer"] = &HudMoney::timer;
@@ -470,6 +471,7 @@ void register_usertypes(sol::state& lua)
     huddata_type["world_num"] = &HudData::world_num;
     huddata_type["level_num"] = &HudData::level_num;
     huddata_type["seed"] = &HudData::seed;
+    huddata_type["opacity"] = &HudData::opacity;
     huddata_type["players"] = &HudData::players;
     huddata_type["money"] = &HudData::money;
     huddata_type["timer"] = &HudData::timer;

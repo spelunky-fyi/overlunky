@@ -354,7 +354,7 @@ struct HudInventory
 
     uint32_t u03;
 
-    uint32_t kapala_blood; // don't know type
+    uint32_t kapala_blood;
 
     uint32_t u0c;
 
@@ -363,20 +363,27 @@ struct HudInventory
     bool elixir;
     uint8_t b13;
 
-    uint8_t skip[176 - 6 * 4 - 4]; // TODO: individual item icons and hats
+    /// Powerup type or 0
+    ENT_TYPE crown;
+
+    uint8_t skip[176 - 7 * 4 - 4]; // TODO: individual item icons
+
     /// Amount of generic pickup items at the bottom. Set to 0 to not draw them.
     uint32_t item_count;
 };
 static_assert(sizeof(HudInventory) == 176);
 
-struct HudPart
+struct HudElement
 {
+    /// Hide background and dim if using the auto adjust setting.
     bool dim;
+    /// Background will be drawn if this is not 0.5
     float opacity;
-    uint32_t bg;
+    /// Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
+    int32_t time_dim;
 };
 
-struct HudPlayer : HudPart
+struct HudPlayer : HudElement
 {
     int16_t health;
     int16_t bombs;
@@ -385,7 +392,7 @@ struct HudPlayer : HudPart
 };
 static_assert(sizeof(HudPlayer) == 24);
 
-struct HudMoney : HudPart
+struct HudMoney : HudElement
 {
     int32_t total;
     int32_t counter;
@@ -403,12 +410,13 @@ struct HudData
     uint8_t world_num;
     uint8_t level_num;
     uint32_t seed;
-    uint8_t skip[1644]; // TODO: probably rendering coordinates all the way down
+    float opacity;
+    uint8_t skip[1640]; // TODO: probably rendering coordinates all the way down
     std::array<HudPlayer, MAX_PLAYERS> players;
     HudMoney money;
     size_t p9c0;
-    HudPart timer;
-    HudPart level;
+    HudElement timer;
+    HudElement level;
     // there's a few pointers and some timer missing, doesn't seem important
 };
 // static_assert(sizeof(HudData) <= 0xa00);
