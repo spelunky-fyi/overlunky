@@ -286,6 +286,7 @@ end
 
     StateMemory* main_state = State::get().ptr_main();
 
+    /// NoDoc
     lua.new_usertype<Players>(
         "Players", sol::no_constructor, sol::meta_function::index, [](Players* p, const int index)
         { return p->at(index - 1); },

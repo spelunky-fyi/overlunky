@@ -616,6 +616,8 @@ for type_cat in type_cats:
     for cat in sorted(type_cats[type_cat], key=lambda x: x):
         print("\n## " + cat + "\n")
         for type in sorted(type_cats[type_cat][cat], key=lambda x: x["name"]):
+            if type["comment"] and "NoDoc" in type["comment"]:
+                continue
             type_name = type["name"]
             print("\n### " + type_name + "\n")
             include_example(type_name)

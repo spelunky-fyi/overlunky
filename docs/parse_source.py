@@ -122,7 +122,9 @@ lualibs = []
 enums = []
 constructors = {}
 
-cpp_type_exceptions = []
+cpp_type_exceptions = [
+    "Players",
+]
 not_functions = [
     "players",
     "state",
