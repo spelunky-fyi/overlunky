@@ -3430,6 +3430,9 @@
                     <a href="#THEME_OVERRIDE" class="toc-h2 toc-link" data-title="THEME_OVERRIDE">THEME_OVERRIDE</a>
                   </li>
                   <li>
+                    <a href="#THEME_OVERRIDE-2" class="toc-h2 toc-link" data-title="THEME_OVERRIDE">THEME_OVERRIDE</a>
+                  </li>
+                  <li>
                     <a href="#TILE_CODE" class="toc-h2 toc-link" data-title="TILE_CODE">TILE_CODE</a>
                   </li>
                   <li>
@@ -15496,6 +15499,531 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=do_procedural_spawn">do_procedural_spawn(SpawnInfo info)</a></td>
 <td>Spawns a single procedural entity, used in spawn_procedural</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_virtual">set_pre_virtual(THEME_OVERRIDE entry, function fun)</a></td>
+<td>Hooks before the virtual function at index <code>entry</code>.</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_virtual">set_post_virtual(THEME_OVERRIDE entry, function fun)</a></td>
+<td>Hooks after the virtual function at index <code>entry</code>.</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clear_virtual">clear_virtual(CallbackId callback_id)</a></td>
+<td>Clears the hook given by <code>callback_id</code>, alternatively use <code>clear_callback()</code> inside the hook.</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_dtor">set_pre_dtor(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>nil dtor(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_dtor">set_post_dtor(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil dtor(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_reset_theme_flags">set_pre_reset_theme_flags(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool reset_theme_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Sets the beehive and leprechaun flags</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_reset_theme_flags">set_post_reset_theme_flags(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil reset_theme_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Sets the beehive and leprechaun flags</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_init_flags">set_pre_init_flags(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_init_flags">set_post_init_flags(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_init_level">set_pre_init_level(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_init_level">set_post_init_level(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_init_rooms">set_pre_init_rooms(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_rooms(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_init_rooms">set_post_init_rooms(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_rooms(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_generate_path">set_pre_generate_path(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool generate_path(ThemeInfo self, bool reset)</code><br/>Virtual function docs:<br/>Generates and adds the path rooms and exit room<br/>Params: reset to start over from the beginning if other rooms didn&#39;t fit</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_generate_path">set_post_generate_path(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil generate_path(ThemeInfo self, bool reset)</code><br/>Virtual function docs:<br/>Generates and adds the path rooms and exit room<br/>Params: reset to start over from the beginning if other rooms didn&#39;t fit</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_special_rooms">set_pre_special_rooms(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool special_rooms(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_special_rooms">set_post_special_rooms(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil special_rooms(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_player_coffin">set_pre_player_coffin(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool player_coffin(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_player_coffin">set_post_player_coffin(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil player_coffin(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_dirk_coffin">set_pre_dirk_coffin(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool dirk_coffin(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_dirk_coffin">set_post_dirk_coffin(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil dirk_coffin(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_idol">set_pre_idol(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool idol(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_idol">set_post_idol(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil idol(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_vault">set_pre_vault(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool vault(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_vault">set_post_vault(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil vault(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_coffin">set_pre_coffin(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool coffin(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_coffin">set_post_coffin(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil coffin(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_feeling">set_pre_feeling(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool feeling(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_feeling">set_post_feeling(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil feeling(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_level">set_pre_spawn_level(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Calls many other theme functions to spawn the floor, enemies, items etc, but not background and players. (Disable this to only spawn background and players.)</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_level">set_post_spawn_level(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Calls many other theme functions to spawn the floor, enemies, items etc, but not background and players. (Disable this to only spawn background and players.)</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_border">set_pre_spawn_border(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_border(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the border entities (some floor or teleportingborder)</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_border">set_post_spawn_border(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_border(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the border entities (some floor or teleportingborder)</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_post_process_level">set_pre_post_process_level(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool post_process_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Theme specific specialties like randomizing ushabti and Coco coffin location, spawns impostor lakes</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_post_process_level">set_post_post_process_level(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil post_process_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Theme specific specialties like randomizing ushabti and Coco coffin location, spawns impostor lakes</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_traps">set_pre_spawn_traps(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_traps(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns theme specific random traps, pushblocks and critters. Sets special exit doors.</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_traps">set_post_spawn_traps(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_traps(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns theme specific random traps, pushblocks and critters. Sets special exit doors.</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_post_process_entities">set_pre_post_process_entities(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool post_process_entities(ThemeInfo self)</code><br/>Virtual function docs:<br/>Fixes textures on pleasure palace ladders, adds some decorations</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_post_process_entities">set_post_post_process_entities(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil post_process_entities(ThemeInfo self)</code><br/>Virtual function docs:<br/>Fixes textures on pleasure palace ladders, adds some decorations</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_procedural">set_pre_spawn_procedural(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_procedural(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, random shadows...</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_procedural">set_post_spawn_procedural(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_procedural(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, random shadows...</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_background">set_pre_spawn_background(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_background(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the main level background , e.g. CO stars / Duat moon / Plain backwall for other themes</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_background">set_post_spawn_background(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_background(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the main level background , e.g. CO stars / Duat moon / Plain backwall for other themes</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_lights">set_pre_spawn_lights(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_lights(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds room lights to udjat chest room or black market</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_lights">set_post_spawn_lights(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_lights(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds room lights to udjat chest room or black market</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_transition">set_pre_spawn_transition(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_transition(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the transition tunnel and players in it</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_transition">set_post_spawn_transition(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_transition(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the transition tunnel and players in it</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_post_transition">set_pre_post_transition(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool post_transition(ThemeInfo self)</code><br/>Virtual function docs:<br/>Handles loading the next level screen from a transition screen</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_post_transition">set_post_post_transition(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil post_transition(ThemeInfo self)</code><br/>Virtual function docs:<br/>Handles loading the next level screen from a transition screen</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_players">set_pre_spawn_players(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_players">set_post_spawn_players(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_effects">set_pre_spawn_effects(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_effects(ThemeInfo self)</code><br/>Virtual function docs:<br/>Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_effects">set_post_spawn_effects(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_effects(ThemeInfo self)</code><br/>Virtual function docs:<br/>Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_theme_id">set_pre_theme_id(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; theme_id(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_theme_id">set_post_theme_id(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil theme_id(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_base_id">set_pre_base_id(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; base_id(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_base_id">set_post_base_id(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil base_id(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_ent_floor_spreading">set_pre_ent_floor_spreading(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; ent_floor_spreading(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_ent_floor_spreading">set_post_ent_floor_spreading(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil ent_floor_spreading(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_ent_floor_spreading2">set_pre_ent_floor_spreading2(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; ent_floor_spreading2(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_ent_floor_spreading2">set_post_ent_floor_spreading2(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil ent_floor_spreading2(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_transition_styled_floor">set_pre_transition_styled_floor(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; transition_styled_floor(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_transition_styled_floor">set_post_transition_styled_floor(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil transition_styled_floor(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_transition_modifier">set_pre_transition_modifier(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; transition_modifier(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_transition_modifier">set_post_transition_modifier(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil transition_modifier(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_ent_transition_styled_floor">set_pre_ent_transition_styled_floor(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; ent_transition_styled_floor(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_ent_transition_styled_floor">set_post_ent_transition_styled_floor(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil ent_transition_styled_floor(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_ent_backwall">set_pre_ent_backwall(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; ent_backwall(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_ent_backwall">set_post_ent_backwall(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil ent_backwall(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_ent_border">set_pre_ent_border(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; ent_border(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_ent_border">set_post_ent_border(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil ent_border(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_ent_critter">set_pre_ent_critter(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; ent_critter(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_ent_critter">set_post_ent_critter(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil ent_critter(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_gravity">set_pre_gravity(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;float&gt; gravity(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_gravity">set_post_gravity(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil gravity(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_player_damage">set_pre_player_damage(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; player_damage(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_player_damage">set_post_player_damage(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil player_damage(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_soot">set_pre_soot(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; soot(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_soot">set_post_soot(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil soot(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_texture_backlayer_lut">set_pre_texture_backlayer_lut(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; texture_backlayer_lut(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_texture_backlayer_lut">set_post_texture_backlayer_lut(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil texture_backlayer_lut(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_backlayer_light_level">set_pre_backlayer_light_level(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;float&gt; backlayer_light_level(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_backlayer_light_level">set_post_backlayer_light_level(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil backlayer_light_level(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_loop">set_pre_loop(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; loop(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_loop">set_post_loop(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil loop(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_vault_level">set_pre_vault_level(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; vault_level(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_vault_level">set_post_vault_level(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil vault_level(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_theme_flag">set_pre_theme_flag(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; theme_flag(ThemeInfo self, int)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_theme_flag">set_post_theme_flag(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil theme_flag(ThemeInfo self, int)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_texture_dynamic">set_pre_texture_dynamic(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; texture_dynamic(ThemeInfo self, int)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_texture_dynamic">set_post_texture_dynamic(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil texture_dynamic(ThemeInfo self, int)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_pre_transition">set_pre_pre_transition(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool pre_transition(ThemeInfo self)</code><br/>Virtual function docs:<br/>Sets state.level_next, world_next and theme_next (or state.win_state) based on level number. Runs when exiting a level.</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_pre_transition">set_post_pre_transition(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil pre_transition(ThemeInfo self)</code><br/>Virtual function docs:<br/>Sets state.level_next, world_next and theme_next (or state.win_state) based on level number. Runs when exiting a level.</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_exit_room_y_level">set_pre_exit_room_y_level(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; exit_room_y_level(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_exit_room_y_level">set_post_exit_room_y_level(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil exit_room_y_level(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_shop_chance">set_pre_shop_chance(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; shop_chance(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_shop_chance">set_post_shop_chance(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil shop_chance(ThemeInfo self)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_decoration">set_pre_spawn_decoration(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_decoration(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns some specific decoration, e.g. Vlad&#39;s big banner</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_decoration">set_post_spawn_decoration(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_decoration(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns some specific decoration, e.g. Vlad&#39;s big banner</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_decoration2">set_pre_spawn_decoration2(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_decoration2(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns some other specific decorations, e.g. grass, flowers, udjat room decal</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_decoration2">set_post_spawn_decoration2(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_decoration2(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns some other specific decorations, e.g. grass, flowers, udjat room decal</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_extra">set_pre_spawn_extra(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_extra(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_extra">set_post_spawn_extra(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_extra(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_do_procedural_spawn">set_pre_do_procedural_spawn(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_do_procedural_spawn">set_post_do_procedural_spawn(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural</td>
 </tr>
 </tbody></table>
 <h1 id='Entity-types'>Entity types</h1><h2 id='Background-entities'>Background entities</h2><h3 id='BGBackLayerDoor'>BGBackLayerDoor</h3>
@@ -28694,6 +29222,274 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </blockquote>
 
 <p>Overrides for different <a href="#CustomTheme">CustomTheme</a> functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.</p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.DTOR">DTOR</a></td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.RESET_THEME_FLAGS">RESET_THEME_FLAGS</a></td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.INIT_FLAGS">INIT_FLAGS</a></td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.INIT_LEVEL">INIT_LEVEL</a></td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.INIT_ROOMS">INIT_ROOMS</a></td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.GENERATE_PATH">GENERATE_PATH</a></td>
+<td>5</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPECIAL_ROOMS">SPECIAL_ROOMS</a></td>
+<td>6</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.PLAYER_COFFIN">PLAYER_COFFIN</a></td>
+<td>7</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.DIRK_COFFIN">DIRK_COFFIN</a></td>
+<td>8</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.IDOL">IDOL</a></td>
+<td>9</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.VAULT">VAULT</a></td>
+<td>10</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.COFFIN">COFFIN</a></td>
+<td>11</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.FEELING">FEELING</a></td>
+<td>12</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_LEVEL">SPAWN_LEVEL</a></td>
+<td>13</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_BORDER">SPAWN_BORDER</a></td>
+<td>14</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.POST_PROCESS_LEVEL">POST_PROCESS_LEVEL</a></td>
+<td>15</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_TRAPS">SPAWN_TRAPS</a></td>
+<td>16</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.POST_PROCESS_ENTITIES">POST_PROCESS_ENTITIES</a></td>
+<td>17</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_PROCEDURAL">SPAWN_PROCEDURAL</a></td>
+<td>18</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_BACKGROUND">SPAWN_BACKGROUND</a></td>
+<td>19</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_LIGHTS">SPAWN_LIGHTS</a></td>
+<td>20</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_TRANSITION">SPAWN_TRANSITION</a></td>
+<td>21</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.POST_TRANSITION">POST_TRANSITION</a></td>
+<td>22</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_PLAYERS">SPAWN_PLAYERS</a></td>
+<td>23</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_EFFECTS">SPAWN_EFFECTS</a></td>
+<td>24</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.THEME_ID">THEME_ID</a></td>
+<td>26</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.BASE_ID">BASE_ID</a></td>
+<td>27</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.ENT_FLOOR_SPREADING">ENT_FLOOR_SPREADING</a></td>
+<td>28</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.ENT_FLOOR_SPREADING2">ENT_FLOOR_SPREADING2</a></td>
+<td>29</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.TRANSITION_STYLED_FLOOR">TRANSITION_STYLED_FLOOR</a></td>
+<td>30</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.TRANSITION_MODIFIER">TRANSITION_MODIFIER</a></td>
+<td>31</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.ENT_TRANSITION_STYLED_FLOOR">ENT_TRANSITION_STYLED_FLOOR</a></td>
+<td>32</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.ENT_BACKWALL">ENT_BACKWALL</a></td>
+<td>33</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.ENT_BORDER">ENT_BORDER</a></td>
+<td>34</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.ENT_CRITTER">ENT_CRITTER</a></td>
+<td>35</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.GRAVITY">GRAVITY</a></td>
+<td>36</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.PLAYER_DAMAGE">PLAYER_DAMAGE</a></td>
+<td>37</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SOOT">SOOT</a></td>
+<td>38</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.TEXTURE_BACKLAYER_LUT">TEXTURE_BACKLAYER_LUT</a></td>
+<td>39</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.BACKLAYER_LIGHT_LEVEL">BACKLAYER_LIGHT_LEVEL</a></td>
+<td>40</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.LOOP">LOOP</a></td>
+<td>41</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.VAULT_LEVEL">VAULT_LEVEL</a></td>
+<td>42</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.THEME_FLAG">THEME_FLAG</a></td>
+<td>43</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.TEXTURE_DYNAMIC">TEXTURE_DYNAMIC</a></td>
+<td>44</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.PRE_TRANSITION">PRE_TRANSITION</a></td>
+<td>45</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.EXIT_ROOM_Y_LEVEL">EXIT_ROOM_Y_LEVEL</a></td>
+<td>46</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SHOP_CHANCE">SHOP_CHANCE</a></td>
+<td>47</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_DECORATION">SPAWN_DECORATION</a></td>
+<td>48</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_DECORATION2">SPAWN_DECORATION2</a></td>
+<td>49</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.SPAWN_EXTRA">SPAWN_EXTRA</a></td>
+<td>50</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE.DO_PROCEDURAL_SPAWN">DO_PROCEDURAL_SPAWN</a></td>
+<td>51</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='THEME_OVERRIDE-2'>THEME_OVERRIDE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=THEME_OVERRIDE">THEME_OVERRIDE</a></p>
+</blockquote>
 
 <table><thead>
 <tr>
