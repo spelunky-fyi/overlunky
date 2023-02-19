@@ -107,6 +107,7 @@ api_files = [
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",
+    "../src/game_api/script/usertypes/theme_vtable_lua.hpp",
 ]
 rpc = []
 classes = []
@@ -150,7 +151,7 @@ def get_cb_signature(text):
     signature_ms = reSignature.findall(text)
     if not signature_ms:
         return None
-    
+
     cb_signatures = {}
     for m in signature_ms:
         cb_signatures[m[1]] = cb_signature_dict(m[0], m[2])
