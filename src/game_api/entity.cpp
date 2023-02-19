@@ -203,7 +203,7 @@ void Movable::broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, ui
     damage(damage_dealer_uid, damage_amount, stun_time, velocity_x, velocity_y, 80);
 }
 
-void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint8_t iframes)
+void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint16_t iframes)
 {
     if ((flags & (1 << 28)) > 0)
     {
@@ -216,8 +216,9 @@ void Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t 
         return;
     }
 
-    Vec2 velocities = {velocity_x, velocity_y};
-    on_regular_damage(dealer, damage_amount, 0x1000, &velocities, 0, stun_time, iframes);
+    float velocities[] = {velocity_x, velocity_y};
+    float unknown[] = {0.0f, 0.0f};
+    on_regular_damage(dealer, damage_amount, 0x1000, velocities, unknown, stun_time, iframes);
 }
 
 bool Movable::is_button_pressed(BUTTON button)

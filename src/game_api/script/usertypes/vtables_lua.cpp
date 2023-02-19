@@ -1,11 +1,8 @@
 #include "entity_lua.hpp"
 
-#include "entities_items.hpp"  // for Container
-#include "entity.hpp"          // for Entity
-#include "hookable_vtable.hpp" // for HookableVTable
-
-// #pragma optimize("", off) // fix some wierd bug, should be followed up by turning it back on later, but that makes it not work, i don't know
-
+#include "entities_items.hpp"                      // for Container
+#include "entity.hpp"                              // for Entity
+#include "hookable_vtable.hpp"                     // for HookableVTable
 #include "movable.hpp"                             // for Movable
 #include "render_api.hpp"                          // for RenderInfo
 #include "script/usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
@@ -32,7 +29,7 @@ void register_usertypes(sol::state& lua)
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"damage", 0x30, void(Entity*, int8_t, uint32_t, Vec2*, uint8_t, uint16_t, uint8_t)>>;
+        VTableEntry<"damage", 0x30, void(Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t)>>;
     static MovableVTable movable_vtable(lua, lua["Movable"], "ENTITY_OVERRIDE");
 
     using FloorVTable = HookableVTable<
