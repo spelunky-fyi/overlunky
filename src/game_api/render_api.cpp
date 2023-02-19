@@ -99,8 +99,7 @@ void render_hud(size_t hud_data, float y, float opacity, size_t hud_data2)
 {
     // hud_data and hud_data2 are the same pointer, but the second one is actually used (displays garbage if not passed)
 
-    // auto inv_opacity = (float*)(hud_data + 0x94c);
-    // DEBUG("{} {} {} {}", y, opacity, *inv_opacity, (void*)hud_data);
+    // DEBUG("{} {}", (void*)hud_data, (void*)(hud_data - Memory::get().at_exe(0)));
     Hud hud{y, opacity, (HudData*)hud_data};
     if (trigger_vanilla_render_hud_callbacks(ON::RENDER_PRE_HUD, &hud))
         return;

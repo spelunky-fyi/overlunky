@@ -346,7 +346,26 @@ struct HudInventory
     uint8_t health;
     uint8_t bombs;
     uint8_t ropes;
-    uint8_t skip[176 - 4]; // TODO: individual item icon bools in some stupid order
+
+    uint8_t b00;
+    bool ankh;
+    bool kapala;
+    uint8_t b03;
+
+    uint32_t u03;
+
+    uint32_t kapala_blood; // don't know type
+
+    uint32_t u0c;
+
+    bool poison;
+    bool curse;
+    bool elixir;
+    uint8_t b13;
+
+    uint8_t skip[176 - 6 * 4 - 4]; // TODO: individual item icons and hats
+    /// Amount of generic pickup items at the bottom. Set to 0 to not draw them.
+    uint32_t item_count;
 };
 static_assert(sizeof(HudInventory) == 176);
 

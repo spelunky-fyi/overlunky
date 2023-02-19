@@ -437,6 +437,13 @@ void register_usertypes(sol::state& lua)
     hudinventory_type["health"] = &HudInventory::health;
     hudinventory_type["bombs"] = &HudInventory::bombs;
     hudinventory_type["ropes"] = &HudInventory::ropes;
+    hudinventory_type["ankh"] = &HudInventory::ankh;
+    hudinventory_type["kapala"] = &HudInventory::kapala;
+    hudinventory_type["kapala_blood"] = &HudInventory::kapala_blood;
+    hudinventory_type["poison"] = &HudInventory::poison;
+    hudinventory_type["curse"] = &HudInventory::curse;
+    hudinventory_type["elixir"] = &HudInventory::elixir;
+    hudinventory_type["item_count"] = &HudInventory::item_count;
 
     auto hudpart_type = lua.new_usertype<HudPart>("HudPart");
     hudpart_type["dim"] = &HudPart::dim;
@@ -472,5 +479,7 @@ void register_usertypes(sol::state& lua)
     hud_type["y"] = &Hud::y;
     hud_type["opacity"] = &Hud::opacity;
     hud_type["data"] = &Hud::data;
+
+    // TODO: maybe add a getter for HudData outside render_hud, I think it's always at 0x22e18020
 };
 } // namespace NVanillaRender
