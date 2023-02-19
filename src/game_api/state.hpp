@@ -290,6 +290,9 @@ struct State
 
     static void set_write_load_opt(bool allow);
 
+    static void init();
+    static void post_init();
+
     static State& get();
 
     // Returns the main-thread version of StateMemory*

@@ -9,25 +9,28 @@
 #include <string>      // for allocator, operator""sv, operator""s
 #include <type_traits> // for move
 
-#include "entities_chars.hpp"    // for Player
-#include "entity.hpp"            // for to_id, Entity, HookWithId, EntityDB
-#include "entity_hooks_info.hpp" // for Player
-#include "game_manager.hpp"      // for get_game_manager, GameManager, SaveR...
-#include "items.hpp"             // for Items, SelectPlayerSlot
-#include "level_api.hpp"         // for LevelGenSystem, LevelGenSystem::(ano...
-#include "logger.h"              // for DEBUG
-#include "memory.hpp"            // for write_mem_prot, memory_read
-#include "movable.hpp"           // for Movable
-#include "movable_behavior.hpp"  // for init_behavior_hooks
-#include "render_api.hpp"        // for init_render_api_hooks
-#include "savedata.hpp"          // for SaveData
-#include "script/events.hpp"     // for pre_entity_instagib
-#include "search.hpp"            // for get_address
-#include "spawn_api.hpp"         // for init_spawn_hooks
-#include "steam_api.hpp"
-#include "strings.hpp"       // for strings_init
-#include "thread_utils.hpp"  // for OnHeapPointer
-#include "virtual_table.hpp" // for get_virtual_function_address, VTABLE...
+#include "entities_chars.hpp"                    // for Player
+#include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
+#include "entity_hooks_info.hpp"                 // for Player
+#include "game_manager.hpp"                      // for get_game_manager, GameManager, SaveR...
+#include "items.hpp"                             // for Items, SelectPlayerSlot
+#include "level_api.hpp"                         // for LevelGenSystem, LevelGenSystem::(ano...
+#include "logger.h"                              // for DEBUG
+#include "memory.hpp"                            // for write_mem_prot, memory_read
+#include "movable.hpp"                           // for Movable
+#include "movable_behavior.hpp"                  // for init_behavior_hooks
+#include "render_api.hpp"                        // for init_render_api_hooks
+#include "savedata.hpp"                          // for SaveData
+#include "script/events.hpp"                     // for pre_entity_instagib
+#include "script/lua_vm.hpp"                     // for get_lua_vm
+#include "script/usertypes/theme_vtable_lua.hpp" // for NThemeVTables
+#include "search.hpp"                            // for get_address
+#include "spawn_api.hpp"                         // for init_spawn_hooks
+#include "steam_api.hpp"                         // for init_achievement_hooks
+#include "strings.hpp"                           // for strings_init
+#include "thread_utils.hpp"                      // for OnHeapPointer
+#include "virtual_table.hpp"                     // for get_virtual_function_address, VTABLE...
+#include "vtable_hook.hpp"                       // for hook_vtable
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -201,14 +204,60 @@ void hook_godmode_functions()
 
 void State::godmode(bool g)
 {
-    // hook_godmode_functions();
     g_godmode_player_active = g;
 }
 
 void State::godmode_companions(bool g)
 {
-    // hook_godmode_functions();
     g_godmode_companions_active = g;
+}
+
+struct ThemeHookImpl
+{
+    template <class FunT, class HookFunT>
+    struct lua_wrapper;
+    template <class... ArgsT, class HookFunT>
+    struct lua_wrapper<void(ArgsT...), HookFunT>
+    {
+        static auto make(HookFunT* fun)
+        {
+            return [=](ArgsT... args)
+            {
+                thread_local bool tester;
+                tester = true;
+                fun(args..., [](ArgsT...)
+                    { tester = false; });
+                return tester;
+            };
+        }
+    };
+
+    template <class FunT, size_t Index, class HookFunT>
+    void hook(ThemeInfo* theme, HookFunT* fun)
+    {
+        if (get_do_hooks())
+        {
+            auto& vtable = NThemeVTables::get_theme_info_vtable(get_lua_vm());
+            vtable.set_pre<FunT, Index>(theme, vtable.reserve_callback_id(theme), lua_wrapper<FunT, HookFunT>::make(fun));
+        }
+        else
+        {
+            hook_vtable<FunT, Index>(theme, fun);
+        }
+    }
+};
+
+void State::init()
+{
+    State::get();
+}
+void State::post_init()
+{
+    if (get_is_init())
+    {
+        StateMemory& state{*State::get().ptr_main()};
+        state.level_gen->hook_themes(ThemeHookImpl{});
+    }
 }
 
 State& State::get()
@@ -223,8 +272,7 @@ State& State::get()
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
 
-        const bool do_hooks = get_do_hooks();
-        if (do_hooks)
+        if (get_do_hooks())
         {
             STATE.ptr_main()->level_gen->init();
             init_spawn_hooks();

@@ -107,6 +107,7 @@ api_files = [
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",
+    "../src/game_api/script/usertypes/theme_vtable_lua.hpp",
 ]
 rpc = []
 classes = []
@@ -136,6 +137,25 @@ not_functions = [
 replace_fun = None
 
 reConstructorFix = re.compile(r"const (\w+)(?: \w+)?(&&|&)?")
+reSignature = re.compile(r"(?:\bsignature\b.*is|function) `?([\S]*) (\w*?)\((.*?)\)")
+
+
+def cb_signature_dict(ret, param):
+    return {
+        "return": ret,
+        "param": param,
+    }
+
+
+def get_cb_signature(text):
+    signature_ms = reSignature.findall(text)
+    if not signature_ms:
+        return None
+
+    cb_signatures = {}
+    for m in signature_ms:
+        cb_signatures[m[1]] = cb_signature_dict(m[0], m[2])
+    return cb_signatures
 
 
 def camel_case_to_snake_case(name):
@@ -401,6 +421,9 @@ def run_parse():
                                         [p.strip() for p in af["param"].split(",")[1:]]
                                     ),
                                     "comment": af["comment"],
+                                    "cb_signature": af["cb_signature"]
+                                    if "cb_signature" in af
+                                    else None,
                                 }
                             )
                     else:
@@ -430,10 +453,14 @@ def run_parse():
                 m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', line)
                 if m and not m.group(1).startswith("__"):
                     if not getfunc(m.group(1)):
+                        cb_signature = (
+                            get_cb_signature(" ".join(comment)) if comment else None
+                        )
                         func = {
                             "name": m.group(1),
                             "cpp": m.group(2),
                             "comment": comment,
+                            "cb_signature": cb_signature,
                         }
                         if not comment or "NoDoc" not in comment[0]:
                             if comment and comment[0] == "Deprecated":
@@ -636,6 +663,11 @@ def run_parse():
                         ret = fun["return"] or "nil"
                         param = fun["param"]
                         sig = f"{ret} {var_name}({param})"
+                        cb_signature = (
+                            get_cb_signature(" ".join(fun["comment"]))
+                            if fun["comment"]
+                            else None
+                        )
 
                         vars.append(
                             {
@@ -644,6 +676,7 @@ def run_parse():
                                 "signature": sig,
                                 "comment": fun["comment"],
                                 "function": True,
+                                "cb_signature": cb_signature,
                             }
                         )
                 else:
@@ -734,20 +767,20 @@ def run_parse():
                             ret = fun["return"]
                             ret = f"optional<{ret}>" if ret else "bool"
                             ret = ret if entry_name != "dtor" else "nil"
-                            param = fun["param"].strip()
-                            param = f"{name} self, {param}" if param else f"{name} self"
+                            args = fun["param"].strip()
+                            args = f"{name} self, {args}" if args else f"{name} self"
                             binds = entry["binds"]
                             if binds:
-                                param = f"{param}, {binds}"
-                            pre_signature = f"{ret} {entry_name}({param})"
-                            post_signature = f"nil {entry_name}({param})"
+                                args = f"{args}, {binds}"
+                            pre_signature = f"{ret} {entry_name}({args})"
+                            post_signature = f"nil {entry_name}({args})"
                             cpp_comment = fun["comment"]
                             if cpp_comment:
                                 cpp_comment = ["Virtual function docs:"] + cpp_comment
                             break
                     else:
                         ret = entry["ret"]
-                        ret = f"optional<{ret}>" if ret != "nil" else "bool"
+                        ret = f"optional<{ret}>" if ret else "bool"
                         ret = ret if entry_name != "dtor" else "nil"
                         args = " ".join(entry["args"])
                         args = f"{name} self, {args}" if args else f"{name} self"
@@ -764,6 +797,7 @@ def run_parse():
                             ]
                             + cpp_comment,
                             "function": True,
+                            "cb_signature": {"fun": cb_signature_dict(ret, args)},
                         }
                     )
                     vars.append(
@@ -776,6 +810,7 @@ def run_parse():
                             ]
                             + cpp_comment,
                             "function": True,
+                            "cb_signature": {"fun": cb_signature_dict(ret, args)},
                         }
                     )
 

@@ -235,8 +235,9 @@ void register_usertypes(sol::state& lua)
     */
 
     auto damage = sol::overload(
-        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
-        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint16_t)>(&Movable::damage));
+        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
+        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint8_t)>(&Movable::damage),
+        &Movable::on_damage);
     auto light_on_fire = sol::overload(
         static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
@@ -409,6 +410,60 @@ void register_usertypes(sol::state& lua)
     // Short for (MASK.WATER &#124; MASK.LAVA)
     // ANY
     // Value of 0, treated by all the functions as ANY mask
+    */
+
+    /// 16bit bitmask used in Movable::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
+    lua.create_named_table(
+        "DAMAGE_TYPE",
+        "GENERIC",
+        0x1,
+        "WHIP",
+        0x2,
+        "THROW",
+        0x4,
+        "ARROW",
+        0x8,
+        "SWORD",
+        0x10,
+        "FIRE",
+        0x20,
+        "POISON",
+        0x40,
+        "POISON_TICK",
+        0x80,
+        "CURSE",
+        0x100,
+        "FALL",
+        0x200,
+        "LASER",
+        0x400,
+        "ICE_BREAK",
+        0x800,
+        "STOMP",
+        0x1000,
+        "EXPLOSION",
+        0x2000,
+        "VOODOO",
+        0x4000);
+    /* DAMAGE_TYPE
+    // GENERIC
+    // enemy contact, rope hit, spikes(-1 damage), anubisshot, forcefield, dagger shot, spear trap...
+    // THROW
+    // rock, bullet, monkey, yeti
+    // FIRE
+    // fire, fireball, lava
+    // POISON
+    // applies the status effect, not damage
+    // POISON_TICK
+    // actual damage from being poisoned for a while
+    // CURSE
+    // witchskull, catmummy directly, but not cloud
+    // LASER
+    // laser trap, ufo, not dagger
+    // ICE_BREAK
+    // damage or fall when frozen
+    // EXPLOSION
+    // also from lava
     */
 }
 }; // namespace NEntity
