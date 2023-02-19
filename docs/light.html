@@ -3286,6 +3286,9 @@
                     <a href="#COSUBTHEME" class="toc-h2 toc-link" data-title="COSUBTHEME">COSUBTHEME</a>
                   </li>
                   <li>
+                    <a href="#DAMAGE_TYPE" class="toc-h2 toc-link" data-title="DAMAGE_TYPE">DAMAGE_TYPE</a>
+                  </li>
+                  <li>
                     <a href="#DRAW_LAYER" class="toc-h2 toc-link" data-title="DRAW_LAYER">DRAW_LAYER</a>
                   </li>
                   <li>
@@ -24111,9 +24114,9 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td>nil</td>
+<td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=damage">damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</a></td>
-<td>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities</td>
+<td>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 <tr>
 <td>array&lt;int&gt;</td>
@@ -24198,12 +24201,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_damage">set_pre_damage(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_damage">set_post_damage(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 </tbody></table>
 <h3 id='MovingIcon'>MovingIcon</h3>
@@ -26196,6 +26199,96 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=COSUBTHEME.SUNKEN_CITY">SUNKEN_CITY</a></td>
 <td>7</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='DAMAGE_TYPE'>DAMAGE_TYPE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE">DAMAGE_TYPE</a></p>
+</blockquote>
+
+<p>16bit bitmask used in <a href="#Movable">Movable</a>::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.</p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.GENERIC">GENERIC</a></td>
+<td>0x1</td>
+<td>enemy contact, rope hit, spikes(-1 damage), anubisshot, forcefield, dagger shot, spear trap...<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.WHIP">WHIP</a></td>
+<td>0x2</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.THROW">THROW</a></td>
+<td>0x4</td>
+<td>rock, bullet, monkey, yeti<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.ARROW">ARROW</a></td>
+<td>0x8</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.SWORD">SWORD</a></td>
+<td>0x10</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.FIRE">FIRE</a></td>
+<td>0x20</td>
+<td>fire, fireball, lava<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.POISON">POISON</a></td>
+<td>0x40</td>
+<td>applies the status effect, not damage<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.POISON_TICK">POISON_TICK</a></td>
+<td>0x80</td>
+<td>actual damage from being poisoned for a while<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.CURSE">CURSE</a></td>
+<td>0x100</td>
+<td>witchskull, catmummy directly, but not cloud<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.FALL">FALL</a></td>
+<td>0x200</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.LASER">LASER</a></td>
+<td>0x400</td>
+<td>laser trap, ufo, not dagger<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.ICE_BREAK">ICE_BREAK</a></td>
+<td>0x800</td>
+<td>damage or fall when frozen<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.STOMP">STOMP</a></td>
+<td>0x1000</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.EXPLOSION">EXPLOSION</a></td>
+<td>0x2000</td>
+<td>also from lava<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE.VOODOO">VOODOO</a></td>
+<td>0x4000</td>
 <td></td>
 </tr>
 </tbody></table>

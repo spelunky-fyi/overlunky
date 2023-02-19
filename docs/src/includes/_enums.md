@@ -124,6 +124,31 @@ Name | Data | Description
 [NEO_BABYLON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NEO_BABYLON) | 6 | 
 [SUNKEN_CITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKEN_CITY) | 7 | 
 
+## DAMAGE_TYPE
+
+
+> Search script examples for [DAMAGE_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE)
+
+16bit bitmask used in [Movable](#Movable)::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
+
+Name | Data | Description
+---- | ---- | -----------
+[GENERIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.GENERIC) | 0x1 | enemy contact, rope hit, spikes(-1 damage), anubisshot, forcefield, dagger shot, spear trap...<br/>
+[WHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.WHIP) | 0x2 | 
+[THROW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.THROW) | 0x4 | rock, bullet, monkey, yeti<br/>
+[ARROW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.ARROW) | 0x8 | 
+[SWORD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.SWORD) | 0x10 | 
+[FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.FIRE) | 0x20 | fire, fireball, lava<br/>
+[POISON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.POISON) | 0x40 | applies the status effect, not damage<br/>
+[POISON_TICK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.POISON_TICK) | 0x80 | actual damage from being poisoned for a while<br/>
+[CURSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.CURSE) | 0x100 | witchskull, catmummy directly, but not cloud<br/>
+[FALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.FALL) | 0x200 | 
+[LASER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.LASER) | 0x400 | laser trap, ufo, not dagger<br/>
+[ICE_BREAK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.ICE_BREAK) | 0x800 | damage or fall when frozen<br/>
+[STOMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.STOMP) | 0x1000 | 
+[EXPLOSION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.EXPLOSION) | 0x2000 | also from lava<br/>
+[VOODOO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.VOODOO) | 0x4000 | 
+
 ## DRAW_LAYER
 
 
