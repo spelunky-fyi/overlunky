@@ -59,6 +59,27 @@ void register_usertypes(sol::state& lua)
     /// Determines what class of prng is used, which in turn determines which parts of the game's future prng is affected. See more info at [PRNG](#PRNG)
     /// For example when choosing `PRNG_CLASS.PROCEDURAL_SPAWNS` to generate a random number, random Tiamat spawns will not be affected.
     /// Any integer in the range [0, 9] is a valid class, some are however not documented because of missing information.
-    lua.create_named_table("PRNG_CLASS", "PROCEDURAL_SPAWNS", PRNG::PROCEDURAL_SPAWNS, "PARTICLES", PRNG::PARTICLES, "ENTITY_VARIATION", PRNG::ENTITY_VARIATION, "EXTRA_SPAWNS", PRNG::EXTRA_SPAWNS, "LEVEL_DECO", PRNG::LEVEL_DECO);
+    lua.create_named_table("PRNG_CLASS", "PROCEDURAL_SPAWNS", PRNG::PROCEDURAL_SPAWNS, "PARTICLES", PRNG::PARTICLES, "ENTITY_VARIATION", PRNG::ENTITY_VARIATION, "EXTRA_SPAWNS", PRNG::EXTRA_SPAWNS, "LEVEL_DECO", PRNG::LEVEL_DECO, "LIQUID", PRNG::LIQUID, "AI", PRNG::EXTRA_SPAWNS, "LEVEL_GEN", PRNG::PROCEDURAL_SPAWNS, "FX", PRNG::FX, "CHAR_AI", PRNG::CHAR_AI);
+
+    /* PRNG_CLASS
+    // PROCEDURAL_SPAWNS
+    // Anything level gen related really, including but not limited to path, room and enemy placement.
+    // LEVEL_GEN
+    // Anything level gen related really, including but not limited to path, room and enemy placement.
+    // PARTICLES
+    // Direction and angle of torch flames etc, but also includes other things not related to particles at all...
+    // ENTITY_VARIATION
+    // Some entities that have many texture to choose from on spawn
+    // FX
+    // Some effects, like water splashes, background stars and teleport shadow
+    // LIQUID
+    // Liquid movement
+    // LEVEL_DECO
+    // I have no idea what this name means, cause this seems to advance every 3 or so frames even with zero entities in a level
+    // AI
+    // Monster AI decisions
+    // CHAR_AI
+    // Character AI decisions
+    */
 }
 } // namespace NPRNG

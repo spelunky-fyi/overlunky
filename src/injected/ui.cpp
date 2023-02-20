@@ -5035,6 +5035,13 @@ void render_options()
         tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
         ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
         tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
+        static bool void_mode = false;
+        if (ImGui::Checkbox("Void playground mode", &void_mode))
+        {
+            g_ui_scripts["void"]->set_enabled(void_mode);
+            g_state->quest_flags = 1;
+            g_state->loading = 1;
+        }
         endmenu();
     }
 
@@ -7689,6 +7696,27 @@ void imgui_init(ImGuiContext*)
             g_Console.get(),
             false);
         g_ui_scripts["light"] = std::unique_ptr<SpelunkyScript>(script);
+    }
+    if (g_ui_scripts.find("void") == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            R"(for t=THEME.DWELLING,THEME.EGGPLANT_WORLD do
+    for i=1,20 do state.level_gen.themes[t]:set_pre_virtual(i, function() return true end) end
+    for i=48,51 do state.level_gen.themes[t]:set_pre_virtual(i, function() return true end) end
+    state.level_gen.themes[t]:set_pre_virtual(THEME_OVERRIDE.SPAWN_EFFECTS, function() return true end)
+    state.level_gen.themes[t]:set_pre_virtual(THEME_OVERRIDE.SHOP_CHANCE, function() return 0 end)
+    state.level_gen.themes[t]:set_pre_spawn_players(function()
+        state.level_gen.spawn_x, state.level_gen.spawn_y = math.floor(state.width*10/2+2), 123
+        spawn_grid_entity(ENT_TYPE.FLOOR_DOOR_PLATFORM, state.level_gen.spawn_x, state.level_gen.spawn_y-1, LAYER.FRONT)
+        spawn_player(1, state.level_gen.spawn_x, state.level_gen.spawn_y)
+        return true
+    end)
+end)",
+            "void",
+            g_SoundManager.get(),
+            g_Console.get(),
+            false);
+        g_ui_scripts["void"] = std::unique_ptr<SpelunkyScript>(script);
     }
 }
 
