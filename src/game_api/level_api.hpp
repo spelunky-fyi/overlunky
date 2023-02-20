@@ -119,7 +119,7 @@ struct LevelGenData
 
     union
     {
-        uint32_t level_config[18];
+        std::array<uint32_t, 18> level_config;
         struct
         {
             uint32_t back_room_chance;
