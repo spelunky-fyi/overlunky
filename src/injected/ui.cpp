@@ -4317,7 +4317,7 @@ void render_clickhandler()
             }
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
-            ImGui::PopStyleVar(ImGuiStyleVar_WindowPadding);
+            ImGui::PopStyleVar();
         }
     }
 
