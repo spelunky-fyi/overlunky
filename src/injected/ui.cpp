@@ -1635,6 +1635,12 @@ void toggle_noclip()
             player->type->max_speed = 0.0725f;
         }
     }
+    if (!options["noclip"] && g_state->items->player_select_slots[0].activated)
+    {
+        auto type = get_type(g_state->items->player_select_slots[0].character);
+        if (type)
+            type->max_speed = 0.0725f;
+    }
 }
 
 bool should_speedhack()
