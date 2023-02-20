@@ -7836,7 +7836,7 @@ void imgui_draw()
     render_clickhandler();
     if (options["draw_hud"])
         render_prohud();
-    if (options["draw_script_messages"])
+    if (options["draw_script_messages"] && !g_Console->is_toggled())
         render_messages();
 
     focused_tool = "";
