@@ -1245,6 +1245,7 @@ std::string spawned_type()
 
 int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
 {
+    bool flip = g_vx < -0.04f;
     std::pair<float, float> cpos = UI::click_position(g_x, g_y);
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
@@ -1252,6 +1253,11 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
         if (!lock_entity && set_last)
             g_last_id = spawned;
         return spawned;
+    }
+    else if (to_spawn.name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+    {
+        if (!g_players.empty())
+            g_players.at(0)->give_powerup(to_spawn.id);
     }
     else if (to_spawn.name == "ENT_TYPE_ITEM_PLAYERGHOST")
     {
@@ -1291,6 +1297,13 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
         {
             if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
             {
+                if (flip && (to_spawn.name.find("ARROW_TRAP") != std::string::npos || to_spawn.name.find("LASER_TRAP") != std::string::npos || to_spawn.name.find("HORIZONTAL") != std::string::npos))
+                {
+                    floor->flags |= (1U << 16);
+                    for (auto trig : floor->items.entities())
+                        trig->flags |= (1U << 16);
+                }
+
                 if (floor->get_decoration_entity_type() != -1)
                 {
                     floor->fix_decorations(true, false);
@@ -1303,6 +1316,12 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                                }};
                 callbacks.push_back(cb);
             }
+        }
+        else if (flip)
+        {
+            auto ent = get_entity_ptr(spawned);
+            if (ent)
+                ent->flags |= (1U << 16);
         }
         if (!lock_entity && set_last)
             g_last_id = spawned;
@@ -1425,19 +1444,24 @@ void spawn_entity_over()
     {
         if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
             return;
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
-        {
-            int spawned = UI::spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
-            if (!lock_entity)
-                g_last_id = spawned;
-        }
-        else
+        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") != std::string::npos)
         {
             auto cpos = UI::click_position(g_x, g_y);
             auto mpos = normalize(mouse_pos());
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
             UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+        }
+        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+        {
+            auto who = get_entity_ptr(g_over_id)->as<PowerupCapable>();
+            who->give_powerup(g_items[g_filtered_items[g_current_item]].id);
+        }
+        else
+        {
+            int spawned = UI::spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
+            if (!lock_entity)
+                g_last_id = spawned;
         }
     }
 }
@@ -2483,8 +2507,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("toggle_void", wParam))
     {
         g_ui_scripts["void"]->set_enabled(!g_ui_scripts["void"]->is_enabled());
-        g_state->quest_flags = 1;
-        g_state->loading = 1;
+        if (g_ui_scripts["void"]->is_enabled())
+        {
+            g_state->quest_flags = 1;
+            g_state->loading = 1;
+        }
     }
     else if (pressed("spawn_layer_door", wParam))
     {
