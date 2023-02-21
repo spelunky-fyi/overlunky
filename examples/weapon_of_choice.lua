@@ -1,10 +1,8 @@
 meta = {
-    name = 'Weapon Of Choice',
+    name = 'Weapon of Choice',
     description = [[Replace your whip with anything, but that is the only weapon you can swing, shoot or throw, besides bombs and ropes. Unless you choose bombs or ropes, then that's the only thing you can use.
 
-Your weapon won't take damage and won't damage you. You can pick up your weapon and can carry it through all doors. Don't lose your weapon or you're screwed, unless you find a new one!
-
-There are a few completely useless items in case you want to do some 'carry a useless item' challenge.]],
+Your weapon won't take damage and won't damage you. You can pick up the weapon and carry it through all doors. Don't lose your only weapon or you're screwed!]],
     version = '1.0',
     author = 'Dregu'
 }
@@ -30,7 +28,6 @@ weapons = {
     'MONS_SHOPKEEPER',
     'MONS_MERCHANT',
     'MONS_YANG',
-    'MONS_MARLA_TUNNEL',
     'MONS_SISTER_PARSLEY',
     'MONS_SISTER_PARSNIP',
     'MONS_SISTER_PARMESAN',
@@ -97,15 +94,37 @@ weapons = {
     'MOUNT_QILIN'
 }
 
-weapon_options = table.concat(weapons, '\0') .. '\0\0'
+function short_name(name)
+    name = name:gsub('ITEM_', '')
+    name = name:gsub('MONS_', '')
+    name = name:gsub('MOUNT_', '')
+    name = name:gsub('SISTER_', '')
+    name = name:gsub('PET_', '')
+    name = name:gsub('_NAKED', '')
+    name = name:gsub('MADAME', '')
+    name = name:gsub('LOCKEDCHEST_KEY', 'GOLD KEY')
+    name = name:gsub('HUNDUNS_SERVANT', 'BEG')
+    name = name:gsub('MERCHANT', 'TUN')
+    name = name:gsub('_', ' ')
+    return name
+end
+
+weapons_short = {}
+for i,v in pairs(weapons) do
+    weapons_short[#weapons_short+1] = short_name(v)
+end
+
+weapon_options = table.concat(weapons_short, '\0') .. '\0\0'
 
 register_option_combo('aweapon', 'Weapon of Choice', weapon_options, 1)
-register_option_bool('shiny', 'Shiny weapon', 'They even glow in the dark, harder to lose!', true)
-register_option_bool('corpse', 'Dead weapon', 'Your weapon will be a dead monster when applicaple, instead of stunned.', false)
-register_option_bool('switch', 'Switch weapon', 'Allow switching weapons by carrying something else to the exit.', false)
-register_option_bool('brandom', 'Random weapon per run', 'Get a different random weapon every run!', false)
-register_option_bool('brandom2', 'Random weapon per level', 'Get a different random weapon every level!', false)
-register_option_bool('unbreak', 'Unbreakable weapon', 'Your weapon won\'t get damaged by most things.', true)
+register_option_bool('shiny', 'Shiny weapon', '- They even glow in the dark, harder to lose!', true)
+register_option_bool('corpse', 'Dead weapon', '- Your weapon will be a dead monster when applicaple, instead of stunned.', false)
+register_option_bool('switch', 'Switch weapon', ' - Allow switching weapons by carrying something else to the exit.', false)
+register_option_bool('brandom', 'Random weapon per run', '- Get a different random weapon every run!', false)
+register_option_bool('brandom2', 'Random weapon per level', '- Get a different random weapon every level!', false)
+register_option_bool('unbreak', 'Unbreakable weapon', '- Your weapon won\'t get damaged by most things.', true)
+register_option_bool('nobombs', 'No cheating!', '- Disable bombs and ropes for extra challenge!', false)
+register_option_bool('respawn', 'Respawn lost weapon', '- Gives you a new one in the next level.', false)
 
 WEAPON = ENT_TYPE.MONS_FISH
 WEAPON_UID = -1
@@ -114,12 +133,19 @@ function get_ushabti_frame()
     return prng:random_int(0, 9, PRNG_CLASS.LEVEL_DECO) + prng:random_int(0, 9, PRNG_CLASS.LEVEL_DECO) * 12
 end
 
+function show_toast()
+    local name = short_name(enum_get_name(ENT_TYPE, WEAPON))
+    toast('Your Weapon of Choice is '..name..'\nand it\'s the only one you get!')
+end
+
 set_callback(function()
-    if state.level_count == 0 or options.brandom2 then
+    if state.screen ~= SCREEN.LEVEL then return end
+    if state.level_count == 0 or options.brandom2 or options.respawn then
         if options.brandom or options.brandom2 then
             options.aweapon = prng:random_index(#weapons, PRNG_CLASS.LEVEL_DECO)
         end
         WEAPON = ENT_TYPE[weapons[options.aweapon]]
+        show_toast()
         if WEAPON == ENT_TYPE.ITEM_PASTEBOMB then
             state.items.player_inventory[1].acquired_powerups[1] = ENT_TYPE.ITEM_POWERUP_PASTE
         end
@@ -261,6 +287,11 @@ set_callback(function()
             end
         end
     end
+    if state.screen == SCREEN.LEVEL and state.screen_next == SCREEN.TRANSITION then
+        if players[1] and players[1].holding_uid ~= -1 and get_entity(players[1].holding_uid).type.id == WEAPON and players[1].holding_uid ~= WEAPON_UID then
+            players[1]:drop(get_entity(players[1].holding_uid))
+        end
+    end
 end, ON.PRE_LOAD_SCREEN)
 
 set_callback(function()
@@ -275,5 +306,9 @@ set_callback(function()
     if WEAPON == ENT_TYPE.ITEM_ROPE then
         players[1].inventory.bombs = 0
         players[1].inventory.ropes = 99
+    end
+    if options.nobombs then
+        players[1].inventory.bombs = 0
+        players[1].inventory.ropes = 0
     end
 end, ON.PRE_UPDATE)
