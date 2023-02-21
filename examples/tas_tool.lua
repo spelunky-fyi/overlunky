@@ -451,7 +451,7 @@ set_callback(function()
     if load_prng then
         load_prng = false
         if rng[rerecord_level+1] ~= nil then
-            for i,v in ipairs(rng[rerecord_level+1]) do
+            for i,v in pairs(rng[rerecord_level+1]) do
                 prng:set_pair(i, v.a, v.b)
             end
         end
@@ -459,7 +459,7 @@ set_callback(function()
         if rng[state.level_count+1] == nil then
             rng[state.level_count+1] = {}
         end
-        for i=1,20 do
+        for i=0,9 do
             local a,b = prng:get_pair(i)
             rng[state.level_count+1][i] = { a=a, b=b }
         end

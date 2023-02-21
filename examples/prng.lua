@@ -23,14 +23,14 @@ set_callback(function(ctx)
         end
         for i=0,9 do
             ctx:win_separator()
-            local a, b = prng:get_pair(i+1)
+            local a, b = prng:get_pair(i)
             local name = table.concat(enum_get_names(PRNG_CLASS, i), ", ") or "???"
             t[i].a = ctx:win_input_text(F"{i}: {name}##A{i}", string.format("%016X", a))
             t[i].b = ctx:win_input_text(F"##B{i}", string.format("%016X", b))
             local na = tonumber(t[i].a, 16)
             local nb = tonumber(t[i].b, 16)
             if na ~= a or nb ~= b then
-                prng:set_pair(i+1, na, nb)
+                prng:set_pair(i, na, nb)
             end
         end
     end)
