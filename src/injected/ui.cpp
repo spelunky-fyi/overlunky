@@ -1917,6 +1917,15 @@ void warp_next_level(size_t num)
         uint8_t theme = 12;
         targets.emplace_back(world, level, theme);
     }
+
+    if (targets.empty())
+    {
+        target_world = g_state->world;
+        target_level = g_state->level + 1;
+        target_theme = g_state->theme;
+        targets.emplace_back(target_world, target_level, target_theme);
+    }
+
     if (num > targets.size() - 1 && targets.size() > 0)
     {
         num = targets.size() - 1;
@@ -3310,6 +3319,15 @@ void render_narnia()
                 warp_inc(target_world, target_level, target_theme);
             }
             n++;
+        }
+        if (n == 0)
+        {
+            target_world = g_state->world;
+            target_level = g_state->level + 1;
+            target_theme = g_state->theme;
+            std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
+            if (ImGui::Button(buf.c_str()))
+                warp_inc(target_world, target_level, target_theme);
         }
     }
     else
@@ -7770,59 +7788,74 @@ void imgui_init(ImGuiContext*)
     {
         SpelunkyScript* script = new SpelunkyScript(
             R"(
-local qflags = {2,3,5,17,18,19,25,26,27}
-for t=THEME.DWELLING,THEME.HUNDUN do
-    state.level_gen.themes[t]:set_pre_virtual(1, function()
-        for i=LEVEL_CONFIG.BACK_ROOM_CHANCE,LEVEL_CONFIG.MACHINE_REWARDROOM_CHANCE do
-            set_level_config(i, 0)
+qflags = {2,3,5,17,18,19,25,26,27}
+disable_virts = {2,3,4,5,6,7,8,9,10,11,12,15,16,17,18,19,20}
+hooks = {}
+function add_hook(t, cb)
+    hooks[#hooks+1] = {t=t, cb=cb}
+end
+function clear_hooks()
+    for i,h in pairs(hooks) do
+        state.level_gen.themes[h.t]:clear_virtual(h.cb)
+    end
+    hooks = {}
+end
+function init_hooks()
+    clear_hooks()
+    for t=THEME.DWELLING,THEME.HUNDUN do
+        for i,v in pairs(disable_virts) do
+            add_hook(t, state.level_gen.themes[t]:set_pre_virtual(v, function() return true end))
         end
-        state.current_theme.allow_beehive = false
-        state.current_theme.allow_leprechaun = false
-        for i,v in pairs(qflags) do
-            state.quest_flags = set_flag(state.quest_flags, v)
-        end
-        state.quests.yang_state = 7
-        state.quests.jungle_sisters_flags = 63
-        state.quests.van_horsing_state = 7
-        state.quests.sparrow_state = 8
-        state.quests.madame_tusk_state = 3
-        return true
-    end)
-    for i=2,13 do state.level_gen.themes[t]:set_pre_virtual(i, function() return true end) end
-    for i=15,20 do state.level_gen.themes[t]:set_pre_virtual(i, function() return true end) end
-    for i=48,51 do state.level_gen.themes[t]:set_pre_virtual(i, function() return true end) end
-    state.level_gen.themes[t]:set_pre_virtual(THEME_OVERRIDE.SPAWN_EFFECTS, function()
-        if state.current_theme:get_loop() then
-            state.camera.bounds_left = -math.huge
-            state.camera.bounds_right = math.huge
-            state.camera.bounds_top = math.huge
-            state.camera.bounds_bottom = -math.huge
-        else
-            state.camera.bounds_left = 0.5
-            state.camera.bounds_right = state.width * 10.0 + 4.5
-            state.camera.bounds_top = 124.5
-            state.camera.bounds_bottom = 120.5 - state.height * 8.0
-        end
-        return true
-    end)
-    state.level_gen.themes[t]:set_pre_spawn_players(function(theme)
-        theme:spawn_border()
-        --[[for i,v in pairs(get_entities_by({ENT_TYPE.FLOOR_BORDERTILE, ENT_TYPE.FLOOR_BORDERTILE_METAL, ENT_TYPE.FLOOR_BORDERTILE_OCTOPUS}, MASK.FLOOR, LAYER.BOTH)) do
-            local e = get_entity(v)
-            if e then
-                e:fix_border_tile_animation()
-                e:fix_decorations(false, false)
+        add_hook(t, state.level_gen.themes[t]:set_pre_reset_theme_flags(function()
+            for i=LEVEL_CONFIG.BACK_ROOM_CHANCE,LEVEL_CONFIG.MACHINE_REWARDROOM_CHANCE do
+                set_level_config(i, 0)
             end
-        end]]
-        local ax, ay, bx, by = get_bounds()
-        state.level_gen.spawn_x, state.level_gen.spawn_y = math.floor(state.width*10/2+2), by+0.5
-        if state.theme == THEME.OLMEC then
-            if state.width == 1 then state.level_gen.spawn_x = 4 end
-            spawn(ENT_TYPE.ACTIVEFLOOR_OLMEC, state.level_gen.spawn_x+5, by+2, LAYER.FRONT, 0, 0)
-        end
-        spawn(ENT_TYPE.LOGICAL_PLATFORM_SPAWNER, state.level_gen.spawn_x, state.level_gen.spawn_y-1, LAYER.FRONT, 0, 0)
-    end)
-end)",
+            state.current_theme.allow_beehive = false
+            state.current_theme.allow_leprechaun = false
+            for i,v in pairs(qflags) do
+                state.quest_flags = set_flag(state.quest_flags, v)
+            end
+            state.quests.yang_state = 7
+            state.quests.jungle_sisters_flags = 63
+            state.quests.van_horsing_state = 7
+            state.quests.sparrow_state = 8
+            state.quests.madame_tusk_state = 3
+            return true
+        end))
+        add_hook(t, state.level_gen.themes[t]:set_pre_spawn_effects(function()
+            if state.current_theme:get_loop() then
+                state.camera.bounds_left = -math.huge
+                state.camera.bounds_right = math.huge
+                state.camera.bounds_top = math.huge
+                state.camera.bounds_bottom = -math.huge
+            else
+                state.camera.bounds_left = 0.5
+                state.camera.bounds_right = state.width * 10.0 + 4.5
+                state.camera.bounds_top = 124.5
+                state.camera.bounds_bottom = 120.5 - state.height * 8.0
+            end
+            return true
+        end))
+        add_hook(t, state.level_gen.themes[t]:set_pre_spawn_level(function(theme)
+            theme:spawn_border()
+            return true
+        end))
+        add_hook(t, state.level_gen.themes[t]:set_pre_spawn_players(function()
+            local ax, ay, bx, by = get_bounds()
+            state.level_gen.spawn_x, state.level_gen.spawn_y = math.floor(state.width*10/2+2), by+0.5
+            if state.theme == THEME.OLMEC then
+                if state.width == 1 then state.level_gen.spawn_x = 4 end
+                spawn(ENT_TYPE.ACTIVEFLOOR_OLMEC, state.level_gen.spawn_x+5, by+2, LAYER.FRONT, 0, 0)
+            end
+            spawn(ENT_TYPE.LOGICAL_PLATFORM_SPAWNER, state.level_gen.spawn_x, state.level_gen.spawn_y-1, LAYER.FRONT, 0, 0)
+        end))
+    end
+end
+
+set_callback(init_hooks, ON.LOAD)
+set_callback(init_hooks, ON.SCRIPT_ENABLE)
+set_callback(clear_hooks, ON.SCRIPT_DISABLE)
+)",
             "void",
             g_SoundManager.get(),
             g_Console.get(),
