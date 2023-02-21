@@ -339,3 +339,91 @@ struct RenderInfo
 void init_render_api_hooks();
 bool& get_journal_enabled();
 void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);
+
+struct HudInventory
+{
+    bool enabled;
+    uint8_t health;
+    uint8_t bombs;
+    uint8_t ropes;
+
+    uint8_t b00;
+    bool ankh;
+    bool kapala;
+    uint8_t b03;
+
+    uint32_t u03;
+
+    uint32_t kapala_blood;
+
+    uint32_t u0c;
+
+    bool poison;
+    bool curse;
+    bool elixir;
+    uint8_t b13;
+
+    /// Powerup type or 0
+    ENT_TYPE crown;
+
+    uint8_t skip[176 - 7 * 4 - 4]; // TODO: individual item icons
+
+    /// Amount of generic pickup items at the bottom. Set to 0 to not draw them.
+    uint32_t item_count;
+};
+static_assert(sizeof(HudInventory) == 176);
+
+struct HudElement
+{
+    /// Hide background and dim if using the auto adjust setting.
+    bool dim;
+    /// Background will be drawn if this is not 0.5
+    float opacity;
+    /// Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
+    int32_t time_dim;
+};
+
+struct HudPlayer : HudElement
+{
+    int16_t health;
+    int16_t bombs;
+    int16_t ropes;
+    int32_t idunno;
+};
+static_assert(sizeof(HudPlayer) == 24);
+
+struct HudMoney : HudElement
+{
+    int32_t total;
+    int32_t counter;
+    int32_t timer;
+};
+
+struct HudData
+{
+    std::array<HudInventory, MAX_PLAYERS> inventory;
+    bool udjat;
+    int32_t money_total;
+    int32_t money_counter;
+    uint32_t time_total;
+    uint32_t time_level;
+    uint8_t world_num;
+    uint8_t level_num;
+    uint32_t seed;
+    float opacity;
+    uint8_t skip[1640]; // TODO: probably rendering coordinates all the way down
+    std::array<HudPlayer, MAX_PLAYERS> players;
+    HudMoney money;
+    size_t p9c0;
+    HudElement timer;
+    HudElement level;
+    // there's a few pointers and some timer missing, doesn't seem important
+};
+// static_assert(sizeof(HudData) <= 0xa00);
+
+struct Hud
+{
+    float y;
+    float opacity;
+    HudData* data;
+};
