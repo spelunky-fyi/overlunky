@@ -822,6 +822,9 @@
                             <a href="#set_seed" class="toc-h3 toc-link" data-title="set_seed">set_seed</a>
                           </li>
                           <li>
+                            <a href="#set_setting" class="toc-h3 toc-link" data-title="set_setting">set_setting</a>
+                          </li>
+                          <li>
                             <a href="#set_storage_layer" class="toc-h3 toc-link" data-title="set_storage_layer">set_storage_layer</a>
                           </li>
                           <li>
@@ -1016,6 +1019,9 @@
                           </li>
                           <li>
                             <a href="#get_hitbox" class="toc-h3 toc-link" data-title="get_hitbox">get_hitbox</a>
+                          </li>
+                          <li>
+                            <a href="#get_hud_position" class="toc-h3 toc-link" data-title="get_hud_position">get_hud_position</a>
                           </li>
                           <li>
                             <a href="#get_image_size" class="toc-h3 toc-link" data-title="get_image_size">get_image_size</a>
@@ -1581,6 +1587,9 @@
                             <a href="#EntityDB" class="toc-h3 toc-link" data-title="EntityDB">EntityDB</a>
                           </li>
                           <li>
+                            <a href="#HudInventory" class="toc-h3 toc-link" data-title="HudInventory">HudInventory</a>
+                          </li>
+                          <li>
                             <a href="#Inventory" class="toc-h3 toc-link" data-title="Inventory">Inventory</a>
                           </li>
                       </ul>
@@ -1596,6 +1605,21 @@
                           </li>
                           <li>
                             <a href="#Color" class="toc-h3 toc-link" data-title="Color">Color</a>
+                          </li>
+                          <li>
+                            <a href="#Hud" class="toc-h3 toc-link" data-title="Hud">Hud</a>
+                          </li>
+                          <li>
+                            <a href="#HudData" class="toc-h3 toc-link" data-title="HudData">HudData</a>
+                          </li>
+                          <li>
+                            <a href="#HudElement" class="toc-h3 toc-link" data-title="HudElement">HudElement</a>
+                          </li>
+                          <li>
+                            <a href="#HudMoney" class="toc-h3 toc-link" data-title="HudMoney">HudMoney</a>
+                          </li>
+                          <li>
+                            <a href="#HudPlayer" class="toc-h3 toc-link" data-title="HudPlayer">HudPlayer</a>
                           </li>
                           <li>
                             <a href="#Letter" class="toc-h3 toc-link" data-title="Letter">Letter</a>
@@ -4618,7 +4642,11 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_seed-int-seed'>nil set_seed(int seed)</h4>
 <p>Set seed and reset run.</p>
-<h3 id='set_storage_layer'>set_storage_layer</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Sets the right layer when using the vanilla tile code if waddler is still happy,</span>
+<h3 id='set_setting'>set_setting</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_setting">set_setting</a></p>
+</blockquote>
+<h4 id='bool-set_setting-GAME_SETTING-setting-int-value'>bool set_setting(<a href="#GAME_SETTING">GAME_SETTING</a> setting, int value)</h4><h3 id='set_storage_layer'>set_storage_layer</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Sets the right layer when using the vanilla tile code if waddler is still happy,</span>
 <span class="c1">-- otherwise spawns the floor to the left of this tile.</span>
 <span class="c1">-- Manually spawning FLOOR_STORAGE pre-tilecode doesn't seem to work as expected,</span>
 <span class="c1">-- so we destroy it post-tilecode.</span>
@@ -5018,6 +5046,12 @@ inside these boundaries. The order is: left x, top y, right x, bottom y</p>
 </blockquote>
 <h4 id='AABB-get_hitbox-int-uid-optional-extrude-optional-offsetx-optional-offsety'><a href="#AABB">AABB</a> get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)</h4>
 <p>Gets the hitbox of an entity, use <code>extrude</code> to make the hitbox bigger/smaller in all directions and <code>offset</code> to offset the hitbox in a given direction</p>
+<h3 id='get_hud_position'>get_hud_position</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_hud_position">get_hud_position</a></p>
+</blockquote>
+<h4 id='AABB-get_hud_position-int-index'><a href="#AABB">AABB</a> get_hud_position(int index)</h4>
+<p>Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count</p>
 <h3 id='get_image_size'>get_image_size</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_image_size">get_image_size</a></p>
@@ -7595,6 +7629,75 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 </tbody></table>
+<h3 id='HudInventory'>HudInventory</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enabled">enabled</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=health">health</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bombs">bombs</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ropes">ropes</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ankh">ankh</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kapala">kapala</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kapala_blood">kapala_blood</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=poison">poison</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=curse">curse</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=elixir">elixir</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=crown">crown</a></td>
+<td><a href="#Powerup">Powerup</a> type or 0</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=item_count">item_count</a></td>
+<td>Amount of generic pickup items at the bottom. Set to 0 to not draw them.</td>
+</tr>
+</tbody></table>
 <h3 id='Inventory'>Inventory</h3>
 <p>Used in <a href="#Player">Player</a>, <a href="#PlayerGhost">PlayerGhost</a> and <a href="#Items">Items</a></p>
 
@@ -8088,6 +8191,198 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="#Color">Color</a>&amp;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_ucolor">set_ucolor(const uColor color)</a></td>
 <td>Changes color based on given <a href="#Aliases">uColor</a></td>
+</tr>
+</tbody></table>
+<h3 id='Hud'>Hud</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">hud</span><span class="p">)</span>
+    <span class="c1">-- draw on screen bottom but keep neat animations</span>
+    <span class="k">if</span> <span class="n">hud</span><span class="p">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">then</span> <span class="n">hud</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="n">hud</span><span class="p">.</span><span class="n">y</span> <span class="k">end</span>
+    <span class="c1">-- spoof some values</span>
+    <span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">inventory</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">health</span> <span class="o">=</span> <span class="n">prng</span><span class="p">:</span><span class="n">random_int</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1">-- hide generic pickup items</span>
+    <span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">inventory</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">item_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1">-- hide money element</span>
+    <span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">money</span><span class="p">.</span><span class="n">opacity</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1">-- get real current opacity of p1 inventory element</span>
+    <span class="n">prinspect</span><span class="p">(</span><span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">opacity</span> <span class="o">*</span> <span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">opacity</span> <span class="o">*</span> <span class="n">hud</span><span class="p">.</span><span class="n">opacity</span><span class="p">)</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">RENDER_PRE_HUD</span><span class="p">)</span>
+
+</code></pre></div>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#HudData">HudData</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=data">data</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='HudData'>HudData</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>array&lt;<a href="#HudInventory">HudInventory</a>, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inventory">inventory</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udjat">udjat</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=money_total">money_total</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=money_counter">money_counter</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_total">time_total</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_level">time_level</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=world_num">world_num</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_num">level_num</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seed">seed</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;<a href="#HudPlayer">HudPlayer</a>, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=players">players</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#HudMoney">HudMoney</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=money">money</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#HudElement">HudElement</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#HudElement">HudElement</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level">level</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='HudElement'>HudElement</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dim">dim</a></td>
+<td>Hide background and dim if using the auto adjust setting.</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
+<td>Background will be drawn if this is not 0.5</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_dim">time_dim</a></td>
+<td>Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.</td>
+</tr>
+</tbody></table>
+<h3 id='HudMoney'>HudMoney</h3>
+<p>Derived from <a href="#HudElement">HudElement</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=total">total</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=counter">counter</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='HudPlayer'>HudPlayer</h3>
+<p>Derived from <a href="#HudElement">HudElement</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=health">health</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bombs">bombs</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ropes">ropes</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h3 id='Letter'>Letter</h3>

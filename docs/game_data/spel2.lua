@@ -35,6 +35,10 @@ function f(f_string) end
 ---@return string
 function F(f_string) end
 
+---@param setting GAME_SETTING
+---@param value integer
+---@return boolean
+function set_setting(setting, value) end
 ---Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
 ---@param slot integer
 ---@param or_ghost boolean
@@ -1140,6 +1144,10 @@ function list_dir(dir) end
 ---List all char.png files recursively from Mods/Packs. Returns table of file paths.
 ---@return nil
 function list_char_mods() end
+---Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count
+---@param index integer
+---@return AABB
+function get_hud_position(index) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -4635,6 +4643,56 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
+
+---@class HudInventory
+    ---@field enabled boolean
+    ---@field health integer
+    ---@field bombs integer
+    ---@field ropes integer
+    ---@field ankh boolean
+    ---@field kapala boolean
+    ---@field kapala_blood integer
+    ---@field poison boolean
+    ---@field curse boolean
+    ---@field elixir boolean
+    ---@field crown ENT_TYPE @Powerup type or 0
+    ---@field item_count integer @Amount of generic pickup items at the bottom. Set to 0 to not draw them.
+
+---@class HudElement
+    ---@field dim boolean @Hide background and dim if using the auto adjust setting.
+    ---@field opacity number @Background will be drawn if this is not 0.5
+    ---@field time_dim integer @Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
+
+---@class HudPlayer : HudElement
+    ---@field health integer
+    ---@field bombs integer
+    ---@field ropes integer
+
+---@class HudMoney : HudElement
+    ---@field total integer
+    ---@field counter integer
+    ---@field timer integer
+
+---@class HudData
+    ---@field inventory HudInventory[] @size: MAX_PLAYERS
+    ---@field udjat boolean
+    ---@field money_total integer
+    ---@field money_counter integer
+    ---@field time_total integer
+    ---@field time_level integer
+    ---@field world_num integer
+    ---@field level_num integer
+    ---@field seed integer
+    ---@field opacity number
+    ---@field players HudPlayer[] @size: MAX_PLAYERS
+    ---@field money HudMoney
+    ---@field timer HudElement
+    ---@field level HudElement
+
+---@class Hud
+    ---@field y number
+    ---@field opacity number
+    ---@field data HudData
 
 ---@class TextureDefinition
     ---@field texture_path string

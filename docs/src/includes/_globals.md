@@ -1532,6 +1532,14 @@ Set a bitmask in a number. This doesn't actually change the variable you pass, i
 
 Set seed and reset run.
 
+### set_setting
+
+
+> Search script examples for [set_setting](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_setting)
+
+#### bool set_setting([GAME_SETTING](#GAME_SETTING) setting, int value)
+
+
 ### set_storage_layer
 
 
@@ -2139,6 +2147,15 @@ Gets the current camera position in the level
 #### [AABB](#AABB) get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)
 
 Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
+
+### get_hud_position
+
+
+> Search script examples for [get_hud_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hud_position)
+
+#### [AABB](#AABB) get_hud_position(int index)
+
+Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count
 
 ### get_image_size
 
