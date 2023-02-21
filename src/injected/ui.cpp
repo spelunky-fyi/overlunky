@@ -2507,11 +2507,8 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("toggle_void", wParam))
     {
         g_ui_scripts["void"]->set_enabled(!g_ui_scripts["void"]->is_enabled());
-        if (g_ui_scripts["void"]->is_enabled())
-        {
-            g_state->quest_flags = 1;
-            g_state->loading = 1;
-        }
+        g_state->quest_flags = 1;
+        g_state->loading = 1;
     }
     else if (pressed("spawn_layer_door", wParam))
     {
@@ -7810,13 +7807,13 @@ for t=THEME.DWELLING,THEME.HUNDUN do
     end)
     state.level_gen.themes[t]:set_pre_spawn_players(function(theme)
         theme:spawn_border()
-        for i,v in pairs(get_entities_by({ENT_TYPE.FLOOR_BORDERTILE, ENT_TYPE.FLOOR_BORDERTILE_METAL, ENT_TYPE.FLOOR_BORDERTILE_OCTOPUS}, MASK.FLOOR, LAYER.BOTH)) do
+        --[[for i,v in pairs(get_entities_by({ENT_TYPE.FLOOR_BORDERTILE, ENT_TYPE.FLOOR_BORDERTILE_METAL, ENT_TYPE.FLOOR_BORDERTILE_OCTOPUS}, MASK.FLOOR, LAYER.BOTH)) do
             local e = get_entity(v)
             if e then
                 e:fix_border_tile_animation()
                 e:fix_decorations(false, false)
             end
-        end
+        end]]
         local ax, ay, bx, by = get_bounds()
         state.level_gen.spawn_x, state.level_gen.spawn_y = math.floor(state.width*10/2+2), by+0.5
         if state.theme == THEME.OLMEC then
