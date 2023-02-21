@@ -432,6 +432,24 @@ int | [sound_killed_by_other](https://github.com/spelunky-fyi/overlunky/search?l
 int | [tilex](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilex) | 
 int | [tiley](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiley) | 
 
+### HudInventory
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
+int | [health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) | 
+int | [bombs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) | 
+int | [ropes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) | 
+bool | [ankh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ankh) | 
+bool | [kapala](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala) | 
+int | [kapala_blood](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood) | 
+bool | [poison](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison) | 
+bool | [curse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=curse) | 
+bool | [elixir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elixir) | 
+[ENT_TYPE](#ENT_TYPE) | [crown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=crown) | [Powerup](#Powerup) type or 0
+int | [item_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_count) | Amount of generic pickup items at the bottom. Set to 0 to not draw them.
+
 ### Inventory
 
 Used in [Player](#Player), [PlayerGhost](#PlayerGhost) and [Items](#Items)
@@ -562,6 +580,83 @@ tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/o
 [Color](#Color)& | [set_rgba(int red, int green, int blue, int alpha)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_rgba) | Changes color based on given RGBA colors in 0..255 range
 [uColor](#Aliases) | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
 [Color](#Color)& | [set_ucolor(const uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ucolor) | Changes color based on given [uColor](#Aliases)
+
+### Hud
+
+
+```lua
+set_callback(function(ctx, hud)
+    -- draw on screen bottom but keep neat animations
+    if hud.y > 0 then hud.y = -hud.y end
+    -- spoof some values
+    hud.data.inventory[1].health = prng:random_int(1, 99, 0)
+    -- hide generic pickup items
+    hud.data.inventory[1].item_count = 0
+    -- hide money element
+    hud.data.money.opacity = 0
+    -- get real current opacity of p1 inventory element
+    prinspect(hud.data.players[1].opacity * hud.data.opacity * hud.opacity)
+end, ON.RENDER_PRE_HUD)
+
+```
+
+
+Type | Name | Description
+---- | ---- | -----------
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
+[HudData](#HudData) | [data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data) | 
+
+### HudData
+
+
+Type | Name | Description
+---- | ---- | -----------
+array&lt;[HudInventory](#HudInventory), MAX_PLAYERS&gt; | [inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) | 
+bool | [udjat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udjat) | 
+int | [money_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_total) | 
+int | [money_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_counter) | 
+int | [time_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_total) | 
+int | [time_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) | 
+int | [world_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_num) | 
+int | [level_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_num) | 
+int | [seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed) | 
+float | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
+array&lt;[HudPlayer](#HudPlayer), MAX_PLAYERS&gt; | [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) | 
+[HudMoney](#HudMoney) | [money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) | 
+[HudElement](#HudElement) | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+[HudElement](#HudElement) | [level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) | 
+
+### HudElement
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [dim](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dim) | Hide background and dim if using the auto adjust setting.
+float | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | Background will be drawn if this is not 0.5
+int | [time_dim](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_dim) | Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
+
+### HudMoney
+
+Derived from [HudElement](#HudElement)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=total) | 
+int | [counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### HudPlayer
+
+Derived from [HudElement](#HudElement)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) | 
+int | [bombs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) | 
+int | [ropes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) | 
 
 ### Letter
 
