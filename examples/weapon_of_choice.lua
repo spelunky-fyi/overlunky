@@ -141,7 +141,7 @@ end
 set_callback(function()
     if state.screen ~= SCREEN.LEVEL then return end
     if state.level_count == 0 or options.brandom2 or options.respawn then
-        if options.brandom or options.brandom2 then
+        if (options.brandom and state.level_count == 0) or options.brandom2 then
             options.aweapon = prng:random_index(#weapons, PRNG_CLASS.LEVEL_DECO)
         end
         WEAPON = ENT_TYPE[weapons[options.aweapon]]
@@ -214,7 +214,13 @@ function hook_weapon(ent)
         ent.flags = set_flag(ent.flags, ENT_FLAG.TAKE_NO_DAMAGE)
     end
     if options.unbreak and WEAPON ~= ENT_TYPE.ITEM_IDOL and WEAPON ~= ENT_TYPE.ITEM_MADAMETUSK_IDOL then
-        ent:set_pre_kill(function() return true end)
+        ent:set_pre_kill(function(_, _, killer)
+            if options.unbreak and killer and killer.type.id == ENT_TYPE.FLOOR_ALTAR then
+                local x, y, l = get_position(killer.uid)
+                spawn_critical(ENT_TYPE.FX_EXPLOSION, x, y, l, 0, 0)
+            end
+            return true
+        end)
         ent:set_post_update_state_machine(function(ent)
             ent.health = 99
         end)
@@ -293,6 +299,12 @@ set_callback(function()
         end
     end
 end, ON.PRE_LOAD_SCREEN)
+
+set_post_entity_spawn(function(ent)
+    if WEAPON == ent.type.id then
+        WEAPON_UID = ent.uid
+    end
+end, SPAWN_TYPE.SYSTEMIC, MASK.ITEM, {ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_PASTEBOMB})
 
 set_callback(function()
     if not players[1] then return end
