@@ -243,6 +243,8 @@ void register_usertypes(sol::state& lua)
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
 
     auto movable_type = lua.new_usertype<Movable>("Movable", sol::base_classes, sol::bases<Entity>());
+    movable_type["abs_x"] = &Entity::abs_x;
+    movable_type["abs_y"] = &Entity::abs_y;
     movable_type["move"] = &Movable::move;
     movable_type["movex"] = &Movable::movex;
     movable_type["movey"] = &Movable::movey;
