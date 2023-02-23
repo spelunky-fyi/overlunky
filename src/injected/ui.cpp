@@ -8191,7 +8191,7 @@ void init_ui()
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
-    State::init();
+    State::init(g_SoundManager.get());
     State::post_init();
 
     g_state = State::get().ptr_main();
