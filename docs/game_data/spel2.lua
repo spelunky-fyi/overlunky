@@ -2129,6 +2129,8 @@ local function PRNG_random(self, min, max) end
     ---@field draw_depth integer @Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
     ---@field x number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
     ---@field y number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    ---@field abs_x number @Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    ---@field abs_y number @Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
     ---@field layer integer @Use `set_layer` to change
     ---@field width number @Width of the sprite
     ---@field height number @Height of the sprite
@@ -2196,8 +2198,6 @@ local function PRNG_random(self, min, max) end
 local function Entity_overlaps_with(self, other) end
 
 ---@class Movable : Entity
-    ---@field abs_x any @&Entity::abs_x
-    ---@field abs_y any @&Entity::abs_y
     ---@field move Vec2 @{movex, movey}
     ---@field movex number @Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
     ---@field movey number @Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
