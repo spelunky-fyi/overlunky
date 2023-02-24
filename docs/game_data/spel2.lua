@@ -1063,11 +1063,24 @@ function fix_liquid_out_of_bounds() end
 ---@param setting GAME_SETTING
 ---@return integer?
 function get_setting(setting) end
----Return the name of an unknown number in an enum table
+---Return the name of the first matching number in an enum table
 ---@param enum table
 ---@param value integer
 ---@return string
 function enum_get_name(enum, value) end
+---Return all the names of a number in an enum table
+---@param enum table
+---@param value integer
+---@return table<string>
+function enum_get_names(enum, value) end
+---Return the matching names for a bitmask in an enum table of masks
+---@param enum table
+---@param value integer
+---@return table<string>
+function enum_get_mask_names(enum, value) end
+---Short for print(string.format(...))
+---@return nil
+function printf() end
 ---Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](https://spelunky-fyi.github.io/overlunky/#spawn_roomowner).
 ---@param x number
 ---@param y number,
@@ -1347,6 +1360,11 @@ function force_co_subtheme(subtheme) end
 ---@param config LEVEL_CONFIG
 ---@return integer
 function get_level_config(config) end
+---Set the value for the specified config
+---@param config LEVEL_CONFIG
+---@param value integer
+---@return nil
+function set_level_config(config, value) end
 ---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
 ---@param max_lengh integer
@@ -2109,8 +2127,8 @@ local function PRNG_random(self, min, max) end
     ---@field uid integer @Unique id of the entity, save it to variable to check this entity later (don't use the whole Entity type as it will be replaced with a different one when this is destroyed)
     ---@field animation_frame integer @Number (id) of the sprite in the texture
     ---@field draw_depth integer @Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
-    ---@field x number @Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
-    ---@field y number @Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
+    ---@field x number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    ---@field y number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
     ---@field layer integer @Use `set_layer` to change
     ---@field width number @Width of the sprite
     ---@field height number @Height of the sprite
@@ -2178,6 +2196,8 @@ local function PRNG_random(self, min, max) end
 local function Entity_overlaps_with(self, other) end
 
 ---@class Movable : Entity
+    ---@field abs_x any @&Entity::abs_x
+    ---@field abs_y any @&Entity::abs_y
     ---@field move Vec2 @{movex, movey}
     ---@field movex number @Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
     ---@field movey number @Move directions (-1.0 to 1.0) that represent in whit direction the entity want's to move
@@ -4065,7 +4085,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field spawn_lights fun(self): nil @Adds room lights to udjat chest room or black market
     ---@field spawn_transition fun(self): nil @Spawns the transition tunnel and players in it
     ---@field post_transition fun(self): nil @Handles loading the next level screen from a transition screen
-    ---@field spawn_players fun(self): nil @Spawns the players with inventory at `state.level_gen.spawn_x/y`
+    ---@field spawn_players fun(self): nil @Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     ---@field spawn_effects fun(self): nil @Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
     ---@field get_level_file fun(self): string @Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
     ---@field get_theme_id fun(self): integer @Returns: THEME, or subtheme in CO
@@ -4143,8 +4163,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field set_post_spawn_transition fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_transition(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the transition tunnel and players in it
     ---@field set_pre_post_transition fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool post_transition(ThemeInfo self)`<br/>Virtual function docs:<br/>Handles loading the next level screen from a transition screen
     ---@field set_post_post_transition fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil post_transition(ThemeInfo self)`<br/>Virtual function docs:<br/>Handles loading the next level screen from a transition screen
-    ---@field set_pre_spawn_players fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`
-    ---@field set_post_spawn_players fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`
+    ---@field set_pre_spawn_players fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
+    ---@field set_post_spawn_players fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     ---@field set_pre_spawn_effects fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_effects(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
     ---@field set_post_spawn_effects fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_effects(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
     ---@field set_pre_theme_id fun(self, fun: fun(self: ThemeInfo): integer?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<integer> theme_id(ThemeInfo self)`
