@@ -811,11 +811,16 @@ Determines what class of prng is used, which in turn determines which parts of t
 
 Name | Data | Description
 ---- | ---- | -----------
-[PROCEDURAL_SPAWNS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PROCEDURAL_SPAWNS) | PRNG::PROCEDURAL_SPAWNS | 
-[PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PARTICLES) | PRNG::PARTICLES | 
-[ENTITY_VARIATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.ENTITY_VARIATION) | PRNG::ENTITY_VARIATION | 
+[PROCEDURAL_SPAWNS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PROCEDURAL_SPAWNS) | PRNG::PROCEDURAL_SPAWNS | Anything level gen related really, including but not limited to path, room and enemy placement.<br/>
+[PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PARTICLES) | PRNG::PARTICLES | Direction and angle of torch flames etc, but also includes other things not related to particles at all...<br/>
+[ENTITY_VARIATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.ENTITY_VARIATION) | PRNG::ENTITY_VARIATION | Some entities that have many texture to choose from on spawn<br/>
 [EXTRA_SPAWNS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.EXTRA_SPAWNS) | PRNG::EXTRA_SPAWNS | 
-[LEVEL_DECO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_DECO) | PRNG::LEVEL_DECO | 
+[LEVEL_DECO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_DECO) | PRNG::LEVEL_DECO | I have no idea what this name means, cause this seems to advance every 3 or so frames even with zero entities in a level<br/>
+[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LIQUID) | PRNG::LIQUID | [Liquid](#Liquid) movement<br/>
+[AI](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.AI) | PRNG::EXTRA_SPAWNS | [Monster](#Monster) AI decisions<br/>
+[LEVEL_GEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_GEN) | PRNG::PROCEDURAL_SPAWNS | Anything level gen related really, including but not limited to path, room and enemy placement.<br/>
+[FX](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.FX) | PRNG::FX | Some effects, like water splashes, background stars and teleport shadow<br/>
+[CHAR_AI](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.CHAR_AI) | PRNG::CHAR_AI | Character AI decisions<br/>
 
 ## PROCEDURAL_CHANCE
 

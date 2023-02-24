@@ -189,6 +189,20 @@ void register_usertypes(sol::state& lua)
     entity_type["draw_depth"] = &Entity::draw_depth;
     entity_type["x"] = &Entity::x;
     entity_type["y"] = &Entity::y;
+    // entity_type["abs_x"] = &Entity::abs_x;
+    /// NoDoc
+    entity_type["abs_x"] = sol::property([](Entity& e) -> float
+                                         {
+        if (e.abs_x == -FLT_MAX)
+            return e.position().first;
+        return e.abs_x; });
+    // entity_type["abs_y"] = &Entity::abs_y;
+    /// NoDoc
+    entity_type["abs_y"] = sol::property([](Entity& e) -> float
+                                         {
+        if (e.abs_y == -FLT_MAX)
+            return e.position().second;
+        return e.abs_y; });
     entity_type["layer"] = &Entity::layer;
     entity_type["width"] = &Entity::w;
     entity_type["height"] = &Entity::h;
@@ -243,8 +257,6 @@ void register_usertypes(sol::state& lua)
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
 
     auto movable_type = lua.new_usertype<Movable>("Movable", sol::base_classes, sol::bases<Entity>());
-    movable_type["abs_x"] = &Entity::abs_x;
-    movable_type["abs_y"] = &Entity::abs_y;
     movable_type["move"] = &Movable::move;
     movable_type["movex"] = &Movable::movex;
     movable_type["movey"] = &Movable::movey;
