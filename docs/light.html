@@ -816,6 +816,9 @@
                             <a href="#set_journal_enabled" class="toc-h3 toc-link" data-title="set_journal_enabled">set_journal_enabled</a>
                           </li>
                           <li>
+                            <a href="#set_level_config" class="toc-h3 toc-link" data-title="set_level_config">set_level_config</a>
+                          </li>
+                          <li>
                             <a href="#set_mask" class="toc-h3 toc-link" data-title="set_mask">set_mask</a>
                           </li>
                           <li>
@@ -907,6 +910,9 @@
                           </li>
                           <li>
                             <a href="#print" class="toc-h3 toc-link" data-title="print">print</a>
+                          </li>
+                          <li>
+                            <a href="#printf" class="toc-h3 toc-link" data-title="printf">printf</a>
                           </li>
                           <li>
                             <a href="#say" class="toc-h3 toc-link" data-title="say">say</a>
@@ -1238,7 +1244,13 @@
                             <a href="#clear_custom_name" class="toc-h3 toc-link" data-title="clear_custom_name">clear_custom_name</a>
                           </li>
                           <li>
+                            <a href="#enum_get_mask_names" class="toc-h3 toc-link" data-title="enum_get_mask_names">enum_get_mask_names</a>
+                          </li>
+                          <li>
                             <a href="#enum_get_name" class="toc-h3 toc-link" data-title="enum_get_name">enum_get_name</a>
+                          </li>
+                          <li>
+                            <a href="#enum_get_names" class="toc-h3 toc-link" data-title="enum_get_names">enum_get_names</a>
                           </li>
                           <li>
                             <a href="#get_character_name" class="toc-h3 toc-link" data-title="get_character_name">get_character_name</a>
@@ -4630,6 +4642,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_journal_enabled-bool-b'>nil set_journal_enabled(bool b)</h4>
 <p>Enables or disables the journal</p>
+<h3 id='set_level_config'>set_level_config</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_level_config">set_level_config</a></p>
+</blockquote>
+<h4 id='nil-set_level_config-LEVEL_CONFIG-config-int-value'>nil set_level_config(<a href="#LEVEL_CONFIG">LEVEL_CONFIG</a> config, int value)</h4>
+<p>Set the value for the specified config</p>
 <h3 id='set_mask'>set_mask</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_mask">set_mask</a></p>
@@ -4834,6 +4852,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-print-string-message'>nil print(string message)</h4>
 <p>Print a log message on screen.</p>
+<h3 id='printf'>printf</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=printf">printf</a></p>
+</blockquote>
+<h4 id='nil-printf'>nil printf()</h4>
+<p>Short for print(string.format(...))</p>
 <h3 id='say'>say</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=say">say</a></p>
@@ -5517,12 +5541,24 @@ This edits custom string and in game strings but changing the language in settin
 </blockquote>
 <h4 id='nil-clear_custom_name-int-uid'>nil clear_custom_name(int uid)</h4>
 <p>Clears the name set with <a href="#add_custom_name">add_custom_name</a></p>
+<h3 id='enum_get_mask_names'>enum_get_mask_names</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enum_get_mask_names">enum_get_mask_names</a></p>
+</blockquote>
+<h4 id='table-lt-string-gt-enum_get_mask_names-table-enum-int-value'>table&lt;string&gt; enum_get_mask_names(table enum, int value)</h4>
+<p>Return the matching names for a bitmask in an enum table of masks</p>
 <h3 id='enum_get_name'>enum_get_name</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enum_get_name">enum_get_name</a></p>
 </blockquote>
 <h4 id='string-enum_get_name-table-enum-int-value'>string enum_get_name(table enum, int value)</h4>
-<p>Return the name of an unknown number in an enum table</p>
+<p>Return the name of the first matching number in an enum table</p>
+<h3 id='enum_get_names'>enum_get_names</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enum_get_names">enum_get_names</a></p>
+</blockquote>
+<h4 id='table-lt-string-gt-enum_get_names-table-enum-int-value'>table&lt;string&gt; enum_get_names(table enum, int value)</h4>
+<p>Return all the names of a number in an enum table</p>
 <h3 id='get_character_name'>get_character_name</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_character_name">get_character_name</a></p>
@@ -8495,12 +8531,12 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td>tuple&lt;int, int&gt;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_pair">get_pair(size_t index)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_pair">get_pair(PRNG_CLASS type)</a></td>
 <td></td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pair">set_pair(size_t index, int first, int second)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pair">set_pair(PRNG_CLASS type, int first, int second)</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -15653,7 +15689,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_players">spawn_players()</a></td>
-<td>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code></td>
+<td>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code>. Also shop and kali background and probably other stuff for some stupid reason.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -16043,12 +16079,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_players">set_pre_spawn_players(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code>. Also shop and kali background and probably other stuff for some stupid reason.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_players">set_post_spawn_players(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code>. Also shop and kali background and probably other stuff for some stupid reason.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -17875,12 +17911,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
-<td>Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use <a href="#get_position">get_position</a> to get accurate position in the game world</td>
+<td>Position of the entity in the world, or relative to overlay if attached to something. Use <a href="#get_position">get_position</a> to get real position of anything in the game world.</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
-<td>Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use <a href="#get_position">get_position</a> to get accurate position in the game world</td>
+<td>Position of the entity in the world, or relative to overlay if attached to something. Use <a href="#get_position">get_position</a> to get real position of anything in the game world.</td>
 </tr>
 <tr>
 <td>int</td>
@@ -24184,6 +24220,16 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs_x">abs_x</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs_y">abs_y</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#Vec2">Vec2</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move">move</a></td>
 <td>{movex, movey}</td>
@@ -28758,17 +28804,17 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.PROCEDURAL_SPAWNS">PROCEDURAL_SPAWNS</a></td>
 <td>PRNG::PROCEDURAL_SPAWNS</td>
-<td></td>
+<td>Anything level gen related really, including but not limited to path, room and enemy placement.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.PARTICLES">PARTICLES</a></td>
 <td>PRNG::PARTICLES</td>
-<td></td>
+<td>Direction and angle of torch flames etc, but also includes other things not related to particles at all...<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.ENTITY_VARIATION">ENTITY_VARIATION</a></td>
 <td>PRNG::ENTITY_VARIATION</td>
-<td></td>
+<td>Some entities that have many texture to choose from on spawn<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.EXTRA_SPAWNS">EXTRA_SPAWNS</a></td>
@@ -28778,7 +28824,32 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.LEVEL_DECO">LEVEL_DECO</a></td>
 <td>PRNG::LEVEL_DECO</td>
-<td></td>
+<td>I have no idea what this name means, cause this seems to advance every 3 or so frames even with zero entities in a level<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.LIQUID">LIQUID</a></td>
+<td>PRNG::LIQUID</td>
+<td><a href="#Liquid">Liquid</a> movement<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.AI">AI</a></td>
+<td>PRNG::EXTRA_SPAWNS</td>
+<td><a href="#Monster">Monster</a> AI decisions<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.LEVEL_GEN">LEVEL_GEN</a></td>
+<td>PRNG::PROCEDURAL_SPAWNS</td>
+<td>Anything level gen related really, including but not limited to path, room and enemy placement.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.FX">FX</a></td>
+<td>PRNG::FX</td>
+<td>Some effects, like water splashes, background stars and teleport shadow<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.CHAR_AI">CHAR_AI</a></td>
+<td>PRNG::CHAR_AI</td>
+<td>Character AI decisions<br/></td>
 </tr>
 </tbody></table>
 <h2 id='PROCEDURAL_CHANCE'>PROCEDURAL_CHANCE</h2>

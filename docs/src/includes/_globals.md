@@ -1514,6 +1514,15 @@ Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0
 
 Enables or disables the journal
 
+### set_level_config
+
+
+> Search script examples for [set_level_config](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_config)
+
+#### nil set_level_config([LEVEL_CONFIG](#LEVEL_CONFIG) config, int value)
+
+Set the value for the specified config
+
 ### set_mask
 
 
@@ -1815,6 +1824,15 @@ Prints any type of object by first funneling it through `inspect`, no need for a
 #### nil print(string message)
 
 Print a log message on screen.
+
+### printf
+
+
+> Search script examples for [printf](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=printf)
+
+#### nil printf()
+
+Short for print(string.format(...))
 
 ### say
 
@@ -2851,6 +2869,15 @@ This edits custom string and in game strings but changing the language in settin
 
 Clears the name set with [add_custom_name](#add_custom_name)
 
+### enum_get_mask_names
+
+
+> Search script examples for [enum_get_mask_names](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enum_get_mask_names)
+
+#### table&lt;string&gt; enum_get_mask_names(table enum, int value)
+
+Return the matching names for a bitmask in an enum table of masks
+
 ### enum_get_name
 
 
@@ -2858,7 +2885,16 @@ Clears the name set with [add_custom_name](#add_custom_name)
 
 #### string enum_get_name(table enum, int value)
 
-Return the name of an unknown number in an enum table
+Return the name of the first matching number in an enum table
+
+### enum_get_names
+
+
+> Search script examples for [enum_get_names](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enum_get_names)
+
+#### table&lt;string&gt; enum_get_names(table enum, int value)
+
+Return all the names of a number in an enum table
 
 ### get_character_name
 
