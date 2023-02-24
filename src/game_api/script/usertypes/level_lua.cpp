@@ -1146,6 +1146,12 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->data->level_config[config];
     };
 
+    /// Set the value for the specified config
+    lua["set_level_config"] = [](LEVEL_CONFIG config, uint32_t value)
+    {
+        State::get().ptr_local()->level_gen->data->level_config[config] = value;
+    };
+
     auto grow_vines = sol::overload(
         static_cast<void (*)(LAYER, uint32_t)>(::grow_vines),
         static_cast<void (*)(LAYER, uint32_t, AABB, bool)>(::grow_vines));

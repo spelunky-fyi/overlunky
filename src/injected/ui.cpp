@@ -97,6 +97,7 @@ std::map<std::string, int64_t> default_keys{
     {"toggle_hud", OL_KEY_CTRL | 'H'},
     {"toggle_lights", OL_KEY_CTRL | 'L'},
     {"toggle_ghost", OL_KEY_CTRL | 'O'},
+    {"toggle_void", OL_KEY_ALT | 'V'},
     {"toggle_speedhack_auto", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
@@ -230,7 +231,7 @@ float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, 
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
-    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1;
+    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1, g_force_level_width = 4, g_force_level_height = 4;
 unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0, g_last_kit_spawn = 0;
@@ -1244,6 +1245,7 @@ std::string spawned_type()
 
 int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
 {
+    bool flip = g_vx < -0.04f;
     std::pair<float, float> cpos = UI::click_position(g_x, g_y);
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
@@ -1251,6 +1253,11 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
         if (!lock_entity && set_last)
             g_last_id = spawned;
         return spawned;
+    }
+    else if (to_spawn.name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+    {
+        if (!g_players.empty())
+            g_players.at(0)->give_powerup(to_spawn.id);
     }
     else if (to_spawn.name == "ENT_TYPE_ITEM_PLAYERGHOST")
     {
@@ -1290,6 +1297,13 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
         {
             if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
             {
+                if (flip && (to_spawn.name.find("ARROW_TRAP") != std::string::npos || to_spawn.name.find("LASER_TRAP") != std::string::npos || to_spawn.name.find("HORIZONTAL") != std::string::npos))
+                {
+                    floor->flags |= (1U << 16);
+                    for (auto trig : floor->items.entities())
+                        trig->flags |= (1U << 16);
+                }
+
                 if (floor->get_decoration_entity_type() != -1)
                 {
                     floor->fix_decorations(true, false);
@@ -1302,6 +1316,12 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                                }};
                 callbacks.push_back(cb);
             }
+        }
+        else if (flip)
+        {
+            auto ent = get_entity_ptr(spawned);
+            if (ent)
+                ent->flags |= (1U << 16);
         }
         if (!lock_entity && set_last)
             g_last_id = spawned;
@@ -1424,19 +1444,24 @@ void spawn_entity_over()
     {
         if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
             return;
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
-        {
-            int spawned = UI::spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
-            if (!lock_entity)
-                g_last_id = spawned;
-        }
-        else
+        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") != std::string::npos)
         {
             auto cpos = UI::click_position(g_x, g_y);
             auto mpos = normalize(mouse_pos());
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
             UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+        }
+        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+        {
+            auto who = get_entity_ptr(g_over_id)->as<PowerupCapable>();
+            who->give_powerup(g_items[g_filtered_items[g_current_item]].id);
+        }
+        else
+        {
+            int spawned = UI::spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
+            if (!lock_entity)
+                g_last_id = spawned;
         }
     }
 }
@@ -1633,6 +1658,12 @@ void toggle_noclip()
             player->flags &= ~(1U << 4);
             player->type->max_speed = 0.0725f;
         }
+    }
+    if (!options["noclip"] && g_state->items->player_select_slots[0].activated)
+    {
+        auto type = get_type(g_state->items->player_select_slots[0].character);
+        if (type)
+            type->max_speed = 0.0725f;
     }
 }
 
@@ -1886,6 +1917,15 @@ void warp_next_level(size_t num)
         uint8_t theme = 12;
         targets.emplace_back(world, level, theme);
     }
+
+    if (targets.empty())
+    {
+        target_world = g_state->world;
+        target_level = g_state->level + 1;
+        target_theme = g_state->theme;
+        targets.emplace_back(target_world, target_level, target_theme);
+    }
+
     if (num > targets.size() - 1 && targets.size() > 0)
     {
         num = targets.size() - 1;
@@ -2472,6 +2512,12 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
         UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
         UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
+    }
+    else if (pressed("toggle_void", wParam))
+    {
+        g_ui_scripts["void"]->set_enabled(!g_ui_scripts["void"]->is_enabled());
+        g_state->quest_flags = 1;
+        g_state->loading = 1;
     }
     else if (pressed("spawn_layer_door", wParam))
     {
@@ -3273,6 +3319,15 @@ void render_narnia()
                 warp_inc(target_world, target_level, target_theme);
             }
             n++;
+        }
+        if (n == 0)
+        {
+            target_world = g_state->world;
+            target_level = g_state->level + 1;
+            target_theme = g_state->theme;
+            std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
+            if (ImGui::Button(buf.c_str()))
+                warp_inc(target_world, target_level, target_theme);
         }
     }
     else
@@ -4304,7 +4359,7 @@ void render_clickhandler()
             }
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
-            ImGui::PopStyleVar(ImGuiStyleVar_WindowPadding);
+            ImGui::PopStyleVar();
         }
     }
 
@@ -4958,6 +5013,22 @@ void render_keyconfig()
     }
 }
 
+void force_level_size()
+{
+    if (g_ui_scripts.find("level_size") == g_ui_scripts.end())
+        return;
+    g_ui_scripts["level_size"]->update_code(fmt::format(
+        R"(
+set_callback(function()
+    if state.screen == SCREEN.LEVEL then
+        state.width, state.height = {}, {}
+    end
+end, ON.PRE_LEVEL_GENERATION)
+)",
+        g_force_level_width,
+        g_force_level_height));
+}
+
 void render_options()
 {
     if (options["menu_ui"] && !detached("tool_options"))
@@ -5035,6 +5106,29 @@ void render_options()
         tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
         ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
         tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
+        bool void_mode = g_ui_scripts["void"]->is_enabled();
+        if (ImGui::Checkbox("Void sandbox mode", &void_mode))
+        {
+            g_ui_scripts["void"]->set_enabled(void_mode);
+            g_state->quest_flags = 1;
+            g_state->loading = 1;
+        }
+        tooltip("Just you and the level borders, all alone...", "toggle_void");
+        static bool level_size = false;
+        if (ImGui::Checkbox("Force level size", &level_size))
+        {
+            g_ui_scripts["level_size"]->set_enabled(level_size);
+            if (level_size)
+                force_level_size();
+        }
+        tooltip("Force level size, can cause crashes if used in the wrong place.");
+        if (level_size)
+        {
+            if (ImGui::SliderInt("Width##ForceWidth", &g_force_level_width, 1, 8, "%d", ImGuiSliderFlags_AlwaysClamp))
+                force_level_size();
+            if (ImGui::SliderInt("Height##ForceHeight", &g_force_level_height, 1, 15, "%d", ImGuiSliderFlags_AlwaysClamp))
+                force_level_size();
+        }
         endmenu();
     }
 
@@ -7690,6 +7784,94 @@ void imgui_init(ImGuiContext*)
             false);
         g_ui_scripts["light"] = std::unique_ptr<SpelunkyScript>(script);
     }
+    if (g_ui_scripts.find("void") == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            R"(
+qflags = {2,3,5,17,18,19,25,26,27}
+disable_virts = {2,3,4,5,6,7,8,9,10,11,12,15,16,17,18,19,20}
+hooks = {}
+function add_hook(t, cb)
+    hooks[#hooks+1] = {t=t, cb=cb}
+end
+function clear_hooks()
+    for i,h in pairs(hooks) do
+        state.level_gen.themes[h.t]:clear_virtual(h.cb)
+    end
+    hooks = {}
+end
+function init_hooks()
+    clear_hooks()
+    for t=THEME.DWELLING,THEME.HUNDUN do
+        for i,v in pairs(disable_virts) do
+            add_hook(t, state.level_gen.themes[t]:set_pre_virtual(v, function() return true end))
+        end
+        add_hook(t, state.level_gen.themes[t]:set_pre_reset_theme_flags(function()
+            for i=LEVEL_CONFIG.BACK_ROOM_CHANCE,LEVEL_CONFIG.MACHINE_REWARDROOM_CHANCE do
+                set_level_config(i, 0)
+            end
+            state.current_theme.allow_beehive = false
+            state.current_theme.allow_leprechaun = false
+            for i,v in pairs(qflags) do
+                state.quest_flags = set_flag(state.quest_flags, v)
+            end
+            state.quests.yang_state = 7
+            state.quests.jungle_sisters_flags = 63
+            state.quests.van_horsing_state = 7
+            state.quests.sparrow_state = 8
+            state.quests.madame_tusk_state = 3
+            return true
+        end))
+        add_hook(t, state.level_gen.themes[t]:set_pre_spawn_effects(function()
+            if state.current_theme:get_loop() then
+                state.camera.bounds_left = -math.huge
+                state.camera.bounds_right = math.huge
+                state.camera.bounds_top = math.huge
+                state.camera.bounds_bottom = -math.huge
+            else
+                state.camera.bounds_left = 0.5
+                state.camera.bounds_right = state.width * 10.0 + 4.5
+                state.camera.bounds_top = 124.5
+                state.camera.bounds_bottom = 120.5 - state.height * 8.0
+            end
+            return true
+        end))
+        add_hook(t, state.level_gen.themes[t]:set_pre_spawn_level(function(theme)
+            theme:spawn_border()
+            return true
+        end))
+        add_hook(t, state.level_gen.themes[t]:set_pre_spawn_players(function()
+            local ax, ay, bx, by = get_bounds()
+            state.level_gen.spawn_x, state.level_gen.spawn_y = math.floor(state.width*10/2+2), by+0.5
+            if state.theme == THEME.OLMEC then
+                if state.width == 1 then state.level_gen.spawn_x = 4 end
+                spawn(ENT_TYPE.ACTIVEFLOOR_OLMEC, state.level_gen.spawn_x+5, by+2, LAYER.FRONT, 0, 0)
+            end
+            spawn(ENT_TYPE.LOGICAL_PLATFORM_SPAWNER, state.level_gen.spawn_x, state.level_gen.spawn_y-1, LAYER.FRONT, 0, 0)
+        end))
+    end
+end
+
+set_callback(init_hooks, ON.LOAD)
+set_callback(init_hooks, ON.SCRIPT_ENABLE)
+set_callback(clear_hooks, ON.SCRIPT_DISABLE)
+)",
+            "void",
+            g_SoundManager.get(),
+            g_Console.get(),
+            false);
+        g_ui_scripts["void"] = std::unique_ptr<SpelunkyScript>(script);
+    }
+    if (g_ui_scripts.find("level_size") == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            "",
+            "level_size",
+            g_SoundManager.get(),
+            g_Console.get(),
+            false);
+        g_ui_scripts["level_size"] = std::unique_ptr<SpelunkyScript>(script);
+    }
 }
 
 void imgui_draw()
@@ -7711,7 +7893,7 @@ void imgui_draw()
     render_clickhandler();
     if (options["draw_hud"])
         render_prohud();
-    if (options["draw_script_messages"])
+    if (options["draw_script_messages"] && !g_Console->is_toggled())
         render_messages();
 
     focused_tool = "";
@@ -8009,7 +8191,7 @@ void init_ui()
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
-    State::init();
+    State::init(g_SoundManager.get());
     State::post_init();
 
     g_state = State::get().ptr_main();

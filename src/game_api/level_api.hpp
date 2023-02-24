@@ -119,7 +119,7 @@ struct LevelGenData
 
     union
     {
-        uint32_t level_config[18];
+        std::array<uint32_t, 18> level_config;
         struct
         {
             uint32_t back_room_chance;
@@ -263,7 +263,7 @@ class ThemeInfo
     /// Handles loading the next level screen from a transition screen
     virtual void post_transition() = 0;
 
-    /// Spawns the players with inventory at `state.level_gen.spawn_x/y`
+    /// Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     virtual void spawn_players() = 0;
 
     /// Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.

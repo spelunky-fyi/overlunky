@@ -290,7 +290,7 @@ struct State
 
     static void set_write_load_opt(bool allow);
 
-    static void init();
+    static void init(class SoundManager* sound_manager = nullptr);
     static void post_init();
 
     static State& get();

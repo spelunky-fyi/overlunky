@@ -1671,13 +1671,46 @@ end
     /// Gets the specified setting, values might need to be interpreted differently per setting
     lua["get_setting"] = get_setting;
 
-    /// Return the name of an unknown number in an enum table
+    /// Return the name of the first matching number in an enum table
     // lua["enum_get_name"] = [](table enum, int value) -> string
     lua["enum_get_name"] = lua.safe_script(R"(
-        return function(table, value)
-            for k,v in pairs(table) do
+        return function(enum, value)
+            for k,v in pairs(enum) do
                 if v == value then return k end
             end
+        end
+    )");
+
+    /// Return all the names of a number in an enum table
+    // lua["enum_get_names"] = [](table enum, int value) -> table<string>
+    lua["enum_get_names"] = lua.safe_script(R"(
+        return function(enum, value)
+            local list = {}
+            for k,v in pairs(enum) do
+                if v == value then list[#list+1] = k end
+            end
+            return list
+        end
+    )");
+
+    /// Return the matching names for a bitmask in an enum table of masks
+    // lua["enum_get_mask_names"] = [](table enum, int value) -> table<string>
+    lua["enum_get_mask_names"] = lua.safe_script(R"(
+        return function(enum, mask)
+            local list = {}
+            for k,v in pairs(enum) do
+                if test_mask(mask, v) then list[#list+1] = k end
+            end
+            return list
+        end
+    )");
+
+    /// Short for print(string.format(...))
+    lua["printf"] = lua.safe_script(R"(
+        return function(...)
+            local out = string.format(...)
+            print(out)
+            return out
         end
     )");
 
