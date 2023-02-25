@@ -250,7 +250,8 @@ struct ThemeHookImpl
 void State::init(class SoundManager* sound_manager)
 {
     State::get();
-    get_lua_vm(sound_manager);
+    if (sound_manager)
+        get_lua_vm(sound_manager);
 }
 void State::post_init()
 {
