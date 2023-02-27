@@ -33,7 +33,8 @@ class LuaConsole : public LockableLuaBackend<LuaConsole>
 
     std::unordered_map<std::string, LuaBackend*> console_commands_list;
 
-    bool enabled{false};
+    bool toggled{false};
+    bool enabled{true};
     bool set_focus{false};
     bool scroll_to_bottom{false};
     std::optional<size_t> set_scroll_to_history_item;

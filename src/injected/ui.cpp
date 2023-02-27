@@ -4393,7 +4393,7 @@ void render_clickhandler()
     {
         render_script(script.get(), draw_list);
     }
-    render_script(g_Console.get(), draw_list);
+    g_Console.get()->draw(draw_list);
 
     for (auto& [name, script] : g_ui_scripts)
     {

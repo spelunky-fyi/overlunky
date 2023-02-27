@@ -652,7 +652,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 bool LuaConsole::pre_draw()
 {
     has_new_history = false;
-    if (enabled)
+    if (toggled)
     {
         auto& io = ImGui::GetIO();
         auto& style = ImGui::GetStyle();
@@ -877,6 +877,14 @@ bool LuaConsole::pre_draw()
                 {
                     std::exit(0);
                 }
+                else if (console_input == "enable"sv)
+                {
+                    set_enabled(true);
+                }
+                else if (console_input == "disable"sv)
+                {
+                    set_enabled(false);
+                }
                 else
                 {
                     std::size_t messages_before = messages.size();
@@ -930,14 +938,14 @@ bool LuaConsole::pre_draw()
     return true;
 }
 
-void LuaConsole::set_enabled(bool)
+void LuaConsole::set_enabled(bool enable)
 {
+    enabled = enable;
 }
 bool LuaConsole::get_enabled() const
 {
-    return true;
+    return enabled;
 }
-
 bool LuaConsole::get_unsafe() const
 {
     return true;
@@ -1017,8 +1025,8 @@ std::string LuaConsole::execute_raw(std::string code)
 
 void LuaConsole::toggle()
 {
-    enabled = !enabled;
-    set_focus = enabled;
+    toggled = !toggled;
+    set_focus = toggled;
     scroll_to_bottom = true;
 }
 
