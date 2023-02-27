@@ -77,6 +77,8 @@ class GuiDrawContext
     void win_text(std::string text);
     /// Add a separator line to window
     void win_separator();
+    /// Add a separator text line to window
+    void win_separatortext(std::string text);
     /// Add next thing on the same line. This is same as `win_sameline(0, -1)`
     void win_inline();
     /// Add next thing on the same line, with an offset
@@ -106,13 +108,15 @@ class GuiDrawContext
     /// Pop unique identifier from the stack. Put after the input.
     void win_popid();
     /// Draw image to window.
-    void win_image(IMAGE image, int width, int height);
+    void win_image(IMAGE image, float width, float height);
     /// Draw imagebutton to window.
     bool win_imagebutton(std::string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2);
     /// Add a collapsing accordion section, put contents in the callback function.
     void win_section(std::string title, sol::function callback);
     /// Indent contents, or unindent if negative
     void win_indent(float width);
+    /// Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
+    void win_width(float width);
 
   private:
     class LuaBackend* backend;

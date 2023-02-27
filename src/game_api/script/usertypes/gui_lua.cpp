@@ -347,6 +347,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
 {
     bool win_open = true;
     ImGui::PushID("backendwindow");
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4, 4});
     ImGuiCond cond = (movable ? ImGuiCond_Appearing : ImGuiCond_Always);
     ImGuiCond flag = (movable ? 0 : ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
     if (title == "" || title.find("##") == 0)
@@ -383,6 +384,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     }
     ImGui::End();
     ImGui::PopID();
+    ImGui::PopStyleVar();
 
     if (win_open && backend->windows.count(title) == 0)
     {
@@ -405,12 +407,18 @@ void GuiDrawContext::win_separator()
 {
     ImGui::Separator();
 };
+void GuiDrawContext::win_separatortext(std::string text)
+{
+    ImGui::SeparatorText(text.c_str());
+};
 void GuiDrawContext::win_inline()
 {
     ImGui::SameLine();
 };
 void GuiDrawContext::win_sameline(float offset, float spacing)
 {
+    if (std::abs(offset) < 1.0f)
+        offset *= ImGui::GetContentRegionMax().x;
     ImGui::SameLine(offset, spacing);
 };
 bool GuiDrawContext::win_button(std::string text)
@@ -443,7 +451,7 @@ int GuiDrawContext::win_slider_int(std::string label, int value, int min, int ma
 };
 int GuiDrawContext::win_drag_int(std::string label, int value, int min, int max)
 {
-    ImGui::DragInt(label.c_str(), &value, 0.5f, min, max);
+    ImGui::DragInt(label.c_str(), &value, 0.1f, min, max);
     return value;
 };
 float GuiDrawContext::win_slider_float(std::string label, float value, float min, float max)
@@ -453,7 +461,7 @@ float GuiDrawContext::win_slider_float(std::string label, float value, float min
 };
 float GuiDrawContext::win_drag_float(std::string label, float value, float min, float max)
 {
-    ImGui::DragFloat(label.c_str(), &value, 0.5f, min, max);
+    ImGui::DragFloat(label.c_str(), &value, 0.1f, min, max);
     return value;
 };
 bool GuiDrawContext::win_check(std::string label, bool value)
@@ -475,17 +483,27 @@ void GuiDrawContext::win_popid()
 {
     ImGui::PopID();
 };
-void GuiDrawContext::win_image(IMAGE image, int width, int height)
+void GuiDrawContext::win_image(IMAGE image, float width, float height)
 {
     if (!backend->images.contains(image))
         return;
 
     auto& image_ptr = backend->images[image];
-    if (width < 1)
-        width = image_ptr->width;
-    if (height < 1)
-        height = image_ptr->height;
-    ImGui::Image(image_ptr->texture, ImVec2(static_cast<float>(width), static_cast<float>(height)));
+
+    if (std::abs(width) > 0.0f && std::abs(width) < 1.0f)
+        width *= ImGui::GetContentRegionMax().x;
+
+    if (std::abs(height) > 0.0f && std::abs(height) < 1.0f)
+        height *= ImGui::GetContentRegionMax().x;
+
+    ImVec2 im_size = ImVec2(width, height);
+
+    if (im_size.x <= 0)
+        im_size.x = static_cast<float>(image_ptr->width);
+    if (im_size.y <= 0)
+        im_size.y = static_cast<float>(image_ptr->height);
+
+    ImGui::Image(image_ptr->texture, im_size);
 };
 bool GuiDrawContext::win_imagebutton(std::string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2)
 {
@@ -494,11 +512,17 @@ bool GuiDrawContext::win_imagebutton(std::string label, IMAGE image, float width
 
     auto& image_ptr = backend->images[image];
 
+    if (std::abs(width) > 0.0f && std::abs(width) < 1.0f)
+        width *= ImGui::GetContentRegionMax().x;
+
+    if (std::abs(height) > 0.0f && std::abs(height) < 1.0f)
+        height *= ImGui::GetContentRegionMax().x;
+
     ImVec2 im_size = ImVec2(width, height);
 
-    if (im_size.x < 1)
+    if (im_size.x <= 0)
         im_size.x = static_cast<float>(image_ptr->width);
-    if (im_size.y < 1)
+    if (im_size.y <= 0)
         im_size.y = static_cast<float>(image_ptr->height);
 
     return ImGui::ImageButton(label.c_str(), image_ptr->texture, im_size, ImVec2(uvx1, uvy1), ImVec2(uvx2, uvy2));
@@ -510,10 +534,22 @@ void GuiDrawContext::win_section(std::string title, sol::function callback)
 };
 void GuiDrawContext::win_indent(float width)
 {
+    if (std::abs(width) < 1.0f)
+        width *= ImGui::GetContentRegionMax().x;
     if (width > 0)
         ImGui::Indent(width);
     else if (width < 0)
         ImGui::Unindent(-width);
+}
+void GuiDrawContext::win_width(float width)
+{
+    if (std::abs(width) < 1.0f)
+        width *= ImGui::GetContentRegionMax().x;
+    if (width > ImGui::GetStyle().ItemInnerSpacing.x)
+        width -= ImGui::GetStyle().ItemInnerSpacing.x;
+    else if (width < -ImGui::GetStyle().ItemInnerSpacing.x)
+        width += ImGui::GetStyle().ItemInnerSpacing.x;
+    ImGui::SetNextItemWidth(width);
 }
 void GuiDrawContext::draw_layer(DRAW_LAYER layer)
 {
@@ -574,6 +610,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["window"] = &GuiDrawContext::window;
     guidrawcontext_type["win_text"] = &GuiDrawContext::win_text;
     guidrawcontext_type["win_separator"] = &GuiDrawContext::win_separator;
+    guidrawcontext_type["win_separator_text"] = &GuiDrawContext::win_separatortext;
     guidrawcontext_type["win_inline"] = &GuiDrawContext::win_inline;
     guidrawcontext_type["win_sameline"] = &GuiDrawContext::win_sameline;
     guidrawcontext_type["win_button"] = &GuiDrawContext::win_button;
@@ -592,6 +629,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_imagebutton"] = &GuiDrawContext::win_imagebutton;
     guidrawcontext_type["win_section"] = &GuiDrawContext::win_section;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
+    guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) -> uColor
@@ -1030,7 +1068,7 @@ void register_usertypes(sol::state& lua)
     };
     /// Deprecated
     /// Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
-    lua["win_image"] = [](IMAGE image, int width, int height)
+    lua["win_image"] = [](IMAGE image, float width, float height)
     {
         auto backend = LuaBackend::get_calling_backend();
         GuiDrawContext(backend.get()).win_image(image, width, height);
