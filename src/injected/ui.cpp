@@ -5887,67 +5887,32 @@ void render_powerup(int uid, const char* section)
     ImGui::PopID();
 }
 
-void render_state(const char* label, int state)
+void render_state(const char* label, uint8_t state)
 {
-    if (state == 0)
-        ImGui::LabelText(label, "0 Flailing");
-    else if (state == 1)
-        ImGui::LabelText(label, "1 Standing");
-    else if (state == 2)
-        ImGui::LabelText(label, "2 Sitting");
-    else if (state == 4)
-        ImGui::LabelText(label, "4 Hanging");
-    else if (state == 5)
-        ImGui::LabelText(label, "5 Ducking");
-    else if (state == 6)
-        ImGui::LabelText(label, "6 Climbing");
-    else if (state == 7)
-        ImGui::LabelText(label, "7 Pushing");
-    else if (state == 8)
-        ImGui::LabelText(label, "8 Jumping");
-    else if (state == 9)
-        ImGui::LabelText(label, "9 Falling");
-    else if (state == 10)
-        ImGui::LabelText(label, "10 Dropping");
-    else if (state == 12)
-        ImGui::LabelText(label, "12 Attacking");
-    else if (state == 17)
-        ImGui::LabelText(label, "17 Throwing");
-    else if (state == 18)
-        ImGui::LabelText(label, "18 Stunned");
-    else if (state == 19)
-        ImGui::LabelText(label, "19 Entering");
-    else if (state == 20)
-        ImGui::LabelText(label, "20 Loading");
-    else if (state == 21)
-        ImGui::LabelText(label, "21 Exiting");
-    else if (state == 22)
-        ImGui::LabelText(label, "22 Dying");
+    if (state <= 22)
+        ImGui::LabelText(label, char_states[state]);
     else
-    {
-        std::string statec = std::to_string(state);
-        ImGui::LabelText(label, "%s", statec.c_str());
-    }
+        ImGui::LabelText(label, "%s", std::to_string(state).c_str());
 }
 
 void render_ai(const char* label, int state)
 {
     if (state == 0)
-        ImGui::LabelText(label, "0 Idling");
+        ImGui::LabelText(label, "Idling");
     else if (state == 1)
-        ImGui::LabelText(label, "1 Walking");
+        ImGui::LabelText(label, "Walking");
     else if (state == 2)
-        ImGui::LabelText(label, "2 Jumping");
+        ImGui::LabelText(label, "Jumping");
     else if (state == 4)
-        ImGui::LabelText(label, "4 Dead");
+        ImGui::LabelText(label, "Dead");
     else if (state == 5)
-        ImGui::LabelText(label, "5 Jumping");
+        ImGui::LabelText(label, "Jumping");
     else if (state == 6)
-        ImGui::LabelText(label, "6 Attacking");
+        ImGui::LabelText(label, "Attacking");
     else if (state == 7)
-        ImGui::LabelText(label, "7 Meleeing");
+        ImGui::LabelText(label, "Meleeing");
     else if (state == 11)
-        ImGui::LabelText(label, "11 Rolling");
+        ImGui::LabelText(label, "Rolling");
     else
     {
         std::string statec = std::to_string(state);
@@ -5955,65 +5920,12 @@ void render_ai(const char* label, int state)
     }
 }
 
-void render_screen(const char* label, int state)
+void render_screen(const char* label, uint32_t state)
 {
-    if (state == 0)
-        ImGui::LabelText(label, "0 Logo");
-    else if (state == 1)
-        ImGui::LabelText(label, "1 Intro");
-    else if (state == 2)
-        ImGui::LabelText(label, "2 Prologue");
-    else if (state == 3)
-        ImGui::LabelText(label, "3 Title");
-    else if (state == 4)
-        ImGui::LabelText(label, "4 Main menu");
-    else if (state == 5)
-        ImGui::LabelText(label, "5 Options");
-    else if (state == 7)
-        ImGui::LabelText(label, "7 Leaderboards");
-    else if (state == 8)
-        ImGui::LabelText(label, "8 Seed input");
-    else if (state == 9)
-        ImGui::LabelText(label, "9 Character select");
-    else if (state == 10)
-        ImGui::LabelText(label, "10 Team select");
-    else if (state == 11)
-        ImGui::LabelText(label, "11 Camp");
-    else if (state == 12)
-        ImGui::LabelText(label, "12 Level");
-    else if (state == 13)
-        ImGui::LabelText(label, "13 Level transition");
-    else if (state == 14)
-        ImGui::LabelText(label, "14 Death");
-    else if (state == 15)
-        ImGui::LabelText(label, "15 Spaceship");
-    else if (state == 16)
-        ImGui::LabelText(label, "16 Ending");
-    else if (state == 17)
-        ImGui::LabelText(label, "17 Credits");
-    else if (state == 18)
-        ImGui::LabelText(label, "18 Scores");
-    else if (state == 19)
-        ImGui::LabelText(label, "19 Constellation");
-    else if (state == 20)
-        ImGui::LabelText(label, "20 Recap");
-    else if (state == 21)
-        ImGui::LabelText(label, "21 Arena menu");
-    else if (state == 25)
-        ImGui::LabelText(label, "25 Arena intro");
-    else if (state == 26)
-        ImGui::LabelText(label, "26 Arena match");
-    else if (state == 27)
-        ImGui::LabelText(label, "27 Arena scores");
-    else if (state == 28)
-        ImGui::LabelText(label, "28 Loading online");
-    else if (state == 29)
-        ImGui::LabelText(label, "29 Lobby");
+    if (state <= 29)
+        ImGui::LabelText(label, "%d: %s", state, screen_names[state]);
     else
-    {
-        std::string statec = std::to_string(state);
-        ImGui::LabelText(label, "%s", statec.c_str());
-    }
+        ImGui::LabelText(label, "%d", state);
 }
 
 void render_entity_finder()
@@ -6371,10 +6283,10 @@ void render_entity_props(int uid, bool detached = false)
             entity_windows[uid] = window;
         }
         tooltip("Detach entity to separate window.");
-        ImGui::PopItemWidth();
         if (!update_entity())
             return;
     }
+    ImGui::PopItemWidth();
     if (entity == nullptr)
     {
         auto it = entity_windows.find(uid);
@@ -6383,7 +6295,7 @@ void render_entity_props(int uid, bool detached = false)
         return;
     }
     const auto is_movable = entity->is_movable();
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
     render_uid(entity->uid, "EntityGeneral");
     if (ImGui::Button("Smart delete##SafeKillEntity"))
     {
@@ -6468,9 +6380,20 @@ void render_entity_props(int uid, bool detached = false)
         if (is_movable)
         {
             auto movable = entity->as<Movable>();
+            ImGui::PushItemWidth(ImGui::GetContentRegionMax().x * 0.5f - 24.0f);
+            ImGui::SetNextItemWidth(24.0f);
+            ImGui::InputScalar("##EntityState", ImGuiDataType_U8, &movable->state);
+            ImGui::SameLine(0, 4);
             render_state("Current state", movable->state); // TODO: allow change
+            ImGui::SetNextItemWidth(24.0f);
+            ImGui::InputScalar("##EntityLastState", ImGuiDataType_U8, &movable->last_state);
+            ImGui::SameLine(0, 4);
             render_state("Last state", movable->last_state);
+            ImGui::SetNextItemWidth(24.0f);
+            ImGui::InputScalar("##EntityMoveState", ImGuiDataType_U8, &movable->move_state);
+            ImGui::SameLine(0, 4);
             render_ai("AI state", movable->move_state); // TODO: allow change
+            ImGui::PopItemWidth();
             const std::string current_behavior_str = fmt::format("{}", movable->get_behavior());
             if (ImGui::BeginCombo("Current Behavior##ChangeBehaviorCombo", current_behavior_str.c_str()))
             {
@@ -6684,8 +6607,6 @@ void render_entity_props(int uid, bool detached = false)
             {
                 render_powerup(powerup_entity->uid, "Powerups");
             }
-            ImGui::Text("  Add: ");
-            ImGui::SameLine();
             ImGui::PushItemWidth(160);
             static const char* chosenPowerup = "";
             static uint8_t chosenPowerupIndex = 0;
@@ -6741,7 +6662,7 @@ void render_entity_props(int uid, bool detached = false)
                 ImGui::EndCombo();
             }
             ImGui::SameLine();
-            if (ImGui::Button("Add##AddPowerupButton"))
+            if (ImGui::Button("Add Powerup##AddPowerupButton"))
             {
                 entity_pow->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
