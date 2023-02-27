@@ -5896,7 +5896,7 @@ void render_powerup(int uid, const char* section)
 void render_state(const char* label, uint8_t state)
 {
     if (state <= 22)
-        ImGui::LabelText(label, char_states[state]);
+        ImGui::LabelText(label, "%s", char_states[state]);
     else
         ImGui::LabelText(label, "%s", std::to_string(state).c_str());
 }
