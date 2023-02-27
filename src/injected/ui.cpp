@@ -327,7 +327,8 @@ std::map<std::string, bool> options = {
     {"menu_ui", true},
     {"hd_cursor", true},
     {"inverted", false},
-    {"borders", false}};
+    {"borders", false},
+    {"console_alt_keys", false}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -990,6 +991,7 @@ void load_config(std::string file)
         options["multi_viewports"] = false;
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     }
+    g_Console->set_alt_keys(options["console_alt_keys"]);
     save_config(file);
 }
 
@@ -5173,6 +5175,10 @@ void render_options()
 
         ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
         tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.", "switch_ui");
+
+        if (ImGui::Checkbox("Alternative Console Ctrl key behavior", &options["console_alt_keys"]))
+            g_Console.get()->set_alt_keys(options["console_alt_keys"]);
+        tooltip("Hold Ctrl to execute and scroll history,\nenter and arrows only edit buffer.");
 
         ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
         tooltip("Am I annoying you already :(");

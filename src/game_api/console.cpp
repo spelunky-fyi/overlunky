@@ -139,3 +139,8 @@ void SpelunkyConsole::set_geometry(float x, float y, float w, float h)
 {
     m_Impl->Lock()->set_geometry(x, y, w, h);
 }
+
+void SpelunkyConsole::set_alt_keys(bool enable)
+{
+    m_Impl->Lock()->set_alt_keys(enable);
+}
