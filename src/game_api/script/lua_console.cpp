@@ -836,16 +836,16 @@ bool LuaConsole::pre_draw()
             {
                 if (do_tab_completion && data->Buf[data->CursorPos - 1] == '\t')
                 {
-                    const auto prev_cursor_pos = data->CursorPos;
+                    const auto prev_pos = data->CursorPos;
                     data->DeleteChars(data->CursorPos - 1, 1);
-                    if (prev_cursor_pos == data->CursorPos)
+                    if (prev_pos == data->CursorPos)
                     {
                         data->CursorPos--;
                     }
                     if (!self->on_completion(data))
                     {
                         data->InsertChars(data->CursorPos, "\t");
-                        data->CursorPos = prev_cursor_pos;
+                        data->CursorPos = prev_pos;
                     }
                     do_tab_completion = false;
                 }
