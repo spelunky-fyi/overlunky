@@ -6215,7 +6215,7 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_popid</code> instead<
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_image">win_image</a></p>
 </blockquote>
 
-<p><code>nil win_image(IMAGE image, int width, int height)</code><br/>
+<p><code>nil win_image(IMAGE image, float width, float height)</code><br/>
 Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead</p>
 <h1 id='Non-Entity-types'>Non-Entity types</h1><h2 id='Arena-types'>Arena types</h2><h3 id='ArenaConfigArenas'>ArenaConfigArenas</h3>
 <p>Used in <a href="#ArenaState">ArenaState</a></p>
@@ -6981,6 +6981,11 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 </tr>
 <tr>
 <td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_separator_text">win_separator_text(string text)</a></td>
+<td>Add a separator text line to window</td>
+</tr>
+<tr>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_inline">win_inline()</a></td>
 <td>Add next thing on the same line. This is same as <code>win_sameline(0, -1)</code></td>
 </tr>
@@ -7051,7 +7056,7 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_image">win_image(IMAGE image, int width, int height)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_image">win_image(IMAGE image, float width, float height)</a></td>
 <td>Draw image to window.</td>
 </tr>
 <tr>
@@ -7068,6 +7073,11 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_indent">win_indent(float width)</a></td>
 <td>Indent contents, or unindent if negative</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_width">win_width(float width)</a></td>
+<td>Sets next item width (width&gt;1: width in pixels, width&lt;0: to the right of window, -1&lt;width&lt;1: fractional, multiply by available window width)</td>
 </tr>
 </tbody></table>
 <h3 id='LoadContext'>LoadContext</h3>

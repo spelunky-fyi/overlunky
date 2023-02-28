@@ -194,6 +194,7 @@ nil | [draw_layer(DRAW_LAYER layer)](https://github.com/spelunky-fyi/overlunky/s
 bool | [window(string title, float x, float y, float w, float h, bool movable, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) | Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
 nil | [win_text(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text) | Add some text to window, automatically wrapped
 nil | [win_separator()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator) | Add a separator line to window
+nil | [win_separator_text(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator_text) | Add a separator text line to window
 nil | [win_inline()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline) | Add next thing on the same line. This is same as `win_sameline(0, -1)`
 nil | [win_sameline(float offset, float spacing)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline) | Add next thing on the same line, with an offset
 bool | [win_button(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button) | Add a button
@@ -208,10 +209,11 @@ bool | [win_check(string label, bool value)](https://github.com/spelunky-fyi/ove
 int | [win_combo(string label, int selected, string opts)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo) | Add a combo box
 nil | [win_pushid(int id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) | Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 nil | [win_popid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) | Pop unique identifier from the stack. Put after the input.
-nil | [win_image(IMAGE image, int width, int height)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) | Draw image to window.
+nil | [win_image(IMAGE image, float width, float height)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) | Draw image to window.
 bool | [win_imagebutton(string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_imagebutton) | Draw imagebutton to window.
 nil | [win_section(string title, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_section) | Add a collapsing accordion section, put contents in the callback function.
 nil | [win_indent(float width)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_indent) | Indent contents, or unindent if negative
+nil | [win_width(float width)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_width) | Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
 
 ### LoadContext
 

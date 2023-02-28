@@ -4496,6 +4496,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: fun(ctx: GuiDrawContext, pos: Vec2, size: Vec2): nil): boolean @Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
     ---@field win_text fun(self, text: string): nil @Add some text to window, automatically wrapped
     ---@field win_separator fun(self): nil @Add a separator line to window
+    ---@field win_separator_text fun(self, text: string): nil @Add a separator text line to window
     ---@field win_inline fun(self): nil @Add next thing on the same line. This is same as `win_sameline(0, -1)`
     ---@field win_sameline fun(self, offset: number, spacing: number): nil @Add next thing on the same line, with an offset
     ---@field win_button fun(self, text: string): boolean @Add a button
@@ -4510,10 +4511,11 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer @Add a combo box
     ---@field win_pushid fun(self, id: integer): nil @Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
     ---@field win_popid fun(self): nil @Pop unique identifier from the stack. Put after the input.
-    ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil @Draw image to window.
+    ---@field win_image fun(self, image: IMAGE, width: number, height: number): nil @Draw image to window.
     ---@field win_imagebutton fun(self, label: string, image: IMAGE, width: number, height: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number): boolean @Draw imagebutton to window.
     ---@field win_section fun(self, title: string, callback: function): nil @Add a collapsing accordion section, put contents in the callback function.
     ---@field win_indent fun(self, width: number): nil @Indent contents, or unindent if negative
+    ---@field win_width fun(self, width: number): nil @Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
 
 ---@class GuiDrawContext_draw_rect
 ---@param rect AABB

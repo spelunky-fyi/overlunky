@@ -3737,5 +3737,5 @@ Use [GuiDrawContext](#GuiDrawContext)`.win_popid` instead
 
 > Search script examples for [win_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
 
-`nil win_image(IMAGE image, int width, int height)`<br/>
+`nil win_image(IMAGE image, float width, float height)`<br/>
 Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
