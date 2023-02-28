@@ -95,11 +95,12 @@ Current features and their *default* keyboard shortcuts.
   - **F11**: Hide overlay
   - **F12**: Switch UI style (default menu bar / floating dockable windows)
   - **\~ (or your native Console Key)**: Toggle developer console
-    - The console is its own script environment, where you can run some quick oneliners or paste snippets in.
+    - The console is its own script environment, where you can run some quick oneliners or paste snippets in from the API doc inline examples.
     - **Enter**: Execute
     - **Ctrl+Enter**: New line
     - **"clear/clr/cls"**: Clear history
     - **"reset/reload"**: Clear all callbacks made in the console
+    - **"enable/disable"**: Enable/Disable all callbacks made in the console temporarily
     - **"quit"**: Ragequit
     - **"P"**: Short for get_player(1)
     - **"E"**: Short for the selected Entity

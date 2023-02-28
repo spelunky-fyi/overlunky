@@ -567,16 +567,12 @@ bool LuaBackend::update()
 
 void LuaBackend::draw(ImDrawList* dl)
 {
-    if (!get_enabled())
+    if (!pre_draw() || !get_enabled())
         return;
 
     draw_list = dl;
     try
     {
-        if (!pre_draw())
-        {
-            return;
-        }
 
         // Deprecated
         /// Use `set_callback(function, ON.GUIFRAME)` instead

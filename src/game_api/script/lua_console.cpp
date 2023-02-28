@@ -380,6 +380,7 @@ LuaConsole::LuaConsole(SoundManager* soundmanager)
 
 void LuaConsole::on_history_request(ImGuiInputTextCallbackData* data)
 {
+    bool modifier = !alt_keys || ImGui::GetIO().KeyCtrl;
     std::optional<size_t> prev_history_pos = history_pos;
     if (!history_pos.has_value())
     {
@@ -388,19 +389,19 @@ void LuaConsole::on_history_request(ImGuiInputTextCallbackData* data)
             history_pos = history.size() - 1;
         }
     }
-    else if (data->EventKey == ImGuiKey_UpArrow && history_pos.value() == history.size() - 1 && data->BufTextLen == 0)
+    else if (modifier && data->EventKey == ImGuiKey_UpArrow && history_pos.value() == history.size() - 1 && data->BufTextLen == 0)
     {
         prev_history_pos = -1;
     }
-    else if (data->EventKey == ImGuiKey_DownArrow && history_pos.value() == history.size() - 1)
+    else if (modifier && data->EventKey == ImGuiKey_DownArrow && history_pos.value() == history.size() - 1)
     {
         data->DeleteChars(0, data->BufTextLen);
     }
-    else if (data->EventKey == ImGuiKey_UpArrow && history_pos.value() > 0)
+    else if (modifier && data->EventKey == ImGuiKey_UpArrow && history_pos.value() > 0)
     {
         history_pos.value()--;
     }
-    else if (data->EventKey == ImGuiKey_DownArrow && history_pos.value() < history.size() - 1)
+    else if (modifier && data->EventKey == ImGuiKey_DownArrow && history_pos.value() < history.size() - 1)
     {
         history_pos.value()++;
     }
@@ -411,6 +412,13 @@ void LuaConsole::on_history_request(ImGuiInputTextCallbackData* data)
         data->InsertChars(0, history[history_pos.value()].command.c_str());
         set_scroll_to_history_item = history_pos.value();
         highlight_history = true;
+        if (!alt_keys)
+        {
+            if (prev_history_pos > history_pos)
+                data->CursorPos = 0;
+            else
+                data->CursorPos = data->BufTextLen;
+        }
     }
 }
 bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
@@ -652,7 +660,7 @@ bool LuaConsole::on_completion(ImGuiInputTextCallbackData* data)
 bool LuaConsole::pre_draw()
 {
     has_new_history = false;
-    if (enabled)
+    if (toggled)
     {
         auto& io = ImGui::GetIO();
         auto& style = ImGui::GetStyle();
@@ -799,6 +807,8 @@ bool LuaConsole::pre_draw()
             static bool do_tab_completion{false};
 
             LuaConsole* self = static_cast<LuaConsole*>(data->UserData);
+            bool modifier = !self->alt_keys || ImGui::GetIO().KeyCtrl;
+
             if (data->EventFlag == ImGuiInputTextFlags_CallbackCharFilter)
             {
                 if (data->EventChar == '\t')
@@ -808,7 +818,7 @@ bool LuaConsole::pre_draw()
                 else if (data->EventChar != 0)
                 {
                     do_tab_completion = false;
-                    if (data->EventChar == '\n' && self->last_force_scroll.has_value())
+                    if (modifier && data->EventChar == '\n' && self->last_force_scroll.has_value())
                     {
                         if (self->last_force_scroll.value() < self->history.size())
                         {
@@ -826,39 +836,51 @@ bool LuaConsole::pre_draw()
             {
                 if (do_tab_completion && data->Buf[data->CursorPos - 1] == '\t')
                 {
-                    const auto prev_cursor_pos = data->CursorPos;
+                    const auto prev_pos = data->CursorPos;
                     data->DeleteChars(data->CursorPos - 1, 1);
-                    if (prev_cursor_pos == data->CursorPos)
+                    if (prev_pos == data->CursorPos)
                     {
                         data->CursorPos--;
                     }
                     if (!self->on_completion(data))
                     {
                         data->InsertChars(data->CursorPos, "\t");
-                        data->CursorPos = prev_cursor_pos;
+                        data->CursorPos = prev_pos;
                     }
                     do_tab_completion = false;
                 }
 
-                const bool up_arrow_pressed = ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_UpArrow));
-                const bool down_arrow_pressed = ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_DownArrow));
+                const bool up_arrow_pressed = ImGui::IsKeyPressed(ImGuiKey_UpArrow);
+                const bool down_arrow_pressed = ImGui::IsKeyPressed(ImGuiKey_DownArrow);
+                const std::string_view buf_view(data->Buf, data->BufTextLen);
 
-                if ((up_arrow_pressed || down_arrow_pressed) && (data->CursorPos == 0 || data->CursorPos == data->BufTextLen))
+                if (modifier && (up_arrow_pressed || down_arrow_pressed) && (data->CursorPos == 0 || data->CursorPos == data->BufTextLen || self->alt_keys))
                 {
                     data->EventKey = up_arrow_pressed
                                          ? ImGuiKey_UpArrow
                                          : ImGuiKey_DownArrow;
                     self->on_history_request(data);
                 }
+                else if (up_arrow_pressed && (buf_view.find_first_of("\n") == std::string::npos || self->prev_cursor_pos <= buf_view.find_first_of("\n")))
+                {
+                    data->CursorPos = 0;
+                }
+                else if (down_arrow_pressed && (buf_view.find_last_of("\n") == std::string::npos || self->prev_cursor_pos > buf_view.find_last_of("\n")))
+                {
+                    data->CursorPos = data->BufTextLen;
+                }
             }
 
+            self->prev_cursor_pos = data->CursorPos;
             return 0;
         };
 
         const float indent_size = ImGui::GetFont()->CalcTextSizeA(ImGui::GetFontSize(), std::numeric_limits<float>::max(), -1.0f, "00", nullptr, nullptr).x + 2.0f;
         ImGui::PushItemWidth(ImGui::GetWindowWidth() - indent_size);
         ImGui::Indent(indent_size);
-        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_CallbackCharFilter | ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine;
+        ImGuiInputTextFlags input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackAlways | ImGuiInputTextFlags_AllowTabInput;
+        if (!alt_keys)
+            input_text_flags |= ImGuiInputTextFlags_CtrlEnterForNewLine;
         if (ImGui::InputTextMultiline("##ConsoleInput", console_input, IM_ARRAYSIZE(console_input), ImVec2{-1, -1}, input_text_flags, input_callback, this))
         {
             if (console_input[0] != '\0')
@@ -876,6 +898,14 @@ bool LuaConsole::pre_draw()
                 else if (console_input == "quit"sv)
                 {
                     std::exit(0);
+                }
+                else if (console_input == "enable"sv)
+                {
+                    set_enabled(true);
+                }
+                else if (console_input == "disable"sv)
+                {
+                    set_enabled(false);
                 }
                 else
                 {
@@ -930,14 +960,14 @@ bool LuaConsole::pre_draw()
     return true;
 }
 
-void LuaConsole::set_enabled(bool)
+void LuaConsole::set_enabled(bool enable)
 {
+    enabled = enable;
 }
 bool LuaConsole::get_enabled() const
 {
-    return true;
+    return enabled;
 }
-
 bool LuaConsole::get_unsafe() const
 {
     return true;
@@ -1017,8 +1047,8 @@ std::string LuaConsole::execute_raw(std::string code)
 
 void LuaConsole::toggle()
 {
-    enabled = !enabled;
-    set_focus = enabled;
+    toggled = !toggled;
+    set_focus = toggled;
     scroll_to_bottom = true;
 }
 
@@ -1121,4 +1151,9 @@ void LuaConsole::set_geometry(float x, float y, float w, float h)
 {
     pos = ImVec2(x, y);
     size = ImVec2(w, h);
+}
+
+void LuaConsole::set_alt_keys(bool enable)
+{
+    alt_keys = enable;
 }
