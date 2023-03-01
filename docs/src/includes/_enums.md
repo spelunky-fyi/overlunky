@@ -919,8 +919,6 @@ Paramater to set_setting
 
 Name | Data | Description
 ---- | ---- | -----------
-[VFX](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.VFX) | 9 | 
-[BRIGHTNESS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.BRIGHTNESS) | 10 | 
 [PET_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.PET_STYLE) | 20 | 
 [SCREEN_SHAKE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.SCREEN_SHAKE) | 21 | 
 [HUD_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.HUD_STYLE) | 23 | 
@@ -929,7 +927,6 @@ Name | Data | Description
 [TIMER_DETAIL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TIMER_DETAIL) | 26 | 
 [LEVEL_NUMBER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.LEVEL_NUMBER) | 27 | 
 [ANGRY_SHOPKEEPER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.ANGRY_SHOPKEEPER) | 28 | 
-[CLASSIC_AGGRO_MUSIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.CLASSIC_AGGRO_MUSIC) | 29 | 
 [BUTTON_PROMPTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.BUTTON_PROMPTS) | 30 | 
 [FEAT_POPUPS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.FEAT_POPUPS) | 32 | 
 [TEXTBOX_SIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TEXTBOX_SIZE) | 33 | 
@@ -939,7 +936,6 @@ Name | Data | Description
 [DIALOG_TEXT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.DIALOG_TEXT) | 37 | 
 [KALI_TEXT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.KALI_TEXT) | 38 | 
 [GHOST_TEXT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.GHOST_TEXT) | 39 | 
-[BRIGHT_FLASHES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.BRIGHT_FLASHES) | 41 | 
 
 ## SCREEN
 

@@ -35,10 +35,6 @@ function f(f_string) end
 ---@return string
 function F(f_string) end
 
----@param setting GAME_SETTING
----@param value integer
----@return boolean
-function set_setting(setting, value) end
 ---Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
 ---@param slot integer
 ---@param or_ghost boolean
@@ -1059,10 +1055,6 @@ function refresh_illumination(illumination) end
 ---Removes all liquid that is about to go out of bounds, which crashes the game.
 ---@return nil
 function fix_liquid_out_of_bounds() end
----Gets the specified setting, values might need to be interpreted differently per setting
----@param setting GAME_SETTING
----@return integer?
-function get_setting(setting) end
 ---Return the name of the first matching number in an enum table
 ---@param enum table
 ---@param value integer
@@ -1078,6 +1070,15 @@ function enum_get_names(enum, value) end
 ---@param value integer
 ---@return table<string>
 function enum_get_mask_names(enum, value) end
+---Gets the specified setting, values might need to be interpreted differently per setting
+---@param setting GAME_SETTING
+---@return integer?
+function get_setting(setting) end
+---Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals.
+---@param setting GAME_SETTING
+---@param value integer
+---@return boolean
+function set_setting(setting, value) end
 ---Short for print(string.format(...))
 ---@return nil
 function printf() end

@@ -1701,7 +1701,7 @@ end
     )");
 
     /// Paramater to set_setting
-    lua.create_named_table("SAFE_SETTING", "VFX", 9, "BRIGHTNESS", 10, "PET_STYLE", 20, "SCREEN_SHAKE", 21, "HUD_STYLE", 23, "HUD_SIZE", 24, "LEVEL_TIMER", 25, "TIMER_DETAIL", 26, "LEVEL_NUMBER", 27, "ANGRY_SHOPKEEPER", 28, "CLASSIC_AGGRO_MUSIC", 29, "BUTTON_PROMPTS", 30, "FEAT_POPUPS", 32, "TEXTBOX_SIZE", 33, "TEXTBOX_DURATION", 34, "TEXTBOX_OPACITY", 35, "LEVEL_FEELINGS", 36, "DIALOG_TEXT", 37, "KALI_TEXT", 38, "GHOST_TEXT", 39, "BRIGHT_FLASHES", 41);
+    lua.create_named_table("SAFE_SETTING", "PET_STYLE", 20, "SCREEN_SHAKE", 21, "HUD_STYLE", 23, "HUD_SIZE", 24, "LEVEL_TIMER", 25, "TIMER_DETAIL", 26, "LEVEL_NUMBER", 27, "ANGRY_SHOPKEEPER", 28, "BUTTON_PROMPTS", 30, "FEAT_POPUPS", 32, "TEXTBOX_SIZE", 33, "TEXTBOX_DURATION", 34, "TEXTBOX_OPACITY", 35, "LEVEL_FEELINGS", 36, "DIALOG_TEXT", 37, "KALI_TEXT", 38, "GHOST_TEXT", 39);
 
     /// Gets the specified setting, values might need to be interpreted differently per setting
     lua["get_setting"] = get_setting;
@@ -1709,7 +1709,7 @@ end
     /// Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals.
     // lua["set_setting"] = set_setting;
     /// NoDoc
-    lua["set_setting"] = [&lua](GAME_SETTING setting, std::uint32_t value)
+    lua["set_setting"] = [](GAME_SETTING setting, std::uint32_t value)
     {
         auto backend = LuaBackend::get_calling_backend();
         bool is_safe = std::find(std::begin(safe_settings), std::end(safe_settings), setting) != std::end(safe_settings);

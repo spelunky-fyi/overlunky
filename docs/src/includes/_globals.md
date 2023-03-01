@@ -1550,7 +1550,7 @@ Set seed and reset run.
 
 set_callback(function()
     if state.screen_next == SCREEN.LEVEL then
-        -- use the hidden tiny hud size
+        -- use the secret tiny hud size
         set_setting(GAME_SETTING.HUD_SIZE, 3)
         -- force opaque textboxes
         set_setting(GAME_SETTING.TEXTBOX_OPACITY, 0)
