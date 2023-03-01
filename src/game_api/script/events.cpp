@@ -56,6 +56,9 @@ bool pre_load_screen()
         }
     }
 
+    if (state->screen_next != 5)
+        unlock_settings();
+
     bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)

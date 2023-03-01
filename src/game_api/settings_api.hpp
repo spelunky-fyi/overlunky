@@ -68,3 +68,4 @@ std::optional<std::uint32_t> get_setting_default(GAME_SETTING setting);
 std::vector<std::pair<std::string_view, GAME_SETTING>> get_settings_names_and_indices();
 void restore_original_settings();
 void save_original_setting(GAME_SETTING setting);
+void unlock_settings();

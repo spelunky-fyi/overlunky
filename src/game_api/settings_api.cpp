@@ -31,6 +31,7 @@ struct SettingData
 };
 
 static std::map<GAME_SETTING, uint32_t> g_original_settings;
+static bool g_lock_settings{false};
 
 SettingData* get_setting_data(GAME_SETTING setting)
 {
@@ -64,10 +65,19 @@ void restore_original_settings()
     for (auto& [k, v] : g_original_settings)
         set_setting(k, v);
     g_original_settings.clear();
+    g_lock_settings = true;
+}
+
+void unlock_settings()
+{
+    g_lock_settings = false;
 }
 
 bool set_setting(GAME_SETTING setting, std::uint32_t value)
 {
+    if (g_lock_settings)
+        return false;
+
     if (SettingData* data = get_setting_data(setting))
     {
         switch (setting)

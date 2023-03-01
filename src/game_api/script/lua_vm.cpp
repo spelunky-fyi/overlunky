@@ -1706,7 +1706,7 @@ end
     /// Gets the specified setting, values might need to be interpreted differently per setting
     lua["get_setting"] = get_setting;
 
-    /// Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals.
+    /// Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals. Returns false, if setting failed.
     // lua["set_setting"] = set_setting;
     /// NoDoc
     lua["set_setting"] = [](GAME_SETTING setting, std::uint32_t value)
@@ -1717,8 +1717,9 @@ end
         if (backend->get_unsafe() || is_safe)
         {
             save_original_setting(setting);
-            set_setting(setting, value);
+            return set_setting(setting, value);
         }
+        return false;
     };
 
     /// Short for print(string.format(...))
