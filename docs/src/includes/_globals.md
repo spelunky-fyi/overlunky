@@ -1544,10 +1544,27 @@ Set seed and reset run.
 ### set_setting
 
 
+```lua
+-- set some visual settings needed by your mod
+-- doing this here will reapply these after visiting the options, which would reset them to real values
+
+set_callback(function()
+    if state.screen_next == SCREEN.LEVEL then
+        -- use the hidden tiny hud size
+        set_setting(GAME_SETTING.HUD_SIZE, 3)
+        -- force opaque textboxes
+        set_setting(GAME_SETTING.TEXTBOX_OPACITY, 0)
+    end
+end, ON.PRE_LOAD_SCREEN)
+
+```
+
+
 > Search script examples for [set_setting](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_setting)
 
 #### bool set_setting([GAME_SETTING](#GAME_SETTING) setting, int value)
 
+Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals.
 
 ### set_storage_layer
 

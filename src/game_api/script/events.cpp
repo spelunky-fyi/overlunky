@@ -10,6 +10,7 @@
 #include "level_api_types.hpp"    // for LevelGenRoomData
 #include "rpc.hpp"                // for game_log, get_adventure_seed
 #include "script/lua_backend.hpp" // for LuaBackend, ON, LuaBackend::PreHan...
+#include "settings_api.hpp"       // for restore_original_settings
 #include "state.hpp"              // for StateMemory, State
 
 class JournalPage;
@@ -62,6 +63,10 @@ bool pre_load_screen()
             block = backend->pre_load_screen();
             return !block;
         });
+
+    if (state->screen_next == 5 && !block)
+        restore_original_settings();
+
     return block;
 }
 void post_room_generation()
