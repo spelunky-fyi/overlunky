@@ -111,8 +111,6 @@ void load_unsafe_libraries(sol::state& lua)
     lua.open_libraries(sol::lib::io, sol::lib::os, sol::lib::ffi, sol::lib::debug);
     require_serpent_lua(lua);
     NSocket::register_usertypes(lua);
-
-    lua["set_setting"] = set_setting;
 }
 void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
@@ -1668,9 +1666,6 @@ end
     /// Removes all liquid that is about to go out of bounds, which crashes the game.
     lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
 
-    /// Gets the specified setting, values might need to be interpreted differently per setting
-    lua["get_setting"] = get_setting;
-
     /// Return the name of the first matching number in an enum table
     // lua["enum_get_name"] = [](table enum, int value) -> string
     lua["enum_get_name"] = lua.safe_script(R"(
@@ -1704,6 +1699,28 @@ end
             return list
         end
     )");
+
+    /// Paramater to set_setting
+    lua.create_named_table("SAFE_SETTING", "PET_STYLE", 20, "SCREEN_SHAKE", 21, "HUD_STYLE", 23, "HUD_SIZE", 24, "LEVEL_TIMER", 25, "TIMER_DETAIL", 26, "LEVEL_NUMBER", 27, "ANGRY_SHOPKEEPER", 28, "BUTTON_PROMPTS", 30, "FEAT_POPUPS", 32, "TEXTBOX_SIZE", 33, "TEXTBOX_DURATION", 34, "TEXTBOX_OPACITY", 35, "LEVEL_FEELINGS", 36, "DIALOG_TEXT", 37, "KALI_TEXT", 38, "GHOST_TEXT", 39);
+
+    /// Gets the specified setting, values might need to be interpreted differently per setting
+    lua["get_setting"] = get_setting;
+
+    /// Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals. Returns false, if setting failed.
+    // lua["set_setting"] = set_setting;
+    /// NoDoc
+    lua["set_setting"] = [](GAME_SETTING setting, std::uint32_t value)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        bool is_safe = std::find(std::begin(safe_settings), std::end(safe_settings), setting) != std::end(safe_settings);
+
+        if (backend->get_unsafe() || is_safe)
+        {
+            save_original_setting(setting);
+            return set_setting(setting, value);
+        }
+        return false;
+    };
 
     /// Short for print(string.format(...))
     lua["printf"] = lua.safe_script(R"(
@@ -2293,7 +2310,7 @@ end
         "BOLD",
         2);
 
-    /// Paramater to `get_setting()`
+    /// Paramater to get_setting (and set_setting in unsafe mode)
     lua.create_named_table("GAME_SETTING"
                            //, "DAMSEL_STYLE", 0
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
