@@ -3439,6 +3439,9 @@
                     <a href="#ROOM_TEMPLATE_TYPE" class="toc-h2 toc-link" data-title="ROOM_TEMPLATE_TYPE">ROOM_TEMPLATE_TYPE</a>
                   </li>
                   <li>
+                    <a href="#SAFE_SETTING" class="toc-h2 toc-link" data-title="SAFE_SETTING">SAFE_SETTING</a>
+                  </li>
+                  <li>
                     <a href="#SCREEN" class="toc-h2 toc-link" data-title="SCREEN">SCREEN</a>
                   </li>
                   <li>
@@ -4660,11 +4663,25 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_seed-int-seed'>nil set_seed(int seed)</h4>
 <p>Set seed and reset run.</p>
-<h3 id='set_setting'>set_setting</h3>
+<h3 id='set_setting'>set_setting</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- set some visual settings needed by your mod</span>
+<span class="c1">-- doing this here will reapply these after visiting the options, which would reset them to real values</span>
+
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">screen_next</span> <span class="o">==</span> <span class="n">SCREEN</span><span class="p">.</span><span class="n">LEVEL</span> <span class="k">then</span>
+        <span class="c1">-- use the secret tiny hud size</span>
+        <span class="n">set_setting</span><span class="p">(</span><span class="n">GAME_SETTING</span><span class="p">.</span><span class="n">HUD_SIZE</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="c1">-- force opaque textboxes</span>
+        <span class="n">set_setting</span><span class="p">(</span><span class="n">GAME_SETTING</span><span class="p">.</span><span class="n">TEXTBOX_OPACITY</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">end</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">PRE_LOAD_SCREEN</span><span class="p">)</span>
+
+</code></pre></div>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_setting">set_setting</a></p>
 </blockquote>
-<h4 id='bool-set_setting-GAME_SETTING-setting-int-value'>bool set_setting(<a href="#GAME_SETTING">GAME_SETTING</a> setting, int value)</h4><h3 id='set_storage_layer'>set_storage_layer</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Sets the right layer when using the vanilla tile code if waddler is still happy,</span>
+<h4 id='bool-set_setting-GAME_SETTING-setting-int-value'>bool set_setting(<a href="#GAME_SETTING">GAME_SETTING</a> setting, int value)</h4>
+<p>Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset <a href="#SAFE_SETTING">SAFE_SETTING</a> by default for <a href="#Hud">Hud</a> and other visuals. Returns false, if setting failed.</p>
+<h3 id='set_storage_layer'>set_storage_layer</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Sets the right layer when using the vanilla tile code if waddler is still happy,</span>
 <span class="c1">-- otherwise spawns the floor to the left of this tile.</span>
 <span class="c1">-- Manually spawning FLOOR_STORAGE pre-tilecode doesn't seem to work as expected,</span>
 <span class="c1">-- so we destroy it post-tilecode.</span>
@@ -29094,6 +29111,106 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ROOM_TEMPLATE_TYPE.MACHINE_ROOM">MACHINE_ROOM</a></td>
 <td>4</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='SAFE_SETTING'>SAFE_SETTING</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING">SAFE_SETTING</a></p>
+</blockquote>
+
+<p>Paramater to set_setting</p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.PET_STYLE">PET_STYLE</a></td>
+<td>20</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.SCREEN_SHAKE">SCREEN_SHAKE</a></td>
+<td>21</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.HUD_STYLE">HUD_STYLE</a></td>
+<td>23</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.HUD_SIZE">HUD_SIZE</a></td>
+<td>24</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.LEVEL_TIMER">LEVEL_TIMER</a></td>
+<td>25</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.TIMER_DETAIL">TIMER_DETAIL</a></td>
+<td>26</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.LEVEL_NUMBER">LEVEL_NUMBER</a></td>
+<td>27</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.ANGRY_SHOPKEEPER">ANGRY_SHOPKEEPER</a></td>
+<td>28</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.BUTTON_PROMPTS">BUTTON_PROMPTS</a></td>
+<td>30</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.FEAT_POPUPS">FEAT_POPUPS</a></td>
+<td>32</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.TEXTBOX_SIZE">TEXTBOX_SIZE</a></td>
+<td>33</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.TEXTBOX_DURATION">TEXTBOX_DURATION</a></td>
+<td>34</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.TEXTBOX_OPACITY">TEXTBOX_OPACITY</a></td>
+<td>35</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.LEVEL_FEELINGS">LEVEL_FEELINGS</a></td>
+<td>36</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.DIALOG_TEXT">DIALOG_TEXT</a></td>
+<td>37</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.KALI_TEXT">KALI_TEXT</a></td>
+<td>38</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.GHOST_TEXT">GHOST_TEXT</a></td>
+<td>39</td>
 <td></td>
 </tr>
 </tbody></table>

@@ -1074,7 +1074,7 @@ function enum_get_mask_names(enum, value) end
 ---@param setting GAME_SETTING
 ---@return integer?
 function get_setting(setting) end
----Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals.
+---Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals. Returns false, if setting failed.
 ---@param setting GAME_SETTING
 ---@param value integer
 ---@return boolean

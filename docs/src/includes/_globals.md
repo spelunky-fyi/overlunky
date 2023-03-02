@@ -1564,7 +1564,7 @@ end, ON.PRE_LOAD_SCREEN)
 
 #### bool set_setting([GAME_SETTING](#GAME_SETTING) setting, int value)
 
-Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals.
+Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals. Returns false, if setting failed.
 
 ### set_storage_layer
 
