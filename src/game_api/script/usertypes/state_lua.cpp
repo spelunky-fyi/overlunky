@@ -135,6 +135,7 @@ void register_usertypes(sol::state& lua)
     arenastate_type["timer_ending"] = &ArenaState::timer_ending;
     arenastate_type["wins"] = &ArenaState::wins;
     arenastate_type["lives"] = &ArenaState::lives;
+    arenastate_type["time_to_win"] = &ArenaState::time_to_win;
     arenastate_type["player_idolheld_countdown"] = &ArenaState::player_idolheld_countdown;
     arenastate_type["health"] = &ArenaState::health;
     arenastate_type["bombs"] = &ArenaState::bombs;

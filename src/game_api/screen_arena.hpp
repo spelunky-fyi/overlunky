@@ -130,6 +130,26 @@ class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
     float unknown30;
     float unknown31;
     float unknown32;
+    uint32_t unknown33;
+    uint32_t unknown34;
+    uint32_t unknown35;
+    uint32_t unknown36;
+    uint32_t unknown37;
+    uint32_t unknown38;
+    uint32_t unknown39;
+    uint32_t unknown40;
+    uint32_t unknown41;
+    uint32_t unknown42;
+    uint32_t unknown43;
+    uint32_t unknown44;
+    uint32_t unknown45;
+    uint32_t unknown46;
+    uint32_t unknown47;
+    uint32_t unknown48;
+    uint32_t unknown49;
+    uint32_t unknown50;
+    uint32_t unknown51;
+    uint32_t selected_stage_index;
 };
 
 class ScreenArenaItems : public Screen // ID: 23

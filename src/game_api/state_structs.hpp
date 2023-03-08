@@ -357,7 +357,7 @@ struct ArenaState
     uint8_t timer_ending;
     uint8_t wins;
     uint8_t lives;
-    uint8_t unknown15; // time_to_win
+    uint8_t time_to_win;
     uint8_t unknown16;
     std::array<uint16_t, 4> player_idolheld_countdown;
     uint8_t health;
