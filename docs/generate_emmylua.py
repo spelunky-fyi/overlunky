@@ -404,10 +404,10 @@ function F(f_string) end
     print("\n--## Enums\n")
     enumStr = ""
     data = open("./game_data/lua_enums.txt", "r", encoding="latin-1").read()
-    match_i = re.finditer(r"\n([A-Z_]+?) = {\n(?! *__)[\s\S]+?\n}", data)
+    match_i = re.finditer(r"(?:^|\n)(([A-Z_]+?) = {\n(?! *__)[\s\S]+?\n})", data)
 
     for match in match_i:
-        enumStr += f"\n{match.group(0)[1:]}\n---@alias {match.group(1)} integer"
+        enumStr += f"\n{match.group(1)}\n---@alias {match.group(2)} integer"
 
     print(enumStr)
 
