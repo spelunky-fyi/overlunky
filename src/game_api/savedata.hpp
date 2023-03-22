@@ -88,8 +88,11 @@ struct SaveData
     char last_daily[8];
     uint8_t show_longer_journal_popup_count; // the next n times the 'Journal entry added' popup is shown, it's shown for 300 frames instead of 180
     int8_t skip2[3];
+    /// 20bit bitmask of unlocked characters
     uint32_t characters;
+    /// Tutorial state 0..4. Changes the camp layout, camera and lighting. (0=nothing, 1=journal got, 2=key spawned, 3=door unlocked, 4=complete)
     int8_t tutorial_state;
+    /// Terra quest state 0..10 (0=not met ... 10=complete)
     uint8_t shortcuts;
     int8_t skip3[2];
     std::array<int32_t, 78> bestiary_killed;

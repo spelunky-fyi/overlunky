@@ -1498,6 +1498,7 @@ void register_usertypes(sol::state& lua)
     savedata_type["traps"] = &SaveData::traps;
     savedata_type["last_daily"] = &SaveData::last_daily;
     savedata_type["characters"] = &SaveData::characters;
+    savedata_type["tutorial_state"] = &SaveData::tutorial_state;
     savedata_type["shortcuts"] = &SaveData::shortcuts;
     savedata_type["bestiary_killed"] = &SaveData::bestiary_killed;
     savedata_type["bestiary_killed_by"] = &SaveData::bestiary_killed_by;
@@ -1524,6 +1525,7 @@ void register_usertypes(sol::state& lua)
     savedata_type["seeded_unlocked"] = &SaveData::seeded_unlocked;
     savedata_type["world_last"] = &SaveData::world_last;
     savedata_type["level_last"] = &SaveData::level_last;
+    savedata_type["theme_last"] = &SaveData::theme_last;
     savedata_type["score_last"] = &SaveData::score_last;
     savedata_type["time_last"] = &SaveData::time_last;
     savedata_type["stickers"] = &SaveData::stickers;
