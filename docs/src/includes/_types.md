@@ -1419,8 +1419,9 @@ array&lt;bool, 38&gt; | [people](https://github.com/spelunky-fyi/overlunky/searc
 array&lt;bool, 54&gt; | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | 
 array&lt;bool, 24&gt; | [traps](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=traps) | 
 string | [last_daily](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily) | 
-int | [characters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters) | 
-int | [shortcuts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shortcuts) | 
+int | [characters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters) | 20bit bitmask of unlocked characters
+int | [tutorial_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tutorial_state) | Tutorial state 0..4. Changes the camp layout, camera and lighting. (0=nothing, 1=journal got, 2=key spawned, 3=door unlocked, 4=complete)
+int | [shortcuts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shortcuts) | [Terra](#Terra) quest state 0..10 (0=not met ... 10=complete)
 array&lt;int, 78&gt; | [bestiary_killed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed) | 
 array&lt;int, 78&gt; | [bestiary_killed_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed_by) | 
 array&lt;int, 38&gt; | [people_killed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people_killed) | 
@@ -1446,6 +1447,7 @@ bool | [profile_seen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=p
 bool | [seeded_unlocked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seeded_unlocked) | 
 int | [world_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_last) | 
 int | [level_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_last) | 
+int | [theme_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_last) | 
 int | [score_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_last) | 
 int | [time_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last) | 
 array&lt;[ENT_TYPE](#ENT_TYPE), 20&gt; | [stickers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) | 

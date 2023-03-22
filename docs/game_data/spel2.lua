@@ -4343,8 +4343,9 @@ local function MovableBehavior_get_state_id(self) end
     ---@field items boolean[] @size: 54
     ---@field traps boolean[] @size: 24
     ---@field last_daily string
-    ---@field characters integer
-    ---@field shortcuts integer
+    ---@field characters integer @20bit bitmask of unlocked characters
+    ---@field tutorial_state integer @Tutorial state 0..4. Changes the camp layout, camera and lighting. (0=nothing, 1=journal got, 2=key spawned, 3=door unlocked, 4=complete)
+    ---@field shortcuts integer @Terra quest state 0..10 (0=not met ... 10=complete)
     ---@field bestiary_killed integer[] @size: 78
     ---@field bestiary_killed_by integer[] @size: 78
     ---@field people_killed integer[] @size: 38
@@ -4370,6 +4371,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field seeded_unlocked boolean
     ---@field world_last integer
     ---@field level_last integer
+    ---@field theme_last integer
     ---@field score_last integer
     ---@field time_last integer
     ---@field stickers ENT_TYPE[] @size: 20
