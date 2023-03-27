@@ -1878,9 +1878,14 @@ void load_void(std::string data)
                                }};
                 callbacks.push_back(cb);
             }
+            else if (ent->type->search_flags & 0x8)
+            {
+                ent->y = e.y - 0.5f + ent->hitboxy - ent->offsety;
+            }
         }
         ents = ents.substr(6);
     }
+    // TODO: attach floor_spikes to floor, flip arrow traps or add direction metadata
 }
 
 void import_void()
@@ -1914,13 +1919,19 @@ void import_void()
 
 std::string serialize_void()
 {
+    const int export_mask = 398;
     auto [px, py] = g_players[0]->position();
     std::string v = fmt::format("V1{:02X}{:02X}", (uint8_t)(px + 0.5f), (uint8_t)(py + 0.5f));
-    for (auto uid : UI::get_entities_by({}, 398, LAYER::FRONT))
+    auto uids = g_selected_ids;
+    if (uids.empty())
+        uids = UI::get_entities_by({}, export_mask, LAYER::FRONT);
+    for (auto uid : uids)
     {
         auto ent = get_entity_ptr(uid)->as<Movable>();
+        if (!(ent->type->search_flags & export_mask))
+            continue;
         auto [x, y] = ent->position();
-        if ((!ent->overlay || (ent->x != 0 && ent->y != 0)) && x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
+        if ((!ent->overlay || (ent->x != 0 || ent->y != 0)) && x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
         {
             char buf[4];
             _itoa_s(ent->type->id, buf, 4, 36);
