@@ -99,7 +99,7 @@ std::map<std::string, int64_t> default_keys{
     {"toggle_ghost", OL_KEY_CTRL | 'O'},
     {"toggle_void", OL_KEY_ALT | 'V'},
     {"import_void", OL_KEY_CTRL | 'V'},
-    {"export_void", OL_KEY_CTRL | 'B'},
+    {"export_void", OL_KEY_CTRL | 'E'},
     {"toggle_speedhack_auto", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
@@ -1851,11 +1851,11 @@ void load_void(std::string data)
                               { return !std::isalnum(c); }),
                data.end());
     VoidData v;
-    sscanf_s(data.c_str(), "V%02X%02X", &v.x, &v.y);
+    sscanf_s(data.c_str(), "V1%02X%02X", &v.x, &v.y);
     g_players = UI::get_players();
     g_players[0]->teleport_abs((float)v.x, (float)v.y, 0, 0);
 
-    std::string ents = data.substr(5);
+    std::string ents = data.substr(6);
     if (ents.size() > 0)
         clear_void();
     while (ents.size() > 0)
@@ -1890,7 +1890,7 @@ void import_void()
                               { return !std::isalnum(c); }),
                clip.end());
 
-    if (clip != "" && clip[0] == 'V')
+    if (clip.size() > 2 && clip[0] == 'V' && clip[1] == '1') // void data, version 1 I guess
     {
         if (g_state->screen != 12 || g_players.empty())
         {
@@ -1915,7 +1915,7 @@ void import_void()
 std::string serialize_void()
 {
     auto [px, py] = g_players[0]->position();
-    std::string v = fmt::format("V{:02X}{:02X}", (uint8_t)(px + 0.5f), (uint8_t)(py + 0.5f));
+    std::string v = fmt::format("V1{:02X}{:02X}", (uint8_t)(px + 0.5f), (uint8_t)(py + 0.5f));
     for (auto uid : UI::get_entities_by({}, 398, LAYER::FRONT))
     {
         auto ent = get_entity_ptr(uid)->as<Movable>();
