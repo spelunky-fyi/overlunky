@@ -1828,6 +1828,7 @@ struct VoidEntity
     uint32_t id;
     uint32_t x;
     uint32_t y;
+    uint32_t flags;
     /*uint32_t layer;
     uint32_t health;
     uint32_t state;
@@ -1861,9 +1862,9 @@ void load_void(std::string data)
     while (ents.size() > 0)
     {
         VoidEntity e;
-        std::string str = ents.substr(0, 6);
+        std::string str = ents.substr(0, 8);
         std::string id36 = str.substr(0, 2);
-        sscanf_s(str.c_str() + 2, "%02X%02X", &e.x, &e.y);
+        sscanf_s(str.c_str() + 2, "%02X%02X%02X", &e.x, &e.y, &e.flags);
         e.id = strtol(id36.c_str(), nullptr, 36);
         if (e.id <= 915)
         {
@@ -1882,10 +1883,16 @@ void load_void(std::string data)
             {
                 ent->y = e.y - 0.5f + ent->hitboxy - ent->offsety;
             }
+            if (e.flags & 1)
+            {
+                ent->flags = set_flag(ent->flags, 17);
+                for (auto trig : ent->items.entities())
+                    trig->flags = set_flag(trig->flags, 17);
+            }
         }
-        ents = ents.substr(6);
+        ents = ents.substr(8);
     }
-    // TODO: attach floor_spikes to floor, flip arrow traps or add direction metadata
+    // TODO: attach spikes, totems to floor
 }
 
 void import_void()
@@ -1927,8 +1934,8 @@ std::string serialize_void()
         uids = UI::get_entities_by({}, export_mask, LAYER::FRONT);
     for (auto uid : uids)
     {
-        auto ent = get_entity_ptr(uid)->as<Movable>();
-        if (!(ent->type->search_flags & export_mask))
+        auto ent = get_entity_ptr(uid);
+        if (!ent || !(ent->type->search_flags & export_mask))
             continue;
         auto [x, y] = ent->position();
         if ((!ent->overlay || (ent->x != 0 || ent->y != 0)) && x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
@@ -1940,7 +1947,10 @@ std::string serialize_void()
                 buf[1] = buf[0];
                 buf[0] = '0';
             }
-            v += fmt::format("{:2s}{:02X}{:02X}", buf, (uint8_t)(x + 0.5f), (uint8_t)(y + 0.5f));
+            uint32_t flags = 0;
+            if (test_flag(ent->flags, 17))
+                flags = set_flag(flags, 1);
+            v += fmt::format("{:2s}{:02X}{:02X}{:02X}", buf, (uint8_t)(x + 0.5f), (uint8_t)(y + 0.5f), (uint8_t)flags);
         }
     }
     return v;
