@@ -186,6 +186,11 @@ int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float v
 
     return state->layers[state->camera_layer]->spawn_entity(entity_type, x, y, s, vx, vy, snap)->uid;
 }
+int32_t UI::spawn_grid(ENT_TYPE entity_type, float x, float y, uint8_t layer)
+{
+    auto state = State::get().ptr_local();
+    return state->layers[layer]->spawn_entity(entity_type, x, y, false, 0, 0, false)->uid;
+}
 int32_t UI::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get().ptr_local();
