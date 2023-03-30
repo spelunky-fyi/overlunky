@@ -98,6 +98,8 @@ std::map<std::string, int64_t> default_keys{
     {"toggle_lights", OL_KEY_CTRL | 'L'},
     {"toggle_ghost", OL_KEY_CTRL | 'O'},
     {"toggle_void", OL_KEY_ALT | 'V'},
+    {"import_void", OL_KEY_CTRL | 'V'},
+    {"export_void", OL_KEY_CTRL | 'E'},
     {"toggle_speedhack_auto", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
@@ -258,7 +260,7 @@ SaveData* g_save = 0;
 GameManager* g_game_manager = 0;
 std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
-std::string active_tab = "", activate_tab = "", detach_tab = "", focused_tool = "";
+std::string active_tab = "", activate_tab = "", detach_tab = "", focused_tool = "", g_load_void = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_texture", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 std::vector<std::string> tab_order_main = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options"};
 std::vector<std::string> tab_order_extra = {"tool_texture"};
@@ -1744,28 +1746,6 @@ void force_cheats()
     }
 }
 
-void force_kits()
-{
-    if (g_state->screen == 12 && g_state->time_total <= 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
-    {
-        for (auto kit : kits)
-        {
-            if (kit->automatic)
-                spawn_kit(kit);
-        }
-        g_last_kit_spawn = g_state->time_startup + 1;
-    }
-}
-
-void frame_advance()
-{
-    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
-    {
-        g_state->pause = 0x2;
-        g_pause_at = -1;
-    }
-}
-
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
     static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
@@ -1797,6 +1777,218 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     {
         g_game_manager->main_menu_music->kill(false);
         g_game_manager->main_menu_music = nullptr;
+    }
+}
+
+std::string get_clipboard()
+{
+    if (!OpenClipboard(nullptr))
+        return "";
+    HANDLE hData = GetClipboardData(CF_TEXT);
+    if (hData == nullptr)
+        return "";
+    char* pszText = static_cast<char*>(GlobalLock(hData));
+    if (pszText == nullptr)
+        return "";
+    std::string str(pszText);
+    GlobalUnlock(hData);
+    CloseClipboard();
+    return str;
+}
+
+void set_clipboard(std::string str)
+{
+    const char* output = str.c_str();
+    const size_t len = strlen(output) + 1;
+    HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
+    memcpy(GlobalLock(hMem), output, len);
+    GlobalUnlock(hMem);
+    OpenClipboard(0);
+    EmptyClipboard();
+    SetClipboardData(CF_TEXT, hMem);
+    CloseClipboard();
+}
+
+struct VoidData
+{
+    uint32_t x;
+    uint32_t y;
+    /*uint32_t health;
+    uint32_t bombs;
+    uint32_t ropes;
+    uint32_t width;
+    uint32_t height;
+    uint32_t world;
+    uint32_t level;
+    uint32_t theme;*/
+};
+
+struct VoidEntity
+{
+    uint32_t id;
+    uint32_t x;
+    uint32_t y;
+    uint32_t flags;
+    /*uint32_t layer;
+    uint32_t health;
+    uint32_t state;
+    uint32_t ai;*/
+};
+
+void clear_void()
+{
+    for (auto uid : UI::get_entities_by({}, 1422, LAYER::FRONT))
+    {
+        auto ent = get_entity_ptr(uid);
+        auto [x, y] = ent->position();
+        if (x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
+            UI::safe_destroy(ent);
+    }
+}
+
+void load_void(std::string data)
+{
+    data.erase(std::remove_if(data.begin(), data.end(), [](char c)
+                              { return !std::isalnum(c); }),
+               data.end());
+    VoidData v;
+    sscanf_s(data.c_str(), "V1%02X%02X", &v.x, &v.y);
+    g_players = UI::get_players();
+    g_players[0]->teleport_abs((float)v.x, (float)v.y, 0, 0);
+
+    std::string ents = data.substr(6);
+    if (ents.size() > 0)
+        clear_void();
+    while (ents.size() > 0)
+    {
+        VoidEntity e;
+        std::string str = ents.substr(0, 8);
+        std::string id36 = str.substr(0, 2);
+        sscanf_s(str.c_str() + 2, "%02X%02X%02X", &e.x, &e.y, &e.flags);
+        e.id = strtol(id36.c_str(), nullptr, 36);
+        if (e.id <= 915)
+        {
+            auto uid = UI::spawn_grid(e.id, (float)e.x, (float)e.y, 0);
+            auto ent = get_entity_ptr(uid);
+            if (ent->type->search_flags & 0x100)
+            {
+                fix_decorations_at((float)e.x, (float)e.y, LAYER::FRONT);
+                Callback cb = {g_state->time_total + 2, [e]
+                               {
+                                   fix_decorations_at((float)e.x, (float)e.y, LAYER::FRONT);
+                               }};
+                callbacks.push_back(cb);
+            }
+            else if (ent->type->search_flags & 0x8)
+            {
+                ent->y = e.y - 0.5f + ent->hitboxy - ent->offsety;
+            }
+            if (e.flags & 1)
+            {
+                ent->flags = set_flag(ent->flags, 17);
+                for (auto trig : ent->items.entities())
+                    trig->flags = set_flag(trig->flags, 17);
+            }
+        }
+        ents = ents.substr(8);
+    }
+    // TODO: attach spikes, totems to floor
+}
+
+void import_void()
+{
+    auto clip = get_clipboard();
+    clip.erase(std::remove_if(clip.begin(), clip.end(), [](char c)
+                              { return !std::isalnum(c); }),
+               clip.end());
+
+    if (clip.size() > 2 && clip[0] == 'V' && clip[1] == '1') // void data, version 1 I guess
+    {
+        if (g_state->screen != 12 || g_players.empty())
+        {
+            g_load_void = clip;
+            g_ui_scripts["void"]->set_enabled(true);
+            quick_start(12, 1, 1, 1);
+        }
+        else if (g_ui_scripts["void"]->is_enabled())
+        {
+            load_void(clip);
+        }
+        else
+        {
+            g_load_void = clip;
+            g_ui_scripts["void"]->set_enabled(true);
+            g_state->quest_flags = 1;
+            g_state->loading = 1;
+        }
+    }
+}
+
+std::string serialize_void()
+{
+    const int export_mask = 398;
+    auto [px, py] = g_players[0]->position();
+    std::string v = fmt::format("V1{:02X}{:02X}", (uint8_t)(px + 0.5f), (uint8_t)(py + 0.5f));
+    auto uids = g_selected_ids;
+    if (uids.empty())
+        uids = UI::get_entities_by({}, export_mask, LAYER::FRONT);
+    for (auto uid : uids)
+    {
+        auto ent = get_entity_ptr(uid);
+        if (!ent || !(ent->type->search_flags & export_mask))
+            continue;
+        auto [x, y] = ent->position();
+        if ((!ent->overlay || (ent->x != 0 || ent->y != 0)) && x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
+        {
+            char buf[4];
+            _itoa_s(ent->type->id, buf, 4, 36);
+            if (ent->type->id < 36)
+            {
+                buf[1] = buf[0];
+                buf[0] = '0';
+            }
+            uint32_t flags = 0;
+            if (test_flag(ent->flags, 17))
+                flags = set_flag(flags, 1);
+            v += fmt::format("{:2s}{:02X}{:02X}{:02X}", buf, (uint8_t)(x + 0.5f), (uint8_t)(y + 0.5f), (uint8_t)flags);
+        }
+    }
+    return v;
+}
+
+void export_void()
+{
+    if (g_state->screen != 12 || g_players.empty())
+        return;
+    set_clipboard(serialize_void());
+}
+
+void force_kits()
+{
+    if (g_state->screen == 12 && g_state->time_total <= 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
+    {
+        for (auto kit : kits)
+        {
+            if (kit->automatic)
+                spawn_kit(kit);
+        }
+
+        if (g_load_void != "")
+        {
+            load_void(g_load_void);
+            g_load_void = "";
+        }
+
+        g_last_kit_spawn = g_state->time_startup + 1;
+    }
+}
+
+void frame_advance()
+{
+    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
+    {
+        g_state->pause = 0x2;
+        g_pause_at = -1;
     }
 }
 
@@ -2520,6 +2712,14 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_ui_scripts["void"]->set_enabled(!g_ui_scripts["void"]->is_enabled());
         g_state->quest_flags = 1;
         g_state->loading = 1;
+    }
+    else if (pressed("import_void", wParam))
+    {
+        import_void();
+    }
+    else if (pressed("export_void", wParam))
+    {
+        export_void();
     }
     else if (pressed("spawn_layer_door", wParam))
     {
