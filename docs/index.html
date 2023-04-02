@@ -3257,6 +3257,12 @@
                     <a href="#ON-RENDER_POST_PAUSE_MENU" class="toc-h2 toc-link" data-title="ON.RENDER_POST_PAUSE_MENU">ON.RENDER_POST_PAUSE_MENU</a>
                   </li>
                   <li>
+                    <a href="#ON-RENDER_PRE_BLURRED_BACKGROUND" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_BLURRED_BACKGROUND">ON.RENDER_PRE_BLURRED_BACKGROUND</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_POST_BLURRED_BACKGROUND" class="toc-h2 toc-link" data-title="ON.RENDER_POST_BLURRED_BACKGROUND">ON.RENDER_POST_BLURRED_BACKGROUND</a>
+                  </li>
+                  <li>
                     <a href="#ON-RENDER_PRE_DRAW_DEPTH" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_DRAW_DEPTH">ON.RENDER_PRE_DRAW_DEPTH</a>
                   </li>
                   <li>
@@ -11119,6 +11125,11 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fade_timer">fade_timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -26139,13 +26150,41 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_PAUSE_MENU">ON.RENDER_PRE_PAUSE_MENU</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them<br/></p>
 <h2 id='ON-RENDER_POST_PAUSE_MENU'>ON.RENDER_POST_PAUSE_MENU</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_PAUSE_MENU">ON.RENDER_POST_PAUSE_MENU</a></p>
 </blockquote>
 
 <p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the pause menu is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
+<h2 id='ON-RENDER_PRE_BLURRED_BACKGROUND'>ON.RENDER_PRE_BLURRED_BACKGROUND</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_BLURRED_BACKGROUND">ON.RENDER_PRE_BLURRED_BACKGROUND</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them<br/></p>
+<h2 id='ON-RENDER_POST_BLURRED_BACKGROUND'>ON.RENDER_POST_BLURRED_BACKGROUND</h2><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- replace journal book background with a piece of paper, drawn on top of the blurred bg</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">blur</span><span class="p">)</span>
+    <span class="kd">local</span> <span class="n">src</span> <span class="o">=</span> <span class="n">Quad</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="n">AABB</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">535</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">21</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">85</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">93</span><span class="p">))</span>
+    <span class="kd">local</span> <span class="n">dest</span> <span class="o">=</span> <span class="n">Quad</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="n">AABB</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="kd">local</span> <span class="n">col</span> <span class="o">=</span> <span class="n">Color</span><span class="p">:</span><span class="n">white</span><span class="p">()</span>
+    <span class="n">col</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">game_manager</span><span class="p">.</span><span class="n">journal_ui</span><span class="p">.</span><span class="n">opacity</span> <span class="c1">--or simply 'blur' to draw behind pause menu too</span>
+    <span class="n">ctx</span><span class="p">:</span><span class="n">draw_screen_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_JOURNAL_TOP_MAIN_0</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+    <span class="c1">-- hide real book offscreen, only drawing pages</span>
+    <span class="n">game_manager</span><span class="p">.</span><span class="n">journal_ui</span><span class="p">.</span><span class="n">book_background</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">RENDER_POST_BLURRED_BACKGROUND</span><span class="p">)</span>
+
+<span class="c1">-- the previous cb is not called for death screen, default to normal book bg there</span>
+<span class="n">set_pre_render_screen</span><span class="p">(</span><span class="n">SCREEN</span><span class="p">.</span><span class="n">DEATH</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+    <span class="n">game_manager</span><span class="p">.</span><span class="n">journal_ui</span><span class="p">.</span><span class="n">book_background</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">end</span><span class="p">)</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_BLURRED_BACKGROUND">ON.RENDER_POST_BLURRED_BACKGROUND</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx. (blur amount is probably the same as journal opacity)<br/></p>
 <h2 id='ON-RENDER_PRE_DRAW_DEPTH'>ON.RENDER_PRE_DRAW_DEPTH</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_DRAW_DEPTH">ON.RENDER_PRE_DRAW_DEPTH</a></p>
@@ -28504,12 +28543,22 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_PAUSE_MENU">RENDER_PRE_PAUSE_MENU</a></td>
 <td>ON::RENDER_PRE_PAUSE_MENU</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_PAUSE_MENU">RENDER_POST_PAUSE_MENU</a></td>
 <td>ON::RENDER_POST_PAUSE_MENU</td>
 <td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the pause menu is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_BLURRED_BACKGROUND">RENDER_PRE_BLURRED_BACKGROUND</a></td>
+<td>ON::RENDER_PRE_BLURRED_BACKGROUND</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_BLURRED_BACKGROUND">RENDER_POST_BLURRED_BACKGROUND</a></td>
+<td>ON::RENDER_POST_BLURRED_BACKGROUND</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx. (blur amount is probably the same as journal opacity)<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_DRAW_DEPTH">RENDER_PRE_DRAW_DEPTH</a></td>

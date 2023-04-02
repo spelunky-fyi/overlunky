@@ -5165,6 +5165,7 @@ local function Triangle_offset(self, x, y) end
     ---@field entire_book TextureRenderingInfo
     ---@field page_timer integer
     ---@field fade_timer integer
+    ---@field opacity integer
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo
