@@ -118,11 +118,11 @@ void render_pause_menu(float* drawing_info)
 
 using VanillaRenderBlurredBgFun = void(size_t, float, size_t);
 VanillaRenderBlurredBgFun* g_render_blurred_bg_trampoline{nullptr};
-void render_blurred_bg(size_t a, float b, size_t c)
+void render_blurred_bg(size_t a, float blur_amount, size_t c)
 {
-    trigger_vanilla_render_callbacks(ON::RENDER_PRE_BLURRED_BACKGROUND);
-    g_render_blurred_bg_trampoline(a, b, c);
-    trigger_vanilla_render_callbacks(ON::RENDER_POST_BLURRED_BACKGROUND);
+    trigger_vanilla_render_blur_callbacks(ON::RENDER_PRE_BLURRED_BACKGROUND, blur_amount);
+    g_render_blurred_bg_trampoline(a, blur_amount, c);
+    trigger_vanilla_render_blur_callbacks(ON::RENDER_POST_BLURRED_BACKGROUND, blur_amount);
 }
 
 using VanillaRenderDrawDepthFun = void(Layer*, uint8_t, float, float, float, float);

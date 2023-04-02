@@ -2156,11 +2156,11 @@ end
     // Params: VanillaRenderContext render_ctx
     // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_BLURRED_BACKGROUND
-    // Params: VanillaRenderContext render_ctx
+    // Params: VanillaRenderContext render_ctx, float blur
     // Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them
     // RENDER_POST_BLURRED_BACKGROUND
-    // Params: VanillaRenderContext render_ctx
-    // Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // Params: VanillaRenderContext render_ctx, float blur
+    // Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx. (blur amount is probably the same as journal opacity)
     // RENDER_PRE_DRAW_DEPTH
     // Params: VanillaRenderContext render_ctx, int draw_depth
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx

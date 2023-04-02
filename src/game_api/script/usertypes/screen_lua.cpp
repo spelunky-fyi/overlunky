@@ -586,9 +586,9 @@ void register_usertypes(sol::state& lua)
                 case 0:
                     return 0.0f;
                 case 1:
-                    return 1.0f - (float)ui.fade_timer / 14.0f;
+                    return 1.0f - (float)ui.fade_timer / 15.0f;
                 case 5:
-                    return (float)ui.fade_timer / 14.0f;
+                    return (float)ui.fade_timer / 15.0f;
                 default:
                     return 1.0f;
                 } }));

@@ -1164,6 +1164,28 @@ void LuaBackend::process_vanilla_render_callbacks(ON event)
     }
 }
 
+void LuaBackend::process_vanilla_render_blur_callbacks(ON event, float blur_amount)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, render_ctx, blur_amount);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+
 bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, Hud* hud)
 {
     bool skip{false};
