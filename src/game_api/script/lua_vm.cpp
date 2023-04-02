@@ -2006,6 +2006,10 @@ end
         ON::RENDER_PRE_PAUSE_MENU,
         "RENDER_POST_PAUSE_MENU",
         ON::RENDER_POST_PAUSE_MENU,
+        "RENDER_PRE_BLURRED_BACKGROUND",
+        ON::RENDER_PRE_BLURRED_BACKGROUND,
+        "RENDER_POST_BLURRED_BACKGROUND",
+        ON::RENDER_POST_BLURRED_BACKGROUND,
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
         "RENDER_POST_DRAW_DEPTH",
@@ -2147,10 +2151,16 @@ end
     // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_PAUSE_MENU
     // Params: VanillaRenderContext render_ctx
-    // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them
     // RENDER_POST_PAUSE_MENU
     // Params: VanillaRenderContext render_ctx
     // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_PRE_BLURRED_BACKGROUND
+    // Params: VanillaRenderContext render_ctx
+    // Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them
+    // RENDER_POST_BLURRED_BACKGROUND
+    // Params: VanillaRenderContext render_ctx
+    // Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_DRAW_DEPTH
     // Params: VanillaRenderContext render_ctx, int draw_depth
     // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx

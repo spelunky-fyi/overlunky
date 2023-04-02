@@ -972,6 +972,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        "render_blurred_bg"sv,
+        // Second call in the previous function
+        PatternCommandBuffer{}
+            .find_inst("48 c7 84 24 c0 00 00 00 00 00 80 3f 48 8b 81 a8 00 00 00"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "render_draw_depth"sv,
         // Break on draw_world_texture and go a couple functions higher in the call stack (4-5) until
         // you reach one that has rdx counting down from 0x35 to 0x01
