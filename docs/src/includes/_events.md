@@ -367,7 +367,7 @@ Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after 
 
 > Search script examples for [ON.RENDER_PRE_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU)
 
-Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them<br/>
 
 ## ON.RENDER_POST_PAUSE_MENU
 
@@ -375,6 +375,40 @@ Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before
 > Search script examples for [ON.RENDER_POST_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_PAUSE_MENU)
 
 Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
+
+## ON.RENDER_PRE_BLURRED_BACKGROUND
+
+
+> Search script examples for [ON.RENDER_PRE_BLURRED_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_BLURRED_BACKGROUND)
+
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them<br/>
+
+## ON.RENDER_POST_BLURRED_BACKGROUND
+
+
+```lua
+-- replace journal book background with a piece of paper, drawn on top of the blurred bg
+set_callback(function(ctx, blur)
+    local src = Quad:new(AABB:new(0.535, 0.21, 0.85, 0.93))
+    local dest = Quad:new(AABB:new(-1, 1, 1, -1))
+    local col = Color:white()
+    col.a = game_manager.journal_ui.opacity --or simply 'blur' to draw behind pause menu too
+    ctx:draw_screen_texture(TEXTURE.DATA_TEXTURES_JOURNAL_TOP_MAIN_0, src, dest, col)
+    -- hide real book offscreen, only drawing pages
+    game_manager.journal_ui.book_background.y = 2
+end, ON.RENDER_POST_BLURRED_BACKGROUND)
+
+-- the previous cb is not called for death screen, default to normal book bg there
+set_pre_render_screen(SCREEN.DEATH, function(ctx)
+    game_manager.journal_ui.book_background.y = 0
+end)
+
+```
+
+
+> Search script examples for [ON.RENDER_POST_BLURRED_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_BLURRED_BACKGROUND)
+
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, float blur<br/>Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx. (blur amount is probably the same as journal opacity)<br/>
 
 ## ON.RENDER_PRE_DRAW_DEPTH
 
