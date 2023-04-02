@@ -116,6 +116,15 @@ void render_pause_menu(float* drawing_info)
     trigger_vanilla_render_callbacks(ON::RENDER_POST_PAUSE_MENU);
 }
 
+using VanillaRenderBlurredBgFun = void(size_t, float, size_t);
+VanillaRenderBlurredBgFun* g_render_blurred_bg_trampoline{nullptr};
+void render_blurred_bg(size_t a, float blur_amount, size_t c)
+{
+    trigger_vanilla_render_blur_callbacks(ON::RENDER_PRE_BLURRED_BACKGROUND, blur_amount);
+    g_render_blurred_bg_trampoline(a, blur_amount, c);
+    trigger_vanilla_render_blur_callbacks(ON::RENDER_POST_BLURRED_BACKGROUND, blur_amount);
+}
+
 using VanillaRenderDrawDepthFun = void(Layer*, uint8_t, float, float, float, float);
 VanillaRenderDrawDepthFun* g_render_draw_depth_trampoline{nullptr};
 void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float bbox_bottom, float bbox_right, float bbox_top)
@@ -512,6 +521,7 @@ void init_render_api_hooks()
     g_render_layer_trampoline = (RenderLayer*)get_address("render_layer"sv);
     g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud"sv);
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
+    g_render_blurred_bg_trampoline = (VanillaRenderBlurredBgFun*)get_address("render_blurred_bg"sv);
     g_render_draw_depth_trampoline = (VanillaRenderDrawDepthFun*)get_address("render_draw_depth"sv);
     g_on_show_journal_trampoline = (OnShowJournalFun*)get_address("show_journal");
     g_on_select_from_journal_menu_trampoline = (OnSelectFromJournalMenu*)get_address("journal_menu_select");
@@ -557,6 +567,7 @@ void init_render_api_hooks()
     DetourAttach((void**)&g_render_layer_trampoline, render_layer);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
+    DetourAttach((void**)&g_render_blurred_bg_trampoline, &render_blurred_bg);
     DetourAttach((void**)&g_render_draw_depth_trampoline, &render_draw_depth);
     DetourAttach((void**)&g_render_journal_page_journalmenu_trampoline, &render_journal_page_journalmenu);
     DetourAttach((void**)&g_render_journal_page_progress_trampoline, &render_journal_page_progress);

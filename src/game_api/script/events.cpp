@@ -207,6 +207,16 @@ void trigger_vanilla_render_callbacks(ON event)
         });
 }
 
+void trigger_vanilla_render_blur_callbacks(ON event, float blur_amount)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->process_vanilla_render_blur_callbacks(event, blur_amount);
+            return true;
+        });
+}
+
 bool trigger_vanilla_render_hud_callbacks(ON event, Hud* hud)
 {
     bool skip{false};
