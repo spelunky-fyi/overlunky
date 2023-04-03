@@ -184,6 +184,7 @@ std::map<std::string, int64_t> default_keys{
     {"quick_start", 'Q'},
     {"quick_restart", OL_KEY_CTRL | 'Q'},
     {"quick_camp", OL_KEY_CTRL | 'C'},
+    {"peek_layer", 0x8}, // backspace
     {"speedhack_increase", OL_KEY_CTRL | OL_KEY_SHIFT | VK_PRIOR},
     {"speedhack_decrease", OL_KEY_CTRL | OL_KEY_SHIFT | VK_NEXT},
     {"speedhack_10pct", OL_KEY_CTRL | OL_KEY_SHIFT | '1'},
@@ -251,7 +252,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -2411,6 +2412,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             speedhack(g_speedhack_old_multiplier);
             g_speedhack_old_multiplier = 1.0f;
         }
+        else if (pressed("peek_layer", wParam))
+        {
+            peek_layer = false;
+        }
     }
 
     if (nCode != WM_KEYDOWN && nCode != WM_SYSKEYDOWN)
@@ -3025,6 +3030,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
                 smart_delete(ent, false);
         }
         g_selected_ids.clear();
+    }
+    else if (pressed("peek_layer", wParam))
+    {
+        peek_layer = true;
     }
     else
     {
@@ -6985,6 +6994,17 @@ struct TextureViewer
 static TextureViewer texture_viewer{0, -1};
 void render_vanilla_stuff()
 {
+    if (peek_layer)
+    {
+        uint8_t other_layer = g_state->camera_layer ? 0 : 1;
+        auto [bbox_left, bbox_top] = UI::click_position(-1.0f, 1.0f);
+        auto [bbox_right, bbox_bottom] = UI::click_position(1.0f, -1.0f);
+        for (uint8_t i = 52; i > 0; --i)
+        {
+            render_draw_depth(g_state->layers[other_layer], i, bbox_left, bbox_bottom, bbox_right, bbox_top);
+        }
+    }
+
     auto& render = RenderAPI::get();
     auto* textures = get_textures();
     if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture") || (options["menu_ui"] && !detached("tool_texture")) || hide_ui)
