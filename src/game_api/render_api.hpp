@@ -339,6 +339,7 @@ struct RenderInfo
 void init_render_api_hooks();
 bool& get_journal_enabled();
 void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);
+float get_layer_zoom_offset(uint8_t layer);
 
 struct HudInventory
 {

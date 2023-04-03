@@ -64,11 +64,23 @@ void render_loading(size_t param_1)
 }
 
 std::optional<TEXTURE> g_forced_lut_textures[2]{};
+float g_layer_zoom_offset[2]{0};
 
 using RenderLayer = void(const std::vector<Illumination*>&, uint8_t, const Camera&, const char**, const char**);
 RenderLayer* g_render_layer_trampoline{nullptr};
 void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer, const Camera& camera, const char** lut_lhs, const char** lut_rhs)
 {
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        auto addr = State::get_zoom_level_address();
+        offset = addr + 8;
+    }
+    if (offset != 0)
+    {
+        g_layer_zoom_offset[layer] = memory_read<float>(offset);
+    }
+
     // The lhs and rhs LUTs are blended in the shader, but we don't know where that value is CPU side so we can only override
     // with a single LUT for now
     if (g_forced_lut_textures[layer])
@@ -80,6 +92,11 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
         }
     }
     g_render_layer_trampoline(lightsources, layer, camera, lut_lhs, lut_rhs);
+}
+
+float get_layer_zoom_offset(uint8_t layer)
+{
+    return g_layer_zoom_offset[layer];
 }
 
 void RenderAPI::set_lut(TEXTURE texture_id, uint8_t layer)

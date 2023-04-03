@@ -356,7 +356,8 @@ float State::get_zoom_level()
         }
         offset = addr - 4;
     }
-    return memory_read<float>(offset);
+    auto state = State::get().ptr();
+    return memory_read<float>(offset) + get_layer_zoom_offset(state->camera_layer);
 }
 
 void State::zoom(float level)
