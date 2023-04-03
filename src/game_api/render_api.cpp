@@ -70,6 +70,9 @@ using RenderLayer = void(const std::vector<Illumination*>&, uint8_t, const Camer
 RenderLayer* g_render_layer_trampoline{nullptr};
 void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer, const Camera& camera, const char** lut_lhs, const char** lut_rhs)
 {
+    if (trigger_vanilla_render_layer_callbacks(ON::RENDER_PRE_LAYER, layer))
+        return;
+
     static size_t offset = 0;
     if (offset == 0)
     {
@@ -80,8 +83,6 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
     {
         g_layer_zoom_offset[layer] = memory_read<float>(offset);
     }
-    if (trigger_vanilla_render_layer_callbacks(ON::RENDER_PRE_LAYER, layer))
-        return;
     // The lhs and rhs LUTs are blended in the shader, but we don't know where that value is CPU side so we can only override
     // with a single LUT for now
     if (g_forced_lut_textures[layer])
@@ -94,6 +95,16 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
     }
     g_render_layer_trampoline(lightsources, layer, camera, lut_lhs, lut_rhs);
     trigger_vanilla_render_layer_callbacks(ON::RENDER_POST_LAYER, layer);
+}
+
+using RenderLevel = void(StateMemory*, uint8_t, uint8_t);
+RenderLevel* g_render_level_trampoline{nullptr};
+void render_level(StateMemory* state, uint8_t layer, uint8_t c)
+{
+    if (trigger_vanilla_render_layer_callbacks(ON::RENDER_PRE_LEVEL, layer))
+        return;
+    g_render_level_trampoline(state, layer, c);
+    trigger_vanilla_render_layer_callbacks(ON::RENDER_POST_LEVEL, layer);
 }
 
 float get_layer_zoom_offset(uint8_t layer)
@@ -130,7 +141,8 @@ using VanillaRenderPauseMenuFun = void(float*);
 VanillaRenderPauseMenuFun* g_render_pause_menu_trampoline{nullptr};
 void render_pause_menu(float* drawing_info)
 {
-    trigger_vanilla_render_callbacks(ON::RENDER_PRE_PAUSE_MENU);
+    if (trigger_vanilla_render_callbacks(ON::RENDER_PRE_PAUSE_MENU))
+        return;
     g_render_pause_menu_trampoline(drawing_info);
     trigger_vanilla_render_callbacks(ON::RENDER_POST_PAUSE_MENU);
 }
@@ -139,7 +151,8 @@ using VanillaRenderBlurredBgFun = void(size_t, float, size_t);
 VanillaRenderBlurredBgFun* g_render_blurred_bg_trampoline{nullptr};
 void render_blurred_bg(size_t a, float blur_amount, size_t c)
 {
-    trigger_vanilla_render_blur_callbacks(ON::RENDER_PRE_BLURRED_BACKGROUND, blur_amount);
+    if (trigger_vanilla_render_blur_callbacks(ON::RENDER_PRE_BLURRED_BACKGROUND, blur_amount))
+        return;
     g_render_blurred_bg_trampoline(a, blur_amount, c);
     trigger_vanilla_render_blur_callbacks(ON::RENDER_POST_BLURRED_BACKGROUND, blur_amount);
 }
@@ -148,7 +161,8 @@ using VanillaRenderDrawDepthFun = void(Layer*, uint8_t, float, float, float, flo
 VanillaRenderDrawDepthFun* g_render_draw_depth_trampoline{nullptr};
 void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float bbox_bottom, float bbox_right, float bbox_top)
 {
-    trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_PRE_DRAW_DEPTH, draw_depth, {bbox_left, bbox_top, bbox_right, bbox_bottom});
+    if (trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_PRE_DRAW_DEPTH, draw_depth, {bbox_left, bbox_top, bbox_right, bbox_bottom}))
+        return;
     g_render_draw_depth_trampoline(layer, draw_depth, bbox_left, bbox_bottom, bbox_right, bbox_top);
     trigger_vanilla_render_draw_depth_callbacks(ON::RENDER_POST_DRAW_DEPTH, draw_depth, {bbox_left, bbox_top, bbox_right, bbox_bottom});
 }
@@ -538,6 +552,7 @@ void init_render_api_hooks()
 
     g_render_loading_trampoline = (VanillaRenderLoadingFun*)get_address("render_loading"sv);
     g_render_layer_trampoline = (RenderLayer*)get_address("render_layer"sv);
+    g_render_level_trampoline = (RenderLevel*)get_address("render_level"sv);
     g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud"sv);
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
     g_render_blurred_bg_trampoline = (VanillaRenderBlurredBgFun*)get_address("render_blurred_bg"sv);
@@ -582,8 +597,9 @@ void init_render_api_hooks()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
-    DetourAttach((void**)&g_render_loading_trampoline, render_loading);
-    DetourAttach((void**)&g_render_layer_trampoline, render_layer);
+    DetourAttach((void**)&g_render_loading_trampoline, &render_loading);
+    DetourAttach((void**)&g_render_layer_trampoline, &render_layer);
+    DetourAttach((void**)&g_render_level_trampoline, &render_level);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
     DetourAttach((void**)&g_render_blurred_bg_trampoline, &render_blurred_bg);
