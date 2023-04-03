@@ -264,6 +264,13 @@ void register_usertypes(sol::state& lua)
         static_cast<void (VanillaRenderContext::*)(const std::string&, float, float, float, float, Color, uint32_t, uint32_t)>(&VanillaRenderContext::draw_text),
         static_cast<void (VanillaRenderContext::*)(const TextRenderingInfo*, Color)>(&VanillaRenderContext::draw_text));
 
+    auto render_draw_depth_lua = [](VanillaRenderContext&, LAYER layer, uint8_t draw_depth, AABB bbox)
+    {
+        const uint8_t real_layer = enum_to_layer(layer);
+        auto layer_ptr = State::get().layer(real_layer);
+        render_draw_depth(layer_ptr, draw_depth, bbox.left, bbox.bottom, bbox.right, bbox.top);
+    };
+
     /// Used in [set_callback](#set_callback) ON.RENDER_* callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
     lua.new_usertype<VanillaRenderContext>(
         "VanillaRenderContext",
@@ -274,7 +281,11 @@ void register_usertypes(sol::state& lua)
         "draw_screen_texture",
         draw_screen_texture,
         "draw_world_texture",
-        draw_world_texture);
+        draw_world_texture,
+        "bounding_box",
+        &VanillaRenderContext::bounding_box,
+        "render_draw_depth",
+        render_draw_depth_lua);
 
     auto texturerenderinginfo_type = lua.new_usertype<TextureRenderingInfo>("TextureRenderingInfo");
     texturerenderinginfo_type["x"] = &TextureRenderingInfo::x;

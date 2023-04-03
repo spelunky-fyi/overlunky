@@ -80,7 +80,8 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
     {
         g_layer_zoom_offset[layer] = memory_read<float>(offset);
     }
-
+    if (trigger_vanilla_render_layer_callbacks(ON::RENDER_PRE_LAYER, layer))
+        return;
     // The lhs and rhs LUTs are blended in the shader, but we don't know where that value is CPU side so we can only override
     // with a single LUT for now
     if (g_forced_lut_textures[layer])
@@ -92,6 +93,7 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
         }
     }
     g_render_layer_trampoline(lightsources, layer, camera, lut_lhs, lut_rhs);
+    trigger_vanilla_render_layer_callbacks(ON::RENDER_POST_LAYER, layer);
 }
 
 float get_layer_zoom_offset(uint8_t layer)

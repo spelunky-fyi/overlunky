@@ -102,6 +102,8 @@ enum class ON
     RENDER_POST_DRAW_DEPTH,
     RENDER_PRE_JOURNAL_PAGE,
     RENDER_POST_JOURNAL_PAGE,
+    RENDER_PRE_LAYER,
+    RENDER_POST_LAYER,
     SPEECH_BUBBLE,
     TOAST,
     PRE_LOAD_SCREEN,
@@ -379,6 +381,7 @@ class LuaBackend
     void process_vanilla_render_callbacks(ON event);
     void process_vanilla_render_blur_callbacks(ON event, float blur_amount);
     bool process_vanilla_render_hud_callbacks(ON event, Hud* hud);
+    bool process_vanilla_render_layer_callbacks(ON event, uint8_t layer);
     void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
     void process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
 

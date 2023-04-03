@@ -1210,6 +1210,30 @@ bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, Hud* hud)
     return skip;
 }
 
+bool LuaBackend::process_vanilla_render_layer_callbacks(ON event, uint8_t layer)
+{
+    bool skip{false};
+    if (!get_enabled())
+        return skip;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, layer).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+    return skip;
+}
+
 void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
 {
     if (!get_enabled())

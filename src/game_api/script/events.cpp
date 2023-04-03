@@ -229,6 +229,18 @@ bool trigger_vanilla_render_hud_callbacks(ON event, Hud* hud)
     return skip;
 }
 
+bool trigger_vanilla_render_layer_callbacks(ON event, uint8_t layer)
+{
+    bool skip{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            skip |= backend->process_vanilla_render_layer_callbacks(event, layer);
+            return true;
+        });
+    return skip;
+}
+
 void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
 {
     LuaBackend::for_each_backend(
