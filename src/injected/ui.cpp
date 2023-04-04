@@ -6082,7 +6082,7 @@ void render_savegame()
     ImGui::PopID();
 }
 
-void render_powerup(int uid, const char* section)
+void render_powerup(PowerupCapable* ent, int uid, const char* section)
 {
     std::string uidc = std::to_string(uid);
     int ptype = UI::get_entity_type(uid);
@@ -6102,9 +6102,9 @@ void render_powerup(int uid, const char* section)
     ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
-    if (ImGui::Button("X"))
+    if (ImGui::Button("Remove"))
     {
-        g_entity->as<Player>()->remove_powerup(ptype);
+        ent->as<Player>()->remove_powerup(ptype);
     }
     ImGui::PopID();
     ImGui::PopID();
@@ -6828,7 +6828,7 @@ void render_entity_props(int uid, bool detached = false)
             auto entity_pow = entity->as<PowerupCapable>();
             for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
             {
-                render_powerup(powerup_entity->uid, "Powerups");
+                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
             }
             ImGui::PushItemWidth(160);
             static const char* chosenPowerup = "";
