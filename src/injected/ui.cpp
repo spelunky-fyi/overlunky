@@ -1300,6 +1300,11 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
             }
         }
         int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
+        if (to_spawn.name.find("ENT_TYPE_MOUNT") != std::string::npos)
+        {
+            auto mount = get_entity_ptr(spawned)->as<Mount>();
+            mount->tame(true);
+        }
         if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
         {
             if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
@@ -1447,6 +1452,8 @@ void spawn_entities(bool s, std::string list = "")
 
 void spawn_entity_over()
 {
+    static const auto turkey = to_id("ENT_TYPE_MOUNT_TURKEY");
+    static const auto couch = to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH");
     if (g_filtered_count > 0)
     {
         if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
@@ -1458,11 +1465,27 @@ void spawn_entity_over()
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
             UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+            return;
         }
-        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+
+        if (g_over_id == -1 || !get_entity_ptr(g_over_id))
+            return;
+        auto overlay = get_entity_ptr(g_over_id);
+
+        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
         {
-            auto who = get_entity_ptr(g_over_id)->as<PowerupCapable>();
+            auto who = overlay->as<PowerupCapable>();
             who->give_powerup(g_items[g_filtered_items[g_current_item]].id);
+        }
+        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_MONS") != std::string::npos && overlay->type->id >= turkey && overlay->type->id <= couch)
+        {
+            auto mount = overlay->as<Mount>();
+            int spawned = UI::spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, true, g_vx, g_vy, false);
+            auto rider = get_entity_ptr(spawned)->as<Movable>();
+            mount->carry(rider);
+            rider->move_state = 0;
+            if (!lock_entity)
+                g_last_id = spawned;
         }
         else
         {
