@@ -2026,6 +2026,10 @@ end
         ON::RENDER_PRE_LEVEL,
         "RENDER_POST_LEVEL",
         ON::RENDER_POST_LEVEL,
+        "RENDER_PRE_GAME",
+        ON::RENDER_PRE_GAME,
+        "RENDER_POST_GAME",
+        ON::RENDER_POST_GAME,
         "SPEECH_BUBBLE",
         ON::SPEECH_BUBBLE,
         "TOAST",
@@ -2151,30 +2155,51 @@ end
     // LOAD
     // Params: LoadContext load_ctx
     // Runs as soon as your script is loaded, including reloads, then never again
+    // RENDER_PRE_GAME
+    // Params: VanillaRenderContext render_ctx
+    // Runs before the ingame part of the game is rendered. Return `true` to skip rendering.
+    // RENDER_POST_GAME
+    // Params: VanillaRenderContext render_ctx
+    // Runs after the level and HUD are rendered, before pause menus and blur effects
+    // RENDER_PRE_LEVEL
+    // Params: VanillaRenderContext render_ctx, int camera_layer
+    // Runs before the level is rendered. Return `true` to skip rendering.
+    // RENDER_POST_LEVEL
+    // Params: VanillaRenderContext render_ctx, int camera_layer
+    // Runs after the level is rendered, before hud
+    // RENDER_PRE_LAYER
+    // Params: VanillaRenderContext render_ctx, int rendered_layer
+    // Runs before a layer is rendered, runs for both layers during layer door transitions. Return `true` to skip rendering.
+    // RENDER_POST_LAYER
+    // Params: VanillaRenderContext render_ctx, int rendered_layer
+    // Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation
     // RENDER_PRE_HUD
-    // Params: VanillaRenderContext render_ctx
-    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // Params: VanillaRenderContext render_ctx, Hud hud
+    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx or edit the Hud values. Return `true` to skip rendering.
     // RENDER_POST_HUD
-    // Params: VanillaRenderContext render_ctx
+    // Params: VanillaRenderContext render_ctx, Hud hud
     // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_PAUSE_MENU
     // Params: VanillaRenderContext render_ctx
-    // Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them
+    // Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.
     // RENDER_POST_PAUSE_MENU
     // Params: VanillaRenderContext render_ctx
     // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_BLURRED_BACKGROUND
     // Params: VanillaRenderContext render_ctx, float blur
-    // Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them
+    // Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.
     // RENDER_POST_BLURRED_BACKGROUND
     // Params: VanillaRenderContext render_ctx, float blur
     // Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx. (blur amount is probably the same as journal opacity)
     // RENDER_PRE_DRAW_DEPTH
     // Params: VanillaRenderContext render_ctx, int draw_depth
-    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx. Return `true` to skip rendering.
     // RENDER_POST_DRAW_DEPTH
     // Params: VanillaRenderContext render_ctx, int draw_depth
     // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_PRE_JOURNAL_PAGE
+    // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
+    // Runs before the journal page is drawn on screen. Return `true` to skip rendering.
     // RENDER_POST_JOURNAL_PAGE
     // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
     // Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the VanillaRenderContext

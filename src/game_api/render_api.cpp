@@ -107,6 +107,16 @@ void render_level(StateMemory* state, uint8_t layer, uint8_t c)
     trigger_vanilla_render_layer_callbacks(ON::RENDER_POST_LEVEL, layer);
 }
 
+using RenderGame = void(StateMemory*);
+RenderGame* g_render_game_trampoline{nullptr};
+void render_game(StateMemory* state)
+{
+    if (trigger_vanilla_render_callbacks(ON::RENDER_PRE_GAME))
+        return;
+    g_render_game_trampoline(state);
+    trigger_vanilla_render_callbacks(ON::RENDER_POST_GAME);
+}
+
 float get_layer_zoom_offset(uint8_t layer)
 {
     return g_layer_zoom_offset[layer];
@@ -184,85 +194,99 @@ VanillaRenderJournalPageFun* g_render_journal_page_player_profile_trampoline{nul
 VanillaRenderJournalPageFun* g_render_journal_page_last_game_played_trampoline{nullptr};
 void render_journal_page_journalmenu(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::JournalMenu, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::JournalMenu, page))
+        return;
     g_render_journal_page_journalmenu_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::JournalMenu, page);
 }
 void render_journal_page_progress(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Progress, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Progress, page))
+        return;
     g_render_journal_page_progress_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Progress, page);
 }
 void render_journal_page_place(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Places, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Places, page))
+        return;
     g_render_journal_page_place_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Places, page);
 }
 void render_journal_page_people(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::People, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::People, page))
+        return;
     g_render_journal_page_people_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::People, page);
 }
 void render_journal_page_bestiary(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Bestiary, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Bestiary, page))
+        return;
     g_render_journal_page_bestiary_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Bestiary, page);
 }
 void render_journal_page_items(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Items, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Items, page))
+        return;
     g_render_journal_page_items_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Items, page);
 }
 void render_journal_page_traps(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Traps, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Traps, page))
+        return;
     g_render_journal_page_traps_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Traps, page);
 }
 void render_journal_page_story(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Story, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Story, page))
+        return;
     g_render_journal_page_story_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Story, page);
 }
 void render_journal_page_feats(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Feats, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Feats, page))
+        return;
     g_render_journal_page_feats_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Feats, page);
 }
 void render_journal_page_deathcause(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::DeathCause, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::DeathCause, page))
+        return;
     g_render_journal_page_deathcause_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::DeathCause, page);
 }
 void render_journal_page_deathmenu(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::DeathMenu, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::DeathMenu, page))
+        return;
     g_render_journal_page_deathmenu_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::DeathMenu, page);
 }
 void render_journal_page_recap(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Recap, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::Recap, page))
+        return;
     g_render_journal_page_recap_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::Recap, page);
 }
 void render_journal_page_player_profile(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::PlayerProfile, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::PlayerProfile, page))
+        return;
     g_render_journal_page_player_profile_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::PlayerProfile, page);
 }
 void render_journal_page_last_game_played(JournalPage* page)
 {
-    trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::LastGamePlayed, page);
+    if (trigger_vanilla_render_journal_page_callbacks(ON::RENDER_PRE_JOURNAL_PAGE, JournalPageType::LastGamePlayed, page))
+        return;
     g_render_journal_page_last_game_played_trampoline(page);
     trigger_vanilla_render_journal_page_callbacks(ON::RENDER_POST_JOURNAL_PAGE, JournalPageType::LastGamePlayed, page);
 }
@@ -553,6 +577,7 @@ void init_render_api_hooks()
     g_render_loading_trampoline = (VanillaRenderLoadingFun*)get_address("render_loading"sv);
     g_render_layer_trampoline = (RenderLayer*)get_address("render_layer"sv);
     g_render_level_trampoline = (RenderLevel*)get_address("render_level"sv);
+    g_render_game_trampoline = (RenderGame*)get_address("render_game"sv);
     g_render_hud_trampoline = (VanillaRenderHudFun*)get_address("render_hud"sv);
     g_render_pause_menu_trampoline = (VanillaRenderPauseMenuFun*)get_address("render_pause_menu"sv);
     g_render_blurred_bg_trampoline = (VanillaRenderBlurredBgFun*)get_address("render_blurred_bg"sv);
@@ -600,6 +625,7 @@ void init_render_api_hooks()
     DetourAttach((void**)&g_render_loading_trampoline, &render_loading);
     DetourAttach((void**)&g_render_layer_trampoline, &render_layer);
     DetourAttach((void**)&g_render_level_trampoline, &render_level);
+    DetourAttach((void**)&g_render_game_trampoline, &render_game);
     DetourAttach((void**)&g_render_hud_trampoline, &render_hud);
     DetourAttach((void**)&g_render_pause_menu_trampoline, &render_pause_menu);
     DetourAttach((void**)&g_render_blurred_bg_trampoline, &render_blurred_bg);
