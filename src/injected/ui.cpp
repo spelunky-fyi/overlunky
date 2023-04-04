@@ -184,6 +184,7 @@ std::map<std::string, int64_t> default_keys{
     {"quick_start", 'Q'},
     {"quick_restart", OL_KEY_CTRL | 'Q'},
     {"quick_camp", OL_KEY_CTRL | 'C'},
+    {"peek_layer", 0x8}, // backspace
     {"speedhack_increase", OL_KEY_CTRL | OL_KEY_SHIFT | VK_PRIOR},
     {"speedhack_decrease", OL_KEY_CTRL | OL_KEY_SHIFT | VK_NEXT},
     {"speedhack_10pct", OL_KEY_CTRL | OL_KEY_SHIFT | '1'},
@@ -234,7 +235,7 @@ ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1, g_force_level_width = 4, g_force_level_height = 4;
-unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
+unsigned int g_level_width = 0, grid_x = 0, grid_y = 0, g_pause_type = 0x2;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0, g_last_kit_spawn = 0;
 std::vector<EntityItem> g_items;
@@ -251,7 +252,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -326,6 +327,7 @@ std::map<std::string, bool> options = {
     {"show_tooltips", true},
     {"smooth_camera", true},
     {"multi_viewports", true},
+    {"docking_with_shift", true},
     {"menu_ui", true},
     {"hd_cursor", true},
     {"inverted", false},
@@ -820,6 +822,7 @@ void save_config(std::string file)
     writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0" << std::endl;
     writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
     writeData << "camera_speed = " << std::fixed << std::setprecision(2) << g_camera_speed << " # float" << std::endl;
+    writeData << "pause_type = 0x" << std::hex << g_pause_type << " # 8bit flags" << std::endl;
 
     writeData << "kits = [";
     for (unsigned int i = 0; i < kits.size(); i++)
@@ -956,6 +959,7 @@ void load_config(std::string file)
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66f);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0f);
     g_camera_speed = toml::find_or<float>(opts, "camera_speed", 1.0f);
+    g_pause_type = toml::find_or<unsigned int>(opts, "pause_type", 2);
     kits.clear();
     saved_entities.clear();
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
@@ -993,6 +997,7 @@ void load_config(std::string file)
         options["multi_viewports"] = false;
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     }
+    ImGui::GetIO().ConfigDockingWithShift = options["docking_with_shift"];
     g_Console->set_alt_keys(options["console_alt_keys"]);
     save_config(file);
 }
@@ -1297,6 +1302,11 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
             }
         }
         int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
+        if (to_spawn.name.find("ENT_TYPE_MOUNT") != std::string::npos)
+        {
+            auto mount = get_entity_ptr(spawned)->as<Mount>();
+            mount->tame(true);
+        }
         if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
         {
             if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
@@ -1444,6 +1454,8 @@ void spawn_entities(bool s, std::string list = "")
 
 void spawn_entity_over()
 {
+    static const auto turkey = to_id("ENT_TYPE_MOUNT_TURKEY");
+    static const auto couch = to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH");
     if (g_filtered_count > 0)
     {
         if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
@@ -1455,11 +1467,27 @@ void spawn_entity_over()
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
             UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+            return;
         }
-        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+
+        if (g_over_id == -1 || !get_entity_ptr(g_over_id))
+            return;
+        auto overlay = get_entity_ptr(g_over_id);
+
+        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
         {
-            auto who = get_entity_ptr(g_over_id)->as<PowerupCapable>();
+            auto who = overlay->as<PowerupCapable>();
             who->give_powerup(g_items[g_filtered_items[g_current_item]].id);
+        }
+        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_MONS") != std::string::npos && overlay->type->id >= turkey && overlay->type->id <= couch)
+        {
+            auto mount = overlay->as<Mount>();
+            int spawned = UI::spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, true, g_vx, g_vy, false);
+            auto rider = get_entity_ptr(spawned)->as<Movable>();
+            mount->carry(rider);
+            rider->move_state = 0;
+            if (!lock_entity)
+                g_last_id = spawned;
         }
         else
         {
@@ -1987,7 +2015,7 @@ void frame_advance()
 {
     if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
     {
-        g_state->pause = 0x2;
+        g_state->pause = (uint8_t)g_pause_type;
         g_pause_at = -1;
     }
 }
@@ -2411,6 +2439,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             speedhack(g_speedhack_old_multiplier);
             g_speedhack_old_multiplier = 1.0f;
         }
+        else if (pressed("peek_layer", wParam))
+        {
+            peek_layer = false;
+        }
     }
 
     if (nCode != WM_KEYDOWN && nCode != WM_SYSKEYDOWN)
@@ -2660,7 +2692,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_pause_at = -1;
         if (g_state->pause == 0)
         {
-            g_state->pause = 0x2;
+            g_state->pause = (uint8_t)g_pause_type;
             paused = true;
         }
         else
@@ -2675,7 +2707,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_state->pause == 0x2)
+        if (g_state->pause == (uint8_t)g_pause_type)
         {
             g_pause_at = UI::get_frame_count() + 1;
             g_state->pause = 0;
@@ -3026,6 +3058,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         }
         g_selected_ids.clear();
     }
+    else if (pressed("peek_layer", wParam))
+    {
+        peek_layer = true;
+    }
     else
     {
         return false;
@@ -3215,52 +3251,6 @@ void render_liquid_pool(int i)
     ImGui::PopID();
 }
 
-void render_list()
-{
-    // ImGui::ListBox with filter
-    ImVec2 boxsize = {-1, -1};
-    if (options["menu_ui"] && !detached("tool_entity"))
-        boxsize = {400.0f, 400.0f};
-    if (!ImGui::ListBoxHeader("##Entities", boxsize))
-        return;
-    ImGuiListClipper clipper;
-    clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
-    if (scroll_top)
-    {
-        scroll_top = false;
-        ImGui::SetScrollHereY();
-    }
-    while (clipper.Step())
-    {
-        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
-        {
-            const bool item_selected = (i == g_current_item);
-            std::stringstream item_ss;
-            item_ss << g_items[g_filtered_items[i]].id;
-            std::string item_id = item_ss.str();
-            std::string item_name = g_items[g_filtered_items[i]].name.c_str();
-            std::string item_concat = item_id + ": " + item_name.substr(9);
-            const char* item_text = item_concat.c_str();
-            ImGui::PushID(i);
-            if (ImGui::Selectable(item_text, item_selected))
-            {
-                g_current_item = i;
-            }
-            if (item_selected)
-            {
-                if (scroll_to_entity)
-                {
-                    ImGui::SetScrollHereY();
-                    scroll_to_entity = false;
-                }
-                // ImGui::SetItemDefaultFocus();
-            }
-            ImGui::PopID();
-        }
-    }
-    ImGui::ListBoxFooter();
-}
-
 void render_themes()
 {
     // ImGui::ListBox with filter
@@ -3281,115 +3271,6 @@ void render_themes()
         ImGui::PopID();
     }
     ImGui::EndCombo();
-}
-
-void render_input()
-{
-    int n = 0;
-    for (auto kit : kits)
-    {
-        ImGui::PushID(kit->items.c_str());
-        std::string search = "";
-        std::stringstream sss(kit->items);
-        int item = 0;
-        while (sss >> item)
-        {
-            std::string name = entity_names[item];
-            name = name.substr(name.find_last_of("_") + 1);
-            if (search.find(name) == std::string::npos)
-                search += name + " ";
-        }
-        if (search.length() > 1)
-        {
-            search.pop_back();
-        }
-        if (search.empty())
-            search = kit->items;
-        ImGui::Text("%d:", n + 1);
-        ImGui::SameLine();
-        ImGui::TextWrapped("%s", search.c_str());
-        ImGui::PushID(2 * n);
-        if (ImGui::Button("X"))
-        {
-            kits.erase(kits.begin() + n);
-            save_config(cfgfile);
-        }
-        tooltip("Delete kit.");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(4 * n);
-        if (ImGui::Button("Load"))
-        {
-            text = kit->items;
-            update_filter(text);
-            // spawn_entities(false);
-        }
-        tooltip("Edit kit or spawn later with mouse.");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(8 * n);
-        if (ImGui::Button("Spawn"))
-        {
-            spawn_kit(kit);
-        }
-        tooltip("Spawn saved kit where you're standing,\nautomatically equipping anything wearable.", "spawn_kit_1");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(16 * n);
-        ImGui::Checkbox("Auto spawn", &kit->automatic);
-        tooltip("Spawn automatically on new game.", "");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(32 * n);
-        if (ImGui::Button("Add item"))
-        {
-            if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
-            {
-                EntityItem to_add = g_items[g_filtered_items[g_current_item]];
-                trim(kit->items);
-                kit->items = fmt::format("{} {}", kit->items, to_add.id);
-                trim(kit->items);
-                save_config(cfgfile);
-            }
-        }
-        tooltip("Add selected item to this kit.", "");
-        ImGui::PopID();
-
-        ImGui::PopID();
-        n++;
-        ImGui::Separator();
-    }
-    if (set_focus_entity)
-    {
-        ImGui::SetKeyboardFocusHere();
-        set_focus_entity = false;
-    }
-    ImVec2 region = ImGui::GetContentRegionMax();
-    ImGui::PushItemWidth(region.x - 135);
-    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
-    {
-        update_filter(text);
-    }
-    if (ImGui::IsItemFocused())
-        focused_tool = "tool_entity";
-    tooltip("Search for entities to spawn. Hit TAB to add the selected id to list.");
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
-    if (ImGui::Button("Save kit"))
-    {
-        save_search();
-    }
-    tooltip("Save entity id(s) or selected item as a kit for quick use later.");
-    ImGui::SameLine();
-    if (ImGui::Button("Spawn"))
-    {
-        spawn_entities(false);
-    }
-    tooltip("Spawn selected entity where you're standing.", "spawn_entity");
 }
 
 const char* theme_name(int theme)
@@ -5370,6 +5251,12 @@ void render_options()
         }
         tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
 
+        if (ImGui::Checkbox("Docking only while holding Shift", &options["docking_with_shift"]))
+        {
+            ImGui::GetIO().ConfigDockingWithShift = options["docking_with_shift"];
+        }
+        tooltip("Allow annoying window docking only while holding Shift");
+
         ImGui::Checkbox("Enable unsafe scripts", &options["enable_unsafe_scripts"]);
         tooltip("Allow using unsafe Lua libraries in scripts.");
 
@@ -5417,6 +5304,17 @@ void render_options()
         ImGui::SameLine();
         if (ImGui::Button("Defaults##RestoreDefaultEntityMask"))
             safe_entity_mask = default_entity_mask;
+        ImGui::PopID();
+        endmenu();
+    }
+
+    if (submenu("Frame advance / Engine pause type"))
+    {
+        ImGui::PushID("PauseType");
+        for (int i = 1; i < 6; i++)
+        {
+            ImGui::CheckboxFlags(pause_types[i], &g_pause_type, (int)std::pow(2, i));
+        }
         ImGui::PopID();
         endmenu();
     }
@@ -6065,7 +5963,7 @@ void render_savegame()
     ImGui::PopID();
 }
 
-void render_powerup(int uid, const char* section)
+void render_powerup(PowerupCapable* ent, int uid, const char* section)
 {
     std::string uidc = std::to_string(uid);
     int ptype = UI::get_entity_type(uid);
@@ -6085,9 +5983,9 @@ void render_powerup(int uid, const char* section)
     ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
-    if (ImGui::Button("X"))
+    if (ImGui::Button("Remove"))
     {
-        g_entity->as<Player>()->remove_powerup(ptype);
+        ent->as<Player>()->remove_powerup(ptype);
     }
     ImGui::PopID();
     ImGui::PopID();
@@ -6811,7 +6709,7 @@ void render_entity_props(int uid, bool detached = false)
             auto entity_pow = entity->as<PowerupCapable>();
             for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
             {
-                render_powerup(powerup_entity->uid, "Powerups");
+                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
             }
             ImGui::PushItemWidth(160);
             static const char* chosenPowerup = "";
@@ -6985,6 +6883,17 @@ struct TextureViewer
 static TextureViewer texture_viewer{0, -1};
 void render_vanilla_stuff()
 {
+    if (peek_layer)
+    {
+        uint8_t other_layer = g_state->camera_layer ? 0 : 1;
+        auto [bbox_left, bbox_top] = UI::click_position(-1.0f, 1.0f);
+        auto [bbox_right, bbox_bottom] = UI::click_position(1.0f, -1.0f);
+        for (uint8_t i = 52; i > 0; --i)
+        {
+            render_draw_depth(g_state->layers[other_layer], i, bbox_left, bbox_bottom, bbox_right, bbox_top);
+        }
+    }
+
     auto& render = RenderAPI::get();
     auto* textures = get_textures();
     if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture") || (options["menu_ui"] && !detached("tool_texture")) || hide_ui)
@@ -7251,7 +7160,7 @@ void render_game_props()
         if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
         {
             if (paused)
-                g_state->pause = 0x2;
+                g_state->pause = (uint8_t)g_pause_type;
             else
                 g_state->pause = 0;
         }
@@ -7723,8 +7632,155 @@ void load_font()
 
 void render_spawner()
 {
-    render_input();
-    render_list();
+    int n = 0;
+    for (auto kit : kits)
+    {
+        ImGui::PushID(kit->items.c_str());
+        std::string search = "";
+        std::stringstream sss(kit->items);
+        int item = 0;
+        while (sss >> item)
+        {
+            std::string name = entity_names[item];
+            name = name.substr(name.find_last_of("_") + 1);
+            if (search.find(name) == std::string::npos)
+                search += name + " ";
+        }
+        if (search.length() > 1)
+        {
+            search.pop_back();
+        }
+        if (search.empty())
+            search = kit->items;
+        ImGui::Text("%d:", n + 1);
+        ImGui::SameLine();
+        ImGui::TextWrapped("%s", search.c_str());
+        ImGui::PushID(2 * n);
+        if (ImGui::Button("X"))
+        {
+            kits.erase(kits.begin() + n);
+            save_config(cfgfile);
+        }
+        tooltip("Delete kit.");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(4 * n);
+        if (ImGui::Button("Load"))
+        {
+            text = kit->items;
+            update_filter(text);
+            // spawn_entities(false);
+        }
+        tooltip("Edit kit or spawn later with mouse.");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(8 * n);
+        if (ImGui::Button("Spawn"))
+        {
+            spawn_kit(kit);
+        }
+        tooltip("Spawn saved kit where you're standing,\nautomatically equipping anything wearable.", "spawn_kit_1");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(16 * n);
+        ImGui::Checkbox("Auto spawn", &kit->automatic);
+        tooltip("Spawn automatically on new game.", "");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(32 * n);
+        if (ImGui::Button("Add item"))
+        {
+            if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
+            {
+                EntityItem to_add = g_items[g_filtered_items[g_current_item]];
+                trim(kit->items);
+                kit->items = fmt::format("{} {}", kit->items, to_add.id);
+                trim(kit->items);
+                save_config(cfgfile);
+            }
+        }
+        tooltip("Add selected item to this kit.", "");
+        ImGui::PopID();
+
+        ImGui::PopID();
+        n++;
+        ImGui::Separator();
+    }
+    if (set_focus_entity)
+    {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_entity = false;
+    }
+    ImVec2 region = ImGui::GetContentRegionMax();
+    ImGui::PushItemWidth(0.6667f * region.x);
+    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
+    {
+        update_filter(text);
+    }
+    if (ImGui::IsItemFocused())
+        focused_tool = "tool_entity";
+    tooltip("Search for entities to spawn. Hit TAB to add the selected id to list.");
+    ImGui::SameLine(0, 4.0f);
+    if (ImGui::Button("Save kit", ImVec2(0.16665f * region.x - 4.0f, 0.0f)))
+    {
+        save_search();
+    }
+    tooltip("Save entity id(s) or selected item as a kit for quick use later.");
+    ImGui::SameLine(0, 4.0f);
+    if (ImGui::Button("Spawn", ImVec2(0.16665f * region.x - 4.0f, 0.0f)))
+    {
+        spawn_entities(false);
+    }
+    tooltip("Spawn selected entity where you're standing.", "spawn_entity");
+    ImGui::PopItemWidth();
+
+    ImGui::PushItemWidth(region.x);
+    ImVec2 boxsize = {-1, -1};
+    if (options["menu_ui"] && !detached("tool_entity"))
+        boxsize = {392.0f, 392.0f};
+    if (!ImGui::ListBoxHeader("##Entities", boxsize))
+        return;
+    ImGuiListClipper clipper;
+    clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
+    if (scroll_top)
+    {
+        scroll_top = false;
+        ImGui::SetScrollHereY();
+    }
+    while (clipper.Step())
+    {
+        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+        {
+            const bool item_selected = (i == g_current_item);
+            std::stringstream item_ss;
+            item_ss << g_items[g_filtered_items[i]].id;
+            std::string item_id = item_ss.str();
+            std::string item_name = g_items[g_filtered_items[i]].name.c_str();
+            std::string item_concat = item_id + ": " + item_name.substr(9);
+            const char* item_text = item_concat.c_str();
+            ImGui::PushID(i);
+            if (ImGui::Selectable(item_text, item_selected))
+            {
+                g_current_item = i;
+            }
+            if (item_selected)
+            {
+                if (scroll_to_entity)
+                {
+                    ImGui::SetScrollHereY();
+                    scroll_to_entity = false;
+                }
+                // ImGui::SetItemDefaultFocus();
+            }
+            ImGui::PopID();
+        }
+    }
+    ImGui::ListBoxFooter();
+    ImGui::PopItemWidth();
 }
 
 std::string hud_input(int buttons)
@@ -8043,7 +8099,9 @@ void imgui_draw()
                     auto tab = tab_order_main[i];
                     if (windows[tab]->detached)
                         continue;
-                    ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {600.0f, base->Size.y - 50.0f});
+                    ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {500.0f, base->Size.y - 50.0f});
+                    if (tab == "tool_entity")
+                        ImGui::SetNextWindowSizeConstraints({400.0f, 100.0f}, {400.0f, base->Size.y - 50.0f});
                     bool ismenu = false;
                     if (windows[tab]->popup)
                     {

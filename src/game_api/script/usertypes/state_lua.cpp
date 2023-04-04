@@ -314,6 +314,7 @@ void register_usertypes(sol::state& lua)
     statememory_type["correct_ushabti"] = &StateMemory::correct_ushabti;
     statememory_type["items"] = &StateMemory::items;
     statememory_type["camera_layer"] = &StateMemory::camera_layer;
+    statememory_type["layer_transition_timer"] = &StateMemory::layer_transition_effect_timer;
     statememory_type["screen_team_select"] = &StateMemory::screen_team_select;
     statememory_type["screen_character_select"] = &StateMemory::screen_character_select;
     statememory_type["screen_transition"] = &StateMemory::screen_transition;

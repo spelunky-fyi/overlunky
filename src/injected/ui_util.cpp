@@ -578,6 +578,9 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
     };
 
     static const auto just_kill = {
+        to_id("ENT_TYPE_MONS_OSIRIS_HAND"),
+        to_id("ENT_TYPE_MONS_HUNDUN_BIRDHEAD"),
+        to_id("ENT_TYPE_MONS_HUNDUN_SNAKEHEAD"),
         to_id("ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL"),
         to_id("ENT_TYPE_ACTIVEFLOOR_CHAINED_SPIKEBALL"),
         to_id("ENT_TYPE_ITEM_STICKYTRAP_BALL"),

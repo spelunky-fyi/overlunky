@@ -746,3 +746,12 @@ const char* screen_names[]{
     "Online Loading",
     "Online Lobby",
 };
+
+const char* pause_types[]{
+    "1: Menu",
+    "2: Fade (janky camera, default)",
+    "4: Cutscene",
+    "8: ?",
+    "16: ?",
+    "32: Ankh (smooth camera, janky audio)",
+};
