@@ -296,6 +296,8 @@ nil | [draw_world_texture(TEXTURE texture_id, int row, int column, const Quad& d
 nil | [draw_world_texture(TEXTURE texture_id, int row, int column, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
 nil | [draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color, WORLD_SHADER shader)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen<br/>The `shader` parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 nil | [draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+[AABB](#AABB) | [bounding_box](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounding_box) | 
+ | [render_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_draw_depth) | 
 
 ## Entity related types
 
@@ -2494,6 +2496,7 @@ int | [speechbubble_owner](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | See `get_correct_ushabti`. == anim_frame - (2  floor(anim_frame/12))
 [Items](#Items) | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | Has the current player count, player inventories and character selections
 int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | The currently drawn layer, can't be changed
+int | [layer_transition_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_transition_timer) | 
 [ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
 [ScreenCharacterSelect](#ScreenCharacterSelect) | [screen_character_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) | 
 [ScreenTransition](#ScreenTransition) | [screen_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) | 

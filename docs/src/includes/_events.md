@@ -353,21 +353,21 @@ Runs when the script is disabled from the UI and also right before unloading/rel
 
 > Search script examples for [ON.RENDER_PRE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD)
 
-Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [Hud](#Hud) hud<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx or edit the Hud values. Return `true` to skip rendering.<br/>
 
 ## ON.RENDER_POST_HUD
 
 
 > Search script examples for [ON.RENDER_POST_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_HUD)
 
-Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [Hud](#Hud) hud<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
 
 ## ON.RENDER_PRE_PAUSE_MENU
 
 
 > Search script examples for [ON.RENDER_PRE_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU)
 
-Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them<br/>
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.<br/>
 
 ## ON.RENDER_POST_PAUSE_MENU
 
@@ -381,7 +381,7 @@ Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after 
 
 > Search script examples for [ON.RENDER_PRE_BLURRED_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_BLURRED_BACKGROUND)
 
-Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them<br/>
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.<br/>
 
 ## ON.RENDER_POST_BLURRED_BACKGROUND
 
@@ -415,7 +415,7 @@ Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, float blur<br/
 
 > Search script examples for [ON.RENDER_PRE_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_DRAW_DEPTH)
 
-Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx<br/>
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx. Return `true` to skip rendering.<br/>
 
 ## ON.RENDER_POST_DRAW_DEPTH
 
@@ -429,6 +429,7 @@ Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth
 
 > Search script examples for [ON.RENDER_PRE_JOURNAL_PAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_JOURNAL_PAGE)
 
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [JOURNAL_PAGE_TYPE](#JOURNAL_PAGE_TYPE) page_type, [JournalPage](#JournalPage) page<br/>Runs before the journal page is drawn on screen. Return `true` to skip rendering.<br/>
 
 ## ON.RENDER_POST_JOURNAL_PAGE
 
@@ -436,6 +437,48 @@ Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth
 > Search script examples for [ON.RENDER_POST_JOURNAL_PAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_JOURNAL_PAGE)
 
 Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [JOURNAL_PAGE_TYPE](#JOURNAL_PAGE_TYPE) page_type, [JournalPage](#JournalPage) page<br/>Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the [VanillaRenderContext](#VanillaRenderContext)<br/>The [JournalPage](#JournalPage) parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:<br/>`page:as_journal_page_progress()`<br/>`page:as_journal_page_journalmenu()`<br/>`page:as_journal_page_places()`<br/>`page:as_journal_page_people()`<br/>`page:as_journal_page_bestiary()`<br/>`page:as_journal_page_items()`<br/>`page:as_journal_page_traps()`<br/>`page:as_journal_page_story()`<br/>`page:as_journal_page_feats()`<br/>`page:as_journal_page_deathcause()`<br/>`page:as_journal_page_deathmenu()`<br/>`page:as_journal_page_recap()`<br/>`page:as_journal_page_playerprofile()`<br/>`page:as_journal_page_lastgameplayed()`<br/>
+
+## ON.RENDER_PRE_LAYER
+
+
+> Search script examples for [ON.RENDER_PRE_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_LAYER)
+
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int rendered_layer<br/>Runs before a layer is rendered, runs for both layers during layer door transitions. Return `true` to skip rendering.<br/>
+
+## ON.RENDER_POST_LAYER
+
+
+> Search script examples for [ON.RENDER_POST_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_LAYER)
+
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int rendered_layer<br/>Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation<br/>
+
+## ON.RENDER_PRE_LEVEL
+
+
+> Search script examples for [ON.RENDER_PRE_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_LEVEL)
+
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int camera_layer<br/>Runs before the level is rendered. Return `true` to skip rendering.<br/>
+
+## ON.RENDER_POST_LEVEL
+
+
+> Search script examples for [ON.RENDER_POST_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_LEVEL)
+
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int camera_layer<br/>Runs after the level is rendered, before hud<br/>
+
+## ON.RENDER_PRE_GAME
+
+
+> Search script examples for [ON.RENDER_PRE_GAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_GAME)
+
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the ingame part of the game is rendered. Return `true` to skip rendering.<br/>
+
+## ON.RENDER_POST_GAME
+
+
+> Search script examples for [ON.RENDER_POST_GAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_GAME)
+
+Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the level and HUD are rendered, before pause menus and blur effects<br/>
 
 ## ON.SPEECH_BUBBLE
 

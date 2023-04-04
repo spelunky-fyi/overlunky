@@ -1836,6 +1836,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field correct_ushabti integer @See `get_correct_ushabti`. == anim_frame - (2  floor(anim_frame/12))
     ---@field items Items @Has the current player count, player inventories and character selections
     ---@field camera_layer integer @The currently drawn layer, can't be changed
+    ---@field layer_transition_timer integer
     ---@field screen_team_select ScreenTeamSelect
     ---@field screen_character_select ScreenCharacterSelect
     ---@field screen_transition ScreenTransition
@@ -4591,6 +4592,8 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer
     ---@field draw_screen_texture VanillaRenderContext_draw_screen_texture @Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     ---@field draw_world_texture VanillaRenderContext_draw_world_texture @Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a Quad instead
+    ---@field bounding_box AABB
+    ---@field render_draw_depth any @render_draw_depth_lua
 
 ---@class VanillaRenderContext_draw_text
 ---@param tri TextRenderingInfo

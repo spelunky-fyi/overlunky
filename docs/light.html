@@ -3275,6 +3275,24 @@
                     <a href="#ON-RENDER_POST_JOURNAL_PAGE" class="toc-h2 toc-link" data-title="ON.RENDER_POST_JOURNAL_PAGE">ON.RENDER_POST_JOURNAL_PAGE</a>
                   </li>
                   <li>
+                    <a href="#ON-RENDER_PRE_LAYER" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_LAYER">ON.RENDER_PRE_LAYER</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_POST_LAYER" class="toc-h2 toc-link" data-title="ON.RENDER_POST_LAYER">ON.RENDER_POST_LAYER</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_PRE_LEVEL" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_LEVEL">ON.RENDER_PRE_LEVEL</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_POST_LEVEL" class="toc-h2 toc-link" data-title="ON.RENDER_POST_LEVEL">ON.RENDER_POST_LEVEL</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_PRE_GAME" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_GAME">ON.RENDER_PRE_GAME</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_POST_GAME" class="toc-h2 toc-link" data-title="ON.RENDER_POST_GAME">ON.RENDER_POST_GAME</a>
+                  </li>
+                  <li>
                     <a href="#ON-SPEECH_BUBBLE" class="toc-h2 toc-link" data-title="ON.SPEECH_BUBBLE">ON.SPEECH_BUBBLE</a>
                   </li>
                   <li>
@@ -7347,6 +7365,16 @@ Future calls to this will override the save</p>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td><a href="#AABB">AABB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bounding_box">bounding_box</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=render_draw_depth">render_draw_depth</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h2 id='Entity-related-types'>Entity related types</h2><h3 id='Ai'>Ai</h3>
@@ -14756,6 +14784,11 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=camera_layer">camera_layer</a></td>
 <td>The currently drawn layer, can&#39;t be changed</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=layer_transition_timer">layer_transition_timer</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="#ScreenTeamSelect">ScreenTeamSelect</a></td>
@@ -26138,19 +26171,19 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_HUD">ON.RENDER_PRE_HUD</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Hud">Hud</a> hud<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx or edit the Hud values. Return <code>true</code> to skip rendering.<br/></p>
 <h2 id='ON-RENDER_POST_HUD'>ON.RENDER_POST_HUD</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_HUD">ON.RENDER_POST_HUD</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Hud">Hud</a> hud<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
 <h2 id='ON-RENDER_PRE_PAUSE_MENU'>ON.RENDER_PRE_PAUSE_MENU</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_PAUSE_MENU">ON.RENDER_PRE_PAUSE_MENU</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them. Return <code>true</code> to skip rendering.<br/></p>
 <h2 id='ON-RENDER_POST_PAUSE_MENU'>ON.RENDER_POST_PAUSE_MENU</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_PAUSE_MENU">ON.RENDER_POST_PAUSE_MENU</a></p>
@@ -26162,7 +26195,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_BLURRED_BACKGROUND">ON.RENDER_PRE_BLURRED_BACKGROUND</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them. Return <code>true</code> to skip rendering.<br/></p>
 <h2 id='ON-RENDER_POST_BLURRED_BACKGROUND'>ON.RENDER_POST_BLURRED_BACKGROUND</h2><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- replace journal book background with a piece of paper, drawn on top of the blurred bg</span>
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">blur</span><span class="p">)</span>
     <span class="kd">local</span> <span class="n">src</span> <span class="o">=</span> <span class="n">Quad</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="n">AABB</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">535</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">21</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">85</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">93</span><span class="p">))</span>
@@ -26190,7 +26223,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_DRAW_DEPTH">ON.RENDER_PRE_DRAW_DEPTH</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx. Return <code>true</code> to skip rendering.<br/></p>
 <h2 id='ON-RENDER_POST_DRAW_DEPTH'>ON.RENDER_POST_DRAW_DEPTH</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_DRAW_DEPTH">ON.RENDER_POST_DRAW_DEPTH</a></p>
@@ -26201,12 +26234,50 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_JOURNAL_PAGE">ON.RENDER_PRE_JOURNAL_PAGE</a></p>
 </blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#JOURNAL_PAGE_TYPE">JOURNAL_PAGE_TYPE</a> page_type, <a href="#JournalPage">JournalPage</a> page<br/>Runs before the journal page is drawn on screen. Return <code>true</code> to skip rendering.<br/></p>
 <h2 id='ON-RENDER_POST_JOURNAL_PAGE'>ON.RENDER_POST_JOURNAL_PAGE</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_JOURNAL_PAGE">ON.RENDER_POST_JOURNAL_PAGE</a></p>
 </blockquote>
 
 <p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#JOURNAL_PAGE_TYPE">JOURNAL_PAGE_TYPE</a> page_type, <a href="#JournalPage">JournalPage</a> page<br/>Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the <a href="#VanillaRenderContext">VanillaRenderContext</a><br/>The <a href="#JournalPage">JournalPage</a> parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:<br/><code>page:as_journal_page_progress()</code><br/><code>page:as_journal_page_journalmenu()</code><br/><code>page:as_journal_page_places()</code><br/><code>page:as_journal_page_people()</code><br/><code>page:as_journal_page_bestiary()</code><br/><code>page:as_journal_page_items()</code><br/><code>page:as_journal_page_traps()</code><br/><code>page:as_journal_page_story()</code><br/><code>page:as_journal_page_feats()</code><br/><code>page:as_journal_page_deathcause()</code><br/><code>page:as_journal_page_deathmenu()</code><br/><code>page:as_journal_page_recap()</code><br/><code>page:as_journal_page_playerprofile()</code><br/><code>page:as_journal_page_lastgameplayed()</code><br/></p>
+<h2 id='ON-RENDER_PRE_LAYER'>ON.RENDER_PRE_LAYER</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_LAYER">ON.RENDER_PRE_LAYER</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int rendered_layer<br/>Runs before a layer is rendered, runs for both layers during layer door transitions. Return <code>true</code> to skip rendering.<br/></p>
+<h2 id='ON-RENDER_POST_LAYER'>ON.RENDER_POST_LAYER</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_LAYER">ON.RENDER_POST_LAYER</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int rendered_layer<br/>Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation<br/></p>
+<h2 id='ON-RENDER_PRE_LEVEL'>ON.RENDER_PRE_LEVEL</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_LEVEL">ON.RENDER_PRE_LEVEL</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int camera_layer<br/>Runs before the level is rendered. Return <code>true</code> to skip rendering.<br/></p>
+<h2 id='ON-RENDER_POST_LEVEL'>ON.RENDER_POST_LEVEL</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_LEVEL">ON.RENDER_POST_LEVEL</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int camera_layer<br/>Runs after the level is rendered, before hud<br/></p>
+<h2 id='ON-RENDER_PRE_GAME'>ON.RENDER_PRE_GAME</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_GAME">ON.RENDER_PRE_GAME</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the ingame part of the game is rendered. Return <code>true</code> to skip rendering.<br/></p>
+<h2 id='ON-RENDER_POST_GAME'>ON.RENDER_POST_GAME</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_GAME">ON.RENDER_POST_GAME</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the level and HUD are rendered, before pause menus and blur effects<br/></p>
 <h2 id='ON-SPEECH_BUBBLE'>ON.SPEECH_BUBBLE</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.SPEECH_BUBBLE">ON.SPEECH_BUBBLE</a></p>
@@ -28533,17 +28604,17 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_HUD">RENDER_PRE_HUD</a></td>
 <td>ON::RENDER_PRE_HUD</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Hud">Hud</a> hud<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx or edit the Hud values. Return <code>true</code> to skip rendering.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_HUD">RENDER_POST_HUD</a></td>
 <td>ON::RENDER_POST_HUD</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Hud">Hud</a> hud<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_PAUSE_MENU">RENDER_PRE_PAUSE_MENU</a></td>
 <td>ON::RENDER_PRE_PAUSE_MENU</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them. Return <code>true</code> to skip rendering.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_PAUSE_MENU">RENDER_POST_PAUSE_MENU</a></td>
@@ -28553,7 +28624,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_BLURRED_BACKGROUND">RENDER_PRE_BLURRED_BACKGROUND</a></td>
 <td>ON::RENDER_PRE_BLURRED_BACKGROUND</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them. Return <code>true</code> to skip rendering.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_BLURRED_BACKGROUND">RENDER_POST_BLURRED_BACKGROUND</a></td>
@@ -28563,7 +28634,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_DRAW_DEPTH">RENDER_PRE_DRAW_DEPTH</a></td>
 <td>ON::RENDER_PRE_DRAW_DEPTH</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx. Return <code>true</code> to skip rendering.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_DRAW_DEPTH">RENDER_POST_DRAW_DEPTH</a></td>
@@ -28573,12 +28644,42 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_JOURNAL_PAGE">RENDER_PRE_JOURNAL_PAGE</a></td>
 <td>ON::RENDER_PRE_JOURNAL_PAGE</td>
-<td></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#JOURNAL_PAGE_TYPE">JOURNAL_PAGE_TYPE</a> page_type, <a href="#JournalPage">JournalPage</a> page<br/>Runs before the journal page is drawn on screen. Return <code>true</code> to skip rendering.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_JOURNAL_PAGE">RENDER_POST_JOURNAL_PAGE</a></td>
 <td>ON::RENDER_POST_JOURNAL_PAGE</td>
 <td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#JOURNAL_PAGE_TYPE">JOURNAL_PAGE_TYPE</a> page_type, <a href="#JournalPage">JournalPage</a> page<br/>Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the <a href="#VanillaRenderContext">VanillaRenderContext</a><br/>The <a href="#JournalPage">JournalPage</a> parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:<br/><code>page:as_journal_page_progress()</code><br/><code>page:as_journal_page_journalmenu()</code><br/><code>page:as_journal_page_places()</code><br/><code>page:as_journal_page_people()</code><br/><code>page:as_journal_page_bestiary()</code><br/><code>page:as_journal_page_items()</code><br/><code>page:as_journal_page_traps()</code><br/><code>page:as_journal_page_story()</code><br/><code>page:as_journal_page_feats()</code><br/><code>page:as_journal_page_deathcause()</code><br/><code>page:as_journal_page_deathmenu()</code><br/><code>page:as_journal_page_recap()</code><br/><code>page:as_journal_page_playerprofile()</code><br/><code>page:as_journal_page_lastgameplayed()</code><br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_LAYER">RENDER_PRE_LAYER</a></td>
+<td>ON::RENDER_PRE_LAYER</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int rendered_layer<br/>Runs before a layer is rendered, runs for both layers during layer door transitions. Return <code>true</code> to skip rendering.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_LAYER">RENDER_POST_LAYER</a></td>
+<td>ON::RENDER_POST_LAYER</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int rendered_layer<br/>Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_LEVEL">RENDER_PRE_LEVEL</a></td>
+<td>ON::RENDER_PRE_LEVEL</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int camera_layer<br/>Runs before the level is rendered. Return <code>true</code> to skip rendering.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_LEVEL">RENDER_POST_LEVEL</a></td>
+<td>ON::RENDER_POST_LEVEL</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int camera_layer<br/>Runs after the level is rendered, before hud<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_GAME">RENDER_PRE_GAME</a></td>
+<td>ON::RENDER_PRE_GAME</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the ingame part of the game is rendered. Return <code>true</code> to skip rendering.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_GAME">RENDER_POST_GAME</a></td>
+<td>ON::RENDER_POST_GAME</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the level and HUD are rendered, before pause menus and blur effects<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.SPEECH_BUBBLE">SPEECH_BUBBLE</a></td>
