@@ -327,6 +327,7 @@ std::map<std::string, bool> options = {
     {"show_tooltips", true},
     {"smooth_camera", true},
     {"multi_viewports", true},
+    {"docking_with_shift", true},
     {"menu_ui", true},
     {"hd_cursor", true},
     {"inverted", false},
@@ -994,6 +995,7 @@ void load_config(std::string file)
         options["multi_viewports"] = false;
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     }
+    ImGui::GetIO().ConfigDockingWithShift = options["docking_with_shift"];
     g_Console->set_alt_keys(options["console_alt_keys"]);
     save_config(file);
 }
@@ -5378,6 +5380,12 @@ void render_options()
                 ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
         }
         tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
+
+        if (ImGui::Checkbox("Docking only while holding Shift", &options["docking_with_shift"]))
+        {
+            ImGui::GetIO().ConfigDockingWithShift = options["docking_with_shift"];
+        }
+        tooltip("Allow annoying window docking only while holding Shift");
 
         ImGui::Checkbox("Enable unsafe scripts", &options["enable_unsafe_scripts"]);
         tooltip("Allow using unsafe Lua libraries in scripts.");
