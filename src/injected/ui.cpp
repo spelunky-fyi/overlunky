@@ -235,7 +235,7 @@ ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1, g_force_level_width = 4, g_force_level_height = 4;
-unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
+unsigned int g_level_width = 0, grid_x = 0, grid_y = 0, g_pause_type = 0x2;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0, g_last_kit_spawn = 0;
 std::vector<EntityItem> g_items;
@@ -822,6 +822,7 @@ void save_config(std::string file)
     writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0" << std::endl;
     writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
     writeData << "camera_speed = " << std::fixed << std::setprecision(2) << g_camera_speed << " # float" << std::endl;
+    writeData << "pause_type = 0x" << std::hex << g_pause_type << " # 8bit flags" << std::endl;
 
     writeData << "kits = [";
     for (unsigned int i = 0; i < kits.size(); i++)
@@ -958,6 +959,7 @@ void load_config(std::string file)
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66f);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0f);
     g_camera_speed = toml::find_or<float>(opts, "camera_speed", 1.0f);
+    g_pause_type = toml::find_or<unsigned int>(opts, "pause_type", 2);
     kits.clear();
     saved_entities.clear();
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
@@ -2013,7 +2015,7 @@ void frame_advance()
 {
     if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
     {
-        g_state->pause = 0x2;
+        g_state->pause = (uint8_t)g_pause_type;
         g_pause_at = -1;
     }
 }
@@ -2690,7 +2692,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_pause_at = -1;
         if (g_state->pause == 0)
         {
-            g_state->pause = 0x2;
+            g_state->pause = (uint8_t)g_pause_type;
             paused = true;
         }
         else
@@ -2705,7 +2707,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_state->pause == 0x2)
+        if (g_state->pause == (uint8_t)g_pause_type)
         {
             g_pause_at = UI::get_frame_count() + 1;
             g_state->pause = 0;
@@ -5306,6 +5308,17 @@ void render_options()
         endmenu();
     }
 
+    if (submenu("Frame advance / Engine pause type"))
+    {
+        ImGui::PushID("PauseType");
+        for (int i = 1; i < 6; i++)
+        {
+            ImGui::CheckboxFlags(pause_types[i], &g_pause_type, (int)std::pow(2, i));
+        }
+        ImGui::PopID();
+        endmenu();
+    }
+
     if (submenu("Window style"))
     {
         render_style_editor();
@@ -7147,7 +7160,7 @@ void render_game_props()
         if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
         {
             if (paused)
-                g_state->pause = 0x2;
+                g_state->pause = (uint8_t)g_pause_type;
             else
                 g_state->pause = 0;
         }
