@@ -3249,52 +3249,6 @@ void render_liquid_pool(int i)
     ImGui::PopID();
 }
 
-void render_list()
-{
-    // ImGui::ListBox with filter
-    ImVec2 boxsize = {-1, -1};
-    if (options["menu_ui"] && !detached("tool_entity"))
-        boxsize = {400.0f, 400.0f};
-    if (!ImGui::ListBoxHeader("##Entities", boxsize))
-        return;
-    ImGuiListClipper clipper;
-    clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
-    if (scroll_top)
-    {
-        scroll_top = false;
-        ImGui::SetScrollHereY();
-    }
-    while (clipper.Step())
-    {
-        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
-        {
-            const bool item_selected = (i == g_current_item);
-            std::stringstream item_ss;
-            item_ss << g_items[g_filtered_items[i]].id;
-            std::string item_id = item_ss.str();
-            std::string item_name = g_items[g_filtered_items[i]].name.c_str();
-            std::string item_concat = item_id + ": " + item_name.substr(9);
-            const char* item_text = item_concat.c_str();
-            ImGui::PushID(i);
-            if (ImGui::Selectable(item_text, item_selected))
-            {
-                g_current_item = i;
-            }
-            if (item_selected)
-            {
-                if (scroll_to_entity)
-                {
-                    ImGui::SetScrollHereY();
-                    scroll_to_entity = false;
-                }
-                // ImGui::SetItemDefaultFocus();
-            }
-            ImGui::PopID();
-        }
-    }
-    ImGui::ListBoxFooter();
-}
-
 void render_themes()
 {
     // ImGui::ListBox with filter
@@ -3315,115 +3269,6 @@ void render_themes()
         ImGui::PopID();
     }
     ImGui::EndCombo();
-}
-
-void render_input()
-{
-    int n = 0;
-    for (auto kit : kits)
-    {
-        ImGui::PushID(kit->items.c_str());
-        std::string search = "";
-        std::stringstream sss(kit->items);
-        int item = 0;
-        while (sss >> item)
-        {
-            std::string name = entity_names[item];
-            name = name.substr(name.find_last_of("_") + 1);
-            if (search.find(name) == std::string::npos)
-                search += name + " ";
-        }
-        if (search.length() > 1)
-        {
-            search.pop_back();
-        }
-        if (search.empty())
-            search = kit->items;
-        ImGui::Text("%d:", n + 1);
-        ImGui::SameLine();
-        ImGui::TextWrapped("%s", search.c_str());
-        ImGui::PushID(2 * n);
-        if (ImGui::Button("X"))
-        {
-            kits.erase(kits.begin() + n);
-            save_config(cfgfile);
-        }
-        tooltip("Delete kit.");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(4 * n);
-        if (ImGui::Button("Load"))
-        {
-            text = kit->items;
-            update_filter(text);
-            // spawn_entities(false);
-        }
-        tooltip("Edit kit or spawn later with mouse.");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(8 * n);
-        if (ImGui::Button("Spawn"))
-        {
-            spawn_kit(kit);
-        }
-        tooltip("Spawn saved kit where you're standing,\nautomatically equipping anything wearable.", "spawn_kit_1");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(16 * n);
-        ImGui::Checkbox("Auto spawn", &kit->automatic);
-        tooltip("Spawn automatically on new game.", "");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(32 * n);
-        if (ImGui::Button("Add item"))
-        {
-            if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
-            {
-                EntityItem to_add = g_items[g_filtered_items[g_current_item]];
-                trim(kit->items);
-                kit->items = fmt::format("{} {}", kit->items, to_add.id);
-                trim(kit->items);
-                save_config(cfgfile);
-            }
-        }
-        tooltip("Add selected item to this kit.", "");
-        ImGui::PopID();
-
-        ImGui::PopID();
-        n++;
-        ImGui::Separator();
-    }
-    if (set_focus_entity)
-    {
-        ImGui::SetKeyboardFocusHere();
-        set_focus_entity = false;
-    }
-    ImVec2 region = ImGui::GetContentRegionMax();
-    ImGui::PushItemWidth(region.x - 135);
-    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
-    {
-        update_filter(text);
-    }
-    if (ImGui::IsItemFocused())
-        focused_tool = "tool_entity";
-    tooltip("Search for entities to spawn. Hit TAB to add the selected id to list.");
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
-    if (ImGui::Button("Save kit"))
-    {
-        save_search();
-    }
-    tooltip("Save entity id(s) or selected item as a kit for quick use later.");
-    ImGui::SameLine();
-    if (ImGui::Button("Spawn"))
-    {
-        spawn_entities(false);
-    }
-    tooltip("Spawn selected entity where you're standing.", "spawn_entity");
 }
 
 const char* theme_name(int theme)
@@ -7774,8 +7619,155 @@ void load_font()
 
 void render_spawner()
 {
-    render_input();
-    render_list();
+    int n = 0;
+    for (auto kit : kits)
+    {
+        ImGui::PushID(kit->items.c_str());
+        std::string search = "";
+        std::stringstream sss(kit->items);
+        int item = 0;
+        while (sss >> item)
+        {
+            std::string name = entity_names[item];
+            name = name.substr(name.find_last_of("_") + 1);
+            if (search.find(name) == std::string::npos)
+                search += name + " ";
+        }
+        if (search.length() > 1)
+        {
+            search.pop_back();
+        }
+        if (search.empty())
+            search = kit->items;
+        ImGui::Text("%d:", n + 1);
+        ImGui::SameLine();
+        ImGui::TextWrapped("%s", search.c_str());
+        ImGui::PushID(2 * n);
+        if (ImGui::Button("X"))
+        {
+            kits.erase(kits.begin() + n);
+            save_config(cfgfile);
+        }
+        tooltip("Delete kit.");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(4 * n);
+        if (ImGui::Button("Load"))
+        {
+            text = kit->items;
+            update_filter(text);
+            // spawn_entities(false);
+        }
+        tooltip("Edit kit or spawn later with mouse.");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(8 * n);
+        if (ImGui::Button("Spawn"))
+        {
+            spawn_kit(kit);
+        }
+        tooltip("Spawn saved kit where you're standing,\nautomatically equipping anything wearable.", "spawn_kit_1");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(16 * n);
+        ImGui::Checkbox("Auto spawn", &kit->automatic);
+        tooltip("Spawn automatically on new game.", "");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(32 * n);
+        if (ImGui::Button("Add item"))
+        {
+            if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
+            {
+                EntityItem to_add = g_items[g_filtered_items[g_current_item]];
+                trim(kit->items);
+                kit->items = fmt::format("{} {}", kit->items, to_add.id);
+                trim(kit->items);
+                save_config(cfgfile);
+            }
+        }
+        tooltip("Add selected item to this kit.", "");
+        ImGui::PopID();
+
+        ImGui::PopID();
+        n++;
+        ImGui::Separator();
+    }
+    if (set_focus_entity)
+    {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_entity = false;
+    }
+    ImVec2 region = ImGui::GetContentRegionMax();
+    ImGui::PushItemWidth(0.6667f * region.x);
+    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
+    {
+        update_filter(text);
+    }
+    if (ImGui::IsItemFocused())
+        focused_tool = "tool_entity";
+    tooltip("Search for entities to spawn. Hit TAB to add the selected id to list.");
+    ImGui::SameLine(0, 4.0f);
+    if (ImGui::Button("Save kit", ImVec2(0.16665f * region.x - 4.0f, 0.0f)))
+    {
+        save_search();
+    }
+    tooltip("Save entity id(s) or selected item as a kit for quick use later.");
+    ImGui::SameLine(0, 4.0f);
+    if (ImGui::Button("Spawn", ImVec2(0.16665f * region.x - 4.0f, 0.0f)))
+    {
+        spawn_entities(false);
+    }
+    tooltip("Spawn selected entity where you're standing.", "spawn_entity");
+    ImGui::PopItemWidth();
+
+    ImGui::PushItemWidth(region.x);
+    ImVec2 boxsize = {-1, -1};
+    if (options["menu_ui"] && !detached("tool_entity"))
+        boxsize = {392.0f, 392.0f};
+    if (!ImGui::ListBoxHeader("##Entities", boxsize))
+        return;
+    ImGuiListClipper clipper;
+    clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
+    if (scroll_top)
+    {
+        scroll_top = false;
+        ImGui::SetScrollHereY();
+    }
+    while (clipper.Step())
+    {
+        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+        {
+            const bool item_selected = (i == g_current_item);
+            std::stringstream item_ss;
+            item_ss << g_items[g_filtered_items[i]].id;
+            std::string item_id = item_ss.str();
+            std::string item_name = g_items[g_filtered_items[i]].name.c_str();
+            std::string item_concat = item_id + ": " + item_name.substr(9);
+            const char* item_text = item_concat.c_str();
+            ImGui::PushID(i);
+            if (ImGui::Selectable(item_text, item_selected))
+            {
+                g_current_item = i;
+            }
+            if (item_selected)
+            {
+                if (scroll_to_entity)
+                {
+                    ImGui::SetScrollHereY();
+                    scroll_to_entity = false;
+                }
+                // ImGui::SetItemDefaultFocus();
+            }
+            ImGui::PopID();
+        }
+    }
+    ImGui::ListBoxFooter();
+    ImGui::PopItemWidth();
 }
 
 std::string hud_input(int buttons)
@@ -8094,7 +8086,9 @@ void imgui_draw()
                     auto tab = tab_order_main[i];
                     if (windows[tab]->detached)
                         continue;
-                    ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {600.0f, base->Size.y - 50.0f});
+                    ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {500.0f, base->Size.y - 50.0f});
+                    if (tab == "tool_entity")
+                        ImGui::SetNextWindowSizeConstraints({400.0f, 100.0f}, {400.0f, base->Size.y - 50.0f});
                     bool ismenu = false;
                     if (windows[tab]->popup)
                     {
