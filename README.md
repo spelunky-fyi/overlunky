@@ -43,7 +43,7 @@ Current features and their *default* keyboard shortcuts.
       + **Mouse left**: Spawn entity at mouse cursor (drag to set velocity)
       + **Ctrl+Mouse left**: Spawn overlay on hovered entity (drag to offset position) / Spawn or throw single liquid blob
       + **Alt+Mouse left**: Hold to draw floors or other entities on grid
-      + **Mouse right**: Teleport to mouse cursor (drag to set velocity)
+      + **Mouse right**: Teleport to mouse cursor (drag to set velocity) / Remove entity from hotbar
       + **Mouse middle**: Select or drag safe entities around (doubleclick to clear selection)
       + **Alt+Mouse middle**: Select multiple entities in the finder
       + **Shift+Mouse middle**: Select or drag all entities around (even walls and background)
@@ -54,6 +54,8 @@ Current features and their *default* keyboard shortcuts.
       + **Shift+123...**: Spawn saved kit number
       + **Shift+Tab**: Change P1 layer
       + **Delete**: Delete selected entity safely
+      + **Numbers**: Select item in hotbar
+      + **Numbers+Mouse middle**: Add selected entity type to hotbar
       + You can also draw a velocity vector for spawn/teleport by holding the mouse button
       + Dragged entities have noclip on, so you can drag yourself through walls etc
       + Enter multiple numeric IDs like `526 560 570` to spawn them all at once. Useful for making a kit you can `Save` for later use with a single click.
@@ -111,6 +113,7 @@ Current features and their *default* keyboard shortcuts.
   - **Ctrl+Shift+D**: Detach active tab in tabbed interface
   - **Mouse right**: Detach hovered tab in menu UI
   - **Enter**: Run active tool
+  - **Backspace**: (Hold) Peek to the other layer
   - **Escape**: Return focus to game from an input
   - **Q**: Quick start from the intro or menu
   - **Ctrl+Q**: Quick restart from anywhere
