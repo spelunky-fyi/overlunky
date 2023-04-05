@@ -40,6 +40,7 @@
 #include "flags.hpp"
 #include "game_manager.hpp"
 #include "items.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "math.hpp"
 #include "savedata.hpp"
@@ -130,6 +131,17 @@ std::map<std::string, int64_t> default_keys{
     {"spawn_kit_7", OL_KEY_SHIFT | '7'},
     {"spawn_kit_8", OL_KEY_SHIFT | '8'},
     {"spawn_kit_9", OL_KEY_SHIFT | '9'},
+    {"hotbar_1", '1'},
+    {"hotbar_2", '2'},
+    {"hotbar_3", '3'},
+    {"hotbar_4", '4'},
+    {"hotbar_5", '5'},
+    {"hotbar_6", '6'},
+    {"hotbar_7", '7'},
+    {"hotbar_8", '8'},
+    {"hotbar_9", '9'},
+    {"hotbar_0", '0'},
+    {"toggle_hotbar", OL_KEY_CTRL | OL_KEY_SHIFT | 'B'},
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
     {"destroy_grabbed", VK_DELETE},
@@ -246,6 +258,7 @@ struct Kit
     bool automatic;
 };
 std::vector<std::string> saved_entities;
+std::vector<uint32_t> saved_hotbar;
 std::vector<Kit*> kits;
 std::vector<Player*> g_players;
 std::vector<uint32_t> g_selected_ids;
@@ -267,6 +280,8 @@ std::vector<std::string> tab_order_main = {"tool_entity", "tool_door", "tool_cam
 std::vector<std::string> tab_order_extra = {"tool_texture"};
 std::vector<std::string> tabs_open = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"};
 std::vector<std::string> tabs_detached = {};
+
+std::map<uint32_t, uint32_t> hotbar = {};
 
 std::string text;
 std::string g_change_key = "";
@@ -320,6 +335,7 @@ std::map<std::string, bool> options = {
     {"disable_savegame", true},
     {"disable_ghost_timer", false},
     {"draw_hud", true},
+    {"draw_hotbar", true},
     {"draw_script_messages", true},
     {"fade_script_messages", true},
     {"console_script_messages", false},
@@ -836,6 +852,23 @@ void save_config(std::string file)
         writeData << std::endl;
     writeData << "]" << std::endl;
 
+    uint32_t max = 0;
+    for (auto [i, id] : hotbar)
+    {
+        max = i;
+    }
+    writeData << "hotbar = [";
+    for (unsigned int i = 0; i <= max; i++)
+    {
+        uint32_t id = 0;
+        if (hotbar.contains(i))
+            id = hotbar[i];
+        writeData << std::dec << id;
+        if (i < max)
+            writeData << ", ";
+    }
+    writeData << "] # array of numeric ent types" << std::endl;
+
     writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\" or empty to use the embedded font \"Hack\"" << std::endl;
     writeData << "font_size = [";
     for (unsigned int i = 0; i < fontsize.size(); i++)
@@ -968,6 +1001,15 @@ void load_config(std::string file)
         kits.push_back(new Kit({saved, false}));
     }
     saved_entities.clear();
+    hotbar.clear();
+    saved_hotbar.clear();
+    saved_hotbar = toml::find_or<std::vector<uint32_t>>(opts, "hotbar", {});
+    for (uint32_t i = 0; i < saved_hotbar.size(); ++i)
+    {
+        if (saved_hotbar[i] != 0)
+            hotbar[i] = saved_hotbar[i];
+    }
+    saved_hotbar.clear();
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
     fontfile = toml::find_or<std::string>(opts, "font_file", "");
@@ -1222,34 +1264,41 @@ ImVec2 mouse_pos()
     return ImGui::GetMousePos() - base->Pos;
 }
 
+std::optional<EntityItem> get_spawn_item()
+{
+    auto to_spawn = g_items[g_filtered_items[g_current_item]];
+    if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
+    {
+        if (g_entity)
+        {
+            to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
+        }
+        else if (g_last_type >= 0)
+        {
+            to_spawn = EntityItem{entity_full_names[g_last_type], (uint32_t)g_last_type};
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
+    return to_spawn;
+}
+
 std::string spawned_type()
 {
     const auto pos = text.find_first_of(" ");
     if (pos == std::string::npos && g_filtered_count > 0)
     {
-        auto to_spawn = g_items[g_filtered_items[g_current_item]];
-        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-        {
-            if (g_entity)
-            {
-                return entity_full_names[g_entity->type->id];
-            }
-            else if (g_last_type >= 0)
-            {
-                return entity_full_names[g_last_type];
-            }
-        }
-        else if (g_current_item > 0 && g_filtered_count > 0)
-        {
-            to_spawn = g_items[g_filtered_items[g_current_item]];
-            return to_spawn.name;
-        }
-        return "";
+        auto to_spawn = get_spawn_item();
+        if (to_spawn.has_value())
+            return to_spawn.value().name;
     }
     else
     {
         return text;
     }
+    return "";
 }
 
 int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
@@ -1353,6 +1402,9 @@ void spawn_kit(Kit* kit)
     if (g_players.size() == 0)
         return;
 
+    if ((g_state->screen < 11 || g_state->screen > 19) && g_state->screen != 1 && g_state->screen != 26)
+        return;
+
     static const ENT_TYPE wearable[] = {
         to_id("ENT_TYPE_ITEM_CAPE"),
         to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
@@ -1418,26 +1470,15 @@ void spawn_entities(bool s, std::string list = "")
     if (g_game_manager->pause_ui->visibility > 0)
         return;
 
+    if ((g_state->screen < 11 || g_state->screen > 19) && g_state->screen != 1 && g_state->screen != 26)
+        return;
+
     const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
-        auto to_spawn = g_items[g_filtered_items[g_current_item]];
-        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-        {
-            if (g_entity)
-            {
-                to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
-            }
-            else if (g_last_type >= 0)
-            {
-                to_spawn = EntityItem{entity_full_names[g_last_type], (uint32_t)g_last_type};
-            }
-            else
-            {
-                return;
-            }
-        }
-        spawn_entityitem(to_spawn, s);
+        auto to_spawn = get_spawn_item();
+        if (to_spawn.has_value())
+            spawn_entityitem(to_spawn.value(), s);
     }
     else
     {
@@ -1454,19 +1495,22 @@ void spawn_entities(bool s, std::string list = "")
 
 void spawn_entity_over()
 {
+    if ((g_state->screen < 11 || g_state->screen > 19) && g_state->screen != 1 && g_state->screen != 26)
+        return;
+
     static const auto turkey = to_id("ENT_TYPE_MOUNT_TURKEY");
     static const auto couch = to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH");
-    if (g_filtered_count > 0)
+    auto to_spawn = get_spawn_item();
+    if (to_spawn.has_value())
     {
-        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-            return;
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") != std::string::npos)
+        auto item = to_spawn.value();
+        if (item.name.find("ENT_TYPE_LIQUID") != std::string::npos)
         {
             auto cpos = UI::click_position(g_x, g_y);
             auto mpos = normalize(mouse_pos());
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
-            UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+            UI::spawn_liquid(item.id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
             return;
         }
 
@@ -1474,15 +1518,15 @@ void spawn_entity_over()
             return;
         auto overlay = get_entity_ptr(g_over_id);
 
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+        if (item.name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
         {
             auto who = overlay->as<PowerupCapable>();
-            who->give_powerup(g_items[g_filtered_items[g_current_item]].id);
+            who->give_powerup(item.id);
         }
-        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_MONS") != std::string::npos && overlay->type->id >= turkey && overlay->type->id <= couch)
+        else if (item.name.find("ENT_TYPE_MONS") != std::string::npos && overlay->type->id >= turkey && overlay->type->id <= couch)
         {
             auto mount = overlay->as<Mount>();
-            int spawned = UI::spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, true, g_vx, g_vy, false);
+            int spawned = UI::spawn_entity(item.id, g_x, g_y, true, g_vx, g_vy, false);
             auto rider = get_entity_ptr(spawned)->as<Movable>();
             mount->carry(rider);
             rider->move_state = 0;
@@ -1491,7 +1535,7 @@ void spawn_entity_over()
         }
         else
         {
-            int spawned = UI::spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
+            int spawned = UI::spawn_entity_over(item.id, g_over_id, g_dx, g_dy);
             if (!lock_entity)
                 g_last_id = spawned;
         }
@@ -2182,6 +2226,31 @@ bool pressed(std::string keyname, WPARAM wParam)
     return wParam == (unsigned)keycode;
 }
 
+bool pressing(std::string keyname)
+{
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int64_t keycode = keys[keyname];
+    int key = (int)(keycode & 0xff);
+    int64_t wParam = key;
+
+    if (ImGui::GetIO().KeyCtrl)
+    {
+        wParam += OL_KEY_CTRL;
+    }
+    if (ImGui::GetIO().KeyShift)
+    {
+        wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
+    }
+    return wParam == (unsigned)keycode && (GetKeyState(key) & 0x8000);
+}
+
 bool clicked(std::string keyname)
 {
     int wParam = OL_BUTTON_MOUSE;
@@ -2421,6 +2490,47 @@ float held_duration_last(std::string keyname)
         }
     }
     return -1.0;
+}
+
+std::string last_word(std::string str)
+{
+    while (!str.empty() && std::isspace(str.back()))
+        str.pop_back();
+    const auto pos = str.find_last_of(" ");
+    return pos == std::string::npos ? str : str.substr(pos + 1);
+}
+
+void update_filter(std::string s)
+{
+    int count = 0;
+    std::string last = last_word(s);
+    uint32_t searchid = 0;
+    // auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
+    for (unsigned int i = 0; i < g_items.size(); i++)
+    {
+        if (s[0] == '\0' || std::isspace(s.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
+        {
+            if (g_items[i].id == 0 && s[0] != '\0')
+                continue;
+            g_filtered_items[count++] = i;
+        }
+    }
+    g_filtered_count = count;
+    g_current_item = 0;
+    scroll_top = true;
+}
+
+void set_selected_type(uint32_t id)
+{
+    update_filter("");
+    for (int j = 0; j < g_filtered_count; ++j)
+    {
+        if (g_items[g_filtered_items[j]].id == id)
+        {
+            g_current_item = j;
+        }
+    }
+    g_last_type = id;
 }
 
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
@@ -2705,6 +2815,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["draw_hud"] = !options["draw_hud"];
     }
+    else if (pressed("toggle_hotbar", wParam))
+    {
+        options["draw_hotbar"] = !options["draw_hotbar"];
+    }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
         if (g_state->pause == (uint8_t)g_pause_type)
@@ -2863,6 +2977,56 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (kits.size() > 8)
             spawn_kit(kits.at(8));
+    }
+    else if (pressed("hotbar_1", wParam))
+    {
+        if (hotbar.contains(0))
+            set_selected_type(hotbar[0]);
+    }
+    else if (pressed("hotbar_2", wParam))
+    {
+        if (hotbar.contains(1))
+            set_selected_type(hotbar[1]);
+    }
+    else if (pressed("hotbar_3", wParam))
+    {
+        if (hotbar.contains(2))
+            set_selected_type(hotbar[2]);
+    }
+    else if (pressed("hotbar_4", wParam))
+    {
+        if (hotbar.contains(3))
+            set_selected_type(hotbar[3]);
+    }
+    else if (pressed("hotbar_5", wParam))
+    {
+        if (hotbar.contains(4))
+            set_selected_type(hotbar[4]);
+    }
+    else if (pressed("hotbar_6", wParam))
+    {
+        if (hotbar.contains(5))
+            set_selected_type(hotbar[5]);
+    }
+    else if (pressed("hotbar_7", wParam))
+    {
+        if (hotbar.contains(6))
+            set_selected_type(hotbar[6]);
+    }
+    else if (pressed("hotbar_8", wParam))
+    {
+        if (hotbar.contains(7))
+            set_selected_type(hotbar[7]);
+    }
+    else if (pressed("hotbar_9", wParam))
+    {
+        if (hotbar.contains(8))
+            set_selected_type(hotbar[8]);
+    }
+    else if (pressed("hotbar_0", wParam))
+    {
+        if (hotbar.contains(9))
+            set_selected_type(hotbar[9]);
     }
     else if (pressed("spawn_warp_door", wParam))
     {
@@ -3067,34 +3231,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         return false;
     }
     return true;
-}
-
-std::string last_word(std::string str)
-{
-    while (!str.empty() && std::isspace(str.back()))
-        str.pop_back();
-    const auto pos = str.find_last_of(" ");
-    return pos == std::string::npos ? str : str.substr(pos + 1);
-}
-
-void update_filter(std::string s)
-{
-    int count = 0;
-    std::string last = last_word(s);
-    uint32_t searchid = 0;
-    // auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
-    for (unsigned int i = 0; i < g_items.size(); i++)
-    {
-        if (s[0] == '\0' || std::isspace(s.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
-        {
-            if (g_items[i].id == 0 && s[0] != '\0')
-                continue;
-            g_filtered_items[count++] = i;
-        }
-    }
-    g_filtered_count = count;
-    g_current_item = 0;
-    scroll_top = true;
 }
 
 void tooltip(const char* tip, bool force = false)
@@ -4660,7 +4796,6 @@ void render_clickhandler()
             g_selected_ids.clear();
             if (!lock_entity)
                 g_last_id = -1;
-            g_current_item = 0;
             update_filter("");
         }
         else if (clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
@@ -4677,7 +4812,57 @@ void render_clickhandler()
             {
                 g_held_id = g_held_entity->uid;
                 g_held_flags = g_held_entity->flags;
-                g_last_type = g_held_entity->type->id;
+                set_selected_type(g_held_entity->type->id);
+                if (pressing("hotbar_1"))
+                {
+                    hotbar[0] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_2"))
+                {
+                    hotbar[1] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_3"))
+                {
+                    hotbar[2] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_4"))
+                {
+                    hotbar[3] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_5"))
+                {
+                    hotbar[4] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_6"))
+                {
+                    hotbar[5] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_7"))
+                {
+                    hotbar[6] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_8"))
+                {
+                    hotbar[7] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_9"))
+                {
+                    hotbar[8] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_0"))
+                {
+                    hotbar[9] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
             }
             if (!lock_entity)
             {
@@ -5242,6 +5427,8 @@ void render_options()
         tooltip("Show path rooms.", "toggle_path");
         ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
         tooltip("Show enabled cheats and random\ninteresting state variables on screen.", "toggle_hud");
+        ImGui::Checkbox("Draw hotbar##DrawHotbar", &options["draw_hotbar"]);
+        tooltip("Show spawner hotbar on the bottom of the screen.", "toggle_hotbar");
         if (ImGui::Checkbox("Drag windows outside the game window", &options["multi_viewports"]))
         {
             if (options["multi_viewports"])
@@ -6872,6 +7059,165 @@ void render_entity_props(int uid, bool detached = false)
     ImGui::PopItemWidth();
 }
 
+void render_hotbar()
+{
+    if (g_Console->is_toggled() || hotbar.empty())
+        return;
+
+    ImGuiIO& io = ImGui::GetIO();
+    auto base = ImGui::GetMainViewport();
+    auto main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
+    auto space = ImGui::DockBuilderGetCentralNode(main_dock);
+
+    uint32_t max = 0;
+    for (auto [i, id] : hotbar)
+    {
+        max = i;
+    }
+    const float iconsize = 64.0f;
+    const float margin = base->Size.y / 50.0f;
+    const float width = (max + 1) * (iconsize + 4.0f) + 4.0f;
+    const float height = iconsize + margin;
+
+    ImGui::SetNextWindowSize({width, height});
+    ImGui::SetNextWindowPos({space->Pos.x + space->Size.x / 2 - width / 2, space->Pos.y + space->Size.y - height});
+    ImGui::SetNextWindowViewport(base->ID);
+    ImGui::Begin(
+        "Hotbar",
+        NULL,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground |
+            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking);
+    if (ImGui::IsWindowHovered())
+    {
+        io.WantCaptureMouse = true;
+        ImGui::SetWindowFocus();
+    }
+    ImGui::PushID("Hotbar");
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 4.0f);
+    for (uint32_t i = 0; i <= max; ++i)
+    {
+        if (hotbar.contains(i))
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0, 0, 0, 0});
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {1.0f, 1.0f, 1.0f, 0.3f});
+            ImGui::PushStyleColor(ImGuiCol_Text, {1.0f, 1.0f, 1.0f, 1.0f});
+            if (g_items[g_filtered_items[g_current_item]].id == hotbar[i])
+                ImGui::PushStyleColor(ImGuiCol_Border, {1.0f, 1.0f, 1.0f, 0.8f});
+            else
+                ImGui::PushStyleColor(ImGuiCol_Border, {0, 0, 0, 0.8f});
+            ImGui::PushID(i);
+            auto name = entity_names[hotbar[i]];
+            // std::replace(name.begin(), name.end(), '_', '\n');
+            name = name.substr(name.find_last_of('_') + 1);
+            if (ImGui::Button(fmt::format("{}          \n\n\n{}", i + 1, name).c_str(), {iconsize, iconsize}))
+            {
+                set_selected_type(hotbar[i]);
+            }
+            else if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+            {
+                hotbar.erase(i);
+                save_config(cfgfile);
+            }
+            tooltip("(Mouse Left) to set spawned entity, (Mouse Right) to remove");
+            ImGui::PopID();
+            ImGui::PopStyleColor(5);
+        }
+        if (i != max)
+            ImGui::SameLine((i + 1) * (iconsize + 4.0f), 4.0f);
+    }
+    ImGui::PopStyleVar();
+    ImGui::PopID();
+    ImGui::End();
+}
+
+void render_hotbar_textures()
+{
+    if (g_Console->is_toggled() || hotbar.empty())
+        return;
+
+    static const auto chest = to_id("ENT_TYPE_ITEM_CHEST");
+
+    auto base = ImGui::GetMainViewport();
+    auto main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
+    auto space = ImGui::DockBuilderGetCentralNode(main_dock);
+
+    uint32_t max = 0;
+    for (auto [i, id] : hotbar)
+    {
+        max = i;
+    }
+    const float iconsize = 64.0f;
+    const float margin = base->Size.y / 50.0f;
+    const float width = (max + 1) * (iconsize + 4.0f) + 4.0f;
+    const float height = iconsize + margin;
+
+    ImVec2 size = {width, height};
+    ImVec2 pos = {space->Pos.x + space->Size.x / 2 - width / 2, space->Pos.y + space->Size.y - height};
+
+    auto* textures = get_textures();
+
+    for (uint32_t i = 0; i <= max; ++i)
+    {
+        if (hotbar.contains(i))
+        {
+            auto type = get_type(hotbar[i]);
+            if (!type)
+                continue;
+            auto texture = get_texture(type->texture_id);
+            if (type->texture_id < 0)
+            {
+                const auto theme = g_state->current_theme ? g_state->current_theme : g_state->level_gen->themes[0];
+                texture = get_texture(theme->get_dynamic_texture(type->texture_id));
+            }
+            if (!texture)
+                continue;
+            auto def = get_texture_definition(texture->id);
+            int32_t tx = type->tile_x, ty = type->tile_y;
+            if ((uint32_t)tx > def.sub_image_width / def.tile_width)
+            {
+                tx = type->tile_x % (def.sub_image_width / def.tile_width);
+                ty = (uint32_t)floor(type->tile_x / (def.sub_image_width / def.tile_width));
+            }
+            if (!type->animations.empty())
+            {
+                auto anim = type->animations.begin()->second;
+                if (type->animations.contains(0))
+                    anim = type->animations[0];
+                tx = anim.texture % (def.sub_image_width / def.tile_width);
+                ty = (uint32_t)floor(anim.texture / (def.sub_image_height / def.tile_height));
+            }
+            float uv_left = (texture->tile_width_fraction * tx) + texture->offset_x_weird_math;
+            float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
+            float uv_top = (texture->tile_height_fraction * ty) + texture->offset_y_weird_math;
+            float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
+
+            const Quad source(
+                // bottom left:
+                uv_left,
+                uv_bottom,
+                // bottom right:
+                uv_right,
+                uv_bottom,
+                // top right:
+                uv_right,
+                uv_top,
+                // top left:
+                uv_left,
+                uv_top);
+
+            ImVec2 sa{pos.x + i * (iconsize + 4.0f) + 8.0f - base->Pos.x, pos.y - base->Pos.y + 8.0f};
+            ImVec2 sb{pos.x + i * (iconsize + 4.0f) + iconsize - base->Pos.x, pos.y + iconsize - base->Pos.y};
+            auto a = normalize(sa);
+            auto b = normalize(sb);
+            auto dest = Quad(AABB(a.x, a.y, b.x, b.y));
+            RenderAPI::get().draw_screen_texture(textures->texture_map[0], source, dest, Color::black());
+            if (!(hotbar[i] != chest && hotbar[i] != chest + 1 && texture->id == 373 && tx == 0 && ty == 0))
+                RenderAPI::get().draw_screen_texture(texture, source, dest, Color::white());
+        }
+    }
+}
+
 struct TextureViewer
 {
     TEXTURE id;
@@ -6883,7 +7229,7 @@ struct TextureViewer
 static TextureViewer texture_viewer{0, -1};
 void render_vanilla_stuff()
 {
-    if (peek_layer)
+    if (peek_layer && g_state->layer_transition_effect_timer == 0)
     {
         uint8_t other_layer = g_state->camera_layer ? 0 : 1;
         auto [bbox_left, bbox_top] = UI::click_position(-1.0f, 1.0f);
@@ -6893,6 +7239,9 @@ void render_vanilla_stuff()
             render_draw_depth(g_state->layers[other_layer], i, bbox_left, bbox_bottom, bbox_right, bbox_top);
         }
     }
+
+    if (!hide_ui && options["draw_hotbar"])
+        render_hotbar_textures();
 
     auto& render = RenderAPI::get();
     auto* textures = get_textures();
@@ -7710,12 +8059,45 @@ void render_spawner()
         n++;
         ImGui::Separator();
     }
+    ImVec2 region = ImGui::GetContentRegionMax();
+
+    ImGui::PushID("HotbarSet");
+    ImGui::Text("Add selected item to hotbar:");
+    const float buttonwidth = 1.0f / 11.0f * region.x - 4.0f;
+    for (uint32_t i = 0; i < 10; ++i)
+    {
+        if (!hotbar.contains(i))
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+        else
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_Button]);
+        if (ImGui::Button(fmt::format("{}", i < 9 ? i + 1 : 0).c_str(), {buttonwidth, 0}))
+        {
+            hotbar[i] = g_items[g_filtered_items[g_current_item]].id;
+            save_config(cfgfile);
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine(0, 4.0f);
+    }
+    if (ImGui::Button("+", {buttonwidth, 0}))
+    {
+        for (uint32_t i = 0; i < 20; ++i)
+        {
+            if (!hotbar.contains(i))
+            {
+                hotbar[i] = g_items[g_filtered_items[g_current_item]].id;
+                save_config(cfgfile);
+                break;
+            }
+        }
+        save_config(cfgfile);
+    }
+    ImGui::PopID();
+
     if (set_focus_entity)
     {
         ImGui::SetKeyboardFocusHere();
         set_focus_entity = false;
     }
-    ImVec2 region = ImGui::GetContentRegionMax();
     ImGui::PushItemWidth(0.6667f * region.x);
     if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
     {
@@ -7745,16 +8127,37 @@ void render_spawner()
     if (!ImGui::ListBoxHeader("##Entities", boxsize))
         return;
     ImGuiListClipper clipper;
-    clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
+    clipper.Begin(g_filtered_count, -1.0f);
+    int select_last_index = 0;
+    if (g_last_type >= 0 && g_filtered_count == g_items.size())
+    {
+        for (int j = 0; j < g_filtered_count; ++j)
+        {
+            if (g_items[j].id == (uint32_t)g_last_type)
+            {
+                select_last_index = j;
+                scroll_top = false;
+            }
+        }
+        clipper.ForceDisplayRangeByIndices(select_last_index, select_last_index + 1);
+    }
     if (scroll_top)
     {
         scroll_top = false;
         ImGui::SetScrollHereY();
     }
+
     while (clipper.Step())
     {
         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
         {
+            const bool select_last = (g_last_type >= 0 && g_items[g_filtered_items[i]].id == (uint32_t)g_last_type);
+            if (select_last)
+            {
+                g_current_item = i;
+                g_last_type = -1;
+                scroll_to_entity = true;
+            }
             const bool item_selected = (i == g_current_item);
             std::stringstream item_ss;
             item_ss << g_items[g_filtered_items[i]].id;
@@ -7765,6 +8168,7 @@ void render_spawner()
             ImGui::PushID(i);
             if (ImGui::Selectable(item_text, item_selected))
             {
+                g_last_type = -1;
                 g_current_item = i;
             }
             if (item_selected)
@@ -8074,6 +8478,8 @@ void imgui_draw()
     }
 
     render_clickhandler();
+    if (!hide_ui && options["draw_hotbar"])
+        render_hotbar();
     if (options["draw_hud"])
         render_prohud();
     if (options["draw_script_messages"] && !g_Console->is_toggled())
