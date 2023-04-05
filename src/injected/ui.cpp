@@ -1222,34 +1222,41 @@ ImVec2 mouse_pos()
     return ImGui::GetMousePos() - base->Pos;
 }
 
+std::optional<EntityItem> get_spawn_item()
+{
+    auto to_spawn = g_items[g_filtered_items[g_current_item]];
+    if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
+    {
+        if (g_entity)
+        {
+            to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
+        }
+        else if (g_last_type >= 0)
+        {
+            to_spawn = EntityItem{entity_full_names[g_last_type], (uint32_t)g_last_type};
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
+    return to_spawn;
+}
+
 std::string spawned_type()
 {
     const auto pos = text.find_first_of(" ");
     if (pos == std::string::npos && g_filtered_count > 0)
     {
-        auto to_spawn = g_items[g_filtered_items[g_current_item]];
-        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-        {
-            if (g_entity)
-            {
-                return entity_full_names[g_entity->type->id];
-            }
-            else if (g_last_type >= 0)
-            {
-                return entity_full_names[g_last_type];
-            }
-        }
-        else if (g_current_item > 0 && g_filtered_count > 0)
-        {
-            to_spawn = g_items[g_filtered_items[g_current_item]];
-            return to_spawn.name;
-        }
-        return "";
+        auto to_spawn = get_spawn_item();
+        if (to_spawn.has_value())
+            return to_spawn.value().name;
     }
     else
     {
         return text;
     }
+    return "";
 }
 
 int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
@@ -1421,23 +1428,9 @@ void spawn_entities(bool s, std::string list = "")
     const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
-        auto to_spawn = g_items[g_filtered_items[g_current_item]];
-        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-        {
-            if (g_entity)
-            {
-                to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
-            }
-            else if (g_last_type >= 0)
-            {
-                to_spawn = EntityItem{entity_full_names[g_last_type], (uint32_t)g_last_type};
-            }
-            else
-            {
-                return;
-            }
-        }
-        spawn_entityitem(to_spawn, s);
+        auto to_spawn = get_spawn_item();
+        if (to_spawn.has_value())
+            spawn_entityitem(to_spawn.value(), s);
     }
     else
     {
@@ -1456,17 +1449,17 @@ void spawn_entity_over()
 {
     static const auto turkey = to_id("ENT_TYPE_MOUNT_TURKEY");
     static const auto couch = to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH");
-    if (g_filtered_count > 0)
+    auto to_spawn = get_spawn_item();
+    if (to_spawn.has_value())
     {
-        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-            return;
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") != std::string::npos)
+        auto item = to_spawn.value();
+        if (item.name.find("ENT_TYPE_LIQUID") != std::string::npos)
         {
             auto cpos = UI::click_position(g_x, g_y);
             auto mpos = normalize(mouse_pos());
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
-            UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+            UI::spawn_liquid(item.id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
             return;
         }
 
@@ -1474,15 +1467,15 @@ void spawn_entity_over()
             return;
         auto overlay = get_entity_ptr(g_over_id);
 
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+        if (item.name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
         {
             auto who = overlay->as<PowerupCapable>();
-            who->give_powerup(g_items[g_filtered_items[g_current_item]].id);
+            who->give_powerup(item.id);
         }
-        else if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_MONS") != std::string::npos && overlay->type->id >= turkey && overlay->type->id <= couch)
+        else if (item.name.find("ENT_TYPE_MONS") != std::string::npos && overlay->type->id >= turkey && overlay->type->id <= couch)
         {
             auto mount = overlay->as<Mount>();
-            int spawned = UI::spawn_entity(g_items[g_filtered_items[g_current_item]].id, g_x, g_y, true, g_vx, g_vy, false);
+            int spawned = UI::spawn_entity(item.id, g_x, g_y, true, g_vx, g_vy, false);
             auto rider = get_entity_ptr(spawned)->as<Movable>();
             mount->carry(rider);
             rider->move_state = 0;
@@ -1491,7 +1484,7 @@ void spawn_entity_over()
         }
         else
         {
-            int spawned = UI::spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
+            int spawned = UI::spawn_entity_over(item.id, g_over_id, g_dx, g_dy);
             if (!lock_entity)
                 g_last_id = spawned;
         }
@@ -4660,7 +4653,7 @@ void render_clickhandler()
             g_selected_ids.clear();
             if (!lock_entity)
                 g_last_id = -1;
-            g_current_item = 0;
+            g_last_type = -1;
             update_filter("");
         }
         else if (clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
@@ -4678,6 +4671,7 @@ void render_clickhandler()
                 g_held_id = g_held_entity->uid;
                 g_held_flags = g_held_entity->flags;
                 g_last_type = g_held_entity->type->id;
+                update_filter("");
             }
             if (!lock_entity)
             {
@@ -7745,16 +7739,37 @@ void render_spawner()
     if (!ImGui::ListBoxHeader("##Entities", boxsize))
         return;
     ImGuiListClipper clipper;
-    clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
+    clipper.Begin(g_filtered_count, -1.0f);
+    int select_last_index = 0;
+    if (g_last_type >= 0 && g_filtered_count == g_items.size())
+    {
+        for (int j = 0; j < g_filtered_count; ++j)
+        {
+            if (g_items[j].id == (uint32_t)g_last_type)
+            {
+                select_last_index = j;
+                scroll_top = false;
+            }
+        }
+        clipper.ForceDisplayRangeByIndices(select_last_index, select_last_index + 1);
+    }
     if (scroll_top)
     {
         scroll_top = false;
         ImGui::SetScrollHereY();
     }
+
     while (clipper.Step())
     {
         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
         {
+            const bool select_last = (g_last_type >= 0 && g_items[g_filtered_items[i]].id == (uint32_t)g_last_type);
+            if (select_last)
+            {
+                g_current_item = i;
+                g_last_type = -1;
+                scroll_to_entity = true;
+            }
             const bool item_selected = (i == g_current_item);
             std::stringstream item_ss;
             item_ss << g_items[g_filtered_items[i]].id;
@@ -7765,6 +7780,7 @@ void render_spawner()
             ImGui::PushID(i);
             if (ImGui::Selectable(item_text, item_selected))
             {
+                g_last_type = -1;
                 g_current_item = i;
             }
             if (item_selected)
