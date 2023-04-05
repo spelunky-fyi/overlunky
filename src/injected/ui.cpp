@@ -865,9 +865,9 @@ void save_config(std::string file)
             id = hotbar[i];
         writeData << std::dec << id;
         if (i < max)
-            writeData << ",";
+            writeData << ", ";
     }
-    writeData << "]" << std::endl;
+    writeData << "] # array of numeric ent types" << std::endl;
 
     writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\" or empty to use the embedded font \"Hack\"" << std::endl;
     writeData << "font_size = [";
@@ -4814,25 +4814,55 @@ void render_clickhandler()
                 g_held_flags = g_held_entity->flags;
                 set_selected_type(g_held_entity->type->id);
                 if (pressing("hotbar_1"))
+                {
                     hotbar[0] = g_held_entity->type->id;
-                if (pressing("hotbar_2"))
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_2"))
+                {
                     hotbar[1] = g_held_entity->type->id;
-                if (pressing("hotbar_3"))
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_3"))
+                {
                     hotbar[2] = g_held_entity->type->id;
-                if (pressing("hotbar_4"))
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_4"))
+                {
                     hotbar[3] = g_held_entity->type->id;
-                if (pressing("hotbar_5"))
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_5"))
+                {
                     hotbar[4] = g_held_entity->type->id;
-                if (pressing("hotbar_6"))
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_6"))
+                {
                     hotbar[5] = g_held_entity->type->id;
-                if (pressing("hotbar_7"))
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_7"))
+                {
                     hotbar[6] = g_held_entity->type->id;
-                if (pressing("hotbar_8"))
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_8"))
+                {
                     hotbar[7] = g_held_entity->type->id;
-                if (pressing("hotbar_9"))
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_9"))
+                {
                     hotbar[8] = g_held_entity->type->id;
-                if (pressing("hotbar_0"))
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_0"))
+                {
                     hotbar[9] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
             }
             if (!lock_entity)
             {
@@ -8052,6 +8082,7 @@ void render_spawner()
             if (!hotbar.contains(i))
             {
                 hotbar[i] = g_items[g_filtered_items[g_current_item]].id;
+                save_config(cfgfile);
                 break;
             }
         }
