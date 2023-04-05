@@ -7071,6 +7071,7 @@ void render_hotbar()
             ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0, 0, 0, 0});
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {1.0f, 1.0f, 1.0f, 0.3f});
+            ImGui::PushStyleColor(ImGuiCol_Text, {1.0f, 1.0f, 1.0f, 1.0f});
             if (g_items[g_filtered_items[g_current_item]].id == hotbar[i])
                 ImGui::PushStyleColor(ImGuiCol_Border, {1.0f, 1.0f, 1.0f, 0.8f});
             else
@@ -7090,7 +7091,7 @@ void render_hotbar()
             }
             tooltip("(Mouse Left) to set spawned entity, (Mouse Right) to remove");
             ImGui::PopID();
-            ImGui::PopStyleColor(4);
+            ImGui::PopStyleColor(5);
         }
         if (i != max)
             ImGui::SameLine((i + 1) * (iconsize + 4.0f), 4.0f);
@@ -8032,11 +8033,16 @@ void render_spawner()
     const float buttonwidth = 1.0f / 11.0f * region.x - 4.0f;
     for (uint32_t i = 0; i < 10; ++i)
     {
+        if (!hotbar.contains(i))
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+        else
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_Button]);
         if (ImGui::Button(fmt::format("{}", i < 9 ? i + 1 : 0).c_str(), {buttonwidth, 0}))
         {
             hotbar[i] = g_items[g_filtered_items[g_current_item]].id;
             save_config(cfgfile);
         }
+        ImGui::PopStyleColor();
         ImGui::SameLine(0, 4.0f);
     }
     if (ImGui::Button("+", {buttonwidth, 0}))
