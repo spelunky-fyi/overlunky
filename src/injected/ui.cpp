@@ -1402,6 +1402,9 @@ void spawn_kit(Kit* kit)
     if (g_players.size() == 0)
         return;
 
+    if ((g_state->screen < 11 || g_state->screen > 19) && g_state->screen != 1 && g_state->screen != 26)
+        return;
+
     static const ENT_TYPE wearable[] = {
         to_id("ENT_TYPE_ITEM_CAPE"),
         to_id("ENT_TYPE_ITEM_VLADS_CAPE"),
@@ -1467,6 +1470,9 @@ void spawn_entities(bool s, std::string list = "")
     if (g_game_manager->pause_ui->visibility > 0)
         return;
 
+    if ((g_state->screen < 11 || g_state->screen > 19) && g_state->screen != 1 && g_state->screen != 26)
+        return;
+
     const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
@@ -1489,6 +1495,9 @@ void spawn_entities(bool s, std::string list = "")
 
 void spawn_entity_over()
 {
+    if ((g_state->screen < 11 || g_state->screen > 19) && g_state->screen != 1 && g_state->screen != 26)
+        return;
+
     static const auto turkey = to_id("ENT_TYPE_MOUNT_TURKEY");
     static const auto couch = to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH");
     auto to_spawn = get_spawn_item();
