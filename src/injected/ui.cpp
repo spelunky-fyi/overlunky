@@ -7174,6 +7174,11 @@ void render_hotbar_textures()
                 continue;
             auto def = get_texture_definition(texture->id);
             int32_t tx = type->tile_x, ty = type->tile_y;
+            if ((uint32_t)tx > def.sub_image_width / def.tile_width)
+            {
+                tx = type->tile_x % (def.sub_image_width / def.tile_width);
+                ty = (uint32_t)floor(type->tile_x / (def.sub_image_width / def.tile_width));
+            }
             if (!type->animations.empty())
             {
                 auto anim = type->animations.begin()->second;
@@ -7181,8 +7186,6 @@ void render_hotbar_textures()
                     anim = type->animations[0];
                 tx = anim.texture % (def.sub_image_width / def.tile_width);
                 ty = (uint32_t)floor(anim.texture / (def.sub_image_height / def.tile_height));
-                // tx = def.sub_image_offset_x + def.tile_width * (anim.texture % (def.sub_image_width / def.tile_width));
-                // ty = def.sub_image_offset_y + def.tile_height * (uint32_t)floor(anim.texture / (def.sub_image_height / def.tile_height));
             }
             float uv_left = (texture->tile_width_fraction * tx) + texture->offset_x_weird_math;
             float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
