@@ -199,10 +199,10 @@ class ThemeInfo
     // temple: unset levelgen.flags.flag10 + calculate chance of grasshopper critter spawn
     // sunken: unset levelgen.flags.flag9, 10, 17, 18 + if state.level == 1 -> unset flag 11
     // cosmic: calls same virtual on its sub_theme
-    /// Initializes some flags in the LevelGenSystem
+    /// Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
     virtual void init_flags() = 0;
 
-    /// Adds the entrance room
+    /// Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
     virtual void init_level() = 0;
 
     // most themes call the same function, some check whether they are in CO
