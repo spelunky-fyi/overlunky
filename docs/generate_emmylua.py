@@ -257,6 +257,7 @@ function F(f_string) end
         index = 0
         for var in type["vars"]:
             if "comment" in var and var["comment"] and "NoDoc" in var["comment"][0]:
+                index += 1
                 continue
             comment_str = (
                 (" @" + "<br/>".join(var["comment"]))
