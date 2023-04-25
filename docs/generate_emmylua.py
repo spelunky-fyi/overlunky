@@ -282,6 +282,7 @@ function F(f_string) end
                                 "param": params,
                                 "ret": ret,
                                 "orig_params": var["signature"],
+                                "comment": var["comment"]
                             }
                         )
                         index += 1
@@ -298,11 +299,9 @@ function F(f_string) end
                                 "param": params,
                                 "ret": ret,
                                 "orig_params": var["signature"],
+                                "comment": var["comment"]
                             }
                         ]
-                        print(
-                            f"    ---@field {name} {type['name']}_{name}{comment_str}"
-                        )
                         index += 1
                         continue
                     elif params:
@@ -348,32 +347,21 @@ function F(f_string) end
                 var_cpp_type = var["type"]
                 print(f"    ---@field {var_name} any @{var_cpp_type}{comment_str}")
             index += 1
-        print()
+        print(f"{type['name']} = nil")
         if "overloads" in type:
             for overload_name, funcs in type["overloads"].items():
-                class_name = f"{type['name']}_{overload_name}"
-                print(f"---@class {class_name}")
-                m = re.search(r"\s*(.*)\s+([^\(]*)\((.*)\)", funcs[-1]["orig_params"])
-                typed_params, params = cpp_params_to_emmy_lua(m.group(3))
-                print(typed_params.strip())
-                index = 0
+                func_name = f"{type['name']}:{overload_name}"
                 for overload in funcs:
-                    if index + 1 < len(funcs):
-                        overload_param = (
-                            f"self, {overload['param']}"
-                            if overload["param"] != ""
-                            else "self"
-                        )
-                        print(f"---@overload fun({overload_param}): {overload['ret']}")
-                    else:
-                        params = f"self, {params}" if params != "" else "self"
-                        print(f"local function {class_name}({params}) end\n")
-                    index += 1
+                    m = re.search(r"\s*(.*)\s+([^\(]*)\((.*)\)", overload["orig_params"])
+                    typed_params, params = cpp_params_to_emmy_lua(m.group(3))
+                    print_comment(overload)
+                    print_func(func_name, params, overload["ret"], typed_params)
+        print()
 
     print("\n--## Constructors")
 
     for name, overloads in ps.constructors.items():
-        print(f"\n{name} = nil")
+        # print(f"\n{name} = nil")
         for ctor in overloads:
             if "comment" in ctor and ctor["comment"] and "NoDoc" in ctor["comment"][0]:
                 continue

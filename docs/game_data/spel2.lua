@@ -1607,9 +1607,11 @@ function change_feat(feat, hidden, name, description) end
 
 ---@class SaveContext
     ---@field save fun(self, data: string): boolean
+SaveContext = nil
 
 ---@class LoadContext
     ---@field load fun(self): string
+LoadContext = nil
 
 ---@class ArenaConfigArenas
     ---@field dwelling_1 boolean
@@ -1652,6 +1654,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field sunkencity_3 boolean
     ---@field sunkencity_4 boolean
     ---@field sunkencity_5 boolean
+ArenaConfigArenas = nil
 
 ---@class ArenaConfigItems
     ---@field rock boolean
@@ -1694,6 +1697,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field scepter boolean
     ---@field kapala boolean
     ---@field true_crown boolean
+ArenaConfigItems = nil
 
 ---@class ArenaConfigEquippedItems
     ---@field paste boolean
@@ -1704,6 +1708,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field parachute boolean
     ---@field kapala boolean
     ---@field scepter boolean
+ArenaConfigEquippedItems = nil
 
 ---@class ArenaState
     ---@field current_arena integer
@@ -1736,11 +1741,13 @@ function change_feat(feat, hidden, name, description) end
     ---@field final_ghost boolean
     ---@field breath_cooldown integer
     ---@field punish_ball boolean
+ArenaState = nil
 
 ---@class SelectPlayerSlot
     ---@field activated boolean
     ---@field character ENT_TYPE
     ---@field texture integer
+SelectPlayerSlot = nil
 
 ---@class Items
     ---@field player_count integer
@@ -1750,6 +1757,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field is_pet_poisoned boolean[] @size: 4
     ---@field player_inventory Inventory[] @size: MAX_PLAYERS
     ---@field player_select SelectPlayerSlot[] @size: MAX_PLAYERS
+Items = nil
 
 ---@class LiquidPhysicsEngine
     ---@field pause boolean
@@ -1759,18 +1767,22 @@ function change_feat(feat, hidden, name, description) end
     ---@field size number
     ---@field weight number
     ---@field count integer
+LiquidPhysicsEngine = nil
 
 ---@class LiquidPhysicsParams
     ---@field gravity number
     ---@field cohesion number
     ---@field elasticity number
+LiquidPhysicsParams = nil
 
 ---@class LiquidPool
     ---@field default LiquidPhysicsParams
     ---@field engine LiquidPhysicsEngine
+LiquidPool = nil
 
 ---@class LiquidPhysics
     ---@field pools LiquidPool[] @size: 5
+LiquidPhysics = nil
 
 ---@class StateMemory
     ---@field screen_last integer @Previous SCREEN, used to check where we're coming from when loading another SCREEN
@@ -1875,12 +1887,14 @@ function change_feat(feat, hidden, name, description) end
     ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
     ---@field next_entity_uid integer @Next entity spawned will have this uid
+StateMemory = nil
 
 ---@class LightParams
     ---@field red number
     ---@field green number
     ---@field blue number
     ---@field size number
+LightParams = nil
 
 ---@class Illumination
     ---@field lights LightParams[] @size: 4 @Table of light1, light2, ... etc.
@@ -1900,6 +1914,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field type_flags integer @Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
     ---@field enabled boolean
     ---@field layer integer
+Illumination = nil
 
 ---@class Camera
     ---@field bounds_left number
@@ -1923,41 +1938,49 @@ function change_feat(feat, hidden, name, description) end
     ---@field uniform_shake boolean
     ---@field focused_entity_uid integer
     ---@field inertia number
+Camera = nil
 
 ---@class Online
     ---@field online_players OnlinePlayer[] @size: 4
     ---@field local_player OnlinePlayer
     ---@field lobby OnlineLobby
+Online = nil
 
 ---@class OnlinePlayer
     ---@field ready_state integer
     ---@field character integer
     ---@field player_name string
+OnlinePlayer = nil
 
 ---@class OnlineLobby
     ---@field code integer
     ---@field local_player_slot integer
     ---@field get_code fun(self): string @Gets the string equivalent of the code
+OnlineLobby = nil
 
 ---@class LogicList
     ---@field olmec_cutscene LogicOlmecCutscene
     ---@field tiamat_cutscene LogicTiamatCutscene
     ---@field diceshop LogicDiceShop
+LogicList = nil
 
 ---@class Logic
     ---@field logic_index integer
+Logic = nil
 
 ---@class LogicOlmecCutscene : Logic
     ---@field olmec Entity
     ---@field player Entity
     ---@field cinematic_anchor Entity
     ---@field timer integer
+LogicOlmecCutscene = nil
 
 ---@class LogicTiamatCutscene : Logic
     ---@field tiamat Entity
     ---@field player Entity
     ---@field cinematic_anchor Entity
     ---@field timer integer
+LogicTiamatCutscene = nil
 
 ---@class LogicDiceShop : Logic
     ---@field bet_machine integer
@@ -1974,6 +1997,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field result_announcement_timer integer
     ---@field won_prizes_count integer
     ---@field balance integer
+LogicDiceShop = nil
 
 ---@class BackgroundMusic
     ---@field game_startup BackgroundSound
@@ -1991,6 +2015,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field inside_sunken_city_pipe BackgroundSound
     ---@field pause_menu BackgroundSound
     ---@field death_transition BackgroundSound
+BackgroundMusic = nil
 
 ---@class GameManager
     ---@field music BackgroundMusic
@@ -2011,9 +2036,11 @@ function change_feat(feat, hidden, name, description) end
     ---@field pause_ui PauseUI
     ---@field journal_ui JournalUI
     ---@field save_related SaveRelated
+GameManager = nil
 
 ---@class SaveRelated
     ---@field journal_popup_ui JournalPopupUI
+SaveRelated = nil
 
 ---@class JournalPopupUI
     ---@field wiggling_page_icon TextureRenderingInfo
@@ -2024,10 +2051,12 @@ function change_feat(feat, hidden, name, description) end
     ---@field entry_to_show integer
     ---@field timer integer
     ---@field slide_position number
+JournalPopupUI = nil
 
 ---@class GameProps
     ---@field buttons integer
     ---@field game_has_focus boolean
+GameProps = nil
 
 ---@class PRNG
     ---@field seed fun(self, seed: integer): nil @Same as `seed_prng`
@@ -2035,16 +2064,21 @@ function change_feat(feat, hidden, name, description) end
     ---@field random_chance fun(self, inverse_chance: integer, type: PRNG_CLASS): boolean @Returns true with a chance of `1/inverse_chance`
     ---@field random_index fun(self, i: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
     ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[min, max]` or `nil` if `max < min`
-    ---@field random PRNG_random @Drop-in replacement for `math.random()`
     ---@field get_pair any @&PRNG::get_pair
     ---@field set_pair any @&PRNG::set_pair
-
----@class PRNG_random
+PRNG = nil
+---Drop-in replacement for `math.random()`
+---@return number
+function PRNG:random() end
+---Drop-in replacement for `math.random(i)`
+---@param i integer
+---@return integer?
+function PRNG:random(i) end
+---Drop-in replacement for `math.random(min, max)`
 ---@param min integer
 ---@param max integer
----@overload fun(self): number
----@overload fun(self, i: integer): integer?
-local function PRNG_random(self, min, max) end
+---@return integer?
+function PRNG:random(min, max) end
 
 ---@class Color
     ---@field r number
@@ -2055,6 +2089,7 @@ local function PRNG_random(self, min, max) end
     ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color @Changes color based on given RGBA colors in 0..255 range
     ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
     ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
+Color = nil
 
 ---@class Animation
     ---@field id integer
@@ -2062,6 +2097,7 @@ local function PRNG_random(self, min, max) end
     ---@field num_tiles integer
     ---@field interval integer
     ---@field repeat_mode REPEAT_TYPE
+Animation = nil
 
 ---@class EntityDB
     ---@field id ENT_TYPE
@@ -2101,6 +2137,7 @@ local function PRNG_random(self, min, max) end
     ---@field description STRINGID
     ---@field tilex integer
     ---@field tiley integer
+EntityDB = nil
 
 ---@class RenderInfo
     ---@field x number
@@ -2120,6 +2157,7 @@ local function PRNG_random(self, min, max) end
     ---@field set_post_dtor fun(self, fun: fun(self: RenderInfo): nil): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil dtor(RenderInfo self)`
     ---@field set_pre_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool render(RenderInfo self, number number, VanillaRenderContext vanilla_render_context)`
     ---@field set_post_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil render(RenderInfo self, number number, VanillaRenderContext vanilla_render_context)`
+RenderInfo = nil
 
 ---@class Entity
     ---@field type EntityDB @Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the EntityDB
@@ -2152,7 +2190,6 @@ local function PRNG_random(self, min, max) end
     ---@field user_data any
     ---@field topmost fun(self): Entity
     ---@field topmost_mount fun(self): Entity
-    ---@field overlaps_with Entity_overlaps_with
     ---@field get_texture fun(self): TEXTURE
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean @Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     ---@field set_draw_depth fun(self, draw_depth: integer): nil
@@ -2192,12 +2229,21 @@ local function PRNG_random(self, min, max) end
     ---@field set_post_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
     ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_collision2(Entity self, Entity other_entity)`
     ---@field set_post_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_collision2(Entity self, Entity other_entity)`
-
----@class Entity_overlaps_with
+Entity = nil
+---@param hitbox AABB
+---@return boolean
+function Entity:overlaps_with(hitbox) end
+---Deprecated
+---Use `overlaps_with(AABB hitbox)` instead
+---@param rect_left number
+---@param rect_bottom number
+---@param rect_right number
+---@param rect_top number
+---@return boolean
+function Entity:overlaps_with(rect_left, rect_bottom, rect_right, rect_top) end
 ---@param other Entity
----@overload fun(self, hitbox: AABB): boolean
----@overload fun(self, rect_left: number, rect_bottom: number, rect_right: number, rect_top: number): boolean
-local function Entity_overlaps_with(self, other) end
+---@return boolean
+function Entity:overlaps_with(other) end
 
 ---@class Movable : Entity
     ---@field move Vec2 @{movex, movey}
@@ -2225,7 +2271,6 @@ local function Entity_overlaps_with(self, other) end
     ---@field wet_effect_timer integer
     ---@field poison_tick_timer integer @Used to apply damage from poison, can be set to -1 to cure poison, to set poison use [poison_entity](#poison_entity)
     ---@field falling_timer integer
-    ---@field is_poisoned Movable_is_poisoned
     ---@field dark_shadow_timer integer
     ---@field onfire_effect_timer integer
     ---@field exit_invincibility_timer integer
@@ -2257,24 +2302,29 @@ local function Entity_overlaps_with(self, other) end
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil @Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
     ---@field clear_behaviors fun(self): nil @Clears all behaviors of this movable, need to call `add_behavior` to avoid crashing
     ---@field generic_update_world fun(self): nil @Move a movable according to its velocity, update physics, gravity, etc.<br/>Will also update `movable.animation_frame` and various timers and counters
-    ---@field generic_update_world Movable_generic_update_world @Move a movable according to its velocity, can disable gravity<br/>Will also update `movable.animation_frame` and various timers and counters
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
     ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
-
----@class Movable_is_poisoned
-
-local function Movable_is_poisoned(self) end
-
----@class Movable_generic_update_world
+Movable = nil
+---@return boolean
+function Movable:is_poisoned() end
+---Move a movable according to its velocity, can disable gravity
+---Will also update `movable.animation_frame` and various timers and counters
+---@param disable_gravity boolean
+---@return nil
+function Movable:generic_update_world(disable_gravity) end
+---Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is
+---held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal
+---movement via `on_rope`. Use this for example to update a custom enemy type.
+---Will also update `movable.animation_frame` and various timers and counters
 ---@param move Vec2
 ---@param sprint_factor number
 ---@param disable_gravity boolean
 ---@param on_rope boolean
----@overload fun(self, disable_gravity: boolean): nil
-local function Movable_generic_update_world(self, move, sprint_factor, disable_gravity, on_rope) end
+---@return nil
+function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_rope) end
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil @Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
@@ -2283,6 +2333,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field get_powerups fun(self): ENT_TYPE[] @Return all powerups that the entity has
     ---@field unequip_backitem fun(self): nil @Unequips the currently worn backitem
     ---@field worn_backitem fun(self): integer @Returns the uid of the currently worn backitem, or -1 if wearing nothing
+PowerupCapable = nil
 
 ---@class Inventory
     ---@field money integer @Sum of the money collected in current level
@@ -2315,6 +2366,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field companion_poison_tick_timers integer[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field is_companion_cursed boolean[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field acquired_powerups ENT_TYPE[] @size: 30 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+Inventory = nil
 
 ---@class Ai
     ---@field target Entity
@@ -2325,6 +2377,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field trust integer @Levels completed with, 0..3
     ---@field whipped integer @Number of times whipped by player
     ---@field walk_pause_timer integer @positive: walking, negative: wating/idle
+Ai = nil
 
 ---@class Player : PowerupCapable
     ---@field inventory Inventory
@@ -2346,6 +2399,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field is_female fun(self): boolean @Check whether the character is female, will be `true` if the character was modded to be female as well.
     ---@field set_heart_color fun(self, hcolor: Color): nil @Set the heart color the character.
     ---@field let_go fun(self): nil @Drops from ladders, ropes and ledge grabs
+Player = nil
 
 ---@class Floor : Entity
     ---@field deco_top integer
@@ -2363,6 +2417,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
     ---@field set_pre_floor_update fun(self, fun: fun(self: Floor): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool floor_update(Floor self)`
     ---@field set_post_floor_update fun(self, fun: fun(self: Floor): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil floor_update(Floor self)`
+Floor = nil
 
 ---@class Door : Floor
     ---@field counter integer
@@ -2370,6 +2425,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field enter fun(self, who: Entity): integer
     ---@field is_unlocked fun(self): boolean @Will alwyas return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
     ---@field unlock fun(self, unlock: boolean): nil @Lock/Unlock doors
+Door = nil
 
 ---@class ExitDoor : Door
     ---@field entered boolean @if true entering it does not load the transition
@@ -2378,47 +2434,59 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
     ---@field world integer
     ---@field theme integer
+ExitDoor = nil
 
 ---@class DecoratedDoor : ExitDoor
     ---@field special_bg Entity
+DecoratedDoor = nil
 
 ---@class LockedDoor : Door
     ---@field unlocked boolean
+LockedDoor = nil
 
 ---@class CityOfGoldDoor : DecoratedDoor
     ---@field unlocked boolean
+CityOfGoldDoor = nil
 
 ---@class MainExit : ExitDoor
     ---@field sound SoundMeta
     ---@field door_blocker Entity @Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
+MainExit = nil
 
 ---@class EggShipDoor : Door
     ---@field timer integer
+EggShipDoor = nil
 
 ---@class EggShipDoorS : EggShipDoor
     ---@field entered boolean
+EggShipDoorS = nil
 
 ---@class Arrowtrap : Floor
     ---@field arrow_shot boolean
     ---@field rearm fun(self): nil
     ---@field trigger fun(self, who_uid: integer): nil @The uid must be movable entity for ownership transfers
+Arrowtrap = nil
 
 ---@class TotemTrap : Floor
     ---@field spawn_entity_type ENT_TYPE
     ---@field first_sound_id integer
     ---@field trigger fun(self, who_uid: integer, left: boolean): nil @The uid must be movable entity for ownership transfers
+TotemTrap = nil
 
 ---@class LaserTrap : Floor
     ---@field emitted_light Illumination
     ---@field timer integer @counts up from 0 after triggering, cannot shoot again until 360
     ---@field trigger fun(self, who_uid: integer): nil @The uid must be movable entity for ownership transfers
+LaserTrap = nil
 
 ---@class SparkTrap : Floor
     ---@field emitted_light Illumination
     ---@field spark_uid integer
+SparkTrap = nil
 
 ---@class Altar : Floor
     ---@field timer integer @for normal altar: counts from 0 to 20 then 0, then 1 then 0 and sacrifice happens
+Altar = nil
 
 ---@class SpikeballTrap : Floor
     ---@field sound SoundMeta
@@ -2426,16 +2494,20 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field end_piece Entity
     ---@field state integer @0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause; going_up is only right when timer is 0, otherwise it just sits at the bottom
     ---@field timer integer @for the start and retract
+SpikeballTrap = nil
 
 ---@class TransferFloor : Floor
     ---@field transferred_entities table<integer, integer> @Index is the uid, value is frame the entity entered the floor (time_level), use `pairs` to loop thru
+TransferFloor = nil
 
 ---@class ConveyorBelt : TransferFloor
     ---@field timer integer
+ConveyorBelt = nil
 
 ---@class Pipe : Floor
     ---@field direction_type integer @3 - straight_horizontal, 4 - blocked, 5 - down_left_turn, 6 - down_right_turn, 8 - blocked, 9 - up_left_turn, 10 - up_right_turn, 12 - straight_vertical
     ---@field end_pipe boolean
+Pipe = nil
 
 ---@class Generator : Floor
     ---@field spawned_uid integer
@@ -2443,6 +2515,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
     ---@field start_counter integer @works only for star challenge
     ---@field on_off boolean @works only for star challenge
+Generator = nil
 
 ---@class SlidingWallCeiling : Floor
     ---@field attached_piece Entity
@@ -2450,13 +2523,16 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field state integer @1 - going up / is at the top, 2 - pause
     ---@field ball_rise SoundMeta
     ---@field ball_drop SoundMeta
+SlidingWallCeiling = nil
 
 ---@class QuickSand : Floor
+QuickSand = nil
 
 ---@class BigSpearTrap : Floor
     ---@field spear_uid integer
     ---@field left_part boolean @setting the left part to 0 or right part to 1 destroys the trap
     ---@field trigger fun(self, who_uid: integer, left: boolean): nil @The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,
+BigSpearTrap = nil
 
 ---@class StickyTrap : Floor
     ---@field sound SoundMeta
@@ -2464,6 +2540,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field ball_uid integer
     ---@field state integer @0 - none, 1 - start, 2 - going down, 3 - is at the bottom, 4 - going up, 5 - pause
     ---@field timer integer
+StickyTrap = nil
 
 ---@class MotherStatue : Floor
     ---@field players_standing boolean[] @size: 4 @Table of player1_standing, player2_standing, ... etc.
@@ -2483,9 +2560,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field player4_health_timer integer
     ---@field eggplantchild_timer integer
     ---@field eggplantchild_detected boolean
+MotherStatue = nil
 
 ---@class TeleportingBorder : Floor
     ---@field direction integer @0 - right, 1 - left, 2 - bottom, 3 - top, 4 - disable
+TeleportingBorder = nil
 
 ---@class ForceField : Floor
     ---@field first_item_beam Entity
@@ -2494,10 +2573,12 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field emitted_light Illumination
     ---@field is_on boolean
     ---@field activate_laserbeam fun(self, turn_on: boolean): nil
+ForceField = nil
 
 ---@class TimedForceField : ForceField
     ---@field timer integer
     ---@field pause boolean
+TimedForceField = nil
 
 ---@class HorizontalForceField : Floor
     ---@field first_item_beam Entity
@@ -2505,24 +2586,29 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sound SoundMeta
     ---@field timer integer
     ---@field is_on boolean
+HorizontalForceField = nil
 
 ---@class TentacleBottom : Floor
     ---@field attached_piece_uid integer
     ---@field tentacle_uid integer
     ---@field state integer @0 - none, 1 - start, 2 - moving up, 3 - at the top, 4 - moving down 5 - pause
+TentacleBottom = nil
 
 ---@class PoleDeco : Floor
     ---@field deco_up integer
     ---@field deco_down integer
+PoleDeco = nil
 
 ---@class JungleSpearTrap : Floor
     ---@field trigger fun(self, who_uid: integer, direction: integer): nil @The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right, 3 = up, 4 = down
+JungleSpearTrap = nil
 
 ---@class Crushtrap : Movable
     ---@field dirx number
     ---@field diry number
     ---@field timer integer @counts from 30 to 0 before moving, after it stops, counts from 60 to 0 before it can be triggered again
     ---@field bounce_back_timer integer @counts from 7 to 0 after it hits the wall and moves away until the timer hits 0, then moves back and counts from 255 until it hits the wall again, if needed it will start the counter again for another bounce
+Crushtrap = nil
 
 ---@class Olmec : Movable
     ---@field sound SoundMeta
@@ -2535,49 +2621,61 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field phase1_amount_of_bomb_salvos integer
     ---@field unknown_attack_state integer
     ---@field broken_floaters fun(self): integer
+Olmec = nil
 
 ---@class WoodenlogTrap : Movable
     ---@field ceiling_1_uid integer
     ---@field ceiling_2_uid integer
     ---@field falling_speed number
+WoodenlogTrap = nil
 
 ---@class Boulder : Movable
     ---@field is_rolling integer @is set to 1 when the boulder first hits the ground
+Boulder = nil
 
 ---@class PushBlock : Movable
     ---@field sound SoundMeta
     ---@field dust_particle ParticleEmitterInfo
     ---@field dest_pos_x number
+PushBlock = nil
 
 ---@class BoneBlock : Movable
+BoneBlock = nil
 
 ---@class ChainedPushBlock : PushBlock
     ---@field is_chained boolean
+ChainedPushBlock = nil
 
 ---@class LightArrowPlatform : Movable
     ---@field emitted_light Illumination
+LightArrowPlatform = nil
 
 ---@class FallingPlatform : Movable
     ---@field timer integer
     ---@field shaking_factor number
     ---@field y_pos number
+FallingPlatform = nil
 
 ---@class UnchainedSpikeBall : Movable
     ---@field bounce boolean
+UnchainedSpikeBall = nil
 
 ---@class Drill : Movable
     ---@field sound1 SoundMeta
     ---@field sound2 SoundMeta
     ---@field top_chain_piece Entity
     ---@field trigger fun(self): nil
+Drill = nil
 
 ---@class ThinIce : Movable
     ---@field strength integer @counts down when standing on, maximum is 134 as based of this value it changes animation_frame, and above that value it changes to wrong sprite
+ThinIce = nil
 
 ---@class Elevator : Movable
     ---@field emitted_light Illumination
     ---@field timer integer @pause timer, counts down 60 to 0
     ---@field moving_up boolean
+Elevator = nil
 
 ---@class ClamBase : Movable
     ---@field treasure_type ENT_TYPE
@@ -2585,12 +2683,15 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field treasure_x_pos number
     ---@field treasure_y_pos number
     ---@field top_part_uid integer
+ClamBase = nil
 
 ---@class RegenBlock : Movable
     ---@field on_breaking boolean
+RegenBlock = nil
 
 ---@class TimedPowderkeg : PushBlock
     ---@field timer integer @timer till explosion, -1 = pause, counts down
+TimedPowderkeg = nil
 
 ---@class Mount : PowerupCapable
     ---@field rider_uid integer
@@ -2603,13 +2704,16 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field remove_rider fun(self): nil
     ---@field carry fun(self, rider: Movable): nil
     ---@field tame fun(self, value: boolean): nil
+Mount = nil
 
 ---@class Rockdog : Mount
     ---@field attack_cooldown integer
+Rockdog = nil
 
 ---@class Axolotl : Mount
     ---@field attack_cooldown integer
     ---@field can_teleport boolean
+Axolotl = nil
 
 ---@class Mech : Mount
     ---@field crouch_walk_sound SoundMeta
@@ -2617,14 +2721,17 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field gun_cooldown integer
     ---@field walking boolean
     ---@field breaking_wall boolean
+Mech = nil
 
 ---@class Qilin : Mount
     ---@field fly_gallop_sound SoundMeta
     ---@field attack_cooldown integer
+Qilin = nil
 
 ---@class Monster : PowerupCapable
     ---@field chased_target_uid integer
     ---@field target_selection_timer integer
+Monster = nil
 
 ---@class RoomOwner : Monster
     ---@field room_index integer
@@ -2636,17 +2743,20 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field is_patrolling boolean
     ---@field aggro_trigger boolean @setting this makes him angry, if it's shopkeeper you get 2 agrro points
     ---@field was_hurt boolean @also is set true if you set aggro to true, get's trigger even when whiping
+RoomOwner = nil
 
 ---@class WalkingMonster : Monster
     ---@field chatting_to_uid integer
     ---@field walk_pause_timer integer @alternates between walking and pausing every time it reaches zero
     ---@field cooldown_timer integer @used for chatting with other monsters, attack cooldowns etc.
+WalkingMonster = nil
 
 ---@class NPC : Monster
     ---@field climb_direction number
     ---@field target_in_sight_timer integer
     ---@field ai_state integer
     ---@field aggro boolean @for bodyguard and shopkeeperclone it spawns a weapon as well
+NPC = nil
 
 ---@class Ghost : Monster
     ---@field split_timer integer @for SMALL_HAPPY this is also the sequence timer of its various states
@@ -2661,25 +2771,30 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field happy_dancing_clockwise boolean
     ---@field target_dist_visibility_factor number
     ---@field target_layer_visibility_factor number
+Ghost = nil
 
 ---@class Bat : Monster
     ---@field spawn_x number
     ---@field spawn_y number
+Bat = nil
 
 ---@class Jiangshi : Monster
     ---@field wait_timer integer @wait time between jumps
     ---@field jump_counter integer @only female aka assassin: when 0 will jump up into ceiling
     ---@field on_ceiling boolean @only female aka assassin
+Jiangshi = nil
 
 ---@class Monkey : Monster
     ---@field sound SoundMeta
     ---@field jump_timer integer
     ---@field on_vine boolean
+Monkey = nil
 
 ---@class GoldMonkey : Monster
     ---@field jump_timer integer
     ---@field poop_timer integer
     ---@field poop_count integer
+GoldMonkey = nil
 
 ---@class Mole : Monster
     ---@field burrowing_sound SoundMeta
@@ -2692,17 +2807,20 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field counter_nonburrowing integer
     ---@field countdown_for_appearing integer
     ---@field digging_state integer @0 - non_burrowed, 1 - unknown, 2 - burrowed, 3 - state_change
+Mole = nil
 
 ---@class Spider : Monster
     ---@field ceiling_pos_x number
     ---@field ceiling_pos_y number
     ---@field jump_timer integer @For the giant spider, some times he shot web instead of jumping
     ---@field trigger_distance number @only in the x coord
+Spider = nil
 
 ---@class HangSpider : Monster
     ---@field dangle_jump_timer integer
     ---@field ceiling_pos_x number
     ---@field ceiling_pos_y number
+HangSpider = nil
 
 ---@class Shopkeeper : RoomOwner
     ---@field name integer @0 - Ali, 1 - Bob, 2 - Comso ... and so one, anything above 28 is just random string, can crash the game
@@ -2710,12 +2828,14 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field has_key boolean @will drop key after stun/kill
     ---@field is_ear boolean
     ---@field shop_owner boolean
+Shopkeeper = nil
 
 ---@class Yang : RoomOwner
     ---@field turkeys_in_den integer[] @Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
     ---@field first_message_shown boolean @I'm looking for turkeys, wanna help?
     ---@field quest_incomplete boolean @Is set to false when the quest is over (Yang dead or second turkey delivered)
     ---@field special_message_shown boolean @Tusk palace/black market/one way door - message shown
+Yang = nil
 
 ---@class Tun : RoomOwner
     ---@field arrows_left integer
@@ -2725,6 +2845,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field murdered boolean
     ---@field shop_entered boolean
     ---@field tiamat_encounter boolean @if set to false, greets you with 'you've done well to reach this place'
+Tun = nil
 
 ---@class Pet : Monster
     ---@field fx_button Entity
@@ -2733,15 +2854,18 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field func_timer integer @used when free running in the camp
     ---@field active_state integer @-1 = sitting and yelling, 0 = either running, dead or picked up
     ---@field petted_counter integer @number of times petted in the camp
+Pet = nil
 
 ---@class Caveman : WalkingMonster
     ---@field wake_up_timer integer
     ---@field can_pick_up_timer integer @0 = can pick something up, when holding forced to 179, after tripping and regaining consciousness counts down to 0
     ---@field aggro_timer integer @keeps resetting when angry and a player is nearby
+Caveman = nil
 
 ---@class CavemanShopkeeper : WalkingMonster
     ---@field tripping boolean
     ---@field shop_entered boolean
+CavemanShopkeeper = nil
 
 ---@class HornedLizard : Monster
     ---@field eaten_uid integer @dungbeetle being eaten
@@ -2750,6 +2874,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field blood_squirt_timer integer
     ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
+HornedLizard = nil
 
 ---@class Mosquito : Monster
     ---@field direction_x number
@@ -2758,22 +2883,27 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field stuck_rel_pos_y number
     ---@field sound SoundMeta
     ---@field timer integer
+Mosquito = nil
 
 ---@class Mantrap : Monster
     ---@field walk_pause_timer integer @alternates between walking and pausing every time it reaches zero
     ---@field eaten_uid integer @the uid of the entity the mantrap has eaten, in case it can break out, like a shopkeeper
+Mantrap = nil
 
 ---@class Skeleton : Monster
     ---@field explosion_timer integer @-1 = never explodes
+Skeleton = nil
 
 ---@class Scarab : Monster
     ---@field sound SoundMeta
     ---@field emitted_light Illumination
     ---@field timer integer @how long to stay in current position
+Scarab = nil
 
 ---@class Imp : Monster
     ---@field carrying_uid integer
     ---@field patrol_y_level number
+Imp = nil
 
 ---@class Lavamander : Monster
     ---@field emitted_light Illumination
@@ -2782,27 +2912,32 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field lava_detection_timer integer
     ---@field is_hot boolean
     ---@field player_detect_state integer @0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
+Lavamander = nil
 
 ---@class Firebug : Monster
     ---@field sound SoundMeta
     ---@field fire_timer integer
     ---@field going_up boolean
     ---@field detached_from_chain boolean
+Firebug = nil
 
 ---@class FirebugUnchained : Monster
     ---@field sound SoundMeta
     ---@field max_flight_height number
     ---@field ai_timer integer
     ---@field walking_timer integer
+FirebugUnchained = nil
 
 ---@class Robot : WalkingMonster
     ---@field sound SoundMeta
     ---@field emitted_light_explosion Illumination
+Robot = nil
 
 ---@class Quillback : WalkingMonster
     ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
     ---@field seen_player boolean
+Quillback = nil
 
 ---@class Leprechaun : WalkingMonster
     ---@field sound SoundMeta
@@ -2810,29 +2945,36 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field target_in_sight_timer integer
     ---@field gold integer @amount of gold he picked up, will be drooped on death
     ---@field timer_after_humping integer
+Leprechaun = nil
 
 ---@class Crocman : WalkingMonster
     ---@field teleport_cooldown integer
+Crocman = nil
 
 ---@class Mummy : Monster
     ---@field walk_pause_timer integer
+Mummy = nil
 
 ---@class VanHorsing : NPC
     ---@field show_text boolean @if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
     ---@field special_message_shown boolean @one way door message has been shown
+VanHorsing = nil
 
 ---@class WitchDoctor : WalkingMonster
     ---@field sound SoundMeta
     ---@field skull_regen_timer integer
+WitchDoctor = nil
 
 ---@class WitchDoctorSkull : Monster
     ---@field witch_doctor_uid integer
     ---@field emitted_light Illumination
     ---@field sound SoundMeta
     ---@field rotation_angle number
+WitchDoctorSkull = nil
 
 ---@class ForestSister : NPC
     ---@field walk_pause_timer integer
+ForestSister = nil
 
 ---@class Vampire : Monster
     ---@field jump_trigger_distance_x number
@@ -2840,29 +2982,36 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sleep_pos_x number
     ---@field sleep_pos_y number
     ---@field walk_pause_timer integer
+Vampire = nil
 
 ---@class Vlad : Vampire
     ---@field teleport_timer integer @triggers when Vlad teleports, when timer running he can't teleport and will stun when hit
     ---@field aggro boolean @or is awake
+Vlad = nil
 
 ---@class Waddler : RoomOwner
     ---@field player_detected boolean
     ---@field on_the_ground boolean
     ---@field air_timer integer
+Waddler = nil
 
 ---@class Octopus : WalkingMonster
+Octopus = nil
 
 ---@class Bodyguard : NPC
     ---@field position_state integer @0 - none, 1 - Tusk dice shop, 2 - Entrence to pleasure palace, 3 - Basement entrance to pleasure palace
     ---@field message_shown boolean
+Bodyguard = nil
 
 ---@class Fish : Monster
     ---@field change_direction_timer integer
+Fish = nil
 
 ---@class GiantFish : Monster
     ---@field sound SoundMeta
     ---@field change_direction_timer integer @when bouncing into a wall
     ---@field lose_interest_timer integer @delay in-between attacks
+GiantFish = nil
 
 ---@class Crabman : Monster
     ---@field walk_pause_timer integer
@@ -2870,6 +3019,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field poison_attack_timer integer
     ---@field attacking_claw_uid integer
     ---@field at_maximum_attack boolean
+Crabman = nil
 
 ---@class Kingu : Monster
     ---@field sound1 SoundMeta @initialized when breaking the shell (sliding down sound maybe?)
@@ -2881,6 +3031,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field monster_spawn_timer integer
     ---@field initial_shell_health integer @excalibur wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip
     ---@field player_seen_by_kingu boolean
+Kingu = nil
 
 ---@class Anubis : Monster
     ---@field spawn_x number
@@ -2891,13 +3042,16 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field next_attack_timer integer
     ---@field psychic_orbs_counter integer
     ---@field awake boolean
+Anubis = nil
 
 ---@class Cobra : Monster
     ---@field spit_timer integer
+Cobra = nil
 
 ---@class CatMummy : Monster
     ---@field ai_state integer
     ---@field attack_timer integer
+CatMummy = nil
 
 ---@class Sorceress : WalkingMonster
     ---@field inbetween_attack_timer integer
@@ -2906,6 +3060,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field fx_entity Entity
     ---@field sound SoundMeta
     ---@field hover_timer integer
+Sorceress = nil
 
 ---@class MagmaMan : Monster
     ---@field emitted_light Illumination
@@ -2913,6 +3068,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field particle ParticleEmitterInfo
     ---@field jump_timer integer
     ---@field alive_timer integer
+MagmaMan = nil
 
 ---@class Bee : Monster
     ---@field can_rest boolean
@@ -2923,15 +3079,18 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field walk_end_time integer
     ---@field wobble_x number
     ---@field wobble_y number
+Bee = nil
 
 ---@class Ammit : Monster
     ---@field walk_pause_timer integer
     ---@field particle ParticleEmitterInfo
+Ammit = nil
 
 ---@class ApepPart : Monster
     ---@field y_pos number
     ---@field sine_angle number
     ---@field sync_timer integer @or pause timer, used to sync the body parts moving up and down
+ApepPart = nil
 
 ---@class ApepHead : ApepPart
     ---@field sound1 SoundMeta
@@ -2940,6 +3099,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field tail_uid integer
     ---@field fx_mouthpiece1_uid integer
     ---@field fx_mouthpiece2_uid integer
+ApepHead = nil
 
 ---@class OsirisHead : Monster
     ---@field right_hand_uid integer @right from his perspective
@@ -2947,26 +3107,32 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field moving_left boolean
     ---@field targeting_timer integer
     ---@field invincibility_timer integer
+OsirisHead = nil
 
 ---@class OsirisHand : Monster
     ---@field attack_cooldown_timer integer
+OsirisHand = nil
 
 ---@class Alien : Monster
     ---@field jump_timer integer
+Alien = nil
 
 ---@class UFO : Monster
     ---@field sound SoundMeta
     ---@field patrol_distance integer
     ---@field attack_cooldown_timer integer
     ---@field is_falling boolean
+UFO = nil
 
 ---@class Lahamu : Monster
     ---@field sound SoundMeta
     ---@field eyeball Entity
     ---@field attack_cooldown_timer integer
+Lahamu = nil
 
 ---@class YetiQueen : Monster
     ---@field walk_pause_timer integer
+YetiQueen = nil
 
 ---@class YetiKing : Monster
     ---@field walk_pause_timer integer
@@ -2974,6 +3140,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field particle_fog ParticleEmitterInfo
     ---@field particle_dust ParticleEmitterInfo
     ---@field particle_sparkles ParticleEmitterInfo
+YetiKing = nil
 
 ---@class Lamassu : Monster
     ---@field sound SoundMeta
@@ -2984,6 +3151,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field flight_timer integer
     ---@field attack_timer integer
     ---@field attack_angle number
+Lamassu = nil
 
 ---@class Olmite : WalkingMonster
     ---@field armor_on boolean
@@ -2992,6 +3160,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field on_top_uid integer
     ---@field y_offset number
     ---@field attack_cooldown_timer integer
+Olmite = nil
 
 ---@class Tiamat : Monster
     ---@field sound SoundMeta @Turning into stone sound
@@ -3005,6 +3174,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field tail_radian number
     ---@field tail_move_speed number
     ---@field right_arm_angle number
+Tiamat = nil
 
 ---@class GiantFrog : Monster
     ---@field door_front_layer Entity
@@ -3015,14 +3185,17 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field invincibility_timer integer
     ---@field mouth_close_timer integer
     ---@field mouth_open_trigger boolean @opens the mouth and starts mouth_close_timer, used when detecting grub in the mouth area
+GiantFrog = nil
 
 ---@class Frog : Monster
     ---@field grub_being_eaten_uid integer
     ---@field jump_timer integer
     ---@field pause boolean
+Frog = nil
 
 ---@class FireFrog : Frog
     ---@field sound SoundMeta
+FireFrog = nil
 
 ---@class Grub : Monster
     ---@field rotation_delta number
@@ -3032,10 +3205,12 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field turn_into_fly_timer integer
     ---@field particle ParticleEmitterInfo
     ---@field sound SoundMeta
+Grub = nil
 
 ---@class Tadpole : Monster
     ---@field acceleration_timer integer
     ---@field player_spotted boolean
+Tadpole = nil
 
 ---@class GiantFly : Monster
     ---@field head_entity Entity
@@ -3045,6 +3220,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sine_frequency number
     ---@field delta_y_angle number
     ---@field sine_counter integer
+GiantFly = nil
 
 ---@class Ghist : Monster
     ---@field body_uid integer
@@ -3052,18 +3228,22 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sound SoundMeta
     ---@field transparency integer
     ---@field fadeout integer
+Ghist = nil
 
 ---@class JumpDog : Monster
     ---@field walk_pause_timer integer
     ---@field squish_timer integer
+JumpDog = nil
 
 ---@class EggplantMinister : Monster
     ---@field sound SoundMeta
     ---@field walk_pause_timer integer
     ---@field squish_timer integer
+EggplantMinister = nil
 
 ---@class Yama : Monster
     ---@field message_shown boolean
+Yama = nil
 
 ---@class Hundun : Monster
     ---@field applied_hor_velocity number
@@ -3076,6 +3256,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field birdhead_defeated boolean
     ---@field snakehead_defeated boolean
     ---@field hundun_flags integer @1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs
+Hundun = nil
 
 ---@class HundunHead : Monster
     ---@field attack_position_x number @Posiotion where the head will move on attack
@@ -3084,6 +3265,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field targeted_player_uid integer
     ---@field looking_for_target_timer integer @also cooldown before attack
     ---@field invincibility_timer integer
+HundunHead = nil
 
 ---@class MegaJellyfish : Monster
     ---@field flipper1 Entity
@@ -3095,10 +3277,12 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field wagging_tail_counter number
     ---@field flipper_distance integer @only applies to door-blocking one
     ---@field velocity_application_timer integer
+MegaJellyfish = nil
 
 ---@class Scorpion : Monster
     ---@field walk_pause_timer integer
     ---@field jump_cooldown_timer integer
+Scorpion = nil
 
 ---@class Hermitcrab : Monster
     ---@field carried_entity_type ENT_TYPE
@@ -3107,6 +3291,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field is_active boolean @whether it is hidden behind the carried block or not, if true you can damage him
     ---@field is_inactive boolean
     ---@field spawn_new_carried_item boolean @defaults to true, when toggled to false, a new carried item spawns
+Hermitcrab = nil
 
 ---@class Necromancer : WalkingMonster
     ---@field sound SoundMeta
@@ -3114,40 +3299,49 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field red_skeleton_spawn_y number
     ---@field resurrection_uid integer
     ---@field resurrection_timer integer
+Necromancer = nil
 
 ---@class ProtoShopkeeper : Monster
     ---@field movement_state integer @1: "Headpulse/explosion related, 2: Walking, 3: Headpulse/explosion related, 4: Crawling, 6: Headpulse/explosion related
     ---@field walk_pause_explode_timer integer
     ---@field walking_speed integer @0 = slow, 4 = fast
+ProtoShopkeeper = nil
 
 ---@class Beg : NPC
     ---@field walk_pause_timer integer
     ---@field disappear_timer integer
+Beg = nil
 
 ---@class Terra : Monster
     ---@field fx_button Entity
     ---@field x_pos number
     ---@field abuse_speechbubble_timer integer
+Terra = nil
 
 ---@class Critter : Monster
     ---@field last_picked_up_by_uid integer
     ---@field holding_state integer
+Critter = nil
 
 ---@class CritterBeetle : Critter
     ---@field pause boolean @used when he's getting eaten
+CritterBeetle = nil
 
 ---@class CritterCrab : Critter
     ---@field walk_pause_timer integer
     ---@field walking_left boolean
     ---@field unfriendly boolean @moves away from its target instead of towards it
+CritterCrab = nil
 
 ---@class CritterButterfly : Critter
     ---@field change_direction_timer integer
     ---@field vertical_flight_direction integer
+CritterButterfly = nil
 
 ---@class CritterLocust : Critter
     ---@field sound SoundMeta
     ---@field jump_timer integer
+CritterLocust = nil
 
 ---@class CritterSnail : Critter
     ---@field x_direction number
@@ -3158,14 +3352,17 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field rotation_center_y number
     ---@field rotation_angle number
     ---@field rotation_speed number
+CritterSnail = nil
 
 ---@class CritterFish : Critter
     ---@field swim_pause_timer integer
     ---@field player_in_proximity boolean
+CritterFish = nil
 
 ---@class CritterPenguin : Critter
     ---@field walk_pause_timer integer
     ---@field jump_timer integer
+CritterPenguin = nil
 
 ---@class CritterFirefly : Critter
     ---@field sine_amplitude number
@@ -3174,6 +3371,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field change_direction_timer integer
     ---@field sit_timer integer
     ---@field sit_cooldown_timer integer
+CritterFirefly = nil
 
 ---@class CritterDrone : Critter
     ---@field emitted_light Illumination
@@ -3182,6 +3380,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field applied_ver_momentum number
     ---@field unfriendly boolean @moves away from its target instead of towards it
     ---@field move_timer integer
+CritterDrone = nil
 
 ---@class CritterSlime : Critter
     ---@field x_direction number
@@ -3193,62 +3392,79 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field rotation_angle number
     ---@field rotation_speed number
     ---@field walk_pause_timer integer
+CritterSlime = nil
 
 ---@class Bomb : Movable
     ---@field sound SoundMeta
     ---@field scale_hor number @1.25 = default regular bomb, 1.875 = default giant bomb, > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
     ---@field scale_ver number
     ---@field is_big_bomb boolean @is bomb from powerpack
+Bomb = nil
 
 ---@class Backpack : Movable
     ---@field explosion_trigger boolean @More like on fire trigger, the explosion happens when the timer reaches > 29
     ---@field explosion_timer integer
     ---@field trigger_explosion fun(self): nil
+Backpack = nil
 
 ---@class Projectile : Movable
+Projectile = nil
 
 ---@class Purchasable : Movable
+Purchasable = nil
 
 ---@class DummyPurchasableEntity : Purchasable
+DummyPurchasableEntity = nil
 
 ---@class Bow : Purchasable
     ---@field get_arrow_special_offset fun(self): number
+Bow = nil
 
 ---@class Present : Purchasable
     ---@field inside ENT_TYPE
+Present = nil
 
 ---@class Jetpack : Backpack
     ---@field flame_on boolean
     ---@field fuel integer
+Jetpack = nil
 
 ---@class TeleporterBackpack : Backpack
     ---@field teleport_number integer
+TeleporterBackpack = nil
 
 ---@class Hoverpack : Backpack
     ---@field sound SoundMeta
     ---@field is_on boolean
+Hoverpack = nil
 
 ---@class Cape : Backpack
     ---@field floating_down boolean
+Cape = nil
 
 ---@class VladsCape : Cape
     ---@field can_double_jump boolean
+VladsCape = nil
 
 ---@class Mattock : Purchasable
     ---@field remaining integer
+Mattock = nil
 
 ---@class Gun : Purchasable
     ---@field cooldown integer
     ---@field shots integer @used only for webgun
     ---@field shots2 integer @used only for clonegun
     ---@field in_chamber integer @Only for webgun, uid of the webshot entity
+Gun = nil
 
 ---@class Flame : Movable
     ---@field sound SoundMeta
     ---@field emitted_light Illumination
+Flame = nil
 
 ---@class FlameSize : Flame
     ---@field flame_size number @if changed, gradually goes down (0.03 per frame) to the default size
+FlameSize = nil
 
 ---@class ClimbableRope : Movable
     ---@field segment_nr_inverse integer
@@ -3256,28 +3472,35 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field above_part Entity
     ---@field below_part Entity
     ---@field segment_nr integer
+ClimbableRope = nil
 
 ---@class Idol : Movable
     ---@field trap_triggered boolean @if you set it to true for the ice caves or volcano idol, the trap won't trigger
     ---@field touch integer @changes to 0 when first picked up by player and back to -1 if HH picks it up
     ---@field spawn_x number
     ---@field spawn_y number
+Idol = nil
 
 ---@class Spear : Movable
     ---@field sound_id integer
+Spear = nil
 
 ---@class JungleSpearCosmetic : Movable
     ---@field move_x number
     ---@field move_y number
+JungleSpearCosmetic = nil
 
 ---@class WebShot : Projectile
     ---@field shot boolean @if false, it's attached to the gun
+WebShot = nil
 
 ---@class HangStrand : Movable
     ---@field start_pos_y number
+HangStrand = nil
 
 ---@class HangAnchor : Movable
     ---@field spider_uid integer
+HangAnchor = nil
 
 ---@class Arrow : Purchasable
     ---@field flame_uid integer
@@ -3286,27 +3509,34 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field shot_from_trap boolean
     ---@field poison_arrow fun(self, poisoned: boolean): nil
     ---@field light_up fun(self, lit: boolean): nil
+Arrow = nil
 
 ---@class LightArrow : Arrow
     ---@field emitted_light Illumination
+LightArrow = nil
 
 ---@class LightShot : Projectile
     ---@field emitted_light Illumination
+LightShot = nil
 
 ---@class LightEmitter : Movable
     ---@field emitted_light Illumination
+LightEmitter = nil
 
 ---@class ScepterShot : LightEmitter
     ---@field sound SoundMeta
     ---@field speed number
     ---@field idle_timer integer @short timer before it goes after target
+ScepterShot = nil
 
 ---@class SpecialShot : LightEmitter
     ---@field target_x number
     ---@field target_y number
+SpecialShot = nil
 
 ---@class SoundShot : LightShot
     ---@field sound SoundMeta
+SoundShot = nil
 
 ---@class Spark : Flame
     ---@field particle ParticleEmitterInfo
@@ -3320,27 +3550,33 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field size_change_timer integer @very short timer before next size change, giving a pulsing effect
     ---@field speed number @This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     ---@field distance number @This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
+Spark = nil
 
 ---@class TiamatShot : LightEmitter
     ---@field sound SoundMeta
+TiamatShot = nil
 
 ---@class Fireball : SoundShot
     ---@field particle ParticleEmitterInfo
+Fireball = nil
 
 ---@class Leaf : Movable
     ---@field fade_away_counter number @counts to 100.0 then the leaf fades away
     ---@field swing_direction integer
     ---@field fade_away_trigger boolean
+Leaf = nil
 
 ---@class AcidBubble : Movable
     ---@field speed_x number
     ---@field speed_y number
     ---@field float_counter number
+AcidBubble = nil
 
 ---@class Claw : Movable
     ---@field crabman_uid integer
     ---@field spawn_x number
     ---@field spawn_y number
+Claw = nil
 
 ---@class StretchChain : Movable
     ---@field at_end_of_chain_uid integer
@@ -3348,16 +3584,20 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field position_in_chain integer
     ---@field inverse_doubled_position_in_chain integer
     ---@field is_dot_hidden boolean
+StretchChain = nil
 
 ---@class Chest : Movable
     ---@field leprechaun boolean
     ---@field bomb boolean @size of the bomb is random, if set both true only leprechaun spawns
+Chest = nil
 
 ---@class Treasure : Movable
     ---@field cashed boolean @spawns a dust effect and adds money for the total
+Treasure = nil
 
 ---@class HundunChest : Treasure
     ---@field timer integer
+HundunChest = nil
 
 ---@class Boombox : Movable
     ---@field fx_button Entity
@@ -3368,86 +3608,107 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field station_change_delay integer
     ---@field jump_timer integer
     ---@field jump_state integer
+Boombox = nil
 
 ---@class TV : Movable
     ---@field sound SoundMeta
     ---@field fx_button Entity
     ---@field emitted_light Illumination
     ---@field station integer
+TV = nil
 
 ---@class Telescope : Movable
     ---@field fx_button Entity
     ---@field camera_anchor Entity
     ---@field looked_through_by_uid integer
+Telescope = nil
 
 ---@class Torch : Movable
     ---@field flame_uid integer
     ---@field is_lit boolean @It's used just to check, to light/extinguish use `light_up` function
     ---@field light_up fun(self, lit: boolean): nil
     ---@field get_flame_type fun(self): ENT_TYPE
+Torch = nil
 
 ---@class WallTorch : Torch
     ---@field dropped_gold boolean @if false, it will drop gold when light up
+WallTorch = nil
 
 ---@class TorchFlame : Flame
     ---@field smoke_particle ParticleEmitterInfo
     ---@field flame_particle ParticleEmitterInfo
     ---@field warp_particle ParticleEmitterInfo
     ---@field flame_size number
+TorchFlame = nil
 
 ---@class LampFlame : Flame
     ---@field flame_particle ParticleEmitterInfo
+LampFlame = nil
 
 ---@class Bullet : Projectile
+Bullet = nil
 
 ---@class TimedShot : LightShot
     ---@field timer integer
+TimedShot = nil
 
 ---@class CloneGunShot : LightShot
     ---@field timer integer
     ---@field spawn_y number
+CloneGunShot = nil
 
 ---@class PunishBall : Movable
     ---@field attached_to_uid integer
     ---@field timer integer @counts down from 20 while the ball is eligible to break a floor and tries to break it at 0
     ---@field x_pos number
     ---@field y_pos number
+PunishBall = nil
 
 ---@class Chain : Movable
     ---@field attached_to_uid integer
     ---@field timer integer
+Chain = nil
 
 ---@class Container : Movable
     ---@field inside ENT_TYPE
+Container = nil
 
 ---@class Coffin : Movable
     ---@field inside ENT_TYPE
     ---@field timer integer
     ---@field player_respawn boolean
+Coffin = nil
 
 ---@class Fly : Movable
     ---@field timer integer
+Fly = nil
 
 ---@class OlmecCannon : Movable
     ---@field timer integer
     ---@field bombs_left integer
+OlmecCannon = nil
 
 ---@class Landmine : LightEmitter
     ---@field timer integer @explodes at 57, if you set it to 58 will count to overflow
+Landmine = nil
 
 ---@class UdjatSocket : Movable
     ---@field fx_button Entity
+UdjatSocket = nil
 
 ---@class Ushabti : Movable
     ---@field wiggle_timer integer
     ---@field shine_timer integer
+Ushabti = nil
 
 ---@class Honey : Movable
     ---@field wiggle_timer integer
+Honey = nil
 
 ---@class GiantClamTop : Movable
     ---@field close_timer integer
     ---@field open_timer integer
+GiantClamTop = nil
 
 ---@class PlayerGhost : LightEmitter
     ---@field sparkles_particle ParticleEmitterInfo
@@ -3457,17 +3718,21 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field body_uid integer @Is not set to -1 when crushed
     ---@field shake_timer integer
     ---@field boost_timer integer
+PlayerGhost = nil
 
 ---@class GhostBreath : Projectile
     ---@field timer integer
     ---@field big_cloud boolean
+GhostBreath = nil
 
 ---@class LaserBeam : Movable
     ---@field sparks ParticleEmitterInfo
     ---@field emitted_light Illumination
+LaserBeam = nil
 
 ---@class TreasureHook : Movable
     ---@field sound SoundMeta
+TreasureHook = nil
 
 ---@class AxolotlShot : Projectile
     ---@field trapped_uid integer
@@ -3475,9 +3740,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field swing number
     ---@field swing_periodicity number
     ---@field distance_after_capture number
+AxolotlShot = nil
 
 ---@class TrapPart : Movable
     ---@field ceiling Entity
+TrapPart = nil
 
 ---@class SkullDropTrap : Movable
     ---@field sound SoundMeta
@@ -3488,25 +3755,32 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field middle_skull_drop_time integer
     ---@field right_skull_drop_time integer
     ---@field timer integer @counts from 60 to 0, 3 times, the last time dropping the skulls, then random longer timer for reset
+SkullDropTrap = nil
 
 ---@class FrozenLiquid : Movable
+FrozenLiquid = nil
 
 ---@class Switch : Movable
     ---@field timer integer
+Switch = nil
 
 ---@class FlyHead : Movable
     ---@field vored_entity_uid integer
+FlyHead = nil
 
 ---@class SnapTrap : Movable
     ---@field bait_uid integer
     ---@field reload_timer integer
+SnapTrap = nil
 
 ---@class EmpressGrave : Movable
     ---@field fx_button Entity
     ---@field ghost Entity
+EmpressGrave = nil
 
 ---@class Tentacle : Chain
     ---@field bottom Entity
+Tentacle = nil
 
 ---@class MiniGameShip : Movable
     ---@field sound SoundMeta
@@ -3514,6 +3788,7 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field velocity_y number
     ---@field swing number
     ---@field up_down_normal number @0.0 - down, 1.0 - up, 0.5 - idle
+MiniGameShip = nil
 
 ---@class OlmecShip : Movable
     ---@field sound SoundMeta
@@ -3521,17 +3796,21 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field smoke ParticleEmitterInfo
     ---@field flight_time integer
     ---@field has_spawned_jetflames boolean
+OlmecShip = nil
 
 ---@class MiniGameAsteroid : Movable
     ---@field spin_speed number
+MiniGameAsteroid = nil
 
 ---@class Pot : Purchasable
     ---@field inside ENT_TYPE
     ---@field dont_transfer_dmg boolean
+Pot = nil
 
 ---@class CursedPot : Movable
     ---@field smoke ParticleEmitterInfo
     ---@field smoke2 ParticleEmitterInfo
+CursedPot = nil
 
 ---@class CookFire : Torch
     ---@field emitted_light Illumination
@@ -3539,30 +3818,39 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field particles_flames ParticleEmitterInfo
     ---@field particles_warp ParticleEmitterInfo
     ---@field sound SoundMeta
+CookFire = nil
 
 ---@class Orb : Movable
     ---@field sound SoundMeta
     ---@field timer integer
+Orb = nil
 
 ---@class EggSac : Movable
     ---@field timer integer
+EggSac = nil
 
 ---@class Goldbar : Movable
+Goldbar = nil
 
 ---@class Coin : Movable
     ---@field nominal_price integer
+Coin = nil
 
 ---@class RollingItem : Purchasable
     ---@field roll_speed number
+RollingItem = nil
 
 ---@class PlayerBag : Movable
     ---@field bombs integer
     ---@field ropes integer
+PlayerBag = nil
 
 ---@class Powerup : Movable
+Powerup = nil
 
 ---@class KapalaPowerup : Powerup
     ---@field amount_of_blood integer
+KapalaPowerup = nil
 
 ---@class ParachutePowerup : Powerup
     ---@field falltime_deploy integer @this gets compared with entity's falling_timer
@@ -3570,9 +3858,11 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field deploy fun(self): nil
     ---@field gold_timer integer @Timer for spawning a single gold nugget.
     ---@field gold_spawning_time integer @Time until gold nuggets stop spawning.
+ParachutePowerup = nil
 
 ---@class TrueCrownPowerup : Powerup
     ---@field timer integer
+TrueCrownPowerup = nil
 
 ---@class AnkhPowerup : Powerup
     ---@field sound SoundMeta
@@ -3582,12 +3872,15 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer2 integer
     ---@field timer3 integer
     ---@field music_on_off boolean
+AnkhPowerup = nil
 
 ---@class YellowCape : Cape
     ---@field sound SoundMeta
+YellowCape = nil
 
 ---@class Teleporter : Purchasable
     ---@field teleport_number integer
+Teleporter = nil
 
 ---@class Boomerang : Purchasable
     ---@field sound SoundMeta
@@ -3595,39 +3888,48 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field distance number
     ---@field rotation number
     ---@field returns_to_uid integer
+Boomerang = nil
 
 ---@class Excalibur : Movable
     ---@field in_stone boolean
+Excalibur = nil
 
 ---@class Shield : Purchasable
     ---@field shake number
+Shield = nil
 
 ---@class PrizeDispenser : Movable
     ---@field item_ids integer[] @size: 6 @Id's of the items (not types), by default 0-24, look at [change_diceshop_prizes](#change_diceshop_prizes) for the list of default prizes<br/>so for example: id 0 equals ITEM_PICKUP_BOMBBAG, id 1 equals ITEM_PICKUP_BOMBBOX etc. Game generates 6 but uses max 5 for Tusk dice shop
     ---@field prizes_spawned integer
+PrizeDispenser = nil
 
 ---@class Web : Movable
     ---@field decay_rate number @Is subtracted from the color alpha every frame after the `stand_counter` is more than 300.<br/>Entity automatically dies when the alpha is less than 0.1
+Web = nil
 
 ---@class LiquidSurface : Movable
     ---@field glow_radius number
     ---@field sine_pos number
     ---@field sine_pos_increment number
+LiquidSurface = nil
 
 ---@class OlmecFloater : Movable
     ---@field both_floaters_intact boolean
     ---@field on_breaking boolean
+OlmecFloater = nil
 
 ---@class EggshipCenterJetFlame : Movable
     ---@field sound SoundMeta
     ---@field emitted_light Illumination
     ---@field particle ParticleEmitterInfo
     ---@field smoke_on boolean
+EggshipCenterJetFlame = nil
 
 ---@class MiniGameShipOffset : Movable
     ---@field offset_x number
     ---@field offset_y number
     ---@field normal_y_offset number @Is added to offset_y
+MiniGameShipOffset = nil
 
 ---@class Button : Movable
     ---@field button_sprite integer @Only one can be set:<br/>1 - pad: A, key: Z<br/>2 - pad: X, key: X<br/>4 - pad: B, key: C<br/>8 - pad: Y, key: D<br/>16 - pad: LB, key: L Shift<br/>32 - pad: RB, key: A<br/>64 - pad: menu?, key: (none)<br/>128 - pad: copy?, key: Tab
@@ -3635,38 +3937,49 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field is_visible boolean @It's false for selldialog used in shops
     ---@field player_trigger boolean @It's set true even if player does not see the button, like the drill or COG door
     ---@field seen integer @<br/>-1 - hasn't been seen<br/>0 - last seen by player 1<br/>1 - last seen by player 2<br/>2 - last seen by player 3<br/>3 - last seen by player 4
+Button = nil
 
 ---@class FxTornJournalPage : Movable
     ---@field page_number integer @Only in tutorial
+FxTornJournalPage = nil
 
 ---@class FxMainExitDoor : Movable
     ---@field emitted_light Illumination
     ---@field timer integer @When breaking open in tutorial
+FxMainExitDoor = nil
 
 ---@class Birdies : Movable
+Birdies = nil
 
 ---@class Explosion : Movable
     ---@field emitted_light Illumination
+Explosion = nil
 
 ---@class FxOuroboroOccluder : Movable
+FxOuroboroOccluder = nil
 
 ---@class FxOuroboroDragonPart : Movable
     ---@field speed number
     ---@field timer integer
     ---@field particle ParticleEmitterInfo
+FxOuroboroDragonPart = nil
 
 ---@class Rubble : Movable
+Rubble = nil
 
 ---@class FxCompass : Movable
     ---@field sine_angle number @Counts form 0 to 2pi, responsible for moving back and forth
     ---@field visibility number
     ---@field is_active boolean @Player has compass
+FxCompass = nil
 
 ---@class SleepBubble : Movable
     ---@field show_hide_timer integer
+SleepBubble = nil
 
 ---@class MovingIcon : Movable
     ---@field movement_timer integer @Used to move it up and down in sync with others
+MovingIcon = nil
 
 ---@class FxSaleContainer : Movable
     ---@field fx_value Entity
@@ -3675,92 +3988,117 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field shake_amplitude number @For effect when you don't have enough money
     ---@field sound_trigger boolean @Also sound_played, keeps re-triggering from time to time
     ---@field pop_in_out_procentage integer
+FxSaleContainer = nil
 
 ---@class FxPickupEffect : Movable
     ---@field spawn_y number
     ---@field visibility number
+FxPickupEffect = nil
 
 ---@class FxShotgunBlast : Movable
     ---@field illumination Illumination
+FxShotgunBlast = nil
 
 ---@class FxJetpackFlame : Movable
     ---@field particle_smoke ParticleEmitterInfo
     ---@field particle_flame ParticleEmitterInfo
     ---@field sound SoundMeta
     ---@field illumination Illumination
+FxJetpackFlame = nil
 
 ---@class FxPlayerIndicator : Movable
     ---@field attached_to integer
     ---@field pos_x number
     ---@field pos_y number
+FxPlayerIndicator = nil
 
 ---@class FxSpringtrapRing : Movable
     ---@field timer integer
     ---@field illumination Illumination
+FxSpringtrapRing = nil
 
 ---@class FxWitchdoctorHint : Movable
+FxWitchdoctorHint = nil
 
 ---@class FxNecromancerANKH : Movable
+FxNecromancerANKH = nil
 
 ---@class FxWebbedEffect : Movable
     ---@field visible boolean
+FxWebbedEffect = nil
 
 ---@class FxUnderwaterBubble : Movable
     ---@field bubble_source_uid integer
     ---@field direction integer @1 / -1
     ---@field pop boolean @Setting it true makes it disappear/fade away
     ---@field inverted boolean
+FxUnderwaterBubble = nil
 
 ---@class FxWaterDrop : Movable
     ---@field inverted boolean
     ---@field droplet_source_uid integer
+FxWaterDrop = nil
 
 ---@class FxKinguSliding : Movable
     ---@field particle ParticleEmitterInfo
+FxKinguSliding = nil
 
 ---@class FxAlienBlast : Movable
+FxAlienBlast = nil
 
 ---@class FxSparkSmall : Movable
     ---@field timer integer
+FxSparkSmall = nil
 
 ---@class FxTiamatHead : Movable
     ---@field timer integer
+FxTiamatHead = nil
 
 ---@class FxTiamatTorso : Movable
     ---@field timer integer
     ---@field torso_target_size number @Slowly increases/decreases to the given value
+FxTiamatTorso = nil
 
 ---@class FxTiamatTail : Movable
     ---@field angle_two number @Added _two just to not shadow angle in entity, it's angle but the pivot point is at the edge
     ---@field x_pos number
     ---@field y_pos number
+FxTiamatTail = nil
 
 ---@class FxVatBubble : Movable
     ---@field max_y number
+FxVatBubble = nil
 
 ---@class FxHundunNeckPiece : Movable
     ---@field kill_timer integer @Short timer after the head is dead
+FxHundunNeckPiece = nil
 
 ---@class FxJellyfishStar : Movable
     ---@field rotation_angle number
     ---@field radius number
     ---@field speed number
+FxJellyfishStar = nil
 
 ---@class FxQuickSand : Movable
+FxQuickSand = nil
 
 ---@class FxSorceressAttack : Movable
     ---@field size number
+FxSorceressAttack = nil
 
 ---@class FxLamassuAttack : Movable
     ---@field attack_angle number
+FxLamassuAttack = nil
 
 ---@class FxFireflyLight : Movable
     ---@field illumination Illumination
     ---@field light_timer integer
     ---@field cooldown_timer integer @Timer between light flashes
+FxFireflyLight = nil
 
 ---@class FxEmpress : Movable
     ---@field sine_angle number
+FxEmpress = nil
 
 ---@class FxAnkhRotatingSpark : Movable
     ---@field radius number
@@ -3768,36 +4106,45 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field speed number @0 - 1.0
     ---@field sine_angle number
     ---@field size number
+FxAnkhRotatingSpark = nil
 
 ---@class FxAnkhBrokenPiece : Movable
+FxAnkhBrokenPiece = nil
 
 ---@class MegaJellyfishEye : Movable
     ---@field timer integer
+MegaJellyfishEye = nil
 
 ---@class Liquid : Entity
     ---@field fx_surface Entity
     ---@field get_liquid_flags fun(self): integer
     ---@field set_liquid_flags fun(self, flags: integer): nil
+Liquid = nil
 
 ---@class Lava : Liquid
     ---@field emitted_light Illumination
+Lava = nil
 
 ---@class BGBackLayerDoor : Entity
     ---@field illumination1 Illumination
     ---@field illumination2 Illumination
+BGBackLayerDoor = nil
 
 ---@class BGSurfaceStar : Entity
     ---@field blink_timer integer
     ---@field relative_x number
     ---@field relative_y number
+BGSurfaceStar = nil
 
 ---@class BGRelativeElement : Entity
     ---@field relative_x number
     ---@field relative_y number
+BGRelativeElement = nil
 
 ---@class BGSurfaceLayer : BGRelativeElement
     ---@field relative_offset_x number
     ---@field relative_offset_y number
+BGSurfaceLayer = nil
 
 ---@class BGEggshipRoom : Entity
     ---@field sound SoundMeta
@@ -3807,12 +4154,15 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field platform_middle Entity
     ---@field platform_right Entity
     ---@field player_in boolean
+BGEggshipRoom = nil
 
 ---@class BGMovingStar : BGSurfaceStar
     ---@field falling_speed number @Can make it rise if set to negative
+BGMovingStar = nil
 
 ---@class BGTutorialSign : Entity
     ---@field is_shown boolean
+BGTutorialSign = nil
 
 ---@class BGShootingStar : BGRelativeElement
     ---@field x_increment number
@@ -3820,14 +4170,17 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field timer integer
     ---@field max_timer integer
     ---@field size number @Gets smaller as the timer gets close to the max_timer
+BGShootingStar = nil
 
 ---@class BGShopEntrence : Entity
     ---@field on_entering boolean
+BGShopEntrence = nil
 
 ---@class BGFloatingDebris : BGSurfaceLayer
     ---@field distance number @Distance it travels up and down from spawn position
     ---@field speed number
     ---@field sine_angle number
+BGFloatingDebris = nil
 
 ---@class BGShopKeeperPrime : Entity
     ---@field normal_y number
@@ -3835,20 +4188,25 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field bubbles_timer integer
     ---@field bubble_spawn_trigger boolean
     ---@field bubble_spawn_delay integer
+BGShopKeeperPrime = nil
 
 ---@class CrossBeam : Entity
     ---@field attached_to_side_uid integer
     ---@field attached_to_top_uid integer
+CrossBeam = nil
 
 ---@class DestructibleBG : Entity
+DestructibleBG = nil
 
 ---@class PalaceSign : Entity
     ---@field sound SoundMeta @The neon buzz sound
     ---@field illumination Illumination
     ---@field arrow_illumination Illumination
     ---@field arrow_change_timer integer
+PalaceSign = nil
 
 ---@class DecoRegeneratingBlock : Entity
+DecoRegeneratingBlock = nil
 
 ---@class Portal : Entity
     ---@field emitted_light Illumination
@@ -3857,125 +4215,159 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field world integer
     ---@field theme integer
     ---@field timer integer
+Portal = nil
 
 ---@class ShootingStarSpawner : Entity
     ---@field timer integer
+ShootingStarSpawner = nil
 
 ---@class LogicalDoor : Entity
     ---@field door_type ENT_TYPE
     ---@field platform_type ENT_TYPE
     ---@field visible boolean
     ---@field platform_spawned boolean @Is set true when you bomb the door, no matter what door, can't be reset
+LogicalDoor = nil
 
 ---@class LogicalSound : Entity
     ---@field sound SoundMeta
+LogicalSound = nil
 
 ---@class LogicalStaticSound : LogicalSound
+LogicalStaticSound = nil
 
 ---@class LogicalLiquidStreamSound : LogicalStaticSound
+LogicalLiquidStreamSound = nil
 
 ---@class LogicalTrapTrigger : Entity
     ---@field min_empty_distance integer @Used in BigSpearTrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles
     ---@field trigger_distance integer @Value in tiles
     ---@field vertical boolean
+LogicalTrapTrigger = nil
 
 ---@class JungleTrapTrigger : LogicalTrapTrigger
+JungleTrapTrigger = nil
 
 ---@class WetEffect : Entity
     ---@field particle ParticleEmitterInfo
+WetEffect = nil
 
 ---@class OnFireEffect : Entity
     ---@field particle_smoke ParticleEmitterInfo
     ---@field particle_flame ParticleEmitterInfo
     ---@field illumination Illumination
+OnFireEffect = nil
 
 ---@class PoisonedEffect : Entity
     ---@field particle_burst ParticleEmitterInfo
     ---@field particle_base ParticleEmitterInfo
     ---@field burst_timer integer
     ---@field burst_active boolean @If forced to false, it will not play the sound or spawn burst particles
+PoisonedEffect = nil
 
 ---@class CursedEffect : Entity
     ---@field particle ParticleEmitterInfo
     ---@field sound SoundMeta
+CursedEffect = nil
 
 ---@class OuroboroCameraAnchor : Entity
     ---@field target_x number
     ---@field target_y number
     ---@field velocity_x number
     ---@field velocity_y number
+OuroboroCameraAnchor = nil
 
 ---@class OuroboroCameraZoomin : Entity
     ---@field zoomin_level number @Can be set to negative, seams to trigger the warp at some value
+OuroboroCameraZoomin = nil
 
 ---@class CinematicAnchor : Entity
     ---@field blackbar_top Entity
     ---@field blackbar_bottom Entity
     ---@field roll_in number @0.0 to 1.0
+CinematicAnchor = nil
 
 ---@class BurningRopeEffect : Entity
     ---@field illumination Illumination
     ---@field sound SoundMeta
+BurningRopeEffect = nil
 
 ---@class DustWallApep : Entity
     ---@field particle ParticleEmitterInfo
+DustWallApep = nil
 
 ---@class CameraFlash : Entity
     ---@field illumination1 Illumination
     ---@field illumination2 Illumination
     ---@field timer integer
+CameraFlash = nil
 
 ---@class RoomLight : Entity
     ---@field illumination Illumination
+RoomLight = nil
 
 ---@class LimbAnchor : Entity
     ---@field move_timer integer
     ---@field flip_vertical boolean
+LimbAnchor = nil
 
 ---@class LogicalConveyorbeltSound : LogicalSound
+LogicalConveyorbeltSound = nil
 
 ---@class LogicalAnchovyFlock : Entity
     ---@field current_speed number @Increases until max_speed reached
     ---@field max_speed number
     ---@field timer integer
+LogicalAnchovyFlock = nil
 
 ---@class MummyFliesSound : LogicalSound
     ---@field mummy_uid integer
     ---@field flies integer @Numbers of flies spawned
+MummyFliesSound = nil
 
 ---@class QuickSandSound : LogicalSound
+QuickSandSound = nil
 
 ---@class IceSlidingSound : LogicalSound
+IceSlidingSound = nil
 
 ---@class FrostBreathEffect : Entity
     ---@field timer integer
+FrostBreathEffect = nil
 
 ---@class BoulderSpawner : Entity
     ---@field timer integer @Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
     ---@field sound SoundMeta
+BoulderSpawner = nil
 
 ---@class PipeTravelerSound : LogicalSound
     ---@field enter_exit boolean
+PipeTravelerSound = nil
 
 ---@class LogicalDrain : Entity
     ---@field timer integer @Little delay between pulling blob of liquid thru
+LogicalDrain = nil
 
 ---@class LogicalRegeneratingBlock : Entity
     ---@field timer integer
+LogicalRegeneratingBlock = nil
 
 ---@class SplashBubbleGenerator : Entity
     ---@field timer integer
+SplashBubbleGenerator = nil
 
 ---@class EggplantThrower : Entity
+EggplantThrower = nil
 
 ---@class LogicalMiniGame : Entity
     ---@field timer integer @Delay between spwning ufo
+LogicalMiniGame = nil
 
 ---@class DMSpawning : Entity
     ---@field spawn_x number
     ---@field spawn_y number
     ---@field sine_pos number
     ---@field timer integer
+DMSpawning = nil
 
 ---@class DMAlienBlast : Entity
     ---@field owner_uid integer
@@ -3983,16 +4375,19 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field sound SoundMeta
     ---@field reticule_internal Entity
     ---@field reticule_external Entity
+DMAlienBlast = nil
 
 ---@class MovableBehavior
-    ---@field get_state_id MovableBehavior_get_state_id
-
----@class MovableBehavior_get_state_id
-
----@overload fun(self): integer
-local function MovableBehavior_get_state_id(self) end
+MovableBehavior = nil
+---@return integer
+function MovableBehavior:get_state_id() end
+---Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's
+---`get_next_state_id` to enter this state, given that the behavior is added to the movable.
+---@return integer
+function MovableBehavior:get_state_id() end
 
 ---@class VanillaMovableBehavior : MovableBehavior
+VanillaMovableBehavior = nil
 
 ---@class CustomMovableBehavior : MovableBehavior
     ---@field base_behavior VanillaMovableBehavior
@@ -4002,6 +4397,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field set_update_logic fun(self, update_logic: fun(movable: Movable, base_fun: function): nil): nil @Set the `update_logic` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_logic` is already set it will be overridden. The signature<br/>of the function is `nil update_logic(Movable movable, function base_fun))`, use it to change the color, texture,<br/>some timers, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
     ---@field set_update_world fun(self, update_world: fun(movable: Movable, base_fun: function): nil): nil @Set the `update_world` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_world` is already set it will be overridden. The signature<br/>of the function is `nil update_world(Movable movable, function base_fun))`, use this to update the move, velocity,<br/>current_animation, etc. of the movable, then call `mov:generic_update_world` to update the movable. If no<br/>base behavior is set `base_fun` will be `nil`.
     ---@field set_get_next_state_id fun(self, get_next_state_id: fun(movable: Movable, base_fun: function): integer): nil @Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature<br/>of the function is `int get_next_state_id(Movable movable, function base_fun))`, use this to move to another state, return `nil`.<br/>or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
+CustomMovableBehavior = nil
 
 ---@class ParticleDB
     ---@field id integer
@@ -4034,6 +4430,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field invisible boolean
     ---@field get_texture fun(self): integer
     ---@field set_texture fun(self, texture_id: integer): boolean
+ParticleDB = nil
 
 ---@class ParticleEmitterInfo
     ---@field particle_type ParticleDB
@@ -4046,6 +4443,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field offset_y number
     ---@field emitted_particles Particle[]
     ---@field emitted_particles_back_layer Particle[]
+ParticleEmitterInfo = nil
 
 ---@class Particle
     ---@field x number
@@ -4057,6 +4455,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field height number
     ---@field lifetime integer
     ---@field max_lifetime integer
+Particle = nil
 
 ---@class ThemeInfo
     ---@field unknown3 integer
@@ -4066,8 +4465,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field allow_leprechaun boolean
     ---@field sub_theme ThemeInfo
     ---@field reset_theme_flags fun(self): nil @Sets the beehive and leprechaun flags
-    ---@field init_flags fun(self): nil @Initializes some flags in the LevelGenSystem
-    ---@field init_level fun(self): nil @Adds the entrance room
+    ---@field init_flags fun(self): nil @Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
+    ---@field init_level fun(self): nil @Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
     ---@field init_rooms fun(self): nil
     ---@field generate_path fun(self, reset: boolean): nil @Generates and adds the path rooms and exit room<br/>Params: reset to start over from the beginning if other rooms didn't fit
     ---@field add_special_rooms fun(self): nil @Adds rooms related to udjat, black market, castle etc
@@ -4123,10 +4522,10 @@ local function MovableBehavior_get_state_id(self) end
     ---@field set_post_dtor fun(self, fun: fun(self: ThemeInfo): nil): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil dtor(ThemeInfo self)`
     ---@field set_pre_reset_theme_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool reset_theme_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the beehive and leprechaun flags
     ---@field set_post_reset_theme_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil reset_theme_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the beehive and leprechaun flags
-    ---@field set_pre_init_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem
-    ---@field set_post_init_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem
-    ---@field set_pre_init_level fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room
-    ---@field set_post_init_level fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room
+    ---@field set_pre_init_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
+    ---@field set_post_init_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
+    ---@field set_pre_init_level fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
+    ---@field set_post_init_level fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
     ---@field set_pre_init_rooms fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_rooms(ThemeInfo self)`
     ---@field set_post_init_rooms fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_rooms(ThemeInfo self)`
     ---@field set_pre_generate_path fun(self, fun: fun(self: ThemeInfo, reset: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool generate_path(ThemeInfo self, boolean reset)`<br/>Virtual function docs:<br/>Generates and adds the path rooms and exit room<br/>Params: reset to start over from the beginning if other rooms didn't fit
@@ -4221,6 +4620,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field set_post_spawn_extra fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_extra(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
     ---@field set_pre_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural
     ---@field set_post_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural
+ThemeInfo = nil
 
 ---@class CustomTheme : ThemeInfo
     ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
@@ -4281,16 +4681,19 @@ local function MovableBehavior_get_state_id(self) end
     ---@field spawn_decoration2 fun(self): nil
     ---@field spawn_extra fun(self): nil
     ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil
+CustomTheme = nil
 
 ---@class PreLoadLevelFilesContext
     ---@field override_level_files fun(self, levels: string[]): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
     ---@field add_level_files fun(self, levels: string[]): nil @Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
+PreLoadLevelFilesContext = nil
 
 ---@class DoorCoords
     ---@field door1_x number
     ---@field door1_y number
     ---@field door2_x number @door2 only valid when there are two in the level, like Volcana drill, Olmec, ...
     ---@field door2_y number
+DoorCoords = nil
 
 ---@class LevelGenSystem
     ---@field shop_type SHOP_TYPE
@@ -4303,6 +4706,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field spawn_room_y integer
     ---@field exit_doors Vec2[]
     ---@field themes ThemeInfo[] @size: 18
+LevelGenSystem = nil
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.
@@ -4314,6 +4718,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field set_num_extra_spawns fun(self, extra_spawn_id: integer, num_spawns_front_layer: integer, num_spawns_back_layer: integer): nil @Change the amount of extra spawns for the given `extra_spawn_id`.
     ---@field define_short_tile_code fun(self, short_tile_code_def: ShortTileCodeDef): SHORT_TILE_CODE? @Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match<br/>Returns `nil` if all possible short tile codes are already in use
     ---@field change_short_tile_code fun(self, short_tile_code: SHORT_TILE_CODE, short_tile_code_def: ShortTileCodeDef): nil @Overrides a specific short tile code, this means it will change for the whole level
+PostRoomGenerationContext = nil
 
 ---@class PreHandleRoomTilesContext
     ---@field get_short_tile_code fun(self, tx: integer, ty: integer, layer: LAYER): SHORT_TILE_CODE? @Gets the tile code at the specified tile coordinate<br/>Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK}`<br/>Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
@@ -4323,11 +4728,13 @@ local function MovableBehavior_get_state_id(self) end
     ---@field has_back_layer fun(self): boolean @Check whether the room has a back layer
     ---@field add_empty_back_layer fun(self): nil @Add a back layer filled with all `0` if there is no back layer yet<br/>Does nothing if there already is a backlayer
     ---@field add_copied_back_layer fun(self): nil @Add a back layer that is a copy of the front layer<br/>Does nothing if there already is a backlayer
+PreHandleRoomTilesContext = nil
 
 ---@class ShortTileCodeDef
     ---@field tile_code TILE_CODE @Tile code that is used by default when this short tile code is encountered. Defaults to 0.
     ---@field chance integer @Chance in percent to pick `tile_code` over `alt_tile_code`, ignored if `chance == 0`. Defaults to 100.
     ---@field alt_tile_code TILE_CODE @Alternative tile code, ignored if `chance == 100`. Defaults to 0.
+ShortTileCodeDef = nil
 
 ---@class QuestsInfo
     ---@field yang_state integer
@@ -4336,6 +4743,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field sparrow_state integer
     ---@field madame_tusk_state integer
     ---@field beg_state integer
+QuestsInfo = nil
 
 ---@class SaveData
     ---@field places boolean[] @size: 16
@@ -4378,6 +4786,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field stickers ENT_TYPE[] @size: 20
     ---@field players integer[] @size: 4
     ---@field constellation Constellation
+SaveData = nil
 
 ---@class Constellation
     ---@field star_count integer
@@ -4386,6 +4795,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field line_count integer
     ---@field lines ConstellationLine[] @size: 90
     ---@field line_red_intensity number
+Constellation = nil
 
 ---@class ConstellationStar
     ---@field type integer
@@ -4402,21 +4812,25 @@ local function MovableBehavior_get_state_id(self) end
     ---@field halo_alpha number
     ---@field canis_ring boolean
     ---@field fidelis_ring boolean
+ConstellationStar = nil
 
 ---@class ConstellationLine
     ---@field from integer
     ---@field to integer
+ConstellationLine = nil
 
 ---@class CustomSound
-    ---@field play CustomSound_play
     ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
-
----@class CustomSound_play
+CustomSound = nil
+---@return PlayingSound
+function CustomSound:play() end
+---@param paused boolean
+---@return PlayingSound
+function CustomSound:play(paused) end
 ---@param paused boolean
 ---@param sound_type SOUND_TYPE
----@overload fun(self): PlayingSound
----@overload fun(self, paused: boolean): PlayingSound
-local function CustomSound_play(self, paused, sound_type) end
+---@return PlayingSound
+function CustomSound:play(paused, sound_type) end
 
 ---@class PlayingSound
     ---@field is_playing fun(self): boolean
@@ -4431,6 +4845,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
     ---@field get_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM): number?
     ---@field set_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM, value: number): boolean
+PlayingSound = nil
 
 ---@class SoundMeta
     ---@field x number
@@ -4439,13 +4854,16 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field right_channel number[] @size: 38
     ---@field start_over boolean @when false, current track starts from the beginning, is immediately set back to true
     ---@field playing boolean @set to false to turn off
+SoundMeta = nil
 
 ---@class BackgroundSound : SoundMeta
+BackgroundSound = nil
 
 ---@class PlayerSlotSettings
     ---@field controller_vibration boolean
     ---@field auto_run_enabled boolean
     ---@field controller_right_stick boolean
+PlayerSlotSettings = nil
 
 ---@class PlayerSlot
     ---@field buttons_gameplay INPUTS
@@ -4454,6 +4872,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field input_mapping_controller InputMapping
     ---@field player_id integer
     ---@field is_participating boolean
+PlayerSlot = nil
 
 ---@class InputMapping
     ---@field jump integer
@@ -4468,6 +4887,7 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field right integer
     ---@field up integer
     ---@field down integer
+InputMapping = nil
 
 ---@class PlayerInputs
     ---@field player_slots PlayerSlot[] @size: MAX_PLAYERS
@@ -4480,11 +4900,10 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field player_slot_2_settings PlayerSlotSettings
     ---@field player_slot_3_settings PlayerSlotSettings
     ---@field player_slot_4_settings PlayerSlotSettings
+PlayerInputs = nil
 
 ---@class GuiDrawContext
     ---@field draw_line fun(self, x1: number, y1: number, x2: number, y2: number, thickness: number, color: uColor): nil @Draws a line on screen
-    ---@field draw_rect GuiDrawContext_draw_rect @Draws a rectangle on screen from top-left to bottom-right.
-    ---@field draw_rect_filled GuiDrawContext_draw_rect_filled @Draws a filled rectangle on screen from top-left to bottom-right.
     ---@field draw_triangle fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil @Draws a triangle on screen.
     ---@field draw_triangle_filled fun(self, p1: Vec2, p2: Vec2, p3: Vec2, color: uColor): nil @Draws a filled triangle on screen.
     ---@field draw_poly fun(self, points: Vec2[], thickness: number, color: uColor): nil @Draws a polyline on screen.
@@ -4494,8 +4913,6 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_circle fun(self, x: number, y: number, radius: number, thickness: number, color: uColor): nil @Draws a circle on screen
     ---@field draw_circle_filled fun(self, x: number, y: number, radius: number, color: uColor): nil @Draws a filled circle on screen
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil @Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
-    ---@field draw_image GuiDrawContext_draw_image @Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-    ---@field draw_image_rotated GuiDrawContext_draw_image_rotated @Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
     ---@field draw_layer fun(self, layer: DRAW_LAYER): nil @Draw on top of UI windows, including platform windows that may be outside the game area, or only in current widget window. Defaults to main viewport background.
     ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: fun(ctx: GuiDrawContext, pos: Vec2, size: Vec2): nil): boolean @Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
     ---@field win_text fun(self, text: string): nil @Add some text to window, automatically wrapped
@@ -4520,31 +4937,76 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field win_section fun(self, title: string, callback: function): nil @Add a collapsing accordion section, put contents in the callback function.
     ---@field win_indent fun(self, width: number): nil @Indent contents, or unindent if negative
     ---@field win_width fun(self, width: number): nil @Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
-
----@class GuiDrawContext_draw_rect
+GuiDrawContext = nil
+---Draws a rectangle on screen from top-left to bottom-right.
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param thickness number
+---@param rounding number
+---@param color uColor
+---@return nil
+function GuiDrawContext:draw_rect(left, top, right, bottom, thickness, rounding, color) end
+---Draws a rectangle on screen from top-left to bottom-right.
 ---@param rect AABB
 ---@param thickness number
 ---@param rounding number
 ---@param color uColor
----@overload fun(self, left: number, top: number, right: number, bottom: number, thickness: number, rounding: number, color: uColor): nil
-local function GuiDrawContext_draw_rect(self, rect, thickness, rounding, color) end
-
----@class GuiDrawContext_draw_rect_filled
+---@return nil
+function GuiDrawContext:draw_rect(rect, thickness, rounding, color) end
+---Draws a filled rectangle on screen from top-left to bottom-right.
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param rounding number
+---@param color uColor
+---@return nil
+function GuiDrawContext:draw_rect_filled(left, top, right, bottom, rounding, color) end
+---Draws a filled rectangle on screen from top-left to bottom-right.
 ---@param rect AABB
 ---@param rounding number
 ---@param color uColor
----@overload fun(self, left: number, top: number, right: number, bottom: number, rounding: number, color: uColor): nil
-local function GuiDrawContext_draw_rect_filled(self, rect, rounding, color) end
-
----@class GuiDrawContext_draw_image
+---@return nil
+function GuiDrawContext:draw_rect_filled(rect, rounding, color) end
+---Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+---@param image IMAGE
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param uvx1 number
+---@param uvy1 number
+---@param uvx2 number
+---@param uvy2 number
+---@param color uColor
+---@return nil
+function GuiDrawContext:draw_image(image, left, top, right, bottom, uvx1, uvy1, uvx2, uvy2, color) end
+---Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 ---@param image IMAGE
 ---@param rect AABB
 ---@param uv_rect AABB
 ---@param color uColor
----@overload fun(self, image: IMAGE, left: number, top: number, right: number, bottom: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number, color: uColor): nil
-local function GuiDrawContext_draw_image(self, image, rect, uv_rect, color) end
-
----@class GuiDrawContext_draw_image_rotated
+---@return nil
+function GuiDrawContext:draw_image(image, rect, uv_rect, color) end
+---Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
+---@param image IMAGE
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param uvx1 number
+---@param uvy1 number
+---@param uvx2 number
+---@param uvy2 number
+---@param color uColor
+---@param angle number
+---@param px number
+---@param py number
+---@return nil
+function GuiDrawContext:draw_image_rotated(image, left, top, right, bottom, uvx1, uvy1, uvx2, uvy2, color, angle, px, py) end
+---Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 ---@param image IMAGE
 ---@param rect AABB
 ---@param uv_rect AABB
@@ -4552,8 +5014,8 @@ local function GuiDrawContext_draw_image(self, image, rect, uv_rect, color) end
 ---@param angle number
 ---@param px number
 ---@param py number
----@overload fun(self, image: IMAGE, left: number, top: number, right: number, bottom: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number, color: uColor, angle: number, px: number, py: number): nil
-local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, color, angle, px, py) end
+---@return nil
+function GuiDrawContext:draw_image_rotated(image, rect, uv_rect, color, angle, px, py) end
 
 ---@class Gamepad
     ---@field enabled boolean
@@ -4564,6 +5026,7 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field ly number
     ---@field rx number
     ---@field ry number
+Gamepad = nil
 
 ---@class ImGuiIO
     ---@field displaysize Vec2
@@ -4586,44 +5049,153 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field gamepad Gamepad
     ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
     ---@field showcursor boolean
+ImGuiIO = nil
 
 ---@class VanillaRenderContext
-    ---@field draw_text VanillaRenderContext_draw_text @Draw text using the built-in renderer<br/>Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
     ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer
-    ---@field draw_screen_texture VanillaRenderContext_draw_screen_texture @Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    ---@field draw_world_texture VanillaRenderContext_draw_world_texture @Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a Quad instead
     ---@field bounding_box AABB
     ---@field render_draw_depth any @render_draw_depth_lua
-
----@class VanillaRenderContext_draw_text
+VanillaRenderContext = nil
+---Draw text using the built-in renderer
+---Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
+---@param text string
+---@param x number
+---@param y number
+---@param scale_x number
+---@param scale_y number
+---@param color Color
+---@param alignment integer
+---@param fontstyle integer
+---@return nil
+function VanillaRenderContext:draw_text(text, x, y, scale_x, scale_y, color, alignment, fontstyle) end
 ---@param tri TextRenderingInfo
 ---@param color Color
----@overload fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
-local function VanillaRenderContext_draw_text(self, tri, color) end
-
----@class VanillaRenderContext_draw_screen_texture
+---@return nil
+function VanillaRenderContext:draw_text(tri, color) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, row, column, left, top, right, bottom, color) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param rect AABB
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, row, column, rect, color) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param rect AABB
+---@param color Color
+---@param angle number
+---@param px number
+---@param py number
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, row, column, rect, color, angle, px, py) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest Quad
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, row, column, dest, color) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. `source` - the coordinates in the texture, `dest` - the coordinates on the screen
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 ---@param texture_id TEXTURE
 ---@param source Quad
 ---@param dest Quad
 ---@param color Color
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
-local function VanillaRenderContext_draw_screen_texture(self, texture_id, source, dest, color) end
-
----@class VanillaRenderContext_draw_world_texture
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, source, dest, color) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---For more control use the version taking a Quad instead
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, left, top, right, bottom, color) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---For more control use the version taking a Quad instead
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest AABB
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, dest, color) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---For more control use the version taking a Quad instead
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest AABB
+---@param color Color
+---@param angle number
+---@param px number
+---@param py number
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, dest, color, angle, px, py) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+---The `shader` parameter controls how to render the texture
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest Quad
+---@param color Color
+---@param shader WORLD_SHADER
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, dest, color, shader) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest Quad
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, dest, color) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen
+---The `shader` parameter controls how to render the texture
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 ---@param texture_id TEXTURE
 ---@param source Quad
 ---@param dest Quad
 ---@param color Color
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color, angle: number, px: number, py: number): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color, shader: WORLD_SHADER): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, source: Quad, dest: Quad, color: Color, shader: WORLD_SHADER): nil
-local function VanillaRenderContext_draw_world_texture(self, texture_id, source, dest, color) end
+---@param shader WORLD_SHADER
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, source, dest, color, shader) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param texture_id TEXTURE
+---@param source Quad
+---@param dest Quad
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, source, dest, color) end
 
 ---@class TextureRenderingInfo
     ---@field x number
@@ -4649,6 +5221,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field source_top_right_y number
     ---@field source_get_quad fun(self): Quad
     ---@field source_set_quad fun(self, quad: Quad): nil
+TextureRenderingInfo = nil
 
 ---@class Letter
     ---@field bottom Triangle
@@ -4656,6 +5229,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field get_quad fun(self): Quad @Get the Quad of a letter (easier to work with compared to the two triangles)<br/>This assumes that the triangles are in the correct 'touching each other' position<br/>if the positions were altered the results may not end up as expected
     ---@field set_quad fun(self, quad: Quad): nil @Inverse of the get_quad
     ---@field center fun(self): Vec2 @Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
+Letter = nil
 
 ---@class TextRenderingInfo
     ---@field new any @sol::initializers(&TextRenderingInfo_ctor)
@@ -4671,6 +5245,7 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
+TextRenderingInfo = nil
 
 ---@class HudInventory
     ---@field enabled boolean
@@ -4685,21 +5260,25 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field elixir boolean
     ---@field crown ENT_TYPE @Powerup type or 0
     ---@field item_count integer @Amount of generic pickup items at the bottom. Set to 0 to not draw them.
+HudInventory = nil
 
 ---@class HudElement
     ---@field dim boolean @Hide background and dim if using the auto adjust setting.
     ---@field opacity number @Background will be drawn if this is not 0.5
     ---@field time_dim integer @Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
+HudElement = nil
 
 ---@class HudPlayer : HudElement
     ---@field health integer
     ---@field bombs integer
     ---@field ropes integer
+HudPlayer = nil
 
 ---@class HudMoney : HudElement
     ---@field total integer
     ---@field counter integer
     ---@field timer integer
+HudMoney = nil
 
 ---@class HudData
     ---@field inventory HudInventory[] @size: MAX_PLAYERS
@@ -4716,11 +5295,13 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field money HudMoney
     ---@field timer HudElement
     ---@field level HudElement
+HudData = nil
 
 ---@class Hud
     ---@field y number
     ---@field opacity number
     ---@field data HudData
+Hud = nil
 
 ---@class TextureDefinition
     ---@field texture_path string
@@ -4732,12 +5313,14 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field sub_image_offset_y integer
     ---@field sub_image_width integer
     ---@field sub_image_height integer
+TextureDefinition = nil
 
 ---@class Vec2
     ---@field x number
     ---@field y number
     ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
     ---@field split fun(self): number, number
+Vec2 = nil
 
 ---@class AABB
     ---@field left number
@@ -4746,34 +5329,40 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field top number
     ---@field overlaps_with fun(self, other: AABB): boolean
     ---@field abs fun(self): AABB @Fixes the AABB if any of the sides have negative length
-    ---@field extrude AABB_extrude @Grows or shrinks the AABB by the given amount in all directions.<br/>If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
     ---@field offset fun(self, off_x: number, off_y: number): AABB @Offsets the AABB by the given offset.
     ---@field area fun(self): number @Compute area of the AABB, can be zero if one dimension is zero or negative if one dimension is inverted.
     ---@field center fun(self): number, number @Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
     ---@field width fun(self): number @Short for `aabb.right - aabb.left`.
     ---@field height fun(self): number @Short for `aabb.top - aabb.bottom`.
     ---@field split fun(self): number, number, number, number
-
----@class AABB_extrude
+AABB = nil
+---Grows or shrinks the AABB by the given amount in all directions.
+---If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
+---@param amount number
+---@return AABB
+function AABB:extrude(amount) end
+---Grows or shrinks the AABB by the given amount in each direction.
+---If `amount_x/y < 0` and `abs(amount_x/y) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
 ---@param amount_x number
 ---@param amount_y number
----@overload fun(self, amount: number): AABB
-local function AABB_extrude(self, amount_x, amount_y) end
+---@return AABB
+function AABB:extrude(amount_x, amount_y) end
 
 ---@class Triangle
     ---@field A Vec2
     ---@field B Vec2
     ---@field C Vec2
-    ---@field offset Triangle_offset
     ---@field rotate fun(self, angle: number, px: number, py: number): Triangle
     ---@field center fun(self): Vec2 @Also known as centroid
     ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corners
-
----@class Triangle_offset
+Triangle = nil
+---@param off Vec2
+---@return Triangle
+function Triangle:offset(off) end
 ---@param x number
 ---@param y number
----@overload fun(self, off: Vec2): Triangle
-local function Triangle_offset(self, x, y) end
+---@return Triangle
+function Triangle:offset(x, y) end
 
 ---@class Quad
     ---@field bottom_left_x number
@@ -4790,17 +5379,21 @@ local function Triangle_offset(self, x, y) end
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
     ---@field split fun(self): Vec2, Vec2, Vec2, Vec2 @Returns the corners in order: bottom_left, bottom_right, top_right, top_left
+Quad = nil
 
 ---@class Screen
     ---@field render_timer number
+Screen = nil
 
 ---@class ScreenLogo : Screen
     ---@field logo_mossmouth TextureRenderingInfo
     ---@field logo_blitworks TextureRenderingInfo
     ---@field logo_fmod TextureRenderingInfo
+ScreenLogo = nil
 
 ---@class ScreenIntro : Screen
     ---@field unknown4 TextureRenderingInfo
+ScreenIntro = nil
 
 ---@class ScreenPrologue : Screen
     ---@field line1 STRINGID
@@ -4809,6 +5402,7 @@ local function Triangle_offset(self, x, y) end
     ---@field line1_alpha number
     ---@field line2_alpha number
     ---@field line3_alpha number
+ScreenPrologue = nil
 
 ---@class ScreenTitle : Screen
     ---@field logo_spelunky2 TextureRenderingInfo
@@ -4823,6 +5417,7 @@ local function Triangle_offset(self, x, y) end
     ---@field particle_torchflame_ash ParticleEmitterInfo
     ---@field music SoundMeta
     ---@field torch_sound SoundMeta
+ScreenTitle = nil
 
 ---@class ScreenMenu : Screen
     ---@field tunnel_background TextureRenderingInfo
@@ -4850,6 +5445,7 @@ local function Triangle_offset(self, x, y) end
     ---@field spear_dangler SpearDanglerAnimFrames[] @size: 6
     ---@field play_scroll_descend_timer number
     ---@field scroll_text STRINGID
+ScreenMenu = nil
 
 ---@class ScreenOptions : Screen
     ---@field selected_menu_index integer
@@ -4887,10 +5483,13 @@ local function Triangle_offset(self, x, y) end
     ---@field topleft_woodpanel_esc_slidein_timer number
     ---@field text_fadein_timer number
     ---@field vertical_scroll_effect_timer number
+ScreenOptions = nil
 
 ---@class ScreenPlayerProfile : Screen
+ScreenPlayerProfile = nil
 
 ---@class ScreenLeaderboards : Screen
+ScreenLeaderboards = nil
 
 ---@class ScreenSeedInput : Screen
     ---@field bottom_woodpanel_slideup_timer number
@@ -4907,6 +5506,7 @@ local function Triangle_offset(self, x, y) end
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field start_sidepanel TextureRenderingInfo
     ---@field start_sidepanel_slidein_timer number
+ScreenSeedInput = nil
 
 ---@class ScreenCharacterSelect : Screen
     ---@field main_background_zoom_target number
@@ -4972,6 +5572,7 @@ local function Triangle_offset(self, x, y) end
     ---@field particle_torchflame_smoke4 ParticleEmitterInfo
     ---@field particle_torchflame_flames4 ParticleEmitterInfo
     ---@field sound SoundMeta
+ScreenCharacterSelect = nil
 
 ---@class FlyingThing
     ---@field texture_info TextureRenderingInfo
@@ -4983,6 +5584,7 @@ local function Triangle_offset(self, x, y) end
     ---@field amplitude number
     ---@field frequency number
     ---@field sinewave_angle number
+FlyingThing = nil
 
 ---@class ScreenTeamSelect : Screen
     ---@field ana_carrying_torch TextureRenderingInfo
@@ -4999,12 +5601,15 @@ local function Triangle_offset(self, x, y) end
     ---@field selected_player integer
     ---@field buttons integer
     ---@field ready boolean
+ScreenTeamSelect = nil
 
 ---@class ScreenCamp : Screen
     ---@field buttons integer
+ScreenCamp = nil
 
 ---@class ScreenLevel : Screen
     ---@field buttons integer
+ScreenLevel = nil
 
 ---@class ScreenTransition : Screen
     ---@field woodpanel_pos number
@@ -5053,16 +5658,20 @@ local function Triangle_offset(self, x, y) end
     ---@field hourglasses TextureRenderingInfo
     ---@field small_dollar_signs TextureRenderingInfo
     ---@field this_level_money_color Color
+ScreenTransition = nil
 
 ---@class ScreenDeath : Screen
+ScreenDeath = nil
 
 ---@class ScreenWin : Screen
     ---@field sequence_timer integer
     ---@field frame_timer integer
     ---@field animation_state integer
     ---@field rescuing_ship_entity Entity
+ScreenWin = nil
 
 ---@class ScreenCredits : Screen
+ScreenCredits = nil
 
 ---@class ScreenScores : Screen
     ---@field animation_state integer
@@ -5074,18 +5683,22 @@ local function Triangle_offset(self, x, y) end
     ---@field hourglass TextureRenderingInfo
     ---@field animation_timer integer
     ---@field woodpanel_slidedown_timer number
+ScreenScores = nil
 
 ---@class ScreenConstellation
     ---@field sequence_state integer
     ---@field animation_timer integer
     ---@field constellation_text_opacity number
     ---@field constellation_text number
+ScreenConstellation = nil
 
 ---@class ScreenRecap : Screen
+ScreenRecap = nil
 
 ---@class ScreenOnlineLoading : Screen
     ---@field ouroboros TextureRenderingInfo
     ---@field ouroboros_angle number
+ScreenOnlineLoading = nil
 
 ---@class ScreenOnlineLobby : Screen
     ---@field woodpanels_slidein_timer number
@@ -5142,6 +5755,7 @@ local function Triangle_offset(self, x, y) end
     ---@field enter_code_your_code_scroll_left_handle TextureRenderingInfo
     ---@field enter_code_your_code_scroll_right_handle TextureRenderingInfo
     ---@field set_code fun(self, code: string): nil
+ScreenOnlineLobby = nil
 
 ---@class PauseUI
     ---@field menu_slidein_progress number
@@ -5154,6 +5768,7 @@ local function Triangle_offset(self, x, y) end
     ---@field confirmation_panel TextureRenderingInfo
     ---@field previously_selected_menu_index integer
     ---@field visibility integer
+PauseUI = nil
 
 ---@class JournalUI
     ---@field state integer
@@ -5169,33 +5784,40 @@ local function Triangle_offset(self, x, y) end
     ---@field page_timer integer
     ---@field fade_timer integer
     ---@field opacity integer
+JournalUI = nil
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo
     ---@field page_number integer
     ---@field is_right_side_page fun(self): boolean @background.x < 0
+JournalPage = nil
 
 ---@class JournalPageProgress : JournalPage
     ---@field coffeestain_top TextureRenderingInfo
+JournalPageProgress = nil
 
 ---@class JournalPageJournalMenu : JournalPage
     ---@field selected_menu_index integer
     ---@field journal_text_info TextRenderingInfo
     ---@field completion_badge TextureRenderingInfo
+JournalPageJournalMenu = nil
 
 ---@class JournalPageDiscoverable : JournalPage
     ---@field show_main_image boolean
     ---@field title_text_info TextRenderingInfo
     ---@field entry_text_info TextRenderingInfo
     ---@field chapter_title_text_info TextRenderingInfo
+JournalPageDiscoverable = nil
 
 ---@class JournalPagePlaces : JournalPageDiscoverable
     ---@field main_image TextureRenderingInfo
+JournalPagePlaces = nil
 
 ---@class JournalPagePeople : JournalPageDiscoverable
     ---@field character_background TextureRenderingInfo
     ---@field character_icon TextureRenderingInfo
     ---@field character_drawing TextureRenderingInfo
+JournalPagePeople = nil
 
 ---@class JournalPageBestiary : JournalPageDiscoverable
     ---@field monster_background TextureRenderingInfo
@@ -5205,23 +5827,29 @@ local function Triangle_offset(self, x, y) end
     ---@field defeated_value_text_info TextRenderingInfo
     ---@field killedby_text_info TextRenderingInfo
     ---@field killedby_value_text_info TextRenderingInfo
+JournalPageBestiary = nil
 
 ---@class JournalPageItems : JournalPageDiscoverable
     ---@field item_icon TextureRenderingInfo
     ---@field item_background TextureRenderingInfo
+JournalPageItems = nil
 
 ---@class JournalPageTraps : JournalPageDiscoverable
     ---@field trap_icon TextureRenderingInfo
     ---@field trap_background TextureRenderingInfo
+JournalPageTraps = nil
 
 ---@class JournalPageStory : JournalPage
+JournalPageStory = nil
 
 ---@class JournalPageFeats : JournalPage
     ---@field chapter_title_text_info TextRenderingInfo
     ---@field feat_icons TextureRenderingInfo
+JournalPageFeats = nil
 
 ---@class JournalPageDeathCause : JournalPage
     ---@field death_cause_text_info TextRenderingInfo
+JournalPageDeathCause = nil
 
 ---@class JournalPageDeathMenu : JournalPage
     ---@field selected_menu_index integer
@@ -5232,8 +5860,10 @@ local function Triangle_offset(self, x, y) end
     ---@field money_value_text_info TextRenderingInfo
     ---@field time_text_info TextRenderingInfo
     ---@field time_value_text_info TextRenderingInfo
+JournalPageDeathMenu = nil
 
 ---@class JournalPageRecap : JournalPage
+JournalPageRecap = nil
 
 ---@class JournalPagePlayerProfile : JournalPage
     ---@field player_icon TextureRenderingInfo
@@ -5259,6 +5889,7 @@ local function Triangle_offset(self, x, y) end
     ---@field average_time_value_text_info TextRenderingInfo
     ---@field best_time_text_info TextRenderingInfo
     ---@field best_time_value_text_info TextRenderingInfo
+JournalPagePlayerProfile = nil
 
 ---@class JournalPageLastGamePlayed : JournalPage
     ---@field main_image TextureRenderingInfo
@@ -5271,6 +5902,7 @@ local function Triangle_offset(self, x, y) end
     ---@field time_value_text_info TextRenderingInfo
     ---@field sticker_count integer
     ---@field stickers TextureRenderingInfo[] @size: 20
+JournalPageLastGamePlayed = nil
 
 ---@class ScreenArenaMenu : Screen
     ---@field brick_background_animation ScreenZoomAnimation
@@ -5318,9 +5950,11 @@ local function Triangle_offset(self, x, y) end
     ---@field esc_next_panels_slide_timer number
     ---@field main_panel_vertical_scroll_position number
     ---@field selected_option_index integer
+ScreenArenaMenu = nil
 
 ---@class ScreenZoomAnimation
     ---@field zoom_target number
+ScreenZoomAnimation = nil
 
 ---@class ScreenArenaStagesSelect : Screen
     ---@field woodenpanel_top_slidein_timer number
@@ -5361,6 +5995,7 @@ local function Triangle_offset(self, x, y) end
     ---@field players_turn_scroll TextureRenderingInfo
     ---@field players_turn_scroll_handle TextureRenderingInfo
     ---@field grid_player_icon TextureRenderingInfo
+ScreenArenaStagesSelect = nil
 
 ---@class ScreenArenaItems : Screen
     ---@field woodpanel_top_slidein_timer number
@@ -5395,6 +6030,7 @@ local function Triangle_offset(self, x, y) end
     ---@field center_panels_horizontal_slide_position number
     ---@field esc_panel_slide_timer number
     ---@field selected_item_index integer
+ScreenArenaItems = nil
 
 ---@class ScreenArenaIntro : Screen
     ---@field players TextureRenderingInfo
@@ -5410,11 +6046,13 @@ local function Triangle_offset(self, x, y) end
     ---@field line_electricity_effect_timer number
     ---@field state integer
     ---@field countdown integer
+ScreenArenaIntro = nil
 
 ---@class ScreenArenaLevel : Screen
     ---@field get_ready TextureRenderingInfo
     ---@field get_ready_gray_background TextureRenderingInfo
     ---@field get_ready_outline TextureRenderingInfo
+ScreenArenaLevel = nil
 
 ---@class ScreenArenaScore : Screen
     ---@field woodpanel_slide_timer number
@@ -5453,11 +6091,10 @@ local function Triangle_offset(self, x, y) end
     ---@field player_crushing_pillar_height number[] @size: MAX_PLAYERS
     ---@field player_create_giblets boolean[] @size: MAX_PLAYERS
     ---@field next_sidepanel_slidein_timer number
+ScreenArenaScore = nil
 
 
 --## Constructors
-
-Color = nil
 ---Create a new color - defaults to black
 ---@return Color
 function Color.new(self) end
@@ -5474,16 +6111,12 @@ function Color.new(self, color) end
 ---@param a_ number
 ---@return Color
 function Color.new(self, r_, g_, b_, a_) end
-
-EntityDB = nil
 ---@param other EntityDB
 ---@return EntityDB
 function EntityDB.new(self, other) end
 ---@param other ENT_TYPE
 ---@return EntityDB
 function EntityDB.new(self, other) end
-
-CustomTheme = nil
 ---Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
 ---@param theme_id_ integer
 ---@param base_theme_ integer
@@ -5498,8 +6131,6 @@ function CustomTheme.new(self, theme_id_, base_theme_) end
 ---Create a new theme with base dwelling and id 100.
 ---@return CustomTheme
 function CustomTheme.new(self) end
-
-Vec2 = nil
 ---@return Vec2
 function Vec2.new(self) end
 ---@param vec2 Vec2
@@ -5509,8 +6140,6 @@ function Vec2.new(self, vec2) end
 ---@param y_ number
 ---@return Vec2
 function Vec2.new(self, x_, y_) end
-
-AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
 ---@return AABB
 function AABB.new(self) end
@@ -5525,8 +6154,6 @@ function AABB.new(self, aabb) end
 ---@param bottom_ number
 ---@return AABB
 function AABB.new(self, left_, top_, right_, bottom_) end
-
-Triangle = nil
 ---@return Triangle
 function Triangle.new(self) end
 ---@param triangle Triangle
@@ -5545,8 +6172,6 @@ function Triangle.new(self, _a, _b, _c) end
 ---@param cy number
 ---@return Triangle
 function Triangle.new(self, ax, ay, bx, by, cx, cy) end
-
-Quad = nil
 ---@return Quad
 function Quad.new(self) end
 ---@param quad Quad
