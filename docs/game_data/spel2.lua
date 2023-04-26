@@ -1604,14 +1604,15 @@ function set_feat_hidden(feat, hidden) end
 function change_feat(feat, hidden, name, description) end
 
 --## Types
+do
 
 ---@class SaveContext
     ---@field save fun(self, data: string): boolean
-SaveContext = nil
+local SaveContext = nil
 
 ---@class LoadContext
     ---@field load fun(self): string
-LoadContext = nil
+local LoadContext = nil
 
 ---@class ArenaConfigArenas
     ---@field dwelling_1 boolean
@@ -1654,7 +1655,7 @@ LoadContext = nil
     ---@field sunkencity_3 boolean
     ---@field sunkencity_4 boolean
     ---@field sunkencity_5 boolean
-ArenaConfigArenas = nil
+local ArenaConfigArenas = nil
 
 ---@class ArenaConfigItems
     ---@field rock boolean
@@ -1697,7 +1698,7 @@ ArenaConfigArenas = nil
     ---@field scepter boolean
     ---@field kapala boolean
     ---@field true_crown boolean
-ArenaConfigItems = nil
+local ArenaConfigItems = nil
 
 ---@class ArenaConfigEquippedItems
     ---@field paste boolean
@@ -1708,7 +1709,7 @@ ArenaConfigItems = nil
     ---@field parachute boolean
     ---@field kapala boolean
     ---@field scepter boolean
-ArenaConfigEquippedItems = nil
+local ArenaConfigEquippedItems = nil
 
 ---@class ArenaState
     ---@field current_arena integer
@@ -1741,13 +1742,13 @@ ArenaConfigEquippedItems = nil
     ---@field final_ghost boolean
     ---@field breath_cooldown integer
     ---@field punish_ball boolean
-ArenaState = nil
+local ArenaState = nil
 
 ---@class SelectPlayerSlot
     ---@field activated boolean
     ---@field character ENT_TYPE
     ---@field texture integer
-SelectPlayerSlot = nil
+local SelectPlayerSlot = nil
 
 ---@class Items
     ---@field player_count integer
@@ -1757,7 +1758,7 @@ SelectPlayerSlot = nil
     ---@field is_pet_poisoned boolean[] @size: 4
     ---@field player_inventory Inventory[] @size: MAX_PLAYERS
     ---@field player_select SelectPlayerSlot[] @size: MAX_PLAYERS
-Items = nil
+local Items = nil
 
 ---@class LiquidPhysicsEngine
     ---@field pause boolean
@@ -1767,22 +1768,22 @@ Items = nil
     ---@field size number
     ---@field weight number
     ---@field count integer
-LiquidPhysicsEngine = nil
+local LiquidPhysicsEngine = nil
 
 ---@class LiquidPhysicsParams
     ---@field gravity number
     ---@field cohesion number
     ---@field elasticity number
-LiquidPhysicsParams = nil
+local LiquidPhysicsParams = nil
 
 ---@class LiquidPool
     ---@field default LiquidPhysicsParams
     ---@field engine LiquidPhysicsEngine
-LiquidPool = nil
+local LiquidPool = nil
 
 ---@class LiquidPhysics
     ---@field pools LiquidPool[] @size: 5
-LiquidPhysics = nil
+local LiquidPhysics = nil
 
 ---@class StateMemory
     ---@field screen_last integer @Previous SCREEN, used to check where we're coming from when loading another SCREEN
@@ -1887,14 +1888,14 @@ LiquidPhysics = nil
     ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
     ---@field next_entity_uid integer @Next entity spawned will have this uid
-StateMemory = nil
+local StateMemory = nil
 
 ---@class LightParams
     ---@field red number
     ---@field green number
     ---@field blue number
     ---@field size number
-LightParams = nil
+local LightParams = nil
 
 ---@class Illumination
     ---@field lights LightParams[] @size: 4 @Table of light1, light2, ... etc.
@@ -1914,7 +1915,7 @@ LightParams = nil
     ---@field type_flags integer @Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
     ---@field enabled boolean
     ---@field layer integer
-Illumination = nil
+local Illumination = nil
 
 ---@class Camera
     ---@field bounds_left number
@@ -1938,49 +1939,49 @@ Illumination = nil
     ---@field uniform_shake boolean
     ---@field focused_entity_uid integer
     ---@field inertia number
-Camera = nil
+local Camera = nil
 
 ---@class Online
     ---@field online_players OnlinePlayer[] @size: 4
     ---@field local_player OnlinePlayer
     ---@field lobby OnlineLobby
-Online = nil
+local Online = nil
 
 ---@class OnlinePlayer
     ---@field ready_state integer
     ---@field character integer
     ---@field player_name string
-OnlinePlayer = nil
+local OnlinePlayer = nil
 
 ---@class OnlineLobby
     ---@field code integer
     ---@field local_player_slot integer
     ---@field get_code fun(self): string @Gets the string equivalent of the code
-OnlineLobby = nil
+local OnlineLobby = nil
 
 ---@class LogicList
     ---@field olmec_cutscene LogicOlmecCutscene
     ---@field tiamat_cutscene LogicTiamatCutscene
     ---@field diceshop LogicDiceShop
-LogicList = nil
+local LogicList = nil
 
 ---@class Logic
     ---@field logic_index integer
-Logic = nil
+local Logic = nil
 
 ---@class LogicOlmecCutscene : Logic
     ---@field olmec Entity
     ---@field player Entity
     ---@field cinematic_anchor Entity
     ---@field timer integer
-LogicOlmecCutscene = nil
+local LogicOlmecCutscene = nil
 
 ---@class LogicTiamatCutscene : Logic
     ---@field tiamat Entity
     ---@field player Entity
     ---@field cinematic_anchor Entity
     ---@field timer integer
-LogicTiamatCutscene = nil
+local LogicTiamatCutscene = nil
 
 ---@class LogicDiceShop : Logic
     ---@field bet_machine integer
@@ -1997,7 +1998,7 @@ LogicTiamatCutscene = nil
     ---@field result_announcement_timer integer
     ---@field won_prizes_count integer
     ---@field balance integer
-LogicDiceShop = nil
+local LogicDiceShop = nil
 
 ---@class BackgroundMusic
     ---@field game_startup BackgroundSound
@@ -2015,7 +2016,7 @@ LogicDiceShop = nil
     ---@field inside_sunken_city_pipe BackgroundSound
     ---@field pause_menu BackgroundSound
     ---@field death_transition BackgroundSound
-BackgroundMusic = nil
+local BackgroundMusic = nil
 
 ---@class GameManager
     ---@field music BackgroundMusic
@@ -2036,11 +2037,11 @@ BackgroundMusic = nil
     ---@field pause_ui PauseUI
     ---@field journal_ui JournalUI
     ---@field save_related SaveRelated
-GameManager = nil
+local GameManager = nil
 
 ---@class SaveRelated
     ---@field journal_popup_ui JournalPopupUI
-SaveRelated = nil
+local SaveRelated = nil
 
 ---@class JournalPopupUI
     ---@field wiggling_page_icon TextureRenderingInfo
@@ -2051,12 +2052,12 @@ SaveRelated = nil
     ---@field entry_to_show integer
     ---@field timer integer
     ---@field slide_position number
-JournalPopupUI = nil
+local JournalPopupUI = nil
 
 ---@class GameProps
     ---@field buttons integer
     ---@field game_has_focus boolean
-GameProps = nil
+local GameProps = nil
 
 ---@class PRNG
     ---@field seed fun(self, seed: integer): nil @Same as `seed_prng`
@@ -2066,7 +2067,7 @@ GameProps = nil
     ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[min, max]` or `nil` if `max < min`
     ---@field get_pair any @&PRNG::get_pair
     ---@field set_pair any @&PRNG::set_pair
-PRNG = nil
+local PRNG = nil
 ---Drop-in replacement for `math.random()`
 ---@return number
 function PRNG:random() end
@@ -2089,7 +2090,7 @@ function PRNG:random(min, max) end
     ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color @Changes color based on given RGBA colors in 0..255 range
     ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
     ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
-Color = nil
+local Color = nil
 
 ---@class Animation
     ---@field id integer
@@ -2097,7 +2098,7 @@ Color = nil
     ---@field num_tiles integer
     ---@field interval integer
     ---@field repeat_mode REPEAT_TYPE
-Animation = nil
+local Animation = nil
 
 ---@class EntityDB
     ---@field id ENT_TYPE
@@ -2137,7 +2138,7 @@ Animation = nil
     ---@field description STRINGID
     ---@field tilex integer
     ---@field tiley integer
-EntityDB = nil
+local EntityDB = nil
 
 ---@class RenderInfo
     ---@field x number
@@ -2157,7 +2158,7 @@ EntityDB = nil
     ---@field set_post_dtor fun(self, fun: fun(self: RenderInfo): nil): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil dtor(RenderInfo self)`
     ---@field set_pre_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool render(RenderInfo self, number number, VanillaRenderContext vanilla_render_context)`
     ---@field set_post_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil render(RenderInfo self, number number, VanillaRenderContext vanilla_render_context)`
-RenderInfo = nil
+local RenderInfo = nil
 
 ---@class Entity
     ---@field type EntityDB @Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the EntityDB
@@ -2229,7 +2230,7 @@ RenderInfo = nil
     ---@field set_post_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
     ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_collision2(Entity self, Entity other_entity)`
     ---@field set_post_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_collision2(Entity self, Entity other_entity)`
-Entity = nil
+local Entity = nil
 ---@param hitbox AABB
 ---@return boolean
 function Entity:overlaps_with(hitbox) end
@@ -2307,7 +2308,7 @@ function Entity:overlaps_with(other) end
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
     ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
-Movable = nil
+local Movable = nil
 ---Move a movable according to its velocity, update physics, gravity, etc.
 ---Will also update `movable.animation_frame` and various timers and counters
 ---@return nil
@@ -2335,7 +2336,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field get_powerups fun(self): ENT_TYPE[] @Return all powerups that the entity has
     ---@field unequip_backitem fun(self): nil @Unequips the currently worn backitem
     ---@field worn_backitem fun(self): integer @Returns the uid of the currently worn backitem, or -1 if wearing nothing
-PowerupCapable = nil
+local PowerupCapable = nil
 
 ---@class Inventory
     ---@field money integer @Sum of the money collected in current level
@@ -2368,7 +2369,7 @@ PowerupCapable = nil
     ---@field companion_poison_tick_timers integer[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field is_companion_cursed boolean[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field acquired_powerups ENT_TYPE[] @size: 30 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-Inventory = nil
+local Inventory = nil
 
 ---@class Ai
     ---@field target Entity
@@ -2379,7 +2380,7 @@ Inventory = nil
     ---@field trust integer @Levels completed with, 0..3
     ---@field whipped integer @Number of times whipped by player
     ---@field walk_pause_timer integer @positive: walking, negative: wating/idle
-Ai = nil
+local Ai = nil
 
 ---@class Player : PowerupCapable
     ---@field inventory Inventory
@@ -2401,7 +2402,7 @@ Ai = nil
     ---@field is_female fun(self): boolean @Check whether the character is female, will be `true` if the character was modded to be female as well.
     ---@field set_heart_color fun(self, hcolor: Color): nil @Set the heart color the character.
     ---@field let_go fun(self): nil @Drops from ladders, ropes and ledge grabs
-Player = nil
+local Player = nil
 
 ---@class Floor : Entity
     ---@field deco_top integer
@@ -2419,7 +2420,7 @@ Player = nil
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
     ---@field set_pre_floor_update fun(self, fun: fun(self: Floor): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool floor_update(Floor self)`
     ---@field set_post_floor_update fun(self, fun: fun(self: Floor): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil floor_update(Floor self)`
-Floor = nil
+local Floor = nil
 
 ---@class Door : Floor
     ---@field counter integer
@@ -2427,7 +2428,7 @@ Floor = nil
     ---@field enter fun(self, who: Entity): integer
     ---@field is_unlocked fun(self): boolean @Will alwyas return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
     ---@field unlock fun(self, unlock: boolean): nil @Lock/Unlock doors
-Door = nil
+local Door = nil
 
 ---@class ExitDoor : Door
     ---@field entered boolean @if true entering it does not load the transition
@@ -2436,59 +2437,59 @@ Door = nil
     ---@field timer integer
     ---@field world integer
     ---@field theme integer
-ExitDoor = nil
+local ExitDoor = nil
 
 ---@class DecoratedDoor : ExitDoor
     ---@field special_bg Entity
-DecoratedDoor = nil
+local DecoratedDoor = nil
 
 ---@class LockedDoor : Door
     ---@field unlocked boolean
-LockedDoor = nil
+local LockedDoor = nil
 
 ---@class CityOfGoldDoor : DecoratedDoor
     ---@field unlocked boolean
-CityOfGoldDoor = nil
+local CityOfGoldDoor = nil
 
 ---@class MainExit : ExitDoor
     ---@field sound SoundMeta
     ---@field door_blocker Entity @Normally `FX_MAIN_EXIT_DOOR` but setting any entity here will block the door
-MainExit = nil
+local MainExit = nil
 
 ---@class EggShipDoor : Door
     ---@field timer integer
-EggShipDoor = nil
+local EggShipDoor = nil
 
 ---@class EggShipDoorS : EggShipDoor
     ---@field entered boolean
-EggShipDoorS = nil
+local EggShipDoorS = nil
 
 ---@class Arrowtrap : Floor
     ---@field arrow_shot boolean
     ---@field rearm fun(self): nil
     ---@field trigger fun(self, who_uid: integer): nil @The uid must be movable entity for ownership transfers
-Arrowtrap = nil
+local Arrowtrap = nil
 
 ---@class TotemTrap : Floor
     ---@field spawn_entity_type ENT_TYPE
     ---@field first_sound_id integer
     ---@field trigger fun(self, who_uid: integer, left: boolean): nil @The uid must be movable entity for ownership transfers
-TotemTrap = nil
+local TotemTrap = nil
 
 ---@class LaserTrap : Floor
     ---@field emitted_light Illumination
     ---@field timer integer @counts up from 0 after triggering, cannot shoot again until 360
     ---@field trigger fun(self, who_uid: integer): nil @The uid must be movable entity for ownership transfers
-LaserTrap = nil
+local LaserTrap = nil
 
 ---@class SparkTrap : Floor
     ---@field emitted_light Illumination
     ---@field spark_uid integer
-SparkTrap = nil
+local SparkTrap = nil
 
 ---@class Altar : Floor
     ---@field timer integer @for normal altar: counts from 0 to 20 then 0, then 1 then 0 and sacrifice happens
-Altar = nil
+local Altar = nil
 
 ---@class SpikeballTrap : Floor
     ---@field sound SoundMeta
@@ -2496,20 +2497,20 @@ Altar = nil
     ---@field end_piece Entity
     ---@field state integer @0 - none, 1 - start, 2 - going_down, 3 - going_up, 4 - pause; going_up is only right when timer is 0, otherwise it just sits at the bottom
     ---@field timer integer @for the start and retract
-SpikeballTrap = nil
+local SpikeballTrap = nil
 
 ---@class TransferFloor : Floor
     ---@field transferred_entities table<integer, integer> @Index is the uid, value is frame the entity entered the floor (time_level), use `pairs` to loop thru
-TransferFloor = nil
+local TransferFloor = nil
 
 ---@class ConveyorBelt : TransferFloor
     ---@field timer integer
-ConveyorBelt = nil
+local ConveyorBelt = nil
 
 ---@class Pipe : Floor
     ---@field direction_type integer @3 - straight_horizontal, 4 - blocked, 5 - down_left_turn, 6 - down_right_turn, 8 - blocked, 9 - up_left_turn, 10 - up_right_turn, 12 - straight_vertical
     ---@field end_pipe boolean
-Pipe = nil
+local Pipe = nil
 
 ---@class Generator : Floor
     ---@field spawned_uid integer
@@ -2517,7 +2518,7 @@ Pipe = nil
     ---@field timer integer
     ---@field start_counter integer @works only for star challenge
     ---@field on_off boolean @works only for star challenge
-Generator = nil
+local Generator = nil
 
 ---@class SlidingWallCeiling : Floor
     ---@field attached_piece Entity
@@ -2525,16 +2526,16 @@ Generator = nil
     ---@field state integer @1 - going up / is at the top, 2 - pause
     ---@field ball_rise SoundMeta
     ---@field ball_drop SoundMeta
-SlidingWallCeiling = nil
+local SlidingWallCeiling = nil
 
 ---@class QuickSand : Floor
-QuickSand = nil
+local QuickSand = nil
 
 ---@class BigSpearTrap : Floor
     ---@field spear_uid integer
     ---@field left_part boolean @setting the left part to 0 or right part to 1 destroys the trap
     ---@field trigger fun(self, who_uid: integer, left: boolean): nil @The uid must be movable entity for ownership transfers, has to be called on the left part of the trap,
-BigSpearTrap = nil
+local BigSpearTrap = nil
 
 ---@class StickyTrap : Floor
     ---@field sound SoundMeta
@@ -2542,7 +2543,7 @@ BigSpearTrap = nil
     ---@field ball_uid integer
     ---@field state integer @0 - none, 1 - start, 2 - going down, 3 - is at the bottom, 4 - going up, 5 - pause
     ---@field timer integer
-StickyTrap = nil
+local StickyTrap = nil
 
 ---@class MotherStatue : Floor
     ---@field players_standing boolean[] @size: 4 @Table of player1_standing, player2_standing, ... etc.
@@ -2562,11 +2563,11 @@ StickyTrap = nil
     ---@field player4_health_timer integer
     ---@field eggplantchild_timer integer
     ---@field eggplantchild_detected boolean
-MotherStatue = nil
+local MotherStatue = nil
 
 ---@class TeleportingBorder : Floor
     ---@field direction integer @0 - right, 1 - left, 2 - bottom, 3 - top, 4 - disable
-TeleportingBorder = nil
+local TeleportingBorder = nil
 
 ---@class ForceField : Floor
     ---@field first_item_beam Entity
@@ -2575,12 +2576,12 @@ TeleportingBorder = nil
     ---@field emitted_light Illumination
     ---@field is_on boolean
     ---@field activate_laserbeam fun(self, turn_on: boolean): nil
-ForceField = nil
+local ForceField = nil
 
 ---@class TimedForceField : ForceField
     ---@field timer integer
     ---@field pause boolean
-TimedForceField = nil
+local TimedForceField = nil
 
 ---@class HorizontalForceField : Floor
     ---@field first_item_beam Entity
@@ -2588,29 +2589,29 @@ TimedForceField = nil
     ---@field sound SoundMeta
     ---@field timer integer
     ---@field is_on boolean
-HorizontalForceField = nil
+local HorizontalForceField = nil
 
 ---@class TentacleBottom : Floor
     ---@field attached_piece_uid integer
     ---@field tentacle_uid integer
     ---@field state integer @0 - none, 1 - start, 2 - moving up, 3 - at the top, 4 - moving down 5 - pause
-TentacleBottom = nil
+local TentacleBottom = nil
 
 ---@class PoleDeco : Floor
     ---@field deco_up integer
     ---@field deco_down integer
-PoleDeco = nil
+local PoleDeco = nil
 
 ---@class JungleSpearTrap : Floor
     ---@field trigger fun(self, who_uid: integer, direction: integer): nil @The uid must be movable entity for ownership transfers, direction: 1 = left, 2 = right, 3 = up, 4 = down
-JungleSpearTrap = nil
+local JungleSpearTrap = nil
 
 ---@class Crushtrap : Movable
     ---@field dirx number
     ---@field diry number
     ---@field timer integer @counts from 30 to 0 before moving, after it stops, counts from 60 to 0 before it can be triggered again
     ---@field bounce_back_timer integer @counts from 7 to 0 after it hits the wall and moves away until the timer hits 0, then moves back and counts from 255 until it hits the wall again, if needed it will start the counter again for another bounce
-Crushtrap = nil
+local Crushtrap = nil
 
 ---@class Olmec : Movable
     ---@field sound SoundMeta
@@ -2623,61 +2624,61 @@ Crushtrap = nil
     ---@field phase1_amount_of_bomb_salvos integer
     ---@field unknown_attack_state integer
     ---@field broken_floaters fun(self): integer
-Olmec = nil
+local Olmec = nil
 
 ---@class WoodenlogTrap : Movable
     ---@field ceiling_1_uid integer
     ---@field ceiling_2_uid integer
     ---@field falling_speed number
-WoodenlogTrap = nil
+local WoodenlogTrap = nil
 
 ---@class Boulder : Movable
     ---@field is_rolling integer @is set to 1 when the boulder first hits the ground
-Boulder = nil
+local Boulder = nil
 
 ---@class PushBlock : Movable
     ---@field sound SoundMeta
     ---@field dust_particle ParticleEmitterInfo
     ---@field dest_pos_x number
-PushBlock = nil
+local PushBlock = nil
 
 ---@class BoneBlock : Movable
-BoneBlock = nil
+local BoneBlock = nil
 
 ---@class ChainedPushBlock : PushBlock
     ---@field is_chained boolean
-ChainedPushBlock = nil
+local ChainedPushBlock = nil
 
 ---@class LightArrowPlatform : Movable
     ---@field emitted_light Illumination
-LightArrowPlatform = nil
+local LightArrowPlatform = nil
 
 ---@class FallingPlatform : Movable
     ---@field timer integer
     ---@field shaking_factor number
     ---@field y_pos number
-FallingPlatform = nil
+local FallingPlatform = nil
 
 ---@class UnchainedSpikeBall : Movable
     ---@field bounce boolean
-UnchainedSpikeBall = nil
+local UnchainedSpikeBall = nil
 
 ---@class Drill : Movable
     ---@field sound1 SoundMeta
     ---@field sound2 SoundMeta
     ---@field top_chain_piece Entity
     ---@field trigger fun(self): nil
-Drill = nil
+local Drill = nil
 
 ---@class ThinIce : Movable
     ---@field strength integer @counts down when standing on, maximum is 134 as based of this value it changes animation_frame, and above that value it changes to wrong sprite
-ThinIce = nil
+local ThinIce = nil
 
 ---@class Elevator : Movable
     ---@field emitted_light Illumination
     ---@field timer integer @pause timer, counts down 60 to 0
     ---@field moving_up boolean
-Elevator = nil
+local Elevator = nil
 
 ---@class ClamBase : Movable
     ---@field treasure_type ENT_TYPE
@@ -2685,15 +2686,15 @@ Elevator = nil
     ---@field treasure_x_pos number
     ---@field treasure_y_pos number
     ---@field top_part_uid integer
-ClamBase = nil
+local ClamBase = nil
 
 ---@class RegenBlock : Movable
     ---@field on_breaking boolean
-RegenBlock = nil
+local RegenBlock = nil
 
 ---@class TimedPowderkeg : PushBlock
     ---@field timer integer @timer till explosion, -1 = pause, counts down
-TimedPowderkeg = nil
+local TimedPowderkeg = nil
 
 ---@class Mount : PowerupCapable
     ---@field rider_uid integer
@@ -2706,16 +2707,16 @@ TimedPowderkeg = nil
     ---@field remove_rider fun(self): nil
     ---@field carry fun(self, rider: Movable): nil
     ---@field tame fun(self, value: boolean): nil
-Mount = nil
+local Mount = nil
 
 ---@class Rockdog : Mount
     ---@field attack_cooldown integer
-Rockdog = nil
+local Rockdog = nil
 
 ---@class Axolotl : Mount
     ---@field attack_cooldown integer
     ---@field can_teleport boolean
-Axolotl = nil
+local Axolotl = nil
 
 ---@class Mech : Mount
     ---@field crouch_walk_sound SoundMeta
@@ -2723,17 +2724,17 @@ Axolotl = nil
     ---@field gun_cooldown integer
     ---@field walking boolean
     ---@field breaking_wall boolean
-Mech = nil
+local Mech = nil
 
 ---@class Qilin : Mount
     ---@field fly_gallop_sound SoundMeta
     ---@field attack_cooldown integer
-Qilin = nil
+local Qilin = nil
 
 ---@class Monster : PowerupCapable
     ---@field chased_target_uid integer
     ---@field target_selection_timer integer
-Monster = nil
+local Monster = nil
 
 ---@class RoomOwner : Monster
     ---@field room_index integer
@@ -2745,20 +2746,20 @@ Monster = nil
     ---@field is_patrolling boolean
     ---@field aggro_trigger boolean @setting this makes him angry, if it's shopkeeper you get 2 agrro points
     ---@field was_hurt boolean @also is set true if you set aggro to true, get's trigger even when whiping
-RoomOwner = nil
+local RoomOwner = nil
 
 ---@class WalkingMonster : Monster
     ---@field chatting_to_uid integer
     ---@field walk_pause_timer integer @alternates between walking and pausing every time it reaches zero
     ---@field cooldown_timer integer @used for chatting with other monsters, attack cooldowns etc.
-WalkingMonster = nil
+local WalkingMonster = nil
 
 ---@class NPC : Monster
     ---@field climb_direction number
     ---@field target_in_sight_timer integer
     ---@field ai_state integer
     ---@field aggro boolean @for bodyguard and shopkeeperclone it spawns a weapon as well
-NPC = nil
+local NPC = nil
 
 ---@class Ghost : Monster
     ---@field split_timer integer @for SMALL_HAPPY this is also the sequence timer of its various states
@@ -2773,30 +2774,30 @@ NPC = nil
     ---@field happy_dancing_clockwise boolean
     ---@field target_dist_visibility_factor number
     ---@field target_layer_visibility_factor number
-Ghost = nil
+local Ghost = nil
 
 ---@class Bat : Monster
     ---@field spawn_x number
     ---@field spawn_y number
-Bat = nil
+local Bat = nil
 
 ---@class Jiangshi : Monster
     ---@field wait_timer integer @wait time between jumps
     ---@field jump_counter integer @only female aka assassin: when 0 will jump up into ceiling
     ---@field on_ceiling boolean @only female aka assassin
-Jiangshi = nil
+local Jiangshi = nil
 
 ---@class Monkey : Monster
     ---@field sound SoundMeta
     ---@field jump_timer integer
     ---@field on_vine boolean
-Monkey = nil
+local Monkey = nil
 
 ---@class GoldMonkey : Monster
     ---@field jump_timer integer
     ---@field poop_timer integer
     ---@field poop_count integer
-GoldMonkey = nil
+local GoldMonkey = nil
 
 ---@class Mole : Monster
     ---@field burrowing_sound SoundMeta
@@ -2809,20 +2810,20 @@ GoldMonkey = nil
     ---@field counter_nonburrowing integer
     ---@field countdown_for_appearing integer
     ---@field digging_state integer @0 - non_burrowed, 1 - unknown, 2 - burrowed, 3 - state_change
-Mole = nil
+local Mole = nil
 
 ---@class Spider : Monster
     ---@field ceiling_pos_x number
     ---@field ceiling_pos_y number
     ---@field jump_timer integer @For the giant spider, some times he shot web instead of jumping
     ---@field trigger_distance number @only in the x coord
-Spider = nil
+local Spider = nil
 
 ---@class HangSpider : Monster
     ---@field dangle_jump_timer integer
     ---@field ceiling_pos_x number
     ---@field ceiling_pos_y number
-HangSpider = nil
+local HangSpider = nil
 
 ---@class Shopkeeper : RoomOwner
     ---@field name integer @0 - Ali, 1 - Bob, 2 - Comso ... and so one, anything above 28 is just random string, can crash the game
@@ -2830,14 +2831,14 @@ HangSpider = nil
     ---@field has_key boolean @will drop key after stun/kill
     ---@field is_ear boolean
     ---@field shop_owner boolean
-Shopkeeper = nil
+local Shopkeeper = nil
 
 ---@class Yang : RoomOwner
     ---@field turkeys_in_den integer[] @Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
     ---@field first_message_shown boolean @I'm looking for turkeys, wanna help?
     ---@field quest_incomplete boolean @Is set to false when the quest is over (Yang dead or second turkey delivered)
     ---@field special_message_shown boolean @Tusk palace/black market/one way door - message shown
-Yang = nil
+local Yang = nil
 
 ---@class Tun : RoomOwner
     ---@field arrows_left integer
@@ -2847,7 +2848,7 @@ Yang = nil
     ---@field murdered boolean
     ---@field shop_entered boolean
     ---@field tiamat_encounter boolean @if set to false, greets you with 'you've done well to reach this place'
-Tun = nil
+local Tun = nil
 
 ---@class Pet : Monster
     ---@field fx_button Entity
@@ -2856,18 +2857,18 @@ Tun = nil
     ---@field func_timer integer @used when free running in the camp
     ---@field active_state integer @-1 = sitting and yelling, 0 = either running, dead or picked up
     ---@field petted_counter integer @number of times petted in the camp
-Pet = nil
+local Pet = nil
 
 ---@class Caveman : WalkingMonster
     ---@field wake_up_timer integer
     ---@field can_pick_up_timer integer @0 = can pick something up, when holding forced to 179, after tripping and regaining consciousness counts down to 0
     ---@field aggro_timer integer @keeps resetting when angry and a player is nearby
-Caveman = nil
+local Caveman = nil
 
 ---@class CavemanShopkeeper : WalkingMonster
     ---@field tripping boolean
     ---@field shop_entered boolean
-CavemanShopkeeper = nil
+local CavemanShopkeeper = nil
 
 ---@class HornedLizard : Monster
     ---@field eaten_uid integer @dungbeetle being eaten
@@ -2876,7 +2877,7 @@ CavemanShopkeeper = nil
     ---@field blood_squirt_timer integer
     ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
-HornedLizard = nil
+local HornedLizard = nil
 
 ---@class Mosquito : Monster
     ---@field direction_x number
@@ -2885,27 +2886,27 @@ HornedLizard = nil
     ---@field stuck_rel_pos_y number
     ---@field sound SoundMeta
     ---@field timer integer
-Mosquito = nil
+local Mosquito = nil
 
 ---@class Mantrap : Monster
     ---@field walk_pause_timer integer @alternates between walking and pausing every time it reaches zero
     ---@field eaten_uid integer @the uid of the entity the mantrap has eaten, in case it can break out, like a shopkeeper
-Mantrap = nil
+local Mantrap = nil
 
 ---@class Skeleton : Monster
     ---@field explosion_timer integer @-1 = never explodes
-Skeleton = nil
+local Skeleton = nil
 
 ---@class Scarab : Monster
     ---@field sound SoundMeta
     ---@field emitted_light Illumination
     ---@field timer integer @how long to stay in current position
-Scarab = nil
+local Scarab = nil
 
 ---@class Imp : Monster
     ---@field carrying_uid integer
     ---@field patrol_y_level number
-Imp = nil
+local Imp = nil
 
 ---@class Lavamander : Monster
     ---@field emitted_light Illumination
@@ -2914,32 +2915,32 @@ Imp = nil
     ---@field lava_detection_timer integer
     ---@field is_hot boolean
     ---@field player_detect_state integer @0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
-Lavamander = nil
+local Lavamander = nil
 
 ---@class Firebug : Monster
     ---@field sound SoundMeta
     ---@field fire_timer integer
     ---@field going_up boolean
     ---@field detached_from_chain boolean
-Firebug = nil
+local Firebug = nil
 
 ---@class FirebugUnchained : Monster
     ---@field sound SoundMeta
     ---@field max_flight_height number
     ---@field ai_timer integer
     ---@field walking_timer integer
-FirebugUnchained = nil
+local FirebugUnchained = nil
 
 ---@class Robot : WalkingMonster
     ---@field sound SoundMeta
     ---@field emitted_light_explosion Illumination
-Robot = nil
+local Robot = nil
 
 ---@class Quillback : WalkingMonster
     ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
     ---@field seen_player boolean
-Quillback = nil
+local Quillback = nil
 
 ---@class Leprechaun : WalkingMonster
     ---@field sound SoundMeta
@@ -2947,36 +2948,36 @@ Quillback = nil
     ---@field target_in_sight_timer integer
     ---@field gold integer @amount of gold he picked up, will be drooped on death
     ---@field timer_after_humping integer
-Leprechaun = nil
+local Leprechaun = nil
 
 ---@class Crocman : WalkingMonster
     ---@field teleport_cooldown integer
-Crocman = nil
+local Crocman = nil
 
 ---@class Mummy : Monster
     ---@field walk_pause_timer integer
-Mummy = nil
+local Mummy = nil
 
 ---@class VanHorsing : NPC
     ---@field show_text boolean @if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
     ---@field special_message_shown boolean @one way door message has been shown
-VanHorsing = nil
+local VanHorsing = nil
 
 ---@class WitchDoctor : WalkingMonster
     ---@field sound SoundMeta
     ---@field skull_regen_timer integer
-WitchDoctor = nil
+local WitchDoctor = nil
 
 ---@class WitchDoctorSkull : Monster
     ---@field witch_doctor_uid integer
     ---@field emitted_light Illumination
     ---@field sound SoundMeta
     ---@field rotation_angle number
-WitchDoctorSkull = nil
+local WitchDoctorSkull = nil
 
 ---@class ForestSister : NPC
     ---@field walk_pause_timer integer
-ForestSister = nil
+local ForestSister = nil
 
 ---@class Vampire : Monster
     ---@field jump_trigger_distance_x number
@@ -2984,36 +2985,36 @@ ForestSister = nil
     ---@field sleep_pos_x number
     ---@field sleep_pos_y number
     ---@field walk_pause_timer integer
-Vampire = nil
+local Vampire = nil
 
 ---@class Vlad : Vampire
     ---@field teleport_timer integer @triggers when Vlad teleports, when timer running he can't teleport and will stun when hit
     ---@field aggro boolean @or is awake
-Vlad = nil
+local Vlad = nil
 
 ---@class Waddler : RoomOwner
     ---@field player_detected boolean
     ---@field on_the_ground boolean
     ---@field air_timer integer
-Waddler = nil
+local Waddler = nil
 
 ---@class Octopus : WalkingMonster
-Octopus = nil
+local Octopus = nil
 
 ---@class Bodyguard : NPC
     ---@field position_state integer @0 - none, 1 - Tusk dice shop, 2 - Entrence to pleasure palace, 3 - Basement entrance to pleasure palace
     ---@field message_shown boolean
-Bodyguard = nil
+local Bodyguard = nil
 
 ---@class Fish : Monster
     ---@field change_direction_timer integer
-Fish = nil
+local Fish = nil
 
 ---@class GiantFish : Monster
     ---@field sound SoundMeta
     ---@field change_direction_timer integer @when bouncing into a wall
     ---@field lose_interest_timer integer @delay in-between attacks
-GiantFish = nil
+local GiantFish = nil
 
 ---@class Crabman : Monster
     ---@field walk_pause_timer integer
@@ -3021,7 +3022,7 @@ GiantFish = nil
     ---@field poison_attack_timer integer
     ---@field attacking_claw_uid integer
     ---@field at_maximum_attack boolean
-Crabman = nil
+local Crabman = nil
 
 ---@class Kingu : Monster
     ---@field sound1 SoundMeta @initialized when breaking the shell (sliding down sound maybe?)
@@ -3033,7 +3034,7 @@ Crabman = nil
     ---@field monster_spawn_timer integer
     ---@field initial_shell_health integer @excalibur wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip
     ---@field player_seen_by_kingu boolean
-Kingu = nil
+local Kingu = nil
 
 ---@class Anubis : Monster
     ---@field spawn_x number
@@ -3044,16 +3045,16 @@ Kingu = nil
     ---@field next_attack_timer integer
     ---@field psychic_orbs_counter integer
     ---@field awake boolean
-Anubis = nil
+local Anubis = nil
 
 ---@class Cobra : Monster
     ---@field spit_timer integer
-Cobra = nil
+local Cobra = nil
 
 ---@class CatMummy : Monster
     ---@field ai_state integer
     ---@field attack_timer integer
-CatMummy = nil
+local CatMummy = nil
 
 ---@class Sorceress : WalkingMonster
     ---@field inbetween_attack_timer integer
@@ -3062,7 +3063,7 @@ CatMummy = nil
     ---@field fx_entity Entity
     ---@field sound SoundMeta
     ---@field hover_timer integer
-Sorceress = nil
+local Sorceress = nil
 
 ---@class MagmaMan : Monster
     ---@field emitted_light Illumination
@@ -3070,7 +3071,7 @@ Sorceress = nil
     ---@field particle ParticleEmitterInfo
     ---@field jump_timer integer
     ---@field alive_timer integer
-MagmaMan = nil
+local MagmaMan = nil
 
 ---@class Bee : Monster
     ---@field can_rest boolean
@@ -3081,18 +3082,18 @@ MagmaMan = nil
     ---@field walk_end_time integer
     ---@field wobble_x number
     ---@field wobble_y number
-Bee = nil
+local Bee = nil
 
 ---@class Ammit : Monster
     ---@field walk_pause_timer integer
     ---@field particle ParticleEmitterInfo
-Ammit = nil
+local Ammit = nil
 
 ---@class ApepPart : Monster
     ---@field y_pos number
     ---@field sine_angle number
     ---@field sync_timer integer @or pause timer, used to sync the body parts moving up and down
-ApepPart = nil
+local ApepPart = nil
 
 ---@class ApepHead : ApepPart
     ---@field sound1 SoundMeta
@@ -3101,7 +3102,7 @@ ApepPart = nil
     ---@field tail_uid integer
     ---@field fx_mouthpiece1_uid integer
     ---@field fx_mouthpiece2_uid integer
-ApepHead = nil
+local ApepHead = nil
 
 ---@class OsirisHead : Monster
     ---@field right_hand_uid integer @right from his perspective
@@ -3109,32 +3110,32 @@ ApepHead = nil
     ---@field moving_left boolean
     ---@field targeting_timer integer
     ---@field invincibility_timer integer
-OsirisHead = nil
+local OsirisHead = nil
 
 ---@class OsirisHand : Monster
     ---@field attack_cooldown_timer integer
-OsirisHand = nil
+local OsirisHand = nil
 
 ---@class Alien : Monster
     ---@field jump_timer integer
-Alien = nil
+local Alien = nil
 
 ---@class UFO : Monster
     ---@field sound SoundMeta
     ---@field patrol_distance integer
     ---@field attack_cooldown_timer integer
     ---@field is_falling boolean
-UFO = nil
+local UFO = nil
 
 ---@class Lahamu : Monster
     ---@field sound SoundMeta
     ---@field eyeball Entity
     ---@field attack_cooldown_timer integer
-Lahamu = nil
+local Lahamu = nil
 
 ---@class YetiQueen : Monster
     ---@field walk_pause_timer integer
-YetiQueen = nil
+local YetiQueen = nil
 
 ---@class YetiKing : Monster
     ---@field walk_pause_timer integer
@@ -3142,7 +3143,7 @@ YetiQueen = nil
     ---@field particle_fog ParticleEmitterInfo
     ---@field particle_dust ParticleEmitterInfo
     ---@field particle_sparkles ParticleEmitterInfo
-YetiKing = nil
+local YetiKing = nil
 
 ---@class Lamassu : Monster
     ---@field sound SoundMeta
@@ -3153,7 +3154,7 @@ YetiKing = nil
     ---@field flight_timer integer
     ---@field attack_timer integer
     ---@field attack_angle number
-Lamassu = nil
+local Lamassu = nil
 
 ---@class Olmite : WalkingMonster
     ---@field armor_on boolean
@@ -3162,7 +3163,7 @@ Lamassu = nil
     ---@field on_top_uid integer
     ---@field y_offset number
     ---@field attack_cooldown_timer integer
-Olmite = nil
+local Olmite = nil
 
 ---@class Tiamat : Monster
     ---@field sound SoundMeta @Turning into stone sound
@@ -3176,7 +3177,7 @@ Olmite = nil
     ---@field tail_radian number
     ---@field tail_move_speed number
     ---@field right_arm_angle number
-Tiamat = nil
+local Tiamat = nil
 
 ---@class GiantFrog : Monster
     ---@field door_front_layer Entity
@@ -3187,17 +3188,17 @@ Tiamat = nil
     ---@field invincibility_timer integer
     ---@field mouth_close_timer integer
     ---@field mouth_open_trigger boolean @opens the mouth and starts mouth_close_timer, used when detecting grub in the mouth area
-GiantFrog = nil
+local GiantFrog = nil
 
 ---@class Frog : Monster
     ---@field grub_being_eaten_uid integer
     ---@field jump_timer integer
     ---@field pause boolean
-Frog = nil
+local Frog = nil
 
 ---@class FireFrog : Frog
     ---@field sound SoundMeta
-FireFrog = nil
+local FireFrog = nil
 
 ---@class Grub : Monster
     ---@field rotation_delta number
@@ -3207,12 +3208,12 @@ FireFrog = nil
     ---@field turn_into_fly_timer integer
     ---@field particle ParticleEmitterInfo
     ---@field sound SoundMeta
-Grub = nil
+local Grub = nil
 
 ---@class Tadpole : Monster
     ---@field acceleration_timer integer
     ---@field player_spotted boolean
-Tadpole = nil
+local Tadpole = nil
 
 ---@class GiantFly : Monster
     ---@field head_entity Entity
@@ -3222,7 +3223,7 @@ Tadpole = nil
     ---@field sine_frequency number
     ---@field delta_y_angle number
     ---@field sine_counter integer
-GiantFly = nil
+local GiantFly = nil
 
 ---@class Ghist : Monster
     ---@field body_uid integer
@@ -3230,22 +3231,22 @@ GiantFly = nil
     ---@field sound SoundMeta
     ---@field transparency integer
     ---@field fadeout integer
-Ghist = nil
+local Ghist = nil
 
 ---@class JumpDog : Monster
     ---@field walk_pause_timer integer
     ---@field squish_timer integer
-JumpDog = nil
+local JumpDog = nil
 
 ---@class EggplantMinister : Monster
     ---@field sound SoundMeta
     ---@field walk_pause_timer integer
     ---@field squish_timer integer
-EggplantMinister = nil
+local EggplantMinister = nil
 
 ---@class Yama : Monster
     ---@field message_shown boolean
-Yama = nil
+local Yama = nil
 
 ---@class Hundun : Monster
     ---@field applied_hor_velocity number
@@ -3258,7 +3259,7 @@ Yama = nil
     ---@field birdhead_defeated boolean
     ---@field snakehead_defeated boolean
     ---@field hundun_flags integer @1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs
-Hundun = nil
+local Hundun = nil
 
 ---@class HundunHead : Monster
     ---@field attack_position_x number @Posiotion where the head will move on attack
@@ -3267,7 +3268,7 @@ Hundun = nil
     ---@field targeted_player_uid integer
     ---@field looking_for_target_timer integer @also cooldown before attack
     ---@field invincibility_timer integer
-HundunHead = nil
+local HundunHead = nil
 
 ---@class MegaJellyfish : Monster
     ---@field flipper1 Entity
@@ -3279,12 +3280,12 @@ HundunHead = nil
     ---@field wagging_tail_counter number
     ---@field flipper_distance integer @only applies to door-blocking one
     ---@field velocity_application_timer integer
-MegaJellyfish = nil
+local MegaJellyfish = nil
 
 ---@class Scorpion : Monster
     ---@field walk_pause_timer integer
     ---@field jump_cooldown_timer integer
-Scorpion = nil
+local Scorpion = nil
 
 ---@class Hermitcrab : Monster
     ---@field carried_entity_type ENT_TYPE
@@ -3293,7 +3294,7 @@ Scorpion = nil
     ---@field is_active boolean @whether it is hidden behind the carried block or not, if true you can damage him
     ---@field is_inactive boolean
     ---@field spawn_new_carried_item boolean @defaults to true, when toggled to false, a new carried item spawns
-Hermitcrab = nil
+local Hermitcrab = nil
 
 ---@class Necromancer : WalkingMonster
     ---@field sound SoundMeta
@@ -3301,49 +3302,49 @@ Hermitcrab = nil
     ---@field red_skeleton_spawn_y number
     ---@field resurrection_uid integer
     ---@field resurrection_timer integer
-Necromancer = nil
+local Necromancer = nil
 
 ---@class ProtoShopkeeper : Monster
     ---@field movement_state integer @1: "Headpulse/explosion related, 2: Walking, 3: Headpulse/explosion related, 4: Crawling, 6: Headpulse/explosion related
     ---@field walk_pause_explode_timer integer
     ---@field walking_speed integer @0 = slow, 4 = fast
-ProtoShopkeeper = nil
+local ProtoShopkeeper = nil
 
 ---@class Beg : NPC
     ---@field walk_pause_timer integer
     ---@field disappear_timer integer
-Beg = nil
+local Beg = nil
 
 ---@class Terra : Monster
     ---@field fx_button Entity
     ---@field x_pos number
     ---@field abuse_speechbubble_timer integer
-Terra = nil
+local Terra = nil
 
 ---@class Critter : Monster
     ---@field last_picked_up_by_uid integer
     ---@field holding_state integer
-Critter = nil
+local Critter = nil
 
 ---@class CritterBeetle : Critter
     ---@field pause boolean @used when he's getting eaten
-CritterBeetle = nil
+local CritterBeetle = nil
 
 ---@class CritterCrab : Critter
     ---@field walk_pause_timer integer
     ---@field walking_left boolean
     ---@field unfriendly boolean @moves away from its target instead of towards it
-CritterCrab = nil
+local CritterCrab = nil
 
 ---@class CritterButterfly : Critter
     ---@field change_direction_timer integer
     ---@field vertical_flight_direction integer
-CritterButterfly = nil
+local CritterButterfly = nil
 
 ---@class CritterLocust : Critter
     ---@field sound SoundMeta
     ---@field jump_timer integer
-CritterLocust = nil
+local CritterLocust = nil
 
 ---@class CritterSnail : Critter
     ---@field x_direction number
@@ -3354,17 +3355,17 @@ CritterLocust = nil
     ---@field rotation_center_y number
     ---@field rotation_angle number
     ---@field rotation_speed number
-CritterSnail = nil
+local CritterSnail = nil
 
 ---@class CritterFish : Critter
     ---@field swim_pause_timer integer
     ---@field player_in_proximity boolean
-CritterFish = nil
+local CritterFish = nil
 
 ---@class CritterPenguin : Critter
     ---@field walk_pause_timer integer
     ---@field jump_timer integer
-CritterPenguin = nil
+local CritterPenguin = nil
 
 ---@class CritterFirefly : Critter
     ---@field sine_amplitude number
@@ -3373,7 +3374,7 @@ CritterPenguin = nil
     ---@field change_direction_timer integer
     ---@field sit_timer integer
     ---@field sit_cooldown_timer integer
-CritterFirefly = nil
+local CritterFirefly = nil
 
 ---@class CritterDrone : Critter
     ---@field emitted_light Illumination
@@ -3382,7 +3383,7 @@ CritterFirefly = nil
     ---@field applied_ver_momentum number
     ---@field unfriendly boolean @moves away from its target instead of towards it
     ---@field move_timer integer
-CritterDrone = nil
+local CritterDrone = nil
 
 ---@class CritterSlime : Critter
     ---@field x_direction number
@@ -3394,79 +3395,79 @@ CritterDrone = nil
     ---@field rotation_angle number
     ---@field rotation_speed number
     ---@field walk_pause_timer integer
-CritterSlime = nil
+local CritterSlime = nil
 
 ---@class Bomb : Movable
     ---@field sound SoundMeta
     ---@field scale_hor number @1.25 = default regular bomb, 1.875 = default giant bomb, > 1.25 generates ENT_TYPE_FX_POWEREDEXPLOSION
     ---@field scale_ver number
     ---@field is_big_bomb boolean @is bomb from powerpack
-Bomb = nil
+local Bomb = nil
 
 ---@class Backpack : Movable
     ---@field explosion_trigger boolean @More like on fire trigger, the explosion happens when the timer reaches > 29
     ---@field explosion_timer integer
     ---@field trigger_explosion fun(self): nil
-Backpack = nil
+local Backpack = nil
 
 ---@class Projectile : Movable
-Projectile = nil
+local Projectile = nil
 
 ---@class Purchasable : Movable
-Purchasable = nil
+local Purchasable = nil
 
 ---@class DummyPurchasableEntity : Purchasable
-DummyPurchasableEntity = nil
+local DummyPurchasableEntity = nil
 
 ---@class Bow : Purchasable
     ---@field get_arrow_special_offset fun(self): number
-Bow = nil
+local Bow = nil
 
 ---@class Present : Purchasable
     ---@field inside ENT_TYPE
-Present = nil
+local Present = nil
 
 ---@class Jetpack : Backpack
     ---@field flame_on boolean
     ---@field fuel integer
-Jetpack = nil
+local Jetpack = nil
 
 ---@class TeleporterBackpack : Backpack
     ---@field teleport_number integer
-TeleporterBackpack = nil
+local TeleporterBackpack = nil
 
 ---@class Hoverpack : Backpack
     ---@field sound SoundMeta
     ---@field is_on boolean
-Hoverpack = nil
+local Hoverpack = nil
 
 ---@class Cape : Backpack
     ---@field floating_down boolean
-Cape = nil
+local Cape = nil
 
 ---@class VladsCape : Cape
     ---@field can_double_jump boolean
-VladsCape = nil
+local VladsCape = nil
 
 ---@class Mattock : Purchasable
     ---@field remaining integer
-Mattock = nil
+local Mattock = nil
 
 ---@class Gun : Purchasable
     ---@field cooldown integer
     ---@field shots integer @used only for webgun
     ---@field shots2 integer @used only for clonegun
     ---@field in_chamber integer @Only for webgun, uid of the webshot entity
-Gun = nil
+local Gun = nil
 
 ---@class Flame : Movable
     ---@field sound SoundMeta
     ---@field emitted_light Illumination
-Flame = nil
+local Flame = nil
 
 ---@class FlameSize : Flame
     ---@field flame_size number @if changed, gradually goes down (0.03 per frame) to the default size
-FlameSize = nil
+local FlameSize = nil
 
 ---@class ClimbableRope : Movable
     ---@field segment_nr_inverse integer
@@ -3474,35 +3475,35 @@ FlameSize = nil
     ---@field above_part Entity
     ---@field below_part Entity
     ---@field segment_nr integer
-ClimbableRope = nil
+local ClimbableRope = nil
 
 ---@class Idol : Movable
     ---@field trap_triggered boolean @if you set it to true for the ice caves or volcano idol, the trap won't trigger
     ---@field touch integer @changes to 0 when first picked up by player and back to -1 if HH picks it up
     ---@field spawn_x number
     ---@field spawn_y number
-Idol = nil
+local Idol = nil
 
 ---@class Spear : Movable
     ---@field sound_id integer
-Spear = nil
+local Spear = nil
 
 ---@class JungleSpearCosmetic : Movable
     ---@field move_x number
     ---@field move_y number
-JungleSpearCosmetic = nil
+local JungleSpearCosmetic = nil
 
 ---@class WebShot : Projectile
     ---@field shot boolean @if false, it's attached to the gun
-WebShot = nil
+local WebShot = nil
 
 ---@class HangStrand : Movable
     ---@field start_pos_y number
-HangStrand = nil
+local HangStrand = nil
 
 ---@class HangAnchor : Movable
     ---@field spider_uid integer
-HangAnchor = nil
+local HangAnchor = nil
 
 ---@class Arrow : Purchasable
     ---@field flame_uid integer
@@ -3511,34 +3512,34 @@ HangAnchor = nil
     ---@field shot_from_trap boolean
     ---@field poison_arrow fun(self, poisoned: boolean): nil
     ---@field light_up fun(self, lit: boolean): nil
-Arrow = nil
+local Arrow = nil
 
 ---@class LightArrow : Arrow
     ---@field emitted_light Illumination
-LightArrow = nil
+local LightArrow = nil
 
 ---@class LightShot : Projectile
     ---@field emitted_light Illumination
-LightShot = nil
+local LightShot = nil
 
 ---@class LightEmitter : Movable
     ---@field emitted_light Illumination
-LightEmitter = nil
+local LightEmitter = nil
 
 ---@class ScepterShot : LightEmitter
     ---@field sound SoundMeta
     ---@field speed number
     ---@field idle_timer integer @short timer before it goes after target
-ScepterShot = nil
+local ScepterShot = nil
 
 ---@class SpecialShot : LightEmitter
     ---@field target_x number
     ---@field target_y number
-SpecialShot = nil
+local SpecialShot = nil
 
 ---@class SoundShot : LightShot
     ---@field sound SoundMeta
-SoundShot = nil
+local SoundShot = nil
 
 ---@class Spark : Flame
     ---@field particle ParticleEmitterInfo
@@ -3552,33 +3553,33 @@ SoundShot = nil
     ---@field size_change_timer integer @very short timer before next size change, giving a pulsing effect
     ---@field speed number @This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     ---@field distance number @This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
-Spark = nil
+local Spark = nil
 
 ---@class TiamatShot : LightEmitter
     ---@field sound SoundMeta
-TiamatShot = nil
+local TiamatShot = nil
 
 ---@class Fireball : SoundShot
     ---@field particle ParticleEmitterInfo
-Fireball = nil
+local Fireball = nil
 
 ---@class Leaf : Movable
     ---@field fade_away_counter number @counts to 100.0 then the leaf fades away
     ---@field swing_direction integer
     ---@field fade_away_trigger boolean
-Leaf = nil
+local Leaf = nil
 
 ---@class AcidBubble : Movable
     ---@field speed_x number
     ---@field speed_y number
     ---@field float_counter number
-AcidBubble = nil
+local AcidBubble = nil
 
 ---@class Claw : Movable
     ---@field crabman_uid integer
     ---@field spawn_x number
     ---@field spawn_y number
-Claw = nil
+local Claw = nil
 
 ---@class StretchChain : Movable
     ---@field at_end_of_chain_uid integer
@@ -3586,20 +3587,20 @@ Claw = nil
     ---@field position_in_chain integer
     ---@field inverse_doubled_position_in_chain integer
     ---@field is_dot_hidden boolean
-StretchChain = nil
+local StretchChain = nil
 
 ---@class Chest : Movable
     ---@field leprechaun boolean
     ---@field bomb boolean @size of the bomb is random, if set both true only leprechaun spawns
-Chest = nil
+local Chest = nil
 
 ---@class Treasure : Movable
     ---@field cashed boolean @spawns a dust effect and adds money for the total
-Treasure = nil
+local Treasure = nil
 
 ---@class HundunChest : Treasure
     ---@field timer integer
-HundunChest = nil
+local HundunChest = nil
 
 ---@class Boombox : Movable
     ---@field fx_button Entity
@@ -3610,107 +3611,107 @@ HundunChest = nil
     ---@field station_change_delay integer
     ---@field jump_timer integer
     ---@field jump_state integer
-Boombox = nil
+local Boombox = nil
 
 ---@class TV : Movable
     ---@field sound SoundMeta
     ---@field fx_button Entity
     ---@field emitted_light Illumination
     ---@field station integer
-TV = nil
+local TV = nil
 
 ---@class Telescope : Movable
     ---@field fx_button Entity
     ---@field camera_anchor Entity
     ---@field looked_through_by_uid integer
-Telescope = nil
+local Telescope = nil
 
 ---@class Torch : Movable
     ---@field flame_uid integer
     ---@field is_lit boolean @It's used just to check, to light/extinguish use `light_up` function
     ---@field light_up fun(self, lit: boolean): nil
     ---@field get_flame_type fun(self): ENT_TYPE
-Torch = nil
+local Torch = nil
 
 ---@class WallTorch : Torch
     ---@field dropped_gold boolean @if false, it will drop gold when light up
-WallTorch = nil
+local WallTorch = nil
 
 ---@class TorchFlame : Flame
     ---@field smoke_particle ParticleEmitterInfo
     ---@field flame_particle ParticleEmitterInfo
     ---@field warp_particle ParticleEmitterInfo
     ---@field flame_size number
-TorchFlame = nil
+local TorchFlame = nil
 
 ---@class LampFlame : Flame
     ---@field flame_particle ParticleEmitterInfo
-LampFlame = nil
+local LampFlame = nil
 
 ---@class Bullet : Projectile
-Bullet = nil
+local Bullet = nil
 
 ---@class TimedShot : LightShot
     ---@field timer integer
-TimedShot = nil
+local TimedShot = nil
 
 ---@class CloneGunShot : LightShot
     ---@field timer integer
     ---@field spawn_y number
-CloneGunShot = nil
+local CloneGunShot = nil
 
 ---@class PunishBall : Movable
     ---@field attached_to_uid integer
     ---@field timer integer @counts down from 20 while the ball is eligible to break a floor and tries to break it at 0
     ---@field x_pos number
     ---@field y_pos number
-PunishBall = nil
+local PunishBall = nil
 
 ---@class Chain : Movable
     ---@field attached_to_uid integer
     ---@field timer integer
-Chain = nil
+local Chain = nil
 
 ---@class Container : Movable
     ---@field inside ENT_TYPE
-Container = nil
+local Container = nil
 
 ---@class Coffin : Movable
     ---@field inside ENT_TYPE
     ---@field timer integer
     ---@field player_respawn boolean
-Coffin = nil
+local Coffin = nil
 
 ---@class Fly : Movable
     ---@field timer integer
-Fly = nil
+local Fly = nil
 
 ---@class OlmecCannon : Movable
     ---@field timer integer
     ---@field bombs_left integer
-OlmecCannon = nil
+local OlmecCannon = nil
 
 ---@class Landmine : LightEmitter
     ---@field timer integer @explodes at 57, if you set it to 58 will count to overflow
-Landmine = nil
+local Landmine = nil
 
 ---@class UdjatSocket : Movable
     ---@field fx_button Entity
-UdjatSocket = nil
+local UdjatSocket = nil
 
 ---@class Ushabti : Movable
     ---@field wiggle_timer integer
     ---@field shine_timer integer
-Ushabti = nil
+local Ushabti = nil
 
 ---@class Honey : Movable
     ---@field wiggle_timer integer
-Honey = nil
+local Honey = nil
 
 ---@class GiantClamTop : Movable
     ---@field close_timer integer
     ---@field open_timer integer
-GiantClamTop = nil
+local GiantClamTop = nil
 
 ---@class PlayerGhost : LightEmitter
     ---@field sparkles_particle ParticleEmitterInfo
@@ -3720,21 +3721,21 @@ GiantClamTop = nil
     ---@field body_uid integer @Is not set to -1 when crushed
     ---@field shake_timer integer
     ---@field boost_timer integer
-PlayerGhost = nil
+local PlayerGhost = nil
 
 ---@class GhostBreath : Projectile
     ---@field timer integer
     ---@field big_cloud boolean
-GhostBreath = nil
+local GhostBreath = nil
 
 ---@class LaserBeam : Movable
     ---@field sparks ParticleEmitterInfo
     ---@field emitted_light Illumination
-LaserBeam = nil
+local LaserBeam = nil
 
 ---@class TreasureHook : Movable
     ---@field sound SoundMeta
-TreasureHook = nil
+local TreasureHook = nil
 
 ---@class AxolotlShot : Projectile
     ---@field trapped_uid integer
@@ -3742,11 +3743,11 @@ TreasureHook = nil
     ---@field swing number
     ---@field swing_periodicity number
     ---@field distance_after_capture number
-AxolotlShot = nil
+local AxolotlShot = nil
 
 ---@class TrapPart : Movable
     ---@field ceiling Entity
-TrapPart = nil
+local TrapPart = nil
 
 ---@class SkullDropTrap : Movable
     ---@field sound SoundMeta
@@ -3757,32 +3758,32 @@ TrapPart = nil
     ---@field middle_skull_drop_time integer
     ---@field right_skull_drop_time integer
     ---@field timer integer @counts from 60 to 0, 3 times, the last time dropping the skulls, then random longer timer for reset
-SkullDropTrap = nil
+local SkullDropTrap = nil
 
 ---@class FrozenLiquid : Movable
-FrozenLiquid = nil
+local FrozenLiquid = nil
 
 ---@class Switch : Movable
     ---@field timer integer
-Switch = nil
+local Switch = nil
 
 ---@class FlyHead : Movable
     ---@field vored_entity_uid integer
-FlyHead = nil
+local FlyHead = nil
 
 ---@class SnapTrap : Movable
     ---@field bait_uid integer
     ---@field reload_timer integer
-SnapTrap = nil
+local SnapTrap = nil
 
 ---@class EmpressGrave : Movable
     ---@field fx_button Entity
     ---@field ghost Entity
-EmpressGrave = nil
+local EmpressGrave = nil
 
 ---@class Tentacle : Chain
     ---@field bottom Entity
-Tentacle = nil
+local Tentacle = nil
 
 ---@class MiniGameShip : Movable
     ---@field sound SoundMeta
@@ -3790,7 +3791,7 @@ Tentacle = nil
     ---@field velocity_y number
     ---@field swing number
     ---@field up_down_normal number @0.0 - down, 1.0 - up, 0.5 - idle
-MiniGameShip = nil
+local MiniGameShip = nil
 
 ---@class OlmecShip : Movable
     ---@field sound SoundMeta
@@ -3798,21 +3799,21 @@ MiniGameShip = nil
     ---@field smoke ParticleEmitterInfo
     ---@field flight_time integer
     ---@field has_spawned_jetflames boolean
-OlmecShip = nil
+local OlmecShip = nil
 
 ---@class MiniGameAsteroid : Movable
     ---@field spin_speed number
-MiniGameAsteroid = nil
+local MiniGameAsteroid = nil
 
 ---@class Pot : Purchasable
     ---@field inside ENT_TYPE
     ---@field dont_transfer_dmg boolean
-Pot = nil
+local Pot = nil
 
 ---@class CursedPot : Movable
     ---@field smoke ParticleEmitterInfo
     ---@field smoke2 ParticleEmitterInfo
-CursedPot = nil
+local CursedPot = nil
 
 ---@class CookFire : Torch
     ---@field emitted_light Illumination
@@ -3820,39 +3821,39 @@ CursedPot = nil
     ---@field particles_flames ParticleEmitterInfo
     ---@field particles_warp ParticleEmitterInfo
     ---@field sound SoundMeta
-CookFire = nil
+local CookFire = nil
 
 ---@class Orb : Movable
     ---@field sound SoundMeta
     ---@field timer integer
-Orb = nil
+local Orb = nil
 
 ---@class EggSac : Movable
     ---@field timer integer
-EggSac = nil
+local EggSac = nil
 
 ---@class Goldbar : Movable
-Goldbar = nil
+local Goldbar = nil
 
 ---@class Coin : Movable
     ---@field nominal_price integer
-Coin = nil
+local Coin = nil
 
 ---@class RollingItem : Purchasable
     ---@field roll_speed number
-RollingItem = nil
+local RollingItem = nil
 
 ---@class PlayerBag : Movable
     ---@field bombs integer
     ---@field ropes integer
-PlayerBag = nil
+local PlayerBag = nil
 
 ---@class Powerup : Movable
-Powerup = nil
+local Powerup = nil
 
 ---@class KapalaPowerup : Powerup
     ---@field amount_of_blood integer
-KapalaPowerup = nil
+local KapalaPowerup = nil
 
 ---@class ParachutePowerup : Powerup
     ---@field falltime_deploy integer @this gets compared with entity's falling_timer
@@ -3860,11 +3861,11 @@ KapalaPowerup = nil
     ---@field deploy fun(self): nil
     ---@field gold_timer integer @Timer for spawning a single gold nugget.
     ---@field gold_spawning_time integer @Time until gold nuggets stop spawning.
-ParachutePowerup = nil
+local ParachutePowerup = nil
 
 ---@class TrueCrownPowerup : Powerup
     ---@field timer integer
-TrueCrownPowerup = nil
+local TrueCrownPowerup = nil
 
 ---@class AnkhPowerup : Powerup
     ---@field sound SoundMeta
@@ -3874,15 +3875,15 @@ TrueCrownPowerup = nil
     ---@field timer2 integer
     ---@field timer3 integer
     ---@field music_on_off boolean
-AnkhPowerup = nil
+local AnkhPowerup = nil
 
 ---@class YellowCape : Cape
     ---@field sound SoundMeta
-YellowCape = nil
+local YellowCape = nil
 
 ---@class Teleporter : Purchasable
     ---@field teleport_number integer
-Teleporter = nil
+local Teleporter = nil
 
 ---@class Boomerang : Purchasable
     ---@field sound SoundMeta
@@ -3890,48 +3891,48 @@ Teleporter = nil
     ---@field distance number
     ---@field rotation number
     ---@field returns_to_uid integer
-Boomerang = nil
+local Boomerang = nil
 
 ---@class Excalibur : Movable
     ---@field in_stone boolean
-Excalibur = nil
+local Excalibur = nil
 
 ---@class Shield : Purchasable
     ---@field shake number
-Shield = nil
+local Shield = nil
 
 ---@class PrizeDispenser : Movable
     ---@field item_ids integer[] @size: 6 @Id's of the items (not types), by default 0-24, look at [change_diceshop_prizes](#change_diceshop_prizes) for the list of default prizes<br/>so for example: id 0 equals ITEM_PICKUP_BOMBBAG, id 1 equals ITEM_PICKUP_BOMBBOX etc. Game generates 6 but uses max 5 for Tusk dice shop
     ---@field prizes_spawned integer
-PrizeDispenser = nil
+local PrizeDispenser = nil
 
 ---@class Web : Movable
     ---@field decay_rate number @Is subtracted from the color alpha every frame after the `stand_counter` is more than 300.<br/>Entity automatically dies when the alpha is less than 0.1
-Web = nil
+local Web = nil
 
 ---@class LiquidSurface : Movable
     ---@field glow_radius number
     ---@field sine_pos number
     ---@field sine_pos_increment number
-LiquidSurface = nil
+local LiquidSurface = nil
 
 ---@class OlmecFloater : Movable
     ---@field both_floaters_intact boolean
     ---@field on_breaking boolean
-OlmecFloater = nil
+local OlmecFloater = nil
 
 ---@class EggshipCenterJetFlame : Movable
     ---@field sound SoundMeta
     ---@field emitted_light Illumination
     ---@field particle ParticleEmitterInfo
     ---@field smoke_on boolean
-EggshipCenterJetFlame = nil
+local EggshipCenterJetFlame = nil
 
 ---@class MiniGameShipOffset : Movable
     ---@field offset_x number
     ---@field offset_y number
     ---@field normal_y_offset number @Is added to offset_y
-MiniGameShipOffset = nil
+local MiniGameShipOffset = nil
 
 ---@class Button : Movable
     ---@field button_sprite integer @Only one can be set:<br/>1 - pad: A, key: Z<br/>2 - pad: X, key: X<br/>4 - pad: B, key: C<br/>8 - pad: Y, key: D<br/>16 - pad: LB, key: L Shift<br/>32 - pad: RB, key: A<br/>64 - pad: menu?, key: (none)<br/>128 - pad: copy?, key: Tab
@@ -3939,49 +3940,49 @@ MiniGameShipOffset = nil
     ---@field is_visible boolean @It's false for selldialog used in shops
     ---@field player_trigger boolean @It's set true even if player does not see the button, like the drill or COG door
     ---@field seen integer @<br/>-1 - hasn't been seen<br/>0 - last seen by player 1<br/>1 - last seen by player 2<br/>2 - last seen by player 3<br/>3 - last seen by player 4
-Button = nil
+local Button = nil
 
 ---@class FxTornJournalPage : Movable
     ---@field page_number integer @Only in tutorial
-FxTornJournalPage = nil
+local FxTornJournalPage = nil
 
 ---@class FxMainExitDoor : Movable
     ---@field emitted_light Illumination
     ---@field timer integer @When breaking open in tutorial
-FxMainExitDoor = nil
+local FxMainExitDoor = nil
 
 ---@class Birdies : Movable
-Birdies = nil
+local Birdies = nil
 
 ---@class Explosion : Movable
     ---@field emitted_light Illumination
-Explosion = nil
+local Explosion = nil
 
 ---@class FxOuroboroOccluder : Movable
-FxOuroboroOccluder = nil
+local FxOuroboroOccluder = nil
 
 ---@class FxOuroboroDragonPart : Movable
     ---@field speed number
     ---@field timer integer
     ---@field particle ParticleEmitterInfo
-FxOuroboroDragonPart = nil
+local FxOuroboroDragonPart = nil
 
 ---@class Rubble : Movable
-Rubble = nil
+local Rubble = nil
 
 ---@class FxCompass : Movable
     ---@field sine_angle number @Counts form 0 to 2pi, responsible for moving back and forth
     ---@field visibility number
     ---@field is_active boolean @Player has compass
-FxCompass = nil
+local FxCompass = nil
 
 ---@class SleepBubble : Movable
     ---@field show_hide_timer integer
-SleepBubble = nil
+local SleepBubble = nil
 
 ---@class MovingIcon : Movable
     ---@field movement_timer integer @Used to move it up and down in sync with others
-MovingIcon = nil
+local MovingIcon = nil
 
 ---@class FxSaleContainer : Movable
     ---@field fx_value Entity
@@ -3990,117 +3991,117 @@ MovingIcon = nil
     ---@field shake_amplitude number @For effect when you don't have enough money
     ---@field sound_trigger boolean @Also sound_played, keeps re-triggering from time to time
     ---@field pop_in_out_procentage integer
-FxSaleContainer = nil
+local FxSaleContainer = nil
 
 ---@class FxPickupEffect : Movable
     ---@field spawn_y number
     ---@field visibility number
-FxPickupEffect = nil
+local FxPickupEffect = nil
 
 ---@class FxShotgunBlast : Movable
     ---@field illumination Illumination
-FxShotgunBlast = nil
+local FxShotgunBlast = nil
 
 ---@class FxJetpackFlame : Movable
     ---@field particle_smoke ParticleEmitterInfo
     ---@field particle_flame ParticleEmitterInfo
     ---@field sound SoundMeta
     ---@field illumination Illumination
-FxJetpackFlame = nil
+local FxJetpackFlame = nil
 
 ---@class FxPlayerIndicator : Movable
     ---@field attached_to integer
     ---@field pos_x number
     ---@field pos_y number
-FxPlayerIndicator = nil
+local FxPlayerIndicator = nil
 
 ---@class FxSpringtrapRing : Movable
     ---@field timer integer
     ---@field illumination Illumination
-FxSpringtrapRing = nil
+local FxSpringtrapRing = nil
 
 ---@class FxWitchdoctorHint : Movable
-FxWitchdoctorHint = nil
+local FxWitchdoctorHint = nil
 
 ---@class FxNecromancerANKH : Movable
-FxNecromancerANKH = nil
+local FxNecromancerANKH = nil
 
 ---@class FxWebbedEffect : Movable
     ---@field visible boolean
-FxWebbedEffect = nil
+local FxWebbedEffect = nil
 
 ---@class FxUnderwaterBubble : Movable
     ---@field bubble_source_uid integer
     ---@field direction integer @1 / -1
     ---@field pop boolean @Setting it true makes it disappear/fade away
     ---@field inverted boolean
-FxUnderwaterBubble = nil
+local FxUnderwaterBubble = nil
 
 ---@class FxWaterDrop : Movable
     ---@field inverted boolean
     ---@field droplet_source_uid integer
-FxWaterDrop = nil
+local FxWaterDrop = nil
 
 ---@class FxKinguSliding : Movable
     ---@field particle ParticleEmitterInfo
-FxKinguSliding = nil
+local FxKinguSliding = nil
 
 ---@class FxAlienBlast : Movable
-FxAlienBlast = nil
+local FxAlienBlast = nil
 
 ---@class FxSparkSmall : Movable
     ---@field timer integer
-FxSparkSmall = nil
+local FxSparkSmall = nil
 
 ---@class FxTiamatHead : Movable
     ---@field timer integer
-FxTiamatHead = nil
+local FxTiamatHead = nil
 
 ---@class FxTiamatTorso : Movable
     ---@field timer integer
     ---@field torso_target_size number @Slowly increases/decreases to the given value
-FxTiamatTorso = nil
+local FxTiamatTorso = nil
 
 ---@class FxTiamatTail : Movable
     ---@field angle_two number @Added _two just to not shadow angle in entity, it's angle but the pivot point is at the edge
     ---@field x_pos number
     ---@field y_pos number
-FxTiamatTail = nil
+local FxTiamatTail = nil
 
 ---@class FxVatBubble : Movable
     ---@field max_y number
-FxVatBubble = nil
+local FxVatBubble = nil
 
 ---@class FxHundunNeckPiece : Movable
     ---@field kill_timer integer @Short timer after the head is dead
-FxHundunNeckPiece = nil
+local FxHundunNeckPiece = nil
 
 ---@class FxJellyfishStar : Movable
     ---@field rotation_angle number
     ---@field radius number
     ---@field speed number
-FxJellyfishStar = nil
+local FxJellyfishStar = nil
 
 ---@class FxQuickSand : Movable
-FxQuickSand = nil
+local FxQuickSand = nil
 
 ---@class FxSorceressAttack : Movable
     ---@field size number
-FxSorceressAttack = nil
+local FxSorceressAttack = nil
 
 ---@class FxLamassuAttack : Movable
     ---@field attack_angle number
-FxLamassuAttack = nil
+local FxLamassuAttack = nil
 
 ---@class FxFireflyLight : Movable
     ---@field illumination Illumination
     ---@field light_timer integer
     ---@field cooldown_timer integer @Timer between light flashes
-FxFireflyLight = nil
+local FxFireflyLight = nil
 
 ---@class FxEmpress : Movable
     ---@field sine_angle number
-FxEmpress = nil
+local FxEmpress = nil
 
 ---@class FxAnkhRotatingSpark : Movable
     ---@field radius number
@@ -4108,45 +4109,45 @@ FxEmpress = nil
     ---@field speed number @0 - 1.0
     ---@field sine_angle number
     ---@field size number
-FxAnkhRotatingSpark = nil
+local FxAnkhRotatingSpark = nil
 
 ---@class FxAnkhBrokenPiece : Movable
-FxAnkhBrokenPiece = nil
+local FxAnkhBrokenPiece = nil
 
 ---@class MegaJellyfishEye : Movable
     ---@field timer integer
-MegaJellyfishEye = nil
+local MegaJellyfishEye = nil
 
 ---@class Liquid : Entity
     ---@field fx_surface Entity
     ---@field get_liquid_flags fun(self): integer
     ---@field set_liquid_flags fun(self, flags: integer): nil
-Liquid = nil
+local Liquid = nil
 
 ---@class Lava : Liquid
     ---@field emitted_light Illumination
-Lava = nil
+local Lava = nil
 
 ---@class BGBackLayerDoor : Entity
     ---@field illumination1 Illumination
     ---@field illumination2 Illumination
-BGBackLayerDoor = nil
+local BGBackLayerDoor = nil
 
 ---@class BGSurfaceStar : Entity
     ---@field blink_timer integer
     ---@field relative_x number
     ---@field relative_y number
-BGSurfaceStar = nil
+local BGSurfaceStar = nil
 
 ---@class BGRelativeElement : Entity
     ---@field relative_x number
     ---@field relative_y number
-BGRelativeElement = nil
+local BGRelativeElement = nil
 
 ---@class BGSurfaceLayer : BGRelativeElement
     ---@field relative_offset_x number
     ---@field relative_offset_y number
-BGSurfaceLayer = nil
+local BGSurfaceLayer = nil
 
 ---@class BGEggshipRoom : Entity
     ---@field sound SoundMeta
@@ -4156,15 +4157,15 @@ BGSurfaceLayer = nil
     ---@field platform_middle Entity
     ---@field platform_right Entity
     ---@field player_in boolean
-BGEggshipRoom = nil
+local BGEggshipRoom = nil
 
 ---@class BGMovingStar : BGSurfaceStar
     ---@field falling_speed number @Can make it rise if set to negative
-BGMovingStar = nil
+local BGMovingStar = nil
 
 ---@class BGTutorialSign : Entity
     ---@field is_shown boolean
-BGTutorialSign = nil
+local BGTutorialSign = nil
 
 ---@class BGShootingStar : BGRelativeElement
     ---@field x_increment number
@@ -4172,17 +4173,17 @@ BGTutorialSign = nil
     ---@field timer integer
     ---@field max_timer integer
     ---@field size number @Gets smaller as the timer gets close to the max_timer
-BGShootingStar = nil
+local BGShootingStar = nil
 
 ---@class BGShopEntrence : Entity
     ---@field on_entering boolean
-BGShopEntrence = nil
+local BGShopEntrence = nil
 
 ---@class BGFloatingDebris : BGSurfaceLayer
     ---@field distance number @Distance it travels up and down from spawn position
     ---@field speed number
     ---@field sine_angle number
-BGFloatingDebris = nil
+local BGFloatingDebris = nil
 
 ---@class BGShopKeeperPrime : Entity
     ---@field normal_y number
@@ -4190,25 +4191,25 @@ BGFloatingDebris = nil
     ---@field bubbles_timer integer
     ---@field bubble_spawn_trigger boolean
     ---@field bubble_spawn_delay integer
-BGShopKeeperPrime = nil
+local BGShopKeeperPrime = nil
 
 ---@class CrossBeam : Entity
     ---@field attached_to_side_uid integer
     ---@field attached_to_top_uid integer
-CrossBeam = nil
+local CrossBeam = nil
 
 ---@class DestructibleBG : Entity
-DestructibleBG = nil
+local DestructibleBG = nil
 
 ---@class PalaceSign : Entity
     ---@field sound SoundMeta @The neon buzz sound
     ---@field illumination Illumination
     ---@field arrow_illumination Illumination
     ---@field arrow_change_timer integer
-PalaceSign = nil
+local PalaceSign = nil
 
 ---@class DecoRegeneratingBlock : Entity
-DecoRegeneratingBlock = nil
+local DecoRegeneratingBlock = nil
 
 ---@class Portal : Entity
     ---@field emitted_light Illumination
@@ -4217,159 +4218,159 @@ DecoRegeneratingBlock = nil
     ---@field world integer
     ---@field theme integer
     ---@field timer integer
-Portal = nil
+local Portal = nil
 
 ---@class ShootingStarSpawner : Entity
     ---@field timer integer
-ShootingStarSpawner = nil
+local ShootingStarSpawner = nil
 
 ---@class LogicalDoor : Entity
     ---@field door_type ENT_TYPE
     ---@field platform_type ENT_TYPE
     ---@field visible boolean
     ---@field platform_spawned boolean @Is set true when you bomb the door, no matter what door, can't be reset
-LogicalDoor = nil
+local LogicalDoor = nil
 
 ---@class LogicalSound : Entity
     ---@field sound SoundMeta
-LogicalSound = nil
+local LogicalSound = nil
 
 ---@class LogicalStaticSound : LogicalSound
-LogicalStaticSound = nil
+local LogicalStaticSound = nil
 
 ---@class LogicalLiquidStreamSound : LogicalStaticSound
-LogicalLiquidStreamSound = nil
+local LogicalLiquidStreamSound = nil
 
 ---@class LogicalTrapTrigger : Entity
     ---@field min_empty_distance integer @Used in BigSpearTrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles
     ---@field trigger_distance integer @Value in tiles
     ---@field vertical boolean
-LogicalTrapTrigger = nil
+local LogicalTrapTrigger = nil
 
 ---@class JungleTrapTrigger : LogicalTrapTrigger
-JungleTrapTrigger = nil
+local JungleTrapTrigger = nil
 
 ---@class WetEffect : Entity
     ---@field particle ParticleEmitterInfo
-WetEffect = nil
+local WetEffect = nil
 
 ---@class OnFireEffect : Entity
     ---@field particle_smoke ParticleEmitterInfo
     ---@field particle_flame ParticleEmitterInfo
     ---@field illumination Illumination
-OnFireEffect = nil
+local OnFireEffect = nil
 
 ---@class PoisonedEffect : Entity
     ---@field particle_burst ParticleEmitterInfo
     ---@field particle_base ParticleEmitterInfo
     ---@field burst_timer integer
     ---@field burst_active boolean @If forced to false, it will not play the sound or spawn burst particles
-PoisonedEffect = nil
+local PoisonedEffect = nil
 
 ---@class CursedEffect : Entity
     ---@field particle ParticleEmitterInfo
     ---@field sound SoundMeta
-CursedEffect = nil
+local CursedEffect = nil
 
 ---@class OuroboroCameraAnchor : Entity
     ---@field target_x number
     ---@field target_y number
     ---@field velocity_x number
     ---@field velocity_y number
-OuroboroCameraAnchor = nil
+local OuroboroCameraAnchor = nil
 
 ---@class OuroboroCameraZoomin : Entity
     ---@field zoomin_level number @Can be set to negative, seams to trigger the warp at some value
-OuroboroCameraZoomin = nil
+local OuroboroCameraZoomin = nil
 
 ---@class CinematicAnchor : Entity
     ---@field blackbar_top Entity
     ---@field blackbar_bottom Entity
     ---@field roll_in number @0.0 to 1.0
-CinematicAnchor = nil
+local CinematicAnchor = nil
 
 ---@class BurningRopeEffect : Entity
     ---@field illumination Illumination
     ---@field sound SoundMeta
-BurningRopeEffect = nil
+local BurningRopeEffect = nil
 
 ---@class DustWallApep : Entity
     ---@field particle ParticleEmitterInfo
-DustWallApep = nil
+local DustWallApep = nil
 
 ---@class CameraFlash : Entity
     ---@field illumination1 Illumination
     ---@field illumination2 Illumination
     ---@field timer integer
-CameraFlash = nil
+local CameraFlash = nil
 
 ---@class RoomLight : Entity
     ---@field illumination Illumination
-RoomLight = nil
+local RoomLight = nil
 
 ---@class LimbAnchor : Entity
     ---@field move_timer integer
     ---@field flip_vertical boolean
-LimbAnchor = nil
+local LimbAnchor = nil
 
 ---@class LogicalConveyorbeltSound : LogicalSound
-LogicalConveyorbeltSound = nil
+local LogicalConveyorbeltSound = nil
 
 ---@class LogicalAnchovyFlock : Entity
     ---@field current_speed number @Increases until max_speed reached
     ---@field max_speed number
     ---@field timer integer
-LogicalAnchovyFlock = nil
+local LogicalAnchovyFlock = nil
 
 ---@class MummyFliesSound : LogicalSound
     ---@field mummy_uid integer
     ---@field flies integer @Numbers of flies spawned
-MummyFliesSound = nil
+local MummyFliesSound = nil
 
 ---@class QuickSandSound : LogicalSound
-QuickSandSound = nil
+local QuickSandSound = nil
 
 ---@class IceSlidingSound : LogicalSound
-IceSlidingSound = nil
+local IceSlidingSound = nil
 
 ---@class FrostBreathEffect : Entity
     ---@field timer integer
-FrostBreathEffect = nil
+local FrostBreathEffect = nil
 
 ---@class BoulderSpawner : Entity
     ---@field timer integer @Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
     ---@field sound SoundMeta
-BoulderSpawner = nil
+local BoulderSpawner = nil
 
 ---@class PipeTravelerSound : LogicalSound
     ---@field enter_exit boolean
-PipeTravelerSound = nil
+local PipeTravelerSound = nil
 
 ---@class LogicalDrain : Entity
     ---@field timer integer @Little delay between pulling blob of liquid thru
-LogicalDrain = nil
+local LogicalDrain = nil
 
 ---@class LogicalRegeneratingBlock : Entity
     ---@field timer integer
-LogicalRegeneratingBlock = nil
+local LogicalRegeneratingBlock = nil
 
 ---@class SplashBubbleGenerator : Entity
     ---@field timer integer
-SplashBubbleGenerator = nil
+local SplashBubbleGenerator = nil
 
 ---@class EggplantThrower : Entity
-EggplantThrower = nil
+local EggplantThrower = nil
 
 ---@class LogicalMiniGame : Entity
     ---@field timer integer @Delay between spwning ufo
-LogicalMiniGame = nil
+local LogicalMiniGame = nil
 
 ---@class DMSpawning : Entity
     ---@field spawn_x number
     ---@field spawn_y number
     ---@field sine_pos number
     ---@field timer integer
-DMSpawning = nil
+local DMSpawning = nil
 
 ---@class DMAlienBlast : Entity
     ---@field owner_uid integer
@@ -4377,10 +4378,10 @@ DMSpawning = nil
     ---@field sound SoundMeta
     ---@field reticule_internal Entity
     ---@field reticule_external Entity
-DMAlienBlast = nil
+local DMAlienBlast = nil
 
 ---@class MovableBehavior
-MovableBehavior = nil
+local MovableBehavior = nil
 ---@return integer
 function MovableBehavior:get_state_id() end
 ---Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's
@@ -4389,7 +4390,7 @@ function MovableBehavior:get_state_id() end
 function MovableBehavior:get_state_id() end
 
 ---@class VanillaMovableBehavior : MovableBehavior
-VanillaMovableBehavior = nil
+local VanillaMovableBehavior = nil
 
 ---@class CustomMovableBehavior : MovableBehavior
     ---@field base_behavior VanillaMovableBehavior
@@ -4399,7 +4400,7 @@ VanillaMovableBehavior = nil
     ---@field set_update_logic fun(self, update_logic: fun(movable: Movable, base_fun: function): nil): nil @Set the `update_logic` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_logic` is already set it will be overridden. The signature<br/>of the function is `nil update_logic(Movable movable, function base_fun))`, use it to change the color, texture,<br/>some timers, etc. of the movable. If no base behavior is set `base_fun` will be `nil`.
     ---@field set_update_world fun(self, update_world: fun(movable: Movable, base_fun: function): nil): nil @Set the `update_world` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `update_world` is already set it will be overridden. The signature<br/>of the function is `nil update_world(Movable movable, function base_fun))`, use this to update the move, velocity,<br/>current_animation, etc. of the movable, then call `mov:generic_update_world` to update the movable. If no<br/>base behavior is set `base_fun` will be `nil`.
     ---@field set_get_next_state_id fun(self, get_next_state_id: fun(movable: Movable, base_fun: function): integer): nil @Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature<br/>of the function is `int get_next_state_id(Movable movable, function base_fun))`, use this to move to another state, return `nil`.<br/>or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
-CustomMovableBehavior = nil
+local CustomMovableBehavior = nil
 
 ---@class ParticleDB
     ---@field id integer
@@ -4432,7 +4433,7 @@ CustomMovableBehavior = nil
     ---@field invisible boolean
     ---@field get_texture fun(self): integer
     ---@field set_texture fun(self, texture_id: integer): boolean
-ParticleDB = nil
+local ParticleDB = nil
 
 ---@class ParticleEmitterInfo
     ---@field particle_type ParticleDB
@@ -4445,7 +4446,7 @@ ParticleDB = nil
     ---@field offset_y number
     ---@field emitted_particles Particle[]
     ---@field emitted_particles_back_layer Particle[]
-ParticleEmitterInfo = nil
+local ParticleEmitterInfo = nil
 
 ---@class Particle
     ---@field x number
@@ -4457,7 +4458,7 @@ ParticleEmitterInfo = nil
     ---@field height number
     ---@field lifetime integer
     ---@field max_lifetime integer
-Particle = nil
+local Particle = nil
 
 ---@class ThemeInfo
     ---@field unknown3 integer
@@ -4622,7 +4623,7 @@ Particle = nil
     ---@field set_post_spawn_extra fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_extra(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
     ---@field set_pre_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural
     ---@field set_post_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural
-ThemeInfo = nil
+local ThemeInfo = nil
 
 ---@class CustomTheme : ThemeInfo
     ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
@@ -4683,19 +4684,19 @@ ThemeInfo = nil
     ---@field spawn_decoration2 fun(self): nil
     ---@field spawn_extra fun(self): nil
     ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil
-CustomTheme = nil
+local CustomTheme = nil
 
 ---@class PreLoadLevelFilesContext
     ---@field override_level_files fun(self, levels: string[]): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
     ---@field add_level_files fun(self, levels: string[]): nil @Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
-PreLoadLevelFilesContext = nil
+local PreLoadLevelFilesContext = nil
 
 ---@class DoorCoords
     ---@field door1_x number
     ---@field door1_y number
     ---@field door2_x number @door2 only valid when there are two in the level, like Volcana drill, Olmec, ...
     ---@field door2_y number
-DoorCoords = nil
+local DoorCoords = nil
 
 ---@class LevelGenSystem
     ---@field shop_type SHOP_TYPE
@@ -4708,7 +4709,7 @@ DoorCoords = nil
     ---@field spawn_room_y integer
     ---@field exit_doors Vec2[]
     ---@field themes ThemeInfo[] @size: 18
-LevelGenSystem = nil
+local LevelGenSystem = nil
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.
@@ -4720,7 +4721,7 @@ LevelGenSystem = nil
     ---@field set_num_extra_spawns fun(self, extra_spawn_id: integer, num_spawns_front_layer: integer, num_spawns_back_layer: integer): nil @Change the amount of extra spawns for the given `extra_spawn_id`.
     ---@field define_short_tile_code fun(self, short_tile_code_def: ShortTileCodeDef): SHORT_TILE_CODE? @Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match<br/>Returns `nil` if all possible short tile codes are already in use
     ---@field change_short_tile_code fun(self, short_tile_code: SHORT_TILE_CODE, short_tile_code_def: ShortTileCodeDef): nil @Overrides a specific short tile code, this means it will change for the whole level
-PostRoomGenerationContext = nil
+local PostRoomGenerationContext = nil
 
 ---@class PreHandleRoomTilesContext
     ---@field get_short_tile_code fun(self, tx: integer, ty: integer, layer: LAYER): SHORT_TILE_CODE? @Gets the tile code at the specified tile coordinate<br/>Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK}`<br/>Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
@@ -4730,13 +4731,13 @@ PostRoomGenerationContext = nil
     ---@field has_back_layer fun(self): boolean @Check whether the room has a back layer
     ---@field add_empty_back_layer fun(self): nil @Add a back layer filled with all `0` if there is no back layer yet<br/>Does nothing if there already is a backlayer
     ---@field add_copied_back_layer fun(self): nil @Add a back layer that is a copy of the front layer<br/>Does nothing if there already is a backlayer
-PreHandleRoomTilesContext = nil
+local PreHandleRoomTilesContext = nil
 
 ---@class ShortTileCodeDef
     ---@field tile_code TILE_CODE @Tile code that is used by default when this short tile code is encountered. Defaults to 0.
     ---@field chance integer @Chance in percent to pick `tile_code` over `alt_tile_code`, ignored if `chance == 0`. Defaults to 100.
     ---@field alt_tile_code TILE_CODE @Alternative tile code, ignored if `chance == 100`. Defaults to 0.
-ShortTileCodeDef = nil
+local ShortTileCodeDef = nil
 
 ---@class QuestsInfo
     ---@field yang_state integer
@@ -4745,7 +4746,7 @@ ShortTileCodeDef = nil
     ---@field sparrow_state integer
     ---@field madame_tusk_state integer
     ---@field beg_state integer
-QuestsInfo = nil
+local QuestsInfo = nil
 
 ---@class SaveData
     ---@field places boolean[] @size: 16
@@ -4788,7 +4789,7 @@ QuestsInfo = nil
     ---@field stickers ENT_TYPE[] @size: 20
     ---@field players integer[] @size: 4
     ---@field constellation Constellation
-SaveData = nil
+local SaveData = nil
 
 ---@class Constellation
     ---@field star_count integer
@@ -4797,7 +4798,7 @@ SaveData = nil
     ---@field line_count integer
     ---@field lines ConstellationLine[] @size: 90
     ---@field line_red_intensity number
-Constellation = nil
+local Constellation = nil
 
 ---@class ConstellationStar
     ---@field type integer
@@ -4814,16 +4815,16 @@ Constellation = nil
     ---@field halo_alpha number
     ---@field canis_ring boolean
     ---@field fidelis_ring boolean
-ConstellationStar = nil
+local ConstellationStar = nil
 
 ---@class ConstellationLine
     ---@field from integer
     ---@field to integer
-ConstellationLine = nil
+local ConstellationLine = nil
 
 ---@class CustomSound
     ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
-CustomSound = nil
+local CustomSound = nil
 ---@return PlayingSound
 function CustomSound:play() end
 ---@param paused boolean
@@ -4847,7 +4848,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
     ---@field get_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM): number?
     ---@field set_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM, value: number): boolean
-PlayingSound = nil
+local PlayingSound = nil
 
 ---@class SoundMeta
     ---@field x number
@@ -4856,16 +4857,16 @@ PlayingSound = nil
     ---@field right_channel number[] @size: 38
     ---@field start_over boolean @when false, current track starts from the beginning, is immediately set back to true
     ---@field playing boolean @set to false to turn off
-SoundMeta = nil
+local SoundMeta = nil
 
 ---@class BackgroundSound : SoundMeta
-BackgroundSound = nil
+local BackgroundSound = nil
 
 ---@class PlayerSlotSettings
     ---@field controller_vibration boolean
     ---@field auto_run_enabled boolean
     ---@field controller_right_stick boolean
-PlayerSlotSettings = nil
+local PlayerSlotSettings = nil
 
 ---@class PlayerSlot
     ---@field buttons_gameplay INPUTS
@@ -4874,7 +4875,7 @@ PlayerSlotSettings = nil
     ---@field input_mapping_controller InputMapping
     ---@field player_id integer
     ---@field is_participating boolean
-PlayerSlot = nil
+local PlayerSlot = nil
 
 ---@class InputMapping
     ---@field jump integer
@@ -4889,7 +4890,7 @@ PlayerSlot = nil
     ---@field right integer
     ---@field up integer
     ---@field down integer
-InputMapping = nil
+local InputMapping = nil
 
 ---@class PlayerInputs
     ---@field player_slots PlayerSlot[] @size: MAX_PLAYERS
@@ -4902,7 +4903,7 @@ InputMapping = nil
     ---@field player_slot_2_settings PlayerSlotSettings
     ---@field player_slot_3_settings PlayerSlotSettings
     ---@field player_slot_4_settings PlayerSlotSettings
-PlayerInputs = nil
+local PlayerInputs = nil
 
 ---@class GuiDrawContext
     ---@field draw_line fun(self, x1: number, y1: number, x2: number, y2: number, thickness: number, color: uColor): nil @Draws a line on screen
@@ -4939,7 +4940,7 @@ PlayerInputs = nil
     ---@field win_section fun(self, title: string, callback: function): nil @Add a collapsing accordion section, put contents in the callback function.
     ---@field win_indent fun(self, width: number): nil @Indent contents, or unindent if negative
     ---@field win_width fun(self, width: number): nil @Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
-GuiDrawContext = nil
+local GuiDrawContext = nil
 ---Draws a rectangle on screen from top-left to bottom-right.
 ---@param left number
 ---@param top number
@@ -5028,7 +5029,7 @@ function GuiDrawContext:draw_image_rotated(image, rect, uv_rect, color, angle, p
     ---@field ly number
     ---@field rx number
     ---@field ry number
-Gamepad = nil
+local Gamepad = nil
 
 ---@class ImGuiIO
     ---@field displaysize Vec2
@@ -5051,13 +5052,13 @@ Gamepad = nil
     ---@field gamepad Gamepad
     ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
     ---@field showcursor boolean
-ImGuiIO = nil
+local ImGuiIO = nil
 
 ---@class VanillaRenderContext
     ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer
     ---@field bounding_box AABB
     ---@field render_draw_depth any @render_draw_depth_lua
-VanillaRenderContext = nil
+local VanillaRenderContext = nil
 ---Draw text using the built-in renderer
 ---Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
 ---@param text string
@@ -5223,7 +5224,7 @@ function VanillaRenderContext:draw_world_texture(texture_id, source, dest, color
     ---@field source_top_right_y number
     ---@field source_get_quad fun(self): Quad
     ---@field source_set_quad fun(self, quad: Quad): nil
-TextureRenderingInfo = nil
+local TextureRenderingInfo = nil
 
 ---@class Letter
     ---@field bottom Triangle
@@ -5231,7 +5232,7 @@ TextureRenderingInfo = nil
     ---@field get_quad fun(self): Quad @Get the Quad of a letter (easier to work with compared to the two triangles)<br/>This assumes that the triangles are in the correct 'touching each other' position<br/>if the positions were altered the results may not end up as expected
     ---@field set_quad fun(self, quad: Quad): nil @Inverse of the get_quad
     ---@field center fun(self): Vec2 @Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
-Letter = nil
+local Letter = nil
 
 ---@class TextRenderingInfo
     ---@field new any @sol::initializers(&TextRenderingInfo_ctor)
@@ -5247,7 +5248,7 @@ Letter = nil
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
-TextRenderingInfo = nil
+local TextRenderingInfo = nil
 
 ---@class HudInventory
     ---@field enabled boolean
@@ -5262,25 +5263,25 @@ TextRenderingInfo = nil
     ---@field elixir boolean
     ---@field crown ENT_TYPE @Powerup type or 0
     ---@field item_count integer @Amount of generic pickup items at the bottom. Set to 0 to not draw them.
-HudInventory = nil
+local HudInventory = nil
 
 ---@class HudElement
     ---@field dim boolean @Hide background and dim if using the auto adjust setting.
     ---@field opacity number @Background will be drawn if this is not 0.5
     ---@field time_dim integer @Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
-HudElement = nil
+local HudElement = nil
 
 ---@class HudPlayer : HudElement
     ---@field health integer
     ---@field bombs integer
     ---@field ropes integer
-HudPlayer = nil
+local HudPlayer = nil
 
 ---@class HudMoney : HudElement
     ---@field total integer
     ---@field counter integer
     ---@field timer integer
-HudMoney = nil
+local HudMoney = nil
 
 ---@class HudData
     ---@field inventory HudInventory[] @size: MAX_PLAYERS
@@ -5297,13 +5298,13 @@ HudMoney = nil
     ---@field money HudMoney
     ---@field timer HudElement
     ---@field level HudElement
-HudData = nil
+local HudData = nil
 
 ---@class Hud
     ---@field y number
     ---@field opacity number
     ---@field data HudData
-Hud = nil
+local Hud = nil
 
 ---@class TextureDefinition
     ---@field texture_path string
@@ -5315,14 +5316,14 @@ Hud = nil
     ---@field sub_image_offset_y integer
     ---@field sub_image_width integer
     ---@field sub_image_height integer
-TextureDefinition = nil
+local TextureDefinition = nil
 
 ---@class Vec2
     ---@field x number
     ---@field y number
     ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
     ---@field split fun(self): number, number
-Vec2 = nil
+local Vec2 = nil
 
 ---@class AABB
     ---@field left number
@@ -5337,7 +5338,7 @@ Vec2 = nil
     ---@field width fun(self): number @Short for `aabb.right - aabb.left`.
     ---@field height fun(self): number @Short for `aabb.top - aabb.bottom`.
     ---@field split fun(self): number, number, number, number
-AABB = nil
+local AABB = nil
 ---Grows or shrinks the AABB by the given amount in all directions.
 ---If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
 ---@param amount number
@@ -5357,7 +5358,7 @@ function AABB:extrude(amount_x, amount_y) end
     ---@field rotate fun(self, angle: number, px: number, py: number): Triangle
     ---@field center fun(self): Vec2 @Also known as centroid
     ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corners
-Triangle = nil
+local Triangle = nil
 ---@param off Vec2
 ---@return Triangle
 function Triangle:offset(off) end
@@ -5381,21 +5382,21 @@ function Triangle:offset(x, y) end
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
     ---@field split fun(self): Vec2, Vec2, Vec2, Vec2 @Returns the corners in order: bottom_left, bottom_right, top_right, top_left
-Quad = nil
+local Quad = nil
 
 ---@class Screen
     ---@field render_timer number
-Screen = nil
+local Screen = nil
 
 ---@class ScreenLogo : Screen
     ---@field logo_mossmouth TextureRenderingInfo
     ---@field logo_blitworks TextureRenderingInfo
     ---@field logo_fmod TextureRenderingInfo
-ScreenLogo = nil
+local ScreenLogo = nil
 
 ---@class ScreenIntro : Screen
     ---@field unknown4 TextureRenderingInfo
-ScreenIntro = nil
+local ScreenIntro = nil
 
 ---@class ScreenPrologue : Screen
     ---@field line1 STRINGID
@@ -5404,7 +5405,7 @@ ScreenIntro = nil
     ---@field line1_alpha number
     ---@field line2_alpha number
     ---@field line3_alpha number
-ScreenPrologue = nil
+local ScreenPrologue = nil
 
 ---@class ScreenTitle : Screen
     ---@field logo_spelunky2 TextureRenderingInfo
@@ -5419,7 +5420,7 @@ ScreenPrologue = nil
     ---@field particle_torchflame_ash ParticleEmitterInfo
     ---@field music SoundMeta
     ---@field torch_sound SoundMeta
-ScreenTitle = nil
+local ScreenTitle = nil
 
 ---@class ScreenMenu : Screen
     ---@field tunnel_background TextureRenderingInfo
@@ -5447,7 +5448,7 @@ ScreenTitle = nil
     ---@field spear_dangler SpearDanglerAnimFrames[] @size: 6
     ---@field play_scroll_descend_timer number
     ---@field scroll_text STRINGID
-ScreenMenu = nil
+local ScreenMenu = nil
 
 ---@class ScreenOptions : Screen
     ---@field selected_menu_index integer
@@ -5485,13 +5486,13 @@ ScreenMenu = nil
     ---@field topleft_woodpanel_esc_slidein_timer number
     ---@field text_fadein_timer number
     ---@field vertical_scroll_effect_timer number
-ScreenOptions = nil
+local ScreenOptions = nil
 
 ---@class ScreenPlayerProfile : Screen
-ScreenPlayerProfile = nil
+local ScreenPlayerProfile = nil
 
 ---@class ScreenLeaderboards : Screen
-ScreenLeaderboards = nil
+local ScreenLeaderboards = nil
 
 ---@class ScreenSeedInput : Screen
     ---@field bottom_woodpanel_slideup_timer number
@@ -5508,7 +5509,7 @@ ScreenLeaderboards = nil
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field start_sidepanel TextureRenderingInfo
     ---@field start_sidepanel_slidein_timer number
-ScreenSeedInput = nil
+local ScreenSeedInput = nil
 
 ---@class ScreenCharacterSelect : Screen
     ---@field main_background_zoom_target number
@@ -5574,7 +5575,7 @@ ScreenSeedInput = nil
     ---@field particle_torchflame_smoke4 ParticleEmitterInfo
     ---@field particle_torchflame_flames4 ParticleEmitterInfo
     ---@field sound SoundMeta
-ScreenCharacterSelect = nil
+local ScreenCharacterSelect = nil
 
 ---@class FlyingThing
     ---@field texture_info TextureRenderingInfo
@@ -5586,7 +5587,7 @@ ScreenCharacterSelect = nil
     ---@field amplitude number
     ---@field frequency number
     ---@field sinewave_angle number
-FlyingThing = nil
+local FlyingThing = nil
 
 ---@class ScreenTeamSelect : Screen
     ---@field ana_carrying_torch TextureRenderingInfo
@@ -5603,15 +5604,15 @@ FlyingThing = nil
     ---@field selected_player integer
     ---@field buttons integer
     ---@field ready boolean
-ScreenTeamSelect = nil
+local ScreenTeamSelect = nil
 
 ---@class ScreenCamp : Screen
     ---@field buttons integer
-ScreenCamp = nil
+local ScreenCamp = nil
 
 ---@class ScreenLevel : Screen
     ---@field buttons integer
-ScreenLevel = nil
+local ScreenLevel = nil
 
 ---@class ScreenTransition : Screen
     ---@field woodpanel_pos number
@@ -5660,20 +5661,20 @@ ScreenLevel = nil
     ---@field hourglasses TextureRenderingInfo
     ---@field small_dollar_signs TextureRenderingInfo
     ---@field this_level_money_color Color
-ScreenTransition = nil
+local ScreenTransition = nil
 
 ---@class ScreenDeath : Screen
-ScreenDeath = nil
+local ScreenDeath = nil
 
 ---@class ScreenWin : Screen
     ---@field sequence_timer integer
     ---@field frame_timer integer
     ---@field animation_state integer
     ---@field rescuing_ship_entity Entity
-ScreenWin = nil
+local ScreenWin = nil
 
 ---@class ScreenCredits : Screen
-ScreenCredits = nil
+local ScreenCredits = nil
 
 ---@class ScreenScores : Screen
     ---@field animation_state integer
@@ -5685,22 +5686,22 @@ ScreenCredits = nil
     ---@field hourglass TextureRenderingInfo
     ---@field animation_timer integer
     ---@field woodpanel_slidedown_timer number
-ScreenScores = nil
+local ScreenScores = nil
 
 ---@class ScreenConstellation
     ---@field sequence_state integer
     ---@field animation_timer integer
     ---@field constellation_text_opacity number
     ---@field constellation_text number
-ScreenConstellation = nil
+local ScreenConstellation = nil
 
 ---@class ScreenRecap : Screen
-ScreenRecap = nil
+local ScreenRecap = nil
 
 ---@class ScreenOnlineLoading : Screen
     ---@field ouroboros TextureRenderingInfo
     ---@field ouroboros_angle number
-ScreenOnlineLoading = nil
+local ScreenOnlineLoading = nil
 
 ---@class ScreenOnlineLobby : Screen
     ---@field woodpanels_slidein_timer number
@@ -5757,7 +5758,7 @@ ScreenOnlineLoading = nil
     ---@field enter_code_your_code_scroll_left_handle TextureRenderingInfo
     ---@field enter_code_your_code_scroll_right_handle TextureRenderingInfo
     ---@field set_code fun(self, code: string): nil
-ScreenOnlineLobby = nil
+local ScreenOnlineLobby = nil
 
 ---@class PauseUI
     ---@field menu_slidein_progress number
@@ -5770,7 +5771,7 @@ ScreenOnlineLobby = nil
     ---@field confirmation_panel TextureRenderingInfo
     ---@field previously_selected_menu_index integer
     ---@field visibility integer
-PauseUI = nil
+local PauseUI = nil
 
 ---@class JournalUI
     ---@field state integer
@@ -5786,40 +5787,40 @@ PauseUI = nil
     ---@field page_timer integer
     ---@field fade_timer integer
     ---@field opacity integer
-JournalUI = nil
+local JournalUI = nil
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo
     ---@field page_number integer
     ---@field is_right_side_page fun(self): boolean @background.x < 0
-JournalPage = nil
+local JournalPage = nil
 
 ---@class JournalPageProgress : JournalPage
     ---@field coffeestain_top TextureRenderingInfo
-JournalPageProgress = nil
+local JournalPageProgress = nil
 
 ---@class JournalPageJournalMenu : JournalPage
     ---@field selected_menu_index integer
     ---@field journal_text_info TextRenderingInfo
     ---@field completion_badge TextureRenderingInfo
-JournalPageJournalMenu = nil
+local JournalPageJournalMenu = nil
 
 ---@class JournalPageDiscoverable : JournalPage
     ---@field show_main_image boolean
     ---@field title_text_info TextRenderingInfo
     ---@field entry_text_info TextRenderingInfo
     ---@field chapter_title_text_info TextRenderingInfo
-JournalPageDiscoverable = nil
+local JournalPageDiscoverable = nil
 
 ---@class JournalPagePlaces : JournalPageDiscoverable
     ---@field main_image TextureRenderingInfo
-JournalPagePlaces = nil
+local JournalPagePlaces = nil
 
 ---@class JournalPagePeople : JournalPageDiscoverable
     ---@field character_background TextureRenderingInfo
     ---@field character_icon TextureRenderingInfo
     ---@field character_drawing TextureRenderingInfo
-JournalPagePeople = nil
+local JournalPagePeople = nil
 
 ---@class JournalPageBestiary : JournalPageDiscoverable
     ---@field monster_background TextureRenderingInfo
@@ -5829,29 +5830,29 @@ JournalPagePeople = nil
     ---@field defeated_value_text_info TextRenderingInfo
     ---@field killedby_text_info TextRenderingInfo
     ---@field killedby_value_text_info TextRenderingInfo
-JournalPageBestiary = nil
+local JournalPageBestiary = nil
 
 ---@class JournalPageItems : JournalPageDiscoverable
     ---@field item_icon TextureRenderingInfo
     ---@field item_background TextureRenderingInfo
-JournalPageItems = nil
+local JournalPageItems = nil
 
 ---@class JournalPageTraps : JournalPageDiscoverable
     ---@field trap_icon TextureRenderingInfo
     ---@field trap_background TextureRenderingInfo
-JournalPageTraps = nil
+local JournalPageTraps = nil
 
 ---@class JournalPageStory : JournalPage
-JournalPageStory = nil
+local JournalPageStory = nil
 
 ---@class JournalPageFeats : JournalPage
     ---@field chapter_title_text_info TextRenderingInfo
     ---@field feat_icons TextureRenderingInfo
-JournalPageFeats = nil
+local JournalPageFeats = nil
 
 ---@class JournalPageDeathCause : JournalPage
     ---@field death_cause_text_info TextRenderingInfo
-JournalPageDeathCause = nil
+local JournalPageDeathCause = nil
 
 ---@class JournalPageDeathMenu : JournalPage
     ---@field selected_menu_index integer
@@ -5862,10 +5863,10 @@ JournalPageDeathCause = nil
     ---@field money_value_text_info TextRenderingInfo
     ---@field time_text_info TextRenderingInfo
     ---@field time_value_text_info TextRenderingInfo
-JournalPageDeathMenu = nil
+local JournalPageDeathMenu = nil
 
 ---@class JournalPageRecap : JournalPage
-JournalPageRecap = nil
+local JournalPageRecap = nil
 
 ---@class JournalPagePlayerProfile : JournalPage
     ---@field player_icon TextureRenderingInfo
@@ -5891,7 +5892,7 @@ JournalPageRecap = nil
     ---@field average_time_value_text_info TextRenderingInfo
     ---@field best_time_text_info TextRenderingInfo
     ---@field best_time_value_text_info TextRenderingInfo
-JournalPagePlayerProfile = nil
+local JournalPagePlayerProfile = nil
 
 ---@class JournalPageLastGamePlayed : JournalPage
     ---@field main_image TextureRenderingInfo
@@ -5904,7 +5905,7 @@ JournalPagePlayerProfile = nil
     ---@field time_value_text_info TextRenderingInfo
     ---@field sticker_count integer
     ---@field stickers TextureRenderingInfo[] @size: 20
-JournalPageLastGamePlayed = nil
+local JournalPageLastGamePlayed = nil
 
 ---@class ScreenArenaMenu : Screen
     ---@field brick_background_animation ScreenZoomAnimation
@@ -5952,11 +5953,11 @@ JournalPageLastGamePlayed = nil
     ---@field esc_next_panels_slide_timer number
     ---@field main_panel_vertical_scroll_position number
     ---@field selected_option_index integer
-ScreenArenaMenu = nil
+local ScreenArenaMenu = nil
 
 ---@class ScreenZoomAnimation
     ---@field zoom_target number
-ScreenZoomAnimation = nil
+local ScreenZoomAnimation = nil
 
 ---@class ScreenArenaStagesSelect : Screen
     ---@field woodenpanel_top_slidein_timer number
@@ -5997,7 +5998,7 @@ ScreenZoomAnimation = nil
     ---@field players_turn_scroll TextureRenderingInfo
     ---@field players_turn_scroll_handle TextureRenderingInfo
     ---@field grid_player_icon TextureRenderingInfo
-ScreenArenaStagesSelect = nil
+local ScreenArenaStagesSelect = nil
 
 ---@class ScreenArenaItems : Screen
     ---@field woodpanel_top_slidein_timer number
@@ -6032,7 +6033,7 @@ ScreenArenaStagesSelect = nil
     ---@field center_panels_horizontal_slide_position number
     ---@field esc_panel_slide_timer number
     ---@field selected_item_index integer
-ScreenArenaItems = nil
+local ScreenArenaItems = nil
 
 ---@class ScreenArenaIntro : Screen
     ---@field players TextureRenderingInfo
@@ -6048,13 +6049,13 @@ ScreenArenaItems = nil
     ---@field line_electricity_effect_timer number
     ---@field state integer
     ---@field countdown integer
-ScreenArenaIntro = nil
+local ScreenArenaIntro = nil
 
 ---@class ScreenArenaLevel : Screen
     ---@field get_ready TextureRenderingInfo
     ---@field get_ready_gray_background TextureRenderingInfo
     ---@field get_ready_outline TextureRenderingInfo
-ScreenArenaLevel = nil
+local ScreenArenaLevel = nil
 
 ---@class ScreenArenaScore : Screen
     ---@field woodpanel_slide_timer number
@@ -6093,10 +6094,12 @@ ScreenArenaLevel = nil
     ---@field player_crushing_pillar_height number[] @size: MAX_PLAYERS
     ---@field player_create_giblets boolean[] @size: MAX_PLAYERS
     ---@field next_sidepanel_slidein_timer number
-ScreenArenaScore = nil
+local ScreenArenaScore = nil
 
-
+end
 --## Constructors
+
+Color = nil
 ---Create a new color - defaults to black
 ---@return Color
 function Color.new(self) end
@@ -6113,12 +6116,16 @@ function Color.new(self, color) end
 ---@param a_ number
 ---@return Color
 function Color.new(self, r_, g_, b_, a_) end
+
+EntityDB = nil
 ---@param other EntityDB
 ---@return EntityDB
 function EntityDB.new(self, other) end
 ---@param other ENT_TYPE
 ---@return EntityDB
 function EntityDB.new(self, other) end
+
+CustomTheme = nil
 ---Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
 ---@param theme_id_ integer
 ---@param base_theme_ integer
@@ -6133,6 +6140,8 @@ function CustomTheme.new(self, theme_id_, base_theme_) end
 ---Create a new theme with base dwelling and id 100.
 ---@return CustomTheme
 function CustomTheme.new(self) end
+
+Vec2 = nil
 ---@return Vec2
 function Vec2.new(self) end
 ---@param vec2 Vec2
@@ -6142,6 +6151,8 @@ function Vec2.new(self, vec2) end
 ---@param y_ number
 ---@return Vec2
 function Vec2.new(self, x_, y_) end
+
+AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
 ---@return AABB
 function AABB.new(self) end
@@ -6156,6 +6167,8 @@ function AABB.new(self, aabb) end
 ---@param bottom_ number
 ---@return AABB
 function AABB.new(self, left_, top_, right_, bottom_) end
+
+Triangle = nil
 ---@return Triangle
 function Triangle.new(self) end
 ---@param triangle Triangle
@@ -6174,6 +6187,8 @@ function Triangle.new(self, _a, _b, _c) end
 ---@param cy number
 ---@return Triangle
 function Triangle.new(self, ax, ay, bx, by, cx, cy) end
+
+Quad = nil
 ---@return Quad
 function Quad.new(self) end
 ---@param quad Quad

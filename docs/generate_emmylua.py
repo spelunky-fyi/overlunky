@@ -247,7 +247,7 @@ function F(f_string) end
             print_comment(lf)
             print_func(name, params, ret, typed_params)
 
-    print("\n--## Types\n")
+    print("\n--## Types\ndo\n")
     for type in ps.types:
         print("---@class " + type["name"], end="")
         if type["base"]:
@@ -348,7 +348,7 @@ function F(f_string) end
                 var_cpp_type = var["type"]
                 print(f"    ---@field {var_name} any @{var_cpp_type}{comment_str}")
             index += 1
-        print(f"{type['name']} = nil")
+        print(f"local {type['name']} = nil")
         if "overloads" in type:
             for overload_name, funcs in type["overloads"].items():
                 func_name = f"{type['name']}:{overload_name}"
@@ -359,10 +359,10 @@ function F(f_string) end
                     print_func(func_name, params, overload["ret"], typed_params)
         print()
 
-    print("\n--## Constructors")
+    print("end\n--## Constructors")
 
     for name, overloads in ps.constructors.items():
-        # print(f"\n{name} = nil")
+        print(f"\n{name} = nil")
         for ctor in overloads:
             if "comment" in ctor and ctor["comment"] and "NoDoc" in ctor["comment"][0]:
                 continue
