@@ -183,7 +183,7 @@ def main():
     gu.setup_stdout("game_data/spel2.lua")
 
     print(
-        """---@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias
+        """---@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias,duplicate-set-field
 ---@class Meta
 ---@field name string
 ---@field version string
@@ -247,6 +247,7 @@ function F(f_string) end
             print_comment(lf)
             print_func(name, params, ret, typed_params)
 
+    type_static_funcs = {}
     print("\n--## Types\ndo\n")
     for type in ps.types:
         print("---@class " + type["name"], end="")
@@ -271,18 +272,28 @@ function F(f_string) end
                 m = re.search(r"\s*(.*)\s+([^\(]*)\((.*)\)", signature)
                 if m:
                     ret = fix_return(m.group(1)) or "nil"
-                    if ret.startswith("static"):
-                        continue
                     name = m.group(2)
                     params = cpp_params_to_emmy_lua_fun(m.group(3))
                     var_name = var["name"]
+                    if ret.startswith("static"):
+                        ret = ret.split("static", 1)[1].strip()
+                        if type["name"] not in type_static_funcs:
+                            type_static_funcs[type["name"]] = []
+                        type_static_funcs[type["name"]].append(
+                            {
+                                "name": name,
+                                "params": m.group(3),
+                                "ret": ret,
+                                "comment": var["comment"]
+                            }
+                        )
+                        continue
                     if "overloads" in type and var_name in type["overloads"]:
                         type["overloads"][var_name].append(
                             {
                                 "name": name,
-                                "param": params,
+                                "params": m.group(3),
                                 "ret": ret,
-                                "orig_params": var["signature"],
                                 "comment": var["comment"]
                             }
                         )
@@ -297,9 +308,8 @@ function F(f_string) end
                         type["overloads"][var_name] = [
                             {
                                 "name": name,
-                                "param": params,
+                                "params": m.group(3),
                                 "ret": ret,
-                                "orig_params": var["signature"],
                                 "comment": var["comment"]
                             }
                         ]
@@ -353,16 +363,32 @@ function F(f_string) end
             for overload_name, funcs in type["overloads"].items():
                 func_name = f"{type['name']}:{overload_name}"
                 for overload in funcs:
-                    m = re.search(r"\s*(.*)\s+([^\(]*)\((.*)\)", overload["orig_params"])
-                    typed_params, params = cpp_params_to_emmy_lua(m.group(3))
+                    typed_params, params = cpp_params_to_emmy_lua(overload["params"])
                     print_comment(overload)
                     print_func(func_name, params, overload["ret"], typed_params)
         print()
 
-    print("end\n--## Constructors")
+    print("end\n--## Static class functions")
+
+    for name, funcs in type_static_funcs.items():
+        print(f"\n{name} = nil")
+        for func in funcs:
+            if "comment" in func and func["comment"] and "NoDoc" in func["comment"][0]:
+                continue
+            typed_params, params = cpp_params_to_emmy_lua(func["params"])
+            typed_params.strip()
+            typed_params = replace_all(typed_params)
+
+            new_name = f"{name}:{func['name']}"
+
+            print_comment(func)
+            print_func(new_name, params, name, typed_params)
+
+    print("\n--## Constructors")
 
     for name, overloads in ps.constructors.items():
-        print(f"\n{name} = nil")
+        if name not in type_static_funcs:
+            print(f"\n{name} = nil")
         for ctor in overloads:
             if "comment" in ctor and ctor["comment"] and "NoDoc" in ctor["comment"][0]:
                 continue
@@ -370,8 +396,7 @@ function F(f_string) end
             typed_params.strip()
             typed_params = replace_all(typed_params)
 
-            new_name = f"{name}.new"
-            params = f"self, {params}" if params != "" else "self"
+            new_name = f"{name}:new"
 
             print_comment(ctor)
             print_func(new_name, params, name, typed_params)

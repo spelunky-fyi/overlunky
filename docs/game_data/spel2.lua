@@ -1,4 +1,4 @@
----@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias
+---@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias,duplicate-set-field
 ---@class Meta
 ---@field name string
 ---@field version string
@@ -5633,33 +5633,67 @@ function Triangle:offset(x, y) end
     ---@field next_sidepanel_slidein_timer number
 
 end
---## Constructors
+--## Static class functions
 
 Color = nil
+---@return Color
+function Color:white() end
+---@return Color
+function Color:silver() end
+---@return Color
+function Color:gray() end
+---@return Color
+function Color:black() end
+---@return Color
+function Color:red() end
+---@return Color
+function Color:maroon() end
+---@return Color
+function Color:yellow() end
+---@return Color
+function Color:olive() end
+---@return Color
+function Color:lime() end
+---@return Color
+function Color:green() end
+---@return Color
+function Color:aqua() end
+---@return Color
+function Color:teal() end
+---@return Color
+function Color:blue() end
+---@return Color
+function Color:navy() end
+---@return Color
+function Color:fuchsia() end
+---@return Color
+function Color:purple() end
+
+--## Constructors
 ---Create a new color - defaults to black
 ---@return Color
-function Color.new(self) end
+function Color:new() end
 ---@param color Color
 ---@return Color
-function Color.new(self, color) end
+function Color:new(color) end
 ---@param color Color
 ---@return Color
-function Color.new(self, color) end
+function Color:new(color) end
 ---Create a new color by specifying its values
 ---@param r_ number
 ---@param g_ number
 ---@param b_ number
 ---@param a_ number
 ---@return Color
-function Color.new(self, r_, g_, b_, a_) end
+function Color:new(r_, g_, b_, a_) end
 
 EntityDB = nil
 ---@param other EntityDB
 ---@return EntityDB
-function EntityDB.new(self, other) end
+function EntityDB:new(other) end
 ---@param other ENT_TYPE
 ---@return EntityDB
-function EntityDB.new(self, other) end
+function EntityDB:new(other) end
 
 CustomTheme = nil
 ---Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
@@ -5667,54 +5701,54 @@ CustomTheme = nil
 ---@param base_theme_ integer
 ---@param defaults boolean
 ---@return CustomTheme
-function CustomTheme.new(self, theme_id_, base_theme_, defaults) end
+function CustomTheme:new(theme_id_, base_theme_, defaults) end
 ---Create a new theme with defaults.
 ---@param theme_id_ integer
 ---@param base_theme_ integer
 ---@return CustomTheme
-function CustomTheme.new(self, theme_id_, base_theme_) end
+function CustomTheme:new(theme_id_, base_theme_) end
 ---Create a new theme with base dwelling and id 100.
 ---@return CustomTheme
-function CustomTheme.new(self) end
+function CustomTheme:new() end
 
 Vec2 = nil
 ---@return Vec2
-function Vec2.new(self) end
+function Vec2:new() end
 ---@param vec2 Vec2
 ---@return Vec2
-function Vec2.new(self, vec2) end
+function Vec2:new(vec2) end
 ---@param x_ number
 ---@param y_ number
 ---@return Vec2
-function Vec2.new(self, x_, y_) end
+function Vec2:new(x_, y_) end
 
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
 ---@return AABB
-function AABB.new(self) end
+function AABB:new() end
 ---Copy an axis aligned bounding box
 ---@param aabb AABB
 ---@return AABB
-function AABB.new(self, aabb) end
+function AABB:new(aabb) end
 ---Create a new axis aligned bounding box by specifying its values
 ---@param left_ number
 ---@param top_ number
 ---@param right_ number
 ---@param bottom_ number
 ---@return AABB
-function AABB.new(self, left_, top_, right_, bottom_) end
+function AABB:new(left_, top_, right_, bottom_) end
 
 Triangle = nil
 ---@return Triangle
-function Triangle.new(self) end
+function Triangle:new() end
 ---@param triangle Triangle
 ---@return Triangle
-function Triangle.new(self, triangle) end
+function Triangle:new(triangle) end
 ---@param _a Vec2
 ---@param _b Vec2
 ---@param _c Vec2
 ---@return Triangle
-function Triangle.new(self, _a, _b, _c) end
+function Triangle:new(_a, _b, _c) end
 ---@param ax number
 ---@param ay number
 ---@param bx number
@@ -5722,20 +5756,20 @@ function Triangle.new(self, _a, _b, _c) end
 ---@param cx number
 ---@param cy number
 ---@return Triangle
-function Triangle.new(self, ax, ay, bx, by, cx, cy) end
+function Triangle:new(ax, ay, bx, by, cx, cy) end
 
 Quad = nil
 ---@return Quad
-function Quad.new(self) end
+function Quad:new() end
 ---@param quad Quad
 ---@return Quad
-function Quad.new(self, quad) end
+function Quad:new(quad) end
 ---@param bottom_left_ Vec2
 ---@param bottom_right_ Vec2
 ---@param top_right_ Vec2
 ---@param top_left_ Vec2
 ---@return Quad
-function Quad.new(self, bottom_left_, bottom_right_, top_right_, top_left_) end
+function Quad:new(bottom_left_, bottom_right_, top_right_, top_left_) end
 ---@param _bottom_left_x number
 ---@param _bottom_left_y number
 ---@param _bottom_right_x number
@@ -5745,10 +5779,10 @@ function Quad.new(self, bottom_left_, bottom_right_, top_right_, top_left_) end
 ---@param _top_left_x number
 ---@param _top_left_y number
 ---@return Quad
-function Quad.new(self, _bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right_y, _top_right_x, _top_right_y, _top_left_x, _top_left_y) end
+function Quad:new(_bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right_y, _top_right_x, _top_right_y, _top_left_x, _top_left_y) end
 ---@param aabb AABB
 ---@return Quad
-function Quad.new(self, aabb) end
+function Quad:new(aabb) end
 
 --## Enums
 
