@@ -348,8 +348,8 @@ function F(f_string) end
                 var_cpp_type = var["type"]
                 print(f"    ---@field {var_name} any @{var_cpp_type}{comment_str}")
             index += 1
-        print(f"local {type['name']} = nil")
         if "overloads" in type:
+            print(f"local {type['name']} = nil")
             for overload_name, funcs in type["overloads"].items():
                 func_name = f"{type['name']}:{overload_name}"
                 for overload in funcs:
