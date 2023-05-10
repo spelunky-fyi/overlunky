@@ -15665,12 +15665,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_flags">init_flags()</a></td>
-<td>Initializes some flags in the <a href="#LevelGenSystem">LevelGenSystem</a></td>
+<td>Initializes some flags in the <a href="#LevelGenSystem">LevelGenSystem</a>, also dark level flag in state.level_flags.</td>
 </tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_level">init_level()</a></td>
-<td>Adds the entrance room</td>
+<td>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -15950,22 +15950,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_init_flags">set_pre_init_flags(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_init_flags">set_post_init_flags(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_init_level">set_pre_init_level(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_init_level">set_post_init_level(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
