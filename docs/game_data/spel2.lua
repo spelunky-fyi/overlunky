@@ -5349,6 +5349,7 @@ function Triangle:offset(x, y) end
     ---@field page_timer integer
     ---@field fade_timer integer
     ---@field opacity integer
+    ---@field pages custom_Array<JournalPage> @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo
