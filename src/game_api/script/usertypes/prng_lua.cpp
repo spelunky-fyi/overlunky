@@ -21,7 +21,7 @@ void register_usertypes(sol::state& lua)
     /// Seed the game prng.
     lua["seed_prng"] = [](int64_t seed)
     {
-        PRNG::get().seed(seed);
+        PRNG::get_main().seed(seed);
     };
 
     /// PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
@@ -48,7 +48,7 @@ void register_usertypes(sol::state& lua)
         &PRNG::set_pair);
 
     /// The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
-    lua["prng"] = &PRNG::get();
+    lua["prng"] = &PRNG::get_main();
 
     /// Get the thread-local version of prng
     lua["get_local_prng"] = []()

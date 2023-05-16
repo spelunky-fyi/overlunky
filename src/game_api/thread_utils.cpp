@@ -73,5 +73,8 @@ size_t heap_base()
 size_t local_heap_base()
 {
     thread_local const size_t* this_thread_heap_base_addr = get_thread_heap_base(GetCurrentThread());
+    if (this_thread_heap_base_addr == nullptr)
+        return NULL;
+
     return *this_thread_heap_base_addr;
 }
