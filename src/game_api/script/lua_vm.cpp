@@ -137,8 +137,16 @@ struct Players
 
     void update()
     {
-        StateMemory* main_state = State::get().ptr_main();
-        p = get_players(main_state);
+        StateMemory* local_state = State::get().ptr_local();
+        if (local_state == nullptr)
+        {
+            StateMemory* main_state = State::get().ptr_main();
+            p = get_players(main_state);
+        }
+        else
+        {
+            p = get_players(local_state);
+        }
     }
     struct lua_iterator_state
     {
