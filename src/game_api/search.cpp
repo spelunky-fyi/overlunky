@@ -946,6 +946,22 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
+        "render_level"sv,
+        // Calls render_layer
+        PatternCommandBuffer{}
+            .find_inst("48 81 ec 88 06 00 00 48 8d ac 24 80 00 00 00"_gh)
+            .offset(-12)
+            .at_exe(),
+    },
+    {
+        "render_game"sv,
+        // Calls render_level
+        PatternCommandBuffer{}
+            .find_inst("48 83 c0 18 48 3d 18 05 00 00"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
         "prepare_text_for_rendering"sv,
         // Use `render_hud` to find the big function that renders the HUD. After every string preparation you will see two calls very
         // close to each other. The first is to prepare the text for rendering/calculate text dimensions/...
@@ -968,6 +984,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put write bp on GameManager.pause_ui.scroll.y
         PatternCommandBuffer{}
             .find_inst("F3 0F 5C F0 49 8D 7E 4C"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "render_blurred_bg"sv,
+        // Second call in the previous function
+        PatternCommandBuffer{}
+            .find_inst("48 c7 84 24 c0 00 00 00 00 00 80 3f 48 8b 81 a8 00 00 00"_gh)
             .at_exe()
             .function_start(),
     },

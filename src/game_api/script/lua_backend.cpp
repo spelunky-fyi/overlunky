@@ -565,16 +565,12 @@ bool LuaBackend::update()
 
 void LuaBackend::draw(ImDrawList* dl)
 {
-    if (!get_enabled())
+    if (!pre_draw() || !get_enabled())
         return;
 
     draw_list = dl;
     try
     {
-        if (!pre_draw())
-        {
-            return;
-        }
 
         // Deprecated
         /// Use `set_callback(function, ON.GUIFRAME)` instead
@@ -1140,10 +1136,11 @@ bool LuaBackend::pre_entity_instagib(Entity* victim)
     return skip;
 }
 
-void LuaBackend::process_vanilla_render_callbacks(ON event)
+bool LuaBackend::process_vanilla_render_callbacks(ON event)
 {
+    bool skip{false};
     if (!get_enabled())
-        return;
+        return skip;
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
@@ -1155,17 +1152,95 @@ void LuaBackend::process_vanilla_render_callbacks(ON event)
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func, render_ctx);
+            skip |= handle_function<bool>(this, callback.func, render_ctx).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
         }
     }
+
+    return skip;
 }
 
-void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
+bool LuaBackend::process_vanilla_render_blur_callbacks(ON event, float blur_amount)
 {
+    bool skip{false};
     if (!get_enabled())
-        return;
+        return skip;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, blur_amount).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+
+    return skip;
+}
+
+bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, Hud* hud)
+{
+    bool skip{false};
+    if (!get_enabled())
+        return skip;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, hud).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+
+    return skip;
+}
+
+bool LuaBackend::process_vanilla_render_layer_callbacks(ON event, uint8_t layer)
+{
+    bool skip{false};
+    if (!get_enabled())
+        return skip;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, layer).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+
+    return skip;
+}
+
+bool LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
+{
+    bool skip{false};
+    if (!get_enabled())
+        return skip;
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
@@ -1178,17 +1253,20 @@ void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func, render_ctx, draw_depth);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, draw_depth).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
         }
     }
+
+    return skip;
 }
 
-void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
+bool LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
 {
+    bool skip{false};
     if (!get_enabled())
-        return;
+        return skip;
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
@@ -1200,11 +1278,13 @@ void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func, render_ctx, page_type, page);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, page_type, page).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
         }
     }
+
+    return skip;
 }
 
 std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)

@@ -816,10 +816,16 @@
                             <a href="#set_journal_enabled" class="toc-h3 toc-link" data-title="set_journal_enabled">set_journal_enabled</a>
                           </li>
                           <li>
+                            <a href="#set_level_config" class="toc-h3 toc-link" data-title="set_level_config">set_level_config</a>
+                          </li>
+                          <li>
                             <a href="#set_mask" class="toc-h3 toc-link" data-title="set_mask">set_mask</a>
                           </li>
                           <li>
                             <a href="#set_seed" class="toc-h3 toc-link" data-title="set_seed">set_seed</a>
+                          </li>
+                          <li>
+                            <a href="#set_setting" class="toc-h3 toc-link" data-title="set_setting">set_setting</a>
                           </li>
                           <li>
                             <a href="#set_storage_layer" class="toc-h3 toc-link" data-title="set_storage_layer">set_storage_layer</a>
@@ -904,6 +910,9 @@
                           </li>
                           <li>
                             <a href="#print" class="toc-h3 toc-link" data-title="print">print</a>
+                          </li>
+                          <li>
+                            <a href="#printf" class="toc-h3 toc-link" data-title="printf">printf</a>
                           </li>
                           <li>
                             <a href="#say" class="toc-h3 toc-link" data-title="say">say</a>
@@ -1016,6 +1025,9 @@
                           </li>
                           <li>
                             <a href="#get_hitbox" class="toc-h3 toc-link" data-title="get_hitbox">get_hitbox</a>
+                          </li>
+                          <li>
+                            <a href="#get_hud_position" class="toc-h3 toc-link" data-title="get_hud_position">get_hud_position</a>
                           </li>
                           <li>
                             <a href="#get_image_size" class="toc-h3 toc-link" data-title="get_image_size">get_image_size</a>
@@ -1232,7 +1244,13 @@
                             <a href="#clear_custom_name" class="toc-h3 toc-link" data-title="clear_custom_name">clear_custom_name</a>
                           </li>
                           <li>
+                            <a href="#enum_get_mask_names" class="toc-h3 toc-link" data-title="enum_get_mask_names">enum_get_mask_names</a>
+                          </li>
+                          <li>
                             <a href="#enum_get_name" class="toc-h3 toc-link" data-title="enum_get_name">enum_get_name</a>
+                          </li>
+                          <li>
+                            <a href="#enum_get_names" class="toc-h3 toc-link" data-title="enum_get_names">enum_get_names</a>
                           </li>
                           <li>
                             <a href="#get_character_name" class="toc-h3 toc-link" data-title="get_character_name">get_character_name</a>
@@ -1581,6 +1599,9 @@
                             <a href="#EntityDB" class="toc-h3 toc-link" data-title="EntityDB">EntityDB</a>
                           </li>
                           <li>
+                            <a href="#HudInventory" class="toc-h3 toc-link" data-title="HudInventory">HudInventory</a>
+                          </li>
+                          <li>
                             <a href="#Inventory" class="toc-h3 toc-link" data-title="Inventory">Inventory</a>
                           </li>
                       </ul>
@@ -1596,6 +1617,21 @@
                           </li>
                           <li>
                             <a href="#Color" class="toc-h3 toc-link" data-title="Color">Color</a>
+                          </li>
+                          <li>
+                            <a href="#Hud" class="toc-h3 toc-link" data-title="Hud">Hud</a>
+                          </li>
+                          <li>
+                            <a href="#HudData" class="toc-h3 toc-link" data-title="HudData">HudData</a>
+                          </li>
+                          <li>
+                            <a href="#HudElement" class="toc-h3 toc-link" data-title="HudElement">HudElement</a>
+                          </li>
+                          <li>
+                            <a href="#HudMoney" class="toc-h3 toc-link" data-title="HudMoney">HudMoney</a>
+                          </li>
+                          <li>
+                            <a href="#HudPlayer" class="toc-h3 toc-link" data-title="HudPlayer">HudPlayer</a>
                           </li>
                           <li>
                             <a href="#Letter" class="toc-h3 toc-link" data-title="Letter">Letter</a>
@@ -3221,6 +3257,12 @@
                     <a href="#ON-RENDER_POST_PAUSE_MENU" class="toc-h2 toc-link" data-title="ON.RENDER_POST_PAUSE_MENU">ON.RENDER_POST_PAUSE_MENU</a>
                   </li>
                   <li>
+                    <a href="#ON-RENDER_PRE_BLURRED_BACKGROUND" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_BLURRED_BACKGROUND">ON.RENDER_PRE_BLURRED_BACKGROUND</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_POST_BLURRED_BACKGROUND" class="toc-h2 toc-link" data-title="ON.RENDER_POST_BLURRED_BACKGROUND">ON.RENDER_POST_BLURRED_BACKGROUND</a>
+                  </li>
+                  <li>
                     <a href="#ON-RENDER_PRE_DRAW_DEPTH" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_DRAW_DEPTH">ON.RENDER_PRE_DRAW_DEPTH</a>
                   </li>
                   <li>
@@ -3231,6 +3273,24 @@
                   </li>
                   <li>
                     <a href="#ON-RENDER_POST_JOURNAL_PAGE" class="toc-h2 toc-link" data-title="ON.RENDER_POST_JOURNAL_PAGE">ON.RENDER_POST_JOURNAL_PAGE</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_PRE_LAYER" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_LAYER">ON.RENDER_PRE_LAYER</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_POST_LAYER" class="toc-h2 toc-link" data-title="ON.RENDER_POST_LAYER">ON.RENDER_POST_LAYER</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_PRE_LEVEL" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_LEVEL">ON.RENDER_PRE_LEVEL</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_POST_LEVEL" class="toc-h2 toc-link" data-title="ON.RENDER_POST_LEVEL">ON.RENDER_POST_LEVEL</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_PRE_GAME" class="toc-h2 toc-link" data-title="ON.RENDER_PRE_GAME">ON.RENDER_PRE_GAME</a>
+                  </li>
+                  <li>
+                    <a href="#ON-RENDER_POST_GAME" class="toc-h2 toc-link" data-title="ON.RENDER_POST_GAME">ON.RENDER_POST_GAME</a>
                   </li>
                   <li>
                     <a href="#ON-SPEECH_BUBBLE" class="toc-h2 toc-link" data-title="ON.SPEECH_BUBBLE">ON.SPEECH_BUBBLE</a>
@@ -3401,6 +3461,9 @@
                   </li>
                   <li>
                     <a href="#ROOM_TEMPLATE_TYPE" class="toc-h2 toc-link" data-title="ROOM_TEMPLATE_TYPE">ROOM_TEMPLATE_TYPE</a>
+                  </li>
+                  <li>
+                    <a href="#SAFE_SETTING" class="toc-h2 toc-link" data-title="SAFE_SETTING">SAFE_SETTING</a>
                   </li>
                   <li>
                     <a href="#SCREEN" class="toc-h2 toc-link" data-title="SCREEN">SCREEN</a>
@@ -4606,6 +4669,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_journal_enabled-bool-b'>nil set_journal_enabled(bool b)</h4>
 <p>Enables or disables the journal</p>
+<h3 id='set_level_config'>set_level_config</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_level_config">set_level_config</a></p>
+</blockquote>
+<h4 id='nil-set_level_config-LEVEL_CONFIG-config-int-value'>nil set_level_config(<a href="#LEVEL_CONFIG">LEVEL_CONFIG</a> config, int value)</h4>
+<p>Set the value for the specified config</p>
 <h3 id='set_mask'>set_mask</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_mask">set_mask</a></p>
@@ -4618,6 +4687,24 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_seed-int-seed'>nil set_seed(int seed)</h4>
 <p>Set seed and reset run.</p>
+<h3 id='set_setting'>set_setting</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- set some visual settings needed by your mod</span>
+<span class="c1">-- doing this here will reapply these after visiting the options, which would reset them to real values</span>
+
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">screen_next</span> <span class="o">==</span> <span class="n">SCREEN</span><span class="p">.</span><span class="n">LEVEL</span> <span class="k">then</span>
+        <span class="c1">-- use the secret tiny hud size</span>
+        <span class="n">set_setting</span><span class="p">(</span><span class="n">GAME_SETTING</span><span class="p">.</span><span class="n">HUD_SIZE</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="c1">-- force opaque textboxes</span>
+        <span class="n">set_setting</span><span class="p">(</span><span class="n">GAME_SETTING</span><span class="p">.</span><span class="n">TEXTBOX_OPACITY</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">end</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">PRE_LOAD_SCREEN</span><span class="p">)</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_setting">set_setting</a></p>
+</blockquote>
+<h4 id='bool-set_setting-GAME_SETTING-setting-int-value'>bool set_setting(<a href="#GAME_SETTING">GAME_SETTING</a> setting, int value)</h4>
+<p>Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset <a href="#SAFE_SETTING">SAFE_SETTING</a> by default for <a href="#Hud">Hud</a> and other visuals. Returns false, if setting failed.</p>
 <h3 id='set_storage_layer'>set_storage_layer</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Sets the right layer when using the vanilla tile code if waddler is still happy,</span>
 <span class="c1">-- otherwise spawns the floor to the left of this tile.</span>
 <span class="c1">-- Manually spawning FLOOR_STORAGE pre-tilecode doesn't seem to work as expected,</span>
@@ -4806,6 +4893,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-print-string-message'>nil print(string message)</h4>
 <p>Print a log message on screen.</p>
+<h3 id='printf'>printf</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=printf">printf</a></p>
+</blockquote>
+<h4 id='nil-printf'>nil printf()</h4>
+<p>Short for print(string.format(...))</p>
 <h3 id='say'>say</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=say">say</a></p>
@@ -5018,6 +5111,12 @@ inside these boundaries. The order is: left x, top y, right x, bottom y</p>
 </blockquote>
 <h4 id='AABB-get_hitbox-int-uid-optional-extrude-optional-offsetx-optional-offsety'><a href="#AABB">AABB</a> get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)</h4>
 <p>Gets the hitbox of an entity, use <code>extrude</code> to make the hitbox bigger/smaller in all directions and <code>offset</code> to offset the hitbox in a given direction</p>
+<h3 id='get_hud_position'>get_hud_position</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_hud_position">get_hud_position</a></p>
+</blockquote>
+<h4 id='AABB-get_hud_position-int-index'><a href="#AABB">AABB</a> get_hud_position(int index)</h4>
+<p>Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count</p>
 <h3 id='get_image_size'>get_image_size</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_image_size">get_image_size</a></p>
@@ -5483,12 +5582,24 @@ This edits custom string and in game strings but changing the language in settin
 </blockquote>
 <h4 id='nil-clear_custom_name-int-uid'>nil clear_custom_name(int uid)</h4>
 <p>Clears the name set with <a href="#add_custom_name">add_custom_name</a></p>
+<h3 id='enum_get_mask_names'>enum_get_mask_names</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enum_get_mask_names">enum_get_mask_names</a></p>
+</blockquote>
+<h4 id='table-lt-string-gt-enum_get_mask_names-table-enum-int-value'>table&lt;string&gt; enum_get_mask_names(table enum, int value)</h4>
+<p>Return the matching names for a bitmask in an enum table of masks</p>
 <h3 id='enum_get_name'>enum_get_name</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enum_get_name">enum_get_name</a></p>
 </blockquote>
 <h4 id='string-enum_get_name-table-enum-int-value'>string enum_get_name(table enum, int value)</h4>
-<p>Return the name of an unknown number in an enum table</p>
+<p>Return the name of the first matching number in an enum table</p>
+<h3 id='enum_get_names'>enum_get_names</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enum_get_names">enum_get_names</a></p>
+</blockquote>
+<h4 id='table-lt-string-gt-enum_get_names-table-enum-int-value'>table&lt;string&gt; enum_get_names(table enum, int value)</h4>
+<p>Return all the names of a number in an enum table</p>
 <h3 id='get_character_name'>get_character_name</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_character_name">get_character_name</a></p>
@@ -5861,13 +5972,13 @@ Returns unique id for the callback to be used in <a href="#clear_entity_callback
 Sets a callback that is called right before a floor is updated (by killed neighbor), return <code>true</code> to skip the game&#39;s neighbor update handling.
 Use this only when no other approach works, this call can be expensive if overused.
 <br/>The callback signature is bool pre_floor_update(<a href="#Entity">Entity</a> self)</p>
-<h3 id='set_post_floor_update'>set_post_floor_update</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Use FLOOR_GENERIC from different themes in your level,</span>
-<span class="c1">-- with textures that update correctly when destroyed</span>
-
+<h3 id='set_post_floor_update'>set_post_floor_update</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Use FLOOR_GENERIC with textures from different themes that update correctly when destroyed.</span>
+<span class="c1">-- This lets you use the custom tile code 'floor_generic_tidepool'</span>
+<span class="c1">-- in the level editor to spawn tidepool floor in dwelling for example...</span>
 <span class="n">define_tile_code</span><span class="p">(</span><span class="s2">"floor_generic_tidepool"</span><span class="p">)</span>
 <span class="n">set_pre_tile_code_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
     <span class="kd">local</span> <span class="n">uid</span> <span class="o">=</span> <span class="n">spawn_grid_entity</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">FLOOR_GENERIC</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
-    <span class="n">set_post_update</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+    <span class="n">set_post_floor_update</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
         <span class="n">me</span><span class="p">:</span><span class="n">set_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_FLOOR_TIDEPOOL_0</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="k">in</span> <span class="nb">ipairs</span><span class="p">(</span><span class="n">entity_get_items_by</span><span class="p">(</span><span class="n">me</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">DECORATION_GENERIC</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">DECORATION</span><span class="p">))</span> <span class="k">do</span>
             <span class="kd">local</span> <span class="n">deco</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
@@ -5880,7 +5991,7 @@ Use this only when no other approach works, this call can be expensive if overus
 
 <span class="c1">-- Fix quicksand decorations when not in temple</span>
 <span class="n">set_post_entity_spawn</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span>
-    <span class="n">set_post_floor_update</span><span class="p">(</span><span class="n">ent</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
+    <span class="n">ent</span><span class="p">:</span><span class="n">set_post_floor_update</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">me</span><span class="p">)</span>
         <span class="n">me</span><span class="p">:</span><span class="n">set_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_FLOOR_TEMPLE_0</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">v</span> <span class="k">in</span> <span class="nb">ipairs</span><span class="p">(</span><span class="n">entity_get_items_by</span><span class="p">(</span><span class="n">me</span><span class="p">.</span><span class="n">uid</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">DECORATION_GENERIC</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">DECORATION</span><span class="p">))</span> <span class="k">do</span>
             <span class="kd">local</span> <span class="n">deco</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
@@ -6145,7 +6256,7 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_popid</code> instead<
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_image">win_image</a></p>
 </blockquote>
 
-<p><code>nil win_image(IMAGE image, int width, int height)</code><br/>
+<p><code>nil win_image(IMAGE image, float width, float height)</code><br/>
 Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead</p>
 <h1 id='Non-Entity-types'>Non-Entity types</h1><h2 id='Arena-types'>Arena types</h2><h3 id='ArenaConfigArenas'>ArenaConfigArenas</h3>
 <p>Used in <a href="#ArenaState">ArenaState</a></p>
@@ -6911,6 +7022,11 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 </tr>
 <tr>
 <td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_separator_text">win_separator_text(string text)</a></td>
+<td>Add a separator text line to window</td>
+</tr>
+<tr>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_inline">win_inline()</a></td>
 <td>Add next thing on the same line. This is same as <code>win_sameline(0, -1)</code></td>
 </tr>
@@ -6981,7 +7097,7 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_image">win_image(IMAGE image, int width, int height)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_image">win_image(IMAGE image, float width, float height)</a></td>
 <td>Draw image to window.</td>
 </tr>
 <tr>
@@ -6998,6 +7114,11 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_indent">win_indent(float width)</a></td>
 <td>Indent contents, or unindent if negative</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=win_width">win_width(float width)</a></td>
+<td>Sets next item width (width&gt;1: width in pixels, width&lt;0: to the right of window, -1&lt;width&lt;1: fractional, multiply by available window width)</td>
 </tr>
 </tbody></table>
 <h3 id='LoadContext'>LoadContext</h3>
@@ -7244,6 +7365,16 @@ Future calls to this will override the save</p>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td><a href="#AABB">AABB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bounding_box">bounding_box</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=render_draw_depth">render_draw_depth</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h2 id='Entity-related-types'>Entity related types</h2><h3 id='Ai'>Ai</h3>
@@ -7593,6 +7724,75 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tiley">tiley</a></td>
 <td></td>
+</tr>
+</tbody></table>
+<h3 id='HudInventory'>HudInventory</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=enabled">enabled</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=health">health</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bombs">bombs</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ropes">ropes</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ankh">ankh</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kapala">kapala</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kapala_blood">kapala_blood</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=poison">poison</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=curse">curse</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=elixir">elixir</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=crown">crown</a></td>
+<td><a href="#Powerup">Powerup</a> type or 0</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=item_count">item_count</a></td>
+<td>Amount of generic pickup items at the bottom. Set to 0 to not draw them.</td>
 </tr>
 </tbody></table>
 <h3 id='Inventory'>Inventory</h3>
@@ -8090,6 +8290,198 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>Changes color based on given <a href="#Aliases">uColor</a></td>
 </tr>
 </tbody></table>
+<h3 id='Hud'>Hud</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">hud</span><span class="p">)</span>
+    <span class="c1">-- draw on screen bottom but keep neat animations</span>
+    <span class="k">if</span> <span class="n">hud</span><span class="p">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">then</span> <span class="n">hud</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="o">-</span><span class="n">hud</span><span class="p">.</span><span class="n">y</span> <span class="k">end</span>
+    <span class="c1">-- spoof some values</span>
+    <span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">inventory</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">health</span> <span class="o">=</span> <span class="n">prng</span><span class="p">:</span><span class="n">random_int</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1">-- hide generic pickup items</span>
+    <span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">inventory</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">item_count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1">-- hide money element</span>
+    <span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">money</span><span class="p">.</span><span class="n">opacity</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1">-- get real current opacity of p1 inventory element</span>
+    <span class="n">prinspect</span><span class="p">(</span><span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">players</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">opacity</span> <span class="o">*</span> <span class="n">hud</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">opacity</span> <span class="o">*</span> <span class="n">hud</span><span class="p">.</span><span class="n">opacity</span><span class="p">)</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">RENDER_PRE_HUD</span><span class="p">)</span>
+
+</code></pre></div>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#HudData">HudData</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=data">data</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='HudData'>HudData</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>array&lt;<a href="#HudInventory">HudInventory</a>, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inventory">inventory</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udjat">udjat</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=money_total">money_total</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=money_counter">money_counter</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_total">time_total</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_level">time_level</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=world_num">world_num</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_num">level_num</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seed">seed</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;<a href="#HudPlayer">HudPlayer</a>, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=players">players</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#HudMoney">HudMoney</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=money">money</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#HudElement">HudElement</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#HudElement">HudElement</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level">level</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='HudElement'>HudElement</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dim">dim</a></td>
+<td>Hide background and dim if using the auto adjust setting.</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
+<td>Background will be drawn if this is not 0.5</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_dim">time_dim</a></td>
+<td>Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.</td>
+</tr>
+</tbody></table>
+<h3 id='HudMoney'>HudMoney</h3>
+<p>Derived from <a href="#HudElement">HudElement</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=total">total</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=counter">counter</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='HudPlayer'>HudPlayer</h3>
+<p>Derived from <a href="#HudElement">HudElement</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=health">health</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bombs">bombs</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ropes">ropes</a></td>
+<td></td>
+</tr>
+</tbody></table>
 <h3 id='Letter'>Letter</h3>
 <table><thead>
 <tr>
@@ -8200,12 +8592,12 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td>tuple&lt;int, int&gt;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_pair">get_pair(size_t index)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_pair">get_pair(PRNG_CLASS type)</a></td>
 <td></td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pair">set_pair(size_t index, int first, int second)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pair">set_pair(PRNG_CLASS type, int first, int second)</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -10424,12 +10816,17 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=characters">characters</a></td>
-<td></td>
+<td>20bit bitmask of unlocked characters</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tutorial_state">tutorial_state</a></td>
+<td>Tutorial state 0..4. Changes the camp layout, camera and lighting. (0=nothing, 1=journal got, 2=key spawned, 3=door unlocked, 4=complete)</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=shortcuts">shortcuts</a></td>
-<td></td>
+<td><a href="#Terra">Terra</a> quest state 0..10 (0=not met ... 10=complete)</td>
 </tr>
 <tr>
 <td>array&lt;int, 78&gt;</td>
@@ -10554,6 +10951,11 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_last">level_last</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=theme_last">theme_last</a></td>
 <td></td>
 </tr>
 <tr>
@@ -10751,6 +11153,11 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fade_timer">fade_timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -14379,6 +14786,11 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>The currently drawn layer, can&#39;t be changed</td>
 </tr>
 <tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=layer_transition_timer">layer_transition_timer</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#ScreenTeamSelect">ScreenTeamSelect</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_team_select">screen_team_select</a></td>
 <td></td>
@@ -15253,12 +15665,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_flags">init_flags()</a></td>
-<td>Initializes some flags in the <a href="#LevelGenSystem">LevelGenSystem</a></td>
+<td>Initializes some flags in the <a href="#LevelGenSystem">LevelGenSystem</a>, also dark level flag in state.level_flags.</td>
 </tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init_level">init_level()</a></td>
-<td>Adds the entrance room</td>
+<td>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -15358,7 +15770,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_players">spawn_players()</a></td>
-<td>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code></td>
+<td>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code>. Also shop and kali background and probably other stuff for some stupid reason.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -15538,22 +15950,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_init_flags">set_pre_init_flags(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_init_flags">set_post_init_flags(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_flags(ThemeInfo self)</code><br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_init_level">set_pre_init_level(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_init_level">set_post_init_level(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil init_level(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -15748,12 +16160,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_players">set_pre_spawn_players(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code>. Also shop and kali background and probably other stuff for some stupid reason.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_players">set_post_spawn_players(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_players(ThemeInfo self)</code><br/>Virtual function docs:<br/>Spawns the players with inventory at <code>state.level_gen.spawn_x/y</code>. Also shop and kali background and probably other stuff for some stupid reason.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -17580,12 +17992,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
-<td>Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use <a href="#get_position">get_position</a> to get accurate position in the game world</td>
+<td>Position of the entity in the world, or relative to overlay if attached to something. Use <a href="#get_position">get_position</a> to get real position of anything in the game world.</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
-<td>Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use <a href="#get_position">get_position</a> to get accurate position in the game world</td>
+<td>Position of the entity in the world, or relative to overlay if attached to something. Use <a href="#get_position">get_position</a> to get real position of anything in the game world.</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs_x">abs_x</a></td>
+<td>Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs_y">abs_y</a></td>
+<td>Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.</td>
 </tr>
 <tr>
 <td>int</td>
@@ -25749,31 +26171,59 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_HUD">ON.RENDER_PRE_HUD</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Hud">Hud</a> hud<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx or edit the Hud values. Return <code>true</code> to skip rendering.<br/></p>
 <h2 id='ON-RENDER_POST_HUD'>ON.RENDER_POST_HUD</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_HUD">ON.RENDER_POST_HUD</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Hud">Hud</a> hud<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
 <h2 id='ON-RENDER_PRE_PAUSE_MENU'>ON.RENDER_PRE_PAUSE_MENU</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_PAUSE_MENU">ON.RENDER_PRE_PAUSE_MENU</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them. Return <code>true</code> to skip rendering.<br/></p>
 <h2 id='ON-RENDER_POST_PAUSE_MENU'>ON.RENDER_POST_PAUSE_MENU</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_PAUSE_MENU">ON.RENDER_POST_PAUSE_MENU</a></p>
 </blockquote>
 
 <p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the pause menu is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></p>
+<h2 id='ON-RENDER_PRE_BLURRED_BACKGROUND'>ON.RENDER_PRE_BLURRED_BACKGROUND</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_BLURRED_BACKGROUND">ON.RENDER_PRE_BLURRED_BACKGROUND</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them. Return <code>true</code> to skip rendering.<br/></p>
+<h2 id='ON-RENDER_POST_BLURRED_BACKGROUND'>ON.RENDER_POST_BLURRED_BACKGROUND</h2><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- replace journal book background with a piece of paper, drawn on top of the blurred bg</span>
+<span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">blur</span><span class="p">)</span>
+    <span class="kd">local</span> <span class="n">src</span> <span class="o">=</span> <span class="n">Quad</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="n">AABB</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">.</span><span class="mi">535</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">21</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">85</span><span class="p">,</span> <span class="mi">0</span><span class="p">.</span><span class="mi">93</span><span class="p">))</span>
+    <span class="kd">local</span> <span class="n">dest</span> <span class="o">=</span> <span class="n">Quad</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="n">AABB</span><span class="p">:</span><span class="n">new</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="kd">local</span> <span class="n">col</span> <span class="o">=</span> <span class="n">Color</span><span class="p">:</span><span class="n">white</span><span class="p">()</span>
+    <span class="n">col</span><span class="p">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">game_manager</span><span class="p">.</span><span class="n">journal_ui</span><span class="p">.</span><span class="n">opacity</span> <span class="c1">--or simply 'blur' to draw behind pause menu too</span>
+    <span class="n">ctx</span><span class="p">:</span><span class="n">draw_screen_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_JOURNAL_TOP_MAIN_0</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+    <span class="c1">-- hide real book offscreen, only drawing pages</span>
+    <span class="n">game_manager</span><span class="p">.</span><span class="n">journal_ui</span><span class="p">.</span><span class="n">book_background</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">RENDER_POST_BLURRED_BACKGROUND</span><span class="p">)</span>
+
+<span class="c1">-- the previous cb is not called for death screen, default to normal book bg there</span>
+<span class="n">set_pre_render_screen</span><span class="p">(</span><span class="n">SCREEN</span><span class="p">.</span><span class="n">DEATH</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">)</span>
+    <span class="n">game_manager</span><span class="p">.</span><span class="n">journal_ui</span><span class="p">.</span><span class="n">book_background</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">end</span><span class="p">)</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_BLURRED_BACKGROUND">ON.RENDER_POST_BLURRED_BACKGROUND</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx. (blur amount is probably the same as journal opacity)<br/></p>
 <h2 id='ON-RENDER_PRE_DRAW_DEPTH'>ON.RENDER_PRE_DRAW_DEPTH</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_DRAW_DEPTH">ON.RENDER_PRE_DRAW_DEPTH</a></p>
 </blockquote>
 
-<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx<br/></p>
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx. Return <code>true</code> to skip rendering.<br/></p>
 <h2 id='ON-RENDER_POST_DRAW_DEPTH'>ON.RENDER_POST_DRAW_DEPTH</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_DRAW_DEPTH">ON.RENDER_POST_DRAW_DEPTH</a></p>
@@ -25784,12 +26234,50 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_JOURNAL_PAGE">ON.RENDER_PRE_JOURNAL_PAGE</a></p>
 </blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#JOURNAL_PAGE_TYPE">JOURNAL_PAGE_TYPE</a> page_type, <a href="#JournalPage">JournalPage</a> page<br/>Runs before the journal page is drawn on screen. Return <code>true</code> to skip rendering.<br/></p>
 <h2 id='ON-RENDER_POST_JOURNAL_PAGE'>ON.RENDER_POST_JOURNAL_PAGE</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_JOURNAL_PAGE">ON.RENDER_POST_JOURNAL_PAGE</a></p>
 </blockquote>
 
 <p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#JOURNAL_PAGE_TYPE">JOURNAL_PAGE_TYPE</a> page_type, <a href="#JournalPage">JournalPage</a> page<br/>Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the <a href="#VanillaRenderContext">VanillaRenderContext</a><br/>The <a href="#JournalPage">JournalPage</a> parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:<br/><code>page:as_journal_page_progress()</code><br/><code>page:as_journal_page_journalmenu()</code><br/><code>page:as_journal_page_places()</code><br/><code>page:as_journal_page_people()</code><br/><code>page:as_journal_page_bestiary()</code><br/><code>page:as_journal_page_items()</code><br/><code>page:as_journal_page_traps()</code><br/><code>page:as_journal_page_story()</code><br/><code>page:as_journal_page_feats()</code><br/><code>page:as_journal_page_deathcause()</code><br/><code>page:as_journal_page_deathmenu()</code><br/><code>page:as_journal_page_recap()</code><br/><code>page:as_journal_page_playerprofile()</code><br/><code>page:as_journal_page_lastgameplayed()</code><br/></p>
+<h2 id='ON-RENDER_PRE_LAYER'>ON.RENDER_PRE_LAYER</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_LAYER">ON.RENDER_PRE_LAYER</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int rendered_layer<br/>Runs before a layer is rendered, runs for both layers during layer door transitions. Return <code>true</code> to skip rendering.<br/></p>
+<h2 id='ON-RENDER_POST_LAYER'>ON.RENDER_POST_LAYER</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_LAYER">ON.RENDER_POST_LAYER</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int rendered_layer<br/>Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation<br/></p>
+<h2 id='ON-RENDER_PRE_LEVEL'>ON.RENDER_PRE_LEVEL</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_LEVEL">ON.RENDER_PRE_LEVEL</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int camera_layer<br/>Runs before the level is rendered. Return <code>true</code> to skip rendering.<br/></p>
+<h2 id='ON-RENDER_POST_LEVEL'>ON.RENDER_POST_LEVEL</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_LEVEL">ON.RENDER_POST_LEVEL</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int camera_layer<br/>Runs after the level is rendered, before hud<br/></p>
+<h2 id='ON-RENDER_PRE_GAME'>ON.RENDER_PRE_GAME</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_GAME">ON.RENDER_PRE_GAME</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the ingame part of the game is rendered. Return <code>true</code> to skip rendering.<br/></p>
+<h2 id='ON-RENDER_POST_GAME'>ON.RENDER_POST_GAME</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_GAME">ON.RENDER_POST_GAME</a></p>
+</blockquote>
+
+<p>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the level and HUD are rendered, before pause menus and blur effects<br/></p>
 <h2 id='ON-SPEECH_BUBBLE'>ON.SPEECH_BUBBLE</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.SPEECH_BUBBLE">ON.SPEECH_BUBBLE</a></p>
@@ -28116,17 +28604,17 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_HUD">RENDER_PRE_HUD</a></td>
 <td>ON::RENDER_PRE_HUD</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Hud">Hud</a> hud<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx or edit the Hud values. Return <code>true</code> to skip rendering.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_HUD">RENDER_POST_HUD</a></td>
 <td>ON::RENDER_POST_HUD</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#Hud">Hud</a> hud<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_PAUSE_MENU">RENDER_PRE_PAUSE_MENU</a></td>
 <td>ON::RENDER_PRE_PAUSE_MENU</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them. Return <code>true</code> to skip rendering.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_PAUSE_MENU">RENDER_POST_PAUSE_MENU</a></td>
@@ -28134,9 +28622,19 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the pause menu is drawn on screen. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx<br/></td>
 </tr>
 <tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_BLURRED_BACKGROUND">RENDER_PRE_BLURRED_BACKGROUND</a></td>
+<td>ON::RENDER_PRE_BLURRED_BACKGROUND</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can&#39;t really draw textures, because the blurred background is drawn on top of them. Return <code>true</code> to skip rendering.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_BLURRED_BACKGROUND">RENDER_POST_BLURRED_BACKGROUND</a></td>
+<td>ON::RENDER_POST_BLURRED_BACKGROUND</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, float blur<br/>Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the <code>draw_screen_texture</code> function of the render_ctx. (blur amount is probably the same as journal opacity)<br/></td>
+</tr>
+<tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_DRAW_DEPTH">RENDER_PRE_DRAW_DEPTH</a></td>
 <td>ON::RENDER_PRE_DRAW_DEPTH</td>
-<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx<br/></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the <code>draw_world_texture</code> function of the render_ctx. Return <code>true</code> to skip rendering.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_DRAW_DEPTH">RENDER_POST_DRAW_DEPTH</a></td>
@@ -28146,12 +28644,42 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_JOURNAL_PAGE">RENDER_PRE_JOURNAL_PAGE</a></td>
 <td>ON::RENDER_PRE_JOURNAL_PAGE</td>
-<td></td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#JOURNAL_PAGE_TYPE">JOURNAL_PAGE_TYPE</a> page_type, <a href="#JournalPage">JournalPage</a> page<br/>Runs before the journal page is drawn on screen. Return <code>true</code> to skip rendering.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_JOURNAL_PAGE">RENDER_POST_JOURNAL_PAGE</a></td>
 <td>ON::RENDER_POST_JOURNAL_PAGE</td>
 <td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, <a href="#JOURNAL_PAGE_TYPE">JOURNAL_PAGE_TYPE</a> page_type, <a href="#JournalPage">JournalPage</a> page<br/>Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the <a href="#VanillaRenderContext">VanillaRenderContext</a><br/>The <a href="#JournalPage">JournalPage</a> parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:<br/><code>page:as_journal_page_progress()</code><br/><code>page:as_journal_page_journalmenu()</code><br/><code>page:as_journal_page_places()</code><br/><code>page:as_journal_page_people()</code><br/><code>page:as_journal_page_bestiary()</code><br/><code>page:as_journal_page_items()</code><br/><code>page:as_journal_page_traps()</code><br/><code>page:as_journal_page_story()</code><br/><code>page:as_journal_page_feats()</code><br/><code>page:as_journal_page_deathcause()</code><br/><code>page:as_journal_page_deathmenu()</code><br/><code>page:as_journal_page_recap()</code><br/><code>page:as_journal_page_playerprofile()</code><br/><code>page:as_journal_page_lastgameplayed()</code><br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_LAYER">RENDER_PRE_LAYER</a></td>
+<td>ON::RENDER_PRE_LAYER</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int rendered_layer<br/>Runs before a layer is rendered, runs for both layers during layer door transitions. Return <code>true</code> to skip rendering.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_LAYER">RENDER_POST_LAYER</a></td>
+<td>ON::RENDER_POST_LAYER</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int rendered_layer<br/>Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_LEVEL">RENDER_PRE_LEVEL</a></td>
+<td>ON::RENDER_PRE_LEVEL</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int camera_layer<br/>Runs before the level is rendered. Return <code>true</code> to skip rendering.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_LEVEL">RENDER_POST_LEVEL</a></td>
+<td>ON::RENDER_POST_LEVEL</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx, int camera_layer<br/>Runs after the level is rendered, before hud<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_PRE_GAME">RENDER_PRE_GAME</a></td>
+<td>ON::RENDER_PRE_GAME</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs before the ingame part of the game is rendered. Return <code>true</code> to skip rendering.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.RENDER_POST_GAME">RENDER_POST_GAME</a></td>
+<td>ON::RENDER_POST_GAME</td>
+<td>Params: <a href="#VanillaRenderContext">VanillaRenderContext</a> render_ctx<br/>Runs after the level and HUD are rendered, before pause menus and blur effects<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.SPEECH_BUBBLE">SPEECH_BUBBLE</a></td>
@@ -28463,17 +28991,17 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.PROCEDURAL_SPAWNS">PROCEDURAL_SPAWNS</a></td>
 <td>PRNG::PROCEDURAL_SPAWNS</td>
-<td></td>
+<td>Anything level gen related really, including but not limited to path, room and enemy placement.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.PARTICLES">PARTICLES</a></td>
 <td>PRNG::PARTICLES</td>
-<td></td>
+<td>Direction and angle of torch flames etc, but also includes other things not related to particles at all...<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.ENTITY_VARIATION">ENTITY_VARIATION</a></td>
 <td>PRNG::ENTITY_VARIATION</td>
-<td></td>
+<td>Some entities that have many texture to choose from on spawn<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.EXTRA_SPAWNS">EXTRA_SPAWNS</a></td>
@@ -28483,7 +29011,32 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.LEVEL_DECO">LEVEL_DECO</a></td>
 <td>PRNG::LEVEL_DECO</td>
-<td></td>
+<td>I have no idea what this name means, cause this seems to advance every 3 or so frames even with zero entities in a level<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.LIQUID">LIQUID</a></td>
+<td>PRNG::LIQUID</td>
+<td><a href="#Liquid">Liquid</a> movement<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.AI">AI</a></td>
+<td>PRNG::EXTRA_SPAWNS</td>
+<td><a href="#Monster">Monster</a> AI decisions<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.LEVEL_GEN">LEVEL_GEN</a></td>
+<td>PRNG::PROCEDURAL_SPAWNS</td>
+<td>Anything level gen related really, including but not limited to path, room and enemy placement.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.FX">FX</a></td>
+<td>PRNG::FX</td>
+<td>Some effects, like water splashes, background stars and teleport shadow<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PRNG_CLASS.CHAR_AI">CHAR_AI</a></td>
+<td>PRNG::CHAR_AI</td>
+<td>Character AI decisions<br/></td>
 </tr>
 </tbody></table>
 <h2 id='PROCEDURAL_CHANCE'>PROCEDURAL_CHANCE</h2>
@@ -28718,6 +29271,106 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ROOM_TEMPLATE_TYPE.MACHINE_ROOM">MACHINE_ROOM</a></td>
 <td>4</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='SAFE_SETTING'>SAFE_SETTING</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING">SAFE_SETTING</a></p>
+</blockquote>
+
+<p>Paramater to set_setting</p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.PET_STYLE">PET_STYLE</a></td>
+<td>20</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.SCREEN_SHAKE">SCREEN_SHAKE</a></td>
+<td>21</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.HUD_STYLE">HUD_STYLE</a></td>
+<td>23</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.HUD_SIZE">HUD_SIZE</a></td>
+<td>24</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.LEVEL_TIMER">LEVEL_TIMER</a></td>
+<td>25</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.TIMER_DETAIL">TIMER_DETAIL</a></td>
+<td>26</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.LEVEL_NUMBER">LEVEL_NUMBER</a></td>
+<td>27</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.ANGRY_SHOPKEEPER">ANGRY_SHOPKEEPER</a></td>
+<td>28</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.BUTTON_PROMPTS">BUTTON_PROMPTS</a></td>
+<td>30</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.FEAT_POPUPS">FEAT_POPUPS</a></td>
+<td>32</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.TEXTBOX_SIZE">TEXTBOX_SIZE</a></td>
+<td>33</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.TEXTBOX_DURATION">TEXTBOX_DURATION</a></td>
+<td>34</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.TEXTBOX_OPACITY">TEXTBOX_OPACITY</a></td>
+<td>35</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.LEVEL_FEELINGS">LEVEL_FEELINGS</a></td>
+<td>36</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.DIALOG_TEXT">DIALOG_TEXT</a></td>
+<td>37</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.KALI_TEXT">KALI_TEXT</a></td>
+<td>38</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING.GHOST_TEXT">GHOST_TEXT</a></td>
+<td>39</td>
 <td></td>
 </tr>
 </tbody></table>

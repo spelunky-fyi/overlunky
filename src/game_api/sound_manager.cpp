@@ -293,7 +293,8 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
     m_IsInit = true;
 #define AUDIO_INIT_ERROR(format, ...) \
     DEBUG(format, __VA_ARGS__);       \
-    m_IsInit = false;
+    // what's the point of this then?
+    // m_IsInit = false;
 
     if (HMODULE fmod_studio = GetModuleHandle("fmodstudio.dll"))
     {

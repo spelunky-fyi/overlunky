@@ -699,14 +699,22 @@ Name | Data | Description
 [PRE_HANDLE_ROOM_TILES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_HANDLE_ROOM_TILES) | ON::PRE_HANDLE_ROOM_TILES | Params: int x, int y, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template, [PreHandleRoomTilesContext](#PreHandleRoomTilesContext) room_ctx<br/>Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this<br/>Runs after a random room was selected and right before it would spawn entities for each tile code<br/>Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant<br/>
 [SCRIPT_ENABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) | ON::SCRIPT_ENABLE | Runs when the script is enabled from the UI or when imported by another script while disabled, but not on load.<br/>
 [SCRIPT_DISABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) | ON::SCRIPT_DISABLE | Runs when the script is disabled from the UI and also right before unloading/reloading.<br/>
-[RENDER_PRE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) | ON::RENDER_PRE_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
-[RENDER_POST_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_HUD) | ON::RENDER_POST_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
-[RENDER_PRE_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU) | ON::RENDER_PRE_PAUSE_MENU | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
+[RENDER_PRE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) | ON::RENDER_PRE_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [Hud](#Hud) hud<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx or edit the Hud values. Return `true` to skip rendering.<br/>
+[RENDER_POST_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_HUD) | ON::RENDER_POST_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [Hud](#Hud) hud<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
+[RENDER_PRE_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU) | ON::RENDER_PRE_PAUSE_MENU | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.<br/>
 [RENDER_POST_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_PAUSE_MENU) | ON::RENDER_POST_PAUSE_MENU | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
-[RENDER_PRE_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_DRAW_DEPTH) | ON::RENDER_PRE_DRAW_DEPTH | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx<br/>
+[RENDER_PRE_BLURRED_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_BLURRED_BACKGROUND) | ON::RENDER_PRE_BLURRED_BACKGROUND | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.<br/>
+[RENDER_POST_BLURRED_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_BLURRED_BACKGROUND) | ON::RENDER_POST_BLURRED_BACKGROUND | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, float blur<br/>Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx. (blur amount is probably the same as journal opacity)<br/>
+[RENDER_PRE_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_DRAW_DEPTH) | ON::RENDER_PRE_DRAW_DEPTH | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx. Return `true` to skip rendering.<br/>
 [RENDER_POST_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_DRAW_DEPTH) | ON::RENDER_POST_DRAW_DEPTH | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth<br/>Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx<br/>
-[RENDER_PRE_JOURNAL_PAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_JOURNAL_PAGE) | ON::RENDER_PRE_JOURNAL_PAGE | 
+[RENDER_PRE_JOURNAL_PAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_JOURNAL_PAGE) | ON::RENDER_PRE_JOURNAL_PAGE | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [JOURNAL_PAGE_TYPE](#JOURNAL_PAGE_TYPE) page_type, [JournalPage](#JournalPage) page<br/>Runs before the journal page is drawn on screen. Return `true` to skip rendering.<br/>
 [RENDER_POST_JOURNAL_PAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_JOURNAL_PAGE) | ON::RENDER_POST_JOURNAL_PAGE | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [JOURNAL_PAGE_TYPE](#JOURNAL_PAGE_TYPE) page_type, [JournalPage](#JournalPage) page<br/>Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the [VanillaRenderContext](#VanillaRenderContext)<br/>The [JournalPage](#JournalPage) parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:<br/>`page:as_journal_page_progress()`<br/>`page:as_journal_page_journalmenu()`<br/>`page:as_journal_page_places()`<br/>`page:as_journal_page_people()`<br/>`page:as_journal_page_bestiary()`<br/>`page:as_journal_page_items()`<br/>`page:as_journal_page_traps()`<br/>`page:as_journal_page_story()`<br/>`page:as_journal_page_feats()`<br/>`page:as_journal_page_deathcause()`<br/>`page:as_journal_page_deathmenu()`<br/>`page:as_journal_page_recap()`<br/>`page:as_journal_page_playerprofile()`<br/>`page:as_journal_page_lastgameplayed()`<br/>
+[RENDER_PRE_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_LAYER) | ON::RENDER_PRE_LAYER | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int rendered_layer<br/>Runs before a layer is rendered, runs for both layers during layer door transitions. Return `true` to skip rendering.<br/>
+[RENDER_POST_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_LAYER) | ON::RENDER_POST_LAYER | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int rendered_layer<br/>Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation<br/>
+[RENDER_PRE_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_LEVEL) | ON::RENDER_PRE_LEVEL | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int camera_layer<br/>Runs before the level is rendered. Return `true` to skip rendering.<br/>
+[RENDER_POST_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_LEVEL) | ON::RENDER_POST_LEVEL | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int camera_layer<br/>Runs after the level is rendered, before hud<br/>
+[RENDER_PRE_GAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_GAME) | ON::RENDER_PRE_GAME | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the ingame part of the game is rendered. Return `true` to skip rendering.<br/>
+[RENDER_POST_GAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_GAME) | ON::RENDER_POST_GAME | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the level and HUD are rendered, before pause menus and blur effects<br/>
 [SPEECH_BUBBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) | ON::SPEECH_BUBBLE | Params: [Entity](#Entity) speaking_entity, string text<br/>Runs before any speech bubble is created, even the one using [say](#say) function<br/>Return: if you don't return anything it will execute the speech bubble function normally with default message<br/>if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [TOAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TOAST) | ON::TOAST | Params: string text<br/>Runs before any toast is created, even the one using [toast](#toast) function<br/>Return: if you don't return anything it will execute the toast function normally with default message<br/>if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [DEATH_MESSAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH_MESSAGE) | ON::DEATH_MESSAGE | Params: [STRINGID](#Aliases) id<br/>Runs once after death when the death message journal page is shown. The parameter is the [STRINGID](#Aliases) of the title, like 1221 for BLOWN UP.<br/>
@@ -811,11 +819,16 @@ Determines what class of prng is used, which in turn determines which parts of t
 
 Name | Data | Description
 ---- | ---- | -----------
-[PROCEDURAL_SPAWNS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PROCEDURAL_SPAWNS) | PRNG::PROCEDURAL_SPAWNS | 
-[PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PARTICLES) | PRNG::PARTICLES | 
-[ENTITY_VARIATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.ENTITY_VARIATION) | PRNG::ENTITY_VARIATION | 
+[PROCEDURAL_SPAWNS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PROCEDURAL_SPAWNS) | PRNG::PROCEDURAL_SPAWNS | Anything level gen related really, including but not limited to path, room and enemy placement.<br/>
+[PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PARTICLES) | PRNG::PARTICLES | Direction and angle of torch flames etc, but also includes other things not related to particles at all...<br/>
+[ENTITY_VARIATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.ENTITY_VARIATION) | PRNG::ENTITY_VARIATION | Some entities that have many texture to choose from on spawn<br/>
 [EXTRA_SPAWNS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.EXTRA_SPAWNS) | PRNG::EXTRA_SPAWNS | 
-[LEVEL_DECO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_DECO) | PRNG::LEVEL_DECO | 
+[LEVEL_DECO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_DECO) | PRNG::LEVEL_DECO | I have no idea what this name means, cause this seems to advance every 3 or so frames even with zero entities in a level<br/>
+[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LIQUID) | PRNG::LIQUID | [Liquid](#Liquid) movement<br/>
+[AI](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.AI) | PRNG::EXTRA_SPAWNS | [Monster](#Monster) AI decisions<br/>
+[LEVEL_GEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_GEN) | PRNG::PROCEDURAL_SPAWNS | Anything level gen related really, including but not limited to path, room and enemy placement.<br/>
+[FX](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.FX) | PRNG::FX | Some effects, like water splashes, background stars and teleport shadow<br/>
+[CHAR_AI](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.CHAR_AI) | PRNG::CHAR_AI | Character AI decisions<br/>
 
 ## PROCEDURAL_CHANCE
 
@@ -904,6 +917,33 @@ Name | Data | Description
 [EXIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.EXIT) | 2 | 
 [SHOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.SHOP) | 3 | 
 [MACHINE_ROOM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.MACHINE_ROOM) | 4 | 
+
+## SAFE_SETTING
+
+
+> Search script examples for [SAFE_SETTING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING)
+
+Paramater to set_setting
+
+Name | Data | Description
+---- | ---- | -----------
+[PET_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.PET_STYLE) | 20 | 
+[SCREEN_SHAKE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.SCREEN_SHAKE) | 21 | 
+[HUD_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.HUD_STYLE) | 23 | 
+[HUD_SIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.HUD_SIZE) | 24 | 
+[LEVEL_TIMER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.LEVEL_TIMER) | 25 | 
+[TIMER_DETAIL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TIMER_DETAIL) | 26 | 
+[LEVEL_NUMBER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.LEVEL_NUMBER) | 27 | 
+[ANGRY_SHOPKEEPER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.ANGRY_SHOPKEEPER) | 28 | 
+[BUTTON_PROMPTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.BUTTON_PROMPTS) | 30 | 
+[FEAT_POPUPS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.FEAT_POPUPS) | 32 | 
+[TEXTBOX_SIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TEXTBOX_SIZE) | 33 | 
+[TEXTBOX_DURATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TEXTBOX_DURATION) | 34 | 
+[TEXTBOX_OPACITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TEXTBOX_OPACITY) | 35 | 
+[LEVEL_FEELINGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.LEVEL_FEELINGS) | 36 | 
+[DIALOG_TEXT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.DIALOG_TEXT) | 37 | 
+[KALI_TEXT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.KALI_TEXT) | 38 | 
+[GHOST_TEXT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.GHOST_TEXT) | 39 | 
 
 ## SCREEN
 

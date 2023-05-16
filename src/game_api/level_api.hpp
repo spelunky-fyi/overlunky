@@ -119,7 +119,7 @@ struct LevelGenData
 
     union
     {
-        uint32_t level_config[18];
+        std::array<uint32_t, 18> level_config;
         struct
         {
             uint32_t back_room_chance;
@@ -199,10 +199,10 @@ class ThemeInfo
     // temple: unset levelgen.flags.flag10 + calculate chance of grasshopper critter spawn
     // sunken: unset levelgen.flags.flag9, 10, 17, 18 + if state.level == 1 -> unset flag 11
     // cosmic: calls same virtual on its sub_theme
-    /// Initializes some flags in the LevelGenSystem
+    /// Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
     virtual void init_flags() = 0;
 
-    /// Adds the entrance room
+    /// Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
     virtual void init_level() = 0;
 
     // most themes call the same function, some check whether they are in CO
@@ -263,7 +263,7 @@ class ThemeInfo
     /// Handles loading the next level screen from a transition screen
     virtual void post_transition() = 0;
 
-    /// Spawns the players with inventory at `state.level_gen.spawn_x/y`
+    /// Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     virtual void spawn_players() = 0;
 
     /// Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.

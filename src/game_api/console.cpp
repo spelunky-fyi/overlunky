@@ -38,12 +38,11 @@ std::deque<ScriptMessage> SpelunkyConsole::consume_messages()
 bool SpelunkyConsole::is_enabled()
 {
     // Note: Does not mean the console is showing, only that it should get updated
-    return true;
+    return m_Impl->Lock()->get_enabled();
 }
 bool SpelunkyConsole::is_toggled()
 {
-    // Directly access `enabled` here, the implementation of `get_enabled` is just faking it
-    return m_Impl->Lock()->enabled;
+    return m_Impl->Lock()->toggled;
 }
 
 void SpelunkyConsole::draw(ImDrawList* dl)
@@ -139,4 +138,9 @@ unsigned int SpelunkyConsole::get_input_lines()
 void SpelunkyConsole::set_geometry(float x, float y, float w, float h)
 {
     m_Impl->Lock()->set_geometry(x, y, w, h);
+}
+
+void SpelunkyConsole::set_alt_keys(bool enable)
+{
+    m_Impl->Lock()->set_alt_keys(enable);
 }

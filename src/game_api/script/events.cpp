@@ -10,6 +10,7 @@
 #include "level_api_types.hpp"    // for LevelGenRoomData
 #include "rpc.hpp"                // for game_log, get_adventure_seed
 #include "script/lua_backend.hpp" // for LuaBackend, ON, LuaBackend::PreHan...
+#include "settings_api.hpp"       // for restore_original_settings
 #include "state.hpp"              // for StateMemory, State
 
 class JournalPage;
@@ -55,6 +56,9 @@ bool pre_load_screen()
         }
     }
 
+    if (state->screen_next != 5)
+        unlock_settings();
+
     bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
@@ -62,6 +66,10 @@ bool pre_load_screen()
             block = backend->pre_load_screen();
             return !block;
         });
+
+    if (state->screen_next == 5 && !block)
+        restore_original_settings();
+
     return block;
 }
 void post_room_generation()
@@ -189,34 +197,76 @@ bool pre_entity_instagib(Entity* victim)
     return skip;
 }
 
-void trigger_vanilla_render_callbacks(ON event)
+bool trigger_vanilla_render_callbacks(ON event)
 {
+    bool skip{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->process_vanilla_render_callbacks(event);
+            skip |= backend->process_vanilla_render_callbacks(event);
             return true;
         });
+    return skip;
 }
 
-void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
+bool trigger_vanilla_render_blur_callbacks(ON event, float blur_amount)
 {
+    bool skip{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->process_vanilla_render_draw_depth_callbacks(event, draw_depth, bbox);
+            skip |= backend->process_vanilla_render_blur_callbacks(event, blur_amount);
             return true;
         });
+    return skip;
 }
 
-void trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
+bool trigger_vanilla_render_hud_callbacks(ON event, Hud* hud)
 {
+    bool skip{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->process_vanilla_render_journal_page_callbacks(event, page_type, page);
+            skip |= backend->process_vanilla_render_hud_callbacks(event, hud);
             return true;
         });
+    return skip;
+}
+
+bool trigger_vanilla_render_layer_callbacks(ON event, uint8_t layer)
+{
+    bool skip{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            skip |= backend->process_vanilla_render_layer_callbacks(event, layer);
+            return true;
+        });
+    return skip;
+}
+
+bool trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
+{
+    bool skip{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            skip |= backend->process_vanilla_render_draw_depth_callbacks(event, draw_depth, bbox);
+            return true;
+        });
+    return skip;
+}
+
+bool trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
+{
+    bool skip{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            skip |= backend->process_vanilla_render_journal_page_callbacks(event, page_type, page);
+            return true;
+        });
+    return skip;
 }
 
 std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer)

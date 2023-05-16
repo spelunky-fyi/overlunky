@@ -1771,16 +1771,68 @@ end
     /// Removes all liquid that is about to go out of bounds, which crashes the game.
     lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
 
+    /// Return the name of the first matching number in an enum table
+    // lua["enum_get_name"] = [](table enum, int value) -> string
+    lua["enum_get_name"] = lua.safe_script(R"(
+        return function(enum, value)
+            for k,v in pairs(enum) do
+                if v == value then return k end
+            end
+        end
+    )");
+
+    /// Return all the names of a number in an enum table
+    // lua["enum_get_names"] = [](table enum, int value) -> table<string>
+    lua["enum_get_names"] = lua.safe_script(R"(
+        return function(enum, value)
+            local list = {}
+            for k,v in pairs(enum) do
+                if v == value then list[#list+1] = k end
+            end
+            return list
+        end
+    )");
+
+    /// Return the matching names for a bitmask in an enum table of masks
+    // lua["enum_get_mask_names"] = [](table enum, int value) -> table<string>
+    lua["enum_get_mask_names"] = lua.safe_script(R"(
+        return function(enum, mask)
+            local list = {}
+            for k,v in pairs(enum) do
+                if test_mask(mask, v) then list[#list+1] = k end
+            end
+            return list
+        end
+    )");
+
+    /// Paramater to set_setting
+    lua.create_named_table("SAFE_SETTING", "PET_STYLE", 20, "SCREEN_SHAKE", 21, "HUD_STYLE", 23, "HUD_SIZE", 24, "LEVEL_TIMER", 25, "TIMER_DETAIL", 26, "LEVEL_NUMBER", 27, "ANGRY_SHOPKEEPER", 28, "BUTTON_PROMPTS", 30, "FEAT_POPUPS", 32, "TEXTBOX_SIZE", 33, "TEXTBOX_DURATION", 34, "TEXTBOX_OPACITY", 35, "LEVEL_FEELINGS", 36, "DIALOG_TEXT", 37, "KALI_TEXT", 38, "GHOST_TEXT", 39);
+
     /// Gets the specified setting, values might need to be interpreted differently per setting
     lua["get_setting"] = get_setting;
 
-    /// Return the name of an unknown number in an enum table
-    // lua["enum_get_name"] = [](table enum, int value) -> string
-    lua["enum_get_name"] = lua.safe_script(R"(
-        return function(table, value)
-            for k,v in pairs(table) do
-                if v == value then return k end
-            end
+    /// Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals. Returns false, if setting failed.
+    // lua["set_setting"] = set_setting;
+    /// NoDoc
+    lua["set_setting"] = [](GAME_SETTING setting, std::uint32_t value)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        bool is_safe = std::find(std::begin(safe_settings), std::end(safe_settings), setting) != std::end(safe_settings);
+
+        if (backend->get_unsafe() || is_safe)
+        {
+            save_original_setting(setting);
+            return set_setting(setting, value);
+        }
+        return false;
+    };
+
+    /// Short for print(string.format(...))
+    lua["printf"] = lua.safe_script(R"(
+        return function(...)
+            local out = string.format(...)
+            print(out)
+            return out
         end
     )");
 
@@ -1927,6 +1979,27 @@ end
         return sol::make_object(lua, sol::as_table(files));
     };
 
+    /// Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count
+    lua["get_hud_position"] = [](int index) -> AABB
+    {
+        index--;
+        float ax = -0.98f;
+        float f = 1.0f;
+        uint32_t hs = get_setting(GAME_SETTING::HUD_SIZE).value_or(0);
+        if (hs == 0 || State::get().ptr()->items->player_count > 3)
+            f = 1.0f;
+        else if (hs == 1 || State::get().ptr()->items->player_count > 2)
+            f = 1.15f;
+        else
+            f = 1.3f;
+        float w = 0.32f * f;
+
+        float ay = 0.94f - (1.0f - f) * 0.1f;
+        float h = 0.2f * f;
+
+        return AABB(ax + index * w + 0.02f * f, ay, ax + index * w + w - 0.02f * f, ay - h);
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
@@ -2038,6 +2111,10 @@ end
         ON::RENDER_PRE_PAUSE_MENU,
         "RENDER_POST_PAUSE_MENU",
         ON::RENDER_POST_PAUSE_MENU,
+        "RENDER_PRE_BLURRED_BACKGROUND",
+        ON::RENDER_PRE_BLURRED_BACKGROUND,
+        "RENDER_POST_BLURRED_BACKGROUND",
+        ON::RENDER_POST_BLURRED_BACKGROUND,
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
         "RENDER_POST_DRAW_DEPTH",
@@ -2046,6 +2123,18 @@ end
         ON::RENDER_PRE_JOURNAL_PAGE,
         "RENDER_POST_JOURNAL_PAGE",
         ON::RENDER_POST_JOURNAL_PAGE,
+        "RENDER_PRE_LAYER",
+        ON::RENDER_PRE_LAYER,
+        "RENDER_POST_LAYER",
+        ON::RENDER_POST_LAYER,
+        "RENDER_PRE_LEVEL",
+        ON::RENDER_PRE_LEVEL,
+        "RENDER_POST_LEVEL",
+        ON::RENDER_POST_LEVEL,
+        "RENDER_PRE_GAME",
+        ON::RENDER_PRE_GAME,
+        "RENDER_POST_GAME",
+        ON::RENDER_POST_GAME,
         "SPEECH_BUBBLE",
         ON::SPEECH_BUBBLE,
         "TOAST",
@@ -2171,24 +2260,51 @@ end
     // LOAD
     // Params: LoadContext load_ctx
     // Runs as soon as your script is loaded, including reloads, then never again
+    // RENDER_PRE_GAME
+    // Params: VanillaRenderContext render_ctx
+    // Runs before the ingame part of the game is rendered. Return `true` to skip rendering.
+    // RENDER_POST_GAME
+    // Params: VanillaRenderContext render_ctx
+    // Runs after the level and HUD are rendered, before pause menus and blur effects
+    // RENDER_PRE_LEVEL
+    // Params: VanillaRenderContext render_ctx, int camera_layer
+    // Runs before the level is rendered. Return `true` to skip rendering.
+    // RENDER_POST_LEVEL
+    // Params: VanillaRenderContext render_ctx, int camera_layer
+    // Runs after the level is rendered, before hud
+    // RENDER_PRE_LAYER
+    // Params: VanillaRenderContext render_ctx, int rendered_layer
+    // Runs before a layer is rendered, runs for both layers during layer door transitions. Return `true` to skip rendering.
+    // RENDER_POST_LAYER
+    // Params: VanillaRenderContext render_ctx, int rendered_layer
+    // Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation
     // RENDER_PRE_HUD
-    // Params: VanillaRenderContext render_ctx
-    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // Params: VanillaRenderContext render_ctx, Hud hud
+    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx or edit the Hud values. Return `true` to skip rendering.
     // RENDER_POST_HUD
-    // Params: VanillaRenderContext render_ctx
+    // Params: VanillaRenderContext render_ctx, Hud hud
     // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_PAUSE_MENU
     // Params: VanillaRenderContext render_ctx
-    // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.
     // RENDER_POST_PAUSE_MENU
     // Params: VanillaRenderContext render_ctx
     // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_PRE_BLURRED_BACKGROUND
+    // Params: VanillaRenderContext render_ctx, float blur
+    // Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.
+    // RENDER_POST_BLURRED_BACKGROUND
+    // Params: VanillaRenderContext render_ctx, float blur
+    // Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx. (blur amount is probably the same as journal opacity)
     // RENDER_PRE_DRAW_DEPTH
     // Params: VanillaRenderContext render_ctx, int draw_depth
-    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx. Return `true` to skip rendering.
     // RENDER_POST_DRAW_DEPTH
     // Params: VanillaRenderContext render_ctx, int draw_depth
     // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_PRE_JOURNAL_PAGE
+    // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
+    // Runs before the journal page is drawn on screen. Return `true` to skip rendering.
     // RENDER_POST_JOURNAL_PAGE
     // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
     // Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the VanillaRenderContext
@@ -2342,7 +2458,7 @@ end
         "BOLD",
         2);
 
-    /// Paramater to `get_setting()`
+    /// Paramater to get_setting (and set_setting in unsafe mode)
     lua.create_named_table("GAME_SETTING"
                            //, "DAMSEL_STYLE", 0
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...

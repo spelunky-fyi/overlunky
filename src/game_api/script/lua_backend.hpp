@@ -38,6 +38,8 @@ class JournalPage;
 class Entity;
 struct LevelGenRoomData;
 struct AABB;
+struct HudData;
+struct Hud;
 
 enum class ON
 {
@@ -94,10 +96,18 @@ enum class ON
     RENDER_POST_HUD,
     RENDER_PRE_PAUSE_MENU,
     RENDER_POST_PAUSE_MENU,
+    RENDER_PRE_BLURRED_BACKGROUND,
+    RENDER_POST_BLURRED_BACKGROUND,
     RENDER_PRE_DRAW_DEPTH,
     RENDER_POST_DRAW_DEPTH,
     RENDER_PRE_JOURNAL_PAGE,
     RENDER_POST_JOURNAL_PAGE,
+    RENDER_PRE_LAYER,
+    RENDER_POST_LAYER,
+    RENDER_PRE_LEVEL,
+    RENDER_POST_LEVEL,
+    RENDER_PRE_GAME,
+    RENDER_POST_GAME,
     SPEECH_BUBBLE,
     TOAST,
     PRE_LOAD_SCREEN,
@@ -372,9 +382,12 @@ class LuaBackend
 
     bool pre_entity_instagib(Entity* victim);
 
-    void process_vanilla_render_callbacks(ON event);
-    void process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
-    void process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
+    bool process_vanilla_render_callbacks(ON event);
+    bool process_vanilla_render_blur_callbacks(ON event, float blur_amount);
+    bool process_vanilla_render_hud_callbacks(ON event, Hud* hud);
+    bool process_vanilla_render_layer_callbacks(ON event, uint8_t layer);
+    bool process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
+    bool process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
 
     std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
     std::u16string pre_toast(char16_t* buffer);

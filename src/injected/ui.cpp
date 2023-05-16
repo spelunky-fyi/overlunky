@@ -40,6 +40,7 @@
 #include "flags.hpp"
 #include "game_manager.hpp"
 #include "items.hpp"
+#include "level_api.hpp"
 #include "logger.h"
 #include "math.hpp"
 #include "savedata.hpp"
@@ -97,6 +98,9 @@ std::map<std::string, int64_t> default_keys{
     {"toggle_hud", OL_KEY_CTRL | 'H'},
     {"toggle_lights", OL_KEY_CTRL | 'L'},
     {"toggle_ghost", OL_KEY_CTRL | 'O'},
+    {"toggle_void", OL_KEY_ALT | 'V'},
+    {"import_void", OL_KEY_CTRL | 'V'},
+    {"export_void", OL_KEY_CTRL | 'E'},
     {"toggle_speedhack_auto", OL_KEY_CTRL | OL_KEY_SHIFT | 'T'},
     {"frame_advance", VK_SPACE},
     {"frame_advance_alt", OL_KEY_SHIFT | VK_SPACE},
@@ -127,6 +131,17 @@ std::map<std::string, int64_t> default_keys{
     {"spawn_kit_7", OL_KEY_SHIFT | '7'},
     {"spawn_kit_8", OL_KEY_SHIFT | '8'},
     {"spawn_kit_9", OL_KEY_SHIFT | '9'},
+    {"hotbar_1", '1'},
+    {"hotbar_2", '2'},
+    {"hotbar_3", '3'},
+    {"hotbar_4", '4'},
+    {"hotbar_5", '5'},
+    {"hotbar_6", '6'},
+    {"hotbar_7", '7'},
+    {"hotbar_8", '8'},
+    {"hotbar_9", '9'},
+    {"hotbar_0", '0'},
+    {"toggle_hotbar", OL_KEY_CTRL | OL_KEY_SHIFT | 'B'},
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
     {"destroy_grabbed", VK_DELETE},
@@ -181,6 +196,7 @@ std::map<std::string, int64_t> default_keys{
     {"quick_start", 'Q'},
     {"quick_restart", OL_KEY_CTRL | 'Q'},
     {"quick_camp", OL_KEY_CTRL | 'C'},
+    {"peek_layer", 0x8}, // backspace
     {"speedhack_increase", OL_KEY_CTRL | OL_KEY_SHIFT | VK_PRIOR},
     {"speedhack_decrease", OL_KEY_CTRL | OL_KEY_SHIFT | VK_NEXT},
     {"speedhack_10pct", OL_KEY_CTRL | OL_KEY_SHIFT | '1'},
@@ -230,8 +246,8 @@ float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, 
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
-    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1;
-unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
+    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1, g_force_level_width = 4, g_force_level_height = 4;
+unsigned int g_level_width = 0, grid_x = 0, grid_y = 0, g_pause_type = 0x2;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0, g_last_kit_spawn = 0;
 std::vector<EntityItem> g_items;
@@ -242,13 +258,14 @@ struct Kit
     bool automatic;
 };
 std::vector<std::string> saved_entities;
+std::vector<uint32_t> saved_hotbar;
 std::vector<Kit*> kits;
 std::vector<Player*> g_players;
 std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -257,12 +274,14 @@ SaveData* g_save = 0;
 GameManager* g_game_manager = 0;
 std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
-std::string active_tab = "", activate_tab = "", detach_tab = "", focused_tool = "";
+std::string active_tab = "", activate_tab = "", detach_tab = "", focused_tool = "", g_load_void = "";
 std::vector<std::string> tab_order = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_texture", "tool_options", "tool_style", "tool_keys", "tool_debug"};
 std::vector<std::string> tab_order_main = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_save", "tool_finder", "tool_script", "tool_options"};
 std::vector<std::string> tab_order_extra = {"tool_texture"};
 std::vector<std::string> tabs_open = {"tool_entity", "tool_door", "tool_camera", "tool_entity_properties", "tool_game_properties", "tool_finder"};
 std::vector<std::string> tabs_detached = {};
+
+std::map<uint32_t, uint32_t> hotbar = {};
 
 std::string text;
 std::string g_change_key = "";
@@ -316,6 +335,7 @@ std::map<std::string, bool> options = {
     {"disable_savegame", true},
     {"disable_ghost_timer", false},
     {"draw_hud", true},
+    {"draw_hotbar", true},
     {"draw_script_messages", true},
     {"fade_script_messages", true},
     {"console_script_messages", false},
@@ -323,10 +343,12 @@ std::map<std::string, bool> options = {
     {"show_tooltips", true},
     {"smooth_camera", true},
     {"multi_viewports", true},
+    {"docking_with_shift", true},
     {"menu_ui", true},
     {"hd_cursor", true},
     {"inverted", false},
-    {"borders", false}};
+    {"borders", false},
+    {"console_alt_keys", false}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -816,6 +838,7 @@ void save_config(std::string file)
     writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0" << std::endl;
     writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
     writeData << "camera_speed = " << std::fixed << std::setprecision(2) << g_camera_speed << " # float" << std::endl;
+    writeData << "pause_type = 0x" << std::hex << g_pause_type << " # 8bit flags" << std::endl;
 
     writeData << "kits = [";
     for (unsigned int i = 0; i < kits.size(); i++)
@@ -828,6 +851,23 @@ void save_config(std::string file)
     if (!kits.empty())
         writeData << std::endl;
     writeData << "]" << std::endl;
+
+    uint32_t max = 0;
+    for (auto [i, id] : hotbar)
+    {
+        max = i;
+    }
+    writeData << "hotbar = [";
+    for (unsigned int i = 0; i <= max; i++)
+    {
+        uint32_t id = 0;
+        if (hotbar.contains(i))
+            id = hotbar[i];
+        writeData << std::dec << id;
+        if (i < max)
+            writeData << ", ";
+    }
+    writeData << "] # array of numeric ent types" << std::endl;
 
     writeData << "font_file = \"" << fontfile << "\" # string, \"file.ttf\" or empty to use the embedded font \"Hack\"" << std::endl;
     writeData << "font_size = [";
@@ -952,6 +992,7 @@ void load_config(std::string file)
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66f);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0f);
     g_camera_speed = toml::find_or<float>(opts, "camera_speed", 1.0f);
+    g_pause_type = toml::find_or<unsigned int>(opts, "pause_type", 2);
     kits.clear();
     saved_entities.clear();
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
@@ -960,6 +1001,15 @@ void load_config(std::string file)
         kits.push_back(new Kit({saved, false}));
     }
     saved_entities.clear();
+    hotbar.clear();
+    saved_hotbar.clear();
+    saved_hotbar = toml::find_or<std::vector<uint32_t>>(opts, "hotbar", {});
+    for (uint32_t i = 0; i < saved_hotbar.size(); ++i)
+    {
+        if (saved_hotbar[i] != 0)
+            hotbar[i] = saved_hotbar[i];
+    }
+    saved_hotbar.clear();
     g_script_autorun = toml::find_or<std::vector<std::string>>(opts, "autorun_scripts", {});
     scriptpath = toml::find_or<std::string>(opts, "script_dir", "Overlunky/Scripts");
     fontfile = toml::find_or<std::string>(opts, "font_file", "");
@@ -989,6 +1039,8 @@ void load_config(std::string file)
         options["multi_viewports"] = false;
         ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
     }
+    ImGui::GetIO().ConfigDockingWithShift = options["docking_with_shift"];
+    g_Console->set_alt_keys(options["console_alt_keys"]);
     save_config(file);
 }
 
@@ -1212,38 +1264,46 @@ ImVec2 mouse_pos()
     return ImGui::GetMousePos() - base->Pos;
 }
 
+std::optional<EntityItem> get_spawn_item()
+{
+    auto to_spawn = g_items[g_filtered_items[g_current_item]];
+    if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
+    {
+        if (g_entity)
+        {
+            to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
+        }
+        else if (g_last_type >= 0)
+        {
+            to_spawn = EntityItem{entity_full_names[g_last_type], (uint32_t)g_last_type};
+        }
+        else
+        {
+            return std::nullopt;
+        }
+    }
+    return to_spawn;
+}
+
 std::string spawned_type()
 {
     const auto pos = text.find_first_of(" ");
     if (pos == std::string::npos && g_filtered_count > 0)
     {
-        auto to_spawn = g_items[g_filtered_items[g_current_item]];
-        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-        {
-            if (g_entity)
-            {
-                return entity_full_names[g_entity->type->id];
-            }
-            else if (g_last_type >= 0)
-            {
-                return entity_full_names[g_last_type];
-            }
-        }
-        else if (g_current_item > 0 && g_filtered_count > 0)
-        {
-            to_spawn = g_items[g_filtered_items[g_current_item]];
-            return to_spawn.name;
-        }
-        return "";
+        auto to_spawn = get_spawn_item();
+        if (to_spawn.has_value())
+            return to_spawn.value().name;
     }
     else
     {
         return text;
     }
+    return "";
 }
 
 int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
 {
+    bool flip = g_vx < -0.04f;
     std::pair<float, float> cpos = UI::click_position(g_x, g_y);
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
@@ -1251,6 +1311,11 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
         if (!lock_entity && set_last)
             g_last_id = spawned;
         return spawned;
+    }
+    else if (to_spawn.name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+    {
+        if (!g_players.empty())
+            g_players.at(0)->give_powerup(to_spawn.id);
     }
     else if (to_spawn.name == "ENT_TYPE_ITEM_PLAYERGHOST")
     {
@@ -1286,10 +1351,22 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
             }
         }
         int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
+        if (to_spawn.name.find("ENT_TYPE_MOUNT") != std::string::npos)
+        {
+            auto mount = get_entity_ptr(spawned)->as<Mount>();
+            mount->tame(true);
+        }
         if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
         {
             if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
             {
+                if (flip && (to_spawn.name.find("ARROW_TRAP") != std::string::npos || to_spawn.name.find("LASER_TRAP") != std::string::npos || to_spawn.name.find("HORIZONTAL") != std::string::npos))
+                {
+                    floor->flags |= (1U << 16);
+                    for (auto trig : floor->items.entities())
+                        trig->flags |= (1U << 16);
+                }
+
                 if (floor->get_decoration_entity_type() != -1)
                 {
                     floor->fix_decorations(true, false);
@@ -1302,6 +1379,12 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                                }};
                 callbacks.push_back(cb);
             }
+        }
+        else if (flip)
+        {
+            auto ent = get_entity_ptr(spawned);
+            if (ent)
+                ent->flags |= (1U << 16);
         }
         if (!lock_entity && set_last)
             g_last_id = spawned;
@@ -1317,6 +1400,9 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
 void spawn_kit(Kit* kit)
 {
     if (g_players.size() == 0)
+        return;
+
+    if ((g_state->screen < 11 || g_state->screen > 19) && g_state->screen != 1 && g_state->screen != 26)
         return;
 
     static const ENT_TYPE wearable[] = {
@@ -1384,26 +1470,15 @@ void spawn_entities(bool s, std::string list = "")
     if (g_game_manager->pause_ui->visibility > 0)
         return;
 
+    if ((g_state->screen < 11 || g_state->screen > 19) && g_state->screen != 1 && g_state->screen != 26)
+        return;
+
     const auto pos = text.find_first_of(" ");
     if (list == "" && pos == std::string::npos && g_filtered_count > 0)
     {
-        auto to_spawn = g_items[g_filtered_items[g_current_item]];
-        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-        {
-            if (g_entity)
-            {
-                to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
-            }
-            else if (g_last_type >= 0)
-            {
-                to_spawn = EntityItem{entity_full_names[g_last_type], (uint32_t)g_last_type};
-            }
-            else
-            {
-                return;
-            }
-        }
-        spawn_entityitem(to_spawn, s);
+        auto to_spawn = get_spawn_item();
+        if (to_spawn.has_value())
+            spawn_entityitem(to_spawn.value(), s);
     }
     else
     {
@@ -1420,23 +1495,49 @@ void spawn_entities(bool s, std::string list = "")
 
 void spawn_entity_over()
 {
-    if (g_filtered_count > 0)
+    if ((g_state->screen < 11 || g_state->screen > 19) && g_state->screen != 1 && g_state->screen != 26)
+        return;
+
+    static const auto turkey = to_id("ENT_TYPE_MOUNT_TURKEY");
+    static const auto couch = to_id("ENT_TYPE_MOUNT_BASECAMP_COUCH");
+    auto to_spawn = get_spawn_item();
+    if (to_spawn.has_value())
     {
-        if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
-            return;
-        if (g_items[g_filtered_items[g_current_item]].name.find("ENT_TYPE_LIQUID") == std::string::npos)
-        {
-            int spawned = UI::spawn_entity_over(g_items[g_filtered_items[g_current_item]].id, g_over_id, g_dx, g_dy);
-            if (!lock_entity)
-                g_last_id = spawned;
-        }
-        else
+        auto item = to_spawn.value();
+        if (item.name.find("ENT_TYPE_LIQUID") != std::string::npos)
         {
             auto cpos = UI::click_position(g_x, g_y);
             auto mpos = normalize(mouse_pos());
             auto cpos2 = UI::click_position(mpos.x, mpos.y);
             g_last_id = g_state->next_entity_uid;
-            UI::spawn_liquid(g_items[g_filtered_items[g_current_item]].id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+            UI::spawn_liquid(item.id, cpos.first + 0.3f, cpos.second + 0.3f, 2 * (cpos2.first - cpos.first), 2 * (cpos2.second - cpos.second), 0, 1, INFINITY);
+            return;
+        }
+
+        if (g_over_id == -1 || !get_entity_ptr(g_over_id))
+            return;
+        auto overlay = get_entity_ptr(g_over_id);
+
+        if (item.name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
+        {
+            auto who = overlay->as<PowerupCapable>();
+            who->give_powerup(item.id);
+        }
+        else if (item.name.find("ENT_TYPE_MONS") != std::string::npos && overlay->type->id >= turkey && overlay->type->id <= couch)
+        {
+            auto mount = overlay->as<Mount>();
+            int spawned = UI::spawn_entity(item.id, g_x, g_y, true, g_vx, g_vy, false);
+            auto rider = get_entity_ptr(spawned)->as<Movable>();
+            mount->carry(rider);
+            rider->move_state = 0;
+            if (!lock_entity)
+                g_last_id = spawned;
+        }
+        else
+        {
+            int spawned = UI::spawn_entity_over(item.id, g_over_id, g_dx, g_dy);
+            if (!lock_entity)
+                g_last_id = spawned;
         }
     }
 }
@@ -1634,6 +1735,12 @@ void toggle_noclip()
             player->type->max_speed = 0.0725f;
         }
     }
+    if (!options["noclip"] && g_state->items->player_select_slots[0].activated)
+    {
+        auto type = get_type(g_state->items->player_select_slots[0].character);
+        if (type)
+            type->max_speed = 0.0725f;
+    }
 }
 
 bool should_speedhack()
@@ -1711,28 +1818,6 @@ void force_cheats()
     }
 }
 
-void force_kits()
-{
-    if (g_state->screen == 12 && g_state->time_total <= 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
-    {
-        for (auto kit : kits)
-        {
-            if (kit->automatic)
-                spawn_kit(kit);
-        }
-        g_last_kit_spawn = g_state->time_startup + 1;
-    }
-}
-
-void frame_advance()
-{
-    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
-    {
-        g_state->pause = 0x2;
-        g_pause_at = -1;
-    }
-}
-
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
 {
     static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
@@ -1764,6 +1849,218 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     {
         g_game_manager->main_menu_music->kill(false);
         g_game_manager->main_menu_music = nullptr;
+    }
+}
+
+std::string get_clipboard()
+{
+    if (!OpenClipboard(nullptr))
+        return "";
+    HANDLE hData = GetClipboardData(CF_TEXT);
+    if (hData == nullptr)
+        return "";
+    char* pszText = static_cast<char*>(GlobalLock(hData));
+    if (pszText == nullptr)
+        return "";
+    std::string str(pszText);
+    GlobalUnlock(hData);
+    CloseClipboard();
+    return str;
+}
+
+void set_clipboard(std::string str)
+{
+    const char* output = str.c_str();
+    const size_t len = strlen(output) + 1;
+    HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
+    memcpy(GlobalLock(hMem), output, len);
+    GlobalUnlock(hMem);
+    OpenClipboard(0);
+    EmptyClipboard();
+    SetClipboardData(CF_TEXT, hMem);
+    CloseClipboard();
+}
+
+struct VoidData
+{
+    uint32_t x;
+    uint32_t y;
+    /*uint32_t health;
+    uint32_t bombs;
+    uint32_t ropes;
+    uint32_t width;
+    uint32_t height;
+    uint32_t world;
+    uint32_t level;
+    uint32_t theme;*/
+};
+
+struct VoidEntity
+{
+    uint32_t id;
+    uint32_t x;
+    uint32_t y;
+    uint32_t flags;
+    /*uint32_t layer;
+    uint32_t health;
+    uint32_t state;
+    uint32_t ai;*/
+};
+
+void clear_void()
+{
+    for (auto uid : UI::get_entities_by({}, 1422, LAYER::FRONT))
+    {
+        auto ent = get_entity_ptr(uid);
+        auto [x, y] = ent->position();
+        if (x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
+            UI::safe_destroy(ent);
+    }
+}
+
+void load_void(std::string data)
+{
+    data.erase(std::remove_if(data.begin(), data.end(), [](char c)
+                              { return !std::isalnum(c); }),
+               data.end());
+    VoidData v;
+    sscanf_s(data.c_str(), "V1%02X%02X", &v.x, &v.y);
+    g_players = UI::get_players();
+    g_players[0]->teleport_abs((float)v.x, (float)v.y, 0, 0);
+
+    std::string ents = data.substr(6);
+    if (ents.size() > 0)
+        clear_void();
+    while (ents.size() > 0)
+    {
+        VoidEntity e;
+        std::string str = ents.substr(0, 8);
+        std::string id36 = str.substr(0, 2);
+        sscanf_s(str.c_str() + 2, "%02X%02X%02X", &e.x, &e.y, &e.flags);
+        e.id = strtol(id36.c_str(), nullptr, 36);
+        if (e.id <= 915)
+        {
+            auto uid = UI::spawn_grid(e.id, (float)e.x, (float)e.y, 0);
+            auto ent = get_entity_ptr(uid);
+            if (ent->type->search_flags & 0x100)
+            {
+                fix_decorations_at((float)e.x, (float)e.y, LAYER::FRONT);
+                Callback cb = {g_state->time_total + 2, [e]
+                               {
+                                   fix_decorations_at((float)e.x, (float)e.y, LAYER::FRONT);
+                               }};
+                callbacks.push_back(cb);
+            }
+            else if (ent->type->search_flags & 0x8)
+            {
+                ent->y = e.y - 0.5f + ent->hitboxy - ent->offsety;
+            }
+            if (e.flags & 1)
+            {
+                ent->flags = set_flag(ent->flags, 17);
+                for (auto trig : ent->items.entities())
+                    trig->flags = set_flag(trig->flags, 17);
+            }
+        }
+        ents = ents.substr(8);
+    }
+    // TODO: attach spikes, totems to floor
+}
+
+void import_void()
+{
+    auto clip = get_clipboard();
+    clip.erase(std::remove_if(clip.begin(), clip.end(), [](char c)
+                              { return !std::isalnum(c); }),
+               clip.end());
+
+    if (clip.size() > 2 && clip[0] == 'V' && clip[1] == '1') // void data, version 1 I guess
+    {
+        if (g_state->screen != 12 || g_players.empty())
+        {
+            g_load_void = clip;
+            g_ui_scripts["void"]->set_enabled(true);
+            quick_start(12, 1, 1, 1);
+        }
+        else if (g_ui_scripts["void"]->is_enabled())
+        {
+            load_void(clip);
+        }
+        else
+        {
+            g_load_void = clip;
+            g_ui_scripts["void"]->set_enabled(true);
+            g_state->quest_flags = 1;
+            g_state->loading = 1;
+        }
+    }
+}
+
+std::string serialize_void()
+{
+    const int export_mask = 398;
+    auto [px, py] = g_players[0]->position();
+    std::string v = fmt::format("V1{:02X}{:02X}", (uint8_t)(px + 0.5f), (uint8_t)(py + 0.5f));
+    auto uids = g_selected_ids;
+    if (uids.empty())
+        uids = UI::get_entities_by({}, export_mask, LAYER::FRONT);
+    for (auto uid : uids)
+    {
+        auto ent = get_entity_ptr(uid);
+        if (!ent || !(ent->type->search_flags & export_mask))
+            continue;
+        auto [x, y] = ent->position();
+        if ((!ent->overlay || (ent->x != 0 || ent->y != 0)) && x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
+        {
+            char buf[4];
+            _itoa_s(ent->type->id, buf, 4, 36);
+            if (ent->type->id < 36)
+            {
+                buf[1] = buf[0];
+                buf[0] = '0';
+            }
+            uint32_t flags = 0;
+            if (test_flag(ent->flags, 17))
+                flags = set_flag(flags, 1);
+            v += fmt::format("{:2s}{:02X}{:02X}{:02X}", buf, (uint8_t)(x + 0.5f), (uint8_t)(y + 0.5f), (uint8_t)flags);
+        }
+    }
+    return v;
+}
+
+void export_void()
+{
+    if (g_state->screen != 12 || g_players.empty())
+        return;
+    set_clipboard(serialize_void());
+}
+
+void force_kits()
+{
+    if (g_state->screen == 12 && g_state->time_total <= 1 && g_state->loading == 3 && g_state->time_startup > g_last_kit_spawn)
+    {
+        for (auto kit : kits)
+        {
+            if (kit->automatic)
+                spawn_kit(kit);
+        }
+
+        if (g_load_void != "")
+        {
+            load_void(g_load_void);
+            g_load_void = "";
+        }
+
+        g_last_kit_spawn = g_state->time_startup + 1;
+    }
+}
+
+void frame_advance()
+{
+    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
+    {
+        g_state->pause = (uint8_t)g_pause_type;
+        g_pause_at = -1;
     }
 }
 
@@ -1886,6 +2183,15 @@ void warp_next_level(size_t num)
         uint8_t theme = 12;
         targets.emplace_back(world, level, theme);
     }
+
+    if (targets.empty())
+    {
+        target_world = g_state->world;
+        target_level = g_state->level + 1;
+        target_theme = g_state->theme;
+        targets.emplace_back(target_world, target_level, target_theme);
+    }
+
     if (num > targets.size() - 1 && targets.size() > 0)
     {
         num = targets.size() - 1;
@@ -1918,6 +2224,31 @@ bool pressed(std::string keyname, WPARAM wParam)
         wParam += OL_KEY_ALT;
     }
     return wParam == (unsigned)keycode;
+}
+
+bool pressing(std::string keyname)
+{
+    if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
+    {
+        return false;
+    }
+    int64_t keycode = keys[keyname];
+    int key = (int)(keycode & 0xff);
+    int64_t wParam = key;
+
+    if (ImGui::GetIO().KeyCtrl)
+    {
+        wParam += OL_KEY_CTRL;
+    }
+    if (ImGui::GetIO().KeyShift)
+    {
+        wParam += OL_KEY_SHIFT;
+    }
+    if (ImGui::GetIO().KeyAlt)
+    {
+        wParam += OL_KEY_ALT;
+    }
+    return wParam == (unsigned)keycode && (GetKeyState(key) & 0x8000);
 }
 
 bool clicked(std::string keyname)
@@ -2161,6 +2492,47 @@ float held_duration_last(std::string keyname)
     return -1.0;
 }
 
+std::string last_word(std::string str)
+{
+    while (!str.empty() && std::isspace(str.back()))
+        str.pop_back();
+    const auto pos = str.find_last_of(" ");
+    return pos == std::string::npos ? str : str.substr(pos + 1);
+}
+
+void update_filter(std::string s)
+{
+    int count = 0;
+    std::string last = last_word(s);
+    uint32_t searchid = 0;
+    // auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
+    for (unsigned int i = 0; i < g_items.size(); i++)
+    {
+        if (s[0] == '\0' || std::isspace(s.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
+        {
+            if (g_items[i].id == 0 && s[0] != '\0')
+                continue;
+            g_filtered_items[count++] = i;
+        }
+    }
+    g_filtered_count = count;
+    g_current_item = 0;
+    scroll_top = true;
+}
+
+void set_selected_type(uint32_t id)
+{
+    update_filter("");
+    for (int j = 0; j < g_filtered_count; ++j)
+    {
+        if (g_items[g_filtered_items[j]].id == id)
+        {
+            g_current_item = j;
+        }
+    }
+    g_last_type = id;
+}
+
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
     ImGuiContext& g = *GImGui;
@@ -2176,6 +2548,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         {
             speedhack(g_speedhack_old_multiplier);
             g_speedhack_old_multiplier = 1.0f;
+        }
+        else if (pressed("peek_layer", wParam))
+        {
+            peek_layer = false;
         }
     }
 
@@ -2426,7 +2802,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_pause_at = -1;
         if (g_state->pause == 0)
         {
-            g_state->pause = 0x2;
+            g_state->pause = (uint8_t)g_pause_type;
             paused = true;
         }
         else
@@ -2439,9 +2815,13 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["draw_hud"] = !options["draw_hud"];
     }
+    else if (pressed("toggle_hotbar", wParam))
+    {
+        options["draw_hotbar"] = !options["draw_hotbar"];
+    }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_state->pause == 0x2)
+        if (g_state->pause == (uint8_t)g_pause_type)
         {
             g_pause_at = UI::get_frame_count() + 1;
             g_state->pause = 0;
@@ -2472,6 +2852,20 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
         UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
         UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
+    }
+    else if (pressed("toggle_void", wParam))
+    {
+        g_ui_scripts["void"]->set_enabled(!g_ui_scripts["void"]->is_enabled());
+        g_state->quest_flags = 1;
+        g_state->loading = 1;
+    }
+    else if (pressed("import_void", wParam))
+    {
+        import_void();
+    }
+    else if (pressed("export_void", wParam))
+    {
+        export_void();
     }
     else if (pressed("spawn_layer_door", wParam))
     {
@@ -2583,6 +2977,56 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (kits.size() > 8)
             spawn_kit(kits.at(8));
+    }
+    else if (pressed("hotbar_1", wParam))
+    {
+        if (hotbar.contains(0))
+            set_selected_type(hotbar[0]);
+    }
+    else if (pressed("hotbar_2", wParam))
+    {
+        if (hotbar.contains(1))
+            set_selected_type(hotbar[1]);
+    }
+    else if (pressed("hotbar_3", wParam))
+    {
+        if (hotbar.contains(2))
+            set_selected_type(hotbar[2]);
+    }
+    else if (pressed("hotbar_4", wParam))
+    {
+        if (hotbar.contains(3))
+            set_selected_type(hotbar[3]);
+    }
+    else if (pressed("hotbar_5", wParam))
+    {
+        if (hotbar.contains(4))
+            set_selected_type(hotbar[4]);
+    }
+    else if (pressed("hotbar_6", wParam))
+    {
+        if (hotbar.contains(5))
+            set_selected_type(hotbar[5]);
+    }
+    else if (pressed("hotbar_7", wParam))
+    {
+        if (hotbar.contains(6))
+            set_selected_type(hotbar[6]);
+    }
+    else if (pressed("hotbar_8", wParam))
+    {
+        if (hotbar.contains(7))
+            set_selected_type(hotbar[7]);
+    }
+    else if (pressed("hotbar_9", wParam))
+    {
+        if (hotbar.contains(8))
+            set_selected_type(hotbar[8]);
+    }
+    else if (pressed("hotbar_0", wParam))
+    {
+        if (hotbar.contains(9))
+            set_selected_type(hotbar[9]);
     }
     else if (pressed("spawn_warp_door", wParam))
     {
@@ -2778,39 +3222,15 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         }
         g_selected_ids.clear();
     }
+    else if (pressed("peek_layer", wParam))
+    {
+        peek_layer = true;
+    }
     else
     {
         return false;
     }
     return true;
-}
-
-std::string last_word(std::string str)
-{
-    while (!str.empty() && std::isspace(str.back()))
-        str.pop_back();
-    const auto pos = str.find_last_of(" ");
-    return pos == std::string::npos ? str : str.substr(pos + 1);
-}
-
-void update_filter(std::string s)
-{
-    int count = 0;
-    std::string last = last_word(s);
-    uint32_t searchid = 0;
-    // auto res = std::from_chars(last.c_str(), last.c_str() + last.size(), searchid);
-    for (unsigned int i = 0; i < g_items.size(); i++)
-    {
-        if (s[0] == '\0' || std::isspace(s.back()) || StrStrIA(g_items[i].name.data(), last.data()) || g_items[i].id == searchid)
-        {
-            if (g_items[i].id == 0 && s[0] != '\0')
-                continue;
-            g_filtered_items[count++] = i;
-        }
-    }
-    g_filtered_count = count;
-    g_current_item = 0;
-    scroll_top = true;
 }
 
 void tooltip(const char* tip, bool force = false)
@@ -2967,52 +3387,6 @@ void render_liquid_pool(int i)
     ImGui::PopID();
 }
 
-void render_list()
-{
-    // ImGui::ListBox with filter
-    ImVec2 boxsize = {-1, -1};
-    if (options["menu_ui"] && !detached("tool_entity"))
-        boxsize = {400.0f, 400.0f};
-    if (!ImGui::ListBoxHeader("##Entities", boxsize))
-        return;
-    ImGuiListClipper clipper;
-    clipper.Begin(g_filtered_count, ImGui::GetTextLineHeightWithSpacing());
-    if (scroll_top)
-    {
-        scroll_top = false;
-        ImGui::SetScrollHereY();
-    }
-    while (clipper.Step())
-    {
-        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
-        {
-            const bool item_selected = (i == g_current_item);
-            std::stringstream item_ss;
-            item_ss << g_items[g_filtered_items[i]].id;
-            std::string item_id = item_ss.str();
-            std::string item_name = g_items[g_filtered_items[i]].name.c_str();
-            std::string item_concat = item_id + ": " + item_name.substr(9);
-            const char* item_text = item_concat.c_str();
-            ImGui::PushID(i);
-            if (ImGui::Selectable(item_text, item_selected))
-            {
-                g_current_item = i;
-            }
-            if (item_selected)
-            {
-                if (scroll_to_entity)
-                {
-                    ImGui::SetScrollHereY();
-                    scroll_to_entity = false;
-                }
-                // ImGui::SetItemDefaultFocus();
-            }
-            ImGui::PopID();
-        }
-    }
-    ImGui::ListBoxFooter();
-}
-
 void render_themes()
 {
     // ImGui::ListBox with filter
@@ -3033,115 +3407,6 @@ void render_themes()
         ImGui::PopID();
     }
     ImGui::EndCombo();
-}
-
-void render_input()
-{
-    int n = 0;
-    for (auto kit : kits)
-    {
-        ImGui::PushID(kit->items.c_str());
-        std::string search = "";
-        std::stringstream sss(kit->items);
-        int item = 0;
-        while (sss >> item)
-        {
-            std::string name = entity_names[item];
-            name = name.substr(name.find_last_of("_") + 1);
-            if (search.find(name) == std::string::npos)
-                search += name + " ";
-        }
-        if (search.length() > 1)
-        {
-            search.pop_back();
-        }
-        if (search.empty())
-            search = kit->items;
-        ImGui::Text("%d:", n + 1);
-        ImGui::SameLine();
-        ImGui::TextWrapped("%s", search.c_str());
-        ImGui::PushID(2 * n);
-        if (ImGui::Button("X"))
-        {
-            kits.erase(kits.begin() + n);
-            save_config(cfgfile);
-        }
-        tooltip("Delete kit.");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(4 * n);
-        if (ImGui::Button("Load"))
-        {
-            text = kit->items;
-            update_filter(text);
-            // spawn_entities(false);
-        }
-        tooltip("Edit kit or spawn later with mouse.");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(8 * n);
-        if (ImGui::Button("Spawn"))
-        {
-            spawn_kit(kit);
-        }
-        tooltip("Spawn saved kit where you're standing,\nautomatically equipping anything wearable.", "spawn_kit_1");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(16 * n);
-        ImGui::Checkbox("Auto spawn", &kit->automatic);
-        tooltip("Spawn automatically on new game.", "");
-        ImGui::SameLine();
-        ImGui::PopID();
-
-        ImGui::PushID(32 * n);
-        if (ImGui::Button("Add item"))
-        {
-            if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
-            {
-                EntityItem to_add = g_items[g_filtered_items[g_current_item]];
-                trim(kit->items);
-                kit->items = fmt::format("{} {}", kit->items, to_add.id);
-                trim(kit->items);
-                save_config(cfgfile);
-            }
-        }
-        tooltip("Add selected item to this kit.", "");
-        ImGui::PopID();
-
-        ImGui::PopID();
-        n++;
-        ImGui::Separator();
-    }
-    if (set_focus_entity)
-    {
-        ImGui::SetKeyboardFocusHere();
-        set_focus_entity = false;
-    }
-    ImVec2 region = ImGui::GetContentRegionMax();
-    ImGui::PushItemWidth(region.x - 135);
-    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
-    {
-        update_filter(text);
-    }
-    if (ImGui::IsItemFocused())
-        focused_tool = "tool_entity";
-    tooltip("Search for entities to spawn. Hit TAB to add the selected id to list.");
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
-    if (ImGui::Button("Save kit"))
-    {
-        save_search();
-    }
-    tooltip("Save entity id(s) or selected item as a kit for quick use later.");
-    ImGui::SameLine();
-    if (ImGui::Button("Spawn"))
-    {
-        spawn_entities(false);
-    }
-    tooltip("Spawn selected entity where you're standing.", "spawn_entity");
 }
 
 const char* theme_name(int theme)
@@ -3273,6 +3538,15 @@ void render_narnia()
                 warp_inc(target_world, target_level, target_theme);
             }
             n++;
+        }
+        if (n == 0)
+        {
+            target_world = g_state->world;
+            target_level = g_state->level + 1;
+            target_theme = g_state->theme;
+            std::string buf = fmt::format("{}-{} {}", target_world, target_level, theme_name(target_theme));
+            if (ImGui::Button(buf.c_str()))
+                warp_inc(target_world, target_level, target_theme);
         }
     }
     else
@@ -4304,7 +4578,7 @@ void render_clickhandler()
             }
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
-            ImGui::PopStyleVar(ImGuiStyleVar_WindowPadding);
+            ImGui::PopStyleVar();
         }
     }
 
@@ -4338,7 +4612,7 @@ void render_clickhandler()
     {
         render_script(script.get(), draw_list);
     }
-    render_script(g_Console.get(), draw_list);
+    g_Console.get()->draw(draw_list);
 
     for (auto& [name, script] : g_ui_scripts)
     {
@@ -4522,7 +4796,6 @@ void render_clickhandler()
             g_selected_ids.clear();
             if (!lock_entity)
                 g_last_id = -1;
-            g_current_item = 0;
             update_filter("");
         }
         else if (clicked("mouse_grab") || clicked("mouse_grab_unsafe"))
@@ -4539,7 +4812,57 @@ void render_clickhandler()
             {
                 g_held_id = g_held_entity->uid;
                 g_held_flags = g_held_entity->flags;
-                g_last_type = g_held_entity->type->id;
+                set_selected_type(g_held_entity->type->id);
+                if (pressing("hotbar_1"))
+                {
+                    hotbar[0] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_2"))
+                {
+                    hotbar[1] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_3"))
+                {
+                    hotbar[2] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_4"))
+                {
+                    hotbar[3] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_5"))
+                {
+                    hotbar[4] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_6"))
+                {
+                    hotbar[5] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_7"))
+                {
+                    hotbar[6] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_8"))
+                {
+                    hotbar[7] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_9"))
+                {
+                    hotbar[8] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
+                else if (pressing("hotbar_0"))
+                {
+                    hotbar[9] = g_held_entity->type->id;
+                    save_config(cfgfile);
+                }
             }
             if (!lock_entity)
             {
@@ -4958,6 +5281,22 @@ void render_keyconfig()
     }
 }
 
+void force_level_size()
+{
+    if (g_ui_scripts.find("level_size") == g_ui_scripts.end())
+        return;
+    g_ui_scripts["level_size"]->update_code(fmt::format(
+        R"(
+set_callback(function()
+    if state.screen == SCREEN.LEVEL then
+        state.width, state.height = {}, {}
+    end
+end, ON.PRE_LEVEL_GENERATION)
+)",
+        g_force_level_width,
+        g_force_level_height));
+}
+
 void render_options()
 {
     if (options["menu_ui"] && !detached("tool_options"))
@@ -5035,6 +5374,29 @@ void render_options()
         tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
         ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
         tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
+        bool void_mode = g_ui_scripts["void"]->is_enabled();
+        if (ImGui::Checkbox("Void sandbox mode", &void_mode))
+        {
+            g_ui_scripts["void"]->set_enabled(void_mode);
+            g_state->quest_flags = 1;
+            g_state->loading = 1;
+        }
+        tooltip("Just you and the level borders, all alone...", "toggle_void");
+        static bool level_size = false;
+        if (ImGui::Checkbox("Force level size", &level_size))
+        {
+            g_ui_scripts["level_size"]->set_enabled(level_size);
+            if (level_size)
+                force_level_size();
+        }
+        tooltip("Force level size, can cause crashes if used in the wrong place.");
+        if (level_size)
+        {
+            if (ImGui::SliderInt("Width##ForceWidth", &g_force_level_width, 1, 8, "%d", ImGuiSliderFlags_AlwaysClamp))
+                force_level_size();
+            if (ImGui::SliderInt("Height##ForceHeight", &g_force_level_height, 1, 15, "%d", ImGuiSliderFlags_AlwaysClamp))
+                force_level_size();
+        }
         endmenu();
     }
 
@@ -5065,6 +5427,8 @@ void render_options()
         tooltip("Show path rooms.", "toggle_path");
         ImGui::Checkbox("Draw HUD##DrawHUD", &options["draw_hud"]);
         tooltip("Show enabled cheats and random\ninteresting state variables on screen.", "toggle_hud");
+        ImGui::Checkbox("Draw hotbar##DrawHotbar", &options["draw_hotbar"]);
+        tooltip("Show spawner hotbar on the bottom of the screen.", "toggle_hotbar");
         if (ImGui::Checkbox("Drag windows outside the game window", &options["multi_viewports"]))
         {
             if (options["multi_viewports"])
@@ -5074,11 +5438,21 @@ void render_options()
         }
         tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
 
+        if (ImGui::Checkbox("Docking only while holding Shift", &options["docking_with_shift"]))
+        {
+            ImGui::GetIO().ConfigDockingWithShift = options["docking_with_shift"];
+        }
+        tooltip("Allow annoying window docking only while holding Shift");
+
         ImGui::Checkbox("Enable unsafe scripts", &options["enable_unsafe_scripts"]);
         tooltip("Allow using unsafe Lua libraries in scripts.");
 
         ImGui::Checkbox("Menu UI, instead of a floating window", &options["menu_ui"]);
         tooltip("Puts everything in a main menu instead of a floating window.\nYou can still create individual windows by dragging from the contents.", "switch_ui");
+
+        if (ImGui::Checkbox("Alternative Console Ctrl key behavior", &options["console_alt_keys"]))
+            g_Console.get()->set_alt_keys(options["console_alt_keys"]);
+        tooltip("Hold Ctrl to execute and scroll history,\nenter and arrows only edit buffer.");
 
         ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
         tooltip("Am I annoying you already :(");
@@ -5117,6 +5491,17 @@ void render_options()
         ImGui::SameLine();
         if (ImGui::Button("Defaults##RestoreDefaultEntityMask"))
             safe_entity_mask = default_entity_mask;
+        ImGui::PopID();
+        endmenu();
+    }
+
+    if (submenu("Frame advance / Engine pause type"))
+    {
+        ImGui::PushID("PauseType");
+        for (int i = 1; i < 6; i++)
+        {
+            ImGui::CheckboxFlags(pause_types[i], &g_pause_type, (int)std::pow(2, i));
+        }
         ImGui::PopID();
         endmenu();
     }
@@ -5765,7 +6150,7 @@ void render_savegame()
     ImGui::PopID();
 }
 
-void render_powerup(int uid, const char* section)
+void render_powerup(PowerupCapable* ent, int uid, const char* section)
 {
     std::string uidc = std::to_string(uid);
     int ptype = UI::get_entity_type(uid);
@@ -5785,75 +6170,40 @@ void render_powerup(int uid, const char* section)
     ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
-    if (ImGui::Button("X"))
+    if (ImGui::Button("Remove"))
     {
-        g_entity->as<Player>()->remove_powerup(ptype);
+        ent->as<Player>()->remove_powerup(ptype);
     }
     ImGui::PopID();
     ImGui::PopID();
 }
 
-void render_state(const char* label, int state)
+void render_state(const char* label, uint8_t state)
 {
-    if (state == 0)
-        ImGui::LabelText(label, "0 Flailing");
-    else if (state == 1)
-        ImGui::LabelText(label, "1 Standing");
-    else if (state == 2)
-        ImGui::LabelText(label, "2 Sitting");
-    else if (state == 4)
-        ImGui::LabelText(label, "4 Hanging");
-    else if (state == 5)
-        ImGui::LabelText(label, "5 Ducking");
-    else if (state == 6)
-        ImGui::LabelText(label, "6 Climbing");
-    else if (state == 7)
-        ImGui::LabelText(label, "7 Pushing");
-    else if (state == 8)
-        ImGui::LabelText(label, "8 Jumping");
-    else if (state == 9)
-        ImGui::LabelText(label, "9 Falling");
-    else if (state == 10)
-        ImGui::LabelText(label, "10 Dropping");
-    else if (state == 12)
-        ImGui::LabelText(label, "12 Attacking");
-    else if (state == 17)
-        ImGui::LabelText(label, "17 Throwing");
-    else if (state == 18)
-        ImGui::LabelText(label, "18 Stunned");
-    else if (state == 19)
-        ImGui::LabelText(label, "19 Entering");
-    else if (state == 20)
-        ImGui::LabelText(label, "20 Loading");
-    else if (state == 21)
-        ImGui::LabelText(label, "21 Exiting");
-    else if (state == 22)
-        ImGui::LabelText(label, "22 Dying");
+    if (state <= 22)
+        ImGui::LabelText(label, "%s", char_states[state]);
     else
-    {
-        std::string statec = std::to_string(state);
-        ImGui::LabelText(label, "%s", statec.c_str());
-    }
+        ImGui::LabelText(label, "%s", std::to_string(state).c_str());
 }
 
 void render_ai(const char* label, int state)
 {
     if (state == 0)
-        ImGui::LabelText(label, "0 Idling");
+        ImGui::LabelText(label, "Idling");
     else if (state == 1)
-        ImGui::LabelText(label, "1 Walking");
+        ImGui::LabelText(label, "Walking");
     else if (state == 2)
-        ImGui::LabelText(label, "2 Jumping");
+        ImGui::LabelText(label, "Jumping");
     else if (state == 4)
-        ImGui::LabelText(label, "4 Dead");
+        ImGui::LabelText(label, "Dead");
     else if (state == 5)
-        ImGui::LabelText(label, "5 Jumping");
+        ImGui::LabelText(label, "Jumping");
     else if (state == 6)
-        ImGui::LabelText(label, "6 Attacking");
+        ImGui::LabelText(label, "Attacking");
     else if (state == 7)
-        ImGui::LabelText(label, "7 Meleeing");
+        ImGui::LabelText(label, "Meleeing");
     else if (state == 11)
-        ImGui::LabelText(label, "11 Rolling");
+        ImGui::LabelText(label, "Rolling");
     else
     {
         std::string statec = std::to_string(state);
@@ -5861,65 +6211,12 @@ void render_ai(const char* label, int state)
     }
 }
 
-void render_screen(const char* label, int state)
+void render_screen(const char* label, uint32_t state)
 {
-    if (state == 0)
-        ImGui::LabelText(label, "0 Logo");
-    else if (state == 1)
-        ImGui::LabelText(label, "1 Intro");
-    else if (state == 2)
-        ImGui::LabelText(label, "2 Prologue");
-    else if (state == 3)
-        ImGui::LabelText(label, "3 Title");
-    else if (state == 4)
-        ImGui::LabelText(label, "4 Main menu");
-    else if (state == 5)
-        ImGui::LabelText(label, "5 Options");
-    else if (state == 7)
-        ImGui::LabelText(label, "7 Leaderboards");
-    else if (state == 8)
-        ImGui::LabelText(label, "8 Seed input");
-    else if (state == 9)
-        ImGui::LabelText(label, "9 Character select");
-    else if (state == 10)
-        ImGui::LabelText(label, "10 Team select");
-    else if (state == 11)
-        ImGui::LabelText(label, "11 Camp");
-    else if (state == 12)
-        ImGui::LabelText(label, "12 Level");
-    else if (state == 13)
-        ImGui::LabelText(label, "13 Level transition");
-    else if (state == 14)
-        ImGui::LabelText(label, "14 Death");
-    else if (state == 15)
-        ImGui::LabelText(label, "15 Spaceship");
-    else if (state == 16)
-        ImGui::LabelText(label, "16 Ending");
-    else if (state == 17)
-        ImGui::LabelText(label, "17 Credits");
-    else if (state == 18)
-        ImGui::LabelText(label, "18 Scores");
-    else if (state == 19)
-        ImGui::LabelText(label, "19 Constellation");
-    else if (state == 20)
-        ImGui::LabelText(label, "20 Recap");
-    else if (state == 21)
-        ImGui::LabelText(label, "21 Arena menu");
-    else if (state == 25)
-        ImGui::LabelText(label, "25 Arena intro");
-    else if (state == 26)
-        ImGui::LabelText(label, "26 Arena match");
-    else if (state == 27)
-        ImGui::LabelText(label, "27 Arena scores");
-    else if (state == 28)
-        ImGui::LabelText(label, "28 Loading online");
-    else if (state == 29)
-        ImGui::LabelText(label, "29 Lobby");
+    if (state <= 29)
+        ImGui::LabelText(label, "%d: %s", state, screen_names[state]);
     else
-    {
-        std::string statec = std::to_string(state);
-        ImGui::LabelText(label, "%s", statec.c_str());
-    }
+        ImGui::LabelText(label, "%d", state);
 }
 
 void render_entity_finder()
@@ -6277,10 +6574,10 @@ void render_entity_props(int uid, bool detached = false)
             entity_windows[uid] = window;
         }
         tooltip("Detach entity to separate window.");
-        ImGui::PopItemWidth();
         if (!update_entity())
             return;
     }
+    ImGui::PopItemWidth();
     if (entity == nullptr)
     {
         auto it = entity_windows.find(uid);
@@ -6289,7 +6586,7 @@ void render_entity_props(int uid, bool detached = false)
         return;
     }
     const auto is_movable = entity->is_movable();
-    ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
     render_uid(entity->uid, "EntityGeneral");
     if (ImGui::Button("Smart delete##SafeKillEntity"))
     {
@@ -6374,9 +6671,20 @@ void render_entity_props(int uid, bool detached = false)
         if (is_movable)
         {
             auto movable = entity->as<Movable>();
+            ImGui::PushItemWidth(ImGui::GetContentRegionMax().x * 0.5f - 24.0f);
+            ImGui::SetNextItemWidth(24.0f);
+            ImGui::InputScalar("##EntityState", ImGuiDataType_U8, &movable->state);
+            ImGui::SameLine(0, 4);
             render_state("Current state", movable->state); // TODO: allow change
+            ImGui::SetNextItemWidth(24.0f);
+            ImGui::InputScalar("##EntityLastState", ImGuiDataType_U8, &movable->last_state);
+            ImGui::SameLine(0, 4);
             render_state("Last state", movable->last_state);
+            ImGui::SetNextItemWidth(24.0f);
+            ImGui::InputScalar("##EntityMoveState", ImGuiDataType_U8, &movable->move_state);
+            ImGui::SameLine(0, 4);
             render_ai("AI state", movable->move_state); // TODO: allow change
+            ImGui::PopItemWidth();
             const std::string current_behavior_str = fmt::format("{}", movable->get_behavior());
             if (ImGui::BeginCombo("Current Behavior##ChangeBehaviorCombo", current_behavior_str.c_str()))
             {
@@ -6588,10 +6896,8 @@ void render_entity_props(int uid, bool detached = false)
             auto entity_pow = entity->as<PowerupCapable>();
             for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
             {
-                render_powerup(powerup_entity->uid, "Powerups");
+                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
             }
-            ImGui::Text("  Add: ");
-            ImGui::SameLine();
             ImGui::PushItemWidth(160);
             static const char* chosenPowerup = "";
             static uint8_t chosenPowerupIndex = 0;
@@ -6647,7 +6953,7 @@ void render_entity_props(int uid, bool detached = false)
                 ImGui::EndCombo();
             }
             ImGui::SameLine();
-            if (ImGui::Button("Add##AddPowerupButton"))
+            if (ImGui::Button("Add Powerup##AddPowerupButton"))
             {
                 entity_pow->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
             }
@@ -6753,6 +7059,165 @@ void render_entity_props(int uid, bool detached = false)
     ImGui::PopItemWidth();
 }
 
+void render_hotbar()
+{
+    if (g_Console->is_toggled() || hotbar.empty())
+        return;
+
+    ImGuiIO& io = ImGui::GetIO();
+    auto base = ImGui::GetMainViewport();
+    auto main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
+    auto space = ImGui::DockBuilderGetCentralNode(main_dock);
+
+    uint32_t max = 0;
+    for (auto [i, id] : hotbar)
+    {
+        max = i;
+    }
+    const float iconsize = 64.0f;
+    const float margin = base->Size.y / 50.0f;
+    const float width = (max + 1) * (iconsize + 4.0f) + 4.0f;
+    const float height = iconsize + margin;
+
+    ImGui::SetNextWindowSize({width, height});
+    ImGui::SetNextWindowPos({space->Pos.x + space->Size.x / 2 - width / 2, space->Pos.y + space->Size.y - height});
+    ImGui::SetNextWindowViewport(base->ID);
+    ImGui::Begin(
+        "Hotbar",
+        NULL,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground |
+            ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoDocking);
+    if (ImGui::IsWindowHovered())
+    {
+        io.WantCaptureMouse = true;
+        ImGui::SetWindowFocus();
+    }
+    ImGui::PushID("Hotbar");
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 4.0f);
+    for (uint32_t i = 0; i <= max; ++i)
+    {
+        if (hotbar.contains(i))
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button, {0, 0, 0, 0});
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, {0, 0, 0, 0});
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, {1.0f, 1.0f, 1.0f, 0.3f});
+            ImGui::PushStyleColor(ImGuiCol_Text, {1.0f, 1.0f, 1.0f, 1.0f});
+            if (g_items[g_filtered_items[g_current_item]].id == hotbar[i])
+                ImGui::PushStyleColor(ImGuiCol_Border, {1.0f, 1.0f, 1.0f, 0.8f});
+            else
+                ImGui::PushStyleColor(ImGuiCol_Border, {0, 0, 0, 0.8f});
+            ImGui::PushID(i);
+            auto name = entity_names[hotbar[i]];
+            // std::replace(name.begin(), name.end(), '_', '\n');
+            name = name.substr(name.find_last_of('_') + 1);
+            if (ImGui::Button(fmt::format("{}          \n\n\n{}", i + 1, name).c_str(), {iconsize, iconsize}))
+            {
+                set_selected_type(hotbar[i]);
+            }
+            else if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+            {
+                hotbar.erase(i);
+                save_config(cfgfile);
+            }
+            tooltip("(Mouse Left) to set spawned entity, (Mouse Right) to remove");
+            ImGui::PopID();
+            ImGui::PopStyleColor(5);
+        }
+        if (i != max)
+            ImGui::SameLine((i + 1) * (iconsize + 4.0f), 4.0f);
+    }
+    ImGui::PopStyleVar();
+    ImGui::PopID();
+    ImGui::End();
+}
+
+void render_hotbar_textures()
+{
+    if (g_Console->is_toggled() || hotbar.empty())
+        return;
+
+    static const auto chest = to_id("ENT_TYPE_ITEM_CHEST");
+
+    auto base = ImGui::GetMainViewport();
+    auto main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
+    auto space = ImGui::DockBuilderGetCentralNode(main_dock);
+
+    uint32_t max = 0;
+    for (auto [i, id] : hotbar)
+    {
+        max = i;
+    }
+    const float iconsize = 64.0f;
+    const float margin = base->Size.y / 50.0f;
+    const float width = (max + 1) * (iconsize + 4.0f) + 4.0f;
+    const float height = iconsize + margin;
+
+    ImVec2 size = {width, height};
+    ImVec2 pos = {space->Pos.x + space->Size.x / 2 - width / 2, space->Pos.y + space->Size.y - height};
+
+    auto* textures = get_textures();
+
+    for (uint32_t i = 0; i <= max; ++i)
+    {
+        if (hotbar.contains(i))
+        {
+            auto type = get_type(hotbar[i]);
+            if (!type)
+                continue;
+            auto texture = get_texture(type->texture_id);
+            if (type->texture_id < 0)
+            {
+                const auto theme = g_state->current_theme ? g_state->current_theme : g_state->level_gen->themes[0];
+                texture = get_texture(theme->get_dynamic_texture(type->texture_id));
+            }
+            if (!texture)
+                continue;
+            auto def = get_texture_definition(texture->id);
+            int32_t tx = type->tile_x, ty = type->tile_y;
+            if ((uint32_t)tx > def.sub_image_width / def.tile_width)
+            {
+                tx = type->tile_x % (def.sub_image_width / def.tile_width);
+                ty = (uint32_t)floor(type->tile_x / (def.sub_image_width / def.tile_width));
+            }
+            if (!type->animations.empty())
+            {
+                auto anim = type->animations.begin()->second;
+                if (type->animations.contains(0))
+                    anim = type->animations[0];
+                tx = anim.texture % (def.sub_image_width / def.tile_width);
+                ty = (uint32_t)floor(anim.texture / (def.sub_image_height / def.tile_height));
+            }
+            float uv_left = (texture->tile_width_fraction * tx) + texture->offset_x_weird_math;
+            float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
+            float uv_top = (texture->tile_height_fraction * ty) + texture->offset_y_weird_math;
+            float uv_bottom = uv_top + texture->tile_height_fraction - texture->one_over_height;
+
+            const Quad source(
+                // bottom left:
+                uv_left,
+                uv_bottom,
+                // bottom right:
+                uv_right,
+                uv_bottom,
+                // top right:
+                uv_right,
+                uv_top,
+                // top left:
+                uv_left,
+                uv_top);
+
+            ImVec2 sa{pos.x + i * (iconsize + 4.0f) + 8.0f - base->Pos.x, pos.y - base->Pos.y + 8.0f};
+            ImVec2 sb{pos.x + i * (iconsize + 4.0f) + iconsize - base->Pos.x, pos.y + iconsize - base->Pos.y};
+            auto a = normalize(sa);
+            auto b = normalize(sb);
+            auto dest = Quad(AABB(a.x, a.y, b.x, b.y));
+            RenderAPI::get().draw_screen_texture(textures->texture_map[0], source, dest, Color::black());
+            if (!(hotbar[i] != chest && hotbar[i] != chest + 1 && texture->id == 373 && tx == 0 && ty == 0))
+                RenderAPI::get().draw_screen_texture(texture, source, dest, Color::white());
+        }
+    }
+}
+
 struct TextureViewer
 {
     TEXTURE id;
@@ -6764,6 +7229,20 @@ struct TextureViewer
 static TextureViewer texture_viewer{0, -1};
 void render_vanilla_stuff()
 {
+    if (peek_layer && g_state->layer_transition_effect_timer == 0)
+    {
+        uint8_t other_layer = g_state->camera_layer ? 0 : 1;
+        auto [bbox_left, bbox_top] = UI::click_position(-1.0f, 1.0f);
+        auto [bbox_right, bbox_bottom] = UI::click_position(1.0f, -1.0f);
+        for (uint8_t i = 52; i > 0; --i)
+        {
+            render_draw_depth(g_state->layers[other_layer], i, bbox_left, bbox_bottom, bbox_right, bbox_top);
+        }
+    }
+
+    if (!hide_ui && options["draw_hotbar"])
+        render_hotbar_textures();
+
     auto& render = RenderAPI::get();
     auto* textures = get_textures();
     if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture") || (options["menu_ui"] && !detached("tool_texture")) || hide_ui)
@@ -7030,7 +7509,7 @@ void render_game_props()
         if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
         {
             if (paused)
-                g_state->pause = 0x2;
+                g_state->pause = (uint8_t)g_pause_type;
             else
                 g_state->pause = 0;
         }
@@ -7502,8 +7981,210 @@ void load_font()
 
 void render_spawner()
 {
-    render_input();
-    render_list();
+    int n = 0;
+    for (auto kit : kits)
+    {
+        ImGui::PushID(kit->items.c_str());
+        std::string search = "";
+        std::stringstream sss(kit->items);
+        int item = 0;
+        while (sss >> item)
+        {
+            std::string name = entity_names[item];
+            name = name.substr(name.find_last_of("_") + 1);
+            if (search.find(name) == std::string::npos)
+                search += name + " ";
+        }
+        if (search.length() > 1)
+        {
+            search.pop_back();
+        }
+        if (search.empty())
+            search = kit->items;
+        ImGui::Text("%d:", n + 1);
+        ImGui::SameLine();
+        ImGui::TextWrapped("%s", search.c_str());
+        ImGui::PushID(2 * n);
+        if (ImGui::Button("X"))
+        {
+            kits.erase(kits.begin() + n);
+            save_config(cfgfile);
+        }
+        tooltip("Delete kit.");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(4 * n);
+        if (ImGui::Button("Load"))
+        {
+            text = kit->items;
+            update_filter(text);
+            // spawn_entities(false);
+        }
+        tooltip("Edit kit or spawn later with mouse.");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(8 * n);
+        if (ImGui::Button("Spawn"))
+        {
+            spawn_kit(kit);
+        }
+        tooltip("Spawn saved kit where you're standing,\nautomatically equipping anything wearable.", "spawn_kit_1");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(16 * n);
+        ImGui::Checkbox("Auto spawn", &kit->automatic);
+        tooltip("Spawn automatically on new game.", "");
+        ImGui::SameLine();
+        ImGui::PopID();
+
+        ImGui::PushID(32 * n);
+        if (ImGui::Button("Add item"))
+        {
+            if (g_current_item > 0 || (unsigned)g_filtered_count < g_items.size())
+            {
+                EntityItem to_add = g_items[g_filtered_items[g_current_item]];
+                trim(kit->items);
+                kit->items = fmt::format("{} {}", kit->items, to_add.id);
+                trim(kit->items);
+                save_config(cfgfile);
+            }
+        }
+        tooltip("Add selected item to this kit.", "");
+        ImGui::PopID();
+
+        ImGui::PopID();
+        n++;
+        ImGui::Separator();
+    }
+    ImVec2 region = ImGui::GetContentRegionMax();
+
+    ImGui::PushID("HotbarSet");
+    ImGui::Text("Add selected item to hotbar:");
+    const float buttonwidth = 1.0f / 11.0f * region.x - 4.0f;
+    for (uint32_t i = 0; i < 10; ++i)
+    {
+        if (!hotbar.contains(i))
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+        else
+            ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_Button]);
+        if (ImGui::Button(fmt::format("{}", i < 9 ? i + 1 : 0).c_str(), {buttonwidth, 0}))
+        {
+            hotbar[i] = g_items[g_filtered_items[g_current_item]].id;
+            save_config(cfgfile);
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine(0, 4.0f);
+    }
+    if (ImGui::Button("+", {buttonwidth, 0}))
+    {
+        for (uint32_t i = 0; i < 20; ++i)
+        {
+            if (!hotbar.contains(i))
+            {
+                hotbar[i] = g_items[g_filtered_items[g_current_item]].id;
+                save_config(cfgfile);
+                break;
+            }
+        }
+        save_config(cfgfile);
+    }
+    ImGui::PopID();
+
+    if (set_focus_entity)
+    {
+        ImGui::SetKeyboardFocusHere();
+        set_focus_entity = false;
+    }
+    ImGui::PushItemWidth(0.6667f * region.x);
+    if (ImGui::InputText("##Input", &text, ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_AutoSelectAll, pick_selected_entity))
+    {
+        update_filter(text);
+    }
+    if (ImGui::IsItemFocused())
+        focused_tool = "tool_entity";
+    tooltip("Search for entities to spawn. Hit TAB to add the selected id to list.");
+    ImGui::SameLine(0, 4.0f);
+    if (ImGui::Button("Save kit", ImVec2(0.16665f * region.x - 4.0f, 0.0f)))
+    {
+        save_search();
+    }
+    tooltip("Save entity id(s) or selected item as a kit for quick use later.");
+    ImGui::SameLine(0, 4.0f);
+    if (ImGui::Button("Spawn", ImVec2(0.16665f * region.x - 4.0f, 0.0f)))
+    {
+        spawn_entities(false);
+    }
+    tooltip("Spawn selected entity where you're standing.", "spawn_entity");
+    ImGui::PopItemWidth();
+
+    ImGui::PushItemWidth(region.x);
+    ImVec2 boxsize = {-1, -1};
+    if (options["menu_ui"] && !detached("tool_entity"))
+        boxsize = {392.0f, 392.0f};
+    if (!ImGui::ListBoxHeader("##Entities", boxsize))
+        return;
+    ImGuiListClipper clipper;
+    clipper.Begin(g_filtered_count, -1.0f);
+    int select_last_index = 0;
+    if (g_last_type >= 0 && g_filtered_count == g_items.size())
+    {
+        for (int j = 0; j < g_filtered_count; ++j)
+        {
+            if (g_items[j].id == (uint32_t)g_last_type)
+            {
+                select_last_index = j;
+                scroll_top = false;
+            }
+        }
+        clipper.ForceDisplayRangeByIndices(select_last_index, select_last_index + 1);
+    }
+    if (scroll_top)
+    {
+        scroll_top = false;
+        ImGui::SetScrollHereY();
+    }
+
+    while (clipper.Step())
+    {
+        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; i++)
+        {
+            const bool select_last = (g_last_type >= 0 && g_items[g_filtered_items[i]].id == (uint32_t)g_last_type);
+            if (select_last)
+            {
+                g_current_item = i;
+                g_last_type = -1;
+                scroll_to_entity = true;
+            }
+            const bool item_selected = (i == g_current_item);
+            std::stringstream item_ss;
+            item_ss << g_items[g_filtered_items[i]].id;
+            std::string item_id = item_ss.str();
+            std::string item_name = g_items[g_filtered_items[i]].name.c_str();
+            std::string item_concat = item_id + ": " + item_name.substr(9);
+            const char* item_text = item_concat.c_str();
+            ImGui::PushID(i);
+            if (ImGui::Selectable(item_text, item_selected))
+            {
+                g_last_type = -1;
+                g_current_item = i;
+            }
+            if (item_selected)
+            {
+                if (scroll_to_entity)
+                {
+                    ImGui::SetScrollHereY();
+                    scroll_to_entity = false;
+                }
+                // ImGui::SetItemDefaultFocus();
+            }
+            ImGui::PopID();
+        }
+    }
+    ImGui::ListBoxFooter();
+    ImGui::PopItemWidth();
 }
 
 std::string hud_input(int buttons)
@@ -7690,6 +8371,94 @@ void imgui_init(ImGuiContext*)
             false);
         g_ui_scripts["light"] = std::unique_ptr<SpelunkyScript>(script);
     }
+    if (g_ui_scripts.find("void") == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            R"(
+qflags = {2,3,5,17,18,19,25,26,27}
+disable_virts = {2,3,4,5,6,7,8,9,10,11,12,15,16,17,18,19,20}
+hooks = {}
+function add_hook(t, cb)
+    hooks[#hooks+1] = {t=t, cb=cb}
+end
+function clear_hooks()
+    for i,h in pairs(hooks) do
+        state.level_gen.themes[h.t]:clear_virtual(h.cb)
+    end
+    hooks = {}
+end
+function init_hooks()
+    clear_hooks()
+    for t=THEME.DWELLING,THEME.HUNDUN do
+        for i,v in pairs(disable_virts) do
+            add_hook(t, state.level_gen.themes[t]:set_pre_virtual(v, function() return true end))
+        end
+        add_hook(t, state.level_gen.themes[t]:set_pre_reset_theme_flags(function()
+            for i=LEVEL_CONFIG.BACK_ROOM_CHANCE,LEVEL_CONFIG.MACHINE_REWARDROOM_CHANCE do
+                set_level_config(i, 0)
+            end
+            state.current_theme.allow_beehive = false
+            state.current_theme.allow_leprechaun = false
+            for i,v in pairs(qflags) do
+                state.quest_flags = set_flag(state.quest_flags, v)
+            end
+            state.quests.yang_state = 7
+            state.quests.jungle_sisters_flags = 63
+            state.quests.van_horsing_state = 7
+            state.quests.sparrow_state = 8
+            state.quests.madame_tusk_state = 3
+            return true
+        end))
+        add_hook(t, state.level_gen.themes[t]:set_pre_spawn_effects(function()
+            if state.current_theme:get_loop() then
+                state.camera.bounds_left = -math.huge
+                state.camera.bounds_right = math.huge
+                state.camera.bounds_top = math.huge
+                state.camera.bounds_bottom = -math.huge
+            else
+                state.camera.bounds_left = 0.5
+                state.camera.bounds_right = state.width * 10.0 + 4.5
+                state.camera.bounds_top = 124.5
+                state.camera.bounds_bottom = 120.5 - state.height * 8.0
+            end
+            return true
+        end))
+        add_hook(t, state.level_gen.themes[t]:set_pre_spawn_level(function(theme)
+            theme:spawn_border()
+            return true
+        end))
+        add_hook(t, state.level_gen.themes[t]:set_pre_spawn_players(function()
+            local ax, ay, bx, by = get_bounds()
+            state.level_gen.spawn_x, state.level_gen.spawn_y = math.floor(state.width*10/2+2), by+0.5
+            if state.theme == THEME.OLMEC then
+                if state.width == 1 then state.level_gen.spawn_x = 4 end
+                spawn(ENT_TYPE.ACTIVEFLOOR_OLMEC, state.level_gen.spawn_x+5, by+2, LAYER.FRONT, 0, 0)
+            end
+            spawn(ENT_TYPE.LOGICAL_PLATFORM_SPAWNER, state.level_gen.spawn_x, state.level_gen.spawn_y-1, LAYER.FRONT, 0, 0)
+        end))
+    end
+end
+
+set_callback(init_hooks, ON.LOAD)
+set_callback(init_hooks, ON.SCRIPT_ENABLE)
+set_callback(clear_hooks, ON.SCRIPT_DISABLE)
+)",
+            "void",
+            g_SoundManager.get(),
+            g_Console.get(),
+            false);
+        g_ui_scripts["void"] = std::unique_ptr<SpelunkyScript>(script);
+    }
+    if (g_ui_scripts.find("level_size") == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            "",
+            "level_size",
+            g_SoundManager.get(),
+            g_Console.get(),
+            false);
+        g_ui_scripts["level_size"] = std::unique_ptr<SpelunkyScript>(script);
+    }
 }
 
 void imgui_draw()
@@ -7709,9 +8478,11 @@ void imgui_draw()
     }
 
     render_clickhandler();
+    if (!hide_ui && options["draw_hotbar"])
+        render_hotbar();
     if (options["draw_hud"])
         render_prohud();
-    if (options["draw_script_messages"])
+    if (options["draw_script_messages"] && !g_Console->is_toggled())
         render_messages();
 
     focused_tool = "";
@@ -7734,7 +8505,9 @@ void imgui_draw()
                     auto tab = tab_order_main[i];
                     if (windows[tab]->detached)
                         continue;
-                    ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {600.0f, base->Size.y - 50.0f});
+                    ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {500.0f, base->Size.y - 50.0f});
+                    if (tab == "tool_entity")
+                        ImGui::SetNextWindowSizeConstraints({400.0f, 100.0f}, {400.0f, base->Size.y - 50.0f});
                     bool ismenu = false;
                     if (windows[tab]->popup)
                     {
@@ -8009,7 +8782,7 @@ void init_ui()
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
-    State::init();
+    State::init(g_SoundManager.get());
     State::post_init();
 
     g_state = State::get().ptr_main();

@@ -1146,6 +1146,12 @@ void register_usertypes(sol::state& lua)
         return State::get().ptr_local()->level_gen->data->level_config[config];
     };
 
+    /// Set the value for the specified config
+    lua["set_level_config"] = [](LEVEL_CONFIG config, uint32_t value)
+    {
+        State::get().ptr_local()->level_gen->data->level_config[config] = value;
+    };
+
     auto grow_vines = sol::overload(
         static_cast<void (*)(LAYER, uint32_t)>(::grow_vines),
         static_cast<void (*)(LAYER, uint32_t, AABB, bool)>(::grow_vines));
@@ -1492,6 +1498,7 @@ void register_usertypes(sol::state& lua)
     savedata_type["traps"] = &SaveData::traps;
     savedata_type["last_daily"] = &SaveData::last_daily;
     savedata_type["characters"] = &SaveData::characters;
+    savedata_type["tutorial_state"] = &SaveData::tutorial_state;
     savedata_type["shortcuts"] = &SaveData::shortcuts;
     savedata_type["bestiary_killed"] = &SaveData::bestiary_killed;
     savedata_type["bestiary_killed_by"] = &SaveData::bestiary_killed_by;
@@ -1518,6 +1525,7 @@ void register_usertypes(sol::state& lua)
     savedata_type["seeded_unlocked"] = &SaveData::seeded_unlocked;
     savedata_type["world_last"] = &SaveData::world_last;
     savedata_type["level_last"] = &SaveData::level_last;
+    savedata_type["theme_last"] = &SaveData::theme_last;
     savedata_type["score_last"] = &SaveData::score_last;
     savedata_type["time_last"] = &SaveData::time_last;
     savedata_type["stickers"] = &SaveData::stickers;

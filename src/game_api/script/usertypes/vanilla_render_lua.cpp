@@ -264,6 +264,13 @@ void register_usertypes(sol::state& lua)
         static_cast<void (VanillaRenderContext::*)(const std::string&, float, float, float, float, Color, uint32_t, uint32_t)>(&VanillaRenderContext::draw_text),
         static_cast<void (VanillaRenderContext::*)(const TextRenderingInfo*, Color)>(&VanillaRenderContext::draw_text));
 
+    auto render_draw_depth_lua = [](VanillaRenderContext&, LAYER layer, uint8_t draw_depth, AABB bbox)
+    {
+        const uint8_t real_layer = enum_to_layer(layer);
+        auto layer_ptr = State::get().layer(real_layer);
+        render_draw_depth(layer_ptr, draw_depth, bbox.left, bbox.bottom, bbox.right, bbox.top);
+    };
+
     /// Used in [set_callback](#set_callback) ON.RENDER_* callbacks, [set_post_render](#set_post_render), [set_post_render_screen](#set_post_render_screen), [set_pre_render](#set_pre_render), [set_pre_render_screen](#set_pre_render_screen)
     lua.new_usertype<VanillaRenderContext>(
         "VanillaRenderContext",
@@ -274,7 +281,11 @@ void register_usertypes(sol::state& lua)
         "draw_screen_texture",
         draw_screen_texture,
         "draw_world_texture",
-        draw_world_texture);
+        draw_world_texture,
+        "bounding_box",
+        &VanillaRenderContext::bounding_box,
+        "render_draw_depth",
+        render_draw_depth_lua);
 
     auto texturerenderinginfo_type = lua.new_usertype<TextureRenderingInfo>("TextureRenderingInfo");
     texturerenderinginfo_type["x"] = &TextureRenderingInfo::x;
@@ -431,5 +442,57 @@ void register_usertypes(sol::state& lua)
     // DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION
     // Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW but renders texture as solid color
     */
+
+    auto hudinventory_type = lua.new_usertype<HudInventory>("HudInventory");
+    hudinventory_type["enabled"] = &HudInventory::enabled;
+    hudinventory_type["health"] = &HudInventory::health;
+    hudinventory_type["bombs"] = &HudInventory::bombs;
+    hudinventory_type["ropes"] = &HudInventory::ropes;
+    hudinventory_type["ankh"] = &HudInventory::ankh;
+    hudinventory_type["kapala"] = &HudInventory::kapala;
+    hudinventory_type["kapala_blood"] = &HudInventory::kapala_blood;
+    hudinventory_type["poison"] = &HudInventory::poison;
+    hudinventory_type["curse"] = &HudInventory::curse;
+    hudinventory_type["elixir"] = &HudInventory::elixir;
+    hudinventory_type["crown"] = &HudInventory::crown;
+    hudinventory_type["item_count"] = &HudInventory::item_count;
+
+    auto hudelement_type = lua.new_usertype<HudElement>("HudElement");
+    hudelement_type["dim"] = &HudElement::dim;
+    hudelement_type["opacity"] = &HudElement::opacity;
+    hudelement_type["time_dim"] = &HudElement::time_dim;
+
+    auto hudplayer_type = lua.new_usertype<HudPlayer>("HudPlayer", sol::base_classes, sol::bases<HudElement>());
+    hudplayer_type["health"] = &HudPlayer::health;
+    hudplayer_type["bombs"] = &HudPlayer::bombs;
+    hudplayer_type["ropes"] = &HudPlayer::ropes;
+
+    auto hudmoney_type = lua.new_usertype<HudMoney>("HudMoney", sol::base_classes, sol::bases<HudElement>());
+    hudmoney_type["total"] = &HudMoney::total;
+    hudmoney_type["counter"] = &HudMoney::counter;
+    hudmoney_type["timer"] = &HudMoney::timer;
+
+    auto huddata_type = lua.new_usertype<HudData>("HudData");
+    huddata_type["inventory"] = &HudData::inventory;
+    huddata_type["udjat"] = &HudData::udjat;
+    huddata_type["money_total"] = &HudData::money_total;
+    huddata_type["money_counter"] = &HudData::money_counter;
+    huddata_type["time_total"] = &HudData::time_total;
+    huddata_type["time_level"] = &HudData::time_level;
+    huddata_type["world_num"] = &HudData::world_num;
+    huddata_type["level_num"] = &HudData::level_num;
+    huddata_type["seed"] = &HudData::seed;
+    huddata_type["opacity"] = &HudData::opacity;
+    huddata_type["players"] = &HudData::players;
+    huddata_type["money"] = &HudData::money;
+    huddata_type["timer"] = &HudData::timer;
+    huddata_type["level"] = &HudData::level;
+
+    auto hud_type = lua.new_usertype<Hud>("Hud");
+    hud_type["y"] = &Hud::y;
+    hud_type["opacity"] = &Hud::opacity;
+    hud_type["data"] = &Hud::data;
+
+    // TODO: maybe add a getter for HudData outside render_hud, I think it's always at 0x22e18020
 };
 } // namespace NVanillaRender

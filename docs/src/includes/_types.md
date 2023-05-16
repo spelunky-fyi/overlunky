@@ -194,6 +194,7 @@ nil | [draw_layer(DRAW_LAYER layer)](https://github.com/spelunky-fyi/overlunky/s
 bool | [window(string title, float x, float y, float w, float h, bool movable, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window) | Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
 nil | [win_text(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text) | Add some text to window, automatically wrapped
 nil | [win_separator()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator) | Add a separator line to window
+nil | [win_separator_text(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator_text) | Add a separator text line to window
 nil | [win_inline()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline) | Add next thing on the same line. This is same as `win_sameline(0, -1)`
 nil | [win_sameline(float offset, float spacing)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline) | Add next thing on the same line, with an offset
 bool | [win_button(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button) | Add a button
@@ -208,10 +209,11 @@ bool | [win_check(string label, bool value)](https://github.com/spelunky-fyi/ove
 int | [win_combo(string label, int selected, string opts)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo) | Add a combo box
 nil | [win_pushid(int id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) | Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 nil | [win_popid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) | Pop unique identifier from the stack. Put after the input.
-nil | [win_image(IMAGE image, int width, int height)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) | Draw image to window.
+nil | [win_image(IMAGE image, float width, float height)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) | Draw image to window.
 bool | [win_imagebutton(string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_imagebutton) | Draw imagebutton to window.
 nil | [win_section(string title, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_section) | Add a collapsing accordion section, put contents in the callback function.
 nil | [win_indent(float width)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_indent) | Indent contents, or unindent if negative
+nil | [win_width(float width)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_width) | Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
 
 ### LoadContext
 
@@ -294,6 +296,8 @@ nil | [draw_world_texture(TEXTURE texture_id, int row, int column, const Quad& d
 nil | [draw_world_texture(TEXTURE texture_id, int row, int column, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
 nil | [draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color, WORLD_SHADER shader)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen<br/>The `shader` parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 nil | [draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+[AABB](#AABB) | [bounding_box](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounding_box) | 
+ | [render_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_draw_depth) | 
 
 ## Entity related types
 
@@ -432,6 +436,24 @@ int | [sound_killed_by_other](https://github.com/spelunky-fyi/overlunky/search?l
 int | [tilex](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilex) | 
 int | [tiley](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiley) | 
 
+### HudInventory
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
+int | [health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) | 
+int | [bombs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) | 
+int | [ropes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) | 
+bool | [ankh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ankh) | 
+bool | [kapala](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala) | 
+int | [kapala_blood](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood) | 
+bool | [poison](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison) | 
+bool | [curse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=curse) | 
+bool | [elixir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elixir) | 
+[ENT_TYPE](#ENT_TYPE) | [crown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=crown) | [Powerup](#Powerup) type or 0
+int | [item_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_count) | Amount of generic pickup items at the bottom. Set to 0 to not draw them.
+
 ### Inventory
 
 Used in [Player](#Player), [PlayerGhost](#PlayerGhost) and [Items](#Items)
@@ -563,6 +585,83 @@ tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/o
 [uColor](#Aliases) | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
 [Color](#Color)& | [set_ucolor(const uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ucolor) | Changes color based on given [uColor](#Aliases)
 
+### Hud
+
+
+```lua
+set_callback(function(ctx, hud)
+    -- draw on screen bottom but keep neat animations
+    if hud.y > 0 then hud.y = -hud.y end
+    -- spoof some values
+    hud.data.inventory[1].health = prng:random_int(1, 99, 0)
+    -- hide generic pickup items
+    hud.data.inventory[1].item_count = 0
+    -- hide money element
+    hud.data.money.opacity = 0
+    -- get real current opacity of p1 inventory element
+    prinspect(hud.data.players[1].opacity * hud.data.opacity * hud.opacity)
+end, ON.RENDER_PRE_HUD)
+
+```
+
+
+Type | Name | Description
+---- | ---- | -----------
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
+[HudData](#HudData) | [data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data) | 
+
+### HudData
+
+
+Type | Name | Description
+---- | ---- | -----------
+array&lt;[HudInventory](#HudInventory), MAX_PLAYERS&gt; | [inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inventory) | 
+bool | [udjat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udjat) | 
+int | [money_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_total) | 
+int | [money_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_counter) | 
+int | [time_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_total) | 
+int | [time_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) | 
+int | [world_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_num) | 
+int | [level_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_num) | 
+int | [seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed) | 
+float | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
+array&lt;[HudPlayer](#HudPlayer), MAX_PLAYERS&gt; | [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) | 
+[HudMoney](#HudMoney) | [money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) | 
+[HudElement](#HudElement) | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+[HudElement](#HudElement) | [level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) | 
+
+### HudElement
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [dim](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dim) | Hide background and dim if using the auto adjust setting.
+float | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | Background will be drawn if this is not 0.5
+int | [time_dim](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_dim) | Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
+
+### HudMoney
+
+Derived from [HudElement](#HudElement)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=total) | 
+int | [counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=counter) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### HudPlayer
+
+Derived from [HudElement](#HudElement)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) | 
+int | [bombs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) | 
+int | [ropes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) | 
+
 ### Letter
 
 
@@ -600,8 +699,8 @@ optional&lt;int&gt; | [random_int(int min, int max, PRNG_CLASS type)](https://gi
 float | [random()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random()`
 optional&lt;int&gt; | [random(int i)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random(i)`
 optional&lt;int&gt; | [random(int min, int max)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random(min, max)`
-tuple&lt;int, int&gt; | [get_pair(size_t index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) | 
-nil | [set_pair(size_t index, int first, int second)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) | 
+tuple&lt;int, int&gt; | [get_pair(PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) | 
+nil | [set_pair(PRNG_CLASS type, int first, int second)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) | 
 
 ### Quad
 
@@ -1323,8 +1422,9 @@ array&lt;bool, 38&gt; | [people](https://github.com/spelunky-fyi/overlunky/searc
 array&lt;bool, 54&gt; | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | 
 array&lt;bool, 24&gt; | [traps](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=traps) | 
 string | [last_daily](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_daily) | 
-int | [characters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters) | 
-int | [shortcuts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shortcuts) | 
+int | [characters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=characters) | 20bit bitmask of unlocked characters
+int | [tutorial_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tutorial_state) | Tutorial state 0..4. Changes the camp layout, camera and lighting. (0=nothing, 1=journal got, 2=key spawned, 3=door unlocked, 4=complete)
+int | [shortcuts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shortcuts) | [Terra](#Terra) quest state 0..10 (0=not met ... 10=complete)
 array&lt;int, 78&gt; | [bestiary_killed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed) | 
 array&lt;int, 78&gt; | [bestiary_killed_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_killed_by) | 
 array&lt;int, 38&gt; | [people_killed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people_killed) | 
@@ -1350,6 +1450,7 @@ bool | [profile_seen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=p
 bool | [seeded_unlocked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seeded_unlocked) | 
 int | [world_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_last) | 
 int | [level_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_last) | 
+int | [theme_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_last) | 
 int | [score_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_last) | 
 int | [time_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last) | 
 array&lt;[ENT_TYPE](#ENT_TYPE), 20&gt; | [stickers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers) | 
@@ -1405,6 +1506,7 @@ int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 [TextureRenderingInfo](#TextureRenderingInfo) | [entire_book](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entire_book) | 
 int | [page_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) | 
 int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | 
+int | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
 custom_array&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ### PauseUI
@@ -2396,6 +2498,7 @@ int | [speechbubble_owner](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | See `get_correct_ushabti`. == anim_frame - (2  floor(anim_frame/12))
 [Items](#Items) | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | Has the current player count, player inventories and character selections
 int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | The currently drawn layer, can't be changed
+int | [layer_transition_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_transition_timer) | 
 [ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
 [ScreenCharacterSelect](#ScreenCharacterSelect) | [screen_character_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) | 
 [ScreenTransition](#ScreenTransition) | [screen_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) | 
@@ -2662,8 +2765,8 @@ bool | [allow_beehive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 bool | [allow_leprechaun](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=allow_leprechaun) | 
 [ThemeInfo](#ThemeInfo) | [sub_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sub_theme) | 
 nil | [reset_theme_flags()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_theme_flags) | Sets the beehive and leprechaun flags
-nil | [init_flags()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_flags) | Initializes some flags in the [LevelGenSystem](#LevelGenSystem)
-nil | [init_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_level) | Adds the entrance room
+nil | [init_flags()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_flags) | Initializes some flags in the [LevelGenSystem](#LevelGenSystem), also dark level flag in state.level_flags.
+nil | [init_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_level) | Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
 nil | [init_rooms()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init_rooms) | 
 nil | [generate_path(bool reset)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_path) | Generates and adds the path rooms and exit room<br/>Params: reset to start over from the beginning if other rooms didn't fit
 nil | [add_special_rooms()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_special_rooms) | Adds rooms related to udjat, black market, castle etc
@@ -2683,7 +2786,7 @@ nil | [spawn_background()](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 nil | [spawn_lights()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_lights) | Adds room lights to udjat chest room or black market
 nil | [spawn_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_transition) | Spawns the transition tunnel and players in it
 nil | [post_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post_transition) | Handles loading the next level screen from a transition screen
-nil | [spawn_players()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_players) | Spawns the players with inventory at `state.level_gen.spawn_x/y`
+nil | [spawn_players()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_players) | Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
 nil | [spawn_effects()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_effects) | Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
 string | [get_level_file()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_file) | Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
 int | [get_theme_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_id) | Returns: [THEME](#THEME), or subtheme in CO
@@ -2719,10 +2822,10 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_post_dtor(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_dtor) | Hooks after the virtual function.<br/>The callback signature is `nil dtor(ThemeInfo self)`
 [CallbackId](#Aliases) | [set_pre_reset_theme_flags(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_reset_theme_flags) | Hooks before the virtual function.<br/>The callback signature is `bool reset_theme_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the beehive and leprechaun flags
 [CallbackId](#Aliases) | [set_post_reset_theme_flags(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_reset_theme_flags) | Hooks after the virtual function.<br/>The callback signature is `nil reset_theme_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the beehive and leprechaun flags
-[CallbackId](#Aliases) | [set_pre_init_flags(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_init_flags) | Hooks before the virtual function.<br/>The callback signature is `bool init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem
-[CallbackId](#Aliases) | [set_post_init_flags(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_init_flags) | Hooks after the virtual function.<br/>The callback signature is `nil init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem
-[CallbackId](#Aliases) | [set_pre_init_level(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_init_level) | Hooks before the virtual function.<br/>The callback signature is `bool init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room
-[CallbackId](#Aliases) | [set_post_init_level(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_init_level) | Hooks after the virtual function.<br/>The callback signature is `nil init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room
+[CallbackId](#Aliases) | [set_pre_init_flags(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_init_flags) | Hooks before the virtual function.<br/>The callback signature is `bool init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
+[CallbackId](#Aliases) | [set_post_init_flags(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_init_flags) | Hooks after the virtual function.<br/>The callback signature is `nil init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
+[CallbackId](#Aliases) | [set_pre_init_level(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_init_level) | Hooks before the virtual function.<br/>The callback signature is `bool init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
+[CallbackId](#Aliases) | [set_post_init_level(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_init_level) | Hooks after the virtual function.<br/>The callback signature is `nil init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
 [CallbackId](#Aliases) | [set_pre_init_rooms(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_init_rooms) | Hooks before the virtual function.<br/>The callback signature is `bool init_rooms(ThemeInfo self)`
 [CallbackId](#Aliases) | [set_post_init_rooms(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_init_rooms) | Hooks after the virtual function.<br/>The callback signature is `nil init_rooms(ThemeInfo self)`
 [CallbackId](#Aliases) | [set_pre_generate_path(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_generate_path) | Hooks before the virtual function.<br/>The callback signature is `bool generate_path(ThemeInfo self, bool reset)`<br/>Virtual function docs:<br/>Generates and adds the path rooms and exit room<br/>Params: reset to start over from the beginning if other rooms didn't fit
@@ -2761,8 +2864,8 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_post_spawn_transition(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_spawn_transition) | Hooks after the virtual function.<br/>The callback signature is `nil spawn_transition(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the transition tunnel and players in it
 [CallbackId](#Aliases) | [set_pre_post_transition(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_post_transition) | Hooks before the virtual function.<br/>The callback signature is `bool post_transition(ThemeInfo self)`<br/>Virtual function docs:<br/>Handles loading the next level screen from a transition screen
 [CallbackId](#Aliases) | [set_post_post_transition(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_post_transition) | Hooks after the virtual function.<br/>The callback signature is `nil post_transition(ThemeInfo self)`<br/>Virtual function docs:<br/>Handles loading the next level screen from a transition screen
-[CallbackId](#Aliases) | [set_pre_spawn_players(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_spawn_players) | Hooks before the virtual function.<br/>The callback signature is `bool spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`
-[CallbackId](#Aliases) | [set_post_spawn_players(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_spawn_players) | Hooks after the virtual function.<br/>The callback signature is `nil spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`
+[CallbackId](#Aliases) | [set_pre_spawn_players(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_spawn_players) | Hooks before the virtual function.<br/>The callback signature is `bool spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
+[CallbackId](#Aliases) | [set_post_spawn_players(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_spawn_players) | Hooks after the virtual function.<br/>The callback signature is `nil spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
 [CallbackId](#Aliases) | [set_pre_spawn_effects(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_spawn_effects) | Hooks before the virtual function.<br/>The callback signature is `bool spawn_effects(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
 [CallbackId](#Aliases) | [set_post_spawn_effects(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_spawn_effects) | Hooks after the virtual function.<br/>The callback signature is `nil spawn_effects(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
 [CallbackId](#Aliases) | [set_pre_theme_id(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_theme_id) | Hooks before the virtual function.<br/>The callback signature is `optional<int> theme_id(ThemeInfo self)`
@@ -3483,8 +3586,10 @@ Type | Name | Description
 int | [uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) | Unique id of the entity, save it to variable to check this entity later (don't use the whole [Entity](#Entity) type as it will be replaced with a different one when this is destroyed)
 int | [animation_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) | Number (id) of the sprite in the texture
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
-float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
-float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+float | [abs_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_x) | Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+float | [abs_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_y) | Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
 int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | Use `set_layer` to change
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | Width of the sprite
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Height of the sprite

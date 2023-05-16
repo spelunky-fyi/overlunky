@@ -579,6 +579,19 @@ void register_usertypes(sol::state& lua)
         &JournalUI::page_timer,
         "fade_timer",
         &JournalUI::fade_timer,
+        "opacity",
+        sol::property([](JournalUI& ui) -> float
+                      {
+            switch (ui.state){
+                case 0:
+                    return 0.0f;
+                case 1:
+                    return 1.0f - (float)ui.fade_timer / 15.0f;
+                case 5:
+                    return (float)ui.fade_timer / 15.0f;
+                default:
+                    return 1.0f;
+                } }),
         "pages",
         sol::readonly(&JournalUI::pages));
 

@@ -1,4 +1,4 @@
----@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias
+---@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias,duplicate-set-field
 ---@class Meta
 ---@field name string
 ---@field version string
@@ -1055,15 +1055,33 @@ function refresh_illumination(illumination) end
 ---Removes all liquid that is about to go out of bounds, which crashes the game.
 ---@return nil
 function fix_liquid_out_of_bounds() end
----Gets the specified setting, values might need to be interpreted differently per setting
----@param setting GAME_SETTING
----@return integer?
-function get_setting(setting) end
----Return the name of an unknown number in an enum table
+---Return the name of the first matching number in an enum table
 ---@param enum table
 ---@param value integer
 ---@return string
 function enum_get_name(enum, value) end
+---Return all the names of a number in an enum table
+---@param enum table
+---@param value integer
+---@return table<string>
+function enum_get_names(enum, value) end
+---Return the matching names for a bitmask in an enum table of masks
+---@param enum table
+---@param value integer
+---@return table<string>
+function enum_get_mask_names(enum, value) end
+---Gets the specified setting, values might need to be interpreted differently per setting
+---@param setting GAME_SETTING
+---@return integer?
+function get_setting(setting) end
+---Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals. Returns false, if setting failed.
+---@param setting GAME_SETTING
+---@param value integer
+---@return boolean
+function set_setting(setting, value) end
+---Short for print(string.format(...))
+---@return nil
+function printf() end
 ---Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](https://spelunky-fyi.github.io/overlunky/#spawn_roomowner).
 ---@param x number
 ---@param y number,
@@ -1140,6 +1158,10 @@ function list_dir(dir) end
 ---List all char.png files recursively from Mods/Packs. Returns table of file paths.
 ---@return nil
 function list_char_mods() end
+---Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count
+---@param index integer
+---@return AABB
+function get_hud_position(index) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1339,6 +1361,11 @@ function force_co_subtheme(subtheme) end
 ---@param config LEVEL_CONFIG
 ---@return integer
 function get_level_config(config) end
+---Set the value for the specified config
+---@param config LEVEL_CONFIG
+---@param value integer
+---@return nil
+function set_level_config(config, value) end
 ---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
 ---@param max_lengh integer
@@ -1577,6 +1604,7 @@ function set_feat_hidden(feat, hidden) end
 function change_feat(feat, hidden, name, description) end
 
 --## Types
+do
 
 ---@class Players
 
@@ -1811,6 +1839,7 @@ function change_feat(feat, hidden, name, description) end
     ---@field correct_ushabti integer @See `get_correct_ushabti`. == anim_frame - (2  floor(anim_frame/12))
     ---@field items Items @Has the current player count, player inventories and character selections
     ---@field camera_layer integer @The currently drawn layer, can't be changed
+    ---@field layer_transition_timer integer
     ---@field screen_team_select ScreenTeamSelect
     ---@field screen_character_select ScreenCharacterSelect
     ---@field screen_transition ScreenTransition
@@ -2009,16 +2038,21 @@ function change_feat(feat, hidden, name, description) end
     ---@field random_chance fun(self, inverse_chance: integer, type: PRNG_CLASS): boolean @Returns true with a chance of `1/inverse_chance`
     ---@field random_index fun(self, i: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
     ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[min, max]` or `nil` if `max < min`
-    ---@field random PRNG_random @Drop-in replacement for `math.random()`
     ---@field get_pair any @&PRNG::get_pair
     ---@field set_pair any @&PRNG::set_pair
-
----@class PRNG_random
+local PRNG = nil
+---Drop-in replacement for `math.random()`
+---@return number
+function PRNG:random() end
+---Drop-in replacement for `math.random(i)`
+---@param i integer
+---@return integer?
+function PRNG:random(i) end
+---Drop-in replacement for `math.random(min, max)`
 ---@param min integer
 ---@param max integer
----@overload fun(self): number
----@overload fun(self, i: integer): integer?
-local function PRNG_random(self, min, max) end
+---@return integer?
+function PRNG:random(min, max) end
 
 ---@class Color
     ---@field r number
@@ -2103,8 +2137,10 @@ local function PRNG_random(self, min, max) end
     ---@field uid integer @Unique id of the entity, save it to variable to check this entity later (don't use the whole Entity type as it will be replaced with a different one when this is destroyed)
     ---@field animation_frame integer @Number (id) of the sprite in the texture
     ---@field draw_depth integer @Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
-    ---@field x number @Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
-    ---@field y number @Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
+    ---@field x number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    ---@field y number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    ---@field abs_x number @Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    ---@field abs_y number @Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
     ---@field layer integer @Use `set_layer` to change
     ---@field width number @Width of the sprite
     ---@field height number @Height of the sprite
@@ -2124,7 +2160,6 @@ local function PRNG_random(self, min, max) end
     ---@field user_data any
     ---@field topmost fun(self): Entity
     ---@field topmost_mount fun(self): Entity
-    ---@field overlaps_with Entity_overlaps_with
     ---@field get_texture fun(self): TEXTURE
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean @Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     ---@field set_draw_depth fun(self, draw_depth: integer): nil
@@ -2164,12 +2199,21 @@ local function PRNG_random(self, min, max) end
     ---@field set_post_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
     ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_collision2(Entity self, Entity other_entity)`
     ---@field set_post_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_collision2(Entity self, Entity other_entity)`
-
----@class Entity_overlaps_with
+local Entity = nil
+---@param hitbox AABB
+---@return boolean
+function Entity:overlaps_with(hitbox) end
+---Deprecated
+---Use `overlaps_with(AABB hitbox)` instead
+---@param rect_left number
+---@param rect_bottom number
+---@param rect_right number
+---@param rect_top number
+---@return boolean
+function Entity:overlaps_with(rect_left, rect_bottom, rect_right, rect_top) end
 ---@param other Entity
----@overload fun(self, hitbox: AABB): boolean
----@overload fun(self, rect_left: number, rect_bottom: number, rect_right: number, rect_top: number): boolean
-local function Entity_overlaps_with(self, other) end
+---@return boolean
+function Entity:overlaps_with(other) end
 
 ---@class Movable : Entity
     ---@field move Vec2 @{movex, movey}
@@ -2197,7 +2241,7 @@ local function Entity_overlaps_with(self, other) end
     ---@field wet_effect_timer integer
     ---@field poison_tick_timer integer @Used to apply damage from poison, can be set to -1 to cure poison, to set poison use [poison_entity](#poison_entity)
     ---@field falling_timer integer
-    ---@field is_poisoned Movable_is_poisoned
+    ---@field is_poisoned fun(self): boolean
     ---@field dark_shadow_timer integer
     ---@field onfire_effect_timer integer
     ---@field exit_invincibility_timer integer
@@ -2228,25 +2272,31 @@ local function Entity_overlaps_with(self, other) end
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil @Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil @Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
     ---@field clear_behaviors fun(self): nil @Clears all behaviors of this movable, need to call `add_behavior` to avoid crashing
-    ---@field generic_update_world fun(self): nil @Move a movable according to its velocity, update physics, gravity, etc.<br/>Will also update `movable.animation_frame` and various timers and counters
-    ---@field generic_update_world Movable_generic_update_world @Move a movable according to its velocity, can disable gravity<br/>Will also update `movable.animation_frame` and various timers and counters
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
     ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
-
----@class Movable_is_poisoned
-
-local function Movable_is_poisoned(self) end
-
----@class Movable_generic_update_world
+local Movable = nil
+---Move a movable according to its velocity, update physics, gravity, etc.
+---Will also update `movable.animation_frame` and various timers and counters
+---@return nil
+function Movable:generic_update_world() end
+---Move a movable according to its velocity, can disable gravity
+---Will also update `movable.animation_frame` and various timers and counters
+---@param disable_gravity boolean
+---@return nil
+function Movable:generic_update_world(disable_gravity) end
+---Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is
+---held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal
+---movement via `on_rope`. Use this for example to update a custom enemy type.
+---Will also update `movable.animation_frame` and various timers and counters
 ---@param move Vec2
 ---@param sprint_factor number
 ---@param disable_gravity boolean
 ---@param on_rope boolean
----@overload fun(self, disable_gravity: boolean): nil
-local function Movable_generic_update_world(self, move, sprint_factor, disable_gravity, on_rope) end
+---@return nil
+function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_rope) end
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil @Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
@@ -3957,12 +4007,13 @@ local function Movable_generic_update_world(self, move, sprint_factor, disable_g
     ---@field reticule_external Entity
 
 ---@class MovableBehavior
-    ---@field get_state_id MovableBehavior_get_state_id
-
----@class MovableBehavior_get_state_id
-
----@overload fun(self): integer
-local function MovableBehavior_get_state_id(self) end
+local MovableBehavior = nil
+---@return integer
+function MovableBehavior:get_state_id() end
+---Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's
+---`get_next_state_id` to enter this state, given that the behavior is added to the movable.
+---@return integer
+function MovableBehavior:get_state_id() end
 
 ---@class VanillaMovableBehavior : MovableBehavior
 
@@ -4038,8 +4089,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field allow_leprechaun boolean
     ---@field sub_theme ThemeInfo
     ---@field reset_theme_flags fun(self): nil @Sets the beehive and leprechaun flags
-    ---@field init_flags fun(self): nil @Initializes some flags in the LevelGenSystem
-    ---@field init_level fun(self): nil @Adds the entrance room
+    ---@field init_flags fun(self): nil @Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
+    ---@field init_level fun(self): nil @Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
     ---@field init_rooms fun(self): nil
     ---@field generate_path fun(self, reset: boolean): nil @Generates and adds the path rooms and exit room<br/>Params: reset to start over from the beginning if other rooms didn't fit
     ---@field add_special_rooms fun(self): nil @Adds rooms related to udjat, black market, castle etc
@@ -4059,7 +4110,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field spawn_lights fun(self): nil @Adds room lights to udjat chest room or black market
     ---@field spawn_transition fun(self): nil @Spawns the transition tunnel and players in it
     ---@field post_transition fun(self): nil @Handles loading the next level screen from a transition screen
-    ---@field spawn_players fun(self): nil @Spawns the players with inventory at `state.level_gen.spawn_x/y`
+    ---@field spawn_players fun(self): nil @Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     ---@field spawn_effects fun(self): nil @Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
     ---@field get_level_file fun(self): string @Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
     ---@field get_theme_id fun(self): integer @Returns: THEME, or subtheme in CO
@@ -4095,10 +4146,10 @@ local function MovableBehavior_get_state_id(self) end
     ---@field set_post_dtor fun(self, fun: fun(self: ThemeInfo): nil): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil dtor(ThemeInfo self)`
     ---@field set_pre_reset_theme_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool reset_theme_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the beehive and leprechaun flags
     ---@field set_post_reset_theme_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil reset_theme_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the beehive and leprechaun flags
-    ---@field set_pre_init_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem
-    ---@field set_post_init_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem
-    ---@field set_pre_init_level fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room
-    ---@field set_post_init_level fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room
+    ---@field set_pre_init_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
+    ---@field set_post_init_flags fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_flags(ThemeInfo self)`<br/>Virtual function docs:<br/>Initializes some flags in the LevelGenSystem, also dark level flag in state.level_flags.
+    ---@field set_pre_init_level fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
+    ---@field set_post_init_level fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_level(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the entrance room and sets spawn_room_x/y. Sets the level size and toast for echoes feeling. Sets some other level_flags, shop related flags and shop_type.
     ---@field set_pre_init_rooms fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init_rooms(ThemeInfo self)`
     ---@field set_post_init_rooms fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init_rooms(ThemeInfo self)`
     ---@field set_pre_generate_path fun(self, fun: fun(self: ThemeInfo, reset: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool generate_path(ThemeInfo self, boolean reset)`<br/>Virtual function docs:<br/>Generates and adds the path rooms and exit room<br/>Params: reset to start over from the beginning if other rooms didn't fit
@@ -4137,8 +4188,8 @@ local function MovableBehavior_get_state_id(self) end
     ---@field set_post_spawn_transition fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_transition(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the transition tunnel and players in it
     ---@field set_pre_post_transition fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool post_transition(ThemeInfo self)`<br/>Virtual function docs:<br/>Handles loading the next level screen from a transition screen
     ---@field set_post_post_transition fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil post_transition(ThemeInfo self)`<br/>Virtual function docs:<br/>Handles loading the next level screen from a transition screen
-    ---@field set_pre_spawn_players fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`
-    ---@field set_post_spawn_players fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`
+    ---@field set_pre_spawn_players fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
+    ---@field set_post_spawn_players fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_players(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     ---@field set_pre_spawn_effects fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_effects(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
     ---@field set_post_spawn_effects fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_effects(ThemeInfo self)`<br/>Virtual function docs:<br/>Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
     ---@field set_pre_theme_id fun(self, fun: fun(self: ThemeInfo): integer?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<integer> theme_id(ThemeInfo self)`
@@ -4316,8 +4367,9 @@ local function MovableBehavior_get_state_id(self) end
     ---@field items boolean[] @size: 54
     ---@field traps boolean[] @size: 24
     ---@field last_daily string
-    ---@field characters integer
-    ---@field shortcuts integer
+    ---@field characters integer @20bit bitmask of unlocked characters
+    ---@field tutorial_state integer @Tutorial state 0..4. Changes the camp layout, camera and lighting. (0=nothing, 1=journal got, 2=key spawned, 3=door unlocked, 4=complete)
+    ---@field shortcuts integer @Terra quest state 0..10 (0=not met ... 10=complete)
     ---@field bestiary_killed integer[] @size: 78
     ---@field bestiary_killed_by integer[] @size: 78
     ---@field people_killed integer[] @size: 38
@@ -4343,6 +4395,7 @@ local function MovableBehavior_get_state_id(self) end
     ---@field seeded_unlocked boolean
     ---@field world_last integer
     ---@field level_last integer
+    ---@field theme_last integer
     ---@field score_last integer
     ---@field time_last integer
     ---@field stickers ENT_TYPE[] @size: 20
@@ -4378,15 +4431,17 @@ local function MovableBehavior_get_state_id(self) end
     ---@field to integer
 
 ---@class CustomSound
-    ---@field play CustomSound_play
     ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
-
----@class CustomSound_play
+local CustomSound = nil
+---@return PlayingSound
+function CustomSound:play() end
+---@param paused boolean
+---@return PlayingSound
+function CustomSound:play(paused) end
 ---@param paused boolean
 ---@param sound_type SOUND_TYPE
----@overload fun(self): PlayingSound
----@overload fun(self, paused: boolean): PlayingSound
-local function CustomSound_play(self, paused, sound_type) end
+---@return PlayingSound
+function CustomSound:play(paused, sound_type) end
 
 ---@class PlayingSound
     ---@field is_playing fun(self): boolean
@@ -4453,8 +4508,6 @@ local function CustomSound_play(self, paused, sound_type) end
 
 ---@class GuiDrawContext
     ---@field draw_line fun(self, x1: number, y1: number, x2: number, y2: number, thickness: number, color: uColor): nil @Draws a line on screen
-    ---@field draw_rect GuiDrawContext_draw_rect @Draws a rectangle on screen from top-left to bottom-right.
-    ---@field draw_rect_filled GuiDrawContext_draw_rect_filled @Draws a filled rectangle on screen from top-left to bottom-right.
     ---@field draw_triangle fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil @Draws a triangle on screen.
     ---@field draw_triangle_filled fun(self, p1: Vec2, p2: Vec2, p3: Vec2, color: uColor): nil @Draws a filled triangle on screen.
     ---@field draw_poly fun(self, points: Vec2[], thickness: number, color: uColor): nil @Draws a polyline on screen.
@@ -4464,12 +4517,11 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field draw_circle fun(self, x: number, y: number, radius: number, thickness: number, color: uColor): nil @Draws a circle on screen
     ---@field draw_circle_filled fun(self, x: number, y: number, radius: number, color: uColor): nil @Draws a filled circle on screen
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil @Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
-    ---@field draw_image GuiDrawContext_draw_image @Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
-    ---@field draw_image_rotated GuiDrawContext_draw_image_rotated @Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
     ---@field draw_layer fun(self, layer: DRAW_LAYER): nil @Draw on top of UI windows, including platform windows that may be outside the game area, or only in current widget window. Defaults to main viewport background.
     ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: fun(ctx: GuiDrawContext, pos: Vec2, size: Vec2): nil): boolean @Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
     ---@field win_text fun(self, text: string): nil @Add some text to window, automatically wrapped
     ---@field win_separator fun(self): nil @Add a separator line to window
+    ---@field win_separator_text fun(self, text: string): nil @Add a separator text line to window
     ---@field win_inline fun(self): nil @Add next thing on the same line. This is same as `win_sameline(0, -1)`
     ---@field win_sameline fun(self, offset: number, spacing: number): nil @Add next thing on the same line, with an offset
     ---@field win_button fun(self, text: string): boolean @Add a button
@@ -4484,35 +4536,81 @@ local function CustomSound_play(self, paused, sound_type) end
     ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer @Add a combo box
     ---@field win_pushid fun(self, id: integer): nil @Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
     ---@field win_popid fun(self): nil @Pop unique identifier from the stack. Put after the input.
-    ---@field win_image fun(self, image: IMAGE, width: integer, height: integer): nil @Draw image to window.
+    ---@field win_image fun(self, image: IMAGE, width: number, height: number): nil @Draw image to window.
     ---@field win_imagebutton fun(self, label: string, image: IMAGE, width: number, height: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number): boolean @Draw imagebutton to window.
     ---@field win_section fun(self, title: string, callback: function): nil @Add a collapsing accordion section, put contents in the callback function.
     ---@field win_indent fun(self, width: number): nil @Indent contents, or unindent if negative
-
----@class GuiDrawContext_draw_rect
+    ---@field win_width fun(self, width: number): nil @Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
+local GuiDrawContext = nil
+---Draws a rectangle on screen from top-left to bottom-right.
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param thickness number
+---@param rounding number
+---@param color uColor
+---@return nil
+function GuiDrawContext:draw_rect(left, top, right, bottom, thickness, rounding, color) end
+---Draws a rectangle on screen from top-left to bottom-right.
 ---@param rect AABB
 ---@param thickness number
 ---@param rounding number
 ---@param color uColor
----@overload fun(self, left: number, top: number, right: number, bottom: number, thickness: number, rounding: number, color: uColor): nil
-local function GuiDrawContext_draw_rect(self, rect, thickness, rounding, color) end
-
----@class GuiDrawContext_draw_rect_filled
+---@return nil
+function GuiDrawContext:draw_rect(rect, thickness, rounding, color) end
+---Draws a filled rectangle on screen from top-left to bottom-right.
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param rounding number
+---@param color uColor
+---@return nil
+function GuiDrawContext:draw_rect_filled(left, top, right, bottom, rounding, color) end
+---Draws a filled rectangle on screen from top-left to bottom-right.
 ---@param rect AABB
 ---@param rounding number
 ---@param color uColor
----@overload fun(self, left: number, top: number, right: number, bottom: number, rounding: number, color: uColor): nil
-local function GuiDrawContext_draw_rect_filled(self, rect, rounding, color) end
-
----@class GuiDrawContext_draw_image
+---@return nil
+function GuiDrawContext:draw_rect_filled(rect, rounding, color) end
+---Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
+---@param image IMAGE
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param uvx1 number
+---@param uvy1 number
+---@param uvx2 number
+---@param uvy2 number
+---@param color uColor
+---@return nil
+function GuiDrawContext:draw_image(image, left, top, right, bottom, uvx1, uvy1, uvx2, uvy2, color) end
+---Draws an image on screen from top-left to bottom-right. Use UV coordinates `0, 0, 1, 1` to just draw the whole image.
 ---@param image IMAGE
 ---@param rect AABB
 ---@param uv_rect AABB
 ---@param color uColor
----@overload fun(self, image: IMAGE, left: number, top: number, right: number, bottom: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number, color: uColor): nil
-local function GuiDrawContext_draw_image(self, image, rect, uv_rect, color) end
-
----@class GuiDrawContext_draw_image_rotated
+---@return nil
+function GuiDrawContext:draw_image(image, rect, uv_rect, color) end
+---Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
+---@param image IMAGE
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param uvx1 number
+---@param uvy1 number
+---@param uvx2 number
+---@param uvy2 number
+---@param color uColor
+---@param angle number
+---@param px number
+---@param py number
+---@return nil
+function GuiDrawContext:draw_image_rotated(image, left, top, right, bottom, uvx1, uvy1, uvx2, uvy2, color, angle, px, py) end
+---Same as `draw_image` but rotates the image by angle in radians around the pivot offset from the center of the rect (meaning `px=py=0` rotates around the center)
 ---@param image IMAGE
 ---@param rect AABB
 ---@param uv_rect AABB
@@ -4520,8 +4618,8 @@ local function GuiDrawContext_draw_image(self, image, rect, uv_rect, color) end
 ---@param angle number
 ---@param px number
 ---@param py number
----@overload fun(self, image: IMAGE, left: number, top: number, right: number, bottom: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number, color: uColor, angle: number, px: number, py: number): nil
-local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, color, angle, px, py) end
+---@return nil
+function GuiDrawContext:draw_image_rotated(image, rect, uv_rect, color, angle, px, py) end
 
 ---@class Gamepad
     ---@field enabled boolean
@@ -4556,40 +4654,150 @@ local function GuiDrawContext_draw_image_rotated(self, image, rect, uv_rect, col
     ---@field showcursor boolean
 
 ---@class VanillaRenderContext
-    ---@field draw_text VanillaRenderContext_draw_text @Draw text using the built-in renderer<br/>Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
     ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer
-    ---@field draw_screen_texture VanillaRenderContext_draw_screen_texture @Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    ---@field draw_world_texture VanillaRenderContext_draw_world_texture @Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a Quad instead
-
----@class VanillaRenderContext_draw_text
+    ---@field bounding_box AABB
+    ---@field render_draw_depth any @render_draw_depth_lua
+local VanillaRenderContext = nil
+---Draw text using the built-in renderer
+---Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
+---@param text string
+---@param x number
+---@param y number
+---@param scale_x number
+---@param scale_y number
+---@param color Color
+---@param alignment integer
+---@param fontstyle integer
+---@return nil
+function VanillaRenderContext:draw_text(text, x, y, scale_x, scale_y, color, alignment, fontstyle) end
 ---@param tri TextRenderingInfo
 ---@param color Color
----@overload fun(self, text: string, x: number, y: number, scale_x: number, scale_y: number, color: Color, alignment: integer, fontstyle: integer): nil
-local function VanillaRenderContext_draw_text(self, tri, color) end
-
----@class VanillaRenderContext_draw_screen_texture
+---@return nil
+function VanillaRenderContext:draw_text(tri, color) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, row, column, left, top, right, bottom, color) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param rect AABB
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, row, column, rect, color) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param rect AABB
+---@param color Color
+---@param angle number
+---@param px number
+---@param py number
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, row, column, rect, color, angle, px, py) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest Quad
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, row, column, dest, color) end
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. `source` - the coordinates in the texture, `dest` - the coordinates on the screen
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 ---@param texture_id TEXTURE
 ---@param source Quad
 ---@param dest Quad
 ---@param color Color
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, rect: AABB, color: Color, angle: number, px: number, py: number): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
-local function VanillaRenderContext_draw_screen_texture(self, texture_id, source, dest, color) end
-
----@class VanillaRenderContext_draw_world_texture
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, source, dest, color) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---For more control use the version taking a Quad instead
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param left number
+---@param top number
+---@param right number
+---@param bottom number
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, left, top, right, bottom, color) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---For more control use the version taking a Quad instead
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest AABB
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, dest, color) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---For more control use the version taking a Quad instead
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest AABB
+---@param color Color
+---@param angle number
+---@param px number
+---@param py number
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, dest, color, angle, px, py) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+---The `shader` parameter controls how to render the texture
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest Quad
+---@param color Color
+---@param shader WORLD_SHADER
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, dest, color, shader) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param texture_id TEXTURE
+---@param row integer
+---@param column integer
+---@param dest Quad
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, row, column, dest, color) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen
+---The `shader` parameter controls how to render the texture
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 ---@param texture_id TEXTURE
 ---@param source Quad
 ---@param dest Quad
 ---@param color Color
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, left: number, top: number, right: number, bottom: number, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: AABB, color: Color, angle: number, px: number, py: number): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color, shader: WORLD_SHADER): nil
----@overload fun(self, texture_id: TEXTURE, row: integer, column: integer, dest: Quad, color: Color): nil
----@overload fun(self, texture_id: TEXTURE, source: Quad, dest: Quad, color: Color, shader: WORLD_SHADER): nil
-local function VanillaRenderContext_draw_world_texture(self, texture_id, source, dest, color) end
+---@param shader WORLD_SHADER
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, source, dest, color, shader) end
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  `source` - the coordinates in the texture, `dest` - the coordinates on the screen
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param texture_id TEXTURE
+---@param source Quad
+---@param dest Quad
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_texture(texture_id, source, dest, color) end
 
 ---@class TextureRenderingInfo
     ---@field x number
@@ -4638,6 +4846,56 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
 
+---@class HudInventory
+    ---@field enabled boolean
+    ---@field health integer
+    ---@field bombs integer
+    ---@field ropes integer
+    ---@field ankh boolean
+    ---@field kapala boolean
+    ---@field kapala_blood integer
+    ---@field poison boolean
+    ---@field curse boolean
+    ---@field elixir boolean
+    ---@field crown ENT_TYPE @Powerup type or 0
+    ---@field item_count integer @Amount of generic pickup items at the bottom. Set to 0 to not draw them.
+
+---@class HudElement
+    ---@field dim boolean @Hide background and dim if using the auto adjust setting.
+    ---@field opacity number @Background will be drawn if this is not 0.5
+    ---@field time_dim integer @Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
+
+---@class HudPlayer : HudElement
+    ---@field health integer
+    ---@field bombs integer
+    ---@field ropes integer
+
+---@class HudMoney : HudElement
+    ---@field total integer
+    ---@field counter integer
+    ---@field timer integer
+
+---@class HudData
+    ---@field inventory HudInventory[] @size: MAX_PLAYERS
+    ---@field udjat boolean
+    ---@field money_total integer
+    ---@field money_counter integer
+    ---@field time_total integer
+    ---@field time_level integer
+    ---@field world_num integer
+    ---@field level_num integer
+    ---@field seed integer
+    ---@field opacity number
+    ---@field players HudPlayer[] @size: MAX_PLAYERS
+    ---@field money HudMoney
+    ---@field timer HudElement
+    ---@field level HudElement
+
+---@class Hud
+    ---@field y number
+    ---@field opacity number
+    ---@field data HudData
+
 ---@class TextureDefinition
     ---@field texture_path string
     ---@field width integer
@@ -4662,34 +4920,40 @@ local function VanillaRenderContext_draw_world_texture(self, texture_id, source,
     ---@field top number
     ---@field overlaps_with fun(self, other: AABB): boolean
     ---@field abs fun(self): AABB @Fixes the AABB if any of the sides have negative length
-    ---@field extrude AABB_extrude @Grows or shrinks the AABB by the given amount in all directions.<br/>If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
     ---@field offset fun(self, off_x: number, off_y: number): AABB @Offsets the AABB by the given offset.
     ---@field area fun(self): number @Compute area of the AABB, can be zero if one dimension is zero or negative if one dimension is inverted.
     ---@field center fun(self): number, number @Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
     ---@field width fun(self): number @Short for `aabb.right - aabb.left`.
     ---@field height fun(self): number @Short for `aabb.top - aabb.bottom`.
     ---@field split fun(self): number, number, number, number
-
----@class AABB_extrude
+local AABB = nil
+---Grows or shrinks the AABB by the given amount in all directions.
+---If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
+---@param amount number
+---@return AABB
+function AABB:extrude(amount) end
+---Grows or shrinks the AABB by the given amount in each direction.
+---If `amount_x/y < 0` and `abs(amount_x/y) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
 ---@param amount_x number
 ---@param amount_y number
----@overload fun(self, amount: number): AABB
-local function AABB_extrude(self, amount_x, amount_y) end
+---@return AABB
+function AABB:extrude(amount_x, amount_y) end
 
 ---@class Triangle
     ---@field A Vec2
     ---@field B Vec2
     ---@field C Vec2
-    ---@field offset Triangle_offset
     ---@field rotate fun(self, angle: number, px: number, py: number): Triangle
     ---@field center fun(self): Vec2 @Also known as centroid
     ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corners
-
----@class Triangle_offset
+local Triangle = nil
+---@param off Vec2
+---@return Triangle
+function Triangle:offset(off) end
 ---@param x number
 ---@param y number
----@overload fun(self, off: Vec2): Triangle
-local function Triangle_offset(self, x, y) end
+---@return Triangle
+function Triangle:offset(x, y) end
 
 ---@class Quad
     ---@field bottom_left_x number
@@ -5084,7 +5348,7 @@ local function Triangle_offset(self, x, y) end
     ---@field entire_book TextureRenderingInfo
     ---@field page_timer integer
     ---@field fade_timer integer
-    ---@field pages custom_Array<JournalPage> @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+    ---@field opacity integer
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo
@@ -5371,34 +5635,68 @@ local function Triangle_offset(self, x, y) end
     ---@field player_create_giblets boolean[] @size: MAX_PLAYERS
     ---@field next_sidepanel_slidein_timer number
 
-
---## Constructors
+end
+--## Static class functions
 
 Color = nil
+---@return Color
+function Color:white() end
+---@return Color
+function Color:silver() end
+---@return Color
+function Color:gray() end
+---@return Color
+function Color:black() end
+---@return Color
+function Color:red() end
+---@return Color
+function Color:maroon() end
+---@return Color
+function Color:yellow() end
+---@return Color
+function Color:olive() end
+---@return Color
+function Color:lime() end
+---@return Color
+function Color:green() end
+---@return Color
+function Color:aqua() end
+---@return Color
+function Color:teal() end
+---@return Color
+function Color:blue() end
+---@return Color
+function Color:navy() end
+---@return Color
+function Color:fuchsia() end
+---@return Color
+function Color:purple() end
+
+--## Constructors
 ---Create a new color - defaults to black
 ---@return Color
-function Color.new(self) end
+function Color:new() end
 ---@param color Color
 ---@return Color
-function Color.new(self, color) end
+function Color:new(color) end
 ---@param color Color
 ---@return Color
-function Color.new(self, color) end
+function Color:new(color) end
 ---Create a new color by specifying its values
 ---@param r_ number
 ---@param g_ number
 ---@param b_ number
 ---@param a_ number
 ---@return Color
-function Color.new(self, r_, g_, b_, a_) end
+function Color:new(r_, g_, b_, a_) end
 
 EntityDB = nil
 ---@param other EntityDB
 ---@return EntityDB
-function EntityDB.new(self, other) end
+function EntityDB:new(other) end
 ---@param other ENT_TYPE
 ---@return EntityDB
-function EntityDB.new(self, other) end
+function EntityDB:new(other) end
 
 CustomTheme = nil
 ---Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).
@@ -5406,54 +5704,54 @@ CustomTheme = nil
 ---@param base_theme_ integer
 ---@param defaults boolean
 ---@return CustomTheme
-function CustomTheme.new(self, theme_id_, base_theme_, defaults) end
+function CustomTheme:new(theme_id_, base_theme_, defaults) end
 ---Create a new theme with defaults.
 ---@param theme_id_ integer
 ---@param base_theme_ integer
 ---@return CustomTheme
-function CustomTheme.new(self, theme_id_, base_theme_) end
+function CustomTheme:new(theme_id_, base_theme_) end
 ---Create a new theme with base dwelling and id 100.
 ---@return CustomTheme
-function CustomTheme.new(self) end
+function CustomTheme:new() end
 
 Vec2 = nil
 ---@return Vec2
-function Vec2.new(self) end
+function Vec2:new() end
 ---@param vec2 Vec2
 ---@return Vec2
-function Vec2.new(self, vec2) end
+function Vec2:new(vec2) end
 ---@param x_ number
 ---@param y_ number
 ---@return Vec2
-function Vec2.new(self, x_, y_) end
+function Vec2:new(x_, y_) end
 
 AABB = nil
 ---Create a new axis aligned bounding box - defaults to all zeroes
 ---@return AABB
-function AABB.new(self) end
+function AABB:new() end
 ---Copy an axis aligned bounding box
 ---@param aabb AABB
 ---@return AABB
-function AABB.new(self, aabb) end
+function AABB:new(aabb) end
 ---Create a new axis aligned bounding box by specifying its values
 ---@param left_ number
 ---@param top_ number
 ---@param right_ number
 ---@param bottom_ number
 ---@return AABB
-function AABB.new(self, left_, top_, right_, bottom_) end
+function AABB:new(left_, top_, right_, bottom_) end
 
 Triangle = nil
 ---@return Triangle
-function Triangle.new(self) end
+function Triangle:new() end
 ---@param triangle Triangle
 ---@return Triangle
-function Triangle.new(self, triangle) end
+function Triangle:new(triangle) end
 ---@param _a Vec2
 ---@param _b Vec2
 ---@param _c Vec2
 ---@return Triangle
-function Triangle.new(self, _a, _b, _c) end
+function Triangle:new(_a, _b, _c) end
 ---@param ax number
 ---@param ay number
 ---@param bx number
@@ -5461,20 +5759,20 @@ function Triangle.new(self, _a, _b, _c) end
 ---@param cx number
 ---@param cy number
 ---@return Triangle
-function Triangle.new(self, ax, ay, bx, by, cx, cy) end
+function Triangle:new(ax, ay, bx, by, cx, cy) end
 
 Quad = nil
 ---@return Quad
-function Quad.new(self) end
+function Quad:new() end
 ---@param quad Quad
 ---@return Quad
-function Quad.new(self, quad) end
+function Quad:new(quad) end
 ---@param bottom_left_ Vec2
 ---@param bottom_right_ Vec2
 ---@param top_right_ Vec2
 ---@param top_left_ Vec2
 ---@return Quad
-function Quad.new(self, bottom_left_, bottom_right_, top_right_, top_left_) end
+function Quad:new(bottom_left_, bottom_right_, top_right_, top_left_) end
 ---@param _bottom_left_x number
 ---@param _bottom_left_y number
 ---@param _bottom_right_x number
@@ -5484,10 +5782,10 @@ function Quad.new(self, bottom_left_, bottom_right_, top_right_, top_left_) end
 ---@param _top_left_x number
 ---@param _top_left_y number
 ---@return Quad
-function Quad.new(self, _bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right_y, _top_right_x, _top_right_y, _top_left_x, _top_left_y) end
+function Quad:new(_bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right_y, _top_right_x, _top_right_y, _top_left_x, _top_left_y) end
 ---@param aabb AABB
 ---@return Quad
-function Quad.new(self, aabb) end
+function Quad:new(aabb) end
 
 --## Enums
 

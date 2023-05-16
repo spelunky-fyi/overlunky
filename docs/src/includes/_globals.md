@@ -1514,6 +1514,15 @@ Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0
 
 Enables or disables the journal
 
+### set_level_config
+
+
+> Search script examples for [set_level_config](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_config)
+
+#### nil set_level_config([LEVEL_CONFIG](#LEVEL_CONFIG) config, int value)
+
+Set the value for the specified config
+
 ### set_mask
 
 
@@ -1531,6 +1540,31 @@ Set a bitmask in a number. This doesn't actually change the variable you pass, i
 #### nil set_seed(int seed)
 
 Set seed and reset run.
+
+### set_setting
+
+
+```lua
+-- set some visual settings needed by your mod
+-- doing this here will reapply these after visiting the options, which would reset them to real values
+
+set_callback(function()
+    if state.screen_next == SCREEN.LEVEL then
+        -- use the secret tiny hud size
+        set_setting(GAME_SETTING.HUD_SIZE, 3)
+        -- force opaque textboxes
+        set_setting(GAME_SETTING.TEXTBOX_OPACITY, 0)
+    end
+end, ON.PRE_LOAD_SCREEN)
+
+```
+
+
+> Search script examples for [set_setting](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_setting)
+
+#### bool set_setting([GAME_SETTING](#GAME_SETTING) setting, int value)
+
+Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals. Returns false, if setting failed.
 
 ### set_storage_layer
 
@@ -1807,6 +1841,15 @@ Prints any type of object by first funneling it through `inspect`, no need for a
 #### nil print(string message)
 
 Print a log message on screen.
+
+### printf
+
+
+> Search script examples for [printf](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=printf)
+
+#### nil printf()
+
+Short for print(string.format(...))
 
 ### say
 
@@ -2139,6 +2182,15 @@ Gets the current camera position in the level
 #### [AABB](#AABB) get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)
 
 Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
+
+### get_hud_position
+
+
+> Search script examples for [get_hud_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hud_position)
+
+#### [AABB](#AABB) get_hud_position(int index)
+
+Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count
 
 ### get_image_size
 
@@ -2834,6 +2886,15 @@ This edits custom string and in game strings but changing the language in settin
 
 Clears the name set with [add_custom_name](#add_custom_name)
 
+### enum_get_mask_names
+
+
+> Search script examples for [enum_get_mask_names](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enum_get_mask_names)
+
+#### table&lt;string&gt; enum_get_mask_names(table enum, int value)
+
+Return the matching names for a bitmask in an enum table of masks
+
 ### enum_get_name
 
 
@@ -2841,7 +2902,16 @@ Clears the name set with [add_custom_name](#add_custom_name)
 
 #### string enum_get_name(table enum, int value)
 
-Return the name of an unknown number in an enum table
+Return the name of the first matching number in an enum table
+
+### enum_get_names
+
+
+> Search script examples for [enum_get_names](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enum_get_names)
+
+#### table&lt;string&gt; enum_get_names(table enum, int value)
+
+Return all the names of a number in an enum table
 
 ### get_character_name
 
@@ -3366,13 +3436,13 @@ Use this only when no other approach works, this call can be expensive if overus
 
 
 ```lua
--- Use FLOOR_GENERIC from different themes in your level,
--- with textures that update correctly when destroyed
-
+-- Use FLOOR_GENERIC with textures from different themes that update correctly when destroyed.
+-- This lets you use the custom tile code 'floor_generic_tidepool'
+-- in the level editor to spawn tidepool floor in dwelling for example...
 define_tile_code("floor_generic_tidepool")
 set_pre_tile_code_callback(function(x, y, layer)
     local uid = spawn_grid_entity(ENT_TYPE.FLOOR_GENERIC, x, y, layer)
-    set_post_update(uid, function(me)
+    set_post_floor_update(uid, function(me)
         me:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TIDEPOOL_0)
         for i,v in ipairs(entity_get_items_by(me.uid, ENT_TYPE.DECORATION_GENERIC, MASK.DECORATION)) do
             local deco = get_entity(v)
@@ -3385,7 +3455,7 @@ end, "floor_generic_tidepool")
 
 -- Fix quicksand decorations when not in temple
 set_post_entity_spawn(function(ent)
-    set_post_floor_update(ent.uid, function(me)
+    ent:set_post_floor_update(function(me)
         me:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0)
         for i,v in ipairs(entity_get_items_by(me.uid, ENT_TYPE.DECORATION_GENERIC, MASK.DECORATION)) do
             local deco = get_entity(v)
@@ -3684,5 +3754,5 @@ Use [GuiDrawContext](#GuiDrawContext)`.win_popid` instead
 
 > Search script examples for [win_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
 
-`nil win_image(IMAGE image, int width, int height)`<br/>
+`nil win_image(IMAGE image, float width, float height)`<br/>
 Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
