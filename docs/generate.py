@@ -93,21 +93,25 @@ def link_custom_type(ret):
 
 
 def include_example(name):
-    example = "examples/" + name + ".md"
+    true_file_name = name + ".md"
+    example = "examples/" + true_file_name
     if os.path.exists(example):
-        gu.print_console("Including " + example)
-        file = open(example, "r")
-        data = file.read()
-        file.close()
-        print("\n" + data + "\n")
+        if true_file_name in os.listdir("examples"):
+            gu.print_console("Including " + example)
+            file = open(example, "r")
+            data = file.read()
+            file.close()
+            print("\n" + data + "\n")
 
-    example = "examples/" + name + ".lua"
+    true_file_name = name + ".lua"
+    example = "examples/" + true_file_name
     if os.path.exists(example):
-        gu.print_console("Including " + example)
-        file = open(example, "r")
-        data = file.read()
-        file.close()
-        print("\n```lua\n" + data + "\n```\n")
+        if true_file_name in os.listdir("examples"):
+            gu.print_console("Including " + example)
+            file = open(example, "r")
+            data = file.read()
+            file.close()
+            print("\n```lua\n" + data + "\n```\n")
 
 
 printed_funcs = []
@@ -612,6 +616,8 @@ for type_cat in type_cats:
     for cat in sorted(type_cats[type_cat], key=lambda x: x):
         print("\n## " + cat + "\n")
         for type in sorted(type_cats[type_cat][cat], key=lambda x: x["name"]):
+            if type["comment"] and "NoDoc" in type["comment"]:
+                continue
             type_name = type["name"]
             print("\n### " + type_name + "\n")
             include_example(type_name)

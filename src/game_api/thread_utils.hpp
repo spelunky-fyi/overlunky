@@ -28,7 +28,11 @@ class OnHeapPointer
 
     T* decode_local()
     {
-        return reinterpret_cast<T*>(ptr_ + local_heap_base());
+        auto lhb = local_heap_base();
+        if (lhb == 0)
+            return nullptr;
+
+        return reinterpret_cast<T*>(ptr_ + lhb);
     }
 
     T* operator->()

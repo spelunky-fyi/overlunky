@@ -11,7 +11,7 @@ struct PRNG
     PRNG(const PRNG&) = delete;
     PRNG(PRNG&&) = delete;
 
-    static PRNG& get();
+    static PRNG& get_main();
     static PRNG& get_local();
 
     /// Same as `seed_prng`

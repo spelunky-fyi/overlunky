@@ -4,7 +4,7 @@
 
 #include "state.hpp" // for State
 
-PRNG& PRNG::get()
+PRNG& PRNG::get_main()
 {
     const auto& state = State::get();
     static PRNG* prng = (PRNG*)((size_t)state.ptr_main() - 0xb0);

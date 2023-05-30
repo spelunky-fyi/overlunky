@@ -591,7 +591,9 @@ void register_usertypes(sol::state& lua)
                     return (float)ui.fade_timer / 15.0f;
                 default:
                     return 1.0f;
-                } }));
+                } }),
+        "pages",
+        sol::readonly(&JournalUI::pages));
 
     /// Used in [set_callback](#set_callback) with ON.RENDER_POST_JOURNAL_PAGE
     lua.new_usertype<JournalPage>(
@@ -601,7 +603,9 @@ void register_usertypes(sol::state& lua)
         "page_number",
         &JournalPage::page_number,
         "is_right_side_page",
-        &JournalPage::is_right_side_page);
+        &JournalPage::is_right_side_page,
+        "get_type",
+        &JournalPage::get_type);
 
     lua["JournalPage"]["as_journal_page_progress"] = &JournalPage::as<JournalPageProgress>;
     lua["JournalPage"]["as_journal_page_journalmenu"] = &JournalPage::as<JournalPageJournalMenu>;

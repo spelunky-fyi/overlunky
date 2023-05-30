@@ -815,6 +815,8 @@ struct PauseUI
     uint32_t visibility;
 };
 
+using JOURNAL_PAGE_TYPE = JournalPageType;
+
 class JournalPage
 {
   public:
@@ -831,6 +833,7 @@ class JournalPage
     /// background.x < 0
     bool is_right_side_page();
     void set_page_background_side(bool right);
+    JOURNAL_PAGE_TYPE get_type();
 
     virtual ~JournalPage() = 0;
     virtual void v1() = 0;
@@ -1064,7 +1067,9 @@ struct JournalUI
 
     uint8_t unknown1;
     uint16_t unknown2;
-    custom_vector<JournalPage*> pages;     // adding pages directly to it crash the game (on vector resize)
+    /// Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.
+    /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+    custom_vector<JournalPage*> pages;
     custom_vector<JournalPage*> pages_tmp; // pages are constructed in the show_journal function and put here, later transfered to the pages vector
     uint32_t current_page;
     uint32_t flipping_to_page;

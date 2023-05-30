@@ -886,6 +886,7 @@ Type | Name | Description
 [TextureRenderingInfo](#TextureRenderingInfo) | [background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background) | 
 int | [page_number](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_number) | 
 bool | [is_right_side_page()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_right_side_page) | background.x < 0
+[JOURNAL_PAGE_TYPE](#JOURNAL_PAGE_TYPE) | [get_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type) | 
 
 ### JournalPageBestiary
 
@@ -1506,6 +1507,7 @@ int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [page_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) | 
 int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | 
 int | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
+custom_array&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ### PauseUI
 
