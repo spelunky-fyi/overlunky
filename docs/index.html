@@ -9261,6 +9261,11 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_right_side_page">is_right_side_page()</a></td>
 <td>background.x &lt; 0</td>
 </tr>
+<tr>
+<td><a href="#JOURNAL_PAGE_TYPE">JOURNAL_PAGE_TYPE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_type">get_type()</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='JournalPageBestiary'>JournalPageBestiary</h3>
 <p>Derived from <a href="#JournalPage">JournalPage</a> <a href="#JournalPageDiscoverable">JournalPageDiscoverable</a></p>
@@ -11159,6 +11164,11 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
 <td></td>
+</tr>
+<tr>
+<td>custom_array&lt;<a href="#JournalPage">JournalPage</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pages">pages</a></td>
+<td>Stores pages loaded into memeory. It&#39;s not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use <code>:get_type()</code> to chcek page type and cast it correctly (see ON.<a href="#ON-RENDER_PRE_JOURNAL_PAGE">RENDER_POST_DRAW_DEPTH</a>)</td>
 </tr>
 </tbody></table>
 <h3 id='PauseUI'>PauseUI</h3>
