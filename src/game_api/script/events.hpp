@@ -12,6 +12,8 @@ class Entity;
 class JournalPage;
 struct AABB;
 struct LevelGenRoomData;
+struct HudData;
+struct Hud;
 
 void pre_load_level_files();
 void pre_level_generation();
@@ -34,9 +36,12 @@ void post_entity_spawn(Entity* entity, int spawn_type_flags);
 
 bool pre_entity_instagib(Entity* victim);
 
-void trigger_vanilla_render_callbacks(ON event);
-void trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
-void trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
+bool trigger_vanilla_render_callbacks(ON event);
+bool trigger_vanilla_render_blur_callbacks(ON event, float blur_amount);
+bool trigger_vanilla_render_hud_callbacks(ON event, Hud* hud);
+bool trigger_vanilla_render_layer_callbacks(ON event, uint8_t layer);
+bool trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
+bool trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
 
 std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
 std::u16string pre_toast(char16_t* buffer);

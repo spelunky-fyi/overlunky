@@ -97,6 +97,8 @@ void LuaBackend::clear_all_callbacks()
     {
         sound_manager->clear_callback(id);
     }
+    load_callbacks.clear();
+    save_callbacks.clear();
     vanilla_sound_callbacks.clear();
     pre_tile_code_callbacks.clear();
     post_tile_code_callbacks.clear();
@@ -116,6 +118,7 @@ void LuaBackend::clear_all_callbacks()
 
     HookHandler<Entity, CallbackType::Entity>::clear_all_hooks();
     HookHandler<RenderInfo, CallbackType::Entity>::clear_all_hooks();
+    HookHandler<ThemeInfo, CallbackType::Theme>::clear_all_hooks();
 
     for (auto& [screen_id, id] : screen_hooks)
     {
@@ -204,7 +207,11 @@ void LuaBackend::set_user_data(Entity& entity, sol::object user_data)
             });
         user_datas[entity.uid].dtor_hook_id = dtor_hook_id;
     }
-    user_datas[entity.uid].data = user_data;
+    if (user_data == sol::nil)
+        user_datas.erase(entity.uid);
+    else
+        user_datas[entity.uid].data = user_data;
+    on_set_user_data(&entity);
 }
 void LuaBackend::set_user_data(uint32_t uid, sol::object user_data)
 {
@@ -244,8 +251,6 @@ bool LuaBackend::update()
         sol::optional<sol::function> on_screen = lua["on_screen"];
 
         // ==========
-
-        lua["players"] = get_players(g_state);
 
         if (LuaConsole* is_console = dynamic_cast<LuaConsole*>(this))
         {
@@ -306,6 +311,7 @@ bool LuaBackend::update()
             global_timers.erase(id);
             callbacks.erase(id);
             load_callbacks.erase(id);
+            save_callbacks.erase(id);
 
             std::erase_if(pre_tile_code_callbacks, [id](auto& cb)
                           { return cb.id == id; });
@@ -322,6 +328,7 @@ bool LuaBackend::update()
 
         HookHandler<Entity, CallbackType::Entity>::clear_pending();
         HookHandler<RenderInfo, CallbackType::Entity>::clear_pending();
+        HookHandler<ThemeInfo, CallbackType::Theme>::clear_pending();
 
         for (auto& [screen_id, id] : clear_screen_hooks)
         {
@@ -475,15 +482,6 @@ bool LuaBackend::update()
                     }
                     break;
                 }
-                case ON::SAVE:
-                {
-                    if ((g_state->loading != state.loading && g_state->loading == 1) || manual_save)
-                    {
-                        handle_function<void>(this, callback.func, SaveContext{get_root(), get_name()});
-                        callback.lastRan = now;
-                    }
-                    break;
-                }
                 default:
                     break;
                 }
@@ -529,6 +527,19 @@ bool LuaBackend::update()
             }
         }
 
+        // Save callbacks have to run after all other callbacks or manual saves that happen after
+        // will be skipped.
+        for (auto& [id, callback] : save_callbacks)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            if ((g_state->loading != state.loading && g_state->loading == 1) || manual_save)
+            {
+                handle_function<void>(this, callback.func, SaveContext{get_root(), get_name()});
+                callback.lastRan = now;
+            }
+            clear_current_callback();
+        }
+
         state.screen = g_state->screen;
         state.time_level = g_state->time_level;
         state.time_total = g_state->time_total;
@@ -541,7 +552,7 @@ bool LuaBackend::update()
         if (manual_save)
         {
             manual_save = false;
-            last_save = g_state->time_startup;
+            last_save = get_frame_count();
         }
     }
     catch (const sol::error& e)
@@ -554,16 +565,12 @@ bool LuaBackend::update()
 
 void LuaBackend::draw(ImDrawList* dl)
 {
-    if (!get_enabled())
+    if (!pre_draw() || !get_enabled())
         return;
 
     draw_list = dl;
     try
     {
-        if (!pre_draw())
-        {
-            return;
-        }
 
         // Deprecated
         /// Use `set_callback(function, ON.GUIFRAME)` instead
@@ -751,8 +758,6 @@ void LuaBackend::pre_level_generation()
 
     auto now = get_frame_count();
 
-    lua["players"] = get_players(g_state);
-
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -851,9 +856,12 @@ bool LuaBackend::pre_load_screen()
         }
     }
 
-    level_timers.clear();
-    script_input.clear();
-    clear_custom_shopitem_names();
+    if ((ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
+    {
+        level_timers.clear();
+        script_input.clear();
+        clear_custom_shopitem_names();
+    }
 
     return false;
 }
@@ -878,6 +886,48 @@ void LuaBackend::post_room_generation()
         }
     }
 }
+
+void LuaBackend::load_user_data()
+{
+    for (auto uid : get_entities_by_mask(1))
+    {
+        auto ent = get_entity_ptr(uid)->as<Player>();
+        int slot = ent->inventory_ptr->player_slot;
+        if (slot == -1 && ent->linked_companion_parent == -1)
+            continue;
+        if (slot == -1 && ent->linked_companion_parent != -1)
+        {
+            Player* parent = ent;
+            while (true)
+            {
+                parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                slot++;
+                if (parent->linked_companion_parent == -1)
+                {
+                    slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                    break;
+                }
+            }
+        }
+        if (slot < 0)
+            continue;
+        if (saved_user_datas.contains(slot))
+        {
+            if (saved_user_datas[slot].self.has_value())
+                set_user_data(*ent, saved_user_datas[slot].self.value());
+            if (ent->holding_uid != -1 && saved_user_datas[slot].held.has_value())
+                set_user_data(ent->holding_uid, saved_user_datas[slot].held.value());
+            if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && saved_user_datas[slot].mount.has_value())
+                set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value());
+            for (auto [type, powerup] : ent->powerups)
+            {
+                if (saved_user_datas[slot].powerups.contains(type))
+                    set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
+            }
+        }
+    }
+}
+
 void LuaBackend::post_level_generation()
 {
     if (!get_enabled())
@@ -885,47 +935,10 @@ void LuaBackend::post_level_generation()
 
     auto now = get_frame_count();
 
-    lua["players"] = get_players(g_state);
-
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::LEVEL)
     {
-        for (auto uid : get_entities_by_mask(1))
-        {
-            auto ent = get_entity_ptr(uid)->as<Player>();
-            int slot = ent->inventory_ptr->player_slot;
-            if (slot == -1 && ent->linked_companion_parent == -1)
-                continue;
-            if (slot == -1 && ent->linked_companion_parent != -1)
-            {
-                Player* parent = ent;
-                while (true)
-                {
-                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
-                    slot++;
-                    if (parent->linked_companion_parent == -1)
-                    {
-                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
-                        break;
-                    }
-                }
-            }
-            if (slot < 0)
-                continue;
-            if (saved_user_datas.contains(slot))
-            {
-                set_user_data(*ent, saved_user_datas[slot].self.value_or(sol::nil));
-                if (ent->holding_uid != -1)
-                    set_user_data(ent->holding_uid, saved_user_datas[slot].held.value_or(sol::nil));
-                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0)
-                    set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value_or(sol::nil));
-                for (auto [type, powerup] : ent->powerups)
-                {
-                    if (saved_user_datas[slot].powerups.contains(type))
-                        set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
-                }
-            }
-        }
+        load_user_data();
         saved_user_datas.clear();
     }
 
@@ -947,6 +960,12 @@ void LuaBackend::post_load_screen()
 {
     if (!get_enabled())
         return;
+
+    auto state_ptr = State::get().ptr();
+    if ((ON)state_ptr->screen == ON::TRANSITION)
+    {
+        load_user_data();
+    }
 
     auto now = get_frame_count();
 
@@ -1117,10 +1136,11 @@ bool LuaBackend::pre_entity_instagib(Entity* victim)
     return skip;
 }
 
-void LuaBackend::process_vanilla_render_callbacks(ON event)
+bool LuaBackend::process_vanilla_render_callbacks(ON event)
 {
+    bool skip{false};
     if (!get_enabled())
-        return;
+        return skip;
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
@@ -1132,17 +1152,95 @@ void LuaBackend::process_vanilla_render_callbacks(ON event)
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func, render_ctx);
+            skip |= handle_function<bool>(this, callback.func, render_ctx).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
         }
     }
+
+    return skip;
 }
 
-void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
+bool LuaBackend::process_vanilla_render_blur_callbacks(ON event, float blur_amount)
 {
+    bool skip{false};
     if (!get_enabled())
-        return;
+        return skip;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, blur_amount).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+
+    return skip;
+}
+
+bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, Hud* hud)
+{
+    bool skip{false};
+    if (!get_enabled())
+        return skip;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, hud).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+
+    return skip;
+}
+
+bool LuaBackend::process_vanilla_render_layer_callbacks(ON event, uint8_t layer)
+{
+    bool skip{false};
+    if (!get_enabled())
+        return skip;
+
+    auto now = get_frame_count();
+    VanillaRenderContext render_ctx;
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, layer).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+
+    return skip;
+}
+
+bool LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox)
+{
+    bool skip{false};
+    if (!get_enabled())
+        return skip;
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
@@ -1155,17 +1253,20 @@ void LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func, render_ctx, draw_depth);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, draw_depth).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
         }
     }
+
+    return skip;
 }
 
-void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
+bool LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page)
 {
+    bool skip{false};
     if (!get_enabled())
-        return;
+        return skip;
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
@@ -1177,11 +1278,13 @@ void LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
         if (callback.screen == event)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func, render_ctx, page_type, page);
+            skip |= handle_function<bool>(this, callback.func, render_ctx, page_type, page).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
         }
     }
+
+    return skip;
 }
 
 std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
@@ -1391,8 +1494,6 @@ void LuaBackend::set_error(std::string err)
     result = std::move(err);
 
 #ifdef SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS
-    DEBUG("{}", result);
-
     std::istringstream errors{result};
     const auto now{std::chrono::system_clock::now()};
     while (!errors.eof())
@@ -1404,6 +1505,8 @@ void LuaBackend::set_error(std::string err)
         {
             messages.pop_front();
         }
+        std::replace(err_line.begin(), err_line.end(), '\r', ' ');
+        DEBUG("[{}] {}", get_name(), err_line);
     }
 #endif
 }
@@ -1539,4 +1642,25 @@ bool LuaBackend::on_pre_state_update()
         }
     }
     return false;
+}
+
+void LuaBackend::on_set_user_data(Entity* ent)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::USER_DATA)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, ent);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
 }

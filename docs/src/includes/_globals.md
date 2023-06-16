@@ -19,7 +19,7 @@ meta.description = [[
 
 ```
 
-#### array&lt;string&gt; meta
+#### array&lt;mixed&gt; meta
 
 > Search script examples for [meta](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=meta)
 
@@ -118,11 +118,11 @@ end, ON.LEVEL)
 
 ```
 
-#### array&lt;mixed&gt; options
+#### optional&lt;array&lt;mixed&gt;&gt; options
 
 > Search script examples for [options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options)
 
-Table of options set in the UI, added with the [register_option_functions](#Option-functions). You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
+Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
 ### prng
 
 
@@ -164,7 +164,7 @@ set_interval(function()
   count = count + 1
   spawn(ENT_TYPE.FX_EXPLOSION, 0, 0, LAYER.FRONT, 0, 0)
   if count >= 3 then
-    -- calling this without parameters clears the fallback that's calling it
+    -- calling this without parameters clears the callback that's calling it
     clear_callback()
   end
 end, 60)
@@ -204,7 +204,7 @@ Clears a previously set callback
 #### [CallbackId](#Aliases) set_callback(function cb, [ON](#ON) event)
 
 Returns unique id for the callback to be used in [clear_callback](#clear_callback).
-Add global callback function to be called on an [event](#ON).
+Add global callback function to be called on an [event](#Events).
 
 ### set_global_interval
 
@@ -653,6 +653,15 @@ Get the [ENT_TYPE](#ENT_TYPE)... of the entity by uid
 #### int get_grid_entity_at(float x, float y, [LAYER](#LAYER) layer)
 
 Gets a grid entity, such as floor or spikes, at the given position and layer.
+
+### get_local_players
+
+
+> Search script examples for [get_local_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_players)
+
+#### nil get_local_players()
+
+Get the thread-local version of players
 
 ### get_player
 
@@ -1112,6 +1121,15 @@ Returns true if the nth bit is set in the number.
 
 Change the amount of frames after the damage from poison is applied
 
+### clear_cache
+
+
+> Search script examples for [clear_cache](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_cache)
+
+#### nil clear_cache()
+
+Clear cache for a file path or the whole directory
+
 ### clr_mask
 
 
@@ -1129,6 +1147,16 @@ Clears a bitmask in a number. This doesn't actually change the variable you pass
 #### tuple&lt;IMAGE, int, int&gt; create_image(string path)
 
 Create image from file. Returns a tuple containing id, width and height.
+Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
+
+### create_image_crop
+
+
+> Search script examples for [create_image_crop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_image_crop)
+
+#### tuple&lt;IMAGE, int, int&gt; create_image_crop(string path, int x, int y, int w, int h)
+
+Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
 
 ### disable_floor_embeds
@@ -1202,6 +1230,24 @@ Get your sanitized script id to be used in import.
 #### int get_level_config([LEVEL_CONFIG](#LEVEL_CONFIG) config)
 
 Gets the value for the specified config
+
+### get_local_prng
+
+
+> Search script examples for [get_local_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_prng)
+
+#### nil get_local_prng()
+
+Get the thread-local version of prng
+
+### get_local_state
+
+
+> Search script examples for [get_local_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_state)
+
+#### nil get_local_state()
+
+Get the thread-local version of state
 
 ### get_ms
 
@@ -1295,6 +1341,24 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 #### bool is_character_female([ENT_TYPE](#ENT_TYPE) type_id)
 
 Same as `Player.is_female`
+
+### list_char_mods
+
+
+> Search script examples for [list_char_mods](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_char_mods)
+
+#### nil list_char_mods()
+
+List all char.png files recursively from Mods/Packs. Returns table of file paths.
+
+### list_dir
+
+
+> Search script examples for [list_dir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_dir)
+
+#### nil list_dir(string dir)
+
+List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 
 ### load_death_screen
 
@@ -1450,6 +1514,15 @@ Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0
 
 Enables or disables the journal
 
+### set_level_config
+
+
+> Search script examples for [set_level_config](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_config)
+
+#### nil set_level_config([LEVEL_CONFIG](#LEVEL_CONFIG) config, int value)
+
+Set the value for the specified config
+
 ### set_mask
 
 
@@ -1467,6 +1540,31 @@ Set a bitmask in a number. This doesn't actually change the variable you pass, i
 #### nil set_seed(int seed)
 
 Set seed and reset run.
+
+### set_setting
+
+
+```lua
+-- set some visual settings needed by your mod
+-- doing this here will reapply these after visiting the options, which would reset them to real values
+
+set_callback(function()
+    if state.screen_next == SCREEN.LEVEL then
+        -- use the secret tiny hud size
+        set_setting(GAME_SETTING.HUD_SIZE, 3)
+        -- force opaque textboxes
+        set_setting(GAME_SETTING.TEXTBOX_OPACITY, 0)
+    end
+end, ON.PRE_LOAD_SCREEN)
+
+```
+
+
+> Search script examples for [set_setting](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_setting)
+
+#### bool set_setting([GAME_SETTING](#GAME_SETTING) setting, int value)
+
+Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals. Returns false, if setting failed.
 
 ### set_storage_layer
 
@@ -1668,7 +1766,7 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out
 
 #### nil console_prinspect(variadic_args objects)
 
-Prinspect to console
+Prinspect to ingame console.
 
 ### console_print
 
@@ -1677,7 +1775,7 @@ Prinspect to console
 
 #### nil console_print(string message)
 
-Print a log message to console.
+Print a log message to ingame console.
 
 ### log_print
 
@@ -1743,6 +1841,15 @@ Prints any type of object by first funneling it through `inspect`, no need for a
 #### nil print(string message)
 
 Print a log message on screen.
+
+### printf
+
+
+> Search script examples for [printf](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=printf)
+
+#### nil printf()
+
+Short for print(string.format(...))
 
 ### say
 
@@ -1897,6 +2004,15 @@ limits, you can override them in the UI with double click.
 #### nil register_option_string(string name, string desc, string long_desc, string value)
 
 Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
+
+### unregister_option
+
+
+> Search script examples for [unregister_option](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unregister_option)
+
+#### nil unregister_option(string name)
+
+Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
 
 ## Particle functions
 
@@ -2066,6 +2182,24 @@ Gets the current camera position in the level
 #### [AABB](#AABB) get_hitbox(int uid, optional<float> extrude, optional<float> offsetx, optional<float> offsety)
 
 Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
+
+### get_hud_position
+
+
+> Search script examples for [get_hud_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hud_position)
+
+#### [AABB](#AABB) get_hud_position(int index)
+
+Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count
+
+### get_image_size
+
+
+> Search script examples for [get_image_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_image_size)
+
+#### tuple&lt;int, int&gt; get_image_size(string path)
+
+Get image size from file. Returns a tuple containing width and height.
 
 ### get_position
 
@@ -2431,8 +2565,8 @@ Default function in spawn definitions to check whether a spawn is valid or not
 #### int define_extra_spawn(function do_spawn, function is_valid, int num_spawns_frontlayer, int num_spawns_backlayer)
 
 Define a new extra spawn, these are semi-guaranteed level gen spawns with a fixed upper bound.
-The function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
-The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+The function `nil do_spawn(float x, float y, LAYER layer)` contains your code to spawn the thing, whatever it is.
+The function `bool is_valid(float x, float y, LAYER layer)` determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 To change the number of spawns use `PostRoomGenerationContext:set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
@@ -2445,8 +2579,8 @@ No name is attached to the extra spawn since it is not modified from level files
 
 #### [PROCEDURAL_CHANCE](#PROCEDURAL_CHANCE) define_procedural_spawn(string procedural_spawn, function do_spawn, function is_valid)
 
-Define a new procedural spawn, the function `nil do_spawn(x, y, layer)` contains your code to spawn the thing, whatever it is.
-The function `bool is_valid(x, y, layer)` determines whether the spawn is legal in the given position and layer.
+Define a new procedural spawn, the function `nil do_spawn(float x, float y, LAYER layer)` contains your code to spawn the thing, whatever it is.
+The function `bool is_valid(float x, float y, LAYER layer)` determines whether the spawn is legal in the given position and layer.
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 If a user disables your script but still uses your level mod nothing will be spawned in place of your procedural spawn.
@@ -2752,6 +2886,15 @@ This edits custom string and in game strings but changing the language in settin
 
 Clears the name set with [add_custom_name](#add_custom_name)
 
+### enum_get_mask_names
+
+
+> Search script examples for [enum_get_mask_names](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enum_get_mask_names)
+
+#### table&lt;string&gt; enum_get_mask_names(table enum, int value)
+
+Return the matching names for a bitmask in an enum table of masks
+
 ### enum_get_name
 
 
@@ -2759,7 +2902,16 @@ Clears the name set with [add_custom_name](#add_custom_name)
 
 #### string enum_get_name(table enum, int value)
 
-Return the name of an unknown number in an enum table
+Return the name of the first matching number in an enum table
+
+### enum_get_names
+
+
+> Search script examples for [enum_get_names](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enum_get_names)
+
+#### table&lt;string&gt; enum_get_names(table enum, int value)
+
+Return all the names of a number in an enum table
 
 ### get_character_name
 
@@ -2864,6 +3016,24 @@ Gets a `TextureDefinition` for equivalent to the one used to define the texture 
 Reloads a texture from disk, use this only as a development tool for example in the console
 Note that [define_texture](#define_texture) will also reload the texture if it already exists
 
+### replace_texture
+
+
+> Search script examples for [replace_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_texture)
+
+#### bool replace_texture([TEXTURE](#TEXTURE) vanilla_id, [TEXTURE](#TEXTURE) custom_id)
+
+Replace a vanilla texture definition with a custom texture definition and reload the texture.
+
+### replace_texture_and_heart_color
+
+
+> Search script examples for [replace_texture_and_heart_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_texture_and_heart_color)
+
+#### bool replace_texture_and_heart_color([TEXTURE](#TEXTURE) vanilla_id, [TEXTURE](#TEXTURE) custom_id)
+
+Replace a vanilla texture definition with a custom texture definition and reload the texture. Set corresponding character heart color to the pixel in the center of the player indicator arrow in that texture. (448,1472)
+
 ### reset_lut
 
 
@@ -2872,6 +3042,15 @@ Note that [define_texture](#define_texture) will also reload the texture if it a
 #### nil reset_lut([LAYER](#LAYER) layer)
 
 Same as `set_lut(nil, layer)`
+
+### reset_texture
+
+
+> Search script examples for [reset_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_texture)
+
+#### nil reset_texture([TEXTURE](#TEXTURE) vanilla_id)
+
+Reset a replaced vanilla texture to the original and reload the texture.
 
 ### set_lut
 
@@ -3257,13 +3436,13 @@ Use this only when no other approach works, this call can be expensive if overus
 
 
 ```lua
--- Use FLOOR_GENERIC from different themes in your level,
--- with textures that update correctly when destroyed
-
+-- Use FLOOR_GENERIC with textures from different themes that update correctly when destroyed.
+-- This lets you use the custom tile code 'floor_generic_tidepool'
+-- in the level editor to spawn tidepool floor in dwelling for example...
 define_tile_code("floor_generic_tidepool")
 set_pre_tile_code_callback(function(x, y, layer)
     local uid = spawn_grid_entity(ENT_TYPE.FLOOR_GENERIC, x, y, layer)
-    set_post_update(uid, function(me)
+    set_post_floor_update(uid, function(me)
         me:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TIDEPOOL_0)
         for i,v in ipairs(entity_get_items_by(me.uid, ENT_TYPE.DECORATION_GENERIC, MASK.DECORATION)) do
             local deco = get_entity(v)
@@ -3276,7 +3455,7 @@ end, "floor_generic_tidepool")
 
 -- Fix quicksand decorations when not in temple
 set_post_entity_spawn(function(ent)
-    set_post_floor_update(ent.uid, function(me)
+    ent:set_post_floor_update(function(me)
         me:set_texture(TEXTURE.DATA_TEXTURES_FLOOR_TEMPLE_0)
         for i,v in ipairs(entity_get_items_by(me.uid, ENT_TYPE.DECORATION_GENERIC, MASK.DECORATION)) do
             local deco = get_entity(v)
@@ -3575,5 +3754,5 @@ Use [GuiDrawContext](#GuiDrawContext)`.win_popid` instead
 
 > Search script examples for [win_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
 
-`nil win_image(IMAGE image, int width, int height)`<br/>
+`nil win_image(IMAGE image, float width, float height)`<br/>
 Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead

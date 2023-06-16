@@ -18,20 +18,22 @@
 #include <tuple>         // for tie, tuple
 #include <unordered_map> // for unordered_map, _Umap_traits<>::allo...
 
-#include "entities_monsters.hpp" // for GHOST_BEHAVIOR, GHOST_BEHAVIOR::MED...
-#include "entity.hpp"            // for to_id, Entity, get_entity_ptr, Enti...
-#include "layer.hpp"             // for Layer, g_level_max_y, g_level_max_x
-#include "logger.h"              // for DEBUG
-#include "memory.hpp"            // for to_le_bytes, write_mem_prot, Execut...
-#include "movable.hpp"           // for Movable
-#include "prng.hpp"              // for PRNG, PRNG::EXTRA_SPAWNS
-#include "rpc.hpp"               // for attach_entity, get_entities_overlap...
-#include "script/events.hpp"     // for post_load_screen, pre_load_screen
-#include "search.hpp"            // for get_address
-#include "spawn_api.hpp"         // for pop_spawn_type_flags, push_spawn_ty...
-#include "state.hpp"             // for StateMemory, State, enum_to_layer
-#include "util.hpp"              // for OnScopeExit, trim
-#include "vtable_hook.hpp"       // for hook_vtable
+#include "entities_activefloors.hpp" //
+#include "entities_items.hpp"        //
+#include "entities_monsters.hpp"     // for GHOST_BEHAVIOR, GHOST_BEHAVIOR::MED...
+#include "entity.hpp"                // for to_id, Entity, get_entity_ptr, Enti...
+#include "layer.hpp"                 // for Layer, g_level_max_y, g_level_max_x
+#include "logger.h"                  // for DEBUG
+#include "memory.hpp"                // for to_le_bytes, write_mem_prot, Execut...
+#include "movable.hpp"               // for Movable
+#include "prng.hpp"                  // for PRNG, PRNG::EXTRA_SPAWNS
+#include "rpc.hpp"                   // for attach_entity, get_entities_overlap...
+#include "script/events.hpp"         // for post_load_screen, pre_load_screen
+#include "search.hpp"                // for get_address
+#include "spawn_api.hpp"             // for pop_spawn_type_flags, push_spawn_ty...
+#include "state.hpp"                 // for StateMemory, State, enum_to_layer
+#include "util.hpp"                  // for OnScopeExit, trim
+#include "vtable_hook.hpp"           // for hook_vtable
 
 std::uint32_t g_last_tile_code_id;
 std::uint32_t g_last_community_tile_code_id;
@@ -358,8 +360,8 @@ std::array g_community_tile_codes{
             layer->spawn_entity_over(strand_id, spider, 0.0f, 0.0f);
 
             Entity* web = layer->spawn_entity(web_id, x, y, false, 0.0f, 0.0f, true);
-            Entity* anchor = layer->spawn_entity_over(anchor_id, web, 0.0f, 0.0f);
-            *(uint32_t*)((size_t)anchor + sizeof(Movable)) = spider->uid;
+            HangAnchor* anchor = layer->spawn_entity_over(anchor_id, web, 0.0f, 0.0f)->as<HangAnchor>();
+            anchor->spider_uid = spider->uid;
         },
     },
     CommunityTileCode{"skull_drop_trap", "ENT_TYPE_ITEM_SKULLDROPTRAP"},
@@ -411,8 +413,8 @@ std::array g_community_tile_codes{
         "ENT_TYPE_ACTIVEFLOOR_UNCHAINED_SPIKEBALL",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
         {
-            Entity* spikeball = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true);
-            *(bool*)((size_t)spikeball + sizeof(Movable)) = true;
+            UnchainedSpikeBall* spikeball = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true)->as<UnchainedSpikeBall>();
+            spikeball->bounce = true;
         },
     },
     CommunityTileCode{"boulder", "ENT_TYPE_ACTIVEFLOOR_BOULDER"},
@@ -441,7 +443,7 @@ std::array g_community_tile_codes{
             static const auto helmet_id = to_id("ENT_TYPE_MONS_OLMITE_HELMET");
             static const auto naked_id = to_id("ENT_TYPE_MONS_OLMITE_NAKED");
 
-            Entity* olmite = layer->spawn_entity_snap_to_floor(self.entity_id, x, y);
+            Olmite* olmite = layer->spawn_entity_snap_to_floor(self.entity_id, x, y)->as<Olmite>();
 
             std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer({}, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
             for (uint32_t uid : entities_above)
@@ -450,9 +452,9 @@ std::array g_community_tile_codes{
                 {
                     if (ent->type->id == helmet_id || ent->type->id == naked_id || ent->type->id == self.entity_id)
                     {
-                        *(bool*)((size_t)ent + 0x151) = true;
-                        *(bool*)((size_t)olmite + 0x151) = true;
-                        *(uint32_t*)((size_t)olmite + 0x154) = ent->uid;
+                        ent->as<Olmite>()->in_stack = true;
+                        olmite->in_stack = true;
+                        olmite->on_top_uid = ent->uid;
 
                         static constexpr float offset[]{0.0f, 0.64f};
                         stack_entities(olmite->uid, ent->uid, offset);
@@ -1217,13 +1219,6 @@ void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, in
 using TestChance = bool(LevelGenData**, std::uint32_t chance_id);
 TestChance* g_test_chance{nullptr};
 
-struct SpawnInfo
-{
-    void* ptr0;
-    void* ptr1;
-    float x;
-    float y;
-};
 bool handle_chance(SpawnInfo* spawn_info)
 {
     auto level_gen_data = State::get().ptr()->level_gen->data;
@@ -1743,42 +1738,52 @@ uint16_t LevelGenData::get_pretend_room_template(std::uint16_t room_template)
     }
 }
 
+uint32_t ThemeInfo::get_aux_id()
+{
+    thread_local const LevelGenSystem* level_gen_system = State::get().ptr_local()->level_gen;
+    for (size_t i = 0; i < std::size(level_gen_system->themes); i++)
+    {
+        if (level_gen_system->themes[i] == this)
+        {
+            return uint32_t(i + 1);
+        }
+    }
+
+    return 0;
+}
+
 void LevelGenSystem::init()
 {
     data->init();
+}
 
-    for (ThemeInfo* theme : themes)
+void LevelGenSystem::populate_level_hook(ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)
+{
+    post_room_generation();
+
     {
-        using PopulateLevelFun = void(ThemeInfo * self, uint64_t param_2, uint64_t param_3, uint64_t param_4);
-        hook_vtable<PopulateLevelFun, 0xd>(
-            theme, [](ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)
-            {
-                post_room_generation();
-
-                {
-                    std::lock_guard lock{g_extra_spawn_logic_providers_lock};
-                    for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
-                    {
-                        provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
-                        provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
-                    }
-                }
-
-                original(self, param_2, param_3, param_4); });
-        using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
-        hook_vtable<DoProceduralSpawnFun, 0x33>(
-            theme, [](ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
-            {
-                push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
-                OnScopeExit pop{[]
-                                { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL); }};
-
-                if (handle_chance(spawn_info))
-                {
-                    return;
-                }
-                original(self, spawn_info); });
+        std::lock_guard lock{g_extra_spawn_logic_providers_lock};
+        for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
+        {
+            provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
+            provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
+        }
     }
+
+    original(self, param_2, param_3, param_4);
+}
+void LevelGenSystem::do_procedural_spawn_hook(ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
+{
+    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
+    OnScopeExit pop{[]
+                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL); }};
+
+    if (handle_chance(spawn_info))
+    {
+        return;
+    }
+
+    original(self, spawn_info);
 }
 
 std::pair<int, int> LevelGenSystem::get_room_index(float x, float y)
@@ -2067,11 +2072,11 @@ void force_co_subtheme(COSUBTHEME subtheme)
     if (subtheme >= 0 && subtheme <= 7)
     {
         uint8_t replacement[] = {0x41, 0xB8, (uint8_t)subtheme, 0x00, 0x00, 0x00, 0xEB, 0x1F, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90};
-        write_mem_prot(offset, replacement, true);
+        write_mem_recoverable("force_co_subtheme", offset, replacement, true);
     }
     else if (subtheme == -1)
     {
-        write_mem_prot(offset, "\x4C\x8B\x00\x4C\x8B\x48\x08\x48\xBA\x4B\x57\x4C\x4F\x80"sv, true);
+        recover_mem("force_co_subtheme");
     }
 }
 

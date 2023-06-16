@@ -58,9 +58,14 @@ enum class GAME_SETTING
     CROSSPROGRESS_AUTOSYNC = 47,
 };
 
+const GAME_SETTING safe_settings[]{GAME_SETTING::PET_STYLE, GAME_SETTING::SCREEN_SHAKE, GAME_SETTING::HUD_STYLE, GAME_SETTING::HUD_SIZE, GAME_SETTING::LEVEL_TIMER, GAME_SETTING::TIMER_DETAIL, GAME_SETTING::LEVEL_NUMBER, GAME_SETTING::ANGRY_SHOPKEEPER, GAME_SETTING::BUTTON_PROMPTS, GAME_SETTING::FEAT_POPUPS, GAME_SETTING::TEXTBOX_SIZE, GAME_SETTING::TEXTBOX_DURATION, GAME_SETTING::TEXTBOX_OPACITY, GAME_SETTING::LEVEL_FEELINGS, GAME_SETTING::DIALOG_TEXT, GAME_SETTING::KALI_TEXT, GAME_SETTING::GHOST_TEXT};
+
 // Returns false if the value is too big for the setting or the setting does not exist
 // most settings only hold 1 byte of data
 bool set_setting(GAME_SETTING setting, std::uint32_t value);
 std::optional<std::uint32_t> get_setting(GAME_SETTING setting);
 std::optional<std::uint32_t> get_setting_default(GAME_SETTING setting);
 std::vector<std::pair<std::string_view, GAME_SETTING>> get_settings_names_and_indices();
+void restore_original_settings();
+void save_original_setting(GAME_SETTING setting);
+void unlock_settings();

@@ -11,7 +11,7 @@ struct PRNG
     PRNG(const PRNG&) = delete;
     PRNG(PRNG&&) = delete;
 
-    static PRNG& get();
+    static PRNG& get_main();
     static PRNG& get_local();
 
     /// Same as `seed_prng`
@@ -20,22 +20,22 @@ struct PRNG
     enum PRNG_CLASS
     {
         PROCEDURAL_SPAWNS = 0,
-        // ?? = 1,
+        CHAR_AI = 1,
         PARTICLES = 2,
         ENTITY_VARIATION = 3,
         // ?? = 4,
-        EXTRA_SPAWNS = 5,
-        // ?? = 6,
-        // SOME_ENTITY_STUFF = 7,
+        EXTRA_SPAWNS = 5, // also AI
+        // ?? = 6, // somehow related to spawning characters, cause it advances
+        LIQUID = 7,
         LEVEL_DECO = 8,
-        // ?? = 9
+        FX = 9
     };
 
     using prng_pair = std::pair<std::uint64_t, std::uint64_t>;
     prng_pair get_and_advance(PRNG_CLASS type);
 
-    std::pair<int64_t, int64_t> get_pair(size_t index);
-    void set_pair(size_t index, int64_t first, int64_t second);
+    std::pair<int64_t, int64_t> get_pair(PRNG_CLASS type);
+    void set_pair(PRNG_CLASS type, int64_t first, int64_t second);
 
     /// Generate a random integer in the range `[0, size)`
     std::int64_t internal_random_index(std::int64_t size, PRNG_CLASS type);

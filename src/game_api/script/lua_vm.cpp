@@ -11,6 +11,7 @@
 #include <cstdint>       // for uint32_t, int8_t
 #include <deque>         // for deque
 #include <exception>     // for exception
+#include <fmt/chrono.h>  // for format_time
 #include <fmt/format.h>  // for format_error
 #include <functional>    // for _Func_impl_no_all...
 #include <imgui.h>       // for GetIO, ImVec4
@@ -95,6 +96,112 @@
 #include "usertypes/vtables_lua.hpp"               // for register_usertypes
 
 struct Illumination;
+
+struct Players
+{
+    // This is probably over complicating
+    // but i couldn't find better solution for the global players to be always correct
+    // (not return reference to non existing entity when in between screens etc. like in draw callback)
+
+    using value_type = Player*;
+    using iterator = std::vector<Player*>::iterator;
+
+    Players()
+    {
+        update();
+    }
+    size_t size()
+    {
+        update();
+        return p.size();
+    }
+    Player* at(const int index)
+    {
+        update();
+        if (index < 0 || index >= p.size())
+            return nullptr;
+
+        return p[index];
+    }
+    auto begin()
+    {
+        return p.begin();
+    }
+    auto end()
+    {
+        return p.end();
+    }
+
+  private:
+    std::vector<Player*> p;
+
+    void update()
+    {
+        StateMemory* local_state = State::get().ptr_local();
+        if (local_state == nullptr)
+        {
+            StateMemory* main_state = State::get().ptr_main();
+            p = get_players(main_state);
+        }
+        else
+        {
+            p = get_players(local_state);
+        }
+    }
+    struct lua_iterator_state
+    {
+        typedef std::vector<Player*>::iterator it_t;
+        it_t begin;
+        it_t it;
+        it_t last;
+
+        lua_iterator_state(Players& mt)
+            : begin(mt.begin()), it(mt.begin()), last(mt.end())
+        {
+        }
+    };
+    static std::tuple<sol::object, sol::object> my_next(sol::user<lua_iterator_state&> user_it_state, sol::this_state l)
+    {
+        // this gets called
+        // to start the first iteration, and every
+        // iteration there after
+
+        lua_iterator_state& it_state = user_it_state;
+        auto& it = it_state.it;
+        if (it == it_state.last)
+        {
+            // return nil to signify that there's nothing more to work with.
+            return std::make_tuple(sol::object(sol::lua_nil), sol::object(sol::lua_nil));
+        }
+        // 2 values are returned (pushed onto the stack):
+        // the key and the value
+        // the state is left alone
+        auto r = std::make_tuple(
+            sol::object(l, sol::in_place, it - it_state.begin + 1),
+            sol::object(l, sol::in_place, *it));
+        // the iterator must be moved forward one before we return
+        std::advance(it, 1);
+        return r;
+    }
+
+  public:
+    static auto my_pairs(Players& mt)
+    {
+        mt.update();
+        // pairs expects 3 returns:
+        // the "next" function on how to advance,
+        // the "table" itself or some state,
+        // and an initial key value (can be nil)
+
+        // prepare our state
+        lua_iterator_state it_state(mt);
+        // sol::user is a space/time optimization over regular
+        // usertypes, it's incompatible with regular usertypes and
+        // stores the type T directly in lua without any pretty
+        // setup saves space allocation and a single dereference
+        return std::make_tuple(&my_next, sol::user<lua_iterator_state>(std::move(it_state)), sol::lua_nil);
+    }
+};
 
 void load_libraries(sol::state& lua)
 {
@@ -186,7 +293,14 @@ end
     NVTables::register_usertypes(lua);
 
     StateMemory* main_state = State::get().ptr_main();
-    std::vector<Player*> players = get_players(main_state);
+
+    /// NoDoc
+    lua.new_usertype<Players>(
+        "Players", sol::no_constructor, sol::meta_function::index, [](Players* p, const int index)
+        { return p->at(index - 1); },
+        sol::meta_function::pairs,
+        Players::my_pairs);
+    Players players;
 
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
     lua["state"] = main_state;
@@ -256,17 +370,18 @@ end
         backend->lua["lua_print"](message);
     };
 
-    /// Print a log message to console.
+    /// Print a log message to ingame console.
     lua["console_print"] = [](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
-        backend->console->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
-        if (backend->console->messages.size() > 20)
-            backend->console->messages.pop_front();
-        backend->lua["lua_print"](message);
+        auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        std::tm time_buf;
+        localtime_s(&time_buf, &in_time_t);
+        std::vector<ScriptMessage> messages{{message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)}};
+        backend->console->push_history(fmt::format("--- [{}] at {:%Y-%m-%d %X}", backend->get_id(), time_buf), std::move(messages));
     };
 
-    /// Prinspect to console
+    /// Prinspect to ingame console.
     lua["console_prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
         if (objects.size() > 0)
@@ -358,13 +473,15 @@ end
         return backend->cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add global callback function to be called on an [event](#ON).
+    /// Add global callback function to be called on an [event](#Events).
     lua["set_callback"] = [](sol::function cb, ON event) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
         auto luaCb = ScreenCallback{cb, event, -1};
         if (luaCb.screen == ON::LOAD)
             backend->load_callbacks[backend->cbcount] = luaCb; // Make sure load always runs before other callbacks
+        else if (luaCb.screen == ON::SAVE)
+            backend->save_callbacks[backend->cbcount] = luaCb; // Make sure save always runs after other callbacks
         else
             backend->callbacks[backend->cbcount] = luaCb;
         return backend->cbcount++;
@@ -392,6 +509,9 @@ end
             case CallbackType::Screen:
                 backend->clear_screen_hooks.push_back({caller.aux_id, caller.id});
                 break;
+            case CallbackType::Theme:
+                backend->HookHandler<ThemeInfo, CallbackType::Theme>::clear_hook(caller.id, caller.aux_id);
+                break;
             case CallbackType::None:
                 // DEBUG("No callback to clear");
             default:
@@ -399,7 +519,7 @@ end
             }
         });
 
-    /// Table of options set in the UI, added with the [register_option_functions](#Option-functions). You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
+    /// Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
     // lua["options"] = lua.create_named_table("options");
 
     /// Load another script by id "author/name" and import its `exports` table. Returns:
@@ -680,6 +800,14 @@ end
             else
                 backend->lua[sol::create_if_nil]["options"] = value;
         }
+    };
+
+    /// Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
+    lua["unregister_option"] = [](std::string name)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->options.erase(name);
+        backend->lua["options"][name] = sol::nil;
     };
 
     auto spawn_liquid = sol::overload(
@@ -1651,16 +1779,68 @@ end
     /// Removes all liquid that is about to go out of bounds, which crashes the game.
     lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
 
+    /// Return the name of the first matching number in an enum table
+    // lua["enum_get_name"] = [](table enum, int value) -> string
+    lua["enum_get_name"] = lua.safe_script(R"(
+        return function(enum, value)
+            for k,v in pairs(enum) do
+                if v == value then return k end
+            end
+        end
+    )");
+
+    /// Return all the names of a number in an enum table
+    // lua["enum_get_names"] = [](table enum, int value) -> table<string>
+    lua["enum_get_names"] = lua.safe_script(R"(
+        return function(enum, value)
+            local list = {}
+            for k,v in pairs(enum) do
+                if v == value then list[#list+1] = k end
+            end
+            return list
+        end
+    )");
+
+    /// Return the matching names for a bitmask in an enum table of masks
+    // lua["enum_get_mask_names"] = [](table enum, int value) -> table<string>
+    lua["enum_get_mask_names"] = lua.safe_script(R"(
+        return function(enum, mask)
+            local list = {}
+            for k,v in pairs(enum) do
+                if test_mask(mask, v) then list[#list+1] = k end
+            end
+            return list
+        end
+    )");
+
+    /// Paramater to set_setting
+    lua.create_named_table("SAFE_SETTING", "PET_STYLE", 20, "SCREEN_SHAKE", 21, "HUD_STYLE", 23, "HUD_SIZE", 24, "LEVEL_TIMER", 25, "TIMER_DETAIL", 26, "LEVEL_NUMBER", 27, "ANGRY_SHOPKEEPER", 28, "BUTTON_PROMPTS", 30, "FEAT_POPUPS", 32, "TEXTBOX_SIZE", 33, "TEXTBOX_DURATION", 34, "TEXTBOX_OPACITY", 35, "LEVEL_FEELINGS", 36, "DIALOG_TEXT", 37, "KALI_TEXT", 38, "GHOST_TEXT", 39);
+
     /// Gets the specified setting, values might need to be interpreted differently per setting
     lua["get_setting"] = get_setting;
 
-    /// Return the name of an unknown number in an enum table
-    // lua["enum_get_name"] = [](table enum, int value) -> string
-    lua["enum_get_name"] = lua.safe_script(R"(
-        return function(table, value)
-            for k,v in pairs(table) do
-                if v == value then return k end
-            end
+    /// Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset SAFE_SETTING by default for Hud and other visuals. Returns false, if setting failed.
+    // lua["set_setting"] = set_setting;
+    /// NoDoc
+    lua["set_setting"] = [](GAME_SETTING setting, std::uint32_t value)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        bool is_safe = std::find(std::begin(safe_settings), std::end(safe_settings), setting) != std::end(safe_settings);
+
+        if (backend->get_unsafe() || is_safe)
+        {
+            save_original_setting(setting);
+            return set_setting(setting, value);
+        }
+        return false;
+    };
+
+    /// Short for print(string.format(...))
+    lua["printf"] = lua.safe_script(R"(
+        return function(...)
+            local out = string.format(...)
+            print(out)
+            return out
         end
     )");
 
@@ -1730,7 +1910,7 @@ end
     lua["save_script"] = []() -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (backend->last_save <= State::get().ptr()->time_startup - 120)
+        if (backend->last_save <= get_frame_count() - 120)
         {
             backend->manual_save = true;
             return true;
@@ -1747,6 +1927,86 @@ end
 
     /// Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
     lua["set_ending_unlock"] = set_ending_unlock;
+
+    /// Get the thread-local version of state
+    lua["get_local_state"] = []()
+    {
+        return State::get().ptr_local();
+    };
+
+    /// Get the thread-local version of players
+    lua["get_local_players"] = []()
+    {
+        return get_players(State::get().ptr_local());
+    };
+
+    /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
+    lua["list_dir"] = [&lua](std::string dir)
+    {
+        std::vector<std::string> files;
+        auto backend = LuaBackend::get_calling_backend();
+        auto base = backend->get_root_path();
+        auto path = base / std::filesystem::path(dir);
+        if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+            return sol::make_object(lua, sol::lua_nil);
+        auto base_check = std::filesystem::relative(path, base).string();
+        if (base_check.starts_with("..") && !backend->get_unsafe())
+        {
+            luaL_error(lua, "Tried to list parent directory without unsafe mode.");
+            return sol::make_object(lua, sol::lua_nil);
+        }
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            auto str = std::filesystem::relative(file.path(), base).string();
+            std::replace(str.begin(), str.end(), '\\', '/');
+            if (std::filesystem::is_directory(file.path()))
+                str = str + "/";
+            files.push_back(str);
+        }
+        return sol::make_object(lua, sol::as_table(files));
+    };
+
+    /// List all char*.png files recursively from Mods/Packs. Returns table of file paths.
+    lua["list_char_mods"] = [&lua]()
+    {
+        std::vector<std::string> files;
+        auto backend = LuaBackend::get_calling_backend();
+        auto path = std::filesystem::path("Mods/Packs");
+        auto base = std::filesystem::path(".");
+        if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+            return sol::make_object(lua, sol::lua_nil);
+        for (const auto& file : std::filesystem::recursive_directory_iterator(path))
+        {
+            auto str = std::filesystem::relative(file.path(), base).string();
+            std::replace(str.begin(), str.end(), '\\', '/');
+            if (str.find("/.db") != std::string::npos || str.find("char_") == std::string::npos || !str.ends_with(".png") || str.ends_with("_col.png") || str.ends_with("_lumin.png"))
+                continue;
+            str = "/" + str;
+            files.push_back(str);
+        }
+        return sol::make_object(lua, sol::as_table(files));
+    };
+
+    /// Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count
+    lua["get_hud_position"] = [](int index) -> AABB
+    {
+        index--;
+        float ax = -0.98f;
+        float f = 1.0f;
+        uint32_t hs = get_setting(GAME_SETTING::HUD_SIZE).value_or(0);
+        if (hs == 0 || State::get().ptr()->items->player_count > 3)
+            f = 1.0f;
+        else if (hs == 1 || State::get().ptr()->items->player_count > 2)
+            f = 1.15f;
+        else
+            f = 1.3f;
+        float w = 0.32f * f;
+
+        float ay = 0.94f - (1.0f - f) * 0.1f;
+        float h = 0.2f * f;
+
+        return AABB(ax + index * w + 0.02f * f, ay, ax + index * w + w - 0.02f * f, ay - h);
+    };
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
@@ -1859,12 +2119,30 @@ end
         ON::RENDER_PRE_PAUSE_MENU,
         "RENDER_POST_PAUSE_MENU",
         ON::RENDER_POST_PAUSE_MENU,
+        "RENDER_PRE_BLURRED_BACKGROUND",
+        ON::RENDER_PRE_BLURRED_BACKGROUND,
+        "RENDER_POST_BLURRED_BACKGROUND",
+        ON::RENDER_POST_BLURRED_BACKGROUND,
         "RENDER_PRE_DRAW_DEPTH",
         ON::RENDER_PRE_DRAW_DEPTH,
         "RENDER_POST_DRAW_DEPTH",
         ON::RENDER_POST_DRAW_DEPTH,
+        "RENDER_PRE_JOURNAL_PAGE",
+        ON::RENDER_PRE_JOURNAL_PAGE,
         "RENDER_POST_JOURNAL_PAGE",
         ON::RENDER_POST_JOURNAL_PAGE,
+        "RENDER_PRE_LAYER",
+        ON::RENDER_PRE_LAYER,
+        "RENDER_POST_LAYER",
+        ON::RENDER_POST_LAYER,
+        "RENDER_PRE_LEVEL",
+        ON::RENDER_PRE_LEVEL,
+        "RENDER_POST_LEVEL",
+        ON::RENDER_POST_LEVEL,
+        "RENDER_PRE_GAME",
+        ON::RENDER_PRE_GAME,
+        "RENDER_POST_GAME",
+        ON::RENDER_POST_GAME,
         "SPEECH_BUBBLE",
         ON::SPEECH_BUBBLE,
         "TOAST",
@@ -1882,8 +2160,68 @@ end
         "PRE_UPDATE",
         ON::PRE_UPDATE,
         "POST_UPDATE",
-        ON::POST_UPDATE);
+        ON::POST_UPDATE,
+        "USER_DATA",
+        ON::USER_DATA);
     /* ON
+    // LOGO
+    // Runs when entering the the mossmouth logo screen.
+    // INTRO
+    // Runs when entering the intro cutscene.
+    // PROLOGUE
+    // Runs when entering the prologue / poem.
+    // TITLE
+    // Runs when entering the title screen.
+    // MENU
+    // Runs when entering the main menu.
+    // OPTIONS
+    // Runs when entering the options menu.
+    // PLAYER_PROFILE
+    // Runs when entering the player profile screen.
+    // LEADERBOARD
+    // Runs when entering the leaderboard screen.
+    // SEED_INPUT
+    // Runs when entering the seed input screen of a seeded run.
+    // CHARACTER_SELECT
+    // Runs when entering the character select screen.
+    // TEAM_SELECT
+    // Runs when entering the team select screen of arena mode.
+    // CAMP
+    // Runs when entering the camp, after all entities have spawned, on the first level frame.
+    // LEVEL
+    // Runs when entering any level, after all entities have spawned, on the first level frame.
+    // TRANSITION
+    // Runs when entering the transition screen, after all entities have spawned.
+    // DEATH
+    // Runs when entering the death screen.
+    // SPACESHIP
+    // Runs when entering the olmecship cutscene after Tiamat.
+    // WIN
+    // Runs when entering any winning cutscene, including the constellation.
+    // CREDITS
+    // Runs when entering the credits.
+    // SCORES
+    // Runs when entering the final score celebration screen of a normal or hard ending.
+    // CONSTELLATION
+    // Runs when entering the turning into constellation cutscene after cosmic ocean.
+    // RECAP
+    // Runs when entering the Dear Journal screen after final scores.
+    // ARENA_MENU
+    // Runs when entering the main arena rules menu screen.
+    // ARENA_STAGES
+    // Runs when entering the arena stage selection screen.
+    // ARENA_ITEMS
+    // Runs when entering the arena item config screen.
+    // ARENA_INTRO
+    // Runs when entering the arena VS intro screen.
+    // ARENA_MATCH
+    // Runs when entering the arena level screen, after all entities have spawned, on the first level frame, before the get ready go scene.
+    // ARENA_SCORE
+    // Runs when entering the arena scores screen.
+    // ONLINE_LOADING
+    // Runs when entering the online loading screen.
+    // ONLINE_LOBBY
+    // Runs when entering the online lobby screen.
     // GUIFRAME
     // Params: GuiDrawContext draw_ctx
     // Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a GuiDrawContext
@@ -1930,24 +2268,51 @@ end
     // LOAD
     // Params: LoadContext load_ctx
     // Runs as soon as your script is loaded, including reloads, then never again
+    // RENDER_PRE_GAME
+    // Params: VanillaRenderContext render_ctx
+    // Runs before the ingame part of the game is rendered. Return `true` to skip rendering.
+    // RENDER_POST_GAME
+    // Params: VanillaRenderContext render_ctx
+    // Runs after the level and HUD are rendered, before pause menus and blur effects
+    // RENDER_PRE_LEVEL
+    // Params: VanillaRenderContext render_ctx, int camera_layer
+    // Runs before the level is rendered. Return `true` to skip rendering.
+    // RENDER_POST_LEVEL
+    // Params: VanillaRenderContext render_ctx, int camera_layer
+    // Runs after the level is rendered, before hud
+    // RENDER_PRE_LAYER
+    // Params: VanillaRenderContext render_ctx, int rendered_layer
+    // Runs before a layer is rendered, runs for both layers during layer door transitions. Return `true` to skip rendering.
+    // RENDER_POST_LAYER
+    // Params: VanillaRenderContext render_ctx, int rendered_layer
+    // Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation
     // RENDER_PRE_HUD
-    // Params: VanillaRenderContext render_ctx
-    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // Params: VanillaRenderContext render_ctx, Hud hud
+    // Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx or edit the Hud values. Return `true` to skip rendering.
     // RENDER_POST_HUD
-    // Params: VanillaRenderContext render_ctx
+    // Params: VanillaRenderContext render_ctx, Hud hud
     // Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
     // RENDER_PRE_PAUSE_MENU
     // Params: VanillaRenderContext render_ctx
-    // Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.
     // RENDER_POST_PAUSE_MENU
     // Params: VanillaRenderContext render_ctx
     // Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx
+    // RENDER_PRE_BLURRED_BACKGROUND
+    // Params: VanillaRenderContext render_ctx, float blur
+    // Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.
+    // RENDER_POST_BLURRED_BACKGROUND
+    // Params: VanillaRenderContext render_ctx, float blur
+    // Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx. (blur amount is probably the same as journal opacity)
     // RENDER_PRE_DRAW_DEPTH
     // Params: VanillaRenderContext render_ctx, int draw_depth
-    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx. Return `true` to skip rendering.
     // RENDER_POST_DRAW_DEPTH
     // Params: VanillaRenderContext render_ctx, int draw_depth
     // Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx
+    // RENDER_PRE_JOURNAL_PAGE
+    // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
+    // Runs before the journal page is drawn on screen. Return `true` to skip rendering.
     // RENDER_POST_JOURNAL_PAGE
     // Params: VanillaRenderContext render_ctx, JOURNAL_PAGE_TYPE page_type, JournalPage page
     // Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the VanillaRenderContext
@@ -2002,6 +2367,13 @@ end
     // Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
     // POST_UPDATE
     // Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
+    // SCRIPT_ENABLE
+    // Runs when the script is enabled from the UI or when imported by another script while disabled, but not on load.
+    // SCRIPT_DISABLE
+    // Runs when the script is disabled from the UI and also right before unloading/reloading.
+    // USER_DATA
+    // Params: Entity ent
+    // Runs on all changes to Entity.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.
     */
 
     lua.create_named_table(
@@ -2094,7 +2466,7 @@ end
         "BOLD",
         2);
 
-    /// Paramater to `get_setting()`
+    /// Paramater to get_setting (and set_setting in unsafe mode)
     lua.create_named_table("GAME_SETTING"
                            //, "DAMSEL_STYLE", 0
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...

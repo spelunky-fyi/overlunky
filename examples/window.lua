@@ -11,7 +11,7 @@ local inputcombo = 1
 local comboopts = { 'one', 'two', 'three' }
 local inputcheck = false
 
-local widgetopen = false
+local widgetopen = true
 local closebutton = false
 
 local seedinput = ''
@@ -38,8 +38,19 @@ set_callback(function(draw_ctx)
     if widgetopen then
         -- create a new window and test most of the widgets
         -- we'll put this one top center and make it movable, with no titlebar
-        widgetopen = draw_ctx:window('##TestWindow', -0.2, 1, 0.4, 0.5, true, function(ctx, pos, size)
+        widgetopen = draw_ctx:window('##TestWindow', -0.3, 0.9, 0.6, 0.5, true, function(ctx, pos, size)
+            draw_ctx:win_separator_text('Section One')
+
             draw_ctx:win_text(string.format("Geometry: %f,%f %f x %f", pos.x, pos.y, size.x, size.y))
+
+            draw_ctx:win_width(0.12)
+            draw_ctx:win_input_text('Width < 1.0 means the fraction of the window width', '')
+
+            draw_ctx:win_width(-0.12)
+            draw_ctx:win_input_text('I\'m short', 'Negative width means width of the description instead')
+
+            draw_ctx:win_width(100)
+            fixedwidth = draw_ctx:win_input_text('Fixed width textbox knows it only takes 12 characters', fixedwidth and fixedwidth:sub(0, 12) or '')
 
             -- open another window from this window
             if draw_ctx:win_button('Open seed dialog') then
@@ -56,7 +67,32 @@ set_callback(function(draw_ctx)
             inputdrag = draw_ctx:win_drag_float('Select another number##drag', inputdrag, 1, 10)
             inputcombo = draw_ctx:win_combo('Combo thing', inputcombo, table.concat(comboopts, '\0')..'\0\0')
             inputcheck = draw_ctx:win_check('Check this out', inputcheck)
-            draw_ctx:win_separator()
+
+            draw_ctx:win_separator_text('Section Two')
+            -- pseudo table layout
+            do
+                -- four columns
+                local n = 4
+                local width = 1 / n
+                local headers = {'Alpha', 'Beta', 'Gamma', 'Delta'}
+                -- headers
+                for i=1,n do
+                    if i > 1 then draw_ctx:win_sameline(width*(i-1), 4) end
+                    draw_ctx:win_text(headers[i])
+                end
+                -- textboxes with no label
+                for i=1,n do
+                    if i > 1 then draw_ctx:win_sameline(0, 4) end
+                    draw_ctx:win_width(width)
+                    whatever = draw_ctx:win_input_text(F'##BoxA{i}', whatever or '')
+                end
+                -- more textboxes with no label
+                for i=1,n do
+                    if i > 1 then draw_ctx:win_sameline(0, 4) end
+                    draw_ctx:win_width(width)
+                    whatever = draw_ctx:win_input_text(F'##BoxB{i}', whatever or '')
+                end
+            end
             draw_ctx:win_text('Click here:')
             draw_ctx:win_inline()
             if draw_ctx:win_button('Submit') then
@@ -69,6 +105,9 @@ set_callback(function(draw_ctx)
             -- draw the image we loaded before
             if loadingimage > -1 then
                 draw_ctx:win_image(loadingimage, 0, 0)
+
+                -- imagebutton, always 1/3 width of window, height smaller but keeps 3:1 aspect ratio
+                draw_ctx:win_imagebutton('##coolbutton', loadingimage, 0.33, 0.11, 0, 0, 1, 1)
             end
 
             -- remember to use unique labels on identical inputs

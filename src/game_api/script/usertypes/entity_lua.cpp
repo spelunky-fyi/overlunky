@@ -189,6 +189,20 @@ void register_usertypes(sol::state& lua)
     entity_type["draw_depth"] = &Entity::draw_depth;
     entity_type["x"] = &Entity::x;
     entity_type["y"] = &Entity::y;
+    // entity_type["abs_x"] = &Entity::abs_x;
+    /// NoDoc
+    entity_type["abs_x"] = sol::property([](Entity& e) -> float
+                                         {
+        if (e.abs_x == -FLT_MAX)
+            return e.position().first;
+        return e.abs_x; });
+    // entity_type["abs_y"] = &Entity::abs_y;
+    /// NoDoc
+    entity_type["abs_y"] = sol::property([](Entity& e) -> float
+                                         {
+        if (e.abs_y == -FLT_MAX)
+            return e.position().second;
+        return e.abs_y; });
     entity_type["layer"] = &Entity::layer;
     entity_type["width"] = &Entity::w;
     entity_type["height"] = &Entity::h;
@@ -231,12 +245,13 @@ void register_usertypes(sol::state& lua)
     entity_type["is_cursed"] = &Entity::is_cursed;
     /* Entity
     // user_data
-    // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LEVEL_GENERATION.
+    // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LOAD_SCREEN to a level or transition. It is not available yet in post_entity_spawn, but that is a good place to initialize it for new custom entities. See example for more.
     */
 
     auto damage = sol::overload(
-        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
-        static_cast<void (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint16_t)>(&Movable::damage));
+        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
+        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint8_t)>(&Movable::damage),
+        &Movable::on_damage);
     auto light_on_fire = sol::overload(
         static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
@@ -409,6 +424,60 @@ void register_usertypes(sol::state& lua)
     // Short for (MASK.WATER &#124; MASK.LAVA)
     // ANY
     // Value of 0, treated by all the functions as ANY mask
+    */
+
+    /// 16bit bitmask used in Movable::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
+    lua.create_named_table(
+        "DAMAGE_TYPE",
+        "GENERIC",
+        0x1,
+        "WHIP",
+        0x2,
+        "THROW",
+        0x4,
+        "ARROW",
+        0x8,
+        "SWORD",
+        0x10,
+        "FIRE",
+        0x20,
+        "POISON",
+        0x40,
+        "POISON_TICK",
+        0x80,
+        "CURSE",
+        0x100,
+        "FALL",
+        0x200,
+        "LASER",
+        0x400,
+        "ICE_BREAK",
+        0x800,
+        "STOMP",
+        0x1000,
+        "EXPLOSION",
+        0x2000,
+        "VOODOO",
+        0x4000);
+    /* DAMAGE_TYPE
+    // GENERIC
+    // enemy contact, rope hit, spikes(-1 damage), anubisshot, forcefield, dagger shot, spear trap...
+    // THROW
+    // rock, bullet, monkey, yeti
+    // FIRE
+    // fire, fireball, lava
+    // POISON
+    // applies the status effect, not damage
+    // POISON_TICK
+    // actual damage from being poisoned for a while
+    // CURSE
+    // witchskull, catmummy directly, but not cloud
+    // LASER
+    // laser trap, ufo, not dagger
+    // ICE_BREAK
+    // damage or fall when frozen
+    // EXPLOSION
+    // also from lava
     */
 }
 }; // namespace NEntity

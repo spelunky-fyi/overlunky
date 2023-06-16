@@ -30,6 +30,9 @@ struct SettingData
     SettingValue& value;
 };
 
+static std::map<GAME_SETTING, uint32_t> g_original_settings;
+static bool g_lock_settings{false};
+
 SettingData* get_setting_data(GAME_SETTING setting)
 {
     static auto* settings_map = (std::map<GAME_SETTING, SettingData>*)get_address("settings_map");
@@ -49,8 +52,32 @@ SettingData* get_setting_data(GAME_SETTING setting)
     return nullptr;
 }
 
+void save_original_setting(GAME_SETTING setting)
+{
+    if (g_original_settings.contains(setting))
+        return;
+    if (auto original = get_setting(setting))
+        g_original_settings[setting] = original.value();
+}
+
+void restore_original_settings()
+{
+    for (auto& [k, v] : g_original_settings)
+        set_setting(k, v);
+    g_original_settings.clear();
+    g_lock_settings = true;
+}
+
+void unlock_settings()
+{
+    g_lock_settings = false;
+}
+
 bool set_setting(GAME_SETTING setting, std::uint32_t value)
 {
+    if (g_lock_settings)
+        return false;
+
     if (SettingData* data = get_setting_data(setting))
     {
         switch (setting)

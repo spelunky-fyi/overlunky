@@ -49,11 +49,13 @@ class Entity
     /// Don't edit this directly, use `set_draw_depth` function
     uint8_t draw_depth;
     uint8_t b3f; // depth related, changed when going thru doors etc.
-    /// Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
+    /// Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
     float x;
-    /// Position of the entity, can be relative to the platform you standing on (pushblocks, elevators), use [get_position](#get_position) to get accurate position in the game world
+    /// Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
     float y;
-    float abs_x; // only for movable entities, or entities that can be spawned without overlay, for the rest it's FLOAT_MIN?
+    /// Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    float abs_x;
+    /// Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
     float abs_y;
     /// Width of the sprite
     float w;

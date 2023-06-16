@@ -33,12 +33,15 @@ class LuaConsole : public LockableLuaBackend<LuaConsole>
 
     std::unordered_map<std::string, LuaBackend*> console_commands_list;
 
-    bool enabled{false};
+    bool toggled{false};
+    bool enabled{true};
     bool set_focus{false};
     bool scroll_to_bottom{false};
     std::optional<size_t> set_scroll_to_history_item;
     std::optional<size_t> last_force_scroll;
     char console_input[8192]{};
+    bool alt_keys{false};
+    int prev_cursor_pos{0};
 
     bool has_new_history{false};
     size_t max_history{30};
@@ -85,4 +88,5 @@ class LuaConsole : public LockableLuaBackend<LuaConsole>
     std::string dump_api();
     unsigned int get_input_lines();
     void set_geometry(float x, float y, float w, float h);
+    void set_alt_keys(bool enable);
 };

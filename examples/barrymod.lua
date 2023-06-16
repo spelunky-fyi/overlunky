@@ -63,7 +63,7 @@ set_callback(function()
 
     if restart then
         if status.rng then
-            for i,v in ipairs(status.rng) do
+            for i,v in pairs(status.rng) do
                     prng:set_pair(i, v.a, v.b)
             end
         end
@@ -74,7 +74,7 @@ set_callback(function()
         if not status.rng then
             status.rng = {}
         end
-        for i=1,20 do
+        for i=0,9 do
             local a,b = prng:get_pair(i)
             status.rng[i] = { a=a, b=b }
         end

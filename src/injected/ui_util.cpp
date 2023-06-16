@@ -186,6 +186,11 @@ int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float v
 
     return state->layers[state->camera_layer]->spawn_entity(entity_type, x, y, s, vx, vy, snap)->uid;
 }
+int32_t UI::spawn_grid(ENT_TYPE entity_type, float x, float y, uint8_t layer)
+{
+    auto state = State::get().ptr_local();
+    return state->layers[layer]->spawn_entity(entity_type, x, y, false, 0, 0, false)->uid;
+}
 int32_t UI::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
     auto state = State::get().ptr_local();
@@ -573,6 +578,9 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
     };
 
     static const auto just_kill = {
+        to_id("ENT_TYPE_MONS_OSIRIS_HAND"),
+        to_id("ENT_TYPE_MONS_HUNDUN_BIRDHEAD"),
+        to_id("ENT_TYPE_MONS_HUNDUN_SNAKEHEAD"),
         to_id("ENT_TYPE_ACTIVEFLOOR_SLIDINGWALL"),
         to_id("ENT_TYPE_ACTIVEFLOOR_CHAINED_SPIKEBALL"),
         to_id("ENT_TYPE_ITEM_STICKYTRAP_BALL"),
@@ -734,4 +742,14 @@ int32_t UI::spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer,
     ent->velocityx = vx;
     ent->velocityy = vy;
     return uid;
+}
+
+void UI::spawn_player(uint8_t player_slot, float x, float y)
+{
+    ::spawn_player(player_slot + 1, x, y);
+}
+
+std::pair<float, float> UI::spawn_position()
+{
+    return {State::get().ptr()->level_gen->spawn_x, State::get().ptr()->level_gen->spawn_y};
 }

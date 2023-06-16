@@ -124,6 +124,31 @@ Name | Data | Description
 [NEO_BABYLON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.NEO_BABYLON) | 6 | 
 [SUNKEN_CITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=COSUBTHEME.SUNKEN_CITY) | 7 | 
 
+## DAMAGE_TYPE
+
+
+> Search script examples for [DAMAGE_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE)
+
+16bit bitmask used in [Movable](#Movable)::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
+
+Name | Data | Description
+---- | ---- | -----------
+[GENERIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.GENERIC) | 0x1 | enemy contact, rope hit, spikes(-1 damage), anubisshot, forcefield, dagger shot, spear trap...<br/>
+[WHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.WHIP) | 0x2 | 
+[THROW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.THROW) | 0x4 | rock, bullet, monkey, yeti<br/>
+[ARROW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.ARROW) | 0x8 | 
+[SWORD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.SWORD) | 0x10 | 
+[FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.FIRE) | 0x20 | fire, fireball, lava<br/>
+[POISON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.POISON) | 0x40 | applies the status effect, not damage<br/>
+[POISON_TICK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.POISON_TICK) | 0x80 | actual damage from being poisoned for a while<br/>
+[CURSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.CURSE) | 0x100 | witchskull, catmummy directly, but not cloud<br/>
+[FALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.FALL) | 0x200 | 
+[LASER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.LASER) | 0x400 | laser trap, ufo, not dagger<br/>
+[ICE_BREAK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.ICE_BREAK) | 0x800 | damage or fall when frozen<br/>
+[STOMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.STOMP) | 0x1000 | 
+[EXPLOSION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.EXPLOSION) | 0x2000 | also from lava<br/>
+[VOODOO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE.VOODOO) | 0x4000 | 
+
 ## DRAW_LAYER
 
 
@@ -458,6 +483,37 @@ Name | Data | Description
 [FLIPPING_RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.FLIPPING_RIGHT) | 4 | 
 [FADING_OUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNALUI_STATE.FADING_OUT) | 5 | 
 
+## JOURNAL_FLAG
+
+
+> Search script examples for [JOURNAL_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[PACIFIST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.PACIFIST) | 1 | 
+[VEGAN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.VEGAN) | 2 | 
+[VEGETARIAN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.VEGETARIAN) | 3 | 
+[PETTY_CRIMINAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.PETTY_CRIMINAL) | 4 | 
+[WANTED_CRIMINAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.WANTED_CRIMINAL) | 5 | 
+[CRIME_LORD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.CRIME_LORD) | 6 | 
+[KING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.KING) | 7 | 
+[QUEEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.QUEEN) | 8 | 
+[FOOL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.FOOL) | 9 | 
+[EGGPLANT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.EGGPLANT) | 10 | 
+[NO_GOLD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.NO_GOLD) | 11 | 
+[LIKED_PETS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.LIKED_PETS) | 12 | 
+[LOVED_PETS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.LOVED_PETS) | 13 | 
+[TOOK_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.TOOK_DAMAGE) | 14 | 
+[ANKH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.ANKH) | 15 | 
+[KINGU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.KINGU) | 16 | 
+[OSIRIS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.OSIRIS) | 17 | 
+[TIAMAT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.TIAMAT) | 18 | 
+[HUNDUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.HUNDUN) | 19 | 
+[COSMOS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.COSMOS) | 20 | 
+[DIED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JOURNAL_FLAG.DIED) | 21 | 
+
 ## JOURNAL_PAGE_TYPE
 
 
@@ -594,36 +650,36 @@ Name | Data | Description
 
 Name | Data | Description
 ---- | ---- | -----------
-[LOGO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOGO) | ON::LOGO | 
-[INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.INTRO) | ON::INTRO | 
-[PROLOGUE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PROLOGUE) | ON::PROLOGUE | 
-[TITLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TITLE) | ON::TITLE | 
-[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.MENU) | ON::MENU | 
-[OPTIONS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.OPTIONS) | ON::OPTIONS | 
-[PLAYER_PROFILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PLAYER_PROFILE) | ON::PLAYER_PROFILE | 
-[LEADERBOARD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LEADERBOARD) | ON::LEADERBOARD | 
-[SEED_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SEED_INPUT) | ON::SEED_INPUT | 
-[CHARACTER_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CHARACTER_SELECT) | ON::CHARACTER_SELECT | 
-[TEAM_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TEAM_SELECT) | ON::TEAM_SELECT | 
-[CAMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CAMP) | ON::CAMP | 
-[LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LEVEL) | ON::LEVEL | 
-[TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TRANSITION) | ON::TRANSITION | 
-[DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH) | ON::DEATH | 
-[SPACESHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPACESHIP) | ON::SPACESHIP | 
-[WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.WIN) | ON::WIN | 
-[CREDITS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CREDITS) | ON::CREDITS | 
-[SCORES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCORES) | ON::SCORES | 
-[CONSTELLATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CONSTELLATION) | ON::CONSTELLATION | 
-[RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RECAP) | ON::RECAP | 
-[ARENA_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MENU) | ON::ARENA_MENU | 
-[ARENA_STAGES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_STAGES) | ON::ARENA_STAGES | 
-[ARENA_ITEMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_ITEMS) | ON::ARENA_ITEMS | 
+[LOGO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOGO) | ON::LOGO | Runs when entering the the mossmouth logo screen.<br/>
+[INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.INTRO) | ON::INTRO | Runs when entering the intro cutscene.<br/>
+[PROLOGUE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PROLOGUE) | ON::PROLOGUE | Runs when entering the prologue / poem.<br/>
+[TITLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TITLE) | ON::TITLE | Runs when entering the title screen.<br/>
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.MENU) | ON::MENU | Runs when entering the main menu.<br/>
+[OPTIONS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.OPTIONS) | ON::OPTIONS | Runs when entering the options menu.<br/>
+[PLAYER_PROFILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PLAYER_PROFILE) | ON::PLAYER_PROFILE | Runs when entering the player profile screen.<br/>
+[LEADERBOARD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LEADERBOARD) | ON::LEADERBOARD | Runs when entering the leaderboard screen.<br/>
+[SEED_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SEED_INPUT) | ON::SEED_INPUT | Runs when entering the seed input screen of a seeded run.<br/>
+[CHARACTER_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CHARACTER_SELECT) | ON::CHARACTER_SELECT | Runs when entering the character select screen.<br/>
+[TEAM_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TEAM_SELECT) | ON::TEAM_SELECT | Runs when entering the team select screen of arena mode.<br/>
+[CAMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CAMP) | ON::CAMP | Runs when entering the camp, after all entities have spawned, on the first level frame.<br/>
+[LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LEVEL) | ON::LEVEL | Runs when entering any level, after all entities have spawned, on the first level frame.<br/>
+[TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TRANSITION) | ON::TRANSITION | Runs when entering the transition screen, after all entities have spawned.<br/>
+[DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH) | ON::DEATH | Runs when entering the death screen.<br/>
+[SPACESHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPACESHIP) | ON::SPACESHIP | Runs when entering the olmecship cutscene after [Tiamat](#Tiamat).<br/>
+[WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.WIN) | ON::WIN | Runs when entering any winning cutscene, including the constellation.<br/>
+[CREDITS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CREDITS) | ON::CREDITS | Runs when entering the credits.<br/>
+[SCORES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCORES) | ON::SCORES | Runs when entering the final score celebration screen of a normal or hard ending.<br/>
+[CONSTELLATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CONSTELLATION) | ON::CONSTELLATION | Runs when entering the turning into constellation cutscene after cosmic ocean.<br/>
+[RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RECAP) | ON::RECAP | Runs when entering the Dear Journal screen after final scores.<br/>
+[ARENA_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MENU) | ON::ARENA_MENU | Runs when entering the main arena rules menu screen.<br/>
+[ARENA_STAGES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_STAGES) | ON::ARENA_STAGES | Runs when entering the arena stage selection screen.<br/>
+[ARENA_ITEMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_ITEMS) | ON::ARENA_ITEMS | Runs when entering the arena item config screen.<br/>
 [ARENA_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_SELECT) | ON::ARENA_SELECT | 
-[ARENA_INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_INTRO) | ON::ARENA_INTRO | 
-[ARENA_MATCH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MATCH) | ON::ARENA_MATCH | 
-[ARENA_SCORE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_SCORE) | ON::ARENA_SCORE | 
-[ONLINE_LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOADING) | ON::ONLINE_LOADING | 
-[ONLINE_LOBBY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOBBY) | ON::ONLINE_LOBBY | 
+[ARENA_INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_INTRO) | ON::ARENA_INTRO | Runs when entering the arena VS intro screen.<br/>
+[ARENA_MATCH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_MATCH) | ON::ARENA_MATCH | Runs when entering the arena level screen, after all entities have spawned, on the first level frame, before the get ready go scene.<br/>
+[ARENA_SCORE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ARENA_SCORE) | ON::ARENA_SCORE | Runs when entering the arena scores screen.<br/>
+[ONLINE_LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOADING) | ON::ONLINE_LOADING | Runs when entering the online loading screen.<br/>
+[ONLINE_LOBBY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.ONLINE_LOBBY) | ON::ONLINE_LOBBY | Runs when entering the online lobby screen.<br/>
 [GUIFRAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GUIFRAME) | ON::GUIFRAME | Params: [GuiDrawContext](#GuiDrawContext) draw_ctx<br/>Runs every frame the game is rendered, thus runs at selected framerate. Drawing functions are only available during this callback through a [GuiDrawContext](#GuiDrawContext)<br/>
 [FRAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.FRAME) | ON::FRAME | Runs while playing the game while the player is controllable, not in the base camp or the arena mode<br/>
 [GAMEFRAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.GAMEFRAME) | ON::GAMEFRAME | Runs whenever the game engine is actively running. This includes base camp, arena, level transition and death screen<br/>
@@ -641,15 +697,24 @@ Name | Data | Description
 [POST_LOAD_SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_SCREEN) | ON::POST_LOAD_SCREEN | Runs right after a screen is loaded, before rendering anything<br/>
 [PRE_GET_RANDOM_ROOM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GET_RANDOM_ROOM) | ON::PRE_GET_RANDOM_ROOM | Params: int x, int y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template<br/>Return: `string room_data`<br/>Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.<br/>If the size of the string returned does not match with the room templates expected size the room is discarded.<br/>White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.<br/>
 [PRE_HANDLE_ROOM_TILES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_HANDLE_ROOM_TILES) | ON::PRE_HANDLE_ROOM_TILES | Params: int x, int y, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template, [PreHandleRoomTilesContext](#PreHandleRoomTilesContext) room_ctx<br/>Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this<br/>Runs after a random room was selected and right before it would spawn entities for each tile code<br/>Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant<br/>
-[SCRIPT_ENABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) | ON::SCRIPT_ENABLE | 
-[SCRIPT_DISABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) | ON::SCRIPT_DISABLE | 
-[RENDER_PRE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) | ON::RENDER_PRE_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
-[RENDER_POST_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_HUD) | ON::RENDER_POST_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
-[RENDER_PRE_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU) | ON::RENDER_PRE_PAUSE_MENU | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
+[SCRIPT_ENABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) | ON::SCRIPT_ENABLE | Runs when the script is enabled from the UI or when imported by another script while disabled, but not on load.<br/>
+[SCRIPT_DISABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) | ON::SCRIPT_DISABLE | Runs when the script is disabled from the UI and also right before unloading/reloading.<br/>
+[RENDER_PRE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) | ON::RENDER_PRE_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [Hud](#Hud) hud<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx or edit the Hud values. Return `true` to skip rendering.<br/>
+[RENDER_POST_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_HUD) | ON::RENDER_POST_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [Hud](#Hud) hud<br/>Runs after the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
+[RENDER_PRE_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_PAUSE_MENU) | ON::RENDER_PRE_PAUSE_MENU | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the pause menu is drawn on screen. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.<br/>
 [RENDER_POST_PAUSE_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_PAUSE_MENU) | ON::RENDER_POST_PAUSE_MENU | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the pause menu is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx<br/>
-[RENDER_PRE_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_DRAW_DEPTH) | ON::RENDER_PRE_DRAW_DEPTH | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx<br/>
+[RENDER_PRE_BLURRED_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_BLURRED_BACKGROUND) | ON::RENDER_PRE_BLURRED_BACKGROUND | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, float blur<br/>Runs before the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can't really draw textures, because the blurred background is drawn on top of them. Return `true` to skip rendering.<br/>
+[RENDER_POST_BLURRED_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_BLURRED_BACKGROUND) | ON::RENDER_POST_BLURRED_BACKGROUND | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, float blur<br/>Runs after the blurred background is drawn on screen, behind pause menu or journal book. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx. (blur amount is probably the same as journal opacity)<br/>
+[RENDER_PRE_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_DRAW_DEPTH) | ON::RENDER_PRE_DRAW_DEPTH | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth<br/>Runs before the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx. Return `true` to skip rendering.<br/>
 [RENDER_POST_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_DRAW_DEPTH) | ON::RENDER_POST_DRAW_DEPTH | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int draw_depth<br/>Runs right after the entities of the specified draw_depth are drawn on screen. In this event, you can draw textures with the `draw_world_texture` function of the render_ctx<br/>
+[RENDER_PRE_JOURNAL_PAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_JOURNAL_PAGE) | ON::RENDER_PRE_JOURNAL_PAGE | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [JOURNAL_PAGE_TYPE](#JOURNAL_PAGE_TYPE) page_type, [JournalPage](#JournalPage) page<br/>Runs before the journal page is drawn on screen. Return `true` to skip rendering.<br/>
 [RENDER_POST_JOURNAL_PAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_JOURNAL_PAGE) | ON::RENDER_POST_JOURNAL_PAGE | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [JOURNAL_PAGE_TYPE](#JOURNAL_PAGE_TYPE) page_type, [JournalPage](#JournalPage) page<br/>Runs after the journal page is drawn on screen. In this event, you can draw textures with the draw_screen_texture function of the [VanillaRenderContext](#VanillaRenderContext)<br/>The [JournalPage](#JournalPage) parameter gives you access to the specific fields of the page. Be sure to cast it to the correct type, the following functions are available to do that:<br/>`page:as_journal_page_progress()`<br/>`page:as_journal_page_journalmenu()`<br/>`page:as_journal_page_places()`<br/>`page:as_journal_page_people()`<br/>`page:as_journal_page_bestiary()`<br/>`page:as_journal_page_items()`<br/>`page:as_journal_page_traps()`<br/>`page:as_journal_page_story()`<br/>`page:as_journal_page_feats()`<br/>`page:as_journal_page_deathcause()`<br/>`page:as_journal_page_deathmenu()`<br/>`page:as_journal_page_recap()`<br/>`page:as_journal_page_playerprofile()`<br/>`page:as_journal_page_lastgameplayed()`<br/>
+[RENDER_PRE_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_LAYER) | ON::RENDER_PRE_LAYER | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int rendered_layer<br/>Runs before a layer is rendered, runs for both layers during layer door transitions. Return `true` to skip rendering.<br/>
+[RENDER_POST_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_LAYER) | ON::RENDER_POST_LAYER | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int rendered_layer<br/>Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation<br/>
+[RENDER_PRE_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_LEVEL) | ON::RENDER_PRE_LEVEL | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int camera_layer<br/>Runs before the level is rendered. Return `true` to skip rendering.<br/>
+[RENDER_POST_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_LEVEL) | ON::RENDER_POST_LEVEL | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int camera_layer<br/>Runs after the level is rendered, before hud<br/>
+[RENDER_PRE_GAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_GAME) | ON::RENDER_PRE_GAME | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the ingame part of the game is rendered. Return `true` to skip rendering.<br/>
+[RENDER_POST_GAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_GAME) | ON::RENDER_POST_GAME | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the level and HUD are rendered, before pause menus and blur effects<br/>
 [SPEECH_BUBBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) | ON::SPEECH_BUBBLE | Params: [Entity](#Entity) speaking_entity, string text<br/>Runs before any speech bubble is created, even the one using [say](#say) function<br/>Return: if you don't return anything it will execute the speech bubble function normally with default message<br/>if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [TOAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TOAST) | ON::TOAST | Params: string text<br/>Runs before any toast is created, even the one using [toast](#toast) function<br/>Return: if you don't return anything it will execute the toast function normally with default message<br/>if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [DEATH_MESSAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH_MESSAGE) | ON::DEATH_MESSAGE | Params: [STRINGID](#Aliases) id<br/>Runs once after death when the death message journal page is shown. The parameter is the [STRINGID](#Aliases) of the title, like 1221 for BLOWN UP.<br/>
@@ -659,6 +724,7 @@ Name | Data | Description
 [PRE_SET_FEAT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_SET_FEAT) | ON::PRE_SET_FEAT | Runs before the game sets a vanilla feat performed.<br/>Return: true to block the default behaviour of calling Steam SetAchievement.<br/>
 [PRE_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_UPDATE) | ON::PRE_UPDATE | Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/>Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)<br/>
 [POST_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_UPDATE) | ON::POST_UPDATE | Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/>
+[USER_DATA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.USER_DATA) | ON::USER_DATA | Params: [Entity](#Entity) ent<br/>Runs on all changes to [Entity](#Entity).user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.<br/>
 
 ## PARTICLEEMITTER
 
@@ -727,6 +793,23 @@ Name | Data | Description
 [WALL_LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL_LEFT) | POS_TYPE::WALL_LEFT | Next to a wall on the left<br/>
 [WALL_RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=POS_TYPE.WALL_RIGHT) | POS_TYPE::WALL_RIGHT | Next to a wall on the right<br/>
 
+## PRESENCE_FLAG
+
+
+> Search script examples for [PRESENCE_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[UDJAT_EYE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.UDJAT_EYE) | 1 | 
+[BLACK_MARKET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.BLACK_MARKET) | 2 | 
+[VLADS_CASTLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.VLADS_CASTLE) | 3 | 
+[DRILL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.DRILL) | 3 | 
+[MOON_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.MOON_CHALLENGE) | 9 | 
+[STAR_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.STAR_CHALLENGE) | 10 | 
+[SUN_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRESENCE_FLAG.SUN_CHALLENGE) | 11 | 
+
 ## PRNG_CLASS
 
 
@@ -736,11 +819,16 @@ Determines what class of prng is used, which in turn determines which parts of t
 
 Name | Data | Description
 ---- | ---- | -----------
-[PROCEDURAL_SPAWNS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PROCEDURAL_SPAWNS) | PRNG::PROCEDURAL_SPAWNS | 
-[PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PARTICLES) | PRNG::PARTICLES | 
-[ENTITY_VARIATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.ENTITY_VARIATION) | PRNG::ENTITY_VARIATION | 
+[PROCEDURAL_SPAWNS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PROCEDURAL_SPAWNS) | PRNG::PROCEDURAL_SPAWNS | Anything level gen related really, including but not limited to path, room and enemy placement.<br/>
+[PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.PARTICLES) | PRNG::PARTICLES | Direction and angle of torch flames etc, but also includes other things not related to particles at all...<br/>
+[ENTITY_VARIATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.ENTITY_VARIATION) | PRNG::ENTITY_VARIATION | Some entities that have many texture to choose from on spawn<br/>
 [EXTRA_SPAWNS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.EXTRA_SPAWNS) | PRNG::EXTRA_SPAWNS | 
-[LEVEL_DECO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_DECO) | PRNG::LEVEL_DECO | 
+[LEVEL_DECO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_DECO) | PRNG::LEVEL_DECO | I have no idea what this name means, cause this seems to advance every 3 or so frames even with zero entities in a level<br/>
+[LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LIQUID) | PRNG::LIQUID | [Liquid](#Liquid) movement<br/>
+[AI](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.AI) | PRNG::EXTRA_SPAWNS | [Monster](#Monster) AI decisions<br/>
+[LEVEL_GEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.LEVEL_GEN) | PRNG::PROCEDURAL_SPAWNS | Anything level gen related really, including but not limited to path, room and enemy placement.<br/>
+[FX](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.FX) | PRNG::FX | Some effects, like water splashes, background stars and teleport shadow<br/>
+[CHAR_AI](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PRNG_CLASS.CHAR_AI) | PRNG::CHAR_AI | Character AI decisions<br/>
 
 ## PROCEDURAL_CHANCE
 
@@ -752,6 +840,33 @@ Name | Data | Description
 ---- | ---- | -----------
 [ARROWTRAP_CHANCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PROCEDURAL_CHANCE.ARROWTRAP_CHANCE) | 0 | 
 ...check [spawn_chances.txt](game_data/spawn_chances.txt)... |  | 
+
+## QUEST_FLAG
+
+
+> Search script examples for [QUEST_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[RESET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.RESET) | 1 | 
+[DARK_LEVEL_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.DARK_LEVEL_SPAWNED) | 2 | 
+[VAULT_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.VAULT_SPAWNED) | 3 | 
+[SPAWN_OUTPOST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SPAWN_OUTPOST) | 4 | 
+[SHOP_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SHOP_SPAWNED) | 5 | 
+[SHORTCUT_USED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SHORTCUT_USED) | 6 | 
+[SEEDED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SEEDED) | 7 | 
+[DAILY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.DAILY) | 8 | 
+[CAVEMAN_SHOPPIE_AGGROED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.CAVEMAN_SHOPPIE_AGGROED) | 9 | 
+[WADDLER_AGGROED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.WADDLER_AGGROED) | 10 | 
+[EGGPLANT_CROWN_PICKED_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.EGGPLANT_CROWN_PICKED_UP) | 12 | 
+[UDJAT_EYE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.UDJAT_EYE_SPAWNED) | 17 | 
+[BLACK_MARKET_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.BLACK_MARKET_SPAWNED) | 18 | 
+[DRILL_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.DRILL_SPAWNED) | 19 | 
+[MOON_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.MOON_CHALLENGE_SPAWNED) | 25 | 
+[STAR_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.STAR_CHALLENGE_SPAWNED) | 26 | 
+[SUN_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SUN_CHALLENGE_SPAWNED) | 27 | 
 
 ## RENDER_INFO_OVERRIDE
 
@@ -802,6 +917,33 @@ Name | Data | Description
 [EXIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.EXIT) | 2 | 
 [SHOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.SHOP) | 3 | 
 [MACHINE_ROOM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ROOM_TEMPLATE_TYPE.MACHINE_ROOM) | 4 | 
+
+## SAFE_SETTING
+
+
+> Search script examples for [SAFE_SETTING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING)
+
+Paramater to set_setting
+
+Name | Data | Description
+---- | ---- | -----------
+[PET_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.PET_STYLE) | 20 | 
+[SCREEN_SHAKE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.SCREEN_SHAKE) | 21 | 
+[HUD_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.HUD_STYLE) | 23 | 
+[HUD_SIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.HUD_SIZE) | 24 | 
+[LEVEL_TIMER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.LEVEL_TIMER) | 25 | 
+[TIMER_DETAIL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TIMER_DETAIL) | 26 | 
+[LEVEL_NUMBER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.LEVEL_NUMBER) | 27 | 
+[ANGRY_SHOPKEEPER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.ANGRY_SHOPKEEPER) | 28 | 
+[BUTTON_PROMPTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.BUTTON_PROMPTS) | 30 | 
+[FEAT_POPUPS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.FEAT_POPUPS) | 32 | 
+[TEXTBOX_SIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TEXTBOX_SIZE) | 33 | 
+[TEXTBOX_DURATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TEXTBOX_DURATION) | 34 | 
+[TEXTBOX_OPACITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.TEXTBOX_OPACITY) | 35 | 
+[LEVEL_FEELINGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.LEVEL_FEELINGS) | 36 | 
+[DIALOG_TEXT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.DIALOG_TEXT) | 37 | 
+[KALI_TEXT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.KALI_TEXT) | 38 | 
+[GHOST_TEXT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SAFE_SETTING.GHOST_TEXT) | 39 | 
 
 ## SCREEN
 
@@ -989,62 +1131,60 @@ Name | Data | Description
 
 > Search script examples for [THEME_OVERRIDE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE)
 
-Overrides for different [CustomTheme](#CustomTheme) functions. Warning: We WILL change these, especially the unknown ones, and even the known ones if they turn out wrong in testing.
 
 Name | Data | Description
 ---- | ---- | -----------
-[BASE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BASE) | THEME_OVERRIDE::BASE | 
-[UNKNOWN_V1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V1) | THEME_OVERRIDE::UNKNOWN_V1 | 
-[INIT_FLAGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_FLAGS) | THEME_OVERRIDE::INIT_FLAGS | 
-[INIT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_LEVEL) | THEME_OVERRIDE::INIT_LEVEL | 
-[UNKNOWN_V4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V4) | THEME_OVERRIDE::UNKNOWN_V4 | 
-[UNKNOWN_V5](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V5) | THEME_OVERRIDE::UNKNOWN_V5 | 
-[SPECIAL_ROOMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPECIAL_ROOMS) | THEME_OVERRIDE::SPECIAL_ROOMS | 
-[UNKNOWN_V7](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V7) | THEME_OVERRIDE::UNKNOWN_V7 | 
-[UNKNOWN_V8](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V8) | THEME_OVERRIDE::UNKNOWN_V8 | 
-[VAULT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.VAULT) | THEME_OVERRIDE::VAULT | 
-[COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.COFFIN) | THEME_OVERRIDE::COFFIN | 
-[FEELING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.FEELING) | THEME_OVERRIDE::FEELING | 
-[UNKNOWN_V12](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V12) | THEME_OVERRIDE::UNKNOWN_V12 | 
-[SPAWN_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_LEVEL) | THEME_OVERRIDE::SPAWN_LEVEL | 
-[SPAWN_BORDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_BORDER) | THEME_OVERRIDE::SPAWN_BORDER | 
-[POST_PROCESS_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_LEVEL) | THEME_OVERRIDE::POST_PROCESS_LEVEL | 
-[SPAWN_TRAPS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_TRAPS) | THEME_OVERRIDE::SPAWN_TRAPS | 
-[POST_PROCESS_ENTITIES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_ENTITIES) | THEME_OVERRIDE::POST_PROCESS_ENTITIES | 
-[SPAWN_PROCEDURAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_PROCEDURAL) | THEME_OVERRIDE::SPAWN_PROCEDURAL | 
-[SPAWN_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_BACKGROUND) | THEME_OVERRIDE::SPAWN_BACKGROUND | 
-[SPAWN_LIGHTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_LIGHTS) | THEME_OVERRIDE::SPAWN_LIGHTS | 
-[SPAWN_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_TRANSITION) | THEME_OVERRIDE::SPAWN_TRANSITION | 
-[POST_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_TRANSITION) | THEME_OVERRIDE::POST_TRANSITION | 
-[SPAWN_PLAYERS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_PLAYERS) | THEME_OVERRIDE::SPAWN_PLAYERS | 
-[SPAWN_EFFECTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_EFFECTS) | THEME_OVERRIDE::SPAWN_EFFECTS | 
-[LVL_FILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.LVL_FILE) | THEME_OVERRIDE::LVL_FILE | 
-[THEME_ID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.THEME_ID) | THEME_OVERRIDE::THEME_ID | 
-[BASE_ID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BASE_ID) | THEME_OVERRIDE::BASE_ID | 
-[ENT_FLOOR_SPREADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_FLOOR_SPREADING) | THEME_OVERRIDE::ENT_FLOOR_SPREADING | 
-[ENT_FLOOR_SPREADING2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_FLOOR_SPREADING2) | THEME_OVERRIDE::ENT_FLOOR_SPREADING2 | 
-[UNKNOWN_V30](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V30) | THEME_OVERRIDE::UNKNOWN_V30 | 
-[TRANSITION_MODIFIER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TRANSITION_MODIFIER) | THEME_OVERRIDE::TRANSITION_MODIFIER | 
-[UNKNOWN_V32](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V32) | THEME_OVERRIDE::UNKNOWN_V32 | 
-[ENT_BACKWALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_BACKWALL) | THEME_OVERRIDE::ENT_BACKWALL | 
-[ENT_BORDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_BORDER) | THEME_OVERRIDE::ENT_BORDER | 
-[ENT_CRITTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_CRITTER) | THEME_OVERRIDE::ENT_CRITTER | 
-[GRAVITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.GRAVITY) | THEME_OVERRIDE::GRAVITY | 
-[PLAYER_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PLAYER_DAMAGE) | THEME_OVERRIDE::PLAYER_DAMAGE | 
-[UNKNOWN_V38](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V38) | THEME_OVERRIDE::UNKNOWN_V38 | 
-[TEXTURE_BACKLAYER_LUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TEXTURE_BACKLAYER_LUT) | THEME_OVERRIDE::TEXTURE_BACKLAYER_LUT | 
-[BACKLAYER_LIGHT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BACKLAYER_LIGHT_LEVEL) | THEME_OVERRIDE::BACKLAYER_LIGHT_LEVEL | 
-[LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.LOOP) | THEME_OVERRIDE::LOOP | 
-[VAULT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.VAULT_LEVEL) | THEME_OVERRIDE::VAULT_LEVEL | 
-[GET_UNKNOWN1_OR_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.GET_UNKNOWN1_OR_2) | THEME_OVERRIDE::GET_UNKNOWN1_OR_2 | 
-[TEXTURE_DYNAMIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TEXTURE_DYNAMIC) | THEME_OVERRIDE::TEXTURE_DYNAMIC | 
-[PRE_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PRE_TRANSITION) | THEME_OVERRIDE::PRE_TRANSITION | 
-[LEVEL_HEIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.LEVEL_HEIGHT) | THEME_OVERRIDE::LEVEL_HEIGHT | 
-[UNKNOWN_V47](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V47) | THEME_OVERRIDE::UNKNOWN_V47 | 
-[SPAWN_DECORATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION) | THEME_OVERRIDE::SPAWN_DECORATION | 
-[SPAWN_DECORATION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION2) | THEME_OVERRIDE::SPAWN_DECORATION2 | 
-[SPAWN_EXTRA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_EXTRA) | THEME_OVERRIDE::SPAWN_EXTRA | 
-[UNKNOWN_V51](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.UNKNOWN_V51) | THEME_OVERRIDE::UNKNOWN_V51 | 
+[DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.DTOR) | 0 | 
+[RESET_THEME_FLAGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.RESET_THEME_FLAGS) | 1 | 
+[INIT_FLAGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_FLAGS) | 2 | 
+[INIT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_LEVEL) | 3 | 
+[INIT_ROOMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.INIT_ROOMS) | 4 | 
+[GENERATE_PATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.GENERATE_PATH) | 5 | 
+[SPECIAL_ROOMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPECIAL_ROOMS) | 6 | 
+[PLAYER_COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PLAYER_COFFIN) | 7 | 
+[DIRK_COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.DIRK_COFFIN) | 8 | 
+[IDOL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.IDOL) | 9 | 
+[VAULT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.VAULT) | 10 | 
+[COFFIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.COFFIN) | 11 | 
+[FEELING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.FEELING) | 12 | 
+[SPAWN_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_LEVEL) | 13 | 
+[SPAWN_BORDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_BORDER) | 14 | 
+[POST_PROCESS_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_LEVEL) | 15 | 
+[SPAWN_TRAPS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_TRAPS) | 16 | 
+[POST_PROCESS_ENTITIES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_PROCESS_ENTITIES) | 17 | 
+[SPAWN_PROCEDURAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_PROCEDURAL) | 18 | 
+[SPAWN_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_BACKGROUND) | 19 | 
+[SPAWN_LIGHTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_LIGHTS) | 20 | 
+[SPAWN_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_TRANSITION) | 21 | 
+[POST_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.POST_TRANSITION) | 22 | 
+[SPAWN_PLAYERS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_PLAYERS) | 23 | 
+[SPAWN_EFFECTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_EFFECTS) | 24 | 
+[THEME_ID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.THEME_ID) | 26 | 
+[BASE_ID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BASE_ID) | 27 | 
+[ENT_FLOOR_SPREADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_FLOOR_SPREADING) | 28 | 
+[ENT_FLOOR_SPREADING2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_FLOOR_SPREADING2) | 29 | 
+[TRANSITION_STYLED_FLOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TRANSITION_STYLED_FLOOR) | 30 | 
+[TRANSITION_MODIFIER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TRANSITION_MODIFIER) | 31 | 
+[ENT_TRANSITION_STYLED_FLOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_TRANSITION_STYLED_FLOOR) | 32 | 
+[ENT_BACKWALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_BACKWALL) | 33 | 
+[ENT_BORDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_BORDER) | 34 | 
+[ENT_CRITTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.ENT_CRITTER) | 35 | 
+[GRAVITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.GRAVITY) | 36 | 
+[PLAYER_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PLAYER_DAMAGE) | 37 | 
+[SOOT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SOOT) | 38 | 
+[TEXTURE_BACKLAYER_LUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TEXTURE_BACKLAYER_LUT) | 39 | 
+[BACKLAYER_LIGHT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.BACKLAYER_LIGHT_LEVEL) | 40 | 
+[LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.LOOP) | 41 | 
+[VAULT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.VAULT_LEVEL) | 42 | 
+[THEME_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.THEME_FLAG) | 43 | 
+[TEXTURE_DYNAMIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.TEXTURE_DYNAMIC) | 44 | 
+[PRE_TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.PRE_TRANSITION) | 45 | 
+[EXIT_ROOM_Y_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.EXIT_ROOM_Y_LEVEL) | 46 | 
+[SHOP_CHANCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SHOP_CHANCE) | 47 | 
+[SPAWN_DECORATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION) | 48 | 
+[SPAWN_DECORATION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_DECORATION2) | 49 | 
+[SPAWN_EXTRA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.SPAWN_EXTRA) | 50 | 
+[DO_PROCEDURAL_SPAWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=THEME_OVERRIDE.DO_PROCEDURAL_SPAWN) | 51 | 
 
 ## TILE_CODE
 

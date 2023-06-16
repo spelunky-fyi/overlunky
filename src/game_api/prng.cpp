@@ -4,7 +4,7 @@
 
 #include "state.hpp" // for State
 
-PRNG& PRNG::get()
+PRNG& PRNG::get_main()
 {
     const auto& state = State::get();
     static PRNG* prng = (PRNG*)((size_t)state.ptr_main() - 0xb0);
@@ -112,19 +112,19 @@ std::optional<std::int64_t> PRNG::random_int(std::int64_t min, std::int64_t max,
     }
     return std::nullopt;
 }
-std::pair<int64_t, int64_t> PRNG::get_pair(size_t index)
+std::pair<int64_t, int64_t> PRNG::get_pair(PRNG_CLASS type)
 {
-    if (index >= 1 && index <= 10)
+    if (type >= 0 && type <= 9)
     {
-        return pairs[index - 1];
+        return pairs[type];
     }
     return {0, 0};
 }
-void PRNG::set_pair(size_t index, int64_t first, int64_t second)
+void PRNG::set_pair(PRNG_CLASS type, int64_t first, int64_t second)
 {
-    if (index >= 1 && index <= 10)
+    if (type >= 0 && type <= 9)
     {
-        pairs[index - 1].first = first;
-        pairs[index - 1].second = second;
+        pairs[type].first = first;
+        pairs[type].second = second;
     }
 }

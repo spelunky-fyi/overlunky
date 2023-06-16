@@ -1,16 +1,19 @@
-#include "entity_lua.hpp"
+#include "vtables_lua.hpp"
 
-#include "entities_items.hpp"                      // for Container
 #include "entity.hpp"                              // for Entity
 #include "hookable_vtable.hpp"                     // for HookableVTable
 #include "movable.hpp"                             // for Movable
 #include "render_api.hpp"                          // for RenderInfo
+#include "script/usertypes/theme_vtable_lua.hpp"   // for NThemeVTables
 #include "script/usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
+#include "state.hpp"                               // for State
 
 namespace NVTables
 {
 void register_usertypes(sol::state& lua)
 {
+    NThemeVTables::register_usertypes(lua);
+
     // Define all vtables
     using EntityVTable = HookableVTable<
         Entity,
@@ -29,7 +32,7 @@ void register_usertypes(sol::state& lua)
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"damage", 0x30, void(Entity*, int8_t, uint32_t, float*, float*, uint16_t, uint8_t)>>;
+        VTableEntry<"damage", 0x30, bool(Entity*, int8_t, uint16_t, Vec2*, uint8_t, uint16_t, uint8_t, bool)>>;
     static MovableVTable movable_vtable(lua, lua["Movable"], "ENTITY_OVERRIDE");
 
     using FloorVTable = HookableVTable<
