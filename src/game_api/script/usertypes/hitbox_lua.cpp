@@ -58,7 +58,7 @@ void register_usertypes(sol::state& lua)
         sol::meta_function::multiplication,
         static_cast<Vec2 (Vec2::*)(const Vec2&) const>(&Vec2::operator*),
         sol::meta_function::division,
-        &Vec2::operator/,
+        static_cast<Vec2 (Vec2::*)(const Vec2&) const>(&Vec2::operator/),
         "x",
         &Vec2::x,
         "y",
