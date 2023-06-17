@@ -147,6 +147,7 @@ enum class CORNER_FINISH
     CUT,
     ADAPTIVE,
     REAL,
+    NONE,
 };
 
 auto g_angle_style = CORNER_FINISH::ADAPTIVE;
@@ -154,6 +155,8 @@ auto g_angle_style = CORNER_FINISH::ADAPTIVE;
 // get a Quad to fill out the corner between two lines and fix their overlap
 Quad get_corner_quad(Quad& line1, Quad& line2)
 {
+    // save the corners as Vec2 for easier calculations
+    // and calculate inner and outher corner, we don't know which is which at this point
     Vec2 A{line1.top_left_x, line1.top_left_y};
     Vec2 B{line1.top_right_x, line1.top_right_y};
 
@@ -172,68 +175,60 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
     if (corner2.x == INFINITY || corner2.y == INFINITY)
         return {};
 
-    auto get_angle = [](const Vec2 a, Vec2& b, const Vec2 c) -> float
-    {
-        Vec2 ab = b - a;
-        Vec2 bc = c - b;
-        float angle = std::abs(std::atan((bc.y * ab.x - bc.x * ab.y) / (bc.x * ab.x + bc.y * ab.y)));
-        return angle;
-    };
-
+    // calculate true angle between the two lines that we want to fill (doesn't matter if we use (B, corner1, D) vs (F, corner2, H) as the lines are parallel to each other
     Vec2 ab = corner1 - B;
     Vec2 bc = D - corner1;
     float true_angle = std::atan2((bc.y * ab.x - bc.x * ab.y), (bc.x * ab.x + bc.y * ab.y));
 
+    // use references to minimize code duplication
+    Vec2 *first, *second, *outer_corner, *inner_corner;
+
     if (true_angle < 0) // check which one is the inner and which outer corner
     {
-        if (true_angle < -1) // only do the test for one quadrant
-        {
-            // test angle for the outer corner
-            float angle = get_angle(B, corner1, D);
-            if (angle < 0.09f) // too small angle is problematic, and it get's worse when the lines almost overlap generating the corner in wrong spot
-                return {};
-
-            if (g_angle_style == CORNER_FINISH::ADAPTIVE && angle < 1)
-            {
-                auto offset = corner1 - corner2;
-                offset = offset * angle;
-                corner1 -= offset;
-            }
-        }
-        if (g_angle_style == CORNER_FINISH::CUT)
-            corner1 = D;
-
-        line1.bottom_right_x = corner2.x;
-        line1.bottom_right_y = corner2.y;
-        line2.bottom_left_x = corner2.x;
-        line2.bottom_left_y = corner2.y;
-        return Quad{B, corner2, D, corner1};
+        first = &B;
+        second = &D;
+        outer_corner = &corner1;
+        inner_corner = &corner2;
     }
     else
     {
-        // same as above
-        if (true_angle > 1)
-        {
-            float angle = get_angle(F, corner2, H);
-            if (angle < 0.09f)
-                return {};
-
-            if (g_angle_style == CORNER_FINISH::ADAPTIVE && angle < 1)
-            {
-                auto offset = corner2 - corner1;
-                offset = offset * angle;
-                corner2 -= offset;
-            }
-        }
-        if (g_angle_style == CORNER_FINISH::CUT)
-            corner2 = H;
-
-        line1.top_right_x = corner1.x;
-        line1.top_right_y = corner1.y;
-        line2.top_left_x = corner1.x;
-        line2.top_left_y = corner1.y;
-        return Quad{F, corner1, H, corner2};
+        first = &F;
+        second = &H;
+        outer_corner = &corner2;
+        inner_corner = &corner1;
     }
+
+    DEBUG("{} ", true_angle);
+
+    if (g_angle_style == CORNER_FINISH::ADAPTIVE && std::abs(true_angle) > 1.6f)
+    {
+        Vec2 offset = *outer_corner - (*first - (*first - *second) / 2);
+        offset = offset * (float)std::pow((std::abs(true_angle) - 1.6f) / 1.54f, 2);
+        *outer_corner -= offset;
+    }
+    else if (g_angle_style == CORNER_FINISH::CUT)
+    {
+        *outer_corner = *second;
+    }
+
+    if (true_angle < 0) // check inner vs outer again, fix the two lines from the drawn boxes that overlap
+    {
+        line1.bottom_right_x = inner_corner->x;
+        line1.bottom_right_y = inner_corner->y;
+        line2.bottom_left_x = inner_corner->x;
+        line2.bottom_left_y = inner_corner->y;
+    }
+    else
+    {
+        line1.top_right_x = inner_corner->x;
+        line1.top_right_y = inner_corner->y;
+        line2.top_left_x = inner_corner->x;
+        line2.top_left_y = inner_corner->y;
+    }
+    if (g_angle_style == CORNER_FINISH::NONE)
+        return {};
+
+    return Quad{*first, *inner_corner, *second, *outer_corner};
 };
 // convert two points into Quad (rectangle) with given `thickness` (height)
 Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness)
@@ -248,7 +243,7 @@ Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness)
     return dest;
 };
 
-void VanillaRenderContext::draw_screen_rect(const AABB& rect, float thickness, Color color, sol::optional<float> angle, sol::optional<float> px, sol::optional<float> py)
+void VanillaRenderContext::draw_screen_rect(const AABB& rect, float thickness, Color color, std::optional<float> angle, std::optional<float> px, std::optional<float> py)
 {
     Quad dest{rect};
     if (angle.has_value())
@@ -269,7 +264,7 @@ void VanillaRenderContext::draw_screen_rect(const AABB& rect, float thickness, C
     }
     draw_screen_poly(dest, thickness, std::move(color), true);
 }
-void VanillaRenderContext::draw_screen_rect_filled(const AABB& rect, Color color, sol::optional<float> angle, sol::optional<float> px, sol::optional<float> py)
+void VanillaRenderContext::draw_screen_rect_filled(const AABB& rect, Color color, std::optional<float> angle, std::optional<float> px, std::optional<float> py)
 {
     Quad dest{rect};
     if (angle.has_value())

@@ -56,9 +56,9 @@ class VanillaRenderContext
     /// Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.
     /// `px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    void draw_screen_rect(const AABB& rect, float thickness, Color color, sol::optional<float> angle, sol::optional<float> px, sol::optional<float> py);
+    void draw_screen_rect(const AABB& rect, float thickness, Color color, std::optional<float> angle, std::optional<float> px, std::optional<float> py);
 
-    void draw_screen_rect_filled(const AABB& rect, Color color, sol::optional<float> angle, sol::optional<float> px, sol::optional<float> py);
+    void draw_screen_rect_filled(const AABB& rect, Color color, std::optional<float> angle, std::optional<float> px, std::optional<float> py);
 
     /// Draw triangle in screen coordinates using the built-in renderer.
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
