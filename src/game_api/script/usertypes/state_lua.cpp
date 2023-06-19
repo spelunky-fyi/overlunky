@@ -168,6 +168,8 @@ void register_usertypes(sol::state& lua)
     /// Used in StateMemory
     lua.new_usertype<Items>(
         "Items",
+        "leader",
+        &Items::leader,
         "player_count",
         &Items::player_count,
         "saved_pets_count",

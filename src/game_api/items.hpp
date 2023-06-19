@@ -107,7 +107,11 @@ struct SelectPlayerSlot
 
 struct Items
 {
-    std::array<bool, MAX_PLAYERS> unknown_player; // who the original leader was? in local coop is set to true if the leader dies, and then to false when he gets the flag back
+    /// Index of leader player in coop
+    uint8_t leader;
+    uint8_t unknown1;
+    uint8_t unknown2;
+    uint8_t unknown3;
     uint32_t unknown;                             // padding probably
     std::array<Player*, MAX_PLAYERS> players;
     std::array<Inventory, MAX_PLAYERS> player_inventories;
