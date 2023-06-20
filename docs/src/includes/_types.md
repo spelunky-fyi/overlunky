@@ -131,6 +131,7 @@ int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 int | [timer_ending](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer_ending) | 
 int | [wins](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wins) | 
 int | [lives](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lives) | 
+int | [time_to_win](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_to_win) | 
 array&lt;int, 4&gt; | [player_idolheld_countdown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_idolheld_countdown) | 
 int | [health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) | 
 int | [bombs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) | 
@@ -208,6 +209,7 @@ float | [win_drag_float(string label, float value, float min, float max)](https:
 bool | [win_check(string label, bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check) | Add a checkbox
 int | [win_combo(string label, int selected, string opts)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo) | Add a combo box
 nil | [win_pushid(int id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) | Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
+nil | [win_pushid(string id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) | Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 nil | [win_popid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) | Pop unique identifier from the stack. Put after the input.
 nil | [win_image(IMAGE image, float width, float height)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) | Draw image to window.
 bool | [win_imagebutton(string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_imagebutton) | Draw imagebutton to window.
@@ -1753,6 +1755,7 @@ int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons
 [TextureRenderingInfo](#TextureRenderingInfo) | [players_turn_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players_turn_scroll) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [players_turn_scroll_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players_turn_scroll_handle) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [grid_player_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grid_player_icon) | 
+int | [selected_stage_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_stage_index) | 
 
 ### ScreenCamp
 
@@ -2378,6 +2381,7 @@ Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
+int | [leader](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leader) | Index of leader player in coop
 int | [player_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) | 
 int | [saved_pets_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets_count) | 
 array&lt;[ENT_TYPE](#ENT_TYPE), 4&gt; | [saved_pets](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_pets) | [Pet](#Pet) information for level transition

@@ -1720,6 +1720,7 @@ do
     ---@field timer_ending integer
     ---@field wins integer
     ---@field lives integer
+    ---@field time_to_win integer
     ---@field player_idolheld_countdown integer[] @size: 4
     ---@field health integer
     ---@field bombs integer
@@ -1746,6 +1747,7 @@ do
     ---@field texture integer
 
 ---@class Items
+    ---@field leader integer @Index of leader player in coop
     ---@field player_count integer
     ---@field saved_pets_count integer
     ---@field saved_pets ENT_TYPE[] @size: 4 @Pet information for level transition
@@ -4534,7 +4536,6 @@ function CustomSound:play(paused, sound_type) end
     ---@field win_drag_float fun(self, label: string, value: number, min: number, max: number): number @Add an number dragfield
     ---@field win_check fun(self, label: string, value: boolean): boolean @Add a checkbox
     ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer @Add a combo box
-    ---@field win_pushid fun(self, id: integer): nil @Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
     ---@field win_popid fun(self): nil @Pop unique identifier from the stack. Put after the input.
     ---@field win_image fun(self, image: IMAGE, width: number, height: number): nil @Draw image to window.
     ---@field win_imagebutton fun(self, label: string, image: IMAGE, width: number, height: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number): boolean @Draw imagebutton to window.
@@ -4620,6 +4621,14 @@ function GuiDrawContext:draw_image_rotated(image, left, top, right, bottom, uvx1
 ---@param py number
 ---@return nil
 function GuiDrawContext:draw_image_rotated(image, rect, uv_rect, color, angle, px, py) end
+---Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
+---@param id integer
+---@return nil
+function GuiDrawContext:win_pushid(id) end
+---Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
+---@param id string
+---@return nil
+function GuiDrawContext:win_pushid(id) end
 
 ---@class Gamepad
     ---@field enabled boolean
@@ -5543,6 +5552,7 @@ function Triangle:offset(x, y) end
     ---@field players_turn_scroll TextureRenderingInfo
     ---@field players_turn_scroll_handle TextureRenderingInfo
     ---@field grid_player_icon TextureRenderingInfo
+    ---@field selected_stage_index integer
 
 ---@class ScreenArenaItems : Screen
     ---@field woodpanel_top_slidein_timer number
@@ -5791,6 +5801,15 @@ function Quad:new(aabb) end
 --## Enums
 
 
+BEG = {
+  ALTAR_DESTROYED = 1,
+  BOMBBAG_THROWN = 3,
+  QUEST_NOT_STARTED = 0,
+  SPAWNED_WITH_BOMBBAG = 2,
+  SPAWNED_WITH_TRUECROWN = 4,
+  TRUECROWN_THROWN = 5
+}
+---@alias BEG integer
 BUTTON = {
   BOMB = 4,
   DOOR = 32,
@@ -5852,6 +5871,24 @@ COSUBTHEME = {
   VOLCANA = 2
 }
 ---@alias COSUBTHEME integer
+DAMAGE_TYPE = {
+  ARROW = 8,
+  CURSE = 256,
+  EXPLOSION = 8192,
+  FALL = 512,
+  FIRE = 32,
+  GENERIC = 1,
+  ICE_BREAK = 2048,
+  LASER = 1024,
+  POISON = 64,
+  POISON_TICK = 128,
+  STOMP = 4096,
+  SWORD = 16,
+  THROW = 4,
+  VOODOO = 16384,
+  WHIP = 2
+}
+---@alias DAMAGE_TYPE integer
 DRAW_LAYER = {
   BACKGROUND = 0,
   FOREGROUND = 1,
@@ -7688,7 +7725,7 @@ ON = {
   CONSTELLATION = 19,
   CREDITS = 17,
   DEATH = 14,
-  DEATH_MESSAGE = 129,
+  DEATH_MESSAGE = 137,
   FRAME = 101,
   GAMEFRAME = 108,
   GUIFRAME = 100,
@@ -7704,28 +7741,36 @@ ON = {
   OPTIONS = 5,
   PLAYER_PROFILE = 6,
   POST_LEVEL_GENERATION = 112,
-  POST_LOAD_JOURNAL_CHAPTER = 131,
-  POST_LOAD_SCREEN = 128,
+  POST_LOAD_JOURNAL_CHAPTER = 139,
+  POST_LOAD_SCREEN = 136,
   POST_ROOM_GENERATION = 111,
-  POST_UPDATE = 135,
-  PRE_GET_FEAT = 132,
+  POST_UPDATE = 143,
+  PRE_GET_FEAT = 140,
   PRE_GET_RANDOM_ROOM = 113,
   PRE_HANDLE_ROOM_TILES = 114,
   PRE_LEVEL_GENERATION = 110,
-  PRE_LOAD_JOURNAL_CHAPTER = 130,
+  PRE_LOAD_JOURNAL_CHAPTER = 138,
   PRE_LOAD_LEVEL_FILES = 109,
-  PRE_LOAD_SCREEN = 127,
-  PRE_SET_FEAT = 133,
-  PRE_UPDATE = 134,
+  PRE_LOAD_SCREEN = 135,
+  PRE_SET_FEAT = 141,
+  PRE_UPDATE = 142,
   PROLOGUE = 2,
   RECAP = 20,
-  RENDER_POST_DRAW_DEPTH = 122,
+  RENDER_POST_BLURRED_BACKGROUND = 122,
+  RENDER_POST_DRAW_DEPTH = 124,
+  RENDER_POST_GAME = 132,
   RENDER_POST_HUD = 118,
-  RENDER_POST_JOURNAL_PAGE = 124,
+  RENDER_POST_JOURNAL_PAGE = 126,
+  RENDER_POST_LAYER = 128,
+  RENDER_POST_LEVEL = 130,
   RENDER_POST_PAUSE_MENU = 120,
-  RENDER_PRE_DRAW_DEPTH = 121,
+  RENDER_PRE_BLURRED_BACKGROUND = 121,
+  RENDER_PRE_DRAW_DEPTH = 123,
+  RENDER_PRE_GAME = 131,
   RENDER_PRE_HUD = 117,
-  RENDER_PRE_JOURNAL_PAGE = 123,
+  RENDER_PRE_JOURNAL_PAGE = 125,
+  RENDER_PRE_LAYER = 127,
+  RENDER_PRE_LEVEL = 129,
   RENDER_PRE_PAUSE_MENU = 119,
   RESET = 105,
   SAVE = 106,
@@ -7735,13 +7780,13 @@ ON = {
   SCRIPT_ENABLE = 115,
   SEED_INPUT = 8,
   SPACESHIP = 15,
-  SPEECH_BUBBLE = 125,
+  SPEECH_BUBBLE = 133,
   START = 103,
   TEAM_SELECT = 10,
   TITLE = 3,
-  TOAST = 126,
+  TOAST = 134,
   TRANSITION = 13,
-  USER_DATA = 136,
+  USER_DATA = 144,
   WIN = 16
 }
 ---@alias ON integer
@@ -8013,9 +8058,14 @@ PRESENCE_FLAG = {
 }
 ---@alias PRESENCE_FLAG integer
 PRNG_CLASS = {
+  AI = 5,
+  CHAR_AI = 1,
   ENTITY_VARIATION = 3,
   EXTRA_SPAWNS = 5,
+  FX = 9,
   LEVEL_DECO = 8,
+  LEVEL_GEN = 0,
+  LIQUID = 7,
   PARTICLES = 2,
   PROCEDURAL_SPAWNS = 0
 }
@@ -8112,6 +8162,7 @@ QUEST_FLAG = {
   MOON_CHALLENGE_SPAWNED = 25,
   RESET = 1,
   SEEDED = 7,
+  SHOP_BOUGHT_OUT = 11,
   SHOP_SPAWNED = 5,
   SHORTCUT_USED = 6,
   SPAWN_OUTPOST = 4,
@@ -8397,6 +8448,26 @@ ROOM_TEMPLATE_TYPE = {
   SHOP = 3
 }
 ---@alias ROOM_TEMPLATE_TYPE integer
+SAFE_SETTING = {
+  ANGRY_SHOPKEEPER = 28,
+  BUTTON_PROMPTS = 30,
+  DIALOG_TEXT = 37,
+  FEAT_POPUPS = 32,
+  GHOST_TEXT = 39,
+  HUD_SIZE = 24,
+  HUD_STYLE = 23,
+  KALI_TEXT = 38,
+  LEVEL_FEELINGS = 36,
+  LEVEL_NUMBER = 27,
+  LEVEL_TIMER = 25,
+  PET_STYLE = 20,
+  SCREEN_SHAKE = 21,
+  TEXTBOX_DURATION = 34,
+  TEXTBOX_OPACITY = 35,
+  TEXTBOX_SIZE = 33,
+  TIMER_DETAIL = 26
+}
+---@alias SAFE_SETTING integer
 SCREEN = {
   ARENA_INTRO = 25,
   ARENA_ITEMS = 23,
@@ -8914,27 +8985,35 @@ THEME = {
 ---@alias THEME integer
 THEME_OVERRIDE = {
   BACKLAYER_LIGHT_LEVEL = 40,
-  BASE = 0,
   BASE_ID = 27,
-  COFFIN = 10,
+  COFFIN = 11,
+  DIRK_COFFIN = 8,
+  DO_PROCEDURAL_SPAWN = 51,
+  DTOR = 0,
   ENT_BACKWALL = 33,
   ENT_BORDER = 34,
   ENT_CRITTER = 35,
   ENT_FLOOR_SPREADING = 28,
   ENT_FLOOR_SPREADING2 = 29,
-  FEELING = 11,
-  GET_UNKNOWN1_OR_2 = 43,
+  ENT_TRANSITION_STYLED_FLOOR = 32,
+  EXIT_ROOM_Y_LEVEL = 46,
+  FEELING = 12,
+  GENERATE_PATH = 5,
   GRAVITY = 36,
+  IDOL = 9,
   INIT_FLAGS = 2,
   INIT_LEVEL = 3,
-  LEVEL_HEIGHT = 46,
+  INIT_ROOMS = 4,
   LOOP = 41,
-  LVL_FILE = 25,
+  PLAYER_COFFIN = 7,
   PLAYER_DAMAGE = 37,
   POST_PROCESS_ENTITIES = 17,
   POST_PROCESS_LEVEL = 15,
   POST_TRANSITION = 22,
   PRE_TRANSITION = 45,
+  RESET_THEME_FLAGS = 1,
+  SHOP_CHANCE = 47,
+  SOOT = 38,
   SPAWN_BACKGROUND = 19,
   SPAWN_BORDER = 14,
   SPAWN_DECORATION = 48,
@@ -8950,20 +9029,11 @@ THEME_OVERRIDE = {
   SPECIAL_ROOMS = 6,
   TEXTURE_BACKLAYER_LUT = 39,
   TEXTURE_DYNAMIC = 44,
+  THEME_FLAG = 43,
   THEME_ID = 26,
   TRANSITION_MODIFIER = 31,
-  UNKNOWN_V1 = 1,
-  UNKNOWN_V4 = 4,
-  UNKNOWN_V5 = 5,
-  UNKNOWN_V7 = 7,
-  UNKNOWN_V8 = 8,
-  UNKNOWN_V12 = 12,
-  UNKNOWN_V30 = 30,
-  UNKNOWN_V32 = 32,
-  UNKNOWN_V38 = 38,
-  UNKNOWN_V47 = 47,
-  UNKNOWN_V51 = 51,
-  VAULT = 9,
+  TRANSITION_STYLED_FLOOR = 30,
+  VAULT = 10,
   VAULT_LEVEL = 42
 }
 ---@alias THEME_OVERRIDE integer

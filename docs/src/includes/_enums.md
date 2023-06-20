@@ -860,6 +860,7 @@ Name | Data | Description
 [DAILY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.DAILY) | 8 | 
 [CAVEMAN_SHOPPIE_AGGROED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.CAVEMAN_SHOPPIE_AGGROED) | 9 | 
 [WADDLER_AGGROED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.WADDLER_AGGROED) | 10 | 
+[SHOP_BOUGHT_OUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SHOP_BOUGHT_OUT) | 11 | 
 [EGGPLANT_CROWN_PICKED_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.EGGPLANT_CROWN_PICKED_UP) | 12 | 
 [UDJAT_EYE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.UDJAT_EYE_SPAWNED) | 17 | 
 [BLACK_MARKET_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.BLACK_MARKET_SPAWNED) | 18 | 
