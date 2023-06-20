@@ -224,7 +224,7 @@ const char* quest_flags[]{
     "8: Daily challenge mode",
     "9: Caveman Shopkeeper aggroed",
     "10: Waddler aggroed",
-    "11: ",
+    "11: Shop bought out",
     "12: Eggplant crown picked up",
     "13: ",
     "14: ",
