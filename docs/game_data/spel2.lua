@@ -1747,12 +1747,12 @@ do
     ---@field texture integer
 
 ---@class Items
-    ---@field leader integer @Index of leader player in coop
     ---@field player_count integer
     ---@field saved_pets_count integer
     ---@field saved_pets ENT_TYPE[] @size: 4 @Pet information for level transition
     ---@field is_pet_cursed boolean[] @size: 4
     ---@field is_pet_poisoned boolean[] @size: 4
+    ---@field leader integer @Index of leader player in coop
     ---@field player_inventory Inventory[] @size: MAX_PLAYERS
     ---@field player_select SelectPlayerSlot[] @size: MAX_PLAYERS
 

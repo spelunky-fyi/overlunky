@@ -168,8 +168,6 @@ void register_usertypes(sol::state& lua)
     /// Used in StateMemory
     lua.new_usertype<Items>(
         "Items",
-        "leader",
-        &Items::leader,
         "player_count",
         &Items::player_count,
         "saved_pets_count",
@@ -182,12 +180,19 @@ void register_usertypes(sol::state& lua)
         &Items::is_pet_poisoned,
 
         // had to be done this way as autodoc doesn't like sol::property stuff
+        /*"leader",
+        &Items::leader,*/
         /*"player_inventory",
         &Items::player_inventories,*/
         /*"player_select",
         &Items::player_select_slots,*/
         //); stop autodoc here
 
+        "leader",
+        sol::property([](Items& s) -> uint8_t
+                      { return s.leader + 1; },
+                      [](Items& s, uint8_t leader)
+                      { s.leader = leader - 1; }),
         "player_select",
         sol::property([](Items& s)
                       { return std::ref(s.player_select_slots); }),
