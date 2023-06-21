@@ -113,11 +113,12 @@ set_callback(function(draw_ctx)
             -- remember to use unique labels on identical inputs
             if draw_ctx:win_button('Test##FirstTest') then
                 message('First button')
-            elseif draw_ctx:win_button('Test##SecondTest') then
+            end
+            if draw_ctx:win_button('Test##SecondTest') then
                 message('Second button')
             end
 
-            -- or with pushid
+            -- or distinguish between identical inputs with pushid (integer)
             a = {}
             for i=1,5 do
                 draw_ctx:win_pushid(i)
@@ -130,6 +131,23 @@ set_callback(function(draw_ctx)
             for i=1,5 do
                 if a[i] then
                     message('Clicked A number '..tostring(i))
+                end
+            end
+
+            -- or with pushid (string)
+            local b_ids = { "first", "second", "third" }
+            b = {}
+            for i, id in ipairs(b_ids) do
+                draw_ctx:win_pushid(id)
+                b[id] = draw_ctx:win_button('B')
+                if i < #b_ids then
+                    draw_ctx:win_inline()
+                end
+                draw_ctx:win_popid()
+            end
+            for _, id in ipairs(b_ids) do
+                if b[id] then
+                    message('Clicked B string '..id)
                 end
             end
 

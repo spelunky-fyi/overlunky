@@ -135,6 +135,7 @@ void register_usertypes(sol::state& lua)
     arenastate_type["timer_ending"] = &ArenaState::timer_ending;
     arenastate_type["wins"] = &ArenaState::wins;
     arenastate_type["lives"] = &ArenaState::lives;
+    arenastate_type["time_to_win"] = &ArenaState::time_to_win;
     arenastate_type["player_idolheld_countdown"] = &ArenaState::player_idolheld_countdown;
     arenastate_type["health"] = &ArenaState::health;
     arenastate_type["bombs"] = &ArenaState::bombs;
@@ -179,12 +180,19 @@ void register_usertypes(sol::state& lua)
         &Items::is_pet_poisoned,
 
         // had to be done this way as autodoc doesn't like sol::property stuff
+        /*"leader",
+        &Items::leader,*/
         /*"player_inventory",
         &Items::player_inventories,*/
         /*"player_select",
         &Items::player_select_slots,*/
         //); stop autodoc here
 
+        "leader",
+        sol::property([](Items& s) -> uint8_t
+                      { return s.leader + 1; },
+                      [](Items& s, uint8_t leader)
+                      { s.leader = leader - 1; }),
         "player_select",
         sol::property([](Items& s)
                       { return std::ref(s.player_select_slots); }),
@@ -354,7 +362,7 @@ void register_usertypes(sol::state& lua)
     statememory_type["liquid"] = &StateMemory::liquid_physics;
     statememory_type["next_entity_uid"] = &StateMemory::next_entity_uid;
 
-    lua.create_named_table("QUEST_FLAG", "RESET", 1, "DARK_LEVEL_SPAWNED", 2, "VAULT_SPAWNED", 3, "SPAWN_OUTPOST", 4, "SHOP_SPAWNED", 5, "SHORTCUT_USED", 6, "SEEDED", 7, "DAILY", 8, "CAVEMAN_SHOPPIE_AGGROED", 9, "WADDLER_AGGROED", 10, "EGGPLANT_CROWN_PICKED_UP", 12, "UDJAT_EYE_SPAWNED", 17, "BLACK_MARKET_SPAWNED", 18, "DRILL_SPAWNED", 19, "MOON_CHALLENGE_SPAWNED", 25, "STAR_CHALLENGE_SPAWNED", 26, "SUN_CHALLENGE_SPAWNED", 27);
+    lua.create_named_table("QUEST_FLAG", "RESET", 1, "DARK_LEVEL_SPAWNED", 2, "VAULT_SPAWNED", 3, "SPAWN_OUTPOST", 4, "SHOP_SPAWNED", 5, "SHORTCUT_USED", 6, "SEEDED", 7, "DAILY", 8, "CAVEMAN_SHOPPIE_AGGROED", 9, "WADDLER_AGGROED", 10, "SHOP_BOUGHT_OUT", 11, "EGGPLANT_CROWN_PICKED_UP", 12, "UDJAT_EYE_SPAWNED", 17, "BLACK_MARKET_SPAWNED", 18, "DRILL_SPAWNED", 19, "MOON_CHALLENGE_SPAWNED", 25, "STAR_CHALLENGE_SPAWNED", 26, "SUN_CHALLENGE_SPAWNED", 27);
 
     lua.create_named_table("PRESENCE_FLAG", "UDJAT_EYE", 1, "BLACK_MARKET", 2, "VLADS_CASTLE", 3, "DRILL", 3, "MOON_CHALLENGE", 9, "STAR_CHALLENGE", 10, "SUN_CHALLENGE", 11);
 

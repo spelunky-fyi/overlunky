@@ -105,6 +105,8 @@ class GuiDrawContext
     int win_combo(std::string label, int selected, std::string opts);
     /// Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
     void win_pushid(int id);
+    /// Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
+    void win_pushid(std::string id);
     /// Pop unique identifier from the stack. Put after the input.
     void win_popid();
     /// Draw image to window.

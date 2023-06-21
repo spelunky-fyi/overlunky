@@ -479,6 +479,10 @@ void GuiDrawContext::win_pushid(int id)
 {
     ImGui::PushID(id);
 };
+void GuiDrawContext::win_pushid(std::string id)
+{
+    ImGui::PushID(id.c_str());
+};
 void GuiDrawContext::win_popid()
 {
     ImGui::PopID();
@@ -589,6 +593,9 @@ void register_usertypes(sol::state& lua)
     auto draw_image_rotated = sol::overload(
         static_cast<void (GuiDrawContext::*)(IMAGE, float, float, float, float, float, float, float, float, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated),
         static_cast<void (GuiDrawContext::*)(IMAGE, AABB, AABB, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated));
+    auto win_pushid = sol::overload(
+        static_cast<void (GuiDrawContext::*)(int)>(&GuiDrawContext::win_pushid),
+        static_cast<void (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_pushid));
 
     /// Used in [register_option_callback](#register_option_callback) and [set_callback](#set_callback) with ON.GUIFRAME
     auto guidrawcontext_type = lua.new_usertype<GuiDrawContext>("GuiDrawContext");
@@ -623,7 +630,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_drag_float"] = &GuiDrawContext::win_drag_float;
     guidrawcontext_type["win_check"] = &GuiDrawContext::win_check;
     guidrawcontext_type["win_combo"] = &GuiDrawContext::win_combo;
-    guidrawcontext_type["win_pushid"] = &GuiDrawContext::win_pushid;
+    guidrawcontext_type["win_pushid"] = win_pushid;
     guidrawcontext_type["win_popid"] = &GuiDrawContext::win_popid;
     guidrawcontext_type["win_image"] = &GuiDrawContext::win_image;
     guidrawcontext_type["win_imagebutton"] = &GuiDrawContext::win_imagebutton;

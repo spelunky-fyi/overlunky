@@ -106,6 +106,7 @@ void register_usertypes(sol::state& lua)
     screenarenastagesselect_type["players_turn_scroll"] = &ScreenArenaStagesSelect::players_turn_scroll;
     screenarenastagesselect_type["players_turn_scroll_handle"] = &ScreenArenaStagesSelect::players_turn_scroll_handle;
     screenarenastagesselect_type["grid_player_icon"] = &ScreenArenaStagesSelect::grid_player_icon;
+    screenarenastagesselect_type["selected_stage_index"] = &ScreenArenaStagesSelect::selected_stage_index;
 
     auto screenarenaitems_type = lua.new_usertype<ScreenArenaItems>("ScreenArenaItems", sol::base_classes, sol::bases<Screen>());
     screenarenaitems_type["woodpanel_top_slidein_timer"] = &ScreenArenaItems::woodpanel_top_slidein_timer;
