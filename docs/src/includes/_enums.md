@@ -104,6 +104,20 @@ Name | Data | Description
 [NOF_DRAW_DEPTHS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.NOF_DRAW_DEPTHS) | 53 | Number of draw_depths, 53 (0-52)<br/>
 [MAX_PLAYERS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CONST.MAX_PLAYERS) | 4 | Just the max number of players in multiplayer<br/>
 
+## CORNER_FINISH
+
+
+> Search script examples for [CORNER_FINISH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CORNER_FINISH)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CORNER_FINISH.NONE) | CORNER_FINISH::NONE | Don't draw corner at all, will draw lines as separate pieces, overlaping etc.<br/>
+[REAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CORNER_FINISH.REAL) | CORNER_FINISH::REAL | Draws a real corner, no matter how far away the "peak" of the corner may end up being<br/>
+[CUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CORNER_FINISH.CUT) | CORNER_FINISH::CUT | Instead of drawing a sharp point at the end of the corner, it just cuts it flat<br/>
+[ADAPTIVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CORNER_FINISH.ADAPTIVE) | CORNER_FINISH::ADAPTIVE | Default<br/>similar to REAL but for low angles reduces the size of the "peak" of the corner<br/>
+
 ## COSUBTHEME
 
 

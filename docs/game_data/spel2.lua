@@ -2113,7 +2113,7 @@ function PRNG:random(min, max) end
 ---@class RenderInfo
     ---@field x number
     ---@field y number
-    ---@field shader integer
+    ---@field shader WORLD_SHADER
     ---@field source Quad
     ---@field destination Quad
     ---@field tilew number
@@ -4654,7 +4654,18 @@ function GuiDrawContext:draw_image_rotated(image, rect, uv_rect, color, angle, p
     ---@field showcursor boolean
 
 ---@class VanillaRenderContext
-    ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer
+    ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer<br/>If you can, consider creating your own TextureRenderingInfo instead<br/>You can then use `:text_size()` and `draw_text` with that one any<br/>`draw_text_size` works by creating new TextureRenderingInfo just to call `:text_size()`, which is not very optimal
+    ---@field set_corner_finish fun(self, c: CORNER_FINISH): nil @Set the prefered way of drawing corners for the non filled shapes
+    ---@field draw_screen_line fun(self, A: Vec2, B: Vec2, thickness: number, color: Color): nil @Draws a line on screen using the built-in renderer from point `A` to point `B`.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    ---@field draw_screen_rect fun(self, rect: AABB, thickness: number, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    ---@field draw_screen_rect_filled fun(self, rect: AABB, color: Color, angle: number?, px: number?, py: number?): nil @Draw filled rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    ---@field draw_screen_triangle fun(self, triangle: Triangle, thickness: number, color: Color): nil @Draw triangle in screen coordinates using the built-in renderer.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    ---@field draw_screen_triangle_filled fun(self, triangle: Triangle, color: Color): nil @Draw filled triangle in screen coordinates using the built-in renderer.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    ---@field draw_world_line fun(self, A: Vec2, B: Vec2, thickness: number, color: Color): nil @Draws a line in world coordinates using the built-in renderer from point `A` to point `B`.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    ---@field draw_world_rect fun(self, rect: AABB, thickness: number, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    ---@field draw_world_rect_filled fun(self, rect: AABB, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    ---@field draw_world_triangle fun(self, triangle: Triangle, thickness: number, color: Color): nil @Draw triangle in world coordinates using the built-in renderer.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    ---@field draw_world_triangle_filled fun(self, triangle: Triangle, color: Color): nil @Draw filled triangle in world coordinates using the built-in renderer.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
     ---@field bounding_box AABB
     ---@field render_draw_depth any @render_draw_depth_lua
 local VanillaRenderContext = nil
@@ -4724,6 +4735,36 @@ function VanillaRenderContext:draw_screen_texture(texture_id, row, column, dest,
 ---@param color Color
 ---@return nil
 function VanillaRenderContext:draw_screen_texture(texture_id, source, dest, color) end
+---Draw a polyline on screen from points using the built-in renderer
+---Draws from the first to the last point, use `closed` to connect first and last as well
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param points Vec2[]
+---@param thickness number
+---@param color Color
+---@param closed boolean
+---@return nil
+function VanillaRenderContext:draw_screen_poly(points, thickness, color, closed) end
+---Draw quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param points Quad
+---@param thickness number
+---@param color Color
+---@param closed boolean
+---@return nil
+function VanillaRenderContext:draw_screen_poly(points, thickness, color, closed) end
+---Draw a convex polygon on screen from points using the built-in renderer
+---Can probably draw almost any polygon, but the convex one is guaranteed to look correct
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param points Vec2[]
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_screen_poly_filled(points, color) end
+---Draw filled quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param points Quad
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_screen_poly_filled(points, color) end
 ---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer
 ---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 ---For more control use the version taking a Quad instead
@@ -4798,6 +4839,36 @@ function VanillaRenderContext:draw_world_texture(texture_id, source, dest, color
 ---@param color Color
 ---@return nil
 function VanillaRenderContext:draw_world_texture(texture_id, source, dest, color) end
+---Draw a polyline in world coordinates from points using the built-in renderer
+---Draws from the first to the last point, use `closed` to connect first and last as well
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param points Vec2[]
+---@param thickness number
+---@param color Color
+---@param closed boolean
+---@return nil
+function VanillaRenderContext:draw_world_poly(points, thickness, color, closed) end
+---Draw quadrilateral in world coordinates from top-left to bottom-right using the built-in renderer.
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param points Quad
+---@param thickness number
+---@param color Color
+---@param closed boolean
+---@return nil
+function VanillaRenderContext:draw_world_poly(points, thickness, color, closed) end
+---Draw a convex polygon in world coordinates from points using the built-in renderer
+---Can probably draw almost any polygon, but the convex one is guaranteed to look correct
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param points Vec2[]
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_poly_filled(points, color) end
+---Draw filled quadrilateral in world coordinates from top-left to bottom-right using the built-in renderer.
+---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+---@param points Quad
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_world_poly_filled(points, color) end
 
 ---@class TextureRenderingInfo
     ---@field x number
@@ -4838,11 +4909,11 @@ function VanillaRenderContext:draw_world_texture(texture_id, source, dest, color
     ---@field text_length integer @You can also just use `#` operator on the whole any to get the text lenght
     ---@field width number
     ---@field height number
-    ---@field special_texture_id integer @Used to draw buttons default is -1 wich is the buttons texture
+    ---@field special_texture_id integer @Used to draw buttons and stuff, default is -1 wich uses the buttons texture
     ---@field font Texture
     ---@field get_dest fun(self): Letter[] @Returns refrence to the letter coordinates relative to the x,y position
     ---@field get_source fun(self): Letter[] @Returns refrence to the letter coordinates in the texture
-    ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text
+    ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
 
@@ -4943,8 +5014,10 @@ function AABB:extrude(amount_x, amount_y) end
     ---@field A Vec2
     ---@field B Vec2
     ---@field C Vec2
-    ---@field rotate fun(self, angle: number, px: number, py: number): Triangle
+    ---@field rotate fun(self, angle: number, px: number, py: number): Triangle @Rotate triangle by an angle, the px/py are just coordinates, not offset from the center
     ---@field center fun(self): Vec2 @Also known as centroid
+    ---@field get_angles fun(self): number, number, number @Returns ABC, BCA, CAB angles in radians
+    ---@field scale fun(self, scale: number): Triangle
     ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corners
 local Triangle = nil
 ---@param off Vec2
@@ -5734,6 +5807,10 @@ function AABB:new() end
 ---@param aabb AABB
 ---@return AABB
 function AABB:new(aabb) end
+---@param top_left Vec2
+---@param bottom_right Vec2
+---@return AABB
+function AABB:new(top_left, bottom_right) end
 ---Create a new axis aligned bounding box by specifying its values
 ---@param left_ number
 ---@param top_ number
