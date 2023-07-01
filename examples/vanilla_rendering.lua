@@ -8,13 +8,12 @@ red = Color:red()
 green = Color:green()
 blue = Color:blue()
 black = Color:black()
+fuchsia = Color:fuchsia()
 
 font_scale = 0.0006
 
-background_rect_top_left_x = 0.0
-background_rect_top_left_y = 0.0
-background_rect_bottom_right_x = 0.0
-background_rect_bottom_right_y = 0.0
+-- On way to render text that isn't changing is to create TextRenderingInfo for it, this saves some resources compared to drawing a text directly
+textRender = TextRenderingInfo:new("Bordered, shadowed text", 0.0008, 0.0008, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
 
 set_callback(function(render_ctx)
     local y = 0.9
@@ -55,17 +54,19 @@ set_callback(function(render_ctx)
     render_ctx:draw_text("Bold text", 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.BOLD)
     y = y - 0.07
 
-    local text = "Bordered, shadowed text"
-    render_ctx:draw_text(text, 0.0025, y - 0.0025, scale, scale, black, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
-    render_ctx:draw_text(text, 0.0, y, scale, scale, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
-    width, height = render_ctx:draw_text_size(text, scale, scale, VANILLA_FONT_STYLE.ITALIC)
-
+    -- "Bordered, shadowed text"
+    textRender.x = 0.0035
+    textRender.y = y - 0.0035
+    render_ctx:draw_text(textRender, black) -- shadow
+    textRender.x = 0.0
+    textRender.y = y
+    render_ctx:draw_text(textRender, white) -- normal text
+    
     -- because this text is rendered centered, we have to calc the top left relative to the centerpoint we provided to render_ctx:draw_text
-    background_rect_top_left_x = 0.0 - (width / 2.0)
-    background_rect_top_left_y = y - (height / 2.0)
-    background_rect_bottom_right_x = background_rect_top_left_x + width
-    background_rect_bottom_right_y = background_rect_top_left_y + height
-    -- these background rect coords are then used below in the GUIFRAME callback to draw the border on the screen
+    width, height = textRender:text_size()
+    borderBox = AABB:new(0.0 - (width / 2.0), y - (height / 2.0), 0.0 - (width / 2.0) + width, y - (height / 2.0) + height)
+    render_ctx:draw_screen_rect(borderBox, 2, fuchsia) -- border
+    
     y = y - 0.12
 
     -- jump = \u{83}
@@ -91,10 +92,6 @@ end, ON.RENDER_POST_HUD)
 set_callback(function(render_ctx)
     render_ctx:draw_text("Rendered below the HUD", 0.95, 0.86, 0.0006, 0.0006, red, VANILLA_TEXT_ALIGNMENT.RIGHT, VANILLA_FONT_STYLE.ITALIC)
 end, ON.RENDER_PRE_HUD)
-
-set_callback(function(draw_ctx)
-    draw_ctx:draw_rect(background_rect_top_left_x, background_rect_top_left_y, background_rect_bottom_right_x, background_rect_bottom_right_y, 2, 2, rgba(255, 0, 255, 200))
-end, ON.GUIFRAME)
 
 -- draw a crown on the player's head
 set_callback(function(render_ctx, draw_depth)

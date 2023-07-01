@@ -2568,7 +2568,7 @@ int | [next_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 
 Type | Name | Description
 ---- | ---- | -----------
- | [new](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=new) | [TextRenderingInfo](#TextRenderingInfo):new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)<br/>Creates new [TextRenderingInfo](#TextRenderingInfo) that can be used in [VanillaRenderContext](#VanillaRenderContext) draw_text<br/>For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you<br/> 
+ | [new](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=new) | [TextRenderingInfo](#TextRenderingInfo):new(string text, float scale_x, float scale_y, int alignment, int fontstyle)<br/>[TextRenderingInfo](#TextRenderingInfo):new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)<br/>Creates new [TextRenderingInfo](#TextRenderingInfo) that can be used in [VanillaRenderContext](#VanillaRenderContext) draw_text<br/>For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you<br/> 
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) | You can also just use `#` operator on the whole object to get the text lenght

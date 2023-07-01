@@ -570,6 +570,11 @@ void TextRenderingInfo_ctor(TextRenderingInfo& uninitialized_memory, const std::
     new (&uninitialized_memory) TextRenderingInfo{};
     uninitialized_memory.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
 }
+void TextRenderingInfo_ctor2(TextRenderingInfo& uninitialized_memory, const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    new (&uninitialized_memory) TextRenderingInfo{};
+    uninitialized_memory.set_text(text, 0, 0, scale_x, scale_y, alignment, fontstyle);
+}
 
 namespace NVanillaRender
 {
@@ -760,7 +765,7 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<TextRenderingInfo>(
         "TextRenderingInfo",
         "new",
-        sol::initializers(&TextRenderingInfo_ctor),
+        sol::initializers(&TextRenderingInfo_ctor, &TextRenderingInfo_ctor2),
         "x",
         &TextRenderingInfo::x,
         "y",
@@ -787,6 +792,7 @@ void register_usertypes(sol::state& lua)
         &TextRenderingInfo::set_textx);
     /* TextRenderingInfo
     // new
+    // TextRenderingInfo:new(string text, float scale_x, float scale_y, int alignment, int fontstyle)
     // TextRenderingInfo:new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)
     // Creates new TextRenderingInfo that can be used in VanillaRenderContext draw_text
     // For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you

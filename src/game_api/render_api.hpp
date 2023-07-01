@@ -94,6 +94,7 @@ struct Letter
         bottom.C = top.A = std::get<3>(vectors);
     }
 
+    // example letter: N
     // b - bottom, t - top
     //
     // bC    tA===tC

@@ -4903,7 +4903,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field center fun(self): Vec2 @Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
 
 ---@class TextRenderingInfo
-    ---@field new any @sol::initializers(&TextRenderingInfo_ctor)
+    ---@field new any @sol::initializers(&TextRenderingInfo_ctor
     ---@field x number
     ---@field y number
     ---@field text_length integer @You can also just use `#` operator on the whole any to get the text lenght
