@@ -18,6 +18,9 @@
 struct JournalUI;
 struct Layer;
 
+using VANILLA_TEXT_ALIGNMENT = uint32_t;
+using VANILLA_FONT_STYLE = uint32_t;
+
 enum JOURNAL_VFTABLE
 {
     // to get those offsets, find "vftable_JournalPages" then go to each page in journal, then to it's first vtable function address
@@ -81,7 +84,7 @@ struct Letter
     /// if the positions were altered the results may not end up as expected
     Quad get_quad() const
     {
-        return {bottom.A, bottom.B, bottom.C, top.C};
+        return {bottom.A, bottom.B, top.C, top.A};
     }
     /// Inverse of the get_quad
     void set_quad(Quad quad)
@@ -115,7 +118,7 @@ struct TextRenderingInfo
     ~TextRenderingInfo();
 
     /// Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
-    void set_textx(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+    void set_textx(const std::u16string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle);
 
     void set_text(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
     void set_text(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);

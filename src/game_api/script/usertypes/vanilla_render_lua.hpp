@@ -15,6 +15,9 @@ class state;
 
 struct TextRenderingInfo;
 
+using VANILLA_TEXT_ALIGNMENT = uint32_t;
+using VANILLA_FONT_STYLE = uint32_t;
+
 enum class CORNER_FINISH
 {
     CUT,
@@ -28,7 +31,7 @@ class VanillaRenderContext
   public:
     /// Draw text using the built-in renderer
     /// Use in combination with ON.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
-    void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle);
+    void draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle);
     void draw_text(const TextRenderingInfo* tri, Color color);
 
     /// Measure the provided text using the built-in renderer

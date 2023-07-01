@@ -13,7 +13,7 @@
 #include "state.hpp"      // for enum_to_layer
 #include "texture.hpp"    // for Texture, get_texture
 
-void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
+void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)
 {
     TextRenderingInfo tri{};
     tri.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
@@ -792,8 +792,8 @@ void register_usertypes(sol::state& lua)
         &TextRenderingInfo::set_textx);
     /* TextRenderingInfo
     // new
-    // TextRenderingInfo:new(string text, float scale_x, float scale_y, int alignment, int fontstyle)
-    // TextRenderingInfo:new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)
+    // TextRenderingInfo:new(string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)
+    // TextRenderingInfo:new(string text, float x, float y, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)
     // Creates new TextRenderingInfo that can be used in VanillaRenderContext draw_text
     // For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you
     */
