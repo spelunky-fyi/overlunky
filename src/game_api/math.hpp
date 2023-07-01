@@ -472,3 +472,6 @@ struct Quad
     float top_left_x{0};
     float top_left_y{0};
 };
+
+// get intersection point of two lines
+Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D);

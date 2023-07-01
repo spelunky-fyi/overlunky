@@ -123,25 +123,6 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, const Quad& s
     RenderAPI::get().draw_screen_texture(texture, source, quad, std::move(color), 0x29);
 }
 
-// get intersection point of two lines
-Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D)
-{
-    float a = B.y - A.y;
-    float b = A.x - B.x;
-    float c = a * (A.x) + b * (A.y);
-    // Line CD represented as a2x + b2y = c2
-    float a1 = D.y - C.y;
-    float b1 = C.x - D.x;
-    float c1 = a1 * (C.x) + b1 * (C.y);
-
-    float det = a * b1 - a1 * b;
-
-    if (det == 0)
-        return {INFINITY, INFINITY};
-
-    return Vec2{(b1 * c - b * c1) / det, (a * c1 - a1 * c) / det};
-}
-
 auto g_angle_style = CORNER_FINISH::ADAPTIVE;
 
 void VanillaRenderContext::set_corner_finish(CORNER_FINISH c)
@@ -246,7 +227,7 @@ Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness, bool world = fal
     float axis_AB_angle = std::atan2((B.y - A.y), (B.x) - (A.x));
     float hypotenuse = (float)std::sqrt(std::pow(B.x - A.x, 2) + std::pow(B.y - A.y, 2));
 
-    // make it straight and then rotate because i'm stupid
+    // make ractangle and then rotate it because i'm stupid
     Quad dest{AABB{A.x, A.y + thickness / 2, (A.x + hypotenuse), A.y - thickness / 2}};
     dest.rotate(axis_AB_angle, A.x, A.y);
     return dest;
