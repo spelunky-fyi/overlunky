@@ -281,7 +281,7 @@ Used in [set_callback](#set_callback) [ON](#ON).RENDER_ callbacks, [set_post_ren
 
 Type | Name | Description
 ---- | ---- | -----------
-nil | [draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) | Draw text using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
+nil | [draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) | Draw text using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
 nil | [draw_text(const TextRenderingInfo tri, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) | 
 tuple&lt;float, float&gt; | [draw_text_size(const string& text, float scale_x, float scale_y, int fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size) | Measure the provided text using the built-in renderer<br/>If you can, consider creating your own [TextureRenderingInfo](#TextureRenderingInfo) instead<br/>You can then use `:text_size()` and `draw_text` with that one object<br/>`draw_text_size` works by creating new TextureRenderingInfo just to call `:text_size()`, which is not very optimal
 nil | [draw_screen_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
@@ -536,6 +536,8 @@ float | [area()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) 
 tuple&lt;float, float&gt; | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
 float | [width()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | Short for `aabb.right - aabb.left`.
 float | [height()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Short for `aabb.top - aabb.bottom`.
+bool | [is_point_inside(const Vec2 p)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | Checks if point lies between left/right and top/bottom
+bool | [is_point_inside(float x, float y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | 
 tuple&lt;float, float, float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ### BackgroundMusic
@@ -2568,7 +2570,7 @@ int | [next_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 
 Type | Name | Description
 ---- | ---- | -----------
- | [new](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=new) | [TextRenderingInfo](#TextRenderingInfo):new(string text, float scale_x, float scale_y, int alignment, int fontstyle)<br/>[TextRenderingInfo](#TextRenderingInfo):new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)<br/>Creates new [TextRenderingInfo](#TextRenderingInfo) that can be used in [VanillaRenderContext](#VanillaRenderContext) draw_text<br/>For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you<br/> 
+ | [new](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=new) | [TextRenderingInfo](#TextRenderingInfo):new(string text, float scale_x, float scale_y, [VANILLA_TEXT_ALIGNMENT](#VANILLA_TEXT_ALIGNMENT) alignment, [VANILLA_FONT_STYLE](#VANILLA_FONT_STYLE) fontstyle)<br/>[TextRenderingInfo](#TextRenderingInfo):new(string text, float x, float y, float scale_x, float scale_y, [VANILLA_TEXT_ALIGNMENT](#VANILLA_TEXT_ALIGNMENT) alignment, [VANILLA_FONT_STYLE](#VANILLA_FONT_STYLE) fontstyle)<br/>Creates new [TextRenderingInfo](#TextRenderingInfo) that can be used in [VanillaRenderContext](#VanillaRenderContext) draw_text<br/>For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you<br/> 
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) | You can also just use `#` operator on the whole object to get the text lenght
@@ -2580,7 +2582,7 @@ array&lt;[Letter](#Letter)&gt; | [get_dest()](https://github.com/spelunky-fyi/ov
 array&lt;[Letter](#Letter)&gt; | [get_source()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_source) | Returns refrence to the letter coordinates in the texture
 tuple&lt;float, float&gt; | [text_size()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_size) | {width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
 nil | [rotate(float angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
-nil | [set_text(const string text, float scale_x, float scale_y, int alignment, int fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_text) | Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
+nil | [set_text(const string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_text) | Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
 
 ### TextureDefinition
 

@@ -4677,8 +4677,8 @@ local VanillaRenderContext = nil
 ---@param scale_x number
 ---@param scale_y number
 ---@param color Color
----@param alignment integer
----@param fontstyle integer
+---@param alignment VANILLA_TEXT_ALIGNMENT
+---@param fontstyle VANILLA_FONT_STYLE
 ---@return nil
 function VanillaRenderContext:draw_text(text, x, y, scale_x, scale_y, color, alignment, fontstyle) end
 ---@param tri TextRenderingInfo
@@ -4915,7 +4915,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field get_source fun(self): Letter[] @Returns refrence to the letter coordinates in the texture
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
-    ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: integer, fontstyle: integer): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
+    ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: VANILLA_TEXT_ALIGNMENT, fontstyle: VANILLA_FONT_STYLE): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
 
 ---@class HudInventory
     ---@field enabled boolean
@@ -5009,6 +5009,14 @@ function AABB:extrude(amount) end
 ---@param amount_y number
 ---@return AABB
 function AABB:extrude(amount_x, amount_y) end
+---Checks if point lies between left/right and top/bottom
+---@param p Vec2
+---@return boolean
+function AABB:is_point_inside(p) end
+---@param x number
+---@param y number
+---@return boolean
+function AABB:is_point_inside(x, y) end
 
 ---@class Triangle
     ---@field A Vec2

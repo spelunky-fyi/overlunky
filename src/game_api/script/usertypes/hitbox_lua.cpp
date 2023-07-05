@@ -72,6 +72,9 @@ void register_usertypes(sol::state& lua)
     const auto extrude = sol::overload(
         static_cast<AABB& (AABB::*)(float)>(&AABB::extrude),
         static_cast<AABB& (AABB::*)(float, float)>(&AABB::extrude));
+    const auto is_point_inside = sol::overload(
+        static_cast<bool (AABB::*)(const Vec2)>(&AABB::is_point_inside),
+        static_cast<bool (AABB::*)(float, float)>(&AABB::is_point_inside));
 
     /// Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
     lua.new_usertype<AABB>(
@@ -101,6 +104,8 @@ void register_usertypes(sol::state& lua)
         &AABB::width,
         "height",
         &AABB::height,
+        "is_point_inside",
+        is_point_inside,
         "split",
         // &Vec2::split); // for the autodoc
         &AABB::operator std::tuple<float, float, float, float>);

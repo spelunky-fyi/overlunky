@@ -237,6 +237,25 @@ struct AABB
     {
         return (top - bottom);
     }
+    /// Checks if point lies between left/right and top/bottom
+    bool is_point_inside(const Vec2 p)
+    {
+        AABB copy{*this};
+        copy.abs();
+        if (copy.left < p.x && copy.right > p.x && copy.bottom < p.y && copy.top > p.y)
+            return true;
+
+        return false;
+    }
+    bool is_point_inside(float x, float y)
+    {
+        AABB copy{*this};
+        copy.abs();
+        if (copy.left < x && copy.right > x && copy.bottom < y && copy.top > y)
+            return true;
+
+        return false;
+    }
     /*
     std::tuple<float, float, float, float> split()
     {} // just for the autodoc

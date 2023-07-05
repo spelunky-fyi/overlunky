@@ -247,8 +247,8 @@ struct RenderInfo
     uint32_t unknown7;
     uint32_t unknown8;
     uint32_t unknown9;
-    float x_dupe1;
-    float y_dupe1;
+    float x_dupe1; // position last refresh
+    float y_dupe1; // position last refresh
     uint32_t unknown10;
     float x_dupe2;
     float y_dupe2;
