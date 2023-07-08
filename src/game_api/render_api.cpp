@@ -408,11 +408,9 @@ std::pair<float, float> RenderAPI::draw_text_size(const std::string& text, float
     return tri.text_size();
 }
 
-void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color)
+void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color, uint8_t shader)
 {
     static size_t offset = get_address("draw_screen_texture");
-    constexpr uint8_t shader = 0x29;
-
     if (offset != 0)
     {
         TextureRenderingInfo tri = {
@@ -743,7 +741,7 @@ void TextRenderingInfo::set_text(const std::u16string text, float _x, float _y, 
         f1(fontstyle, text.c_str(), 2, _x, _y, this, scale_x, scale_y, alignment, 2, 0);
     }
 }
-void TextRenderingInfo::set_textx(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+void TextRenderingInfo::set_textx(const std::u16string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)
 {
     set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
 }
@@ -775,16 +773,13 @@ void TextRenderingInfo::rotate(float angle, std::optional<float> px, std::option
 {
     constexpr float ratio = 16.0f / 9.0f;
     constexpr float inverse_ratio = 9.0f / 16.0f;
-
     const float sin_a{std::sin(angle)};
     const float cos_a{std::cos(angle)};
-
     const Vec2 p{px.value_or(0.f), py.value_or(0.f)};
-    const Vec2 mp{-px.value_or(0.f), -py.value_or(0.f)};
 
     auto rotate_around_pivot = [=](Vec2 in) -> Vec2
     {
-        in += mp;
+        in -= p;
         const Vec2 old = in;
         in.x = old.x * cos_a - old.y * sin_a;
         in.y = old.y * cos_a + old.x * sin_a;
@@ -795,6 +790,7 @@ void TextRenderingInfo::rotate(float angle, std::optional<float> px, std::option
     for (uint32_t i = 0; i < size(); ++i)
     {
         auto letter = (dest + i);
+
         letter->bottom.A.x *= ratio;
         letter->bottom.B.x *= ratio;
         letter->bottom.C.x *= ratio;

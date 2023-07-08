@@ -56,9 +56,9 @@ void register_usertypes(sol::state& lua)
         sol::meta_function::equal_to,
         &Vec2::operator==,
         sol::meta_function::multiplication,
-        &Vec2::operator*,
+        static_cast<Vec2 (Vec2::*)(const Vec2&) const>(&Vec2::operator*),
         sol::meta_function::division,
-        &Vec2::operator/,
+        static_cast<Vec2 (Vec2::*)(const Vec2&) const>(&Vec2::operator/),
         "x",
         &Vec2::x,
         "y",
@@ -72,11 +72,14 @@ void register_usertypes(sol::state& lua)
     const auto extrude = sol::overload(
         static_cast<AABB& (AABB::*)(float)>(&AABB::extrude),
         static_cast<AABB& (AABB::*)(float, float)>(&AABB::extrude));
+    const auto is_point_inside = sol::overload(
+        static_cast<bool (AABB::*)(const Vec2)>(&AABB::is_point_inside),
+        static_cast<bool (AABB::*)(float, float)>(&AABB::is_point_inside));
 
     /// Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
     lua.new_usertype<AABB>(
         "AABB",
-        sol::constructors<AABB(), AABB(const AABB&), AABB(float, float, float, float)>{},
+        sol::constructors<AABB(), AABB(const AABB&), AABB(const Vec2&, const Vec2&), AABB(float, float, float, float)>{},
         "left",
         &AABB::left,
         "bottom",
@@ -101,6 +104,8 @@ void register_usertypes(sol::state& lua)
         &AABB::width,
         "height",
         &AABB::height,
+        "is_point_inside",
+        is_point_inside,
         "split",
         // &Vec2::split); // for the autodoc
         &AABB::operator std::tuple<float, float, float, float>);
@@ -124,6 +129,10 @@ void register_usertypes(sol::state& lua)
         &Triangle::rotate,
         "center",
         &Triangle::center,
+        "get_angles",
+        &Triangle::get_angles,
+        "scale",
+        &Triangle::scale,
         "split",
         // &Triangle::split); // for the autodoc
         &Triangle::operator std::tuple<Vec2, Vec2, Vec2>);

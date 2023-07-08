@@ -13,7 +13,7 @@
 #include "state.hpp"      // for enum_to_layer
 #include "texture.hpp"    // for Texture, get_texture
 
-void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, uint32_t alignment, uint32_t fontstyle)
+void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)
 {
     TextRenderingInfo tri{};
     tri.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
@@ -32,12 +32,33 @@ std::pair<float, float> VanillaRenderContext::draw_text_size(const std::string& 
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    draw_screen_texture(texture_id, row, column, Quad(AABB(left, top, right, bottom)), color);
+    draw_screen_texture(texture_id, row, column, Quad(AABB(left, top, right, bottom)), std::move(color));
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
 {
-    draw_screen_texture(texture_id, row, column, Quad(rect), color);
+    draw_screen_texture(texture_id, row, column, Quad(rect), std::move(color));
+}
+
+Quad& convert_ratio(Quad& quad, bool to_screen)
+{
+    constexpr float ratio = 16.0f / 9.0f;
+    constexpr float inverse_ratio = 9.0f / 16.0f;
+    if (to_screen)
+    {
+        quad.bottom_left_x *= inverse_ratio;
+        quad.bottom_right_x *= inverse_ratio;
+        quad.top_left_x *= inverse_ratio;
+        quad.top_right_x *= inverse_ratio;
+    }
+    else
+    {
+        quad.bottom_left_x *= ratio;
+        quad.bottom_right_x *= ratio;
+        quad.top_left_x *= ratio;
+        quad.top_right_x *= ratio;
+    }
+    return quad;
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle, float px, float py)
@@ -46,7 +67,6 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
     if (angle != 0)
     {
         constexpr float ratio = 16.0f / 9.0f;
-        constexpr float inverse_ratio = 9.0f / 16.0f;
 
         // fix ratio to 1/1 to properly rotate the coordinates
         const AABB new_rect{rect.left * ratio, rect.top, rect.right * ratio, rect.bottom};
@@ -54,18 +74,14 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
         auto pivot = new_rect.center();
         if (px != 0 || py != 0)
         {
-            pivot.first += abs(pivot.first - new_rect.left) * px;
-            pivot.second += abs(pivot.second - new_rect.bottom) * py;
+            pivot.first += std::abs(pivot.first - new_rect.left) * px;
+            pivot.second += std::abs(pivot.second - new_rect.bottom) * py;
         }
 
         dest.rotate(angle, pivot.first, pivot.second);
-        // bring back to the 16/9
-        dest.bottom_left_x *= inverse_ratio;
-        dest.bottom_right_x *= inverse_ratio;
-        dest.top_left_x *= inverse_ratio;
-        dest.top_right_x *= inverse_ratio;
+        convert_ratio(dest, true);
     }
-    draw_screen_texture(texture_id, row, column, dest, color);
+    draw_screen_texture(texture_id, row, column, dest, std::move(color));
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color)
@@ -94,7 +110,7 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, uint8_t row, 
         uv_left,
         uv_top);
 
-    RenderAPI::get().draw_screen_texture(texture, source, dest, color);
+    RenderAPI::get().draw_screen_texture(texture, source, dest, std::move(color), 0x29);
 }
 
 void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& quad, Color color)
@@ -104,17 +120,260 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, const Quad& s
     {
         return;
     }
-    RenderAPI::get().draw_screen_texture(texture, source, quad, color);
+    RenderAPI::get().draw_screen_texture(texture, source, quad, std::move(color), 0x29);
+}
+
+auto g_angle_style = CORNER_FINISH::ADAPTIVE;
+
+void VanillaRenderContext::set_corner_finish(CORNER_FINISH c)
+{
+    g_angle_style = c;
+}
+
+// get a Quad to fill out the corner between two lines and fix their overlap
+Quad get_corner_quad(Quad& line1, Quad& line2)
+{
+    if (g_angle_style == CORNER_FINISH::NONE)
+        return {};
+    // save the corners as Vec2 for easier calculations
+    // and calculate inner and outher corner, we don't know which is which at this point
+    Vec2 A{line1.top_left_x, line1.top_left_y};
+    Vec2 B{line1.top_right_x, line1.top_right_y};
+
+    Vec2 C{line2.top_right_x, line2.top_right_y};
+    Vec2 D{line2.top_left_x, line2.top_left_y};
+    Vec2 corner1 = intersection(A, B, C, D);
+    if (corner1.x == INFINITY || corner1.y == INFINITY)
+        return {};
+
+    Vec2 E{line1.bottom_left_x, line1.bottom_left_y};
+    Vec2 F{line1.bottom_right_x, line1.bottom_right_y};
+
+    Vec2 G{line2.bottom_right_x, line2.bottom_right_y};
+    Vec2 H{line2.bottom_left_x, line2.bottom_left_y};
+    Vec2 corner2 = intersection(E, F, G, H);
+    if (corner2.x == INFINITY || corner2.y == INFINITY)
+        return {};
+
+    // calculate true angle between the two lines that we want to fill (doesn't matter if we use (B, corner1, D) vs (F, corner2, H) as the lines are parallel to each other
+    Vec2 ab = corner1 - B;
+    Vec2 bc = D - corner1;
+    float true_angle = std::atan2((bc.y * ab.x - bc.x * ab.y), (bc.x * ab.x + bc.y * ab.y));
+
+    // use references to minimize code duplication
+    Vec2 *first, *second, *outer_corner, *inner_corner;
+
+    if (true_angle < 0) // check which one is the inner and which outer corner
+    {
+        first = &B;
+        second = &D;
+        outer_corner = &corner1;
+        inner_corner = &corner2;
+    }
+    else
+    {
+        first = &F;
+        second = &H;
+        outer_corner = &corner2;
+        inner_corner = &corner1;
+    }
+
+    Vec2 middle_point = *first - (*first - *second) / 2;
+
+    if (g_angle_style == CORNER_FINISH::ADAPTIVE && std::abs(true_angle) > 1.6f)
+    {
+        Vec2 offset = *outer_corner - middle_point;
+        offset = offset * (float)std::pow((std::abs(true_angle) - 1.6f) / 1.54f, 2);
+        *outer_corner -= offset;
+    }
+    else if (g_angle_style == CORNER_FINISH::CUT)
+    {
+        *outer_corner = *second;
+    }
+
+    if (std::abs(true_angle) > 3) // for small corners it's hard to do this right, so we give up on this
+    {
+        *inner_corner = middle_point;
+    }
+    else
+    {
+        if (true_angle < 0) // check inner vs outer again, fix the two lines from the drawn boxes that overlap
+        {
+            line1.bottom_right_x = inner_corner->x;
+            line1.bottom_right_y = inner_corner->y;
+            line2.bottom_left_x = inner_corner->x;
+            line2.bottom_left_y = inner_corner->y;
+        }
+        else
+        {
+            line1.top_right_x = inner_corner->x;
+            line1.top_right_y = inner_corner->y;
+            line2.top_left_x = inner_corner->x;
+            line2.top_left_y = inner_corner->y;
+        }
+    }
+
+    return Quad{*first, *inner_corner, *second, *outer_corner};
+};
+// convert two points into Quad (rectangle) with given `thickness` (height)
+Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness, bool world = false)
+{
+    // scale it to use more of a whole values, and make world vs screen the same with default zoom level
+    if (world)
+        thickness *= .00559659576f;
+    else
+        thickness *= .001f;
+
+    float axis_AB_angle = std::atan2((B.y - A.y), (B.x) - (A.x));
+    float hypotenuse = (float)std::sqrt(std::pow(B.x - A.x, 2) + std::pow(B.y - A.y, 2));
+
+    // make ractangle and then rotate it because i'm stupid
+    Quad dest{AABB{A.x, A.y + thickness / 2, (A.x + hypotenuse), A.y - thickness / 2}};
+    dest.rotate(axis_AB_angle, A.x, A.y);
+    return dest;
+};
+
+void VanillaRenderContext::draw_screen_rect(const AABB& rect, float thickness, Color color, std::optional<float> angle, std::optional<float> px, std::optional<float> py)
+{
+    Quad dest{rect};
+    if (angle.has_value())
+    {
+        constexpr float ratio = 16.0f / 9.0f;
+
+        // fix ratio to 1/1 to properly rotate the coordinates
+        const AABB new_rect{rect.left * ratio, rect.top, rect.right * ratio, rect.bottom};
+        dest = Quad{new_rect};
+        auto pivot = new_rect.center();
+        if (px.has_value() || py.has_value())
+        {
+            pivot.first += std::abs(pivot.first - new_rect.left) * px.value_or(0);
+            pivot.second += std::abs(pivot.second - new_rect.bottom) * py.value_or(0);
+        }
+        dest.rotate(angle.value(), pivot.first, pivot.second);
+        convert_ratio(dest, true);
+    }
+    draw_screen_poly(dest, thickness, std::move(color), true);
+}
+void VanillaRenderContext::draw_screen_rect_filled(const AABB& rect, Color color, std::optional<float> angle, std::optional<float> px, std::optional<float> py)
+{
+    Quad dest{rect};
+    if (angle.has_value())
+    {
+        constexpr float ratio = 16.0f / 9.0f;
+
+        // fix ratio to 1/1 to properly rotate the coordinates
+        const AABB new_rect{rect.left * ratio, rect.top, rect.right * ratio, rect.bottom};
+        dest = Quad{new_rect};
+        auto pivot = new_rect.center();
+        if (px.has_value() || py.has_value())
+        {
+            pivot.first += std::abs(pivot.first - new_rect.left) * px.value_or(0);
+            pivot.second += std::abs(pivot.second - new_rect.bottom) * py.value_or(0);
+        }
+        dest.rotate(angle.value(), pivot.first, pivot.second);
+        convert_ratio(dest, true);
+    }
+    draw_screen_poly_filled(dest, std::move(color));
+}
+
+void VanillaRenderContext::draw_screen_triangle(const Triangle& triangle, float thickness, Color color)
+{
+    draw_screen_poly({triangle.A, triangle.B, triangle.C}, thickness, std::move(color), true);
+}
+void VanillaRenderContext::draw_screen_triangle_filled(const Triangle& triangle, Color color)
+{
+    draw_screen_poly_filled({triangle.A, triangle.B, triangle.C}, std::move(color));
+}
+
+void VanillaRenderContext::draw_screen_line(const Vec2& A, const Vec2& B, float thickness, Color color)
+{
+    constexpr float ratio = 16.0f / 9.0f;
+
+    Vec2 new_A{A.x * ratio, A.y};
+    Vec2 new_B{B.x * ratio, B.y};
+    Quad line = get_line_quad(new_A, new_B, thickness);
+    draw_screen_poly_filled(convert_ratio(line, true), std::move(color));
+}
+
+void VanillaRenderContext::draw_screen_poly(const Quad& points, float thickness, Color color, bool closed)
+{
+    auto [A, B, C, D] = points.operator std::tuple<Vec2, Vec2, Vec2, Vec2>();
+    draw_screen_poly(std::vector<Vec2>{A, B, C, D}, thickness, color, closed);
+}
+void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, float thickness, Color color, bool closed)
+{
+    constexpr float ratio = 16.0f / 9.0f;
+
+    if (points.size() < 2)
+        return;
+
+    std::vector<Quad> draw_list;
+    draw_list.reserve(points.size());
+    Vec2 last_point{points[0].x * ratio, points[0].y};
+
+    if (closed)
+    {
+        Vec2 end = points.back();
+        end.x *= ratio;
+        draw_list.push_back(get_line_quad(end, last_point, thickness));
+    }
+
+    for (int i = 1; i < points.size(); ++i)
+    {
+        Vec2 new_B{points[i].x * ratio, points[i].y};
+        Quad line = get_line_quad(last_point, new_B, thickness);
+        if (!draw_list.empty())
+        {
+            Quad corner = get_corner_quad(draw_list.back(), line);
+            if (!corner.is_null())
+                draw_screen_poly_filled(convert_ratio(corner, true), std::move(color));
+        }
+        draw_list.push_back(line);
+        last_point = new_B;
+    }
+    if (closed)
+    {
+        Quad corner = get_corner_quad(draw_list.back(), draw_list.front());
+        if (!corner.is_null())
+            draw_screen_poly_filled(convert_ratio(corner, true), std::move(color));
+    }
+    for (auto line : draw_list)
+    {
+        draw_screen_poly_filled(convert_ratio(line, true), std::move(color));
+    }
+}
+void VanillaRenderContext::draw_screen_poly_filled(const Quad& dest, Color color)
+{
+    auto texture = get_texture(0);                                                       // any texture works
+    RenderAPI::get().draw_screen_texture(texture, Quad{}, dest, std::move(color), 0x27); // 0x27 funky shader, 2C also works
+}
+void VanillaRenderContext::draw_screen_poly_filled(std::vector<Vec2> points, Color color)
+{
+    if (points.size() < 3)
+        return;
+
+    Vec2 temp = points[1];
+    unsigned int i = 3;
+    for (; i < points.size(); i += 2)
+    {
+
+        draw_screen_poly_filled(Quad{points[0], temp, points[i - 1], points[i]}, std::move(color));
+        temp = points[i]; // always repeat the last "line" drawn
+    }
+    if (points.size() % 2 != 0) // not even number of points so the last piece is triangle
+    {
+        draw_screen_poly_filled(Quad{points[0], temp, points.back(), points.back()}, std::move(color));
+    }
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, float left, float top, float right, float bottom, Color color)
 {
-    draw_world_texture(texture_id, row, column, Quad{AABB{left, top, right, bottom}}, color);
+    draw_world_texture(texture_id, row, column, Quad{AABB{left, top, right, bottom}}, std::move(color));
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color)
 {
-    draw_world_texture(texture_id, row, column, Quad{rect}, color);
+    draw_world_texture(texture_id, row, column, Quad{rect}, std::move(color));
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const AABB& rect, Color color, float angle, float px, float py)
@@ -134,7 +393,7 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
         }
         new_quad.rotate(angle, center.first, center.second);
     }
-    draw_world_texture(texture_id, row, column, new_quad, color);
+    draw_world_texture(texture_id, row, column, new_quad, std::move(color));
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color, WORLD_SHADER shader)
@@ -164,12 +423,12 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, u
         uv_left,
         uv_top,
     };
-    RenderAPI::get().draw_world_texture(texture, source, dest, color, (WorldShader)shader);
+    RenderAPI::get().draw_world_texture(texture, source, dest, std::move(color), (WorldShader)shader);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, uint8_t row, uint8_t column, const Quad& dest, Color color)
 {
-    draw_world_texture(texture_id, row, column, dest, color, (WORLD_SHADER)WorldShader::TextureColor);
+    draw_world_texture(texture_id, row, column, dest, std::move(color), (WORLD_SHADER)WorldShader::TextureColor);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color, WORLD_SHADER shader)
@@ -179,12 +438,130 @@ void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& so
     {
         return;
     }
-    RenderAPI::get().draw_world_texture(texture, source, dest, color, (WorldShader)shader);
+    RenderAPI::get().draw_world_texture(texture, source, dest, std::move(color), (WorldShader)shader);
 }
 
 void VanillaRenderContext::draw_world_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)
 {
-    draw_world_texture(texture_id, source, dest, color, (WORLD_SHADER)WorldShader::TextureColor);
+    draw_world_texture(texture_id, source, dest, std::move(color), (WORLD_SHADER)WorldShader::TextureColor);
+}
+
+void VanillaRenderContext::draw_world_rect(const AABB& rect, float thickness, Color color, std::optional<float> angle, std::optional<float> px, std::optional<float> py)
+{
+    Quad dest{rect};
+    if (angle.has_value())
+    {
+        auto pivot = rect.center();
+        if (px.has_value() || py.has_value())
+        {
+            pivot.first += std::abs(pivot.first - rect.left) * px.value_or(0);
+            pivot.second += std::abs(pivot.second - rect.bottom) * py.value_or(0);
+        }
+        dest.rotate(angle.value(), pivot.first, pivot.second);
+    }
+    draw_world_poly(dest, thickness, std::move(color), true);
+}
+
+void VanillaRenderContext::draw_world_rect_filled(const AABB& rect, Color color, std::optional<float> angle, std::optional<float> px, std::optional<float> py)
+{
+    Quad dest{rect};
+    if (angle.has_value())
+    {
+        auto pivot = rect.center();
+        if (px.has_value() || py.has_value())
+        {
+            pivot.first += std::abs(pivot.first - rect.left) * px.value_or(0);
+            pivot.second += std::abs(pivot.second - rect.bottom) * py.value_or(0);
+        }
+        dest.rotate(angle.value(), pivot.first, pivot.second);
+    }
+    draw_world_poly_filled(dest, std::move(color));
+}
+
+void VanillaRenderContext::draw_world_triangle(const Triangle& triangle, float thickness, Color color)
+{
+    draw_world_poly({triangle.A, triangle.B, triangle.C}, thickness, std::move(color), true);
+}
+
+void VanillaRenderContext::draw_world_triangle_filled(const Triangle& triangle, Color color)
+{
+    draw_world_poly_filled({triangle.A, triangle.B, triangle.C}, std::move(color));
+}
+
+void VanillaRenderContext::draw_world_line(const Vec2& A, const Vec2& B, float thickness, Color color)
+{
+    Quad line = get_line_quad(A, B, thickness, true);
+    draw_world_poly_filled(line, std::move(color));
+}
+
+void VanillaRenderContext::draw_world_poly(const Quad& points, float thickness, Color color, bool closed)
+{
+    auto [A, B, C, D] = points.operator std::tuple<Vec2, Vec2, Vec2, Vec2>();
+    draw_world_poly(std::vector<Vec2>{A, B, C, D}, thickness, color, closed);
+}
+
+void VanillaRenderContext::draw_world_poly(std::vector<Vec2> points, float thickness, Color color, bool closed)
+{
+    if (points.size() < 2)
+        return;
+
+    std::vector<Quad> draw_list;
+    draw_list.reserve(points.size());
+    Vec2 last_point{points[0]};
+
+    if (closed)
+    {
+        Vec2 end = points.back();
+        draw_list.push_back(get_line_quad(end, last_point, thickness, true));
+    }
+
+    for (int i = 1; i < points.size(); ++i)
+    {
+        Quad line = get_line_quad(last_point, points[i], thickness, true);
+        if (!draw_list.empty())
+        {
+            Quad corner = get_corner_quad(draw_list.back(), line);
+            if (!corner.is_null())
+                draw_world_poly_filled(corner, std::move(color));
+        }
+        draw_list.push_back(line);
+        last_point = points[i];
+    }
+    if (closed)
+    {
+        Quad corner = get_corner_quad(draw_list.back(), draw_list.front());
+        if (!corner.is_null())
+            draw_world_poly_filled(corner, std::move(color));
+    }
+    for (auto line : draw_list)
+    {
+        draw_world_poly_filled(line, std::move(color));
+    }
+}
+
+void VanillaRenderContext::draw_world_poly_filled(const Quad& dest, Color color)
+{
+    auto texture = get_texture(0); // any texture works
+    RenderAPI::get().draw_world_texture(texture, Quad{}, dest, std::move(color), WorldShader::DeferredColorTransparent);
+}
+
+void VanillaRenderContext::draw_world_poly_filled(std::vector<Vec2> points, Color color)
+{
+    if (points.size() < 3)
+        return;
+
+    Vec2 temp = points[1];
+    unsigned int i = 3;
+    for (; i < points.size(); i += 2)
+    {
+
+        draw_world_poly_filled(Quad{points[0], temp, points[i - 1], points[i]}, std::move(color));
+        temp = points[i]; // always repeat the last "line" drawn
+    }
+    if (points.size() % 2 != 0) // not even number of points so the last piece is triangle
+    {
+        draw_world_poly_filled(Quad{points[0], temp, points.back(), points.back()}, std::move(color));
+    }
 }
 
 // For the custom constructor
@@ -192,6 +569,11 @@ void TextRenderingInfo_ctor(TextRenderingInfo& uninitialized_memory, const std::
 {
     new (&uninitialized_memory) TextRenderingInfo{};
     uninitialized_memory.set_text(text, x, y, scale_x, scale_y, alignment, fontstyle);
+}
+void TextRenderingInfo_ctor2(TextRenderingInfo& uninitialized_memory, const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle)
+{
+    new (&uninitialized_memory) TextRenderingInfo{};
+    uninitialized_memory.set_text(text, 0, 0, scale_x, scale_y, alignment, fontstyle);
 }
 
 namespace NVanillaRender
@@ -263,6 +645,18 @@ void register_usertypes(sol::state& lua)
     auto draw_text = sol::overload(
         static_cast<void (VanillaRenderContext::*)(const std::string&, float, float, float, float, Color, uint32_t, uint32_t)>(&VanillaRenderContext::draw_text),
         static_cast<void (VanillaRenderContext::*)(const TextRenderingInfo*, Color)>(&VanillaRenderContext::draw_text));
+    auto draw_screen_poly = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const Quad&, float, Color, bool)>(&VanillaRenderContext::draw_screen_poly),
+        static_cast<void (VanillaRenderContext::*)(const std::vector<Vec2>, float, Color, bool)>(&VanillaRenderContext::draw_screen_poly));
+    auto draw_screen_poly_filled = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const Quad&, Color)>(&VanillaRenderContext::draw_screen_poly_filled),
+        static_cast<void (VanillaRenderContext::*)(const std::vector<Vec2>, Color)>(&VanillaRenderContext::draw_screen_poly_filled));
+    auto draw_world_poly = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const Quad&, float, Color, bool)>(&VanillaRenderContext::draw_world_poly),
+        static_cast<void (VanillaRenderContext::*)(const std::vector<Vec2>, float, Color, bool)>(&VanillaRenderContext::draw_world_poly));
+    auto draw_world_poly_filled = sol::overload(
+        static_cast<void (VanillaRenderContext::*)(const Quad&, Color)>(&VanillaRenderContext::draw_world_poly_filled),
+        static_cast<void (VanillaRenderContext::*)(const std::vector<Vec2>, Color)>(&VanillaRenderContext::draw_world_poly_filled));
 
     auto render_draw_depth_lua = [](VanillaRenderContext&, LAYER layer, uint8_t draw_depth, AABB bbox)
     {
@@ -280,12 +674,55 @@ void register_usertypes(sol::state& lua)
         &VanillaRenderContext::draw_text_size,
         "draw_screen_texture",
         draw_screen_texture,
+        "set_corner_finish",
+        &VanillaRenderContext::set_corner_finish,
+        "draw_screen_line",
+        &VanillaRenderContext::draw_screen_line,
+        "draw_screen_rect",
+        &VanillaRenderContext::draw_screen_rect,
+        "draw_screen_rect_filled",
+        &VanillaRenderContext::draw_screen_rect_filled,
+        "draw_screen_triangle",
+        &VanillaRenderContext::draw_screen_triangle,
+        "draw_screen_triangle_filled",
+        &VanillaRenderContext::draw_screen_triangle_filled,
+        "draw_screen_poly",
+        draw_screen_poly,
+        "draw_screen_poly_filled",
+        draw_screen_poly_filled,
         "draw_world_texture",
         draw_world_texture,
+        "draw_world_line",
+        &VanillaRenderContext::draw_world_line,
+        "draw_world_rect",
+        &VanillaRenderContext::draw_world_rect,
+        "draw_world_rect_filled",
+        &VanillaRenderContext::draw_world_rect_filled,
+        "draw_world_triangle",
+        &VanillaRenderContext::draw_world_triangle,
+        "draw_world_triangle_filled",
+        &VanillaRenderContext::draw_world_triangle_filled,
+        "draw_world_poly",
+        draw_world_poly,
+        "draw_world_poly_filled",
+        draw_world_poly_filled,
         "bounding_box",
         &VanillaRenderContext::bounding_box,
         "render_draw_depth",
         render_draw_depth_lua);
+
+    lua.create_named_table("CORNER_FINISH", "NONE", CORNER_FINISH::NONE, "REAL", CORNER_FINISH::REAL, "CUT", CORNER_FINISH::CUT, "ADAPTIVE", CORNER_FINISH::ADAPTIVE);
+    /* CORNER_FINISH
+    // NONE
+    // Don't draw corner at all, will draw lines as separate pieces, overlaping etc.
+    // REAL
+    // Draws a real corner, no matter how far away the "peak" of the corner may end up being
+    // CUT
+    // Instead of drawing a sharp point at the end of the corner, it just cuts it flat
+    // ADAPTIVE
+    // Default
+    // similar to REAL but for low angles reduces the size of the "peak" of the corner
+    */
 
     auto texturerenderinginfo_type = lua.new_usertype<TextureRenderingInfo>("TextureRenderingInfo");
     texturerenderinginfo_type["x"] = &TextureRenderingInfo::x;
@@ -328,7 +765,7 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<TextRenderingInfo>(
         "TextRenderingInfo",
         "new",
-        sol::initializers(&TextRenderingInfo_ctor),
+        sol::initializers(&TextRenderingInfo_ctor, &TextRenderingInfo_ctor2),
         "x",
         &TextRenderingInfo::x,
         "y",
@@ -355,7 +792,8 @@ void register_usertypes(sol::state& lua)
         &TextRenderingInfo::set_textx);
     /* TextRenderingInfo
     // new
-    // TextRenderingInfo:new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)
+    // TextRenderingInfo:new(string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)
+    // TextRenderingInfo:new(string text, float x, float y, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)
     // Creates new TextRenderingInfo that can be used in VanillaRenderContext draw_text
     // For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you
     */

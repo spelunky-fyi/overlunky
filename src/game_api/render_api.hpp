@@ -18,6 +18,9 @@
 struct JournalUI;
 struct Layer;
 
+using VANILLA_TEXT_ALIGNMENT = uint32_t;
+using VANILLA_FONT_STYLE = uint32_t;
+
 enum JOURNAL_VFTABLE
 {
     // to get those offsets, find "vftable_JournalPages" then go to each page in journal, then to it's first vtable function address
@@ -81,7 +84,7 @@ struct Letter
     /// if the positions were altered the results may not end up as expected
     Quad get_quad() const
     {
-        return {bottom.A, bottom.B, bottom.C, top.C};
+        return {bottom.A, bottom.B, top.C, top.A};
     }
     /// Inverse of the get_quad
     void set_quad(Quad quad)
@@ -94,6 +97,7 @@ struct Letter
         bottom.C = top.A = std::get<3>(vectors);
     }
 
+    // example letter: N
     // b - bottom, t - top
     //
     // bC    tA===tC
@@ -114,7 +118,7 @@ struct TextRenderingInfo
     ~TextRenderingInfo();
 
     /// Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
-    void set_textx(const std::u16string text, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
+    void set_textx(const std::u16string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle);
 
     void set_text(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
     void set_text(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
@@ -130,7 +134,7 @@ struct TextRenderingInfo
         return {source, (source + text_length)};
     }
 
-    /// {width, height}, is only updated when you set/change the text
+    /// {width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
     std::pair<float, float> text_size() const
     {
         return {width, height};
@@ -155,11 +159,11 @@ struct TextRenderingInfo
     // 6 * wcslen(input_text), just numbers in order 0, 1, 2 ... have some strage effect if you change them
     uint16_t* unknown6{nullptr};
 
-    uint16_t nof_special_character; // number of special characters, still not sure how the game known which ones are the special ones?
+    uint16_t nof_special_character; // number of special characters, still not sure how the game knows which ones are the special ones?
                                     // setting higher value than the `text_length` will crash
     uint16_t unknown8;              // padding probably
 
-    /// Used to draw buttons default is -1 wich is the buttons texture
+    /// Used to draw buttons and stuff, default is -1 wich uses the buttons texture
     int32_t special_texture_id;
 
     uint8_t shader; // ? changing it can change the text color, or make the text all rectangles?
@@ -223,7 +227,7 @@ struct RenderAPI
 
     void draw_text(const TextRenderingInfo* tri, Color color);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
-    void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color);
+    void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color, uint8_t shader);
     void draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader);
 
     void set_post_render_game(void (*post_render_game)());
@@ -243,8 +247,8 @@ struct RenderInfo
     uint32_t unknown7;
     uint32_t unknown8;
     uint32_t unknown9;
-    float x_dupe1;
-    float y_dupe1;
+    float x_dupe1; // position last refresh
+    float y_dupe1; // position last refresh
     uint32_t unknown10;
     float x_dupe2;
     float y_dupe2;
@@ -263,7 +267,7 @@ struct RenderInfo
     bool unknown17;
     bool unknown18;
     uint32_t unknown19;
-    uint8_t shader; // 0 - 36, game crash at around 55
+    WORLD_SHADER shader; // 0 - 36, game crash at around 55
     uint8_t unknown20a;
     uint8_t unknown20b;
     uint8_t unknown20c;
@@ -289,8 +293,8 @@ struct RenderInfo
     float tileh;
     float x_dupe3;
     float y_dupe3;
-    float x_dupe4;
-    float y_dupe4;
+    float x_dupe4; // this will be writen into x next refresh
+    float y_dupe4; // this will be writen into y next refresh
     float angle1;
     float angle2;
     float angle_related;

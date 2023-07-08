@@ -7211,9 +7211,9 @@ void render_hotbar_textures()
             auto a = normalize(sa);
             auto b = normalize(sb);
             auto dest = Quad(AABB(a.x, a.y, b.x, b.y));
-            RenderAPI::get().draw_screen_texture(textures->texture_map[0], source, dest, Color::black());
+            RenderAPI::get().draw_screen_texture(textures->texture_map[0], source, dest, Color::black(), 0x29);
             if (!(hotbar[i] != chest && hotbar[i] != chest + 1 && texture->id == 373 && tx == 0 && ty == 0))
-                RenderAPI::get().draw_screen_texture(texture, source, dest, Color::white());
+                RenderAPI::get().draw_screen_texture(texture, source, dest, Color::white(), 0x29);
         }
     }
 }
@@ -7248,9 +7248,9 @@ void render_vanilla_stuff()
     if (texture_viewer.id < 0 || texture_viewer.id > 0x192 || !visible("tool_texture") || (options["menu_ui"] && !detached("tool_texture")) || hide_ui)
         return;
     // black bg hack
-    render.draw_screen_texture(textures->texture_map[0], texture_viewer.src, texture_viewer.dest, Color::black());
+    render.draw_screen_texture(textures->texture_map[0], texture_viewer.src, texture_viewer.dest, Color::black(), 0x29);
     // draw vanilla texture right under the gui window
-    render.draw_screen_texture(textures->texture_map[texture_viewer.id], texture_viewer.src, texture_viewer.dest, Color::white());
+    render.draw_screen_texture(textures->texture_map[texture_viewer.id], texture_viewer.src, texture_viewer.dest, Color::white(), 0x29);
 }
 
 void render_texture_viewer()
