@@ -3343,6 +3343,9 @@
                     <a href="#CONST" class="toc-h2 toc-link" data-title="CONST">CONST</a>
                   </li>
                   <li>
+                    <a href="#CORNER_FINISH" class="toc-h2 toc-link" data-title="CORNER_FINISH">CORNER_FINISH</a>
+                  </li>
+                  <li>
                     <a href="#COSUBTHEME" class="toc-h2 toc-link" data-title="COSUBTHEME">COSUBTHEME</a>
                   </li>
                   <li>
@@ -7303,7 +7306,7 @@ Future calls to this will override the save</p>
 </thead><tbody>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text(const string&amp; text, float x, float y, float scale_x, float scale_y, Color color, int alignment, int fontstyle)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text(const string&amp; text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)</a></td>
 <td>Draw text using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.</td>
 </tr>
 <tr>
@@ -7314,7 +7317,7 @@ Future calls to this will override the save</p>
 <tr>
 <td>tuple&lt;float, float&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text_size">draw_text_size(const string&amp; text, float scale_x, float scale_y, int fontstyle)</a></td>
-<td>Measure the provided text using the built-in renderer</td>
+<td>Measure the provided text using the built-in renderer<br/>If you can, consider creating your own <a href="#TextureRenderingInfo">TextureRenderingInfo</a> instead<br/>You can then use <code>:text_size()</code> and <code>draw_text</code> with that one object<br/><code>draw_text_size</code> works by creating new TextureRenderingInfo just to call <code>:text_size()</code>, which is not very optimal</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -7340,6 +7343,56 @@ Future calls to this will override the save</p>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_corner_finish">set_corner_finish(CORNER_FINISH c)</a></td>
+<td>Set the prefered way of drawing corners for the non filled shapes</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_line">draw_screen_line(const Vec2&amp; A, const Vec2&amp; B, float thickness, Color color)</a></td>
+<td>Draws a line on screen using the built-in renderer from point <code>A</code> to point <code>B</code>.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_rect">draw_screen_rect(const AABB&amp; rect, float thickness, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
+<td>Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the <code>thickness</code>)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_rect_filled">draw_screen_rect_filled(const AABB&amp; rect, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
+<td>Draw filled rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_triangle">draw_screen_triangle(const Triangle&amp; triangle, float thickness, Color color)</a></td>
+<td>Draw triangle in screen coordinates using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_triangle_filled">draw_screen_triangle_filled(const Triangle&amp; triangle, Color color)</a></td>
+<td>Draw filled triangle in screen coordinates using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_poly">draw_screen_poly(array<Vec2> points, float thickness, Color color, bool closed)</a></td>
+<td>Draw a polyline on screen from points using the built-in renderer<br/>Draws from the first to the last point, use <code>closed</code> to connect first and last as well<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_poly">draw_screen_poly(const Quad&amp; points, float thickness, Color color, bool closed)</a></td>
+<td>Draw quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_poly_filled">draw_screen_poly_filled(array<Vec2> points, Color color)</a></td>
+<td>Draw a convex polygon on screen from points using the built-in renderer<br/>Can probably draw almost any polygon, but the convex one is guaranteed to look correct<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_poly_filled">draw_screen_poly_filled(const Quad&amp; points, Color color)</a></td>
+<td>Draw filled quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -7375,6 +7428,51 @@ Future calls to this will override the save</p>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_line">draw_world_line(const Vec2&amp; A, const Vec2&amp; B, float thickness, Color color)</a></td>
+<td>Draws a line in world coordinates using the built-in renderer from point <code>A</code> to point <code>B</code>.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_rect">draw_world_rect(const AABB&amp; rect, float thickness, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
+<td>Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the <code>thickness</code>)<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_rect_filled">draw_world_rect_filled(const AABB&amp; rect, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
+<td>Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_triangle">draw_world_triangle(const Triangle&amp; triangle, float thickness, Color color)</a></td>
+<td>Draw triangle in world coordinates using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_triangle_filled">draw_world_triangle_filled(const Triangle&amp; triangle, Color color)</a></td>
+<td>Draw filled triangle in world coordinates using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_poly">draw_world_poly(array<Vec2> points, float thickness, Color color, bool closed)</a></td>
+<td>Draw a polyline in world coordinates from points using the built-in renderer<br/>Draws from the first to the last point, use <code>closed</code> to connect first and last as well<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_poly">draw_world_poly(const Quad&amp; points, float thickness, Color color, bool closed)</a></td>
+<td>Draw quadrilateral in world coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_poly_filled">draw_world_poly_filled(array<Vec2> points, Color color)</a></td>
+<td>Draw a convex polygon in world coordinates from points using the built-in renderer<br/>Can probably draw almost any polygon, but the convex one is guaranteed to look correct<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_poly_filled">draw_world_poly_filled(const Quad&amp; points, Color color)</a></td>
+<td>Draw filled quadrilateral in world coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td><a href="#AABB">AABB</a></td>
@@ -7988,6 +8086,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 </tr>
 <tr>
 <td><a href="#AABB">AABB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=AABB">new(Vec2 top_left, Vec2 bottom_right)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#AABB">AABB</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=AABB">new(float left_, float top_, float right_, float bottom_)</a></td>
 <td>Create a new axis aligned bounding box by specifying its values</td>
 </tr>
@@ -8055,6 +8158,16 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=height">height()</a></td>
 <td>Short for <code>aabb.top - aabb.bottom</code>.</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_point_inside">is_point_inside(const Vec2 p)</a></td>
+<td>Checks if point lies between left/right and top/bottom</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_point_inside">is_point_inside(float x, float y)</a></td>
+<td></td>
 </tr>
 <tr>
 <td>tuple&lt;float, float, float, float&gt;</td>
@@ -8736,7 +8849,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#WORLD_SHADER">WORLD_SHADER</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=shader">shader</a></td>
 <td></td>
 </tr>
@@ -8857,7 +8970,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td><a href="#Triangle">Triangle</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Triangle">new(Vec2&amp; _a, Vec2&amp; _b, Vec2&amp; _c)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Triangle">new(Vec2 _a, Vec2 _b, Vec2 _c)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -8893,12 +9006,22 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td><a href="#Triangle">Triangle</a>&amp;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, float px, float py)</a></td>
-<td></td>
+<td>Rotate triangle by an angle, the px/py are just coordinates, not offset from the center</td>
 </tr>
 <tr>
 <td><a href="#Vec2">Vec2</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=center">center()</a></td>
 <td>Also known as centroid</td>
+</tr>
+<tr>
+<td>tuple&lt;float, float, float&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_angles">get_angles()</a></td>
+<td>Returns ABC, BCA, CAB angles in radians</td>
+</tr>
+<tr>
+<td><a href="#Triangle">Triangle</a>&amp;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scale">scale(float scale)</a></td>
+<td></td>
 </tr>
 <tr>
 <td>tuple&lt;<a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>&gt;</td>
@@ -15022,7 +15145,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=new">new</a></td>
-<td><a href="#TextRenderingInfo">TextRenderingInfo</a>:new(string text, float x, float y, float scale_x, float scale_y, int alignment, int fontstyle)<br/>Creates new <a href="#TextRenderingInfo">TextRenderingInfo</a> that can be used in <a href="#VanillaRenderContext">VanillaRenderContext</a> draw_text<br/>For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you<br/></td>
+<td><a href="#TextRenderingInfo">TextRenderingInfo</a>:new(string text, float scale_x, float scale_y, <a href="#VANILLA_TEXT_ALIGNMENT">VANILLA_TEXT_ALIGNMENT</a> alignment, <a href="#VANILLA_FONT_STYLE">VANILLA_FONT_STYLE</a> fontstyle)<br/><a href="#TextRenderingInfo">TextRenderingInfo</a>:new(string text, float x, float y, float scale_x, float scale_y, <a href="#VANILLA_TEXT_ALIGNMENT">VANILLA_TEXT_ALIGNMENT</a> alignment, <a href="#VANILLA_FONT_STYLE">VANILLA_FONT_STYLE</a> fontstyle)<br/>Creates new <a href="#TextRenderingInfo">TextRenderingInfo</a> that can be used in <a href="#VanillaRenderContext">VanillaRenderContext</a> draw_text<br/>For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you<br/></td>
 </tr>
 <tr>
 <td>float</td>
@@ -15052,7 +15175,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=special_texture_id">special_texture_id</a></td>
-<td>Used to draw buttons default is -1 wich is the buttons texture</td>
+<td>Used to draw buttons and stuff, default is -1 wich uses the buttons texture</td>
 </tr>
 <tr>
 <td>Texture</td>
@@ -15072,7 +15195,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>tuple&lt;float, float&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_size">text_size()</a></td>
-<td>{width, height}, is only updated when you set/change the text</td>
+<td>{width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -15081,7 +15204,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_text">set_text(const string text, float scale_x, float scale_y, int alignment, int fontstyle)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_text">set_text(const string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)</a></td>
 <td>Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters</td>
 </tr>
 </tbody></table>
@@ -26653,6 +26776,39 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CONST.MAX_PLAYERS">MAX_PLAYERS</a></td>
 <td>4</td>
 <td>Just the max number of players in multiplayer<br/></td>
+</tr>
+</tbody></table>
+<h2 id='CORNER_FINISH'>CORNER_FINISH</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CORNER_FINISH">CORNER_FINISH</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CORNER_FINISH.NONE">NONE</a></td>
+<td>CORNER_FINISH::NONE</td>
+<td>Don&#39;t draw corner at all, will draw lines as separate pieces, overlaping etc.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CORNER_FINISH.REAL">REAL</a></td>
+<td>CORNER_FINISH::REAL</td>
+<td>Draws a real corner, no matter how far away the &quot;peak&quot; of the corner may end up being<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CORNER_FINISH.CUT">CUT</a></td>
+<td>CORNER_FINISH::CUT</td>
+<td>Instead of drawing a sharp point at the end of the corner, it just cuts it flat<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CORNER_FINISH.ADAPTIVE">ADAPTIVE</a></td>
+<td>CORNER_FINISH::ADAPTIVE</td>
+<td>Default<br/>similar to REAL but for low angles reduces the size of the &quot;peak&quot; of the corner<br/></td>
 </tr>
 </tbody></table>
 <h2 id='COSUBTHEME'>COSUBTHEME</h2>
