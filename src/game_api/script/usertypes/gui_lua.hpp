@@ -113,6 +113,8 @@ class GuiDrawContext
     void win_image(IMAGE image, float width, float height);
     /// Draw imagebutton to window.
     bool win_imagebutton(std::string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2);
+    /// Sets a tooltip to show when hovering the cursor over the previous item.
+    void win_tooltip(std::string text);
     /// Add a collapsing accordion section, put contents in the callback function.
     void win_section(std::string title, sol::function callback);
     /// Indent contents, or unindent if negative

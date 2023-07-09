@@ -11,6 +11,8 @@ local inputcombo = 1
 local comboopts = { 'one', 'two', 'three' }
 local inputcheck = false
 
+local inputtooltip = 'This input\'s value is used as its tooltip.'
+
 local widgetopen = true
 local closebutton = false
 
@@ -101,6 +103,14 @@ set_callback(function(draw_ctx)
 
             -- long text is wrapped
             draw_ctx:win_text('Sed non justo eu orci lacinia mollis. Morbi finibus luctus massa eu gravida. Maecenas ornare tincidunt pellentesque. Aliquam vel nulla eu mauris pulvinar consequat sed vitae nisi. Nulla facilisi. Nulla venenatis mollis mauris, sed blandit nisi auctor facilisis. In tempor magna eleifend, ornare sem in, egestas massa. Donec pulvinar orci ac ligula rhoncus, a hendrerit elit interdum. Maecenas sed orci quis justo imperdiet finibus.')
+
+            -- add tooltips to widgets
+            draw_ctx:win_text('Hover the cursor over this text to see a tooltip.')
+            draw_ctx:win_tooltip('This is a tooltip for the text.')
+            draw_ctx:win_button('This button has a tooltip too')
+            draw_ctx:win_tooltip('This is a tooltip for the button.\nTooltips can have multiple lines.')
+            inputtooltip = draw_ctx:win_input_text('Tooltip text input', inputtooltip)
+            draw_ctx:win_tooltip(inputtooltip)
 
             -- draw the image we loaded before
             if loadingimage > -1 then
