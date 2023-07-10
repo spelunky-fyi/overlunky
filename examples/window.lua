@@ -10,6 +10,8 @@ local inputdrag = 9
 local inputcombo = 1
 local comboopts = { 'one', 'two', 'three' }
 local inputcheck = false
+local inputcolorrgb = Color:green()
+local inputcolorrgba = Color:new(0.0, 0.0, 1.0, 0.5) -- 50% opacity blue
 
 local inputtooltip = 'This input\'s value is used as its tooltip.'
 
@@ -69,6 +71,8 @@ set_callback(function(draw_ctx)
             inputdrag = draw_ctx:win_drag_float('Select another number##drag', inputdrag, 1, 10)
             inputcombo = draw_ctx:win_combo('Combo thing', inputcombo, table.concat(comboopts, '\0')..'\0\0')
             inputcheck = draw_ctx:win_check('Check this out', inputcheck)
+            inputcolorrgb = draw_ctx:win_color_editor('Color (RGB)', inputcolorrgb, false)
+            inputcolorrgba = draw_ctx:win_color_editor('Color (RGBA)', inputcolorrgba, true)
 
             draw_ctx:win_separator_text('Section Two')
             -- pseudo table layout
@@ -98,7 +102,8 @@ set_callback(function(draw_ctx)
             draw_ctx:win_text('Click here:')
             draw_ctx:win_inline()
             if draw_ctx:win_button('Submit') then
-                message(inputtext..' '..tostring(inputnumber)..' '..tostring(inputslider)..' '..tostring(inputdrag)..' '..comboopts[inputcombo]..' '..tostring(inputcheck))
+                message(inputtext..' '..tostring(inputnumber)..' '..tostring(inputslider)..' '..tostring(inputdrag)..' '..comboopts[inputcombo]..' '..tostring(inputcheck)
+                    ..' '..tostring(inputcolorrgb:get_ucolor())..' '..tostring(inputcolorrgba:get_ucolor()))
             end
 
             -- long text is wrapped
@@ -167,9 +172,11 @@ set_callback(function(draw_ctx)
             if #players > 0 then
                 local x, y, l = get_position(players[1].uid)
                 local sx, sy = screen_position(x, y)
-                radius = screen_distance(1) -- one tile
+                local radius = screen_distance(1) -- one tile
                 draw_ctx:draw_layer(DRAW_LAYER.WINDOW)
                 draw_ctx:draw_circle(sx, sy, radius, 3, rgba(255, 0, 0, 255))
+                -- draw an inner circle using one of the colors from the window color editors
+                draw_ctx:draw_circle(sx, sy, 0.75 * radius, 6, inputcolorrgba:get_ucolor())
             end
 
         end)

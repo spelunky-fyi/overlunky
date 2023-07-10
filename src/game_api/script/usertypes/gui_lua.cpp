@@ -475,6 +475,14 @@ int GuiDrawContext::win_combo(std::string label, int selected, std::string opts)
     ImGui::Combo(label.c_str(), &reals, opts.c_str());
     return reals + 1;
 };
+Color GuiDrawContext::win_color_editor(std::string label, Color value, bool can_edit_alpha)
+{
+    if (can_edit_alpha)
+        ImGui::ColorEdit4(label.c_str(), (float*)&value);
+    else
+        ImGui::ColorEdit3(label.c_str(), (float*)&value);
+    return value;
+};
 void GuiDrawContext::win_pushid(int id)
 {
     ImGui::PushID(id);
@@ -636,6 +644,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_drag_float"] = &GuiDrawContext::win_drag_float;
     guidrawcontext_type["win_check"] = &GuiDrawContext::win_check;
     guidrawcontext_type["win_combo"] = &GuiDrawContext::win_combo;
+    guidrawcontext_type["win_color_editor"] = &GuiDrawContext::win_color_editor;
     guidrawcontext_type["win_pushid"] = win_pushid;
     guidrawcontext_type["win_popid"] = &GuiDrawContext::win_popid;
     guidrawcontext_type["win_image"] = &GuiDrawContext::win_image;

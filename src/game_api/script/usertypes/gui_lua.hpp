@@ -5,6 +5,7 @@
 #include <vector>          // for vector
 
 #include "aliases.hpp" // for uColor, IMAGE
+#include "color.hpp"   // for Color
 #include "math.hpp"    // for Vec2, AABB (ptr only)
 
 enum class DRAW_LAYER
@@ -103,6 +104,8 @@ class GuiDrawContext
     bool win_check(std::string label, bool value);
     /// Add a combo box
     int win_combo(std::string label, int selected, std::string opts);
+    /// Add a color editor
+    Color win_color_editor(std::string label, Color value, bool can_edit_alpha);
     /// Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
     void win_pushid(int id);
     /// Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
