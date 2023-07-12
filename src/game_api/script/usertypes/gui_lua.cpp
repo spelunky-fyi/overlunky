@@ -550,6 +550,31 @@ void GuiDrawContext::win_section(std::string title, sol::function callback)
     if (ImGui::CollapsingHeader(title.c_str()))
         handle_function<void>(backend, callback);
 };
+void GuiDrawContext::win_tab_bar(std::string id, sol::function callback)
+{
+    // TODO: Which ImGuiTabBarFlags should be exposed? ImGuiTabBarFlags_Reorderable and ImGuiTabBarFlags_AutoSelectNewTabs seem useful.
+    if (ImGui::BeginTabBar(id.c_str()))
+    {
+        handle_function<void>(backend, callback);
+        ImGui::EndTabBar();
+    }
+};
+bool GuiDrawContext::win_tab_item(std::string label, bool closeable, sol::function callback)
+{
+    // TODO: Which ImGuiTabItemFlags should be exposed? Many of them seem useful.
+    bool open = true;
+    if (ImGui::BeginTabItem(label.c_str(), closeable ? &open : NULL))
+    {
+        handle_function<void>(backend, callback);
+        ImGui::EndTabItem();
+    }
+    return open;
+};
+bool GuiDrawContext::win_tab_item_button(std::string label)
+{
+    // TODO: Which ImGuiTabItemFlags should be exposed? Many of them seem useful.
+    return ImGui::TabItemButton(label.c_str());
+};
 void GuiDrawContext::win_indent(float width)
 {
     if (std::abs(width) < 1.0f)
@@ -651,6 +676,9 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_imagebutton"] = &GuiDrawContext::win_imagebutton;
     guidrawcontext_type["win_tooltip"] = &GuiDrawContext::win_tooltip;
     guidrawcontext_type["win_section"] = &GuiDrawContext::win_section;
+    guidrawcontext_type["win_tab_bar"] = &GuiDrawContext::win_tab_bar;
+    guidrawcontext_type["win_tab_item"] = &GuiDrawContext::win_tab_item;
+    guidrawcontext_type["win_tab_item_button"] = &GuiDrawContext::win_tab_item_button;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
 

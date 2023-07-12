@@ -15,6 +15,9 @@ local inputcolorrgba = Color:new(0.0, 0.0, 1.0, 0.5) -- 50% opacity blue
 
 local inputtooltip = 'This input\'s value is used as its tooltip.'
 
+local extratabs = {}
+local nextextratabid = 1
+
 local widgetopen = true
 local closebutton = false
 
@@ -125,6 +128,39 @@ set_callback(function(draw_ctx)
                 draw_ctx:win_imagebutton('##coolbutton', loadingimage, 0.33, 0.11, 0, 0, 1, 1)
             end
 
+            draw_ctx:win_separator_text('Tabs')
+
+            draw_ctx:win_tab_bar('ExampleTabBar', function()
+                draw_ctx:win_tab_item('Small Tab', false, function()
+                    draw_ctx:win_text('Not much to see here.')
+                end)
+                draw_ctx:win_tab_item('Large Tab', false, function()
+                    draw_ctx:win_text('This tab has a lot of content.')
+                    for i=1,20 do
+                        draw_ctx:win_text('Content #'..i)
+                        draw_ctx:win_inline()
+                        draw_ctx:win_button('Button #'..i)
+                    end
+                end)
+                local i = 1
+                while i <= #extratabs do
+                    local open = draw_ctx:win_tab_item(extratabs[i], true, function()
+                        draw_ctx:win_text('This is '..extratabs[i]..'. It can be closed with the X.')
+                    end)
+                    if open then
+                        i = i + 1
+                    else
+                        table.remove(extratabs, i)
+                    end
+                end
+                if draw_ctx:win_tab_item_button('+') then
+                    table.insert(extratabs, 'Extra Tab #'..nextextratabid)
+                    nextextratabid = nextextratabid + 1
+                end
+            end)
+
+            draw_ctx:win_separator_text('Identical Input Labels')
+
             -- remember to use unique labels on identical inputs
             if draw_ctx:win_button('Test##FirstTest') then
                 message('First button')
@@ -150,7 +186,7 @@ set_callback(function(draw_ctx)
             end
 
             -- or with pushid (string)
-            local b_ids = { "first", "second", "third" }
+            local b_ids = { 'first', 'second', 'third' }
             b = {}
             for i, id in ipairs(b_ids) do
                 draw_ctx:win_pushid(id)
