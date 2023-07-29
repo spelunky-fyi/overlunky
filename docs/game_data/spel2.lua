@@ -1553,6 +1553,26 @@ function get_render_hitbox(uid, extrude, offsetx, offsety) end
 ---@param box AABB
 ---@return AABB
 function screen_aabb(box) end
+---Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don't intersect each other [parallel]
+---@param A Vec2
+---@param B Vec2
+---@param C Vec2
+---@param D Vec2
+---@return Vec2
+function intersection(A, B, C, D) end
+---Mesures angle between two lines with one common point
+---@param A Vec2
+---@param common Vec2
+---@param B Vec2
+---@return number
+function two_lines_angle(A, common, B) end
+---Gets line1_A, intersection point and line2_B and calls the 3 parameter version of this function
+---@param line1_A Vec2
+---@param line1_B Vec2
+---@param line2_A Vec2
+---@param line2_B Vec2
+---@return number
+function two_lines_angle(line1_A, line1_B, line2_A, line2_B) end
 ---Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
 ---@param chapter integer
 ---@param entry integer
@@ -5035,7 +5055,8 @@ function AABB:is_point_inside(x, y) end
     ---@field center fun(self): Vec2 @Also known as centroid
     ---@field get_angles fun(self): number, number, number @Returns ABC, BCA, CAB angles in radians
     ---@field scale fun(self, scale: number): Triangle
-    ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corners
+    ---@field area fun(self): number
+    ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corner points
 local Triangle = nil
 ---@param off Vec2
 ---@return Triangle
@@ -5044,6 +5065,17 @@ function Triangle:offset(off) end
 ---@param y number
 ---@return Triangle
 function Triangle:offset(x, y) end
+---Check if point lies inside of triangle
+---Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.0001`
+---@param p Vec2
+---@param epsilon number?
+---@return boolean
+function Triangle:is_point_inside(p, epsilon) end
+---@param x number
+---@param y number
+---@param epsilon number?
+---@return boolean
+function Triangle:is_point_inside(x, y, epsilon) end
 
 ---@class Quad
     ---@field bottom_left_x number
@@ -5060,6 +5092,18 @@ function Triangle:offset(x, y) end
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
     ---@field split fun(self): Vec2, Vec2, Vec2, Vec2 @Returns the corners in order: bottom_left, bottom_right, top_right, top_left
+local Quad = nil
+---Check if point lies inside of triangle
+---Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
+---@param p Vec2
+---@param epsilon number?
+---@return boolean
+function Quad:is_point_inside(p, epsilon) end
+---@param x number
+---@param y number
+---@param epsilon number?
+---@return boolean
+function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class Screen
     ---@field render_timer number
