@@ -1907,6 +1907,7 @@ Derived from [Screen](#Screen)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [bg_music_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bg_music_info) | 
 
 ### ScreenDeath
 
@@ -1924,6 +1925,9 @@ Derived from [Screen](#Screen)
 Type | Name | Description
 ---- | ---- | -----------
 [TextureRenderingInfo](#TextureRenderingInfo) | [unknown4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown4) | 
+float | [darkness](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=darkness) | 
+bool | [active](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active) | ends the intro immediately if set to false
+bool | [skip_prologue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=skip_prologue) | skips prologue and goes straight to the title screen after the intro
 
 ### ScreenLeaderboards
 

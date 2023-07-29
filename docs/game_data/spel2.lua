@@ -5115,6 +5115,9 @@ function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class ScreenIntro : Screen
     ---@field unknown4 TextureRenderingInfo
+    ---@field darkness number
+    ---@field active boolean @ends the intro immediately if set to false
+    ---@field skip_prologue boolean @skips prologue and goes straight to the title screen after the intro
 
 ---@class ScreenPrologue : Screen
     ---@field line1 STRINGID
@@ -5377,6 +5380,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field rescuing_ship_entity Entity
 
 ---@class ScreenCredits : Screen
+    ---@field bg_music_info SoundMeta
 
 ---@class ScreenScores : Screen
     ---@field animation_state integer

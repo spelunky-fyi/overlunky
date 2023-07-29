@@ -56,6 +56,11 @@ class ScreenIntro : public Screen // ID: 1
 {
   public:
     TextureRenderingInfo unknown4;
+    float darkness;
+    /// ends the intro immediately if set to false
+    bool active;
+    /// skips prologue and goes straight to the title screen after the intro
+    bool skip_prologue;
 };
 
 class ScreenPrologue : public Screen // ID: 2
@@ -605,7 +610,7 @@ class ScreenCredits : public Screen // ID: 17
 {
   public:
     float* credits_progression;
-    size_t bg_music_info; /* unsure */
+    SoundMeta* bg_music_info;
 };
 
 class ScreenScores : public Screen // ID: 18
