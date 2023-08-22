@@ -301,7 +301,7 @@ std::vector<DropEntry> drop_entries{
     {"KAPALA_HEALTH", "\xBA\x01\x00\x00\x00\xB8\x01"s, VTABLE_OFFSET::NONE, 0, 1},
     /* can't do elixir as there are some calculations for cursed, poisoned etc.
     can't do pet, it has some complex calculation for some reason
-    can't do ankh as it is a byte, and some complex stuff
+    can't do ankh made a separete function for that (see modify_ankh_health_gain)
     can't do initial health (camp, level, duat, coffin) as it's a word/byte
     can't do drops for: humphead, yetiking, yetiqueen, alien queen, pangxie (gems) those are stored in array, need special funciton for that
     */
