@@ -162,7 +162,9 @@ struct StateMemory
     std::array<int16_t, 99> waddler_storage_meta; // to store mattock durability for example
     uint16_t journal_progression_count;
     std::array<JournalProgressionSlot, 40> journal_progression_slots;
-    uint8_t skip2[844]; // TODO
+    uint8_t death_screen_blood_spalts_count;
+    uint8_t skip2[3]; // padding
+    std::array<DeathScreenBloodSlot, 30> death_screen_blood_splats;
     ThemeProgression theme_progression;
     uint8_t unknown3;
     uint8_t unknown4;
