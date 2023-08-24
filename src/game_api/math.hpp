@@ -238,20 +238,20 @@ struct AABB
         return (top - bottom);
     }
     /// Checks if point lies between left/right and top/bottom
-    bool is_point_inside(const Vec2 p)
+    bool is_point_inside(const Vec2 p) const
     {
         AABB copy{*this};
         copy.abs();
-        if (copy.left < p.x && copy.right > p.x && copy.bottom < p.y && copy.top > p.y)
+        if (copy.left <= p.x && copy.right >= p.x && copy.bottom <= p.y && copy.top >= p.y)
             return true;
 
         return false;
     }
-    bool is_point_inside(float x, float y)
+    bool is_point_inside(float x, float y) const
     {
         AABB copy{*this};
         copy.abs();
-        if (copy.left < x && copy.right > x && copy.bottom < y && copy.top > y)
+        if (copy.left <= x && copy.right >= x && copy.bottom <= y && copy.top >= y)
             return true;
 
         return false;
@@ -349,11 +349,31 @@ struct Triangle
         C = (C - centroid) * scale + centroid;
         return *this;
     }
+    float area() const
+    {
+        return std::abs((A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)) / 2.0f);
+    }
+    bool is_point_inside(Vec2 p) const
+    {
+        return is_point_inside(p, 0.0001f);
+    }
+    bool is_point_inside(Vec2 p, float epsilon) const;
+    bool is_point_inside(float x, float y) const
+    {
+        return is_point_inside(Vec2{x, y}, 0.0001f);
+    }
+    bool is_point_inside(float x, float y, float epsilon) const
+    {
+        return is_point_inside(Vec2{x, y}, epsilon);
+    }
 
-    /*
-    /// Returns the corners
-    std::tuple<Vec2, Vec2, Vec2> split()
-    {} // just for the autodoc
+    /* // just for the autodoc
+    /// Returns the corner points
+    std::tuple<Vec2, Vec2, Vec2> split();
+    /// Check if point lies inside of triangle
+    /// Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.0001`
+    bool is_point_inside_triangle(Vec2 p, std::optional<float> epsilon);
+    bool is_point_inside_triangle(float x, float y, std::optional<float> epsilon);
     */
 
     /// Returns the corners
@@ -470,10 +490,28 @@ struct Quad
 
         return *this;
     }
-    /*
+
+    bool is_point_inside(Vec2 p) const
+    {
+        return is_point_inside(p, 0.00001f);
+    }
+    bool is_point_inside(Vec2 p, float epsilon) const;
+    bool is_point_inside(float x, float y) const
+    {
+        return is_point_inside(Vec2{x, y}, 0.00001f);
+    }
+    bool is_point_inside(float x, float y, float epsilon) const
+    {
+        return is_point_inside(Vec2{x, y}, epsilon);
+    }
+
+    /* // just for the autodoc
     /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
-    std::tuple<Vec2, Vec2, Vec2, Vec2> split()
-    {} // just for the autodoc
+    std::tuple<Vec2, Vec2, Vec2, Vec2> split();
+    /// Check if point lies inside of triangle
+    /// Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
+    bool is_point_inside_quad(Vec2 p, std::optional<float> epsilon);
+    bool is_point_inside_quad(float x, float y, std::optional<float> epsilon);
     */
 
     /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
@@ -492,5 +530,11 @@ struct Quad
     float top_left_y{0};
 };
 
-// get intersection point of two lines
+/// Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don't intersect each other [parallel]
 Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D);
+
+/// Mesures angle between two lines with one common point
+float two_lines_angle(Vec2 A, Vec2 common, Vec2 B);
+
+/// Gets line1_A, intersection point and line2_B and calls the 3 parameter version of this function
+float two_lines_angle(Vec2 line1_A, Vec2 line1_B, Vec2 line2_A, Vec2 line2_B);

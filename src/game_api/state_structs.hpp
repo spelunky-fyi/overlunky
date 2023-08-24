@@ -995,3 +995,14 @@ struct MultiLineTextRendering
     float x;                               // center of the text box?
     float z;                               // center of the text box?
 };
+
+struct DeathScreenBloodSlot
+{
+    float x;
+    float y;
+    float size_x;           /* Unsure */
+    float size_y;           /* Unsure */
+    int32_t texture_column; // normally set to 4
+    int32_t texture_row;    // normally set to 5
+    int32_t texture_range;  // when the death screens renders it rools 0 to this value, normally the value is 2 so it can roll 0, 1, or 2 (?)
+};
