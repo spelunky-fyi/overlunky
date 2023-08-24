@@ -1084,7 +1084,7 @@ function set_setting(setting, value) end
 function printf() end
 ---Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](https://spelunky-fyi.github.io/overlunky/#spawn_roomowner).
 ---@param x number
----@param y number,
+---@param y number
 ---@param layer LAYER
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
@@ -1092,7 +1092,7 @@ function spawn_shopkeeper(x, y, layer, room_template) end
 ---Spawn a RoomOwner (or a few other like [CavemanShopkeeper](https://spelunky-fyi.github.io/overlunky/#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
 ---@param owner_type ENT_TYPE
 ---@param x number
----@param y number,
+---@param y number
 ---@param layer LAYER
 ---@param room_template ROOM_TEMPLATE
 ---@return integer

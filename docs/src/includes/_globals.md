@@ -2437,7 +2437,7 @@ end, "pet_shop_boys")
 
 > Search script examples for [spawn_roomowner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_roomowner)
 
-#### int spawn_roomowner([ENT_TYPE](#ENT_TYPE) owner_type, float x, float, y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = -1)
+#### int spawn_roomowner([ENT_TYPE](#ENT_TYPE) owner_type, float x, float y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = -1)
 
 Spawn a [RoomOwner](#RoomOwner) (or a few other like [CavemanShopkeeper](#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the [RoomOwner](#RoomOwner) uid.
 
@@ -2512,7 +2512,7 @@ ctx:set_room_template(rx, ry, l, ROOM_TEMPLATE.SHOP)
 
 > Search script examples for [spawn_shopkeeper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_shopkeeper)
 
-#### int spawn_shopkeeper(float x, float, y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = [ROOM_TEMPLATE](#ROOM_TEMPLATE).SHOP)
+#### int spawn_shopkeeper(float x, float y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = [ROOM_TEMPLATE](#ROOM_TEMPLATE).SHOP)
 
 Spawn a [Shopkeeper](#Shopkeeper) in the coordinates and make the room their shop. Returns the [Shopkeeper](#Shopkeeper) uid. Also see [spawn_roomowner](#spawn_roomowner).
 
