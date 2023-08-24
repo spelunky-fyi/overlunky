@@ -762,6 +762,9 @@
                             <a href="#import" class="toc-h3 toc-link" data-title="import">import</a>
                           </li>
                           <li>
+                            <a href="#intersection" class="toc-h3 toc-link" data-title="intersection">intersection</a>
+                          </li>
+                          <li>
                             <a href="#is_character_female" class="toc-h3 toc-link" data-title="is_character_female">is_character_female</a>
                           </li>
                           <li>
@@ -838,6 +841,9 @@
                           </li>
                           <li>
                             <a href="#toggle_journal" class="toc-h3 toc-link" data-title="toggle_journal">toggle_journal</a>
+                          </li>
+                          <li>
+                            <a href="#two_lines_angle" class="toc-h3 toc-link" data-title="two_lines_angle">two_lines_angle</a>
                           </li>
                           <li>
                             <a href="#update_liquid_collision_at" class="toc-h3 toc-link" data-title="update_liquid_collision_at">update_liquid_collision_at</a>
@@ -4549,6 +4555,12 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 <li><code>false</code> if the script was not found but optional is set to true</li>
 <li>an error if the script was not found and the optional argument was not set</li>
 </ul>
+<h3 id='intersection'>intersection</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=intersection">intersection</a></p>
+</blockquote>
+<h4 id='Vec2-intersection-const-Vec2-A-const-Vec2-B-const-Vec2-C-const-Vec2-D'><a href="#Vec2">Vec2</a> intersection(const <a href="#Vec2">Vec2</a> A, const <a href="#Vec2">Vec2</a> B, const <a href="#Vec2">Vec2</a> C, const <a href="#Vec2">Vec2</a> D)</h4>
+<p>Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don&#39;t intersect each other [parallel]</p>
 <h3 id='is_character_female'>is_character_female</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_character_female">is_character_female</a></p>
@@ -4772,6 +4784,14 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-toggle_journal'>nil toggle_journal()</h4>
 <p>Open or close the journal as if pressing the journal button. Will respect visible journal popups and <a href="#force_journal">force_journal</a>.</p>
+<h3 id='two_lines_angle'>two_lines_angle</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=two_lines_angle">two_lines_angle</a></p>
+</blockquote>
+<h4 id='float-two_lines_angle-Vec2-A-Vec2-common-Vec2-B'>float two_lines_angle(<a href="#Vec2">Vec2</a> A, <a href="#Vec2">Vec2</a> common, <a href="#Vec2">Vec2</a> B)</h4>
+<p>Mesures angle between two lines with one common point</p>
+<h4 id='float-two_lines_angle-Vec2-line1_A-Vec2-line1_B-Vec2-line2_A-Vec2-line2_B'>float two_lines_angle(<a href="#Vec2">Vec2</a> line1_A, <a href="#Vec2">Vec2</a> line1_B, <a href="#Vec2">Vec2</a> line2_A, <a href="#Vec2">Vec2</a> line2_B)</h4>
+<p>Gets line1_A, intersection point and line2_B and calls the 3 parameter version of this function</p>
 <h3 id='update_liquid_collision_at'>update_liquid_collision_at</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=update_liquid_collision_at">update_liquid_collision_at</a></p>
@@ -5270,7 +5290,7 @@ you&#39;re standing on, not real level coordinates.</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_roomowner">spawn_roomowner</a></p>
 </blockquote>
-<h4 id='int-spawn_roomowner-ENT_TYPE-owner_type-float-x-float-y-LAYER-layer-ROOM_TEMPLATE-room_template-1'>int spawn_roomowner(<a href="#ENT_TYPE">ENT_TYPE</a> owner_type, float x, float, y, <a href="#LAYER">LAYER</a> layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template = -1)</h4>
+<h4 id='int-spawn_roomowner-ENT_TYPE-owner_type-float-x-float-y-LAYER-layer-ROOM_TEMPLATE-room_template-1'>int spawn_roomowner(<a href="#ENT_TYPE">ENT_TYPE</a> owner_type, float x, float y, <a href="#LAYER">LAYER</a> layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template = -1)</h4>
 <p>Spawn a <a href="#RoomOwner">RoomOwner</a> (or a few other like <a href="#CavemanShopkeeper">CavemanShopkeeper</a>) in the coordinates and make them own the room, optionally changing the room template. Returns the <a href="#RoomOwner">RoomOwner</a> uid.</p>
 <h2 id='Shop-functions'>Shop functions</h2><h3 id='add_item_to_shop'>add_item_to_shop</h3>
 <blockquote>
@@ -5323,7 +5343,7 @@ Use empty table as argument to reset to the game default</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_shopkeeper">spawn_shopkeeper</a></p>
 </blockquote>
-<h4 id='int-spawn_shopkeeper-float-x-float-y-LAYER-layer-ROOM_TEMPLATE-room_template-ROOM_TEMPLATE-SHOP'>int spawn_shopkeeper(float x, float, y, <a href="#LAYER">LAYER</a> layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template = <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a>.SHOP)</h4>
+<h4 id='int-spawn_shopkeeper-float-x-float-y-LAYER-layer-ROOM_TEMPLATE-room_template-ROOM_TEMPLATE-SHOP'>int spawn_shopkeeper(float x, float y, <a href="#LAYER">LAYER</a> layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template = <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a>.SHOP)</h4>
 <p>Spawn a <a href="#Shopkeeper">Shopkeeper</a> in the coordinates and make the room their shop. Returns the <a href="#Shopkeeper">Shopkeeper</a> uid. Also see <a href="#spawn_roomowner">spawn_roomowner</a>.</p>
 <h2 id='Sound-functions'>Sound functions</h2><h3 id='create_sound'>create_sound</h3>
 <blockquote>
@@ -8823,6 +8843,16 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_point_inside">is_point_inside(Vec2 p, optional<float> epsilon)</a></td>
+<td>Check if point lies inside of triangle<br/>Because of the imprecise nature of floating point values, the <code>epsilon</code> value is needed to compare the floats, the default value is <code>0.00001</code></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_point_inside">is_point_inside(float x, float y, optional<float> epsilon)</a></td>
+<td></td>
+</tr>
+<tr>
 <td>tuple&lt;<a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split()</a></td>
 <td>Returns the corners in order: bottom_left, bottom_right, top_right, top_left</td>
@@ -9024,9 +9054,24 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=area">area()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_point_inside">is_point_inside(Vec2 p, optional<float> epsilon)</a></td>
+<td>Check if point lies inside of triangle<br/>Because of the imprecise nature of floating point values, the <code>epsilon</code> value is needed to compare the floats, the default value is <code>0.0001</code></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_point_inside">is_point_inside(float x, float y, optional<float> epsilon)</a></td>
+<td></td>
+</tr>
+<tr>
 <td>tuple&lt;<a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split()</a></td>
-<td>Returns the corners</td>
+<td>Returns the corner points</td>
 </tr>
 </tbody></table>
 <h3 id='Vec2'>Vec2</h3>
@@ -12698,6 +12743,11 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bg_music_info">bg_music_info</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='ScreenDeath'>ScreenDeath</h3>
 <p>Derived from <a href="#Screen">Screen</a></p>
@@ -12724,6 +12774,21 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown4">unknown4</a></td>
 <td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=darkness">darkness</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=active">active</a></td>
+<td>ends the intro immediately if set to false</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=skip_prologue">skip_prologue</a></td>
+<td>skips prologue and goes straight to the title screen after the intro</td>
 </tr>
 </tbody></table>
 <h3 id='ScreenLeaderboards'>ScreenLeaderboards</h3>
