@@ -439,7 +439,8 @@ end
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto luaCb = IntervalCallback{cb, frames, -1};
+        auto state = State::get().ptr_main();
+        auto luaCb = IntervalCallback{cb, frames, (int)state->time_level};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
