@@ -337,7 +337,7 @@ void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, float thic
         if (!corner.is_null())
             draw_screen_poly_filled(convert_ratio(corner, true), std::move(color));
     }
-    for (auto line : draw_list)
+    for (auto& line : draw_list)
     {
         draw_screen_poly_filled(convert_ratio(line, true), std::move(color));
     }
@@ -533,7 +533,7 @@ void VanillaRenderContext::draw_world_poly(std::vector<Vec2> points, float thick
         if (!corner.is_null())
             draw_world_poly_filled(corner, std::move(color));
     }
-    for (auto line : draw_list)
+    for (auto& line : draw_list)
     {
         draw_world_poly_filled(line, std::move(color));
     }

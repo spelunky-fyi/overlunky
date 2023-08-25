@@ -2473,7 +2473,7 @@ end
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
                            //, "CROSSPROGRESS_AUTOSYNC", 47
     );
-    for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
+    for (auto& [setting_name_view, setting_index] : get_settings_names_and_indices())
     {
         std::string setting_name{setting_name_view};
         std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)

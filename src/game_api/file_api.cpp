@@ -62,7 +62,7 @@ std::string hash_path(std::string_view path)
     int i = 0;
     do
     {
-        uint64_t merge = std::toupper(abs_path_str[i]) * 65536 + std::toupper(abs_path_str[i + 1]);
+        uint64_t merge = (uint64_t)std::toupper(abs_path_str[i]) * 65536 + (uint64_t)std::toupper(abs_path_str[i + 1]);
         res = res * 8191 + merge;
         i++;
     } while (i < abs_path_str.length());
@@ -260,13 +260,12 @@ FileInfo* load_file_as_dds_if_image(const char* file_path, AllocFun alloc_fun)
             {
                 fwrite(file_info->Data, sizeof(char), file_info->DataSize, cache_file);
                 DEBUG("Cached '{}' to '{}'", path, cache_path.string());
+                fclose(cache_file);
             }
             else
             {
                 DEBUG("Couldn't cache '{}' to '{}'", path, cache_path.string());
             }
-            fclose(cache_file);
-
             return file_info;
         }
     }
