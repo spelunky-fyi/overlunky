@@ -592,6 +592,8 @@ for type in ps.types:
             "Camera",
             "QuestsInfo",
             "PlayerSlot",
+            "JournalProgressStickerSlot",
+            "JournalProgressStainSlot"
         ]
     ):
         cat = "State types"
