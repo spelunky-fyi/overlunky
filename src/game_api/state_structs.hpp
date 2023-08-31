@@ -532,8 +532,8 @@ class MagmamanSpawnPosition
 
 class LogicMagmamanSpawn : public Logic
 {
-    public:
-      std::vector<MagmamanSpawnPosition> magmaman_positions;
+  public:
+    std::vector<MagmamanSpawnPosition> magmaman_positions;
 
     virtual ~LogicMagmamanSpawn() = 0;
 };
