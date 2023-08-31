@@ -4,7 +4,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) I
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
 
 Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
-meta.version = "2.7"
+meta.version = "2.8"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -144,7 +144,11 @@ local function register_options()
     register_option_button("_reset", "Reset options to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
+        for k,v in pairs(real_default_options) do
+            options[k] = v
+        end
     end)
+    register_option_button("_save", "Save options", save_script)
 end
 register_options()
 
@@ -164,6 +168,9 @@ set_callback(function(ctx)
         end
     end
     register_options()
+    for k,v in pairs(default_options) do
+        options[k] = v
+    end
 end, ON.LOAD)
 
 local function get_chance(min, max)
@@ -2502,7 +2509,7 @@ set_callback(function()
     LevelNum = state.level_count+1
 
     local level_str = F"{LevelNum}/{#level_order}"
-    if LevelNum > #level_order then
+    if LevelNum > #level_order or not options.door then
         level_str = "%d-%d"
     end
     set_level_string(level_str)
@@ -2819,7 +2826,7 @@ end, ON.PRE_GET_RANDOM_ROOM)
 
 --[[WATER LEVELS]]
 set_callback(function()
-    if #get_entities_by_mask(MASK.LIQUID) > 0 or state.theme == THEME.COSMIC_OCEAN then return end
+    if #get_entities_by_mask(MASK.LIQUID) > 0 or state.theme == THEME.COSMIC_OCEAN or state.screen ~= SCREEN.LEVEL then return end
     if prng:random() < options.water_chance / 100 then
         swapping_liquid = false
         local ax, ay, bx, by = get_bounds()

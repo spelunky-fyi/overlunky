@@ -1333,6 +1333,16 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 - `false` if the script was not found but optional is set to true
 - an error if the script was not found and the optional argument was not set
 
+### intersection
+
+
+> Search script examples for [intersection](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=intersection)
+
+#### [Vec2](#Vec2) intersection(const [Vec2](#Vec2) A, const [Vec2](#Vec2) B, const [Vec2](#Vec2) C, const [Vec2](#Vec2) D)
+
+Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don't intersect each other [parallel]
+
+
 ### is_character_female
 
 
@@ -1645,6 +1655,20 @@ Returns true if a bitmask is set in the number.
 #### nil toggle_journal()
 
 Open or close the journal as if pressing the journal button. Will respect visible journal popups and [force_journal](#force_journal).
+
+### two_lines_angle
+
+
+> Search script examples for [two_lines_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=two_lines_angle)
+
+#### float two_lines_angle([Vec2](#Vec2) A, [Vec2](#Vec2) common, [Vec2](#Vec2) B)
+
+Mesures angle between two lines with one common point
+
+#### float two_lines_angle([Vec2](#Vec2) line1_A, [Vec2](#Vec2) line1_B, [Vec2](#Vec2) line2_A, [Vec2](#Vec2) line2_B)
+
+Gets line1_A, intersection point and line2_B and calls the 3 parameter version of this function
+
 
 ### update_liquid_collision_at
 
@@ -2413,7 +2437,7 @@ end, "pet_shop_boys")
 
 > Search script examples for [spawn_roomowner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_roomowner)
 
-#### int spawn_roomowner([ENT_TYPE](#ENT_TYPE) owner_type, float x, float, y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = -1)
+#### int spawn_roomowner([ENT_TYPE](#ENT_TYPE) owner_type, float x, float y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = -1)
 
 Spawn a [RoomOwner](#RoomOwner) (or a few other like [CavemanShopkeeper](#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the [RoomOwner](#RoomOwner) uid.
 
@@ -2488,7 +2512,7 @@ ctx:set_room_template(rx, ry, l, ROOM_TEMPLATE.SHOP)
 
 > Search script examples for [spawn_shopkeeper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_shopkeeper)
 
-#### int spawn_shopkeeper(float x, float, y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = [ROOM_TEMPLATE](#ROOM_TEMPLATE).SHOP)
+#### int spawn_shopkeeper(float x, float y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = [ROOM_TEMPLATE](#ROOM_TEMPLATE).SHOP)
 
 Spawn a [Shopkeeper](#Shopkeeper) in the coordinates and make the room their shop. Returns the [Shopkeeper](#Shopkeeper) uid. Also see [spawn_roomowner](#spawn_roomowner).
 

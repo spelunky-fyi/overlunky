@@ -749,6 +749,8 @@ float | [top_left_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=to
 [Quad](#Quad)& | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates a [Quad](#Quad) by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
 [Quad](#Quad)& | [flip_horizontally()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_horizontally) | 
 [Quad](#Quad)& | [flip_vertically()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_vertically) | 
+bool | [is_point_inside(Vec2 p, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | Check if point lies inside of triangle<br/>Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
+bool | [is_point_inside(float x, float y, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | 
 tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corners in order: bottom_left, bottom_right, top_right, top_left
 
 ### RenderInfo
@@ -803,7 +805,10 @@ Type | Name | Description
 [Vec2](#Vec2) | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Also known as centroid
 tuple&lt;float, float, float&gt; | [get_angles()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_angles) | Returns ABC, BCA, CAB angles in radians
 [Triangle](#Triangle)& | [scale(float scale)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale) | 
-tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corners
+float | [area()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) | 
+bool | [is_point_inside(Vec2 p, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | Check if point lies inside of triangle<br/>Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.0001`
+bool | [is_point_inside(float x, float y, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | 
+tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corner points
 
 ### Vec2
 
@@ -1902,6 +1907,7 @@ Derived from [Screen](#Screen)
 
 Type | Name | Description
 ---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [bg_music_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bg_music_info) | 
 
 ### ScreenDeath
 
@@ -1919,6 +1925,9 @@ Derived from [Screen](#Screen)
 Type | Name | Description
 ---- | ---- | -----------
 [TextureRenderingInfo](#TextureRenderingInfo) | [unknown4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown4) | 
+float | [darkness](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=darkness) | 
+bool | [active](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active) | ends the intro immediately if set to false
+bool | [skip_prologue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=skip_prologue) | skips prologue and goes straight to the title screen after the intro
 
 ### ScreenLeaderboards
 
