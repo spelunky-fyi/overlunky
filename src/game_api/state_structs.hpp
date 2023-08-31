@@ -522,6 +522,22 @@ class LogicSunChallenge : public Logic
     virtual ~LogicSunChallenge() = 0;
 };
 
+class MagmamanSpawnPosition
+{
+  public:
+    uint32_t x;
+    uint32_t y;
+    uint32_t timer;
+};
+
+class LogicMagmamanSpawn : public Logic
+{
+    public:
+      std::vector<MagmamanSpawnPosition> magmaman_positions;
+
+    virtual ~LogicMagmamanSpawn() = 0;
+};
+
 class LogicOlmecCutscene : public Logic
 {
   public:
@@ -643,7 +659,7 @@ struct LogicList
     LogicMoonChallenge* tun_moon_challenge;
     LogicStarChallenge* tun_star_challenge;
     LogicSunChallenge* tun_sun_challenge;
-    Logic* volcana_related;
+    LogicMagmamanSpawn* magmaman_spawn;
     Logic* water_related;
     LogicOlmecCutscene* olmec_cutscene;
     LogicTiamatCutscene* tiamat_cutscene;
