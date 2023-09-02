@@ -2468,7 +2468,7 @@ end
 
     /// Paramater to get_setting (and set_setting in unsafe mode)
     lua.create_named_table("GAME_SETTING"
-                           //, "DAMSEL_STYLE", 0
+                           //, "WINDOW_SCALE", 0
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
                            //, "CROSSPROGRESS_AUTOSYNC", 47
     );

@@ -2423,6 +2423,33 @@ int | [leader](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leader) 
 array&lt;[Inventory](#Inventory), MAX_PLAYERS&gt; | [player_inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) | 
 array&lt;[SelectPlayerSlot](#SelectPlayerSlot), MAX_PLAYERS&gt; | [player_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) | 
 
+### JournalProgressStainSlot
+
+Used in [StateMemory](#StateMemory)
+
+Type | Name | Description
+---- | ---- | -----------
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) | 
+float | [scale](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale) | 
+int | [texture_column](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_column) | 
+int | [texture_row](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_row) | 
+int | [texture_range](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_range) | 
+
+### JournalProgressStickerSlot
+
+Used in [StateMemory](#StateMemory)
+
+Type | Name | Description
+---- | ---- | -----------
+int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
+int | [grid_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grid_position) | 
+[ENT_TYPE](#ENT_TYPE) | [entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_type) | 
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) | 
+
 ### PlayerSlot
 
 
@@ -2570,6 +2597,12 @@ int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ti
 int | [storage_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=storage_uid) | entity uid of the first floor_storage entity
 array&lt;[ENT_TYPE](#ENT_TYPE), 99&gt; | [waddler_storage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_storage) | 
 array&lt;int, 99&gt; | [waddler_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_metadata) | 
+int | [journal_progress_sticker_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_sticker_count) | 
+array&lt;[JournalProgressStickerSlot](#JournalProgressStickerSlot), 40&gt; | [journal_progress_sticker_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_sticker_slots) | stickers for notable items and entities in journal progress page
+int | [journal_progress_stain_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_stain_count) | 
+array&lt;[JournalProgressStainSlot](#JournalProgressStainSlot), 30&gt; | [journal_progress_stain_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_stain_slots) | blood splats and paw prints in journal progress page
+int | [journal_progress_theme_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_theme_count) | 
+array&lt;int, 9&gt; | [journal_progress_theme_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_theme_slots) | visited themes in journal progress page
 [ThemeInfo](#ThemeInfo) | [theme_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_info) | Points to the current [ThemeInfo](#ThemeInfo)
 [LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | Level logic like dice game and cutscenes
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
