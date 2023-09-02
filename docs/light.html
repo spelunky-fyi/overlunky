@@ -1982,6 +1982,12 @@
                             <a href="#Items" class="toc-h3 toc-link" data-title="Items">Items</a>
                           </li>
                           <li>
+                            <a href="#JournalProgressStainSlot" class="toc-h3 toc-link" data-title="JournalProgressStainSlot">JournalProgressStainSlot</a>
+                          </li>
+                          <li>
+                            <a href="#JournalProgressStickerSlot" class="toc-h3 toc-link" data-title="JournalProgressStickerSlot">JournalProgressStickerSlot</a>
+                          </li>
+                          <li>
                             <a href="#PlayerSlot" class="toc-h3 toc-link" data-title="PlayerSlot">PlayerSlot</a>
                           </li>
                           <li>
@@ -14550,6 +14556,93 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 </tbody></table>
+<h3 id='JournalProgressStainSlot'>JournalProgressStainSlot</h3>
+<p>Used in <a href="#StateMemory">StateMemory</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=angle">angle</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scale">scale</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture_column">texture_column</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture_row">texture_row</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture_range">texture_range</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='JournalProgressStickerSlot'>JournalProgressStickerSlot</h3>
+<p>Used in <a href="#StateMemory">StateMemory</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=theme">theme</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=grid_position">grid_position</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=entity_type">entity_type</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=angle">angle</a></td>
+<td></td>
+</tr>
+</tbody></table>
 <h3 id='PlayerSlot'>PlayerSlot</h3>
 <table><thead>
 <tr>
@@ -15177,6 +15270,36 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>array&lt;int, 99&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=waddler_metadata">waddler_metadata</a></td>
 <td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=journal_progress_sticker_count">journal_progress_sticker_count</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;<a href="#JournalProgressStickerSlot">JournalProgressStickerSlot</a>, 40&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=journal_progress_sticker_slots">journal_progress_sticker_slots</a></td>
+<td>stickers for notable items and entities in journal progress page</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=journal_progress_stain_count">journal_progress_stain_count</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;<a href="#JournalProgressStainSlot">JournalProgressStainSlot</a>, 30&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=journal_progress_stain_slots">journal_progress_stain_slots</a></td>
+<td>blood splats and paw prints in journal progress page</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=journal_progress_theme_count">journal_progress_theme_count</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;int, 9&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=journal_progress_theme_slots">journal_progress_theme_slots</a></td>
+<td>visited themes in journal progress page</td>
 </tr>
 <tr>
 <td><a href="#ThemeInfo">ThemeInfo</a></td>
@@ -27697,7 +27820,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 </thead><tbody>
 <tr>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAME_SETTING.DAMSEL_STYLE">DAMSEL_STYLE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAME_SETTING.WINDOW_SCALE">WINDOW_SCALE</a></td>
 <td>0</td>
 <td></td>
 </tr>
