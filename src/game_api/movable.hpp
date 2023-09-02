@@ -16,7 +16,7 @@ class Movable : public Entity
     custom_map<uint32_t, MovableBehavior*> behaviors_map;
     custom_set<MovableBehavior*, SortMovableBehavior> behaviors;
     MovableBehavior* current_behavior;
-    int64_t ic8;
+    int64_t ic8; // some AI stuff for cutscenes
     union
     {
         /// {movex, movey}
