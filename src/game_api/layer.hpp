@@ -123,7 +123,7 @@ struct EntityRegions
     // pointers to entities from entities_by_region array
 
     uint8_t size;
-    uint8_t cap; // seam to be locked at 4
+    uint8_t cap;
 };
 
 struct Layer
@@ -138,7 +138,7 @@ struct Layer
 
     std::map<uint32_t, EntityList> entities_by_mask; // key is the mask
 
-    // 4x4 block areas (overlaping one block plus the edge ones extending to infinity?), each probably contains diffrent mask entities
+    // 4x4 block areas (the edge ones extend to infinity?), each probably contains diffrent mask entities
     EntityList entities_by_region1[31][21];
     EntityList entities_by_region2[31][21]; // Active floors ?
     EntityList entities_by_region3[31][21];
@@ -154,7 +154,7 @@ struct Layer
     EntityList unknown_entities3;        // debris, explosions, laserbeams etc. ?
     EntityList unknown_entities4;        // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
     std::vector<Entity*> unknown_vector; // add_to_layer uses this
-    std::set<float>* unknown6;          // triggered by floor entity destruction? needs more testing
+    std::set<float>* unknown6;           // triggered by floor entity destruction? needs more testing
     // List of items that were destroyed and are waiting to have the dtor called
     // and then be returned to the entity pool
     EntityList expired_entities;
