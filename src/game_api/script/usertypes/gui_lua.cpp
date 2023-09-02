@@ -36,8 +36,8 @@ static HMODULE g_XInputDLL = NULL;
 static PFN_XInputGetCapabilities g_XInputGetCapabilities = NULL;
 static PFN_XInputGetState g_XInputGetState = NULL;
 
-Vec2::Vec2(const ImVec2& p)
-    : x(p.x), y(p.y){};
+//Vec2::Vec2(const ImVec2& p)
+//    : x(p.x), y(p.y){};
 
 struct Gamepad : XINPUT_GAMEPAD
 {
@@ -374,7 +374,8 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     size.x += 1.0f;
     size.y -= 1.0f;
     size.y *= -1.0f;
-    handle_function<void>(backend, callback, this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size));
+    auto tmp = normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos);
+    handle_function<void>(backend, callback, this, Vec2(tmp.x, tmp.y), Vec2(size.x, size.y));
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
@@ -813,7 +814,7 @@ void register_usertypes(sol::state& lua)
         "ImGuiIO",
         "displaysize",
         sol::property([](ImGuiIO& io) -> Vec2
-                      { return Vec2(io.DisplaySize) /**/; }),
+                      { return Vec2(io.DisplaySize.x, io.DisplaySize.y) /**/; }),
         "framerate",
         &ImGuiIO::Framerate,
         "wantkeyboard",
@@ -839,7 +840,7 @@ void register_usertypes(sol::state& lua)
         &ImGuiIO::WantCaptureMouse,
         "mousepos",
         sol::property([](ImGuiIO& io) -> Vec2
-                      { return Vec2(io.MousePos) /**/; }),
+                      { return Vec2(io.MousePos.x, io.MousePos.y) /**/; }),
         "mousedown",
         sol::property([](ImGuiIO& io)
                       { return std::ref(io.MouseDown) /**/; }),
