@@ -435,7 +435,12 @@ end
     };
 
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
-    /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+    /// Add per level callback function to be called every `frames` engine frames
+    /// Ex. frames = 100 - will call the function on 100th frame from this point. This might differ in the exact timing of first frame depending as in what part of the frame you call this function
+    /// or even be one frame off if called right before the time_level variable is updated
+    /// If you require precise timing, choose the start of your interval in one of those safe callbacks:
+    /// The SCREEN callbacks: from ON.LOGO to ON.ONLINE_LOBBY or custom callbacks ON.FRAME, ON.SCREEN, ON.START, ON.LOADING, ON.RESET, ON.POST_UPDATE
+    /// Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
