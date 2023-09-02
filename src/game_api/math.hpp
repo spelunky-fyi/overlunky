@@ -9,7 +9,8 @@ struct Vec2
 {
     Vec2() = default;
 
-    Vec2(const Vec2&) = default;
+    Vec2(const Vec2& v)
+        : x(v.x), y(v.y){};
 
     Vec2(float x_, float y_)
         : x(x_), y(y_){};
