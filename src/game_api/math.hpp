@@ -107,18 +107,18 @@ struct Vec2
     std::tuple<float, float> split()
     {} // just for the autodoc
     */
-    operator std::pair<float, float>() const
-    {
-        return {x, y};
-    }
-    operator std::tuple<float, float>() const
-    {
-        return {x, y};
-    }
-    operator std::tuple<float&, float&>()
-    {
-        return {x, y};
-    }
+    //operator std::pair<float, float>() const
+    //{
+    //    return {x, y};
+    //}
+    //operator std::tuple<float, float>() const
+    //{
+    //    return {x, y};
+    //}
+    //operator std::tuple<float&, float&>()
+    //{
+    //    return {x, y};
+    //}
 
     float x{0};
     float y{0};
@@ -463,10 +463,10 @@ struct Quad
             return in;
         };
 
-        std::tie(bottom_left_x, bottom_left_y) = rotate_around_pivot({bottom_left_x, bottom_left_y});
-        std::tie(bottom_right_x, bottom_right_y) = rotate_around_pivot({bottom_right_x, bottom_right_y});
-        std::tie(top_left_x, top_left_y) = rotate_around_pivot({top_left_x, top_left_y});
-        std::tie(top_right_x, top_right_y) = rotate_around_pivot({top_right_x, top_right_y});
+        //std::tie(bottom_left_x, bottom_left_y) = rotate_around_pivot({bottom_left_x, bottom_left_y});
+        //std::tie(bottom_right_x, bottom_right_y) = rotate_around_pivot({bottom_right_x, bottom_right_y});
+        //std::tie(top_left_x, top_left_y) = rotate_around_pivot({top_left_x, top_left_y});
+        //std::tie(top_right_x, top_right_y) = rotate_around_pivot({top_right_x, top_right_y});
 
         return *this;
     }

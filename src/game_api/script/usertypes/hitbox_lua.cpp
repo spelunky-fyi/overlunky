@@ -64,10 +64,10 @@ void register_usertypes(sol::state& lua)
         "y",
         &Vec2::y,
         "rotate",
-        &Vec2::rotate,
+        &Vec2::rotate/*,
         "split",
         // &Vec2::split); // for the autodoc
-        &Vec2::operator std::pair<float, float>);
+        &Vec2::operator std::pair<float, float>*/);
 
     const auto extrude = sol::overload(
         static_cast<AABB& (AABB::*)(float)>(&AABB::extrude),
