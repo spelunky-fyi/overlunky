@@ -9,8 +9,8 @@ struct Vec2
 {
     Vec2() = default;
 
-    // what if i move this line? hehe
-    Vec2(const Vec2&) = default;
+    Vec2(const Vec2& v)
+        : x(v.x), y(v.y){};
 
     Vec2(float x_, float y_)
         : x(x_), y(y_){};
@@ -20,7 +20,7 @@ struct Vec2
         : x(p.first), y(p.second){};
 
     /// NoDoc
-    //Vec2(const ImVec2&);
+    Vec2(const ImVec2&);
 
     Vec2& rotate(float angle, float px, float py)
     {
