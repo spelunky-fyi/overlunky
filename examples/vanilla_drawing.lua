@@ -252,7 +252,7 @@ function DVD_change_color()
 end
 
 set_callback(function(render_ctx, draw_depth)
-    -- use the previously acquired ImGuiIO for the frame rate to make the speed more consistent and maek it less depended on the user hardware
+    -- use the previously acquired ImGuiIO for the frame rate to make the speed more consistent and make it less depended on the user hardware
     actual_speed = DVD_speed / iio.framerate
     DVDLogo.x = DVDLogo.x + actual_speed * DVD_direction_x
     DVDLogo.y = DVDLogo.y + actual_speed * DVD_direction_y
