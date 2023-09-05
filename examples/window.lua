@@ -15,15 +15,33 @@ local inputcolorrgba = Color:new(0.0, 0.0, 1.0, 0.5) -- 50% opacity blue
 
 local inputtooltip = 'This input\'s value is used as its tooltip.'
 
-local extratabs = {}
-local nextextratabid = 1
-
 local widgetopen = true
 local closebutton = false
 
+local tab_window_open = true
+local custom_tab_bar_flags = GUI_TAB_BAR_FLAG.NONE
+local next_custom_tab_id = 4
+local custom_tabs = {
+    {
+        label = 'Tab 1',
+        closeable = false,
+        flags = GUI_TAB_ITEM_FLAG.LEADING
+    },
+    {
+        label = 'Tab 2',
+        closeable = false,
+        flags = GUI_TAB_ITEM_FLAG.NONE
+    },
+    {
+        label = 'Tab 3',
+        closeable = true,
+        flags = GUI_TAB_ITEM_FLAG.NONE
+    }
+}
+
 local seedinput = ''
-local widgetopen2 = false
-local closebutton2 = false
+local seeddialogopen = false
+local seeddialogclosebutton = false
 
 -- load image to use later
 local loadingimage = create_image('loading.png')
@@ -32,9 +50,21 @@ local loadingimage = create_image('loading.png')
 register_option_button('open', 'Open test window', function()
     widgetopen = true
 end)
-register_option_button('open2', 'Open seed dialog', function()
-    widgetopen2 = true
+register_option_button('open2', 'Open tab window', function()
+    tab_window_open = true
 end)
+register_option_button('open3', 'Open seed dialog', function()
+    seeddialogopen = true
+end)
+
+-- draw a checkbox for a specific flag in a mask
+local function draw_flag_checkbox(draw_ctx, label, flags, flag)
+    if draw_ctx:win_check(label, test_mask(flags, flag)) then
+        return set_mask(flags, flag)
+    else
+        return clr_mask(flags, flag)
+    end
+end
 
 set_callback(function(draw_ctx)
     if closebutton then
@@ -61,7 +91,7 @@ set_callback(function(draw_ctx)
 
             -- open another window from this window
             if draw_ctx:win_button('Open seed dialog') then
-                widgetopen2 = true
+                seeddialogopen = true
             end
 
             -- all the input widgets return the current value always, and expect you to keep feeding it back, or it will just revert to default when you blur the input
@@ -128,37 +158,6 @@ set_callback(function(draw_ctx)
                 draw_ctx:win_imagebutton('##coolbutton', loadingimage, 0.33, 0.11, 0, 0, 1, 1)
             end
 
-            draw_ctx:win_separator_text('Tabs')
-
-            draw_ctx:win_tab_bar('ExampleTabBar', function()
-                draw_ctx:win_tab_item('Small Tab', false, function()
-                    draw_ctx:win_text('Not much to see here.')
-                end)
-                draw_ctx:win_tab_item('Large Tab', false, function()
-                    draw_ctx:win_text('This tab has a lot of content.')
-                    for i=1,20 do
-                        draw_ctx:win_text('Content #'..i)
-                        draw_ctx:win_inline()
-                        draw_ctx:win_button('Button #'..i)
-                    end
-                end)
-                local i = 1
-                while i <= #extratabs do
-                    local open = draw_ctx:win_tab_item(extratabs[i], true, function()
-                        draw_ctx:win_text('This is '..extratabs[i]..'. It can be closed with the X.')
-                    end)
-                    if open then
-                        i = i + 1
-                    else
-                        table.remove(extratabs, i)
-                    end
-                end
-                if draw_ctx:win_tab_item_button('+') then
-                    table.insert(extratabs, 'Extra Tab #'..nextextratabid)
-                    nextextratabid = nextextratabid + 1
-                end
-            end)
-
             draw_ctx:win_separator_text('Identical Input Labels')
 
             -- remember to use unique labels on identical inputs
@@ -221,18 +220,103 @@ set_callback(function(draw_ctx)
         end
     end
 
-    -- another smaller thing opened from the larger thing
-    if closebutton2 then
-        closebutton2 = false
-        widgetopen2 = false
+    if tab_window_open then
+        -- create a window showing tab examples
+        -- position the window in the bottom-right quadrant of the screen
+        tab_window_open = draw_ctx:window('Tab Examples', 0.2, 0.0, 0.7, 0.9, true, function()
+            draw_ctx:win_tab_bar('MainTabBar', function()
+                draw_ctx:win_tab_item('Small Tab', false, function()
+                    draw_ctx:win_text('Not much to see here.')
+                end)
+                draw_ctx:win_tab_item('Large Tab', false, function()
+                    draw_ctx:win_text('This tab has a lot of content.')
+                    for i=1,30 do
+                        draw_ctx:win_text('Content #'..i)
+                        draw_ctx:win_inline()
+                        draw_ctx:win_button('Button #'..i)
+                    end
+                end)
+                draw_ctx:win_tab_item('Customization', false, function()
+                    draw_ctx:win_text('Tab bar behavior can be customized. These are the settings for the tab bar below.')
+                    custom_tab_bar_flags = draw_flag_checkbox(draw_ctx, 'Reorderable', custom_tab_bar_flags, GUI_TAB_BAR_FLAG.REORDERABLE)
+                    custom_tab_bar_flags = draw_flag_checkbox(draw_ctx, 'Auto-select new tabs', custom_tab_bar_flags, GUI_TAB_BAR_FLAG.AUTO_SELECT_NEW_TABS)
+                    custom_tab_bar_flags = draw_flag_checkbox(draw_ctx, 'Show tab list pop-up button', custom_tab_bar_flags, GUI_TAB_BAR_FLAG.TAB_LIST_POPUP_BUTTON)
+                    custom_tab_bar_flags = draw_flag_checkbox(draw_ctx, 'No close with middle mouse button', custom_tab_bar_flags, GUI_TAB_BAR_FLAG.NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON)
+                    custom_tab_bar_flags = draw_flag_checkbox(draw_ctx, 'No tab list scrolling buttons', custom_tab_bar_flags, GUI_TAB_BAR_FLAG.NO_TAB_LIST_SCROLLING_BUTTONS)
+                    custom_tab_bar_flags = draw_flag_checkbox(draw_ctx, 'No tooltip when label is truncated', custom_tab_bar_flags, GUI_TAB_BAR_FLAG.NO_TOOLTIP)
+                    custom_tab_bar_flags = draw_flag_checkbox(draw_ctx, 'Fitting policy: resize down', custom_tab_bar_flags, GUI_TAB_BAR_FLAG.FITTING_POLICY_RESIZE_DOWN)
+                    custom_tab_bar_flags = draw_flag_checkbox(draw_ctx, 'Fitting policy: scroll', custom_tab_bar_flags, GUI_TAB_BAR_FLAG.FITTING_POLICY_SCROLL)
+                    local select_a_tab = false
+                    if #custom_tabs > 0 then
+                        if draw_ctx:win_button('Select '..custom_tabs[1].label) then
+                            select_a_tab = true
+                        end
+                    end
+                    draw_ctx:win_text('Use the "+" tab button to create more tabs.')
+                    draw_ctx:win_tab_bar('CustomizedTabBar', custom_tab_bar_flags, function()
+                        local i = 1
+                        while i <= #custom_tabs do
+                            local tab = custom_tabs[i]
+                            local tab_flags = tab.flags
+                            if i == 1 and select_a_tab then
+                                -- enable the SET_SELECTED flag for one frame to force a tab to be selected
+                                -- don't use this flag on every frame, or else it will be impossible to select any other tab
+                                tab_flags = set_mask(tab_flags, GUI_TAB_ITEM_FLAG.SET_SELECTED)
+                            end
+                            local keep_tab = draw_ctx:win_tab_item(tab.label, tab.closeable, tab_flags, function()
+                                -- all changes to these tab settings will be applied on the next frame that the tab is drawn
+                                draw_ctx:win_text('Individual tab behavior can also be customized. These are the settings for '..tab.label..'.')
+                                tab.closeable = draw_ctx:win_check('Closeable', tab.closeable)
+                                tab.flags = draw_flag_checkbox(draw_ctx, 'Show unsaved document indicator', tab.flags, GUI_TAB_ITEM_FLAG.UNSAVED_DOCUMENT)
+                                tab.flags = draw_flag_checkbox(draw_ctx, 'No close with middle mouse button', tab.flags, GUI_TAB_ITEM_FLAG.NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON)
+                                tab.flags = draw_flag_checkbox(draw_ctx, 'Don\'t push/pop tab ID around contents', tab.flags, GUI_TAB_ITEM_FLAG.NO_PUSH_ID)
+                                tab.flags = draw_flag_checkbox(draw_ctx, 'No tooltip when label is truncated', tab.flags, GUI_TAB_ITEM_FLAG.NO_TOOLTIP)
+                                tab.flags = draw_flag_checkbox(draw_ctx, 'No reordering', tab.flags, GUI_TAB_ITEM_FLAG.NO_REORDER)
+                                tab.flags = draw_flag_checkbox(draw_ctx, 'Leading', tab.flags, GUI_TAB_ITEM_FLAG.LEADING)
+                                tab.flags = draw_flag_checkbox(draw_ctx, 'Trailing', tab.flags, GUI_TAB_ITEM_FLAG.TRAILING)
+                            end)
+                            if not keep_tab and test_mask(tab.flags, GUI_TAB_ITEM_FLAG.UNSAVED_DOCUMENT) then
+                                -- the UNSAVED_DOCUMENT flag doesn't prevent tab closure
+                                -- you need to skip closure yourself and add your own special behavior, such as showing a message or dialog
+                                keep_tab = true
+                                message('Prevented closure of '..tab.label..' with UNSAVED_DOCUMENT flag')
+                            end
+                            if keep_tab then
+                                i = i + 1
+                            else
+                                table.remove(custom_tabs, i)
+                            end
+                        end
+                        -- this button always appears at the end of the tab bar, even when the tabs are reorderable
+                        if draw_ctx:win_tab_item_button('+', GUI_TAB_ITEM_FLAG.TRAILING) then
+                            table.insert(custom_tabs, {
+                                label = 'Tab '..next_custom_tab_id,
+                                closeable = true,
+                                flags = GUI_TAB_ITEM_FLAG.NONE
+                            })
+                            next_custom_tab_id = next_custom_tab_id + 1
+                        end
+                    end)
+                end)
+                if draw_ctx:win_tab_item_button('Button') then
+                    message('Tab button pressed')
+                end
+            end)
+        end)
     end
-    if widgetopen2 then
+
+    -- another smaller thing opened from the larger thing
+    if seeddialogclosebutton then
+        seeddialogclosebutton = false
+        seeddialogopen = false
+    end
+    if seeddialogopen then
         -- non movable prompt in the center of your screen
-        widgetopen2 = draw_ctx:window('Enter seed', 0, 0, 0, 0, false, function()
+        seeddialogopen = draw_ctx:window('Enter seed', 0, 0, 0, 0, false, function()
             seedinput = draw_ctx:win_input_text('Seed', seedinput)
             local seed = tonumber(seedinput, 16)
             if draw_ctx:win_button('Set seed') and seed then
-                closebutton2 = true
+                seeddialogclosebutton = true
                 set_seed(seed)
             end
         end)

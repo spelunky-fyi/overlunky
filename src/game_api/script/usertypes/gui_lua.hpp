@@ -122,10 +122,16 @@ class GuiDrawContext
     void win_section(std::string title, sol::function callback);
     /// Add a tab bar. Only create tab items inside the callback.
     void win_tab_bar(std::string id, sol::function callback);
-    /// Add a tab item. Only use this inside a tab bar callback. Returns false if closed from the X.
+    /// Add a tab bar. Only create tab items inside the callback. `flags` are a mask of GUI_TAB_BAR_FLAG.
+    void win_tab_bar(std::string id, int flags, sol::function callback);
+    /// Add a tab item. Only use this inside a tab bar callback. Returns false when the tab is closed.
     bool win_tab_item(std::string label, bool closeable, sol::function callback);
+    /// Add a tab item. Only use this inside a tab bar callback. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns false when the tab is closed.
+    bool win_tab_item(std::string label, bool closeable, int flags, sol::function callback);
     /// Add a tab item button. Only use this inside a tab bar callback. Returns true when clicked.
     bool win_tab_item_button(std::string label);
+    /// Add a tab item button. Only use this inside a tab bar callback. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns true when clicked.
+    bool win_tab_item_button(std::string label, int flags);
     /// Indent contents, or unindent if negative
     void win_indent(float width);
     /// Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)

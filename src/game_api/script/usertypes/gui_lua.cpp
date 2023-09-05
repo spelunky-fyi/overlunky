@@ -552,29 +552,38 @@ void GuiDrawContext::win_section(std::string title, sol::function callback)
 };
 void GuiDrawContext::win_tab_bar(std::string id, sol::function callback)
 {
-    // TODO: Which ImGuiTabBarFlags should be exposed? ImGuiTabBarFlags_Reorderable and ImGuiTabBarFlags_AutoSelectNewTabs seem useful.
-    if (ImGui::BeginTabBar(id.c_str()))
+    win_tab_bar(id, ImGuiTabBarFlags_None, callback);
+}
+void GuiDrawContext::win_tab_bar(std::string id, int flags, sol::function callback)
+{
+    if (ImGui::BeginTabBar(id.c_str(), flags))
     {
         handle_function<void>(backend, callback);
         ImGui::EndTabBar();
     }
-};
+}
 bool GuiDrawContext::win_tab_item(std::string label, bool closeable, sol::function callback)
 {
-    // TODO: Which ImGuiTabItemFlags should be exposed? Many of them seem useful.
+    return win_tab_item(label, closeable, ImGuiTabItemFlags_None, callback);
+}
+bool GuiDrawContext::win_tab_item(std::string label, bool closeable, int flags, sol::function callback)
+{
     bool open = true;
-    if (ImGui::BeginTabItem(label.c_str(), closeable ? &open : NULL))
+    if (ImGui::BeginTabItem(label.c_str(), closeable ? &open : NULL, flags))
     {
         handle_function<void>(backend, callback);
         ImGui::EndTabItem();
     }
     return open;
-};
+}
 bool GuiDrawContext::win_tab_item_button(std::string label)
 {
-    // TODO: Which ImGuiTabItemFlags should be exposed? Many of them seem useful.
-    return ImGui::TabItemButton(label.c_str());
-};
+    return win_tab_item_button(label, ImGuiTabItemFlags_None);
+}
+bool GuiDrawContext::win_tab_item_button(std::string label, int flags)
+{
+    return ImGui::TabItemButton(label.c_str(), flags);
+}
 void GuiDrawContext::win_indent(float width)
 {
     if (std::abs(width) < 1.0f)
@@ -635,6 +644,15 @@ void register_usertypes(sol::state& lua)
     auto win_pushid = sol::overload(
         static_cast<void (GuiDrawContext::*)(int)>(&GuiDrawContext::win_pushid),
         static_cast<void (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_pushid));
+    auto win_tab_bar = sol::overload(
+        static_cast<void (GuiDrawContext::*)(std::string, sol::function)>(&GuiDrawContext::win_tab_bar),
+        static_cast<void (GuiDrawContext::*)(std::string, int, sol::function)>(&GuiDrawContext::win_tab_bar));
+    auto win_tab_item = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string, bool, sol::function)>(&GuiDrawContext::win_tab_item),
+        static_cast<bool (GuiDrawContext::*)(std::string, bool, int, sol::function)>(&GuiDrawContext::win_tab_item));
+    auto win_tab_item_button = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_tab_item_button),
+        static_cast<bool (GuiDrawContext::*)(std::string, int)>(&GuiDrawContext::win_tab_item_button));
 
     /// Used in [register_option_callback](#register_option_callback) and [set_callback](#set_callback) with ON.GUIFRAME
     auto guidrawcontext_type = lua.new_usertype<GuiDrawContext>("GuiDrawContext");
@@ -676,11 +694,34 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_imagebutton"] = &GuiDrawContext::win_imagebutton;
     guidrawcontext_type["win_tooltip"] = &GuiDrawContext::win_tooltip;
     guidrawcontext_type["win_section"] = &GuiDrawContext::win_section;
-    guidrawcontext_type["win_tab_bar"] = &GuiDrawContext::win_tab_bar;
-    guidrawcontext_type["win_tab_item"] = &GuiDrawContext::win_tab_item;
-    guidrawcontext_type["win_tab_item_button"] = &GuiDrawContext::win_tab_item_button;
+    guidrawcontext_type["win_tab_bar"] = win_tab_bar;
+    guidrawcontext_type["win_tab_item"] = win_tab_item;
+    guidrawcontext_type["win_tab_item_button"] = win_tab_item_button;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
+
+    /// Tab bar flags for `win_tab_bar` in GuiDrawContext.
+    lua.create_named_table("GUI_TAB_BAR_FLAG",
+        "NONE", ImGuiTabBarFlags_None,
+        "REORDERABLE", ImGuiTabBarFlags_Reorderable,
+        "AUTO_SELECT_NEW_TABS", ImGuiTabBarFlags_AutoSelectNewTabs,
+        "TAB_LIST_POPUP_BUTTON", ImGuiTabBarFlags_TabListPopupButton,
+        "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton,
+        "NO_TAB_LIST_SCROLLING_BUTTONS", ImGuiTabBarFlags_NoTabListScrollingButtons,
+        "NO_TOOLTIP", ImGuiTabBarFlags_NoTooltip,
+        "FITTING_POLICY_RESIZE_DOWN", ImGuiTabBarFlags_FittingPolicyResizeDown,
+        "FITTING_POLICY_SCROLL", ImGuiTabBarFlags_FittingPolicyScroll);
+    /// Tab item flags for `win_tab_item` and `win_tab_item_button` in GuiDrawContext.
+    lua.create_named_table("GUI_TAB_ITEM_FLAG",
+        "NONE", ImGuiTabItemFlags_None,
+        "UNSAVED_DOCUMENT", ImGuiTabItemFlags_UnsavedDocument,
+        "SET_SELECTED", ImGuiTabItemFlags_SetSelected,
+        "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabItemFlags_NoCloseWithMiddleMouseButton,
+        "NO_PUSH_ID", ImGuiTabItemFlags_NoPushId,
+        "NO_TOOLTIP", ImGuiTabItemFlags_NoTooltip,
+        "NO_REORDER", ImGuiTabItemFlags_NoReorder,
+        "LEADING", ImGuiTabItemFlags_Leading,
+        "TRAILING", ImGuiTabItemFlags_Trailing);
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) -> uColor
