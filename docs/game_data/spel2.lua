@@ -5042,6 +5042,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field x number
     ---@field y number
     ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
+    ---@field distance_to fun(self, other: Vec2): number @Just simple pythagoras theorem
     ---@field split fun(self): number, number
 
 ---@class AABB

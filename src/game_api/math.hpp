@@ -34,6 +34,13 @@ struct Vec2
         *this += p;
         return *this;
     }
+    /// Just simple pythagoras theorem
+    float distance_to(const Vec2 other) const
+    {
+        auto diff{*this - other};
+        diff *= diff; // pow
+        return (float)std::sqrt(diff.x + diff.y);
+    }
 
     Vec2 operator+(const Vec2& a) const
     {
@@ -73,6 +80,12 @@ struct Vec2
     {
         x -= a.x;
         y -= a.y;
+        return *this;
+    }
+    Vec2& operator*=(const Vec2& a)
+    {
+        x *= a.x;
+        y *= a.y;
         return *this;
     }
     Vec2& operator++()

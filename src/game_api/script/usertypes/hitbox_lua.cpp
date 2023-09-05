@@ -65,6 +65,8 @@ void register_usertypes(sol::state& lua)
         &Vec2::y,
         "rotate",
         &Vec2::rotate,
+        "distance_to",
+        &Vec2::distance_to,
         "split",
         // &Vec2::split); // for the autodoc
         &Vec2::operator std::pair<float, float>);
