@@ -35,9 +35,9 @@ class VanillaRenderContext
     void draw_text(const TextRenderingInfo* tri, Color color);
 
     /// Measure the provided text using the built-in renderer
-    /// If you can, consider creating your own TextureRenderingInfo instead
+    /// If you can, consider creating your own TextRenderingInfo instead
     /// You can then use `:text_size()` and `draw_text` with that one object
-    /// `draw_text_size` works by creating new TextureRenderingInfo just to call `:text_size()`, which is not very optimal
+    /// `draw_text_size` works by creating new TextRenderingInfo just to call `:text_size()`, which is not very optimal
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
 
     /// Set the prefered way of drawing corners for the non filled shapes
