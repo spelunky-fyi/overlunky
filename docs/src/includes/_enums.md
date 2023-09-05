@@ -400,6 +400,44 @@ Name | Data | Description
 [SMALL_SAD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_SAD) | GHOST_BEHAVIOR::SMALL_SAD | 
 [SMALL_HAPPY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_HAPPY) | GHOST_BEHAVIOR::SMALL_HAPPY | 
 
+## GUI_TAB_BAR_FLAG
+
+
+> Search script examples for [GUI_TAB_BAR_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG)
+
+Tab bar flags for `win_tab_bar` in GuiDrawContext.
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.NONE) | ImGuiTabBarFlags_None | 
+[REORDERABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.REORDERABLE) | ImGuiTabBarFlags_Reorderable | 
+[AUTO_SELECT_NEW_TABS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.AUTO_SELECT_NEW_TABS) | ImGuiTabBarFlags_AutoSelectNewTabs | 
+[TAB_LIST_POPUP_BUTTON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.TAB_LIST_POPUP_BUTTON) | ImGuiTabBarFlags_TabListPopupButton | 
+[NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON) | ImGuiTabBarFlags_NoCloseWithMiddleMouseButton | 
+[NO_TAB_LIST_SCROLLING_BUTTONS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.NO_TAB_LIST_SCROLLING_BUTTONS) | ImGuiTabBarFlags_NoTabListScrollingButtons | 
+[NO_TOOLTIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.NO_TOOLTIP) | ImGuiTabBarFlags_NoTooltip | 
+[FITTING_POLICY_RESIZE_DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.FITTING_POLICY_RESIZE_DOWN) | ImGuiTabBarFlags_FittingPolicyResizeDown | 
+[FITTING_POLICY_SCROLL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.FITTING_POLICY_SCROLL) | ImGuiTabBarFlags_FittingPolicyScroll | 
+
+## GUI_TAB_ITEM_FLAG
+
+
+> Search script examples for [GUI_TAB_ITEM_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG)
+
+Tab item flags for `win_tab_item` and `win_tab_item_button` in GuiDrawContext.
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NONE) | ImGuiTabItemFlags_None | 
+[UNSAVED_DOCUMENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.UNSAVED_DOCUMENT) | ImGuiTabItemFlags_UnsavedDocument | 
+[SET_SELECTED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.SET_SELECTED) | ImGuiTabItemFlags_SetSelected | 
+[NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON) | ImGuiTabItemFlags_NoCloseWithMiddleMouseButton | 
+[NO_PUSH_ID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NO_PUSH_ID) | ImGuiTabItemFlags_NoPushId | 
+[NO_TOOLTIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NO_TOOLTIP) | ImGuiTabItemFlags_NoTooltip | 
+[NO_REORDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NO_REORDER) | ImGuiTabItemFlags_NoReorder | 
+[LEADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.LEADING) | ImGuiTabItemFlags_Leading | 
+[TRAILING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.TRAILING) | ImGuiTabItemFlags_Trailing | 
+
 ## HUNDUNFLAGS
 
 

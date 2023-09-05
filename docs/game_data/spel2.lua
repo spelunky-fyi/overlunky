@@ -4536,9 +4536,11 @@ function CustomSound:play(paused, sound_type) end
     ---@field win_drag_float fun(self, label: string, value: number, min: number, max: number): number @Add an number dragfield
     ---@field win_check fun(self, label: string, value: boolean): boolean @Add a checkbox
     ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer @Add a combo box
+    ---@field win_color_editor fun(self, label: string, value: Color, can_edit_alpha: boolean): Color @Add a color editor
     ---@field win_popid fun(self): nil @Pop unique identifier from the stack. Put after the input.
     ---@field win_image fun(self, image: IMAGE, width: number, height: number): nil @Draw image to window.
     ---@field win_imagebutton fun(self, label: string, image: IMAGE, width: number, height: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number): boolean @Draw imagebutton to window.
+    ---@field win_tooltip fun(self, text: string): nil @Sets a tooltip to show when hovering the cursor over the previous item.
     ---@field win_section fun(self, title: string, callback: function): nil @Add a collapsing accordion section, put contents in the callback function.
     ---@field win_indent fun(self, width: number): nil @Indent contents, or unindent if negative
     ---@field win_width fun(self, width: number): nil @Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
@@ -4629,6 +4631,39 @@ function GuiDrawContext:win_pushid(id) end
 ---@param id string
 ---@return nil
 function GuiDrawContext:win_pushid(id) end
+---Add a tab bar. Only create tab items inside the callback.
+---@param id string
+---@param callback function
+---@return nil
+function GuiDrawContext:win_tab_bar(id, callback) end
+---Add a tab bar. Only create tab items inside the callback. `flags` are a mask of GUI_TAB_BAR_FLAG.
+---@param id string
+---@param flags integer
+---@param callback function
+---@return nil
+function GuiDrawContext:win_tab_bar(id, flags, callback) end
+---Add a tab item. Only use this inside a tab bar callback. Put contents in the callback function. Returns false when the tab is closed.
+---@param label string
+---@param closeable boolean
+---@param callback function
+---@return boolean
+function GuiDrawContext:win_tab_item(label, closeable, callback) end
+---Add a tab item. Only use this inside a tab bar callback. Put contents in the callback function. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns false when the tab is closed.
+---@param label string
+---@param closeable boolean
+---@param flags integer
+---@param callback function
+---@return boolean
+function GuiDrawContext:win_tab_item(label, closeable, flags, callback) end
+---Add a tab item button. Only use this inside a tab bar callback. Returns true when clicked.
+---@param label string
+---@return boolean
+function GuiDrawContext:win_tab_item_button(label) end
+---Add a tab item button. Only use this inside a tab bar callback. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns true when clicked.
+---@param label string
+---@param flags integer
+---@return boolean
+function GuiDrawContext:win_tab_item_button(label, flags) end
 
 ---@class Gamepad
     ---@field enabled boolean

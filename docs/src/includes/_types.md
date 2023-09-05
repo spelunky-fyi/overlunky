@@ -208,12 +208,20 @@ float | [win_slider_float(string label, float value, float min, float max)](http
 float | [win_drag_float(string label, float value, float min, float max)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_float) | Add an float dragfield
 bool | [win_check(string label, bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check) | Add a checkbox
 int | [win_combo(string label, int selected, string opts)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo) | Add a combo box
+[Color](#Color) | [win_color_editor(string label, Color value, bool can_edit_alpha)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_color_editor) | Add a color editor
 nil | [win_pushid(int id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) | Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 nil | [win_pushid(string id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid) | Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 nil | [win_popid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid) | Pop unique identifier from the stack. Put after the input.
 nil | [win_image(IMAGE image, float width, float height)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image) | Draw image to window.
 bool | [win_imagebutton(string label, IMAGE image, float width, float height, float uvx1, float uvy1, float uvx2, float uvy2)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_imagebutton) | Draw imagebutton to window.
+nil | [win_tooltip(string text)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_tooltip) | Sets a tooltip to show when hovering the cursor over the previous item.
 nil | [win_section(string title, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_section) | Add a collapsing accordion section, put contents in the callback function.
+nil | [win_tab_bar(string id, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_tab_bar) | Add a tab bar. Only create tab items inside the callback.
+nil | [win_tab_bar(string id, int flags, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_tab_bar) | Add a tab bar. Only create tab items inside the callback. `flags` are a mask of GUI_TAB_BAR_FLAG.
+bool | [win_tab_item(string label, bool closeable, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_tab_item) | Add a tab item. Only use this inside a tab bar callback. Put contents in the callback function. Returns false when the tab is closed.
+bool | [win_tab_item(string label, bool closeable, int flags, function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_tab_item) | Add a tab item. Only use this inside a tab bar callback. Put contents in the callback function. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns false when the tab is closed.
+bool | [win_tab_item_button(string label)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_tab_item_button) | Add a tab item button. Only use this inside a tab bar callback. Returns true when clicked.
+bool | [win_tab_item_button(string label, int flags)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_tab_item_button) | Add a tab item button. Only use this inside a tab bar callback. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns true when clicked.
 nil | [win_indent(float width)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_indent) | Indent contents, or unindent if negative
 nil | [win_width(float width)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_width) | Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
 

@@ -124,9 +124,9 @@ class GuiDrawContext
     void win_tab_bar(std::string id, sol::function callback);
     /// Add a tab bar. Only create tab items inside the callback. `flags` are a mask of GUI_TAB_BAR_FLAG.
     void win_tab_bar(std::string id, int flags, sol::function callback);
-    /// Add a tab item. Only use this inside a tab bar callback. Returns false when the tab is closed.
+    /// Add a tab item. Only use this inside a tab bar callback. Put contents in the callback function. Returns false when the tab is closed.
     bool win_tab_item(std::string label, bool closeable, sol::function callback);
-    /// Add a tab item. Only use this inside a tab bar callback. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns false when the tab is closed.
+    /// Add a tab item. Only use this inside a tab bar callback. Put contents in the callback function. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns false when the tab is closed.
     bool win_tab_item(std::string label, bool closeable, int flags, sol::function callback);
     /// Add a tab item button. Only use this inside a tab bar callback. Returns true when clicked.
     bool win_tab_item_button(std::string label);
