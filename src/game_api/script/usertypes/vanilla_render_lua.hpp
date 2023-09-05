@@ -14,6 +14,7 @@ class state;
 } // namespace sol
 
 struct TextRenderingInfo;
+struct TextureRenderingInfo;
 
 using VANILLA_TEXT_ALIGNMENT = uint32_t;
 using VANILLA_FONT_STYLE = uint32_t;
@@ -62,6 +63,10 @@ class VanillaRenderContext
     /// Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. `source` - the coordinates in the texture, `dest` - the coordinates on the screen
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     void draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color);
+
+    /// Draw a texture in screen coordinates using TextureRenderingInfo
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_texture(TEXTURE texture_id, TextureRenderingInfo tri, Color color);
 
     /// Draws a line on screen using the built-in renderer from point `A` to point `B`.
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events

@@ -123,6 +123,16 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, const Quad& s
     RenderAPI::get().draw_screen_texture(texture, source, quad, std::move(color), 0x29);
 }
 
+void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, TextureRenderingInfo tri, Color color)
+{
+    auto texture = get_texture(texture_id);
+    if (texture == nullptr)
+    {
+        return;
+    }
+    RenderAPI::get().draw_screen_texture(texture, std::move(tri), std::move(color), 0x29);
+}
+
 auto g_angle_style = CORNER_FINISH::ADAPTIVE;
 
 void VanillaRenderContext::set_corner_finish(CORNER_FINISH c)
@@ -633,7 +643,8 @@ void register_usertypes(sol::state& lua)
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_screen_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color, float, float, float)>(&VanillaRenderContext::draw_screen_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const Quad&, Color)>(&VanillaRenderContext::draw_screen_texture),
-        static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color)>(&VanillaRenderContext::draw_screen_texture));
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, const Quad&, const Quad&, Color)>(&VanillaRenderContext::draw_screen_texture),
+        static_cast<void (VanillaRenderContext::*)(TEXTURE, TextureRenderingInfo, Color)>(&VanillaRenderContext::draw_screen_texture));
     auto draw_world_texture = sol::overload(
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, float, float, float, float, Color)>(&VanillaRenderContext::draw_world_texture),
         static_cast<void (VanillaRenderContext::*)(TEXTURE, uint8_t, uint8_t, const AABB&, Color)>(&VanillaRenderContext::draw_world_texture),
@@ -725,6 +736,7 @@ void register_usertypes(sol::state& lua)
     */
 
     auto texturerenderinginfo_type = lua.new_usertype<TextureRenderingInfo>("TextureRenderingInfo");
+    texturerenderinginfo_type["new"] = sol::constructors<TextureRenderingInfo(), TextureRenderingInfo(const TextureRenderingInfo&)>{};
     texturerenderinginfo_type["x"] = &TextureRenderingInfo::x;
     texturerenderinginfo_type["y"] = &TextureRenderingInfo::y;
     texturerenderinginfo_type["destination_bottom_left_x"] = &TextureRenderingInfo::destination_bottom_left_x;
