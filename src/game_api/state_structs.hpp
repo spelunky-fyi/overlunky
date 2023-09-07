@@ -1,11 +1,12 @@
 #pragma once
 
 #include "aliases.hpp"
+#include "containers/custom_map.hpp"
 #include "containers/custom_vector.hpp"
 #include "render_api.hpp"
 #include <array>
 #include <cstdint>
-#include <set>
+#include <map>
 
 class Entity;
 
@@ -834,13 +835,13 @@ struct LiquidPhysics
             LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
-    std::list<uint32_t>* floors;              // pointer to map/list that contains all floor uids that the liquid interact with
-    std::list<uint32_t>* push_blocks;         // pointer to map/list that contains all activefloor uids that the liquid interact with
-    custom_vector<LiquidLake> impostor_lakes; //
-    uint32_t total_liquid_spawned;            // Total number of spawned liquid entities, all types.
-    uint32_t unknown8;                        // padding probably
-    uint8_t* unknown9;                        // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
-                                              // always allocates after the LiquidPhysics
+    std::map<std::pair<uint8_t, uint8_t>, size_t*>* floors; // key is a grid position, the struct seams to be the same as in push_blocks
+    std::map<uint32_t, size_t*>* push_blocks;               // key is uid, not sure about the struct it points to (it's also possible that the value is 2 pointers)
+    custom_vector<LiquidLake> impostor_lakes;               //
+    uint32_t total_liquid_spawned;                          // Total number of spawned liquid entities, all types.
+    uint32_t unknown8;                                      // padding probably
+    uint8_t* unknown9;                                      // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
+                                                            // always allocates after the LiquidPhysics
 
     uint32_t total_liquid_spawned2; // Same as total_liquid_spawned?
     bool unknown12;
@@ -965,9 +966,8 @@ struct Dialogue
     uint32_t unknown18;
 };
 
-struct ShopRestrictedItem
+struct ItemOwnerDetails
 {
-    int32_t item_uid;
     int32_t owner_uid;
     ENT_TYPE owner_type;
 };
@@ -984,7 +984,8 @@ struct ShopOwnerDetails
 
 struct ShopsInfo
 {
-    std::set<ShopRestrictedItem> items; // could also be a map
+    // key is the uid of an item
+    custom_map<int32_t, ItemOwnerDetails> items;
     std::vector<ShopOwnerDetails> shop_owners;
 };
 

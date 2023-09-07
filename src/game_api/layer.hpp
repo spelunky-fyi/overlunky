@@ -5,6 +5,7 @@
 #include <functional> // for less
 #include <map>        // for map
 #include <new>        // for operator new
+#include <set>        //
 #include <utility>    // for find, pair
 #include <vector>     // for allocator, vector
 
