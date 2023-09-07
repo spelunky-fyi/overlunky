@@ -982,11 +982,11 @@ struct ShopOwnerDetails
     uint32_t shop_owner_uid;
 };
 
-struct ShopsInfo
+struct RoomOwnersInfo
 {
     // key is the uid of an item
-    custom_map<int32_t, ItemOwnerDetails> items;
-    std::vector<ShopOwnerDetails> shop_owners;
+    custom_map<int32_t, ItemOwnerDetails> owned_items;
+    std::vector<ShopOwnerDetails> room_owners;
 };
 
 struct MultiLineTextRendering

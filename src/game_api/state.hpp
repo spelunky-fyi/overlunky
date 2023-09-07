@@ -260,7 +260,7 @@ struct StateMemory
     uint8_t unknown31a; // padding probably
     uint8_t unknown31b;
     uint8_t unknown31c;
-    ShopsInfo shops;
+    RoomOwnersInfo room_owners;
     /// Number of frames since the game was launched
     uint32_t time_startup;
     uint32_t special_visibility_flags;

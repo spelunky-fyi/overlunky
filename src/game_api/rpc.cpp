@@ -1698,7 +1698,7 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
                 state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
 
                 ItemOwnerDetails iod{shop_owner_uid, owner->type->id};
-                state.ptr()->shops.items.insert({item->uid, iod});
+                state.ptr()->room_owners.owned_items.insert({item->uid, iod});
                 return;
             }
         }
