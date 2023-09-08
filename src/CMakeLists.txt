@@ -132,6 +132,11 @@ if(BUILD_OVERLUNKY)
                 endif()
         endif()
 
+        # Disable error on Clang16
+        if(CLANG)
+                target_compile_options(libwavpack PRIVATE "-Wno-implicit-function-declaration")
+        endif()
+
         # --------------------------------------------------
         # toml11
         option(toml11_BUILD_TEST OFF)

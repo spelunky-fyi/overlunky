@@ -755,6 +755,20 @@ tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split
 
 ### RenderInfo
 
+
+> For using a custom normal map:
+
+```lua
+set_post_entity_spawn(function(ent)
+  -- Doesn't really make sense with this texture, you can use your custom normal texture id here
+  ent.rendering_info:set_normal_map_texture(TEXTURE.DATA_TEXTURES_FLOORSTYLED_GOLD_NORMAL_0)
+  ent.rendering_info.shader = 30 -- Make sure to set the shader to one that uses normal map
+end, SPAWN_TYPE.LEVEL_GEN, MASK.FLOOR, ENT_TYPE.FLOORSTYLED_MINEWOOD)
+```
+
+> Note: if using set_texture_num, make sure to have used set_second_texture/set_third_texture before, since not doing so can lead to crashes
+
+
 Some information used to render the entity, can not be changed, used in [Entity](#Entity)
 
 Type | Name | Description
@@ -768,7 +782,14 @@ float | [tilew](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilew) 
 float | [tileh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tileh) | 
 bool | [facing_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=facing_left) | 
 bool | [render_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_inactive) | 
+int | [texture_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_num) | 
 class [Entity](#Entity) | [get_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity) | 
+bool | [set_normal_map_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_normal_map_texture) | Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
+optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_second_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_second_texture) | 
+optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_third_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_third_texture) | 
+bool | [set_second_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_second_texture) | 
+bool | [set_third_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_third_texture) | 
+bool | [set_texture_num(int texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture_num) | Set the number of textures that may be used, need to have them set before for it to work
 [CallbackId](#Aliases) | [set_pre_virtual(RENDER_INFO_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(RENDER_INFO_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -2423,6 +2444,33 @@ int | [leader](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leader) 
 array&lt;[Inventory](#Inventory), MAX_PLAYERS&gt; | [player_inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) | 
 array&lt;[SelectPlayerSlot](#SelectPlayerSlot), MAX_PLAYERS&gt; | [player_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) | 
 
+### JournalProgressStainSlot
+
+Used in [StateMemory](#StateMemory)
+
+Type | Name | Description
+---- | ---- | -----------
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) | 
+float | [scale](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale) | 
+int | [texture_column](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_column) | 
+int | [texture_row](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_row) | 
+int | [texture_range](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_range) | 
+
+### JournalProgressStickerSlot
+
+Used in [StateMemory](#StateMemory)
+
+Type | Name | Description
+---- | ---- | -----------
+int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
+int | [grid_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grid_position) | 
+[ENT_TYPE](#ENT_TYPE) | [entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_type) | 
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) | 
+
 ### PlayerSlot
 
 
@@ -2570,6 +2618,12 @@ int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ti
 int | [storage_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=storage_uid) | entity uid of the first floor_storage entity
 array&lt;[ENT_TYPE](#ENT_TYPE), 99&gt; | [waddler_storage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_storage) | 
 array&lt;int, 99&gt; | [waddler_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_metadata) | 
+int | [journal_progress_sticker_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_sticker_count) | 
+array&lt;[JournalProgressStickerSlot](#JournalProgressStickerSlot), 40&gt; | [journal_progress_sticker_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_sticker_slots) | stickers for notable items and entities in journal progress page
+int | [journal_progress_stain_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_stain_count) | 
+array&lt;[JournalProgressStainSlot](#JournalProgressStainSlot), 30&gt; | [journal_progress_stain_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_stain_slots) | blood splats and paw prints in journal progress page
+int | [journal_progress_theme_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_theme_count) | 
+array&lt;int, 9&gt; | [journal_progress_theme_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_theme_slots) | visited themes in journal progress page
 [ThemeInfo](#ThemeInfo) | [theme_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_info) | Points to the current [ThemeInfo](#ThemeInfo)
 [LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | Level logic like dice game and cutscenes
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 

@@ -7,7 +7,7 @@
 #include <vector>  // for vector
 
 #include "aliases.hpp"       // for ENT_TYPE, LAYER
-#include "state_structs.hpp" // for JournalProgressionSlot, Illumination (p...
+#include "state_structs.hpp" // for JournalProgressStickerSlot, Illumination (p...
 
 class Entity;
 class ScreenArenaIntro;
@@ -160,12 +160,17 @@ struct StateMemory
     uint8_t unknown2d;
     std::array<ENT_TYPE, 99> waddler_storage;
     std::array<int16_t, 99> waddler_storage_meta; // to store mattock durability for example
-    uint16_t journal_progression_count;
-    std::array<JournalProgressionSlot, 40> journal_progression_slots;
-    uint8_t death_screen_blood_splats_count;
-    uint8_t skip2[3]; // padding
-    std::array<DeathScreenBloodSlot, 30> death_screen_blood_splats;
-    ThemeProgression theme_progression;
+    uint8_t journal_progress_sticker_count;
+    uint8_t padding4;
+    /// stickers for notable items and entities in journal progress page
+    std::array<JournalProgressStickerSlot, 40> journal_progress_sticker_slots;
+    uint8_t journal_progress_stain_count;
+    uint8_t padding5[3];
+    /// blood splats and paw prints in journal progress page
+    std::array<JournalProgressStainSlot, 30> journal_progress_stain_slots;
+    uint8_t journal_progress_theme_count;
+    /// visited themes in journal progress page
+    std::array<uint8_t, 9> journal_progress_theme_slots;
     uint8_t unknown3;
     uint8_t unknown4;
     uint8_t unknown5a;
