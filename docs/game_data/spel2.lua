@@ -1761,6 +1761,23 @@ do
     ---@field breath_cooldown integer
     ---@field punish_ball boolean
 
+---@class JournalProgressStickerSlot
+    ---@field theme integer
+    ---@field grid_position integer
+    ---@field entity_type ENT_TYPE
+    ---@field x number
+    ---@field y number
+    ---@field angle number
+
+---@class JournalProgressStainSlot
+    ---@field x number
+    ---@field y number
+    ---@field angle number
+    ---@field scale number
+    ---@field texture_column integer
+    ---@field texture_row integer
+    ---@field texture_range integer
+
 ---@class SelectPlayerSlot
     ---@field activated boolean
     ---@field character ENT_TYPE
@@ -1896,6 +1913,12 @@ do
     ---@field storage_uid integer @entity uid of the first floor_storage entity
     ---@field waddler_storage ENT_TYPE[] @size: 99
     ---@field waddler_metadata integer[] @size: 99
+    ---@field journal_progress_sticker_count integer
+    ---@field journal_progress_sticker_slots JournalProgressStickerSlot[] @size: 40 @stickers for notable items and entities in journal progress page
+    ---@field journal_progress_stain_count integer
+    ---@field journal_progress_stain_slots JournalProgressStainSlot[] @size: 30 @blood splats and paw prints in journal progress page
+    ---@field journal_progress_theme_count integer
+    ---@field journal_progress_theme_slots integer[] @size: 9 @visited themes in journal progress page
     ---@field theme_info ThemeInfo @Points to the current ThemeInfo
     ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
@@ -2142,7 +2165,14 @@ function PRNG:random(min, max) end
     ---@field tileh number
     ---@field facing_left boolean
     ---@field render_inactive boolean
+    ---@field texture_num integer
     ---@field get_entity fun(self): class Entity
+    ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
+    ---@field get_second_texture TEXTURE?
+    ---@field get_third_texture TEXTURE?
+    ---@field set_second_texture fun(self, texture_id: TEXTURE): boolean
+    ---@field set_third_texture fun(self, texture_id: TEXTURE): boolean
+    ---@field set_texture_num fun(self, texture_id: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
     ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.

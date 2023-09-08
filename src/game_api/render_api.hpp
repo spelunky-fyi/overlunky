@@ -303,16 +303,13 @@ struct RenderInfo
     Texture* texture;
     const char** texture_name;
 
-    size_t unknown39;
-    size_t unknown40;
-    size_t unknown41;
+    const char** second_texture_name; // Normal map texture on COG entities (shader 30), shine texture on ice entities. May not have a correct value on entities that don't use it
+    const char** third_texture_name;  // Shine texture on COG entities (shader 30). May not have a correct value on entities that don't use it
+    size_t unknown41;                 // fourth texture?? seems to be somehow used if changing the texture_num to 4
     size_t unknown42;
     size_t unknown43;
     size_t unknown44;
-    bool render_as_non_liquid; // for liquids, forced to false, for non-liquids: sprite goes crazy when moving about
-    uint8_t unknown47;
-    uint8_t unknown48;
-    uint8_t unknown49;
+    uint32_t texture_num; // liquids use 0, most sprite entities use 1, ice uses 2, COG entities use 3
     uint32_t unknown50;
     size_t entity_offset; // the offset of the associated entity in memory, starting from the memory segment that State resides in
     bool flip_horizontal; // facing left
@@ -339,6 +336,13 @@ struct RenderInfo
 
     // for supporting HookableVTable
     uint32_t get_aux_id() const;
+
+    bool set_second_texture(TEXTURE texture_id);
+    bool set_third_texture(TEXTURE texture_id);
+    /// Set the number of textures that may be used, need to have them set before for it to work
+    bool set_texture_num(uint32_t texture_id);
+    /// Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
+    bool set_normal_map_texture(TEXTURE texture_id);
 };
 
 void init_render_api_hooks();
