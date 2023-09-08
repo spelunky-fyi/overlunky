@@ -756,6 +756,20 @@ tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split
 
 ### RenderInfo
 
+
+> For using a custom normal map:
+
+```lua
+set_post_entity_spawn(function(ent)
+  -- Doesn't really make sense with this texture, you can use your custom normal texture id here
+  ent.rendering_info:set_normal_map_texture(TEXTURE.DATA_TEXTURES_FLOORSTYLED_GOLD_NORMAL_0)
+  ent.rendering_info.shader = 30 -- Make sure to set the shader to one that uses normal map
+end, SPAWN_TYPE.LEVEL_GEN, MASK.FLOOR, ENT_TYPE.FLOORSTYLED_MINEWOOD)
+```
+
+> Note: if using set_texture_num, make sure to have used set_second_texture/set_third_texture before, since not doing so can lead to crashes
+
+
 Some information used to render the entity, can not be changed, used in [Entity](#Entity)
 
 Type | Name | Description
@@ -769,7 +783,14 @@ float | [tilew](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilew) 
 float | [tileh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tileh) | 
 bool | [facing_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=facing_left) | 
 bool | [render_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_inactive) | 
+int | [texture_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_num) | 
 class [Entity](#Entity) | [get_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity) | 
+bool | [set_normal_map_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_normal_map_texture) | Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
+optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_second_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_second_texture) | 
+optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_third_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_third_texture) | 
+bool | [set_second_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_second_texture) | 
+bool | [set_third_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_third_texture) | 
+bool | [set_texture_num(int texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture_num) | Set the number of textures that may be used, need to have them set before for it to work
 [CallbackId](#Aliases) | [set_pre_virtual(RENDER_INFO_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(RENDER_INFO_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.

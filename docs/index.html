@@ -8865,6 +8865,19 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 </tbody></table>
 <h3 id='RenderInfo'>RenderInfo</h3>
+<blockquote>
+<p>For using a custom normal map:</p>
+</blockquote>
+<div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_post_entity_spawn</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span>
+  <span class="c1">-- Doesn't really make sense with this texture, you can use your custom normal texture id here</span>
+  <span class="n">ent</span><span class="p">.</span><span class="n">rendering_info</span><span class="p">:</span><span class="n">set_normal_map_texture</span><span class="p">(</span><span class="n">TEXTURE</span><span class="p">.</span><span class="n">DATA_TEXTURES_FLOORSTYLED_GOLD_NORMAL_0</span><span class="p">)</span>
+  <span class="n">ent</span><span class="p">.</span><span class="n">rendering_info</span><span class="p">.</span><span class="n">shader</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1">-- Make sure to set the shader to one that uses normal map</span>
+<span class="k">end</span><span class="p">,</span> <span class="n">SPAWN_TYPE</span><span class="p">.</span><span class="n">LEVEL_GEN</span><span class="p">,</span> <span class="n">MASK</span><span class="p">.</span><span class="n">FLOOR</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">FLOORSTYLED_MINEWOOD</span><span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>Note: if using set_texture_num, make sure to have used set_second_texture/set_third_texture before, since not doing so can lead to crashes</p>
+</blockquote>
+
 <p>Some information used to render the entity, can not be changed, used in <a href="#Entity">Entity</a></p>
 
 <table><thead>
@@ -8920,9 +8933,44 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture_num">texture_num</a></td>
+<td></td>
+</tr>
+<tr>
 <td>class <a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity">get_entity()</a></td>
 <td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_normal_map_texture">set_normal_map_texture(TEXTURE texture_id)</a></td>
+<td>Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)</td>
+</tr>
+<tr>
+<td>optional&lt;<a href="#TEXTURE">TEXTURE</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_second_texture">get_second_texture</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;<a href="#TEXTURE">TEXTURE</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_third_texture">get_third_texture</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_second_texture">set_second_texture(TEXTURE texture_id)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_third_texture">set_third_texture(TEXTURE texture_id)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_texture_num">set_texture_num(int texture_id)</a></td>
+<td>Set the number of textures that may be used, need to have them set before for it to work</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
