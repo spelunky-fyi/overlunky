@@ -3844,7 +3844,12 @@ Add global callback function to be called after <code>frames</code> engine frame
 </blockquote>
 <h4 id='CallbackId-set_interval-function-cb-int-frames'><a href="#Aliases">CallbackId</a> set_interval(function cb, int frames)</h4>
 <p>Returns unique id for the callback to be used in <a href="#clear_callback">clear_callback</a>. You can also return <code>false</code> from your function to clear the callback.
-Add per level callback function to be called every <code>frames</code> engine frames. Timer is paused on pause and cleared on level transition.</p>
+Add per level callback function to be called every <code>frames</code> engine frames
+Ex. frames = 100 - will call the function on 100th frame from this point. This might differ in the exact timing of first frame depending as in what part of the frame you call this function
+or even be one frame off if called right before the time_level variable is updated
+If you require precise timing, choose the start of your interval in one of those safe callbacks:
+The <a href="#SCREEN">SCREEN</a> callbacks: from <a href="#ON">ON</a>.LOGO to <a href="#ON">ON</a>.ONLINE_LOBBY or custom callbacks <a href="#ON">ON</a>.FRAME, <a href="#ON">ON</a>.<a href="#SCREEN">SCREEN</a>, <a href="#ON">ON</a>.START, <a href="#ON">ON</a>.LOADING, <a href="#ON">ON</a>.RESET, <a href="#ON">ON</a>.POST_UPDATE
+Timer is paused on pause and cleared on level transition.</p>
 <h3 id='set_on_player_instagib'>set_on_player_instagib</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_on_player_instagib">set_on_player_instagib</a></p>
