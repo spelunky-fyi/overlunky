@@ -1923,6 +1923,7 @@ do
     ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
     ---@field next_entity_uid integer @Next entity spawned will have this uid
+    ---@field room_owners RoomOwnersInfo @Holds info about owned rooms and items (shops, challenge rooms, vault etc.)
 
 ---@class LightParams
     ---@field red number
@@ -2022,6 +2023,19 @@ do
     ---@field result_announcement_timer integer
     ---@field won_prizes_count integer
     ---@field balance integer
+
+---@class RoomOwnersInfo
+    ---@field owned_items custom_map<integer, ItemOwnerDetails> @key/index is the uid of an item
+    ---@field owned_rooms RoomwOwnerDetails[]
+
+---@class ItemOwnerDetails
+    ---@field owner_type ENT_TYPE
+    ---@field owner_uid integer
+
+---@class RoomwOwnerDetails
+    ---@field layer integer
+    ---@field room_index integer
+    ---@field owner_uid integer
 
 ---@class BackgroundMusic
     ---@field game_startup BackgroundSound

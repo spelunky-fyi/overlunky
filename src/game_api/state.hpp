@@ -265,6 +265,7 @@ struct StateMemory
     uint8_t unknown31a; // padding probably
     uint8_t unknown31b;
     uint8_t unknown31c;
+    /// Holds info about owned rooms and items (shops, challenge rooms, vault etc.)
     RoomOwnersInfo room_owners;
     /// Number of frames since the game was launched
     uint32_t time_startup;
