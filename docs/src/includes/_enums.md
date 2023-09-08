@@ -379,7 +379,7 @@ Name | Data | Description
 
 Name | Data | Description
 ---- | ---- | -----------
-[DAMSEL_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.DAMSEL_STYLE) | 0 | 
+[WINDOW_SCALE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.WINDOW_SCALE) | 0 | 
 ...check [game_settings.txt](game_data/game_settings.txt)... |  | 
 [CROSSPROGRESS_AUTOSYNC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.CROSSPROGRESS_AUTOSYNC) | 47 | 
 
