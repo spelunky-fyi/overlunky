@@ -2165,7 +2165,14 @@ function PRNG:random(min, max) end
     ---@field tileh number
     ---@field facing_left boolean
     ---@field render_inactive boolean
+    ---@field texture_num integer
     ---@field get_entity fun(self): class Entity
+    ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
+    ---@field get_second_texture TEXTURE?
+    ---@field get_third_texture TEXTURE?
+    ---@field set_second_texture fun(self, texture_id: TEXTURE): boolean
+    ---@field set_third_texture fun(self, texture_id: TEXTURE): boolean
+    ---@field set_texture_num fun(self, texture_id: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
     ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
