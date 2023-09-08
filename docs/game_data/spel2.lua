@@ -1761,6 +1761,23 @@ do
     ---@field breath_cooldown integer
     ---@field punish_ball boolean
 
+---@class JournalProgressStickerSlot
+    ---@field theme integer
+    ---@field grid_position integer
+    ---@field entity_type ENT_TYPE
+    ---@field x number
+    ---@field y number
+    ---@field angle number
+
+---@class JournalProgressStainSlot
+    ---@field x number
+    ---@field y number
+    ---@field angle number
+    ---@field scale number
+    ---@field texture_column integer
+    ---@field texture_row integer
+    ---@field texture_range integer
+
 ---@class SelectPlayerSlot
     ---@field activated boolean
     ---@field character ENT_TYPE
@@ -1896,6 +1913,12 @@ do
     ---@field storage_uid integer @entity uid of the first floor_storage entity
     ---@field waddler_storage ENT_TYPE[] @size: 99
     ---@field waddler_metadata integer[] @size: 99
+    ---@field journal_progress_sticker_count integer
+    ---@field journal_progress_sticker_slots JournalProgressStickerSlot[] @size: 40 @stickers for notable items and entities in journal progress page
+    ---@field journal_progress_stain_count integer
+    ---@field journal_progress_stain_slots JournalProgressStainSlot[] @size: 30 @blood splats and paw prints in journal progress page
+    ---@field journal_progress_theme_count integer
+    ---@field journal_progress_theme_slots integer[] @size: 9 @visited themes in journal progress page
     ---@field theme_info ThemeInfo @Points to the current ThemeInfo
     ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
