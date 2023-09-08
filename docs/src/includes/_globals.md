@@ -250,7 +250,12 @@ end, 60)
 #### [CallbackId](#Aliases) set_interval(function cb, int frames)
 
 Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
-Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+Add per level callback function to be called every `frames` engine frames
+Ex. frames = 100 - will call the function on 100th frame from this point. This might differ in the exact timing of first frame depending as in what part of the frame you call this function
+or even be one frame off if called right before the time_level variable is updated
+If you require precise timing, choose the start of your interval in one of those safe callbacks:
+The [SCREEN](#SCREEN) callbacks: from [ON](#ON).LOGO to [ON](#ON).ONLINE_LOBBY or custom callbacks [ON](#ON).FRAME, [ON](#ON).[SCREEN](#SCREEN), [ON](#ON).START, [ON](#ON).LOADING, [ON](#ON).RESET, [ON](#ON).POST_UPDATE
+Timer is paused on pause and cleared on level transition.
 
 ### set_on_player_instagib
 

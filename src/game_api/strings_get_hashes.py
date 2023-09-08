@@ -9,7 +9,7 @@ strings_path = "../../docs/game_data/strings00_hashed.str"
 print(
     """
 // THIS FILE IS AUTO-GENERATED
-// If you need to make changes it please change strings_get_hashes.py
+// If you need to make changes to it, please change "strings_get_hashes.py"
 
 #include <cstdint>    // for uint32_t
 #include <functional> // for less

@@ -374,7 +374,7 @@ void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instan
             }
             side ^= 0x1;
         }
-        for (auto p : pages_copy) // free unused screens
+        for (auto& p : pages_copy) // free unused screens
         {
             if (p.second)
             {
