@@ -8,6 +8,8 @@
 #include "color.hpp"   // for Color
 #include "math.hpp"    // for Vec2, AABB (ptr only)
 
+using GUI_CONDITION = int;
+
 enum class DRAW_LAYER
 {
     BACKGROUND,
@@ -65,15 +67,33 @@ class GuiDrawContext
     void draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uColor color, float angle, float px, float py);
     /// Draw on top of UI windows, including platform windows that may be outside the game area, or only in current widget window. Defaults to main viewport background.
     void draw_layer(DRAW_LAYER layer);
-
-    /// Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the
-    /// [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to
-    /// autosize in center. Use just a `##Label` as title to hide titlebar.
-    /// **Important: Keep all your labels unique!** If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to
-    /// give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...
-    /// Returns false if the window was closed from the X.
-    /// <br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
+    /// Create a new widget window. The window functions are just wrappers for [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there.
+    /// **Important: Keep all your widget ids unique!** If you need inputs with the same visible label, add `##SomeUniqueId` after the label,
+    /// or use `win_pushid` to give things unique ids. ImGui doesn't know what you interacted with if all your widgets have the same id.
+    /// See [ImGui docs](https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#q-about-the-id-stack-system) for more information about unique ids.
+    /// `title`: Title and id of the window. Avoid changing the id of an active window. Every time the id changes, ImGui will discard the old window and create a new one. Use something like `##SomeUniqueId` as the title to hide the title bar.
+    /// `x`, `y`: Initial position of the window, in screen coordinates.
+    /// `w`, `h`: Initial size of the window, in screen coordinates.
+    /// `movable`: Whether the user can move and resize the window.
+    /// `callback`: Add all `win_*` widgets in here. Signature is `nil function(GuiDrawContext ctx, Vec2 pos, Vec2 size, bool collapsed)`.
+    /// Set `x`, `y`, `w`, and `h` to `0, 0, 0, 0` to autosize in center of screen.
+    /// Returns false when the window is closed by the user.
     bool window(std::string title, float x, float y, float w, float h, bool movable, sol::function callback);
+    /// Create a new widget window. The window functions are just wrappers for [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there.
+    /// **Important: Keep all your widget ids unique!** If you need inputs with the same visible label, add `##SomeUniqueId` after the label,
+    /// or use `win_pushid` to give things unique ids. ImGui doesn't know what you interacted with if all your widgets have the same id.
+    /// See [ImGui docs](https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#q-about-the-id-stack-system) for more information about unique ids.
+    /// `title`: Title and id of the window. Avoid changing the id of an active window. Every time the id changes, ImGui will discard the old window and create a new one.
+    /// `x`, `y`: Position of the window, in screen coordinates.
+    /// `w`, `h`: Size of the window, in screen coordinates.
+    /// `collapsed`: Collapsed state of the window.
+    /// `pos_cond`: GUI_CONDITION for applying the position.
+    /// `size_cond`: GUI_CONDITION for applying the size.
+    /// `collapsed_cond`: GUI_CONDITION for applying the collapsed state.
+    /// `callback`: Add all `win_*` widgets in here. Signature is `nil function(GuiDrawContext ctx, Vec2 pos, Vec2 size, bool collapsed)`.
+    /// Set `x`, `y`, `w`, and `h` to `0, 0, 0, 0` to autosize in center of screen.
+    /// Returns false when the window is closed by the user.
+    bool window(std::string title, float x, float y, float w, float h, bool collapsed, GUI_CONDITION pos_cond, GUI_CONDITION size_cond, GUI_CONDITION collapsed_cond, int flags, sol::function callback);
     /// Add some text to window, automatically wrapped
     void win_text(std::string text);
     /// Add a separator line to window

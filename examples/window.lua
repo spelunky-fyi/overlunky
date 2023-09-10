@@ -18,7 +18,7 @@ local inputtooltip = 'This input\'s value is used as its tooltip.'
 local widgetopen = true
 local closebutton = false
 
-local tab_window_open = true
+local tab_window_open = false
 local custom_tab_bar_flags = GUI_TAB_BAR_FLAG.NONE
 local next_custom_tab_id = 4
 local custom_tabs = {
@@ -39,6 +39,33 @@ local custom_tabs = {
     }
 }
 
+local GUI_CONDITION_TO_INDEX = {
+    [GUI_CONDITION.ALWAYS] = 1,
+    [GUI_CONDITION.ONCE] = 2,
+    [GUI_CONDITION.FIRST_USE_EVER] = 3,
+    [GUI_CONDITION.APPEARING] = 4
+}
+local INDEX_TO_GUI_CONDITION = {
+    GUI_CONDITION.ALWAYS,
+    GUI_CONDITION.ONCE,
+    GUI_CONDITION.FIRST_USE_EVER,
+    GUI_CONDITION.APPEARING
+}
+local GUI_CONDITION_OPTS = 'Always\0Once\0First use ever\0Appearing\0\0'
+
+local custom_window_open = false
+local custom_window_name = "Custom Window"
+-- initially position the window in the top-right quadrant of the screen
+local custom_window_x = 0.1
+local custom_window_y = 0.9
+local custom_window_w = 0.8
+local custom_window_h = 0.8
+local custom_window_collapsed = false
+local custom_window_pos_condition = GUI_CONDITION.APPEARING
+local custom_window_size_condition = GUI_CONDITION.APPEARING
+local custom_window_collapsed_condition = GUI_CONDITION.APPEARING
+local custom_window_flags = GUI_WINDOW_FLAG.NONE
+
 local seedinput = ''
 local seeddialogopen = false
 local seeddialogclosebutton = false
@@ -50,10 +77,13 @@ local loadingimage = create_image('loading.png')
 register_option_button('open', 'Open test window', function()
     widgetopen = true
 end)
-register_option_button('open2', 'Open tab window', function()
+register_option_button('open2', 'Open tab examples window', function()
     tab_window_open = true
 end)
-register_option_button('open3', 'Open seed dialog', function()
+register_option_button('open3', 'Open custom window', function()
+    custom_window_open = true
+end)
+register_option_button('open4', 'Open seed dialog', function()
     seeddialogopen = true
 end)
 
@@ -75,7 +105,14 @@ set_callback(function(draw_ctx)
     if widgetopen then
         -- create a new window and test most of the widgets
         -- we'll put this one top center and make it movable, with no titlebar
-        widgetopen = draw_ctx:window('##TestWindow', -0.3, 0.9, 0.6, 0.5, true, function(ctx, pos, size)
+        widgetopen = draw_ctx:window('##TestWindow', -0.3, 0.9, 0.6, 0.5, true, function(ctx, pos, size, collapsed)
+            if draw_ctx:win_button('Open tab examples window') then
+                tab_window_open = true
+            end
+            if draw_ctx:win_button('Open custom window') then
+                custom_window_open = true
+            end
+
             draw_ctx:win_separator_text('Section One')
 
             draw_ctx:win_text(string.format("Geometry: %f,%f %f x %f", pos.x, pos.y, size.x, size.y))
@@ -303,6 +340,64 @@ set_callback(function(draw_ctx)
                 end
             end)
         end)
+    end
+
+    if custom_window_open then
+        -- create a customizable window using the more advanced window function
+        -- use this example to quickly test how different settings affect the window
+        -- this title will always identify the window as "custom_window", even if its visible name changes
+        custom_window_open = draw_ctx:window(custom_window_name..'###custom_window',
+                custom_window_x, custom_window_y, custom_window_w, custom_window_h, custom_window_collapsed,
+                custom_window_pos_condition, custom_window_size_condition, custom_window_collapsed_condition, custom_window_flags, function(ctx, pos, size, collapsed)
+            draw_ctx:win_text('The settings below are for this custom window. Not all combinations of settings will make sense, and some combinations may lock you out of interacting with the window. If that happens, then reload the script to get back the default settings.')
+            custom_window_name = draw_ctx:win_input_text('Window name', custom_window_name)
+            draw_ctx:win_section('Size, Position, Collapsed', function()
+                draw_ctx:win_indent(10)
+                draw_ctx:win_text('The position, size, and collapsed parameters only affect the window when their corresponding condition is met.')
+                draw_ctx:win_text(string.format('Current position: %f, %f', pos.x, pos.y))
+                draw_ctx:win_text(string.format('Current size: %f x %f', size.x, size.y))
+                custom_window_x = draw_ctx:win_input_float('Position (X)', custom_window_x, -1.0, 1.0)
+                custom_window_y = draw_ctx:win_input_float('Position (Y)', custom_window_y, -1.0, 1.0)
+                custom_window_w = draw_ctx:win_input_float('Size (width)', custom_window_w, 0.0, 2.0)
+                custom_window_h = draw_ctx:win_input_float('Size (height)', custom_window_h, 0.0, 2.0)
+                custom_window_collapsed = draw_ctx:win_check('Collapsed', custom_window_collapsed)
+                custom_window_pos_condition = INDEX_TO_GUI_CONDITION[draw_ctx:win_combo('Position condition',
+                    GUI_CONDITION_TO_INDEX[custom_window_pos_condition], GUI_CONDITION_OPTS)]
+                custom_window_size_condition = INDEX_TO_GUI_CONDITION[draw_ctx:win_combo('Size condition',
+                    GUI_CONDITION_TO_INDEX[custom_window_size_condition], GUI_CONDITION_OPTS)]
+                custom_window_collapsed_condition = INDEX_TO_GUI_CONDITION[draw_ctx:win_combo('Collapsed condition',
+                    GUI_CONDITION_TO_INDEX[custom_window_collapsed_condition], GUI_CONDITION_OPTS)]
+                draw_ctx:win_indent(-10)
+            end)
+            draw_ctx:win_section('Flags', function()
+                draw_ctx:win_indent(10)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No title bar', custom_window_flags, GUI_WINDOW_FLAG.NO_TITLE_BAR)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No resizing', custom_window_flags, GUI_WINDOW_FLAG.NO_RESIZE)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No moving', custom_window_flags, GUI_WINDOW_FLAG.NO_MOVE)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No scrollbar', custom_window_flags, GUI_WINDOW_FLAG.NO_SCROLLBAR)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No scrolling with mouse', custom_window_flags, GUI_WINDOW_FLAG.NO_SCROLL_WITH_MOUSE)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No collapsing', custom_window_flags, GUI_WINDOW_FLAG.NO_COLLAPSE)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'Always auto-resize to contents', custom_window_flags, GUI_WINDOW_FLAG.ALWAYS_AUTO_RESIZE)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No background', custom_window_flags, GUI_WINDOW_FLAG.NO_BACKGROUND)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No saved settings', custom_window_flags, GUI_WINDOW_FLAG.NO_SAVED_SETTINGS)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No mouse inputs', custom_window_flags, GUI_WINDOW_FLAG.NO_MOUSE_INPUTS)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'Horizontal scrollbar', custom_window_flags, GUI_WINDOW_FLAG.HORIZONTAL_SCROLLBAR)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No focus on appearing', custom_window_flags, GUI_WINDOW_FLAG.NO_FOCUS_ON_APPEARING)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No bring to front on focus', custom_window_flags, GUI_WINDOW_FLAG.NO_BRING_TO_FRONT_ON_FOCUS)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'Always show vertical scrollbar', custom_window_flags, GUI_WINDOW_FLAG.ALWAYS_VERTICAL_SCROLLBAR)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'Always show horizontal scrollbar', custom_window_flags, GUI_WINDOW_FLAG.ALWAYS_HORIZONTAL_SCROLLBAR)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No navigation inputs', custom_window_flags, GUI_WINDOW_FLAG.NO_NAV_INPUTS)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'No navigation focus', custom_window_flags, GUI_WINDOW_FLAG.NO_NAV_FOCUS)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'Show unsaved document indicator', custom_window_flags, GUI_WINDOW_FLAG.UNSAVED_DOCUMENT)
+                draw_ctx:win_indent(-10)
+            end)
+        end)
+        if not custom_window_open and test_mask(custom_window_flags, GUI_WINDOW_FLAG.UNSAVED_DOCUMENT) then
+            -- the UNSAVED_DOCUMENT flag doesn't prevent window closure
+            -- you need to skip closure yourself and add your own special behavior, such as showing a message or dialog
+            custom_window_open = true
+            message('Prevented closure of custom window with UNSAVED_DOCUMENT flag')
+        end
     end
 
     -- another smaller thing opened from the larger thing

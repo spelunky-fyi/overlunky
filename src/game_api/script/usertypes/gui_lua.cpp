@@ -345,18 +345,22 @@ void GuiDrawContext::draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uC
 
 bool GuiDrawContext::window(std::string title, float x, float y, float w, float h, bool movable, sol::function callback)
 {
+    ImGuiCond pos_size_cond = movable ? ImGuiCond_Appearing : ImGuiCond_Always;
+    ImGuiWindowFlags flags = movable ? ImGuiWindowFlags_None : ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    if (title == "" || title.find("##") == 0)
+    {
+        flags |= ImGuiWindowFlags_NoTitleBar;
+    }
+    return window(title, x, y, w, h, false, pos_size_cond, pos_size_cond, ImGuiCond_Appearing, flags, callback);
+}
+bool GuiDrawContext::window(std::string title, float x, float y, float w, float h, bool collapsed, GUI_CONDITION pos_cond, GUI_CONDITION size_cond, GUI_CONDITION collapsed_cond, int flags, sol::function callback)
+{
     bool win_open = true;
     ImGui::PushID("backendwindow");
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4, 4});
-    ImGuiCond cond = (movable ? ImGuiCond_Appearing : ImGuiCond_Always);
-    ImGuiCond flag = (movable ? 0 : ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-    if (title == "" || title.find("##") == 0)
-    {
-        flag |= ImGuiWindowFlags_NoTitleBar;
-    }
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
-        ImGui::SetNextWindowSize(ImVec2(400, -1), cond);
+        ImGui::SetNextWindowSize(ImVec2(400, -1), size_cond);
     }
     else
     {
@@ -364,23 +368,24 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
         ImVec2 ssa = screenify_fix(ImVec2(w, h));
         ImVec2 ssb = screenify_fix(ImVec2(0, 0));
         ImVec2 ssize = ImVec2(ssa.x - ssb.x, ssb.y - ssa.y);
-        ImGui::SetNextWindowPos(spos, cond);
-        ImGui::SetNextWindowSize(ssize, cond);
+        ImGui::SetNextWindowPos(spos, pos_cond);
+        ImGui::SetNextWindowSize(ssize, size_cond);
     }
-    flag |= ImGuiWindowFlags_NoDocking;
-    ImGui::Begin(title.c_str(), &win_open, flag);
+    ImGui::SetNextWindowCollapsed(collapsed, collapsed_cond);
+    flags |= ImGuiWindowFlags_NoDocking;
+    ImGui::Begin(title.c_str(), &win_open, flags);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() / 2);
     auto size = normalize(ImGui::GetWindowSize());
     size.x += 1.0f;
     size.y -= 1.0f;
     size.y *= -1.0f;
-    handle_function<void>(backend, callback, this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size));
+    handle_function<void>(backend, callback, this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size), ImGui::IsWindowCollapsed());
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
         ImGui::SetWindowPos(
             {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
-            cond);
+            pos_cond);
     }
     ImGui::End();
     ImGui::PopID();
@@ -641,6 +646,9 @@ void register_usertypes(sol::state& lua)
     auto draw_image_rotated = sol::overload(
         static_cast<void (GuiDrawContext::*)(IMAGE, float, float, float, float, float, float, float, float, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated),
         static_cast<void (GuiDrawContext::*)(IMAGE, AABB, AABB, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated));
+    auto window = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string, float, float, float, float, bool, sol::function)>(&GuiDrawContext::window),
+        static_cast<bool (GuiDrawContext::*)(std::string, float, float, float, float, bool, GUI_CONDITION, GUI_CONDITION, GUI_CONDITION, int, sol::function)>(&GuiDrawContext::window));
     auto win_pushid = sol::overload(
         static_cast<void (GuiDrawContext::*)(int)>(&GuiDrawContext::win_pushid),
         static_cast<void (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_pushid));
@@ -671,7 +679,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["draw_image"] = draw_image;
     guidrawcontext_type["draw_image_rotated"] = draw_image_rotated;
     guidrawcontext_type["draw_layer"] = &GuiDrawContext::draw_layer;
-    guidrawcontext_type["window"] = &GuiDrawContext::window;
+    guidrawcontext_type["window"] = window;
     guidrawcontext_type["win_text"] = &GuiDrawContext::win_text;
     guidrawcontext_type["win_separator"] = &GuiDrawContext::win_separator;
     guidrawcontext_type["win_separator_text"] = &GuiDrawContext::win_separatortext;
@@ -700,6 +708,43 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
 
+    /// Condition for setting a variable on a GUI widget. The variable is not changed if the condition is not met.
+    lua.create_named_table("GUI_CONDITION",
+        "ALWAYS", ImGuiCond_Always,
+        "ONCE", ImGuiCond_Once,
+        "FIRST_USE_EVER", ImGuiCond_FirstUseEver,
+        "APPEARING", ImGuiCond_Appearing);
+    /* GUI_CONDITION
+    // ALWAYS
+    // Always set the variable.
+    // ONCE
+    // Set the variable only the first time per runtime session.
+    // FIRST_USE_EVER
+    // Set the variable if the widget has no persistently saved data (no entry in .ini file).
+    // APPEARING
+    // Set the variable if the widget is appearing after being hidden/inactive (or the first time).
+    */
+    /// Window flags for `window` in GuiDrawContext.
+    lua.create_named_table("GUI_WINDOW_FLAG",
+        "NONE", ImGuiWindowFlags_None,
+        "NO_TITLE_BAR", ImGuiWindowFlags_NoTitleBar,
+        "NO_RESIZE", ImGuiWindowFlags_NoResize,
+        "NO_MOVE", ImGuiWindowFlags_NoMove,
+        "NO_SCROLLBAR", ImGuiWindowFlags_NoScrollbar,
+        "NO_SCROLL_WITH_MOUSE", ImGuiWindowFlags_NoScrollWithMouse,
+        "NO_COLLAPSE", ImGuiWindowFlags_NoCollapse,
+        "ALWAYS_AUTO_RESIZE", ImGuiWindowFlags_AlwaysAutoResize,
+        "NO_BACKGROUND", ImGuiWindowFlags_NoBackground,
+        "NO_SAVED_SETTINGS", ImGuiWindowFlags_NoSavedSettings,
+        "NO_MOUSE_INPUTS", ImGuiWindowFlags_NoMouseInputs,
+        "HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_HorizontalScrollbar,
+        "NO_FOCUS_ON_APPEARING", ImGuiWindowFlags_NoFocusOnAppearing,
+        "NO_BRING_TO_FRONT_ON_FOCUS", ImGuiWindowFlags_NoBringToFrontOnFocus,
+        "ALWAYS_VERTICAL_SCROLLBAR", ImGuiWindowFlags_AlwaysVerticalScrollbar,
+        "ALWAYS_HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_AlwaysHorizontalScrollbar,
+        "NO_NAV_INPUTS", ImGuiWindowFlags_NoNavInputs,
+        "NO_NAV_FOCUS", ImGuiWindowFlags_NoNavFocus,
+        "UNSAVED_DOCUMENT", ImGuiWindowFlags_UnsavedDocument);
     /// Tab bar flags for `win_tab_bar` in GuiDrawContext.
     lua.create_named_table("GUI_TAB_BAR_FLAG",
         "NONE", ImGuiTabBarFlags_None,
