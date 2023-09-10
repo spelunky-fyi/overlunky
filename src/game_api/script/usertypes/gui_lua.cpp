@@ -709,11 +709,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
 
     /// Condition for setting a variable on a GUI widget. The variable is not changed if the condition is not met.
-    lua.create_named_table("GUI_CONDITION",
-        "ALWAYS", ImGuiCond_Always,
-        "ONCE", ImGuiCond_Once,
-        "FIRST_USE_EVER", ImGuiCond_FirstUseEver,
-        "APPEARING", ImGuiCond_Appearing);
+    lua.create_named_table("GUI_CONDITION", "ALWAYS", ImGuiCond_Always, "ONCE", ImGuiCond_Once, "FIRST_USE_EVER", ImGuiCond_FirstUseEver, "APPEARING", ImGuiCond_Appearing);
     /* GUI_CONDITION
     // ALWAYS
     // Always set the variable.
@@ -725,48 +721,11 @@ void register_usertypes(sol::state& lua)
     // Set the variable if the widget is appearing after being hidden/inactive (or the first time).
     */
     /// Window flags for `window` in GuiDrawContext.
-    lua.create_named_table("GUI_WINDOW_FLAG",
-        "NONE", ImGuiWindowFlags_None,
-        "NO_TITLE_BAR", ImGuiWindowFlags_NoTitleBar,
-        "NO_RESIZE", ImGuiWindowFlags_NoResize,
-        "NO_MOVE", ImGuiWindowFlags_NoMove,
-        "NO_SCROLLBAR", ImGuiWindowFlags_NoScrollbar,
-        "NO_SCROLL_WITH_MOUSE", ImGuiWindowFlags_NoScrollWithMouse,
-        "NO_COLLAPSE", ImGuiWindowFlags_NoCollapse,
-        "ALWAYS_AUTO_RESIZE", ImGuiWindowFlags_AlwaysAutoResize,
-        "NO_BACKGROUND", ImGuiWindowFlags_NoBackground,
-        "NO_SAVED_SETTINGS", ImGuiWindowFlags_NoSavedSettings,
-        "NO_MOUSE_INPUTS", ImGuiWindowFlags_NoMouseInputs,
-        "HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_HorizontalScrollbar,
-        "NO_FOCUS_ON_APPEARING", ImGuiWindowFlags_NoFocusOnAppearing,
-        "NO_BRING_TO_FRONT_ON_FOCUS", ImGuiWindowFlags_NoBringToFrontOnFocus,
-        "ALWAYS_VERTICAL_SCROLLBAR", ImGuiWindowFlags_AlwaysVerticalScrollbar,
-        "ALWAYS_HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_AlwaysHorizontalScrollbar,
-        "NO_NAV_INPUTS", ImGuiWindowFlags_NoNavInputs,
-        "NO_NAV_FOCUS", ImGuiWindowFlags_NoNavFocus,
-        "UNSAVED_DOCUMENT", ImGuiWindowFlags_UnsavedDocument);
+    lua.create_named_table("GUI_WINDOW_FLAG", "NONE", ImGuiWindowFlags_None, "NO_TITLE_BAR", ImGuiWindowFlags_NoTitleBar, "NO_RESIZE", ImGuiWindowFlags_NoResize, "NO_MOVE", ImGuiWindowFlags_NoMove, "NO_SCROLLBAR", ImGuiWindowFlags_NoScrollbar, "NO_SCROLL_WITH_MOUSE", ImGuiWindowFlags_NoScrollWithMouse, "NO_COLLAPSE", ImGuiWindowFlags_NoCollapse, "ALWAYS_AUTO_RESIZE", ImGuiWindowFlags_AlwaysAutoResize, "NO_BACKGROUND", ImGuiWindowFlags_NoBackground, "NO_SAVED_SETTINGS", ImGuiWindowFlags_NoSavedSettings, "NO_MOUSE_INPUTS", ImGuiWindowFlags_NoMouseInputs, "HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_HorizontalScrollbar, "NO_FOCUS_ON_APPEARING", ImGuiWindowFlags_NoFocusOnAppearing, "NO_BRING_TO_FRONT_ON_FOCUS", ImGuiWindowFlags_NoBringToFrontOnFocus, "ALWAYS_VERTICAL_SCROLLBAR", ImGuiWindowFlags_AlwaysVerticalScrollbar, "ALWAYS_HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_AlwaysHorizontalScrollbar, "NO_NAV_INPUTS", ImGuiWindowFlags_NoNavInputs, "NO_NAV_FOCUS", ImGuiWindowFlags_NoNavFocus, "UNSAVED_DOCUMENT", ImGuiWindowFlags_UnsavedDocument);
     /// Tab bar flags for `win_tab_bar` in GuiDrawContext.
-    lua.create_named_table("GUI_TAB_BAR_FLAG",
-        "NONE", ImGuiTabBarFlags_None,
-        "REORDERABLE", ImGuiTabBarFlags_Reorderable,
-        "AUTO_SELECT_NEW_TABS", ImGuiTabBarFlags_AutoSelectNewTabs,
-        "TAB_LIST_POPUP_BUTTON", ImGuiTabBarFlags_TabListPopupButton,
-        "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton,
-        "NO_TAB_LIST_SCROLLING_BUTTONS", ImGuiTabBarFlags_NoTabListScrollingButtons,
-        "NO_TOOLTIP", ImGuiTabBarFlags_NoTooltip,
-        "FITTING_POLICY_RESIZE_DOWN", ImGuiTabBarFlags_FittingPolicyResizeDown,
-        "FITTING_POLICY_SCROLL", ImGuiTabBarFlags_FittingPolicyScroll);
+    lua.create_named_table("GUI_TAB_BAR_FLAG", "NONE", ImGuiTabBarFlags_None, "REORDERABLE", ImGuiTabBarFlags_Reorderable, "AUTO_SELECT_NEW_TABS", ImGuiTabBarFlags_AutoSelectNewTabs, "TAB_LIST_POPUP_BUTTON", ImGuiTabBarFlags_TabListPopupButton, "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton, "NO_TAB_LIST_SCROLLING_BUTTONS", ImGuiTabBarFlags_NoTabListScrollingButtons, "NO_TOOLTIP", ImGuiTabBarFlags_NoTooltip, "FITTING_POLICY_RESIZE_DOWN", ImGuiTabBarFlags_FittingPolicyResizeDown, "FITTING_POLICY_SCROLL", ImGuiTabBarFlags_FittingPolicyScroll);
     /// Tab item flags for `win_tab_item` and `win_tab_item_button` in GuiDrawContext.
-    lua.create_named_table("GUI_TAB_ITEM_FLAG",
-        "NONE", ImGuiTabItemFlags_None,
-        "UNSAVED_DOCUMENT", ImGuiTabItemFlags_UnsavedDocument,
-        "SET_SELECTED", ImGuiTabItemFlags_SetSelected,
-        "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabItemFlags_NoCloseWithMiddleMouseButton,
-        "NO_PUSH_ID", ImGuiTabItemFlags_NoPushId,
-        "NO_TOOLTIP", ImGuiTabItemFlags_NoTooltip,
-        "NO_REORDER", ImGuiTabItemFlags_NoReorder,
-        "LEADING", ImGuiTabItemFlags_Leading,
-        "TRAILING", ImGuiTabItemFlags_Trailing);
+    lua.create_named_table("GUI_TAB_ITEM_FLAG", "NONE", ImGuiTabItemFlags_None, "UNSAVED_DOCUMENT", ImGuiTabItemFlags_UnsavedDocument, "SET_SELECTED", ImGuiTabItemFlags_SetSelected, "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabItemFlags_NoCloseWithMiddleMouseButton, "NO_PUSH_ID", ImGuiTabItemFlags_NoPushId, "NO_TOOLTIP", ImGuiTabItemFlags_NoTooltip, "NO_REORDER", ImGuiTabItemFlags_NoReorder, "LEADING", ImGuiTabItemFlags_Leading, "TRAILING", ImGuiTabItemFlags_Trailing);
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) -> uColor
