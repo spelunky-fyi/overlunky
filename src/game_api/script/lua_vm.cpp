@@ -435,11 +435,17 @@ end
     };
 
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
-    /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+    /// Add per level callback function to be called every `frames` engine frames
+    /// Ex. frames = 100 - will call the function on 100th frame from this point. This might differ in the exact timing of first frame depending as in what part of the frame you call this function
+    /// or even be one frame off if called right before the time_level variable is updated
+    /// If you require precise timing, choose the start of your interval in one of those safe callbacks:
+    /// The SCREEN callbacks: from ON.LOGO to ON.ONLINE_LOBBY or custom callbacks ON.FRAME, ON.SCREEN, ON.START, ON.LOADING, ON.RESET, ON.POST_UPDATE
+    /// Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto luaCb = IntervalCallback{cb, frames, -1};
+        auto state = State::get().ptr_main();
+        auto luaCb = IntervalCallback{cb, frames, (int)state->time_level};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
@@ -1845,7 +1851,7 @@ end
     )");
 
     /// Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](#spawn_roomowner).
-    // lua["spawn_shopkeeper"] = [](float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = ROOM_TEMPLATE.SHOP) -> uint32_t
+    // lua["spawn_shopkeeper"] = [](float x, float y, LAYER layer, ROOM_TEMPLATE room_template = ROOM_TEMPLATE.SHOP) -> uint32_t
     lua["spawn_shopkeeper"] = sol::overload(
         [](float x, float y, LAYER layer)
         {
@@ -1857,7 +1863,7 @@ end
         });
 
     /// Spawn a RoomOwner (or a few other like [CavemanShopkeeper](#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
-    // lua["spawn_roomowner"] = [](ENT_TYPE owner_type, float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = -1) -> uint32_t
+    // lua["spawn_roomowner"] = [](ENT_TYPE owner_type, float x, float y, LAYER layer, ROOM_TEMPLATE room_template = -1) -> uint32_t
     lua["spawn_roomowner"] = sol::overload(
         [](ENT_TYPE owner_type, float x, float y, LAYER layer)
         {
@@ -2468,11 +2474,11 @@ end
 
     /// Paramater to get_setting (and set_setting in unsafe mode)
     lua.create_named_table("GAME_SETTING"
-                           //, "DAMSEL_STYLE", 0
+                           //, "WINDOW_SCALE", 0
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
                            //, "CROSSPROGRESS_AUTOSYNC", 47
     );
-    for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
+    for (auto& [setting_name_view, setting_index] : get_settings_names_and_indices())
     {
         std::string setting_name{setting_name_view};
         std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)

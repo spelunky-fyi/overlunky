@@ -73,8 +73,8 @@ void register_usertypes(sol::state& lua)
         static_cast<AABB& (AABB::*)(float)>(&AABB::extrude),
         static_cast<AABB& (AABB::*)(float, float)>(&AABB::extrude));
     const auto is_point_inside = sol::overload(
-        static_cast<bool (AABB::*)(const Vec2)>(&AABB::is_point_inside),
-        static_cast<bool (AABB::*)(float, float)>(&AABB::is_point_inside));
+        static_cast<bool (AABB::*)(const Vec2) const>(&AABB::is_point_inside),
+        static_cast<bool (AABB::*)(float, float) const>(&AABB::is_point_inside));
 
     /// Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the size of a gui element
     lua.new_usertype<AABB>(
@@ -113,6 +113,11 @@ void register_usertypes(sol::state& lua)
     auto offset = sol::overload(
         static_cast<Triangle& (Triangle::*)(const Vec2&)>(&Triangle::offset),
         static_cast<Triangle& (Triangle::*)(float, float)>(&Triangle::offset));
+    auto is_point_inside_triangle = sol::overload(
+        static_cast<bool (Triangle::*)(Vec2) const>(&Triangle::is_point_inside),
+        static_cast<bool (Triangle::*)(Vec2, float) const>(&Triangle::is_point_inside),
+        static_cast<bool (Triangle::*)(float, float) const>(&Triangle::is_point_inside),
+        static_cast<bool (Triangle::*)(float, float, float) const>(&Triangle::is_point_inside));
 
     lua.new_usertype<Triangle>(
         "Triangle",
@@ -133,9 +138,19 @@ void register_usertypes(sol::state& lua)
         &Triangle::get_angles,
         "scale",
         &Triangle::scale,
+        "area",
+        &Triangle::area,
+        "is_point_inside",
+        is_point_inside_triangle,
         "split",
         // &Triangle::split); // for the autodoc
         &Triangle::operator std::tuple<Vec2, Vec2, Vec2>);
+
+    auto is_point_inside_quad = sol::overload(
+        static_cast<bool (Quad::*)(Vec2) const>(&Quad::is_point_inside),
+        static_cast<bool (Quad::*)(Vec2, float) const>(&Quad::is_point_inside),
+        static_cast<bool (Quad::*)(float, float) const>(&Quad::is_point_inside),
+        static_cast<bool (Quad::*)(float, float, float) const>(&Quad::is_point_inside));
 
     lua.new_usertype<Quad>(
         "Quad",
@@ -166,8 +181,16 @@ void register_usertypes(sol::state& lua)
         &Quad::flip_horizontally,
         "flip_vertically",
         &Quad::flip_vertically,
+        "is_point_inside",
+        is_point_inside_quad,
         "split",
         // &Quad::split); // for the autodoc
         &Quad::operator std::tuple<Vec2, Vec2, Vec2, Vec2>);
+
+    auto two_lines_angle = sol::overload(
+        static_cast<float (*)(Vec2, Vec2, Vec2)>(::two_lines_angle),
+        static_cast<float (*)(Vec2, Vec2, Vec2, Vec2)>(::two_lines_angle));
+    lua["intersection"] = intersection;
+    lua["two_lines_angle"] = two_lines_angle;
 }
 } // namespace NHitbox

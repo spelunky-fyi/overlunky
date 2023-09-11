@@ -77,7 +77,12 @@ function messpect(...) end
 ---@return nil
 function register_console_command(name, cmd) end
 ---Returns unique id for the callback to be used in [clear_callback](https://spelunky-fyi.github.io/overlunky/#clear_callback). You can also return `false` from your function to clear the callback.
----Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+---Add per level callback function to be called every `frames` engine frames
+---Ex. frames = 100 - will call the function on 100th frame from this point. This might differ in the exact timing of first frame depending as in what part of the frame you call this function
+---or even be one frame off if called right before the time_level variable is updated
+---If you require precise timing, choose the start of your interval in one of those safe callbacks:
+---The SCREEN callbacks: from ON.LOGO to ON.ONLINE_LOBBY or custom callbacks ON.FRAME, ON.SCREEN, ON.START, ON.LOADING, ON.RESET, ON.POST_UPDATE
+---Timer is paused on pause and cleared on level transition.
 ---@param cb function
 ---@param frames integer
 ---@return CallbackId
@@ -1084,7 +1089,7 @@ function set_setting(setting, value) end
 function printf() end
 ---Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](https://spelunky-fyi.github.io/overlunky/#spawn_roomowner).
 ---@param x number
----@param y number,
+---@param y number
 ---@param layer LAYER
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
@@ -1092,7 +1097,7 @@ function spawn_shopkeeper(x, y, layer, room_template) end
 ---Spawn a RoomOwner (or a few other like [CavemanShopkeeper](https://spelunky-fyi.github.io/overlunky/#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
 ---@param owner_type ENT_TYPE
 ---@param x number
----@param y number,
+---@param y number
 ---@param layer LAYER
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
@@ -1553,6 +1558,26 @@ function get_render_hitbox(uid, extrude, offsetx, offsety) end
 ---@param box AABB
 ---@return AABB
 function screen_aabb(box) end
+---Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don't intersect each other [parallel]
+---@param A Vec2
+---@param B Vec2
+---@param C Vec2
+---@param D Vec2
+---@return Vec2
+function intersection(A, B, C, D) end
+---Mesures angle between two lines with one common point
+---@param A Vec2
+---@param common Vec2
+---@param B Vec2
+---@return number
+function two_lines_angle(A, common, B) end
+---Gets line1_A, intersection point and line2_B and calls the 3 parameter version of this function
+---@param line1_A Vec2
+---@param line1_B Vec2
+---@param line2_A Vec2
+---@param line2_B Vec2
+---@return number
+function two_lines_angle(line1_A, line1_B, line2_A, line2_B) end
 ---Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
 ---@param chapter integer
 ---@param entry integer
@@ -1741,6 +1766,23 @@ do
     ---@field breath_cooldown integer
     ---@field punish_ball boolean
 
+---@class JournalProgressStickerSlot
+    ---@field theme integer
+    ---@field grid_position integer
+    ---@field entity_type ENT_TYPE
+    ---@field x number
+    ---@field y number
+    ---@field angle number
+
+---@class JournalProgressStainSlot
+    ---@field x number
+    ---@field y number
+    ---@field angle number
+    ---@field scale number
+    ---@field texture_column integer
+    ---@field texture_row integer
+    ---@field texture_range integer
+
 ---@class SelectPlayerSlot
     ---@field activated boolean
     ---@field character ENT_TYPE
@@ -1876,6 +1918,12 @@ do
     ---@field storage_uid integer @entity uid of the first floor_storage entity
     ---@field waddler_storage ENT_TYPE[] @size: 99
     ---@field waddler_metadata integer[] @size: 99
+    ---@field journal_progress_sticker_count integer
+    ---@field journal_progress_sticker_slots JournalProgressStickerSlot[] @size: 40 @stickers for notable items and entities in journal progress page
+    ---@field journal_progress_stain_count integer
+    ---@field journal_progress_stain_slots JournalProgressStainSlot[] @size: 30 @blood splats and paw prints in journal progress page
+    ---@field journal_progress_theme_count integer
+    ---@field journal_progress_theme_slots integer[] @size: 9 @visited themes in journal progress page
     ---@field theme_info ThemeInfo @Points to the current ThemeInfo
     ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
@@ -2122,7 +2170,14 @@ function PRNG:random(min, max) end
     ---@field tileh number
     ---@field facing_left boolean
     ---@field render_inactive boolean
+    ---@field texture_num integer
     ---@field get_entity fun(self): class Entity
+    ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
+    ---@field get_second_texture TEXTURE?
+    ---@field get_third_texture TEXTURE?
+    ---@field set_second_texture fun(self, texture_id: TEXTURE): boolean
+    ---@field set_third_texture fun(self, texture_id: TEXTURE): boolean
+    ---@field set_texture_num fun(self, texture_id: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
     ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -2187,6 +2242,8 @@ function PRNG:random(min, max) end
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
     ---@field set_pre_dtor fun(self, fun: fun(self: Entity): nil): CallbackId @Hooks before the virtual function.<br/>The callback signature is `nil dtor(Entity self)`
     ---@field set_post_dtor fun(self, fun: fun(self: Entity): nil): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil dtor(Entity self)`
+    ---@field set_pre_create_rendering_info fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool create_rendering_info(Entity self)`
+    ---@field set_post_create_rendering_info fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil create_rendering_info(Entity self)`
     ---@field set_pre_update_state_machine fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool update_state_machine(Entity self)`
     ---@field set_post_update_state_machine fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil update_state_machine(Entity self)`
     ---@field set_pre_kill fun(self, fun: fun(self: Entity, destroy_corpse: boolean, responsible: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool kill(Entity self, boolean destroy_corpse, Entity responsible)`<br/>Virtual function docs:<br/>Kills the entity, you can set responsible to `nil` to ignore it
@@ -2195,12 +2252,32 @@ function PRNG:random(min, max) end
     ---@field set_post_on_collision1 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_collision1(Entity self, Entity other_entity)`
     ---@field set_pre_destroy fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool destroy(Entity self)`<br/>Virtual function docs:<br/>Completely removes the entity from existence
     ---@field set_post_destroy fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil destroy(Entity self)`<br/>Virtual function docs:<br/>Completely removes the entity from existence
+    ---@field set_pre_can_be_pushed fun(self, fun: fun(self: Entity): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> can_be_pushed(Entity self)`
+    ---@field set_post_can_be_pushed fun(self, fun: fun(self: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil can_be_pushed(Entity self)`
+    ---@field set_pre_is_in_liquid fun(self, fun: fun(self: Entity): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> is_in_liquid(Entity self)`<br/>Virtual function docs:<br/>Returns true if entity is in water/lava
+    ---@field set_post_is_in_liquid fun(self, fun: fun(self: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil is_in_liquid(Entity self)`<br/>Virtual function docs:<br/>Returns true if entity is in water/lava
+    ---@field set_pre_set_invisible fun(self, fun: fun(self: Entity, value: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool set_invisible(Entity self, boolean value)`
+    ---@field set_post_set_invisible fun(self, fun: fun(self: Entity, value: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil set_invisible(Entity self, boolean value)`
+    ---@field set_pre_friction fun(self, fun: fun(self: Entity): number?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<number> friction(Entity self)`
+    ---@field set_post_friction fun(self, fun: fun(self: Entity): number?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil friction(Entity self)`
     ---@field set_pre_get_held_entity fun(self, fun: fun(self: Entity): Entity?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<Entity> get_held_entity(Entity self)`
     ---@field set_post_get_held_entity fun(self, fun: fun(self: Entity): Entity?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil get_held_entity(Entity self)`
     ---@field set_pre_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
     ---@field set_post_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    ---@field set_pre_activate fun(self, fun: fun(self: Entity, activator: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool activate(Entity self, Entity activator)`<br/>Virtual function docs:<br/>Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
+    ---@field set_post_activate fun(self, fun: fun(self: Entity, activator: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil activate(Entity self, Entity activator)`<br/>Virtual function docs:<br/>Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_collision2(Entity self, Entity other_entity)`
     ---@field set_post_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_collision2(Entity self, Entity other_entity)`
+    ---@field set_pre_walked_on fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool walked_on(Entity self, Entity*)`
+    ---@field set_post_walked_on fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil walked_on(Entity self, Entity*)`
+    ---@field set_pre_walked_off fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool walked_off(Entity self, Entity*)`
+    ---@field set_post_walked_off fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil walked_off(Entity self, Entity*)`
+    ---@field set_pre_ledge_grab fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool ledge_grab(Entity self, Entity*)`
+    ---@field set_post_ledge_grab fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil ledge_grab(Entity self, Entity*)`
+    ---@field set_pre_stood_on fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stood_on(Entity self, Entity*)`
+    ---@field set_post_stood_on fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stood_on(Entity self, Entity*)`
+    ---@field set_pre_init fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init(Entity self)`
+    ---@field set_post_init fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init(Entity self)`
 local Entity = nil
 ---@param hitbox AABB
 ---@return boolean
@@ -2279,6 +2356,12 @@ function Entity:overlaps_with(other) end
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
     ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
+    ---@field set_pre_apply_movement fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool apply_movement(Movable self)`
+    ---@field set_post_apply_movement fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil apply_movement(Movable self)`
+    ---@field set_pre_check_is_falling fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool check_is_falling(Movable self)`
+    ---@field set_post_check_is_falling fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil check_is_falling(Movable self)`
+    ---@field set_pre_process_input fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool process_input(Movable self)`
+    ---@field set_post_process_input fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil process_input(Movable self)`
 local Movable = nil
 ---Move a movable according to its velocity, update physics, gravity, etc.
 ---Will also update `movable.animation_frame` and various timers and counters
@@ -5035,7 +5118,8 @@ function AABB:is_point_inside(x, y) end
     ---@field center fun(self): Vec2 @Also known as centroid
     ---@field get_angles fun(self): number, number, number @Returns ABC, BCA, CAB angles in radians
     ---@field scale fun(self, scale: number): Triangle
-    ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corners
+    ---@field area fun(self): number
+    ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corner points
 local Triangle = nil
 ---@param off Vec2
 ---@return Triangle
@@ -5044,6 +5128,17 @@ function Triangle:offset(off) end
 ---@param y number
 ---@return Triangle
 function Triangle:offset(x, y) end
+---Check if point lies inside of triangle
+---Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.0001`
+---@param p Vec2
+---@param epsilon number?
+---@return boolean
+function Triangle:is_point_inside(p, epsilon) end
+---@param x number
+---@param y number
+---@param epsilon number?
+---@return boolean
+function Triangle:is_point_inside(x, y, epsilon) end
 
 ---@class Quad
     ---@field bottom_left_x number
@@ -5060,6 +5155,18 @@ function Triangle:offset(x, y) end
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
     ---@field split fun(self): Vec2, Vec2, Vec2, Vec2 @Returns the corners in order: bottom_left, bottom_right, top_right, top_left
+local Quad = nil
+---Check if point lies inside of triangle
+---Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
+---@param p Vec2
+---@param epsilon number?
+---@return boolean
+function Quad:is_point_inside(p, epsilon) end
+---@param x number
+---@param y number
+---@param epsilon number?
+---@return boolean
+function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class Screen
     ---@field render_timer number
@@ -5071,6 +5178,9 @@ function Triangle:offset(x, y) end
 
 ---@class ScreenIntro : Screen
     ---@field unknown4 TextureRenderingInfo
+    ---@field darkness number
+    ---@field active boolean @ends the intro immediately if set to false
+    ---@field skip_prologue boolean @skips prologue and goes straight to the title screen after the intro
 
 ---@class ScreenPrologue : Screen
     ---@field line1 STRINGID
@@ -5333,6 +5443,7 @@ function Triangle:offset(x, y) end
     ---@field rescuing_ship_entity Entity
 
 ---@class ScreenCredits : Screen
+    ---@field bg_music_info SoundMeta
 
 ---@class ScreenScores : Screen
     ---@field animation_state integer
@@ -5943,6 +6054,13 @@ CONST = {
   ROOM_WIDTH = 10
 }
 ---@alias CONST integer
+CORNER_FINISH = {
+  ADAPTIVE = 1,
+  CUT = 0,
+  NONE = 3,
+  REAL = 2
+}
+---@alias CORNER_FINISH integer
 COSUBTHEME = {
   DWELLING = 0,
   ICE_CAVES = 5,
@@ -6219,16 +6337,30 @@ DYNAMIC_TEXTURE = {
 }
 ---@alias DYNAMIC_TEXTURE integer
 ENTITY_OVERRIDE = {
+  ACTIVATE = 25,
+  APPLY_MOVEMENT = 71,
+  CAN_BE_PUSHED = 10,
+  CHECK_IS_FALLING = 75,
+  CREATE_RENDERING_INFO = 1,
   DAMAGE = 48,
   DESTROY = 5,
   DTOR = 0,
   FLOOR_UPDATE = 38,
+  FRICTION = 17,
   GET_HELD_ENTITY = 22,
+  INIT = 36,
+  IS_IN_LIQUID = 12,
   KILL = 3,
+  LEDGE_GRAB = 31,
   ON_COLLISION1 = 4,
   ON_COLLISION2 = 26,
+  PROCESS_INPUT = 77,
+  SET_INVISIBLE = 15,
+  STOOD_ON = 32,
   TRIGGER_ACTION = 24,
-  UPDATE_STATE_MACHINE = 2
+  UPDATE_STATE_MACHINE = 2,
+  WALKED_OFF = 30,
+  WALKED_ON = 29
 }
 ---@alias ENTITY_OVERRIDE integer
 ENT_FLAG = {

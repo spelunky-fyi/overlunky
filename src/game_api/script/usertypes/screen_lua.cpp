@@ -81,6 +81,12 @@ void register_usertypes(sol::state& lua)
         "ScreenIntro",
         "unknown4",
         &ScreenIntro::unknown4,
+        "darkness",
+        &ScreenIntro::darkness,
+        "active",
+        &ScreenIntro::active,
+        "skip_prologue",
+        &ScreenIntro::skip_prologue,
         sol::base_classes,
         sol::bases<Screen>());
 
@@ -405,6 +411,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<ScreenCredits>(
         "ScreenCredits",
+        "bg_music_info",
+        &ScreenCredits::bg_music_info,
         sol::base_classes,
         sol::bases<Screen>());
 

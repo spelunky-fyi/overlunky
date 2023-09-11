@@ -187,22 +187,28 @@ struct Camera
     uint32_t unknown7;
 };
 
-struct JournalProgressionSlot
+struct JournalProgressStickerSlot
 {
-    uint8_t unknown1;
+    uint8_t theme;
     int8_t grid_position; // -1 = unassigned, will be assigned when opening the journal and gets the zoom effect
     uint8_t unknown3;
     uint8_t unknown4;
-    ENT_TYPE entity;
+    ENT_TYPE entity_type;
     float x;
     float y;
     float angle;
 };
 
-struct ThemeProgression
+struct JournalProgressStainSlot
 {
-    uint8_t count;
-    uint8_t visited_themes[9];
+    float x;
+    float y;
+    float angle;
+    float scale;
+    int32_t texture_column;
+    int32_t texture_row;
+    uint8_t texture_range; // when stain is first displayed, rolls [0, texture_range] and adds it to texture_column
+    uint8_t padding[3];
 };
 
 struct ArenaConfigArenas // size: 40 bytes

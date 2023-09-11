@@ -11,4 +11,4 @@ out
 docs/slate
 docs/.db
 *.pyc
-
+/CMakeSettings.json

@@ -156,6 +156,40 @@ void register_usertypes(sol::state& lua)
     arenastate_type["breath_cooldown"] = &ArenaState::breath_cooldown;
     arenastate_type["punish_ball"] = &ArenaState::punish_ball;
 
+    /// Used in StateMemory
+    lua.new_usertype<JournalProgressStickerSlot>(
+        "JournalProgressStickerSlot",
+        "theme",
+        &JournalProgressStickerSlot::theme,
+        "grid_position",
+        &JournalProgressStickerSlot::grid_position,
+        "entity_type",
+        &JournalProgressStickerSlot::entity_type,
+        "x",
+        &JournalProgressStickerSlot::x,
+        "y",
+        &JournalProgressStickerSlot::y,
+        "angle",
+        &JournalProgressStickerSlot::angle);
+
+    /// Used in StateMemory
+    lua.new_usertype<JournalProgressStainSlot>(
+        "JournalProgressStainSlot",
+        "x",
+        &JournalProgressStainSlot::x,
+        "y",
+        &JournalProgressStainSlot::y,
+        "angle",
+        &JournalProgressStainSlot::angle,
+        "scale",
+        &JournalProgressStainSlot::scale,
+        "texture_column",
+        &JournalProgressStainSlot::texture_column,
+        "texture_row",
+        &JournalProgressStainSlot::texture_row,
+        "texture_range",
+        &JournalProgressStainSlot::texture_range);
+
     /// Used in Items
     lua.new_usertype<SelectPlayerSlot>(
         "SelectPlayerSlot",
@@ -357,6 +391,12 @@ void register_usertypes(sol::state& lua)
     statememory_type["storage_uid"] = &StateMemory::waddler_floor_storage;
     statememory_type["waddler_storage"] = &StateMemory::waddler_storage;
     statememory_type["waddler_metadata"] = &StateMemory::waddler_storage_meta;
+    statememory_type["journal_progress_sticker_count"] = &StateMemory::journal_progress_sticker_count;
+    statememory_type["journal_progress_sticker_slots"] = &StateMemory::journal_progress_sticker_slots;
+    statememory_type["journal_progress_stain_count"] = &StateMemory::journal_progress_stain_count;
+    statememory_type["journal_progress_stain_slots"] = &StateMemory::journal_progress_stain_slots;
+    statememory_type["journal_progress_theme_count"] = &StateMemory::journal_progress_theme_count;
+    statememory_type["journal_progress_theme_slots"] = &StateMemory::journal_progress_theme_slots;
     statememory_type["theme_info"] = &StateMemory::current_theme;
     statememory_type["logic"] = &StateMemory::logic;
     statememory_type["liquid"] = &StateMemory::liquid_physics;

@@ -143,7 +143,7 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
     Vec2 C{line2.top_right_x, line2.top_right_y};
     Vec2 D{line2.top_left_x, line2.top_left_y};
     Vec2 corner1 = intersection(A, B, C, D);
-    if (corner1.x == INFINITY || corner1.y == INFINITY)
+    if (isinf(corner1.x) || isinf(corner1.y))
         return {};
 
     Vec2 E{line1.bottom_left_x, line1.bottom_left_y};
@@ -152,7 +152,7 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
     Vec2 G{line2.bottom_right_x, line2.bottom_right_y};
     Vec2 H{line2.bottom_left_x, line2.bottom_left_y};
     Vec2 corner2 = intersection(E, F, G, H);
-    if (corner2.x == INFINITY || corner2.y == INFINITY)
+    if (isinf(corner2.x) || isinf(corner2.y))
         return {};
 
     // calculate true angle between the two lines that we want to fill (doesn't matter if we use (B, corner1, D) vs (F, corner2, H) as the lines are parallel to each other
@@ -337,7 +337,7 @@ void VanillaRenderContext::draw_screen_poly(std::vector<Vec2> points, float thic
         if (!corner.is_null())
             draw_screen_poly_filled(convert_ratio(corner, true), std::move(color));
     }
-    for (auto line : draw_list)
+    for (auto& line : draw_list)
     {
         draw_screen_poly_filled(convert_ratio(line, true), std::move(color));
     }
@@ -533,7 +533,7 @@ void VanillaRenderContext::draw_world_poly(std::vector<Vec2> points, float thick
         if (!corner.is_null())
             draw_world_poly_filled(corner, std::move(color));
     }
-    for (auto line : draw_list)
+    for (auto& line : draw_list)
     {
         draw_world_poly_filled(line, std::move(color));
     }

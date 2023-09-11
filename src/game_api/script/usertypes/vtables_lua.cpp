@@ -19,20 +19,34 @@ void register_usertypes(sol::state& lua)
         Entity,
         CallbackType::Entity,
         VTableEntry<"dtor", 0x0, void()>,
+        VTableEntry<"create_rendering_info", 0x1, void()>,
         VTableEntry<"update_state_machine", 0x2, void()>,
         VTableEntry<"kill", 0x3, void(bool, Entity*)>,
         VTableEntry<"on_collision1", 0x4, void(Entity*)>,
         VTableEntry<"destroy", 0x5, void()>,
+        VTableEntry<"can_be_pushed", 0xa, bool()>,
+        VTableEntry<"is_in_liquid", 0xc, bool()>,
+        VTableEntry<"set_invisible", 0xf, void(bool)>,
+        VTableEntry<"friction", 0x11, float()>,
         VTableEntry<"get_held_entity", 0x16, Entity*()>,
         VTableEntry<"trigger_action", 0x18, void(Entity*)>,
-        VTableEntry<"on_collision2", 0x1a, void(Entity*)>>;
+        VTableEntry<"activate", 0x19, void(Entity*)>,
+        VTableEntry<"on_collision2", 0x1a, void(Entity*)>,
+        VTableEntry<"walked_on", 0x1d, void(Entity*)>,
+        VTableEntry<"walked_off", 0x1e, void(Entity*)>,
+        VTableEntry<"ledge_grab", 0x1f, void(Entity*)>,
+        VTableEntry<"stood_on", 0x20, void(Entity*)>,
+        VTableEntry<"init", 0x24, void()>>;
     static EntityVTable entity_vtable(lua, lua["Entity"], "ENTITY_OVERRIDE");
 
     using MovableVTable = HookableVTable<
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"damage", 0x30, bool(Entity*, int8_t, uint16_t, Vec2*, uint8_t, uint16_t, uint8_t, bool)>>;
+        VTableEntry<"damage", 0x30, bool(Entity*, int8_t, uint16_t, Vec2*, uint8_t, uint16_t, uint8_t, bool)>,
+        VTableEntry<"apply_movement", 71, void()>,
+        VTableEntry<"check_is_falling", 75, void()>,
+        VTableEntry<"process_input", 77, void()>>;
     static MovableVTable movable_vtable(lua, lua["Movable"], "ENTITY_OVERRIDE");
 
     using FloorVTable = HookableVTable<
