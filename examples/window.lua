@@ -3,6 +3,11 @@ meta.version = "WIP"
 meta.description = ""
 meta.author = "Dregu"
 
+local menuitemchecked = true
+local menuinputtext = 'Menu input text'
+local menuinputint = 4
+local menuinputcheck = true
+
 local inputtext = ''
 local inputnumber = 0
 local inputslider = 6
@@ -104,8 +109,60 @@ set_callback(function(draw_ctx)
     end
     if widgetopen then
         -- create a new window and test most of the widgets
-        -- we'll put this one top center and make it movable, with no titlebar
-        widgetopen = draw_ctx:window('##TestWindow', -0.3, 0.9, 0.6, 0.5, true, function(ctx, pos, size, collapsed)
+        -- we'll put this one top center
+        widgetopen = draw_ctx:window('Test Window', -0.3, 0.9, 0.6, 0.8, false,
+                GUI_CONDITION.APPEARING, GUI_CONDITION.APPEARING, GUI_CONDITION.APPEARING, GUI_WINDOW_FLAG.MENU_BAR,
+                function(ctx, pos, size, collapsed)
+            -- this menu bar is only visible if the window has the MENU_BAR flag
+            draw_ctx:win_menu_bar(function()
+                -- only put menus directly inside the menu bar
+                draw_ctx:win_menu('Menu', function()
+                    -- menus can contain menu items, nested menus, and most widgets
+                    if draw_ctx:win_menu_item('Menu item 1') then
+                        message('Menu item 1 pressed')
+                    end
+                    if draw_ctx:win_menu_item('Menu item 2') then
+                        message('Menu item 2 pressed')
+                    end
+                    draw_ctx:win_tooltip('Menu items can have tooltips.')
+                    -- shortcut text is only visual and doesn't actually create a shortcut key
+                    if draw_ctx:win_menu_item('Menu item 3', 'Ctrl+A', false, true) then
+                        message('Menu item 3 pressed')
+                    end
+                    draw_ctx:win_separator()
+                    if draw_ctx:win_menu_item('Checkable menu item', nil, menuitemchecked, true) then
+                        -- the checkbox on the menu item is only visual and must be toggled programmatically
+                        menuitemchecked = not menuitemchecked
+                    end
+                    if draw_ctx:win_menu_item('Disabled menu item', nil, false, false) then
+                        -- this code will never execute for a disabled menu item
+                        message('Disabled menu item pressed')
+                    end
+                    draw_ctx:win_tooltip('This menu item is disabled.')
+                    draw_ctx:win_menu('Sub-menu', function()
+                        if draw_ctx:win_menu_item('Sub-menu item') then
+                            message('Sub-menu item pressed')
+                        end
+                    end)
+                    draw_ctx:win_menu('Disabled sub-menu', false, function() end)
+                    draw_ctx:win_tooltip('This sub-menu is disabled.')
+                end)
+                draw_ctx:win_menu('Widgets', function()
+                    draw_ctx:win_text('Basic text in a menu')
+                    menuinputtext = draw_ctx:win_input_text('Text input', menuinputtext)
+                    menuinputint = draw_ctx:win_slider_int('Integer slider', menuinputint, 1, 10)
+                    menuinputcheck = draw_ctx:win_check('Checkbox', menuinputcheck)
+                    if draw_ctx:win_button('Button') then
+                        message('Menu button pressed')
+                    end
+                end)
+                draw_ctx:win_menu('Disabled', false, function()
+                    -- this menu item will never be shown since the parent menu is disabled
+                    draw_ctx:win_menu_item('Inaccessible menu item')
+                end)
+                draw_ctx:win_tooltip('This menu is disabled.')
+            end)
+
             if draw_ctx:win_button('Open tab examples window') then
                 tab_window_open = true
             end
@@ -349,6 +406,12 @@ set_callback(function(draw_ctx)
         custom_window_open = draw_ctx:window(custom_window_name..'###custom_window',
                 custom_window_x, custom_window_y, custom_window_w, custom_window_h, custom_window_collapsed,
                 custom_window_pos_condition, custom_window_size_condition, custom_window_collapsed_condition, custom_window_flags, function(ctx, pos, size, collapsed)
+            -- this menu bar is only visible if the window has the MENU_BAR flag
+            draw_ctx:win_menu_bar(function()
+                draw_ctx:win_menu('Menu', function()
+                    draw_ctx:win_menu_item('Menu Item')
+                end)
+            end)
             draw_ctx:win_text('The settings below are for this custom window. Not all combinations of settings will make sense, and some combinations may lock you out of interacting with the window. If that happens, then reload the script to get back the default settings.')
             custom_window_name = draw_ctx:win_input_text('Window name', custom_window_name)
             draw_ctx:win_section('Size, Position, Collapsed', function()
@@ -381,6 +444,7 @@ set_callback(function(draw_ctx)
                 custom_window_flags = draw_flag_checkbox(draw_ctx, 'No background', custom_window_flags, GUI_WINDOW_FLAG.NO_BACKGROUND)
                 custom_window_flags = draw_flag_checkbox(draw_ctx, 'No saved settings', custom_window_flags, GUI_WINDOW_FLAG.NO_SAVED_SETTINGS)
                 custom_window_flags = draw_flag_checkbox(draw_ctx, 'No mouse inputs', custom_window_flags, GUI_WINDOW_FLAG.NO_MOUSE_INPUTS)
+                custom_window_flags = draw_flag_checkbox(draw_ctx, 'Menu bar', custom_window_flags, GUI_WINDOW_FLAG.MENU_BAR)
                 custom_window_flags = draw_flag_checkbox(draw_ctx, 'Horizontal scrollbar', custom_window_flags, GUI_WINDOW_FLAG.HORIZONTAL_SCROLLBAR)
                 custom_window_flags = draw_flag_checkbox(draw_ctx, 'No focus on appearing', custom_window_flags, GUI_WINDOW_FLAG.NO_FOCUS_ON_APPEARING)
                 custom_window_flags = draw_flag_checkbox(draw_ctx, 'No bring to front on focus', custom_window_flags, GUI_WINDOW_FLAG.NO_BRING_TO_FRONT_ON_FOCUS)

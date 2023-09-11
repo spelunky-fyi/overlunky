@@ -152,6 +152,16 @@ class GuiDrawContext
     bool win_tab_item_button(std::string label);
     /// Add a tab item button. Only use this inside a tab bar callback. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns true when clicked.
     bool win_tab_item_button(std::string label, int flags);
+    /// Add a menu bar. Only create menus inside the callback.
+    void win_menu_bar(sol::function callback);
+    /// Add a menu. Only use this inside a menu bar or menu callback. Can contain most widgets, including nested menus.
+    void win_menu(std::string label, sol::function callback);
+    /// Add a menu. Only use this inside a menu bar or menu callback. Can contain most widgets, including nested menus.
+    void win_menu(std::string label, bool enabled, sol::function callback);
+    /// Add a menu item. Only use this inside a menu callback. Returns true when clicked.
+    bool win_menu_item(std::string label);
+    /// Add a menu item. Only use this inside a menu callback. Returns true when clicked. Shortcut text is only visual and does not create a shortcut key.
+    bool win_menu_item(std::string label, std::optional<std::string> shortcut, bool checked, bool enabled);
     /// Indent contents, or unindent if negative
     void win_indent(float width);
     /// Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)

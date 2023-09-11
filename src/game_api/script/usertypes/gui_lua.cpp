@@ -546,7 +546,7 @@ bool GuiDrawContext::win_imagebutton(std::string label, IMAGE image, float width
 };
 void GuiDrawContext::win_tooltip(std::string text)
 {
-    if (ImGui::IsItemHovered())
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
         // TODO: HD cursor overlaps tooltip
         ImGui::SetTooltip("%s", text.c_str());
 }
@@ -588,6 +588,34 @@ bool GuiDrawContext::win_tab_item_button(std::string label)
 bool GuiDrawContext::win_tab_item_button(std::string label, int flags)
 {
     return ImGui::TabItemButton(label.c_str(), flags);
+}
+void GuiDrawContext::win_menu_bar(sol::function callback)
+{
+    if (ImGui::BeginMenuBar())
+    {
+        handle_function<void>(backend, callback);
+        ImGui::EndMenuBar();
+    }
+}
+void GuiDrawContext::win_menu(std::string label, sol::function callback)
+{
+    win_menu(label, true, callback);
+}
+void GuiDrawContext::win_menu(std::string label, bool enabled, sol::function callback)
+{
+    if (ImGui::BeginMenu(label.c_str(), enabled))
+    {
+        handle_function<void>(backend, callback);
+        ImGui::EndMenu();
+    }
+}
+bool GuiDrawContext::win_menu_item(std::string label)
+{
+    return ImGui::MenuItem(label.c_str());
+}
+bool GuiDrawContext::win_menu_item(std::string label, std::optional<std::string> shortcut, bool checked, bool enabled)
+{
+    return ImGui::MenuItem(label.c_str(), shortcut ? shortcut.value().c_str() : NULL, checked, enabled);
 }
 void GuiDrawContext::win_indent(float width)
 {
@@ -661,6 +689,12 @@ void register_usertypes(sol::state& lua)
     auto win_tab_item_button = sol::overload(
         static_cast<bool (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_tab_item_button),
         static_cast<bool (GuiDrawContext::*)(std::string, int)>(&GuiDrawContext::win_tab_item_button));
+    auto win_menu = sol::overload(
+        static_cast<void (GuiDrawContext::*)(std::string, sol::function)>(&GuiDrawContext::win_menu),
+        static_cast<void (GuiDrawContext::*)(std::string, bool, sol::function)>(&GuiDrawContext::win_menu));
+    auto win_menu_item = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_menu_item),
+        static_cast<bool (GuiDrawContext::*)(std::string, std::optional<std::string>, bool, bool)>(&GuiDrawContext::win_menu_item));
 
     /// Used in [register_option_callback](#register_option_callback) and [set_callback](#set_callback) with ON.GUIFRAME
     auto guidrawcontext_type = lua.new_usertype<GuiDrawContext>("GuiDrawContext");
@@ -705,6 +739,9 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_tab_bar"] = win_tab_bar;
     guidrawcontext_type["win_tab_item"] = win_tab_item;
     guidrawcontext_type["win_tab_item_button"] = win_tab_item_button;
+    guidrawcontext_type["win_menu_bar"] = &GuiDrawContext::win_menu_bar;
+    guidrawcontext_type["win_menu"] = win_menu;
+    guidrawcontext_type["win_menu_item"] = win_menu_item;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
 
@@ -721,7 +758,7 @@ void register_usertypes(sol::state& lua)
     // Set the variable if the widget is appearing after being hidden/inactive (or the first time).
     */
     /// Window flags for `window` in GuiDrawContext.
-    lua.create_named_table("GUI_WINDOW_FLAG", "NONE", ImGuiWindowFlags_None, "NO_TITLE_BAR", ImGuiWindowFlags_NoTitleBar, "NO_RESIZE", ImGuiWindowFlags_NoResize, "NO_MOVE", ImGuiWindowFlags_NoMove, "NO_SCROLLBAR", ImGuiWindowFlags_NoScrollbar, "NO_SCROLL_WITH_MOUSE", ImGuiWindowFlags_NoScrollWithMouse, "NO_COLLAPSE", ImGuiWindowFlags_NoCollapse, "ALWAYS_AUTO_RESIZE", ImGuiWindowFlags_AlwaysAutoResize, "NO_BACKGROUND", ImGuiWindowFlags_NoBackground, "NO_SAVED_SETTINGS", ImGuiWindowFlags_NoSavedSettings, "NO_MOUSE_INPUTS", ImGuiWindowFlags_NoMouseInputs, "HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_HorizontalScrollbar, "NO_FOCUS_ON_APPEARING", ImGuiWindowFlags_NoFocusOnAppearing, "NO_BRING_TO_FRONT_ON_FOCUS", ImGuiWindowFlags_NoBringToFrontOnFocus, "ALWAYS_VERTICAL_SCROLLBAR", ImGuiWindowFlags_AlwaysVerticalScrollbar, "ALWAYS_HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_AlwaysHorizontalScrollbar, "NO_NAV_INPUTS", ImGuiWindowFlags_NoNavInputs, "NO_NAV_FOCUS", ImGuiWindowFlags_NoNavFocus, "UNSAVED_DOCUMENT", ImGuiWindowFlags_UnsavedDocument);
+    lua.create_named_table("GUI_WINDOW_FLAG", "NONE", ImGuiWindowFlags_None, "NO_TITLE_BAR", ImGuiWindowFlags_NoTitleBar, "NO_RESIZE", ImGuiWindowFlags_NoResize, "NO_MOVE", ImGuiWindowFlags_NoMove, "NO_SCROLLBAR", ImGuiWindowFlags_NoScrollbar, "NO_SCROLL_WITH_MOUSE", ImGuiWindowFlags_NoScrollWithMouse, "NO_COLLAPSE", ImGuiWindowFlags_NoCollapse, "ALWAYS_AUTO_RESIZE", ImGuiWindowFlags_AlwaysAutoResize, "NO_BACKGROUND", ImGuiWindowFlags_NoBackground, "NO_SAVED_SETTINGS", ImGuiWindowFlags_NoSavedSettings, "NO_MOUSE_INPUTS", ImGuiWindowFlags_NoMouseInputs, "MENU_BAR", ImGuiWindowFlags_MenuBar, "HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_HorizontalScrollbar, "NO_FOCUS_ON_APPEARING", ImGuiWindowFlags_NoFocusOnAppearing, "NO_BRING_TO_FRONT_ON_FOCUS", ImGuiWindowFlags_NoBringToFrontOnFocus, "ALWAYS_VERTICAL_SCROLLBAR", ImGuiWindowFlags_AlwaysVerticalScrollbar, "ALWAYS_HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_AlwaysHorizontalScrollbar, "NO_NAV_INPUTS", ImGuiWindowFlags_NoNavInputs, "NO_NAV_FOCUS", ImGuiWindowFlags_NoNavFocus, "UNSAVED_DOCUMENT", ImGuiWindowFlags_UnsavedDocument);
     /// Tab bar flags for `win_tab_bar` in GuiDrawContext.
     lua.create_named_table("GUI_TAB_BAR_FLAG", "NONE", ImGuiTabBarFlags_None, "REORDERABLE", ImGuiTabBarFlags_Reorderable, "AUTO_SELECT_NEW_TABS", ImGuiTabBarFlags_AutoSelectNewTabs, "TAB_LIST_POPUP_BUTTON", ImGuiTabBarFlags_TabListPopupButton, "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton, "NO_TAB_LIST_SCROLLING_BUTTONS", ImGuiTabBarFlags_NoTabListScrollingButtons, "NO_TOOLTIP", ImGuiTabBarFlags_NoTooltip, "FITTING_POLICY_RESIZE_DOWN", ImGuiTabBarFlags_FittingPolicyResizeDown, "FITTING_POLICY_SCROLL", ImGuiTabBarFlags_FittingPolicyScroll);
     /// Tab item flags for `win_tab_item` and `win_tab_item_button` in GuiDrawContext.
