@@ -162,7 +162,7 @@ end, ON.RENDER_POST_HUD)
 
 -- no position will create it at 0,0
 UpsideDownText = TextRenderingInfo:new("Upside down text", text_scale, text_scale, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
-UpsideDownText:rotate(3.14) -- good enogh ;)
+UpsideDownText:rotate(math.pi)
 -- notice: the `:rotate` function, rotates the text by the given angle, not set the given angle
 
 set_callback(function(render_ctx)
@@ -229,13 +229,12 @@ set_callback(function(render_ctx)
     render_ctx:draw_text("CORNER_FINISH.ADAPTIVE", -0.13, -0.57, 0.0005, 0.0005, white, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.NORMAL)
 end, ON.RENDER_POST_HUD)
 
-
 --[[ Text Floating on Screen (bouncing of the screen edges) ]]
 
 DVDLogo = TextRenderingInfo:new("DVD", 0.0055, 0.0018, VANILLA_TEXT_ALIGNMENT.CENTER, VANILLA_FONT_STYLE.ITALIC)
 DVD_direction_x = 1.0
 DVD_direction_y = -1.0
-DVD_speed = 0.003
+DVD_speed = 0.3
 DVD_Colors = {
     Color:purple(), Color:yellow(), Color:white(), Color:silver(),
     Color:gray(), Color:red(), Color:maroon(), Color:olive(),
@@ -253,28 +252,75 @@ function DVD_change_color()
 end
 
 set_callback(function(render_ctx, draw_depth)
-    
-    DVDLogo.x = DVDLogo.x + DVD_speed * DVD_direction_x
-    DVDLogo.y = DVDLogo.y + DVD_speed * DVD_direction_y
+    -- use the previously acquired ImGuiIO for the frame rate to make the speed more consistent and make it less depended on the user hardware
+    actual_speed = DVD_speed / iio.framerate
+    DVDLogo.x = DVDLogo.x + actual_speed * DVD_direction_x
+    DVDLogo.y = DVDLogo.y + actual_speed * DVD_direction_y
+
     if DVDLogo.x + DVDLogo.width / 2 > 1.0 then
-        DVDLogo.x = DVDLogo.x - DVD_speed
         DVD_direction_x = -1.0
         DVD_change_color()
     elseif DVDLogo.x - DVDLogo.width / 2 < -1.0 then
-        DVDLogo.x = DVDLogo.x + DVD_speed
         DVD_direction_x = 1.0
         DVD_change_color()
     end
     
     if DVDLogo.y - DVDLogo.height / 2 > 1.0 then
-        DVDLogo.y = DVDLogo.y - DVD_speed
         DVD_direction_y = -1.0
         DVD_change_color()
     elseif DVDLogo.y + DVDLogo.height / 2 < -1.0 then
-        DVDLogo.y = DVDLogo.y + DVD_speed
         DVD_direction_y = 1.0
         DVD_change_color()
     end
     
     render_ctx:draw_text(DVDLogo, DVD_current_color)
+end, ON.RENDER_POST_HUD)
+
+--[[ Draw text bend to shape of a circle: ]]
+
+right_angle = math.pi / 2
+function bend_text(textRender, radius)
+    for _, l in pairs(textRender:get_dest()) do
+        quad = l:get_quad()
+        bl, br, tr, tl = quad:split()
+        -- this only works if the letter is rectangle (which seams to always be the case?)
+        offx = math.abs(br.x - bl.x) * ratio / 2
+        offy = math.abs(tr.y - br.y) / 2
+        
+        angle = ((bl.x * ratio + offx) / radius - right_angle) * -1
+        a = radius * math.cos(angle)
+        b = radius * math.sin(angle)
+        
+        bl.x = a - offx
+        bl.y = b - offy
+        tl.x = bl.x
+        tl.y = b + offy
+        br.x = a + offx
+        br.y = bl.y
+        tr.x = br.x
+        tr.y = tl.y
+        
+        angle = angle - right_angle
+        bl:rotate(angle, a, b)
+        br:rotate(angle, a, b)
+        tl:rotate(angle, a, b)
+        tr:rotate(angle, a, b)
+        
+        bl.x = bl.x * n_ratio
+        br.x = br.x * n_ratio
+        tl.x = tl.x * n_ratio
+        tr.x = tr.x * n_ratio
+        
+        l:set_quad(Quad:new(bl, br, tr, tl))
+    end
+end
+
+-- if you just want an arch of text, use VANILLA_TEXT_ALIGNMENT.CENTER and play around with the radius and text scale
+bended_text = TextRenderingInfo:new("Long text to see if it correctly wraps around", 0.7, -0.1, text_scale, text_scale, VANILLA_TEXT_ALIGNMENT.LEFT, VANILLA_FONT_STYLE.BOLD)
+bend_radius = 0.229
+bend_text(bended_text, bend_radius)
+
+set_callback(function(render_ctx)
+
+    render_ctx:draw_text(bended_text, white)
 end, ON.RENDER_POST_HUD)

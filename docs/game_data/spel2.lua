@@ -4746,7 +4746,7 @@ function GuiDrawContext:win_pushid(id) end
     ---@field showcursor boolean
 
 ---@class VanillaRenderContext
-    ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer<br/>If you can, consider creating your own TextureRenderingInfo instead<br/>You can then use `:text_size()` and `draw_text` with that one any<br/>`draw_text_size` works by creating new TextureRenderingInfo just to call `:text_size()`, which is not very optimal
+    ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer<br/>If you can, consider creating your own TextRenderingInfo instead<br/>You can then use `:text_size()` and `draw_text` with that one any<br/>`draw_text_size` works by creating new TextRenderingInfo just to call `:text_size()`, which is not very optimal
     ---@field set_corner_finish fun(self, c: CORNER_FINISH): nil @Set the prefered way of drawing corners for the non filled shapes
     ---@field draw_screen_line fun(self, A: Vec2, B: Vec2, thickness: number, color: Color): nil @Draws a line on screen using the built-in renderer from point `A` to point `B`.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     ---@field draw_screen_rect fun(self, rect: AABB, thickness: number, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
@@ -4827,6 +4827,13 @@ function VanillaRenderContext:draw_screen_texture(texture_id, row, column, dest,
 ---@param color Color
 ---@return nil
 function VanillaRenderContext:draw_screen_texture(texture_id, source, dest, color) end
+---Draw a texture in screen coordinates using TextureRenderingInfo
+---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+---@param texture_id TEXTURE
+---@param tri TextureRenderingInfo
+---@param color Color
+---@return nil
+function VanillaRenderContext:draw_screen_texture(texture_id, tri, color) end
 ---Draw a polyline on screen from points using the built-in renderer
 ---Draws from the first to the last point, use `closed` to connect first and last as well
 ---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
@@ -4963,9 +4970,10 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
 function VanillaRenderContext:draw_world_poly_filled(points, color) end
 
 ---@class TextureRenderingInfo
+    ---@field new any @sol::constructors<TextureRenderingInfo()
     ---@field x number
     ---@field y number
-    ---@field destination_bottom_left_x number
+    ---@field destination_bottom_left_x number @destination is relative to the x,y centerpoint
     ---@field destination_bottom_left_y number
     ---@field destination_bottom_right_x number
     ---@field destination_bottom_right_y number
@@ -5074,6 +5082,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field x number
     ---@field y number
     ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
+    ---@field distance_to fun(self, other: Vec2): number @Just simple pythagoras theorem
     ---@field split fun(self): number, number
 
 ---@class AABB
