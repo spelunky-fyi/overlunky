@@ -7348,7 +7348,7 @@ Future calls to this will override the save</p>
 <tr>
 <td>tuple&lt;float, float&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text_size">draw_text_size(const string&amp; text, float scale_x, float scale_y, int fontstyle)</a></td>
-<td>Measure the provided text using the built-in renderer<br/>If you can, consider creating your own <a href="#TextureRenderingInfo">TextureRenderingInfo</a> instead<br/>You can then use <code>:text_size()</code> and <code>draw_text</code> with that one object<br/><code>draw_text_size</code> works by creating new TextureRenderingInfo just to call <code>:text_size()</code>, which is not very optimal</td>
+<td>Measure the provided text using the built-in renderer<br/>If you can, consider creating your own <a href="#TextRenderingInfo">TextRenderingInfo</a> instead<br/>You can then use <code>:text_size()</code> and <code>draw_text</code> with that one object<br/><code>draw_text_size</code> works by creating new TextRenderingInfo just to call <code>:text_size()</code>, which is not very optimal</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -7374,6 +7374,11 @@ Future calls to this will override the save</p>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, TextureRenderingInfo tri, Color color)</a></td>
+<td>Draw a texture in screen coordinates using <a href="#TextureRenderingInfo">TextureRenderingInfo</a><br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -9172,6 +9177,11 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td><a href="#Vec2">Vec2</a>&amp;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, float px, float py)</a></td>
 <td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance_to">distance_to(const Vec2 other)</a></td>
+<td>Just simple pythagoras theorem</td>
 </tr>
 <tr>
 <td>tuple&lt;float, float&gt;</td>
@@ -15518,6 +15528,11 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 </thead><tbody>
 <tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=new">new</a></td>
+<td></td>
+</tr>
+<tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
 <td></td>
@@ -15530,7 +15545,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destination_bottom_left_x">destination_bottom_left_x</a></td>
-<td></td>
+<td>destination is relative to the x,y centerpoint</td>
 </tr>
 <tr>
 <td>float</td>
