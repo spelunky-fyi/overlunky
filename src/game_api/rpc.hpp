@@ -137,3 +137,4 @@ void call_death_screen();
 void save_progress();
 void set_level_string(std::u16string_view text);
 void set_ending_unlock(ENT_TYPE type);
+void patch_orbs_limit();
