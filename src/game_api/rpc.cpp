@@ -1889,47 +1889,21 @@ void patch_orbs_limit()
 
     auto memory = Memory::get();
     const auto function_offset = get_virtual_function_address(VTABLE_OFFSET::ITEM_FLOATING_ORB, (uint32_t)VIRT_FUNC::ENTITY_KILL);
-    if (function_offset == 0)
+    // finding exit of the loop that counts orbs, after jump there is unused code so we have enogh space for a jump
+    auto instance = find_inst(memory.exe(), "\xF3\x75"sv, function_offset, function_offset + 0x622, "Orbs patch in kill virtual");
+    auto offset = memory.at_exe(instance) + 3;
+
+    if (instance == 0) // not found, don't crash the game
         return;
 
-    uint16_t particle_ids[5][3] = {
-        {204, 203, 202},
-        {207, 206, 205},
-        {210, 209, 208},
-        {213, 212, 211},
-        {216, 215, 214},
-    };
+    auto loop_exit_jump = memory_read<int8_t>(offset + 1);
 
-    size_t last_offset = function_offset;
-    std::array<size_t, 5> rel_offsets{0};
-    for (uint8_t idx = 0; idx < rel_offsets.size(); ++idx)
-    {
-        std::string name = fmt::format("Orbs patch in kill virtual ({})", idx);
-        auto instance = find_inst(memory.exe(), "\x48\x8D\x05"sv, last_offset, function_offset + 0x622, name);
-        if (instance == 0) // not found, don't crash the game
-            return;
+    // set r8b to 2 if it's more than 2
+    std::string_view new_code{
+        "\x41\x80\xf8\x02"sv //   cmp    r8b,0x2
+        "\x72\x03"sv         //   jb     <end>
+        "\x41\xb0\x02"sv};   //   mov    r8b,0x2
 
-        rel_offsets[idx] = memory.at_exe(instance) + 3; // 3 pattern size
-        last_offset = instance + 7;
-    }
-    // this is quite an array, but other solution would be to write assembly code and jump to and from it the to original
-    // maybe TODO: write a code that automatically writes correct jump instructions so you only need to write the insert assembly
-
-    uint16_t* new_array = (uint16_t*)alloc_mem_rel32(rel_offsets[4], (size_t)255 * 5 * sizeof(uint16_t)); // 5 arrays of 255 elements of 2 byte size
-    if (new_array == nullptr)
-        return;
-
-    for (uint8_t idx = 0; idx < rel_offsets.size(); ++idx)
-    {
-        auto current_array = new_array + 255 * idx;
-
-        // +2 to skip the first two elements that we will set separately
-        std::fill(current_array + 2, current_array + 255, particle_ids[idx][2]);
-
-        *current_array = particle_ids[idx][0];
-        *(current_array + 1) = particle_ids[idx][1];
-        int32_t rel = static_cast<int32_t>((size_t)current_array - (rel_offsets[idx] + 4));
-        write_mem_prot(rel_offsets[idx], rel, true);
-    }
+    patch_and_redirect(offset, 8, new_code, true, offset + 2 + loop_exit_jump);
     once = true;
 }

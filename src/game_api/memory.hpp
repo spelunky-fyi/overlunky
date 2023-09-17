@@ -96,6 +96,11 @@ size_t function_start(size_t off, uint8_t outside_byte = '\xcc');
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot);
 void recover_mem(std::string name, size_t addr = NULL);
 
+// similar to ExecutableMemory but writes automatic jump from and back, moves the code it replaces etc.
+// it needs at least 5 bytes to move, use just_nop = true to nuke the oryginal code
+// make sure that the first 5 bytes are not a destination for some jump (it's fine if it's exacly at the addr)
+size_t patch_and_redirect(size_t addr, size_t replace_size, std::string_view payload, bool just_nop = false, size_t return_to_addr = 0);
+
 template <typename T>
 requires std::is_trivially_copyable_v<T>
 std::string_view to_le_bytes(const T& payload)
