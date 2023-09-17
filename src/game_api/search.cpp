@@ -1967,7 +1967,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
-};
+    {
+        // warp to olmec, kill/destroy it to crash the game, the code it crashes at should look like this:
+        // movsx rax,byte ptr ds:[r8+13C]
+        // scrolling up you should see access to the state, and above that two jump instructions and above those we need at least 5 bytes for patch
+        "olmec_lookup_crash"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("8B 59 3C 48 C1 E3 03"_gh)
+            .at_exe(),
+    }};
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
 void preload_addresses()

@@ -1883,17 +1883,23 @@ void set_ending_unlock(ENT_TYPE type)
 
 void patch_orbs_limit()
 {
+    /*
+     * The idea: we nuke jump instruction and some nop's after it
+     * in new code we check if the number of orbs is greater than 3
+     * if yes we set it as 3 (2 becouse of 0 - 2 range)
+     * we jump back to the place of oryginal jump
+     */
     static bool once = false;
     if (once)
         return;
 
     auto memory = Memory::get();
     const auto function_offset = get_virtual_function_address(VTABLE_OFFSET::ITEM_FLOATING_ORB, (uint32_t)VIRT_FUNC::ENTITY_KILL);
-    // finding exit of the loop that counts orbs, after jump there is unused code so we have enogh space for a jump
-    auto instance = find_inst(memory.exe(), "\xF3\x75"sv, function_offset, function_offset + 0x622, "Orbs patch in kill virtual");
+    // finding exit of the loop that counts orbs, after jump there is unused code so we have enogh space for a our patch
+    auto instance = find_inst(memory.exe(), "\xF3\x75"sv, function_offset, function_offset + 0x622, "patch_orbs_limit");
     auto offset = memory.at_exe(instance) + 3;
 
-    if (instance == 0) // not found, don't crash the game
+    if (instance == 0) // not found, don't crash the game (ex. PL + OV calling this)
         return;
 
     auto loop_exit_jump = memory_read<int8_t>(offset + 1);
@@ -1905,5 +1911,47 @@ void patch_orbs_limit()
         "\x41\xb0\x02"sv};   //   mov    r8b,0x2
 
     patch_and_redirect(offset, 8, new_code, true, offset + 2 + loop_exit_jump);
+    once = true;
+}
+
+void patch_olmec_kill_crash()
+{
+    /*
+     * The idea: if the loop continues, jump back to the original code
+     * if not, we have to set rdi to correct value and jump out
+     * we jump just like jump that is used during olmec cutscene and when using shortcut to olmec
+     */
+    static bool once = false;
+    if (once)
+        return;
+
+    auto memory = Memory::get();
+    const auto offset = get_address("olmec_lookup_crash");
+    constexpr auto code_to_move = 7;
+    size_t return_addr;
+    {
+        // find address to escape to
+        auto rva = offset - memory.exe_ptr;
+        // there are two jump that performe long jump, at the end, of it, the is 'mov rax,qword ptr ds:[rdi]'
+        auto jump_out_lookup = find_inst(memory.exe(), "\x80\x79\x5C\x03"sv, rva, rva + 0x83, "patch_olmec_kill_crash");
+        if (jump_out_lookup == 0)
+            return;
+        auto jump_offset_offset = memory.at_exe(jump_out_lookup + 6); // 4 (lookup instruction size) + 2 (jump instruction)
+        auto jump_offset = memory_read<int32_t>(jump_offset_offset);
+        return_addr = jump_offset_offset + 4 + jump_offset; // +4 to get address after the jump
+    }
+
+    std::string_view new_code{
+        "\x0f\x85\x00\x00\x00\x00"sv //   jne (offset needs to be updated after we know the address)
+        "\x48\x8B\x7D\x18"};         //   mov rdi,qword ptr ss:[rbp+18]
+
+    auto new_code_addr = patch_and_redirect(offset, code_to_move, new_code, false, return_addr);
+    if (new_code_addr == 0)
+        return;
+
+    new_code_addr += code_to_move; // position after the copied over code
+
+    int32_t rel = static_cast<int32_t>(offset + code_to_move - (new_code_addr + 6)); // +6 after the jump
+    write_mem_prot(new_code_addr + 2, rel, true);
     once = true;
 }
