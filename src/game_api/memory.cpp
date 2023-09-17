@@ -174,7 +174,7 @@ size_t patch_and_redirect(size_t addr, size_t replace_size, std::string_view pay
     }
     std::memcpy(new_code + data_size_to_move, payload.data(), payload.size());
 
-    size_t return_addr = addr;
+    size_t return_addr = addr + jump_size;
     if (return_to_addr != 0)
     {
         return_addr = return_to_addr;
