@@ -1927,10 +1927,10 @@ void patch_olmec_kill_crash()
 
     const auto offset = get_address("olmec_lookup_crash");
     constexpr auto code_to_move = 7;
+    auto memory = Memory::get();
     size_t return_addr;
     {
         // find address to escape to
-        auto memory = Memory::get();
         auto rva = offset - memory.exe_ptr;
         // there are two jump that performe long jump, at the end, of it, the is 'mov rax,qword ptr ds:[rdi]', then find jump that's jumps over that code and create sound meta call
         // this is actually unique pattern
@@ -1942,6 +1942,21 @@ void patch_olmec_kill_crash()
         auto jump_offset_offset = memory.at_exe(jump_out_lookup + 10); // 4 (lookup instruction size) + 1 (jump instruction)
         auto jump_offset = memory_read<int8_t>(jump_offset_offset);
         return_addr = jump_offset_offset + 1 + jump_offset; // +1 to get address after the jump
+    }
+    {
+        // patch the cutscene
+        const auto function_offset = get_virtual_function_address(VTABLE_OFFSET::THEME_OLMEC, 24); // spawn_effects
+        auto jump_out_lookup = find_inst(memory.exe(), "\x48\x03\x58\x28"sv, function_offset, std::nullopt, "patch_olmec_kill_crash");
+        if (jump_out_lookup == 0)
+            return;
+
+        auto end_function = find_inst(memory.exe(), "\x48\x83\xC4\x78"sv, jump_out_lookup, std::nullopt, "patch_olmec_kill_crash");
+        if (jump_out_lookup == 0)
+            return;
+        auto jump_offset_offset = memory.at_exe(jump_out_lookup + 10);
+        auto addr_to_jump_to = memory.at_exe(end_function);
+        int32_t rel = static_cast<int32_t>(addr_to_jump_to - (jump_offset_offset + 4));
+        write_mem_prot(jump_offset_offset, rel, true);
     }
 
     std::string_view new_code{
