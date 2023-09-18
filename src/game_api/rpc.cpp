@@ -1925,25 +1925,28 @@ void patch_olmec_kill_crash()
     if (once)
         return;
 
-    auto memory = Memory::get();
     const auto offset = get_address("olmec_lookup_crash");
     constexpr auto code_to_move = 7;
     size_t return_addr;
     {
         // find address to escape to
+        auto memory = Memory::get();
         auto rva = offset - memory.exe_ptr;
-        // there are two jump that performe long jump, at the end, of it, the is 'mov rax,qword ptr ds:[rdi]'
-        auto jump_out_lookup = find_inst(memory.exe(), "\x80\x79\x5C\x03"sv, rva, rva + 0x83, "patch_olmec_kill_crash");
+        // there are two jump that performe long jump, at the end, of it, the is 'mov rax,qword ptr ds:[rdi]', then find jump that's jumps over that code and create sound meta call
+        // this is actually unique pattern
+        auto jump_out_lookup = find_inst(memory.exe(), "\x48\x8B\x45\x50\x48\x83\x78\x60\x00"sv, rva, std::nullopt, "patch_olmec_kill_crash");
         if (jump_out_lookup == 0)
             return;
-        auto jump_offset_offset = memory.at_exe(jump_out_lookup + 6); // 4 (lookup instruction size) + 2 (jump instruction)
-        auto jump_offset = memory_read<int32_t>(jump_offset_offset);
-        return_addr = jump_offset_offset + 4 + jump_offset; // +4 to get address after the jump
+
+        // could probably just offset this stuff
+        auto jump_offset_offset = memory.at_exe(jump_out_lookup + 10); // 4 (lookup instruction size) + 1 (jump instruction)
+        auto jump_offset = memory_read<int8_t>(jump_offset_offset);
+        return_addr = jump_offset_offset + 1 + jump_offset; // +1 to get address after the jump
     }
 
     std::string_view new_code{
         "\x0f\x85\x00\x00\x00\x00"sv //   jne (offset needs to be updated after we know the address)
-        "\x48\x8B\x7D\x18"};         //   mov rdi,qword ptr ss:[rbp+18]
+        "\x48\x8B\x7D\x18"sv};       //   mov rdi,qword ptr ss:[rbp+18] // TODO: test if needed still
 
     auto new_code_addr = patch_and_redirect(offset, code_to_move, new_code, false, return_addr);
     if (new_code_addr == 0)
@@ -1953,5 +1956,50 @@ void patch_olmec_kill_crash()
 
     int32_t rel = static_cast<int32_t>(offset + code_to_move - (new_code_addr + 6)); // +6 after the jump
     write_mem_prot(new_code_addr + 2, rel, true);
+    once = true;
+}
+
+void patch_liquid_OOB()
+{
+    /*
+     * The idea: there is a loop thru all liquid entities
+     * if liquid is out of bounds (coordinate below 0) we essentially simulate `continue;` behavior
+     */
+
+    static bool once = false;
+    if (once)
+        return;
+
+    const auto offset = get_address("liquid_OOB_crash");
+    size_t continue_addr;
+    {
+        // find address to continue the loop
+        auto memory = Memory::get();
+        auto rva = offset - memory.exe_ptr;
+        // first `ja` loop
+        auto jump_out_lookup = find_inst(memory.exe(), "\x0F\x87"sv, rva, rva + 0x7D, "patch_liquid_OOB");
+        if (jump_out_lookup == 0)
+            return;
+
+        auto jump_out_addr = memory.at_exe(jump_out_lookup);
+        auto jump_offset = memory_read<int32_t>(jump_out_addr + 2); // should be negative
+        continue_addr = jump_out_addr + 6 + jump_offset;            // 6 size of the jump instruction
+    }
+
+    constexpr auto code_to_move = 5;
+
+    std::string_view new_code{
+        "\x48\x83\xFD\x00"sv           //   cmp    ebp,0x0 (ebp = y)
+        "\x0f\x8C\x00\x00\x00\x00"sv   //   jl     (offset needs to be updated after we know the address)
+        "\x48\x83\xfa\x00"             //   cmp    rdx,0x0 (rdx = x)
+        "\x0f\x8C\x00\x00\x00\x00"sv}; //   jl     (same offset as before)
+
+    auto new_code_addr = patch_and_redirect(offset, code_to_move, new_code);
+    new_code_addr += code_to_move;
+
+    int32_t rel = static_cast<int32_t>(continue_addr - (new_code_addr + 10)); // +10 after the jump
+    write_mem_prot(new_code_addr + 6, rel, true);
+    write_mem_prot(new_code_addr + 16, rel - 10, true);
+
     once = true;
 }

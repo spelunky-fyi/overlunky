@@ -1975,7 +1975,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_after_inst("8B 59 3C 48 C1 E3 03"_gh)
             .at_exe(),
-    }};
+    },
+    {
+        // spawn liquid so it falls off the map to crash the game
+        // above the code that crash, look for float to int conversion (cvttss2si)
+        "liquid_OOB_crash"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("F3 41 0F 5E F1 F3 48 0F 2C EE"_gh)
+            .at_exe(),
+    },
+};
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
 void preload_addresses()

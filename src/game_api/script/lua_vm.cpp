@@ -2018,6 +2018,8 @@ end
 
     lua["patch_olmec_kill_crash"] = patch_olmec_kill_crash;
 
+    lua["patch_liquid_OOB"] = patch_liquid_OOB;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
