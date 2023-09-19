@@ -1914,12 +1914,35 @@ void patch_orbs_limit()
     once = true;
 }
 
+void clear_cutscene_behavior()
+{
+    auto state = State::get().ptr_local();
+    if (state == nullptr)
+        state = State::get().ptr_main();
+
+    // loop thru entities mask 7
+    const auto entities_map = &state->layers[0]->entities_by_mask;
+    for (uint8_t mask = 1; mask < 7; mask <<= 1)
+    {
+        auto it = entities_map->find(mask);
+        if (it == entities_map->end())
+            continue;
+        for (auto entity : it->second.entities())
+        {
+            auto mov = entity->as<Movable>();
+            if (mov->ic8 != nullptr)
+            {
+                mov->ic8->~CutsceneBehavior();
+                mov->ic8 = nullptr;
+            }
+        }
+    }
+}
+
 void patch_olmec_kill_crash()
 {
     /*
-     * The idea: if the loop continues, jump back to the original code
-     * if not, we have to set rdi to correct value and jump out
-     * we jump just like jump that is used during olmec cutscene and when using shortcut to olmec
+     * The idea: do what's necessary xd
      */
     static bool once = false;
     if (once)
@@ -1931,6 +1954,7 @@ void patch_olmec_kill_crash()
     size_t return_addr;
     {
         // find address to escape to
+
         auto rva = offset - memory.exe_ptr;
         // there are two jump that performe long jump, at the end, of it, the is 'mov rax,qword ptr ds:[rdi]', then find jump that's jumps over that code and create sound meta call
         // this is actually unique pattern
@@ -1938,37 +1962,58 @@ void patch_olmec_kill_crash()
         if (jump_out_lookup == 0)
             return;
 
-        // could probably just offset this stuff
+        // could probably just make static offset from this stuff
         auto jump_offset_offset = memory.at_exe(jump_out_lookup + 10); // 4 (lookup instruction size) + 1 (jump instruction)
         auto jump_offset = memory_read<int8_t>(jump_offset_offset);
         return_addr = jump_offset_offset + 1 + jump_offset; // +1 to get address after the jump
     }
     {
         // patch the cutscene
+
         const auto function_offset = get_virtual_function_address(VTABLE_OFFSET::THEME_OLMEC, 24); // spawn_effects
-        auto jump_out_lookup = find_inst(memory.exe(), "\x48\x03\x58\x28"sv, function_offset, std::nullopt, "patch_olmec_kill_crash");
+        // find the jump out of olmec lookup loop
+        auto jump_out_lookup = find_inst(memory.exe(), "\x48\x03\x58\x28"sv, function_offset, function_offset + 0x51C, "patch_olmec_kill_crash");
         if (jump_out_lookup == 0)
             return;
 
-        auto end_function = find_inst(memory.exe(), "\x48\x83\xC4\x78"sv, jump_out_lookup, std::nullopt, "patch_olmec_kill_crash");
-        if (jump_out_lookup == 0)
+        // find first jump (skips the whole funciton)
+        auto end_function_jump = find_inst(memory.exe(), "\x0F\x84"sv, function_offset, function_offset + 0xC3, "patch_olmec_kill_crash");
+        if (end_function_jump == 0)
             return;
-        auto jump_offset_offset = memory.at_exe(jump_out_lookup + 10);
-        auto addr_to_jump_to = memory.at_exe(end_function);
-        int32_t rel = static_cast<int32_t>(addr_to_jump_to - (jump_offset_offset + 4));
-        write_mem_prot(jump_offset_offset, rel, true);
+
+        auto end_loop_jump = memory.at_exe(jump_out_lookup + 9); // +9 to skip the pattern and some other stuff
+        auto jump_addr = memory.at_exe(end_function_jump);
+        auto addr_to_jump_to = jump_addr + 6 + memory_read<int32_t>(jump_addr + 2);
+        std::string clear_ic8_code = fmt::format(
+            "\x48\xb8{}"  // movabs RAX, &clear_cutscene_behavior
+            "\xff\xd0"sv, // call   RAX
+            to_le_bytes((size_t)&clear_cutscene_behavior));
+
+        /* The idea:
+         * replace end of the loop jump with jump to the new code
+         * call our own function to clear all the cutscene behaviors
+         * jump to the end of the function
+         * hopefully there isn't something important that we're skipping
+         */
+
+        patch_and_redirect(end_loop_jump, 5, clear_ic8_code, true, addr_to_jump_to);
     }
 
+    /* The idea:
+     * if it's not the end of the array it's looking for olmec, jump back to the oryginal code via jump in `new_code`
+     * if it's end of the array (no olmec found) jump to return_addr
+     * the place for return_addr was kind of choosen by feel, as the code is complicated
+     * the whole point of the patched code is to find olmec and check it's faze, maybe for the music?
+     */
+
     std::string_view new_code{
-        "\x0f\x85\x00\x00\x00\x00"sv //   jne (offset needs to be updated after we know the address)
-        "\x48\x8B\x7D\x18"sv};       //   mov rdi,qword ptr ss:[rbp+18] // TODO: test if needed still
+        "\x0f\x85\x00\x00\x00\x00"sv}; //   jne (offset needs to be updated after we know the address)
 
     auto new_code_addr = patch_and_redirect(offset, code_to_move, new_code, false, return_addr);
     if (new_code_addr == 0)
         return;
 
-    new_code_addr += code_to_move; // position after the copied over code
-
+    new_code_addr += code_to_move;
     int32_t rel = static_cast<int32_t>(offset + code_to_move - (new_code_addr + 6)); // +6 after the jump
     write_mem_prot(new_code_addr + 2, rel, true);
     once = true;
@@ -1977,7 +2022,8 @@ void patch_olmec_kill_crash()
 void patch_liquid_OOB()
 {
     /*
-     * The idea: there is a loop thru all liquid entities
+     * The idea:
+     * there is a loop thru all liquid entities
      * if liquid is out of bounds (coordinate below 0) we essentially simulate `continue;` behavior
      */
 
