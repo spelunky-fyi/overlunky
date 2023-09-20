@@ -2,6 +2,7 @@
 
 #include "aliases.hpp"
 #include "containers/custom_vector.hpp"
+#include "layer.hpp"
 #include "render_api.hpp"
 #include <array>
 #include <cstdint>
@@ -1000,4 +1001,17 @@ struct MultiLineTextRendering
     std::vector<TextRenderingInfo*> lines; // each line is separete TextRenderingInfo
     float x;                               // center of the text box?
     float z;                               // center of the text box?
+};
+
+struct EntityLookup
+{
+    std::array<EntityList, 4> unknown1;
+
+    // is this vector?
+    // holds pointers to elements of the array above
+    // it's almost as static as the capacity is 5 and it can hold max 4 pointers
+    // in "empty" state it holds all 4 pointers
+    size_t unknown2;
+    size_t unknown3;
+    size_t unknown4;
 };
