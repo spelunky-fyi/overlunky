@@ -137,8 +137,36 @@ void register_usertypes(sol::state& lua)
         &RenderInfo::flip_horizontal,
         "render_inactive",
         &RenderInfo::render_inactive,
+        "texture_num",
+        sol::readonly(&RenderInfo::texture_num),
         "get_entity",
-        &RenderInfo::get_entity);
+        &RenderInfo::get_entity,
+        "set_normal_map_texture",
+        &RenderInfo::set_normal_map_texture,
+        "get_second_texture",
+        [](const RenderInfo& ri) -> std::optional<TEXTURE>
+        {
+            if (!ri.second_texture_name || ri.texture_num < 2)
+            {
+                return std::nullopt;
+            }
+            return ::get_texture(std::string_view(*ri.second_texture_name)) /**/;
+        },
+        "get_third_texture",
+        [](const RenderInfo& ri) -> std::optional<TEXTURE>
+        {
+            if (!ri.third_texture_name || ri.texture_num < 3)
+            {
+                return std::nullopt;
+            }
+            return ::get_texture(std::string_view(*ri.third_texture_name)) /**/;
+        },
+        "set_second_texture",
+        &RenderInfo::set_second_texture,
+        "set_third_texture",
+        &RenderInfo::set_third_texture,
+        "set_texture_num",
+        &RenderInfo::set_texture_num);
 
     auto get_overlay = [&lua](Entity& entity)
     {
@@ -327,7 +355,7 @@ void register_usertypes(sol::state& lua)
         auto name = item.name.substr(9, item.name.size());
         lua["ENT_TYPE"][name] = item.id;
     }
-    for (auto elm : get_custom_types_map())
+    for (auto& elm : get_custom_types_map())
     {
         lua["ENT_TYPE"][elm.second] = elm.first;
     }

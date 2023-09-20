@@ -34,6 +34,13 @@ struct Vec2
         *this += p;
         return *this;
     }
+    /// Just simple pythagoras theorem
+    float distance_to(const Vec2 other) const
+    {
+        auto diff{*this - other};
+        diff *= diff; // pow
+        return (float)std::sqrt(diff.x + diff.y);
+    }
 
     Vec2 operator+(const Vec2& a) const
     {
@@ -75,6 +82,12 @@ struct Vec2
         y -= a.y;
         return *this;
     }
+    Vec2& operator*=(const Vec2& a)
+    {
+        x *= a.x;
+        y *= a.y;
+        return *this;
+    }
     Vec2& operator++()
     {
         x++;
@@ -99,6 +112,7 @@ struct Vec2
         operator--();
         return old;
     }
+    Vec2& operator=(const Vec2& a) = default;
     bool operator==(const Vec2& a) const
     {
         return x == a.x && y == a.y;
@@ -217,6 +231,7 @@ struct AABB
         new_aabb.offset(-a.x, -a.y);
         return new_aabb;
     }
+    AABB& operator=(const AABB& a) = default;
     /// Compute area of the AABB, can be zero if one dimension is zero or negative if one dimension is inverted.
     float area() const
     {
@@ -303,6 +318,7 @@ struct Triangle
         new_triangle.offset(-a);
         return new_triangle;
     }
+    Triangle& operator=(const Triangle& a) = default;
     /// Rotate triangle by an angle, the px/py are just coordinates, not offset from the center
     Triangle& rotate(float angle, float px, float py)
     {
@@ -440,6 +456,7 @@ struct Quad
         new_quad.offset(-a.x, -a.y);
         return new_quad;
     }
+    Quad& operator=(const Quad& a) = default;
     bool is_null() const
     {
         return bottom_left_x == 0 && bottom_left_y == 0 && bottom_right_x == 0 && bottom_right_y == 0 /**/

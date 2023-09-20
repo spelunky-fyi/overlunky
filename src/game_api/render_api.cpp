@@ -374,7 +374,7 @@ void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instan
             }
             side ^= 0x1;
         }
-        for (auto p : pages_copy) // free unused screens
+        for (auto& p : pages_copy) // free unused screens
         {
             if (p.second)
             {
@@ -437,6 +437,17 @@ void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Co
             source.top_right_y,
         };
 
+        typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
+        static render_func* rf = (render_func*)(offset);
+        rf(&tri, shader, texture->name, &color);
+    }
+}
+
+void RenderAPI::draw_screen_texture(Texture* texture, TextureRenderingInfo tri, Color color, uint8_t shader)
+{
+    static size_t offset = get_address("draw_screen_texture");
+    if (offset != 0)
+    {
         typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
         static render_func* rf = (render_func*)(offset);
         rf(&tri, shader, texture->name, &color);
@@ -662,6 +673,49 @@ Entity* RenderInfo::get_entity() const
 uint32_t RenderInfo::get_aux_id() const
 {
     return get_entity()->uid;
+}
+
+bool RenderInfo::set_second_texture(TEXTURE texture_id)
+{
+    if (auto* new_texture = ::get_texture(texture_id))
+    {
+        second_texture_name = new_texture->name;
+        return true;
+    }
+    return false;
+}
+
+bool RenderInfo::set_third_texture(TEXTURE texture_id)
+{
+    if (auto* new_texture = ::get_texture(texture_id))
+    {
+        third_texture_name = new_texture->name;
+        return true;
+    }
+    return false;
+}
+
+bool RenderInfo::set_texture_num(uint32_t num)
+{
+    // Prevent some crashes
+    if ((num >= 2 && !second_texture_name) || (num >= 3 && !third_texture_name) || num >= 4)
+    {
+        return false;
+    }
+    texture_num = num;
+    return true;
+}
+
+bool RenderInfo::set_normal_map_texture(TEXTURE texture_id)
+{
+    if (set_second_texture(texture_id))
+    {
+        constexpr uint32_t SHINE_TEXTURE = 400;
+        third_texture_name = ::get_texture(SHINE_TEXTURE)->name;
+        texture_num = 3;
+        return true;
+    }
+    return false;
 }
 
 void TextureRenderingInfo::set_destination(const AABB& bbox)

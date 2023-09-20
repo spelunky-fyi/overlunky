@@ -285,12 +285,13 @@ Type | Name | Description
 ---- | ---- | -----------
 nil | [draw_text(const string& text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) | Draw text using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_✱ events. See vanilla_rendering.lua in the example scripts.
 nil | [draw_text(const TextRenderingInfo tri, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text) | 
-tuple&lt;float, float&gt; | [draw_text_size(const string& text, float scale_x, float scale_y, int fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size) | Measure the provided text using the built-in renderer<br/>If you can, consider creating your own [TextureRenderingInfo](#TextureRenderingInfo) instead<br/>You can then use `:text_size()` and `draw_text` with that one object<br/>`draw_text_size` works by creating new TextureRenderingInfo just to call `:text_size()`, which is not very optimal
+tuple&lt;float, float&gt; | [draw_text_size(const string& text, float scale_x, float scale_y, int fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text_size) | Measure the provided text using the built-in renderer<br/>If you can, consider creating your own [TextRenderingInfo](#TextRenderingInfo) instead<br/>You can then use `:text_size()` and `draw_text` with that one object<br/>`draw_text_size` works by creating new TextRenderingInfo just to call `:text_size()`, which is not very optimal
 nil | [draw_screen_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB& rect, Color color, float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_screen_texture(TEXTURE texture_id, int row, int column, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. `source` - the coordinates in the texture, `dest` - the coordinates on the screen<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+nil | [draw_screen_texture(TEXTURE texture_id, TextureRenderingInfo tri, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_texture) | Draw a texture in screen coordinates using [TextureRenderingInfo](#TextureRenderingInfo)<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [set_corner_finish(CORNER_FINISH c)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_corner_finish) | Set the prefered way of drawing corners for the non filled shapes
 nil | [draw_screen_line(const Vec2& A, const Vec2& B, float thickness, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_line) | Draws a line on screen using the built-in renderer from point `A` to point `B`.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_screen_rect(const AABB& rect, float thickness, Color color, optional<float> angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_rect) | Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
@@ -755,6 +756,20 @@ tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split
 
 ### RenderInfo
 
+
+> For using a custom normal map:
+
+```lua
+set_post_entity_spawn(function(ent)
+  -- Doesn't really make sense with this texture, you can use your custom normal texture id here
+  ent.rendering_info:set_normal_map_texture(TEXTURE.DATA_TEXTURES_FLOORSTYLED_GOLD_NORMAL_0)
+  ent.rendering_info.shader = 30 -- Make sure to set the shader to one that uses normal map
+end, SPAWN_TYPE.LEVEL_GEN, MASK.FLOOR, ENT_TYPE.FLOORSTYLED_MINEWOOD)
+```
+
+> Note: if using set_texture_num, make sure to have used set_second_texture/set_third_texture before, since not doing so can lead to crashes
+
+
 Some information used to render the entity, can not be changed, used in [Entity](#Entity)
 
 Type | Name | Description
@@ -768,7 +783,14 @@ float | [tilew](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilew) 
 float | [tileh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tileh) | 
 bool | [facing_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=facing_left) | 
 bool | [render_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_inactive) | 
+int | [texture_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_num) | 
 class [Entity](#Entity) | [get_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity) | 
+bool | [set_normal_map_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_normal_map_texture) | Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
+optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_second_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_second_texture) | 
+optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_third_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_third_texture) | 
+bool | [set_second_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_second_texture) | 
+bool | [set_third_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_third_texture) | 
+bool | [set_texture_num(int texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture_num) | Set the number of textures that may be used, need to have them set before for it to work
 [CallbackId](#Aliases) | [set_pre_virtual(RENDER_INFO_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(RENDER_INFO_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -822,6 +844,7 @@ Type | Name | Description
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 [Vec2](#Vec2)& | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | 
+float | [distance_to(const Vec2 other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance_to) | Just simple pythagoras theorem
 tuple&lt;float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ## Input types
@@ -2423,6 +2446,33 @@ int | [leader](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leader) 
 array&lt;[Inventory](#Inventory), MAX_PLAYERS&gt; | [player_inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) | 
 array&lt;[SelectPlayerSlot](#SelectPlayerSlot), MAX_PLAYERS&gt; | [player_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) | 
 
+### JournalProgressStainSlot
+
+Used in [StateMemory](#StateMemory)
+
+Type | Name | Description
+---- | ---- | -----------
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) | 
+float | [scale](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale) | 
+int | [texture_column](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_column) | 
+int | [texture_row](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_row) | 
+int | [texture_range](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_range) | 
+
+### JournalProgressStickerSlot
+
+Used in [StateMemory](#StateMemory)
+
+Type | Name | Description
+---- | ---- | -----------
+int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
+int | [grid_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grid_position) | 
+[ENT_TYPE](#ENT_TYPE) | [entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_type) | 
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+float | [angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angle) | 
+
 ### PlayerSlot
 
 
@@ -2570,6 +2620,12 @@ int | [time_startup](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ti
 int | [storage_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=storage_uid) | entity uid of the first floor_storage entity
 array&lt;[ENT_TYPE](#ENT_TYPE), 99&gt; | [waddler_storage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_storage) | 
 array&lt;int, 99&gt; | [waddler_metadata](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=waddler_metadata) | 
+int | [journal_progress_sticker_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_sticker_count) | 
+array&lt;[JournalProgressStickerSlot](#JournalProgressStickerSlot), 40&gt; | [journal_progress_sticker_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_sticker_slots) | stickers for notable items and entities in journal progress page
+int | [journal_progress_stain_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_stain_count) | 
+array&lt;[JournalProgressStainSlot](#JournalProgressStainSlot), 30&gt; | [journal_progress_stain_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_stain_slots) | blood splats and paw prints in journal progress page
+int | [journal_progress_theme_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_theme_count) | 
+array&lt;int, 9&gt; | [journal_progress_theme_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_theme_slots) | visited themes in journal progress page
 [ThemeInfo](#ThemeInfo) | [theme_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_info) | Points to the current [ThemeInfo](#ThemeInfo)
 [LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | Level logic like dice game and cutscenes
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
@@ -2622,9 +2678,10 @@ int | [sub_image_height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 
 Type | Name | Description
 ---- | ---- | -----------
+ | [new](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=new) | 
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
-float | [destination_bottom_left_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_bottom_left_x) | 
+float | [destination_bottom_left_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_bottom_left_x) | destination is relative to the x,y centerpoint
 float | [destination_bottom_left_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_bottom_left_y) | 
 float | [destination_bottom_right_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_bottom_right_x) | 
 float | [destination_bottom_right_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destination_bottom_right_y) | 
@@ -3674,6 +3731,8 @@ bool | [is_cursed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
 [CallbackId](#Aliases) | [set_pre_dtor(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_dtor) | Hooks before the virtual function.<br/>The callback signature is `nil dtor(Entity self)`
 [CallbackId](#Aliases) | [set_post_dtor(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_dtor) | Hooks after the virtual function.<br/>The callback signature is `nil dtor(Entity self)`
+[CallbackId](#Aliases) | [set_pre_create_rendering_info(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_create_rendering_info) | Hooks before the virtual function.<br/>The callback signature is `bool create_rendering_info(Entity self)`
+[CallbackId](#Aliases) | [set_post_create_rendering_info(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_create_rendering_info) | Hooks after the virtual function.<br/>The callback signature is `nil create_rendering_info(Entity self)`
 [CallbackId](#Aliases) | [set_pre_update_state_machine(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_update_state_machine) | Hooks before the virtual function.<br/>The callback signature is `bool update_state_machine(Entity self)`
 [CallbackId](#Aliases) | [set_post_update_state_machine(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_update_state_machine) | Hooks after the virtual function.<br/>The callback signature is `nil update_state_machine(Entity self)`
 [CallbackId](#Aliases) | [set_pre_kill(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_kill) | Hooks before the virtual function.<br/>The callback signature is `bool kill(Entity self, bool destroy_corpse, Entity responsible)`<br/>Virtual function docs:<br/>Kills the entity, you can set responsible to `nil` to ignore it
@@ -3682,12 +3741,32 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_post_on_collision1(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_on_collision1) | Hooks after the virtual function.<br/>The callback signature is `nil on_collision1(Entity self, Entity other_entity)`
 [CallbackId](#Aliases) | [set_pre_destroy(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_destroy) | Hooks before the virtual function.<br/>The callback signature is `bool destroy(Entity self)`<br/>Virtual function docs:<br/>Completely removes the entity from existence
 [CallbackId](#Aliases) | [set_post_destroy(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_destroy) | Hooks after the virtual function.<br/>The callback signature is `nil destroy(Entity self)`<br/>Virtual function docs:<br/>Completely removes the entity from existence
+[CallbackId](#Aliases) | [set_pre_can_be_pushed(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_can_be_pushed) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> can_be_pushed(Entity self)`
+[CallbackId](#Aliases) | [set_post_can_be_pushed(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_can_be_pushed) | Hooks after the virtual function.<br/>The callback signature is `nil can_be_pushed(Entity self)`
+[CallbackId](#Aliases) | [set_pre_is_in_liquid(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_is_in_liquid) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> is_in_liquid(Entity self)`<br/>Virtual function docs:<br/>Returns true if entity is in water/lava
+[CallbackId](#Aliases) | [set_post_is_in_liquid(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_is_in_liquid) | Hooks after the virtual function.<br/>The callback signature is `nil is_in_liquid(Entity self)`<br/>Virtual function docs:<br/>Returns true if entity is in water/lava
+[CallbackId](#Aliases) | [set_pre_set_invisible(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_set_invisible) | Hooks before the virtual function.<br/>The callback signature is `bool set_invisible(Entity self, bool value)`
+[CallbackId](#Aliases) | [set_post_set_invisible(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_set_invisible) | Hooks after the virtual function.<br/>The callback signature is `nil set_invisible(Entity self, bool value)`
+[CallbackId](#Aliases) | [set_pre_friction(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_friction) | Hooks before the virtual function.<br/>The callback signature is `optional<float> friction(Entity self)`
+[CallbackId](#Aliases) | [set_post_friction(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_friction) | Hooks after the virtual function.<br/>The callback signature is `nil friction(Entity self)`
 [CallbackId](#Aliases) | [set_pre_get_held_entity(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_get_held_entity) | Hooks before the virtual function.<br/>The callback signature is `optional<Entity> get_held_entity(Entity self)`
 [CallbackId](#Aliases) | [set_post_get_held_entity(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_get_held_entity) | Hooks after the virtual function.<br/>The callback signature is `nil get_held_entity(Entity self)`
 [CallbackId](#Aliases) | [set_pre_trigger_action(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_trigger_action) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
 [CallbackId](#Aliases) | [set_post_trigger_action(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_trigger_action) | Hooks after the virtual function.<br/>The callback signature is `nil trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+[CallbackId](#Aliases) | [set_pre_activate(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_activate) | Hooks before the virtual function.<br/>The callback signature is `bool activate(Entity self, Entity activator)`<br/>Virtual function docs:<br/>Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
+[CallbackId](#Aliases) | [set_post_activate(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_activate) | Hooks after the virtual function.<br/>The callback signature is `nil activate(Entity self, Entity activator)`<br/>Virtual function docs:<br/>Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
 [CallbackId](#Aliases) | [set_pre_on_collision2(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_on_collision2) | Hooks before the virtual function.<br/>The callback signature is `bool on_collision2(Entity self, Entity other_entity)`
 [CallbackId](#Aliases) | [set_post_on_collision2(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_on_collision2) | Hooks after the virtual function.<br/>The callback signature is `nil on_collision2(Entity self, Entity other_entity)`
+[CallbackId](#Aliases) | [set_pre_walked_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_walked_on) | Hooks before the virtual function.<br/>The callback signature is `bool walked_on(Entity self, Entity*)`
+[CallbackId](#Aliases) | [set_post_walked_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_walked_on) | Hooks after the virtual function.<br/>The callback signature is `nil walked_on(Entity self, Entity*)`
+[CallbackId](#Aliases) | [set_pre_walked_off(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_walked_off) | Hooks before the virtual function.<br/>The callback signature is `bool walked_off(Entity self, Entity*)`
+[CallbackId](#Aliases) | [set_post_walked_off(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_walked_off) | Hooks after the virtual function.<br/>The callback signature is `nil walked_off(Entity self, Entity*)`
+[CallbackId](#Aliases) | [set_pre_ledge_grab(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_ledge_grab) | Hooks before the virtual function.<br/>The callback signature is `bool ledge_grab(Entity self, Entity*)`
+[CallbackId](#Aliases) | [set_post_ledge_grab(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_ledge_grab) | Hooks after the virtual function.<br/>The callback signature is `nil ledge_grab(Entity self, Entity*)`
+[CallbackId](#Aliases) | [set_pre_stood_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_stood_on) | Hooks before the virtual function.<br/>The callback signature is `bool stood_on(Entity self, Entity*)`
+[CallbackId](#Aliases) | [set_post_stood_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_stood_on) | Hooks after the virtual function.<br/>The callback signature is `nil stood_on(Entity self, Entity*)`
+[CallbackId](#Aliases) | [set_pre_init(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_init) | Hooks before the virtual function.<br/>The callback signature is `bool init(Entity self)`
+[CallbackId](#Aliases) | [set_post_init(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_init) | Hooks after the virtual function.<br/>The callback signature is `nil init(Entity self)`
 
 ### IceSlidingSound
 
@@ -6295,6 +6374,12 @@ nil | [generic_update_world(Vec2 move, float sprint_factor, bool disable_gravity
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
 [CallbackId](#Aliases) | [set_pre_damage(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_damage) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
 [CallbackId](#Aliases) | [set_post_damage(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_damage) | Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
+[CallbackId](#Aliases) | [set_pre_apply_movement(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_apply_movement) | Hooks before the virtual function.<br/>The callback signature is `bool apply_movement(Movable self)`
+[CallbackId](#Aliases) | [set_post_apply_movement(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_apply_movement) | Hooks after the virtual function.<br/>The callback signature is `nil apply_movement(Movable self)`
+[CallbackId](#Aliases) | [set_pre_check_is_falling(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_check_is_falling) | Hooks before the virtual function.<br/>The callback signature is `bool check_is_falling(Movable self)`
+[CallbackId](#Aliases) | [set_post_check_is_falling(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_check_is_falling) | Hooks after the virtual function.<br/>The callback signature is `nil check_is_falling(Movable self)`
+[CallbackId](#Aliases) | [set_pre_process_input(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_process_input) | Hooks before the virtual function.<br/>The callback signature is `bool process_input(Movable self)`
+[CallbackId](#Aliases) | [set_post_process_input(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_process_input) | Hooks after the virtual function.<br/>The callback signature is `nil process_input(Movable self)`
 
 ### MovingIcon
 
