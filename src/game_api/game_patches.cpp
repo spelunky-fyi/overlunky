@@ -74,7 +74,6 @@ void clear_cutscene_behavior()
         }
     }
     // some bs, don't worry about it
-    state->entity_lookup->unknown1[3].size = 0;
     state->entity_lookup->unknown3 = state->entity_lookup->unknown4;
 }
 
