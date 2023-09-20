@@ -15,7 +15,7 @@ class CutsceneBehavior
   public:
     virtual ~CutsceneBehavior(){};
     virtual void update() = 0;
-    // no more virtuals, it's possible that different classes have some extra variables as well
+    // no more virtuals, it's possible that different sub classes have some extra variables as well
 };
 
 class Movable : public Entity

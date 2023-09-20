@@ -13,6 +13,7 @@
 #include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
 #include "entity_hooks_info.hpp"                 // for Player
 #include "game_manager.hpp"                      // for get_game_manager, GameManager, SaveR...
+#include "game_patches.hpp"                      //
 #include "items.hpp"                             // for Items, SelectPlayerSlot
 #include "level_api.hpp"                         // for LevelGenSystem, LevelGenSystem::(ano...
 #include "logger.h"                              // for DEBUG
@@ -284,6 +285,11 @@ State& State::get()
             hook_godmode_functions();
             strings_init();
             init_state_update_hook();
+
+            // game patches
+            patch_orbs_limit();
+            patch_olmec_kill_crash();
+            patch_liquid_OOB();
         }
 
         get_is_init() = true;
