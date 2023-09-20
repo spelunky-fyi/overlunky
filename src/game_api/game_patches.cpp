@@ -112,8 +112,7 @@ void patch_olmec_kill_crash()
         // patch the cutscene
 
         const auto function_offset = get_virtual_function_address(VTABLE_OFFSET::THEME_OLMEC, 24); // spawn_effects
-        // find the jump out of olmec lookup loop
-        auto jump_out_lookup = find_inst(memory.exe(), "\x48\x03\x58\x28"sv, function_offset, function_offset + 0x51C, "patch_olmec_kill_crash");
+        const auto jump_out_lookup = get_address("olmec_lookup_in_theme");
         if (jump_out_lookup == 0)
             return;
 
@@ -122,7 +121,6 @@ void patch_olmec_kill_crash()
         if (end_function_jump == 0)
             return;
 
-        auto end_loop_jump = memory.at_exe(jump_out_lookup + 9); // +9 to skip the pattern and some other stuff
         auto jump_addr = memory.at_exe(end_function_jump);
         auto addr_to_jump_to = jump_addr + 6 + memory_read<int32_t>(jump_addr + 2);
         std::string clear_ic8_code = fmt::format(
@@ -137,7 +135,7 @@ void patch_olmec_kill_crash()
          * hopefully there isn't something important that we're skipping
          */
 
-        patch_and_redirect(end_loop_jump, 5, clear_ic8_code, true, addr_to_jump_to);
+        patch_and_redirect(jump_out_lookup, 5, clear_ic8_code, true, addr_to_jump_to);
     }
 
     /* The idea:
@@ -204,4 +202,16 @@ void patch_liquid_OOB()
     write_mem_prot(new_code_addr + 16, rel - 10, true);
 
     once = true;
+}
+
+void set_skip_olmec_cutscene(bool skip)
+{
+    static const auto jump_out_lookup = get_address("olmec_lookup_in_theme");
+    if (jump_out_lookup == 0)
+        return;
+
+    if (skip)
+        write_mem_recoverable("set_skip_olmec_cutscene", jump_out_lookup - 2, "\x90\x90"sv, true);
+    else
+        recover_mem("set_skip_olmec_cutscene");
 }

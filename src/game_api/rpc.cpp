@@ -28,6 +28,7 @@
 #include "entities_mounts.hpp"  // for Mount
 #include "entity.hpp"           // for get_entity_ptr, to_id, Entity, EntityDB
 #include "game_manager.hpp"     //
+#include "game_patches.hpp"     //
 #include "items.hpp"            // for Items
 #include "layer.hpp"            // for EntityList, EntityList::Range, Layer
 #include "logger.h"             // for DEBUG
@@ -1879,4 +1880,9 @@ void set_ending_unlock(ENT_TYPE type)
     {
         recover_mem("ending_unlock");
     }
+}
+
+void set_olmec_cutscene_enabled(bool enable)
+{
+    set_skip_olmec_cutscene(!enable);
 }

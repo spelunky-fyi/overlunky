@@ -1984,6 +1984,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_after_inst("F3 41 0F 5E F1 F3 48 0F 2C EE"_gh)
             .at_exe(),
     },
+    {
+        "olmec_lookup_in_theme"sv,
+        // find the jump out of olmec lookup loop
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_OLMEC, (VIRT_FUNC)24) // spawn_effects
+            .find_after_inst("\x48\x03\x58\x28"sv)
+            .offset(0x5)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
