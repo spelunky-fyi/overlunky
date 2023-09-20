@@ -534,14 +534,14 @@ class MagmamanSpawnPosition
     uint32_t x;
     uint32_t y;
     uint32_t timer;
+
+    MagmamanSpawnPosition(uint32_t x_, uint32_t y_);
 };
 
 class LogicMagmamanSpawn : public Logic
 {
   public:
-    std::vector<MagmamanSpawnPosition> magmaman_positions;
-
-    virtual ~LogicMagmamanSpawn() = 0;
+    custom_vector<MagmamanSpawnPosition> magmaman_positions;
 };
 
 class LogicOlmecCutscene : public Logic

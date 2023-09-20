@@ -541,6 +541,7 @@ void register_usertypes(sol::state& lua)
     /// Used in LogicList
     lua.new_usertype<MagmamanSpawnPosition>(
         "MagmamanSpawnPosition",
+        sol::constructors<MagmamanSpawnPosition(uint32_t, uint32_t)>{},
         "x",
         &MagmamanSpawnPosition::x,
         "y",
