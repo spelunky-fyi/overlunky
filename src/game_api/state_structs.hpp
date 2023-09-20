@@ -1007,11 +1007,10 @@ struct EntityLookup
 {
     std::array<EntityList, 4> unknown1;
 
-    // is this vector?
-    // holds pointers to elements of the array above
-    // it's almost as static as the capacity is 5 and it can hold max 4 pointers
-    // in "empty" state it holds all 4 pointers
-    size_t unknown2;
-    size_t unknown3;
-    size_t unknown4;
+    // this is either very strange vector or something unrelated
+    // if this is vector, then it's just holds list of pointers to the elements from array above
+    // the result of the lookup would then be last element: (unknown3 - 1)
+    EntityList** unknown2; // always points to the first one?
+    EntityList** unknown3; // if lookup is not used, it's the same as unknown4
+    EntityList** unknown4; // capacity? points to nullptr after all the other pointers
 };

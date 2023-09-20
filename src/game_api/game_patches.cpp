@@ -73,9 +73,7 @@ void clear_cutscene_behavior()
             }
         }
     }
-    // memory leak, ignore this, it's only temporary as proof of concept
-    state->entity_lookup->unknown1[2].ent_list = nullptr;
-    state->entity_lookup->unknown1[2].cap = 0;
+    // some bs, don't worry about it
     state->entity_lookup->unknown1[3].size = 0;
     state->entity_lookup->unknown3 = state->entity_lookup->unknown4;
 }
