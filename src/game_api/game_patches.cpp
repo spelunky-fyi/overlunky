@@ -73,6 +73,9 @@ void clear_cutscene_behavior()
             }
         }
     }
+    // fix the camera bound
+    state->camera->bounds_bottom = 66.75;
+
     // some bs, don't worry about it
     state->entity_lookup->unknown3 = state->entity_lookup->unknown4;
 }
