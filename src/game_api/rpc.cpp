@@ -1886,3 +1886,8 @@ void set_olmec_cutscene_enabled(bool enable)
 {
     set_skip_olmec_cutscene(!enable);
 }
+
+void set_tiamat_cutscene_enabled(bool enable)
+{
+    set_skip_tiamat_cutscene(!enable);
+}

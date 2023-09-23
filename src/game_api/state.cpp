@@ -287,8 +287,9 @@ State& State::get()
             init_state_update_hook();
 
             // game patches
+            patch_tiamat_kill_crash();
             patch_orbs_limit();
-            patch_olmec_kill_crash();
+            //patch_olmec_kill_crash();
             patch_liquid_OOB();
         }
 

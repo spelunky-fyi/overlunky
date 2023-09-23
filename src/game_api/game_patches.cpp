@@ -50,34 +50,23 @@ void patch_orbs_limit()
     once = true;
 }
 
-void clear_cutscene_behavior()
+bool check_if_ent_type_exists(ENT_TYPE type, int mask)
 {
     StateMemory* state = State::get().ptr_local();
     if (state == nullptr)
         state = State::get().ptr_main();
 
-    // loop thru entities mask 7
-    const auto entities_map = &state->layers[0]->entities_by_mask;
-    for (uint8_t mask = 1; mask < 7; mask <<= 1)
-    {
-        auto it = entities_map->find(mask);
-        if (it == entities_map->end())
-            continue;
-        for (auto entity : it->second.entities())
-        {
-            auto mov = entity->as<Movable>();
-            if (mov->ic8 != nullptr)
-            {
-                mov->ic8->~CutsceneBehavior();
-                mov->ic8 = nullptr;
-            }
-        }
-    }
-    // fix the camera bound
-    state->camera->bounds_bottom = 66.75;
+    const auto entities_map = &state->layers[0]->entities_by_mask; // game code only cares about the front layer, so we do the same
+    auto it = entities_map->find(mask);
+    if (it == entities_map->end())
+        return false;
 
-    // some bs, don't worry about it
-    state->entity_lookup->unknown3 = state->entity_lookup->unknown4;
+    for (auto entity : it->second.entities())
+    {
+        if (entity->type->id == type)
+            return true;
+    }
+    return false;
 }
 
 void patch_olmec_kill_crash()
@@ -124,9 +113,9 @@ void patch_olmec_kill_crash()
         auto jump_addr = memory.at_exe(end_function_jump);
         auto addr_to_jump_to = jump_addr + 6 + memory_read<int32_t>(jump_addr + 2);
         std::string clear_ic8_code = fmt::format(
-            "\x48\xb8{}"  // movabs RAX, &clear_cutscene_behavior
-            "\xff\xd0"sv, // call   RAX
-            to_le_bytes((size_t)&clear_cutscene_behavior));
+            "\x48\xb8{}" // movabs RAX, &clear_cutscene_behavior
+            "\xff\xd0"sv // call   RAX
+        );
 
         /* The idea:
          * replace end of the loop jump with jump to the new code
@@ -142,7 +131,7 @@ void patch_olmec_kill_crash()
      * if it's not the end of the array it's looking for olmec, jump back to the oryginal code via jump in `new_code`
      * if it's end of the array (no olmec found) jump to return_addr
      * the place for return_addr was kind of choosen by feel, as the code is complicated
-     * the whole point of the patched code is to find olmec and check it's faze, maybe for the music?
+     * the whole point of the patched code is to find olmec and check it's faze, maybe for the music? no idea
      */
 
     std::string_view new_code{
@@ -158,11 +147,65 @@ void patch_olmec_kill_crash()
     once = true;
 }
 
+size_t g_tiamat_patch_size;
+size_t g_tiamat_patch_addr;
+
+void patch_tiamat_kill_crash()
+{
+    static bool once = false;
+    if (once)
+        return;
+
+    auto memory = Memory::get();
+    const auto patch_addr = get_address("tiamat_lookup_in_theme");
+    if (patch_addr == 0)
+        return;
+
+    size_t return_to_addr;
+    {
+        // find end of the function that sets the camera and stuff
+        auto rva = patch_addr - memory.exe_ptr;
+        auto rva_jumpout_to = find_inst(memory.exe(), "\x49\x89\x0C\xC6"sv, rva, rva + 0x5C7, "patch_tiamat_kill_crash");
+        if (rva_jumpout_to == 0)
+            return;
+
+        return_to_addr = memory.at_exe(rva_jumpout_to + 4); // +4 - after pattern
+    }
+
+    std::string new_code = fmt::format(
+        "\xb9{}"sv                    // mov      ecx, ENT_TYPE
+        "\xba\x04\x00\x00\x00"sv      // mov      edx, 0x4 (MASK::MONSTER)
+        "\x48\xb8{}"sv                // movabs   RAX, &check_if_ent_type_exists
+        "\xff\xd0"sv                  // call     RAX
+        "\x84\xc0"sv                  // test     al, al
+        "\x0f\x85\x00\x00\x00\x00"sv, // jnz      (offset needs to be updated after we know the address)
+        to_le_bytes(to_id("ENT_TYPE_MONS_TIAMAT")),
+        to_le_bytes((size_t)&check_if_ent_type_exists));
+
+    /* The idea:
+     * After state.screen == screen::level check, we plug our code
+     * it calls simple function to check if entity exists (tiamat in this case)
+     * if tiamat is found, we jump back to the original code, if not, jump to return_to_addr
+     * we can kind of ignore the replaced game code as it sets R14 register
+     * so we let patch_and_redirect just copy before our new code
+     */
+    constexpr int copy_over_code_size = 7;
+    g_tiamat_patch_size = new_code.size() + copy_over_code_size; // without the final jump added by patch_and_redirect
+
+    g_tiamat_patch_addr = patch_and_redirect(patch_addr, copy_over_code_size, new_code, false, return_to_addr);
+
+    auto jump_addr = g_tiamat_patch_addr + g_tiamat_patch_size;
+    int32_t rel = static_cast<int32_t>(patch_addr + copy_over_code_size - jump_addr);
+    write_mem_prot(jump_addr - 4, rel, true); // update the jump offset
+
+    once = true;
+}
+
 void patch_liquid_OOB()
 {
     /*
      * The idea:
-     * there is a loop thru all liquid entities
+     * there is a loop thru all liquid entities (probably for the collision stuff)
      * if liquid is out of bounds (coordinate below 0) we essentially simulate `continue;` behavior
      */
 
@@ -192,7 +235,7 @@ void patch_liquid_OOB()
         "\x48\x83\xFD\x00"sv           //   cmp    ebp,0x0 (ebp = y)
         "\x0f\x8C\x00\x00\x00\x00"sv   //   jl     (offset needs to be updated after we know the address)
         "\x48\x83\xfa\x00"             //   cmp    rdx,0x0 (rdx = x)
-        "\x0f\x8C\x00\x00\x00\x00"sv}; //   jl     (same offset as before)
+        "\x0f\x8C\x00\x00\x00\x00"sv}; //   jl     (same jump as before)
 
     auto new_code_addr = patch_and_redirect(offset, code_to_move, new_code);
     new_code_addr += code_to_move;
@@ -214,4 +257,16 @@ void set_skip_olmec_cutscene(bool skip)
         write_mem_recoverable("set_skip_olmec_cutscene", jump_out_lookup - 2, "\x90\x90"sv, true);
     else
         recover_mem("set_skip_olmec_cutscene");
+}
+
+void set_skip_tiamat_cutscene(bool skip)
+{
+    patch_tiamat_kill_crash(); // just in case
+
+    // simple jump over the tiamat check, nop here just so there is no funny business
+    static const std::string code = fmt::format("\xEB{}\x90"sv, to_le_bytes(static_cast<int8_t>(g_tiamat_patch_size - 2)));
+    if (skip)
+        write_mem_recoverable("set_skip_tiamat_cutscene", g_tiamat_patch_addr, code, true);
+    else
+        recover_mem("set_skip_tiamat_cutscene");
 }

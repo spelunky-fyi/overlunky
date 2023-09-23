@@ -1993,6 +1993,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x5)
             .at_exe(),
     },
+    {
+        "tiamat_lookup_in_theme"sv,
+        // find the first jump in the virtual that skips the whole function
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_TIAMAT, (VIRT_FUNC)24) // spawn_effects
+            .find_after_inst("83 78 0C 0C"_gh)
+            .offset(0x6) // after the jump instruction
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
