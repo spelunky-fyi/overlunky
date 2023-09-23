@@ -947,6 +947,10 @@ void register_usertypes(sol::state& lua)
         &Tiamat::tail_move_speed,
         "right_arm_angle",
         &Tiamat::right_arm_angle,
+        "attack_x",
+        &Tiamat::attack_x,
+        "attack_y",
+        &Tiamat::attack_y,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 

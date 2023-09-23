@@ -2002,6 +2002,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x6) // after the jump instruction
             .at_exe(),
     },
+    {
+        "tiamat_attack_position"sv,
+        // default 17.5, 62.5
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::MONS_TIAMAT, (VIRT_FUNC)78)
+            .find_after_inst("45 0F 57 C0"_gh)
+            .find_inst("\xF3"sv)
+            .offset(0xA)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

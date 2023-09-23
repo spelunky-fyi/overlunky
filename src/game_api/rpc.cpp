@@ -1891,3 +1891,16 @@ void set_tiamat_cutscene_enabled(bool enable)
 {
     set_skip_tiamat_cutscene(!enable);
 }
+
+void activate_tiamat_position_hack(bool activate)
+{
+    static const auto code_addr = get_address("tiamat_attack_position");
+
+    static const std::string_view code{"\xF3\x0F\x5C\xBE\x78\x01\x00\x00"sv   // subss  xmm7,DWORD PTR [rsi+0x178]
+                                       "\xF3\x0F\x5C\xB6\x7C\x01\x00\x00"sv}; // subss  xmm6,DWORD PTR [rsi+0x17C]
+
+    if (activate)
+        write_mem_recoverable("activate_tiamat_position_hack", code_addr, code, true);
+    else
+        recover_mem("activate_tiamat_position_hack");
+}

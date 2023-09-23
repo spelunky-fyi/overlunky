@@ -139,3 +139,4 @@ void set_level_string(std::u16string_view text);
 void set_ending_unlock(ENT_TYPE type);
 void set_olmec_cutscene_enabled(bool enable);
 void set_tiamat_cutscene_enabled(bool enable);
+void activate_tiamat_position_hack(bool activate);

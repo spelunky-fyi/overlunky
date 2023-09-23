@@ -2018,6 +2018,11 @@ end
 
     lua["set_tiamat_cutscene_enabled"] = set_tiamat_cutscene_enabled;
 
+    /// Activate custom variables for position used for detecting the player (normally hardcoded)
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending `set_post_entity_spawn`
+    /// default game values are: attack_x = 17.5 attack_y = 62.5
+    lua["activate_tiamat_position_hack"] = activate_tiamat_position_hack;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

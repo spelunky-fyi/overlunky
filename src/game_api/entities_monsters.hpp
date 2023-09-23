@@ -796,6 +796,10 @@ class Tiamat : public Monster
     float tail_radian; // Counts from 0 to 2*pi, Used to calculate tail angle
     float tail_move_speed;
     float right_arm_angle;
+    /// This is cusome variable, you need [activate_tiamat_position_hack](#activate_tiamat_position_hack) to use it
+    float attack_x;
+    /// This is cusome variable, you need [activate_tiamat_position_hack](#activate_tiamat_position_hack) to use it
+    float attack_y;
 };
 
 class GiantFrog : public Monster
