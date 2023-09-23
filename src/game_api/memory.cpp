@@ -149,7 +149,7 @@ void recover_mem(std::string name, size_t addr)
     }
 }
 
-size_t patch_and_redirect(size_t addr, size_t replace_size, std::string_view payload, bool just_nop, size_t return_to_addr)
+size_t patch_and_redirect(size_t addr, size_t replace_size, const std::string_view payload, bool just_nop, size_t return_to_addr, bool game_code_first)
 {
     constexpr auto jump_size = 5;
 
@@ -168,11 +168,18 @@ size_t patch_and_redirect(size_t addr, size_t replace_size, std::string_view pay
     if (new_code == nullptr)
         return 0;
 
-    if (!just_nop)
+    if (game_code_first && !just_nop)
     {
         std::memcpy(new_code, (void*)addr, data_size_to_move);
+        std::memcpy(new_code + data_size_to_move, payload.data(), payload.size());
     }
-    std::memcpy(new_code + data_size_to_move, payload.data(), payload.size());
+    else
+    {
+        std::memcpy(new_code + data_size_to_move, payload.data(), payload.size());
+
+        if (!just_nop)
+            std::memcpy(new_code, (void*)addr, data_size_to_move);
+    }
 
     size_t return_addr = addr + jump_size;
     if (return_to_addr != 0)
