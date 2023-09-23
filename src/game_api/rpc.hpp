@@ -141,3 +141,4 @@ void set_olmec_cutscene_enabled(bool enable);
 void set_tiamat_cutscene_enabled(bool enable);
 void activate_tiamat_position_hack(bool activate);
 void activate_crush_elevator_hack(bool activate);
+void activate_hundun_hack(bool activate);

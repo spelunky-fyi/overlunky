@@ -924,6 +924,9 @@ class Hundun : public Monster
     bool snakehead_defeated;
     /// 1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs
     uint8_t hundun_flags;
+    uint16_t padding;
+    /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    float y_limit;
 };
 
 class HundunHead : public Monster

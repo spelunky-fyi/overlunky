@@ -1104,6 +1104,8 @@ void register_usertypes(sol::state& lua)
         &Hundun::snakehead_defeated,
         "hundun_flags",
         &Hundun::hundun_flags,
+        "y_limit",
+        &Hundun::y_limit,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 

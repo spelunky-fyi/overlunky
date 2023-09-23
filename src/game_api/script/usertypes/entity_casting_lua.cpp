@@ -611,7 +611,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][620] = lua["Entity"]["as_movable"];                // ACTIVEFLOOR_TIAMAT_PLATFORM
     lua["TYPE_MAP"][621] = lua["Entity"]["as_movable"];                // ACTIVEFLOOR_TIAMAT_SHOULDERPLATFORM
     lua["TYPE_MAP"][622] = lua["Entity"]["as_movable"];                // ACTIVEFLOOR_BUBBLE_PLATFORM
-    lua["TYPE_MAP"][623] = lua["Entity"]["as_crushelevator"];                // ACTIVEFLOOR_CRUSHING_ELEVATOR
+    lua["TYPE_MAP"][623] = lua["Entity"]["as_crushelevator"];          // ACTIVEFLOOR_CRUSHING_ELEVATOR
     lua["TYPE_MAP"][624] = lua["Entity"]["as_movable"];                // ACTIVEFLOOR_SHIELD
     lua["TYPE_MAP"][625] = lua["Entity"]["as_regenblock"];             // ACTIVEFLOOR_REGENERATINGBLOCK
     lua["TYPE_MAP"][628] = lua["Entity"]["as_movable"];                // FX_EGGSHIP_SHELL

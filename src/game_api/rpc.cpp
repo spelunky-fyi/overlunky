@@ -1939,3 +1939,31 @@ void activate_crush_elevator_hack(bool activate)
     else
         recover_mem("activate_crush_elevator_hack");
 }
+
+void activate_hundun_hack(bool activate)
+{
+    auto memory = Memory::get();
+    static size_t offsets[2];
+    if (offsets[0] == 0)
+    {
+        auto func_offset = get_virtual_function_address(VTABLE_OFFSET::MONS_HUNDUN, 78);
+        offsets[0] = find_inst(memory.exe(), "\x41\xF6\x85\x61\x01\x00\x00\x08"sv, func_offset, func_offset + 0x1420, "activate_hundun_hack");
+        if (offsets[0] == 0)
+            return;
+
+        offsets[0] -= 13; // offset, no good pattern above
+        offsets[1] = find_inst(memory.exe(), "\x41\x80\x8D\x61\x01\x00\x00\x04"sv, offsets[0], offsets[0] + 0xF40, "activate_hundun_hack");
+        if (offsets[1] == 0)
+            return;
+
+        offsets[1] += 8; // pattern size
+    }
+    if (activate)
+    {
+        // probably unsafe to use those registers, but there isin't enogh space to use the proper r13
+        write_mem_recoverable("activate_hundun_hack", memory.at_exe(offsets[0]), "\x0F\x2E\xB9\x64\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rcx+0x164]
+        write_mem_recoverable("activate_hundun_hack", memory.at_exe(offsets[1]), "\x0f\x2e\xb8\x64\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rax+0x164]
+    }
+    else
+        recover_mem("activate_hundun_hack");
+}
