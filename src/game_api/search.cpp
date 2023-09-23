@@ -1986,11 +1986,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "olmec_lookup_in_theme"sv,
-        // find the jump out of olmec lookup loop
+        // find the first jump in the virtual that skips the whole function
         PatternCommandBuffer{}
             .get_virtual_function_address(VTABLE_OFFSET::THEME_OLMEC, (VIRT_FUNC)24) // spawn_effects
-            .find_after_inst("\x48\x03\x58\x28"sv)
-            .offset(0x5)
+            .find_after_inst("83 78 0C 0D"_gh)
+            .offset(0x6) // after the jump instruction
             .at_exe(),
     },
     {
