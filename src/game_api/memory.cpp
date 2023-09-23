@@ -106,19 +106,20 @@ std::unordered_map<std::string, std::vector<RecoverableMemory>> original_memory;
 
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot)
 {
-    if (!original_memory.contains(name))
+    auto map_it = original_memory.find(name);
+    if (map_it == original_memory.end())
     {
         char* old_data = (char*)VirtualAlloc(0, payload.size(), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (old_data)
         {
             memcpy(old_data, (char*)addr, payload.size());
-            original_memory[name] = std::vector<RecoverableMemory>{{addr, old_data, payload.size(), prot}};
+            original_memory.emplace(name, std::vector<RecoverableMemory>{{addr, old_data, payload.size(), prot}});
         }
     }
     else
     {
         bool new_addr = true;
-        for (auto& it : original_memory[name])
+        for (auto& it : map_it->second)
         {
             if (it.address == addr)
             {
@@ -132,7 +133,7 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
             if (old_data)
             {
                 memcpy(old_data, (char*)addr, payload.size());
-                original_memory[name].push_back(RecoverableMemory{addr, old_data, payload.size(), prot});
+                map_it->second.emplace_back(addr, old_data, payload.size(), prot);
             }
         }
     }
