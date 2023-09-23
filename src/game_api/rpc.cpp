@@ -1904,3 +1904,38 @@ void activate_tiamat_position_hack(bool activate)
     else
         recover_mem("activate_tiamat_position_hack");
 }
+
+void activate_crush_elevator_hack(bool activate)
+{
+    auto memory = Memory::get();
+    static size_t offsets[3];
+    if (offsets[0] == 0)
+    {
+        auto func_offset = get_virtual_function_address(VTABLE_OFFSET::ACTIVEFLOOR_CRUSHING_ELEVATOR, 78);
+
+        offsets[0] = find_inst(memory.exe(), "\xF3\x0F\x58\xD0"sv, func_offset, func_offset + 0x80, "activate_crush_elevator_hack");
+        if (offsets[0] == 0)
+            return;
+
+        offsets[0] += 4; // pattern size
+        offsets[1] = find_inst(memory.exe(), "\xEB*\x0F\x57\xD2"sv, offsets[0], offsets[0] + 0xF0, "activate_crush_elevator_hack");
+        if (offsets[1] == 0)
+            return;
+
+        offsets[1] += 5; // pattern size
+        offsets[2] = find_inst(memory.exe(), "\xF3\x0F\x58\xC1"sv, offsets[1], offsets[1] + 0x40, "activate_crush_elevator_hack");
+        if (offsets[2] == 0)
+            return;
+
+        offsets[2] += 4; // pattern size
+    }
+
+    if (activate)
+    {
+        write_mem_recoverable("activate_crush_elevator_hack", memory.at_exe(offsets[0]), "\x0f\x2e\x90\x30\x01\x00\x00"sv, true); // ucomiss xmm2,DWORD PTR [rax+0x130] // limit
+        write_mem_recoverable("activate_crush_elevator_hack", memory.at_exe(offsets[1]), "\xf3\x0f\x10\x9b\x30\x01\x00"sv, true); // movss  xmm3,DWORD PTR [rbx+0x130]  // limit
+        write_mem_recoverable("activate_crush_elevator_hack", memory.at_exe(offsets[2]), "\xf3\x0f\x58\x83\x34\x01\x00"sv, true); // addss  xmm0,DWORD PTR [rbx+0x134]  // speed
+    }
+    else
+        recover_mem("activate_crush_elevator_hack");
+}

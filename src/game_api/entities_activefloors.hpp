@@ -155,3 +155,12 @@ class TimedPowderkeg : public PushBlock
     /// timer till explosion, -1 = pause, counts down
     int32_t timer;
 };
+
+class CrushElevator : public Movable
+{
+  public:
+    /// This is custom variable, you need [activate_crush_elevator_hack](#activate_crush_elevator_hack) to use it
+    float y_limit;
+    /// This is custom variable, you need [activate_crush_elevator_hack](#activate_crush_elevator_hack) to use it
+    float speed;
+};
