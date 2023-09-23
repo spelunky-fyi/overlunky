@@ -657,7 +657,7 @@ struct LogicList
     LogicApepTrigger* apep_trigger;
     LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
     LogicDuatBossesTrigger* duat_bosses_trigger;
-    LogicTiamatBubbles* tiamat;
+    LogicTiamatBubbles* bubbler;
     LogicTuskPleasurePalace* tusk_pleasure_palace;
     Logic* discovery_info; // black market, vlad, wet fur discovery; shows the toast
     Logic* black_market;
