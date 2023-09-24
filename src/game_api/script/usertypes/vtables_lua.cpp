@@ -81,7 +81,7 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"fall_logic", 83, void()>,
         VTableEntry<"apply_friction", 84, void()>,
         VTableEntry<"crush", 90, void()>,
-        VTableEntry<"fall_on", 91, void()>,
+        VTableEntry<"fall_on", 91, void(uint32_t, Entity*)>,
         VTableEntry<"instakill", 92, void()>>;
     static MovableVTable movable_vtable(lua, lua["Movable"], "ENTITY_OVERRIDE");
 
