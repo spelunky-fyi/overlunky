@@ -2012,6 +2012,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0xA)
             .at_exe(),
     },
+    {
+        "hundun_door_control"sv,
+        // kill exit door, crash the game by killing hundun. It crashes in the function that we need
+        // this pattern is also using in set_boss_door_control_enabled function
+        PatternCommandBuffer{}
+            .find_inst("\x4A\x8B\xB4\xC8\x80\xF4\x00\x00")
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

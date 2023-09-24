@@ -1108,8 +1108,8 @@ void register_usertypes(sol::state& lua)
         &Hundun::y_limit,
         "bird_head_spawn_y",
         &Hundun::bird_head_spawn_y,
-        "sneak_head_spawn_y",
-        &Hundun::sneak_head_spawn_y,
+        "snake_head_spawn_y",
+        &Hundun::snake_head_spawn_y,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 

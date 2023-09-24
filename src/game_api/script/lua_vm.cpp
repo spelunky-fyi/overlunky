@@ -2032,8 +2032,12 @@ end
 
     /// Activate custom variables for y coordinate limit for hundun and spawn of it's heads
     /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending `set_post_entity_spawn`
-    /// default game value is: y_limit = 98.5, bird_head_spawn_y = 55, sneak_head_spawn_y = 71
+    /// default game value is: y_limit = 98.5, bird_head_spawn_y = 55, snake_head_spawn_y = 71
     lua["activate_hundun_hack"] = activate_hundun_hack;
+
+    /// Allows you to disable the control over the door for Hundun and Tiamat
+    /// This will also prevent game crashing when there is no exit door when they are in level
+    lua["set_boss_door_control_enabled"] = set_boss_door_control_enabled;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

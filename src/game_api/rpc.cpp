@@ -2016,3 +2016,30 @@ void activate_hundun_hack(bool activate)
     else
         recover_mem("activate_hundun_hack");
 }
+
+void set_boss_door_control_enabled(bool enable)
+{
+    static size_t offsets[2];
+    if (offsets[0] == 0)
+    {
+        auto memory = Memory::get();
+        offsets[0] = get_address("hundun_door_control");
+        if (offsets[0] == 0)
+            return;
+        // find tiamat door control (the same pattern)
+        offsets[1] = find_inst(memory.exe(), "\x4A\x8B\xB4\xC8\x80\xF4\x00\x00", offsets[0] - memory.exe_ptr + 0x777, std::nullopt, "set_boss_door_control_enabled");
+        if (offsets[1] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[1] = function_start(memory.at_exe(offsets[1]));
+    }
+    if (!enable)
+    {
+        write_mem_recoverable("set_boss_door_control_enabled", offsets[0], "\xC3\x90", true);
+        write_mem_recoverable("set_boss_door_control_enabled", offsets[1], "\xC3\x90", true);
+    }
+    else
+        recover_mem("set_boss_door_control_enabled");
+}

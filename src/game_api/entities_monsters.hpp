@@ -931,7 +931,7 @@ class Hundun : public Monster
     /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
     float bird_head_spawn_y;
     /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
-    float sneak_head_spawn_y;
+    float snake_head_spawn_y;
 };
 
 class HundunHead : public Monster
