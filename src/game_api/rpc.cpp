@@ -1942,10 +1942,16 @@ void activate_crush_elevator_hack(bool activate)
 
 void activate_hundun_hack(bool activate)
 {
-    auto memory = Memory::get();
-    static size_t offsets[2];
+    /*
+     * Pointer to Hundun entity is stored in r13 register. which means we need 8 bytes for ucomiss instruction
+     * but we have 7 available, that's why we jump out to new code with the instruction and back
+     */
+    static size_t offsets[4]; // y_limit, y_limit, bird_head, sneak_head
+    static char new_code[2][7];
+
     if (offsets[0] == 0)
     {
+        auto memory = Memory::get();
         auto func_offset = get_virtual_function_address(VTABLE_OFFSET::MONS_HUNDUN, 78);
         offsets[0] = find_inst(memory.exe(), "\x41\xF6\x85\x61\x01\x00\x00\x08"sv, func_offset, func_offset + 0x1420, "activate_hundun_hack");
         if (offsets[0] == 0)
@@ -1954,15 +1960,58 @@ void activate_hundun_hack(bool activate)
         offsets[0] -= 13; // offset, no good pattern above
         offsets[1] = find_inst(memory.exe(), "\x41\x80\x8D\x61\x01\x00\x00\x04"sv, offsets[0], offsets[0] + 0xF40, "activate_hundun_hack");
         if (offsets[1] == 0)
+        {
+            offsets[0] = 0;
             return;
-
+        }
         offsets[1] += 8; // pattern size
+
+        offsets[2] = find_inst(memory.exe(), "\xF3\x41\x0F\x58\x45\x7C"sv, offsets[0], offsets[1], "");
+        if (offsets[2] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[2] += 6; // pattern size
+
+        offsets[3] = find_inst(memory.exe(), "\xF3\x41\x0F\x58\x45\x7C"sv, offsets[2], offsets[1], "");
+        if (offsets[3] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[3] += 6; // pattern size
+
+        offsets[0] = memory.at_exe(offsets[0]);
+        offsets[1] = memory.at_exe(offsets[1]);
+        offsets[2] = memory.at_exe(offsets[2]);
+        offsets[3] = memory.at_exe(offsets[3]);
+
+        char old_code[2][7];
+
+        std::memcpy(old_code[0], (void*)offsets[0], 7);
+        std::memcpy(old_code[1], (void*)offsets[1], 7);
+
+        const std::string_view patch_code{"\x41\x0F\x2E\xBD\x64\x01\x00\x00"sv}; // ucomiss xmm7,DWORD PTR [r13+0x164]
+
+        patch_and_redirect(offsets[0], 7, patch_code, true);
+        patch_and_redirect(offsets[1], 7, patch_code, true);
+
+        std::memcpy(new_code[0], (void*)offsets[0], 7);
+        std::memcpy(new_code[1], (void*)offsets[1], 7);
+
+        // writing back the old code so we can just use write_mem_recoverable for going from vanilla to the patch
+        write_mem_prot(offsets[0], std::string_view{&old_code[0][0], &old_code[0][7]}, true);
+        write_mem_prot(offsets[1], std::string_view{&old_code[1][0], &old_code[1][7]}, true);
     }
+
     if (activate)
     {
-        // probably unsafe to use those registers, but there isin't enogh space to use the proper r13
-        write_mem_recoverable("activate_hundun_hack", memory.at_exe(offsets[0]), "\x0F\x2E\xB9\x64\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rcx+0x164]
-        write_mem_recoverable("activate_hundun_hack", memory.at_exe(offsets[1]), "\x0f\x2e\xb8\x64\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rax+0x164]
+        write_mem_recoverable("activate_hundun_hack", offsets[0], std::string_view{&new_code[0][0], &new_code[0][7]}, true);
+        write_mem_recoverable("activate_hundun_hack", offsets[1], std::string_view{&new_code[1][0], &new_code[1][7]}, true);
+
+        write_mem_recoverable("activate_hundun_hack", offsets[2], "\x0F\x2E\xB8\x68\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rax+0x168]
+        write_mem_recoverable("activate_hundun_hack", offsets[3], "\x0F\x2E\xB8\x6C\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rax+0x16C]
     }
     else
         recover_mem("activate_hundun_hack");

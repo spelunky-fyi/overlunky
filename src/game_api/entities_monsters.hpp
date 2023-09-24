@@ -22,7 +22,7 @@ class Monster : public PowerupCapable
     virtual void on_shop_entered() = 0;
 
     // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
-    // if disabled some monster will stop moving (like bats, jiangshi) some wont attack (crabman), shopkeeper can still kick you but won't fire hes weapon
+    // if disabled some monster will stop moving (like bats, jiangshi) some wont attack (crabman), shopkeeper can still kick you but won't fire his weapon
     virtual void attack_logic_related() = 0;
 
     virtual bool update_target(Entity* ent) = 0;
@@ -917,6 +917,7 @@ class Hundun : public Monster
     float applied_ver_velocity;
     int32_t birdhead_entity_uid;
     int32_t snakehead_entity_uid;
+    /// current floor level
     float y_level;
     uint16_t bounce_timer; // functionality depends on state, determines when it can bounce again, also how long velocity is applied for bouncing
     uint8_t fireball_timer;
@@ -927,6 +928,10 @@ class Hundun : public Monster
     uint16_t padding;
     /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
     float y_limit;
+    /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    float bird_head_spawn_y;
+    /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    float sneak_head_spawn_y;
 };
 
 class HundunHead : public Monster

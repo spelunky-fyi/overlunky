@@ -2030,9 +2030,9 @@ end
     /// default game values are: speed = 0.0125, y_limit = 98.5
     lua["activate_crush_elevator_hack"] = activate_crush_elevator_hack;
 
-    /// Activate custom variable for y coordinate limit for hundun
+    /// Activate custom variables for y coordinate limit for hundun and spawn of it's heads
     /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending `set_post_entity_spawn`
-    /// default game value is: y_limit = 98.5
+    /// default game value is: y_limit = 98.5, bird_head_spawn_y = 55, sneak_head_spawn_y = 71
     lua["activate_hundun_hack"] = activate_hundun_hack;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
