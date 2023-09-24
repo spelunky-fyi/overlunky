@@ -58,10 +58,10 @@ void fix_liquid_out_of_bounds()
             for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
             {
                 auto liquid_coordinates = it.physics_engine->entity_coordinates + i;
-                if (liquid_coordinates->second < 0                // y < 0
-                    || liquid_coordinates->first < 0              // x < 0
-                    || liquid_coordinates->first > g_level_max_x) // x > g_level_max_x
-                // no y > g_level_max_y as the entity should fall back down eventually anyway
+                if (liquid_coordinates->second < 0                 // y < 0
+                    || liquid_coordinates->first < 0               // x < 0
+                    || liquid_coordinates->first > g_level_max_x   // x > g_level_max_x
+                    || liquid_coordinates->second > g_level_max_y) // y > g_level_max_y
                 {
                     if (!*(it.physics_engine->unknown61 + i)) // just some bs
                         continue;
