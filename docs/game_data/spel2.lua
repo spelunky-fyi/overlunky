@@ -1189,7 +1189,7 @@ function activate_tiamat_position_hack(activate) end
 function activate_crush_elevator_hack(activate) end
 ---Activate custom variables for y coordinate limit for hundun and spawn of it's heads
 ---note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending `set_post_entity_spawn`
----default game value is: y_limit = 98.5, bird_head_spawn_y = 55, snake_head_spawn_y = 71
+---default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
 ---@param activate boolean
 ---@return nil
 function activate_hundun_hack(activate) end
@@ -3221,6 +3221,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field snakehead_defeated boolean
     ---@field hundun_flags integer @1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs
     ---@field y_limit number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    ---@field rising_speed_x number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    ---@field rising_speed_y number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
     ---@field bird_head_spawn_y number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
     ---@field snake_head_spawn_y number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
 
