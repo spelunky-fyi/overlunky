@@ -2005,7 +2005,7 @@ void activate_hundun_hack(bool activate)
         offsets[4] = memory.at_exe(offsets[4]);
         offsets[5] = memory.at_exe(offsets[5]);
 
-        char old_code[3][7];
+        char old_code[3][8];
 
         std::memcpy(old_code[0], (void*)offsets[0], 7);
         std::memcpy(old_code[1], (void*)offsets[1], 7);
