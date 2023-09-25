@@ -8,6 +8,7 @@
 #include <set>
 
 class Entity;
+struct SoundMeta;
 
 struct RobinHoodTableEntry
 {
@@ -426,56 +427,53 @@ class Logic
 class LogicOuroboros : public Logic
 {
   public:
-    size_t unknown3; // sound related?
-    uint16_t timer;
-
-    virtual ~LogicOuroboros() = 0;
+    SoundMeta* sound;
+    uint32_t timer;
 };
 
 class LogicBasecampSpeedrun : public Logic
 {
   public:
-    uint32_t official; // entity uid of the character that keeps the time
-    uint32_t crate;    // entity uid; you must break this crate for the run to be valid, otherwise you're cheating
-    uint32_t unknown3;
-    uint32_t unknown4;
-
-    virtual ~LogicBasecampSpeedrun() = 0;
+    /// entity uid of the character that keeps the time
+    uint32_t official;
+    /// entity uid. you must break this crate for the run to be valid, otherwise you're cheating
+    uint32_t crate;
 };
 
 class LogicGhostToast : public Logic
 {
   public:
     uint32_t toast_timer;
-
-    virtual ~LogicGhostToast() = 0;
 };
 
 class LogicDiceShop : public Logic
 {
   public:
-    uint32_t boss; // entity uid; either tusk or the shopkeeper
-    uint32_t unknown4;
-    uint32_t bet_machine; // entity uid
-    uint32_t die1;        // entity uid
-    uint32_t die2;        // entity uid
+    uint32_t boss_uid; // either tusk or the shopkeeper
+    ENT_TYPE boss_type;
+    /// entity uid
+    uint32_t bet_machine;
+    /// entity uid
+    uint32_t die1;
+    /// entity uid
+    uint32_t die2;
     int8_t die_1_value;
     int8_t die_2_value;
     uint16_t unknown8;
-    uint32_t prize_dispenser; // entity uid
-    uint32_t prize;           // entity uid
-    uint32_t forcefield;      // entity uid
+    /// entity uid
+    uint32_t prize_dispenser;
+    /// entity uid
+    uint32_t prize;
+    /// entity uid
+    uint32_t forcefield;
     bool bet_active;
     bool forcefield_deactivated;
     bool boss_angry;
     uint8_t result_announcement_timer; // the time the boss waits after your second die throw to announce the results
     uint8_t won_prizes_count;          // to see whether you achieved high roller status
-    uint8_t unknown14;
-    uint8_t unknown15;
-    uint8_t unknown16;
+    uint8_t padding[3];
     int32_t balance; // cash balance of all the games
-
-    virtual ~LogicDiceShop() = 0;
+    size_t unknown17;
 };
 
 class LogicMoonChallenge : public Logic
@@ -491,8 +489,6 @@ class LogicMoonChallenge : public Logic
     uint16_t unknown8a;
     uint16_t unknown8b;
     uint32_t mattock; // entity uid
-
-    virtual ~LogicMoonChallenge() = 0;
 };
 
 class LogicStarChallenge : public Logic
@@ -507,9 +503,11 @@ class LogicStarChallenge : public Logic
     uint16_t unknown7;
     uint32_t unknown8;
     std::vector<Entity*> torches;
-    uint32_t start_countdown;
-
-    virtual ~LogicStarChallenge() = 0;
+    uint8_t start_countdown;
+    uint8_t padding[3];
+    uint32_t unknown9;
+    float unknown10; // position in from of tun and one tile higher, dunno what for?
+    float unknown11;
 };
 
 class LogicSunChallenge : public Logic
@@ -524,8 +522,10 @@ class LogicSunChallenge : public Logic
     uint16_t unknown7;
     uint32_t unknown8;
     uint8_t start_countdown;
-
-    virtual ~LogicSunChallenge() = 0;
+    uint8_t padding[3];
+    uint32_t unknown9;
+    float unknown10; // position in from of tun and one tile higher, dunno what for?
+    float unknown11;
 };
 
 class LogicOlmecCutscene : public Logic
@@ -544,8 +544,6 @@ class LogicOlmecCutscene : public Logic
     Entity* player;
     Entity* cinematic_anchor;
     uint32_t timer;
-
-    virtual ~LogicOlmecCutscene() = 0;
 };
 
 class LogicTiamatCutscene : public Logic
@@ -560,8 +558,6 @@ class LogicTiamatCutscene : public Logic
     int32_t unknown5;
     uint32_t unknown6;
     uint32_t unknown7;
-
-    virtual ~LogicTiamatCutscene() = 0;
 };
 
 class LogicApepTrigger : public Logic
@@ -570,34 +566,25 @@ class LogicApepTrigger : public Logic
     uint32_t spawn_cooldown;
     bool cooling_down;
     bool apep_journal_entry_logged;
-    uint32_t unknown4c;
-    uint32_t unknown4d;
-    uint32_t unknown5;
-    uint32_t unknown6;
-
-    virtual ~LogicApepTrigger() = 0;
 };
 
 class LogicCOGAnkhSacrifice : public Logic
 {
     uint8_t unknown3;
     uint8_t timer;
-
-    virtual ~LogicCOGAnkhSacrifice() = 0;
 };
 
 class LogicDuatBossesTrigger : public Logic
 {
   public:
-    virtual ~LogicDuatBossesTrigger() = 0;
+    uint32_t unknown3; // definitely is reserved memory, but doesn't seam used?
+    uint32_t unknown4;
 };
 
 class LogicTiamatBubbles : public Logic
 {
   public:
     uint8_t bubble_spawn_timer;
-
-    virtual ~LogicTiamatBubbles() = 0;
 };
 
 class LogicTuskPleasurePalace : public Logic
@@ -605,8 +592,6 @@ class LogicTuskPleasurePalace : public Logic
   public:
     uint32_t locked_door; // entity uid
     uint32_t unknown4;
-
-    virtual ~LogicTuskPleasurePalace() = 0;
 };
 
 class LogicArena1 : public Logic
@@ -616,47 +601,61 @@ class LogicArena1 : public Logic
     uint32_t unknown4;
     uint32_t unknown5;
     uint32_t unknown6;
-
-    virtual ~LogicArena1() = 0;
 };
 
 class LogicArenaAlienBlast : public Logic
 {
   public:
     uint32_t timer;
-
-    virtual ~LogicArenaAlienBlast() = 0;
 };
 
 class LogicArenaLooseBombs : public Logic
 {
   public:
     uint32_t timer;
+};
 
-    virtual ~LogicArenaLooseBombs() = 0;
+class LogicUnderwaterBubbles : public Logic
+{
+  public:
+    float unknown1;
+    int16_t unknown2;
+    int8_t unknown3;
+};
+
+class LogicTunPreChallenge : public Logic
+{
+    // except for Tun the rest of the values do not make any sense (garbage)
+    // the logic.perform does only ever touches the tun as well, first one always 0?
+    size_t unknown1;
+    size_t unknown2;
+    size_t unknown3;
+    int32_t tun;
 };
 
 struct LogicList
 {
     Logic* tutorial;
-    LogicOuroboros* ouroboros;
-    LogicBasecampSpeedrun* basecamp_speedrun;
-    Logic* ghost_trigger;
-    LogicGhostToast* ghost_toast_trigger;
-    Logic* tun_aggro;
-    LogicDiceShop* diceshop;
-    Logic* tun_pre_challenge;
-    LogicMoonChallenge* tun_moon_challenge;
-    LogicStarChallenge* tun_star_challenge;
-    LogicSunChallenge* tun_sun_challenge;
-    Logic* volcana_related;
-    Logic* water_related;
+    LogicOuroboros* ouroboros;                // OK
+    LogicBasecampSpeedrun* basecamp_speedrun; // OK
+    Logic* ghost_trigger;                     // OK
+    LogicGhostToast* ghost_toast_trigger;     // OK
+    Logic* tun_aggro;                         // OK
+    LogicDiceShop* diceshop;                  // OK
+    LogicTunPreChallenge* tun_pre_challenge;  // OK
+    LogicMoonChallenge* tun_moon_challenge;   // OK
+    LogicStarChallenge* tun_star_challenge;   // OK
+    LogicSunChallenge* tun_sun_challenge;     // OK
+    Logic* volcana_related;                   // OK
+    /// Only the bubbles that spawn from the floor
+    /// Even without it, entities moving in water still spawn bubbles
+    LogicUnderwaterBubbles* water_bubbles; // OK
     LogicOlmecCutscene* olmec_cutscene;
     LogicTiamatCutscene* tiamat_cutscene;
-    LogicApepTrigger* apep_trigger;
+    LogicApepTrigger* apep_trigger; // OK
     LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
-    LogicDuatBossesTrigger* duat_bosses_trigger;
-    LogicTiamatBubbles* tiamat;
+    LogicDuatBossesTrigger* duat_bosses_trigger; // OK
+    LogicTiamatBubbles* bubbler;
     LogicTuskPleasurePalace* tusk_pleasure_palace;
     Logic* discovery_info; // black market, vlad, wet fur discovery; shows the toast
     Logic* black_market;
