@@ -182,7 +182,7 @@ size_t patch_and_redirect(size_t addr, size_t replace_size, const std::string_vi
             std::memcpy(new_code, (void*)addr, data_size_to_move);
     }
 
-    size_t return_addr = addr + jump_size;
+    size_t return_addr = addr + replace_size;
     if (return_to_addr != 0)
     {
         return_addr = return_to_addr;
