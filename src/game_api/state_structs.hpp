@@ -391,7 +391,7 @@ class Logic
 {
   public:
     uint32_t logic_index; // array index into state.logic, where this instance resides
-    uint32_t padding;
+    uint32_t unused_padding;
 
     virtual ~Logic() = 0;
 
@@ -570,6 +570,7 @@ class LogicApepTrigger : public Logic
 
 class LogicCOGAnkhSacrifice : public Logic
 {
+  public:
     uint8_t unknown3;
     uint8_t timer;
 };
@@ -625,6 +626,7 @@ class LogicUnderwaterBubbles : public Logic
 
 class LogicTunPreChallenge : public Logic
 {
+  public:
     // except for Tun the rest of the values do not make any sense (garbage)
     // the logic.perform does only ever touches the tun as well, first one always 0?
     size_t unknown1;
