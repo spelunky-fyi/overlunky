@@ -1996,7 +1996,7 @@ void activate_hundun_hack(bool activate)
             offsets[0] = 0;
             return;
         }
-        offsets[5] += 9; // instruction size (din't include the whole thing in pattern, very short distance)
+        offsets[5] += 9; // instruction size (din't include the whole thing in pattern, very short distance from previous pattern)
 
         offsets[0] = memory.at_exe(offsets[0]);
         offsets[1] = memory.at_exe(offsets[1]);
@@ -2012,11 +2012,11 @@ void activate_hundun_hack(bool activate)
         std::memcpy(old_code[2], (void*)offsets[5], 8);
 
         const std::string_view patch_code{"\x41\x0F\x2E\xBD\x64\x01\x00\x00"sv};      // ucomiss xmm7,DWORD PTR [r13+0x164]
-        const std::string_view speed_patch{"\xF3\x41\x0F\x58\x85\x68\x01\x00\x00"sv}; // addss  xmm0,DWORD PTR [r13+0x168]
+        const std::string_view speed_patch{"\xF3\x41\x0F\x58\x85\x6C\x01\x00\x00"sv}; // addss  xmm0,DWORD PTR [r13+0x16C]
 
         patch_and_redirect(offsets[0], 7, patch_code, true);
         patch_and_redirect(offsets[1], 7, patch_code, true);
-        patch_and_redirect(offsets[5], 8, speed_patch, true); // always one byte short :(
+        patch_and_redirect(offsets[5], 8, speed_patch, true);
 
         std::memcpy(new_code[0], (void*)offsets[0], 7);
         std::memcpy(new_code[1], (void*)offsets[1], 7);
