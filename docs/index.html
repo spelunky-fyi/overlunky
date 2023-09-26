@@ -573,6 +573,9 @@
                             <a href="#replace_drop" class="toc-h3 toc-link" data-title="replace_drop">replace_drop</a>
                           </li>
                           <li>
+                            <a href="#set_boss_door_control_enabled" class="toc-h3 toc-link" data-title="set_boss_door_control_enabled">set_boss_door_control_enabled</a>
+                          </li>
+                          <li>
                             <a href="#set_contents" class="toc-h3 toc-link" data-title="set_contents">set_contents</a>
                           </li>
                           <li>
@@ -598,6 +601,9 @@
                           </li>
                           <li>
                             <a href="#set_max_rope_length" class="toc-h3 toc-link" data-title="set_max_rope_length">set_max_rope_length</a>
+                          </li>
+                          <li>
+                            <a href="#set_olmec_cutscene_enabled" class="toc-h3 toc-link" data-title="set_olmec_cutscene_enabled">set_olmec_cutscene_enabled</a>
                           </li>
                           <li>
                             <a href="#set_olmec_phase_y_level" class="toc-h3 toc-link" data-title="set_olmec_phase_y_level">set_olmec_phase_y_level</a>
@@ -692,6 +698,12 @@
                   <li>
                     <a href="#Generic-functions" class="toc-h2 toc-link" data-title="Generic functions">Generic functions</a>
                       <ul class="toc-list-h3">
+                          <li>
+                            <a href="#activate_crush_elevator_hack" class="toc-h3 toc-link" data-title="activate_crush_elevator_hack">activate_crush_elevator_hack</a>
+                          </li>
+                          <li>
+                            <a href="#activate_hundun_hack" class="toc-h3 toc-link" data-title="activate_hundun_hack">activate_hundun_hack</a>
+                          </li>
                           <li>
                             <a href="#change_poison_timer" class="toc-h3 toc-link" data-title="change_poison_timer">change_poison_timer</a>
                           </li>
@@ -832,6 +844,9 @@
                           </li>
                           <li>
                             <a href="#set_storage_layer" class="toc-h3 toc-link" data-title="set_storage_layer">set_storage_layer</a>
+                          </li>
+                          <li>
+                            <a href="#set_tiamat_cutscene_enabled" class="toc-h3 toc-link" data-title="set_tiamat_cutscene_enabled">set_tiamat_cutscene_enabled</a>
                           </li>
                           <li>
                             <a href="#show_journal" class="toc-h3 toc-link" data-title="show_journal">show_journal</a>
@@ -1008,6 +1023,9 @@
                   <li>
                     <a href="#Position-functions" class="toc-h2 toc-link" data-title="Position functions">Position functions</a>
                       <ul class="toc-list-h3">
+                          <li>
+                            <a href="#activate_tiamat_position_hack" class="toc-h3 toc-link" data-title="activate_tiamat_position_hack">activate_tiamat_position_hack</a>
+                          </li>
                           <li>
                             <a href="#distance" class="toc-h3 toc-link" data-title="distance">distance</a>
                           </li>
@@ -2701,6 +2719,9 @@
                             <a href="#CookFire" class="toc-h3 toc-link" data-title="CookFire">CookFire</a>
                           </li>
                           <li>
+                            <a href="#CrushElevator" class="toc-h3 toc-link" data-title="CrushElevator">CrushElevator</a>
+                          </li>
+                          <li>
                             <a href="#Crushtrap" class="toc-h3 toc-link" data-title="Crushtrap">Crushtrap</a>
                           </li>
                           <li>
@@ -4205,6 +4226,13 @@ Distance from center: if you go above 3.0 the game might crash because a spark m
 <h4 id='nil-replace_drop-int-drop_id-ENT_TYPE-new_drop_entity_type'>nil replace_drop(int drop_id, <a href="#ENT_TYPE">ENT_TYPE</a> new_drop_entity_type)</h4>
 <p>Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(<a href="#DROP">DROP</a>.VAN_HORSING_DIAMOND, <a href="#ENT_TYPE">ENT_TYPE</a>.ITEM_PLASMACANNON))
 Use <code>0</code> as type to reset this drop to default, use <code>-1</code> as drop_id to reset all to default</p>
+<h3 id='set_boss_door_control_enabled'>set_boss_door_control_enabled</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_boss_door_control_enabled">set_boss_door_control_enabled</a></p>
+</blockquote>
+<h4 id='nil-set_boss_door_control_enabled-bool-enable'>nil set_boss_door_control_enabled(bool enable)</h4>
+<p>Allows you to disable the control over the door for <a href="#Hundun">Hundun</a> and <a href="#Tiamat">Tiamat</a>
+This will also prevent game crashing when there is no exit door when they are in level</p>
 <h3 id='set_contents'>set_contents</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_contents">set_contents</a></p>
@@ -4262,7 +4290,11 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='nil-set_max_rope_length-int-length'>nil set_max_rope_length(int length)</h4>
 <p>Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.</p>
-<h3 id='set_olmec_phase_y_level'>set_olmec_phase_y_level</h3>
+<h3 id='set_olmec_cutscene_enabled'>set_olmec_cutscene_enabled</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_olmec_cutscene_enabled">set_olmec_cutscene_enabled</a></p>
+</blockquote>
+<h4 id='nil-set_olmec_cutscene_enabled-bool-enable'>nil set_olmec_cutscene_enabled(bool enable)</h4><h3 id='set_olmec_phase_y_level'>set_olmec_phase_y_level</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_olmec_phase_y_level">set_olmec_phase_y_level</a></p>
 </blockquote>
@@ -4418,7 +4450,23 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='bool-test_flag-Flags-flags-int-bit'>bool test_flag(<a href="#Aliases">Flags</a> flags, int bit)</h4>
 <p>Returns true if the nth bit is set in the number.</p>
-<h2 id='Generic-functions'>Generic functions</h2><h3 id='change_poison_timer'>change_poison_timer</h3>
+<h2 id='Generic-functions'>Generic functions</h2><h3 id='activate_crush_elevator_hack'>activate_crush_elevator_hack</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=activate_crush_elevator_hack">activate_crush_elevator_hack</a></p>
+</blockquote>
+<h4 id='nil-activate_crush_elevator_hack-bool-activate'>nil activate_crush_elevator_hack(bool activate)</h4>
+<p>Activate custom variables for speed and y coordinate limit for crushing elevator
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#CrushElevator">CrushElevator</a> entity, recommending <code>set_post_entity_spawn</code>
+default game values are: speed = 0.0125, y_limit = 98.5</p>
+<h3 id='activate_hundun_hack'>activate_hundun_hack</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=activate_hundun_hack">activate_hundun_hack</a></p>
+</blockquote>
+<h4 id='nil-activate_hundun_hack-bool-activate'>nil activate_hundun_hack(bool activate)</h4>
+<p>Activate custom variables for y coordinate limit for hundun and spawn of it&#39;s heads
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Hundun">Hundun</a> entity, recommending <code>set_post_entity_spawn</code>
+default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71</p>
+<h3 id='change_poison_timer'>change_poison_timer</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_poison_timer">change_poison_timer</a></p>
 </blockquote>
@@ -4777,6 +4825,13 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_storage_layer-LAYER-layer'>nil set_storage_layer(<a href="#LAYER">LAYER</a> layer)</h4>
 <p>Set layer to search for storage items on</p>
+<h3 id='set_tiamat_cutscene_enabled'>set_tiamat_cutscene_enabled</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_tiamat_cutscene_enabled">set_tiamat_cutscene_enabled</a></p>
+</blockquote>
+<h4 id='nil-set_tiamat_cutscene_enabled-bool-enable'>nil set_tiamat_cutscene_enabled(bool enable)</h4>
+<p><a href="#Tiamat">Tiamat</a> cutscene is also responsible for locking the exit door
+So you may need to close it yourself if you still want to be required to kill <a href="#Tiamat">Tiamat</a></p>
 <h3 id='show_journal'>show_journal</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=show_journal">show_journal</a></p>
@@ -5072,7 +5127,24 @@ limits, you can override them in the UI with double click.</p>
 </blockquote>
 <h4 id='nil-render_screen_particles-ParticleEmitterInfo-particle_emitter'>nil render_screen_particles(<a href="#ParticleEmitterInfo">ParticleEmitterInfo</a> particle_emitter)</h4>
 <p>Renders the particles to the screen. Only used with screen particle emitters. See the <code>particles.lua</code> example script for more details.</p>
-<h2 id='Position-functions'>Position functions</h2><h3 id='distance'>distance</h3>
+<h2 id='Position-functions'>Position functions</h2><h3 id='activate_tiamat_position_hack'>activate_tiamat_position_hack</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">activate_tiamat_position_hack</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+
+<span class="n">set_post_entity_spawn</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span>
+
+    <span class="c1">-- make them same as in the game, but relative to the tiamat entity</span>
+    <span class="n">ent</span><span class="p">.</span><span class="n">attack_x</span> <span class="o">=</span> <span class="n">ent</span><span class="p">.</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">ent</span><span class="p">.</span><span class="n">attack_y</span> <span class="o">=</span> <span class="n">ent</span><span class="p">.</span><span class="n">y</span> <span class="o">+</span> <span class="mi">2</span>
+
+<span class="k">end</span><span class="p">,</span> <span class="n">SPAWN_TYPE</span><span class="p">.</span><span class="n">ANY</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_TIAMAT</span><span class="p">)</span>
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=activate_tiamat_position_hack">activate_tiamat_position_hack</a></p>
+</blockquote>
+<h4 id='nil-activate_tiamat_position_hack-bool-activate'>nil activate_tiamat_position_hack(bool activate)</h4>
+<p>Activate custom variables for position used for detecting the player (normally hardcoded)
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Tiamat">Tiamat</a> entity, recommending <code>set_post_entity_spawn</code>
+default game values are: attack_x = 17.5 attack_y = 62.5</p>
+<h3 id='distance'>distance</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance">distance</a></p>
 </blockquote>
@@ -20681,7 +20753,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y_level">y_level</a></td>
-<td></td>
+<td>current floor level</td>
 </tr>
 <tr>
 <td>int</td>
@@ -20707,6 +20779,31 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=hundun_flags">hundun_flags</a></td>
 <td>1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y_limit">y_limit</a></td>
+<td>This is custom variable, you need <a href="#activate_hundun_hack">activate_hundun_hack</a> to use it</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rising_speed_x">rising_speed_x</a></td>
+<td>This is custom variable, you need <a href="#activate_hundun_hack">activate_hundun_hack</a> to use it</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rising_speed_y">rising_speed_y</a></td>
+<td>This is custom variable, you need <a href="#activate_hundun_hack">activate_hundun_hack</a> to use it</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bird_head_spawn_y">bird_head_spawn_y</a></td>
+<td>This is custom variable, you need <a href="#activate_hundun_hack">activate_hundun_hack</a> to use it</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=snake_head_spawn_y">snake_head_spawn_y</a></td>
+<td>This is custom variable, you need <a href="#activate_hundun_hack">activate_hundun_hack</a> to use it</td>
 </tr>
 </tbody></table>
 <h3 id='HundunHead'>HundunHead</h3>
@@ -22211,6 +22308,16 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=right_arm_angle">right_arm_angle</a></td>
 <td></td>
 </tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attack_x">attack_x</a></td>
+<td>This is custom variable, you need <a href="#activate_tiamat_position_hack">activate_tiamat_position_hack</a> to use it</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attack_y">attack_y</a></td>
+<td>This is custom variable, you need <a href="#activate_tiamat_position_hack">activate_tiamat_position_hack</a> to use it</td>
+</tr>
 </tbody></table>
 <h3 id='Tun'>Tun</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#PowerupCapable">PowerupCapable</a> <a href="#Monster">Monster</a> <a href="#RoomOwner">RoomOwner</a></p>
@@ -23249,6 +23356,27 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td><a href="#SoundMeta">SoundMeta</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
+</tr>
+</tbody></table>
+<h3 id='CrushElevator'>CrushElevator</h3>
+<p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y_limit">y_limit</a></td>
+<td>This is custom variable, you need <a href="#activate_crush_elevator_hack">activate_crush_elevator_hack</a> to use it</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=speed">speed</a></td>
+<td>This is custom variable, you need <a href="#activate_crush_elevator_hack">activate_crush_elevator_hack</a> to use it</td>
 </tr>
 </tbody></table>
 <h3 id='Crushtrap'>Crushtrap</h3>
@@ -25854,12 +25982,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=speed">speed</a></td>
-<td>This is cusome variable, you need <a href="#activate_sparktraps_hack">activate_sparktraps_hack</a> to use it</td>
+<td>This is custom variable, you need <a href="#activate_sparktraps_hack">activate_sparktraps_hack</a> to use it</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance">distance</a></td>
-<td>This is cusome variable, you need <a href="#activate_sparktraps_hack">activate_sparktraps_hack</a> to use it</td>
+<td>This is custom variable, you need <a href="#activate_sparktraps_hack">activate_sparktraps_hack</a> to use it</td>
 </tr>
 </tbody></table>
 <h3 id='Spear'>Spear</h3>
@@ -31450,6 +31578,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <li>as_crittersnail</li>
 <li>as_crocman</li>
 <li>as_crossbeam</li>
+<li>as_crushelevator</li>
 <li>as_crushtrap</li>
 <li>as_cursedeffect</li>
 <li>as_cursedpot</li>
