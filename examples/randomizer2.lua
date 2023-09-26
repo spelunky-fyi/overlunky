@@ -327,7 +327,7 @@ end, SPAWN_TYPE.ANY, MASK.ACTIVEFLOOR, ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR)
 set_post_entity_spawn(function(e)
     e:set_post_update_state_machine(function(e)
         e.attack_x = e.abs_x - 1
-        e.attack_y = e.abs_y + 2
+        e.attack_y = e.abs_y - 1
     end)
 end, SPAWN_TYPE.ANY, MASK.MONSTER, ENT_TYPE.MONS_TIAMAT)
 set_post_entity_spawn(function(e)
@@ -558,9 +558,9 @@ local function spawn_boss(boss)
         elseif state.theme == THEME.EGGPLANT_WORLD then
             --spawn_critical(boss, 22.5, 112.75, LAYER.FRONT, 0, 0)
             --set_limit(108.5)
-            spawn_critical(boss, 24.5, 48.75, LAYER.FRONT, 0, 0)
-            spawn_critical(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 7.5, 40.5, LAYER.FRONT, 0, 0)
-            spawn_critical(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 37.5, 40.5, LAYER.FRONT, 0, 0)
+            spawn_critical(boss, 24.5, 52.75, LAYER.FRONT, 0, 0)
+            spawn_critical(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 7.5, 44.5, LAYER.FRONT, 0, 0)
+            spawn_critical(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 37.5, 44.5, LAYER.FRONT, 0, 0)
             set_limit(98.5)
         end
     elseif boss == ENT_TYPE.MONS_YAMA then
@@ -1174,7 +1174,7 @@ local enemies_kingu = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_BEE, ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG}
 local random_crap = {ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_PUNISHBALL, ENT_TYPE.ITEM_ROCK}
 local olmec_ammo = join(join(random_crap, enemies_small), traps_item)
-local tiamat_ammo = {ENT_TYPE.ITEM_ACIDSPIT, ENT_TYPE.ITEM_INKSPIT, ENT_TYPE.ITEM_FLY, ENT_TYPE.ITEM_FIREBALL, ENT_TYPE.ITEM_FREEZERAYSHOT, ENT_TYPE.ITEM_LAMASSU_LASER_SHOT}
+local tiamat_ammo = {ENT_TYPE.ITEM_ACIDSPIT, ENT_TYPE.ITEM_INKSPIT, ENT_TYPE.ITEM_FLY}
 local crab_items = {ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ITEM_CHEST, ENT_TYPE.ITEM_VAULTCHEST, ENT_TYPE.ITEM_POT, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_CRATE, ENT_TYPE.ITEM_CAMERA, ENT_TYPE.ITEM_EGGPLANT, ENT_TYPE.ITEM_IDOL, ENT_TYPE.ITEM_KEY, ENT_TYPE.ITEM_SNAP_TRAP, ENT_TYPE.ITEM_LAVAPOT, ENT_TYPE.ITEM_ROCK, ENT_TYPE.ITEM_SCRAP, ENT_TYPE.ITEM_SKULL, ENT_TYPE.ITEM_TV, ENT_TYPE.ITEM_USHABTI, ENT_TYPE.MONS_YANG, ENT_TYPE.ITEM_ICESPIRE}
 local friends = {ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_MARGARET_TUNNEL, ENT_TYPE.CHAR_COLIN_NORTHWARD, ENT_TYPE.CHAR_ROFFY_D_SLOTH, ENT_TYPE.CHAR_BANDA, ENT_TYPE.CHAR_GREEN_GIRL, ENT_TYPE.CHAR_AMAZON, ENT_TYPE.CHAR_LISE_SYSTEM, ENT_TYPE.CHAR_COCO_VON_DIAMONDS, ENT_TYPE.CHAR_MANFRED_TUNNEL, ENT_TYPE.CHAR_OTAKU, ENT_TYPE.CHAR_TINA_FLAN, ENT_TYPE.CHAR_VALERIE_CRUMP, ENT_TYPE.CHAR_AU, ENT_TYPE.CHAR_DEMI_VON_DIAMONDS, ENT_TYPE.CHAR_PILOT, ENT_TYPE.CHAR_PRINCESS_AIRYN, ENT_TYPE.CHAR_DIRK_YAMAOKA, ENT_TYPE.CHAR_GUY_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY, ENT_TYPE.CHAR_HIREDHAND, ENT_TYPE.CHAR_EGGPLANT_CHILD}
 local enemies_challenge = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
@@ -1498,7 +1498,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
 end, SPAWN_TYPE.LEVEL_GEN, 0, {ENT_TYPE.MONS_CAVEMAN_BOSS})
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.OLMEC or not options.hard_olmec then return end
+    if state.theme ~= THEME.OLMEC or not options.hard_olmec or next_boss ~= ENT_TYPE.ACTIVEFLOOR_OLMEC then return end
     local x, y, l = get_position(ent.uid)
     local players = get_entities_at(0, MASK.PLAYER, x, y, l, 0.5)
     if #players > 0 then return end
@@ -1562,7 +1562,7 @@ end
 set_callback(function()
     if state.theme ~= THEME.TIAMAT or not options.hard_tiamat then return end
     set_timeout(tiamat_scream, 60)
-    set_interval(tiamat_attack, 2)
+    set_interval(tiamat_attack, 4)
 end, ON.LEVEL)
 
 local hundun_fireball_timer = -1
@@ -1927,7 +1927,7 @@ local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANG
          ENT_TYPE.ITEM_HOUYIBOW, ENT_TYPE.ITEM_WOODEN_SHIELD, ENT_TYPE.ITEM_METAL_SHIELD, ENT_TYPE.ACTIVEFLOOR_BOULDER,
          ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, ENT_TYPE.ACTIVEFLOOR_POWDERKEG, ENT_TYPE.ACTIVEFLOOR_CRUSH_TRAP,
          ENT_TYPE.ACTIVEFLOOR_ELEVATOR, ENT_TYPE.FX_EXPLOSION, ENT_TYPE.FX_POWEREDEXPLOSION, ENT_TYPE.MOUNT_TURKEY,
-         ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_12BAG, ENT_TYPE.LOGICAL_PORTAL}
+         ENT_TYPE.MOUNT_ROCKDOG, ENT_TYPE.MOUNT_AXOLOTL, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_12BAG, ENT_TYPE.LOGICAL_PORTAL, ENT_TYPE.ITEM_TIAMAT_SHOT}
 local crate_items = {ENT_TYPE.ITEM_LIGHT_ARROW, ENT_TYPE.ITEM_PRESENT, ENT_TYPE.ITEM_PICKUP_BOMBBOX,
          ENT_TYPE.ITEM_PICKUP_ROYALJELLY, ENT_TYPE.ITEM_PICKUP_COOKEDTURKEY, ENT_TYPE.ITEM_PICKUP_GIANTFOOD,
          ENT_TYPE.ITEM_PICKUP_ELIXIR, ENT_TYPE.ITEM_PICKUP_CLOVER, ENT_TYPE.ITEM_PICKUP_SPECTACLES,
@@ -2117,7 +2117,7 @@ local function kill_boss(boss, uid)
         bosses_killed[#bosses_killed+1] = boss
         toast("Boss defeated!\nBosses remaining: " .. tostring(bosses_left()))
         if state.theme == THEME.DUAT and boss ~= ENT_TYPE.MONS_OSIRIS_HEAD then
-            spawn_critical(ENT_TYPE.LOGICAL_PORTAL, 17.5, 110, LAYER.FRONT, 0, 0)
+            spawn_critical(ENT_TYPE.LOGICAL_PORTAL, 17.5, 111, LAYER.FRONT, 0, 0)
         end
         if uid then
             local e = get_entity(uid)
@@ -2303,7 +2303,7 @@ set_post_entity_spawn(function(ent)
     end
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_THIEF)
 
-local yama_food = {ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_LANDMINE}
+local yama_food = {ENT_TYPE.ITEM_BOMB, ENT_TYPE.ITEM_LANDMINE, ENT_TYPE.MONS_MAGMAMAN, ENT_TYPE.ITEM_ACIDSPIT, ENT_TYPE.ITEM_SCEPTER_ANUBISSHOT, ENT_TYPE.ITEM_PICKUP_EGGPLANTCROWN, ENT_TYPE.ITEM_PICKUP_TRUECROWN, ENT_TYPE.ITEM_METAL_ARROW}
 set_post_entity_spawn(function(ent)
     replace_drop(DROP.YAMA_EGGPLANTCROWN, get_chain_item())
     replace_drop(DROP.YAMA_GIANTFOOD, pick(yama_food))
@@ -2916,6 +2916,25 @@ set_post_entity_spawn(function(ent)
         end
     end, 1)
 end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_WEBSHOT)
+
+set_post_entity_spawn(function(ent)
+    if not options.projectile then return end
+    ent:set_post_update_state_machine(function(e)
+        math.randomseed(e.uid)
+        local limit = math.random(100, 400)
+        if e.stand_counter > limit then
+            local x, y, l = get_position(e.uid)
+            local item
+            if prng:random() < 0.015 then
+                item = pick(crate_items)
+            else
+                item = pick(join(olmec_ammo, enemies_air))
+            end
+            spawn_critical(item, x, y, l, 0, 0)
+            kill_entity(e.uid)
+        end
+    end)
+end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_TIAMAT_SHOT)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
     if options.projectile then
