@@ -2,6 +2,7 @@
 
 #include "aliases.hpp"
 #include "containers/custom_vector.hpp"
+#include "layer.hpp"
 #include "render_api.hpp"
 #include <array>
 #include <cstdint>
@@ -656,7 +657,7 @@ struct LogicList
     LogicApepTrigger* apep_trigger;
     LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
     LogicDuatBossesTrigger* duat_bosses_trigger;
-    LogicTiamatBubbles* tiamat;
+    LogicTiamatBubbles* bubbler;
     LogicTuskPleasurePalace* tusk_pleasure_palace;
     Logic* discovery_info; // black market, vlad, wet fur discovery; shows the toast
     Logic* black_market;
@@ -1000,4 +1001,16 @@ struct MultiLineTextRendering
     std::vector<TextRenderingInfo*> lines; // each line is separete TextRenderingInfo
     float x;                               // center of the text box?
     float z;                               // center of the text box?
+};
+
+struct EntityLookup
+{
+    std::array<EntityList, 4> unknown1;
+
+    // this is either very strange vector or something unrelated
+    // if this is vector, then it's just holds list of pointers to the elements from array above
+    // the result of the lookup would then be last element: (unknown3 - 1)
+    EntityList** unknown2; // always points to the first one?
+    EntityList** unknown3; // if lookup is not used, it's the same as unknown4
+    EntityList** unknown4; // capacity? points to nullptr after all the other pointers
 };

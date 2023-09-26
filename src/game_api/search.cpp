@@ -1967,6 +1967,60 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
+    {
+        // warp to olmec, kill/destroy it to crash the game, the code it crashes at should look like this:
+        // movsx rax,byte ptr ds:[r8+13C]
+        // scrolling up you should see access to the state, and above that two jump instructions and above those we need at least 5 bytes for patch
+        "olmec_lookup_crash"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("8B 59 3C 48 C1 E3 03"_gh)
+            .at_exe(),
+    },
+    {
+        // spawn liquid so it falls off the map to crash the game
+        // above the code that crash, look for float to int conversion (cvttss2si)
+        "liquid_OOB_crash"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("F3 41 0F 5E F1 F3 48 0F 2C EE"_gh)
+            .at_exe(),
+    },
+    {
+        "olmec_lookup_in_theme"sv,
+        // find the first jump in the virtual that skips the whole function
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_OLMEC, (VIRT_FUNC)24) // spawn_effects
+            .find_after_inst("83 78 0C 0D"_gh)
+            .offset(0x6) // after the jump instruction
+            .at_exe(),
+    },
+    {
+        "tiamat_lookup_in_theme"sv,
+        // find the first jump in the virtual that skips the whole function
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_TIAMAT, (VIRT_FUNC)24) // spawn_effects
+            .find_after_inst("83 78 0C 0C"_gh)
+            .offset(0x6) // after the jump instruction
+            .at_exe(),
+    },
+    {
+        "tiamat_attack_position"sv,
+        // default 17.5, 62.5
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::MONS_TIAMAT, (VIRT_FUNC)78)
+            .find_after_inst("45 0F 57 C0"_gh)
+            .find_inst("\xF3"sv)
+            .offset(0xA)
+            .at_exe(),
+    },
+    {
+        "hundun_door_control"sv,
+        // kill exit door, crash the game by killing hundun. It crashes in the function that we need
+        // this pattern is also using in set_boss_door_control_enabled function
+        PatternCommandBuffer{}
+            .find_inst("\x4A\x8B\xB4\xC8\x80\xF4\x00\x00")
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

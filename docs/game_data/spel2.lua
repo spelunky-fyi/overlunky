@@ -1167,6 +1167,37 @@ function list_char_mods() end
 ---@param index integer
 ---@return AABB
 function get_hud_position(index) end
+---@param enable boolean
+---@return nil
+function set_olmec_cutscene_enabled(enable) end
+---Tiamat cutscene is also responsible for locking the exit door
+---So you may need to close it yourself if you still want to be required to kill Tiamat
+---@param enable boolean
+---@return nil
+function set_tiamat_cutscene_enabled(enable) end
+---Activate custom variables for position used for detecting the player (normally hardcoded)
+---note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending `set_post_entity_spawn`
+---default game values are: attack_x = 17.5 attack_y = 62.5
+---@param activate boolean
+---@return nil
+function activate_tiamat_position_hack(activate) end
+---Activate custom variables for speed and y coordinate limit for crushing elevator
+---note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending `set_post_entity_spawn`
+---default game values are: speed = 0.0125, y_limit = 98.5
+---@param activate boolean
+---@return nil
+function activate_crush_elevator_hack(activate) end
+---Activate custom variables for y coordinate limit for hundun and spawn of it's heads
+---note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending `set_post_entity_spawn`
+---default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
+---@param activate boolean
+---@return nil
+function activate_hundun_hack(activate) end
+---Allows you to disable the control over the door for Hundun and Tiamat
+---This will also prevent game crashing when there is no exit door when they are in level
+---@param enable boolean
+---@return nil
+function set_boss_door_control_enabled(enable) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -2699,6 +2730,10 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class TimedPowderkeg : PushBlock
     ---@field timer integer @timer till explosion, -1 = pause, counts down
 
+---@class CrushElevator : Movable
+    ---@field y_limit number @This is custom variable, you need [activate_crush_elevator_hack](#activate_crush_elevator_hack) to use it
+    ---@field speed number @This is custom variable, you need [activate_crush_elevator_hack](#activate_crush_elevator_hack) to use it
+
 ---@class Mount : PowerupCapable
     ---@field rider_uid integer
     ---@field sound SoundMeta
@@ -3112,6 +3147,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field tail_radian number
     ---@field tail_move_speed number
     ---@field right_arm_angle number
+    ---@field attack_x number @This is custom variable, you need [activate_tiamat_position_hack](#activate_tiamat_position_hack) to use it
+    ---@field attack_y number @This is custom variable, you need [activate_tiamat_position_hack](#activate_tiamat_position_hack) to use it
 
 ---@class GiantFrog : Monster
     ---@field door_front_layer Entity
@@ -3177,12 +3214,17 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field applied_ver_velocity number
     ---@field birdhead_entity_uid integer
     ---@field snakehead_entity_uid integer
-    ---@field y_level number
+    ---@field y_level number @current floor level
     ---@field bounce_timer integer
     ---@field fireball_timer integer
     ---@field birdhead_defeated boolean
     ---@field snakehead_defeated boolean
     ---@field hundun_flags integer @1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs
+    ---@field y_limit number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    ---@field rising_speed_x number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    ---@field rising_speed_y number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    ---@field bird_head_spawn_y number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    ---@field snake_head_spawn_y number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
 
 ---@class HundunHead : Monster
     ---@field attack_position_x number @Posiotion where the head will move on attack
@@ -3425,8 +3467,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field size_multiply number @0.0 when not on screen
     ---@field next_size number @width and height will be set to `next_size  size_multiply` next frame
     ---@field size_change_timer integer @very short timer before next size change, giving a pulsing effect
-    ---@field speed number @This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
-    ---@field distance number @This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
+    ---@field speed number @This is custom variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
+    ---@field distance number @This is custom variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
 
 ---@class TiamatShot : LightEmitter
     ---@field sound SoundMeta

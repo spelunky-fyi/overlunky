@@ -28,6 +28,7 @@
 #include "entities_mounts.hpp"  // for Mount
 #include "entity.hpp"           // for get_entity_ptr, to_id, Entity, EntityDB
 #include "game_manager.hpp"     //
+#include "game_patches.hpp"     //
 #include "items.hpp"            // for Items
 #include "layer.hpp"            // for EntityList, EntityList::Range, Layer
 #include "logger.h"             // for DEBUG
@@ -1879,4 +1880,195 @@ void set_ending_unlock(ENT_TYPE type)
     {
         recover_mem("ending_unlock");
     }
+}
+
+void set_olmec_cutscene_enabled(bool enable)
+{
+    set_skip_olmec_cutscene(!enable);
+}
+
+void set_tiamat_cutscene_enabled(bool enable)
+{
+    set_skip_tiamat_cutscene(!enable);
+}
+
+void activate_tiamat_position_hack(bool activate)
+{
+    static const auto code_addr = get_address("tiamat_attack_position");
+
+    static const std::string_view code{"\xF3\x0F\x5C\xBE\x78\x01\x00\x00"sv   // subss  xmm7,DWORD PTR [rsi+0x178]
+                                       "\xF3\x0F\x5C\xB6\x7C\x01\x00\x00"sv}; // subss  xmm6,DWORD PTR [rsi+0x17C]
+
+    if (activate)
+        write_mem_recoverable("activate_tiamat_position_hack", code_addr, code, true);
+    else
+        recover_mem("activate_tiamat_position_hack");
+}
+
+void activate_crush_elevator_hack(bool activate)
+{
+    auto memory = Memory::get();
+    static size_t offsets[3];
+    if (offsets[0] == 0)
+    {
+        auto func_offset = get_virtual_function_address(VTABLE_OFFSET::ACTIVEFLOOR_CRUSHING_ELEVATOR, 78);
+
+        offsets[0] = find_inst(memory.exe(), "\xF3\x0F\x58\xD0"sv, func_offset, func_offset + 0x80, "activate_crush_elevator_hack");
+        if (offsets[0] == 0)
+            return;
+
+        offsets[0] += 4; // pattern size
+        offsets[1] = find_inst(memory.exe(), "\xEB*\x0F\x57\xD2"sv, offsets[0], offsets[0] + 0xF0, "activate_crush_elevator_hack");
+        if (offsets[1] == 0)
+            return;
+
+        offsets[1] += 5; // pattern size
+        offsets[2] = find_inst(memory.exe(), "\xF3\x0F\x58\xC1"sv, offsets[1], offsets[1] + 0x40, "activate_crush_elevator_hack");
+        if (offsets[2] == 0)
+            return;
+
+        offsets[2] += 4; // pattern size
+    }
+
+    if (activate)
+    {
+        write_mem_recoverable("activate_crush_elevator_hack", memory.at_exe(offsets[0]), "\x0f\x2e\x90\x30\x01\x00\x00"sv, true); // ucomiss xmm2,DWORD PTR [rax+0x130] // limit
+        write_mem_recoverable("activate_crush_elevator_hack", memory.at_exe(offsets[1]), "\xf3\x0f\x10\x9b\x30\x01\x00"sv, true); // movss  xmm3,DWORD PTR [rbx+0x130]  // limit
+        write_mem_recoverable("activate_crush_elevator_hack", memory.at_exe(offsets[2]), "\xf3\x0f\x58\x83\x34\x01\x00"sv, true); // addss  xmm0,DWORD PTR [rbx+0x134]  // speed
+    }
+    else
+        recover_mem("activate_crush_elevator_hack");
+}
+
+void activate_hundun_hack(bool activate)
+{
+    /*
+     * Pointer to Hundun entity is stored in r13 register. which means we need 8 bytes for ucomiss instruction
+     * but we have 7 available, that's why we jump out to new code with the instruction and back
+     */
+    static size_t offsets[6]; // y_limit, y_limit, bird_head, sneak_head, speed, speed
+    static char new_code[3][8];
+
+    if (offsets[0] == 0)
+    {
+        auto memory = Memory::get();
+        auto func_offset = get_virtual_function_address(VTABLE_OFFSET::MONS_HUNDUN, 78);
+        offsets[0] = find_inst(memory.exe(), "\x41\xF6\x85\x61\x01\x00\x00\x08"sv, func_offset, func_offset + 0x1420, "activate_hundun_hack");
+        if (offsets[0] == 0)
+            return;
+
+        offsets[0] -= 13; // offset, no good pattern above
+        offsets[1] = find_inst(memory.exe(), "\x41\x80\x8D\x61\x01\x00\x00\x04"sv, offsets[0], offsets[0] + 0xF40, "activate_hundun_hack");
+        if (offsets[1] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[1] += 8; // pattern size
+
+        offsets[2] = find_inst(memory.exe(), "\xF3\x41\x0F\x58\x45\x7C"sv, offsets[0], offsets[1], "activate_hundun_hack");
+        if (offsets[2] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[2] += 6; // pattern size
+
+        offsets[3] = find_inst(memory.exe(), "\xF3\x41\x0F\x58\x45\x7C"sv, offsets[2], offsets[1], "activate_hundun_hack");
+        if (offsets[3] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[3] += 6; // pattern size
+
+        offsets[4] = find_inst(memory.exe(), "\x83\x7A\x0C\x0E"sv, offsets[1], offsets[1] + 0xC0, "activate_hundun_hack");
+        if (offsets[4] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[4] += 6; // pattern size plus jump
+
+        offsets[5] = find_inst(memory.exe(), "\xF3\x41\x0F"sv, offsets[4], offsets[4] + 0x58, "activate_hundun_hack");
+        if (offsets[5] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[5] += 9; // instruction size (din't include the whole thing in pattern, very short distance from previous pattern)
+
+        offsets[0] = memory.at_exe(offsets[0]);
+        offsets[1] = memory.at_exe(offsets[1]);
+        offsets[2] = memory.at_exe(offsets[2]);
+        offsets[3] = memory.at_exe(offsets[3]);
+        offsets[4] = memory.at_exe(offsets[4]);
+        offsets[5] = memory.at_exe(offsets[5]);
+
+        char old_code[3][8];
+
+        std::memcpy(old_code[0], (void*)offsets[0], 7);
+        std::memcpy(old_code[1], (void*)offsets[1], 7);
+        std::memcpy(old_code[2], (void*)offsets[5], 8);
+
+        const std::string_view patch_code{"\x41\x0F\x2E\xBD\x64\x01\x00\x00"sv};      // ucomiss xmm7,DWORD PTR [r13+0x164]
+        const std::string_view speed_patch{"\xF3\x41\x0F\x58\x85\x6C\x01\x00\x00"sv}; // addss  xmm0,DWORD PTR [r13+0x16C]
+
+        patch_and_redirect(offsets[0], 7, patch_code, true);
+        patch_and_redirect(offsets[1], 7, patch_code, true);
+        patch_and_redirect(offsets[5], 8, speed_patch, true);
+
+        std::memcpy(new_code[0], (void*)offsets[0], 7);
+        std::memcpy(new_code[1], (void*)offsets[1], 7);
+        std::memcpy(new_code[2], (void*)offsets[5], 8);
+
+        // writing back the old code so we can just use write_mem_recoverable for going from vanilla to the patch
+        write_mem_prot(offsets[0], std::string_view{&old_code[0][0], &old_code[0][7]}, true);
+        write_mem_prot(offsets[1], std::string_view{&old_code[1][0], &old_code[1][7]}, true);
+        write_mem_prot(offsets[5], std::string_view{&old_code[2][0], &old_code[2][8]}, true);
+    }
+
+    if (activate)
+    {
+        static const std::string_view speed_code{"\x49\x8D\x95\x68\x01\x00\x00"sv                           // lea    rdx,[r13+0x168]
+                                                 "\x66\x2E\x0F\x1F\x84\x00\x00\x00\x00\x00\x90\x90\x90"sv}; //  spoiled with space, all nop
+
+        write_mem_recoverable("activate_hundun_hack", offsets[0], std::string_view{&new_code[0][0], &new_code[0][7]}, true); // limit
+        write_mem_recoverable("activate_hundun_hack", offsets[1], std::string_view{&new_code[1][0], &new_code[1][7]}, true); // limit
+        write_mem_recoverable("activate_hundun_hack", offsets[5], std::string_view{&new_code[2][0], &new_code[2][8]}, true); // speed for adding to the y_limit
+
+        write_mem_recoverable("activate_hundun_hack", offsets[4], speed_code, true); // speed (for adding to the x position)
+
+        write_mem_recoverable("activate_hundun_hack", offsets[2], "\x0F\x2E\xB8\x70\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rax+0x170] // bird_head
+        write_mem_recoverable("activate_hundun_hack", offsets[3], "\x0F\x2E\xB8\x74\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rax+0x174] // snake head
+    }
+    else
+        recover_mem("activate_hundun_hack");
+}
+
+void set_boss_door_control_enabled(bool enable)
+{
+    static size_t offsets[2];
+    if (offsets[0] == 0)
+    {
+        auto memory = Memory::get();
+        offsets[0] = get_address("hundun_door_control");
+        if (offsets[0] == 0)
+            return;
+        // find tiamat door control (the same pattern)
+        offsets[1] = find_inst(memory.exe(), "\x4A\x8B\xB4\xC8\x80\xF4\x00\x00"sv, offsets[0] - memory.exe_ptr + 0x777, std::nullopt, "set_boss_door_control_enabled");
+        if (offsets[1] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[1] = function_start(memory.at_exe(offsets[1]));
+    }
+    if (!enable)
+    {
+        write_mem_recoverable("set_boss_door_control_enabled", offsets[0], "\xC3\x90"sv, true);
+        write_mem_recoverable("set_boss_door_control_enabled", offsets[1], "\xC3\x90"sv, true);
+    }
+    else
+        recover_mem("set_boss_door_control_enabled");
 }
