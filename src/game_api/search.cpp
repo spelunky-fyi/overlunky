@@ -670,6 +670,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "virtual_functions_table"sv,
         // Look at any entity in memory, dereference the __vftable to see the big table of pointers
         // scroll up to the first one, and find a reference to that
+        // addition pattern: find_after_inst 48 C7 43 78 00 00 00 00
         PatternCommandBuffer{}
             .find_inst("\x48\x8D\x0D****\x48\x89\x0D****\x48\xC7\x05"sv)
             .decode_pc()
