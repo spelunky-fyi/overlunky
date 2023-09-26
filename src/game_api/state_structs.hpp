@@ -531,14 +531,10 @@ class LogicSunChallenge : public Logic
 class LogicOlmecCutscene : public Logic
 {
   public:
-    uint8_t unknown6a;
-    uint8_t unknown6b;
-    uint8_t unknown6c;
-    uint8_t unknown6d;
-    uint8_t unknown7a;
-    uint8_t unknown7b;
-    uint8_t unknown7c;
-    uint8_t unknown7d;
+    /// Copied over [buttons_gameplay](#PlayerSlot) from the leader, used to skip the cutscene
+    /// You can skip the cutscene if you set it to 1 or 4
+    uint8_t leader_inputs;
+    uint8_t padding[7];
     Entity* fx_olmecpart_large;
     Entity* olmec;
     Entity* player;
@@ -549,15 +545,14 @@ class LogicOlmecCutscene : public Logic
 class LogicTiamatCutscene : public Logic
 {
   public:
-    uint32_t unknown3;
-    uint32_t unknown4;
+    /// Copied over [buttons_gameplay](#PlayerSlot) from the leader, used to skip the cutscene
+    /// You can skip the cutscene if you set it to 1 or 4
+    uint8_t leader_inputs;
+    uint8_t padding[7];
     Entity* tiamat;
     Entity* player;
     Entity* cinematic_anchor;
     uint32_t timer;
-    int32_t unknown5;
-    uint32_t unknown6;
-    uint32_t unknown7;
 };
 
 class LogicApepTrigger : public Logic
@@ -652,7 +647,7 @@ struct LogicList
     /// Only the bubbles that spawn from the floor
     /// Even without it, entities moving in water still spawn bubbles
     LogicUnderwaterBubbles* water_bubbles; // OK
-    LogicOlmecCutscene* olmec_cutscene;
+    LogicOlmecCutscene* olmec_cutscene;    // OK
     LogicTiamatCutscene* tiamat_cutscene;
     LogicApepTrigger* apep_trigger; // OK
     LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
