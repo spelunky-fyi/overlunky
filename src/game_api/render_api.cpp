@@ -374,7 +374,7 @@ void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instan
             }
             side ^= 0x1;
         }
-        for (auto p : pages_copy) // free unused screens
+        for (auto& p : pages_copy) // free unused screens
         {
             if (p.second)
             {
@@ -437,6 +437,17 @@ void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Co
             source.top_right_y,
         };
 
+        typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
+        static render_func* rf = (render_func*)(offset);
+        rf(&tri, shader, texture->name, &color);
+    }
+}
+
+void RenderAPI::draw_screen_texture(Texture* texture, TextureRenderingInfo tri, Color color, uint8_t shader)
+{
+    static size_t offset = get_address("draw_screen_texture");
+    if (offset != 0)
+    {
         typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
         static render_func* rf = (render_func*)(offset);
         rf(&tri, shader, texture->name, &color);

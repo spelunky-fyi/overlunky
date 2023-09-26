@@ -52,6 +52,7 @@ LuaConsole::LuaConsole(SoundManager* soundmanager)
             {"RegenBlock", "as_movable"},
             {"ThinIce", "as_movable"},
             {"TimedPowderkeg", "as_pushblock"},
+            {"CrushElevator", "as_movable"},
             {"UnchainedSpikeBall", "as_movable"},
             {"WoodenlogTrap", "as_movable"},
             {"BGSurfaceStar", "as_entity"},

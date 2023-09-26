@@ -843,7 +843,7 @@ bool LuaBackend::pre_load_screen()
                 saved.mount = get_user_data(ent->overlay->uid);
                 should_save = true;
             }
-            for (auto [type, powerup] : ent->powerups)
+            for (auto& [type, powerup] : ent->powerups)
             {
                 if (user_datas.contains(powerup->uid))
                 {
@@ -919,7 +919,7 @@ void LuaBackend::load_user_data()
                 set_user_data(ent->holding_uid, saved_user_datas[slot].held.value());
             if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && saved_user_datas[slot].mount.has_value())
                 set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value());
-            for (auto [type, powerup] : ent->powerups)
+            for (auto& [type, powerup] : ent->powerups)
             {
                 if (saved_user_datas[slot].powerups.contains(type))
                     set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
@@ -1399,7 +1399,7 @@ std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, con
                 {
                     new_pages.clear();
                     const auto table = returned_pages.as<sol::table>();
-                    for (auto something : table)
+                    for (auto& something : table)
                     {
                         if (something.second.get_type() == sol::type::number)
                         {

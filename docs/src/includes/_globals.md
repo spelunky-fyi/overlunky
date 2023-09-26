@@ -250,7 +250,12 @@ end, 60)
 #### [CallbackId](#Aliases) set_interval(function cb, int frames)
 
 Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
-Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+Add per level callback function to be called every `frames` engine frames
+Ex. frames = 100 - will call the function on 100th frame from this point. This might differ in the exact timing of first frame depending as in what part of the frame you call this function
+or even be one frame off if called right before the time_level variable is updated
+If you require precise timing, choose the start of your interval in one of those safe callbacks:
+The [SCREEN](#SCREEN) callbacks: from [ON](#ON).LOGO to [ON](#ON).ONLINE_LOBBY or custom callbacks [ON](#ON).FRAME, [ON](#ON).[SCREEN](#SCREEN), [ON](#ON).START, [ON](#ON).LOADING, [ON](#ON).RESET, [ON](#ON).POST_UPDATE
+Timer is paused on pause and cleared on level transition.
 
 ### set_on_player_instagib
 
@@ -785,6 +790,16 @@ Poisons entity, to cure poison set [Movable](#Movable).`poison_tick_timer` to -1
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop([DROP](#DROP).VAN_HORSING_DIAMOND, [ENT_TYPE](#ENT_TYPE).ITEM_PLASMACANNON))
 Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
 
+### set_boss_door_control_enabled
+
+
+> Search script examples for [set_boss_door_control_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_boss_door_control_enabled)
+
+#### nil set_boss_door_control_enabled(bool enable)
+
+Allows you to disable the control over the door for [Hundun](#Hundun) and [Tiamat](#Tiamat)
+This will also prevent game crashing when there is no exit door when they are in level
+
 ### set_contents
 
 
@@ -868,6 +883,14 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 #### nil set_max_rope_length(int length)
 
 Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
+
+### set_olmec_cutscene_enabled
+
+
+> Search script examples for [set_olmec_cutscene_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_olmec_cutscene_enabled)
+
+#### nil set_olmec_cutscene_enabled(bool enable)
+
 
 ### set_olmec_phase_y_level
 
@@ -1111,6 +1134,28 @@ Returns true if the nth bit is set in the number.
 
 ## Generic functions
 
+
+### activate_crush_elevator_hack
+
+
+> Search script examples for [activate_crush_elevator_hack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_crush_elevator_hack)
+
+#### nil activate_crush_elevator_hack(bool activate)
+
+Activate custom variables for speed and y coordinate limit for crushing elevator
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each [CrushElevator](#CrushElevator) entity, recommending `set_post_entity_spawn`
+default game values are: speed = 0.0125, y_limit = 98.5
+
+### activate_hundun_hack
+
+
+> Search script examples for [activate_hundun_hack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_hundun_hack)
+
+#### nil activate_hundun_hack(bool activate)
+
+Activate custom variables for y coordinate limit for hundun and spawn of it's heads
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Hundun](#Hundun) entity, recommending `set_post_entity_spawn`
+default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
 
 ### change_poison_timer
 
@@ -1629,6 +1674,16 @@ end, "waddler")
 
 Set layer to search for storage items on
 
+### set_tiamat_cutscene_enabled
+
+
+> Search script examples for [set_tiamat_cutscene_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_tiamat_cutscene_enabled)
+
+#### nil set_tiamat_cutscene_enabled(bool enable)
+
+[Tiamat](#Tiamat) cutscene is also responsible for locking the exit door
+So you may need to close it yourself if you still want to be required to kill [Tiamat](#Tiamat)
+
 ### show_journal
 
 
@@ -2097,6 +2152,30 @@ Renders the particles to the screen. Only used with screen particle emitters. Se
 
 ## Position functions
 
+
+### activate_tiamat_position_hack
+
+
+```lua
+activate_tiamat_position_hack(true);
+
+set_post_entity_spawn(function(ent)
+
+	-- make them same as in the game, but relative to the tiamat entity
+	ent.attack_x = ent.x - 1
+	ent.attack_y = ent.y + 2
+
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_TIAMAT)
+```
+
+
+> Search script examples for [activate_tiamat_position_hack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_tiamat_position_hack)
+
+#### nil activate_tiamat_position_hack(bool activate)
+
+Activate custom variables for position used for detecting the player (normally hardcoded)
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Tiamat](#Tiamat) entity, recommending `set_post_entity_spawn`
+default game values are: attack_x = 17.5 attack_y = 62.5
 
 ### distance
 

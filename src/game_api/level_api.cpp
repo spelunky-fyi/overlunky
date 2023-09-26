@@ -471,6 +471,31 @@ std::array g_community_tile_codes{
     CommunityTileCode{"critter_slime", "ENT_TYPE_MONS_CRITTERSLIME"},
     CommunityTileCode{"skull", "ENT_TYPE_ITEM_SKULL"},
     CommunityTileCode{
+        "venom",
+        "ENT_TYPE_ITEM_ACIDSPIT",
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        {
+            layer->spawn_entity(self.entity_id, x, y - 1, false, 0, 0, false);
+        }},
+    CommunityTileCode{"arrow_wooden", "ENT_TYPE_ITEM_WOODEN_ARROW"},
+    CommunityTileCode{"arrow_metal", "ENT_TYPE_ITEM_METAL_ARROW"},
+    CommunityTileCode{
+        "arrow_wooden_poison",
+        "ENT_TYPE_ITEM_WOODEN_ARROW",
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        {
+            Arrow* arrow = layer->spawn_entity_snap_to_floor(self.entity_id, x, y)->as<Arrow>();
+            arrow->poison_arrow(true);
+        }},
+    CommunityTileCode{
+        "arrow_metal_poison",
+        "ENT_TYPE_ITEM_METAL_ARROW",
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        {
+            Arrow* arrow = layer->spawn_entity_snap_to_floor(self.entity_id, x, y)->as<Arrow>();
+            arrow->poison_arrow(true);
+        }},
+    CommunityTileCode{
         "movable_spikes",
         "ENT_TYPE_ITEM_SPIKES",
         [](const CommunityTileCode& self, float x, float y, Layer* layer)
@@ -1497,7 +1522,7 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
 
 std::optional<uint8_t> LevelGenData::get_short_tile_code(ShortTileCodeDef short_tile_code_def)
 {
-    for (auto [i, def] : short_tile_codes)
+    for (auto& [i, def] : short_tile_codes)
     {
         if (def == short_tile_code_def)
         {

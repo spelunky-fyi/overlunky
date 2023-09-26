@@ -251,7 +251,7 @@ struct StateMemory
     LiquidPhysics* liquid_physics;
     std::vector<ParticleEmitterInfo*>* particle_emitters;
     std::vector<Illumination*>* lightsources;
-    size_t unknown27; // lookup entity struct
+    EntityLookup* entity_lookup;
 
     // This is a Robin Hood Table
     uint32_t uid_to_entity_mask;

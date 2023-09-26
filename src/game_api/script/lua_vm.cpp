@@ -435,11 +435,17 @@ end
     };
 
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
-    /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+    /// Add per level callback function to be called every `frames` engine frames
+    /// Ex. frames = 100 - will call the function on 100th frame from this point. This might differ in the exact timing of first frame depending as in what part of the frame you call this function
+    /// or even be one frame off if called right before the time_level variable is updated
+    /// If you require precise timing, choose the start of your interval in one of those safe callbacks:
+    /// The SCREEN callbacks: from ON.LOGO to ON.ONLINE_LOBBY or custom callbacks ON.FRAME, ON.SCREEN, ON.START, ON.LOADING, ON.RESET, ON.POST_UPDATE
+    /// Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto luaCb = IntervalCallback{cb, frames, -1};
+        auto state = State::get().ptr_main();
+        auto luaCb = IntervalCallback{cb, frames, (int)state->time_level};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
@@ -2008,6 +2014,31 @@ end
         return AABB(ax + index * w + 0.02f * f, ay, ax + index * w + w - 0.02f * f, ay - h);
     };
 
+    lua["set_olmec_cutscene_enabled"] = set_olmec_cutscene_enabled;
+
+    /// Tiamat cutscene is also responsible for locking the exit door
+    /// So you may need to close it yourself if you still want to be required to kill Tiamat
+    lua["set_tiamat_cutscene_enabled"] = set_tiamat_cutscene_enabled;
+
+    /// Activate custom variables for position used for detecting the player (normally hardcoded)
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending `set_post_entity_spawn`
+    /// default game values are: attack_x = 17.5 attack_y = 62.5
+    lua["activate_tiamat_position_hack"] = activate_tiamat_position_hack;
+
+    /// Activate custom variables for speed and y coordinate limit for crushing elevator
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending `set_post_entity_spawn`
+    /// default game values are: speed = 0.0125, y_limit = 98.5
+    lua["activate_crush_elevator_hack"] = activate_crush_elevator_hack;
+
+    /// Activate custom variables for y coordinate limit for hundun and spawn of it's heads
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending `set_post_entity_spawn`
+    /// default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
+    lua["activate_hundun_hack"] = activate_hundun_hack;
+
+    /// Allows you to disable the control over the door for Hundun and Tiamat
+    /// This will also prevent game crashing when there is no exit door when they are in level
+    lua["set_boss_door_control_enabled"] = set_boss_door_control_enabled;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
@@ -2472,7 +2503,7 @@ end
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
                            //, "CROSSPROGRESS_AUTOSYNC", 47
     );
-    for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
+    for (auto& [setting_name_view, setting_index] : get_settings_names_and_indices())
     {
         std::string setting_name{setting_name_view};
         std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)

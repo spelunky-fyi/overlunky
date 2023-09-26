@@ -355,7 +355,7 @@ void register_usertypes(sol::state& lua)
         auto name = item.name.substr(9, item.name.size());
         lua["ENT_TYPE"][name] = item.id;
     }
-    for (auto elm : get_custom_types_map())
+    for (auto& elm : get_custom_types_map())
     {
         lua["ENT_TYPE"][elm.second] = elm.first;
     }

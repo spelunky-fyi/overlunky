@@ -176,28 +176,28 @@ struct TextRenderingInfo
 struct TextureRenderingInfo
 {
     // where to draw on the screen:
-    float x;
-    float y;
+    float x{0};
+    float y{0};
 
-    // destination is relative to the x,y centerpoint
-    float destination_bottom_left_x;
-    float destination_bottom_left_y;
-    float destination_bottom_right_x;
-    float destination_bottom_right_y;
-    float destination_top_left_x;
-    float destination_top_left_y;
-    float destination_top_right_x;
-    float destination_top_right_y;
+    /// destination is relative to the x,y centerpoint
+    float destination_bottom_left_x{0};
+    float destination_bottom_left_y{0};
+    float destination_bottom_right_x{0};
+    float destination_bottom_right_y{0};
+    float destination_top_left_x{0};
+    float destination_top_left_y{0};
+    float destination_top_right_x{0};
+    float destination_top_right_y{0};
 
     // source rectangle in the texture to render
-    float source_bottom_left_x;
-    float source_bottom_left_y;
-    float source_bottom_right_x;
-    float source_bottom_right_y;
-    float source_top_left_x;
-    float source_top_left_y;
-    float source_top_right_x;
-    float source_top_right_y;
+    float source_bottom_left_x{0};
+    float source_bottom_left_y{0};
+    float source_bottom_right_x{0};
+    float source_bottom_right_y{0};
+    float source_top_left_x{0};
+    float source_top_left_y{0};
+    float source_top_right_x{0};
+    float source_top_right_y{0};
 
     void set_destination(const AABB& bbox);
     Quad dest_get_quad() const;
@@ -228,6 +228,7 @@ struct RenderAPI
     void draw_text(const TextRenderingInfo* tri, Color color);
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
     void draw_screen_texture(Texture* texture, Quad source, Quad dest, Color color, uint8_t shader);
+    void draw_screen_texture(Texture* texture, TextureRenderingInfo tri, Color color, uint8_t shader);
     void draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader);
 
     void set_post_render_game(void (*post_render_game)());
