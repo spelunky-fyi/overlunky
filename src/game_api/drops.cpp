@@ -383,7 +383,6 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
         {
             auto memory = Memory::get();
             size_t offset = 0;
-            size_t exe_offset = 0;
             const auto drop_name{"DROP." + entry.caption};
 
             if (entry.vtable_offset == VTABLE_OFFSET::NONE)
@@ -397,15 +396,15 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
             int x = 0;
             do
             {
-                offset = find_inst(memory.exe(), entry.pattern, offset + 1, std::nullopt, drop_name);
+                offset = find_inst(memory.exe(), entry.pattern, offset, std::nullopt, drop_name);
                 if (offset == 0)
                     return;
 
-                exe_offset = memory.at_exe(offset + entry.value_offset);
-                entry.offsets[x] = exe_offset;
+                entry.offsets[x] = memory.at_exe(offset + entry.value_offset);
 
+                offset += entry.pattern.size();
                 ++x;
-            } while (x < entry.vtable_occurrence);
+            } while (x < entry.vtable_occurrence && x < 3);
         }
 
         if (entry.offsets[0] != 0)
