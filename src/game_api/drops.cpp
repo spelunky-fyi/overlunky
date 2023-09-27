@@ -9,8 +9,6 @@
 #include "memory.hpp" // for Memory, recover_mem, write_mem_recoverable
 #include "search.hpp" // for find_inst
 
-using namespace std::string_literals;
-
 std::vector<DropEntry> drop_entries{
     {"ALTAR_DICE_CLIMBINGGLOVES", "\xBA\x0D\x02\x00\x00\xEB\x05"sv, VTABLE_OFFSET::NONE, 0, 1}, // VTABLE_OFFSET::FLOOR_ALTAR, 26
     {"ALTAR_DICE_COOKEDTURKEY", "\xBA\x06\x02\x00\x00\xEB\x0C"sv, VTABLE_OFFSET::NONE, 0, 1},
