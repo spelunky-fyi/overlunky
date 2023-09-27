@@ -2587,6 +2587,20 @@ sol::protected_function_result execute_lua(sol::environment& env, std::string_vi
     return global_vm.safe_script(code, env);
 }
 
+bool check_safe_io_path(const std::string& filepath, const std::string& basepath)
+{
+    if (basepath.empty())
+        return false;
+
+    auto base = std::filesystem::absolute(basepath).lexically_normal();
+    auto path = std::filesystem::absolute(filepath).lexically_normal();
+
+    auto [rootEnd, nothing] =
+        std::mismatch(base.begin(), base.end(), path.begin());
+
+    return rootEnd == base.end();
+}
+
 void populate_lua_env(sol::environment& env)
 {
     static const sol::state& global_vm = get_lua_vm();
@@ -2595,13 +2609,77 @@ void populate_lua_env(sol::environment& env)
         env[field] = global_vm["_G"][field];
     }
     env["_G"] = env;
+    add_partial_safe_libraries(env);
+}
+void add_partial_safe_libraries(sol::environment& env)
+{
+    static const sol::state& global_vm = get_lua_vm();
+
+    auto open_data = [](std::string filename, std::string mode) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        std::string moddir = backend->get_root_path().filename().string();
+        std::string luafile = std::filesystem::path(backend->get_path()).filename().string();
+        std::string datadir = "Mods/Data/" + (check_safe_io_path(backend->get_path(), "Mods/Packs") ? moddir : luafile);
+        std::string fullpath = datadir + "/" + filename;
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        DEBUG("io.open_data: '{}'", fullpath);
+        if (!backend->get_unsafe() && !check_safe_io_path(fullpath, datadir))
+        {
+            luaL_error(global_vm, "Attempted to read file outside data directory");
+            return sol::nil;
+        }
+        std::filesystem::create_directories(dirpath);
+        return global_vm["io"]["open"](fullpath, mode);
+    };
+
+    auto open_mod = [](std::string filename) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        std::string fullpath = std::string(backend->get_root()) + "/" + filename;
+        DEBUG("io.open_mod: {}", fullpath);
+        if (!backend->get_unsafe() && !check_safe_io_path(fullpath, backend->get_root()))
+        {
+            luaL_error(global_vm, "Attempted to read file outside mod directory");
+            return sol::nil;
+        }
+        return global_vm["io"]["open"](fullpath, "r");
+    };
+
+    if (env["os"] == sol::nil)
+    {
+        sol::table os(global_vm, sol::create);
+        os["clock"] = global_vm["os"]["clock"];
+        os["date"] = global_vm["os"]["date"];
+        os["difftime"] = global_vm["os"]["difftime"];
+        os["time"] = global_vm["os"]["time"];
+        env["os"] = os;
+    }
+
+    if (env["io"] == sol::nil)
+    {
+        sol::table io(global_vm, sol::create);
+        io["close"] = global_vm["io"]["close"];
+        io["flush"] = global_vm["io"]["flush"];
+        io["type"] = global_vm["io"]["type"];
+        io["open_data"] = open_data;
+        io["open_mod"] = open_mod;
+        env["io"] = io;
+    }
+    else if (env["io"].get_type() == sol::type::table)
+    {
+        env["io"]["open_data"] = open_data;
+        env["io"]["open_mod"] = open_mod;
+    }
 }
 void hide_unsafe_libraries(sol::environment& env)
 {
+    static const sol::state& global_vm = get_lua_vm();
     for (auto& field : unsafe_fields)
     {
         env[field] = sol::nil;
     }
+    add_partial_safe_libraries(env);
 }
 void expose_unsafe_libraries(sol::environment& env)
 {
@@ -2610,4 +2688,5 @@ void expose_unsafe_libraries(sol::environment& env)
     {
         env[field] = global_vm["_G"][field];
     }
+    add_partial_safe_libraries(env);
 }
