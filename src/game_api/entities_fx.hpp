@@ -216,7 +216,9 @@ class FxSpringtrapRing : public Movable
 class FxWitchdoctorHint : public Movable
 {
   public:
-    std::set<int32_t> unknown; // uid of the witchdoctor, why the map/set?
+    /// There can be only one Hint above the player, so it has list of witchdoctors
+    /// in case there are more then one attacking you the same time
+    std::set<int32_t> witchdoctor;
 };
 
 class FxNecromancerANKH : public Movable

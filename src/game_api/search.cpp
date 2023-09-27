@@ -1728,15 +1728,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // Set write bp on State->shops->restricted_item_count, this structure is quite common so i chosen pattern before the call
-        "add_shopitem"sv,
-        PatternCommandBuffer{}
-            .find_after_inst("\x4C\x8D\x84\x24\xD0\x00\x00\x00\xE8"sv)
-            .offset(-0x1)
-            .decode_call()
-            .at_exe(),
-    },
-    {
         // Find a string "Basic systems initialized", right after it's usage (found via XREFS)
         // stuff gets emplaced to a map, it is this map
         "graphics_settings_map"sv,

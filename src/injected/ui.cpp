@@ -605,6 +605,7 @@ void load_cursor()
 void render_cursor()
 {
     ImGuiContext& g = *GImGui;
+    g.Style.MouseCursorScale = 1.5f;
     if (g_cursor.texture == nullptr || !g.IO.MouseDrawCursor || g.MouseCursor != ImGuiMouseCursor_Arrow)
         return;
     g.MouseCursor = ImGuiMouseCursor_None;
@@ -1522,6 +1523,19 @@ void spawn_entity_over()
         {
             auto who = overlay->as<PowerupCapable>();
             who->give_powerup(item.id);
+        }
+        else if (item.name.find("ENT_TYPE_ITEM") != std::string::npos && overlay->type->search_flags & 0x100)
+        {
+            int spawned = UI::spawn_entity_over(item.id, g_over_id, g_dx, g_dy);
+            auto ent = get_entity_ptr(spawned);
+            ent->set_draw_depth(9);
+            ent->flags = set_flag(ent->flags, 4);  // pass thru objects
+            ent->flags = set_flag(ent->flags, 10); // no gravity
+            ent->flags = clr_flag(ent->flags, 13); // collides walls
+            if (!test_flag(g_state->special_visibility_flags, 1))
+                ent->flags = set_flag(ent->flags, 1); // invisible
+            if (!lock_entity)
+                g_last_id = spawned;
         }
         else if (item.name.find("ENT_TYPE_MONS") != std::string::npos && overlay->type->id >= turkey && overlay->type->id <= couch)
         {
@@ -3239,11 +3253,9 @@ void tooltip(const char* tip, bool force = false)
         return;
     if (ImGui::IsItemHovered() || force)
     {
-        ImGuiContext& g = *GImGui;
-        if (options["hd_cursor"])
-            g.Style.MouseCursorScale = 1.5f;
+        auto base = ImGui::GetMainViewport();
+        ImGui::SetNextWindowViewport(base->ID);
         ImGui::SetTooltip("%s", tip);
-        g.Style.MouseCursorScale = 1.0f;
     }
 }
 
@@ -3253,9 +3265,8 @@ void tooltip(const char* tip, const char* key)
         return;
     if (ImGui::IsItemHovered())
     {
-        ImGuiContext& g = *GImGui;
-        if (options["hd_cursor"])
-            g.Style.MouseCursorScale = 1.5f;
+        auto base = ImGui::GetMainViewport();
+        ImGui::SetNextWindowViewport(base->ID);
         if (key && keys[key])
         {
             ImGui::SetTooltip("(%s) %s", key_string(keys[key]).c_str(), tip);
@@ -3264,7 +3275,6 @@ void tooltip(const char* tip, const char* key)
         {
             ImGui::SetTooltip("%s", tip);
         }
-        g.Style.MouseCursorScale = 1.0f;
     }
 }
 
@@ -8720,6 +8730,8 @@ void imgui_draw()
 
     if (options["hd_cursor"])
         render_cursor();
+    else
+        g.Style.MouseCursorScale = 1.0f;
 }
 
 void check_focus()
