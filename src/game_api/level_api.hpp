@@ -13,6 +13,7 @@
 #include <vector>      // for vector
 
 #include "aliases.hpp"                       // for LAYER
+#include "containers/custom_vector.hpp"      // for custom_vector
 #include "containers/game_string.hpp"        // for game_string
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
 #include "containers/game_vector.hpp"        // for game_vector
@@ -485,7 +486,7 @@ struct LevelGenSystem
     float spawn_y;
     union
     {
-        std::vector<Vec2> exit_doors;
+        custom_vector<Vec2> exit_doors;
         struct
         {
             /// NoDoc

@@ -782,8 +782,16 @@ local function random_bosses(enable)
         boss_cbs[#boss_cbs + 1] = set_post_entity_spawn(function(e)
             e:set_post_update_state_machine(function(e)
                 local box = get_hitbox(e.uid)
-                for _,v in pairs(get_entities_overlapping_hitbox({ENT_TYPE.ACTIVEFLOOR_BONEBLOCK, ENT_TYPE.ACTIVEFLOOR_REGENERATINGBLOCK}, MASK.ACTIVEFLOOR, box, e.layer)) do
+                for _, v in pairs(get_entities_overlapping_hitbox({ ENT_TYPE.ACTIVEFLOOR_BONEBLOCK, ENT_TYPE
+                    .ACTIVEFLOOR_REGENERATINGBLOCK, ENT_TYPE.ACTIVEFLOOR_SLIDINGWALL }, MASK.ACTIVEFLOOR, box, e.layer)) do
                     kill_entity(v, true)
+                end
+                local exit = get_entities_by(ENT_TYPE.FLOOR_DOOR_EXIT, MASK.FLOOR, LAYER.FRONT)
+                if #exit > 0 then
+                    for _,v in pairs(get_entities_overlapping_hitbox(ENT_TYPE.FLOOR_DOOR_ENTRANCE, MASK.FLOOR, box, e.layer)) do
+                        state.level_gen.spawn_x = state.level_gen.exit_doors[1].x
+                        state.level_gen.spawn_y = state.level_gen.exit_doors[1].y
+                    end
                 end
             end)
         end, SPAWN_TYPE.ANY, MASK.ACTIVEFLOOR, ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR)
@@ -2605,7 +2613,9 @@ end
 local function duat_door()
     if not options.door then return end
     -- spawn duat skip door
-    spawn_door(17, 106, 0, level_order[state.level_count+1].w, level_order[state.level_count+1].l, level_order[state.level_count+1].t)
+    spawn_door(17, 106, 0, level_order[state.level_count + 1].w, level_order[state.level_count + 1].l,
+        level_order[state.level_count + 1].t)
+    state.level_gen.exit_doors[1] = Vec2:new(17, 106)
     spawn_entity(ENT_TYPE.BG_DOOR_BACK_LAYER, 17, 106, 0, 0, 0)
 end
 
