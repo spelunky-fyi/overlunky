@@ -1364,6 +1364,25 @@ Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is w
 
 Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
+### http_get
+
+
+> Search script examples for [http_get](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get)
+
+#### optional&lt;string&gt; http_get(string url)
+
+Send a synchronous HTTP GET request and return response as a string or nil on an error
+
+### http_get_async
+
+
+> Search script examples for [http_get_async](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get_async)
+
+#### HttpRequest http_get_async(string url, function on_data)
+
+Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
+The callback signature is nil on_data(string response, string error)
+
 ### import
 
 

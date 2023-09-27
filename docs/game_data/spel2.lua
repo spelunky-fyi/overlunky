@@ -1638,6 +1638,16 @@ function udp_send(host, port, msg) end
 ---Hook the sendto and recvfrom functions and start dumping network data to terminal
 ---@return nil
 function dump_network() end
+---Send a synchronous HTTP GET request and return response as a string or nil on an error
+---@param url string
+---@return string?
+function http_get(url) end
+---Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
+---The callback signature is nil on_data(string response, string error)
+---@param url string
+---@param on_data fun(response: string, error: string): nil
+---@return HttpRequest
+function http_get_async(url, on_data) end
 ---Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
 ---@param feat FEAT
 ---@return boolean, boolean, string, string

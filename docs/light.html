@@ -771,6 +771,12 @@
                             <a href="#grow_vines" class="toc-h3 toc-link" data-title="grow_vines">grow_vines</a>
                           </li>
                           <li>
+                            <a href="#http_get" class="toc-h3 toc-link" data-title="http_get">http_get</a>
+                          </li>
+                          <li>
+                            <a href="#http_get_async" class="toc-h3 toc-link" data-title="http_get_async">http_get_async</a>
+                          </li>
+                          <li>
                             <a href="#import" class="toc-h3 toc-link" data-title="import">import</a>
                           </li>
                           <li>
@@ -4601,6 +4607,19 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 </blockquote>
 <h4 id='nil-grow_vines-LAYER-l-int-max_lengh'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_lengh)</h4><h4 id='nil-grow_vines-LAYER-l-int-max_lengh-AABB-area-bool-destroy_broken'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_lengh, <a href="#AABB">AABB</a> area, bool destroy_broken)</h4>
 <p>Grow vines from <code>GROWABLE_VINE</code> and <code>VINE_TREE_TOP</code> entities in a level, <code>area</code> default is whole level, <code>destroy_broken</code> default is false</p>
+<h3 id='http_get'>http_get</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=http_get">http_get</a></p>
+</blockquote>
+<h4 id='optional-lt-string-gt-http_get-string-url'>optional&lt;string&gt; http_get(string url)</h4>
+<p>Send a synchronous HTTP GET request and return response as a string or nil on an error</p>
+<h3 id='http_get_async'>http_get_async</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=http_get_async">http_get_async</a></p>
+</blockquote>
+<h4 id='HttpRequest-http_get_async-string-url-function-on_data'>HttpRequest http_get_async(string url, function on_data)</h4>
+<p>Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
+The callback signature is nil on_data(string response, string error)</p>
 <h3 id='import'>import</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
