@@ -2674,7 +2674,6 @@ void add_partial_safe_libraries(sol::environment& env)
 }
 void hide_unsafe_libraries(sol::environment& env)
 {
-    static const sol::state& global_vm = get_lua_vm();
     for (auto& field : unsafe_fields)
     {
         env[field] = sol::nil;
