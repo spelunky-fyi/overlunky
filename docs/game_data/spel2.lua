@@ -4461,7 +4461,7 @@ function MovableBehavior:get_state_id() end
     ---@field spawn_y number
     ---@field spawn_room_x integer
     ---@field spawn_room_y integer
-    ---@field exit_doors Vec2[]
+    ---@field exit_doors custom_Array<Vec2>
     ---@field themes ThemeInfo[] @size: 18
 
 ---@class PostRoomGenerationContext
