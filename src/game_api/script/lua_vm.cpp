@@ -2764,8 +2764,6 @@ void add_partial_safe_libraries(sol::environment& env)
     if (env["io"] == sol::nil)
     {
         sol::table io(global_vm, sol::create);
-        io["close"] = global_vm["io"]["close"];
-        io["flush"] = global_vm["io"]["flush"];
         io["type"] = global_vm["io"]["type"];
         io["open_data"] = open_data;
         io["open_mod"] = open_mod;
