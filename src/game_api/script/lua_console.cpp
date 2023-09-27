@@ -911,10 +911,12 @@ bool LuaConsole::pre_draw()
                 else if (console_input == "safe"sv)
                 {
                     hide_unsafe_libraries(lua);
+                    unsafe = false;
                 }
                 else if (console_input == "unsafe"sv)
                 {
                     expose_unsafe_libraries(lua);
+                    unsafe = true;
                 }
                 else
                 {
@@ -979,7 +981,7 @@ bool LuaConsole::get_enabled() const
 }
 bool LuaConsole::get_unsafe() const
 {
-    return true;
+    return unsafe;
 }
 const char* LuaConsole::get_name() const
 {
