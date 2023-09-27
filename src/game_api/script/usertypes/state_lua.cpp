@@ -401,6 +401,7 @@ void register_usertypes(sol::state& lua)
     statememory_type["logic"] = &StateMemory::logic;
     statememory_type["liquid"] = &StateMemory::liquid_physics;
     statememory_type["next_entity_uid"] = &StateMemory::next_entity_uid;
+    statememory_type["room_owners"] = &StateMemory::room_owners;
 
     lua.create_named_table("QUEST_FLAG", "RESET", 1, "DARK_LEVEL_SPAWNED", 2, "VAULT_SPAWNED", 3, "SPAWN_OUTPOST", 4, "SHOP_SPAWNED", 5, "SHORTCUT_USED", 6, "SEEDED", 7, "DAILY", 8, "CAVEMAN_SHOPPIE_AGGROED", 9, "WADDLER_AGGROED", 10, "SHOP_BOUGHT_OUT", 11, "EGGPLANT_CROWN_PICKED_UP", 12, "UDJAT_EYE_SPAWNED", 17, "BLACK_MARKET_SPAWNED", 18, "DRILL_SPAWNED", 19, "MOON_CHALLENGE_SPAWNED", 25, "STAR_CHALLENGE_SPAWNED", 26, "SUN_CHALLENGE_SPAWNED", 27);
 
@@ -553,6 +554,15 @@ void register_usertypes(sol::state& lua)
     logicdiceshop_type["result_announcement_timer"] = &LogicDiceShop::result_announcement_timer;
     logicdiceshop_type["won_prizes_count"] = &LogicDiceShop::won_prizes_count;
     logicdiceshop_type["balance"] = &LogicDiceShop::balance;
+
+    /// Used in StateMemory
+    lua.new_usertype<RoomOwnersInfo>("RoomOwnersInfo", "owned_items", &RoomOwnersInfo::owned_items, "owned_rooms", &RoomOwnersInfo::owned_rooms);
+
+    /// Used in RoomOwnersInfo
+    lua.new_usertype<ItemOwnerDetails>("ItemOwnerDetails", "owner_type", &ItemOwnerDetails::owner_type, "owner_uid", &ItemOwnerDetails::owner_uid);
+
+    /// Used in RoomOwnersInfo
+    lua.new_usertype<RoomOwnerDetails>("RoomOwnerDetails", "layer", &RoomOwnerDetails::layer, "room_index", &RoomOwnerDetails::room_index, "owner_uid", &RoomOwnerDetails::owner_uid);
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 

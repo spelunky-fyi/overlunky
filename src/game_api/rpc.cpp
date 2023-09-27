@@ -1675,13 +1675,6 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
 
 void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
 {
-    struct dummy // dummy struct
-    {
-        std::set<ShopRestrictedItem>::iterator __omg;
-        int __wow;
-    };
-    using AddRestrictedItemFun = size_t(std::set<ShopRestrictedItem>*, dummy, ShopRestrictedItem);
-
     Movable* item = get_entity_ptr(item_uid)->as<Movable>();
     Entity* owner = get_entity_ptr(shop_owner_uid);
     if (item && owner && item->is_movable())
@@ -1699,21 +1692,14 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
         {
             if (owner->type->id == it) // TODO: check what happens if it's not room owner/shopkeeper
             {
-                static auto add_to_items_set = (AddRestrictedItemFun*)get_address("add_shopitem");
                 auto state = State::get();
                 item->flags = setflag(item->flags, 23); // shop item
                 item->flags = setflag(item->flags, 20); // Enable button prompt (flag is problably: show dialogs and other fx)
                 state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
                 state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
 
-                // This function actually only takes iterator and value as argument, but for some reason they need to be passed thru stack
-                // This is probably some standard `insert` function, but the items is a strange one, i would guess it's a map (item uid as a key and array/struct as a value)
-                // but standard function, no matter if i set it to map or set, also adds something at the end of a bucket (key hash?), so it's either very similar container or some special setup for set/map
-                const auto bucket = add_to_items_set(&state.ptr()->shops.items, {state.ptr()->shops.items.end(), 0}, {item_uid, 0, 0});
-
-                auto the_struct = (ShopRestrictedItem*)(bucket + 0x1C); // 0x1C - is just the internal map/set stuff
-                the_struct->owner_uid = shop_owner_uid;
-                the_struct->owner_type = owner->type->id;
+                ItemOwnerDetails iod{shop_owner_uid, owner->type->id};
+                state.ptr()->room_owners.owned_items.insert({item->uid, iod});
                 return;
             }
         }
