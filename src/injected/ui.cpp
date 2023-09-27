@@ -3242,6 +3242,8 @@ void tooltip(const char* tip, bool force = false)
         ImGuiContext& g = *GImGui;
         if (options["hd_cursor"])
             g.Style.MouseCursorScale = 1.5f;
+        auto base = ImGui::GetMainViewport();
+        ImGui::SetNextWindowViewport(base->ID);
         ImGui::SetTooltip("%s", tip);
         g.Style.MouseCursorScale = 1.0f;
     }
@@ -3256,6 +3258,8 @@ void tooltip(const char* tip, const char* key)
         ImGuiContext& g = *GImGui;
         if (options["hd_cursor"])
             g.Style.MouseCursorScale = 1.5f;
+        auto base = ImGui::GetMainViewport();
+        ImGui::SetNextWindowViewport(base->ID);
         if (key && keys[key])
         {
             ImGui::SetTooltip("(%s) %s", key_string(keys[key]).c_str(), tip);
