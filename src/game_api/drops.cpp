@@ -84,16 +84,16 @@ std::vector<DropEntry> drop_entries{
     {"QUEENBEE_ROYALJELLY", "\x05\x02\x00\x00"sv, VTABLE_OFFSET::MONS_QUEENBEE, 3},
     {"ROBOT_METALSHIELD", "\x50\x02\x00\x00"sv, VTABLE_OFFSET::MONS_ROBOT, 3},
     /// It's actually for all RoomOwner's, so: shopkeeper, tun, yang and madame tusk
-    {"svHOPKEEPER_GOLDCOIN", "\xBA\xF6\x01\x00\x00"sv, VTABLE_OFFSET::MONS_YANG, 109, 1},
+    {"SHOPKEEPER_GOLDCOIN", "\xBA\xF6\x01\x00\x00"sv, VTABLE_OFFSET::MONS_YANG, 109, 1},
     /// Rare goldbar from shopkeeper
-    {"svHOPKEEPER_GOLDBAR", "\xBA\xEF\x01\x00\x00"sv, VTABLE_OFFSET::MONS_SHOPKEEPER, 109, 1},
+    {"SHOPKEEPER_GOLDBAR", "\xBA\xEF\x01\x00\x00"sv, VTABLE_OFFSET::MONS_SHOPKEEPER, 109, 1},
     /// GHIST and GHIST_SHOPKEEPER
     {"GHIST_GOLDCOIN", "\xBA\xF6\x01\x00\x00"sv, VTABLE_OFFSET::MONS_GHIST_SHOPKEEPER, 105, 1}, // there is no 105 function for ghist
-    {"svKELETON_SKELETONKEY", "\x1D\x02\x00\x00"sv, VTABLE_OFFSET::MONS_SKELETON, 3},
-    {"svKELETON_SKULL", "\xE2\x01\x00\x00"sv, VTABLE_OFFSET::MONS_SKELETON, 3},
-    {"svORCERESS_RUBY", "\xF4\x01\x00\x00"sv, VTABLE_OFFSET::MONS_SORCERESS, 3},
-    {"svPARROW_ROPEPILE", "\x00\x02\x00\x00"sv, VTABLE_OFFSET::MONS_THIEF, 104},
-    {"svPARROW_SKELETONKEY", "\x1D\x02\x00\x00"sv, VTABLE_OFFSET::MONS_THIEF, 3},
+    {"SKELETON_SKELETONKEY", "\x1D\x02\x00\x00"sv, VTABLE_OFFSET::MONS_SKELETON, 3},
+    {"SKELETON_SKULL", "\xE2\x01\x00\x00"sv, VTABLE_OFFSET::MONS_SKELETON, 3},
+    {"SORCERESS_RUBY", "\xF4\x01\x00\x00"sv, VTABLE_OFFSET::MONS_SORCERESS, 3},
+    {"SPARROW_ROPEPILE", "\x00\x02\x00\x00"sv, VTABLE_OFFSET::MONS_THIEF, 104},
+    {"SPARROW_SKELETONKEY", "\x1D\x02\x00\x00"sv, VTABLE_OFFSET::MONS_THIEF, 3},
 
     /// TIAMAT_SHOT spawns:
     {"TIAMAT_BAT", "\xE0\x00\x00\x00"sv, VTABLE_OFFSET::ITEM_TIAMAT_SHOT, 78},
@@ -125,28 +125,28 @@ std::vector<DropEntry> drop_entries{
     /* set write bp on Generator.spawned_uid, when it's being set to -1, execute return, find item_scrap id close to this location */
     {"FACTORY_GENERATOR_SCRAP", "\x48\x89\xF9\xBA\xE6\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 4},
     /// Keep in mind that shopkeeper generator spawns two types of entities, the second one will be this + 1
-    {"svHOPKEEPER_GENERATOR_1", "\x81\xCA\x10\x01\x00\x00\x4C\x89\xE1"sv, VTABLE_OFFSET::NONE, 0, 2},
+    {"SHOPKEEPER_GENERATOR_1", "\x81\xCA\x10\x01\x00\x00\x4C\x89\xE1"sv, VTABLE_OFFSET::NONE, 0, 2},
     /* set conditional bp on load_item for spider, break some scrap until you hit bp, execute return, you will see spaider id right above the spawn function
      * scroll up to find the same pattern but for snake
      * just above the snake you can find cobra and scorpion id, with jump to the spawn function after snake
      * little higher up, same thing for alien */
-    {"svCRAP_SPIDER", "\xC6\x44\x24\x20\x00\xBA\xDD\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
-    {"svCRAP_SNAKE", "\xC6\x44\x24\x20\x00\xBA\xDC\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
-    {"svCRAP_COBRA", "\xC6\x44\x24\x20\x00\xBA\xF8\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
-    {"svCRAP_SCORPION", "\xC6\x44\x24\x20\x00\xBA\xE5\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
-    {"svCRAP_ALIEN", "\xBA\x0B\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 1},
+    {"SCRAP_SPIDER", "\xC6\x44\x24\x20\x00\xBA\xDD\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
+    {"SCRAP_SNAKE", "\xC6\x44\x24\x20\x00\xBA\xDC\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
+    {"SCRAP_COBRA", "\xC6\x44\x24\x20\x00\xBA\xF8\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
+    {"SCRAP_SCORPION", "\xC6\x44\x24\x20\x00\xBA\xE5\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
+    {"SCRAP_ALIEN", "\xBA\x0B\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 1},
     /// Will spawn with parachute, so has to be PowerupCapable entity
     {"UFO_ALIEN", "\xBA\x0B\x01\x00\x00"sv, VTABLE_OFFSET::MONS_UFO, 3, 1},
     /* set write bp on Altar->unknown (second byte after timer)
-    {"svACRIFICE_DIE", "\x3D\xC0\x01\x00\x00\x0F"sv, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame
-    {"svACRIFICE_USHABTI", "\x3D\xBA\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame */
+    {"SACRIFICE_DIE", "\x3D\xC0\x01\x00\x00\x0F"sv, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame
+    {"SACRIFICE_USHABTI", "\x3D\xBA\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 1}, // depends on animation frame */
 
     /// Game does: (this value & 0xFFFFFFFE) to get idol and tusk idol
     /// Essentially clearing last bit, so it's ether this entity + 1 or -1 or just one entity, depending of the chosen type
-    {"svACRIFICE_IDOL", "\x81\xF9\x64\x01\x00\x00\x0F"sv, VTABLE_OFFSET::NONE, 0, 2},
-    {"svACRIFICE_PRESENT", "\x8B\x40\x14\x3D\xA6\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 4},
-    {"svACRIFICE_ROCK", "\x3D\x6D\x01\x00\x00\x0F\x85"sv, VTABLE_OFFSET::FLOOR_ALTAR, 2, 1},
-    {"svACRIFICE_EGGPLANT", "\x48\x8B\x42\x08\x81\x78\x14\xE7\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 7},
+    {"SACRIFICE_IDOL", "\x81\xF9\x64\x01\x00\x00\x0F"sv, VTABLE_OFFSET::NONE, 0, 2},
+    {"SACRIFICE_PRESENT", "\x8B\x40\x14\x3D\xA6\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 4},
+    {"SACRIFICE_ROCK", "\x3D\x6D\x01\x00\x00\x0F\x85"sv, VTABLE_OFFSET::FLOOR_ALTAR, 2, 1},
+    {"SACRIFICE_EGGPLANT", "\x48\x8B\x42\x08\x81\x78\x14\xE7\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 7},
     {"YAMA_EGGPLANTCROWN", "\xC6\x44\x24\x20\x00\xBA\x19\x02\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
     {"YAMA_GIANTFOOD", "\xC6\x44\x24\x20\x00\xBA\x07\x02\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
     {"YANG_KEY", "\xBA\x8F\x01\x00\x00"sv, VTABLE_OFFSET::MONS_YANG, 0, 1},
@@ -181,7 +181,7 @@ std::vector<DropEntry> drop_entries{
     /// COG
     {"CRUSHTRAP_NUGGET", "\xBA\xF5\x01\x00\x00"sv, VTABLE_OFFSET::ACTIVEFLOOR_CRUSH_TRAP_LARGE, 3, 1},
     /// COG
-    {"svLIDINGWALL_NUGGET", "\xBA\xF5\x01\x00\x00"sv, VTABLE_OFFSET::ACTIVEFLOOR_SLIDINGWALL, 3, 1},
+    {"SLIDINGWALL_NUGGET", "\xBA\xF5\x01\x00\x00"sv, VTABLE_OFFSET::ACTIVEFLOOR_SLIDINGWALL, 3, 1},
     /// Can sapwn this + 5 (for NUGGET_SMALL)
     {"EMBED_NUGGET", "\x81\xC2\xF5\x01\x00\x00"sv, VTABLE_OFFSET::EMBED_GOLD, 3, 2},
     /// Can be +1 for SAPPHIRE_SMALL
@@ -206,7 +206,7 @@ std::vector<DropEntry> drop_entries{
     /// Has a chance to be +5 (NUGGET_SMALL)
     {"CANDLE_NUGGET", "\x81\xC2\xF5\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_PALACE_CANDLE, 3, 2},
     {"COOKFIRE_TORCH", "\xBA\xA0\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_COOKFIRE, 3, 1},
-    {"svKULLDROPTRAP_SKULL", "\xBA\xEA\x01\x00\x00\xE8"sv, VTABLE_OFFSET::NONE, 0, 1},
+    {"SKULLDROPTRAP_SKULL", "\xBA\xEA\x01\x00\x00\xE8"sv, VTABLE_OFFSET::NONE, 0, 1},
     {"COFFIN_SKULL", "\xBA\xE2\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_COFFIN, 88, 1},
     /// Game does this (this value | 0x1) to get BOMBBAG (so depending on the chosen ENT_TYPE it can be + 1 or + 0)
     {"OLMEC_SISTERS_ROPEPILE", "\x0D\x00\x02\x00\x00\x83\xFB\x03"sv, VTABLE_OFFSET::NONE, 0, 1},
@@ -228,16 +228,16 @@ std::vector<DropEntry> drop_entries{
     {"OLMEC_UFO", "\x0A\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_OLMECCANNON_UFO, 93},
     {"YETIKING_ICESPIRE", "\xE8\x01\x00\x00"sv, VTABLE_OFFSET::MONS_YETIKING, 104},
     /// Anubis regular shot = new_drop_uid - 1 !
-    {"svCEPTER_ANUBISSPECIALSHOT", "\x79\x01\x00\x00"sv, VTABLE_OFFSET::MONS_ANUBIS, 101}, // should probably be 102
-    {"svCEPTER_PLAYERSHOT", "\x7A\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_SCEPTER, 24},
+    {"SCEPTER_ANUBISSPECIALSHOT", "\x79\x01\x00\x00"sv, VTABLE_OFFSET::MONS_ANUBIS, 101}, // should probably be 102
+    {"SCEPTER_PLAYERSHOT", "\x7A\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_SCEPTER, 24},
     {"PLASMACANNON_SHOT", "\xBA\x77\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_PLASMACANNON, 24, 1},
     {"FREEZERAY_SHOT", "\xBA\xA9\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_FREEZERAY, 24, 1},
     {"CLONEGUN_SHOT", "\xBA\xAA\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_CLONEGUN, 24, 1},
     /// It spawns 6 bullets
-    {"svHOTGUN_BULLET", "\xBA\xA8\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_SHOTGUN, 24, 1},
+    {"SHOTGUN_BULLET", "\xBA\xA8\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_SHOTGUN, 24, 1},
     {"UFO_LASERSHOT", "\xBA\x7B\x01\x00\x00"sv, VTABLE_OFFSET::MONS_UFO, 75, 1}, // 75 is just the closest function
     {"LAMASSU_LASERSHOT", "\xBA\x7C\x01\x00\x00"sv, VTABLE_OFFSET::MONS_LAMASSU, 78, 1},
-    {"svORCERESS_DAGGERSHOT", "\xBA\x7D\x01\x00\x00"sv, VTABLE_OFFSET::MONS_SORCERESS, 78, 1},
+    {"SORCERESS_DAGGERSHOT", "\xBA\x7D\x01\x00\x00"sv, VTABLE_OFFSET::MONS_SORCERESS, 78, 1},
     {"TIAMAT_TIAMATSHOT", "\xBA\x80\x01\x00\x00"sv, VTABLE_OFFSET::MONS_TIAMAT, 78, 1},
     {"ROCKDOG_FIREBALL", "\xBA\x81\x01\x00\x00"sv, VTABLE_OFFSET::MOUNT_ROCKDOG, 75, 1}, // 75 is just the closest function
     {"QILIN_FIREBALL", "\xBA\x81\x01\x00\x00"sv, VTABLE_OFFSET::MOUNT_QILIN, 75, 1},     // 75 is just the closest function
@@ -319,7 +319,7 @@ std::vector<DropChanceEntry> dropchance_entries{
     {"MOLE_MATTOCK", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_MOLE, 3},
     {"MOSQUITO_HOVERPACK", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_MOSQUITO, 3},
     {"ROBOT_METALSHIELD", "\x64"sv, VTABLE_OFFSET::MONS_ROBOT, 3, 1},
-    {"svKELETON_SKELETONKEY", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_SKELETON, 3},
+    {"SKELETON_SKELETONKEY", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_SKELETON, 3},
     {"UFO_PARACHUTE", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_UFO, 78},
     {"YETI_PITCHERSMITT", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_YETI, 3},
 };
