@@ -979,7 +979,7 @@ struct ItemOwnerDetails
     ENT_TYPE owner_type;
 };
 
-struct RoomwOwnerDetails
+struct RoomOwnerDetails
 {
     uint8_t layer;
     uint8_t padding1;
@@ -993,7 +993,7 @@ struct RoomOwnersInfo
 {
     /// key/index is the uid of an item
     custom_map<int32_t, ItemOwnerDetails> owned_items;
-    std::vector<RoomwOwnerDetails> owned_rooms;
+    std::vector<RoomOwnerDetails> owned_rooms;
 };
 
 struct MultiLineTextRendering

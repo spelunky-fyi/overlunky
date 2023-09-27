@@ -2062,13 +2062,13 @@ do
 
 ---@class RoomOwnersInfo
     ---@field owned_items custom_map<integer, ItemOwnerDetails> @key/index is the uid of an item
-    ---@field owned_rooms RoomwOwnerDetails[]
+    ---@field owned_rooms RoomOwnerDetails[]
 
 ---@class ItemOwnerDetails
     ---@field owner_type ENT_TYPE
     ---@field owner_uid integer
 
----@class RoomwOwnerDetails
+---@class RoomOwnerDetails
     ---@field layer integer
     ---@field room_index integer
     ---@field owner_uid integer

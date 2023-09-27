@@ -808,16 +808,7 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_pre_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render) | Hooks before the virtual function.<br/>The callback signature is `bool render(RenderInfo self, float float, VanillaRenderContext vanilla_render_context)`
 [CallbackId](#Aliases) | [set_post_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render) | Hooks after the virtual function.<br/>The callback signature is `nil render(RenderInfo self, float float, VanillaRenderContext vanilla_render_context)`
 
-### RoomOwnersInfo
-
-Used in [StateMemory](#StateMemory)
-
-Type | Name | Description
----- | ---- | -----------
-custom_map&lt;int, [ItemOwnerDetails](#ItemOwnerDetails)&gt; | [owned_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_items) | key/index is the uid of an item
-array&lt;[RoomwOwnerDetails](#RoomwOwnerDetails)&gt; | [owned_rooms](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_rooms) | 
-
-### RoomwOwnerDetails
+### RoomOwnerDetails
 
 Used in [RoomOwnersInfo](#RoomOwnersInfo)
 
@@ -826,6 +817,15 @@ Type | Name | Description
 int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
 int | [room_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=room_index) | 
 int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
+
+### RoomOwnersInfo
+
+Used in [StateMemory](#StateMemory)
+
+Type | Name | Description
+---- | ---- | -----------
+custom_map&lt;int, [ItemOwnerDetails](#ItemOwnerDetails)&gt; | [owned_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_items) | key/index is the uid of an item
+array&lt;[RoomOwnerDetails](#RoomOwnerDetails)&gt; | [owned_rooms](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_rooms) | 
 
 ### ShortTileCodeDef
 

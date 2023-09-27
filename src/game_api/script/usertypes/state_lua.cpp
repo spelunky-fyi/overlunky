@@ -562,7 +562,7 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<ItemOwnerDetails>("ItemOwnerDetails", "owner_type", &ItemOwnerDetails::owner_type, "owner_uid", &ItemOwnerDetails::owner_uid);
 
     /// Used in RoomOwnersInfo
-    lua.new_usertype<RoomwOwnerDetails>("RoomwOwnerDetails", "layer", &RoomwOwnerDetails::layer, "room_index", &RoomwOwnerDetails::room_index, "owner_uid", &RoomwOwnerDetails::owner_uid);
+    lua.new_usertype<RoomOwnerDetails>("RoomOwnerDetails", "layer", &RoomOwnerDetails::layer, "room_index", &RoomOwnerDetails::room_index, "owner_uid", &RoomOwnerDetails::owner_uid);
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 
