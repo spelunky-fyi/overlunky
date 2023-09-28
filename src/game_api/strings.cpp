@@ -12,6 +12,7 @@
 #include <unordered_map> // for unordered_map, _Umap_traits...
 #include <utility>       // for max, min, pair
 
+#include "constants.hpp"                 //
 #include "containers/game_allocator.hpp" // for game_free, game_malloc
 #include "detours.h"                     // for DetourAttach, DetourTransac...
 #include "entity.hpp"                    // for get_type, Entity, EntityDB
@@ -54,7 +55,7 @@ void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound
 {
     std::u16string str = pre_speach_bubble(NPC, buffer);
     char16_t* new_string = NULL;
-    if (str != u"~[:NO_RETURN:]#")
+    if (str != no_return_str)
     {
         if (str.empty())
         {
@@ -78,7 +79,7 @@ void OnToast(char16_t* buffer)
 {
     std::u16string str = pre_toast(buffer);
     char16_t* new_string = NULL;
-    if (str != u"~[:NO_RETURN:]#")
+    if (str != no_return_str)
     {
         if (str.empty())
         {
