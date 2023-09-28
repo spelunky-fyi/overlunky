@@ -290,7 +290,6 @@ State& State::get()
             strings_init();
             init_state_update_hook();
 
-            auto mem = Memory::get();
             auto watermark_offset = get_address("destroy_game_manager") - 8; // pulled this out of a hat, its just a random place with some CCCC hopefully
             auto watermark = memory_read<uint32_t>(watermark_offset);
             if (watermark != 0x4C4F4C4F)
