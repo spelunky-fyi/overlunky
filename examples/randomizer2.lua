@@ -1,9 +1,11 @@
 meta.name = "Randomizer Two"
-meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' (IN MODLUNKY) IF YOU GET ANY RED ERRORS AT THE INTRO, OR THE BLEEDING EDGE FEATURES WON'T WORK!
+meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' IN MODLUNKY! YOU WILL CRASH IF NOT USING LATEST NIGHTLY!
 
-Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.
+(OR OVERLUNKY WHIP)
 
-Second incarnation of The Randomizer with new API shenannigans. Most familiar things from 1.2 are still there, but better! Progression is changed though, shops are random, level gen is crazy, chain item stuff, multiple endings, secrets... I can't possibly test all of this so fingers crossed it doesn't crash a lot.]]
+I recommend resetting options to defaults after updating to 2.9 for a more balanced experience. Speaking of balance...
+
+Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.]]
 meta.version = "2.9"
 meta.author = "Dregu"
 
@@ -14,7 +16,7 @@ local real_default_options = {
     trap_max = 3.2,
     trap_min = 1.5,
     enemy = true,
-    enemy_max = 9,
+    enemy_max = 10,
     enemy_min = 3.5,
     enemy_curse_chance = 5,
     friend = true,
@@ -230,7 +232,7 @@ end
 
 local function get_ushabti_frame()
     local x, y
-    if prng:random() > options.ushabti_chance/100 or state.correct_ushabti == nil then
+    if (prng:random() > options.ushabti_chance/100 and state.level_count+3 < #level_order) or state.correct_ushabti == nil then
         x = prng:random(0,9)
         y = prng:random(0,9)
     else
@@ -1382,6 +1384,10 @@ set_callback(function()
     end
 end, ON.LEVEL)
 
+local ushabti_spawn = define_extra_spawn(function(x, y, l)
+    spawn_critical(ENT_TYPE.ITEM_USHABTI, x, y, l, 0, 0)
+end, nil, 0, 0)
+
 set_callback(function(ctx)
     if options.enemy then
         ctx:set_procedural_spawn_chance(enemy_small_chance, get_chance(options.enemy_min, options.enemy_max))
@@ -1446,6 +1452,14 @@ set_callback(function(ctx)
     end
 
     ctx:set_procedural_spawn_chance(snowman_chance, get_chance(options.enemy_min, options.enemy_max) * 10)
+
+    if options.door then
+        if state.level_count + 3 == #level_order then
+            ctx:set_num_extra_spawns(ushabti_spawn, 1, 0)
+        else
+            ctx:set_num_extra_spawns(ushabti_spawn, 0, 0)
+        end
+    end
 end, ON.POST_ROOM_GENERATION)
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
@@ -2027,7 +2041,7 @@ end, ON.START)
 
 --[[DOORS]]
 
-local level_order = {}
+level_order = {}
 
 local theme = {1,1,2,2,3,3,5,5,6,6,7,8,8,9,10,10,11}
 local world = {1,2,2,3,4,4,5,6,7,8,4,4,4,6,7,7,1}
@@ -2356,8 +2370,7 @@ set_callback(function()
         end
     end
     replace_drop(DROP.OSIRIS_TABLETOFDESTINY, get_chain_item())
-    --TODO: this is popping up errors for the pattern
-    --replace_drop(DROP.KINGU_TABLETOFDESTINY, get_chain_item())
+    replace_drop(DROP.KINGU_TABLETOFDESTINY, get_chain_item())
 end, ON.LEVEL)
 
 local items_kapala = {ENT_TYPE.ITEM_PICKUP_KAPALA, ENT_TYPE.ITEM_PICKUP_24BAG, ENT_TYPE.ITEM_PICKUP_ANKH, ENT_TYPE.ITEM_PICKUP_CROWN, ENT_TYPE.ITEM_PICKUP_ELIXIR}
