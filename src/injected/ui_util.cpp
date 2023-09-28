@@ -604,14 +604,19 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         auto check = ent;
         do
         {
-            // TODO: weird hack, but destroying the olmec in 3-1 crashes. some logic is still using it
-            // destroying olmec anywhere else would be fine I think
             if (check && in_array(check->type->id, olmecs))
             {
-                auto olmec = check->as<Olmec>();
-                olmec->attack_phase = 3;
-                olmec->flags = 0x50001231;
-                move_entity_abs(olmec->uid, 10.0f, 1000.0f, 0.0f, 0.0f);
+                auto state = State::get().ptr();
+                if (state->logic->olmec_cutscene)
+                {
+                    // if cutscene is still running, perform the last frame of cutscene before killing olmec
+                    state->logic->olmec_cutscene->timer = 809;
+                    state->logic->olmec_cutscene->perform();
+                    state->logic->olmec_cutscene->~LogicOlmecCutscene();
+                    state->logic->olmec_cutscene = nullptr;
+                }
+                destroy_entity_items(check);
+                check->destroy();
                 return;
             }
             else if (in_array(check->type->id, jellys))

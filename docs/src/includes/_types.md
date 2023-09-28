@@ -687,6 +687,15 @@ int | [health](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=health) 
 int | [bombs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) | 
 int | [ropes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) | 
 
+### ItemOwnerDetails
+
+Used in [RoomOwnersInfo](#RoomOwnersInfo)
+
+Type | Name | Description
+---- | ---- | -----------
+[ENT_TYPE](#ENT_TYPE) | [owner_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_type) | 
+int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
+
 ### Letter
 
 
@@ -798,6 +807,25 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_post_dtor(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_dtor) | Hooks after the virtual function.<br/>The callback signature is `nil dtor(RenderInfo self)`
 [CallbackId](#Aliases) | [set_pre_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_render) | Hooks before the virtual function.<br/>The callback signature is `bool render(RenderInfo self, float float, VanillaRenderContext vanilla_render_context)`
 [CallbackId](#Aliases) | [set_post_render(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_render) | Hooks after the virtual function.<br/>The callback signature is `nil render(RenderInfo self, float float, VanillaRenderContext vanilla_render_context)`
+
+### RoomOwnerDetails
+
+Used in [RoomOwnersInfo](#RoomOwnersInfo)
+
+Type | Name | Description
+---- | ---- | -----------
+int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
+int | [room_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=room_index) | 
+int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
+
+### RoomOwnersInfo
+
+Used in [StateMemory](#StateMemory)
+
+Type | Name | Description
+---- | ---- | -----------
+custom_map&lt;int, [ItemOwnerDetails](#ItemOwnerDetails)&gt; | [owned_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_items) | key/index is the uid of an item
+array&lt;[RoomOwnerDetails](#RoomOwnerDetails)&gt; | [owned_rooms](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_rooms) | 
 
 ### ShortTileCodeDef
 
@@ -1158,7 +1186,7 @@ float | [spawn_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn
 float | [spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) | 
 int | [spawn_room_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) | 
 int | [spawn_room_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) | 
-array&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_doors) | 
+custom_array&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_doors) | 
 [ThemeInfo](#ThemeInfo) | [themes[18]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) | 
 
 ## Lighting types
@@ -2630,6 +2658,7 @@ array&lt;int, 9&gt; | [journal_progress_theme_slots](https://github.com/spelunky
 [LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | Level logic like dice game and cutscenes
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
 int | [next_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_entity_uid) | Next entity spawned will have this uid
+[RoomOwnersInfo](#RoomOwnersInfo) | [room_owners](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=room_owners) | Holds info about owned rooms and items (shops, challenge rooms, vault etc.)
 
 ## Texture types
 
@@ -4548,12 +4577,17 @@ float | [applied_hor_velocity](https://github.com/spelunky-fyi/overlunky/search?
 float | [applied_ver_velocity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=applied_ver_velocity) | 
 int | [birdhead_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=birdhead_entity_uid) | 
 int | [snakehead_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=snakehead_entity_uid) | 
-float | [y_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_level) | 
+float | [y_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_level) | current floor level
 int | [bounce_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounce_timer) | 
 int | [fireball_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fireball_timer) | 
 bool | [birdhead_defeated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=birdhead_defeated) | 
 bool | [snakehead_defeated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=snakehead_defeated) | 
 int | [hundun_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hundun_flags) | 1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs
+float | [y_limit](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_limit) | This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+float | [rising_speed_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rising_speed_x) | This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+float | [rising_speed_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rising_speed_y) | This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+float | [bird_head_spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bird_head_spawn_y) | This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+float | [snake_head_spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=snake_head_spawn_y) | This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
 
 ### HundunHead
 
@@ -5104,6 +5138,8 @@ float | [tail_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ta
 float | [tail_radian](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tail_radian) | 
 float | [tail_move_speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tail_move_speed) | 
 float | [right_arm_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_arm_angle) | 
+float | [attack_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_x) | This is custom variable, you need [activate_tiamat_position_hack](#activate_tiamat_position_hack) to use it
+float | [attack_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_y) | This is custom variable, you need [activate_tiamat_position_hack](#activate_tiamat_position_hack) to use it
 
 ### Tun
 
@@ -5541,6 +5577,16 @@ Type | Name | Description
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particles_flames](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_flames) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particles_warp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particles_warp) | 
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
+
+### CrushElevator
+
+Derived from [Entity](#Entity) [Movable](#Movable)
+
+
+Type | Name | Description
+---- | ---- | -----------
+float | [y_limit](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y_limit) | This is custom variable, you need [activate_crush_elevator_hack](#activate_crush_elevator_hack) to use it
+float | [speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) | This is custom variable, you need [activate_crush_elevator_hack](#activate_crush_elevator_hack) to use it
 
 ### Crushtrap
 
@@ -6671,8 +6717,8 @@ float | [size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) | 
 float | [size_multiply](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size_multiply) | 0.0 when not on screen
 float | [next_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_size) | width and height will be set to `next_size  size_multiply` next frame
 int | [size_change_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size_change_timer) | very short timer before next size change, giving a pulsing effect
-float | [speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) | This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
-float | [distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) | This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
+float | [speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=speed) | This is custom variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
+float | [distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance) | This is custom variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
 
 ### Spear
 
