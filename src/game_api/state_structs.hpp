@@ -451,7 +451,7 @@ class LogicGhostToast : public Logic
 class LogicDiceShop : public Logic
 {
   public:
-    uint32_t boss_uid; // either tusk or the shopkeeper
+    uint32_t boss_uid;
     ENT_TYPE boss_type;
     /// entity uid
     uint32_t bet_machine;
@@ -471,11 +471,12 @@ class LogicDiceShop : public Logic
     bool bet_active;
     bool forcefield_deactivated;
     bool boss_angry;
-    uint8_t result_announcement_timer; // the time the boss waits after your second die throw to announce the results
-    uint8_t won_prizes_count;          // to see whether you achieved high roller status
+    /// the time the boss waits after your second die throw to announce the results
+    uint8_t result_announcement_timer;
+    uint8_t won_prizes_count;
     uint8_t padding[3];
-    int32_t balance; // cash balance of all the games
-    size_t unknown17;
+    /// cash balance of all the games
+    int32_t balance;
 };
 
 class LogicMoonChallenge : public Logic
@@ -490,7 +491,8 @@ class LogicMoonChallenge : public Logic
     uint16_t unknown7;
     uint16_t unknown8a;
     uint16_t unknown8b;
-    uint32_t mattock; // entity uid
+    // entity uid
+    int32_t mattock;
 };
 
 class LogicStarChallenge : public Logic
@@ -508,7 +510,7 @@ class LogicStarChallenge : public Logic
     uint8_t start_countdown;
     uint8_t padding[3];
     uint32_t unknown9;
-    float unknown10; // position in from of tun and one tile higher, dunno what for?
+    float unknown10; // position in front of tun and one tile higher, dunno what for?
     float unknown11;
 };
 
@@ -526,7 +528,7 @@ class LogicSunChallenge : public Logic
     uint8_t start_countdown;
     uint8_t padding[3];
     uint32_t unknown9;
-    float unknown10; // position in from of tun and one tile higher, dunno what for?
+    float unknown10; // position in front of tun and one tile higher, dunno what for?
     float unknown11;
 };
 
@@ -590,6 +592,8 @@ class LogicTuskPleasurePalace : public Logic
   public:
     uint32_t locked_door; // entity uid
     uint32_t unknown4;
+    uint32_t unknown5;
+    uint32_t unknown6; // padding probably
 };
 
 class LogicArena1 : public Logic
@@ -629,34 +633,44 @@ class LogicTunPreChallenge : public Logic
     size_t unknown1;
     size_t unknown2;
     size_t unknown3;
-    int32_t tun;
+    int32_t tun_uid;
+};
+
+class LogicTutorial : public Logic
+{
+  public:
+    Entity* pet_tutorial;
+    uint32_t timer;
 };
 
 struct LogicList
 {
-    Logic* tutorial;
+    /// Only the very begging of the tutorial, probably just setting things up
+    LogicTutorial* tutorial;                  // OK
     LogicOuroboros* ouroboros;                // OK
     LogicBasecampSpeedrun* basecamp_speedrun; // OK
     Logic* ghost_trigger;                     // OK
     LogicGhostToast* ghost_toast_trigger;     // OK
-    Logic* tun_aggro;                         // OK
-    LogicDiceShop* diceshop;                  // OK
-    LogicTunPreChallenge* tun_pre_challenge;  // OK
-    LogicMoonChallenge* tun_moon_challenge;   // OK
-    LogicStarChallenge* tun_star_challenge;   // OK
-    LogicSunChallenge* tun_sun_challenge;     // OK
-    Logic* volcana_related;                   // OK
+    /// Spawns tun at the door at 30s mark
+    Logic* tun_aggro;                        // OK
+    LogicDiceShop* diceshop;                 // OK
+    LogicTunPreChallenge* tun_pre_challenge; // OK
+    LogicMoonChallenge* tun_moon_challenge;  // OK
+    LogicStarChallenge* tun_star_challenge;  // OK
+    LogicSunChallenge* tun_sun_challenge;    // OK
+    Logic* volcana_related;                  // OK
     /// Only the bubbles that spawn from the floor
     /// Even without it, entities moving in water still spawn bubbles
     LogicUnderwaterBubbles* water_bubbles; // OK
     LogicOlmecCutscene* olmec_cutscene;    // OK
-    LogicTiamatCutscene* tiamat_cutscene;
-    LogicApepTrigger* apep_trigger; // OK
-    LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
-    LogicDuatBossesTrigger* duat_bosses_trigger; // OK
-    LogicTiamatBubbles* bubbler;
-    LogicTuskPleasurePalace* tusk_pleasure_palace;
-    Logic* discovery_info; // black market, vlad, wet fur discovery; shows the toast
+    LogicTiamatCutscene* tiamat_cutscene;  // OK
+    LogicApepTrigger* apep_trigger;        // OK
+    /// All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
+    LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice; // OK
+    LogicDuatBossesTrigger* duat_bosses_trigger;        // OK
+    LogicTiamatBubbles* bubbler;                        // OK
+    LogicTuskPleasurePalace* tusk_pleasure_palace;      // OK TODO: van helsing
+    Logic* discovery_info;                              // black market, vlad, wet fur discovery; shows the toast // OK
     Logic* black_market;
     Logic* cosmic_ocean;
     LogicArena1* arena_1;
