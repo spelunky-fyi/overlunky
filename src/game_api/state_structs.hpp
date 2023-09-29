@@ -398,32 +398,8 @@ class Logic
     virtual ~Logic() = 0;
 
     // Continuously performs the main functionality of the logic instance
-    // Tutorial: handles dropping of the torch and rope in intro routine
-    // Ouroboros: transitions to level when music finished
-    // Basecamp speedrun: keep track of time, player position passing official
-    // Ghost trigger: spawns ghost when time is up (checks cursed for earlier ghost)
-    // Ghost toast trigger: shows the 'A terrible chill...' toast after 90 frames
-    // Tun aggro: spawns Tun after 30 seconds
-    // Dice shop: runs the logic of the dice shop
-    // Tun pre challenge: unknown
-    // Moon challenge: handles waitroom forcefields + tracks mattock breakage
-    // Star challenge: handles waitroom forcefields + tracks torches/timer
-    // Sun challenge: handles waitroom forcefields + tracks timer
-    // Volcana/Lava: spawns magmamen at random (and does other things)
-    // Water: unknown
-    // Olmec cutscene: runs the cutscene
-    // Tiamat cutscene: runs the cutscene
-    // Apep trigger: tracks player position, spawns APEP_HEAD
-    // COG Ankh sacrifice: countdown timer (100 frames) from the moment you die, triggers transitioning to duat
-    // Duat bosses trigger: tracks player position, spawns ANUBIS2 and OSIRIS_HEAD
-    // Tiamat: spawns bubbles
-    // Tusk pleasure palace: triggers aggro on everyone when non-high roller enters door
-    // Discovery: shows the toast
-    // Black market: lifts camera bounds restrictions
-    // Cosmic ocean: spawns jelly when time is up
-    // Arena 1: handles crate spawning
-    // Arena 3: handles death mist
-    virtual void perform() = 0;
+    // If it returns false, game will call deconstructor next in most cases
+    virtual bool perform() = 0;
 };
 
 class LogicOuroboros : public Logic
@@ -574,13 +550,6 @@ class LogicCOGAnkhSacrifice : public Logic
     uint8_t timer;
 };
 
-class LogicDuatBossesTrigger : public Logic
-{
-  public:
-    uint32_t unknown3; // definitely is reserved memory, but doesn't seam used?
-    uint32_t unknown4;
-};
-
 class LogicTiamatBubbles : public Logic
 {
   public:
@@ -590,19 +559,16 @@ class LogicTiamatBubbles : public Logic
 class LogicTuskPleasurePalace : public Logic
 {
   public:
-    uint32_t locked_door; // entity uid
-    uint32_t unknown4;
-    uint32_t unknown5;
-    uint32_t unknown6; // padding probably
+    int32_t locked_door; // entity uid
+    uint32_t unknown4;   // always 1552
+    uint32_t unknown5;   // dunno
+    uint32_t unknown6;   // padding probably
 };
 
 class LogicArena1 : public Logic
 {
   public:
     uint32_t crate_spawn_timer;
-    uint32_t unknown4;
-    uint32_t unknown5;
-    uint32_t unknown6;
 };
 
 class LogicArenaAlienBlast : public Logic
@@ -620,9 +586,10 @@ class LogicArenaLooseBombs : public Logic
 class LogicUnderwaterBubbles : public Logic
 {
   public:
-    float unknown1;
-    int16_t unknown2;
-    int8_t unknown3;
+    // no idea what does are, messing with them can crash
+    float unknown1;   // 1.0
+    int16_t unknown2; // 1000
+    int8_t unknown3;  // 1 or 0, probably bool
 };
 
 class LogicTunPreChallenge : public Logic
@@ -648,36 +615,53 @@ struct LogicList
     /// Only the very begging of the tutorial, probably just setting things up
     LogicTutorial* tutorial;                  // OK
     LogicOuroboros* ouroboros;                // OK
-    LogicBasecampSpeedrun* basecamp_speedrun; // OK
-    Logic* ghost_trigger;                     // OK
-    LogicGhostToast* ghost_toast_trigger;     // OK
+    union
+    {
+        std::array<Logic*, 28> logic_indexed;
+        struct
+        {
+            /// Handles dropping of the torch and rope in intro routine (first time play)
+            LogicTutorial* tutorial;
+            LogicOuroboros* ouroboros;
+            /// Keep track of time, player position passing official
+            LogicBasecampSpeedrun* basecamp_speedrun;
+            Logic* ghost_trigger; // virtual does nothing, all the code elsewhere, the only purpose is to mark if ghost should spawn this level or not
+            LogicGhostToast* ghost_toast_trigger;
     /// Spawns tun at the door at 30s mark
-    Logic* tun_aggro;                        // OK
-    LogicDiceShop* diceshop;                 // OK
-    LogicTunPreChallenge* tun_pre_challenge; // OK
-    LogicMoonChallenge* tun_moon_challenge;  // OK
-    LogicStarChallenge* tun_star_challenge;  // OK
-    LogicSunChallenge* tun_sun_challenge;    // OK
-    Logic* volcana_related;                  // OK
+            Logic* tun_aggro;
+            LogicDiceShop* diceshop;
+            LogicTunPreChallenge* tun_pre_challenge;
+            LogicMoonChallenge* tun_moon_challenge;
+            LogicStarChallenge* tun_star_challenge;
+            LogicSunChallenge* tun_sun_challenge;
+            Logic* volcana_related;
     /// Only the bubbles that spawn from the floor
     /// Even without it, entities moving in water still spawn bubbles
-    LogicUnderwaterBubbles* water_bubbles; // OK
-    LogicOlmecCutscene* olmec_cutscene;    // OK
-    LogicTiamatCutscene* tiamat_cutscene;  // OK
-    LogicApepTrigger* apep_trigger;        // OK
+            LogicUnderwaterBubbles* water_bubbles;
+            LogicOlmecCutscene* olmec_cutscene;
+            LogicTiamatCutscene* tiamat_cutscene;
+            LogicApepTrigger* apep_spawner;
     /// All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
-    LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice; // OK
-    LogicDuatBossesTrigger* duat_bosses_trigger;        // OK
-    LogicTiamatBubbles* bubbler;                        // OK
-    LogicTuskPleasurePalace* tusk_pleasure_palace;      // OK TODO: van helsing
-    Logic* discovery_info;                              // black market, vlad, wet fur discovery; shows the toast // OK
+            LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
+            Logic* duat_bosses_spawner;
+            /// Spawn rising bubbles at Tiamat (position hardcoded)
+            LogicTiamatBubbles* bubbler;
+            /// Triggers aggro on everyone when non-high roller enters door
+            LogicTuskPleasurePalace* tusk_pleasure_palace; //  TODO: van helsing?
+            /// black market, vlad, wet fur discovery, logic shows the toast
+            Logic* discovery_info;
+            /// Changes the camera bounds when you reach black market
     Logic* black_market;
-    Logic* cosmic_ocean;
+            Logic* jellyfish_trigger; // same as ghost_trigger
+            /// Handles create spawns and more, is cleared as soon as the winner is decided (on last player alive)
     LogicArena1* arena_1;
-    Logic* arena_2;
+            Logic* arena_2; // can't trigger
+            /// Handles time end death
     Logic* arena_3;
     LogicArenaAlienBlast* arena_alien_blast;
     LogicArenaLooseBombs* arena_loose_bombs;
+};
+    };
 };
 
 struct LiquidPhysicsEngine
