@@ -13,6 +13,7 @@
 #include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
 #include "entity_hooks_info.hpp"                 // for Player
 #include "game_manager.hpp"                      // for get_game_manager, GameManager, SaveR...
+#include "game_patches.hpp"                      //
 #include "items.hpp"                             // for Items, SelectPlayerSlot
 #include "level_api.hpp"                         // for LevelGenSystem, LevelGenSystem::(ano...
 #include "logger.h"                              // for DEBUG
@@ -56,7 +57,11 @@ void fix_liquid_out_of_bounds()
         {
             for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
             {
-                if ((it.physics_engine->entity_coordinates + i)->second < 0.1) // 0.1 just to be safe
+                auto liquid_coordinates = it.physics_engine->entity_coordinates + i;
+                if (liquid_coordinates->second < 0                      // y < 0
+                    || liquid_coordinates->first < 0                    // x < 0
+                    || liquid_coordinates->first > g_level_max_x        // x > g_level_max_x
+                    || liquid_coordinates->second > g_level_max_y + 16) // y > g_level_max_y
                 {
                     if (!*(it.physics_engine->unknown61 + i)) // just some bs
                         continue;
@@ -284,6 +289,12 @@ State& State::get()
             hook_godmode_functions();
             strings_init();
             init_state_update_hook();
+
+            // game patches
+            patch_tiamat_kill_crash();
+            patch_orbs_limit();
+            patch_olmec_kill_crash();
+            patch_liquid_OOB();
         }
 
         get_is_init() = true;

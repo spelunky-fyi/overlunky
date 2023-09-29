@@ -10,13 +10,21 @@
 struct MovableBehavior;
 using DAMAGE_TYPE = uint16_t;
 
+class CutsceneBehavior
+{
+  public:
+    virtual ~CutsceneBehavior(){};
+    virtual void update() = 0;
+    // no more virtuals, it's possible that different sub classes have some extra variables as well
+};
+
 class Movable : public Entity
 {
   public:
     custom_map<uint32_t, MovableBehavior*> behaviors_map;
     custom_set<MovableBehavior*, SortMovableBehavior> behaviors;
     MovableBehavior* current_behavior;
-    int64_t ic8;
+    CutsceneBehavior* ic8;
     union
     {
         /// {movex, movey}
