@@ -349,6 +349,11 @@ bool inject_search(fs::path overlunky_path)
     }
     SetConsoleTitle("Overlunky");
     INFO("Found Spel2.exe PID: {}", proc.info.pid);
+    if (find_dll_in_process(proc.info.pid, "Overlunky.dll"))
+    {
+        INFO("Already injected, let's not do that again. If you want to inject multiple game processes, use the --launch_game parameter.");
+        return false;
+    }
     inject_dll(proc, overlunky_path.string());
     INFO("DLL injected");
     wait();
@@ -406,6 +411,11 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
     {
         auto proc = Process{pi.hProcess, {g_exe, pi.dwProcessId}};
         INFO("Game launched, injecting DLL...");
+        if (find_dll_in_process(proc.info.pid, "Overlunky.dll"))
+        {
+            INFO("Already injected, let's not do that again. If you want to inject multiple game processes, use the --launch_game parameter.");
+            return false;
+        }
         inject_dll(proc, overlunky_path.string());
         INFO("DLL injected");
         wait();
