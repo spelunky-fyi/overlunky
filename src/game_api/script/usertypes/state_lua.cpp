@@ -498,31 +498,88 @@ void register_usertypes(sol::state& lua)
         "get_code",
         &OnlineLobby::get_code);
 
-    /// Used in StateMemory
-    lua.new_usertype<LogicList>(
-        "LogicList",
-        "olmec_cutscene",
-        &LogicList::olmec_cutscene,
-        "tiamat_cutscene",
-        &LogicList::tiamat_cutscene,
-        "magmaman_spawn",
-        &LogicList::magmaman_spawn,
-        "diceshop",
-        &LogicList::diceshop,
-        "start_logic",
-        [&lua](LogicList& l, LOGIC idx) -> sol::object // -> Logic
+    auto start_logic = sol::overload(
+        [&lua](LogicList& l, LOGIC idx) -> sol::object
         {
             auto return_logic = l.start_logic(idx);
             // TODO: cast to proper logic type
             return sol::make_object(lua, return_logic);
         },
+        [&lua](LogicList& l, Logic* logic) -> sol::object
+        {
+            auto return_logic = l.start_logic(logic->logic_index);
+            // TODO: cast to proper logic type
+            return sol::make_object(lua, return_logic);
+        });
+
+    /// Used in StateMemory
+    lua.new_usertype<LogicList>(
+        "LogicList",
+        "tutorial",
+        &LogicList::tutorial,
+        "ouroboros",
+        &LogicList::ouroboros,
+        "basecamp_speedrun",
+        &LogicList::basecamp_speedrun,
+        "ghost_trigger",
+        &LogicList::ghost_trigger,
+        "ghost_toast_trigger",
+        &LogicList::ghost_toast_trigger,
+        "tun_aggro",
+        &LogicList::tun_aggro,
+        "diceshop",
+        &LogicList::diceshop,
+        "tun_pre_challenge",
+        &LogicList::tun_pre_challenge,
+        "tun_moon_challenge",
+        &LogicList::tun_moon_challenge,
+        "tun_star_challenge",
+        &LogicList::tun_star_challenge,
+        "tun_sun_challenge",
+        &LogicList::tun_sun_challenge,
+        "magmaman_spawn",
+        &LogicList::magmaman_spawn,
+        "water_bubbles",
+        &LogicList::water_bubbles,
+        "olmec_cutscene",
+        &LogicList::olmec_cutscene,
+        "tiamat_cutscene",
+        &LogicList::tiamat_cutscene,
+        "apep_spawner",
+        &LogicList::apep_spawner,
+        "city_of_gold_ankh_sacrifice",
+        &LogicList::city_of_gold_ankh_sacrifice,
+        "duat_bosses_spawner",
+        &LogicList::duat_bosses_spawner,
+        "bubbler",
+        &LogicList::bubbler,
+        "tusk_pleasure_palace",
+        &LogicList::tusk_pleasure_palace,
+        "discovery_info",
+        &LogicList::discovery_info,
+        "black_market",
+        &LogicList::black_market,
+        "jellyfish_trigger",
+        &LogicList::jellyfish_trigger,
+        "arena_1",
+        &LogicList::arena_1,
+        "arena_2",
+        &LogicList::arena_2,
+        "arena_3",
+        &LogicList::arena_3,
+        "arena_alien_blast",
+        &LogicList::arena_alien_blast,
+        "arena_loose_bombs",
+        &LogicList::arena_loose_bombs,
+        "start_logic",
+        start_logic,
         "stop_logic",
         &LogicList::stop_logic);
     /// Used in LogicList
     lua.new_usertype<Logic>(
         "Logic",
         "logic_index",
-        &Logic::logic_index);
+        sol::readonly(&Logic::logic_index));
     /// Used in LogicList
     lua.new_usertype<LogicOlmecCutscene>(
         "LogicOlmecCutscene",
