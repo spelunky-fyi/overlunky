@@ -554,6 +554,17 @@ class LogicMagmamanSpawn : public Logic
 {
   public:
     custom_vector<MagmamanSpawnPosition> magmaman_positions;
+
+    void add_spawn(uint32_t x, uint32_t y);
+    void add_spawn(MagmamanSpawnPosition ms)
+    {
+        add_spawn(ms.x, ms.y);
+    };
+    void remove_spawn(uint32_t x, uint32_t y);
+    void remove_spawn(MagmamanSpawnPosition ms)
+    {
+        remove_spawn(ms.x, ms.y);
+    };
 };
 
 class LogicOlmecCutscene : public Logic

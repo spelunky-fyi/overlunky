@@ -729,8 +729,8 @@ uint8_t enum_to_layer(const LAYER layer)
 
 Logic* LogicList::start_logic(LOGIC idx)
 {
-    if ((int)idx > 27 || logic_indexed[(uint32_t)idx] != nullptr)
-        return;
+    if ((uint32_t)idx > 27 || logic_indexed[(uint32_t)idx] != nullptr)
+        return nullptr;
 
     int size = 0;
     VTABLE_OFFSET offset = VTABLE_OFFSET::NONE;
@@ -902,7 +902,7 @@ Logic* LogicList::start_logic(LOGIC idx)
         // offset = VTABLE_OFFSET::LOGIC_ARENA_2;
         // size = ?;
     default:
-        return;
+        return nullptr;
     }
     static auto first_table_entry = get_address("virtual_functions_table");
     VTABLE_OFFSET::LOGIC_APEP_TRIGGER;
@@ -910,9 +910,10 @@ Logic* LogicList::start_logic(LOGIC idx)
     auto addr = (size_t*)custom_malloc(size);
     std::memset(addr, 0, size); // just in case
 
-    *addr = first_table_entry + (size_t)offset; // set up vtable
+    *addr = first_table_entry + (size_t)offset * 8; // set up vtable
     Logic* new_logic = (Logic*)addr;
     new_logic->logic_index = idx;
+
     logic_indexed[(uint32_t)idx] = new_logic;
     return new_logic;
 }
@@ -924,4 +925,20 @@ void LogicList::stop_logic(LOGIC idx)
 
     delete logic_indexed[(uint32_t)idx];
     logic_indexed[(uint32_t)idx] = nullptr;
+}
+
+void LogicMagmamanSpawn::add_spawn(uint32_t x, uint32_t y)
+{
+    magmaman_positions.emplace_back(x, y);
+}
+
+void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
+{
+    for (auto it = magmaman_positions.begin(); it < magmaman_positions.end(); ++it)
+    {
+        if (it->x == x && it->y == y)
+        {
+            magmaman_positions.erase(it);
+        }
+    }
 }

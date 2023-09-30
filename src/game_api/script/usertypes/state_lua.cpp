@@ -497,6 +497,7 @@ void register_usertypes(sol::state& lua)
                       }),
         "get_code",
         &OnlineLobby::get_code);
+
     /// Used in StateMemory
     lua.new_usertype<LogicList>(
         "LogicList",
@@ -507,7 +508,16 @@ void register_usertypes(sol::state& lua)
         "magmaman_spawn",
         &LogicList::magmaman_spawn,
         "diceshop",
-        &LogicList::diceshop);
+        &LogicList::diceshop,
+        "start_logic",
+        [&lua](LogicList& l, LOGIC idx) -> sol::object // -> Logic
+        {
+            auto return_logic = l.start_logic(idx);
+            // TODO: cast to proper logic type
+            return sol::make_object(lua, return_logic);
+        },
+        "stop_logic",
+        &LogicList::stop_logic);
     /// Used in LogicList
     lua.new_usertype<Logic>(
         "Logic",
@@ -549,10 +559,21 @@ void register_usertypes(sol::state& lua)
         &MagmamanSpawnPosition::y,
         "timer",
         &MagmamanSpawnPosition::timer);
+    auto add_spawn = sol::overload(
+        static_cast<void (LogicMagmamanSpawn::*)(uint32_t, uint32_t)>(&LogicMagmamanSpawn::add_spawn),
+        static_cast<void (LogicMagmamanSpawn::*)(MagmamanSpawnPosition)>(&LogicMagmamanSpawn::add_spawn));
+    auto remove_spawn = sol::overload(
+        static_cast<void (LogicMagmamanSpawn::*)(uint32_t, uint32_t)>(&LogicMagmamanSpawn::remove_spawn),
+        static_cast<void (LogicMagmamanSpawn::*)(MagmamanSpawnPosition)>(&LogicMagmamanSpawn::remove_spawn));
+
     lua.new_usertype<LogicMagmamanSpawn>(
         "LogicVolcana",
         "magmaman_positions",
         &LogicMagmamanSpawn::magmaman_positions,
+        "add_spawn",
+        add_spawn,
+        "remove_spawn",
+        remove_spawn,
         sol::base_classes,
         sol::bases<Logic>());
 
