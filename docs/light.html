@@ -1670,6 +1670,9 @@
                             <a href="#Letter" class="toc-h3 toc-link" data-title="Letter">Letter</a>
                           </li>
                           <li>
+                            <a href="#MagmamanSpawnPosition" class="toc-h3 toc-link" data-title="MagmamanSpawnPosition">MagmamanSpawnPosition</a>
+                          </li>
+                          <li>
                             <a href="#MovableBehavior" class="toc-h3 toc-link" data-title="MovableBehavior">MovableBehavior</a>
                           </li>
                           <li>
@@ -1824,6 +1827,9 @@
                           </li>
                           <li>
                             <a href="#LogicTiamatCutscene" class="toc-h3 toc-link" data-title="LogicTiamatCutscene">LogicTiamatCutscene</a>
+                          </li>
+                          <li>
+                            <a href="#LogicVolcana" class="toc-h3 toc-link" data-title="LogicVolcana">LogicVolcana</a>
                           </li>
                       </ul>
                   </li>
@@ -8796,6 +8802,37 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>Get&#39;s approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values</td>
 </tr>
 </tbody></table>
+<h3 id='MagmamanSpawnPosition'>MagmamanSpawnPosition</h3>
+<p>Used in <a href="#LogicList">LogicList</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#MagmamanSpawnPosition">MagmamanSpawnPosition</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MagmamanSpawnPosition">new(int x_, int y_)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td></td>
+</tr>
+</tbody></table>
 <h3 id='MovableBehavior'>MovableBehavior</h3>
 <p>Opaque handle to a movable behavior used in some <a href="#Movable">Movable</a> functions</p>
 
@@ -10632,6 +10669,11 @@ Derived from <a href="#Logic">Logic</a></p>
 <td></td>
 </tr>
 <tr>
+<td>LogicMagmamanSpawn</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=magmaman_spawn">magmaman_spawn</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#LogicDiceShop">LogicDiceShop</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=diceshop">diceshop</a></td>
 <td></td>
@@ -10698,6 +10740,22 @@ Derived from <a href="#Logic">Logic</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='LogicVolcana'>LogicVolcana</h3>
+<p>Derived from <a href="#Logic">Logic</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>custom_array&lt;<a href="#MagmamanSpawnPosition">MagmamanSpawnPosition</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=magmaman_positions">magmaman_positions</a></td>
 <td></td>
 </tr>
 </tbody></table>

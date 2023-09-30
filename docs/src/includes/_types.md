@@ -707,6 +707,17 @@ Type | Name | Description
 nil | [set_quad(Quad quad)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_quad) | Inverse of the get_quad
 [Vec2](#Vec2) | [center()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center) | Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
 
+### MagmamanSpawnPosition
+
+Used in [LogicList](#LogicList)
+
+Type | Name | Description
+---- | ---- | -----------
+[MagmamanSpawnPosition](#MagmamanSpawnPosition) | [new(int x_, int y_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MagmamanSpawnPosition) | 
+int | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+int | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
 ### MovableBehavior
 
 Opaque handle to a movable behavior used in some [Movable](#Movable) functions
@@ -1315,6 +1326,7 @@ Type | Name | Description
 ---- | ---- | -----------
 [LogicOlmecCutscene](#LogicOlmecCutscene) | [olmec_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec_cutscene) | 
 [LogicTiamatCutscene](#LogicTiamatCutscene) | [tiamat_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat_cutscene) | 
+LogicMagmamanSpawn | [magmaman_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_spawn) | 
 [LogicDiceShop](#LogicDiceShop) | [diceshop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diceshop) | 
 
 ### LogicOlmecCutscene
@@ -1342,6 +1354,15 @@ Type | Name | Description
 [Entity](#Entity) | [player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) | 
 [Entity](#Entity) | [cinematic_anchor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### LogicVolcana
+
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+custom_array&lt;[MagmamanSpawnPosition](#MagmamanSpawnPosition)&gt; | [magmaman_positions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_positions) | 
 
 ## Online types
 

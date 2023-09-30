@@ -540,6 +540,22 @@ class LogicSunChallenge : public Logic
     float unknown11;
 };
 
+class MagmamanSpawnPosition
+{
+  public:
+    uint32_t x;
+    uint32_t y;
+    uint32_t timer;
+
+    MagmamanSpawnPosition(uint32_t x_, uint32_t y_);
+};
+
+class LogicMagmamanSpawn : public Logic
+{
+  public:
+    custom_vector<MagmamanSpawnPosition> magmaman_positions;
+};
+
 class LogicOlmecCutscene : public Logic
 {
   public:
@@ -668,7 +684,7 @@ struct LogicList
             LogicMoonChallenge* tun_moon_challenge;
             LogicStarChallenge* tun_star_challenge;
             LogicSunChallenge* tun_sun_challenge;
-            Logic* volcana_related;
+            LogicMagmamanSpawn* magmaman_spawn;
             /// Only the bubbles that spawn from the floor
             /// Even without it, entities moving in water still spawn bubbles
             LogicUnderwaterBubbles* water_bubbles;

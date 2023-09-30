@@ -2037,6 +2037,7 @@ do
 ---@class LogicList
     ---@field olmec_cutscene LogicOlmecCutscene
     ---@field tiamat_cutscene LogicTiamatCutscene
+    ---@field magmaman_spawn LogicMagmamanSpawn
     ---@field diceshop LogicDiceShop
 
 ---@class Logic
@@ -2053,6 +2054,14 @@ do
     ---@field player Entity
     ---@field cinematic_anchor Entity
     ---@field timer integer
+
+---@class MagmamanSpawnPosition
+    ---@field x integer
+    ---@field y integer
+    ---@field timer integer
+
+---@class LogicVolcana : Logic
+    ---@field magmaman_positions custom_Array<MagmamanSpawnPosition>
 
 ---@class LogicDiceShop : Logic
     ---@field bet_machine integer
@@ -5951,6 +5960,12 @@ function Color:fuchsia() end
 function Color:purple() end
 
 --## Constructors
+
+MagmamanSpawnPosition = nil
+---@param x_ integer
+---@param y_ integer
+---@return MagmamanSpawnPosition
+function MagmamanSpawnPosition:new(x_, y_) end
 ---Create a new color - defaults to black
 ---@return Color
 function Color:new() end
