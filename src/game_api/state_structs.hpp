@@ -389,10 +389,42 @@ struct ArenaState
     bool punish_ball;
 };
 
+enum class LOGIC : uint32_t
+{
+    TUTORIAL = 0,
+    OUROBOROS,
+    SPEEDRUN,
+    GHOST,
+    GHOST_TOAST,
+    TUN_AGGRO,
+    DICESHOP,
+    PRE_CHALLENGE,
+    MOON_CHALLENGE,
+    STAR_CHALLENGE,
+    SUN_CHALLENGE,
+    MAGMAN_SPAWN,
+    WATER_BUBBLES,
+    OLMEC_CUTSCENE,
+    TIAMAT_CUTSCENE,
+    APEP,
+    COG_SACRIFICE,
+    DUAT_BOSSES,
+    BUBBLER,
+    PLEASURE_PALACE,
+    DISCOVERY_INFO,
+    BLACK_MARKET,
+    JELLYFISH,
+    ARENA_1,
+    ARENA_2,
+    ARENA_3,
+    ARENA_ALIEN_BLAST,
+    ARENA_LOOSE_BOMBS,
+};
+
 class Logic
 {
   public:
-    uint32_t logic_index; // array index into state.logic, where this instance resides
+    LOGIC logic_index;
     uint32_t unused_padding;
 
     virtual ~Logic() = 0;
@@ -612,9 +644,11 @@ class LogicTutorial : public Logic
 
 struct LogicList
 {
-    /// Only the very begging of the tutorial, probably just setting things up
-    LogicTutorial* tutorial;                  // OK
-    LogicOuroboros* ouroboros;                // OK
+    /// This only properly constructs the base class
+    /// you probably will need to set the parameters correctly
+    Logic* start_logic(LOGIC idx);
+    void stop_logic(LOGIC idx);
+
     union
     {
         std::array<Logic*, 28> logic_indexed;
@@ -627,7 +661,7 @@ struct LogicList
             LogicBasecampSpeedrun* basecamp_speedrun;
             Logic* ghost_trigger; // virtual does nothing, all the code elsewhere, the only purpose is to mark if ghost should spawn this level or not
             LogicGhostToast* ghost_toast_trigger;
-    /// Spawns tun at the door at 30s mark
+            /// Spawns tun at the door at 30s mark
             Logic* tun_aggro;
             LogicDiceShop* diceshop;
             LogicTunPreChallenge* tun_pre_challenge;
@@ -635,13 +669,13 @@ struct LogicList
             LogicStarChallenge* tun_star_challenge;
             LogicSunChallenge* tun_sun_challenge;
             Logic* volcana_related;
-    /// Only the bubbles that spawn from the floor
-    /// Even without it, entities moving in water still spawn bubbles
+            /// Only the bubbles that spawn from the floor
+            /// Even without it, entities moving in water still spawn bubbles
             LogicUnderwaterBubbles* water_bubbles;
             LogicOlmecCutscene* olmec_cutscene;
             LogicTiamatCutscene* tiamat_cutscene;
             LogicApepTrigger* apep_spawner;
-    /// All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
+            /// All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
             LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
             Logic* duat_bosses_spawner;
             /// Spawn rising bubbles at Tiamat (position hardcoded)
@@ -651,16 +685,16 @@ struct LogicList
             /// black market, vlad, wet fur discovery, logic shows the toast
             Logic* discovery_info;
             /// Changes the camera bounds when you reach black market
-    Logic* black_market;
+            Logic* black_market;
             Logic* jellyfish_trigger; // same as ghost_trigger
             /// Handles create spawns and more, is cleared as soon as the winner is decided (on last player alive)
-    LogicArena1* arena_1;
+            LogicArena1* arena_1;
             Logic* arena_2; // can't trigger
             /// Handles time end death
-    Logic* arena_3;
-    LogicArenaAlienBlast* arena_alien_blast;
-    LogicArenaLooseBombs* arena_loose_bombs;
-};
+            Logic* arena_3;
+            LogicArenaAlienBlast* arena_alien_blast;
+            LogicArenaLooseBombs* arena_loose_bombs;
+        };
     };
 };
 
