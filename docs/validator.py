@@ -20,7 +20,7 @@ replace_table = {
     "unordered_map<": "map<",
     "game_map<": "map<",
     "custom_map<": "map<",
-    #", identity_hasher<>": "",
+    ", identity_hasher<>": "",
     "const char*": "string",
     "wstring": "string",
     "u16string": "string",
