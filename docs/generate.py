@@ -20,6 +20,7 @@ replace_table = {
     "int32_t": "int",
     "int64_t": "int",
     "ImU32": "int",
+    "in_port_t": "int",
     "vector<": "array<",
     "span<": "array<",
     "unordered_map<": "map<",

@@ -550,7 +550,7 @@ void register_usertypes(sol::state& lua)
         "timer",
         &MagmamanSpawnPosition::timer);
     lua.new_usertype<LogicMagmamanSpawn>(
-        "LogicVolcana",
+        "LogicMagmamanSpawn",
         "magmaman_positions",
         &LogicMagmamanSpawn::magmaman_positions,
         sol::base_classes,

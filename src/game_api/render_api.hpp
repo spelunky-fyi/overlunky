@@ -17,6 +17,7 @@
 
 struct JournalUI;
 struct Layer;
+class Entity;
 
 using VANILLA_TEXT_ALIGNMENT = uint32_t;
 using VANILLA_FONT_STYLE = uint32_t;
@@ -333,7 +334,7 @@ struct RenderInfo
     virtual bool unknown_3() = 0; // init? sets darkness to 1.0 at the start, then does some other stuff
 
     // gets the entity owning this RenderInfo
-    class Entity* get_entity() const;
+    Entity* get_entity() const;
 
     // for supporting HookableVTable
     uint32_t get_aux_id() const;
