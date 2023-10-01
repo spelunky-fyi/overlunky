@@ -356,7 +356,7 @@ Hook the sendto and recvfrom functions and start dumping network data to termina
 
 > Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
 
-#### size_t get_address(string_view address_name)
+#### size_t get_address(string address_name)
 
 Get the address for a pattern name
 
@@ -365,7 +365,7 @@ Get the address for a pattern name
 
 > Search script examples for [get_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rva)
 
-#### size_t get_rva(string_view address_name)
+#### size_t get_rva(string address_name)
 
 Get the rva for a pattern name
 
@@ -1991,7 +1991,7 @@ Show a message that looks like a level feeling.
 
 > Search script examples for [make_custom_behavior](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=make_custom_behavior)
 
-#### [CustomMovableBehavior](#CustomMovableBehavior) make_custom_behavior(string_view behavior_name, int state_id, [VanillaMovableBehavior](#VanillaMovableBehavior) base_behavior)
+#### [CustomMovableBehavior](#CustomMovableBehavior) make_custom_behavior(string behavior_name, int state_id, [VanillaMovableBehavior](#VanillaMovableBehavior) base_behavior)
 
 Make a `CustomMovableBehavior`, if `base_behavior` is `nil` you will have to set all of the
 behavior functions. If a behavior with `behavior_name` already exists for your script it will
@@ -2005,7 +2005,7 @@ be returned instead.
 
 > Search script examples for [udp_listen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
 
-#### UdpServer udp_listen(string host, in_port_t port, function cb)
+#### UdpServer udp_listen(string host, int port, function cb)
 
 Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 The server will be closed once the handle is released.
@@ -2015,7 +2015,7 @@ The server will be closed once the handle is released.
 
 > Search script examples for [udp_send](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_send)
 
-#### nil udp_send(string host, in_port_t port, string msg)
+#### nil udp_send(string host, int port, string msg)
 
 Send data to specified UDP address. Requires unsafe mode.
 
@@ -2476,7 +2476,7 @@ Get the room template given a certain index, returns `nil` if coordinates are ou
 
 > Search script examples for [get_room_template_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 
-#### string_view get_room_template_name(int room_template)
+#### string get_room_template_name(int room_template)
 
 For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
 

@@ -1625,13 +1625,13 @@ function show_journal(chapter, page) end
 ---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 ---The server will be closed once the handle is released.
 ---@param host string
----@param port in_port_t
+---@param port integer
 ---@param cb function
 ---@return UdpServer
 function udp_listen(host, port, cb) end
 ---Send data to specified UDP address. Requires unsafe mode.
 ---@param host string
----@param port in_port_t
+---@param port integer
 ---@param msg string
 ---@return nil
 function udp_send(host, port, msg) end
@@ -2060,7 +2060,7 @@ do
     ---@field y integer
     ---@field timer integer
 
----@class LogicVolcana : Logic
+---@class LogicMagmamanSpawn : Logic
     ---@field magmaman_positions custom_Array<MagmamanSpawnPosition>
 
 ---@class LogicDiceShop : Logic
@@ -2235,7 +2235,7 @@ function PRNG:random(min, max) end
     ---@field facing_left boolean
     ---@field render_inactive boolean
     ---@field texture_num integer
-    ---@field get_entity fun(self): class Entity
+    ---@field get_entity fun(self): Entity
     ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
     ---@field get_second_texture TEXTURE?
     ---@field get_third_texture TEXTURE?
@@ -5085,12 +5085,13 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field width number
     ---@field height number
     ---@field special_texture_id integer @Used to draw buttons and stuff, default is -1 wich uses the buttons texture
-    ---@field font Texture
     ---@field get_dest fun(self): Letter[] @Returns refrence to the letter coordinates relative to the x,y position
     ---@field get_source fun(self): Letter[] @Returns refrence to the letter coordinates in the texture
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: VANILLA_TEXT_ALIGNMENT, fontstyle: VANILLA_FONT_STYLE): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
+    ---@field get_font fun(self): TEXTURE
+    ---@field set_font fun(self, id: TEXTURE): nil
 
 ---@class HudInventory
     ---@field enabled boolean
@@ -5287,6 +5288,10 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field particle_torchflame_ash ParticleEmitterInfo
     ---@field music SoundMeta
     ---@field torch_sound SoundMeta
+
+---@class SpearDanglerAnimFrames
+    ---@field column integer
+    ---@field row integer
 
 ---@class ScreenMenu : Screen
     ---@field tunnel_background TextureRenderingInfo
@@ -5551,6 +5556,10 @@ function Quad:is_point_inside(x, y, epsilon) end
 ---@class ScreenOnlineLoading : Screen
     ---@field ouroboros TextureRenderingInfo
     ---@field ouroboros_angle number
+
+---@class OnlineLobbyScreenPlayer
+    ---@field character integer @0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
+    ---@field ready boolean
 
 ---@class ScreenOnlineLobby : Screen
     ---@field woodpanels_slidein_timer number

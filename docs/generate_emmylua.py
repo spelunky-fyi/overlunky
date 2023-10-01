@@ -14,6 +14,7 @@ replace_table = {
     "int32_t": "integer",
     "int64_t": "integer",
     "size_t": "integer",
+    "in_port_t": "integer",
     "ImU32": "integer",
     "vector": "Array",
     "array": "Array",

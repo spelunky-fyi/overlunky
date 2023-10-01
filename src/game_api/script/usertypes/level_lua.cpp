@@ -65,7 +65,7 @@ bool PostRoomGenerationContext::unmark_as_set_room(uint32_t x, uint32_t y, LAYER
 bool PostRoomGenerationContext::set_shop_type(uint32_t x, uint32_t y, LAYER layer, int32_t shop_type)
 {
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    return State::get().ptr_local()->level_gen->set_shop_type(x, y, real_layer, static_cast<ShopType>(shop_type));
+    return State::get().ptr_local()->level_gen->set_shop_type(x, y, real_layer, static_cast<SHOP_TYPE>(shop_type));
 }
 
 bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance)

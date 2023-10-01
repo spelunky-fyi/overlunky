@@ -790,8 +790,6 @@ void register_usertypes(sol::state& lua)
         &TextRenderingInfo::height,
         "special_texture_id",
         &TextRenderingInfo::special_texture_id,
-        "font",
-        &TextRenderingInfo::font,
         "get_dest",
         &TextRenderingInfo::get_dest,
         "get_source",
@@ -801,7 +799,11 @@ void register_usertypes(sol::state& lua)
         "rotate",
         &TextRenderingInfo::rotate,
         "set_text",
-        &TextRenderingInfo::set_textx);
+        &TextRenderingInfo::set_textx,
+        "get_font",
+        &TextRenderingInfo::get_font,
+        "set_font",
+        &TextRenderingInfo::set_font);
     /* TextRenderingInfo
     // new
     // TextRenderingInfo:new(string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)

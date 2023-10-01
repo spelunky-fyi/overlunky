@@ -144,6 +144,17 @@ struct TextRenderingInfo
     {
         return text_length;
     }
+    TEXTURE get_font() const
+    {
+        if (font)
+            return font->id;
+        else
+            return 0;
+    }
+    void set_font(TEXTURE id)
+    {
+        font = get_texture(id);
+    }
     /// Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     void rotate(float angle, std::optional<float> px, std::optional<float> py);
 

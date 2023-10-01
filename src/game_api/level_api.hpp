@@ -394,7 +394,7 @@ class SpecialLevelGeneration
     virtual void procedual_spawns() = 0;
 };
 
-enum class ShopType : uint8_t
+enum class SHOP_TYPE : uint8_t
 {
     General,
     Clothing,
@@ -500,11 +500,11 @@ struct LevelGenSystem
     uint8_t flags3;
     union
     {
-        ShopType shop_types[2];
+        SHOP_TYPE shop_types[2];
         struct
         {
-            ShopType shop_type;
-            ShopType backlayer_shop_type;
+            SHOP_TYPE shop_type;
+            SHOP_TYPE backlayer_shop_type;
         };
     };
     uint8_t frontlayer_shop_music;
@@ -528,7 +528,7 @@ struct LevelGenSystem
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t l);
     bool mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is_set_room);
 
-    bool set_shop_type(uint32_t x, uint32_t y, uint8_t l, ShopType shop_type);
+    bool set_shop_type(uint32_t x, uint32_t y, uint8_t l, SHOP_TYPE shop_type);
 
     std::string_view get_room_template_name(uint16_t room_template);
 

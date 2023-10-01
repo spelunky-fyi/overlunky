@@ -804,7 +804,7 @@ float | [tileh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tileh) 
 bool | [facing_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=facing_left) | 
 bool | [render_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_inactive) | 
 int | [texture_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_num) | 
-class [Entity](#Entity) | [get_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity) | 
+[Entity](#Entity) | [get_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity) | 
 bool | [set_normal_map_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_normal_map_texture) | Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
 optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_second_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_second_texture) | 
 optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_third_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_third_texture) | 
@@ -835,7 +835,7 @@ Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
-custom_map&lt;int, [ItemOwnerDetails](#ItemOwnerDetails)&gt; | [owned_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_items) | key/index is the uid of an item
+map&lt;int, [ItemOwnerDetails](#ItemOwnerDetails)&gt; | [owned_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_items) | key/index is the uid of an item
 array&lt;[RoomOwnerDetails](#RoomOwnerDetails)&gt; | [owned_rooms](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_rooms) | 
 
 ### ShortTileCodeDef
@@ -847,6 +847,14 @@ Type | Name | Description
 [TILE_CODE](#TILE_CODE) | [tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tile_code) | Tile code that is used by default when this short tile code is encountered. Defaults to 0.
 int | [chance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chance) | Chance in percent to pick `tile_code` over `alt_tile_code`, ignored if `chance == 0`. Defaults to 100.
 [TILE_CODE](#TILE_CODE) | [alt_tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=alt_tile_code) | Alternative tile code, ignored if `chance == 100`. Defaults to 0.
+
+### SpearDanglerAnimFrames
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [column](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=column) | 
+int | [row](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=row) | 
 
 ### Triangle
 
@@ -1189,15 +1197,15 @@ Data relating to level generation, changing anything in here from [ON](#ON).LEVE
 
 Type | Name | Description
 ---- | ---- | -----------
-ShopType | [shop_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) | 
-ShopType | [backlayer_shop_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer_shop_type) | 
+[SHOP_TYPE](#SHOP_TYPE) | [shop_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_type) | 
+[SHOP_TYPE](#SHOP_TYPE) | [backlayer_shop_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer_shop_type) | 
 int | [shop_music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shop_music) | 
 int | [backlayer_shop_music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=backlayer_shop_music) | 
 float | [spawn_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_x) | 
 float | [spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) | 
 int | [spawn_room_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) | 
 int | [spawn_room_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) | 
-custom_array&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_doors) | 
+array&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_doors) | 
 [ThemeInfo](#ThemeInfo) | [themes[18]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) | 
 
 ## Lighting types
@@ -1326,8 +1334,17 @@ Type | Name | Description
 ---- | ---- | -----------
 [LogicOlmecCutscene](#LogicOlmecCutscene) | [olmec_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec_cutscene) | 
 [LogicTiamatCutscene](#LogicTiamatCutscene) | [tiamat_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat_cutscene) | 
-LogicMagmamanSpawn | [magmaman_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_spawn) | 
+[LogicMagmamanSpawn](#LogicMagmamanSpawn) | [magmaman_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_spawn) | 
 [LogicDiceShop](#LogicDiceShop) | [diceshop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diceshop) | 
+
+### LogicMagmamanSpawn
+
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+array&lt;[MagmamanSpawnPosition](#MagmamanSpawnPosition)&gt; | [magmaman_positions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_positions) | 
 
 ### LogicOlmecCutscene
 
@@ -1354,15 +1371,6 @@ Type | Name | Description
 [Entity](#Entity) | [player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) | 
 [Entity](#Entity) | [cinematic_anchor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
-
-### LogicVolcana
-
-Derived from [Logic](#Logic)
-
-
-Type | Name | Description
----- | ---- | -----------
-custom_array&lt;[MagmamanSpawnPosition](#MagmamanSpawnPosition)&gt; | [magmaman_positions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_positions) | 
 
 ## Online types
 
@@ -1610,7 +1618,15 @@ int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [page_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) | 
 int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | 
 int | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
-custom_array&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+array&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+
+### OnlineLobbyScreenPlayer
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) | 0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in [ENT_TYPE](#ENT_TYPE)
+bool | [ready](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready) | 
 
 ### PauseUI
 
@@ -2059,7 +2075,7 @@ int | [selected_menu_index](https://github.com/spelunky-fyi/overlunky/search?l=L
 float | [menu_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_text_opacity) | 
 float | [menu_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_text_opacity) | 
 array&lt;float, 6&gt; | [spear_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_position) | 
-array&lt;SpearDanglerAnimFrames, 6&gt; | [spear_dangler](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangler) | 
+array&lt;[SpearDanglerAnimFrames](#SpearDanglerAnimFrames), 6&gt; | [spear_dangler](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangler) | 
 float | [play_scroll_descend_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_scroll_descend_timer) | 
 [STRINGID](#Aliases) | [scroll_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text) | 
 
@@ -2093,7 +2109,7 @@ float | [scroll_unfurl_timer](https://github.com/spelunky-fyi/overlunky/search?l
 bool | [woodpanel_top_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top_visible) | 
 bool | [woodpanel_bottom_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_bottom_visible) | 
 bool | [toggle_panels_slidein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_panels_slidein) | 
-array&lt;OnlineLobbyScreenPlayer, 4&gt; | [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) | 
+array&lt;[OnlineLobbyScreenPlayer](#OnlineLobbyScreenPlayer), 4&gt; | [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [background_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background_image) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [topleft_woodpanel_esc](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc) | 
 float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc_slidein_timer) | 
@@ -2400,7 +2416,7 @@ bool | [set_pitch(float pitch)](https://github.com/spelunky-fyi/overlunky/search
 bool | [set_pan(float pan)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pan) | 
 bool | [set_volume(float volume)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_volume) | 
 bool | [set_looping(SOUND_LOOP_MODE loop_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_looping) | 
-bool | [set_callback(SoundCallbackFunction callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback) | 
+bool | [set_callback(function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback) | 
 map&lt;[VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM), string&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
 optional&lt;float&gt; | [get_parameter(VANILLA_SOUND_PARAM parameter_index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter) | 
 bool | [set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter) | 
@@ -2696,12 +2712,13 @@ int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tex
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
 int | [special_texture_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_texture_id) | Used to draw buttons and stuff, default is -1 wich uses the buttons texture
-Texture | [font](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=font) | 
 array&lt;[Letter](#Letter)&gt; | [get_dest()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dest) | Returns refrence to the letter coordinates relative to the x,y position
 array&lt;[Letter](#Letter)&gt; | [get_source()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_source) | Returns refrence to the letter coordinates in the texture
 tuple&lt;float, float&gt; | [text_size()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_size) | {width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
 nil | [rotate(float angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
 nil | [set_text(const string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_text) | Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
+[TEXTURE](#TEXTURE) | [get_font()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_font) | 
+nil | [set_font(TEXTURE id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_font) | 
 
 ### TextureDefinition
 

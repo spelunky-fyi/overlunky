@@ -14,10 +14,12 @@ replace_table = {
     "int64_t": "int",
     "ImU32": "int",
     "in_port_t": "int",
+    "custom_vector<": "array<",
     "vector<": "array<",
     "span<": "array<",
     "unordered_map<": "map<",
     "game_map<": "map<",
+    "custom_map<": "map<",
     ", identity_hasher<>": "",
     "const char*": "string",
     "wstring": "string",
@@ -33,6 +35,7 @@ replace_table = {
     "variadic_args va": "int, int...",
     "EmittedParticlesInfo": "array<Particle>",
     "ImVec2": "Vec2",
+    "SoundCallbackFunction": "function",
 }
 
 def replace_all(text):
