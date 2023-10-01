@@ -28,6 +28,7 @@ replace_table = {
     "const char*": "string",
     "wstring": "string",
     "u16string": "string",
+    "string_view": "string",
     "char16_t": "string",
     "pair<": "tuple<",
     "std::": "",
