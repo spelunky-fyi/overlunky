@@ -1017,7 +1017,7 @@ Helper function to set the title and description strings for a [FEAT](#Aliases) 
 
 > Search script examples for [get_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_feat)
 
-#### tuple&lt;bool, bool, const string, const string&gt; get_feat([FEAT](#Aliases) feat)
+#### tuple&lt;bool, bool, string, string&gt; get_feat([FEAT](#Aliases) feat)
 
 Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
 
@@ -1402,7 +1402,7 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 
 > Search script examples for [intersection](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=intersection)
 
-#### [Vec2](#Vec2) intersection(const [Vec2](#Vec2) A, const [Vec2](#Vec2) B, const [Vec2](#Vec2) C, const [Vec2](#Vec2) D)
+#### [Vec2](#Vec2) intersection([Vec2](#Vec2) A, [Vec2](#Vec2) B, [Vec2](#Vec2) C, [Vec2](#Vec2) D)
 
 Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don't intersect each other [parallel]
 
@@ -2058,7 +2058,7 @@ Add a button that the user can click in the UI. Sets the timestamp of last click
 
 > Search script examples for [register_option_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_callback)
 
-#### nil register_option_callback(string name, object value, function on_render)
+#### nil register_option_callback(string name, any value, function on_render)
 
 Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name.
 `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
@@ -3058,7 +3058,7 @@ Same as `Player.get_short_name`
 
 > Search script examples for [get_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_string)
 
-#### const string get_string([STRINGID](#Aliases) string_id)
+#### string get_string([STRINGID](#Aliases) string_id)
 
 Get string behind [STRINGID](#Aliases), don't use stringid diretcly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
 Will return the string of currently choosen language

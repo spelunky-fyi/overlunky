@@ -20,7 +20,7 @@ replace_table = {
     "unordered_map<": "map<",
     "game_map<": "map<",
     "custom_map<": "map<",
-    ", identity_hasher<>": "",
+    #", identity_hasher<>": "",
     "const char*": "string",
     "wstring": "string",
     "u16string": "string",
@@ -31,11 +31,13 @@ replace_table = {
     "sol::": "",
     "void": "",
     "constexpr": "",
+    "const": "",
     "static": "",
     "variadic_args va": "int, int...",
     "EmittedParticlesInfo": "array<Particle>",
     "ImVec2": "Vec2",
     "SoundCallbackFunction": "function",
+    "object": "any",
 }
 
 def replace_all(text):
@@ -66,6 +68,8 @@ known_types = [
     "tuple",
     "variadic_args",
     "MAX_PLAYERS",
+    "any",
+    "IMAGE",
 ]
 
 unknown_types = []

@@ -27,8 +27,8 @@ replace_table = {
     "unordered_map<": "map<",
     "game_map<": "map<",
     "custom_map<": "map<",
-    ", identity_hasher<>": "",
-    "const char*": "string",
+    #", identity_hasher<>": "",
+    "char*": "string",
     "wstring": "string",
     "u16string": "string",
     "string_view": "string",
@@ -38,11 +38,13 @@ replace_table = {
     "sol::": "",
     "void": "",
     "constexpr": "",
+    "const ": "",
     "static": "",
     "variadic_args va": "int, int...",
     "EmittedParticlesInfo": "array<Particle>",
     "ImVec2": "Vec2",
     "SoundCallbackFunction": "function",
+    "object ": "any ",
 }
 
 
