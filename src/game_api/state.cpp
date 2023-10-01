@@ -905,7 +905,6 @@ Logic* LogicList::start_logic(LOGIC idx)
         return nullptr;
     }
     static auto first_table_entry = get_address("virtual_functions_table");
-    VTABLE_OFFSET::LOGIC_APEP_TRIGGER;
 
     auto addr = (size_t*)custom_malloc(size);
     std::memset(addr, 0, size); // just in case
