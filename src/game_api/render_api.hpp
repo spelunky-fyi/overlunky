@@ -160,7 +160,7 @@ struct TextRenderingInfo
 
     float x;
     float y;
-    /// You can also just use `#` operator on the whole object to get the text lenght
+    /// You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
     uint32_t text_length;
     float width;
     float height;

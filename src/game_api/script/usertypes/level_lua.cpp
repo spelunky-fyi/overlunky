@@ -1326,7 +1326,7 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("DYNAMIC_TEXTURE", "INVISIBLE", DYNAMIC_TEXTURE::INVISIBLE, "BACKGROUND", DYNAMIC_TEXTURE::BACKGROUND, "FLOOR", DYNAMIC_TEXTURE::FLOOR, "DOOR", DYNAMIC_TEXTURE::DOOR, "DOOR_LAYER", DYNAMIC_TEXTURE::DOOR_LAYER, "BACKGROUND_DECORATION", DYNAMIC_TEXTURE::BACKGROUND_DECORATION, "KALI_STATUE", DYNAMIC_TEXTURE::KALI_STATUE, "COFFIN", DYNAMIC_TEXTURE::COFFIN);
 
     /// Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
-    // lua["force_custom_theme"] = [](* customtheme)
+    // lua["force_custom_theme"] = [](mixed* customtheme)
     lua["force_custom_theme"] = sol::overload(
         [](CustomTheme* customtheme)
         {
@@ -1343,7 +1343,7 @@ void register_usertypes(sol::state& lua)
         });
 
     /// Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.
-    // lua["force_custom_subtheme"] = [](* customtheme)
+    // lua["force_custom_subtheme"] = [](mixed* customtheme)
     lua["force_custom_subtheme"] = sol::overload(
         [](CustomTheme* customtheme)
         {

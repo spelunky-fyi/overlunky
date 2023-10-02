@@ -1440,13 +1440,13 @@ function grow_chainandblocks(x, y) end
 ---@return nil
 function load_screen() end
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
----@param e customthem
+---@param customtheme mixed
 ---@return nil
-function force_custom_theme(e) end
+function force_custom_theme(customtheme) end
 ---Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.
----@param e customthem
+---@param customtheme mixed
 ---@return nil
-function force_custom_subtheme(e) end
+function force_custom_subtheme(customtheme) end
 ---Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
 ---@param path string
 ---@return CustomSound?
@@ -5081,7 +5081,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field new any @sol::initializers(&TextRenderingInfo_ctor
     ---@field x number
     ---@field y number
-    ---@field text_length integer @You can also just use `#` operator on the whole any to get the text lenght
+    ---@field text_length integer @You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
     ---@field width number
     ---@field height number
     ---@field special_texture_id integer @Used to draw buttons and stuff, default is -1 wich uses the buttons texture

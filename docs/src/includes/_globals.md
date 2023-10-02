@@ -3201,7 +3201,7 @@ Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(
 
 > Search script examples for [force_custom_subtheme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_subtheme)
 
-#### nil force_custom_subtheme(customtheme)
+#### nil force_custom_subtheme(mixed customtheme)
 
 Force current subtheme used in the CO theme. You can pass a [CustomTheme](#CustomTheme), [ThemeInfo](#ThemeInfo) or [THEME](#THEME). Not to be confused with force_co_subtheme.
 
@@ -3210,7 +3210,7 @@ Force current subtheme used in the CO theme. You can pass a [CustomTheme](#Custo
 
 > Search script examples for [force_custom_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_theme)
 
-#### nil force_custom_theme(customtheme)
+#### nil force_custom_theme(mixed customtheme)
 
 Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a [CustomTheme](#CustomTheme), [ThemeInfo](#ThemeInfo) or [THEME](#THEME).
 

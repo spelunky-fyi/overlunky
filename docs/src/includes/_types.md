@@ -418,8 +418,8 @@ Stores static common data for an [ENT_TYPE](#ENT_TYPE). You can also clone entit
 
 Type | Name | Description
 ---- | ---- | -----------
-[EntityDB](#EntityDB) | [new(EntityDB other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
-[EntityDB](#EntityDB) | [new(ENT_TYPE)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
+[EntityDB](#EntityDB) | [new(EntityDB& other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
+[EntityDB](#EntityDB) | [new(ENT_TYPE other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
 [ENT_TYPE](#ENT_TYPE) | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
 int | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) | [MASK](#MASK)
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
@@ -523,8 +523,8 @@ Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the s
 Type | Name | Description
 ---- | ---- | -----------
 [AABB](#AABB) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | Create a new axis aligned bounding box - defaults to all zeroes
-[AABB](#AABB) | [new(AABB)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | Copy an axis aligned bounding box
-[AABB](#AABB) | [new(Vec2 top_left, Vec2 bottom_right)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | 
+[AABB](#AABB) | [new(AABB& aabb&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | Copy an axis aligned bounding box
+[AABB](#AABB) | [new(Vec2& top_left, Vec2& bottom_right)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | 
 [AABB](#AABB) | [new(float left_, float top_, float right_, float bottom_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | Create a new axis aligned bounding box by specifying its values
 float | [left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) | 
 float | [bottom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom) | 
@@ -583,7 +583,7 @@ prinspect(string.format("%x"), color:get_ucolor()) -- 800000ff
 Type | Name | Description
 ---- | ---- | -----------
 [Color](#Color) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | Create a new color - defaults to black
-[Color](#Color) | [new(Color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | 
+[Color](#Color) | [new(Color& color&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | 
 [Color](#Color) | [new(float r_, float g_, float b_, float a_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | Create a new color by specifying its values
 float | [r](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) | 
 float | [g](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) | 
@@ -753,10 +753,10 @@ nil | [set_pair(PRNG_CLASS type, int first, int second)](https://github.com/spel
 Type | Name | Description
 ---- | ---- | -----------
 [Quad](#Quad) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
-[Quad](#Quad) | [new(Quad)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
-[Quad](#Quad) | [new(Vec2 bottom_left_, Vec2 bottom_right_, Vec2 top_right_, Vec2 top_left_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
+[Quad](#Quad) | [new(Quad& quad&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
+[Quad](#Quad) | [new(Vec2& bottom_left_, Vec2& bottom_right_, Vec2& top_right_, Vec2& top_left_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
-[Quad](#Quad) | [new(AABB aabb)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
+[Quad](#Quad) | [new(AABB& aabb)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 float | [bottom_left_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_left_x) | 
 float | [bottom_left_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_left_y) | 
 float | [bottom_right_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_right_x) | 
@@ -862,8 +862,8 @@ int | [row](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=row) |
 Type | Name | Description
 ---- | ---- | -----------
 [Triangle](#Triangle) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
-[Triangle](#Triangle) | [new(Triangle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
-[Triangle](#Triangle) | [new(Vec2 _a, Vec2 _b, Vec2 _c)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
+[Triangle](#Triangle) | [new(Triangle& triangle&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
+[Triangle](#Triangle) | [new(Vec2& _a, Vec2& _b, Vec2& _c)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
 [Triangle](#Triangle) | [new(float ax, float ay, float bx, float by, float cx, float cy)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
 [Vec2](#Vec2) | [A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=A) | 
 [Vec2](#Vec2) | [B](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=B) | 
@@ -886,7 +886,7 @@ Simple object to hold pair of coordinates
 Type | Name | Description
 ---- | ---- | -----------
 [Vec2](#Vec2) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Vec2) | 
-[Vec2](#Vec2) | [new(Vec2)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Vec2) | 
+[Vec2](#Vec2) | [new(Vec2& vec2&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Vec2) | 
 [Vec2](#Vec2) | [new(float x_, float y_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Vec2) | 
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
@@ -2708,7 +2708,7 @@ Type | Name | Description
  | [new](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=new) | [TextRenderingInfo](#TextRenderingInfo):new(string text, float scale_x, float scale_y, [VANILLA_TEXT_ALIGNMENT](#VANILLA_TEXT_ALIGNMENT) alignment, [VANILLA_FONT_STYLE](#VANILLA_FONT_STYLE) fontstyle)<br/>[TextRenderingInfo](#TextRenderingInfo):new(string text, float x, float y, float scale_x, float scale_y, [VANILLA_TEXT_ALIGNMENT](#VANILLA_TEXT_ALIGNMENT) alignment, [VANILLA_FONT_STYLE](#VANILLA_FONT_STYLE) fontstyle)<br/>Creates new [TextRenderingInfo](#TextRenderingInfo) that can be used in [VanillaRenderContext](#VanillaRenderContext) draw_text<br/>For static text, it is better to use one object and call draw_text with it, instead of relaying on draw_text creating this object for you<br/> 
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
-int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) | You can also just use `#` operator on the whole object to get the text lenght
+int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) | You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
 int | [special_texture_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_texture_id) | Used to draw buttons and stuff, default is -1 wich uses the buttons texture
