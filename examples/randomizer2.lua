@@ -6,7 +6,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' IN MODLUNKY! YO
 I recommend resetting options to defaults after updating to 2.9 for a more balanced experience. Speaking of balance...
 
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.]]
-meta.version = "2.9"
+meta.version = "2.9b"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -1210,9 +1210,9 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_MEGAJELLYFISH)
 
 local function enemy_small_spawn(x, y, l)
     local enemy = pick(enemies_small)
-    if prng:random() < 0.03 or (state.theme == THEME.JUNGLE and prng:random() < 0.08) then
+    --[[if prng:random() < 0.03 or (state.theme == THEME.JUNGLE and prng:random() < 0.08) then
         enemy = pick(enemies_sisters)
-    end
+    end]]
     local uid = spawn_entity_snapped_to_floor(enemy, x, y, l)
     local ent = get_entity(uid)
     if prng:random() < options.enemy_curse_chance/100 then
@@ -1910,7 +1910,6 @@ local pot_items = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_HANG
          ENT_TYPE.MONS_OLMITE_BODYARMORED, ENT_TYPE.MONS_OLMITE_NAKED, ENT_TYPE.MONS_BEE, ENT_TYPE.MONS_AMMIT,
          ENT_TYPE.MONS_FROG, ENT_TYPE.MONS_FIREFROG, ENT_TYPE.MONS_GRUB, ENT_TYPE.MONS_TADPOLE, ENT_TYPE.MONS_JUMPDOG,
          ENT_TYPE.MONS_SCARAB, ENT_TYPE.MONS_SHOPKEEPER, ENT_TYPE.MONS_MERCHANT, ENT_TYPE.MONS_YANG,
-         ENT_TYPE.MONS_SISTER_PARSLEY, ENT_TYPE.MONS_SISTER_PARSNIP, ENT_TYPE.MONS_SISTER_PARMESAN,
          ENT_TYPE.MONS_OLD_HUNTER, ENT_TYPE.MONS_THIEF, ENT_TYPE.MONS_MADAMETUSK, ENT_TYPE.MONS_BODYGUARD,
          ENT_TYPE.MONS_HUNDUNS_SERVANT, ENT_TYPE.MONS_GOLDMONKEY, ENT_TYPE.MONS_LEPRECHAUN, ENT_TYPE.MONS_MEGAJELLYFISH,
          ENT_TYPE.MONS_CRITTERDUNGBEETLE,
@@ -2089,7 +2088,7 @@ local function set_doors()
 end
 
 local function add_level(w, l, t)
-    level_order[#level_order+1] = { w = w, l = l, t = t, b = has(bosses, t) or t == THEME.TIAMAT }
+    level_order[#level_order+1] = { w = w, l = l, t = t, b = has(boss_levels, t) or t == THEME.TIAMAT }
 end
 
 local function bosses_left()
