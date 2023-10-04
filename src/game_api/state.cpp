@@ -913,6 +913,8 @@ Logic* LogicList::start_logic(LOGIC idx)
     Logic* new_logic = (Logic*)addr;
     new_logic->logic_index = idx;
 
+    // TODO: set up logic that is not possible to initialize thru the API
+
     logic_indexed[(uint32_t)idx] = new_logic;
     return new_logic;
 }
@@ -923,6 +925,16 @@ void LogicList::stop_logic(LOGIC idx)
         return;
 
     delete logic_indexed[(uint32_t)idx];
+    logic_indexed[(uint32_t)idx] = nullptr;
+}
+
+void LogicList::stop_logic(Logic* log)
+{
+    if (log == nullptr)
+        return;
+
+    auto idx = log->logic_index;
+    delete log;
     logic_indexed[(uint32_t)idx] = nullptr;
 }
 

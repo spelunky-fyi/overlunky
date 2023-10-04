@@ -445,7 +445,7 @@ class LogicBasecampSpeedrun : public Logic
 {
   public:
     /// entity uid of the character that keeps the time
-    uint32_t official;
+    uint32_t administrator;
     /// entity uid. you must break this crate for the run to be valid, otherwise you're cheating
     uint32_t crate;
 };
@@ -500,7 +500,7 @@ class LogicMoonChallenge : public Logic
     uint16_t unknown8a;
     uint16_t unknown8b;
     // entity uid
-    int32_t mattock;
+    int32_t mattock_uid;
 };
 
 class LogicStarChallenge : public Logic
@@ -514,7 +514,7 @@ class LogicStarChallenge : public Logic
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
     uint16_t unknown7;
     uint32_t unknown8;
-    std::vector<Entity*> torches;
+    std::vector<Entity*> torches; // TODO: check if custom vector (probably yes)
     uint8_t start_countdown;
     uint8_t padding[3];
     uint32_t unknown9;
@@ -672,9 +672,10 @@ class LogicTutorial : public Logic
 struct LogicList
 {
     /// This only properly constructs the base class
-    /// you probably will need to set the parameters correctly
+    /// you may still need to initialise the parameters correctly
     Logic* start_logic(LOGIC idx);
     void stop_logic(LOGIC idx);
+    void stop_logic(Logic* log);
 
     union
     {
