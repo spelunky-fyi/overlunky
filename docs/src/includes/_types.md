@@ -180,8 +180,8 @@ nil | [draw_rect_filled(float left, float top, float right, float bottom, float 
 nil | [draw_rect_filled(AABB rect, float rounding, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled) | Draws a filled rectangle on screen from top-left to bottom-right.
 nil | [draw_triangle(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_triangle) | Draws a triangle on screen.
 nil | [draw_triangle_filled(Vec2 p1, Vec2 p2, Vec2 p3, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_triangle_filled) | Draws a filled triangle on screen.
-nil | [draw_poly(array<Vec2> points, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_poly) | Draws a polyline on screen.
-nil | [draw_poly_filled(array<Vec2> points, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_poly_filled) | Draws a filled convex polyline on screen.
+nil | [draw_poly(vector<Vec2> points, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_poly) | Draws a polyline on screen.
+nil | [draw_poly_filled(vector<Vec2> points, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_poly_filled) | Draws a filled convex polyline on screen.
 nil | [draw_bezier_cubic(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_bezier_cubic) | Draws a cubic bezier curve on screen.
 nil | [draw_bezier_quadratic(Vec2 p1, Vec2 p2, Vec2 p3, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_bezier_quadratic) | Draws a quadratic bezier curve on screen.
 nil | [draw_circle(float x, float y, float radius, float thickness, uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle) | Draws a circle on screen
@@ -252,7 +252,7 @@ Type | Name | Description
 ---- | ---- | -----------
 optional&lt;[SHORT_TILE_CODE](#Aliases)&gt; | [get_short_tile_code(int tx, int ty, LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_tile_code) | Gets the tile code at the specified tile coordinate<br/>Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK}`<br/>Also returns `nil` if `layer == LAYER.BACK` and the room does not have a back layer
 bool | [set_short_tile_code(int tx, int ty, LAYER layer, SHORT_TILE_CODE short_tile_code)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_short_tile_code) | Sets the tile code at the specified tile coordinate<br/>Valid coordinates are `0 <= tx < CONST.ROOM_WIDTH`, `0 <= ty < CONST.ROOM_HEIGHT` and `layer` in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Also returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
-array&lt;tuple&lt;int, int, [LAYER](#LAYER)&gt;&gt; | [find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=find_all_short_tile_codes) | Finds all places a short tile code is used in the room, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Returns an empty list if `layer == LAYER.BACK` and the room does not have a back layer
+vector&lt;tuple&lt;int, int, [LAYER](#LAYER)&gt;&gt; | [find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=find_all_short_tile_codes) | Finds all places a short tile code is used in the room, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Returns an empty list if `layer == LAYER.BACK` and the room does not have a back layer
 bool | [replace_short_tile_code(LAYER layer, SHORT_TILE_CODE short_tile_code, SHORT_TILE_CODE replacement_short_tile_code)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_short_tile_code) | Replaces all instances of `short_tile_code` in the given layer with `replacement_short_tile_code`, `layer` must be in `{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}`<br/>Returns `false` if `layer == LAYER.BACK` and the room does not have a back layer
 bool | [has_back_layer()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=has_back_layer) | Check whether the room has a back layer
 nil | [add_empty_back_layer()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_empty_back_layer) | Add a back layer filled with all `0` if there is no back layer yet<br/>Does nothing if there already is a backlayer
@@ -264,8 +264,8 @@ Context received in [ON](#ON).PRE_LOAD_LEVEL_FILES, used for forcing specific `.
 
 Type | Name | Description
 ---- | ---- | -----------
-nil | [override_level_files(array<string> levels)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) | Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
-nil | [add_level_files(array<string> levels)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_level_files) | Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
+nil | [override_level_files(vector<string> levels)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override_level_files) | Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
+nil | [add_level_files(vector<string> levels)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_level_files) | Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
 
 ### SaveContext
 
@@ -298,9 +298,9 @@ nil | [draw_screen_rect(AABB& rect, float thickness, Color color, optional<float
 nil | [draw_screen_rect_filled(AABB& rect, Color color, optional<float> angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_rect_filled) | Draw filled rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_screen_triangle(Triangle& triangle, float thickness, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_triangle) | Draw triangle in screen coordinates using the built-in renderer.<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_screen_triangle_filled(Triangle& triangle, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_triangle_filled) | Draw filled triangle in screen coordinates using the built-in renderer.<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-nil | [draw_screen_poly(array<Vec2> points, float thickness, Color color, bool closed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_poly) | Draw a polyline on screen from points using the built-in renderer<br/>Draws from the first to the last point, use `closed` to connect first and last as well<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+nil | [draw_screen_poly(vector<Vec2> points, float thickness, Color color, bool closed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_poly) | Draw a polyline on screen from points using the built-in renderer<br/>Draws from the first to the last point, use `closed` to connect first and last as well<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_screen_poly(Quad& points, float thickness, Color color, bool closed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_poly) | Draw quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-nil | [draw_screen_poly_filled(array<Vec2> points, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_poly_filled) | Draw a convex polygon on screen from points using the built-in renderer<br/>Can probably draw almost any polygon, but the convex one is guaranteed to look correct<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+nil | [draw_screen_poly_filled(vector<Vec2> points, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_poly_filled) | Draw a convex polygon on screen from points using the built-in renderer<br/>Can probably draw almost any polygon, but the convex one is guaranteed to look correct<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_screen_poly_filled(Quad& points, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_screen_poly_filled) | Draw filled quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with [ON](#ON).RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 nil | [draw_world_texture(TEXTURE texture_id, int row, int column, float left, float top, float right, float bottom, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a [Quad](#Quad) instead
 nil | [draw_world_texture(TEXTURE texture_id, int row, int column, AABB& dest, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_texture) | Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a [Quad](#Quad) instead
@@ -314,9 +314,9 @@ nil | [draw_world_rect(AABB& rect, float thickness, Color color, optional<float>
 nil | [draw_world_rect_filled(AABB& rect, Color color, optional<float> angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_rect_filled) | Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 nil | [draw_world_triangle(Triangle& triangle, float thickness, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_triangle) | Draw triangle in world coordinates using the built-in renderer.<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
 nil | [draw_world_triangle_filled(Triangle& triangle, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_triangle_filled) | Draw filled triangle in world coordinates using the built-in renderer.<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
-nil | [draw_world_poly(array<Vec2> points, float thickness, Color color, bool closed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_poly) | Draw a polyline in world coordinates from points using the built-in renderer<br/>Draws from the first to the last point, use `closed` to connect first and last as well<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+nil | [draw_world_poly(vector<Vec2> points, float thickness, Color color, bool closed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_poly) | Draw a polyline in world coordinates from points using the built-in renderer<br/>Draws from the first to the last point, use `closed` to connect first and last as well<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 nil | [draw_world_poly(Quad& points, float thickness, Color color, bool closed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_poly) | Draw quadrilateral in world coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
-nil | [draw_world_poly_filled(array<Vec2> points, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_poly_filled) | Draw a convex polygon in world coordinates from points using the built-in renderer<br/>Can probably draw almost any polygon, but the convex one is guaranteed to look correct<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
+nil | [draw_world_poly_filled(vector<Vec2> points, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_poly_filled) | Draw a convex polygon in world coordinates from points using the built-in renderer<br/>Can probably draw almost any polygon, but the convex one is guaranteed to look correct<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
 nil | [draw_world_poly_filled(Quad& points, Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_world_poly_filled) | Draw filled quadrilateral in world coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with [ON](#ON).RENDER_PRE_DRAW_DEPTH event
 [AABB](#AABB) | [bounding_box](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bounding_box) | 
  | [render_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_draw_depth) | 
@@ -523,7 +523,7 @@ Axis-Aligned-Bounding-Box, represents for example a hitbox of an entity or the s
 Type | Name | Description
 ---- | ---- | -----------
 [AABB](#AABB) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | Create a new axis aligned bounding box - defaults to all zeroes
-[AABB](#AABB) | [new(AABB& aabb&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | Copy an axis aligned bounding box
+[AABB](#AABB) | [new(AABB&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | Copy an axis aligned bounding box
 [AABB](#AABB) | [new(Vec2& top_left, Vec2& bottom_right)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | 
 [AABB](#AABB) | [new(float left_, float top_, float right_, float bottom_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=AABB) | Create a new axis aligned bounding box by specifying its values
 float | [left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) | 
@@ -583,28 +583,29 @@ prinspect(string.format("%x"), color:get_ucolor()) -- 800000ff
 Type | Name | Description
 ---- | ---- | -----------
 [Color](#Color) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | Create a new color - defaults to black
-[Color](#Color) | [new(Color& color&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | 
+[Color](#Color) | [new(Color&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | 
+[Color](#Color) | [new(Color&& color&&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | 
 [Color](#Color) | [new(float r_, float g_, float b_, float a_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | Create a new color by specifying its values
 float | [r](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) | 
 float | [g](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) | 
 float | [b](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=b) | 
 float | [a](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=a) | 
-[Color](#Color) | [white()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=white) | 
-[Color](#Color) | [silver()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=silver) | 
-[Color](#Color) | [gray()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gray) | 
-[Color](#Color) | [black()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black) | 
-[Color](#Color) | [red()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) | 
-[Color](#Color) | [maroon()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=maroon) | 
-[Color](#Color) | [yellow()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yellow) | 
-[Color](#Color) | [olive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olive) | 
-[Color](#Color) | [lime()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lime) | 
-[Color](#Color) | [green()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) | 
-[Color](#Color) | [aqua()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aqua) | 
-[Color](#Color) | [teal()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teal) | 
-[Color](#Color) | [blue()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) | 
-[Color](#Color) | [navy()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=navy) | 
-[Color](#Color) | [fuchsia()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuchsia) | 
-[Color](#Color) | [purple()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=purple) | 
+  [Color](#Color) | [white()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=white) | 
+  [Color](#Color) | [silver()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=silver) | 
+  [Color](#Color) | [gray()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gray) | 
+  [Color](#Color) | [black()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black) | 
+  [Color](#Color) | [red()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) | 
+  [Color](#Color) | [maroon()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=maroon) | 
+  [Color](#Color) | [yellow()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yellow) | 
+  [Color](#Color) | [olive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olive) | 
+  [Color](#Color) | [lime()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lime) | 
+  [Color](#Color) | [green()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) | 
+  [Color](#Color) | [aqua()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aqua) | 
+  [Color](#Color) | [teal()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teal) | 
+  [Color](#Color) | [blue()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) | 
+  [Color](#Color) | [navy()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=navy) | 
+  [Color](#Color) | [fuchsia()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuchsia) | 
+  [Color](#Color) | [purple()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=purple) | 
 tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rgba) | Returns RGBA colors in 0..255 range
 [Color](#Color)& | [set_rgba(int red, int green, int blue, int alpha)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_rgba) | Changes color based on given RGBA colors in 0..255 range
 [uColor](#Aliases) | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
@@ -753,7 +754,7 @@ nil | [set_pair(PRNG_CLASS type, int first, int second)](https://github.com/spel
 Type | Name | Description
 ---- | ---- | -----------
 [Quad](#Quad) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
-[Quad](#Quad) | [new(Quad& quad&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
+[Quad](#Quad) | [new(Quad&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(Vec2& bottom_left_, Vec2& bottom_right_, Vec2& top_right_, Vec2& top_left_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(AABB& aabb)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
@@ -836,7 +837,7 @@ Used in [StateMemory](#StateMemory)
 Type | Name | Description
 ---- | ---- | -----------
 map&lt;int, [ItemOwnerDetails](#ItemOwnerDetails)&gt; | [owned_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_items) | key/index is the uid of an item
-array&lt;[RoomOwnerDetails](#RoomOwnerDetails)&gt; | [owned_rooms](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_rooms) | 
+vector&lt;[RoomOwnerDetails](#RoomOwnerDetails)&gt; | [owned_rooms](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_rooms) | 
 
 ### ShortTileCodeDef
 
@@ -862,7 +863,7 @@ int | [row](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=row) |
 Type | Name | Description
 ---- | ---- | -----------
 [Triangle](#Triangle) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
-[Triangle](#Triangle) | [new(Triangle& triangle&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
+[Triangle](#Triangle) | [new(Triangle&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
 [Triangle](#Triangle) | [new(Vec2& _a, Vec2& _b, Vec2& _c)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
 [Triangle](#Triangle) | [new(float ax, float ay, float bx, float by, float cx, float cy)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Triangle) | 
 [Vec2](#Vec2) | [A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=A) | 
@@ -886,7 +887,7 @@ Simple object to hold pair of coordinates
 Type | Name | Description
 ---- | ---- | -----------
 [Vec2](#Vec2) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Vec2) | 
-[Vec2](#Vec2) | [new(Vec2& vec2&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Vec2) | 
+[Vec2](#Vec2) | [new(Vec2&)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Vec2) | 
 [Vec2](#Vec2) | [new(float x_, float y_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Vec2) | 
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
@@ -1205,7 +1206,7 @@ float | [spawn_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn
 float | [spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_y) | 
 int | [spawn_room_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) | 
 int | [spawn_room_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) | 
-array&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_doors) | 
+vector&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_doors) | 
 [ThemeInfo](#ThemeInfo) | [themes[18]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) | 
 
 ## Lighting types
@@ -1344,7 +1345,7 @@ Derived from [Logic](#Logic)
 
 Type | Name | Description
 ---- | ---- | -----------
-array&lt;[MagmamanSpawnPosition](#MagmamanSpawnPosition)&gt; | [magmaman_positions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_positions) | 
+vector&lt;[MagmamanSpawnPosition](#MagmamanSpawnPosition)&gt; | [magmaman_positions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_positions) | 
 
 ### LogicOlmecCutscene
 
@@ -1618,7 +1619,7 @@ int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [page_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) | 
 int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | 
 int | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
-array&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+vector&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ### OnlineLobbyScreenPlayer
 
@@ -2399,7 +2400,7 @@ Type | Name | Description
 [PlayingSound](#PlayingSound) | [play()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) | 
 [PlayingSound](#PlayingSound) | [play(bool paused)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) | 
 [PlayingSound](#PlayingSound) | [play(bool paused, SOUND_TYPE sound_type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play) | 
-map&lt;[VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM), string&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
+map&lt;[VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM), char&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
 
 ### PlayingSound
 
@@ -2417,7 +2418,7 @@ bool | [set_pan(float pan)](https://github.com/spelunky-fyi/overlunky/search?l=L
 bool | [set_volume(float volume)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_volume) | 
 bool | [set_looping(SOUND_LOOP_MODE loop_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_looping) | 
 bool | [set_callback(function callback)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_callback) | 
-map&lt;[VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM), string&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
+map&lt;[VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM), char&gt; | [get_parameters()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameters) | 
 optional&lt;float&gt; | [get_parameter(VANILLA_SOUND_PARAM parameter_index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter) | 
 bool | [set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter) | 
 
@@ -2718,7 +2719,7 @@ tuple&lt;float, float&gt; | [text_size()](https://github.com/spelunky-fyi/overlu
 nil | [rotate(float angle, optional<float> px, optional<float> py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
 nil | [set_text(string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_text) | Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
 [TEXTURE](#TEXTURE) | [get_font()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_font) | 
-nil | [set_font(TEXTURE id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_font) | 
+bool | [set_font(TEXTURE id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_font) | 
 
 ### TextureDefinition
 
@@ -2850,7 +2851,7 @@ nil | [spawn_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 nil | [post_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post_transition) | 
 nil | [spawn_players()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_players) | 
 nil | [spawn_effects()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_effects) | 
-string | [get_level_file()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_file) | 
+char | [get_level_file()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_file) | 
 int | [get_theme_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_id) | 
 int | [get_base_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_id) | 
 int | [get_floor_spreading_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type) | 
@@ -2949,7 +2950,7 @@ nil | [spawn_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 nil | [post_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post_transition) | Handles loading the next level screen from a transition screen
 nil | [spawn_players()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_players) | Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
 nil | [spawn_effects()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_effects) | Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
-string | [get_level_file()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_file) | Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
+char | [get_level_file()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_file) | Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
 int | [get_theme_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_id) | Returns: [THEME](#THEME), or subtheme in CO
 int | [get_base_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_id) | Returns: [THEME](#THEME), or logical base [THEME](#THEME) for special levels (Abzu->Tide Pool etc)
 int | [get_floor_spreading_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type) | Returns: [ENT_TYPE](#ENT_TYPE) used for floor spreading (generic or one of the styled floors)
@@ -4996,7 +4997,7 @@ Type | Name | Description
 nil | [remove_powerup(ENT_TYPE powerup_type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_powerup) | Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
 nil | [give_powerup(ENT_TYPE powerup_type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=give_powerup) | Gives the player/monster the specified powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Giving true crown to a monster crashes the game.
 bool | [has_powerup(ENT_TYPE powerup_type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=has_powerup) | Checks whether the player/monster has a certain powerup
-array&lt;[ENT_TYPE](#ENT_TYPE)&gt; | [get_powerups()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_powerups) | Return all powerups that the entity has
+vector&lt;[ENT_TYPE](#ENT_TYPE)&gt; | [get_powerups()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_powerups) | Return all powerups that the entity has
 nil | [unequip_backitem()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip_backitem) | Unequips the currently worn backitem
 int | [worn_backitem()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=worn_backitem) | Returns the uid of the currently worn backitem, or -1 if wearing nothing
 
@@ -6440,7 +6441,7 @@ bool | [can_jump()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can
 nil | [add_money(int money)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money) | Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
 bool | [is_on_fire()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on_fire) | 
 bool | [damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) | Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
-array&lt;int&gt; | [get_all_behaviors()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_all_behaviors) | Get all avaible behavior ids
+vector&lt;int&gt; | [get_all_behaviors()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_all_behaviors) | Get all avaible behavior ids
 bool | [set_behavior(int behavior_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_behavior) | Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity<br/>Returns false if entity doesn't have this behavior id
 int | [get_behavior()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_behavior) | Get the current behavior id
 nil | [set_gravity(float gravity)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_gravity) | Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0

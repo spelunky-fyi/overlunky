@@ -260,7 +260,6 @@ def run_parse():
         member_funs = {}
         member_vars = []
         for line in data:
-            line = replace_fun(line)
             line = line.replace("*", "")
             if not class_name and ("struct" in line or "class" in line):
                 m = re.match(r"(struct|class)\s+(\S+)", line)
@@ -767,9 +766,10 @@ def run_parse():
                     if entry_name in underlying_cpp_type["member_funs"]:
                         for fun in underlying_cpp_type["member_funs"][entry_name]:
                             ret = fun["return"]
+                            ret = replace_fun(ret)
                             ret = f"optional<{ret}>" if ret else "bool"
                             ret = ret if entry_name != "dtor" else "nil"
-                            args = fun["param"].strip()
+                            args = replace_fun(fun["param"]).strip()
                             args = f"{name} self, {args}" if args else f"{name} self"
                             binds = entry["binds"]
                             if binds:
@@ -782,9 +782,10 @@ def run_parse():
                             break
                     else:
                         ret = entry["ret"]
+                        ret = replace_fun(ret)
                         ret = f"optional<{ret}>" if ret else "bool"
                         ret = ret if entry_name != "dtor" else "nil"
-                        args = " ".join(entry["args"])
+                        args = replace_fun(" ".join(entry["args"]))
                         args = f"{name} self, {args}" if args else f"{name} self"
                         pre_signature = f"{ret} {entry_name}({args})"
                         post_signature = f"nil {entry_name}({args})"
