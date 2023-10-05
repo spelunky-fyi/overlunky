@@ -181,6 +181,7 @@ The binaries will be in `build/bin/Release/`. You can also try the scripts in `.
 
 ```
 --launch_game [path]    launch ../Spel2.exe, path/Spel2.exe, or a specific exe, and load OL with Detours
+--oldflip               launch the game with -oldflip, may improve performance with external windows
 --console               keep console open to debug scripts etc
 --inject                use the old injection method instead of Detours with --launch_game
 --info_dump             output a bunch of game data to 'Spelunky 2/game_data'

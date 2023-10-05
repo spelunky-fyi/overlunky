@@ -348,7 +348,8 @@ std::map<std::string, bool> options = {
     {"hd_cursor", true},
     {"inverted", false},
     {"borders", false},
-    {"console_alt_keys", false}};
+    {"console_alt_keys", false},
+    {"vsync", true}};
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -1042,6 +1043,7 @@ void load_config(std::string file)
     }
     ImGui::GetIO().ConfigDockingWithShift = options["docking_with_shift"];
     g_Console->set_alt_keys(options["console_alt_keys"]);
+    imgui_vsync(options["vsync"]);
     save_config(file);
 }
 
@@ -5446,7 +5448,11 @@ void render_options()
             else
                 ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
         }
-        tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
+        tooltip("Allow dragging tools outside the main game window, to different monitor etc.\nMay work smoother with the -oldflip game command line switch.");
+
+        if (ImGui::Checkbox("Enable vsync", &options["vsync"]))
+            imgui_vsync(options["vsync"]);
+        tooltip("Disabling game vsync may affect performance with external windows,\nfor better or worse.");
 
         if (ImGui::Checkbox("Docking only while holding Shift", &options["docking_with_shift"]))
         {
