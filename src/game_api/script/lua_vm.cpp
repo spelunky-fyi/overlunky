@@ -2039,6 +2039,9 @@ end
     /// This will also prevent game crashing when there is no exit door when they are in level
     lua["set_boss_door_control_enabled"] = set_boss_door_control_enabled;
 
+    /// Run state update manually, i.e. simulate one logic frame
+    lua["update_state"] = update_state;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

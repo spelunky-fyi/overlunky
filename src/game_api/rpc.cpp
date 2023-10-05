@@ -2058,3 +2058,19 @@ void set_boss_door_control_enabled(bool enable)
     else
         recover_mem("set_boss_door_control_enabled");
 }
+
+void update_state()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("state_refresh");
+    }
+    if (offset != 0)
+    {
+        auto state = State::get().ptr();
+        typedef void refresh_func(StateMemory*);
+        static refresh_func* rf = (refresh_func*)(offset);
+        rf(state);
+    }
+}
