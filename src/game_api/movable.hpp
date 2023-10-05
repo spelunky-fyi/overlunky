@@ -167,7 +167,7 @@ class Movable : public Entity
     virtual void drop(Entity* entity_to_drop) = 0;               // 69, also used when throwing
 
     /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
-    virtual void add_money(uint32_t money) = 0;                              // 70
+    virtual void add_money(uint32_t money, ENT_TYPE money_type) = 0;         // 70
     virtual void apply_movement() = 0;                                       // 71, disable this function and things can't move, some spin in place
     virtual void damage_entity(Entity* victim) = 0;                          // 72, can't trigger, maybe extra params are needed
     virtual void v73() = 0;                                                  // 73

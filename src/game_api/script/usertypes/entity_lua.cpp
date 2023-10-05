@@ -14,7 +14,9 @@
 
 #include "color.hpp"              // for Color, Color::a, Color::b, Color::g
 #include "custom_types.hpp"       // for get_custom_types_map
+#include "entities_chars.hpp"     // for Player
 #include "entity.hpp"             // for Entity, EntityDB, Animation, Rect
+#include "items.hpp"              // for Inventory
 #include "math.hpp"               // for Quad, AABB
 #include "movable.hpp"            // for Movable, Movable::falling_timer
 #include "render_api.hpp"         // for RenderInfo, RenderInfo::flip_horiz...
@@ -283,7 +285,13 @@ void register_usertypes(sol::state& lua)
     auto light_on_fire = sol::overload(
         static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
-
+    auto add_money = sol::overload(
+        [](Player& ent, uint32_t money)
+        {
+            ent.add_money(money, 0);
+            ent.inventory_ptr->collected_money_count--;
+        },
+        &Movable::add_money);
     auto movable_type = lua.new_usertype<Movable>("Movable", sol::base_classes, sol::bases<Entity>());
     movable_type["move"] = &Movable::move;
     movable_type["movex"] = &Movable::movex;
@@ -332,7 +340,7 @@ void register_usertypes(sol::state& lua)
     movable_type["pick_up"] = &Movable::pick_up;
     movable_type["can_jump"] = &Movable::can_jump;
     movable_type["standing_on"] = &Movable::standing_on;
-    movable_type["add_money"] = &Movable::add_money;
+    movable_type["add_money"] = add_money;
     movable_type["is_on_fire"] = &Movable::is_on_fire;
     movable_type["damage"] = damage;
     movable_type["get_all_behaviors"] = &Movable::get_all_behaviors;
