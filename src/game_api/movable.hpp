@@ -163,7 +163,7 @@ class Movable : public Entity
     virtual void on_picked_up_by(Entity* entity_picking_up) = 0;
     virtual void drop(Entity* entity_to_drop) = 0; // also used when throwing
 
-    /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Important: Updates the collected_money_count in the inventory, but doesn't add any treasure to the following array, which will lead to crashes during the transition, if you don't deal with it. (e.g. set `collected_money_count = collected_money_count - 1` afterwards)
+    /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
     virtual void add_money(uint32_t money) = 0;
 
     virtual void apply_movement() = 0;              // disable this function and things can't move, some spin in place
