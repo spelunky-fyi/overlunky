@@ -5906,7 +5906,14 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field arena_3 Logic @Handles time end death
     ---@field arena_alien_blast LogicArenaAlienBlast
     ---@field arena_loose_bombs LogicArenaLooseBombs
-    ---@field start_logic any @[&lua](LogicList&l
+    ---@field start_logic fun(self, idx: LOGIC): Logic @This only properly constructs the base class<br/>you may still need to initialise the parameters correctly
+local LogicList = nil
+---@param idx LOGIC
+---@return nil
+function LogicList:stop_logic(idx) end
+---@param log Logic
+---@return nil
+function LogicList:stop_logic(log) end
 
 ---@class Logic
     ---@field logic_index LOGIC

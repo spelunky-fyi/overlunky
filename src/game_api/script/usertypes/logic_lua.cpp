@@ -76,6 +76,58 @@ void register_usertypes(sol::state& lua)
                            "ARENA_LOOSE_BOMBS",
                            LOGIC::ARENA_LOOSE_BOMBS);
 
+    auto start_logic = [&lua](LogicList& l, LOGIC idx) -> sol::object
+    {
+        auto return_logic = l.start_logic(idx);
+        switch (idx)
+        {
+        case LOGIC::TUTORIAL:
+            return sol::make_object(lua, (LogicTutorial*)return_logic);
+        case LOGIC::OUROBOROS:
+            return sol::make_object(lua, (LogicOuroboros*)return_logic);
+        case LOGIC::SPEEDRUN:
+            return sol::make_object(lua, (LogicBasecampSpeedrun*)return_logic);
+        case LOGIC::GHOST_TOAST:
+            return sol::make_object(lua, (LogicGhostToast*)return_logic);
+        case LOGIC::DICESHOP:
+            return sol::make_object(lua, (LogicDiceShop*)return_logic);
+        case LOGIC::PRE_CHALLENGE:
+            return sol::make_object(lua, (LogicTunPreChallenge*)return_logic);
+        case LOGIC::MOON_CHALLENGE:
+            return sol::make_object(lua, (LogicMoonChallenge*)return_logic);
+        case LOGIC::STAR_CHALLENGE:
+            return sol::make_object(lua, (LogicStarChallenge*)return_logic);
+        case LOGIC::SUN_CHALLENGE:
+            return sol::make_object(lua, (LogicSunChallenge*)return_logic);
+        case LOGIC::MAGMAN_SPAWN:
+            return sol::make_object(lua, (LogicMagmamanSpawn*)return_logic);
+        case LOGIC::WATER_BUBBLES:
+            return sol::make_object(lua, (LogicUnderwaterBubbles*)return_logic);
+        case LOGIC::OLMEC_CUTSCENE:
+            return sol::make_object(lua, (LogicOlmecCutscene*)return_logic);
+        case LOGIC::TIAMAT_CUTSCENE:
+            return sol::make_object(lua, (LogicTiamatCutscene*)return_logic);
+        case LOGIC::APEP:
+            return sol::make_object(lua, (LogicApepTrigger*)return_logic);
+        case LOGIC::COG_SACRIFICE:
+            return sol::make_object(lua, (LogicCOGAnkhSacrifice*)return_logic);
+        case LOGIC::BUBBLER:
+            return sol::make_object(lua, (LogicTiamatBubbles*)return_logic);
+        case LOGIC::PLEASURE_PALACE:
+            return sol::make_object(lua, (LogicTuskPleasurePalace*)return_logic);
+        case LOGIC::ARENA_1:
+            return sol::make_object(lua, (LogicArena1*)return_logic);
+        // case LOGIC::ARENA_2:
+        //     return sol::make_object(lua, () return_logic);
+        case LOGIC::ARENA_ALIEN_BLAST:
+            return sol::make_object(lua, (LogicArenaAlienBlast*)return_logic);
+        case LOGIC::ARENA_LOOSE_BOMBS:
+            return sol::make_object(lua, (LogicArenaLooseBombs*)return_logic);
+        default:
+            return sol::make_object(lua, return_logic);
+        }
+    };
+
     /// Used in StateMemory
     lua.new_usertype<LogicList>(
         "LogicList",
@@ -136,57 +188,7 @@ void register_usertypes(sol::state& lua)
         "arena_loose_bombs",
         &LogicList::arena_loose_bombs,
         "start_logic",
-        [&lua](LogicList& l, LOGIC idx) -> sol::object // -> mixed*
-        {
-            auto return_logic = l.start_logic(idx);
-            switch (idx)
-            {
-            case LOGIC::TUTORIAL:
-                return sol::make_object(lua, (LogicTutorial*)return_logic);
-            case LOGIC::OUROBOROS:
-                return sol::make_object(lua, (LogicOuroboros*)return_logic);
-            case LOGIC::SPEEDRUN:
-                return sol::make_object(lua, (LogicBasecampSpeedrun*)return_logic);
-            case LOGIC::GHOST_TOAST:
-                return sol::make_object(lua, (LogicGhostToast*)return_logic);
-            case LOGIC::DICESHOP:
-                return sol::make_object(lua, (LogicDiceShop*)return_logic);
-            case LOGIC::PRE_CHALLENGE:
-                return sol::make_object(lua, (LogicTunPreChallenge*)return_logic);
-            case LOGIC::MOON_CHALLENGE:
-                return sol::make_object(lua, (LogicMoonChallenge*)return_logic);
-            case LOGIC::STAR_CHALLENGE:
-                return sol::make_object(lua, (LogicStarChallenge*)return_logic);
-            case LOGIC::SUN_CHALLENGE:
-                return sol::make_object(lua, (LogicSunChallenge*)return_logic);
-            case LOGIC::MAGMAN_SPAWN:
-                return sol::make_object(lua, (LogicMagmamanSpawn*)return_logic);
-            case LOGIC::WATER_BUBBLES:
-                return sol::make_object(lua, (LogicUnderwaterBubbles*)return_logic);
-            case LOGIC::OLMEC_CUTSCENE:
-                return sol::make_object(lua, (LogicOlmecCutscene*)return_logic);
-            case LOGIC::TIAMAT_CUTSCENE:
-                return sol::make_object(lua, (LogicTiamatCutscene*)return_logic);
-            case LOGIC::APEP:
-                return sol::make_object(lua, (LogicApepTrigger*)return_logic);
-            case LOGIC::COG_SACRIFICE:
-                return sol::make_object(lua, (LogicCOGAnkhSacrifice*)return_logic);
-            case LOGIC::BUBBLER:
-                return sol::make_object(lua, (LogicTiamatBubbles*)return_logic);
-            case LOGIC::PLEASURE_PALACE:
-                return sol::make_object(lua, (LogicTuskPleasurePalace*)return_logic);
-            case LOGIC::ARENA_1:
-                return sol::make_object(lua, (LogicArena1*)return_logic);
-            // case LOGIC::ARENA_2:
-            //     return sol::make_object(lua, () return_logic);
-            case LOGIC::ARENA_ALIEN_BLAST:
-                return sol::make_object(lua, (LogicArenaAlienBlast*)return_logic);
-            case LOGIC::ARENA_LOOSE_BOMBS:
-                return sol::make_object(lua, (LogicArenaLooseBombs*)return_logic);
-            default:
-                return sol::make_object(lua, return_logic);
-            }
-        },
+        start_logic,
         "stop_logic",
         stop_logic);
     /// Used in LogicList

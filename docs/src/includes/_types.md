@@ -1439,7 +1439,9 @@ Type | Name | Description
 [Logic](#Logic) | [arena_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_3) | Handles time end death
 [LogicArenaAlienBlast](#LogicArenaAlienBlast) | [arena_alien_blast](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_alien_blast) | 
 [LogicArenaLooseBombs](#LogicArenaLooseBombs) | [arena_loose_bombs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_loose_bombs) | 
- | [start_logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_logic) | 
+[Logic](#Logic) | [start_logic(LOGIC idx)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_logic) | This only properly constructs the base class<br/>you may still need to initialise the parameters correctly
+nil | [stop_logic(LOGIC idx)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop_logic) | 
+nil | [stop_logic(Logic log)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop_logic) | 
 
 ### LogicMagmamanSpawn
 
