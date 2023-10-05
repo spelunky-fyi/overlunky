@@ -642,6 +642,44 @@ Name | Data | Description
 [COARSE_LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.COARSE_LAVA) | 4 | 
 [STAGNANT_LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.STAGNANT_LAVA) | 5 | 
 
+## LOGIC
+
+
+> Search script examples for [LOGIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[TUTORIAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TUTORIAL) | LOGIC::TUTORIAL | 
+[OUROBOROS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.OUROBOROS) | LOGIC::OUROBOROS | 
+[SPEEDRUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.SPEEDRUN) | LOGIC::SPEEDRUN | 
+[GHOST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.GHOST) | LOGIC::GHOST | 
+[GHOST_TOAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.GHOST_TOAST) | LOGIC::GHOST_TOAST | 
+[TUN_AGGRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TUN_AGGRO) | LOGIC::TUN_AGGRO | 
+[DICESHOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.DICESHOP) | LOGIC::DICESHOP | 
+[PRE_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.PRE_CHALLENGE) | LOGIC::PRE_CHALLENGE | 
+[MOON_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.MOON_CHALLENGE) | LOGIC::MOON_CHALLENGE | 
+[STAR_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.STAR_CHALLENGE) | LOGIC::STAR_CHALLENGE | 
+[SUN_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.SUN_CHALLENGE) | LOGIC::SUN_CHALLENGE | 
+[MAGMAN_SPAWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.MAGMAN_SPAWN) | LOGIC::MAGMAN_SPAWN | 
+[WATER_BUBBLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.WATER_BUBBLES) | LOGIC::WATER_BUBBLES | 
+[OLMEC_CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.OLMEC_CUTSCENE) | LOGIC::OLMEC_CUTSCENE | 
+[TIAMAT_CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TIAMAT_CUTSCENE) | LOGIC::TIAMAT_CUTSCENE | 
+[APEP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.APEP) | LOGIC::APEP | 
+[COG_SACRIFICE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.COG_SACRIFICE) | LOGIC::COG_SACRIFICE | 
+[DUAT_BOSSES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.DUAT_BOSSES) | LOGIC::DUAT_BOSSES | 
+[BUBBLER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.BUBBLER) | LOGIC::BUBBLER | 
+[PLEASURE_PALACE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.PLEASURE_PALACE) | LOGIC::PLEASURE_PALACE | 
+[DISCOVERY_INFO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.DISCOVERY_INFO) | LOGIC::DISCOVERY_INFO | 
+[BLACK_MARKET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.BLACK_MARKET) | LOGIC::BLACK_MARKET | 
+[JELLYFISH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.JELLYFISH) | LOGIC::JELLYFISH | 
+[ARENA_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_1) | LOGIC::ARENA_1 | 
+[ARENA_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_2) | LOGIC::ARENA_2 | 
+[ARENA_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_3) | LOGIC::ARENA_3 | 
+[ARENA_ALIEN_BLAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_ALIEN_BLAST) | LOGIC::ARENA_ALIEN_BLAST | 
+[ARENA_LOOSE_BOMBS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_LOOSE_BOMBS) | LOGIC::ARENA_LOOSE_BOMBS | 
+
 ## MASK
 
 
