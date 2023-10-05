@@ -294,3 +294,8 @@ struct BackgroundSound : public SoundMeta
 /// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
 /// Returns SoundMeta (read only), beware that after the sound starts, that memory is no longer valid
 SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid);
+
+// could probably be exposed if someone can actually figure out how to properly "register it"?
+// it also needs to make sure the lua owns the returned object and it will properly delete it
+SoundMeta* construct_soundmeta(VANILLA_SOUND sound, bool background_sound);
+SoundMeta* construct_soundmeta(uint32_t sound_id, bool background_sound);

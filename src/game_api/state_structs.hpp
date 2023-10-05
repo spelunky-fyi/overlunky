@@ -453,6 +453,7 @@ class LogicBasecampSpeedrun : public Logic
 class LogicGhostToast : public Logic
 {
   public:
+    ///  default 90
     uint32_t toast_timer;
 };
 
@@ -478,7 +479,7 @@ class LogicDiceShop : public Logic
     uint32_t forcefield;
     bool bet_active;
     bool forcefield_deactivated;
-    bool boss_angry;
+    bool unknown;
     /// the time the boss waits after your second die throw to announce the results
     uint8_t result_announcement_timer;
     uint8_t won_prizes_count;
@@ -487,7 +488,7 @@ class LogicDiceShop : public Logic
     int32_t balance;
 };
 
-class LogicMoonChallenge : public Logic
+class LogicChallenge : public Logic
 {
   public:
     uint32_t unknown3;
@@ -496,47 +497,35 @@ class LogicMoonChallenge : public Logic
     uint32_t floor_challenge_waitroom_uid;
     bool challenge_active;
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
-    uint16_t unknown7;
-    uint16_t unknown8a;
-    uint16_t unknown8b;
-    // entity uid
+    uint16_t padding1;
+    uint32_t padding2;
+};
+
+class LogicMoonChallenge : public LogicChallenge
+{
+  public:
+    /// entity uid
     int32_t mattock_uid;
 };
 
-class LogicStarChallenge : public Logic
+class LogicStarChallenge : public LogicChallenge
 {
   public:
-    uint32_t unknown3;
-    uint32_t unknown4;
-    uint32_t floor_challenge_entrance_uid;
-    uint32_t floor_challenge_waitroom_uid;
-    bool challenge_active;
-    uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
-    uint16_t unknown7;
-    uint32_t unknown8;
     std::vector<Entity*> torches; // TODO: check if custom vector (probably yes)
     uint8_t start_countdown;
     uint8_t padding[3];
     uint32_t unknown9;
     float unknown10; // position in front of tun and one tile higher, dunno what for?
-    float unknown11;
+    float unknown11; // kind of would make sense for the wanted poster, but you get this struct after you buy the challenge, not possible when tun is angry?
 };
 
-class LogicSunChallenge : public Logic
+class LogicSunChallenge : public LogicChallenge
 {
   public:
-    uint32_t unknown3;
-    uint32_t unknown4;
-    uint32_t floor_challenge_entrance_uid;
-    uint32_t floor_challenge_waitroom_uid;
-    bool challenge_active;
-    uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
-    uint16_t unknown7;
-    uint32_t unknown8;
     uint8_t start_countdown;
     uint8_t padding[3];
     uint32_t unknown9;
-    float unknown10; // position in front of tun and one tile higher, dunno what for?
+    float unknown10; // same as for LogicStarChallenge
     float unknown11;
 };
 
@@ -619,7 +608,7 @@ class LogicTuskPleasurePalace : public Logic
 {
   public:
     int32_t locked_door; // entity uid
-    uint32_t unknown4;   // always 1552
+    uint32_t unknown4;   // default 1552
     uint32_t unknown5;   // dunno
     uint32_t unknown6;   // padding probably
 };
@@ -646,9 +635,12 @@ class LogicUnderwaterBubbles : public Logic
 {
   public:
     // no idea what does are, messing with them can crash
-    float unknown1;   // 1.0
-    int16_t unknown2; // 1000
-    int8_t unknown3;  // 1 or 0, probably bool
+    float unknown1; // default: 1.0, excludes liquid from spawning the bubbles by y level from the top to bottom
+                    // is treated like number (calculations to get the right grid entity level)
+                    // it's more like a value in rooms than y coordinates
+
+    int16_t unknown2; // default: 1000
+    bool unknown3;    // default: 1 or 0
 };
 
 class LogicTunPreChallenge : public Logic
@@ -687,6 +679,7 @@ struct LogicList
             LogicOuroboros* ouroboros;
             /// Keep track of time, player position passing official
             LogicBasecampSpeedrun* basecamp_speedrun;
+            /// It's absence is the only reason why ghost doesn't spawn at boss levels or CO
             Logic* ghost_trigger; // virtual does nothing, all the code elsewhere, the only purpose is to mark if ghost should spawn this level or not
             LogicGhostToast* ghost_toast_trigger;
             /// Spawns tun at the door at 30s mark
@@ -702,6 +695,7 @@ struct LogicList
             LogicUnderwaterBubbles* water_bubbles;
             LogicOlmecCutscene* olmec_cutscene;
             LogicTiamatCutscene* tiamat_cutscene;
+            /// Works only if the level has at least one room ROOM_TEMPLATE.APEP, and it still spawns apep at hardcoded positions
             LogicApepTrigger* apep_spawner;
             /// All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
             LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;

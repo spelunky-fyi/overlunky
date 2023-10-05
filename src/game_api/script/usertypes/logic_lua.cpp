@@ -136,11 +136,56 @@ void register_usertypes(sol::state& lua)
         "arena_loose_bombs",
         &LogicList::arena_loose_bombs,
         "start_logic",
-        [&lua](LogicList& l, LOGIC idx) -> sol::object // -> Logic*
+        [&lua](LogicList& l, LOGIC idx) -> sol::object // -> mixed*
         {
             auto return_logic = l.start_logic(idx);
-            // TODO: cast to proper logic type
-            return sol::make_object(lua, return_logic);
+            switch (idx)
+            {
+            case LOGIC::TUTORIAL:
+                return sol::make_object(lua, (LogicTutorial*)return_logic);
+            case LOGIC::OUROBOROS:
+                return sol::make_object(lua, (LogicOuroboros*)return_logic);
+            case LOGIC::SPEEDRUN:
+                return sol::make_object(lua, (LogicBasecampSpeedrun*)return_logic);
+            case LOGIC::GHOST_TOAST:
+                return sol::make_object(lua, (LogicGhostToast*)return_logic);
+            case LOGIC::DICESHOP:
+                return sol::make_object(lua, (LogicDiceShop*)return_logic);
+            case LOGIC::PRE_CHALLENGE:
+                return sol::make_object(lua, (LogicTunPreChallenge*)return_logic);
+            case LOGIC::MOON_CHALLENGE:
+                return sol::make_object(lua, (LogicMoonChallenge*)return_logic);
+            case LOGIC::STAR_CHALLENGE:
+                return sol::make_object(lua, (LogicStarChallenge*)return_logic);
+            case LOGIC::SUN_CHALLENGE:
+                return sol::make_object(lua, (LogicSunChallenge*)return_logic);
+            case LOGIC::MAGMAN_SPAWN:
+                return sol::make_object(lua, (LogicMagmamanSpawn*)return_logic);
+            case LOGIC::WATER_BUBBLES:
+                return sol::make_object(lua, (LogicUnderwaterBubbles*)return_logic);
+            case LOGIC::OLMEC_CUTSCENE:
+                return sol::make_object(lua, (LogicOlmecCutscene*)return_logic);
+            case LOGIC::TIAMAT_CUTSCENE:
+                return sol::make_object(lua, (LogicTiamatCutscene*)return_logic);
+            case LOGIC::APEP:
+                return sol::make_object(lua, (LogicApepTrigger*)return_logic);
+            case LOGIC::COG_SACRIFICE:
+                return sol::make_object(lua, (LogicCOGAnkhSacrifice*)return_logic);
+            case LOGIC::BUBBLER:
+                return sol::make_object(lua, (LogicTiamatBubbles*)return_logic);
+            case LOGIC::PLEASURE_PALACE:
+                return sol::make_object(lua, (LogicTuskPleasurePalace*)return_logic);
+            case LOGIC::ARENA_1:
+                return sol::make_object(lua, (LogicArena1*)return_logic);
+            // case LOGIC::ARENA_2:
+            //     return sol::make_object(lua, () return_logic);
+            case LOGIC::ARENA_ALIEN_BLAST:
+                return sol::make_object(lua, (LogicArenaAlienBlast*)return_logic);
+            case LOGIC::ARENA_LOOSE_BOMBS:
+                return sol::make_object(lua, (LogicArenaLooseBombs*)return_logic);
+            default:
+                return sol::make_object(lua, return_logic);
+            }
         },
         "stop_logic",
         stop_logic);
@@ -197,7 +242,8 @@ void register_usertypes(sol::state& lua)
     logicdiceshop_type["forcefield"] = &LogicDiceShop::forcefield;
     logicdiceshop_type["bet_active"] = &LogicDiceShop::bet_active;
     logicdiceshop_type["forcefield_deactivated"] = &LogicDiceShop::forcefield_deactivated;
-    logicdiceshop_type["boss_angry"] = &LogicDiceShop::boss_angry;
+    /// NoDoc
+    logicdiceshop_type["boss_angry"] = &LogicDiceShop::unknown;
     logicdiceshop_type["result_announcement_timer"] = &LogicDiceShop::result_announcement_timer;
     logicdiceshop_type["won_prizes_count"] = &LogicDiceShop::won_prizes_count;
     logicdiceshop_type["balance"] = &LogicDiceShop::balance;
@@ -208,53 +254,42 @@ void register_usertypes(sol::state& lua)
         &LogicTunPreChallenge::tun_uid,
         sol::base_classes,
         sol::bases<Logic>());
-    /// Used in LogicList
-    lua.new_usertype<LogicMoonChallenge>(
-        "LogicMoonChallenge",
+    /// Used in LogicMoonChallenge, LogicStarChallenge, LogicSunChallenge
+    lua.new_usertype<LogicChallenge>(
+        "LogicChallenge",
         "floor_challenge_entrance_uid",
-        &LogicMoonChallenge::floor_challenge_entrance_uid,
+        &LogicChallenge::floor_challenge_entrance_uid,
         "floor_challenge_waitroom_uid",
-        &LogicMoonChallenge::floor_challenge_waitroom_uid,
+        &LogicChallenge::floor_challenge_waitroom_uid,
         "challenge_active",
-        &LogicMoonChallenge::challenge_active,
+        &LogicChallenge::challenge_active,
         "forcefield_countdown",
-        &LogicMoonChallenge::forcefield_countdown,
-        "mattock_uid",
-        &LogicMoonChallenge::mattock_uid,
+        &LogicChallenge::forcefield_countdown,
         sol::base_classes,
         sol::bases<Logic>());
     /// Used in LogicList
+    lua.new_usertype<LogicMoonChallenge>(
+        "LogicMoonChallenge",
+        "mattock_uid",
+        &LogicMoonChallenge::mattock_uid,
+        sol::base_classes,
+        sol::bases<Logic, LogicChallenge>());
+    /// Used in LogicList
     lua.new_usertype<LogicStarChallenge>(
         "LogicStarChallenge",
-        "floor_challenge_entrance_uid",
-        &LogicStarChallenge::floor_challenge_entrance_uid,
-        "floor_challenge_waitroom_uid",
-        &LogicStarChallenge::floor_challenge_waitroom_uid,
-        "challenge_active",
-        &LogicStarChallenge::challenge_active,
-        "forcefield_countdown",
-        &LogicStarChallenge::forcefield_countdown,
         "torches",
         &LogicStarChallenge::torches,
         "start_countdown",
         &LogicStarChallenge::start_countdown,
         sol::base_classes,
-        sol::bases<Logic>());
+        sol::bases<Logic, LogicChallenge>());
     /// Used in LogicList
     lua.new_usertype<LogicSunChallenge>(
         "LogicSunChallenge",
-        "floor_challenge_entrance_uid",
-        &LogicSunChallenge::floor_challenge_entrance_uid,
-        "floor_challenge_waitroom_uid",
-        &LogicSunChallenge::floor_challenge_waitroom_uid,
-        "challenge_active",
-        &LogicSunChallenge::challenge_active,
-        "forcefield_countdown",
-        &LogicSunChallenge::forcefield_countdown,
         "start_countdown",
         &LogicSunChallenge::start_countdown,
         sol::base_classes,
-        sol::bases<Logic>());
+        sol::bases<Logic, LogicChallenge>());
     auto add_spawn = sol::overload(
         static_cast<void (LogicMagmamanSpawn::*)(uint32_t, uint32_t)>(&LogicMagmamanSpawn::add_spawn),
         static_cast<void (LogicMagmamanSpawn::*)(MagmamanSpawnPosition)>(&LogicMagmamanSpawn::add_spawn));

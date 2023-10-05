@@ -27,6 +27,7 @@
 #include "script/lua_vm.hpp"                     // for get_lua_vm
 #include "script/usertypes/theme_vtable_lua.hpp" // for NThemeVTables
 #include "search.hpp"                            // for get_address
+#include "sound_manager.hpp"                     //
 #include "spawn_api.hpp"                         // for init_spawn_hooks
 #include "steam_api.hpp"                         // for init_achievement_hooks
 #include "strings.hpp"                           // for strings_init
@@ -913,7 +914,26 @@ Logic* LogicList::start_logic(LOGIC idx)
     Logic* new_logic = (Logic*)addr;
     new_logic->logic_index = idx;
 
-    // TODO: set up logic that is not possible to initialize thru the API
+    // set up logic that is not possible to initialize thru the API
+    if (idx == LOGIC::WATER_BUBBLES)
+    {
+        auto proper_type = (LogicUnderwaterBubbles*)new_logic;
+        proper_type->unknown1 = 1.0f;
+        proper_type->unknown2 = 1000;
+        proper_type->unknown3 = true;
+    }
+    else if (idx == LOGIC::OUROBOROS)
+    {
+        auto proper_type = (LogicOuroboros*)new_logic;
+        proper_type->sound = construct_soundmeta(0x51, false);
+        // proper_type->sound->start(); // it needs something more
+        // game stores the pointer in a special temp memory or something
+    }
+    else if (idx == LOGIC::PLEASURE_PALACE)
+    {
+        auto proper_type = (LogicTuskPleasurePalace*)new_logic;
+        proper_type->unknown4 = 1552; // magic?
+    }
 
     logic_indexed[(uint32_t)idx] = new_logic;
     return new_logic;
