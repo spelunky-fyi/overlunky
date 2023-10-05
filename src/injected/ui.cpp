@@ -3997,7 +3997,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     {
         for (unsigned int y = 0; y < g_state->h; ++y)
         {
-            auto room_temp = UI::get_room_template(x, y, g_state->camera_layer);
+            auto room_temp = UI::get_room_template(x, y, peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer);
             if (room_temp.has_value())
             {
                 auto room_name = UI::get_room_template_name(room_temp.value());
@@ -6778,7 +6778,7 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::InputFloat("Absolute X##EntityAbsoluteX", &entity->abs_x, 0.2f, 1.0f);
             ImGui::InputFloat("Absolute Y##EntityAbsoluteY", &entity->abs_y, 0.2f, 1.0f);
             ImGui::InputFloat("Velocity X##EntityVelocityX", &movable->velocityx, 0.2f, 1.0f);
-            ImGui::InputFloat("Velocity y##EntityVelocityY", &movable->velocityy, 0.2f, 1.0f);
+            ImGui::InputFloat("Velocity Y##EntityVelocityY", &movable->velocityy, 0.2f, 1.0f);
         }
         ImGui::InputFloat("Angle##EntityAngle", &entity->angle, 0.2f, 1.0f);
         if (is_movable)
