@@ -345,6 +345,9 @@ enum class CUSTOM_TYPE : uint32_t
     YETIQUEEN,
 };
 
+constexpr CUSTOM_TYPE custom_type_max = CUSTOM_TYPE::YETIQUEEN;
+
 std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type);
+CUSTOM_TYPE add_new_custom_type(std::vector<ENT_TYPE> types);
 bool is_type_movable(ENT_TYPE type);
 const std::vector<std::pair<CUSTOM_TYPE, std::string_view>>& get_custom_types_vector();

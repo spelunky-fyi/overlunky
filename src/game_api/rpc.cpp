@@ -2058,3 +2058,8 @@ void set_boss_door_control_enabled(bool enable)
     else
         recover_mem("set_boss_door_control_enabled");
 }
+
+ENT_TYPE add_custom_type(std::vector<ENT_TYPE> types)
+{
+    return (ENT_TYPE)add_new_custom_type(std::move(types));
+}

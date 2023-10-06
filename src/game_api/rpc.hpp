@@ -143,3 +143,4 @@ void activate_tiamat_position_hack(bool activate);
 void activate_crush_elevator_hack(bool activate);
 void activate_hundun_hack(bool activate);
 void set_boss_door_control_enabled(bool enable);
+ENT_TYPE add_custom_type(std::vector<ENT_TYPE> types);

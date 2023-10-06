@@ -2039,6 +2039,9 @@ end
     /// This will also prevent game crashing when there is no exit door when they are in level
     lua["set_boss_door_control_enabled"] = set_boss_door_control_enabled;
 
+    /// Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+    lua["add_custom_type"] = add_custom_type;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
