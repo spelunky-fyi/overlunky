@@ -347,4 +347,4 @@ enum class CUSTOM_TYPE : uint32_t
 
 std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type);
 bool is_type_movable(ENT_TYPE type);
-const std::map<CUSTOM_TYPE, std::string_view>& get_custom_types_map();
+const std::vector<std::pair<CUSTOM_TYPE, std::string_view>>& get_custom_types_vector();

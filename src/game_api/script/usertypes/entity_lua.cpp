@@ -355,9 +355,9 @@ void register_usertypes(sol::state& lua)
         auto name = item.name.substr(9, item.name.size());
         lua["ENT_TYPE"][name] = item.id;
     }
-    for (auto& elm : get_custom_types_map())
+    for (auto& elm : get_custom_types_vector())
     {
-        lua["ENT_TYPE"][elm.second] = elm.first;
+        lua["ENT_TYPE"][elm.second] = (uint32_t)elm.first;
     }
 
     lua.create_named_table("REPEAT_TYPE", "NO_REPEAT", REPEAT_TYPE::NoRepeat, "LINEAR", REPEAT_TYPE::Linear, "BACK_AND_FORTH", REPEAT_TYPE::BackAndForth);

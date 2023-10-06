@@ -9,7 +9,7 @@
 
 #include "entity.hpp" // for to_id
 
-const std::map<CUSTOM_TYPE, std::string_view> custom_type_names = {
+const std::vector<std::pair<CUSTOM_TYPE, std::string_view>> custom_type_names = {
     {CUSTOM_TYPE::ACIDBUBBLE, "ACIDBUBBLE"},
     {CUSTOM_TYPE::ALIEN, "ALIEN"},
     {CUSTOM_TYPE::ALTAR, "ALTAR"},
@@ -1574,7 +1574,7 @@ bool is_type_movable(ENT_TYPE type)
     return false;
 }
 
-const std::map<CUSTOM_TYPE, std::string_view>& get_custom_types_map()
+const std::vector<std::pair<CUSTOM_TYPE, std::string_view>>& get_custom_types_vector()
 {
     return custom_type_names;
 }
