@@ -4192,7 +4192,7 @@ void render_path()
     draw_list->PathStroke(color, 0, thick);
 }
 
-void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
+void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, bool rounded = false)
 {
     const auto type = ent->type->id;
     if (!type)
@@ -4208,8 +4208,8 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         UI::screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
     ImVec2 sorigin = screenify({originx, originy});
     ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
-    ImVec2 sboxa = screenify({boxa_x, boxa_y});
-    ImVec2 sboxb = screenify({boxb_x, boxb_y});
+    ImVec2 sboxa = screenify({boxa_x, boxb_y});
+    ImVec2 sboxb = screenify({boxb_x, boxa_y});
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
@@ -4235,9 +4235,9 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         else
             draw_list->AddCircle(fix_pos(spos), sboxb.x - spos.x, color, 0, 2.0f);
     else if (filled)
-        draw_list->AddRectFilled(fix_pos(sboxa), fix_pos(sboxb), color);
+        draw_list->AddRectFilled(fix_pos(sboxa), fix_pos(sboxb), color, rounded ? 5.0f : 0.0f);
     else
-        draw_list->AddRect(fix_pos(sboxa), fix_pos(sboxb), color, 0.0f, 0, 2.0f);
+        draw_list->AddRect(fix_pos(sboxa), fix_pos(sboxb), color, rounded ? 5.0f : 0.0f, 0, 2.0f);
 
     if ((g_hitbox_mask & 0x8000) == 0)
         return;
@@ -4513,7 +4513,7 @@ void render_clickhandler()
     if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)g_state->camera_layer))
+        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer)))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -4563,15 +4563,20 @@ void render_clickhandler()
                 to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
                 to_id("ENT_TYPE_FLOOR_SPIKES"),
             };
-            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, LAYER::PLAYER)) // FLOOR | ACTIVEFLOOR
+            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // FLOOR | ACTIVEFLOOR
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(0, 255, 255, 150));
             }
-            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, LAYER::PLAYER)) // LOGICAL
+            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // LOGICAL
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 0, 0, 150));
+            }
+            for (auto entity : UI::get_entities_by({to_id("ENT_TYPE_LOGICAL_DOOR")}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // DOOR
+            {
+                auto ent = get_entity_ptr(entity);
+                render_hitbox(ent, false, ImColor(255, 180, 45, 150), false, true);
             }
 
             // OOB kill bounds
